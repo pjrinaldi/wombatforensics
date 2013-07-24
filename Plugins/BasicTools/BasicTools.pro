@@ -4,13 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += core sql
+QT       += core
 
 TARGET = BasicTools
 TEMPLATE = lib
-CONFIG += plugin
+CONFIG += plugin static
 
-DESTDIR = $$[QT_INSTALL_PLUGINS]/sqldrivers
+DESTDIR = $$[QT_INSTALL_PLUGINS]/
 
 SOURCES += basictools.cpp
 
@@ -25,3 +25,17 @@ unix:!symbian {
     }
     INSTALLS += target
 }
+
+#TEMPLATE      = lib
+#CONFIG       += plugin static
+#QT           += widgets
+#INCLUDEPATH  += ../..
+#HEADERS       = basictoolsplugin.h
+#SOURCES       = basictoolsplugin.cpp
+#TARGET        = $$qtLibraryTarget(pnp_basictools)
+#DESTDIR       = ../../plugandpaint/plugins
+
+# install
+#target.path = $$[QT_INSTALL_EXAMPLES]/widgets/tools/plugandpaint/plugins
+#INSTALLS += target
+
