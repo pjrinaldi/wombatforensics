@@ -4,9 +4,14 @@ QStringList BasicTools::evidenceActions() const
 {
     return QStringList() << tr("Add Evidence") << tr("Remove Evidence");
 }
-void BasicTools::alterEvidence()
+void BasicTools::addEvidence()
 {
     // add evidence here
+}
+
+void BasicTools::remEvidence()
+{
+    // remove evidence here
 }
 
 /*

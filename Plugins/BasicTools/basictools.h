@@ -15,7 +15,8 @@ class BasicTools : public QObject, public EvidenceInterface
 public:
     //Evidence Interface
     QStringList evidenceActions() const;
-    void alterEvidence();
+    void addEvidence();
+    void remEvidence();
 
     //BasicTools(QObject *parent = 0);
 };

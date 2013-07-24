@@ -10,6 +10,7 @@ WombatForensics::WombatForensics(QWidget *parent) :
 {
     //std::auto_ptr<TskImgDB> pImgDB;
     ui->setupUi(this);
+    loadPlugins();
 }
 
 void WombatForensics::loadPlugins()
@@ -48,7 +49,10 @@ void WombatForensics::populateMenus(QObject *plugin)
 {
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
     if (iEvidence)
+    {
         addToMenu(plugin, iEvidence->evidenceActions(), ui->menuEvidence, SLOT(alterEvidence()));
+        // add items to the toolbar as well
+    }
     /*
         BrushInterface *iBrush = qobject_cast<BrushInterface *>(plugin);
         if (iBrush)
@@ -85,7 +89,10 @@ void WombatForensics::alterEvidence()
 {
     QAction *action = qobject_cast<QAction *>(sender());
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
-    // do something here with iEvidence
+    if(action->text() == tr("Add Evidence"))
+        iEvidence->addEvidence();
+    else if(action->text() == tr("Remove Evidence"))
+        iEvidence->remEvidence();
     /*
     FilterInterface *iFilter =
             qobject_cast<FilterInterface *>(action->parent());
