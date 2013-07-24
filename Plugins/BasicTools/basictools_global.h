@@ -1,0 +1,12 @@
+#ifndef BASICTOOLS_GLOBAL_H
+#define BASICTOOLS_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(BASICTOOLS_LIBRARY)
+#  define BASICTOOLSSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define BASICTOOLSSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // BASICTOOLS_GLOBAL_H
