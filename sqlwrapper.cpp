@@ -1,26 +1,22 @@
 #include "sqlwrapper.h"
 
-SqlWrapper::SqlWrapper()
-{
-}
-/*
-SqlObject::SqlObject(sqlite3_stmt* sqlStatement, const char* errorNumber, sqlite3* openDB)
+SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, sqlite3* openDB)
 {
         sqldb = openDB;
         sqlstatement = sqlStatement;
         errornumber = errorNumber;
 }
-SqlObject::SqlObject(sqlite3_stmt* sqlStatement, const char* errorNumber)
+SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber)
 {
         sqldb = NULL;
         sqlstatement = sqlStatement;
         errornumber = errorNumber;
         char* sqlErrMsg;
         int     sqlValue;
-        BString tmpString;
+        QString tmpString;
         sqlErrMsg = 0;
-        BString tmpPath = GetAppDirPath(); // for testing purposes, use local one.
-        //BString tmpPath = GetUserDirPath(); // for publish purposes, use real location
+        QString tmpPath = GetAppDirPath(); // for testing purposes, use local one.
+        //QString tmpPath = GetUserDirPath(); // for publish purposes, use real location
         if(tmpPath != "-15")
         {
                 tmpPath += "/MasterPiece.db";
