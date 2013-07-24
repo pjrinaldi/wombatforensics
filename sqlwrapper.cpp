@@ -15,19 +15,20 @@ SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber)
         int     sqlValue;
         QString tmpString;
         sqlErrMsg = 0;
-        QString tmpPath = GetAppDirPath(); // for testing purposes, use local one.
+        QString tmpPath = "./";
+        //QString tmpPath = GetAppDirPath(); // for testing purposes, use local one.
         //QString tmpPath = GetUserDirPath(); // for publish purposes, use real location
         if(tmpPath != "-15")
         {
-                tmpPath += "/MasterPiece.db";
-                sqlValue = sqlite3_open_v2(tmpPath, &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
+                tmpPath += "WombatData.db";
+                sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
                 if(sqlite3_errcode(sqldb) == 14) // if error is SQLITE_CANTOPEN, then create db with structure
                 {
-                        sqlValue = sqlite3_open_v2(tmpPath, &sqldb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+                        sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
                         if(sqlite3_errcode(sqldb) == 0) // sqlite_ok
                         {
                                 tmpString = "CREATE TABLE ideatable(ideaid integer primary key autoincrement, ideaname text, ideatext text, ismp integer, mpid integer, ordernumber integer);";
-                                sqlValue = sqlite3_exec(sqldb, tmpString, NULL, NULL, &sqlErrMsg);
+                                sqlValue = sqlite3_exec(sqldb, tmpString.toStdString().c_str(), NULL, NULL, &sqlErrMsg);
                                 if(sqlValue != SQLITE_OK) // if sql was not successful
                                 {
                                         DisplayError("1.1", "OPEN", sqlErrMsg);
@@ -53,10 +54,10 @@ SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber)
                 DisplayError("1.0", "PATH", " to the User Directory not Found");
         }
 }
-SqlObject::~SqlObject(void)
+SqlWrapper::~SqlWrapper(void)
 {
 }
-void SqlObject::PrepareSql(const char* sqlQuery)
+void SqlWrapper::PrepareSql(const char* sqlQuery)
 {
         sqlquery = sqlQuery;
         if(sqlite3_prepare_v2(sqldb, sqlquery, -1, &sqlstatement, NULL) != SQLITE_OK) // sql statement was not prepared
@@ -64,7 +65,7 @@ void SqlObject::PrepareSql(const char* sqlQuery)
                 DisplayError(errornumber, "PREPARE", sqlite3_errmsg(sqldb));
         }
 }
-void SqlObject::BindValue(int bindPlace, int bindValue)
+void SqlWrapper::BindValue(int bindPlace, int bindValue)
 {
         bindplace = bindPlace;
         bindint = bindValue;
@@ -73,7 +74,7 @@ void SqlObject::BindValue(int bindPlace, int bindValue)
                 DisplayError(errornumber, "BIND INT", "MISUSE");
         }
 }
-void SqlObject::BindValue(int bindPlace, double bindValue)
+void SqlWrapper::BindValue(int bindPlace, double bindValue)
 {
         bindplace = bindPlace;
         binddouble = bindValue;
@@ -82,7 +83,7 @@ void SqlObject::BindValue(int bindPlace, double bindValue)
                 DisplayError(errornumber, "BIND DOUBLE", "MISUSE");
         }
 }
-void SqlObject::BindValue(int bindPlace, int64 bindValue)
+void SqlWrapper::BindValue(int bindPlace, sqlite3_int64 bindValue)
 {
         bindplace = bindPlace;
         bindint64 = bindValue;
@@ -91,7 +92,7 @@ void SqlObject::BindValue(int bindPlace, int64 bindValue)
                 DisplayError(errornumber, "BIND INT64", "MISUSE");
         }
 }
-void SqlObject::BindValue(int bindPlace, const char* bindValue)
+void SqlWrapper::BindValue(int bindPlace, const char* bindValue)
 {
         bindplace = bindPlace;
         bindstring = bindValue;
@@ -100,7 +101,7 @@ void SqlObject::BindValue(int bindPlace, const char* bindValue)
                 DisplayError(errornumber, "BIND TEXT", "MISUSE");
         }
 }
-void SqlObject::BindValue(int bindPlace) // bind null
+void SqlWrapper::BindValue(int bindPlace) // bind null
 {
         bindplace = bindPlace;
         if(sqlite3_bind_null(sqlstatement, bindplace) != SQLITE_OK)
@@ -108,7 +109,7 @@ void SqlObject::BindValue(int bindPlace) // bind null
                 DisplayError(errornumber, "BIND NULL", "MISUSE");
         }
 }
-void SqlObject::BindValue(int bindPlace, const void* bindValue)
+void SqlWrapper::BindValue(int bindPlace, const void* bindValue)
 {
         bindplace = bindPlace;
         bindblob = bindValue;
@@ -117,36 +118,37 @@ void SqlObject::BindValue(int bindPlace, const void* bindValue)
                 DisplayError(errornumber, "BIND BLOB", "MISUSE");
         }
 }
-int SqlObject::ReturnInt(int returnPlace)
+int SqlWrapper::ReturnInt(int returnPlace)
 {
         returnplace = returnPlace;
         return sqlite3_column_int(sqlstatement, returnplace);
 }
-double SqlObject::ReturnDouble(int returnPlace)
+double SqlWrapper::ReturnDouble(int returnPlace)
 {
         returnplace = returnPlace;
         return sqlite3_column_double(sqlstatement, returnplace);
 }
-int64 SqlObject::ReturnInt64(int returnPlace)
+sqlite3_int64 SqlWrapper::ReturnInt64(int returnPlace)
 {
         returnplace = returnPlace;
         return sqlite3_column_int64(sqlstatement, returnplace);
 }
-const char* SqlObject::ReturnText(int returnPlace)
+const char* SqlWrapper::ReturnText(int returnPlace)
 {
         returnplace = returnPlace;
         return sqlite3_mprintf("%s", sqlite3_column_text(sqlstatement, returnplace));
 }
-const void* SqlObject::ReturnBlob(int returnPlace)
+const void* SqlWrapper::ReturnBlob(int returnPlace)
 {
         returnplace = returnPlace;
         return sqlite3_column_blob(sqlstatement, returnplace);
 }
-int64 SqlObject::ReturnLastInsertRowID(void)
+
+sqlite3_int64 SqlWrapper::ReturnLastInsertRowID(void)
 {
         return sqlite3_last_insert_rowid(sqldb);
 }
-int SqlObject::StepSql(void)
+int SqlWrapper::StepSql(void)
 {
         sqlcode = sqlite3_step(sqlstatement);
         if(sqlcode != SQLITE_ROW && sqlcode != SQLITE_DONE)
@@ -158,28 +160,28 @@ int SqlObject::StepSql(void)
         }
         return sqlcode;
 }
-void SqlObject::ClearBindings(void)
+void SqlWrapper::ClearBindings(void)
 {
         if(sqlite3_clear_bindings(sqlstatement) != SQLITE_OK)
         {
                 DisplayError(errornumber, "CLEAR", "ERROR");
         }
 }
-void SqlObject::ResetSql(void)
+void SqlWrapper::ResetSql(void)
 {
         if(sqlite3_reset(sqlstatement) != SQLITE_OK)
         {
                 DisplayError(errornumber, "RESET", "ERROR");
         }
 }
-void SqlObject::FinalizeSql(void)
+void SqlWrapper::FinalizeSql(void)
 {
         if(sqlite3_finalize(sqlstatement) != SQLITE_OK)
         {
                 DisplayError(errornumber, "FINALIZE", "ERROR");
         }
 }
-void SqlObject::CloseSql(void)
+void SqlWrapper::CloseSql(void)
 {
         sqlcode = sqlite3_close(sqldb);
         if(sqlcode != SQLITE_OK)
@@ -189,22 +191,23 @@ void SqlObject::CloseSql(void)
                 else DisplayError(errornumber, "CLOSE", "OTHER");
         }
 }
-sqlite3* SqlObject::ReturnSqlDB(void)
+sqlite3* SqlWrapper::ReturnSqlDB(void)
 {
         return sqldb;
 }
-/*
-void DisplayError(const char* errorNumber, const char* errorType, const char* errorValue)
+void SqlWrapper::DisplayError(const char* errorNumber, const char* errorType, const char* errorValue)
 {
-        BString tmpString = errorNumber;
-        ErrorAlert* ealert;
+        QString tmpString = errorNumber;
+        //ErrorAlert* ealert;
         tmpString += ". SqlError: ";
         tmpString += errorType;
         tmpString += " Returned ";
         tmpString += errorValue;
-        ealert = new ErrorAlert(tmpString);
-        ealert->Launch();
+        fprintf(stderr, tmpString.toStdString().c_str());
+        //ealert = new ErrorAlert(tmpString);
+        //ealert->Launch();
 }
+/*
 BString GetAppDirPath(void)
 {
         app_info info;

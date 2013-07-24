@@ -4,6 +4,12 @@ QStringList BasicTools::evidenceActions() const
 {
     return QStringList() << tr("Add Evidence") << tr("Remove Evidence");
 }
+
+QStringList BasicTools::toolboxViews() const
+{
+    return QStringList() << tr("Directory Listing") << tr("File Signature Category");
+}
+
 void BasicTools::addEvidence()
 {
     // add evidence here
@@ -12,6 +18,12 @@ void BasicTools::addEvidence()
 void BasicTools::remEvidence()
 {
     // remove evidence here
+}
+QWidget* BasicTools::setupToolBox() const
+{
+    QTreeView* directoryTreeView = new QTreeView();
+
+    return directoryTreeView;
 }
 
 /*

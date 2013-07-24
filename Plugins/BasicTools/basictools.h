@@ -3,6 +3,7 @@
 
 #include <interfaces.h>
 #include <QStringList>
+#include <QtWidgets>
 
 class BasicTools : public QObject, public EvidenceInterface
 {
@@ -15,10 +16,13 @@ class BasicTools : public QObject, public EvidenceInterface
 public:
     //Evidence Interface
     QStringList evidenceActions() const;
+    QStringList toolboxViews() const;
+    QWidget* setupToolBox() const;
+
     void addEvidence();
     void remEvidence();
 
-    //BasicTools(QObject *parent = 0);
+//    BasicTools(QObject *parent = 0);
 };
 
 #endif // BASICTOOLS_H

@@ -16,7 +16,10 @@ WombatForensics::WombatForensics(QWidget *parent) :
 void WombatForensics::loadPlugins()
 {
     foreach (QObject *plugin, QPluginLoader::staticInstances())
+    {
         populateMenus(plugin);
+        populateToolBox(plugin);
+    }
 
     pluginsDir = QDir(qApp->applicationDirPath());
 
@@ -34,6 +37,7 @@ void WombatForensics::loadPlugins()
         {
             populateMenus(plugin);
             pluginFileNames += fileName;
+            populateToolBox(plugin);
         }
     }
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
@@ -67,6 +71,15 @@ void WombatForensics::populateMenus(QObject *plugin)
         if (iFilter)
             addToMenu(plugin, iFilter->filters(), filterMenu, SLOT(applyFilter()));
      */
+}
+
+void WombatForensics::populateToolBox(QObject *plugin)
+{
+    EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
+    if (iEvidence)
+    {
+        ui->toolBox->addItem(iEvidence->setupToolBox(), iEvidence->toolboxViews()[0]);
+    }
 }
 
 void WombatForensics::addToMenu(QObject *plugin, const QStringList &texts, QMenu *menu, const char *member, QActionGroup *actionGroup)
@@ -110,6 +123,7 @@ WombatForensics::~WombatForensics()
 
 void WombatForensics::on_actionAdd_Evidence_triggered()
 {
+    /*
     QString evidenceFile = QFileDialog::getOpenFileName(this, "Select Evidence Item", "./");
     ui->testLabel->setText(evidenceFile);
 
@@ -305,6 +319,7 @@ void WombatForensics::on_actionAdd_Evidence_triggered()
     // attrTypeVector = pImgDB->findAttributeTypes(62); // return unique artif
 
     // END FILE TYPE SIGNATURE TREE CREATION
+    */
 }
 void WombatForensics::on_actionNew_Case_triggered()
 {

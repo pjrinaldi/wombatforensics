@@ -3,6 +3,7 @@
 
 #include <sqlite3.h>
 #include <QString>
+#include <QDir>
 
 class SqlWrapper
 {
@@ -14,22 +15,23 @@ public:
     void PrepareSql(const char* sqlQuery);
     void BindValue(int bindPlace, int bindValue);
     void BindValue(int bindPlace, double bindValue);
-    void BindValue(int bindPlace, int64 bindValue);
+    void BindValue(int bindPlace, sqlite3_int64 bindValue);
     void BindValue(int bindPlace, const char* bindValue);
     void BindValue(int bindPlace, const void* bindValue);// blob bind
     void BindValue(int bindPlace);
     int ReturnInt(int returnPlace);
     double ReturnDouble(int returnPlace);
-    int64 ReturnInt64(int returnPlace);
+    sqlite3_int64 ReturnInt64(int returnPlace);
     const char* ReturnText(int returnPlace);
     const void* ReturnBlob(int returnPlace);
     int StepSql(void);
     void ClearBindings(void);
-    int64 ReturnLastInsertRowID(void);
+    sqlite3_int64 ReturnLastInsertRowID(void);
     void ResetSql(void);
     void FinalizeSql(void);
     void CloseSql(void);
     sqlite3* ReturnSqlDB(void);
+    void DisplayError(const char* errorNumber, const char* errorType, const char* errorValue);
 
 private:
     sqlite3* sqldb;
@@ -48,8 +50,8 @@ private:
     int returnint;
     double binddouble;
     double returndouble;
-    int64 bindint64;
-    int64 returnint64;
+    sqlite3_int64 bindint64;
+    sqlite3_int64 returnint64;
     QString tmpstring;
 
 };

@@ -69,6 +69,9 @@ private:
 
     void loadPlugins();
     void populateMenus(QObject *plugin);
+    void populateToolBox(QObject *plugin);
+    void populateToolBar(QObject *plugin);
+
     void addToMenu(QObject *plugin, const QStringList &texts, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
 
     void makeDir(const char *dir);
