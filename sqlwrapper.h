@@ -55,3 +55,19 @@ private:
 };
 
 #endif // SQLWRAPPER_H
+
+/*
+void                    DisplayError(const char* errorNumber, const char* errorType, const char* errorValue);
+BString                 GetAppDirPath(void);
+BString                 GetUserDirPath(void);
+
+class ErrorAlert
+{
+public:
+                                ErrorAlert(BString tmpText);
+                                ErrorAlert(BString tmpText1, BString tmpText2);
+                                ~ErrorAlert(void);
+                int     Launch(void);
+                BAlert* tmpAlert;
+};
+ */

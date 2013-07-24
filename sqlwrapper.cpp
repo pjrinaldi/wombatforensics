@@ -193,4 +193,55 @@ sqlite3* SqlObject::ReturnSqlDB(void)
 {
         return sqldb;
 }
+/*
+void DisplayError(const char* errorNumber, const char* errorType, const char* errorValue)
+{
+        BString tmpString = errorNumber;
+        ErrorAlert* ealert;
+        tmpString += ". SqlError: ";
+        tmpString += errorType;
+        tmpString += " Returned ";
+        tmpString += errorValue;
+        ealert = new ErrorAlert(tmpString);
+        ealert->Launch();
+}
+BString GetAppDirPath(void)
+{
+        app_info info;
+        be_app->GetAppInfo(&info);
+        BPath path(&info.ref);
+        path.GetParent(&path);
+        return path.Path();
+}
+BString GetUserDirPath(void)
+{
+        BPath tmpUserPath;
+        status_t result = find_directory(B_USER_DIRECTORY, &tmpUserPath);
+        if(result == B_OK) return tmpUserPath.Path();
+        else return "-15";
+}
+ErrorAlert::ErrorAlert(BString tmpText)
+{
+        tmpAlert = new BAlert("Error:", tmpText, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+        tmpAlert->MoveTo(350, 250);
+        tmpAlert->SetShortcut(0, B_ESCAPE);
+}
+
+ErrorAlert::ErrorAlert(BString tmpText1, BString tmpText2)
+{
+        BString tmpString = tmpText1;
+        tmpString += tmpText2;
+        tmpAlert = new BAlert("Error:", tmpString, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+        tmpAlert->MoveTo(350, 250);
+        tmpAlert->SetShortcut(0, B_ESCAPE);
+}
+
+ErrorAlert::~ErrorAlert(void)
+{
+}
+
+int ErrorAlert::Launch(void)
+{
+        return tmpAlert->Go(NULL);
+}
  */
