@@ -297,7 +297,13 @@
      <string>File</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuEvidence">
+    <property name="title">
+     <string>Evidence</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEvidence"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="movable">

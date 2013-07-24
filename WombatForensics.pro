@@ -14,11 +14,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         wombatforensics.cpp \
-    tskfunctions.cpp
+    tskfunctions.cpp \
+    sqlwrapper.cpp
 
 HEADERS  += wombatforensics.h \
             interfaces.h \
-    tskfunctions.h
+    tskfunctions.h \
+    sqlwrapper.h
 #            /usr/local/include/tsk/framework/services/TskImgDBSqlite.h \
 #            /usr/local/include/tsk/framework/services/TskImgDB.h
 
