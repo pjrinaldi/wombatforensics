@@ -1,14 +1,23 @@
 #include "basictools.h"
 
+QStringList BasicTools::evidenceActions() const
+{
+    return QStringList() << tr("Add Evidence") << tr("Remove Evidence");
+}
+void BasicTools::alterEvidence()
+{
+    // add evidence here
+}
 
+/*
 BasicTools::BasicTools(QObject *parent)
 {
 }
-
+/*
 #if QT_VERSION < 0x050000
 Q_EXPORT_PLUGIN2(BasicTools, BasicTools)
 #endif // QT_VERSION < 0x050000
-
+*/
 /*
 #include <QtWidgets>
 
@@ -77,9 +86,9 @@ QRect BasicToolsPlugin::mouseMove(const QString &brush, QPainter &painter,
     return boundingRect;
 }
 
-QRect BasicToolsPlugin::mouseRelease(const QString & /* brush */,
-                                     QPainter & /* painter */,
-                                     const QPoint & /* pos */)/*
+QRect BasicToolsPlugin::mouseRelease(const QString & /* brush *//*,
+                                     QPainter & /* painter *//*,
+                                     const QPoint & /* pos *//*)/*
 {
     return QRect(0, 0, 0, 0);
 }
@@ -124,7 +133,7 @@ QStringList BasicToolsPlugin::filters() const
 }
 
 QImage BasicToolsPlugin::filterImage(const QString &filter, const QImage &image,
-                                     QWidget * /* parent */) /*
+                                     QWidget * /* parent *//*) /*
 {
     QImage result = image.convertToFormat(QImage::Format_RGB32);
 

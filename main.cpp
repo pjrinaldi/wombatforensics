@@ -2,7 +2,7 @@
 #include <QtPlugin>
 #include <QApplication>
 
-//Q_IMPORT_PLUGIN(BasicToolsPlugin)
+Q_IMPORT_PLUGIN(BasicTools)
 
 int main(int argc, char *argv[])
 {

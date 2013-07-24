@@ -1,17 +1,23 @@
 #ifndef BASICTOOLS_H
 #define BASICTOOLS_H
 
-#include ""
+#include <interfaces.h>
+#include <QStringList>
 
-class BasicTools :
+class BasicTools : public QObject, public EvidenceInterface
 {
     Q_OBJECT
 #if QT_VERSION >= 0x050000
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QSqlDriverFactoryInterface" FILE "BasicTools.json")
+    Q_PLUGIN_METADATA(IID "wombat.forensics.EvidenceInterface" FILE "BasicTools.json")
 #endif // QT_VERSION >= 0x050000
+    Q_INTERFACES(EvidenceInterface)
     
 public:
-    BasicTools(QObject *parent = 0);
+    //Evidence Interface
+    QStringList evidenceActions() const;
+    void alterEvidence();
+
+    //BasicTools(QObject *parent = 0);
 };
 
 #endif // BASICTOOLS_H

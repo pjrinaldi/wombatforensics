@@ -18,6 +18,7 @@
 #include <time.h>
 #include <memory>
 
+#include "interfaces.h"
 #include "/usr/local/include/tsk/tsk_tools_i.h"
 #include "tsk/framework/framework.h"
 #include "tsk/framework/services/TskSchedulerQueue.h"
@@ -57,12 +58,10 @@ public:
     ~WombatForensics();
     
 private slots:
+    void alterEvidence();
     void on_actionAdd_Evidence_triggered();
-
     void on_actionNew_Case_triggered();
-
     void on_actionOpen_Case_triggered();
-
     void on_toolBox_currentChanged(int index);
 
 private:

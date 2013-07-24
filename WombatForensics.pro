@@ -10,7 +10,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = WombatForensics
 TEMPLATE = app
-
+#DESTDIR = ./build
+#target.path = ./build
 
 SOURCES += main.cpp\
         wombatforensics.cpp \
@@ -24,7 +25,7 @@ HEADERS  += wombatforensics.h \
 #            /usr/local/include/tsk/framework/services/TskImgDBSqlite.h \
 #            /usr/local/include/tsk/framework/services/TskImgDB.h
 
-LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins
+LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins -lbasictools
 
 FORMS    += wombatforensics.ui \
     NewCaseDialog.ui

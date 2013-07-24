@@ -71,7 +71,7 @@ public:
 
     virtual QStringList evidenceActions() const = 0;
 
-    virtual addEvidence() = 0;
+    virtual void alterEvidence() = 0;
 
 };
 
