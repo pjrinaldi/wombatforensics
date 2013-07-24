@@ -1,33 +1,27 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2013-07-10T13:22:22
+# Project created by QtCreator 2013-07-24T07:05:44
 #
 #-------------------------------------------------
 
-QT       += widgets
+QT       += core sql
 
-# TARGET = Basic
-TARGET = $$qtLibraryTarget(pnp_basictools)
-DESTDIR = ../../plugins
-CONFIG += plugin static
+TARGET = BasicTools
 TEMPLATE = lib
-INCLUDEPATH += ../..
-# DEFINES += BASICTOOLS_LIBRARY
+CONFIG += plugin
 
-SOURCES = basictoolsplugin.cpp
-HEADERS = basictoolsplugin.h
-# HEADERS += basictoolsplugin.h\
-#         basictools_global.h
+DESTDIR = $$[QT_INSTALL_PLUGINS]/sqldrivers
 
-# install
+SOURCES += basictools.cpp
 
-# unix:!symbian {
-#    maemo5 {
-#        target.path = /opt/usr/lib
-#    } else {
-#        target.path = /usr/lib
-#    }
-#    INSTALLS += target
-#}
-target.path = ../../plugins
-INSTALLS += target
+HEADERS += basictools.h
+OTHER_FILES += BasicTools.json
+
+unix:!symbian {
+    maemo5 {
+        target.path = /opt/usr/lib
+    } else {
+        target.path = /usr/lib
+    }
+    INSTALLS += target
+}

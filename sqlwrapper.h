@@ -1,6 +1,7 @@
 #ifndef SQLWRAPPER_H
 #define SQLWRAPPER_H
 
+
 class SqlWrapper
 {
 public:

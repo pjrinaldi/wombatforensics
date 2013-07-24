@@ -24,7 +24,7 @@ HEADERS  += wombatforensics.h \
 #            /usr/local/include/tsk/framework/services/TskImgDBSqlite.h \
 #            /usr/local/include/tsk/framework/services/TskImgDB.h
 
-LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk
+LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins
 
 FORMS    += wombatforensics.ui \
     NewCaseDialog.ui

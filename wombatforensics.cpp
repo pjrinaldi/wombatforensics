@@ -2,6 +2,8 @@
 #include "ui_wombatforensics.h"
 #include <QPluginLoader>
 
+// static plugins are always available, dynamic are not.
+
 WombatForensics::WombatForensics(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::WombatForensics)
@@ -33,6 +35,7 @@ void WombatForensics::loadPlugins()
             pluginFileNames += fileName;
         }
     }
+    ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
     // enable menu's here
     /*
         brushMenu->setEnabled(!brushActionGroup->actions().isEmpty());
@@ -43,6 +46,9 @@ void WombatForensics::loadPlugins()
 
 void WombatForensics::populateMenus(QObject *plugin)
 {
+    EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
+    if (iEvidence)
+        addToMenu(plugin, iEvidence->evidenceActions(), ui->menuEvidence, SLOT(alterEvidence()));
     /*
         BrushInterface *iBrush = qobject_cast<BrushInterface *>(plugin);
         if (iBrush)
@@ -73,6 +79,21 @@ void WombatForensics::addToMenu(QObject *plugin, const QStringList &texts, QMenu
             actionGroup->addAction(action);
         }
     }
+}
+
+void WombatForensics::alterEvidence()
+{
+    QAction *action = qobject_cast<QAction *>(sender());
+    EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
+    // do something here with iEvidence
+    /*
+    FilterInterface *iFilter =
+            qobject_cast<FilterInterface *>(action->parent());
+
+    const QImage image = iFilter->filterImage(action->text(), paintArea->image(),
+                                              this);
+    paintArea->setImage(image);
+     */
 }
 
 WombatForensics::~WombatForensics()

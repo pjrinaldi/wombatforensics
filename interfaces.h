@@ -43,6 +43,7 @@
 
 #include <QtPlugin>
 
+/*
 class QImage;
 class QPainter;
 class QWidget;
@@ -51,6 +52,8 @@ class QPoint;
 class QRect;
 class QString;
 class QStringList;
+*/
+
 /*
  *
  *
@@ -61,6 +64,24 @@ class QStringList;
  *
  *
  */
+class EvidenceInterface
+{
+public:
+    virtual ~EvidenceInterface() {}
+
+    virtual QStringList evidenceActions() const = 0;
+
+    virtual addEvidence() = 0;
+
+};
+
+#endif
+
+#define EvidenceInterface_iid "wombat.forensics.EvidenceInterface"
+
+Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
+
+/*
 class BrushInterface
 {
 public:
@@ -105,5 +126,4 @@ Q_DECLARE_INTERFACE(ShapeInterface, ShapeInterface_iid)
 #define FilterInterface_iid "org.qt-project.Qt.Examples.PlugAndPaint.FilterInterface"
 
 Q_DECLARE_INTERFACE(FilterInterface, FilterInterface_iid)
-
-#endif
+*/
