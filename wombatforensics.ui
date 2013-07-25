@@ -144,7 +144,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QColumnView" name="columnView">
+         <widget class="QColumnView" name="fileColumnView">
           <property name="minimumSize">
            <size>
             <width>450</width>

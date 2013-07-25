@@ -22,9 +22,8 @@ HEADERS  += wombatforensics.h \
             interfaces.h \
     tskfunctions.h \
     sqlwrapper.h
-#            /usr/local/include/tsk/framework/services/TskImgDBSqlite.h \
-#            /usr/local/include/tsk/framework/services/TskImgDB.h
 
+# LIBS    =   -Wl,-Bstatic -ltskframework -lewf -ltsk -lsqlite3 -Lplugins -lbasictools
 LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins -lbasictools
 
 FORMS    += wombatforensics.ui \

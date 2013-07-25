@@ -4,12 +4,14 @@
 #include <sqlite3.h>
 #include <QString>
 #include <QDir>
+#include <QCoreApplication>
 
 class SqlWrapper
 {
 public:
     SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber);
-    SqlWrapper(sqlite3_stmt *sqlStatement, const char* errorNumber, sqlite3* openDB);
+    //SqlWrapper(sqlite3_stmt *sqlStatement, const char* errorNumber, sqlite3* openDB);
+    SqlWrapper(sqlite3* openDB);
     ~SqlWrapper();
 
     void PrepareSql(const char* sqlQuery);
@@ -41,7 +43,6 @@ private:
     const char* returnstring;
     const void* bindblob;
     const void* returnblob;
-    //ErrorAlert* ealert;
     sqlite3_stmt* sqlstatement;
     int sqlcode;
     int bindplace;
@@ -53,23 +54,8 @@ private:
     sqlite3_int64 bindint64;
     sqlite3_int64 returnint64;
     QString tmpstring;
+    QDir appDir;
 
 };
 
 #endif // SQLWRAPPER_H
-
-/*
-void                    DisplayError(const char* errorNumber, const char* errorType, const char* errorValue);
-BString                 GetAppDirPath(void);
-BString                 GetUserDirPath(void);
-
-class ErrorAlert
-{
-public:
-                                ErrorAlert(BString tmpText);
-                                ErrorAlert(BString tmpText1, BString tmpText2);
-                                ~ErrorAlert(void);
-                int     Launch(void);
-                BAlert* tmpAlert;
-};
- */

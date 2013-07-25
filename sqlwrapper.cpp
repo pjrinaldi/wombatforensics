@@ -1,11 +1,46 @@
 #include "sqlwrapper.h"
-
+/*
 SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, sqlite3* openDB)
 {
         sqldb = openDB;
         sqlstatement = sqlStatement;
         errornumber = errorNumber;
 }
+*/
+SqlWrapper::SqlWrapper(QString dbName)
+{
+    sqldb = NULL;
+    QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
+    tmpPath += dbName;
+    sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
+    if(sqlite3_errcode(sqldb) == 14) // if error is SQLITE_CANTOPEN, then create db with structure
+    {
+            sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+            if(sqlite3_errcode(sqldb) == 0) // sqlite_ok
+            {
+                    tmpString = "CREATE TABLE logtable(logid integer primary key autoincrement, logchannel text, logmsg text);";
+                    sqlValue = sqlite3_exec(sqldb, tmpString.toStdString().c_str(), NULL, NULL, &sqlErrMsg);
+                    if(sqlValue != SQLITE_OK) // if sql was not successful
+                    {
+                            DisplayError("1.1", "OPEN", sqlErrMsg);
+                    }
+            }
+            else // some kind of failure
+            {
+                    DisplayError("1.0", "OPEN", sqlite3_errmsg(sqldb));
+            }
+    }
+    else if(sqlite3_errcode(sqldb) == 0) // sqlite_OK, it exists
+    {
+            //no error, so i will return opendb at end;
+    }
+    else // if error is not ok or not existing, then display error in alert
+    {
+            DisplayError("1.2", "OPEN", sqlite3_errmsg(sqldb));
+    }
+    sqlite3_free(sqlErrMsg);
+}
+
 SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber)
 {
         sqldb = NULL;
@@ -15,12 +50,14 @@ SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber)
         int     sqlValue;
         QString tmpString;
         sqlErrMsg = 0;
-        QString tmpPath = "./";
+        //appDir = QDir(QCoreApplication::applicationDirPath());
+        QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
+        //fprintf(stderr, appDir.absolutePath().toStdString().c_str());
         //QString tmpPath = GetAppDirPath(); // for testing purposes, use local one.
         //QString tmpPath = GetUserDirPath(); // for publish purposes, use real location
         if(tmpPath != "-15")
         {
-                tmpPath += "WombatData.db";
+                tmpPath += "/ErrorLog.db";
                 sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
                 if(sqlite3_errcode(sqldb) == 14) // if error is SQLITE_CANTOPEN, then create db with structure
                 {
@@ -223,28 +260,3 @@ BString GetUserDirPath(void)
         if(result == B_OK) return tmpUserPath.Path();
         else return "-15";
 }
-ErrorAlert::ErrorAlert(BString tmpText)
-{
-        tmpAlert = new BAlert("Error:", tmpText, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-        tmpAlert->MoveTo(350, 250);
-        tmpAlert->SetShortcut(0, B_ESCAPE);
-}
-
-ErrorAlert::ErrorAlert(BString tmpText1, BString tmpText2)
-{
-        BString tmpString = tmpText1;
-        tmpString += tmpText2;
-        tmpAlert = new BAlert("Error:", tmpString, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-        tmpAlert->MoveTo(350, 250);
-        tmpAlert->SetShortcut(0, B_ESCAPE);
-}
-
-ErrorAlert::~ErrorAlert(void)
-{
-}
-
-int ErrorAlert::Launch(void)
-{
-        return tmpAlert->Go(NULL);
-}
- */
