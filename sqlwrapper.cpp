@@ -1,12 +1,5 @@
 #include "sqlwrapper.h"
-/*
-SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, sqlite3* openDB)
-{
-        sqldb = openDB;
-        sqlstatement = sqlStatement;
-        errornumber = errorNumber;
-}
-*/
+
 SqlWrapper::SqlWrapper(QString dbName)
 {
     sqldb = NULL;
@@ -41,20 +34,15 @@ SqlWrapper::SqlWrapper(QString dbName)
     sqlite3_free(sqlErrMsg);
 }
 
-SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber)
+SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName)
 {
         sqldb = NULL;
         sqlstatement = sqlStatement;
         errornumber = errorNumber;
         char* sqlErrMsg;
         int     sqlValue;
-        QString tmpString;
         sqlErrMsg = 0;
-        //appDir = QDir(QCoreApplication::applicationDirPath());
         QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
-        //fprintf(stderr, appDir.absolutePath().toStdString().c_str());
-        //QString tmpPath = GetAppDirPath(); // for testing purposes, use local one.
-        //QString tmpPath = GetUserDirPath(); // for publish purposes, use real location
         if(tmpPath != "-15")
         {
                 tmpPath += "/ErrorLog.db";
@@ -243,20 +231,4 @@ void SqlWrapper::DisplayError(const char* errorNumber, const char* errorType, co
         fprintf(stderr, tmpString.toStdString().c_str());
         //ealert = new ErrorAlert(tmpString);
         //ealert->Launch();
-}
-/*
-BString GetAppDirPath(void)
-{
-        app_info info;
-        be_app->GetAppInfo(&info);
-        BPath path(&info.ref);
-        path.GetParent(&path);
-        return path.Path();
-}
-BString GetUserDirPath(void)
-{
-        BPath tmpUserPath;
-        status_t result = find_directory(B_USER_DIRECTORY, &tmpUserPath);
-        if(result == B_OK) return tmpUserPath.Path();
-        else return "-15";
 }

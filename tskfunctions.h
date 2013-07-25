@@ -2,6 +2,7 @@
 #define TSKFUNCTIONS_H
 
 #include "tsk/framework/framework.h"
+#include "sqlwrapper.h"
 
 
 //#include <iostream>
@@ -41,6 +42,7 @@ public:
     void InitializeFrameworkDatabase(void);
 
     std::auto_ptr<TskImgDB> frameworkDatabase;
+
 };
 
 #endif // TSKFUNCTIONS_H

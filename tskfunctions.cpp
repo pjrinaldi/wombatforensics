@@ -47,6 +47,5 @@ public:
     {
         Log::log(a_channel, a_msg);
         // put code to write to sql table here...
-
     }
 };
