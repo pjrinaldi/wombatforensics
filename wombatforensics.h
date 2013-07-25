@@ -59,7 +59,6 @@ public:
     
 private slots:
     void alterEvidence();
-    void on_actionAdd_Evidence_triggered();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
     void on_toolBox_currentChanged(int index);

@@ -54,7 +54,7 @@ void WombatForensics::populateMenus(QObject *plugin)
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
     if (iEvidence)
     {
-        addToMenu(plugin, iEvidence->evidenceActions(), ui->menuEvidence, SLOT(alterEvidence()));
+        addToMenu(plugin, iEvidence->evidenceMenuActions(), ui->menuEvidence, SLOT(alterEvidence()));
         // add items to the toolbar as well
     }
     /*
@@ -121,9 +121,14 @@ WombatForensics::~WombatForensics()
     delete ui;
 }
 
-void WombatForensics::on_actionAdd_Evidence_triggered()
+void WombatForensics::on_actionNew_Case_triggered()
 {
-    /*
+    // create new case here
+}
+
+void WombatForensics::on_actionOpen_Case_triggered()
+{
+    // open case here
     QString evidenceFile = QFileDialog::getOpenFileName(this, "Select Evidence Item", "./");
     ui->testLabel->setText(evidenceFile);
 
@@ -131,7 +136,7 @@ void WombatForensics::on_actionAdd_Evidence_triggered()
     try
     {
         TskSystemPropertiesImpl *systemProperties = new TskSystemPropertiesImpl();
-        systemProperties->initialize("../../WombatForensics/framework_config.xml");
+        systemProperties->initialize("./framework_config.xml");
         TskServices::Instance().setSystemProperties(*systemProperties);
     }
     catch (TskException& ex)
@@ -139,14 +144,13 @@ void WombatForensics::on_actionAdd_Evidence_triggered()
         fprintf(stderr, "Loading Framework Config: %s\n", ex.message().c_str());
     }
     QString outDirPath;
-    outDirPath = "./test_out";
+    outDirPath = "./tmpoutput";
     SetSystemProperty(TskSystemProperties::OUT_DIR, outDirPath.toStdString().c_str());
     makeDir(outDirPath.toStdString().c_str());
     makeDir(GetSystemProperty(TskSystemProperties::SYSTEM_OUT_DIR).c_str());
     makeDir(GetSystemProperty(TskSystemProperties::MODULE_OUT_DIR).c_str());
     std::string logDir = GetSystemProperty(TskSystemProperties::LOG_DIR);
     makeDir(logDir.c_str());
-
     // LOG TEST
     struct tm * newtime;
     time_t aclock;
@@ -163,7 +167,6 @@ void WombatForensics::on_actionAdd_Evidence_triggered()
 
     log->open(logDir.c_str());
     TskServices::Instance().setLog(*log);
-
     //SetSystemProperty(TskSystemProperties::OUT_DIR, outDirPath.toStdString().c_str());
     std::auto_ptr<TskImgDB> pImgDB(NULL);
     pImgDB = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(outDirPath.toStdString().c_str()));
@@ -174,7 +177,7 @@ void WombatForensics::on_actionAdd_Evidence_triggered()
 
     TskServices::Instance().setImgDB(*pImgDB);
     TskServices::Instance().setBlackboard((TskBlackboard &) TskDBBlackboard::instance());
-    SetSystemProperty(TskSystemProperties::PIPELINE_CONFIG_FILE, "../../WombatForensics/pipeline_config.xml");
+    SetSystemProperty(TskSystemProperties::PIPELINE_CONFIG_FILE, "./pipeline_config.xml");
     TskSchedulerQueue scheduler;
     TskServices::Instance().setScheduler(scheduler);
     TskServices::Instance().setFileManager(TskFileManagerImpl::instance());
@@ -214,7 +217,7 @@ void WombatForensics::on_actionAdd_Evidence_triggered()
         LOGERROR(msg.str());
         exit(1);
     }
-
+// THIS IS WHERE THE DB IS POPULATED WITH THE IMAGE FILES, VOLUME, FS, ETC... NO PROCESSING DONE
     if(!containerExtractor.isNull())
     {
         if(containerExtractor->extractFiles() != 0)
@@ -233,7 +236,8 @@ void WombatForensics::on_actionAdd_Evidence_triggered()
             LOGERROR(msg.str());
         }
     }
-
+    // THIS IS THE ANALYSIS PIPELINE USING THE MODULES
+/*
     TskSchedulerQueue::task_struct *task;
     while ((task = scheduler.nextTask()) != NULL)
     {
@@ -256,8 +260,9 @@ void WombatForensics::on_actionAdd_Evidence_triggered()
             // Error has been logged already
         }
     }
+*/
     // END FRAMEWORK TEST CODE
-
+/*
     // BEGIN POPULATE DIRECTORY TREE
     std::vector<uint64_t> fileidVector;
     std::vector<TskFileRecord> fileRecordVector;
@@ -320,15 +325,6 @@ void WombatForensics::on_actionAdd_Evidence_triggered()
 
     // END FILE TYPE SIGNATURE TREE CREATION
     */
-}
-void WombatForensics::on_actionNew_Case_triggered()
-{
-    // create new case here
-}
-
-void WombatForensics::on_actionOpen_Case_triggered()
-{
-    // open case here
 }
 // FRAMEWORK TEST MAKE DIR CODE
 void WombatForensics::makeDir(const char *dir)

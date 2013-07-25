@@ -213,7 +213,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="naturalTab">
            <property name="sizePolicy">
@@ -327,7 +327,6 @@
    <addaction name="actionNew_Case"/>
    <addaction name="actionOpen_Case"/>
    <addaction name="separator"/>
-   <addaction name="actionAdd_Evidence"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew_Case">
@@ -352,18 +351,6 @@
    </property>
    <property name="toolTip">
     <string>Open an Existing Case</string>
-   </property>
-  </action>
-  <action name="actionAdd_Evidence">
-   <property name="icon">
-    <iconset resource="wombat.qrc">
-     <normaloff>:/addevidence</normaloff>:/addevidence</iconset>
-   </property>
-   <property name="text">
-    <string>Add Evidence</string>
-   </property>
-   <property name="toolTip">
-    <string>Add Evidence to the Case</string>
    </property>
   </action>
  </widget>

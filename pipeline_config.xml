@@ -4,11 +4,10 @@
     <PIPELINE type="FileAnalysis">
       <MODULE order="1" type="plugin" location="tskHashCalcModule"/>
       <!--<MODULE order="2" type="plugin" location="tskHashLookupModule" arguments="TODO: See README for how to create NSRL index file"/>-->
-
       <MODULE order="2" type="plugin" location="tskFileTypeSigModule"/>
       <!--<MODULE order="4" type="plugin" location="tskEntropyModule"/> -->
-      <MODULE order="3" type="plugin" location="tskZipExtractionModule"/>
-      <MODULE order="4" type="plugin" location="tskLibExifModule"/>
+      <!--<MODULE order="3" type="plugin" location="tskZipExtractionModule"/>-->
+      <!--<MODULE order="4" type="plugin" location="tskLibExifModule"/>-->
     </PIPELINE>
 
     <PIPELINE type="PostProcessing">
