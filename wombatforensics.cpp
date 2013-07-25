@@ -8,7 +8,6 @@ WombatForensics::WombatForensics(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::WombatForensics)
 {
-    //std::auto_ptr<TskImgDB> pImgDB;
     ui->setupUi(this);
     loadPlugins();
 }
@@ -128,6 +127,7 @@ void WombatForensics::on_actionNew_Case_triggered()
 
 void WombatForensics::on_actionOpen_Case_triggered()
 {
+/*
     // open case here
     QString evidenceFile = QFileDialog::getOpenFileName(this, "Select Evidence Item", "./");
     ui->testLabel->setText(evidenceFile);
@@ -327,6 +327,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
     */
 }
 // FRAMEWORK TEST MAKE DIR CODE
+/*
 void WombatForensics::makeDir(const char *dir)
 {
     Poco::File path(dir);
@@ -352,6 +353,7 @@ void WombatForensics::makeDir(const char *dir)
  * Logs all messages to a log file and prints
  * error messages to STDERR
  */
+/*
 class StderrLog : public Log
 {
 public:
@@ -381,4 +383,4 @@ void WombatForensics::on_toolBox_currentChanged(int index)
     {
         fprintf(stderr, "File Type Selected");
     }
-}
+}*/

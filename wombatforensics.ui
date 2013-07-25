@@ -50,7 +50,7 @@
          <number>0</number>
         </property>
         <property name="tabSpacing">
-         <number>0</number>
+         <number>6</number>
         </property>
         <widget class="QWidget" name="page">
          <property name="geometry">
@@ -58,7 +58,7 @@
            <x>0</x>
            <y>0</y>
            <width>226</width>
-           <height>392</height>
+           <height>452</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -117,80 +117,6 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="page_2">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>226</width>
-           <height>392</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <attribute name="label">
-          <string>File Type</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <property name="leftMargin">
-           <number>1</number>
-          </property>
-          <property name="topMargin">
-           <number>2</number>
-          </property>
-          <property name="rightMargin">
-           <number>1</number>
-          </property>
-          <property name="bottomMargin">
-           <number>2</number>
-          </property>
-          <item>
-           <widget class="QTreeView" name="fileSignatureTreeView"/>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="page_3">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>226</width>
-           <height>392</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <attribute name="label">
-          <string>Search Results</string>
-         </attribute>
-        </widget>
-        <widget class="QWidget" name="page_4">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>226</width>
-           <height>392</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <attribute name="label">
-          <string>Bookmarks</string>
-         </attribute>
-        </widget>
        </widget>
       </item>
       <item>
@@ -213,49 +139,8 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>-1</number>
           </property>
-          <widget class="QWidget" name="naturalTab">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <attribute name="title">
-            <string>Natural</string>
-           </attribute>
-          </widget>
-          <widget class="QWidget" name="hexTab">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <attribute name="title">
-            <string>Hex</string>
-           </attribute>
-           <widget class="QLabel" name="testLabel">
-            <property name="geometry">
-             <rect>
-              <x>80</x>
-              <y>60</y>
-              <width>331</width>
-              <height>91</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </widget>
          </widget>
         </item>
         <item>
@@ -296,6 +181,10 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionNew_Case_2"/>
+    <addaction name="actionOpen_Case_2"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEvidence">
     <property name="enabled">
@@ -351,6 +240,29 @@
    </property>
    <property name="toolTip">
     <string>Open an Existing Case</string>
+   </property>
+  </action>
+  <action name="actionNew_Case_2">
+   <property name="icon">
+    <iconset resource="wombat.qrc">
+     <normaloff>:/newcase</normaloff>:/newcase</iconset>
+   </property>
+   <property name="text">
+    <string>New Case</string>
+   </property>
+  </action>
+  <action name="actionOpen_Case_2">
+   <property name="icon">
+    <iconset resource="wombat.qrc">
+     <normaloff>:/opencase</normaloff>:/opencase</iconset>
+   </property>
+   <property name="text">
+    <string>Open Case</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
    </property>
   </action>
  </widget>
