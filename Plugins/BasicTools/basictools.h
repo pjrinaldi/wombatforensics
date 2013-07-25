@@ -15,14 +15,19 @@ class BasicTools : public QObject, public EvidenceInterface
     
 public:
     //Evidence Interface
-    QStringList evidenceActions() const;
+    QStringList evidenceMenuActions() const;
+    QStringList evidenceToolbarActions() const;
     QStringList toolboxViews() const;
+    QStringList evidenceToolbarIcons() const;
+    QStringList evidenceToolboxIcons() const;
     QWidget* setupToolBox() const;
+    QWidget* setupTabWidget() const;
+    QWidget* setupColumnView() const;
 
     void addEvidence();
     void remEvidence();
 
-//    BasicTools(QObject *parent = 0);
+
 };
 
 #endif // BASICTOOLS_H

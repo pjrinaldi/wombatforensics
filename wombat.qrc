@@ -2,8 +2,5 @@
     <qresource prefix="/">
         <file alias="newcase">Resources/document-new.png</file>
         <file alias="opencase">Resources/document-open.png</file>
-        <file alias="addevidence">Resources/list-add.png</file>
-        <file alias="treefolder">Resources/folder.png</file>
-        <file alias="treefile">Resources/text-x-generic.png</file>
     </qresource>
 </RCC>

@@ -69,11 +69,15 @@ class EvidenceInterface
 public:
     virtual ~EvidenceInterface() {}
 
-    virtual QStringList evidenceActions() const = 0;
-
+    virtual QStringList evidenceMenuActions() const = 0;
+    virtual QStringList evidenceToolbarActions() const = 0;
     virtual QStringList toolboxViews() const = 0;
+    virtual QStringList evidenceToolbarIcons() const = 0;
+    virtual QStringList evidenceToolboxIcons() const = 0;
 
     virtual QWidget* setupToolBox() const = 0;
+    virtual QWidget* setupTabWidget() const = 0;
+    virtual QWidget* setupColumnView() const = 0;
 
     virtual void addEvidence() = 0;
     virtual void remEvidence() = 0;

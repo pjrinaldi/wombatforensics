@@ -43,3 +43,6 @@ OTHER_FILES += BasicTools.json
 #target.path = $$[QT_INSTALL_EXAMPLES]/widgets/tools/plugandpaint/plugins
 #INSTALLS += target
 
+RESOURCES += \
+    basictools.qrc
+

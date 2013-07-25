@@ -1,8 +1,23 @@
 #include "basictools.h"
 
-QStringList BasicTools::evidenceActions() const
+QStringList BasicTools::evidenceMenuActions() const
 {
     return QStringList() << tr("Add Evidence") << tr("Remove Evidence");
+}
+
+QStringList BasicTools::evidenceToolbarActions() const
+{
+    return QStringList() << tr("Add Evidence") << tr("Remove Evidence");
+}
+
+QStringList BasicTools::evidenceToolbarIcons() const
+{
+    return QStringList() << tr(":/addevidence") << tr(":/remevidence");
+}
+
+QStringList BasicTools::evidenceToolboxIcons() const
+{
+    return QStringList() << tr(":/treefile") << tr(":/treefolder") << (":/treepartition") << tr(":/treefilemanager") << tr(":/treeimage");
 }
 
 QStringList BasicTools::toolboxViews() const
@@ -26,6 +41,20 @@ QWidget* BasicTools::setupToolBox() const
     return directoryTreeView;
 }
 
+QWidget* BasicTools::setupColumnView() const
+{
+    QColumnView* directoryTreeColumnView = new QColumnView();
+
+    return directoryTreeColumnView;
+}
+
+QWidget* BasicTools::setupTabWidget() const
+{
+    QTabWidget* directoryTreeTabWidget = new QTabWidget();
+    // probably add the tabs
+
+    return directoryTreeTabWidget;
+}
 /*
 BasicTools::BasicTools(QObject *parent)
 {
