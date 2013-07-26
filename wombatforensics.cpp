@@ -10,6 +10,8 @@ WombatForensics::WombatForensics(QWidget *parent) :
 {
     ui->setupUi(this);
     loadPlugins();
+    TskFunctions *testcase = new TskFunctions();
+    testcase->SetupTskFramework();
 }
 
 void WombatForensics::loadPlugins()
@@ -102,9 +104,9 @@ void WombatForensics::alterEvidence()
     QAction *action = qobject_cast<QAction *>(sender());
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
-        iEvidence->addEvidence();
+        iEvidence->addEvidence(currentcaseid);
     else if(action->text() == tr("Remove Evidence"))
-        iEvidence->remEvidence();
+        iEvidence->remEvidence(currentcaseid);
     /*
     FilterInterface *iFilter =
             qobject_cast<FilterInterface *>(action->parent());
@@ -123,10 +125,47 @@ WombatForensics::~WombatForensics()
 void WombatForensics::on_actionNew_Case_triggered()
 {
     // create new case here
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
+    if(ok && !text.isEmpty())
+    {
+        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.1", "/data/Wombatdata.db");
+        sqlObject->PrepareSql("INSERT INTO cases (casename) VALUES(?);");
+        sqlObject->BindValue(1, text.toStdString().c_str());
+        sqlObject->StepSql();
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
+    }
+
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()
 {
+    // open case here
+    QStringList caseList;
+    caseList.clear();
+    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.2", "/data/Wombatdata.db");
+    sqlObject->PrepareSql("SELECT casename FROM cases ORDER BY caseid;");
+    while(sqlObject->StepSql() == SQLITE_ROW) // step through the sql
+    {
+        caseList.push_back(sqlObject->ReturnText(0));
+    }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+
+    bool ok;
+    QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
+    if(ok && !item.isEmpty())
+    {
+        // open case here (store case id)
+        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.3", "/data/WombatData.db");
+        sqlObject->PrepareSql("SELECT caseid FROM cases WHERE casename = ?;");
+        sqlObject->BindValue(1, item.toStdString().c_str());
+        sqlObject->StepSql();
+        currentcaseid = sqlObject->ReturnInt(0);
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
+    }
 /*
     // open case here
     QString evidenceFile = QFileDialog::getOpenFileName(this, "Select Evidence Item", "./");

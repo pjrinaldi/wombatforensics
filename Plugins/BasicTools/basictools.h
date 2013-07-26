@@ -2,8 +2,10 @@
 #define BASICTOOLS_H
 
 #include <interfaces.h>
+#include "wombattskimgdbsqlite.h"
 #include <QStringList>
 #include <QtWidgets>
+#include <QFileDialog>
 
 class BasicTools : public QObject, public EvidenceInterface
 {
@@ -24,9 +26,11 @@ public:
     QWidget* setupTabWidget() const;
     QWidget* setupColumnView() const;
 
-    void addEvidence();
-    void remEvidence();
-
+    void addEvidence(int currentCaseID);
+    void remEvidence(int currentCaseID);
+private:
+    sqlite3_stmt *sqlStatement;
+    int currentcaseid;
 
 };
 

@@ -17,13 +17,15 @@ SOURCES += main.cpp\
         wombatforensics.cpp \
     tskfunctions.cpp \
     sqlwrapper.cpp \
-    sqlerrlog.cpp
+    sqlerrlog.cpp \
+    wombattskimgdbsqlite.cpp
 
 HEADERS  += wombatforensics.h \
             interfaces.h \
     tskfunctions.h \
     sqlwrapper.h \
-    sqlerrlog.h
+    sqlerrlog.h \
+    wombattskimgdbsqlite.h
 
 # LIBS    =   -Wl,-Bstatic -ltskframework -lewf -ltsk -lsqlite3 -Lplugins -lbasictools
 LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins -lbasictools

@@ -6,10 +6,10 @@
 class SqlWrapper
 {
 public:
-    //SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName);
-    SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber);
-    //SqlWrapper(QString dbName);
-    SqlWrapper();
+    SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName);
+    //SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber);
+    SqlWrapper(QString dbName);
+    //SqlWrapper();
     ~SqlWrapper();
 
     void PrepareSql(const char* sqlQuery);
@@ -32,7 +32,6 @@ public:
     void CloseSql(void);
     sqlite3* ReturnSqlDB(void);
     void DisplayError(const char* errorNumber, const char* errorType, const char* errorValue);
-    //std::auto_ptr<Log> frameworkLog;
 
 private:
     sqlite3* sqldb;

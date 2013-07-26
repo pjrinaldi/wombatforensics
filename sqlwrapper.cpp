@@ -1,27 +1,67 @@
 #include "sqlwrapper.h"
 
-//SqlWrapper::SqlWrapper(QString dbName)
-SqlWrapper::SqlWrapper()
+//SqlWrapper::SqlWrapper()
+SqlWrapper::SqlWrapper(QString dbName) // open to create db if it doesn't exist
 {
     sqldb = NULL;
     int sqlValue;
     char* sqlErrMsg;
-    QString tmpString;
+    const char* createString;
+    vector<const char*> createStrings;
+    if(dbName == "/data/WombatData.db")
+    {
+        createStrings.clear();
+        createStrings.push_back("CREATE TABLE log(logid INTEGER PRIMARY KEY, logchannel INTEGER, logmessage TEXT);");
+        createStrings.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, casename TEXT);");
+        createStrings.push_back("CREATE TABLE caseimages(imageid INTEGER PRIMARY KEY, imagefullpath TEXT, imagename TEXT, caseid INTEGER);");
+    }
+    else
+    {
+        createStrings.clear();
+        createStrings.push_back("PRAGMA page_size=4096;");
+        createStrings.push_back("PRAGMA synchronous=0;");
+        createStrings.push_back("CREATE TABLE db_info(name TEXT PRIMARY KEY, version TEXT);");
+        createStrings.push_back("CREATE TABLE image_info (type INTEGER, ssize INTEGER);");
+        createStrings.push_back("CREATE TABLE image_names (seq INTEGER PRIMARY KEY, name TEXT);");
+        createStrings.push_back("CREATE TABLE vol_info (vol_id INTEGER PRIMARY KEY, sect_start INTEGER NOT NULL, sect_len INTEGER NOT NULL, description TEXT, flags INTEGER);");
+        createStrings.push_back("CREATE TABLE fs_info (fs_id INTEGER PRIMARY KEY, img_byte_offset INTEGER, vol_id INTEGER NOT NULL, fs_type INTEGER, block_size INTEGER, block_count INTEGER, root_inum INTEGER, first_inum INTEGER, last_inum INTEGER);");
+        createStrings.push_back("CREATE TABLE files (file_id INTEGER PRIMARY KEY, type_id INTEGER, name TEXT, par_file_id INTEGER, dir_type INTEGER, meta_type INTEGER, dir_flags INTEGER, meta_flags INTEGER, size INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, full_path TEXT);");
+        createStrings.push_back("CREATE TABLE fs_files (file_id INTEGER PRIMARY KEY, fs_id INTEGER, fs_file_id INTEGER, attr_type INTEGER, attr_id INTEGER);");
+        createStrings.push_back("CREATE TABLE fs_blocks (fs_id INTEGER NOT NULL, file_id INTEGER NOT NULL, seq INTEGER, blk_start INTEGER NOT NULL, blk_len INTEGER NOT NULL);");
+        createStrings.push_back("CREATE TABLE carved_files (file_id INTEGER PRIMARY KEY, vol_id INTEGER);");
+        createStrings.push_back("CREATE TABLE carved_sectors (file_id INTEGER, seq INTEGER, sect_start INTEGER, sect_len INTEGER);");
+        createStrings.push_back("CREATE TABLE derived_files (file_id INTEGER PRIMARY KEY, derivation_details TEXT);");
+        createStrings.push_back("CREATE TABLE alloc_unalloc_map (vol_id INTEGER, unalloc_img_id INTEGER, unalloc_img_sect_start INTEGER, sect_len INTEGER, orig_img_sect_start INTEGER);");
+        createStrings.push_back("CREATE TABLE file_hashes (file_id INTEGER PRIMARY KEY, md5 TEXT, sha1 TEXT, sha2_256 TEXT, sha2_512 TEXT, known INTEGER);");
+        createStrings.push_back("CREATE TABLE modules (module_id INTEGER PRIMARY KEY, name TEXT UNIQUE NOT NULL, description TEXT);");
+        createStrings.push_back("CREATE TABLE module_status (file_id INTEGER, module_id INTEGER, status INTEGER, PRIMARY KEY (file_id, module_id));");
+        createStrings.push_back("CREATE TABLE unalloc_img_status (unalloc_img_id INTEGER PRIMARY KEY, status INTEGER);");
+        createStrings.push_back("CREATE TABLE unused_sectors (file_id INTEGER PRIMARY KEY, sect_start INTEGER, sect_len INTEGER, vol_id INTEGER);");
+        createStrings.push_back("CREATE TABLE blackboard_artifacts (artifact_id INTEGER PRIMARY KEY, obj_id INTEGER NOT NULL, artifact_type_id INTEGER);");
+        createStrings.push_back("CREATE TABLE blackboard_attributes (artifact_id INTEGER NOT NULL, source TEXT, context TEXT, attribute_type_id INTEGER NOT NULL, value_type INTEGER NOT NULL, value_byte BLOB, value_text TEXT, value_int32 INTEGER, value_int64 INTEGER, value_double NUMERIC(20, 10), obj_id INTEGER NOT NULL);");
+        createStrings.push_back("CREATE TABLE blackboard_artifact_types (artifact_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT);");
+        createStrings.push_back("CREATE TABLE blackboard_attribute_types (attribute_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT);");
+        createStrings.push_back("CREATE INDEX attrs_artifact_id ON blackboard_attributes(artifact_id);");
+        createStrings.push_back("CREATE INDEX attrs_attribute_type ON blackboard_attributes(attribute_type_id);");
+        createStrings.push_back("CREATE INDEX attrs_obj_id ON blackboard_attributes(obj_id);");
+    }
     sqlErrMsg = 0;
     QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
-    tmpPath += "/WombatData.db";
+    tmpPath += dbName;
     sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
     if(sqlite3_errcode(sqldb) == 14) // if error is SQLITE_CANTOPEN, then create db with structure
     {
             sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
             if(sqlite3_errcode(sqldb) == 0) // sqlite_ok
             {
-                    tmpString = "CREATE TABLE logtable(logid integer primary key autoincrement, logchannel integer, logmessage text);";
-                    sqlValue = sqlite3_exec(sqldb, tmpString.toStdString().c_str(), NULL, NULL, &sqlErrMsg);
+                foreach(createString, createStrings)
+                {
+                    sqlValue = sqlite3_exec(sqldb, createString, NULL, NULL, &sqlErrMsg);
                     if(sqlValue != SQLITE_OK) // if sql was not successful
                     {
                             DisplayError("1.1", "OPEN", sqlErrMsg);
                     }
+                }
             }
             else // some kind of failure
             {
@@ -39,52 +79,21 @@ SqlWrapper::SqlWrapper()
     sqlite3_free(sqlErrMsg);
 }
 
-//SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName)
-SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber)
+//SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber)
+SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName) // open to write data to the db.
 {
         sqldb = NULL;
         sqlstatement = sqlStatement;
         errornumber = errorNumber;
         char* sqlErrMsg;
         int     sqlValue;
-        QString tmpString;
         sqlErrMsg = 0;
         QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
-        if(tmpPath != "-15")
-        {
-            tmpPath += "/WombatData.db";
-                sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
-                if(sqlite3_errcode(sqldb) == 14) // if error is SQLITE_CANTOPEN, then create db with structure
-                {
-                        sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
-                        if(sqlite3_errcode(sqldb) == 0) // sqlite_ok
-                        {
-                                tmpString = "CREATE TABLE logtable(logid integer primary key autoincrement, logchannel integer, logmsg text);";
-                                sqlValue = sqlite3_exec(sqldb, tmpString.toStdString().c_str(), NULL, NULL, &sqlErrMsg);
-                                if(sqlValue != SQLITE_OK) // if sql was not successful
-                                {
-                                        DisplayError("1.1", "OPEN", sqlErrMsg);
-                                }
-                        }
-                        else // some kind of failure
-                        {
-                                DisplayError("1.0", "OPEN", sqlite3_errmsg(sqldb));
-                        }
-                }
-                else if(sqlite3_errcode(sqldb) == 0) // sqlite_OK, it exists
-                {
-                        //no error, so i will return opendb at end;
-                }
-                else // if error is not ok or not existing, then display error in alert
-                {
-                        DisplayError("1.2", "OPEN", sqlite3_errmsg(sqldb));
-                }
-                sqlite3_free(sqlErrMsg);
-        }
-        else
-        {
-                DisplayError("1.0", "PATH", " to the User Directory not Found");
-        }
+        tmpPath += dbName;
+        sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // opendb
+        if(sqlite3_errcode(sqldb) != 0)
+            DisplayError("1.0", "OPEN", sqlite3_errmsg(sqldb));
+        sqlite3_free(sqlErrMsg);
 }
 SqlWrapper::~SqlWrapper(void)
 {

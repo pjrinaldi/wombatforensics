@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QObject>
 #include <QStandardItemModel>
+#include <QInputDialog>
 
 #include "interfaces.h"
 #include "tskfunctions.h"
@@ -41,6 +42,8 @@ private:
 
     void makeDir(const char *dir);
 
+    sqlite3_stmt *sqlStatement;
+    int currentcaseid;
     QDir pluginsDir;
     QStringList pluginFileNames;
 

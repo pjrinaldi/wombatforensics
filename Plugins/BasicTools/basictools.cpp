@@ -25,12 +25,33 @@ QStringList BasicTools::toolboxViews() const
     return QStringList() << tr("Directory Listing") << tr("File Signature Category");
 }
 
-void BasicTools::addEvidence()
+void BasicTools::addEvidence(int currentCaseID)
 {
     // add evidence here
+    currentcaseid = currentCaseID;
+    QString evidenceFile = QFileDialog::getOpenFileName(0, tr("Select Evidence Item"), tr("./"));
+    QString evidenceFileName = evidenceFile.split("/").last();
+    QString evidenceDBname = "/data/" + evidenceFileName + ".db";
+
+    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "3.1", evidenceDBname);
+    sqlObject->PrepareSql("INSERT INTO caseimages (imagefullpath, imagename, caseid) VALUES(?, ?, ?);");
+    sqlObject->BindValue(1, evidenceFile);
+    sqlObject->BindValue(2, evidenceFileName);
+    sqlObject->BindValue(3, currentcaseid);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    // set individual db's for each image...
+    std::auto_ptr<TskImgDB> wImgDB(NULL);
+    wImgDB = std::auto_ptr<TskImgDB>(new WombatTskImgDBSqlite(evidenceDBname));
+    if(wImgDB->initialize() != 0)
+    {
+        LOGERROR("Error initializing the Image DB.");
+    }
+    TskServices::Instance().setImgDB(*wImgDB);
 }
 
-void BasicTools::remEvidence()
+void BasicTools::remEvidence(int currentCaseID)
 {
     // remove evidence here
 }

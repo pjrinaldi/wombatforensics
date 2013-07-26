@@ -79,8 +79,8 @@ public:
     virtual QWidget* setupTabWidget() const = 0;
     virtual QWidget* setupColumnView() const = 0;
 
-    virtual void addEvidence() = 0;
-    virtual void remEvidence() = 0;
+    virtual void addEvidence(int currentCaseID) = 0;
+    virtual void remEvidence(int currentCaseID) = 0;
 
 };
 
