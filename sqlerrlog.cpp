@@ -10,7 +10,6 @@ SqlErrLog::~SqlErrLog()
 
 void SqlErrLog::log(Channel a_channel, const std::string &a_msg)
 {
-    Log::log(a_channel, a_msg);
     sqldb = NULL;
     int sqlValue;
     QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
@@ -29,4 +28,5 @@ void SqlErrLog::log(Channel a_channel, const std::string &a_msg)
             sqlValue = sqlite3_close(sqldb);
         }
     }
+    Log::log(a_channel, a_msg);
 }

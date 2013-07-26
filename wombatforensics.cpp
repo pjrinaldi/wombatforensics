@@ -146,7 +146,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
     // open case here
     QStringList caseList;
     caseList.clear();
-    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.2", "Wombatdata.db");
+    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.2", "WombatData.db");
     sqlObject->PrepareSql("SELECT casename FROM cases ORDER BY caseid;");
     while(sqlObject->StepSql() == SQLITE_ROW) // step through the sql
     {
