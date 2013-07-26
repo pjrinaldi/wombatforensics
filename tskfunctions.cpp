@@ -8,11 +8,11 @@ void TskFunctions::SetupTskFramework()
 {
     // container for the framework setup
     InitializeFrameworkProperties();
-    InitializeFrameworkLog();
     InitializeFrameworkDatabase();
-    InitializeFrameworkBlackboard();
-    InitializeFrameworkScheduler();
-    InitializeFrameworkFileManager();
+    InitializeFrameworkLog();
+    //InitializeFrameworkBlackboard();
+    //InitializeFrameworkScheduler();
+    //InitializeFrameworkFileManager();
 
 }
 
@@ -23,6 +23,8 @@ void TskFunctions::InitializeFrameworkProperties()
         TskSystemPropertiesImpl *systemProperties = new TskSystemPropertiesImpl();
         systemProperties->initialize();
         QString tmpString = QDir(QCoreApplication::applicationDirPath()).absolutePath();
+        QDir appPath = QDir(QCoreApplication::applicationDirPath());
+        appPath.mkdir("tmpdata");
         tmpString += "/tmpdata";
         systemProperties->set(TskSystemProperties::OUT_DIR, tmpString.toStdString());
         TskServices::Instance().setSystemProperties(*systemProperties);

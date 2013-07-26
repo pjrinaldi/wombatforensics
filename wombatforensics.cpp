@@ -131,7 +131,7 @@ void WombatForensics::on_actionNew_Case_triggered()
     QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
     if(ok && !text.isEmpty())
     {
-        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.1", "/data/Wombatdata.db");
+        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.1", "WombatData.db");
         sqlObject->PrepareSql("INSERT INTO cases (casename) VALUES(?);");
         sqlObject->BindValue(1, text.toStdString().c_str());
         sqlObject->StepSql();
@@ -146,7 +146,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
     // open case here
     QStringList caseList;
     caseList.clear();
-    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.2", "/data/Wombatdata.db");
+    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.2", "Wombatdata.db");
     sqlObject->PrepareSql("SELECT casename FROM cases ORDER BY caseid;");
     while(sqlObject->StepSql() == SQLITE_ROW) // step through the sql
     {
@@ -160,7 +160,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
     if(ok && !item.isEmpty())
     {
         // open case here (store case id)
-        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.3", "/data/WombatData.db");
+        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.3", "WombatData.db");
         sqlObject->PrepareSql("SELECT caseid FROM cases WHERE casename = ?;");
         sqlObject->BindValue(1, item.toStdString().c_str());
         sqlObject->StepSql();

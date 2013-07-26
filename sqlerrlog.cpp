@@ -16,9 +16,10 @@ void SqlErrLog::log(Channel a_channel, const std::string &a_msg)
     QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
     if(tmpPath != "-15")
     {
-        tmpPath += "/WombatData.db";
+        tmpPath += "/data/";
+        tmpPath += "WombatData.db";
         sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // opendb
-        if(sqlite3_errcode(sqldb) == 0) // sqlite_ok
+        if(sqlValue == 0) // sqlite_ok
         {
             sqlValue = sqlite3_prepare_v2(sqldb, "INSERT INTO logtable (logchannel, logmessage) VALUES(?, ?);", -1, &sqlStatement, NULL);
             sqlValue = sqlite3_bind_int(sqlStatement, 1, a_channel);

@@ -30,29 +30,45 @@ void BasicTools::addEvidence(int currentCaseID)
     // add evidence here
     currentcaseid = currentCaseID;
     QString evidenceFile = QFileDialog::getOpenFileName(0, tr("Select Evidence Item"), tr("./"));
-    QString evidenceFileName = evidenceFile.split("/").last();
-    QString evidenceDBname = evidenceFileName + ".db";
-
-    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "3.1", "WombatData.db");
-    sqlObject->PrepareSql("INSERT INTO caseimages (imagefullpath, imagename, caseid) VALUES(?, ?, ?);");
-    sqlObject->BindValue(1, evidenceFile);
-    sqlObject->BindValue(2, evidenceFileName);
-    sqlObject->BindValue(3, currentcaseid);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
-    // set individual db's for each image...
-    std::auto_ptr<TskImgDB> wImgDB(NULL);
-    wImgDB = std::auto_ptr<TskImgDB>(new WombatTskImgDBSqlite(evidenceDBname));
-    if(wImgDB->initialize() != 0)
+    if (evidenceFile != "")
     {
-        LOGERROR("Error initializing the Image DB.");
+        QString evidenceFileName = evidenceFile.split("/").last();
+        QString evidenceDBname = evidenceFileName + ".db";
+
+        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "3.1", "WombatData.db");
+        sqlObject->PrepareSql("INSERT INTO caseimages (imagefullpath, imagename, caseid) VALUES(?, ?, ?);");
+        sqlObject->BindValue(1, evidenceFile.toStdString().c_str());
+        sqlObject->BindValue(2, evidenceFileName.toStdString().c_str());
+        sqlObject->BindValue(3, currentcaseid);
+        sqlObject->StepSql();
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
+        // set individual db's for each image...
+        std::auto_ptr<TskImgDB> wImgDB(NULL);
+        wImgDB = std::auto_ptr<TskImgDB>(new WombatTskImgDBSqlite(evidenceDBname));
+        if(wImgDB->initialize() != 0)
+        {
+            LOGERROR("Error initializing the Image DB.");
+        }
+        TskServices::Instance().setImgDB(*wImgDB);
+        TskServices::Instance().setBlackboard((TskBlackboard &) TskDBBlackboard::instance());
+        TskSchedulerQueue scheduler;
+        TskServices::Instance().setScheduler(scheduler);
+        TskServices::Instance().setFileManager(TskFileManagerImpl::instance());
+        //InitializeFrameworkBlackboard();
+        //InitializeFrameworkScheduler();
+        //InitializeFrameworkFileManager();
+
+        TskImageFileTsk imageFileTsk;
+        imageFileTsk.open(evidenceFile.toStdString().c_str());
+        TskServices::Instance().setImageFile(imageFileTsk);
+        imageFileTsk.extractFiles();
     }
-    TskServices::Instance().setImgDB(*wImgDB);
 }
 
 void BasicTools::remEvidence(int currentCaseID)
 {
+    currentcaseid = currentCaseID;
     // remove evidence here
 }
 QWidget* BasicTools::setupToolBox() const

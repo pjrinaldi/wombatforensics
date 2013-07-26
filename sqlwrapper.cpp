@@ -53,8 +53,8 @@ SqlWrapper::SqlWrapper(QString dbName) // open to create db if it doesn't exist
     int sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
     if(sqlValue == 14) // if error is SQLITE_CANTOPEN, then create db with structure
     {
-            int sqlValue2 = sqlite3_open(tmpPath.toStdString().c_str(), &sqldb);
-            if(sqlValue2 == 0) // sqlite_ok
+            int sqlValue = sqlite3_open(tmpPath.toStdString().c_str(), &sqldb);
+            if(sqlValue == 0) // sqlite_ok
             {
                 foreach(createString, createStrings)
                 {
@@ -91,9 +91,10 @@ SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QStr
         int     sqlValue;
         sqlErrMsg = 0;
         QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
+        tmpPath += "/data/";
         tmpPath += dbName;
-        sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // opendb
-        if(sqlite3_errcode(sqldb) != 0)
+        sqlValue = sqlite3_open(tmpPath.toStdString().c_str(), &sqldb); // opendb
+        if(sqlValue != 0)
             DisplayError("1.0", "OPEN", sqlite3_errmsg(sqldb));
         sqlite3_free(sqlErrMsg);
 }

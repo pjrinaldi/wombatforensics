@@ -406,6 +406,7 @@ int WombatTskImgDBSqlite::initialize()
 */
 int WombatTskImgDBSqlite::open()
 {
+    /*
     std::wstringstream infoMessage;
 
 #if 0
@@ -456,6 +457,7 @@ int WombatTskImgDBSqlite::open()
     LOGINFO(L"ImgDB Opened.");
 
     return 0;
+    */
 }
 
 int WombatTskImgDBSqlite::addToolInfo(const char* name, const char* version)
