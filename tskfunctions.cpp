@@ -12,7 +12,9 @@ void TskFunctions::InitializeFrameworkProperties()
 
 void TskFunctions::InitializeFrameworkLog()
 {
-
+    frameworkLog = std::auto_ptr<Log>(new SqlErrLog());
+    frameworkLog->open(QDir(QCoreApplication::applicationDirPath()).absolutePath().toStdString().c_str()); // modify the logdir path
+    TskServices::Instance().setLog(*frameworkLog);
 }
 
 void TskFunctions::InitializeFrameworkScheduler()
@@ -40,9 +42,8 @@ public:
     int sqlValue;
     int selected;
 
-    SqlErrLog() : Log()
+    SqlErrLog(void) : Log()
     {
-
     }
 
     ~SqlErrLog()

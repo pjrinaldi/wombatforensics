@@ -6,7 +6,7 @@
 
 
 //#include <iostream>
-//#include <cstdio>
+#include <cstdio>
 //#include <cstdlib>
 //#include <string>
 //#include <sstream>
@@ -42,7 +42,7 @@ public:
     void InitializeFrameworkDatabase(void);
 
     std::auto_ptr<TskImgDB> frameworkDatabase;
-
+    std::auto_ptr<Log> frameworkLog;
 };
 
 #endif // TSKFUNCTIONS_H
