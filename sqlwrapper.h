@@ -1,10 +1,7 @@
 #ifndef SQLWRAPPER_H
 #define SQLWRAPPER_H
 
-#include <sqlite3.h>
-#include <QString>
-#include <QDir>
-#include <QCoreApplication>
+#include "sqlerrlog.h"
 
 class SqlWrapper
 {
@@ -35,6 +32,7 @@ public:
     void CloseSql(void);
     sqlite3* ReturnSqlDB(void);
     void DisplayError(const char* errorNumber, const char* errorType, const char* errorValue);
+    //std::auto_ptr<Log> frameworkLog;
 
 private:
     sqlite3* sqldb;

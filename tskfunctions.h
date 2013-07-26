@@ -1,7 +1,6 @@
 #ifndef TSKFUNCTIONS_H
 #define TSKFUNCTIONS_H
 
-#include "tsk/framework/framework.h"
 #include "sqlwrapper.h"
 #include "tsk/framework/services/TskImgDBSqlite.h"
 #include <sstream>

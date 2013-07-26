@@ -16,12 +16,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
         wombatforensics.cpp \
     tskfunctions.cpp \
-    sqlwrapper.cpp
+    sqlwrapper.cpp \
+    sqlerrlog.cpp
 
 HEADERS  += wombatforensics.h \
             interfaces.h \
     tskfunctions.h \
-    sqlwrapper.h
+    sqlwrapper.h \
+    sqlerrlog.h
 
 # LIBS    =   -Wl,-Bstatic -ltskframework -lewf -ltsk -lsqlite3 -Lplugins -lbasictools
 LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins -lbasictools
