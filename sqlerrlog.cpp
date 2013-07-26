@@ -31,13 +31,29 @@ void SqlErrLog::log(Channel a_channel, const std::string &a_msg)
         //sqlite3_clear_bindings(sqlErrStatement);
         if(sqlValue == 0) // sqlite_ok
         {
-            sqlValue = sqlite3_prepare_v2(sqldb, "INSERT INTO logtable (logchannel, logmessage) VALUES(?, ?);", -1, &sqlErrStatement, NULL);
-            sqlValue = sqlite3_bind_int(sqlErrStatement, 1, channelInt);
-            sqlValue = sqlite3_bind_text(sqlErrStatement, 2, a_msg.c_str(), -1, SQLITE_TRANSIENT);
-            sqlValue = sqlite3_step(sqlErrStatement);
-            sqlValue = sqlite3_finalize(sqlErrStatement);
-            sqlValue = sqlite3_close(sqldb);
+            if(sqlite3_prepare_v2(sqldb, "INSERT INTO log (logchannel, logmessage) VALUES(?, ?);", -1, &sqlErrStatement, NULL) == SQLITE_OK)
+            {
+                if(sqlite3_bind_int(sqlErrStatement, 1, channelInt) == SQLITE_OK)
+                {
+                    if(sqlite3_bind_text(sqlErrStatement, 2, a_msg.c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+                    {
+                        sqlValue = sqlite3_step(sqlErrStatement);
+                        sqlValue = sqlite3_finalize(sqlErrStatement);
+                        sqlValue = sqlite3_close(sqldb);
+                    }
+                    else
+                        fprintf(stderr, sqlite3_errmsg(sqldb));
+                }
+                else
+                {
+                    fprintf(stderr, sqlite3_errmsg(sqldb));
+                }
+            }
+            else
+                fprintf(stderr, sqlite3_errmsg(sqldb));
         }
+        else
+            fprintf(stderr, sqlite3_errmsg(sqldb));
     }
     Log::log(a_channel, a_msg);
 }
