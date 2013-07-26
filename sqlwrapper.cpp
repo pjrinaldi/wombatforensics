@@ -1,17 +1,22 @@
 #include "sqlwrapper.h"
 
-SqlWrapper::SqlWrapper(QString dbName)
+//SqlWrapper::SqlWrapper(QString dbName)
+SqlWrapper::SqlWrapper()
 {
     sqldb = NULL;
+    int sqlValue;
+    char* sqlErrMsg;
+    QString tmpString;
+    sqlErrMsg = 0;
     QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
-    tmpPath += dbName;
+    tmpPath += "/WombatData.db";
     sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
     if(sqlite3_errcode(sqldb) == 14) // if error is SQLITE_CANTOPEN, then create db with structure
     {
             sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
             if(sqlite3_errcode(sqldb) == 0) // sqlite_ok
             {
-                    tmpString = "CREATE TABLE logtable(logid integer primary key autoincrement, logchannel text, logmsg text);";
+                    tmpString = "CREATE TABLE logtable(logid integer primary key autoincrement, logchannel integer, logmessage text);";
                     sqlValue = sqlite3_exec(sqldb, tmpString.toStdString().c_str(), NULL, NULL, &sqlErrMsg);
                     if(sqlValue != SQLITE_OK) // if sql was not successful
                     {
@@ -34,25 +39,27 @@ SqlWrapper::SqlWrapper(QString dbName)
     sqlite3_free(sqlErrMsg);
 }
 
-SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName)
+//SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName)
+SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber)
 {
         sqldb = NULL;
         sqlstatement = sqlStatement;
         errornumber = errorNumber;
         char* sqlErrMsg;
         int     sqlValue;
+        QString tmpString;
         sqlErrMsg = 0;
         QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
         if(tmpPath != "-15")
         {
-                tmpPath += "/ErrorLog.db";
+            tmpPath += "/WombatData.db";
                 sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
                 if(sqlite3_errcode(sqldb) == 14) // if error is SQLITE_CANTOPEN, then create db with structure
                 {
                         sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
                         if(sqlite3_errcode(sqldb) == 0) // sqlite_ok
                         {
-                                tmpString = "CREATE TABLE ideatable(ideaid integer primary key autoincrement, ideaname text, ideatext text, ismp integer, mpid integer, ordernumber integer);";
+                                tmpString = "CREATE TABLE logtable(logid integer primary key autoincrement, logchannel integer, logmsg text);";
                                 sqlValue = sqlite3_exec(sqldb, tmpString.toStdString().c_str(), NULL, NULL, &sqlErrMsg);
                                 if(sqlValue != SQLITE_OK) // if sql was not successful
                                 {

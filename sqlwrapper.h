@@ -9,8 +9,10 @@
 class SqlWrapper
 {
 public:
-    SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName);
-    SqlWrapper(QString dbName);
+    //SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName);
+    SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber);
+    //SqlWrapper(QString dbName);
+    SqlWrapper();
     ~SqlWrapper();
 
     void PrepareSql(const char* sqlQuery);
