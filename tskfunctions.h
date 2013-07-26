@@ -3,10 +3,11 @@
 
 #include "tsk/framework/framework.h"
 #include "sqlwrapper.h"
+#include <memory>
 
 
 //#include <iostream>
-#include <cstdio>
+//#include <cstdio>
 //#include <cstdlib>
 //#include <string>
 //#include <sstream>
@@ -41,8 +42,10 @@ public:
     void InitializeFrameworkBlackboard(void);
     void InitializeFrameworkDatabase(void);
 
+    int ret;
     std::auto_ptr<TskImgDB> frameworkDatabase;
     std::auto_ptr<Log> frameworkLog;
+
 };
 
 #endif // TSKFUNCTIONS_H

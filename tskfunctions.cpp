@@ -1,37 +1,5 @@
 #include "tskfunctions.h"
 
-void TskFunctions::SetupTskFramework()
-{
-    // container for the framework setup
-}
-
-void TskFunctions::InitializeFrameworkProperties()
-{
-
-}
-
-void TskFunctions::InitializeFrameworkLog()
-{
-    frameworkLog = std::auto_ptr<Log>(new SqlErrLog());
-    frameworkLog->open(QDir(QCoreApplication::applicationDirPath()).absolutePath().toStdString().c_str()); // modify the logdir path
-    TskServices::Instance().setLog(*frameworkLog);
-}
-
-void TskFunctions::InitializeFrameworkScheduler()
-{
-
-}
-
-void TskFunctions::InitializeFrameworkBlackboard()
-{
-
-}
-
-void TskFunctions::InitializeFrameworkDatabase()
-{
-
-}
-
 class SqlErrLog : public Log
 {
 public:
@@ -42,7 +10,7 @@ public:
     int sqlValue;
     int selected;
 
-    SqlErrLog(void) : Log()
+    SqlErrLog() : Log()
     {
     }
 
@@ -64,3 +32,35 @@ public:
         sqlObject->CloseSql();
     }
 };
+
+void TskFunctions::SetupTskFramework()
+{
+    // container for the framework setup
+}
+
+void TskFunctions::InitializeFrameworkProperties()
+{
+
+}
+
+void TskFunctions::InitializeFrameworkLog()
+{
+    frameworkLog = std::auto_ptr<Log>(new SqlErrLog());
+    ret = frameworkLog->open(QDir(QCoreApplication::applicationDirPath()).absolutePath().toStdString().c_str()); // modify the logdir path
+    TskServices::Instance().setLog(*frameworkLog);
+}
+
+void TskFunctions::InitializeFrameworkScheduler()
+{
+
+}
+
+void TskFunctions::InitializeFrameworkBlackboard()
+{
+
+}
+
+void TskFunctions::InitializeFrameworkDatabase()
+{
+
+}
