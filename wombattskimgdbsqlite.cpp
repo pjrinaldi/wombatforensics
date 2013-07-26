@@ -406,6 +406,8 @@ int WombatTskImgDBSqlite::initialize()
 */
 int WombatTskImgDBSqlite::open()
 {
+    sqlObject = new SqlWrapper(sqlStatement, "15.15", dbname);
+    return 0;
     /*
     std::wstringstream infoMessage;
 
@@ -462,6 +464,16 @@ int WombatTskImgDBSqlite::open()
 
 int WombatTskImgDBSqlite::addToolInfo(const char* name, const char* version)
 {
+    sqlObject = new SqlWrapper(sqlStatement, "15.16", dbname);
+    sqlObject->PrepareSql("INSERT INTO db_info (name, version) VALUES(?, ?);");
+    sqlObject->BindValue(1, name);
+    sqlObject->BindValue(2, version);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+
+   return 0;
+    /*
     char *errmsg;
     char stmt[1024];
 
@@ -482,10 +494,20 @@ int WombatTskImgDBSqlite::addToolInfo(const char* name, const char* version)
     }
 
     return 0;
+    */
 }
 
 int WombatTskImgDBSqlite::addImageInfo(int type, int size)
 {
+    sqlObject = new SqlWrapper(sqlStatement, "15.15", dbname);
+    sqlObject->PrepareSql("INSERT INTO image_info (type, ssize) VALUES(?, ?);");
+    sqlObject->BindValue(1, type);
+    sqlObject->BindValue(2, size);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    return 0;
+    /*
     char *errmsg;
     std::stringstream stmt;
 
@@ -504,10 +526,18 @@ int WombatTskImgDBSqlite::addImageInfo(int type, int size)
     }
 
     return 0;
+    */
 }
 
 int WombatTskImgDBSqlite::addImageName(char const *imgPath)
 {
+    sqlObject = new sqlObject(sqlStatement, "15.1", dbname);
+    sqlObject->PrepareSql("INSERT INTO image_names (seq, name) VALUES(NULL, ?);");
+    sqlObject->BindValue(1, imgPath);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    /*
     char *errmsg;
     char stmt[1024];
 
@@ -526,6 +556,7 @@ int WombatTskImgDBSqlite::addImageName(char const *imgPath)
         sqlite3_free(errmsg);
         return 1;
     }
+    */
     return 0;
 }
 
@@ -534,6 +565,17 @@ int WombatTskImgDBSqlite::addImageName(char const *imgPath)
  */
 int WombatTskImgDBSqlite::addVolumeInfo(const TSK_VS_PART_INFO * vs_part)
 {
+    sqlObject = new SqlWrapper(sqlStatement, "15.6", dbname);
+    sqlObject->PrepareSql("INSERT INTO vol_info (vol_id, sect_start, sect_len, description, flags) VALUES(?, ?, ?, ?, ?);");
+    sqlObject->BindValue(1, (int)vs_part->addr);
+    sqlObject->BindValue(2, vs_part->start);
+    sqlObject->BindValue(3, vs_part->len);
+    sqlObject->BindValue(4, vs_part->desc);
+    sqlObject->BindValue(5, vs_part->flags);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    /*
     char stmt[1024];
     char * errmsg;
 
@@ -553,12 +595,28 @@ int WombatTskImgDBSqlite::addVolumeInfo(const TSK_VS_PART_INFO * vs_part)
         sqlite3_free(errmsg);
         return 1;
     }
+    */
 
     return 0;
 }
 
 int WombatTskImgDBSqlite::addFsInfo(int volId, int fsId, const TSK_FS_INFO * fs_info)
 {
+    sqlObject = new SqlWrapper(sqlStatement, "15.2", dbname);
+    sqlObject->PrepareSql("INSERT INTO fs_info (fs_id, img_byte_offset, vol_id, fs_type, block_size, block_count, root_inum, first_inum, last_inum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);");
+    sqlObject->BindValue(1, fsId);
+    sqlObject->BindValue(2, fs_info->offset);
+    sqlObject->BindValue(3, volId);
+    sqlObject->BindValue(4, (int)fs_info->ftype);
+    sqlObject->BindValue(5, fs_info->block_size);
+    sqlObject->BindValue(6, fs_info->block_count);
+    sqlObject->BindValue(7, fs_info->root_inum);
+    sqlObject->BindValue(8, fs_info->first_inum);
+    sqlObject->BindValue(9, fs_info->last_inum);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    /*
     std::stringstream stmt;
     char * errmsg;
 
@@ -580,7 +638,7 @@ int WombatTskImgDBSqlite::addFsInfo(int volId, int fsId, const TSK_FS_INFO * fs_
         sqlite3_free(errmsg);
         return 1;
     }
-
+    */
     return 0;
 }
 

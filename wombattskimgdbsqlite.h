@@ -25,6 +25,8 @@ public:
     //WombatTskImgDBSqlite(const char * a_outpath);
     WombatTskImgDBSqlite(QString dbName);
 
+    sqlite3_stmt *sqlStatement;
+
     SqlWrapper *sqlObject;
 
     virtual ~ WombatTskImgDBSqlite();
