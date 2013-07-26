@@ -31,9 +31,9 @@ void BasicTools::addEvidence(int currentCaseID)
     currentcaseid = currentCaseID;
     QString evidenceFile = QFileDialog::getOpenFileName(0, tr("Select Evidence Item"), tr("./"));
     QString evidenceFileName = evidenceFile.split("/").last();
-    QString evidenceDBname = "/data/" + evidenceFileName + ".db";
+    QString evidenceDBname = evidenceFileName + ".db";
 
-    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "3.1", evidenceDBname);
+    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "3.1", "WombatData.db");
     sqlObject->PrepareSql("INSERT INTO caseimages (imagefullpath, imagename, caseid) VALUES(?, ?, ?);");
     sqlObject->BindValue(1, evidenceFile);
     sqlObject->BindValue(2, evidenceFileName);

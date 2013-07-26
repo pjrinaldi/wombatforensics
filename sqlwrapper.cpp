@@ -3,12 +3,12 @@
 //SqlWrapper::SqlWrapper()
 SqlWrapper::SqlWrapper(QString dbName) // open to create db if it doesn't exist
 {
-    sqldb = NULL;
-    int sqlValue;
+    //sqldb = NULL;
+    //int sqlValue = -1;
     char* sqlErrMsg;
     const char* createString;
     vector<const char*> createStrings;
-    if(dbName == "/data/WombatData.db")
+    if(dbName == "WombatData.db")
     {
         createStrings.clear();
         createStrings.push_back("CREATE TABLE log(logid INTEGER PRIMARY KEY, logchannel INTEGER, logmessage TEXT);");
@@ -47,12 +47,14 @@ SqlWrapper::SqlWrapper(QString dbName) // open to create db if it doesn't exist
     }
     sqlErrMsg = 0;
     QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
+    tmpPath += "/data/";
     tmpPath += dbName;
-    sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
-    if(sqlite3_errcode(sqldb) == 14) // if error is SQLITE_CANTOPEN, then create db with structure
+    LOGINFO(tmpPath.toStdString().c_str());
+    int sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
+    if(sqlValue == 14) // if error is SQLITE_CANTOPEN, then create db with structure
     {
-            sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
-            if(sqlite3_errcode(sqldb) == 0) // sqlite_ok
+            int sqlValue2 = sqlite3_open(tmpPath.toStdString().c_str(), &sqldb);
+            if(sqlValue2 == 0) // sqlite_ok
             {
                 foreach(createString, createStrings)
                 {
@@ -68,7 +70,7 @@ SqlWrapper::SqlWrapper(QString dbName) // open to create db if it doesn't exist
                     DisplayError("1.0", "OPEN", sqlite3_errmsg(sqldb));
             }
     }
-    else if(sqlite3_errcode(sqldb) == 0) // sqlite_OK, it exists
+    else if(sqlValue == 0) // sqlite_OK, it exists
     {
             //no error, so i will return opendb at end;
     }

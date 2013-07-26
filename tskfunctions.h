@@ -2,6 +2,9 @@
 #define TSKFUNCTIONS_H
 
 #include "wombattskimgdbsqlite.h"
+#include "tsk/framework/services/TskSchedulerQueue.h"
+#include "tsk/framework/file/TskFileManagerImpl.h"
+#include "tsk/framework/services/TskSystemPropertiesImpl.h"
 
 //#include <iostream>
 //#include <cstdio>
@@ -11,9 +14,7 @@
 //#include <memory>
 
 //#include "/usr/local/include/tsk/tsk_tools_i.h"
-//#include "tsk/framework/services/TskSchedulerQueue.h"
 //#include "tsk/framework/services/TskSystemPropertiesImpl.h"
-//#include "tsk/framework/file/TskFileManagerImpl.h"
 //#include "tsk/framework/extraction/TskCarvePrepSectorConcat.h"
 //#include "tsk/framework/extraction/TskCarveExtractScalpel.h"
 //#include "tsk/framework/extraction/TskExtract.h"
@@ -36,9 +37,10 @@ public:
     void InitializeFrameworkScheduler(void);
     void InitializeFrameworkBlackboard(void);
     void InitializeFrameworkDatabase(void);
+    void InitializeFrameworkFileManager(void);
 
     int ret;
-    std::auto_ptr<TskImgDB> frameworkDatabase;
+    //std::auto_ptr<TskImgDB> frameworkDatabase;
     std::auto_ptr<Log> frameworkLog;
     SqlWrapper *wombatSqlObject;
 

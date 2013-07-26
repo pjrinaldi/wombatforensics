@@ -12,12 +12,25 @@ void TskFunctions::SetupTskFramework()
     InitializeFrameworkDatabase();
     InitializeFrameworkBlackboard();
     InitializeFrameworkScheduler();
+    InitializeFrameworkFileManager();
 
 }
 
 void TskFunctions::InitializeFrameworkProperties()
 {
-
+    try
+    {
+        TskSystemPropertiesImpl *systemProperties = new TskSystemPropertiesImpl();
+        systemProperties->initialize();
+        QString tmpString = QDir(QCoreApplication::applicationDirPath()).absolutePath();
+        tmpString += "/tmpdata";
+        systemProperties->set(TskSystemProperties::OUT_DIR, tmpString.toStdString());
+        TskServices::Instance().setSystemProperties(*systemProperties);
+    }
+    catch(TskException &ex)
+    {
+        LOGERROR(ex.message().c_str());
+    }
 }
 
 void TskFunctions::InitializeFrameworkLog()
@@ -29,15 +42,20 @@ void TskFunctions::InitializeFrameworkLog()
 
 void TskFunctions::InitializeFrameworkScheduler()
 {
-
+    TskSchedulerQueue scheduler;
+    TskServices::Instance().setScheduler(scheduler);
 }
 
 void TskFunctions::InitializeFrameworkBlackboard()
 {
-
+    TskServices::Instance().setBlackboard((TskBlackboard &) TskDBBlackboard::instance());
 }
 
 void TskFunctions::InitializeFrameworkDatabase()
 {
-    wombatSqlObject = new SqlWrapper("/data/WombatData.db"); // create overall db.
+    wombatSqlObject = new SqlWrapper("WombatData.db"); // create overall db.
+}
+void TskFunctions::InitializeFrameworkFileManager()
+{
+    TskServices::Instance().setFileManager(TskFileManagerImpl::instance());
 }

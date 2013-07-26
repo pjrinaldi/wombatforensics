@@ -10,6 +10,8 @@ WombatForensics::WombatForensics(QWidget *parent) :
 {
     ui->setupUi(this);
     loadPlugins();
+    QDir testDir = QDir(qApp->applicationDirPath());
+    testDir.mkdir("data");
     TskFunctions *testcase = new TskFunctions();
     testcase->SetupTskFramework();
 }
