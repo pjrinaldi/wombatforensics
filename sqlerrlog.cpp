@@ -12,19 +12,30 @@ void SqlErrLog::log(Channel a_channel, const std::string &a_msg)
 {
     sqldb = NULL;
     int sqlValue;
+    int channelInt = -1;
+    if(a_channel == Log::Error)
+        channelInt = 0;
+    else if(a_channel == Log::Info)
+        channelInt = 1;
+    else if(a_channel == Log::Warn)
+        channelInt = 2;
+    else
+        channelInt = 15;
     QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
     if(tmpPath != "-15")
     {
         tmpPath += "/data/";
         tmpPath += "WombatData.db";
-        sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // opendb
+        sqlValue = sqlite3_open(tmpPath.toStdString().c_str(), &sqldb); // opendb
+        //sqlite3_reset(sqlErrStatement);
+        //sqlite3_clear_bindings(sqlErrStatement);
         if(sqlValue == 0) // sqlite_ok
         {
-            sqlValue = sqlite3_prepare_v2(sqldb, "INSERT INTO logtable (logchannel, logmessage) VALUES(?, ?);", -1, &sqlStatement, NULL);
-            sqlValue = sqlite3_bind_int(sqlStatement, 1, a_channel);
-            sqlValue = sqlite3_bind_text(sqlStatement, 2, a_msg.c_str(), -1, SQLITE_TRANSIENT);
-            sqlValue = sqlite3_step(sqlStatement);
-            sqlValue = sqlite3_finalize(sqlStatement);
+            sqlValue = sqlite3_prepare_v2(sqldb, "INSERT INTO logtable (logchannel, logmessage) VALUES(?, ?);", -1, &sqlErrStatement, NULL);
+            sqlValue = sqlite3_bind_int(sqlErrStatement, 1, channelInt);
+            sqlValue = sqlite3_bind_text(sqlErrStatement, 2, a_msg.c_str(), -1, SQLITE_TRANSIENT);
+            sqlValue = sqlite3_step(sqlErrStatement);
+            sqlValue = sqlite3_finalize(sqlErrStatement);
             sqlValue = sqlite3_close(sqldb);
         }
     }

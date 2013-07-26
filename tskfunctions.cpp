@@ -38,7 +38,10 @@ void TskFunctions::InitializeFrameworkProperties()
 void TskFunctions::InitializeFrameworkLog()
 {
     frameworkLog = std::auto_ptr<Log>(new SqlErrLog());
-    ret = frameworkLog->open(QDir(QCoreApplication::applicationDirPath()).absolutePath().toStdString().c_str()); // modify the logdir path
+    QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
+    tmpPath += "/data/";
+    tmpPath += "wombatforensics.log";
+    ret = frameworkLog->open(tmpPath.toStdString().c_str()); // modify the logdir path
     TskServices::Instance().setLog(*frameworkLog);
 }
 

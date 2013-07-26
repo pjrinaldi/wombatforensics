@@ -10,9 +10,9 @@
 class SqlErrLog : public Log
 {
 public:
-    sqlite3* sqldb;
-    sqlite3_stmt* sqlStatement;
-    char* sqlErrMsg;
+    sqlite3 *sqldb;
+    sqlite3_stmt *sqlErrStatement;
+    char *sqlErrMsg;
     int sqlValue;
 
     SqlErrLog();

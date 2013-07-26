@@ -168,6 +168,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
         sqlObject->FinalizeSql();
         sqlObject->CloseSql();
     }
+}
 /*
     // open case here
     QString evidenceFile = QFileDialog::getOpenFileName(this, "Select Evidence Item", "./");
@@ -366,7 +367,6 @@ void WombatForensics::on_actionOpen_Case_triggered()
 
     // END FILE TYPE SIGNATURE TREE CREATION
     */
-}
 // FRAMEWORK TEST MAKE DIR CODE
 /*
 void WombatForensics::makeDir(const char *dir)
