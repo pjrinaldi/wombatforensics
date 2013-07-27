@@ -204,6 +204,12 @@ int SqlWrapper::StepSql(void)
         }
         return sqlcode;
 }
+int SqlWrapper::ReturnColumnType(int returnPlace)
+{
+    returnplace = returnPlace;
+    return sqlite3_column_type(sqlstatement, returnplace);
+}
+
 void SqlWrapper::ClearBindings(void)
 {
         if(sqlite3_clear_bindings(sqlstatement) != SQLITE_OK)

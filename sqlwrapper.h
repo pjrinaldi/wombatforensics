@@ -25,6 +25,7 @@ public:
     const char* ReturnText(int returnPlace);
     const void* ReturnBlob(int returnPlace);
     int StepSql(void);
+    int ReturnColumnType(int returnPlace);
     void ClearBindings(void);
     sqlite3_int64 ReturnLastInsertRowID(void);
     void ResetSql(void);

@@ -648,6 +648,24 @@ int WombatTskImgDBSqlite::addFsInfo(int volId, int fsId, const TSK_FS_INFO * fs_
  */
 uint64_t WombatTskImgDBSqlite::getFileId(int a_fsId, uint64_t a_fsFileId) const
 {
+    uint64_t fileId = 0;
+    sqlObject = new SqlWrapper(sqlStatement, "15.8", dbname);
+    sqlObject->PrepareSql("SELECT file_id FROM fs_files WHERE fs_id = ? AND fs_file_id = ?;");
+    sqlObject->BindValue(1, a_fsId);
+    sqlObject->BindValue(2, a_fsFileId);
+    int result = sqlObject->StepSql();
+    if(result == SQLITE_ROW)
+    {
+        fileId = (uint64_t)sqlObject->ReturnInt64(0);
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
+    }
+    else
+    {
+        LOGERROR("Error Querying fs_files table.");
+    }
+    return fileId;
+    /*
     if (!m_db)
         return 0;
 
@@ -657,6 +675,7 @@ uint64_t WombatTskImgDBSqlite::getFileId(int a_fsId, uint64_t a_fsFileId) const
     stmt << "SELECT file_id FROM fs_files WHERE fs_id=" << a_fsId << " and fs_file_id=" << a_fsFileId << ";";
 
     /********** FIND the unallocated volumes *************/
+    /*
     if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
         int result = sqlite3_step(statement);
         if (result == SQLITE_ROW) {
@@ -672,28 +691,65 @@ uint64_t WombatTskImgDBSqlite::getFileId(int a_fsId, uint64_t a_fsFileId) const
         return 0;
     }
     return fileId;
+    */
 }
 
 
 int WombatTskImgDBSqlite::getFileRecord(const uint64_t fileId, TskFileRecord& fileRecord) const
 {
+    sqlObject = new SqlWrapper(sqlStatement, "15.8", dbname);
+    sqlObject->PrepareSql("SELECT f.file_id, f.type_id, f.name, f.par_file_id, f.dir_type, f.meta_type, f.dir_flags, f.meta_flags, f.size, f.ctime, f.crtime, f.atime, f.mtime, f.mode, f.uid, f.gid, f.status, f.full_path, fh.md5, fh.sha1, fh.sha2_256, fh.sha2_512 FROM files f LEFT OUTER JOIN file_hashes fh ON f.file_id = fh.file_id WHERE f.file_id =  ?;");
+    sqlObject->BindValue(1, fileId);
+    int result = sqlObject->StepSql();
+    if(result == SQLITE_ROW)
+    {
+        fileRecord.fileId = sqlObject->ReturnInt64(0);
+        fileRecord.typeId = (TskImgDB::FILE_TYPES)sqlObject->ReturnInt(1);
+        fileRecord.name = (char*)sqlObject->ReturnText(2);
+        fileRecord.parentFileId = sqlObject->ReturnInt64(3);
+        fileRecord.dirType = (TSK_FS_NAME_TYPE_ENUM)sqlObject->ReturnInt(4);
+        fileRecord.metaType = (TSK_FS_META_TYPE_ENUM)sqlObject->ReturnInt(5);
+        fileRecord.dirFlags = (TSK_FS_NAME_FLAG_ENUM)sqlObject->ReturnInt(6);
+        fileRecord.metaFlags = (TSK_FS_META_FLAG_ENUM)sqlObject->ReturnInt(7);
+        fileRecord.size = sqlObject->ReturnInt64(8);
+        fileRecord.ctime = sqlObject->ReturnInt(9);
+        fileRecord.crtime = sqlObject->ReturnInt(10);
+        fileRecord.atime = sqlObject->ReturnInt(11);
+        fileRecord.mtime = sqlObject->ReturnInt(12);
+        fileRecord.mode = (TSK_FS_META_MODE_ENUM)sqlObject->ReturnInt(13);
+        fileRecord.uid = sqlObject->ReturnInt(14);
+        fileRecord.gid = sqlObject->ReturnInt(15);
+        fileRecord.status = (TskImgDB::FILE_STATUS)sqlObject->ReturnInt(16);
+        fileRecord.fullPath = (char *)sqlObject->ReturnText(17);
+
+        if(sqlObject->ReturnColumnType(18) == SQLITE_TEXT)
+            fileRecord.md5 = (char *)sqlObject->ReturnText(18);
+        if(sqlObject->ReturnColumnType(19) == SQLITE_TEXT)
+            fileRecord.sha1 = (char *)sqlObject->ReturnText(19);
+        if(sqlObject->ReturnColumnType(20) == SQLITE_TEXT)
+            fileRecord.sha2_256 = (char *)sqlObject->ReturnText(20);
+        if(sqlObject->ReturnColumnType(21) == SQLITE_TEXT)
+            fileRecord.sha2_512 = (char *)sqlObject->ReturnText(21);
+    }
+    else
+        LOGERROR("Error querying files table for file id");
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+
+    return 0;
+    /*
     if (!m_db)
         return -1;
-
     int ret = 0;
-
     sqlite3_stmt * statement;
     std::stringstream stmt;
-
     stmt << "SELECT f.file_id, f.type_id, f.name, f.par_file_id, f.dir_type, f.meta_type, f.dir_flags, "
         << "f.meta_flags, f.size, f.ctime, f.crtime, f.atime, f.mtime, f.mode, f.uid, f.gid, f.status, f.full_path, "
         << "fh.md5, fh.sha1, fh.sha2_256, fh.sha2_512 "
         << "FROM files f LEFT OUTER JOIN file_hashes fh ON f.file_id = fh.file_id WHERE f.file_id=" << fileId;
-
     if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK)
     {
         int result = sqlite3_step(statement);
-
         if (result == SQLITE_ROW)
         {
             fileRecord.fileId       = sqlite3_column_int64(statement, 0);
@@ -714,7 +770,6 @@ int WombatTskImgDBSqlite::getFileRecord(const uint64_t fileId, TskFileRecord& fi
             fileRecord.gid          = sqlite3_column_int(statement, 15);
             fileRecord.status = (TskImgDB::FILE_STATUS) sqlite3_column_int(statement, 16);
             fileRecord.fullPath     = (char *)sqlite3_column_text(statement, 17);
-
             if (sqlite3_column_type(statement, 18) == SQLITE_TEXT)
                 fileRecord.md5      = (char *)sqlite3_column_text(statement, 18);
             if (sqlite3_column_type(statement, 19) == SQLITE_TEXT)
@@ -744,37 +799,26 @@ int WombatTskImgDBSqlite::getFileRecord(const uint64_t fileId, TskFileRecord& fi
     }
 
     return ret;
+            */
 }
 
 int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fileSystemFile, const char *fileName, int fileSystemAttrType, int fileSystemAttrID, uint64_t &fileID, const char *filePath)
 {
-    const std::string msgPrefix = "WombatTskImgDBSqlite::addFsFileInfo : ";
     fileID = 0;
-
-    if (!m_db)
-    {
-        return -1;
-    }
-
-    // Construct the full path of the file within the image.
     std::string fullpath(filePath);
     fullpath.append(fileName);
-
-    // Replace all single quotes in the file name with double single quotes to comply with SQLLite syntax.
     std::string fileNameAsString(fileName);
     size_t found = fileNameAsString.find("'");
-    if (found != std::string::npos) //Replace it and replace all its subsequent occurrences.
+    if(found != std::string::npos) // replace it and replace all its subsequent occurences
     {
-        fileNameAsString.replace(found,1,"''");
-
-        while ((found=fileNameAsString.find("'", found+2)) != std::string::npos)// found+2 because we want to move past the newly inserted single quote.
+        fileNameAsString.replace(found, 1, "''");
+        while ((found = fileNameAsString.find("'", found+2)) != std::string::npos) // found+2 because we want to move past the newly inserted single quote.
         {
-            fileNameAsString.replace(found,1,"''");
+            fileNameAsString.replace(found, 1, "''");
         }
     }
-
-    // Now remove all the control characters from the file name.
-    for (int codePoint=1; codePoint < 32; codePoint++)
+    sqlObject = new SqlWrapper(sqlStatement, "15.9", dbname);
+    for(int codePoint = 1; codePoint < 32; codePoint++)
     {
         char codePointAsHex[10];
         codePointAsHex[0] = codePoint;
@@ -782,19 +826,16 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
         std::string stringToRemove(codePointAsHex);
 
         found = fileNameAsString.find(stringToRemove);
-        if (found != std::string::npos) //Replace it and replace all its subsequent occurrences.
+        if(found != std::string::npos) // replace it and replace all subsequent occurences
         {
-            fileNameAsString.replace(found,1,"");
-
-            while ((found=fileNameAsString.find(stringToRemove,found+1)) != std::string::npos)// found+1 because the control characters are just 1 character.
+            fileNameAsString.replace(found, 1, "");
+            while((found = fileNameAsString.find(stringToRemove, found+1)) != std::string::npos) // found+1 because the control characters are just 1 character.
             {
-                fileNameAsString.replace(found,1,"");
+                fileNameAsString.replace(found, 1, "");
             }
         }
     }
-
     fileName = fileNameAsString.c_str();
-
     // Get the file size.
     TSK_OFF_T size = 0;
     const TSK_FS_ATTR *fileSystemAttribute = tsk_fs_file_attr_get_id(const_cast<TSK_FS_FILE*>(fileSystemFile), fileSystemAttrID);
@@ -802,7 +843,6 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
     {
         size = fileSystemAttribute->size;
     }
-
     // Get the file metadata, if it's available.
     int mtime = 0;
     int crtime = 0;
@@ -825,7 +865,111 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
         gid = fileSystemFile->meta->gid;
         uid = fileSystemFile->meta->uid;
     }
+    sqlObject->PrepareSql("INSERT INTO files(file_id, type_id, status, name, par_file_id, dir_type, meta_type, dir_flags, meta_flags, size, crtime, ctime, atime, mtime, mode, gid, uid, full_path) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+    sqlObject->BindValue(1, IMGDB_FILES_TYPE_FS);
+    sqlObject->BindValue(2, IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
+    sqlObject->BindValue(3, fileName);
+    sqlObject->BindValue(4, findParObjId(fileSystemID, fileSystemFile->name->par_addr));
+    sqlObject->BindValue(5, fileSystemFile->name->type);
+    sqlObject->BindValue(6, meta_type);
+    sqlObject->BindValue(7, fileSystemFile->name->flags);
+    sqlObject->BindValue(8, meta_flags);
+    sqlObject->BindValue(9, size);
+    sqlObject->BindValue(10, crtime);
+    sqlObject->BindValue(11, ctime);
+    sqlObject->BindValue(12, atime);
+    sqlObject->BindValue(13, mtime);
+    sqlObject->BindValue(14, meta_mode);
+    sqlObject->BindValue(15, gid);
+    sqlObject->BindValue(16, uid);
+    sqlObject->BindValue(17, fullpath.c_str());
+    sqlObject->StepSql();
+    fileID = sqlObject->ReturnLastInsertRowID();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    sqlObject = new SqlWrapper(sqlStatement, "15.8", dbname);
+    sqlObject->PrepareSql("INSERT INTO fs_files (file_id, fs_id, fs_file_id, attr_type, attr_id) VALUES (?, ?, ?, ?, ?);");
+    sqlObject->BindValue(1, fileID);
+    sqlObject->BindValue(2, fileSystemID);
+    sqlObject->BindValue(3, fileSystemFile->name->meta_addr);
+    sqlObject->BindValue(4, fileSystemAttrType);
+    sqlObject->BindValue(5, fileSystemAttrID);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    if(meta_type == TSK_FS_META_TYPE_DIR) // if dir, update parent id cache
+        storeParObjId(fileSystemID, fileSystemFile->name->meta_addr, fileID);
+    /*
+    const std::string msgPrefix = "WombatTskImgDBSqlite::addFsFileInfo : ";
+    fileID = 0;
 
+    if (!m_db)
+    {
+        return -1;
+    }
+    // Construct the full path of the file within the image.
+    std::string fullpath(filePath);
+    fullpath.append(fileName);
+    // Replace all single quotes in the file name with double single quotes to comply with SQLLite syntax.
+    std::string fileNameAsString(fileName);
+    size_t found = fileNameAsString.find("'");
+    if (found != std::string::npos) //Replace it and replace all its subsequent occurrences.
+    {
+        fileNameAsString.replace(found,1,"''");
+
+        while ((found=fileNameAsString.find("'", found+2)) != std::string::npos)// found+2 because we want to move past the newly inserted single quote.
+        {
+            fileNameAsString.replace(found,1,"''");
+        }
+    }
+    // Now remove all the control characters from the file name.
+    for (int codePoint=1; codePoint < 32; codePoint++)
+    {
+        char codePointAsHex[10];
+        codePointAsHex[0] = codePoint;
+        codePointAsHex[1] = '\0';
+        std::string stringToRemove(codePointAsHex);
+        found = fileNameAsString.find(stringToRemove);
+        if (found != std::string::npos) //Replace it and replace all its subsequent occurrences.
+        {
+            fileNameAsString.replace(found,1,"");
+
+            while ((found=fileNameAsString.find(stringToRemove,found+1)) != std::string::npos)// found+1 because the control characters are just 1 character.
+            {
+                fileNameAsString.replace(found,1,"");
+            }
+        }
+    }
+    fileName = fileNameAsString.c_str();
+    // Get the file size.
+    TSK_OFF_T size = 0;
+    const TSK_FS_ATTR *fileSystemAttribute = tsk_fs_file_attr_get_id(const_cast<TSK_FS_FILE*>(fileSystemFile), fileSystemAttrID);
+    if (fileSystemAttribute)
+    {
+        size = fileSystemAttribute->size;
+    }
+    // Get the file metadata, if it's available.
+    int mtime = 0;
+    int crtime = 0;
+    int ctime = 0;
+    int atime = 0;
+    int meta_type = 0;
+    int meta_flags = 0;
+    int meta_mode = 0;
+    int gid = 0;
+    int uid = 0;
+    if (fileSystemFile->meta)
+    {
+        mtime = static_cast<int>(fileSystemFile->meta->mtime);
+        atime = static_cast<int>(fileSystemFile->meta->atime);
+        ctime = static_cast<int>(fileSystemFile->meta->ctime);
+        crtime = static_cast<int>(fileSystemFile->meta->crtime);
+        meta_type = fileSystemFile->meta->type;
+        meta_flags = fileSystemFile->meta->flags;
+        meta_mode = fileSystemFile->meta->mode;
+        gid = fileSystemFile->meta->gid;
+        uid = fileSystemFile->meta->uid;
+    }
     // Insert into the files table.
     char stmt[4096];
     sqlite3_snprintf(4096, stmt,
@@ -847,15 +991,12 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
         sqlite3_free(errmsg);
         return -1;
     }
-
     // Get the file_id from the last insert.
     fileID = sqlite3_last_insert_rowid(m_db);
-
     // Insert into the fs_files table.
     sqlite3_snprintf(4096, stmt,
         "INSERT INTO fs_files (file_id, fs_id, fs_file_id, attr_type, attr_id) VALUES (%llu,%d,%"
         PRIuINUM ",%d,%d)", fileID, fileSystemID, fileSystemFile->name->meta_addr, fileSystemAttrType, fileSystemAttrID);
-
     if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK)
     {
         std::ostringstream msg;
@@ -865,12 +1006,11 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
         sqlite3_free(errmsg);
         return -1;
     }
-
     //if dir, update parent id cache
     if (meta_type == TSK_FS_META_TYPE_DIR) {
         storeParObjId(fileSystemID, fileSystemFile->name->meta_addr, fileID);
     }
-
+    */
     return 0;
 }
 
@@ -886,6 +1026,7 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
  */
 int WombatTskImgDBSqlite::addFsBlockInfo(int a_fsId, uint64_t a_fileId, int a_sequence, uint64_t a_blk_addr, uint64_t a_len)
 {
+    /*
     std::stringstream stmt;
     char * errmsg;
 
