@@ -23,11 +23,17 @@ public:
     double ReturnDouble(int returnPlace);
     sqlite3_int64 ReturnInt64(int returnPlace);
     const char* ReturnText(int returnPlace);
+    const void* ReturnText16(int returnPlace);
     const void* ReturnBlob(int returnPlace);
+    int ReturnTable(char ***queryResults, int numRows, int numColumns, char **errMsg);
+    void SqlWrapper::FreeTable(char **queryResults);
     int StepSql(void);
+    int ExecuteSql(char **errmsg);
     int ReturnColumnType(int returnPlace);
     void ClearBindings(void);
     sqlite3_int64 ReturnLastInsertRowID(void);
+    void Free(void *varToFree);
+    void FreeTable(char **queryResults);
     void ResetSql(void);
     void FinalizeSql(void);
     void CloseSql(void);

@@ -16,17 +16,6 @@
 //WombatTskImgDBSqlite::WombatTskImgDBSqlite(const char * a_outpath)
 WombatTskImgDBSqlite::WombatTskImgDBSqlite(QString dbName)
 {
-    /*
-    strncpy(m_outPath, a_outpath, 256);
-    // ensure that the path ends with a '/'
-    if (m_outPath[strlen(m_outPath)-1] != '/') {
-        int len1 = strlen(m_outPath);
-        m_outPath[len1] = '/';
-        m_outPath[len1+1] = '\0';
-    }
-    strncpy(m_dbFilePath, m_outPath, 256);
-    strncat(m_dbFilePath, "image.db", 256);
-    */
     m_db = NULL;
     dbname = dbName;
 }
@@ -86,289 +75,7 @@ int WombatTskImgDBSqlite::dropTables()
 
 int WombatTskImgDBSqlite::initialize()
 {
-    sqlObject = new SqlWrapper(dbname);
-    /*
-    return 0;
-    std::wstringstream infoMessage;
-    char * errmsg;
-
-    // Open the database.
-    if (open() != 0)
-    {
-        // Error message will have been logged by open()
-        return 1;
-    }
-
-    // Clean up the whole database.
-    dropTables();
-
-    std::string stmt;
-
-    sqlite3_stmt *statement;
-
-    // set page size -- 4k is much faster on Windows than the default
-    executeStatement("PRAGMA page_size = 4096;", statement, "WombatTskImgDBSqlite::initialize");
-    sqlite3_finalize(statement);
-
-    // we don't have a mechanism to recover from a crash anyway
-    executeStatement("PRAGMA synchronous = 0;", statement, "WombatTskImgDBSqlite::initialize");
-    sqlite3_finalize(statement);
-
-    // ----- DB_INFO
-    stmt = "CREATE TABLE db_info (name TEXT PRIMARY KEY, version TEXT)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating db_info table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- IMAGE_INFO
-    stmt = "CREATE TABLE image_info (type INTEGER, ssize INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating image_info table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- IMAGE_NAMES
-    stmt = "CREATE TABLE image_names (seq INTEGER PRIMARY KEY, name TEXT)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating image_names table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- VOL_INFO
-    stmt = "CREATE TABLE vol_info (vol_id INTEGER PRIMARY KEY, sect_start INTEGER NOT NULL, "
-        "sect_len INTEGER NOT NULL, description TEXT, flags INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating vol_info table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- FS_INFO
-    stmt = "CREATE TABLE fs_info (fs_id INTEGER PRIMARY KEY, img_byte_offset INTEGER, "
-        "vol_id INTEGER NOT NULL, fs_type INTEGER, block_size INTEGER, "
-        "block_count INTEGER, root_inum INTEGER, first_inum INTEGER, last_inum INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str() , NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating fs_info table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- FILES
-    stmt = "CREATE TABLE files (file_id INTEGER PRIMARY KEY, type_id INTEGER, "
-        "name TEXT, par_file_id INTEGER, dir_type INTEGER, meta_type INTEGER, "
-        "dir_flags INTEGER, meta_flags INTEGER, size INTEGER, ctime INTEGER, "
-        "crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, "
-        "gid INTEGER, status INTEGER, full_path TEXT)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating files table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- FS_FILES
-    stmt = "CREATE TABLE fs_files (file_id INTEGER PRIMARY KEY, fs_id INTEGER, "
-        "fs_file_id INTEGER, attr_type INTEGER, attr_id INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating fs_files table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- FS_BLOCKS
-    stmt = "CREATE TABLE fs_blocks (fs_id INTEGER NOT NULL, file_id INTEGER NOT NULL, seq INTEGER, "
-        "blk_start INTEGER NOT NULL, blk_len INTEGER NOT NULL)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating fs_blocks table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- CARVED_FILES
-    stmt = "CREATE TABLE carved_files (file_id INTEGER PRIMARY KEY, vol_id INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating carved_files table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- SECTOR_LIST
-    stmt = "CREATE TABLE carved_sectors ("
-        "file_id INTEGER, seq INTEGER, sect_start INTEGER, sect_len INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating carved_sectors table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- DERIVED_FILES
-    stmt = "CREATE TABLE derived_files (file_id INTEGER PRIMARY KEY, derivation_details TEXT)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating derived_files table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- ALLOC_UNALLOC_MAP
-    stmt = "CREATE TABLE alloc_unalloc_map (vol_id INTEGER, unalloc_img_id INTEGER, "
-        "unalloc_img_sect_start INTEGER, sect_len INTEGER, orig_img_sect_start INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating alloc_unalloc_map table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- FILE_HASHES
-    stmt = "CREATE TABLE file_hashes (file_id INTEGER PRIMARY KEY, md5 TEXT, sha1 TEXT, sha2_256 TEXT, sha2_512 TEXT, known INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating file_hashes table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- MODULES
-    stmt = "CREATE TABLE modules (module_id INTEGER PRIMARY KEY, name TEXT UNIQUE NOT NULL, description TEXT)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating module table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- MODULE_STATUS
-    stmt = "CREATE TABLE module_status (file_id INTEGER, module_id INTEGER, status INTEGER, PRIMARY KEY (file_id, module_id))";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating module_status table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- UNALLOC_IMG_STATUS
-    stmt = "CREATE TABLE unalloc_img_status (unalloc_img_id INTEGER PRIMARY KEY, status INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating unalloc_img_status table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- UNUSED_SECTORS
-    stmt = "CREATE TABLE unused_sectors (file_id INTEGER PRIMARY KEY, sect_start INTEGER, sect_len INTEGER, vol_id INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating unused_sectors table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- BLACKBOARD_ARTIFACTS
-    stmt = "CREATE TABLE blackboard_artifacts (artifact_id INTEGER PRIMARY KEY, obj_id INTEGER NOT NULL, artifact_type_id INTEGER)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating blackboard_artifacts table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- BLACKBOARD_ATTRIBUTES
-    stmt = "CREATE TABLE blackboard_attributes (artifact_id INTEGER NOT NULL, source TEXT, context TEXT, attribute_type_id INTEGER NOT NULL, value_type INTEGER NOT NULL, "
-        "value_byte BLOB, value_text TEXT, value_int32 INTEGER, value_int64 INTEGER, value_double NUMERIC(20, 10), obj_id INTEGER NOT NULL)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating blackboard_attributes table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- BLACKBOARD_ARTIFACT_TYPES
-    stmt = "CREATE TABLE blackboard_artifact_types (artifact_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating blackboard_artifact_types table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- BLACKBOARD_ATTRIBUTE_TYPES
-    stmt = "CREATE TABLE blackboard_attribute_types (attribute_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating blackboard_attribute_types table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    // ----- CREATE INDEXES
-    stmt = "CREATE INDEX attrs_artifact_id ON blackboard_attributes(artifact_id)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating attrs_artifact_id index: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    stmt = "CREATE INDEX attrs_attribute_type ON blackboard_attributes(attribute_type_id)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating attrs_attribute_type index: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    stmt = "CREATE INDEX attrs_obj_id ON blackboard_attributes(obj_id)";
-    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::initialize - Error creating attrs_obj_id index: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
+    sqlObject = new SqlWrapper(dbname); // create the image database
 
     map<int, TskArtifactNames> artTypes = TskImgDB::getAllArtifactTypes();
     for (map<int, TskArtifactNames>::iterator it = artTypes.begin(); it != artTypes.end(); it++) {
@@ -380,20 +87,7 @@ int WombatTskImgDBSqlite::initialize()
     }
 
     addToolInfo("DBSchema", IMGDB_SCHEMA_VERSION);
-    LOGINFO(L"ImgDB Created.");
 
-    return 0;
-    */
-    map<int, TskArtifactNames> artTypes = TskImgDB::getAllArtifactTypes();
-    for (map<int, TskArtifactNames>::iterator it = artTypes.begin(); it != artTypes.end(); it++) {
-        addArtifactType(it->first, it->second.typeName, it->second.displayName);
-    }
-    map<int, TskAttributeNames> attrTypes = TskImgDB::getAllAttributeTypes();
-    for (map<int, TskAttributeNames>::iterator it = attrTypes.begin(); it != attrTypes.end(); it++) {
-        addAttributeType(it->first, it->second.typeName, it->second.displayName);
-    }
-
-    addToolInfo("DBSchema", IMGDB_SCHEMA_VERSION);
     LOGINFO(L"ImgDB Created.");
     return 0;
 }
@@ -408,58 +102,6 @@ int WombatTskImgDBSqlite::open()
 {
     sqlObject = new SqlWrapper(sqlStatement, "15.15", dbname);
     return 0;
-    /*
-    std::wstringstream infoMessage;
-
-#if 0
-    if (sqlite3_open16(m_dbFilePath, &m_db))
-#else
-    if (sqlite3_open(m_dbFilePath, &m_db))
-#endif
-    {
-        infoMessage << L"WombatTskImgDBSqlite::open - Can't create new database: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-
-        sqlite3_close(m_db);
-        return 1;
-    }
-
-    // The chunk size setting defines by how much the database will grow
-    // or shrink. The primary motivation behind this setting is to reduce
-    // database file fragmentation and potential performance improvements.
-    // We, however, are using this setting as a workaround for database
-    // corruption issues we have been experiencing when the database is
-    // updated by multiple concurrent processes.
-    // Database corruption was occuring when SQLite determined that the
-    // number of database pages in the database was greater than a value
-    // that it had previously cached.
-    // This workaround is a crude mechanism to get around that situation.
-    int chunkSize = IMGDB_CHUNK_SIZE;
-
-    if (sqlite3_file_control(m_db, NULL, SQLITE_FCNTL_CHUNK_SIZE, &chunkSize) != SQLITE_OK)
-    {
-        infoMessage << L"WombatTskImgDBSqlite::open - Failed to set chunk size: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-
-        sqlite3_close(m_db);
-        return 1;
-    }
-
-    // Register a busy handler that will retry statements in situations
-    // where the database is locked by another process.
-    if (sqlite3_busy_handler(m_db, WombatTskImgDBSqlite::busyHandler, m_db) != SQLITE_OK)
-    {
-        infoMessage <<  L"WombatTskImgDBSqlite::open - Failed to set busy handler: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-
-        sqlite3_close(m_db);
-        return 1;
-    }
-
-    LOGINFO(L"ImgDB Opened.");
-
-    return 0;
-    */
 }
 
 int WombatTskImgDBSqlite::addToolInfo(const char* name, const char* version)
@@ -473,28 +115,6 @@ int WombatTskImgDBSqlite::addToolInfo(const char* name, const char* version)
     sqlObject->CloseSql();
 
    return 0;
-    /*
-    char *errmsg;
-    char stmt[1024];
-
-    if (!m_db)
-        return 1;
-
-    sqlite3_snprintf(1024, stmt,
-        "INSERT INTO db_info (name, version) VALUES ('%q', '%q');",
-        name, version);
-    if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addToolInfo - Error adding data to db_info table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    return 0;
-    */
 }
 
 int WombatTskImgDBSqlite::addImageInfo(int type, int size)
@@ -507,56 +127,16 @@ int WombatTskImgDBSqlite::addImageInfo(int type, int size)
     sqlObject->FinalizeSql();
     sqlObject->CloseSql();
     return 0;
-    /*
-    char *errmsg;
-    std::stringstream stmt;
-
-    if (!m_db)
-        return 1;
-
-    stmt << "INSERT INTO image_info (type, ssize) VALUES ("<< type << ", " << size << ");";
-    if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        std::wstringstream infoMessage;
-        infoMessage <<  L"WombatTskImgDBSqlite::addImageInfo - Error adding data to image_info table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
-    return 0;
-    */
 }
 
 int WombatTskImgDBSqlite::addImageName(char const *imgPath)
 {
-    sqlObject = new sqlObject(sqlStatement, "15.1", dbname);
+    sqlObject = new SqlWrapper(sqlStatement, "15.1", dbname);
     sqlObject->PrepareSql("INSERT INTO image_names (seq, name) VALUES(NULL, ?);");
     sqlObject->BindValue(1, imgPath);
     sqlObject->StepSql();
     sqlObject->FinalizeSql();
     sqlObject->CloseSql();
-    /*
-    char *errmsg;
-    char stmt[1024];
-
-    if (!m_db)
-        return 1;
-
-    sqlite3_snprintf(1024, stmt,
-        "INSERT INTO image_names (seq, name) VALUES (NULL, '%q')",
-        imgPath);
-    if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addImageName - Error adding data to image_names table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-    */
     return 0;
 }
 
@@ -575,28 +155,6 @@ int WombatTskImgDBSqlite::addVolumeInfo(const TSK_VS_PART_INFO * vs_part)
     sqlObject->StepSql();
     sqlObject->FinalizeSql();
     sqlObject->CloseSql();
-    /*
-    char stmt[1024];
-    char * errmsg;
-
-    if (!m_db)
-        return 1;
-
-    sqlite3_snprintf(1024, stmt,
-        "INSERT INTO vol_info (vol_id, sect_start, sect_len, description, flags) VALUES (%d,%"
-        PRIuOFF ",%" PRIuOFF ",'%q',%d)", (int)vs_part->addr,
-        vs_part->start, vs_part->len, vs_part->desc, vs_part->flags);
-
-    if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK) {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addVolumeInfo - Error adding data to vol_info table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-    */
-
     return 0;
 }
 
@@ -616,29 +174,6 @@ int WombatTskImgDBSqlite::addFsInfo(int volId, int fsId, const TSK_FS_INFO * fs_
     sqlObject->StepSql();
     sqlObject->FinalizeSql();
     sqlObject->CloseSql();
-    /*
-    std::stringstream stmt;
-    char * errmsg;
-
-    if (!m_db)
-        return 1;
-
-    stmt <<
-        "INSERT INTO fs_info (fs_id, img_byte_offset, vol_id, fs_type, block_size, "
-        "block_count, root_inum, first_inum, last_inum) VALUES (" <<
-        fsId << ", " << fs_info->offset << ", " <<  volId << ", " <<
-        (int)fs_info->ftype << ", " <<  fs_info->block_size << ", " <<  fs_info->block_count << ", " <<
-        fs_info->root_inum << ", " <<  fs_info->first_inum << ", " <<  fs_info->last_inum << ")";
-
-    if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addFsInfo - Error adding data to fs_info table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-    */
     return 0;
 }
 
@@ -665,33 +200,6 @@ uint64_t WombatTskImgDBSqlite::getFileId(int a_fsId, uint64_t a_fsFileId) const
         LOGERROR("Error Querying fs_files table.");
     }
     return fileId;
-    /*
-    if (!m_db)
-        return 0;
-
-    sqlite3_stmt * statement;
-    std::stringstream stmt;
-    uint64_t fileId = 0;
-    stmt << "SELECT file_id FROM fs_files WHERE fs_id=" << a_fsId << " and fs_file_id=" << a_fsFileId << ";";
-
-    /********** FIND the unallocated volumes *************/
-    /*
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            fileId = (uint64_t)sqlite3_column_int64(statement, 0);
-        }
-        sqlite3_finalize(statement);
-    }
-    else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getFileId - Error querying fs_files table: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-
-        return 0;
-    }
-    return fileId;
-    */
 }
 
 
@@ -737,69 +245,6 @@ int WombatTskImgDBSqlite::getFileRecord(const uint64_t fileId, TskFileRecord& fi
     sqlObject->CloseSql();
 
     return 0;
-    /*
-    if (!m_db)
-        return -1;
-    int ret = 0;
-    sqlite3_stmt * statement;
-    std::stringstream stmt;
-    stmt << "SELECT f.file_id, f.type_id, f.name, f.par_file_id, f.dir_type, f.meta_type, f.dir_flags, "
-        << "f.meta_flags, f.size, f.ctime, f.crtime, f.atime, f.mtime, f.mode, f.uid, f.gid, f.status, f.full_path, "
-        << "fh.md5, fh.sha1, fh.sha2_256, fh.sha2_512 "
-        << "FROM files f LEFT OUTER JOIN file_hashes fh ON f.file_id = fh.file_id WHERE f.file_id=" << fileId;
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK)
-    {
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW)
-        {
-            fileRecord.fileId       = sqlite3_column_int64(statement, 0);
-            fileRecord.typeId = (TskImgDB::FILE_TYPES)sqlite3_column_int(statement, 1);
-            fileRecord.name         = (char *)sqlite3_column_text(statement, 2);
-            fileRecord.parentFileId = sqlite3_column_int64(statement, 3);
-            fileRecord.dirType = (TSK_FS_NAME_TYPE_ENUM) sqlite3_column_int(statement, 4);
-            fileRecord.metaType = (TSK_FS_META_TYPE_ENUM) sqlite3_column_int(statement, 5);
-            fileRecord.dirFlags = (TSK_FS_NAME_FLAG_ENUM) sqlite3_column_int(statement, 6);
-            fileRecord.metaFlags = (TSK_FS_META_FLAG_ENUM) sqlite3_column_int(statement, 7);
-            fileRecord.size         = sqlite3_column_int64(statement, 8);
-            fileRecord.ctime        = sqlite3_column_int(statement, 9);
-            fileRecord.crtime       = sqlite3_column_int(statement, 10);
-            fileRecord.atime        = sqlite3_column_int(statement, 11);
-            fileRecord.mtime        = sqlite3_column_int(statement, 12);
-            fileRecord.mode = (TSK_FS_META_MODE_ENUM)sqlite3_column_int(statement, 13);
-            fileRecord.uid          = sqlite3_column_int(statement, 14);
-            fileRecord.gid          = sqlite3_column_int(statement, 15);
-            fileRecord.status = (TskImgDB::FILE_STATUS) sqlite3_column_int(statement, 16);
-            fileRecord.fullPath     = (char *)sqlite3_column_text(statement, 17);
-            if (sqlite3_column_type(statement, 18) == SQLITE_TEXT)
-                fileRecord.md5      = (char *)sqlite3_column_text(statement, 18);
-            if (sqlite3_column_type(statement, 19) == SQLITE_TEXT)
-                fileRecord.sha1     = (char *)sqlite3_column_text(statement, 19);
-            if (sqlite3_column_type(statement, 20) == SQLITE_TEXT)
-                fileRecord.sha2_256 = (char *)sqlite3_column_text(statement, 20);
-            if (sqlite3_column_type(statement, 21) == SQLITE_TEXT)
-                fileRecord.sha2_512 = (char *)sqlite3_column_text(statement, 21);
-        }
-        else
-        {
-            std::wstringstream msg;
-            msg << L"WombatTskImgDBSqlite::getFileRecord - Error querying files table for file id: " << fileId;
-            LOGERROR(msg.str());
-
-            ret = -1;
-        }
-        sqlite3_finalize(statement);
-    }
-    else
-    {
-        std::wstringstream msg;
-        msg << L"WombatTskImgDBSqlite::getFileRecord - Error querying files table for file id: " << fileId;
-        LOGERROR(msg.str());
-
-        ret = -1;
-    }
-
-    return ret;
-            */
 }
 
 int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fileSystemFile, const char *fileName, int fileSystemAttrType, int fileSystemAttrID, uint64_t &fileID, const char *filePath)
@@ -899,118 +344,6 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
     sqlObject->CloseSql();
     if(meta_type == TSK_FS_META_TYPE_DIR) // if dir, update parent id cache
         storeParObjId(fileSystemID, fileSystemFile->name->meta_addr, fileID);
-    /*
-    const std::string msgPrefix = "WombatTskImgDBSqlite::addFsFileInfo : ";
-    fileID = 0;
-
-    if (!m_db)
-    {
-        return -1;
-    }
-    // Construct the full path of the file within the image.
-    std::string fullpath(filePath);
-    fullpath.append(fileName);
-    // Replace all single quotes in the file name with double single quotes to comply with SQLLite syntax.
-    std::string fileNameAsString(fileName);
-    size_t found = fileNameAsString.find("'");
-    if (found != std::string::npos) //Replace it and replace all its subsequent occurrences.
-    {
-        fileNameAsString.replace(found,1,"''");
-
-        while ((found=fileNameAsString.find("'", found+2)) != std::string::npos)// found+2 because we want to move past the newly inserted single quote.
-        {
-            fileNameAsString.replace(found,1,"''");
-        }
-    }
-    // Now remove all the control characters from the file name.
-    for (int codePoint=1; codePoint < 32; codePoint++)
-    {
-        char codePointAsHex[10];
-        codePointAsHex[0] = codePoint;
-        codePointAsHex[1] = '\0';
-        std::string stringToRemove(codePointAsHex);
-        found = fileNameAsString.find(stringToRemove);
-        if (found != std::string::npos) //Replace it and replace all its subsequent occurrences.
-        {
-            fileNameAsString.replace(found,1,"");
-
-            while ((found=fileNameAsString.find(stringToRemove,found+1)) != std::string::npos)// found+1 because the control characters are just 1 character.
-            {
-                fileNameAsString.replace(found,1,"");
-            }
-        }
-    }
-    fileName = fileNameAsString.c_str();
-    // Get the file size.
-    TSK_OFF_T size = 0;
-    const TSK_FS_ATTR *fileSystemAttribute = tsk_fs_file_attr_get_id(const_cast<TSK_FS_FILE*>(fileSystemFile), fileSystemAttrID);
-    if (fileSystemAttribute)
-    {
-        size = fileSystemAttribute->size;
-    }
-    // Get the file metadata, if it's available.
-    int mtime = 0;
-    int crtime = 0;
-    int ctime = 0;
-    int atime = 0;
-    int meta_type = 0;
-    int meta_flags = 0;
-    int meta_mode = 0;
-    int gid = 0;
-    int uid = 0;
-    if (fileSystemFile->meta)
-    {
-        mtime = static_cast<int>(fileSystemFile->meta->mtime);
-        atime = static_cast<int>(fileSystemFile->meta->atime);
-        ctime = static_cast<int>(fileSystemFile->meta->ctime);
-        crtime = static_cast<int>(fileSystemFile->meta->crtime);
-        meta_type = fileSystemFile->meta->type;
-        meta_flags = fileSystemFile->meta->flags;
-        meta_mode = fileSystemFile->meta->mode;
-        gid = fileSystemFile->meta->gid;
-        uid = fileSystemFile->meta->uid;
-    }
-    // Insert into the files table.
-    char stmt[4096];
-    sqlite3_snprintf(4096, stmt,
-        "INSERT INTO files (file_id, type_id, status, name, par_file_id, dir_type, meta_type, "
-        "dir_flags, meta_flags, size, crtime, ctime, atime, mtime, mode, gid, uid, full_path) VALUES (NULL, %d, %d,"
-        "'%q',%llu,%d,%d,%d,%d,%" PRIuOFF",%d,%d,%d,%d,%d,%d,%d,'%q')",
-        IMGDB_FILES_TYPE_FS, IMGDB_FILES_STATUS_READY_FOR_ANALYSIS, fileName,
-        findParObjId(fileSystemID, fileSystemFile->name->par_addr),
-        fileSystemFile->name->type, meta_type,
-        fileSystemFile->name->flags, meta_flags, size, crtime, ctime, atime,
-        mtime, meta_mode, gid, uid, fullpath.c_str());
-    char *errmsg;
-    if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        std::ostringstream msg;
-        msg << msgPrefix << "Error adding data to files table: " << errmsg;
-        LOGERROR(msg.str());
-
-        sqlite3_free(errmsg);
-        return -1;
-    }
-    // Get the file_id from the last insert.
-    fileID = sqlite3_last_insert_rowid(m_db);
-    // Insert into the fs_files table.
-    sqlite3_snprintf(4096, stmt,
-        "INSERT INTO fs_files (file_id, fs_id, fs_file_id, attr_type, attr_id) VALUES (%llu,%d,%"
-        PRIuINUM ",%d,%d)", fileID, fileSystemID, fileSystemFile->name->meta_addr, fileSystemAttrType, fileSystemAttrID);
-    if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        std::ostringstream msg;
-        msg << msgPrefix << "Error adding data to fs_files table: " << errmsg;
-        LOGERROR(msg.str());
-
-        sqlite3_free(errmsg);
-        return -1;
-    }
-    //if dir, update parent id cache
-    if (meta_type == TSK_FS_META_TYPE_DIR) {
-        storeParObjId(fileSystemID, fileSystemFile->name->meta_addr, fileID);
-    }
-    */
     return 0;
 }
 
@@ -1026,53 +359,29 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
  */
 int WombatTskImgDBSqlite::addFsBlockInfo(int a_fsId, uint64_t a_fileId, int a_sequence, uint64_t a_blk_addr, uint64_t a_len)
 {
-    /*
-    std::stringstream stmt;
-    char * errmsg;
-
-    if (!m_db)
-        return 1;
-
-    stmt <<
-        "INSERT INTO fs_blocks (fs_id, file_id, seq, blk_start, blk_len) VALUES (" <<
-        a_fsId << "," << a_fileId << "," << a_sequence << "," << a_blk_addr << "," <<  a_len << ")";
-
-    if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addFsBlockInfo - Error adding data to fs_blocks table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
+    sqlObject = new SqlWrapper(sqlStatement, "15.9", dbname);
+    sqlObject->PrepareSql("INSERT INTO fs_blocks (fs_id, file_id, seq, blk_start, blk_len) VALUES(?, ?, ?, ?, ?);");
+    sqlObject->BindValue(1, a_fsId);
+    sqlObject->BindValue(2, a_fileId);
+    sqlObject->BindValue(3, a_sequence);
+    sqlObject->BindValue(4, a_blk_addr);
+    sqlObject->BindValue(5, a_len);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
     return 0;
 }
 
 int WombatTskImgDBSqlite::addAllocUnallocMapInfo(int a_volID, int unallocImgID,
                                            uint64_t unallocImgStart, uint64_t length, uint64_t origImgStart)
 {
-    std::stringstream stmt;
-    char * errmsg;
-
-    if (!m_db)
-        return 1;
-
-    stmt <<
-        "INSERT INTO alloc_unalloc_map (vol_id, unalloc_img_id, unalloc_img_sect_start, "
-        "sect_len, orig_img_sect_start) VALUES (" <<
-        a_volID << "," << unallocImgID << "," <<
-        unallocImgStart << "," << length << "," <<  origImgStart << ")";
-
-    if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addAllocUnallocMapInfo - Error adding data to alloc_unalloc_map table: " << errmsg;
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return 1;
-    }
-
+    sqlObject = new SqlWrapper(sqlStatement, "15.10", dbname);
+    sqlObject->PrepareSql("INSERT INTO alloc_unalloc_map (vol_id, unalloc_img_id, unalloc_img_sect_start, sect_len, orig_img_sect_start) VALUES (?, ?, ?, ?, ?);");
+    sqlObject->BindValue(1, a_volID);
+    sqlObject->BindValue(2, unallocImgID);
+    sqlObject->BindValue(3, unallocImgStart);
+    sqlObject->BindValue(4, length);
+    sqlObject->BindValue(5, origImgStart);
     return 0;
 }
 
@@ -1083,60 +392,39 @@ int WombatTskImgDBSqlite::addAllocUnallocMapInfo(int a_volID, int unallocImgID,
  */
 SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
 {
-    std::stringstream infoMessage;
-    std::stringstream msg;
-
-    if (!m_db)
-        return NULL;
-
     SectorRuns * sr = new SectorRuns();
 
     LOGINFO("WombatTskImgDBSqlite::getFreeSectors - Identifying Unallocated Sectors");
-
-    sqlite3_stmt * statement;
-
     /********** FIND the unallocated volumes *************/
-    if (sqlite3_prepare_v2(m_db,
-        "SELECT vol_id, sect_start, sect_len, flags FROM vol_info;",
-        -1, &statement, 0) == SQLITE_OK) {
-            while(true) {
-                int result = sqlite3_step(statement);
-                if (result == SQLITE_ROW) {
-                    int flags = sqlite3_column_int(statement, 3);
+    sqlObject = new SqlWrapper(sqlStatement, "15.11", dbname);
+    sqlObject->PrepareSql("SELECT vol_id, sect_start, sect_len, flags FROM vol_info;");
+    int result = sqlObject->StepSql();
+    while(result == SQLITE_ROW)
+    {
+        int flags = sqlObject->ReturnInt(3);
+        int vol_id = sqlObject->ReturnInt(0);
+        int64_t start = sqlObject->ReturnInt64(1);
+        int64_t len = sqlObject->ReturnInt64(2);
 
-                    int vol_id = sqlite3_column_int(statement,0);
-                    int64_t start = sqlite3_column_int64(statement,1);
-                    int64_t len = sqlite3_column_int64(statement,2);
-
-                    // add the unallocated volumes
-                    if (flags & TSK_VS_PART_FLAG_UNALLOC) {
-                        sr->addRun(start, len, vol_id);
-                    }
-                    // add the allocated volumes that don't have a known file system
-                    else {
-                        std::stringstream stmt;
-                        sqlite3_stmt *statement2;
-                        stmt << "SELECT fs_id FROM fs_info WHERE vol_id = " << vol_id << ";";
-                        if (sqlite3_prepare_v2(m_db, stmt.str().c_str() , -1, &statement2, 0) == SQLITE_OK) {
-                            if (sqlite3_step(statement2) != SQLITE_ROW) {
-                                sr->addRun(start, len, vol_id);
-                            }
-                            sqlite3_finalize(statement2);
-                        }
-                    }
-                }
-                else {
-                    break;
-                }
-            }
-            sqlite3_finalize(statement);
+        // add the unallocated volumes
+        if(flags & TSK_VS_PART_FLAG_UNALLOC)
+            sr->addRun(start, len, vol_id);
+        // add the unallocated volumes that don't have a known file system
+        else
+        {
+            sqlite3_stmt *sqlStatement2;
+            SqlWrapper *sqlObject2 = new SqlWrapper(sqlStatement2, "15.12", dbname);
+            sqlObject2->PrepareSql("SELECT fs_id FROM fs_info WHERE vol_id = ?;");
+            sqlObject2->BindValue(1, vol_id);
+            int result2 = sqlObject2->StepSql();
+            if(result2 != SQLITE_ROW)
+                sr->addRun(start, len, vol_id);
+            sqlObject2->FinalizeSql();
+            sqlObject2->CloseSql();
+        }
     }
-    else {
-        infoMessage << "WombatTskImgDBSqlite::getFreeSectors - Error querying vol_info table: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-
-        return NULL;
-    }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     /*************** Find the unallocated blocks in each file system *************/
     // @@@ Need to make more dynamic
@@ -1148,115 +436,78 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
     uint64_t img_offset[32];
 
     // get basic info on each file system
-    if (sqlite3_prepare_v2(m_db, "SELECT fs_id, vol_id, img_byte_offset, block_size, block_count FROM fs_info;", -1, &statement, 0) == SQLITE_OK) {
-        LOGINFO("WombatTskImgDBSqlite::getFreeSectors - START LOOP: Find the unallocated blocks in each file system.");
-        while(true)
-        {
-            int result = sqlite3_step(statement);
-            if (result == SQLITE_ROW)
-            {
-                int fs_id = sqlite3_column_int(statement, 0);
-                if (fs_id > 32)
-                {
-                    infoMessage.str("");
-                    infoMessage << "WombatTskImgDBSqlite::getFreeSectors - fs_id in fs_info is bigger than 32: " << fs_id;
-                    LOGERROR(infoMessage.str());
-                    break;
-                }
-                vol_id[fs_id] = sqlite3_column_int(statement, 1);
-                img_offset[fs_id] = sqlite3_column_int64(statement, 2) / 512;
-                blk_size[fs_id] = sqlite3_column_int(statement, 3) / 512;
-                blk_count[fs_id] = sqlite3_column_int64(statement, 4);
-                // Debug Info
-                msg.str("");
-                msg << "WombatTskImgDBSqlite::getFreeSectors - fs_id=" << fs_id << " vol_id=" << vol_id[fs_id] << " img_offset=" << img_offset[fs_id] << " blk_size=" << blk_size[fs_id] <<
-                    " blk_count=" << blk_count[fs_id];
-                LOGINFO(msg.str().c_str());
-            }
-            else
-            {
-                break;
-            }
-        }
-        sqlite3_finalize(statement);
-        LOGINFO("WombatTskImgDBSqlite::getFreeSectors - DONE: Find the unallocated blocks in each file system.");
-    }
-    else
+    sqlObject = new SqlWrapper(sqlStatement, "15.13", dbname);
+    sqlObject->PrepareSql("SELECT fs_id, vol_id, img_byte_offset, block_size, block_count FROM fs_info;");
+    LOGINFO("WombatTskImgDBSqlite::getFreeSectors - START LOOP: Find the unallocated blocks in each file system.");
+    int result = sqlObject->StepSql();
+    while(result == SQLITE_ROW)
     {
-        infoMessage.str("");
-        infoMessage << "WombatTskImgDBSqlite::getFreeSectors - Error querying fs_info table: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-
-        return NULL;
+        int fs_id = sqlObject->ReturnInt(0);
+        if(fs_id > 32)
+        {
+            LOGERROR("WombatTskImgDBSqlite::getFreeSectors - fs_id in fs_info is bigger than 32.");
+            break;
+        }
+        vol_id[fs_id] = sqlObject->ReturnInt(1);
+        img_offset[fs_id] = sqlObject->ReturnInt64(2) / 512;
+        blk_size[fs_id] = sqlObject->ReturnInt(3) / 512;
+        blk_count[fs_id] = sqlObject->ReturnInt64(4);
+        std:stringstream msg;
+        msg.str("");
+        msg << "WombatTskImgDBSqlite::getFreeSectors - fs_id=" << fs_id << " vol_id=" << vol_id[fs_id] << " img_offset=" << img_offset[fs_id] << " blk_size=" << blk_size[fs_id] <<
+            " blk_count=" << blk_count[fs_id];
+        LOGINFO(msg.str().c_str());
     }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    LOGINFO("WombatTskImgDBSqlite::getFreeSectors - DONE: Find the unallocated blocks in each file system.");
 
     // see what blocks have been used and add them to a list
     TSK_LIST *seen[32];
     memset(seen, 0, 32*sizeof(TSK_LIST *));
+    sqlObject = new SqlWrapper(sqlStatement, "15.14", dbname);
+    sqlObject->PrepareSql("SELECT fs_id, file_id, blk_start, blk_len FROM fs_blocks;");
+    int result = sqlObject->StepSql();
+    while(result = SQLITE_ROW)
+    {
+        int fs_id = sqlObject->ReturnInt(0);
+        if(fs_id > 32)
+        {
+            LOGERROR("WombatTskImgDBSqlite::getFreeSectors - fs_id in fs_info is bigger than 32.");
+            contine;
+        }
+        uint64_t file_id = (uint64_t)sqlObject->ReturnInt64(1);
+        int64_t addr = sqlObject->ReturnInt64(2);
+        int64_t len = sqlObject->ReturnInt64(3);
 
-    if (sqlite3_prepare_v2(m_db, "SELECT fs_id, file_id, blk_start, blk_len FROM fs_blocks;", -1, &statement, 0) == SQLITE_OK) {
-        LOGINFO("WombatTskImgDBSqlite::getFreeSectors - START LOOP: see what blocks have been used and add them to a list.");
-        while(true) {
-            int result = sqlite3_step(statement);
-            if (result == SQLITE_ROW) {
-                int fs_id = sqlite3_column_int(statement, 0);
-                if (fs_id > 32) {
-                    infoMessage.str("");
-                    infoMessage << "WombatTskImgDBSqlite::getFreeSectors - fs_id in fs_info is bigger than 32: " << fs_id;
-                    LOGERROR(infoMessage.str());
-                    continue;
-                }
-                uint64_t file_id = (uint64_t)sqlite3_column_int64(statement, 1);
-                int64_t addr = sqlite3_column_int64(statement, 2);
-                int64_t len = sqlite3_column_int64(statement, 3);
-
-                // We only want to consider the runs for files that we allocated.
-                std::stringstream stmt;
-                stmt << "SELECT meta_flags from files WHERE file_id=" << file_id;
-
-                sqlite3_stmt * statement2;
-                if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement2, 0) != SQLITE_OK) {
-                    infoMessage.str("");
-                    infoMessage << "WombatTskImgDBSqlite::getFreeSectors - error finding flags for file " << file_id;
-                    LOGERROR(infoMessage.str());
-                    continue;
-                }
-                sqlite3_step(statement2);
-                int flags = sqlite3_column_int(statement2, 0);
-                sqlite3_finalize(statement2);
-
-                if (flags & TSK_FS_META_FLAG_UNALLOC)
-                    continue;
-
-                // @@@ We can probably find a more effecient storage method than this...
-                int error = 0;
-                for (int64_t i = 0; i < len; i++) {
-                    if (tsk_list_add(&seen[fs_id], addr+i)) {
-                        infoMessage.str("");
-                        infoMessage << "WombatTskImgDBSqlite::getFreeSectors - Error adding seen block address to list";
-                        LOGERROR(infoMessage.str());
-
-                        error = 1;
-                        break;
-                    }
-                }
-                if (error)
-                    break;
-            }
-            else {
+        // We only want to consider the runs for files that we allocated.
+        sqlite3_stmt *sqlStatement2;
+        SqlWrapper *sqlObject2 = new SqlWrapper(sqlStatement2, "15.15", dbname);
+        sqlObject2->PrepareSql("SELECT meta_flags from files WHERE file_id = ?");
+        sqlObject2->BindValue(1, file_id);
+        sqlObject2->StepSql();
+        int flags = sqlObject2->ReturnInt(0);
+        sqlObject2->FinalizeSql();
+        sqlObject2->CloseSql();
+        if(flags & TSK_FS_META_FLAG_UNALLOC)
+            contine;
+        // @@@ We can probably find a more effecient storage method than this...
+        int error = 0;
+        for(int64_t i = 0; i < len; i++)
+        {
+            if(tsk_list_add(&seen[fs_id], addr+i))
+            {
+                LOGERROR("WombatTskImgDBSqlite::getFreeSectors - Error adding seen block address to list");
+                error = 1;
                 break;
             }
         }
-        sqlite3_finalize(statement);
-        LOGINFO("WombatTskImgDBSqlite::getFreeSectors - DONE: see what blocks have been used and add them to a list.");
+        if(error)
+            break;
     }
-    else {
-        infoMessage.str("");
-        infoMessage << "WombatTskImgDBSqlite::getFreeSectors - Error querying fs_block table: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-
-        return NULL;
-    }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    LOGINFO("WombatTskImgDBSqlite::getFreeSectors - DONE: see what blocks have been used and add them to a list.");
 
     // cycle through each file system to find the unused blocks
     LOGINFO("WombatTskImgDBSqlite::getFreeSectors - START LOOP: cycle through each file system to find the unused blocks.");
@@ -1271,7 +522,6 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
         msg.str("");
         msg << "blk_count[" << f << "]=" << blk_count[f];
         LOGINFO(msg.str().c_str());
-
         for (uint64_t a = 0; a < blk_count[f]; a++) {
             // see if this addr was used in a file
             if (tsk_list_find(seen[f], a) == 0) {
@@ -1309,18 +559,21 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
 
 std::string WombatTskImgDBSqlite::getImageBaseName() const
 {
-    // There may be multiple file paths if the image is a split image. Oreder by sequence number to extract the file name from the first path.
-    sqlite3_stmt *statement;
-    executeStatement("SELECT name FROM image_names ORDER BY seq;", statement, "WombatTskImgDBSqlite::getImageBaseName");
-
-    int result = sqlite3_step(statement);
-    if (result == SQLITE_ROW)
+    // There may be multiple file paths if the image is a split image. Order by sequence number to extract the file name from the first path.
+    sqlObject = new SqlWrapper(sqlStatement, "15.17", dbname);
+    sqlObject->PrepareSql("SELECT name FROM image_names ORDER BY seq;");
+    int result = sqlObject->StepSql();
+    if(result == SQLITE_ROW)
     {
-        Poco::Path imagePath(reinterpret_cast<const char*>(sqlite3_column_text(statement, 0))); // Reinterpret from const unsigned char*
+        Poco::Path imagePath(reinterpret_cast<const char*>(sqlObject->ReturnText(0)));
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
         return imagePath.getFileName();
     }
     else
     {
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
         return "";
     }
 }
@@ -1328,28 +581,14 @@ std::string WombatTskImgDBSqlite::getImageBaseName() const
 std::vector<std::wstring> WombatTskImgDBSqlite::getImageNamesW() const
 {
     std::vector<std::wstring> imgList;
-
-    if (!m_db)
-        return imgList;
-
-    sqlite3_stmt *statement;
-
-    if (sqlite3_prepare_v2(m_db, "SELECT name FROM image_names ORDER BY seq;",
-        -1, &statement, 0) == SQLITE_OK)
+    sqlObject = new SqlWrapper(sqlStatement, "15.18", dbname);
+    int result = sqlObject->StepSql();
+    while (result == SQLITE_ROW)
     {
-        while(true)
-        {
-            int result = sqlite3_step(statement);
-            if (result == SQLITE_ROW) {
-                imgList.push_back((wchar_t *)sqlite3_column_text16(statement, 0));
-            }
-            else {
-                break;
-            }
-        }
-
-        sqlite3_finalize(statement);
+        imgList.push_back((wchar_t *)sqlObject->ReturnText16(0));
     }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     return imgList;
 }
@@ -1358,34 +597,18 @@ std::vector<std::wstring> WombatTskImgDBSqlite::getImageNamesW() const
 std::vector<std::string> WombatTskImgDBSqlite::getImageNames() const
 {
     std::vector<std::string> imgList;
-
-    if (!m_db)
-        return imgList;
-
-    sqlite3_stmt *statement;
-
-    if (sqlite3_prepare_v2(m_db, "SELECT name FROM image_names ORDER BY seq;",
-        -1, &statement, 0) == SQLITE_OK)
+    sqlObject = new SqlWrapper(sqlStatement, "15.19", dbname);
+    sqlObject->PrepareSql("SELECT name FROM image_names ORDER BY seq;");
+    int result = sqlObject->StepSql();
+    while(result == SQLITE_ROW)
     {
-        while(true)
-        {
-            int result = sqlite3_step(statement);
-            if (result == SQLITE_ROW) {
-                imgList.push_back((char *)sqlite3_column_text(statement, 0));
-            }
-            else {
-                break;
-            }
-        }
-
-        sqlite3_finalize(statement);
+        imgList.push_back((char *)sqlObject->ReturnText(0));
     }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     return imgList;
 }
-
-
-
 
 /**
  * @param a_fileId  File id to get information about
@@ -1397,34 +620,20 @@ std::vector<std::string> WombatTskImgDBSqlite::getImageNames() const
  */
 int WombatTskImgDBSqlite::getFileUniqueIdentifiers(uint64_t a_fileId, uint64_t &a_fsOffset, uint64_t &a_fsFileId, int &a_attrType, int &a_attrId) const
 {
-    if (!m_db)
-        return -1;
-
-    sqlite3_stmt * statement;
-    std::stringstream stmt;
-
-    stmt <<
-        "SELECT fs_file_id, attr_type, attr_id, fs_info.img_byte_offset "
-        "FROM fs_files, fs_info WHERE file_id=" << a_fileId << " AND fs_info.fs_id = fs_files.fs_id;";
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            a_fsFileId = sqlite3_column_int64(statement, 0);
-            a_attrType = sqlite3_column_int(statement, 1);
-            a_attrId = sqlite3_column_int(statement, 2);
-            a_fsOffset = sqlite3_column_int64(statement, 3);
-        }
-        else {
-            return -1;
-        }
-        sqlite3_finalize(statement);
+    sqlObject = new SqlWrapper(sqlStatement, "15.19", dbname);
+    sqlObject->PrepareSql("SELECT fs_file_id, attr_type, attr_id, fs_info.img_byte_offset FROM fs_files, fs_info WHERE file_id = ? AND fs_info.fs_id = fs_files.fs_id;");
+    sqlObject->BindValue(1, a_fileId);
+    if(sqlObject->StepSql() == SQLITE_ROW)
+    {
+        a_fsFileId = sqlObject->ReturnInt64(0);
+        a_attrType = sqlObject->ReturnInt(1);
+        a_attrId = sqlObject->ReturnInt(2);
+        a_fsOffset = sqlObject->ReturnInt64(3);
     }
-    else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getFileUniqueIdentifiers - Error querying fs_files table : " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+    else
         return -1;
-    }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     return 0;
 }
@@ -1435,42 +644,27 @@ int WombatTskImgDBSqlite::getFileUniqueIdentifiers(uint64_t a_fileId, uint64_t &
  */
 int WombatTskImgDBSqlite::getNumVolumes() const
 {
-    if (!m_db)
-        return 0;
-
     int count = 0;
-    sqlite3_stmt * statement;
+    sqlObject = new SqlWrapper(sqlStatement, "15.20", dbname);
+    sqlObject->PrepareSql("SELECT count(*) from vol_info;");
 
     /********** Get the number of volumes *************/
-    if (sqlite3_prepare_v2(m_db, "SELECT count(*) from vol_info;", -1, &statement, 0) == SQLITE_OK)
+    if(sqlObject->StepSql() == SQLITE_ROW)
     {
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW)
-        {
-            count = (int)sqlite3_column_int(statement, 0);
-        }
-        sqlite3_finalize(statement);
+        count = (int)sqlObject->ReturnInt(0);
     }
-    else
-    {
-        std::wstringstream msg;
-        msg << L"WombatTskImgDBSqlite::getNumVolumes - Error querying vol_info table: " << sqlite3_errmsg(m_db);
-        LOGERROR(msg.str());
-
-        return -1;
-    }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     return count;
 }
+
 /**
  * Get number of files in image.
  * @return Number of files in image or -1 on error
  */
 int WombatTskImgDBSqlite::getNumFiles() const
 {
-    if (!m_db)
-        return 0;
-
     std::string condition("");
     return getFileCount(condition);
 }
@@ -1480,85 +674,82 @@ int WombatTskImgDBSqlite::getNumFiles() const
  */
 int WombatTskImgDBSqlite::getSessionID() const
 {
-    if (!m_db)
-        return 0;
-
-    sqlite3_stmt * statement;
-    std::string stmt("SELECT version from db_info WHERE name=\"SID\";");
     int sessionId = -1;
+    sqlObject = new  SqlWrapper(sqlStatement, "15.21", dbname);
 
     /********** FIND the unallocated volumes *************/
-    if (sqlite3_prepare_v2(m_db, stmt.c_str(), -1, &statement, 0) == SQLITE_OK) {
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            sessionId = (int)sqlite3_column_int(statement, 0);
-        }
-        sqlite3_finalize(statement);
+    sqlObject->PrepareSql("SELECT version from db_info WHERE name=\"SID\";");
+    if(sqlObject->StepSql() == SQLITE_ROW)
+    {
+        sessionId = (int)sqlObject->ReturnInt(0);
     }
-    else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getSessionID - Error querying db_info table for Session ID: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
-        return -1;
-    }
     return sessionId;
 }
 
 int WombatTskImgDBSqlite::begin()
 {
     char *errmsg;
-    if (!m_db)
-        return 1;
-
-    if (sqlite3_exec(m_db, "BEGIN", NULL, NULL, &errmsg) != SQLITE_OK) {
+    sqlObject = new SqlWrapper(sqlStatement, "15.22", dbname);
+    sqlObject->PrepareSql("BEGIN");
+    if(sqlObject->ExecuteSql(&errmsg) != SQLITE_OK)
+    {
         std::wstringstream infoMessage;
         infoMessage << L"WombatTskImgDBSqlite::begin - BEGIN Error: " << errmsg;
         LOGERROR(infoMessage.str());
+        sqlObject->Free(errmsg);
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
 
-        sqlite3_free(errmsg);
         return 1;
     }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+
     return 0;
 }
 
 int WombatTskImgDBSqlite::commit()
 {
     char *errmsg;
-    if (!m_db)
-        return 1;
-
-    if (sqlite3_exec(m_db, "COMMIT", NULL, NULL, &errmsg) != SQLITE_OK) {
+    sqlObject = new SqlWrapper(sqlStatement, "15.23", dbname);
+    sqlObject->PrepareSql("COMMIT");
+    if(sqlObject->ExecuteSql(&errmsg) != SQLITE_OK)
+    {
         std::wstringstream infoMessage;
         infoMessage << L"WombatTskImgDBSqlite::commit - COMMIT Error: " << errmsg;
         LOGERROR(infoMessage.str());
+        sqlObject->Free(errmsg);
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
 
-        sqlite3_free(errmsg);
         return 1;
     }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+
     return 0;
 }
 
 UnallocRun * WombatTskImgDBSqlite::getUnallocRun(int a_unalloc_img_id, int a_file_offset) const
 {
-    std::stringstream stmt;
-    char * errmsg;
-    if (!m_db)
-        return NULL;
-
-    stmt << "SELECT vol_id, unalloc_img_sect_start, sect_len, orig_img_sect_start FROM "
-        "alloc_unalloc_map WHERE unalloc_img_id = " << a_unalloc_img_id <<
-        " AND unalloc_img_sect_start <= " << a_file_offset << " ORDER BY unalloc_img_sect_start DESC";
-
+    sqlObject = new SqlWrapper(sqlStatement, "15.24", dbname);
+    sqlObject->PrepareSql("SELECT vol_id, unalloc_img_sect_start, sect_len, orig_img_sect_start FROM alloc_unalloc_map WHERE unalloc_img_id = ? AND unalloc_img_sect_start <= ? ORDER BY unalloc_img_sect_start DESC;");
+    sqlObject->BindValue(1, a_unalloc_img_id);
+    sqlObject->BindValue(2, a_file_offset);
+    char *errmsg;
     char **result;
     int nrow, ncol;
-    if (sqlite3_get_table(m_db, stmt.str().c_str(), &result, &nrow, &ncol, &errmsg) != SQLITE_OK)
+    if(sqlObject->ReturnTable(&result, &nrow, &ncol, &errmsg) != SQLITE_OK)
     {
         std::wstringstream infoMessage;
         infoMessage << L"WombatTskImgDBSqlite::getUnallocRun - Error fetching data from alloc_unalloc_map table: " << errmsg;
         LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
+        sqlObject->Free(errmsg);
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
 
         return new UnallocRun(-1, -1, -1, -1, -1);
     }
@@ -1574,7 +765,10 @@ UnallocRun * WombatTskImgDBSqlite::getUnallocRun(int a_unalloc_img_id, int a_fil
         sscanf(result[5], "%d", &unalloc_img_sect_start);
         sscanf(result[6], "%d", &sect_len);
         sscanf(result[7], "%d", &orig_img_sect_start);
-        sqlite3_free_table(result);
+        sqlObject->FreeTable(result);
+        sqlObject->FinalizeSql();
+        sqlObject->CloseSql();
+
         return new UnallocRun(vol_id, a_unalloc_img_id, unalloc_img_sect_start, sect_len, orig_img_sect_start);
     }
 }
@@ -1595,59 +789,43 @@ UnallocRun * WombatTskImgDBSqlite::getUnallocRun(int a_unalloc_img_id, int a_fil
 int WombatTskImgDBSqlite::addCarvedFileInfo(int vol_id, const char *name, uint64_t size,
                                       uint64_t *runStarts, uint64_t *runLengths, int numRuns, uint64_t & fileId)
 {
-    char stmt[1024];
-    char * errmsg;
-    std::wstringstream infoMessage;
-
-    if (!m_db)
-        return -1;
-
-    // insert into files table
-    sqlite3_snprintf(1024, stmt,
-        "INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type,"
-        "dir_flags, meta_flags, size, ctime, crtime, atime, mtime, mode, uid, gid, status, full_path) "
-        "VALUES (NULL, %d, '%q', NULL, %d, %d, %d, %d, %llu, 0, 0, 0, 0, NULL, NULL, NULL, %d, '%q')",
-        IMGDB_FILES_TYPE_CARVED, name, (int)TSK_FS_NAME_TYPE_REG, (int)TSK_FS_META_TYPE_REG,
-        (int)TSK_FS_NAME_FLAG_UNALLOC, (int)TSK_FS_META_FLAG_UNALLOC, size, IMGDB_FILES_STATUS_CREATED, name);
+    sqlObject = new SqlWrapper(sqlStatement, "15.25", dbname);
+    sqlObject->PrepareSql("INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type, dir_flags, meta_flags, size, ctime, crtime, atime, mtime, mode, uid, gid, status, full_path) VALUES (NULL, ?, ?, NULL, ?, ?, ?, ?, ?, 0, 0, 0, 0, NULL, NULL, NULL, ?, ?)");
+    sqlObject->BindValue(1, IMGDB_FILES_TYPE_CARVED);
+    sqlObject->BindValue(2, name);
+    sqlObject->BindValue(3, (int)TSK_FS_NAME_TYPE_REG);
+    sqlObject->BindValue(4, (int)TSK_FS_META_TYPE_REG);
+    sqlObject->BindValue(5, (int)TSK_FS_NAME_FLAG_UNALLOC);
+    sqlObject->BindValue(6, (int)TSK_FS_META_FLAG_UNALLOC);
+    sqlObject->BindValue(7, size);
+    sqlObject->BindValue(8, IMGDB_FILES_STATUS_CREATED);
+    sqlObject->BindValue(9, name);
     // MAY-118 NOTE: addCarvedFileInfo insert entry into files table, but actual file on disk has not been created yet.
-    if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::addCarvedFileInfo - Error adding data to file table for carved file: " << errmsg << L" " << stmt;
-
-        LOGERROR(infoMessage.str());
-
-        sqlite3_free(errmsg);
-        return -1;
-    }
-
+    sqlObject->StepSql();
     // get the assigned file_id
-    fileId = (uint64_t)sqlite3_last_insert_rowid(m_db);
-
+    fileId = (uint64_t)sqlObject->ReturnLastInsertRowID();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
     // insert into the carved_files_table
-    sqlite3_snprintf(1024, stmt, "INSERT INTO carved_files (file_id, vol_id)"
-        "VALUES (%llu, %d)", fileId, vol_id);
-    if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK) {
-        infoMessage << L"WombatTskImgDBSqlite::addCarvedFileInfo - Error adding data to carved_files table: " << errmsg;
-
-        LOGERROR(infoMessage.str());
-        sqlite3_free(errmsg);
-        return -1;
-    }
-
+    sqlObject = new SqlWrapper(sqlStatement, "15.26", dbname);
+    sqlObject->PrepareSql("INSERT INTO carved_files (file_id, vol_id) VALUES (?, ?);");
+    sqlObject->BindValue(1, fileId);
+    sqlObject->BindValue(2, vol_id);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
     // insert into carved_sectors table
+    sqlObject = new SqlWrapper(sqlStatement, "15.27", dbname);
+    sqlObject->PrepareSql("INSERT INTO carved_sectors (file_id, seq, sect_start, sect_len) VALUES (?, ?, ?, ?);");
     for (int i = 0; i < numRuns; i++)
     {
-        sqlite3_snprintf(1023, stmt,
-            "INSERT INTO carved_sectors (file_id, seq, sect_start, sect_len) "
-            "VALUES (%llu, %d, %llu, %llu)",
-            fileId, i, runStarts[i], runLengths[i]);
-        if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK) {
-            infoMessage << L"WombatTskImgDBSqlite::addCarvedFileInfo - Error adding data to carved_sectors table: " << errmsg;
-
-            LOGERROR(infoMessage.str());
-
-            sqlite3_free(errmsg);
-            return -1;
-        }
+        sqlObject->ResetSql();
+        sqlObject->ClearBindings();
+        sqlObject->BindValue(1, fileId);
+        sqlObject->BindValue(2, i);
+        sqlObject->BindValue(3, runStarts[i]);
+        sqlObject->BindValue(4, runLengths[i]);
+        sqlObject->StepSql();
     }
 
     return 0;

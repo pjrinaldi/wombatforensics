@@ -182,6 +182,12 @@ const char* SqlWrapper::ReturnText(int returnPlace)
         returnplace = returnPlace;
         return sqlite3_mprintf("%s", sqlite3_column_text(sqlstatement, returnplace));
 }
+const void* SqlWrapper::ReturnText16(int returnPlace)
+{
+    returnplace = returnPlace;
+    return sqlite3_column_text16(sqlstatement, returnplace);
+}
+
 const void* SqlWrapper::ReturnBlob(int returnPlace)
 {
         returnplace = returnPlace;
@@ -204,10 +210,26 @@ int SqlWrapper::StepSql(void)
         }
         return sqlcode;
 }
+
+int SqlWrapper::ExecuteSql(char **errmsg)
+{
+    return sqlite3_exec(sqldb, sqlquery, NULL, NULL, errmsg);
+}
+
 int SqlWrapper::ReturnColumnType(int returnPlace)
 {
     returnplace = returnPlace;
     return sqlite3_column_type(sqlstatement, returnplace);
+}
+
+int SqlWrapper::ReturnTable(char ***queryResults, int numRows, int numColumns, char **errMsg)
+{
+    return sqlite3_get_table(sqldb, sqlquery, queryResults, numRows, numColumns, errMsg);
+}
+
+void SqlWrapper::FreeTable(char **queryResults)
+{
+    sqlite3_free_table(queryResults);
 }
 
 void SqlWrapper::ClearBindings(void)
@@ -217,6 +239,12 @@ void SqlWrapper::ClearBindings(void)
                 DisplayError(errornumber, "CLEAR", "ERROR");
         }
 }
+
+void SqlWrapper::Free(void*varToFree)
+{
+    sqlite3_free(varToFree);
+}
+
 void SqlWrapper::ResetSql(void)
 {
         if(sqlite3_reset(sqlstatement) != SQLITE_OK)
