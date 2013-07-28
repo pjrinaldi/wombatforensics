@@ -858,49 +858,36 @@ int WombatTskImgDBSqlite::addDerivedFileInfo(const std::string& name, const uint
                                        const int ctime, const int crtime, const int atime, const int mtime,
                                        uint64_t &fileId, std::string path)
 {
-    if (!m_db)
-        return -1;
-
-    char stmt[1024];
-    char * errmsg;
 
     TSK_FS_NAME_TYPE_ENUM dirType = isDirectory ? TSK_FS_NAME_TYPE_DIR : TSK_FS_NAME_TYPE_REG;
     TSK_FS_META_TYPE_ENUM metaType = isDirectory ? TSK_FS_META_TYPE_DIR : TSK_FS_META_TYPE_REG;
 
     // insert into files table
-    sqlite3_snprintf(1024, stmt,
-        "INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type, size, ctime, crtime, atime, mtime, status, full_path) "
-        "VALUES (NULL, %d, '%q', %llu, %d, %d, %llu, %d, %d, %d, %d, %d, '%q')",
-        IMGDB_FILES_TYPE_DERIVED, name.c_str(), parentId, dirType, metaType, size, ctime, crtime, atime, mtime, IMGDB_FILES_STATUS_CREATED, path.c_str());
-
-    if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        std::wstringstream msg;
-        msg << L"WombatTskImgDBSqlite::addDerivedFileInfo - Error adding data to file table for derived file: "
-            << errmsg << L" " << stmt;
-
-        LOGERROR(msg.str());
-
-        sqlite3_free(errmsg);
-        return -1;
-    }
-
-    // get the assigned file_id
-    fileId = sqlite3_last_insert_rowid(m_db);
-
-    // insert into the derived_files table
-    sqlite3_snprintf(1024, stmt, "INSERT INTO derived_files (file_id, derivation_details) "
-        "VALUES (%llu, '%q')", fileId, details.c_str());
-    if (sqlite3_exec(m_db, stmt, NULL, NULL, &errmsg) != SQLITE_OK)
-    {
-        std::wstringstream msg;
-        msg << L"WombatTskImgDBSqlite::addDerivedFileInfo - Error adding data to derived_files table : "
-            << errmsg;
-
-        LOGERROR(msg.str());
-        sqlite3_free(errmsg);
-        return -1;
-    }
+    sqlObject = new SqlWrapper(sqlStatement, "15.28", dbname);
+    sqlObject->PrepareSql("INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type, size, ctime, crtime, atime, mtime, status, full_path) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+    sqlObject->BindValue(1, IMGDB_FILES_TYPE_DERIVED);
+    sqlObject->BindValue(2, name.c_str());
+    sqlObject->BindValue(3, parentId);
+    sqlObject->BindValue(4, dirType);
+    sqlObject->BindValue(5, metaType);
+    sqlObject->BindValue(6, size);
+    sqlObject->BindValue(7, ctime);
+    sqlObject->BindValue(8, crtime);
+    sqlObject->BindValue(9, atime);
+    sqlObject->BindValue(10, mtime);
+    sqlObject->BindValue(11, IMGDB_FILES_STATUS_CREATED);
+    sqlObject->BindValue(12, path.c_str());
+    sqlObject->StepSql();
+    fileId = sqlObject->ReturnLastInsertRowID();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
+    sqlObject = new SqlWrapper(sqlStatement, "15.29", dbname);
+    sqlObject->PrepareSql("INSERT INTO derived_files (file_id, derivation_details) VALUES(?, ?);");
+    sqlObject->BindValue(1, fileId);
+    sqlObject->BindValue(2, details.c_str());
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     return 0;
 }
@@ -911,7 +898,7 @@ int WombatTskImgDBSqlite::addDerivedFileInfo(const std::string& name, const uint
  */
 int WombatTskImgDBSqlite::getFileIds(char *a_fileName, uint64_t *a_outBuffer, int a_buffSize) const
 {
-
+/*
     if (!m_db)
         return -1;
 
