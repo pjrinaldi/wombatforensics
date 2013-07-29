@@ -898,27 +898,16 @@ int WombatTskImgDBSqlite::addDerivedFileInfo(const std::string& name, const uint
  */
 int WombatTskImgDBSqlite::getFileIds(char *a_fileName, uint64_t *a_outBuffer, int a_buffSize) const
 {
-/*
-    if (!m_db)
-        return -1;
-
     int outIdx = 0;
-
-    sqlite3_stmt * statement;
-    std::stringstream stmt;
-    stmt << "SELECT file_id FROM files WHERE name LIKE '" << a_fileName << "';";
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        while(sqlite3_step(statement) == SQLITE_ROW) {
-            a_outBuffer[outIdx++] = (uint64_t)sqlite3_column_int64(statement, 0);
-        }
-        sqlite3_finalize(statement);
+    sqlObject = new SqlWrapper(sqlStatement, "15.30", dbname);
+    sqlObject->PrepareSql("SELECT file_id FROM files WHERE name LIKE ?;");
+    sqlObject->BindValue(1, a_fileName);
+    while (sqlObject->StepSql() == SQLITE_ROW)
+    {
+        a_outBuffer[outIdx++] = (uint64_t)sqlObject->ReturnInt64(0);
     }
-    else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getFileIds - Error querying files table : " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-        return -1;
-    }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     return outIdx;
 }
@@ -929,28 +918,15 @@ int WombatTskImgDBSqlite::getFileIds(char *a_fileName, uint64_t *a_outBuffer, in
  */
 int WombatTskImgDBSqlite::getMinFileIdReadyForAnalysis(uint64_t & minFileId) const
 {
-    if (!m_db)
-        return -1;
-
     minFileId = 0;
+    sqlObject = new SqlWrapper(sqlStatement, "15.31", dbname);
+    sqlObject->PrepareSql("SELECT min(file_id) FROM files WHERE status = ?;");
+    sqlObject->BindValue(1, TskImgDB::IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
+    if (sqlObject->StepSql() == SQLITE_ROW)
+        minFileId = (uint64_t)sqlObject->ReturnInt64(0);
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
-    sqlite3_stmt * statement;
-    std::stringstream stmt;
-    stmt << "SELECT min(file_id) FROM files WHERE status = " <<
-        TskImgDB::IMGDB_FILES_STATUS_READY_FOR_ANALYSIS << ";";
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            minFileId = (uint64_t)sqlite3_column_int64(statement, 0);
-        }
-        sqlite3_finalize(statement);
-    }
-    else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getMinFileIdReadyForAnalysis - Error querying files table : " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-        return -1;
-    }
     return 0;
 }
 
@@ -960,78 +936,46 @@ int WombatTskImgDBSqlite::getMinFileIdReadyForAnalysis(uint64_t & minFileId) con
  */
 int WombatTskImgDBSqlite::getMaxFileIdReadyForAnalysis(uint64_t a_lastFileId, uint64_t & maxFileId) const
 {
-    if (!m_db)
-        return -1;
-
     maxFileId = 0;
+    sqlObject = new SqlWrapper(sqlStatement, "15.32", dbname);
+    sqlObject->PrepareSql("SELECT max(file_id) FROM files WHERE status = ? AND file_id >= ?;");
+    sqlObject->BindValue(1, TskImgDB::IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
+    sqlObject->BindValue(2, a_lastFileId);
+    if(sqlObject->StepSql() == SQLITE_ROW)
+        maxFileId = (uint64_t)sqlObject->ReturnInt64(0);
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
-    sqlite3_stmt * statement;
-    std::stringstream stmt;
-    stmt << "SELECT max(file_id) FROM files WHERE status = " <<
-        TskImgDB::IMGDB_FILES_STATUS_READY_FOR_ANALYSIS <<
-        " AND file_id >= " <<  a_lastFileId << ";";
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            maxFileId = (uint64_t)sqlite3_column_int64(statement, 0);
-        }
-        sqlite3_finalize(statement);
-    }
-    else {
-        std::wstringstream infoMessage;
-        infoMessage <<  L"WombatTskImgDBSqlite::getMaxFileIdReadyForAnalysis - Error querying files table : " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-        return -1;
-    }
     return 0;
 }
 
 SectorRuns * WombatTskImgDBSqlite::getFileSectors(uint64_t a_fileId) const
 {
-    if (!m_db)
-        return NULL;
-
-    SectorRuns * sr = new SectorRuns();
-
-    sqlite3_stmt * statement;
-    std::stringstream stmt;
+    SectorRuns *sr = new SectorRuns();
     int srCount = 0;
-    stmt <<
-        "SELECT fs_blocks.blk_start, fs_blocks.blk_len, "
-        "fs_info.block_size, fs_info.img_byte_offset, fs_info.vol_id "
-        "FROM files "
-        "JOIN fs_files ON files.file_id = fs_files.file_id "
-        "JOIN fs_blocks ON files.file_id = fs_blocks.file_id "
-        "JOIN fs_info ON fs_blocks.fs_id = fs_info.fs_id "
-        "WHERE files.file_id = " << a_fileId << " "
-        "ORDER BY fs_blocks.seq;";
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        while(sqlite3_step(statement) == SQLITE_ROW) {
-            uint64_t blkStart = (uint64_t)sqlite3_column_int64(statement, 0);
-            uint64_t blkLength = (uint64_t)sqlite3_column_int64(statement, 1);
-            int blkSize = sqlite3_column_int(statement, 2);
-            uint64_t imgByteOffset = (uint64_t)sqlite3_column_int64(statement, 3);
-            int volId = sqlite3_column_int(statement, 4);
 
-            uint64_t start = (imgByteOffset + blkStart * blkSize) / 512;
-            uint64_t len = (blkLength * blkSize) / 512;
+    sqlObject = new SqlWrapper(sqlStatement, "15.33", dbname);
+    sqlObject->PrepareSql("SELECT fs_blocks.blk_start, fs_blocks.blk_len, fs_info.block_size, fs_info.img_byte_offset, fs_info.vol_id FROM files JOIN fs_files ON files.file_id = fs_files.file_id JOIN fs_blocks ON files.file_id = fs_blocks.file_id JOIN fs_info ON fs_blocks.fs_id = fs_info.fs_id WHERE files.file_id = ? ORDER BY fs_blocks.seq;");
+    sqlObject->BindValue(1, a_fileId);
+    while(sqlObject->StepSql() == SQLITE_ROW)
+    {
+        uint64_t blkStart = (uint64_t)sqlObject->ReturnInt64(0);
+        uint64_t blkLength = (uint64_t)sqlObject->ReturnInt64(1);
+        int blkSize = sqlObject->ReturnInt(2);
+        uint64_t imgByteOffset = (uint64_t)sqlObject->ReturnInt64(3);
+        int volId = sqlObject->ReturnInt(4);
 
-            sr->addRun(start, len, volId);
-            srCount++;
-        }
+        uint64_t start = (imgByteOffset + blkStart * blkSize) / 512;
+        uint64_t len = (blkLength * blkSize) / 512;
 
-        sqlite3_finalize(statement);
+        sr->addRun(start, len, volId);
+        srCount++;
     }
-    else {
-        std::wstringstream infoMessage;
-        infoMessage <<
-            L"WombatTskImgDBSqlite::getFileSectors - "
-            L"Error finding block data for file_id=" << a_fileId << ": " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-        return NULL;
-    }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
-    if (srCount < 1) {
+    if(srCount < 1)
+    {
         delete sr;
         sr = NULL;
     }
@@ -1062,50 +1006,46 @@ int WombatTskImgDBSqlite::busyHandler(void * pDB, int count)
     return 0;
 }
 
-
-
 int WombatTskImgDBSqlite::updateFileStatus(uint64_t a_file_id, FILE_STATUS a_status)
 {
-    if (!m_db)
-        return 1;
-
-    std::stringstream stmt;
-    char * errmsg;
-
-    stmt << "UPDATE files SET status = " << a_status << " WHERE file_id = " << a_file_id << ";";
-    if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+    sqlObject = new SqlWrapper(sqlStatement, "15.33", dbname);
+    sqlObject->PrepareSql("UPDATE files SET status = ? WHERE file_id = ?;");
+    sqlObject->BindValue(1, a_status);
+    sqlObject->BindValue(2, a_file_id);
+    if(sqlObject->StepSql() == SQLITE_ROW | sqlObject->StepSql() == SQLITE_DONE)
+    {
+        // all good
+    }
+    else
+    {
         std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::updateFileStatus - Error UPDATE file status: " << sqlite3_errmsg(m_db);
+        infoMessage << L"WombatTskImgDBSqlite::updateFileStatus - Error UPDATE file status.";
         LOGERROR(infoMessage.str());
         return 1;
     }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     return 0;
 }
 
-
 int WombatTskImgDBSqlite::updateKnownStatus(uint64_t a_file_id, KNOWN_STATUS a_status)
 {
-    if (!m_db)
-        return 1;
-
-    std::stringstream stmt;
-    char * errmsg;
-
-    stmt << "UPDATE file_hashes SET known = " << a_status << " WHERE file_id = " << a_file_id << ";";
-    if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::updateFileStatus - Error UPDATE file status: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-        return 1;
-    }
+    sqlObject = new SqlWrapper(sqlStatement, "15.36", dbname);
+    sqlObject->PrepareSql("UPDATE file_hashes SET known = ? WHERE file_id = ?;");
+    sqlObject->BindValue(1, a_status);
+    sqlObject->BindValue(2, a_file_id);
+    sqlObject->StepSql();
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     return 0;
 }
 
 bool WombatTskImgDBSqlite::dbExist() const
 {
-    if (m_db)
+    sqlObject = new SqlWrapper(sqlStatement, "15.35", dbname);
+    if(sqlObject->ReturnSqlDB())
         return true;
     else
         return false;
@@ -1113,36 +1053,26 @@ bool WombatTskImgDBSqlite::dbExist() const
 
 void WombatTskImgDBSqlite::getCarvedFileInfo(const std::string& stmt, std::map<uint64_t, std::string>& results) const
 {
-    sqlite3_stmt * statement;
-    if (sqlite3_prepare_v2(m_db, stmt.c_str(), -1, &statement, 0) == SQLITE_OK)
+    sqlObject = new SqlWrapper(sqlStatement, "15.37", dbname);
+    sqlObject->PrepareSql(stmt.c_str());
+    while(sqlObject->StepSql() == SQLITE_ROW)
     {
-        while (sqlite3_step(statement) == SQLITE_ROW)
-        {
-            uint64_t fileId = (uint64_t)sqlite3_column_int64(statement, 0);
-            std::string fileName = (char*)sqlite3_column_text(statement, 1);
-            std::string cfileName = (char*)sqlite3_column_text(statement, 2);
+        uint64_t fileId = (uint64_t)sqlObject->ReturnInt64(0);
+        std::string fileName = (char*)sqlObject->ReturnText(1);
+        std::string cfileName = (char*)sqlObject->ReturnText(2);
 
-            // Grab the extension and append it to the cfile name
-            std::string::size_type pos = fileName.rfind('.');
-            if (pos != std::string::npos)
-                cfileName.append(fileName.substr(pos));
-
-            results[fileId] = cfileName;
-        }
-        sqlite3_finalize(statement);
-    } else
-    {
-        std::wstringstream msg;
-        msg << L"WombatTskImgDBSqlite::getCarvedFileInfo - Error retrieving carved file details: "
-            << sqlite3_errmsg(m_db);
-        LOGERROR(msg.str());
+        // Grab the extension and append it to the cfile name
+        std::string::size_type pos = fileName.rfind('.');
+        if(pos != std::string::npos)
+            cfileName.append(fileName.substr(pos));
+        results[fileId] = cfileName;
     }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 }
 
 std::map<uint64_t, std::string> WombatTskImgDBSqlite::getUniqueCarvedFiles(HASH_TYPE hashType) const
 {
-    if (!m_db)
-        throw TskException("No database.");
 
     std::map<uint64_t, std::string> results;
 
@@ -1167,36 +1097,29 @@ std::map<uint64_t, std::string> WombatTskImgDBSqlite::getUniqueCarvedFiles(HASH_
         return results;
     }
 
-    stringstream stmt;
-
     // If hashes have not been calculated return all carved files
-    stmt << "SELECT count(*) FROM file_hashes;";
-
-    sqlite3_stmt * statement;
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK)
+    sqlObject = new SqlWrapper(sqlStatement, "15.37", dbname);
+    sqlObject->PrepareSql("SELECT COUNT(*) FROM file_hashes;");
+    if(sqlObject->StepSql() == SQLITE_ROW)
     {
-        if (sqlite3_step(statement) == SQLITE_ROW)
+        uint64_t counter = (uint64_t)sqlObject->ReturnInt64(0);
+        if(counter == 0)
         {
-            uint64_t counter = (uint64_t)sqlite3_column_int64(statement, 0);
-            if (counter == 0)
-            {
-                sqlite3_finalize(statement);
-                stmt.str("");
-                stmt << "select c.file_id, f.name, 'cfile_' || c.vol_id || '_' || cs.sect_start || '_' "
-                    << "|| c.file_id from files f, carved_files c, carved_sectors cs "
-                    << "where c.file_id = cs.file_id and cs.seq = 0 and f.file_id = c.file_id order by c.file_id";
-                getCarvedFileInfo(stmt.str(), results);
-                return results;
-            }
+            sqlObject->FinalizeSql();
+            sqlObject->CloseSql();
+            std::stringstream stmt;
+            stmt.str("");
+            stmt << "select c.file_id, f.name, 'cfile_' || c.vol_id || '_' || cs.sect_start || '_' "
+                << "|| c.file_id from files f, carved_files c, carved_sectors cs "
+                << "where c.file_id = cs.file_id and cs.seq = 0 and f.file_id = c.file_id order by c.file_id";
+            getCarvedFileInfo(stmt.str(), results);
+            return results;
         }
-        sqlite3_finalize(statement);
-    } else
-    {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getUniqueCarvedFiles - Error getting file_hashes count: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
     }
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
+    std::stringstream stmt;
     stmt.str("");
 
     // Get the set of files for which the hash has been calculated.
@@ -1232,31 +1155,25 @@ std::map<uint64_t, std::string> WombatTskImgDBSqlite::getUniqueCarvedFiles(HASH_
 
 void WombatTskImgDBSqlite::getCarvedFileInfo(const std::string &query, bool getHash, std::vector<TskCarvedFileInfo> &carvedFileInfos) const
 {
-    sqlite3_stmt *statement;
-    executeStatement(query, statement, "WombatTskImgDBSqlite::getCarvedFileInfo");
-
     TskCarvedFileInfo info;
-    while (sqlite3_step(statement) == SQLITE_ROW)
+    sqlObject = new SqlWrapper(sqlStatement, "15.39", dbname);
+    sqlObject->PrepareSql(query);
+    while(sqlObject->StepSql() == SQLITE_ROW)
     {
-        info.fileID = static_cast<uint64_t>(sqlite3_column_int64(statement, 0));
-        std::string fileName = reinterpret_cast<const char*>(sqlite3_column_text(statement, 1)); // Reinterpret from unsigned Char*
-        info.cFileName = reinterpret_cast<const char*>(sqlite3_column_text(statement, 2)); // Reinterpret from unsigned Char*
-        if (getHash)
-        {
-            info.hash = reinterpret_cast<const char*>(sqlite3_column_text(statement, 3));
-        }
-
-        // Append the extension from the original file name to the constructed "cfile" name.
+        info.fileID = static_cast<uint64_t>(sqlObject->ReturnInt64(0));
+        std:string fileName = reinterpret_cast<const char*>(sqlObject->ReturnText(1)); // reinterpret from unsigned char*
+        info.cFileName = reinterpret_cast<const char*>(sqlObject->ReturnText(2)); // reinterpret from unsigned char*
+        if(getHash)
+            info.hash = reinterpret_cast<const char*>(sqlObject->ReturnText(3));
+        // Append the extension from the original file name to the constructed "cfile" name
         std::string::size_type pos = fileName.rfind('.');
-        if (pos != std::string::npos)
-        {
+        if(pos != std::string::npos)
             info.cFileName.append(fileName.substr(pos));
-        }
 
         carvedFileInfos.push_back(info);
     }
-
-    sqlite3_finalize(statement);
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 }
 
 std::vector<TskCarvedFileInfo> WombatTskImgDBSqlite::getUniqueCarvedFilesInfo(HASH_TYPE hashType) const
