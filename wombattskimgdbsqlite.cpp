@@ -2306,21 +2306,19 @@ TskImgDB::KNOWN_STATUS WombatTskImgDBSqlite::getKnownStatus(const uint64_t fileI
 int WombatTskImgDBSqlite::addUnallocImg(int & unallocImgId)
 {
     int rc = -1;
-
-    if (!m_db)
-        return rc;
-
-    std::stringstream stmt;
-    stmt << "INSERT INTO unalloc_img_status (unalloc_img_id, status) VALUES (NULL, " << TskImgDB::IMGDB_UNALLOC_IMG_STATUS_CREATED << ")";
-    char * errmsg;
-    if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, &errmsg) == SQLITE_OK) {
-        unallocImgId = (int)sqlite3_last_insert_rowid(m_db);
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("INSERT INTO unalloc_img_status (unalloc_img_id, status) VALUES (NULL, ?);") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, TskImgDB::IMGDB_UNALLOC_IMG_STATUS_CREATED);
+        mainSqlObject->StepSql();
+        unallocImgId = (int)mainSqlObject->ReturnLastInsertRowID();
         rc = 0;
-    } else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addUnallocImg - Error adding unalloc_img_status table: " << errmsg;
-        LOGERROR(infoMessage.str());
-        sqlite3_free(errmsg);
+        mainSqlObject->FinalizeSql();
+    }
+    else
+    {
+        mainSqlObject->DisplayError("15.40", "Sql Error: ", "WombatTskImgDBSqlite::addUnallocImg - Error adding unalloc_img_status table.");
+        mainSqlObject->FinalizeSql();
     }
     return rc;
 }
@@ -2334,21 +2332,21 @@ int WombatTskImgDBSqlite::addUnallocImg(int & unallocImgId)
 int WombatTskImgDBSqlite::setUnallocImgStatus(int unallocImgId, TskImgDB::UNALLOC_IMG_STATUS status)
 {
     int rc = -1;
-
-    if (!m_db)
-        return rc;
-
-    std::stringstream stmt;
-    stmt << "UPDATE unalloc_img_status SET status = " << status << " WHERE unalloc_img_id = " << unallocImgId;
-    char * errmsg;
-    if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, &errmsg) == SQLITE_OK) {
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("UPDATE unalloc_img_status SET status = ? WHERE unalloc_img_id = ?;") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, status);
+        mainSqlObject->BindValue(2, unallocImgId);
+        mainSqlObject->StepSql();
         rc = 0;
-    } else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addUnallocImg - Error adding unalloc_img_status table: " << errmsg;
-        LOGERROR(infoMessage.str());
-        sqlite3_free(errmsg);
+        mainSqlObject->FinalizeSql();
     }
+    else
+    {
+        mainSqlObject->DisplayError("15.41", "Sql Error", "WombatTskImgDBSqlite::addUnallocImg - Error adding unalloc_img_status table.");
+        mainSqlObject->FinalizeSql();
+    }
+
     return rc;
 }
 
@@ -2360,24 +2358,24 @@ int WombatTskImgDBSqlite::setUnallocImgStatus(int unallocImgId, TskImgDB::UNALLO
  */
 TskImgDB::UNALLOC_IMG_STATUS WombatTskImgDBSqlite::getUnallocImgStatus(int unallocImgId) const
 {
-    if (!m_db)
-        throw TskException("Database not initialized.");
 
     int status = 0;
-    stringstream stmt;
-    stmt << "SELECT status FROM unalloc_img_status WHERE unalloc_img_id = " << unallocImgId;
-
-    sqlite3_stmt * statement;
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        if (sqlite3_step(statement) == SQLITE_ROW) {
-            status = (int)sqlite3_column_int(statement, 0);
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("SELECT status FROM unalloc_img_status WHERE unalloc_img_id = ?;") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, unallocImgId);
+        if(mainSqlObject->StepSql() == SQLITE_ROW)
+        {
+            status = (int)mainSqlObject->ReturnInt(0);
         }
-        sqlite3_finalize(statement);
-    } else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getUnallocImgStatus - Error getting unalloc_img_status: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+        mainSqlObject->FinalizeSql();
     }
+    else
+    {
+        mainSqlObject->DisplayError("15.42", "Sql Error: ", "WombatTskImgDBSqlite::getUnallocImgStatus - Error getting unalloc_img_status");
+        mainSqlObject->FinalizeSql();
+    }
+
     return (TskImgDB::UNALLOC_IMG_STATUS)status;
 }
 
@@ -2391,27 +2389,25 @@ int WombatTskImgDBSqlite::getAllUnallocImgStatus(std::vector<TskUnallocImgStatus
     int rc = -1;
     unallocImgStatusList.clear();
 
-    if (!m_db)
-        return rc;
-
-    stringstream stmt;
-    stmt << "SELECT unalloc_img_id, status FROM unalloc_img_status";
-
-    sqlite3_stmt * statement;
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        while (sqlite3_step(statement) == SQLITE_ROW) {
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("SELECT unalloc_img_id, status FROM unalloc_img_status") == SQLITE_OK)
+    {
+        while(mainSqlObject->StepSql() == SQLITE_ROW)
+        {
             TskUnallocImgStatusRecord record;
-            record.unallocImgId = (int)sqlite3_column_int(statement, 0);
-            record.status = (TskImgDB::UNALLOC_IMG_STATUS)sqlite3_column_int(statement, 1);
+            record.unallocImgId = (int)mainSqlObject->ReturnInt(0);
+            record.status = (TskImgDB::UNALLOC_IMG_STATUS)mainSqlObject->ReturnInt(1);
             unallocImgStatusList.push_back(record);
         }
         rc = 0;
-        sqlite3_finalize(statement);
-    } else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getAllUnallocImgStatus - Error getting unalloc_img_status: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+        mainSqlObject->FinalizeSql();
     }
+    else
+    {
+        mainSqlObject->DisplayError("15.43", "Sql Error: ", "WombatTskImgDBSqlite::getAllUnallocImgStatus - Error getting unalloc_img_status.");
+        mainSqlObject->FinalizeSql();
+    }
+
     return rc;
 }
 
@@ -2424,31 +2420,24 @@ int WombatTskImgDBSqlite::getAllUnallocImgStatus(std::vector<TskUnallocImgStatus
 int WombatTskImgDBSqlite::addUnusedSectors(int unallocImgId, std::vector<TskUnusedSectorsRecord> & unusedSectorsList)
 {
     assert(unallocImgId > 0);
-    int rc = -1;
-    if (!m_db)
-        return rc;
 
-    std::stringstream stmt;
-    stmt << "SELECT vol_id, unalloc_img_sect_start, sect_len, orig_img_sect_start FROM alloc_unalloc_map "
-        "WHERE unalloc_img_id = " << unallocImgId << " ORDER BY orig_img_sect_start ASC";
-
-    sqlite3_stmt * statement;
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("SELECT vol_id, unalloc_img_sect_start, sect_len, orig_img_sect_start FROM alloc_unalloc_map WHERE unalloc_img_id = ? ORDER BY orig_img_sect_start ASC;") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, unallocImgId);
         vector<TskAllocUnallocMapRecord> allocUnallocMapList;
-
-        while (sqlite3_step(statement) == SQLITE_ROW) {
+        while(mainSqlObject->StepSql() == SQLITE_ROW)
+        {
             TskAllocUnallocMapRecord record;
-            record.vol_id = (int)sqlite3_column_int(statement, 0);
+            record.vol_id = (int)mainSqlObject->ReturnInt(0);
             record.unalloc_img_id = unallocImgId;
-            record.unalloc_img_sect_start = (uint64_t)sqlite3_column_int64(statement, 1);
-            record.sect_len = (uint64_t)sqlite3_column_int64(statement, 2);
-            record.orig_img_sect_start = (uint64_t)sqlite3_column_int64(statement, 3);
+            record.unalloc_img_sect_start = (uint64_t)mainSqlObject->ReturnInt64(1);
+            record.sect_len = (uint64_t)mainSqlObject->ReturnInt64(2);
+            record.orig_img_sect_start = (uint64_t)mainSqlObject->ReturnInt64(3);
             allocUnallocMapList.push_back(record);
         }
-        sqlite3_finalize(statement);
-
-        for (std::vector<TskAllocUnallocMapRecord>::const_iterator it = allocUnallocMapList.begin();
-             it != allocUnallocMapList.end(); it++)
+        mainSqlObject->FinalizeSql();
+        for(std::vector<TskAllocUnallocMapRecord>::const_iterator it = allocUnallocMapList.begin(); it != allocUnallocMapList.end(); it++)
         {
             // Sector position tracks our position through the unallocated map record.
             uint64_t sectPos = it->orig_img_sect_start;
@@ -2456,41 +2445,40 @@ int WombatTskImgDBSqlite::addUnusedSectors(int unallocImgId, std::vector<TskUnus
             uint64_t endSect = it->orig_img_sect_start + it->sect_len;
 
             // Retrieve all carved_sector records in range for this section of unallocated space.
-            stmt.str("");
-            stmt << "SELECT cs.sect_start, cs.sect_len FROM carved_files cf, carved_sectors cs"
-                << " WHERE cf.file_id = cs.file_id AND cs.sect_start >= " << it->orig_img_sect_start
-                << " AND cs.sect_start < " << endSect << " ORDER BY cs.sect_start ASC";
-
-            if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-                while (sqlite3_step(statement) == SQLITE_ROW) {
-                    uint64_t cfileSectStart = (uint64_t)sqlite3_column_int64(statement, 0);
-                    uint64_t cfileSectLen = (uint64_t)sqlite3_column_int64(statement, 1);
-                    if (cfileSectStart > sectPos)
+            mainSqlObject->PrepSql();
+            if(mainSqlObject->PrepareSql("SELECT cs.sect_start, cs.sect_len FROM carved_files cf, carved_sectors cs WHERE cf.file_id = cs.file_id AND cs.sect_start >= ? AND cs.sect_start < ? ORDER BY cs.sect_start ASC") == SQLITE_OK)
+            {
+                mainSqlObject->BindValue(1, it->orig_img_sect_start);
+                mainSqlObject->BindValue(2, endSect);
+                while(mainSqlObject->StepSql() == SQLITE_ROW)
+                {
+                    uint64_t cfileSectStart = (uint64_t)mainSqlObject->ReturnInt64(0);
+                    uint64_t cfileSectLen = (uint64_t)mainSqlObject->ReturnInt64(1);
+                    if(cfileSectStart > sectPos)
                     {
                         // We have a block of unused sectors between this position in the unallocated map
                         // and the start of the carved file.
                         addUnusedSector(sectPos, cfileSectStart, it->vol_id, unusedSectorsList);
                     }
-
                     sectPos = cfileSectStart + cfileSectLen;
                 }
-
                 // Handle case where there is slack at the end of the unalloc range
                 if (sectPos < endSect)
                     addUnusedSector(sectPos, endSect, it->vol_id, unusedSectorsList);
-
-                sqlite3_finalize(statement);
-            } else {
-                std::wstringstream infoMessage;
-                infoMessage << L"WombatTskImgDBSqlite::addUnusedSectors - Error querying carved_files, carved_sectors table: " << sqlite3_errmsg(m_db);
-                LOGERROR(infoMessage.str());
+                mainSqlObject->FinalizeSql();
+            }
+            else
+            {
+                mainSqlObject->DisplayError("15.45", "Sql Error: ", "WombatTskImgDBSqlite::addUnusedSectors - Error querying carved_files, carved_sectors table");
             }
         }
-    } else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addUnusedSectors - Error querying alloc_unalloc_map table: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
     }
+    else
+    {
+        mainSqlObject->DisplayError("15.46", "Sql Error: ", "WombatTskImgDBSqlite::addUnusedSectors - Error querying alloc_unalloc_map table.");
+        mainSqlObject->FinalizeSql();
+    }
+
     return 0;
 }
 
@@ -2506,11 +2494,6 @@ int WombatTskImgDBSqlite::addUnusedSector(uint64_t sectStart, uint64_t sectEnd, 
 {
     assert(sectEnd > sectStart);
     int rc = -1;
-    if (!m_db)
-        return rc;
-
-    std::stringstream stmt;
-
     std::string maxUnused = GetSystemProperty("MAX_UNUSED_FILE_SIZE_BYTES");
     const uint64_t maxUnusedFileSizeBytes = maxUnused.empty() ? (50 * 1024 * 1024) : Poco::NumberParser::parse64(maxUnused);
 
@@ -2518,68 +2501,74 @@ int WombatTskImgDBSqlite::addUnusedSector(uint64_t sectStart, uint64_t sectEnd, 
     uint64_t sectorIndex = 0;
     uint64_t sectorCount = (sectEnd - sectStart) / maxUnusedSectorSize;
 
-    while (sectorIndex <= sectorCount) {
+    while (sectorIndex <= sectorCount)
+    {
         uint64_t thisSectStart = sectStart + (sectorIndex * maxUnusedSectorSize);
         uint64_t thisSectEnd = thisSectStart + (std::min)(maxUnusedSectorSize, sectEnd - thisSectStart);
-
-        stmt.str("");
-        stmt << "INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type,"
-            "dir_flags, meta_flags, size, ctime, crtime, atime, mtime, mode, uid, gid, status, full_path) "
-            "VALUES (NULL, " << IMGDB_FILES_TYPE_UNUSED << ", " << "'ufile'"
-            << ", NULL, " <<  TSK_FS_NAME_TYPE_REG << ", " <<  TSK_FS_META_TYPE_REG << ", "
-            << TSK_FS_NAME_FLAG_UNALLOC << ", " << TSK_FS_META_FLAG_UNALLOC << ", "
-            << (thisSectEnd - thisSectStart) * 512 << ", NULL, NULL, NULL, NULL, NULL, NULL, NULL, " << IMGDB_FILES_STATUS_READY_FOR_ANALYSIS << "," << "'ufile'" << ")";
-
-        if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, NULL) == SQLITE_OK) {
-
+        mainSqlObject->PrepSql();
+        if(mainSqlObject->PrepareSql("INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type, dir_flags, meta_flags, size, ctime, crtime, atime, mtime, mode, uid, gid, status, full_path) VALUES (NULL, ?, 'ufile', NULL, ?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?, 'ufile')") == SQLITE_OK)
+        {
+            mainSqlObject->BindValue(1, IMGDB_FILES_TYPE_UNUSED);
+            mainSqlObject->BindValue(2, TSK_FS_NAME_TYPE_REG);
+            mainSqlObject->BindValue(3, TSK_FS_META_TYPE_REG);
+            mainSqlObject->BindValue(4, TSK_FS_NAME_FLAG_UNALLOC);
+            mainSqlObject->BindValue(5, TSK_FS_META_FLAG_UNALLOC);
+            mainSqlObject->BindValue(6, (thisSectEnd - thisSectStart) * 512);
+            mainSqlObject->BindValue(7, IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
+            mainSqlObject->StepSql();
             TskUnusedSectorsRecord record;
 
             // get the file_id from the last insert
-            record.fileId = sqlite3_last_insert_rowid(m_db);
+            record.fileId = mainSqlObject->ReturnLastInsertRowID();
+            mainSqlObject->FinalizeSql();
             record.sectStart = thisSectStart;
             record.sectLen = thisSectEnd - thisSectStart;
 
-            std::stringstream name;
-            name << "ufile_" << thisSectStart << "_" << thisSectEnd << "_" << record.fileId;
-            stmt.str("");
-            char *item;
-            item = sqlite3_mprintf("%Q", name.str().c_str());
-            stmt << "UPDATE files SET name = " << item << ", full_path = "
-                << item << " WHERE file_id = " << record.fileId;
-            sqlite3_free(item);
-
-            if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, NULL) != SQLITE_OK) {
-                std::wstringstream infoMessage;
-                infoMessage << L"WombatTskImgDBSqlite::addUnusedSector - Error update into files table: " << sqlite3_errmsg(m_db);
-                LOGERROR(infoMessage.str());
+            secondarySqlObject->PrepSql();
+            if(secondarySqlObject->PrepareSql("UPDATE files SET name = ?, full_path = ? WHERE fil_id = ?;") != SQLITE_OK)
+            {
+                secondarySqlObject->DisplayError("15.48", "Sql Error: ", "WombatTskImgDBSqlite::addUnusedSector - Error update into files table.");
+                secondarySqlObject->FinalizeSql();
                 rc = -1;
                 break;
             }
-
-            stmt.str("");
-            stmt << "INSERT INTO unused_sectors (file_id, sect_start, sect_len, vol_id) VALUES ("
-                 << record.fileId << ", " << record.sectStart << ", " << record.sectLen << ", " << volId << ")";
-
-            if (sqlite3_exec(m_db, stmt.str().c_str(), NULL, NULL, NULL) != SQLITE_OK) {
-                std::wstringstream infoMessage;
-                infoMessage << L"WombatTskImgDBSqlite::addUnusedSector - Error insert into unused_sectors table: " << sqlite3_errmsg(m_db);
-                LOGERROR(infoMessage.str());
+            else
+            {
+                std::stringstream name;
+                name << "ufile_" << thisSectStart << "_" << thisSectEnd << "_" << record.fileId;
+                secondarySqlObject->BindValue(1, name.str().c_str());
+                secondarySqlObject->BindValue(2, record.fileId);
+                secondarySqlObject->StepSql();
+                secondarySqlObject->FinalizeSql();
+            }
+            secondarySqlObject->PrepSql();
+            if(secondarySqlObject->PrepareSql("INSERT INTO unused_sectors (file_id, sect_start, sect_len, vol_id) VALUES (?, ?, ?, ?);") != SQLITE_OK)
+            {
+                secondarySqlObject->DisplayError("15.49", "Sql error", "WombatTskImgDBSqlite::addUnusedSector - Error insert into unused_sectors table.");
+                secondarySqlObject->FinalizeSql();
                 rc = -1;
                 break;
+            }
+            else
+            {
+                secondarySqlObject->BindValue(1, record.fileId);
+                secondarySqlObject->BindValue(2, record.sectStart);
+                secondarySqlObject->BindValue(3, record.sectLen);
+                secondarySqlObject->BindValue(4, volId);
+                secondarySqlObject->StepSql();
+                secondarySqlObject->FinalizeSql();
             }
 
             unusedSectorsList.push_back(record);
             rc = 0;
-
-        } else {
-            std::wstringstream infoMessage;
-            infoMessage << L"WombatTskImgDBSqlite::addUnusedSector - Error insert into files table: " << sqlite3_errmsg(m_db);
-            LOGERROR(infoMessage.str());
-            rc = -1;
-            break;
+        }
+        else
+        {
+            mainSqlObject->DisplayError("15.50", "Sql Error", "WombatTskImgDBSqlite::addUnusedSector - Error insert into files table.");
+            mainSqlObject->FinalizeSql();
         }
         sectorIndex++;
-    } // while
+    } // end of while loop
     return rc;
 }
 
@@ -2592,31 +2581,33 @@ int WombatTskImgDBSqlite::addUnusedSector(uint64_t sectStart, uint64_t sectEnd, 
 int WombatTskImgDBSqlite::getUnusedSector(uint64_t fileId, TskUnusedSectorsRecord & unusedSectorsRecord) const
 {
     int rc = -1;
-    if (!m_db)
-        return rc;
-
-    std::stringstream stmt;
-    stmt << "SELECT sect_start, sect_len FROM unused_sectors WHERE file_id = " << fileId;
-
-    sqlite3_stmt * statement;
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        if (sqlite3_step(statement) == SQLITE_ROW) {
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("SELECT sect_start, sect_len FROM unused_sectors WHERE file_id = ?") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, fileId);
+        if(mainSqlObject->StepSql() == SQLITE_ROW)
+        {
             unusedSectorsRecord.fileId = fileId;
-            unusedSectorsRecord.sectStart = (uint64_t)sqlite3_column_int64(statement, 0);
-            unusedSectorsRecord.sectLen = (uint64_t)sqlite3_column_int64(statement, 1);
+            unusedSectorsRecord.sectStart = (uint64_t)mainSqlObject->ReturnInt64(0);
+            unusedSectorsRecord.sectLen = (uint64_t)mainSqlObject->ReturnInt64(1);
             rc = 0;
-        } else {
+            mainSqlObject->FinalizeSql();
+        }
+        else
+        {
             std::wstringstream msg;
             msg << L"TskDBSqlite::getUnusedSector - Error querying unused_sectors table for file_id "
                 << fileId ;
-            LOGERROR(msg.str());
+            mainSqlObject->DisplayError("15.51", "Sql Error", msg.str().c_str());
+            mainSqlObject->FinalizeSql();
         }
-    } else {
-        std::wstringstream msg;
-        msg << L"TskDBSqlite::getUnusedSector - Error querying unused_sectors table: "
-            << sqlite3_errmsg(m_db) ;
-        LOGERROR(msg.str());
     }
+    else
+    {
+        mainSqlObject->DisplayError("15.52", "Sql Error", "TskDBSqlite::getUnusedSector - Error querying unused_sectors table.");
+        mainSqlObject->FinalizeSql();
+    }
+
     return rc;
 }
 
@@ -2627,8 +2618,7 @@ int WombatTskImgDBSqlite::getUnusedSector(uint64_t fileId, TskUnusedSectorsRecor
  */
 void WombatTskImgDBSqlite::addBlackboardAttribute(TskBlackboardAttribute attr)
 {
-    if (!m_db)
-        throw TskException("No database.");
+    mainSqlObject->PrepSql();
 
     std::stringstream str;
     char *item;
@@ -2664,38 +2654,44 @@ void WombatTskImgDBSqlite::addBlackboardAttribute(TskBlackboardAttribute attr)
     };
     str << ", " << attr.getObjectID();
     str << ")";
-
-    if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
+    if(mainSqlObject->PrepareSql(str.str().c_str()) == SQLITE_OK)
+    {
         int result = SQLITE_OK;
         unsigned char *pBuf = 0;
-        if (attr.getValueType() == TSK_BYTE) {
+        if (attr.getValueType() == TSK_BYTE)
+        {
             // Bind the byte vector
             int a_size = attr.getValueBytes().size();
             pBuf = new unsigned char[a_size];
-            for (int i = 0; i < a_size; i++) {
+            for (int i = 0; i < a_size; i++)
+            {
                 pBuf[i] = attr.getValueBytes()[i];
             }
-            result = sqlite3_bind_blob(statement, 1, pBuf, a_size, SQLITE_STATIC);
+            result = mainSqlObject->BindValue(1, pBuf, a_size);
         }
-        if (result == SQLITE_OK) {
-            result = sqlite3_step(statement);
-            if (!(result == SQLITE_ROW || result == SQLITE_DONE)) {
-                sqlite3_finalize(statement);
-                if (pBuf) delete [] pBuf;
+        if(result == SQLITE_OK)
+        {
+            result = mainSqlObject->StepSql();
+            if(!(result == SQLITE_ROW || result == SQLITE_DONE))
+            {
+                mainSqlObject->FinalizeSql();
+                if(pBuf) delete [] pBuf;
                 throw TskException("WombatTskImgDBSqlite::addBlackboardAttribute - Insert failed");
             }
-        } else {
-            std::wstringstream infoMessage;
-            infoMessage << L"WombatTskImgDBSqlite::addBlackboardAttribute - Error in sqlite3_bind_blob: " << sqlite3_errmsg(m_db);
-            LOGERROR(infoMessage.str());
+        }
+        else
+        {
+            mainSqlObject->DisplayError("15.53", "Sql Error: ", "WombatTskImgDBSqlite::addBlackboardAttribute - Error in sqlite3_bind_blob.");
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::addBlackboardAttribute - Insert failed");
         }
-        sqlite3_finalize(statement);
+        mainSqlObject->FinalizeSql();
         if (pBuf) delete [] pBuf;
-    } else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addBlackboardAttribute - Error adding data to blackboard table: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+    }
+    else
+    {
+        mainSqlObject->DisplayError("15.54", "SQl Error: ", "WombatTskImgDBSqlite::addBlackboardAttribute - Error adding data to blackboard table.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::addBlackboardAttribute - Insert failed");
     }
 }
@@ -2705,34 +2701,30 @@ void WombatTskImgDBSqlite::addBlackboardAttribute(TskBlackboardAttribute attr)
  * @param artifactTypeID artifact type id
  * @returns display name
  */
-string WombatTskImgDBSqlite::getArtifactTypeDisplayName(int artifactTypeID){
-    if (!m_db)
-        throw TskException("No database.");
-
-    std::stringstream str;
-    sqlite3_stmt * statement;
+string WombatTskImgDBSqlite::getArtifactTypeDisplayName(int artifactTypeID)
+{
     std::string displayName = "";
-
-    str << "SELECT display_name FROM blackboard_artifact_types WHERE artifact_type_id = " << artifactTypeID;
-
-    if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK){
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            displayName = (char *)sqlite3_column_text(statement, 0);
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("SELECT display_name FROM blackboard_artifact_types WHERE artifact_type_id = ?") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, artifactTypeID);
+        if(mainSqlObject->StepSql() == SQLITE_ROW)
+        {
+            displayName = (char *)mainSqlObject->ReturnText(0);
         }
-        else{
-            std::wstringstream infoMessage;
-            infoMessage << L"WombatTskImgDBSqlite::getArtifactTypeDisplayName: " << sqlite3_errmsg(m_db);
-            LOGERROR(infoMessage.str());
+        else
+        {
+            mainSqlObject->DisplayError("15.45", "Sql Error: ", "WombatTskImgDBSqlite::getArtifactTypeDisplayName.");
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::getArtifactTypeDisplayName - No artifact type with that ID");
         }
-        sqlite3_finalize(statement);
+        mainSqlObject->FinalizeSql();
         return displayName;
     }
-    else{
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getArtifactTypeDisplayName: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+    else
+    {
+        mainSqlObject->DisplayError("15.46", "Sql Error: ", "WombatTskImgDBSqlite::getArtifactTypeDisplayName.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::getArtifactTypeDisplayName - Select failed");
     }
 }
@@ -2743,33 +2735,30 @@ string WombatTskImgDBSqlite::getArtifactTypeDisplayName(int artifactTypeID){
  * @returns artifact type id
  */
 int WombatTskImgDBSqlite::getArtifactTypeID(string artifactTypeString){
-    if (!m_db)
-        throw TskException("No database.");
 
-    std::stringstream str;
-    sqlite3_stmt * statement;
     int typeID;
-
-    str << "SELECT artifact_type_id FROM blackboard_artifact_types WHERE type_name = " << artifactTypeString;
-
-    if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK){
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            typeID = (int) sqlite3_column_int(statement, 0);
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("SELECT artifact_type_id FROM blackboard_artifact_types WHERE type_name = ?;") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, artifactTypeString);
+        if(mainSqlObject->StepSql() == SQLITE_ROW)
+        {
+            typeID = (int) mainSqlObject->ReturnInt(0);
         }
-        else{
-            std::wstringstream infoMessage;
-            infoMessage << L"WombatTskImgDBSqlite::getArtifactTypeID: " << sqlite3_errmsg(m_db);
-            LOGERROR(infoMessage.str());
+        else
+        {
+            mainSqlObject->DisplayError("15.54", "Sql Error: ", "WombatTskImgDBSqlite::getArtifactTypeID");
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::getArtifactTypeID - No artifact type with that name");
         }
-        sqlite3_finalize(statement);
+        mainSqlObject->FinalizeSql();
+
         return typeID;
     }
-    else{
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getArtifactTypeID: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+    else
+    {
+        mainSqlObject->DisplayError("15.53", "Sql Error: ", "WombatTskImgDBSqlite::getArtifactTypeID.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::getArtifactTypeID - Select failed");
     }
 }
@@ -2779,34 +2768,31 @@ int WombatTskImgDBSqlite::getArtifactTypeID(string artifactTypeString){
  * @param artifactTypeID id
  * @returns artifact type name
  */
-string WombatTskImgDBSqlite::getArtifactTypeName(int artifactTypeID){
-    if (!m_db)
-        throw TskException("No database.");
-
-    std::stringstream str;
-    sqlite3_stmt * statement;
+string WombatTskImgDBSqlite::getArtifactTypeName(int artifactTypeID)
+{
+    mainSqlObject->PrepSql();
     std::string typeName = "";
-
-    str << "SELECT type_name FROM blackboard_artifact_types WHERE artifact_type_id = " << artifactTypeID;
-
-    if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK){
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            typeName = (char *)sqlite3_column_text(statement, 0);
+    if(mainSqlObject->PrepareSql("SELECT type_name FROM blackboard_artifact_types WHERE artifact_type_id = ?;") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, artifactTypeID);
+        if(mainSqlObject->StepSql() == SQLITE_ROW)
+        {
+            typeName = (char *)mainSqlObject->ReturnText(0);
         }
-        else{
-            std::wstringstream infoMessage;
-            infoMessage << L"WombatTskImgDBSqlite::getArtifactTypeName: " << sqlite3_errmsg(m_db);
-            LOGERROR(infoMessage.str());
+        else
+        {
+            mainSqlObject->DisplayError("15.56", "Sql Error: ", "WombatTskImgDBSqlite::getArtifactTypeName.");
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::getArtifactTypeName - No artifact type with that ID");
         }
-        sqlite3_finalize(statement);
+        mainSqlObject->FinalizeSql();
+
         return typeName;
     }
-    else{
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getArtifactTypeName: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+    else
+    {
+        mainSqlObject->DisplayError("15.55", "Sql Error: ", "WombatTskImgDBSqlite::getArtifactTypeName.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::getArtifactTypeName - Select failed");
     }
 }
@@ -2816,34 +2802,30 @@ string WombatTskImgDBSqlite::getArtifactTypeName(int artifactTypeID){
  * @param attributeTypeID attribute type id
  * @returns display name
  */
-string WombatTskImgDBSqlite::getAttributeTypeDisplayName(int attributeTypeID){
-    if (!m_db)
-        throw TskException("No database.");
+string WombatTskImgDBSqlite::getAttributeTypeDisplayName(int attributeTypeID)
+{
 
-    std::stringstream str;
-    sqlite3_stmt * statement;
     std::string displayName = "";
-
-    str << "SELECT display_name FROM blackboard_attribute_types WHERE attribute_type_id = " << attributeTypeID;
-
-    if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK){
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            displayName = (char *)sqlite3_column_text(statement, 0);
-        }
-        else{
-            std::wstringstream infoMessage;
-            infoMessage << L"WombatTskImgDBSqlite::getAttributeTypeDisplayName: " << sqlite3_errmsg(m_db);
-            LOGERROR(infoMessage.str());
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, attributeTypeID);
+        if(mainSqlObject->StepSql() == SQLITE_ROW)
+            displayName = (char *)mainSqlObject->ReturnText(0);
+        else
+        {
+            mainSqlObject->DisplayError("15.58", "Sql Error", "WombatTskImgDBSqlite::getAttributeTypeDisplayName");
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::getAttributeTypeDisplayName - No attribute type with that ID");
         }
-        sqlite3_finalize(statement);
+        mainSqlObject->FinalizeSql();
+
         return displayName;
     }
-    else{
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getAttributeTypeDisplayName: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+    else
+    {
+        mainSqlObject->DisplayError("15.57", "Sql Error: ", "WombatTskImgDBSqlite::getAttributeTypeDisplayName.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::getAttributeTypeDisplayName - Select failed");
     }
 }

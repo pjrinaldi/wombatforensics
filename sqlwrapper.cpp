@@ -194,6 +194,14 @@ void SqlWrapper::BindValue(int bindPlace, const void* bindValue)
                 DisplayError(errornumber, "BIND BLOB", "MISUSE");
         }
 }
+void SqlWrapper::BindValue(int bindPlace, const void * bindValue, int blobSize)
+{
+    bindplace = bindPlace;
+    bindblob = bindValue;
+    blobsize = blobSize;
+    return sqlite3_bind_blob(sqlstatement, bindplace, bindblob, blobsize, SQLITE_STATIC);
+}
+
 int SqlWrapper::ReturnInt(int returnPlace)
 {
         returnplace = returnPlace;

@@ -18,7 +18,8 @@ public:
     void BindValue(int bindPlace, double bindValue);
     void BindValue(int bindPlace, sqlite3_int64 bindValue);
     void BindValue(int bindPlace, const char* bindValue);
-    void BindValue(int bindPlace, const void* bindValue);// blob bind
+    void BindValue(int bindPlace, const void* bindValue);// simple blob bind
+    void BindValue(int bindPlace, const void* bindValue, int blobSize); // complex blob bind
     void BindValue(int bindPlace);
     int ReturnInt(int returnPlace);
     double ReturnDouble(int returnPlace);
@@ -54,6 +55,7 @@ private:
     sqlite3_stmt* sqlstatement;
     int sqlcode;
     int bindplace;
+    int blobsize;
     int returnplace;
     int bindint;
     int returnint;
