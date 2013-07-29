@@ -25,8 +25,6 @@ public:
     //WombatTskImgDBSqlite(const char * a_outpath);
     WombatTskImgDBSqlite(QString dbName);
 
-    sqlite3_stmt *sqlStatement;
-
     SqlWrapper *sqlObject;
 
     virtual ~ WombatTskImgDBSqlite();
@@ -137,7 +135,10 @@ private:
     char m_dbFilePath[256];
     sqlite3 * m_db;
     QString dbname;
+    sqlite3_stmt *sqlStatement;
+    sqlite3_stmt *sqlStatement2;
     SqlWrapper *mainSqlObject;
+    SqlWrapper *secondarySqlObject;
 
     int dropTables();
 

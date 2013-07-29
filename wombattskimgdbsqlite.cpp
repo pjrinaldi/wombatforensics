@@ -29,6 +29,10 @@ int WombatTskImgDBSqlite::close()
     if(mainSqlObject->ReturnSqlDB())
     {
         mainSqlObject->CloseSql();
+        if(secondarySqlObject->ReturnSqlDB())
+            secondarySqlObject->CloseSql();
+        if(sqlObject->ReturnSqlDB())
+            sqlObject->CloseSql();
     }
     else
         return 1;
@@ -86,6 +90,8 @@ int WombatTskImgDBSqlite::initialize()
     }
 
     addToolInfo("DBSchema", IMGDB_SCHEMA_VERSION);
+    sqlObject->FinalizeSql();
+    sqlObject->CloseSql();
 
     LOGINFO(L"ImgDB Created.");
     return 0;
@@ -99,14 +105,15 @@ int WombatTskImgDBSqlite::initialize()
 */
 int WombatTskImgDBSqlite::open()
 {
-    //sqlObject = new SqlWrapper(sqlStatement, "15.15", dbname);
+    //SqlObject = new SqlWrapper(sqlStatement, "15.15", dbname);
     mainSqlObject = new SqlWrapper(sqlStatement, dbname);
+    secondarySqlObject = new SqlWrapper(sqlStatement2, dbname);
 
     // Register a busy handler that will retry statements in situations
     // where the database is locked by another process.
     if(mainSqlObject->SetBusyHandler(WombatTskImgDBSqlite::busyHandler) != SQLITE_OK)
     {
-        mainSqlObject->DisplayError("15.2", "Sql Error", "TskImgDBSqlite::open - Failed to set busy handler.");
+        mainSqlObject->DisplayError("15.2", "Sql Error: ", "TskImgDBSqlite::open - Failed to set busy handler.");
         mainSqlObject->CloseSql();
         return 1;
     }
@@ -116,37 +123,58 @@ int WombatTskImgDBSqlite::open()
 
 int WombatTskImgDBSqlite::addToolInfo(const char* name, const char* version)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.16", dbname);
-    sqlObject->PrepareSql("INSERT INTO db_info (name, version) VALUES(?, ?);");
-    sqlObject->BindValue(1, name);
-    sqlObject->BindValue(2, version);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.16", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO db_info (name, version) VALUES(?, ?);");
+    mainSqlObject->BindValue(1, name);
+    mainSqlObject->BindValue(2, version);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.3", "Sql Error: ", "TskImgDBSqlite::addToolInfo - Error adding data to db_info table.");
+        return 1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
    return 0;
 }
 
 int WombatTskImgDBSqlite::addImageInfo(int type, int size)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.15", dbname);
-    sqlObject->PrepareSql("INSERT INTO image_info (type, ssize) VALUES(?, ?);");
-    sqlObject->BindValue(1, type);
-    sqlObject->BindValue(2, size);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.15", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO image_info (type, ssize) VALUES(?, ?);");
+    mainSqlObject->BindValue(1, type);
+    mainSqlObject->BindValue(2, size);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.4", "Sql Error: ", "TskImgDBSqlite::addImageInfo - Error adding data to image_info table.");
+        return 1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
     return 0;
 }
 
 int WombatTskImgDBSqlite::addImageName(char const *imgPath)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.1", dbname);
-    sqlObject->PrepareSql("INSERT INTO image_names (seq, name) VALUES(NULL, ?);");
-    sqlObject->BindValue(1, imgPath);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainmainSqlObject = new SqlWrapper(sqlStatement, "15.1", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO image_names (seq, name) VALUES(NULL, ?);");
+    mainSqlObject->BindValue(1, imgPath);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.5", "SQL Error: ", "TskImgDBSqlite::addImageName - Error adding data to image_names table.");
+        return 1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainmainSqlObject->CloseSql();
     return 0;
 }
 
@@ -155,35 +183,50 @@ int WombatTskImgDBSqlite::addImageName(char const *imgPath)
  */
 int WombatTskImgDBSqlite::addVolumeInfo(const TSK_VS_PART_INFO * vs_part)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.6", dbname);
-    sqlObject->PrepareSql("INSERT INTO vol_info (vol_id, sect_start, sect_len, description, flags) VALUES(?, ?, ?, ?, ?);");
-    sqlObject->BindValue(1, (int)vs_part->addr);
-    sqlObject->BindValue(2, (sqlite3_int64)vs_part->start);
-    sqlObject->BindValue(3, (sqlite3_int64)vs_part->len);
-    sqlObject->BindValue(4, vs_part->desc);
-    sqlObject->BindValue(5, vs_part->flags);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainmainSqlObject = new SqlWrapper(sqlStatement, "15.6", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO vol_info (vol_id, sect_start, sect_len, description, flags) VALUES(?, ?, ?, ?, ?);");
+    mainSqlObject->BindValue(1, (int)vs_part->addr);
+    mainSqlObject->BindValue(2, (sqlite3_int64)vs_part->start);
+    mainSqlObject->BindValue(3, (sqlite3_int64)vs_part->len);
+    mainSqlObject->BindValue(4, vs_part->desc);
+    mainSqlObject->BindValue(5, vs_part->flags);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.6", "Sql Error: ", "TskImgDBSqlite::addVolumeInfo - Error adding data to vol_info table.");
+        return 1;
+    }
+
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
     return 0;
 }
 
 int WombatTskImgDBSqlite::addFsInfo(int volId, int fsId, const TSK_FS_INFO * fs_info)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.2", dbname);
-    sqlObject->PrepareSql("INSERT INTO fs_info (fs_id, img_byte_offset, vol_id, fs_type, block_size, block_count, root_inum, first_inum, last_inum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);");
-    sqlObject->BindValue(1, fsId);
-    sqlObject->BindValue(2, (sqlite3_int64)fs_info->offset);
-    sqlObject->BindValue(3, volId);
-    sqlObject->BindValue(4, (int)fs_info->ftype);
-    sqlObject->BindValue(5, (int)fs_info->block_size);
-    sqlObject->BindValue(6, (sqlite3_int64)fs_info->block_count);
-    sqlObject->BindValue(7, (sqlite3_int64)fs_info->root_inum);
-    sqlObject->BindValue(8, (sqlite3_int64)fs_info->first_inum);
-    sqlObject->BindValue(9, (sqlite3_int64)fs_info->last_inum);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.2", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO fs_info (fs_id, img_byte_offset, vol_id, fs_type, block_size, block_count, root_inum, first_inum, last_inum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);");
+    mainSqlObject->BindValue(1, fsId);
+    mainSqlObject->BindValue(2, (sqlite3_int64)fs_info->offset);
+    mainSqlObject->BindValue(3, volId);
+    mainSqlObject->BindValue(4, (int)fs_info->ftype);
+    mainSqlObject->BindValue(5, (int)fs_info->block_size);
+    mainSqlObject->BindValue(6, (sqlite3_int64)fs_info->block_count);
+    mainSqlObject->BindValue(7, (sqlite3_int64)fs_info->root_inum);
+    mainSqlObject->BindValue(8, (sqlite3_int64)fs_info->first_inum);
+    mainSqlObject->BindValue(9, (sqlite3_int64)fs_info->last_inum);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.7", "Sql Error: ", "TskImgDBSqlite::addFsInfo - Error adding data to fs_info table.");
+        return 1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
     return 0;
 }
 
@@ -194,83 +237,73 @@ int WombatTskImgDBSqlite::addFsInfo(int volId, int fsId, const TSK_FS_INFO * fs_
 uint64_t WombatTskImgDBSqlite::getFileId(int a_fsId, uint64_t a_fsFileId) const
 {
     uint64_t fileId = 0;
+    mainSqlObject->FinalizeSql();
     mainSqlObject->ResetSql();
     mainSqlObject->ClearBindings();
     mainSqlObject->PrepareSql("SELECT file_id FROM fs_files WHERE fs_id = ? AND fs_file_id = ?;");
     mainSqlObject->BindValue(1, a_fsId);
-    mainSqlObject->BindValue(2, a_fsFileId);
-    int result = mainSqlObject->StepSql();
-    if(result == SQLITE_ROW)
+    mainSqlObject->BindValue(2, (sqlite3_int64)a_fsFileId);
+    if(mainSqlObject->StepSql() == SQLITE_ROW || mainSqlObject->StepSql() == SQLITE_DONE)
     {
         fileId = (uint64_t)mainSqlObject->ReturnInt64(0);
         mainSqlObject->FinalizeSql();
-        //mainSqlObject->CloseSql();
+        //mainmainSqlObject->CloseSql();
     }
     else
     {
-        //LOGERROR("Error Querying fs_files table.");
-    }
-    return fileId;
-
-    sqlObject = new SqlWrapper(sqlStatement, "15.8", dbname);
-    sqlObject->PrepareSql("SELECT file_id FROM fs_files WHERE fs_id = ? AND fs_file_id = ?;");
-    sqlObject->BindValue(1, a_fsId);
-    sqlObject->BindValue(2, a_fsFileId);
-    int result = sqlObject->StepSql();
-    if(result == SQLITE_ROW)
-    {
-        fileId = (uint64_t)sqlObject->ReturnInt64(0);
-        sqlObject->FinalizeSql();
-        sqlObject->CloseSql();
-    }
-    else
-    {
-        LOGERROR("Error Querying fs_files table.");
+        mainSqlObject->DisplayError("15.8", "Sql Error: ", "TskImgDBSqlite::getFileId - Error querying fs_files table.");
+        return 0;
     }
     return fileId;
 }
 
-
 int WombatTskImgDBSqlite::getFileRecord(const uint64_t fileId, TskFileRecord& fileRecord) const
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.8", dbname);
-    sqlObject->PrepareSql("SELECT f.file_id, f.type_id, f.name, f.par_file_id, f.dir_type, f.meta_type, f.dir_flags, f.meta_flags, f.size, f.ctime, f.crtime, f.atime, f.mtime, f.mode, f.uid, f.gid, f.status, f.full_path, fh.md5, fh.sha1, fh.sha2_256, fh.sha2_512 FROM files f LEFT OUTER JOIN file_hashes fh ON f.file_id = fh.file_id WHERE f.file_id =  ?;");
-    sqlObject->BindValue(1, fileId);
-    int result = sqlObject->StepSql();
-    if(result == SQLITE_ROW)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.8", dbname);
+    mainSqlObject->PrepareSql("SELECT f.file_id, f.type_id, f.name, f.par_file_id, f.dir_type, f.meta_type, f.dir_flags, f.meta_flags, f.size, f.ctime, f.crtime, f.atime, f.mtime, f.mode, f.uid, f.gid, f.status, f.full_path, fh.md5, fh.sha1, fh.sha2_256, fh.sha2_512 FROM files f LEFT OUTER JOIN file_hashes fh ON f.file_id = fh.file_id WHERE f.file_id =  ?;");
+    mainSqlObject->BindValue(1, (sqlite3_int64)fileId);
+    int result = mainSqlObject->StepSql();
+    if(result == SQLITE_ROW || result == SQLITE_DONE)
     {
-        fileRecord.fileId = sqlObject->ReturnInt64(0);
-        fileRecord.typeId = (TskImgDB::FILE_TYPES)sqlObject->ReturnInt(1);
-        fileRecord.name = (char*)sqlObject->ReturnText(2);
-        fileRecord.parentFileId = sqlObject->ReturnInt64(3);
-        fileRecord.dirType = (TSK_FS_NAME_TYPE_ENUM)sqlObject->ReturnInt(4);
-        fileRecord.metaType = (TSK_FS_META_TYPE_ENUM)sqlObject->ReturnInt(5);
-        fileRecord.dirFlags = (TSK_FS_NAME_FLAG_ENUM)sqlObject->ReturnInt(6);
-        fileRecord.metaFlags = (TSK_FS_META_FLAG_ENUM)sqlObject->ReturnInt(7);
-        fileRecord.size = sqlObject->ReturnInt64(8);
-        fileRecord.ctime = sqlObject->ReturnInt(9);
-        fileRecord.crtime = sqlObject->ReturnInt(10);
-        fileRecord.atime = sqlObject->ReturnInt(11);
-        fileRecord.mtime = sqlObject->ReturnInt(12);
-        fileRecord.mode = (TSK_FS_META_MODE_ENUM)sqlObject->ReturnInt(13);
-        fileRecord.uid = sqlObject->ReturnInt(14);
-        fileRecord.gid = sqlObject->ReturnInt(15);
-        fileRecord.status = (TskImgDB::FILE_STATUS)sqlObject->ReturnInt(16);
-        fileRecord.fullPath = (char *)sqlObject->ReturnText(17);
+        fileRecord.fileId = mainSqlObject->ReturnInt64(0);
+        fileRecord.typeId = (TskImgDB::FILE_TYPES)mainSqlObject->ReturnInt(1);
+        fileRecord.name = (char*)mainSqlObject->ReturnText(2);
+        fileRecord.parentFileId = mainSqlObject->ReturnInt64(3);
+        fileRecord.dirType = (TSK_FS_NAME_TYPE_ENUM)mainSqlObject->ReturnInt(4);
+        fileRecord.metaType = (TSK_FS_META_TYPE_ENUM)mainSqlObject->ReturnInt(5);
+        fileRecord.dirFlags = (TSK_FS_NAME_FLAG_ENUM)mainSqlObject->ReturnInt(6);
+        fileRecord.metaFlags = (TSK_FS_META_FLAG_ENUM)mainSqlObject->ReturnInt(7);
+        fileRecord.size = mainSqlObject->ReturnInt64(8);
+        fileRecord.ctime = mainSqlObject->ReturnInt(9);
+        fileRecord.crtime = mainSqlObject->ReturnInt(10);
+        fileRecord.atime = mainSqlObject->ReturnInt(11);
+        fileRecord.mtime = mainSqlObject->ReturnInt(12);
+        fileRecord.mode = (TSK_FS_META_MODE_ENUM)mainSqlObject->ReturnInt(13);
+        fileRecord.uid = mainSqlObject->ReturnInt(14);
+        fileRecord.gid = mainSqlObject->ReturnInt(15);
+        fileRecord.status = (TskImgDB::FILE_STATUS)mainSqlObject->ReturnInt(16);
+        fileRecord.fullPath = (char *)mainSqlObject->ReturnText(17);
 
-        if(sqlObject->ReturnColumnType(18) == SQLITE_TEXT)
-            fileRecord.md5 = (char *)sqlObject->ReturnText(18);
-        if(sqlObject->ReturnColumnType(19) == SQLITE_TEXT)
-            fileRecord.sha1 = (char *)sqlObject->ReturnText(19);
-        if(sqlObject->ReturnColumnType(20) == SQLITE_TEXT)
-            fileRecord.sha2_256 = (char *)sqlObject->ReturnText(20);
-        if(sqlObject->ReturnColumnType(21) == SQLITE_TEXT)
-            fileRecord.sha2_512 = (char *)sqlObject->ReturnText(21);
+        if(mainSqlObject->ReturnColumnType(18) == SQLITE_TEXT)
+            fileRecord.md5 = (char *)mainSqlObject->ReturnText(18);
+        if(mainSqlObject->ReturnColumnType(19) == SQLITE_TEXT)
+            fileRecord.sha1 = (char *)mainSqlObject->ReturnText(19);
+        if(mainSqlObject->ReturnColumnType(20) == SQLITE_TEXT)
+            fileRecord.sha2_256 = (char *)mainSqlObject->ReturnText(20);
+        if(mainSqlObject->ReturnColumnType(21) == SQLITE_TEXT)
+            fileRecord.sha2_512 = (char *)mainSqlObject->ReturnText(21);
     }
     else
-        LOGERROR("Error querying files table for file id");
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    {
+        mainSqlObject->DisplayError("15.9", "Sql Error: ", "TskImgDBSqlite::getFileRecord - Error querying files table for file id.");
+        mainSqlObject->FinalizeSql();
+        return -1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return 0;
 }
@@ -290,7 +323,10 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
             fileNameAsString.replace(found, 1, "''");
         }
     }
-    sqlObject = new SqlWrapper(sqlStatement, "15.9", dbname);
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.9", dbname);
     for(int codePoint = 1; codePoint < 32; codePoint++)
     {
         char codePointAsHex[10];
@@ -338,38 +374,48 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
         gid = fileSystemFile->meta->gid;
         uid = fileSystemFile->meta->uid;
     }
-    sqlObject->PrepareSql("INSERT INTO files(file_id, type_id, status, name, par_file_id, dir_type, meta_type, dir_flags, meta_flags, size, crtime, ctime, atime, mtime, mode, gid, uid, full_path) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-    sqlObject->BindValue(1, IMGDB_FILES_TYPE_FS);
-    sqlObject->BindValue(2, IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
-    sqlObject->BindValue(3, fileName);
-    sqlObject->BindValue(4, findParObjId(fileSystemID, fileSystemFile->name->par_addr));
-    sqlObject->BindValue(5, fileSystemFile->name->type);
-    sqlObject->BindValue(6, meta_type);
-    sqlObject->BindValue(7, fileSystemFile->name->flags);
-    sqlObject->BindValue(8, meta_flags);
-    sqlObject->BindValue(9, size);
-    sqlObject->BindValue(10, crtime);
-    sqlObject->BindValue(11, ctime);
-    sqlObject->BindValue(12, atime);
-    sqlObject->BindValue(13, mtime);
-    sqlObject->BindValue(14, meta_mode);
-    sqlObject->BindValue(15, gid);
-    sqlObject->BindValue(16, uid);
-    sqlObject->BindValue(17, fullpath.c_str());
-    sqlObject->StepSql();
-    fileID = sqlObject->ReturnLastInsertRowID();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
-    sqlObject = new SqlWrapper(sqlStatement, "15.8", dbname);
-    sqlObject->PrepareSql("INSERT INTO fs_files (file_id, fs_id, fs_file_id, attr_type, attr_id) VALUES (?, ?, ?, ?, ?);");
-    sqlObject->BindValue(1, fileID);
-    sqlObject->BindValue(2, fileSystemID);
-    sqlObject->BindValue(3, fileSystemFile->name->meta_addr);
-    sqlObject->BindValue(4, fileSystemAttrType);
-    sqlObject->BindValue(5, fileSystemAttrID);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->PrepareSql("INSERT INTO files(file_id, type_id, status, name, par_file_id, dir_type, meta_type, dir_flags, meta_flags, size, crtime, ctime, atime, mtime, mode, gid, uid, full_path) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+    mainSqlObject->BindValue(1, IMGDB_FILES_TYPE_FS);
+    mainSqlObject->BindValue(2, IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
+    mainSqlObject->BindValue(3, fileName);
+    mainSqlObject->BindValue(4, (sqlite3_int64)findParObjId(fileSystemID, fileSystemFile->name->par_addr));
+    mainSqlObject->BindValue(5, fileSystemFile->name->type);
+    mainSqlObject->BindValue(6, meta_type);
+    mainSqlObject->BindValue(7, fileSystemFile->name->flags);
+    mainSqlObject->BindValue(8, meta_flags);
+    mainSqlObject->BindValue(9, (sqlite3_int64)size);
+    mainSqlObject->BindValue(10, crtime);
+    mainSqlObject->BindValue(11, ctime);
+    mainSqlObject->BindValue(12, atime);
+    mainSqlObject->BindValue(13, mtime);
+    mainSqlObject->BindValue(14, meta_mode);
+    mainSqlObject->BindValue(15, gid);
+    mainSqlObject->BindValue(16, uid);
+    mainSqlObject->BindValue(17, fullpath.c_str());
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.9", "Sql Error: ", "Error adding data to files table.");
+        return -1;
+    }
+    fileID = mainSqlObject->ReturnLastInsertRowID();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject->CloseSql();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.8", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO fs_files (file_id, fs_id, fs_file_id, attr_type, attr_id) VALUES (?, ?, ?, ?, ?);");
+    mainSqlObject->BindValue(1, (sqlite3_int64)fileID);
+    mainSqlObject->BindValue(2, fileSystemID);
+    mainSqlObject->BindValue(3, (sqlite3_int64)fileSystemFile->name->meta_addr);
+    mainSqlObject->BindValue(4, fileSystemAttrType);
+    mainSqlObject->BindValue(5, fileSystemAttrID);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.10", "Sql Error: ", "Error adding data to fs_files table.");
+        return -1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
     if(meta_type == TSK_FS_META_TYPE_DIR) // if dir, update parent id cache
         storeParObjId(fileSystemID, fileSystemFile->name->meta_addr, fileID);
     return 0;
@@ -387,29 +433,47 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
  */
 int WombatTskImgDBSqlite::addFsBlockInfo(int a_fsId, uint64_t a_fileId, int a_sequence, uint64_t a_blk_addr, uint64_t a_len)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.9", dbname);
-    sqlObject->PrepareSql("INSERT INTO fs_blocks (fs_id, file_id, seq, blk_start, blk_len) VALUES(?, ?, ?, ?, ?);");
-    sqlObject->BindValue(1, a_fsId);
-    sqlObject->BindValue(2, a_fileId);
-    sqlObject->BindValue(3, a_sequence);
-    sqlObject->BindValue(4, a_blk_addr);
-    sqlObject->BindValue(5, a_len);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.9", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO fs_blocks (fs_id, file_id, seq, blk_start, blk_len) VALUES(?, ?, ?, ?, ?);");
+    mainSqlObject->BindValue(1, a_fsId);
+    mainSqlObject->BindValue(2, (sqlite3_int64)a_fileId);
+    mainSqlObject->BindValue(3, a_sequence);
+    mainSqlObject->BindValue(4, (sqlite3_int64)a_blk_addr);
+    mainSqlObject->BindValue(5, (sqlite3_int64)a_len);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.11", "Sql Error: ", "TskImgDBSqlite::addFsBlockInfo - Error adding data to fs_blocks table");
+        return 1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
     return 0;
 }
 
 int WombatTskImgDBSqlite::addAllocUnallocMapInfo(int a_volID, int unallocImgID,
                                            uint64_t unallocImgStart, uint64_t length, uint64_t origImgStart)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.10", dbname);
-    sqlObject->PrepareSql("INSERT INTO alloc_unalloc_map (vol_id, unalloc_img_id, unalloc_img_sect_start, sect_len, orig_img_sect_start) VALUES (?, ?, ?, ?, ?);");
-    sqlObject->BindValue(1, a_volID);
-    sqlObject->BindValue(2, unallocImgID);
-    sqlObject->BindValue(3, unallocImgStart);
-    sqlObject->BindValue(4, length);
-    sqlObject->BindValue(5, origImgStart);
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.10", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO alloc_unalloc_map (vol_id, unalloc_img_id, unalloc_img_sect_start, sect_len, orig_img_sect_start) VALUES (?, ?, ?, ?, ?);");
+    mainSqlObject->BindValue(1, a_volID);
+    mainSqlObject->BindValue(2, unallocImgID);
+    mainSqlObject->BindValue(3, (sqlite3_int64)unallocImgStart);
+    mainSqlObject->BindValue(4, (sqlite3_int64)length);
+    mainSqlObject->BindValue(5, (sqlite3_int64)origImgStart);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.12", "Sql Error: ", "TskImgDBSqlite::addAllocUnallocMapInfo - Error adding data to alloc_unalloc_map table.");
+        mainSqlObject->FinalizeSql();
+        return 1;
+    }
+    mainSqlObject->FinalizeSql();
+
     return 0;
 }
 
@@ -424,15 +488,17 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
 
     LOGINFO("WombatTskImgDBSqlite::getFreeSectors - Identifying Unallocated Sectors");
     /********** FIND the unallocated volumes *************/
-    sqlObject = new SqlWrapper(sqlStatement, "15.11", dbname);
-    sqlObject->PrepareSql("SELECT vol_id, sect_start, sect_len, flags FROM vol_info;");
-    int result = sqlObject->StepSql();
-    while(result == SQLITE_ROW)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.11", dbname);
+    mainSqlObject->PrepareSql("SELECT vol_id, sect_start, sect_len, flags FROM vol_info;");
+    while(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        int flags = sqlObject->ReturnInt(3);
-        int vol_id = sqlObject->ReturnInt(0);
-        int64_t start = sqlObject->ReturnInt64(1);
-        int64_t len = sqlObject->ReturnInt64(2);
+        int flags = mainSqlObject->ReturnInt(3);
+        int vol_id = mainSqlObject->ReturnInt(0);
+        int64_t start = mainSqlObject->ReturnInt64(1);
+        int64_t len = mainSqlObject->ReturnInt64(2);
 
         // add the unallocated volumes
         if(flags & TSK_VS_PART_FLAG_UNALLOC)
@@ -440,19 +506,29 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
         // add the unallocated volumes that don't have a known file system
         else
         {
-            sqlite3_stmt *sqlStatement2;
-            SqlWrapper *sqlObject2 = new SqlWrapper(sqlStatement2, "15.12", dbname);
-            sqlObject2->PrepareSql("SELECT fs_id FROM fs_info WHERE vol_id = ?;");
-            sqlObject2->BindValue(1, vol_id);
-            int result2 = sqlObject2->StepSql();
-            if(result2 != SQLITE_ROW)
+            //sqlite3_stmt *sqlStatement2;
+            secondarySqlObject->FinalizeSql();
+            secondarySqlObject->ResetSql();
+            secondarySqlObject->ClearBindings();
+            secondarySqlObject->PrepareSql("SELECT fs_id FROM fs_info WHERE vol_id = ?;");
+            secondarySqlObject->BindValue(1, vol_id);
+            if(secondarySqlObject->StepSql() != SQLITE_ROW)
+            {
                 sr->addRun(start, len, vol_id);
-            sqlObject2->FinalizeSql();
-            sqlObject2->CloseSql();
+            }
+            secondarySqlObject->FinalizeSql();
+            //SqlWrapper *mainSqlObject2 = new SqlWrapper(sqlStatement2, "15.12", dbname);
+            //mainSqlObject2->PrepareSql("SELECT fs_id FROM fs_info WHERE vol_id = ?;");
+            //mainSqlObject2->BindValue(1, vol_id);
+            //int result2 = mainSqlObject2->StepSql();
+            //if(result2 != SQLITE_ROW)
+                //sr->addRun(start, len, vol_id);
+            //mainSqlObject2->FinalizeSql();
+            //mainSqlObject2->CloseSql();
         }
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     /*************** Find the unallocated blocks in each file system *************/
     // @@@ Need to make more dynamic
@@ -464,61 +540,71 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
     uint64_t img_offset[32];
 
     // get basic info on each file system
-    sqlObject = new SqlWrapper(sqlStatement, "15.13", dbname);
-    sqlObject->PrepareSql("SELECT fs_id, vol_id, img_byte_offset, block_size, block_count FROM fs_info;");
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.13", dbname);
+    mainSqlObject->PrepareSql("SELECT fs_id, vol_id, img_byte_offset, block_size, block_count FROM fs_info;");
     LOGINFO("WombatTskImgDBSqlite::getFreeSectors - START LOOP: Find the unallocated blocks in each file system.");
-    int result = sqlObject->StepSql();
-    while(result == SQLITE_ROW)
+    while(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        int fs_id = sqlObject->ReturnInt(0);
+        int fs_id = mainSqlObject->ReturnInt(0);
         if(fs_id > 32)
         {
             LOGERROR("WombatTskImgDBSqlite::getFreeSectors - fs_id in fs_info is bigger than 32.");
             break;
         }
-        vol_id[fs_id] = sqlObject->ReturnInt(1);
-        img_offset[fs_id] = sqlObject->ReturnInt64(2) / 512;
-        blk_size[fs_id] = sqlObject->ReturnInt(3) / 512;
-        blk_count[fs_id] = sqlObject->ReturnInt64(4);
+        vol_id[fs_id] = mainSqlObject->ReturnInt(1);
+        img_offset[fs_id] = mainSqlObject->ReturnInt64(2) / 512;
+        blk_size[fs_id] = mainSqlObject->ReturnInt(3) / 512;
+        blk_count[fs_id] = mainSqlObject->ReturnInt64(4);
         std:stringstream msg;
         msg.str("");
         msg << "WombatTskImgDBSqlite::getFreeSectors - fs_id=" << fs_id << " vol_id=" << vol_id[fs_id] << " img_offset=" << img_offset[fs_id] << " blk_size=" << blk_size[fs_id] <<
             " blk_count=" << blk_count[fs_id];
         LOGINFO(msg.str().c_str());
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
     LOGINFO("WombatTskImgDBSqlite::getFreeSectors - DONE: Find the unallocated blocks in each file system.");
 
     // see what blocks have been used and add them to a list
     TSK_LIST *seen[32];
     memset(seen, 0, 32*sizeof(TSK_LIST *));
-    sqlObject = new SqlWrapper(sqlStatement, "15.14", dbname);
-    sqlObject->PrepareSql("SELECT fs_id, file_id, blk_start, blk_len FROM fs_blocks;");
-    int result = sqlObject->StepSql();
-    while(result = SQLITE_ROW)
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.14", dbname);
+    mainSqlObject->PrepareSql("SELECT fs_id, file_id, blk_start, blk_len FROM fs_blocks;");
+    while(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        int fs_id = sqlObject->ReturnInt(0);
+        int fs_id = mainSqlObject->ReturnInt(0);
         if(fs_id > 32)
         {
             LOGERROR("WombatTskImgDBSqlite::getFreeSectors - fs_id in fs_info is bigger than 32.");
-            contine;
+            continue;
         }
-        uint64_t file_id = (uint64_t)sqlObject->ReturnInt64(1);
-        int64_t addr = sqlObject->ReturnInt64(2);
-        int64_t len = sqlObject->ReturnInt64(3);
+        uint64_t file_id = (uint64_t)mainSqlObject->ReturnInt64(1);
+        int64_t addr = mainSqlObject->ReturnInt64(2);
+        int64_t len = mainSqlObject->ReturnInt64(3);
 
         // We only want to consider the runs for files that we allocated.
-        sqlite3_stmt *sqlStatement2;
-        SqlWrapper *sqlObject2 = new SqlWrapper(sqlStatement2, "15.15", dbname);
-        sqlObject2->PrepareSql("SELECT meta_flags from files WHERE file_id = ?");
-        sqlObject2->BindValue(1, file_id);
-        sqlObject2->StepSql();
-        int flags = sqlObject2->ReturnInt(0);
-        sqlObject2->FinalizeSql();
-        sqlObject2->CloseSql();
+        secondarySqlObject->FinalizeSql();
+        secondarySqlObject->ResetSql();
+        secondarySqlObject->ClearBindings();
+        //sqlite3_stmt *sqlStatement2;
+        //SqlWrapper *mainSqlObject2 = new SqlWrapper(sqlStatement2, "15.15", dbname);
+        secondarySqlObject->PrepareSql("SELECT meta_flags from files WHERE file_id = ?");
+        secondarySqlObject->BindValue(1, (sqlite3_int64)file_id);
+        if(secondarySqlObject->StepSql() != SQLITE_ROW)
+        {
+            QString tmpString = "TskImgDBSqlite::getFreeSectors - error finding flags for file " + file_id;
+            secondarySqlObject->DisplayError("15.13", "SQL Error: ", tmpString.toStdString().c_str());
+            continue;
+        }
+        int flags = secondarySqlObject->ReturnInt(0);
+        secondarySqlObject->FinalizeSql();
+        //mainSqlObject2->CloseSql();
         if(flags & TSK_FS_META_FLAG_UNALLOC)
-            contine;
+            continue;
         // @@@ We can probably find a more effecient storage method than this...
         int error = 0;
         for(int64_t i = 0; i < len; i++)
@@ -533,8 +619,8 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
         if(error)
             break;
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
     LOGINFO("WombatTskImgDBSqlite::getFreeSectors - DONE: see what blocks have been used and add them to a list.");
 
     // cycle through each file system to find the unused blocks
@@ -546,7 +632,7 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
         uint64_t st = 0;
         int len = 0;
         // we previously adjusted blk_size and img_offset to be in sectors
-
+        std::stringstream msg;
         msg.str("");
         msg << "blk_count[" << f << "]=" << blk_count[f];
         LOGINFO(msg.str().c_str());
@@ -588,20 +674,23 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
 std::string WombatTskImgDBSqlite::getImageBaseName() const
 {
     // There may be multiple file paths if the image is a split image. Order by sequence number to extract the file name from the first path.
-    sqlObject = new SqlWrapper(sqlStatement, "15.17", dbname);
-    sqlObject->PrepareSql("SELECT name FROM image_names ORDER BY seq;");
-    int result = sqlObject->StepSql();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.17", dbname);
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    mainSqlObject->PrepareSql("SELECT name FROM image_names ORDER BY seq;");
+    int result = mainSqlObject->StepSql();
     if(result == SQLITE_ROW)
     {
-        Poco::Path imagePath(reinterpret_cast<const char*>(sqlObject->ReturnText(0)));
-        sqlObject->FinalizeSql();
-        sqlObject->CloseSql();
+        Poco::Path imagePath(reinterpret_cast<const char*>(mainSqlObject->ReturnText(0)));
+        mainSqlObject->FinalizeSql();
+        //mainSqlObject->CloseSql();
         return imagePath.getFileName();
     }
     else
     {
-        sqlObject->FinalizeSql();
-        sqlObject->CloseSql();
+        mainSqlObject->FinalizeSql();
+        //mainSqlObject->CloseSql();
         return "";
     }
 }
@@ -609,14 +698,16 @@ std::string WombatTskImgDBSqlite::getImageBaseName() const
 std::vector<std::wstring> WombatTskImgDBSqlite::getImageNamesW() const
 {
     std::vector<std::wstring> imgList;
-    sqlObject = new SqlWrapper(sqlStatement, "15.18", dbname);
-    int result = sqlObject->StepSql();
-    while (result == SQLITE_ROW)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.18", dbname);
+    while (mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        imgList.push_back((wchar_t *)sqlObject->ReturnText16(0));
+        imgList.push_back((wchar_t *)mainSqlObject->ReturnText16(0));
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return imgList;
 }
@@ -625,15 +716,17 @@ std::vector<std::wstring> WombatTskImgDBSqlite::getImageNamesW() const
 std::vector<std::string> WombatTskImgDBSqlite::getImageNames() const
 {
     std::vector<std::string> imgList;
-    sqlObject = new SqlWrapper(sqlStatement, "15.19", dbname);
-    sqlObject->PrepareSql("SELECT name FROM image_names ORDER BY seq;");
-    int result = sqlObject->StepSql();
-    while(result == SQLITE_ROW)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.19", dbname);
+    mainSqlObject->PrepareSql("SELECT name FROM image_names ORDER BY seq;");
+    while(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        imgList.push_back((char *)sqlObject->ReturnText(0));
+        imgList.push_back((char *)mainSqlObject->ReturnText(0));
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return imgList;
 }
@@ -648,20 +741,23 @@ std::vector<std::string> WombatTskImgDBSqlite::getImageNames() const
  */
 int WombatTskImgDBSqlite::getFileUniqueIdentifiers(uint64_t a_fileId, uint64_t &a_fsOffset, uint64_t &a_fsFileId, int &a_attrType, int &a_attrId) const
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.19", dbname);
-    sqlObject->PrepareSql("SELECT fs_file_id, attr_type, attr_id, fs_info.img_byte_offset FROM fs_files, fs_info WHERE file_id = ? AND fs_info.fs_id = fs_files.fs_id;");
-    sqlObject->BindValue(1, a_fileId);
-    if(sqlObject->StepSql() == SQLITE_ROW)
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.19", dbname);
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    mainSqlObject->PrepareSql("SELECT fs_file_id, attr_type, attr_id, fs_info.img_byte_offset FROM fs_files, fs_info WHERE file_id = ? AND fs_info.fs_id = fs_files.fs_id;");
+    mainSqlObject->BindValue(1, (sqlite3_int64)a_fileId);
+    if(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        a_fsFileId = sqlObject->ReturnInt64(0);
-        a_attrType = sqlObject->ReturnInt(1);
-        a_attrId = sqlObject->ReturnInt(2);
-        a_fsOffset = sqlObject->ReturnInt64(3);
+        a_fsFileId = mainSqlObject->ReturnInt64(0);
+        a_attrType = mainSqlObject->ReturnInt(1);
+        a_attrId = mainSqlObject->ReturnInt(2);
+        a_fsOffset = mainSqlObject->ReturnInt64(3);
     }
     else
         return -1;
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return 0;
 }
@@ -673,16 +769,24 @@ int WombatTskImgDBSqlite::getFileUniqueIdentifiers(uint64_t a_fileId, uint64_t &
 int WombatTskImgDBSqlite::getNumVolumes() const
 {
     int count = 0;
-    sqlObject = new SqlWrapper(sqlStatement, "15.20", dbname);
-    sqlObject->PrepareSql("SELECT count(*) from vol_info;");
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.20", dbname);
+    mainSqlObject->PrepareSql("SELECT count(*) from vol_info;");
 
     /********** Get the number of volumes *************/
-    if(sqlObject->StepSql() == SQLITE_ROW)
+    if(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        count = (int)sqlObject->ReturnInt(0);
+        count = (int)mainSqlObject->ReturnInt(0);
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    else
+    {
+        mainSqlObject->DisplayError("15.14", "Sql Error: ", "TskImgDBSqlite::getNumVolumes - Error querying vol_info table");
+        return -1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return count;
 }
@@ -703,16 +807,24 @@ int WombatTskImgDBSqlite::getNumFiles() const
 int WombatTskImgDBSqlite::getSessionID() const
 {
     int sessionId = -1;
-    sqlObject = new  SqlWrapper(sqlStatement, "15.21", dbname);
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new  SqlWrapper(sqlStatement, "15.21", dbname);
 
     /********** FIND the unallocated volumes *************/
-    sqlObject->PrepareSql("SELECT version from db_info WHERE name=\"SID\";");
-    if(sqlObject->StepSql() == SQLITE_ROW)
+    mainSqlObject->PrepareSql("SELECT version from db_info WHERE name=\"SID\";");
+    if(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        sessionId = (int)sqlObject->ReturnInt(0);
+        sessionId = (int)mainSqlObject->ReturnInt(0);
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    else
+    {
+        mainSqlObject->DisplayError("15.15", "Sql Error: ", "TskImgDBSqlite::getSessionID - Error querying db_info table for Session ID.");
+        return -1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return sessionId;
 }
@@ -720,21 +832,24 @@ int WombatTskImgDBSqlite::getSessionID() const
 int WombatTskImgDBSqlite::begin()
 {
     char *errmsg;
-    sqlObject = new SqlWrapper(sqlStatement, "15.22", dbname);
-    sqlObject->PrepareSql("BEGIN");
-    if(sqlObject->ExecuteSql(&errmsg) != SQLITE_OK)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.22", dbname);
+    mainSqlObject->PrepareSql("BEGIN");
+    if(mainSqlObject->ExecuteSql(&errmsg) != SQLITE_OK)
     {
         std::wstringstream infoMessage;
         infoMessage << L"WombatTskImgDBSqlite::begin - BEGIN Error: " << errmsg;
         LOGERROR(infoMessage.str());
-        sqlObject->Free(errmsg);
-        sqlObject->FinalizeSql();
-        sqlObject->CloseSql();
+        mainSqlObject->Free(errmsg);
+        mainSqlObject->FinalizeSql();
+        //mainSqlObject->CloseSql();
 
         return 1;
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return 0;
 }
@@ -742,42 +857,48 @@ int WombatTskImgDBSqlite::begin()
 int WombatTskImgDBSqlite::commit()
 {
     char *errmsg;
-    sqlObject = new SqlWrapper(sqlStatement, "15.23", dbname);
-    sqlObject->PrepareSql("COMMIT");
-    if(sqlObject->ExecuteSql(&errmsg) != SQLITE_OK)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.23", dbname);
+    mainSqlObject->PrepareSql("COMMIT");
+    if(mainSqlObject->ExecuteSql(&errmsg) != SQLITE_OK)
     {
         std::wstringstream infoMessage;
         infoMessage << L"WombatTskImgDBSqlite::commit - COMMIT Error: " << errmsg;
         LOGERROR(infoMessage.str());
-        sqlObject->Free(errmsg);
-        sqlObject->FinalizeSql();
-        sqlObject->CloseSql();
+        mainSqlObject->Free(errmsg);
+        mainSqlObject->FinalizeSql();
+        //mainSqlObject->CloseSql();
 
         return 1;
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return 0;
 }
 
 UnallocRun * WombatTskImgDBSqlite::getUnallocRun(int a_unalloc_img_id, int a_file_offset) const
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.24", dbname);
-    sqlObject->PrepareSql("SELECT vol_id, unalloc_img_sect_start, sect_len, orig_img_sect_start FROM alloc_unalloc_map WHERE unalloc_img_id = ? AND unalloc_img_sect_start <= ? ORDER BY unalloc_img_sect_start DESC;");
-    sqlObject->BindValue(1, a_unalloc_img_id);
-    sqlObject->BindValue(2, a_file_offset);
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.24", dbname);
+    mainSqlObject->PrepareSql("SELECT vol_id, unalloc_img_sect_start, sect_len, orig_img_sect_start FROM alloc_unalloc_map WHERE unalloc_img_id = ? AND unalloc_img_sect_start <= ? ORDER BY unalloc_img_sect_start DESC;");
+    mainSqlObject->BindValue(1, a_unalloc_img_id);
+    mainSqlObject->BindValue(2, a_file_offset);
     char *errmsg;
     char **result;
     int nrow, ncol;
-    if(sqlObject->ReturnTable(&result, &nrow, &ncol, &errmsg) != SQLITE_OK)
+    if(mainSqlObject->ReturnTable(&result, nrow, ncol, &errmsg) != SQLITE_OK)
     {
         std::wstringstream infoMessage;
         infoMessage << L"WombatTskImgDBSqlite::getUnallocRun - Error fetching data from alloc_unalloc_map table: " << errmsg;
         LOGERROR(infoMessage.str());
-        sqlObject->Free(errmsg);
-        sqlObject->FinalizeSql();
-        sqlObject->CloseSql();
+        mainSqlObject->Free(errmsg);
+        mainSqlObject->FinalizeSql();
+        //mainSqlObject->CloseSql();
 
         return new UnallocRun(-1, -1, -1, -1, -1);
     }
@@ -793,9 +914,9 @@ UnallocRun * WombatTskImgDBSqlite::getUnallocRun(int a_unalloc_img_id, int a_fil
         sscanf(result[5], "%d", &unalloc_img_sect_start);
         sscanf(result[6], "%d", &sect_len);
         sscanf(result[7], "%d", &orig_img_sect_start);
-        sqlObject->FreeTable(result);
-        sqlObject->FinalizeSql();
-        sqlObject->CloseSql();
+        mainSqlObject->FreeTable(result);
+        mainSqlObject->FinalizeSql();
+        //mainSqlObject->CloseSql();
 
         return new UnallocRun(vol_id, a_unalloc_img_id, unalloc_img_sect_start, sect_len, orig_img_sect_start);
     }
@@ -817,43 +938,64 @@ UnallocRun * WombatTskImgDBSqlite::getUnallocRun(int a_unalloc_img_id, int a_fil
 int WombatTskImgDBSqlite::addCarvedFileInfo(int vol_id, const char *name, uint64_t size,
                                       uint64_t *runStarts, uint64_t *runLengths, int numRuns, uint64_t & fileId)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.25", dbname);
-    sqlObject->PrepareSql("INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type, dir_flags, meta_flags, size, ctime, crtime, atime, mtime, mode, uid, gid, status, full_path) VALUES (NULL, ?, ?, NULL, ?, ?, ?, ?, ?, 0, 0, 0, 0, NULL, NULL, NULL, ?, ?)");
-    sqlObject->BindValue(1, IMGDB_FILES_TYPE_CARVED);
-    sqlObject->BindValue(2, name);
-    sqlObject->BindValue(3, (int)TSK_FS_NAME_TYPE_REG);
-    sqlObject->BindValue(4, (int)TSK_FS_META_TYPE_REG);
-    sqlObject->BindValue(5, (int)TSK_FS_NAME_FLAG_UNALLOC);
-    sqlObject->BindValue(6, (int)TSK_FS_META_FLAG_UNALLOC);
-    sqlObject->BindValue(7, size);
-    sqlObject->BindValue(8, IMGDB_FILES_STATUS_CREATED);
-    sqlObject->BindValue(9, name);
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.25", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type, dir_flags, meta_flags, size, ctime, crtime, atime, mtime, mode, uid, gid, status, full_path) VALUES (NULL, ?, ?, NULL, ?, ?, ?, ?, ?, 0, 0, 0, 0, NULL, NULL, NULL, ?, ?)");
+    mainSqlObject->BindValue(1, IMGDB_FILES_TYPE_CARVED);
+    mainSqlObject->BindValue(2, name);
+    mainSqlObject->BindValue(3, (int)TSK_FS_NAME_TYPE_REG);
+    mainSqlObject->BindValue(4, (int)TSK_FS_META_TYPE_REG);
+    mainSqlObject->BindValue(5, (int)TSK_FS_NAME_FLAG_UNALLOC);
+    mainSqlObject->BindValue(6, (int)TSK_FS_META_FLAG_UNALLOC);
+    mainSqlObject->BindValue(7, (sqlite3_int64)size);
+    mainSqlObject->BindValue(8, IMGDB_FILES_STATUS_CREATED);
+    mainSqlObject->BindValue(9, name);
     // MAY-118 NOTE: addCarvedFileInfo insert entry into files table, but actual file on disk has not been created yet.
-    sqlObject->StepSql();
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.16", "Sql Error: ", "TskImgDBSqlite::addCarvedFileInfo - Error adding data to file table for carved file");
+        mainSqlObject->FinalizeSql();
+        return -1;
+    }
     // get the assigned file_id
-    fileId = (uint64_t)sqlObject->ReturnLastInsertRowID();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    fileId = (uint64_t)mainSqlObject->ReturnLastInsertRowID();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject->CloseSql();
     // insert into the carved_files_table
-    sqlObject = new SqlWrapper(sqlStatement, "15.26", dbname);
-    sqlObject->PrepareSql("INSERT INTO carved_files (file_id, vol_id) VALUES (?, ?);");
-    sqlObject->BindValue(1, fileId);
-    sqlObject->BindValue(2, vol_id);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject = new SqlWrapper(sqlStatement, "15.26", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO carved_files (file_id, vol_id) VALUES (?, ?);");
+    mainSqlObject->BindValue(1, (sqlite3_int64)fileId);
+    mainSqlObject->BindValue(2, vol_id);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.17", "Sql Error: ", "TskImgDBSqlite::addCarvedFileInfo - Error adding data to carved_files table");
+        mainSqlObject->FinalizeSql();
+        return -1;
+    }
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject->CloseSql();
     // insert into carved_sectors table
-    sqlObject = new SqlWrapper(sqlStatement, "15.27", dbname);
-    sqlObject->PrepareSql("INSERT INTO carved_sectors (file_id, seq, sect_start, sect_len) VALUES (?, ?, ?, ?);");
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.27", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO carved_sectors (file_id, seq, sect_start, sect_len) VALUES (?, ?, ?, ?);");
     for (int i = 0; i < numRuns; i++)
     {
-        sqlObject->ResetSql();
-        sqlObject->ClearBindings();
-        sqlObject->BindValue(1, fileId);
-        sqlObject->BindValue(2, i);
-        sqlObject->BindValue(3, runStarts[i]);
-        sqlObject->BindValue(4, runLengths[i]);
-        sqlObject->StepSql();
+        mainSqlObject->ResetSql();
+        mainSqlObject->ClearBindings();
+        mainSqlObject->BindValue(1, (sqlite3_int64)fileId);
+        mainSqlObject->BindValue(2, i);
+        mainSqlObject->BindValue(3, (sqlite3_int64)runStarts[i]);
+        mainSqlObject->BindValue(4, (sqlite3_int64)runLengths[i]);
+        if(mainSqlObject->StepSql() == SQLITE_ERROR)
+        {
+            mainSqlObject->DisplayError("15.18", "SQL Error: ", "TskImgDBSqlite::addCarvedFileInfo - Error adding data to carved_sectors table");
+            return -1;
+        }
     }
 
     return 0;
@@ -891,31 +1033,46 @@ int WombatTskImgDBSqlite::addDerivedFileInfo(const std::string& name, const uint
     TSK_FS_META_TYPE_ENUM metaType = isDirectory ? TSK_FS_META_TYPE_DIR : TSK_FS_META_TYPE_REG;
 
     // insert into files table
-    sqlObject = new SqlWrapper(sqlStatement, "15.28", dbname);
-    sqlObject->PrepareSql("INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type, size, ctime, crtime, atime, mtime, status, full_path) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-    sqlObject->BindValue(1, IMGDB_FILES_TYPE_DERIVED);
-    sqlObject->BindValue(2, name.c_str());
-    sqlObject->BindValue(3, parentId);
-    sqlObject->BindValue(4, dirType);
-    sqlObject->BindValue(5, metaType);
-    sqlObject->BindValue(6, size);
-    sqlObject->BindValue(7, ctime);
-    sqlObject->BindValue(8, crtime);
-    sqlObject->BindValue(9, atime);
-    sqlObject->BindValue(10, mtime);
-    sqlObject->BindValue(11, IMGDB_FILES_STATUS_CREATED);
-    sqlObject->BindValue(12, path.c_str());
-    sqlObject->StepSql();
-    fileId = sqlObject->ReturnLastInsertRowID();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
-    sqlObject = new SqlWrapper(sqlStatement, "15.29", dbname);
-    sqlObject->PrepareSql("INSERT INTO derived_files (file_id, derivation_details) VALUES(?, ?);");
-    sqlObject->BindValue(1, fileId);
-    sqlObject->BindValue(2, details.c_str());
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.28", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO files (file_id, type_id, name, par_file_id, dir_type, meta_type, size, ctime, crtime, atime, mtime, status, full_path) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+    mainSqlObject->BindValue(1, IMGDB_FILES_TYPE_DERIVED);
+    mainSqlObject->BindValue(2, name.c_str());
+    mainSqlObject->BindValue(3, (sqlite3_int64)parentId);
+    mainSqlObject->BindValue(4, dirType);
+    mainSqlObject->BindValue(5, metaType);
+    mainSqlObject->BindValue(6, (sqlite3_int64)size);
+    mainSqlObject->BindValue(7, ctime);
+    mainSqlObject->BindValue(8, crtime);
+    mainSqlObject->BindValue(9, atime);
+    mainSqlObject->BindValue(10, mtime);
+    mainSqlObject->BindValue(11, IMGDB_FILES_STATUS_CREATED);
+    mainSqlObject->BindValue(12, path.c_str());
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.18", "Sql Error: ", "TskImgDBSqlite::addDerivedFileInfo - Error adding data to file table for derived file");
+        mainSqlObject->FinalizeSql();
+        return -1;
+    }
+    fileId = mainSqlObject->ReturnLastInsertRowID();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject->CloseSql();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.29", dbname);
+    mainSqlObject->PrepareSql("INSERT INTO derived_files (file_id, derivation_details) VALUES(?, ?);");
+    mainSqlObject->BindValue(1, (sqlite3_int64)fileId);
+    mainSqlObject->BindValue(2, details.c_str());
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.19", "Sql Error: ", "TskImgDBSqlite::addDerivedFileInfo - Error adding data to derived_files table");
+        mainSqlObject->FinalizeSql();
+        return -1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return 0;
 }
@@ -927,15 +1084,18 @@ int WombatTskImgDBSqlite::addDerivedFileInfo(const std::string& name, const uint
 int WombatTskImgDBSqlite::getFileIds(char *a_fileName, uint64_t *a_outBuffer, int a_buffSize) const
 {
     int outIdx = 0;
-    sqlObject = new SqlWrapper(sqlStatement, "15.30", dbname);
-    sqlObject->PrepareSql("SELECT file_id FROM files WHERE name LIKE ?;");
-    sqlObject->BindValue(1, a_fileName);
-    while (sqlObject->StepSql() == SQLITE_ROW)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.30", dbname);
+    mainSqlObject->PrepareSql("SELECT file_id FROM files WHERE name LIKE ?;");
+    mainSqlObject->BindValue(1, a_fileName);
+    while (mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        a_outBuffer[outIdx++] = (uint64_t)sqlObject->ReturnInt64(0);
+        a_outBuffer[outIdx++] = (uint64_t)mainSqlObject->ReturnInt64(0);
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return outIdx;
 }
@@ -947,13 +1107,22 @@ int WombatTskImgDBSqlite::getFileIds(char *a_fileName, uint64_t *a_outBuffer, in
 int WombatTskImgDBSqlite::getMinFileIdReadyForAnalysis(uint64_t & minFileId) const
 {
     minFileId = 0;
-    sqlObject = new SqlWrapper(sqlStatement, "15.31", dbname);
-    sqlObject->PrepareSql("SELECT min(file_id) FROM files WHERE status = ?;");
-    sqlObject->BindValue(1, TskImgDB::IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
-    if (sqlObject->StepSql() == SQLITE_ROW)
-        minFileId = (uint64_t)sqlObject->ReturnInt64(0);
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.31", dbname);
+    mainSqlObject->PrepareSql("SELECT min(file_id) FROM files WHERE status = ?;");
+    mainSqlObject->BindValue(1, TskImgDB::IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
+    if (mainSqlObject->StepSql() == SQLITE_ROW || mainSqlObject->StepSql() == SQLITE_DONE)
+        minFileId = (uint64_t)mainSqlObject->ReturnInt64(0);
+    else
+    {
+        mainSqlObject->DisplayError("15.20", "Sql Error: ", "TskImgDBSqlite::getMinFileIdReadyForAnalysis - Error querying files table.");
+        mainSqlObject->FinalizeSql();
+        return -1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return 0;
 }
@@ -965,14 +1134,23 @@ int WombatTskImgDBSqlite::getMinFileIdReadyForAnalysis(uint64_t & minFileId) con
 int WombatTskImgDBSqlite::getMaxFileIdReadyForAnalysis(uint64_t a_lastFileId, uint64_t & maxFileId) const
 {
     maxFileId = 0;
-    sqlObject = new SqlWrapper(sqlStatement, "15.32", dbname);
-    sqlObject->PrepareSql("SELECT max(file_id) FROM files WHERE status = ? AND file_id >= ?;");
-    sqlObject->BindValue(1, TskImgDB::IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
-    sqlObject->BindValue(2, a_lastFileId);
-    if(sqlObject->StepSql() == SQLITE_ROW)
-        maxFileId = (uint64_t)sqlObject->ReturnInt64(0);
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.32", dbname);
+    mainSqlObject->PrepareSql("SELECT max(file_id) FROM files WHERE status = ? AND file_id >= ?;");
+    mainSqlObject->BindValue(1, TskImgDB::IMGDB_FILES_STATUS_READY_FOR_ANALYSIS);
+    mainSqlObject->BindValue(2, (sqlite3_int64)a_lastFileId);
+    if(mainSqlObject->StepSql() == SQLITE_ROW || mainSqlObject->StepSql() == SQLITE_DONE)
+        maxFileId = (uint64_t)mainSqlObject->ReturnInt64(0);
+    else
+    {
+        mainSqlObject->DisplayError("15.21", "SQL Error: ", "TskImgDBSqlite::getMaxFileIdReadyForAnalysis - Error querying files table");
+        mainSqlObject->FinalizeSql();
+        return -1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return 0;
 }
@@ -982,16 +1160,19 @@ SectorRuns * WombatTskImgDBSqlite::getFileSectors(uint64_t a_fileId) const
     SectorRuns *sr = new SectorRuns();
     int srCount = 0;
 
-    sqlObject = new SqlWrapper(sqlStatement, "15.33", dbname);
-    sqlObject->PrepareSql("SELECT fs_blocks.blk_start, fs_blocks.blk_len, fs_info.block_size, fs_info.img_byte_offset, fs_info.vol_id FROM files JOIN fs_files ON files.file_id = fs_files.file_id JOIN fs_blocks ON files.file_id = fs_blocks.file_id JOIN fs_info ON fs_blocks.fs_id = fs_info.fs_id WHERE files.file_id = ? ORDER BY fs_blocks.seq;");
-    sqlObject->BindValue(1, a_fileId);
-    while(sqlObject->StepSql() == SQLITE_ROW)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.33", dbname);
+    mainSqlObject->PrepareSql("SELECT fs_blocks.blk_start, fs_blocks.blk_len, fs_info.block_size, fs_info.img_byte_offset, fs_info.vol_id FROM files JOIN fs_files ON files.file_id = fs_files.file_id JOIN fs_blocks ON files.file_id = fs_blocks.file_id JOIN fs_info ON fs_blocks.fs_id = fs_info.fs_id WHERE files.file_id = ? ORDER BY fs_blocks.seq;");
+    mainSqlObject->BindValue(1, (sqlite3_int64)a_fileId);
+    while(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        uint64_t blkStart = (uint64_t)sqlObject->ReturnInt64(0);
-        uint64_t blkLength = (uint64_t)sqlObject->ReturnInt64(1);
-        int blkSize = sqlObject->ReturnInt(2);
-        uint64_t imgByteOffset = (uint64_t)sqlObject->ReturnInt64(3);
-        int volId = sqlObject->ReturnInt(4);
+        uint64_t blkStart = (uint64_t)mainSqlObject->ReturnInt64(0);
+        uint64_t blkLength = (uint64_t)mainSqlObject->ReturnInt64(1);
+        int blkSize = mainSqlObject->ReturnInt(2);
+        uint64_t imgByteOffset = (uint64_t)mainSqlObject->ReturnInt64(3);
+        int volId = mainSqlObject->ReturnInt(4);
 
         uint64_t start = (imgByteOffset + blkStart * blkSize) / 512;
         uint64_t len = (blkLength * blkSize) / 512;
@@ -999,8 +1180,8 @@ SectorRuns * WombatTskImgDBSqlite::getFileSectors(uint64_t a_fileId) const
         sr->addRun(start, len, volId);
         srCount++;
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     if(srCount < 1)
     {
@@ -1036,44 +1217,55 @@ int WombatTskImgDBSqlite::busyHandler(void * pDB, int count)
 
 int WombatTskImgDBSqlite::updateFileStatus(uint64_t a_file_id, FILE_STATUS a_status)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.33", dbname);
-    sqlObject->PrepareSql("UPDATE files SET status = ? WHERE file_id = ?;");
-    sqlObject->BindValue(1, a_status);
-    sqlObject->BindValue(2, a_file_id);
-    if(sqlObject->StepSql() == SQLITE_ROW | sqlObject->StepSql() == SQLITE_DONE)
-    {
-        // all good
-    }
-    else
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.33", dbname);
+    mainSqlObject->PrepareSql("UPDATE files SET status = ? WHERE file_id = ?;");
+    mainSqlObject->BindValue(1, a_status);
+    mainSqlObject->BindValue(2, (sqlite3_int64)a_file_id);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
     {
         std::wstringstream infoMessage;
         infoMessage << L"WombatTskImgDBSqlite::updateFileStatus - Error UPDATE file status.";
         LOGERROR(infoMessage.str());
+        mainSqlObject->FinalizeSql();
         return 1;
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+//    mainSqlObject->CloseSql();
 
     return 0;
 }
 
 int WombatTskImgDBSqlite::updateKnownStatus(uint64_t a_file_id, KNOWN_STATUS a_status)
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.36", dbname);
-    sqlObject->PrepareSql("UPDATE file_hashes SET known = ? WHERE file_id = ?;");
-    sqlObject->BindValue(1, a_status);
-    sqlObject->BindValue(2, a_file_id);
-    sqlObject->StepSql();
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.36", dbname);
+    mainSqlObject->PrepareSql("UPDATE file_hashes SET known = ? WHERE file_id = ?;");
+    mainSqlObject->BindValue(1, a_status);
+    mainSqlObject->BindValue(2, (sqlite3_int64)a_file_id);
+    if(mainSqlObject->StepSql() == SQLITE_ERROR)
+    {
+        mainSqlObject->DisplayError("15.22", "Sql Error: ", "TskImgDBSqlite::updateFileStatus - Error UPDATE file status.");
+        mainSqlObject->FinalizeSql();
+        return 1;
+    }
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     return 0;
 }
 
 bool WombatTskImgDBSqlite::dbExist() const
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.35", dbname);
-    if(sqlObject->ReturnSqlDB())
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.35", dbname);
+    if(mainSqlObject->ReturnSqlDB())
         return true;
     else
         return false;
@@ -1081,13 +1273,16 @@ bool WombatTskImgDBSqlite::dbExist() const
 
 void WombatTskImgDBSqlite::getCarvedFileInfo(const std::string& stmt, std::map<uint64_t, std::string>& results) const
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.37", dbname);
-    sqlObject->PrepareSql(stmt.c_str());
-    while(sqlObject->StepSql() == SQLITE_ROW)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.37", dbname);
+    mainSqlObject->PrepareSql(stmt.c_str());
+    while(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        uint64_t fileId = (uint64_t)sqlObject->ReturnInt64(0);
-        std::string fileName = (char*)sqlObject->ReturnText(1);
-        std::string cfileName = (char*)sqlObject->ReturnText(2);
+        uint64_t fileId = (uint64_t)mainSqlObject->ReturnInt64(0);
+        std::string fileName = (char*)mainSqlObject->ReturnText(1);
+        std::string cfileName = (char*)mainSqlObject->ReturnText(2);
 
         // Grab the extension and append it to the cfile name
         std::string::size_type pos = fileName.rfind('.');
@@ -1095,8 +1290,8 @@ void WombatTskImgDBSqlite::getCarvedFileInfo(const std::string& stmt, std::map<u
             cfileName.append(fileName.substr(pos));
         results[fileId] = cfileName;
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 }
 
 std::map<uint64_t, std::string> WombatTskImgDBSqlite::getUniqueCarvedFiles(HASH_TYPE hashType) const
@@ -1125,16 +1320,19 @@ std::map<uint64_t, std::string> WombatTskImgDBSqlite::getUniqueCarvedFiles(HASH_
         return results;
     }
 
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
     // If hashes have not been calculated return all carved files
-    sqlObject = new SqlWrapper(sqlStatement, "15.37", dbname);
-    sqlObject->PrepareSql("SELECT COUNT(*) FROM file_hashes;");
-    if(sqlObject->StepSql() == SQLITE_ROW)
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.37", dbname);
+    mainSqlObject->PrepareSql("SELECT COUNT(*) FROM file_hashes;");
+    if(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        uint64_t counter = (uint64_t)sqlObject->ReturnInt64(0);
+        uint64_t counter = (uint64_t)mainSqlObject->ReturnInt64(0);
         if(counter == 0)
         {
-            sqlObject->FinalizeSql();
-            sqlObject->CloseSql();
+            mainSqlObject->FinalizeSql();
+            //mainSqlObject->CloseSql();
             std::stringstream stmt;
             stmt.str("");
             stmt << "select c.file_id, f.name, 'cfile_' || c.vol_id || '_' || cs.sect_start || '_' "
@@ -1144,8 +1342,8 @@ std::map<uint64_t, std::string> WombatTskImgDBSqlite::getUniqueCarvedFiles(HASH_
             return results;
         }
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 
     std::stringstream stmt;
     stmt.str("");
@@ -1184,15 +1382,18 @@ std::map<uint64_t, std::string> WombatTskImgDBSqlite::getUniqueCarvedFiles(HASH_
 void WombatTskImgDBSqlite::getCarvedFileInfo(const std::string &query, bool getHash, std::vector<TskCarvedFileInfo> &carvedFileInfos) const
 {
     TskCarvedFileInfo info;
-    sqlObject = new SqlWrapper(sqlStatement, "15.39", dbname);
-    sqlObject->PrepareSql(query);
-    while(sqlObject->StepSql() == SQLITE_ROW)
+    mainSqlObject->FinalizeSql();
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    //mainSqlObject = new SqlWrapper(sqlStatement, "15.39", dbname);
+    mainSqlObject->PrepareSql(query.c_str());
+    while(mainSqlObject->StepSql() == SQLITE_ROW)
     {
-        info.fileID = static_cast<uint64_t>(sqlObject->ReturnInt64(0));
-        std:string fileName = reinterpret_cast<const char*>(sqlObject->ReturnText(1)); // reinterpret from unsigned char*
-        info.cFileName = reinterpret_cast<const char*>(sqlObject->ReturnText(2)); // reinterpret from unsigned char*
+        info.fileID = static_cast<uint64_t>(mainSqlObject->ReturnInt64(0));
+        std::string fileName = reinterpret_cast<const char*>(mainSqlObject->ReturnText(1)); // reinterpret from unsigned char*
+        info.cFileName = reinterpret_cast<const char*>(mainSqlObject->ReturnText(2)); // reinterpret from unsigned char*
         if(getHash)
-            info.hash = reinterpret_cast<const char*>(sqlObject->ReturnText(3));
+            info.hash = reinterpret_cast<const char*>(mainSqlObject->ReturnText(3));
         // Append the extension from the original file name to the constructed "cfile" name
         std::string::size_type pos = fileName.rfind('.');
         if(pos != std::string::npos)
@@ -1200,14 +1401,15 @@ void WombatTskImgDBSqlite::getCarvedFileInfo(const std::string &query, bool getH
 
         carvedFileInfos.push_back(info);
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
+    mainSqlObject->FinalizeSql();
+    //mainSqlObject->CloseSql();
 }
 
 std::vector<TskCarvedFileInfo> WombatTskImgDBSqlite::getUniqueCarvedFilesInfo(HASH_TYPE hashType) const
 {
     const std::string msgPrefix = "WombatTskImgDBSqlite::getUniqueCarvedFilesInfo : ";
 
+/*
     if (!m_db)
     {
         std::ostringstream msg;
