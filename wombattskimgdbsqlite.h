@@ -137,6 +137,7 @@ private:
     char m_dbFilePath[256];
     sqlite3 * m_db;
     QString dbname;
+    SqlWrapper *mainSqlObject;
 
     int dropTables();
 

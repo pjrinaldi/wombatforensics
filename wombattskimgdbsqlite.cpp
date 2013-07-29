@@ -22,18 +22,17 @@ WombatTskImgDBSqlite::WombatTskImgDBSqlite(QString dbName)
 
 WombatTskImgDBSqlite::~WombatTskImgDBSqlite()
 {
-    //(void) close();
+    (void) close();
 }
 int WombatTskImgDBSqlite::close()
 {
-    /*
-    if (m_db) {
-        if (sqlite3_close(m_db) == SQLITE_OK)
-            m_db = NULL;
-        else
-            return 1;
+    if(mainSqlObject->ReturnSqlDB())
+    {
+        mainSqlObject->CloseSql();
     }
-    */
+    else
+        return 1;
+
     return 0;
 }
 /*
@@ -100,7 +99,18 @@ int WombatTskImgDBSqlite::initialize()
 */
 int WombatTskImgDBSqlite::open()
 {
-    sqlObject = new SqlWrapper(sqlStatement, "15.15", dbname);
+    //sqlObject = new SqlWrapper(sqlStatement, "15.15", dbname);
+    mainSqlObject = new SqlWrapper(sqlStatement, dbname);
+
+    // Register a busy handler that will retry statements in situations
+    // where the database is locked by another process.
+    if(mainSqlObject->SetBusyHandler(WombatTskImgDBSqlite::busyHandler) != SQLITE_OK)
+    {
+        mainSqlObject->DisplayError("15.2", "Sql Error", "TskImgDBSqlite::open - Failed to set busy handler.");
+        mainSqlObject->CloseSql();
+        return 1;
+    }
+
     return 0;
 }
 
@@ -148,8 +158,8 @@ int WombatTskImgDBSqlite::addVolumeInfo(const TSK_VS_PART_INFO * vs_part)
     sqlObject = new SqlWrapper(sqlStatement, "15.6", dbname);
     sqlObject->PrepareSql("INSERT INTO vol_info (vol_id, sect_start, sect_len, description, flags) VALUES(?, ?, ?, ?, ?);");
     sqlObject->BindValue(1, (int)vs_part->addr);
-    sqlObject->BindValue(2, vs_part->start);
-    sqlObject->BindValue(3, vs_part->len);
+    sqlObject->BindValue(2, (sqlite3_int64)vs_part->start);
+    sqlObject->BindValue(3, (sqlite3_int64)vs_part->len);
     sqlObject->BindValue(4, vs_part->desc);
     sqlObject->BindValue(5, vs_part->flags);
     sqlObject->StepSql();
@@ -163,14 +173,14 @@ int WombatTskImgDBSqlite::addFsInfo(int volId, int fsId, const TSK_FS_INFO * fs_
     sqlObject = new SqlWrapper(sqlStatement, "15.2", dbname);
     sqlObject->PrepareSql("INSERT INTO fs_info (fs_id, img_byte_offset, vol_id, fs_type, block_size, block_count, root_inum, first_inum, last_inum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);");
     sqlObject->BindValue(1, fsId);
-    sqlObject->BindValue(2, fs_info->offset);
+    sqlObject->BindValue(2, (sqlite3_int64)fs_info->offset);
     sqlObject->BindValue(3, volId);
     sqlObject->BindValue(4, (int)fs_info->ftype);
-    sqlObject->BindValue(5, fs_info->block_size);
-    sqlObject->BindValue(6, fs_info->block_count);
-    sqlObject->BindValue(7, fs_info->root_inum);
-    sqlObject->BindValue(8, fs_info->first_inum);
-    sqlObject->BindValue(9, fs_info->last_inum);
+    sqlObject->BindValue(5, (int)fs_info->block_size);
+    sqlObject->BindValue(6, (sqlite3_int64)fs_info->block_count);
+    sqlObject->BindValue(7, (sqlite3_int64)fs_info->root_inum);
+    sqlObject->BindValue(8, (sqlite3_int64)fs_info->first_inum);
+    sqlObject->BindValue(9, (sqlite3_int64)fs_info->last_inum);
     sqlObject->StepSql();
     sqlObject->FinalizeSql();
     sqlObject->CloseSql();
@@ -184,6 +194,24 @@ int WombatTskImgDBSqlite::addFsInfo(int volId, int fsId, const TSK_FS_INFO * fs_
 uint64_t WombatTskImgDBSqlite::getFileId(int a_fsId, uint64_t a_fsFileId) const
 {
     uint64_t fileId = 0;
+    mainSqlObject->ResetSql();
+    mainSqlObject->ClearBindings();
+    mainSqlObject->PrepareSql("SELECT file_id FROM fs_files WHERE fs_id = ? AND fs_file_id = ?;");
+    mainSqlObject->BindValue(1, a_fsId);
+    mainSqlObject->BindValue(2, a_fsFileId);
+    int result = mainSqlObject->StepSql();
+    if(result == SQLITE_ROW)
+    {
+        fileId = (uint64_t)mainSqlObject->ReturnInt64(0);
+        mainSqlObject->FinalizeSql();
+        //mainSqlObject->CloseSql();
+    }
+    else
+    {
+        //LOGERROR("Error Querying fs_files table.");
+    }
+    return fileId;
+
     sqlObject = new SqlWrapper(sqlStatement, "15.8", dbname);
     sqlObject->PrepareSql("SELECT file_id FROM fs_files WHERE fs_id = ? AND fs_file_id = ?;");
     sqlObject->BindValue(1, a_fsId);

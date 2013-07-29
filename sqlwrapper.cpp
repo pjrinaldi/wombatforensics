@@ -98,9 +98,29 @@ SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QStr
             DisplayError("1.0", "OPEN", sqlite3_errmsg(sqldb));
         sqlite3_free(sqlErrMsg);
 }
+SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, QString dbName) // open to write data to the db.
+{
+        sqldb = NULL;
+        sqlstatement = sqlStatement;
+        //char* sqlErrMsg;
+        int     sqlValue;
+        //sqlErrMsg = 0;
+        QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
+        tmpPath += "/data/";
+        tmpPath += dbName;
+        sqlValue = sqlite3_open(tmpPath.toStdString().c_str(), &sqldb); // opendb
+        if(sqlValue != 0)
+            DisplayError("1.0", "OPEN", sqlite3_errmsg(sqldb));
+        //sqlite3_free(sqlErrMsg);
+}
 SqlWrapper::~SqlWrapper(void)
 {
 }
+int SqlWrapper::SetBusyHandler(int busyHandler(void *, int))
+{
+    return sqlite3_busy_handler(sqldb, busyHandler, sqldb);
+}
+
 void SqlWrapper::PrepareSql(const char* sqlQuery)
 {
         sqlquery = sqlQuery;
@@ -224,7 +244,7 @@ int SqlWrapper::ReturnColumnType(int returnPlace)
 
 int SqlWrapper::ReturnTable(char ***queryResults, int numRows, int numColumns, char **errMsg)
 {
-    return sqlite3_get_table(sqldb, sqlquery, queryResults, numRows, numColumns, errMsg);
+    return sqlite3_get_table(sqldb, sqlquery, queryResults, &numRows, &numColumns, errMsg);
 }
 
 void SqlWrapper::FreeTable(char **queryResults)

@@ -7,8 +7,8 @@ class SqlWrapper
 {
 public:
     SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName);
-    //SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber);
     SqlWrapper(QString dbName);
+    SqlWrapper(sqlite3_stmt *sqlStatement, QString dbName);
     //SqlWrapper();
     ~SqlWrapper();
 
@@ -26,7 +26,7 @@ public:
     const void* ReturnText16(int returnPlace);
     const void* ReturnBlob(int returnPlace);
     int ReturnTable(char ***queryResults, int numRows, int numColumns, char **errMsg);
-    void SqlWrapper::FreeTable(char **queryResults);
+    int SetBusyHandler(int busyHandler(void *, int));
     int StepSql(void);
     int ExecuteSql(char **errmsg);
     int ReturnColumnType(int returnPlace);
