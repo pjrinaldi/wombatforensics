@@ -27,6 +27,7 @@ public:
     const char* ReturnText(int returnPlace);
     const void* ReturnText16(int returnPlace);
     const void* ReturnBlob(int returnPlace);
+    int ReturnBlobSize(int returnPlace);
     int ReturnTable(char ***queryResults, int numRows, int numColumns, char **errMsg);
     int SetBusyHandler(int busyHandler(void *, int));
     int FileControl(int chunkSize);

@@ -2836,33 +2836,28 @@ string WombatTskImgDBSqlite::getAttributeTypeDisplayName(int attributeTypeID)
  * @returns attribute type id
  */
 int WombatTskImgDBSqlite::getAttributeTypeID(string attributeTypeString){
-    if (!m_db)
-        throw TskException("No database.");
 
-    std::stringstream str;
-    sqlite3_stmt * statement;
     int typeID;
-
-    str << "SELECT attribute_type_id FROM blackboard_attribute_types WHERE type_name = " << attributeTypeString;
-
-    if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK){
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            typeID = (int) sqlite3_column_int(statement, 0);
-        }
-        else{
-            std::wstringstream infoMessage;
-            infoMessage << L"WombatTskImgDBSqlite::getAttributeTypeID: " << sqlite3_errmsg(m_db);
-            LOGERROR(infoMessage.str());
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("SELECT attribute_type_id FROM blackboard_attribute_types WHERE type_name = ?;") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, attributeTypeString);
+        if(mainSqlObject->StepSql() == SQLITE_ROW)
+            typeID = (int)mainSqlObject->ReturnInt(0);
+        else
+        {
+            mainSqlObject->DisplayError("15.60", "Sql Error: ", "WombatTskImgDBSqlite::getAttributeTypeID.");
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::getAttributeTypeID - No artifact type with that name");
         }
-        sqlite3_finalize(statement);
+        mainSqlObject->FinalizeSql();
+
         return typeID;
     }
-    else{
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getAttributeTypeID: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+    else
+    {
+        mainSqlObject->DisplayError("15.59", "Sql Error: ", "WombatTskImgDBSqlite::getAttributeTypeID.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::getAttributeTypeID - Select failed");
     }
 }
@@ -2872,34 +2867,29 @@ int WombatTskImgDBSqlite::getAttributeTypeID(string attributeTypeString){
  * @param attributeTypeID id
  * @returns attribute type name
  */
-string WombatTskImgDBSqlite::getAttributeTypeName(int attributeTypeID){
-    if (!m_db)
-        throw TskException("No database.");
-
-    std::stringstream str;
-    sqlite3_stmt * statement;
+string WombatTskImgDBSqlite::getAttributeTypeName(int attributeTypeID)
+{
     std::string typeName = "";
-
-    str << "SELECT type_name FROM blackboard_attribute_types WHERE attribute_type_id = " << attributeTypeID;
-
-    if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK){
-        int result = sqlite3_step(statement);
-        if (result == SQLITE_ROW) {
-            typeName = (char *)sqlite3_column_text(statement, 0);
-        }
-        else{
-            std::wstringstream infoMessage;
-            infoMessage << L"WombatTskImgDBSqlite::getAttributeTypeName: " << sqlite3_errmsg(m_db);
-            LOGERROR(infoMessage.str());
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("SELECT type_name FROM blackboard_attribute_types WHERE attribute_type_id = ?;") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, attributeTypeID);
+        if(mainSqlObject->StepSql() == SQLITE_ROW)
+            typeName = (char *)mainSqlObject->ReturnText(0);
+        else
+        {
+            mainSqlObject->DisplayError("15.62", "Sql Error: ", "WombatTskImgDBSqlite::getAttributeTypeName.");
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::getAttributeTypeName - No attribute type with that ID");
         }
-        sqlite3_finalize(statement);
+        mainSqlObject->FinalizeSql();
+
         return typeName;
     }
-    else{
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getAttributeTypeName: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+    else
+    {
+        mainSqlObject->DisplayError("15.61", "Sql Error: ", "WombatTskImgDBSqlite::getAttributeTypeName.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::getAttributeTypeName - Select failed");
     }
 }
@@ -2911,31 +2901,30 @@ string WombatTskImgDBSqlite::getAttributeTypeName(int attributeTypeID){
  */
 vector<TskBlackboardArtifact> WombatTskImgDBSqlite::getMatchingArtifacts(string condition)
 {
-    if (!m_db)
-        throw TskException("No database.");
 
     vector<TskBlackboardArtifact> artifacts;
     std::string stmt("SELECT blackboard_artifacts.artifact_id, blackboard_artifacts.obj_id, blackboard_artifacts.artifact_type_id FROM blackboard_artifacts");
 
     constructStmt(stmt, condition);
 
-    sqlite3_stmt * statement;
-    if (sqlite3_prepare_v2(m_db, stmt.c_str(), -1, &statement, 0) == SQLITE_OK)
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql(stmt.c_str()) == SQLITE_OK)
     {
-        while (sqlite3_step(statement) == SQLITE_ROW)
+        while(mainSqlObject->StepSql() == SQLITE_ROW)
         {
-            int artifactTypeID = sqlite3_column_int(statement, 2);
+            int artifactTypeID = mainSqlObject->ReturnInt(2);
 
-            artifacts.push_back(TskImgDB::createArtifact(sqlite3_column_int64(statement, 0), sqlite3_column_int64(statement, 1), artifactTypeID));
+            artifacts.push_back(TskImgDB::createArtifact(mainSqlObject->ReturnInt64(0), mainSqlObject->ReturnInt64(1), artifactTypeID));
         }
-        sqlite3_finalize(statement);
-    } else
+        mainSqlObject->FinalizeSql();
+    }
+    else
     {
-        std::wstringstream msg;
-        msg << L"WombatTskImgDBSqlite::getMatchingArtifacts - Error getting artifacts: " << sqlite3_errmsg(m_db);
-        LOGERROR(msg.str());
+        mainSqlObject->DisplayError("15.63", "Sql Error: ", "WombatTskImgDBSqlite::getMatchingArtifacts - Error getting artifacts.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::getMatchingArtifacts - Select failed");
     }
+
     return artifacts;
 }
 
@@ -2946,38 +2935,36 @@ vector<TskBlackboardArtifact> WombatTskImgDBSqlite::getMatchingArtifacts(string 
  */
 vector<TskBlackboardAttribute> WombatTskImgDBSqlite::getMatchingAttributes(string condition)
 {
-    if (!m_db)
-        throw TskException("No database.");
 
     vector<TskBlackboardAttribute> attributes;
     std::string stmt("SELECT blackboard_attributes.artifact_id, blackboard_attributes.source, blackboard_attributes.context, blackboard_attributes.attribute_type_id, blackboard_attributes.value_type, blackboard_attributes.value_byte, blackboard_attributes.value_text, blackboard_attributes.value_int32, blackboard_attributes.value_int64, blackboard_attributes.value_double, blackboard_attributes.obj_id FROM blackboard_attributes ");
 
     constructStmt(stmt, condition);
 
-    sqlite3_stmt * statement;
-    if (sqlite3_prepare_v2(m_db, stmt.c_str(), -1, &statement, 0) == SQLITE_OK)
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql(stmt.c_str()) == SQLITE_OK)
     {
-        while (sqlite3_step(statement) == SQLITE_ROW)
+        while(mainSqlObject->StepSql() == SQLITE_ROW)
         {
-            int blobSize = sqlite3_column_bytes(statement, 6);
-            const unsigned char *pBlob = (const unsigned char *)sqlite3_column_blob(statement, 6);
+            int blobSize = mainSqlObject->ReturnBlobSize(6);
+            const unsigned char *pBlob = (const unsigned char *)mainSqlObject->ReturnBlob(6);
             vector<unsigned char> bytes;
             bytes.reserve(blobSize);
-            for (int i = 0; i < blobSize; i++) {
+            for(int i = 0; i < blobSize; i++)
+            {
                 bytes.push_back((unsigned char)pBlob[i]);
             }
-
-            attributes.push_back(TskImgDB::createAttribute(sqlite3_column_int64(statement, 0),sqlite3_column_int(statement, 3), sqlite3_column_int64(statement, 10), std::string((char *)sqlite3_column_text(statement, 1)),
-                std::string((char *)sqlite3_column_text(statement, 2)), (TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE) sqlite3_column_int(statement, 4), sqlite3_column_int(statement, 7),
-                sqlite3_column_int64(statement, 8), sqlite3_column_double(statement, 9), std::string((char *)sqlite3_column_text(statement, 6)), bytes));
+            attributes.push_back(TskImgDB::createAttribute(mainSqlObject->ReturnInt64(0), mainSqlObject->ReturnInt(3), mainSqlObject->ReturnInt64(10), std::string((char *)mainSqlObject->ReturnText(1)), std::string((char *)mainSqlObject->ReturnText(2)), (TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE) mainSqlObject->ReturnInt(4), mainSqlObject->ReturnInt(7), mainSqlObject->ReturnInt64(8), mainSqlObject->ReturnDouble(9), std::string((char *)mainSqlObject->ReturnText(6)), bytes));
         }
-        sqlite3_finalize(statement);
-    } else {
-        std::wstringstream msg;
-        msg << L"WombatTskImgDBSqlite::getMatchingAttributes - Error getting attributes: " << sqlite3_errmsg(m_db);
-        LOGERROR(msg.str());
+        mainSqlObject->FinalizeSql();
+    }
+    else
+    {
+        mainSqlObject->DisplayError("15.65", "Sql Error: ", "WombatTskImgDBSqlite::getMatchingAttributes - Error getting attributes.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::getMatchingAttributes - Select failed");
     }
+
     return attributes;
 }
 
@@ -2989,40 +2976,39 @@ vector<TskBlackboardAttribute> WombatTskImgDBSqlite::getMatchingAttributes(strin
  */
 TskBlackboardArtifact WombatTskImgDBSqlite::createBlackboardArtifact(uint64_t file_id, int artifactTypeID)
 {
-    if (!m_db)
-        throw TskException("No database.");
-
     uint64_t artifactId = 0;
-    std::stringstream str;
-    sqlite3_stmt * statement;
-
-    str << "INSERT INTO blackboard_artifacts (artifact_id, obj_id, artifact_type_id) VALUES (NULL, " << file_id << ", " << artifactTypeID << ")";
-
-    if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        if (!(sqlite3_step(statement) == SQLITE_DONE)) {
-            sqlite3_finalize(statement);
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("INSERT INTO blackboard_artifacts (artifact_id, obj_id, artifact_type_id) VALUES (NULL, ?, ?)") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, file_id);
+        mainSqlObject->BindValue(2, artifactTypeID);
+        if(!(mainSqlObject->StepSql() == SQLITE_DONE))
+        {
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::addBlackboardInfo - Insert failed");
         }
         // select max(artifact_id) from blackboard
-        str.str("");
-        str << "SELECT artifact_id from blackboard_artifacts WHERE obj_id = " << file_id << " AND artifact_type_id = " << artifactTypeID;
-        sqlite3_finalize(statement);
-        if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-            while(sqlite3_step(statement) == SQLITE_ROW) {
-                uint64_t newID = sqlite3_column_int64(statement, 0);
+        mainSqlObject->PrepSql();
+        if(mainSqlObject->PrepareSql("SELECT artifact_id from blackboard_artifacts WHERE obj_id = ? AND artifact_type_id = ?;") == SQLITE_OK)
+        {
+            while(mainSqlObject->StepSql() == SQLITE_ROW)
+            {
+                uint64_t newID = mainSqlObject->ReturnInt64(0);
                 if(newID > artifactId)
                     artifactId = newID;
             }
-        } else {
-            sqlite3_finalize(statement);
+            mainSqlObject->FinalizeSql();
+        }
+        else
+        {
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::newBlackboardArtifact - Select artifact_id failed");
         }
-        sqlite3_finalize(statement);
-    } else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::newBlackboardArtifact - Error adding new artifact: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-        throw TskException("WombatTskImgDBSqlite::newBlackboardArtifact - Insert failed");
+    }
+    else
+    {
+        mainSqlObject->DisplayError("15.67", "Sql Error: ", "WombatTskImgDBSqlite::newBlackboardArtifact - Error adding new artifact.");
+        mainSqlObject->FinalizeSql();
     }
 
     return TskImgDB::createArtifact(artifactId, file_id, artifactTypeID);
@@ -3036,38 +3022,37 @@ TskBlackboardArtifact WombatTskImgDBSqlite::createBlackboardArtifact(uint64_t fi
  */
 void WombatTskImgDBSqlite::addArtifactType(int typeID, string artifactTypeName, string displayName)
 {
-    if (!m_db)
-        throw TskException("No database.");
-
-    std::stringstream str;
-    sqlite3_stmt * statement;
-
-    str << "SELECT * FROM blackboard_artifact_types WHERE type_name = '" << artifactTypeName << "'";
-
-    if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        if (!(sqlite3_step(statement) == SQLITE_ROW)) {
-            sqlite3_finalize(statement);
-            str.str("");
-            str << "INSERT INTO blackboard_artifact_types (artifact_type_id, type_name, display_name) VALUES (" << typeID << " , '" << artifactTypeName << "', '" << displayName << "')";
-            if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-                if (!(sqlite3_step(statement) == SQLITE_DONE)) {
-                    sqlite3_finalize(statement);
-                    std::wstringstream infoMessage;
-                    infoMessage << L"WombatTskImgDBSqlite::addArtifactType - Error adding data to blackboard table: " << sqlite3_errmsg(m_db);
-                    LOGERROR(infoMessage.str());
+    mainSqlObject->PrepSql();
+    if(mainSqlObject->PrepareSql("SELECT * FROM blackboard_artifact_types WHERE type_name = ?;") == SQLITE_OK)
+    {
+        mainSqlObject->BindValue(1, artifactTypeName);
+        if(!(mainSqlObject->StepSql() == SQLITE_ROW))
+        {
+            mainSqlObject->PrepSql();
+            if(mainSqlObject->PrepareSql("INSERT INTO blackboard_artifact_types (artifact_type_id, type_name, display_name) VALUES (?, ?, ?);") == SQLITE_OK)
+            {
+                mainSqlObject->BindValue(1, typeID);
+                mainSqlObject->BindValue(2, artifactTypeName);
+                mainSqlObject->BindValue(3, displayName);
+                if(!(mainSqlObject->StepSql() == SQLITE_DONE))
+                {
+                    mainSqlObject->DisplayError("15.68", "Sql Error: ", "WombatTskImgDBSqlite::addArtifactType - Error adding data to blackboard table.");
+                    mainSqlObject->FinalizeSql();
                     throw TskException("WombatTskImgDBSqlite::addArtifactType - Artifact type insert failed");
                 }
             }
         }
-        else{
-            sqlite3_finalize(statement);
+        else
+        {
+            mainSqlObject->FinalizeSql();
             throw TskException("WombatTskImgDBSqlite::addArtifactType - Artifact type with that name already exists");
         }
-        sqlite3_finalize(statement);
-    } else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::addArtifactType - Error adding data to blackboard table: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
+        mainSqlObject->FinalizeSql();
+    }
+    else
+    {
+        mainSqlObject->DisplayError("15.69", "Sql Error: ", "WombatTskImgDBSqlite::addArtifactType - Error adding data to blackboard table.");
+        mainSqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::addArtifactType - Insert failed");
     }
 }

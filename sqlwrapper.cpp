@@ -233,6 +233,11 @@ const void* SqlWrapper::ReturnBlob(int returnPlace)
         returnplace = returnPlace;
         return sqlite3_column_blob(sqlstatement, returnplace);
 }
+int SqlWrapper::ReturnBlobSize(int returnPlace)
+{
+    returnplace = returnPlace;
+    return sqlite3_column_bytes(sqlstatement, returnplace);
+}
 
 sqlite3_int64 SqlWrapper::ReturnLastInsertRowID(void)
 {
