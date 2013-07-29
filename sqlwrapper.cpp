@@ -194,7 +194,7 @@ void SqlWrapper::BindValue(int bindPlace, const void* bindValue)
                 DisplayError(errornumber, "BIND BLOB", "MISUSE");
         }
 }
-void SqlWrapper::BindValue(int bindPlace, const void * bindValue, int blobSize)
+int SqlWrapper::BindValue(int bindPlace, const void * bindValue, int blobSize)
 {
     bindplace = bindPlace;
     bindblob = bindValue;

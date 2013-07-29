@@ -147,7 +147,7 @@ private:
     void constructStmt(std::string& stmt, std::string condition) const;
     int addUnusedSector(uint64_t sectStart, uint64_t sectEnd, int volId, std::vector<TskUnusedSectorsRecord> & unusedSectorsList);
     int getFileTypeRecords(const std::string& stmt, std::list<TskFileTypeRecord>& fileTypeInfoList) const;
-    virtual vector<TskBlackboardArtifact> getArtifactsHelper(uint64_t file_id, int artifactTypeID, string artifactTypeName);
+    virtual vector<TskBlackboardArtifact> getArtifactsHelper(uint64_t file_id, int artifactTypeId, string artifactTypeName);
     void getCarvedFileInfo(const std::string& stmt, std::map<uint64_t, std::string>& results) const;
 
     /**
