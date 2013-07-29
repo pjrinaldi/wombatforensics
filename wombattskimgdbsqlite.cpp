@@ -1811,12 +1811,7 @@ int WombatTskImgDBSqlite::getVolumeInfo(std::list<TskVolumeInfoRecord> & volumeI
 
     mainSqlObject->PrepSql();
     mainSqlObject->PrepareSql("SELECT vol_id, sect_start, sect_len, description, flags FROM vol_info;");
-    if(mainSqlObject->StepSql() == SQLITE_ERROR)
-    {
-        mainSqlObject->DisplayError("15.30", "Sql Error: ", "WombatTskImgDBSqlite::getVolumeInfo - Error getting from vol_info table");
-        return -1;
-    }
-    else
+    while(mainSqlObject->StepSql() == SQLITE_ROW)
     {
         TskVolumeInfoRecord vol_info;
         vol_info.vol_id = mainSqlObject->ReturnInt(0);
@@ -1838,35 +1833,24 @@ int WombatTskImgDBSqlite::getVolumeInfo(std::list<TskVolumeInfoRecord> & volumeI
 int WombatTskImgDBSqlite::getFsInfo(std::list<TskFsInfoRecord> & fsInfoList) const
 {
     std::list<TskFsInfoRecord> list;
-
-    if (!m_db)
-        return -1;
-
-    stringstream stmt;
-    stmt << "SELECT fs_id, img_byte_offset, vol_id, fs_type, block_size, block_count, root_inum, first_inum, last_inum FROM fs_info";
-
-    sqlite3_stmt * statement;
-    if (sqlite3_prepare_v2(m_db, stmt.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
-        while (sqlite3_step(statement) == SQLITE_ROW) {
-            TskFsInfoRecord fs_info;
-            fs_info.fs_id = sqlite3_column_int(statement,0);
-            fs_info.img_byte_offset = sqlite3_column_int64(statement,1);
-            fs_info.vol_id = sqlite3_column_int(statement,2);
-            fs_info.fs_type = (TSK_FS_TYPE_ENUM)sqlite3_column_int(statement,3);
-            fs_info.block_size = sqlite3_column_int(statement,4);
-            fs_info.block_count = sqlite3_column_int64(statement,5);
-            fs_info.root_inum = sqlite3_column_int64(statement,6);
-            fs_info.first_inum = sqlite3_column_int64(statement,7);
-            fs_info.last_inum = sqlite3_column_int64(statement,8);
-            fsInfoList.push_back(fs_info);
-        }
-        sqlite3_finalize(statement);
-    } else {
-        std::wstringstream infoMessage;
-        infoMessage << L"WombatTskImgDBSqlite::getFsInfo - Error getting from fs_info table: " << sqlite3_errmsg(m_db);
-        LOGERROR(infoMessage.str());
-        return -1;
+    mainSqlObject->PrepSql();
+    mainSqlObject->PrepareSql("SELECT fs_id, img_byte_offset, vol_id, fs_type, block_size, block_count, root_inum, first_inum, last_inum FROM fs_info;");
+    while(mainSqlObject->StepSql() == SQLITE_ROW)
+    {
+        TskFsInfoRecord fs_info;
+        fs_info.fs_id = mainSqlObject->ReturnInt(0);
+        fs_info.img_byte_offset = mainSqlObject->ReturnInt64(1);
+        fs_info.vol_id = mainSqlObject->ReturnInt(2);
+        fs_info.fs_type = (TSK_FS_TYPE_ENUM)mainSqlObject->ReturnInt(3);
+        fs_info.block_size = mainSqlObject->ReturnInt(4);
+        fs_info.block_count = mainSqlObject->ReturnInt64(5);
+        fs_info.root_inum = mainSqlObject->ReturnInt64(6);
+        fs_info.first_inum = mainSqlObject->ReturnInt64(7);
+        fs_info.last_inum = mainSqlObject->ReturnInt64(8);
+        fsInfoList.push_back(fs_info);
     }
+    mainSqlObject->FinalizeSql();
+
     return 0;
 }
 
