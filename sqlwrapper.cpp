@@ -121,6 +121,17 @@ int SqlWrapper::SetBusyHandler(int busyHandler(void *, int))
     return sqlite3_busy_handler(sqldb, busyHandler, sqldb);
 }
 
+int SqlWrapper::FileControl(int chunkSize)
+{
+    return sqlite3_file_control(sqldb, NULL, SQLITE_FCNTL_CHUNK_SIZE, &chunkSize);
+}
+
+int SqlWrapper::PrepareSql(const char *sqlQuery)
+{
+    sqlquery = sqlQuery;
+    return sqlite3_prepare_v2(sqldb, sqlquery, -1, &sqlstatement, NULL);
+}
+/*
 void SqlWrapper::PrepareSql(const char* sqlQuery)
 {
         sqlquery = sqlQuery;
@@ -129,6 +140,7 @@ void SqlWrapper::PrepareSql(const char* sqlQuery)
                 DisplayError(errornumber, "PREPARE", sqlite3_errmsg(sqldb));
         }
 }
+*/
 void SqlWrapper::BindValue(int bindPlace, int bindValue)
 {
         bindplace = bindPlace;

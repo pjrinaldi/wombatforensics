@@ -12,7 +12,8 @@ public:
     //SqlWrapper();
     ~SqlWrapper();
 
-    void PrepareSql(const char* sqlQuery);
+    int PrepareSql(const char *sqlQuery);
+    //void PrepareSql(const char* sqlQuery);
     void BindValue(int bindPlace, int bindValue);
     void BindValue(int bindPlace, double bindValue);
     void BindValue(int bindPlace, sqlite3_int64 bindValue);
@@ -27,6 +28,7 @@ public:
     const void* ReturnBlob(int returnPlace);
     int ReturnTable(char ***queryResults, int numRows, int numColumns, char **errMsg);
     int SetBusyHandler(int busyHandler(void *, int));
+    int FileControl(int chunkSize);
     int StepSql(void);
     int ExecuteSql(char **errmsg);
     int ReturnColumnType(int returnPlace);
