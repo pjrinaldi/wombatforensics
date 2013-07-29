@@ -36,6 +36,7 @@ public:
     void FreeTable(char **queryResults);
     void ResetSql(void);
     void FinalizeSql(void);
+    void PrepSql(void);
     void CloseSql(void);
     sqlite3* ReturnSqlDB(void);
     void DisplayError(const char* errorNumber, const char* errorType, const char* errorValue);

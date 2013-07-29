@@ -279,6 +279,13 @@ void SqlWrapper::FinalizeSql(void)
                 DisplayError(errornumber, "FINALIZE", "ERROR");
         }
 }
+void SqlWrapper::PrepSql(void)
+{
+    FinalizeSql();
+    ResetSql();
+    ClearBindings();
+}
+
 void SqlWrapper::CloseSql(void)
 {
         sqlcode = sqlite3_close(sqldb);
