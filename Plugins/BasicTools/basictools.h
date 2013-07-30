@@ -22,10 +22,9 @@ class BasicTools : public QObject, public EvidenceInterface
     
 public:
     //Evidence Interface
-    QStringList evidenceMenuActions() const;
-    QStringList evidenceToolbarActions() const;
+    QStringList evidenceActions() const;
     QStringList toolboxViews() const;
-    QStringList evidenceToolbarIcons() const;
+    QStringList evidenceActionIcons() const;
     QStringList evidenceToolboxIcons() const;
     QWidget* setupToolBox() const;
     QWidget* setupTabWidget() const;

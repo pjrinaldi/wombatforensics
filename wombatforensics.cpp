@@ -8,6 +8,7 @@ WombatForensics::WombatForensics(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::WombatForensics)
 {
+    Q_INIT_RESOURCE(basictools);
     ui->setupUi(this);
     currentcaseid = -1;
     QDir testDir = QDir(qApp->applicationDirPath());
@@ -37,7 +38,7 @@ void WombatForensics::loadPlugins()
 {
     foreach (QObject *plugin, QPluginLoader::staticInstances())
     {
-        populateMenus(plugin);
+        populateActions(plugin);
         populateToolBox(plugin);
     }
 
@@ -55,7 +56,7 @@ void WombatForensics::loadPlugins()
         QObject *plugin = loader.instance();
         if (plugin)
         {
-            populateMenus(plugin);
+            populateActions(plugin);
             pluginFileNames += fileName;
             populateToolBox(plugin);
         }
@@ -69,13 +70,14 @@ void WombatForensics::loadPlugins()
      */
 }
 
-void WombatForensics::populateMenus(QObject *plugin)
+void WombatForensics::populateActions(QObject *plugin)
 {
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
     if (iEvidence)
     {
-        addToMenu(plugin, iEvidence->evidenceMenuActions(), ui->menuEvidence, SLOT(alterEvidence()));
-        // add items to the toolbar as well
+        addActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(alterEvidence()));
+        //addToMenu(plugin, iEvidence->evidenceMenuActions(), ui->menuEvidence, SLOT(alterEvidence()));
+        //addToToolbox(plugin, iEvidence->evidenceToolbarActions(), iEvidence->evidenceToolbarIcons(), ui->mainToolBar, SLOT(alterEvidence()));
     }
     /*
         BrushInterface *iBrush = qobject_cast<BrushInterface *>(plugin);
@@ -98,10 +100,10 @@ void WombatForensics::populateToolBox(QObject *plugin)
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
     if (iEvidence)
     {
-        ui->toolBox->addItem(iEvidence->setupToolBox(), iEvidence->toolboxViews()[0]);
+        ui->toolBox->addItem(iEvidence->setupToolBox(), ((QStringList)iEvidence->toolboxViews())[0]);
     }
 }
-
+/*
 void WombatForensics::addToMenu(QObject *plugin, const QStringList &texts, QMenu *menu, const char *member, QActionGroup *actionGroup)
 {
     foreach (QString text, texts)
@@ -117,7 +119,48 @@ void WombatForensics::addToMenu(QObject *plugin, const QStringList &texts, QMenu
         }
     }
 }
+*/
+void WombatForensics::addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
+{
+    for(int i = 0; i < texts.count(); i++)
+    {
+        QAction *action1 = new QAction(texts[i], plugin);
+        QAction *action2 = new QAction(texts[i], plugin);
+        action1->setIcon(QIcon(icons[i]));
+        action2->setIcon(QIcon(icons[i]));
+        connect(action1, SIGNAL(triggered()), this, member);
+        connect(action2, SIGNAL(triggered()), this, member);
+        toolbar->addAction(action1);
+        menu->addAction(action2);
 
+        if(actionGroup)
+        {
+            action1->setCheckable(true);
+            action2->setCheckable(true);
+            actionGroup->addAction(action1);
+            actionGroup->addAction(action2);
+        }
+    }
+}
+
+/*
+void WombatForensics::addToToolBar(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, const char *member, QActionGroup *actionGroup)
+{
+    for(int i = 0; i < texts.count(); i++)
+    {
+        QAction *action = new QAction(texts[i], plugin);
+        action->setIcon(QIcon(icons[i]));
+        connect(action, SIGNAL(triggered()), this, member);
+        toolbar->addAction(action);
+
+        if(actionGroup)
+        {
+            action->setCheckable(true);
+            actionGroup->addAction(action);
+        }
+    }
+}
+*/
 void WombatForensics::alterEvidence()
 {
     QAction *action = qobject_cast<QAction *>(sender());

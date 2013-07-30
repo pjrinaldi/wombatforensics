@@ -1,23 +1,18 @@
 #include "basictools.h"
 
-QStringList BasicTools::evidenceMenuActions() const
+QStringList BasicTools::evidenceActions() const
 {
     return QStringList() << tr("Add Evidence") << tr("Remove Evidence");
 }
 
-QStringList BasicTools::evidenceToolbarActions() const
+QStringList BasicTools::evidenceActionIcons() const
 {
-    return QStringList() << tr("Add Evidence") << tr("Remove Evidence");
-}
-
-QStringList BasicTools::evidenceToolbarIcons() const
-{
-    return QStringList() << tr(":/addevidence") << tr(":/remevidence");
+    return QStringList() << tr(":/basic/addevidence") << tr(":/basic/remevidence");
 }
 
 QStringList BasicTools::evidenceToolboxIcons() const
 {
-    return QStringList() << tr(":/treefile") << tr(":/treefolder") << (":/treepartition") << tr(":/treefilemanager") << tr(":/treeimage");
+    return QStringList() << tr(":/basictools/images/treefile") << tr(":/basictools/images/treefolder") << (":/basictools/images/treepartition") << tr(":/basictools/images/treefilemanager") << tr(":/basictools/images/treeimage");
 }
 
 QStringList BasicTools::toolboxViews() const
@@ -44,7 +39,6 @@ void BasicTools::addEvidence(int currentCaseID)
         sqlObject->FinalizeSql();
         //sqlObject->CloseSql();
         // set individual db's for each image...
-        */
         TskFunctions *testcase = new TskFunctions();
         testcase->InitializeFrameworkProperties();
         testcase->InitializeFrameworkLog();
@@ -72,6 +66,7 @@ void BasicTools::addEvidence(int currentCaseID)
         imageFileTsk.open(evidenceFile.toStdString().c_str()); // open evidence image: dd, e01, etc.
         TskServices::Instance().setImageFile(imageFileTsk);
         imageFileTsk.extractFiles();
+        */
     }
 }
 

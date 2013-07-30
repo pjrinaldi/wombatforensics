@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/basic">
         <file alias="treefolder">Resources/folder.png</file>
         <file alias="addevidence">Resources/list-add.png</file>
         <file alias="treefile">Resources/text-x-generic.png</file>

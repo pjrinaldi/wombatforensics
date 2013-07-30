@@ -37,11 +37,13 @@ private:
     Ui::WombatForensics *ui;
 
     void loadPlugins();
-    void populateMenus(QObject *plugin);
+    void populateActions(QObject *plugin);
     void populateToolBox(QObject *plugin);
-    void populateToolBar(QObject *plugin);
+    //void populateToolBar(QObject *plugin);
 
-    void addToMenu(QObject *plugin, const QStringList &texts, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
+    //void addToMenu(QObject *plugin, const QStringList &texts, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
+    //void addToToolbox(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, const char *member, QActionGroup *actionGroup = 0);
+    void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
 
     void makeDir(const char *dir);
 
