@@ -31,7 +31,7 @@ class TskFunctions
 {
 public:
     TskFunctions();
-    void SetupTskFramework(void);
+    void SetupTskFramework();
     void InitializeFrameworkProperties(void);
     void InitializeFrameworkLog(void);
     void InitializeFrameworkScheduler(void);
@@ -42,8 +42,8 @@ public:
 
     int ret;
     //std::auto_ptr<TskImgDB> frameworkDatabase;
-    //std::auto_ptr<Log> frameworkLog;
-    SqlErrLog *frameworkLog;
+    std::auto_ptr<Log> frameworkLog;
+    //SqlErrLog *frameworkLog;
 
 };
 

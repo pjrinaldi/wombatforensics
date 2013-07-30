@@ -12,8 +12,10 @@ WombatForensics::WombatForensics(QWidget *parent) :
     loadPlugins();
     QDir testDir = QDir(qApp->applicationDirPath());
     testDir.mkdir("data");
-    TskFunctions *testcase = new TskFunctions();
-    testcase->SetupTskFramework();
+    //wInstance->set;
+    //TskFunctions *testcase = new TskFunctions();
+    //testcase->SetupTskFramework();
+    /*
     wombatCaseData = new WombatCaseDb("WombatData.db");
     // determine if a cases db exist and if any cases are open, otherwise disable open existing case
     if(wombatCaseData->ReturnCaseCount() == 0)
@@ -21,6 +23,7 @@ WombatForensics::WombatForensics(QWidget *parent) :
         ui->actionOpen_Case->setEnabled(FALSE);
         ui->actionOpen_Case_2->setEnabled(FALSE);
     }
+    */
 }
 
 void WombatForensics::loadPlugins()
@@ -110,6 +113,7 @@ void WombatForensics::addToMenu(QObject *plugin, const QStringList &texts, QMenu
 
 void WombatForensics::alterEvidence()
 {
+    currentcaseid = 1;
     QAction *action = qobject_cast<QAction *>(sender());
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))

@@ -34,7 +34,7 @@ void BasicTools::addEvidence(int currentCaseID)
     {
         QString evidenceFileName = evidenceFile.split("/").last();
         QString evidenceDBname = evidenceFileName + ".db";
-
+        /*
         SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "3.1", "WombatData.db");
         sqlObject->PrepareSql("INSERT INTO caseimages (imagefullpath, imagename, caseid) VALUES(?, ?, ?);");
         sqlObject->BindValue(1, evidenceFile.toStdString().c_str());
@@ -44,14 +44,21 @@ void BasicTools::addEvidence(int currentCaseID)
         sqlObject->FinalizeSql();
         //sqlObject->CloseSql();
         // set individual db's for each image...
+        */
+        TskFunctions *testcase = new TskFunctions();
+        testcase->InitializeFrameworkProperties();
+        testcase->InitializeFrameworkLog();
+        //testcase->SetupTskFramework();
         std::auto_ptr<TskImgDB> wImgDB(NULL);
-        wImgDB = std::auto_ptr<TskImgDB>(new WombatTskImgDBSqlite(evidenceDBname));
+        //wImgDB = std::auto_ptr<TskImgDB>(new WombatTskImgDBSqlite(evidenceDBname));
+        wImgDB = std::auto_ptr<TskImgDB>(new TskImgDBSqlite("./testout"));
         if(wImgDB->initialize() != 0)
         {
-            LOGERROR("Error initializing the Image DB.");
+            //LOGERROR("Error initializing the Image DB.");
         }
-        else
-            wImgDB->open();
+
+        wImgDB->open();
+
         TskServices::Instance().setImgDB(*wImgDB);
         TskServices::Instance().setBlackboard((TskBlackboard &) TskDBBlackboard::instance());
         TskSchedulerQueue scheduler;
@@ -61,7 +68,7 @@ void BasicTools::addEvidence(int currentCaseID)
         //InitializeFrameworkScheduler();
         //InitializeFrameworkFileManager();
 
-        WombatTskImageFileTsk imageFileTsk;
+        TskImageFileTsk imageFileTsk;
         imageFileTsk.open(evidenceFile.toStdString().c_str()); // open evidence image: dd, e01, etc.
         TskServices::Instance().setImageFile(imageFileTsk);
         imageFileTsk.extractFiles();

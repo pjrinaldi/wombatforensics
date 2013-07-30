@@ -338,7 +338,7 @@ void SqlWrapper::DisplayError(const char* errorNumber, const char* errorType, co
         tmpString += errorType;
         tmpString += " Returned ";
         tmpString += errorValue;
-        errlog->log(SqlErrLog::Error, tmpString.toStdString().c_str());
+        //errlog->log(SqlErrLog::Error, tmpString.toStdString().c_str());
         //fprintf(stderr, tmpString.toStdString().c_str());
         //ealert = new ErrorAlert(tmpString);
         //ealert->Launch();

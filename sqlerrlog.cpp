@@ -10,6 +10,7 @@ SqlErrLog::~SqlErrLog()
 
 void SqlErrLog::log(Channel a_channel, const std::string &a_msg)
 {
+    /*
     sqldb = NULL;
     int sqlValue;
     int channelInt = -1;
@@ -55,5 +56,6 @@ void SqlErrLog::log(Channel a_channel, const std::string &a_msg)
         else
             fprintf(stderr, sqlite3_errmsg(sqldb));
     }
-    //Log::log(a_channel, a_msg);
+    */
+    Log::log(a_channel, a_msg);
 }

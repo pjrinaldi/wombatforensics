@@ -2,8 +2,10 @@
 #define BASICTOOLS_H
 
 #include <interfaces.h>
-#include "wombattskimgdbsqlite.h"
 #include "wombattskimagefiletsk.h"
+#include "tskfunctions.h"
+#include "tsk/framework/extraction/TskImageFileTsk.h"
+#include "tsk/framework/services/TskImgDBSqlite.h"
 #include "tsk/framework/services/TskSchedulerQueue.h"
 #include "tsk/framework/file/TskFileManagerImpl.h"
 #include <QStringList>
