@@ -9,21 +9,29 @@ WombatForensics::WombatForensics(QWidget *parent) :
     ui(new Ui::WombatForensics)
 {
     ui->setupUi(this);
-    loadPlugins();
+    currentcaseid = -1;
+    //loadPlugins();
     QDir testDir = QDir(qApp->applicationDirPath());
     testDir.mkdir("data");
-    //wInstance->set;
-    //TskFunctions *testcase = new TskFunctions();
-    //testcase->SetupTskFramework();
-    /*
-    wombatCaseData = new WombatCaseDb("WombatData.db");
-    // determine if a cases db exist and if any cases are open, otherwise disable open existing case
+    wombatCaseData = new WombatCaseDb("WombatData.db"); // create db.
     if(wombatCaseData->ReturnCaseCount() == 0)
     {
         ui->actionOpen_Case->setEnabled(FALSE);
         ui->actionOpen_Case_2->setEnabled(FALSE);
     }
-    */
+    else if(wombatCaseData->ReturnCaseCount() > 0)
+    {
+        ui->actionOpen_Case->setEnabled(TRUE);
+        ui->actionOpen_Case_2->setEnabled(TRUE);
+    }
+    else
+    {
+        fprintf(stderr, "Case count is < 0.");
+    }
+    //wInstance->set;
+    //TskFunctions *testcase = new TskFunctions();
+    //testcase->SetupTskFramework();
+    // determine if a cases db exist and if any cases are open, otherwise disable open existing case
 }
 
 void WombatForensics::loadPlugins()
@@ -113,7 +121,6 @@ void WombatForensics::addToMenu(QObject *plugin, const QStringList &texts, QMenu
 
 void WombatForensics::alterEvidence()
 {
-    currentcaseid = 1;
     QAction *action = qobject_cast<QAction *>(sender());
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
@@ -137,47 +144,80 @@ WombatForensics::~WombatForensics()
 
 void WombatForensics::on_actionNew_Case_triggered()
 {
-    // create new case here
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
-    if(ok && !text.isEmpty())
+    int ret = QMessageBox::Yes;
+    // determine if a case is open
+    if(currentcaseid > 0) // a case is open, provide action dialog first
     {
-        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.1", "WombatData.db");
-        sqlObject->PrepareSql("INSERT INTO cases (casename) VALUES(?);");
-        sqlObject->BindValue(1, text.toStdString().c_str());
-        sqlObject->StepSql();
-        sqlObject->FinalizeSql();
-        sqlObject->CloseSql();
+        ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
+    }
+    if (ret == QMessageBox::Yes)
+    {
+        // create new case here
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
+        if(ok && !text.isEmpty())
+        {
+            SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.1", "WombatData.db");
+            sqlObject->PrepareSql("INSERT INTO cases (casename) VALUES(?);");
+            sqlObject->BindValue(1, text.toStdString().c_str());
+            sqlObject->StepSql();
+            currentcaseid = sqlObject->ReturnLastInsertRowID();
+            sqlObject->FinalizeSql();
+            sqlObject->CloseSql();
+
+            QString tmpTitle = "Wombat Forensics - ";
+            tmpTitle += text;
+            this->setWindowTitle(tmpTitle);
+
+            if(wombatCaseData->ReturnCaseCount() > 0)
+            {
+                ui->actionOpen_Case->setEnabled(TRUE);
+                ui->actionOpen_Case_2->setEnabled(TRUE);
+            }
+        }
     }
 
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()
 {
-    // open case here
-    QStringList caseList;
-    caseList.clear();
-    SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.2", "WombatData.db");
-    sqlObject->PrepareSql("SELECT casename FROM cases ORDER BY caseid;");
-    while(sqlObject->StepSql() == SQLITE_ROW) // step through the sql
+    int ret = QMessageBox::Yes;
+    // determine if a case is open
+    if(currentcaseid > 0) // a case is open, provide action dialog first
     {
-        caseList.push_back(sqlObject->ReturnText(0));
+        ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
     }
-    sqlObject->FinalizeSql();
-    sqlObject->CloseSql();
-
-    bool ok;
-    QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
-    if(ok && !item.isEmpty())
+    if (ret == QMessageBox::Yes)
     {
-        // open case here (store case id)
-        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.3", "WombatData.db");
-        sqlObject->PrepareSql("SELECT caseid FROM cases WHERE casename = ?;");
-        sqlObject->BindValue(1, item.toStdString().c_str());
-        sqlObject->StepSql();
-        currentcaseid = sqlObject->ReturnInt(0);
+        // open case here
+        QStringList caseList;
+        caseList.clear();
+        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.2", "WombatData.db");
+        sqlObject->PrepareSql("SELECT casename FROM cases ORDER BY caseid;");
+        while(sqlObject->StepSql() == SQLITE_ROW) // step through the sql
+        {
+            caseList.push_back(sqlObject->ReturnText(0));
+        }
         sqlObject->FinalizeSql();
         sqlObject->CloseSql();
+
+        bool ok;
+        QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
+        if(ok && !item.isEmpty())
+        {
+            // open case here (store case id)
+            SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.3", "WombatData.db");
+            sqlObject->PrepareSql("SELECT caseid FROM cases WHERE casename = ?;");
+            sqlObject->BindValue(1, item.toStdString().c_str());
+            sqlObject->StepSql();
+            currentcaseid = sqlObject->ReturnInt(0);
+            sqlObject->FinalizeSql();
+            sqlObject->CloseSql();
+
+            QString tmpTitle = "Wombat Forensics - ";
+            tmpTitle += item;
+            this->setWindowTitle(tmpTitle);
+        }
     }
 }
 /*

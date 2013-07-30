@@ -85,7 +85,7 @@ int WombatTskImgDBSqlite::initialize()
     tmpPath += "wombatforensics.log";
     ret = frameworkLog->open(tmpPath.toStdString().c_str()); // modify the logdir path
      */
-    sqlObject->SetErrorLog(new SqlErrLog());
+    //sqlObject->SetErrorLog(new SqlErrLog());
     map<int, TskArtifactNames> artTypes = TskImgDB::getAllArtifactTypes();
     for (map<int, TskArtifactNames>::iterator it = artTypes.begin(); it != artTypes.end(); it++) {
         addArtifactType(it->first, it->second.typeName, it->second.displayName);

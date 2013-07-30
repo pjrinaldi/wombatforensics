@@ -3,8 +3,8 @@
 //SqlWrapper::SqlWrapper()
 SqlWrapper::SqlWrapper(QString dbName) // open to create db if it doesn't exist
 {
-    //sqldb = NULL;
-    //int sqlValue = -1;
+    sqldb = NULL;
+    int sqlValue = -1;
     char* sqlErrMsg;
     const char* createString;
     vector<const char*> createStrings;
@@ -50,7 +50,7 @@ SqlWrapper::SqlWrapper(QString dbName) // open to create db if it doesn't exist
     tmpPath += "/data/";
     tmpPath += dbName;
     LOGINFO(tmpPath.toStdString().c_str());
-    int sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
+    sqlValue = sqlite3_open_v2(tmpPath.toStdString().c_str(), &sqldb, SQLITE_OPEN_READWRITE, NULL); // open db
     if(sqlValue == 14) // if error is SQLITE_CANTOPEN, then create db with structure
     {
             int sqlValue = sqlite3_open(tmpPath.toStdString().c_str(), &sqldb);
@@ -325,11 +325,12 @@ sqlite3* SqlWrapper::ReturnSqlDB(void)
 {
         return sqldb;
 }
+/*
 void SqlWrapper::SetErrorLog(SqlErrLog *errLog)
 {
     errlog = errLog;
 }
-
+*/
 void SqlWrapper::DisplayError(const char* errorNumber, const char* errorType, const char* errorValue)
 {
         QString tmpString = errorNumber;
@@ -339,7 +340,7 @@ void SqlWrapper::DisplayError(const char* errorNumber, const char* errorType, co
         tmpString += " Returned ";
         tmpString += errorValue;
         //errlog->log(SqlErrLog::Error, tmpString.toStdString().c_str());
-        //fprintf(stderr, tmpString.toStdString().c_str());
+        fprintf(stderr, tmpString.toStdString().c_str());
         //ealert = new ErrorAlert(tmpString);
         //ealert->Launch();
 }

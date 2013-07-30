@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QStandardItemModel>
 #include <QInputDialog>
+#include <QMessageBox>
 
 #include "interfaces.h"
 #include "tskfunctions.h"

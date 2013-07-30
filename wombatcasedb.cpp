@@ -2,7 +2,7 @@
 
 WombatCaseDb::WombatCaseDb(QString dbname)
 {
-    wombatSqlObject = new SqlWrapper(sqlStatement, "3.5", dbname);
+    wombatSqlObject = new SqlWrapper(dbname); // create db
 }
 
 WombatCaseDb::~WombatCaseDb()
