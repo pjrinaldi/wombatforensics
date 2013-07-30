@@ -70,17 +70,23 @@ public:
     virtual ~EvidenceInterface() {}
 
     virtual QStringList evidenceActions() const = 0;
-    virtual QStringList toolboxViews() const = 0;
     virtual QStringList evidenceActionIcons() const = 0;
-    virtual QStringList evidenceToolboxIcons() const = 0;
-
-    virtual QWidget* setupToolBox() const = 0;
-    virtual QWidget* setupTabWidget() const = 0;
-    virtual QWidget* setupColumnView() const = 0;
 
     virtual void addEvidence(int currentCaseID) = 0;
     virtual void remEvidence(int currentCaseID) = 0;
 
+};
+
+class BasicToolsInterface
+{
+public:
+    virtual ~BasicToolsInterface() {}
+
+    virtual QStringList toolboxViews() const = 0;
+    virtual QStringList evidenceToolboxIcons() const = 0;
+    virtual QWidget* setupToolBox() const = 0;
+    virtual QWidget* setupTabWidget() const = 0;
+    virtual QWidget* setupColumnView() const = 0;
 };
 
 #endif
@@ -88,6 +94,10 @@ public:
 #define EvidenceInterface_iid "wombat.forensics.EvidenceInterface"
 
 Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
+
+#define BasicToolsInterface_iid "wombat.forensics.BasicToolsInterface"
+
+Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)
 
 /*
 class BrushInterface

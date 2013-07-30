@@ -12,26 +12,28 @@
 #include <QtWidgets>
 #include <QFileDialog>
 
-class BasicTools : public QObject, public EvidenceInterface
+class BasicTools : public QObject, public EvidenceInterface, public BasicToolsInterface
 {
     Q_OBJECT
 #if QT_VERSION >= 0x050000
     Q_PLUGIN_METADATA(IID "wombat.forensics.EvidenceInterface" FILE "BasicTools.json")
 #endif // QT_VERSION >= 0x050000
-    Q_INTERFACES(EvidenceInterface)
+    Q_INTERFACES(EvidenceInterface BasicToolsInterface)
     
 public:
     //Evidence Interface
     QStringList evidenceActions() const;
-    QStringList toolboxViews() const;
     QStringList evidenceActionIcons() const;
+
+    void addEvidence(int currentCaseID);
+    void remEvidence(int currentCaseID);
+    QStringList toolboxViews() const;
     QStringList evidenceToolboxIcons() const;
+
     QWidget* setupToolBox() const;
     QWidget* setupTabWidget() const;
     QWidget* setupColumnView() const;
 
-    void addEvidence(int currentCaseID);
-    void remEvidence(int currentCaseID);
 private:
     sqlite3_stmt *sqlStatement;
     int currentcaseid;

@@ -72,6 +72,7 @@ void WombatForensics::loadPlugins()
 
 void WombatForensics::populateActions(QObject *plugin)
 {
+
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
     if (iEvidence)
     {
@@ -97,10 +98,10 @@ void WombatForensics::populateActions(QObject *plugin)
 
 void WombatForensics::populateToolBox(QObject *plugin)
 {
-    EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
-    if (iEvidence)
+    BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
+    if(iBasicTools)
     {
-        ui->toolBox->addItem(iEvidence->setupToolBox(), ((QStringList)iEvidence->toolboxViews())[0]);
+        ui->toolBox->addItem(iBasicTools->setupToolBox(), ((QStringList)iBasicTools->toolboxViews())[0]);
     }
 }
 /*
