@@ -18,16 +18,11 @@
 #include <sstream>
 #include <algorithm>
 
+#include "wombattskimagefiletsk.h"
 #include "tsk/framework/extraction/TskAutoImpl.h"
 #include "tsk/framework/utilities/TskUtilities.h"
 #include "tsk/framework/services/TskServices.h"
 #include "tsk/base/tsk_base_i.h"
-
-WombatTskImageFileTsk::WombatTskImageFileTsk() : m_db(TskServices::Instance().getImgDB())
-{
-    m_img_info = NULL;
-    m_images_ptrs = NULL;
-}
 
 /**
  * Utility function to close file system handles.
@@ -41,6 +36,12 @@ void WombatTskImageFileTsk::closeFs(std::pair<uint64_t, TSK_FS_INFO*> pair)
 WombatTskImageFileTsk::~WombatTskImageFileTsk()
 {
     close();
+}
+
+WombatTskImageFileTsk::WombatTskImageFileTsk() : m_db(TskServices::Instance().getImgDB())
+{
+    m_img_info = NULL;
+    m_images_ptrs = NULL;
 }
 
 /*

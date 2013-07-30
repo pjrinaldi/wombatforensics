@@ -14,6 +14,13 @@ WombatForensics::WombatForensics(QWidget *parent) :
     testDir.mkdir("data");
     TskFunctions *testcase = new TskFunctions();
     testcase->SetupTskFramework();
+    wombatCaseData = new WombatCaseDb("WombatData.db");
+    // determine if a cases db exist and if any cases are open, otherwise disable open existing case
+    if(wombatCaseData->ReturnCaseCount() == 0)
+    {
+        ui->actionOpen_Case->setEnabled(FALSE);
+        ui->actionOpen_Case_2->setEnabled(FALSE);
+    }
 }
 
 void WombatForensics::loadPlugins()

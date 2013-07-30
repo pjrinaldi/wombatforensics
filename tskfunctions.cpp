@@ -37,7 +37,8 @@ void TskFunctions::InitializeFrameworkProperties()
 
 void TskFunctions::InitializeFrameworkLog()
 {
-    frameworkLog = std::auto_ptr<Log>(new SqlErrLog());
+    //frameworkLog = std::auto_ptr<Log>(new SqlErrLog());
+    frameworkLog = new SqlErrLog();
     QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
     tmpPath += "/data/";
     tmpPath += "wombatforensics.log";
@@ -59,6 +60,7 @@ void TskFunctions::InitializeFrameworkBlackboard()
 void TskFunctions::InitializeFrameworkDatabase()
 {
     wombatSqlObject = new SqlWrapper("WombatData.db"); // create overall db.
+    wombatSqlObject->SetErrorLog(frameworkLog);
 }
 void TskFunctions::InitializeFrameworkFileManager()
 {

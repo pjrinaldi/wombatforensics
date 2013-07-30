@@ -78,7 +78,14 @@ int WombatTskImgDBSqlite::dropTables()
 int WombatTskImgDBSqlite::initialize()
 {
     sqlObject = new SqlWrapper(dbname); // create the image database
-
+    /*
+    frameworkLog = new SqlErrLog();
+    QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
+    tmpPath += "/data/";
+    tmpPath += "wombatforensics.log";
+    ret = frameworkLog->open(tmpPath.toStdString().c_str()); // modify the logdir path
+     */
+    sqlObject->SetErrorLog(new SqlErrLog());
     map<int, TskArtifactNames> artTypes = TskImgDB::getAllArtifactTypes();
     for (map<int, TskArtifactNames>::iterator it = artTypes.begin(); it != artTypes.end(); it++) {
         addArtifactType(it->first, it->second.typeName, it->second.displayName);
@@ -89,7 +96,7 @@ int WombatTskImgDBSqlite::initialize()
     }
 
     addToolInfo("DBSchema", IMGDB_SCHEMA_VERSION);
-    sqlObject->FinalizeSql();
+    //sqlObject->FinalizeSql();
     sqlObject->CloseSql();
 
     LOGINFO(L"ImgDB Created.");
@@ -138,21 +145,23 @@ int WombatTskImgDBSqlite::open()
 
 int WombatTskImgDBSqlite::addToolInfo(const char* name, const char* version)
 {
-    mainSqlObject->PrepSql();
-    if(mainSqlObject->PrepareSql("INSERT INTO db_info (name, version) VALUES(?, ?);") == SQLITE_OK)
+    sqlObject->PrepSql();
+    sqlObject->ClearBindings();
+    sqlObject->ResetSql();
+    if(sqlObject->PrepareSql("INSERT INTO db_info (name, version) VALUES(?, ?);") == SQLITE_OK)
     {
-        mainSqlObject->BindValue(1, name);
-        mainSqlObject->BindValue(2, version);
-        mainSqlObject->StepSql();
+        sqlObject->BindValue(1, name);
+        sqlObject->BindValue(2, version);
+        sqlObject->StepSql();
     }
     else
     {
-        mainSqlObject->DisplayError("15.3", "Sql Error: ", "TskImgDBSqlite::addToolInfo - Error adding data to db_info table.");
-        mainSqlObject->FinalizeSql();
+        sqlObject->DisplayError("15.3", "Sql Error: ", "TskImgDBSqlite::addToolInfo - Error adding data to db_info table.");
+        sqlObject->FinalizeSql();
         return 1;
 
     }
-    mainSqlObject->FinalizeSql();
+    sqlObject->FinalizeSql();
 
    return 0;
 }
@@ -3022,37 +3031,38 @@ TskBlackboardArtifact WombatTskImgDBSqlite::createBlackboardArtifact(uint64_t fi
  */
 void WombatTskImgDBSqlite::addArtifactType(int typeID, string artifactTypeName, string displayName)
 {
-    mainSqlObject->PrepSql();
-    if(mainSqlObject->PrepareSql("SELECT * FROM blackboard_artifact_types WHERE type_name = ?;") == SQLITE_OK)
+    //sqlObject->PrepSql();
+    //sqlObject->ResetSql();
+    if(sqlObject->PrepareSql("SELECT * FROM blackboard_artifact_types WHERE type_name = ?") == SQLITE_OK)
     {
-        mainSqlObject->BindValue(1, artifactTypeName.c_str());
-        if(!(mainSqlObject->StepSql() == SQLITE_ROW))
+        sqlObject->BindValue(1, artifactTypeName.c_str());
+        if(!(sqlObject->StepSql() == SQLITE_ROW))
         {
-            mainSqlObject->PrepSql();
-            if(mainSqlObject->PrepareSql("INSERT INTO blackboard_artifact_types (artifact_type_id, type_name, display_name) VALUES (?, ?, ?);") == SQLITE_OK)
+            sqlObject->PrepSql();
+            if(sqlObject->PrepareSql("INSERT INTO blackboard_artifact_types (artifact_type_id, type_name, display_name) VALUES (?, ?, ?);") == SQLITE_OK)
             {
-                mainSqlObject->BindValue(1, typeID);
-                mainSqlObject->BindValue(2, artifactTypeName.c_str());
-                mainSqlObject->BindValue(3, displayName.c_str());
-                if(!(mainSqlObject->StepSql() == SQLITE_DONE))
+                sqlObject->BindValue(1, typeID);
+                sqlObject->BindValue(2, artifactTypeName.c_str());
+                sqlObject->BindValue(3, displayName.c_str());
+                if(!(sqlObject->StepSql() == SQLITE_DONE))
                 {
-                    mainSqlObject->DisplayError("15.68", "Sql Error: ", "WombatTskImgDBSqlite::addArtifactType - Error adding data to blackboard table.");
-                    mainSqlObject->FinalizeSql();
+                    sqlObject->DisplayError("15.68", "Sql Error: ", "WombatTskImgDBSqlite::addArtifactType - Error adding data to blackboard table.");
+                    sqlObject->FinalizeSql();
                     throw TskException("WombatTskImgDBSqlite::addArtifactType - Artifact type insert failed");
                 }
             }
         }
         else
         {
-            mainSqlObject->FinalizeSql();
-            throw TskException("WombatTskImgDBSqlite::addArtifactType - Artifact type with that name already exists");
+            //sqlObject->FinalizeSql();
+            //throw TskException("WombatTskImgDBSqlite::addArtifactType - Artifact type with that name already exists");
         }
-        mainSqlObject->FinalizeSql();
+        sqlObject->FinalizeSql();
     }
     else
     {
-        mainSqlObject->DisplayError("15.69", "Sql Error: ", "WombatTskImgDBSqlite::addArtifactType - Error adding data to blackboard table.");
-        mainSqlObject->FinalizeSql();
+        sqlObject->DisplayError("15.69", "Sql Error: ", "WombatTskImgDBSqlite::addArtifactType - Error adding data to blackboard table.");
+        sqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::addArtifactType - Insert failed");
     }
 }
@@ -3065,37 +3075,37 @@ void WombatTskImgDBSqlite::addArtifactType(int typeID, string artifactTypeName, 
  */
 void WombatTskImgDBSqlite::addAttributeType(int typeID, string attributeTypeName, string displayName)
 {
-    mainSqlObject->PrepSql();
-    if(mainSqlObject->PrepareSql("SELECT * FROM blackboard_attribute_types WHERE type_name = ?;") == SQLITE_OK)
+    sqlObject->PrepSql();
+    if(sqlObject->PrepareSql("SELECT * FROM blackboard_attribute_types WHERE type_name = ?;") == SQLITE_OK)
     {
-        mainSqlObject->BindValue(1, attributeTypeName.c_str());
-        if(!(mainSqlObject->StepSql() == SQLITE_ROW))
+        sqlObject->BindValue(1, attributeTypeName.c_str());
+        if(!(sqlObject->StepSql() == SQLITE_ROW))
         {
-            mainSqlObject->PrepSql();
-            if(mainSqlObject->PrepareSql("INSERT INTO blackboard_attribute_types (attribute_type_id, type_name, display_name) VALUES (?, ?, ?);") == SQLITE_OK)
+            sqlObject->PrepSql();
+            if(sqlObject->PrepareSql("INSERT INTO blackboard_attribute_types (attribute_type_id, type_name, display_name) VALUES (?, ?, ?);") == SQLITE_OK)
             {
-                mainSqlObject->BindValue(1, typeID);
-                mainSqlObject->BindValue(2, attributeTypeName.c_str());
-                mainSqlObject->BindValue(3, displayName.c_str());
-                if(!(mainSqlObject->StepSql() == SQLITE_DONE))
+                sqlObject->BindValue(1, typeID);
+                sqlObject->BindValue(2, attributeTypeName.c_str());
+                sqlObject->BindValue(3, displayName.c_str());
+                if(!(sqlObject->StepSql() == SQLITE_DONE))
                 {
-                    mainSqlObject->DisplayError("15.71", "Sql Error: ", "WombatTskImgDBSqlite::addAttributeType - Error adding data to blackboard table.");
-                    mainSqlObject->FinalizeSql();
+                    sqlObject->DisplayError("15.71", "Sql Error: ", "WombatTskImgDBSqlite::addAttributeType - Error adding data to blackboard table.");
+                    sqlObject->FinalizeSql();
                     throw TskException("WombatTskImgDBSqlite::addAttributeType - Attribute type insert failed");
                 }
             }
-            mainSqlObject->FinalizeSql();
+            sqlObject->FinalizeSql();
         }
         else
         {
-            mainSqlObject->FinalizeSql();
-            throw TskException("WombatTskImgDBSqlite::addAttributeType - Attribute type with that name already exists");
+            //sqlObject->FinalizeSql();
+            //throw TskException("WombatTskImgDBSqlite::addAttributeType - Attribute type with that name already exists");
         }
     }
     else
     {
-        mainSqlObject->DisplayError("15.73", "Sql Error: ", "WombatTskImgDBSqlite::addAttributeType - Error adding data to blackboard table");
-        mainSqlObject->FinalizeSql();
+        sqlObject->DisplayError("15.73", "Sql Error: ", "WombatTskImgDBSqlite::addAttributeType - Error adding data to blackboard table");
+        sqlObject->FinalizeSql();
         throw TskException("WombatTskImgDBSqlite::addAttributeType - Insert failed");
     }
 }

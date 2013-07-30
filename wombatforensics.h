@@ -12,6 +12,7 @@
 
 #include "interfaces.h"
 #include "tskfunctions.h"
+#include "wombatcasedb.h"
 
 namespace Ui {
 class WombatForensics;
@@ -24,7 +25,8 @@ class WombatForensics : public QMainWindow
 public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
-    
+    WombatCaseDb *wombatCaseData;
+
 private slots:
     void alterEvidence();
     void on_actionNew_Case_triggered();
@@ -46,7 +48,6 @@ private:
     int currentcaseid;
     QDir pluginsDir;
     QStringList pluginFileNames;
-
 };
 
 #endif // WOMBATFORENSICS_H

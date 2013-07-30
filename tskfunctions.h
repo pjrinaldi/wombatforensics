@@ -38,11 +38,12 @@ public:
     void InitializeFrameworkBlackboard(void);
     void InitializeFrameworkDatabase(void);
     void InitializeFrameworkFileManager(void);
+    SqlWrapper *wombatSqlObject;
 
     int ret;
     //std::auto_ptr<TskImgDB> frameworkDatabase;
-    std::auto_ptr<Log> frameworkLog;
-    SqlWrapper *wombatSqlObject;
+    //std::auto_ptr<Log> frameworkLog;
+    SqlErrLog *frameworkLog;
 
 };
 

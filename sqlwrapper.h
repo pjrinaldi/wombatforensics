@@ -43,6 +43,8 @@ public:
     void PrepSql(void);
     void CloseSql(void);
     sqlite3* ReturnSqlDB(void);
+    //void SetErrorLog(std::auto_ptr<Log> *errLog);
+    void SetErrorLog(SqlErrLog *errlog);
     void DisplayError(const char* errorNumber, const char* errorType, const char* errorValue);
 
 private:
@@ -66,6 +68,8 @@ private:
     sqlite3_int64 returnint64;
     QString tmpstring;
     QDir appDir;
+    //std::auto_ptr<Log> *errlog;
+    SqlErrLog *errlog;
 
 };
 

@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     sqlwrapper.cpp \
     sqlerrlog.cpp \
     wombattskimgdbsqlite.cpp \
-    wombattskimagefiletsk.cpp
+    wombattskimagefiletsk.cpp \
+    wombatcasedb.cpp
 
 HEADERS  += wombatforensics.h \
             interfaces.h \
@@ -27,7 +28,8 @@ HEADERS  += wombatforensics.h \
     sqlwrapper.h \
     sqlerrlog.h \
     wombattskimgdbsqlite.h \
-    wombattskimagefiletsk.h
+    wombattskimagefiletsk.h \
+    wombatcasedb.h
 
 # LIBS    =   -Wl,-Bstatic -ltskframework -lewf -ltsk -lsqlite3 -Lplugins -lbasictools
 LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins -lbasictools

@@ -3,6 +3,7 @@
 
 #include <interfaces.h>
 #include "wombattskimgdbsqlite.h"
+#include "wombattskimagefiletsk.h"
 #include "tsk/framework/services/TskSchedulerQueue.h"
 #include "tsk/framework/file/TskFileManagerImpl.h"
 #include <QStringList>

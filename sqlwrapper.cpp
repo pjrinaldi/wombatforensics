@@ -102,16 +102,16 @@ SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, QString dbName) // open to wr
 {
         sqldb = NULL;
         sqlstatement = sqlStatement;
-        //char* sqlErrMsg;
+        char* sqlErrMsg;
         int     sqlValue;
-        //sqlErrMsg = 0;
+        sqlErrMsg = 0;
         QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
         tmpPath += "/data/";
         tmpPath += dbName;
         sqlValue = sqlite3_open(tmpPath.toStdString().c_str(), &sqldb); // opendb
         if(sqlValue != 0)
             DisplayError("1.0", "OPEN", sqlite3_errmsg(sqldb));
-        //sqlite3_free(sqlErrMsg);
+        sqlite3_free(sqlErrMsg);
 }
 SqlWrapper::~SqlWrapper(void)
 {
@@ -306,9 +306,9 @@ void SqlWrapper::FinalizeSql(void)
 }
 void SqlWrapper::PrepSql(void)
 {
-    FinalizeSql();
-    ResetSql();
-    ClearBindings();
+    //ResetSql();
+    //ClearBindings();
+    //FinalizeSql();
 }
 
 void SqlWrapper::CloseSql(void)
@@ -325,6 +325,11 @@ sqlite3* SqlWrapper::ReturnSqlDB(void)
 {
         return sqldb;
 }
+void SqlWrapper::SetErrorLog(SqlErrLog *errLog)
+{
+    errlog = errLog;
+}
+
 void SqlWrapper::DisplayError(const char* errorNumber, const char* errorType, const char* errorValue)
 {
         QString tmpString = errorNumber;
@@ -333,7 +338,7 @@ void SqlWrapper::DisplayError(const char* errorNumber, const char* errorType, co
         tmpString += errorType;
         tmpString += " Returned ";
         tmpString += errorValue;
-        LOGERROR(tmpString.toStdString().c_str());
+        errlog->log(SqlErrLog::Error, tmpString.toStdString().c_str());
         //fprintf(stderr, tmpString.toStdString().c_str());
         //ealert = new ErrorAlert(tmpString);
         //ealert->Launch();
