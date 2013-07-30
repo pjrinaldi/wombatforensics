@@ -29,9 +29,6 @@ WombatForensics::WombatForensics(QWidget *parent) :
         fprintf(stderr, "Case count is < 0.");
     }
     loadPlugins();
-    //wInstance->set;
-    //TskFunctions *testcase = new TskFunctions();
-    //testcase->SetupTskFramework();
 }
 
 void WombatForensics::loadPlugins()
@@ -62,12 +59,6 @@ void WombatForensics::loadPlugins()
         }
     }
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
-    // enable menu's here
-    /*
-        brushMenu->setEnabled(!brushActionGroup->actions().isEmpty());
-        shapesMenu->setEnabled(!shapesMenu->actions().isEmpty());
-        filterMenu->setEnabled(!filterMenu->actions().isEmpty());
-     */
 }
 
 void WombatForensics::populateActions(QObject *plugin)
@@ -77,23 +68,7 @@ void WombatForensics::populateActions(QObject *plugin)
     if (iEvidence)
     {
         addActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(alterEvidence()));
-        //addToMenu(plugin, iEvidence->evidenceMenuActions(), ui->menuEvidence, SLOT(alterEvidence()));
-        //addToToolbox(plugin, iEvidence->evidenceToolbarActions(), iEvidence->evidenceToolbarIcons(), ui->mainToolBar, SLOT(alterEvidence()));
     }
-    /*
-        BrushInterface *iBrush = qobject_cast<BrushInterface *>(plugin);
-        if (iBrush)
-            addToMenu(plugin, iBrush->brushes(), brushMenu, SLOT(changeBrush()),
-                      brushActionGroup);
-
-        ShapeInterface *iShape = qobject_cast<ShapeInterface *>(plugin);
-        if (iShape)
-            addToMenu(plugin, iShape->shapes(), shapesMenu, SLOT(insertShape()));
-
-        FilterInterface *iFilter = qobject_cast<FilterInterface *>(plugin);
-        if (iFilter)
-            addToMenu(plugin, iFilter->filters(), filterMenu, SLOT(applyFilter()));
-     */
 }
 
 void WombatForensics::populateToolBox(QObject *plugin)
@@ -104,23 +79,7 @@ void WombatForensics::populateToolBox(QObject *plugin)
         ui->toolBox->addItem(iBasicTools->setupToolBox(), ((QStringList)iBasicTools->toolboxViews())[0]);
     }
 }
-/*
-void WombatForensics::addToMenu(QObject *plugin, const QStringList &texts, QMenu *menu, const char *member, QActionGroup *actionGroup)
-{
-    foreach (QString text, texts)
-    {
-        QAction *action = new QAction(text, plugin);
-        connect(action, SIGNAL(triggered()), this, member);
-        menu->addAction(action);
 
-        if (actionGroup)
-        {
-            action->setCheckable(true);
-            actionGroup->addAction(action);
-        }
-    }
-}
-*/
 void WombatForensics::addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
 {
     for(int i = 0; i < texts.count(); i++)
@@ -144,24 +103,6 @@ void WombatForensics::addActions(QObject *plugin, const QStringList &texts, cons
     }
 }
 
-/*
-void WombatForensics::addToToolBar(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, const char *member, QActionGroup *actionGroup)
-{
-    for(int i = 0; i < texts.count(); i++)
-    {
-        QAction *action = new QAction(texts[i], plugin);
-        action->setIcon(QIcon(icons[i]));
-        connect(action, SIGNAL(triggered()), this, member);
-        toolbar->addAction(action);
-
-        if(actionGroup)
-        {
-            action->setCheckable(true);
-            actionGroup->addAction(action);
-        }
-    }
-}
-*/
 void WombatForensics::alterEvidence()
 {
     QAction *action = qobject_cast<QAction *>(sender());
@@ -170,14 +111,6 @@ void WombatForensics::alterEvidence()
         iEvidence->addEvidence(currentcaseid);
     else if(action->text() == tr("Remove Evidence"))
         iEvidence->remEvidence(currentcaseid);
-    /*
-    FilterInterface *iFilter =
-            qobject_cast<FilterInterface *>(action->parent());
-
-    const QImage image = iFilter->filterImage(action->text(), paintArea->image(),
-                                              this);
-    paintArea->setImage(image);
-     */
 }
 
 WombatForensics::~WombatForensics()

@@ -15,7 +15,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         wombatforensics.cpp \
-    tskfunctions.cpp \
     sqlwrapper.cpp \
     sqlerrlog.cpp \
     wombattskimgdbsqlite.cpp \
@@ -24,7 +23,6 @@ SOURCES += main.cpp\
 
 HEADERS  += wombatforensics.h \
             interfaces.h \
-    tskfunctions.h \
     sqlwrapper.h \
     sqlerrlog.h \
     wombattskimgdbsqlite.h \
@@ -34,8 +32,7 @@ HEADERS  += wombatforensics.h \
 # LIBS    =   -Wl,-Bstatic -ltskframework -lewf -ltsk -lsqlite3 -Lplugins -lbasictools
 LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins -lbasictools
 
-FORMS    += wombatforensics.ui \
-    NewCaseDialog.ui
+FORMS    += wombatforensics.ui
 
 # QT += widgets
 

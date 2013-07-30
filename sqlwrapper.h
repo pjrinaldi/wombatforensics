@@ -6,12 +6,12 @@
 class SqlWrapper
 {
 public:
-    SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName);
-    SqlWrapper(QString dbName);
-    SqlWrapper(sqlite3_stmt *sqlStatement, QString dbName);
+    //SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName);
+    //SqlWrapper(QString dbName);
+    //SqlWrapper(sqlite3_stmt *sqlStatement, QString dbName);
     //SqlWrapper();
     ~SqlWrapper();
-
+    int OpenSql()
     int PrepareSql(const char *sqlQuery);
     //void PrepareSql(const char* sqlQuery);
     void BindValue(int bindPlace, int bindValue);

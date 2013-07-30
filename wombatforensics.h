@@ -12,7 +12,6 @@
 #include <QMessageBox>
 
 #include "interfaces.h"
-#include "tskfunctions.h"
 #include "wombatcasedb.h"
 
 namespace Ui {
@@ -39,13 +38,7 @@ private:
     void loadPlugins();
     void populateActions(QObject *plugin);
     void populateToolBox(QObject *plugin);
-    //void populateToolBar(QObject *plugin);
-
-    //void addToMenu(QObject *plugin, const QStringList &texts, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
-    //void addToToolbox(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, const char *member, QActionGroup *actionGroup = 0);
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
-
-    void makeDir(const char *dir);
 
     sqlite3_stmt *sqlStatement;
     int currentcaseid;
