@@ -10,7 +10,6 @@ WombatForensics::WombatForensics(QWidget *parent) :
 {
     ui->setupUi(this);
     currentcaseid = -1;
-    //loadPlugins();
     QDir testDir = QDir(qApp->applicationDirPath());
     testDir.mkdir("data");
     wombatCaseData = new WombatCaseDb("WombatData.db"); // create db.
@@ -28,10 +27,10 @@ WombatForensics::WombatForensics(QWidget *parent) :
     {
         fprintf(stderr, "Case count is < 0.");
     }
+    loadPlugins();
     //wInstance->set;
     //TskFunctions *testcase = new TskFunctions();
     //testcase->SetupTskFramework();
-    // determine if a cases db exist and if any cases are open, otherwise disable open existing case
 }
 
 void WombatForensics::loadPlugins()
