@@ -40,7 +40,6 @@ private:
     void populateToolBox(QObject *plugin);
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
 
-    sqlite3_stmt *sqlStatement;
     int currentcaseid;
     QDir pluginsDir;
     QStringList pluginFileNames;

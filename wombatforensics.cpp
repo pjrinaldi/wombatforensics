@@ -3,32 +3,43 @@
 #include <QPluginLoader>
 
 // static plugins are always available, dynamic are not.
-
 WombatForensics::WombatForensics(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::WombatForensics)
 {
     Q_INIT_RESOURCE(basictools);
     ui->setupUi(this);
+    wombatCaseData = new WombatCaseDb();
     currentcaseid = -1;
     QDir testDir = QDir(qApp->applicationDirPath());
     testDir.mkdir("data");
     QString tmpPath = testDir.currentPath();
     tmpPath += "/data/WombatData.db";
-    wombatCaseData = new WombatCaseDb(tmpPath); // create db.
-    if(wombatCaseData->ReturnCaseCount() == 0)
+    bool doesFileExist = wombatCaseData->FileExists(tmpPath.toStdString());
+    if(!doesFileExist)
     {
-        ui->actionOpen_Case->setEnabled(false);
-        ui->actionOpen_Case_2->setEnabled(false);
-    }
-    else if(wombatCaseData->ReturnCaseCount() > 0)
-    {
-        ui->actionOpen_Case->setEnabled(true);
-        ui->actionOpen_Case_2->setEnabled(true);
-    }
-    else
-    {
-        fprintf(stderr, "Case count is < 0.");
+        const char* errstring = wombatCaseData->CreateCaseDB(tmpPath);
+        if(strcmp(errstring, "") == 0)
+        {
+            if(wombatCaseData->ReturnCaseCount() == 0)
+            {
+                ui->actionOpen_Case->setEnabled(false);
+                ui->actionOpen_Case_2->setEnabled(false);
+            }
+            else if(wombatCaseData->ReturnCaseCount() > 0)
+            {
+                ui->actionOpen_Case->setEnabled(true);
+                ui->actionOpen_Case_2->setEnabled(true);
+            }
+            else
+            {
+                wombatCaseData->DisplayError(this, "1.0", "File Error", "SqlDB does not exist/could not be created.");
+            }
+        }
+        else
+        {
+            wombatCaseData->DisplayError(this, "1.0", "File Error", errstring);
+        }
     }
     loadPlugins();
 }
