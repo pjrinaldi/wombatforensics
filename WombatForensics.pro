@@ -8,8 +8,7 @@ QT       += core gui widgets
 
 TARGET = WombatForensics
 TEMPLATE = app
-DESTDIR = ./build
-target.path = ./build
+DESTDIR = ../wombatforensics-output/debug/build
 CONFIG += debug
 SOURCES += main.cpp wombatforensics.cpp wombatcasedb.cpp
 

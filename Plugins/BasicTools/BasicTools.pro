@@ -13,4 +13,4 @@ INCLUDEPATH += .
 HEADERS += basictools.h ../../interfaces.h
 SOURCES += basictools.cpp
 RESOURCES += basictools.qrc
-DESTDIR = ../../build/plugins
+DESTDIR = ../../../wombatforensics-output/debug/build/plugins
