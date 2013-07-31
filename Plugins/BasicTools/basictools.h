@@ -9,10 +9,11 @@
 #include <QStringList>
 #include <QFileDialog>
 
-class BasicTools : public QObject, public EvidenceInterface, public BasicToolsInterface, public TskFrameworkInterface
+class BasicTools : public QObject, public BasicToolsInterface
 {
-    Q_PLUGIN_METADATA(IID "wombat.forensics.BasicToolsInterface" FILE "BasicTools.json")
-    Q_INTERFACES(EvidenceInterface BasicToolsInterface TskFrameworkInterface)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "BasicToolsInterface" FILE "BasicTools.json")
+    Q_INTERFACES(BasicToolsInterface)
     
 public:
     //Evidence Interface Functions

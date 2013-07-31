@@ -7,6 +7,7 @@ QT += core gui widgets
 CONFIG += plugin
 CONFIG += debug
 TARGET = basictools
+#TARGET = $$qtLibraryTarget(BasicToolsInterface)
 INCLUDEPATH += .
 
 # Input
@@ -14,3 +15,6 @@ HEADERS += basictools.h ../../interfaces.h
 SOURCES += basictools.cpp
 RESOURCES += basictools.qrc
 DESTDIR = ../../../wombatforensics-output/debug/build/plugins
+
+OTHER_FILES += \
+    BasicTools.json

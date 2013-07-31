@@ -43,24 +43,22 @@
 
 #include <QtPlugin>
 
+class QStringList;
+class QObject;
+class QWidget;
 
-class EvidenceInterface
+
+
+class BasicToolsInterface
 {
 public:
-    virtual ~EvidenceInterface() {}
+    virtual ~BasicToolsInterface() {}
 
     virtual QStringList evidenceActions() const = 0;
     virtual QStringList evidenceActionIcons() const = 0;
 
     virtual void addEvidence(int currentCaseID) = 0;
     virtual void remEvidence(int currentCaseID) = 0;
-
-};
-
-class BasicToolsInterface
-{
-public:
-    virtual ~BasicToolsInterface() {}
 
     virtual QStringList toolboxViews() const = 0;
     virtual QStringList evidenceToolboxIcons() const = 0;
@@ -70,22 +68,9 @@ public:
     virtual QWidget* setupColumnView() const = 0;
 };
 
-class TskFrameworkInterface
-{
-public:
-    virtual ~TskFrameworkInterface() {}
-};
-
 #endif
 
-#define EvidenceInterface_iid "wombat.forensics.EvidenceInterface"
 
-Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
-
-#define BasicToolsInterface_iid "wombat.forensics.BasicToolsInterface"
+#define BasicToolsInterface_iid "BasicToolsInterface"
 
 Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)
-
-#define TskFrameworkInterface_iid "wombat.forensics.TskFrameworkInterface"
-
-Q_DECLARE_INTERFACE(TskFrameworkInterface, TskFrameworkInterface_iid)

@@ -42,7 +42,7 @@ WombatForensics::WombatForensics(QWidget *parent) :
     {
         wombatCaseData->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
-    pluginFileNames = locatePlugins();
+    //pluginFileNames = locatePlugins();
     loadPlugin("/home/pasquale/Projects/wombatforensics-output/wombatforensics-output/debug/build/plugins/libbasictools.so");
 
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
@@ -91,9 +91,11 @@ void WombatForensics::loadPlugin(QString fileName)
 */
     QPluginLoader loader(fileName);
     QObject* plugin = loader.instance();
+    fprintf(stderr, "%s\n", fileName.toStdString().c_str());
+    fprintf(stderr, "%s\n", loader.errorString().toStdString().c_str());
     if (plugin)
     {
-        populateActions(plugin);
+        //populateActions(plugin);
         //pluginFileNames += fileName;
         populateToolBox(plugin);
     }
@@ -101,12 +103,13 @@ void WombatForensics::loadPlugin(QString fileName)
 
 void WombatForensics::populateActions(QObject *plugin)
 {
-
+/*
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
     if (iEvidence)
     {
         addActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(alterEvidence()));
     }
+    */
 }
 
 void WombatForensics::populateToolBox(QObject *plugin)
@@ -144,12 +147,14 @@ void WombatForensics::addActions(QObject *plugin, const QStringList &texts, cons
 
 void WombatForensics::alterEvidence()
 {
+    /*
     QAction *action = qobject_cast<QAction *>(sender());
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
         iEvidence->addEvidence(currentcaseid);
     else if(action->text() == tr("Remove Evidence"))
         iEvidence->remEvidence(currentcaseid);
+        */
 }
 
 WombatForensics::~WombatForensics()
