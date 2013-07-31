@@ -13,16 +13,18 @@ WombatForensics::WombatForensics(QWidget *parent) :
     currentcaseid = -1;
     QDir testDir = QDir(qApp->applicationDirPath());
     testDir.mkdir("data");
-    wombatCaseData = new WombatCaseDb("WombatData.db"); // create db.
+    QString tmpPath = testDir.currentPath();
+    tmpPath += "/data/WombatData.db";
+    wombatCaseData = new WombatCaseDb(tmpPath); // create db.
     if(wombatCaseData->ReturnCaseCount() == 0)
     {
-        ui->actionOpen_Case->setEnabled(FALSE);
-        ui->actionOpen_Case_2->setEnabled(FALSE);
+        ui->actionOpen_Case->setEnabled(false);
+        ui->actionOpen_Case_2->setEnabled(false);
     }
     else if(wombatCaseData->ReturnCaseCount() > 0)
     {
-        ui->actionOpen_Case->setEnabled(TRUE);
-        ui->actionOpen_Case_2->setEnabled(TRUE);
+        ui->actionOpen_Case->setEnabled(true);
+        ui->actionOpen_Case_2->setEnabled(true);
     }
     else
     {
@@ -133,13 +135,7 @@ void WombatForensics::on_actionNew_Case_triggered()
         QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
         if(ok && !text.isEmpty())
         {
-            SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.1", "WombatData.db");
-            sqlObject->PrepareSql("INSERT INTO cases (casename) VALUES(?);");
-            sqlObject->BindValue(1, text.toStdString().c_str());
-            sqlObject->StepSql();
-            currentcaseid = sqlObject->ReturnLastInsertRowID();
-            sqlObject->FinalizeSql();
-            sqlObject->CloseSql();
+            currentcaseid = wombatCaseData->InsertCase(text);
 
             QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += text;
@@ -147,8 +143,8 @@ void WombatForensics::on_actionNew_Case_triggered()
 
             if(wombatCaseData->ReturnCaseCount() > 0)
             {
-                ui->actionOpen_Case->setEnabled(TRUE);
-                ui->actionOpen_Case_2->setEnabled(TRUE);
+                ui->actionOpen_Case->setEnabled(true);
+                ui->actionOpen_Case_2->setEnabled(true);
             }
         }
     }
@@ -168,7 +164,8 @@ void WombatForensics::on_actionOpen_Case_triggered()
         // open case here
         QStringList caseList;
         caseList.clear();
-        SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.2", "WombatData.db");
+        /*
+        //SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.2", "WombatData.db");
         sqlObject->PrepareSql("SELECT casename FROM cases ORDER BY caseid;");
         while(sqlObject->StepSql() == SQLITE_ROW) // step through the sql
         {
@@ -176,20 +173,21 @@ void WombatForensics::on_actionOpen_Case_triggered()
         }
         sqlObject->FinalizeSql();
         sqlObject->CloseSql();
-
+        */
         bool ok;
         QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
         if(ok && !item.isEmpty())
         {
             // open case here (store case id)
-            SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.3", "WombatData.db");
+            /*
+            //SqlWrapper *sqlObject = new SqlWrapper(sqlStatement, "2.3", "WombatData.db");
             sqlObject->PrepareSql("SELECT caseid FROM cases WHERE casename = ?;");
             sqlObject->BindValue(1, item.toStdString().c_str());
             sqlObject->StepSql();
             currentcaseid = sqlObject->ReturnInt(0);
             sqlObject->FinalizeSql();
             sqlObject->CloseSql();
-
+            */
             QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += item;
             this->setWindowTitle(tmpTitle);

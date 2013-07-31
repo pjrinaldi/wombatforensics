@@ -1,7 +1,16 @@
 #ifndef SQLWRAPPER_H
 #define SQLWRAPPER_H
 
-#include "sqlerrlog.h"
+#include "sqlite3.h"
+#include <QMessageBox>
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <vector>
+#include <QtWidgets>
+#include <QDir>
 
 class SqlWrapper
 {
@@ -9,11 +18,12 @@ public:
     //SqlWrapper(sqlite3_stmt* sqlStatement, const char* errorNumber, QString dbName);
     //SqlWrapper(QString dbName);
     //SqlWrapper(sqlite3_stmt *sqlStatement, QString dbName);
-    //SqlWrapper();
+    SqlWrapper(QString dbName, sqlite3 *sqlDB);
     ~SqlWrapper();
-    int OpenSql()
-    int PrepareSql(const char *sqlQuery);
-    //void PrepareSql(const char* sqlQuery);
+    void OpenCreateSql(QString sqldbPath, sqlite3 *sqlDB);
+    std::vector<const char *> CreateTableShema(QString dbName);
+    void OpenSql(QString sqldbPath, sqlite3 *sqlDB);
+    void PrepareSql(const char *sqlQuery);
     void BindValue(int bindPlace, int bindValue);
     void BindValue(int bindPlace, double bindValue);
     void BindValue(int bindPlace, sqlite3_int64 bindValue);
@@ -31,7 +41,7 @@ public:
     int ReturnTable(char ***queryResults, int numRows, int numColumns, char **errMsg);
     int SetBusyHandler(int busyHandler(void *, int));
     int FileControl(int chunkSize);
-    int StepSql(void);
+    void StepSql(void);
     int ExecuteSql(char **errmsg);
     int ReturnColumnType(int returnPlace);
     void ClearBindings(void);
@@ -43,14 +53,16 @@ public:
     void PrepSql(void);
     void CloseSql(void);
     sqlite3* ReturnSqlDB(void);
-    //void SetErrorLog(std::auto_ptr<Log> *errLog);
-    //void SetErrorLog(SqlErrLog *errlog);
-    void DisplayError(const char* errorNumber, const char* errorType, const char* errorValue);
+    void DisplayError(QString errorNumber, QString errorType, QString errorValue);
+    void DisplayError(QWidget* parent, QString errorNumber, QString errorType, QString errorValue);
+    bool FileExists(const std::string& filename);
+    sqlite3* sqldb;
+    QString dbname;
 
 private:
-    sqlite3* sqldb;
+    QString sqldbpath;
     const char* sqlquery;
-    const char* errornumber;
+    QString errornumber;
     const char* bindstring;
     const char* returnstring;
     const void* bindblob;
@@ -68,8 +80,8 @@ private:
     sqlite3_int64 returnint64;
     QString tmpstring;
     QDir appDir;
-    //std::auto_ptr<Log> *errlog;
-    //SqlErrLog *errlog;
+    std::vector<const char*> wombatTableSchema;
+    std::vector<const char*> imageTableSchema;
 
 };
 

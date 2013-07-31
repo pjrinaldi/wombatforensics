@@ -1,51 +1,104 @@
 #include "sqlwrapper.h"
 
-//SqlWrapper::SqlWrapper()
-SqlWrapper::SqlWrapper(QString dbName) // open to create db if it doesn't exist
+std::vector<const char *> SqlWrapper::CreateTableShema(QString dbName)
 {
-    sqldb = NULL;
-    int sqlValue = -1;
-    char* sqlErrMsg;
-    const char* createString;
-    vector<const char*> createStrings;
     if(dbName == "WombatData.db")
     {
-        createStrings.clear();
-        createStrings.push_back("CREATE TABLE log(logid INTEGER PRIMARY KEY, logchannel INTEGER, logmessage TEXT);");
-        createStrings.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, casename TEXT);");
-        createStrings.push_back("CREATE TABLE caseimages(imageid INTEGER PRIMARY KEY, imagefullpath TEXT, imagename TEXT, caseid INTEGER);");
+        wombatTableSchema.clear();
+        wombatTableSchema.push_back("CREATE TABLE log(logid INTEGER PRIMARY KEY, logchannel INTEGER, logmessage TEXT);");
+        wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, casename TEXT);");
+        wombatTableSchema.push_back("CREATE TABLE caseimages(imageid INTEGER PRIMARY KEY, imagefullpath TEXT, imagename TEXT, caseid INTEGER);");
+        wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, settingname TEXT, settingvalue TEXT);");
+
+        return wombatTableSchema;
     }
     else
     {
-        createStrings.clear();
-        createStrings.push_back("PRAGMA page_size=4096;");
-        createStrings.push_back("PRAGMA synchronous=0;");
-        createStrings.push_back("CREATE TABLE db_info(name TEXT PRIMARY KEY, version TEXT);");
-        createStrings.push_back("CREATE TABLE image_info (type INTEGER, ssize INTEGER);");
-        createStrings.push_back("CREATE TABLE image_names (seq INTEGER PRIMARY KEY, name TEXT);");
-        createStrings.push_back("CREATE TABLE vol_info (vol_id INTEGER PRIMARY KEY, sect_start INTEGER NOT NULL, sect_len INTEGER NOT NULL, description TEXT, flags INTEGER);");
-        createStrings.push_back("CREATE TABLE fs_info (fs_id INTEGER PRIMARY KEY, img_byte_offset INTEGER, vol_id INTEGER NOT NULL, fs_type INTEGER, block_size INTEGER, block_count INTEGER, root_inum INTEGER, first_inum INTEGER, last_inum INTEGER);");
-        createStrings.push_back("CREATE TABLE files (file_id INTEGER PRIMARY KEY, type_id INTEGER, name TEXT, par_file_id INTEGER, dir_type INTEGER, meta_type INTEGER, dir_flags INTEGER, meta_flags INTEGER, size INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, full_path TEXT);");
-        createStrings.push_back("CREATE TABLE fs_files (file_id INTEGER PRIMARY KEY, fs_id INTEGER, fs_file_id INTEGER, attr_type INTEGER, attr_id INTEGER);");
-        createStrings.push_back("CREATE TABLE fs_blocks (fs_id INTEGER NOT NULL, file_id INTEGER NOT NULL, seq INTEGER, blk_start INTEGER NOT NULL, blk_len INTEGER NOT NULL);");
-        createStrings.push_back("CREATE TABLE carved_files (file_id INTEGER PRIMARY KEY, vol_id INTEGER);");
-        createStrings.push_back("CREATE TABLE carved_sectors (file_id INTEGER, seq INTEGER, sect_start INTEGER, sect_len INTEGER);");
-        createStrings.push_back("CREATE TABLE derived_files (file_id INTEGER PRIMARY KEY, derivation_details TEXT);");
-        createStrings.push_back("CREATE TABLE alloc_unalloc_map (vol_id INTEGER, unalloc_img_id INTEGER, unalloc_img_sect_start INTEGER, sect_len INTEGER, orig_img_sect_start INTEGER);");
-        createStrings.push_back("CREATE TABLE file_hashes (file_id INTEGER PRIMARY KEY, md5 TEXT, sha1 TEXT, sha2_256 TEXT, sha2_512 TEXT, known INTEGER);");
-        createStrings.push_back("CREATE TABLE modules (module_id INTEGER PRIMARY KEY, name TEXT UNIQUE NOT NULL, description TEXT);");
-        createStrings.push_back("CREATE TABLE module_status (file_id INTEGER, module_id INTEGER, status INTEGER, PRIMARY KEY (file_id, module_id));");
-        createStrings.push_back("CREATE TABLE unalloc_img_status (unalloc_img_id INTEGER PRIMARY KEY, status INTEGER);");
-        createStrings.push_back("CREATE TABLE unused_sectors (file_id INTEGER PRIMARY KEY, sect_start INTEGER, sect_len INTEGER, vol_id INTEGER);");
-        createStrings.push_back("CREATE TABLE blackboard_artifacts (artifact_id INTEGER PRIMARY KEY, obj_id INTEGER NOT NULL, artifact_type_id INTEGER);");
-        createStrings.push_back("CREATE TABLE blackboard_attributes (artifact_id INTEGER NOT NULL, source TEXT, context TEXT, attribute_type_id INTEGER NOT NULL, value_type INTEGER NOT NULL, value_byte BLOB, value_text TEXT, value_int32 INTEGER, value_int64 INTEGER, value_double NUMERIC(20, 10), obj_id INTEGER NOT NULL);");
-        createStrings.push_back("CREATE TABLE blackboard_artifact_types (artifact_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT);");
-        createStrings.push_back("CREATE TABLE blackboard_attribute_types (attribute_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT);");
-        createStrings.push_back("CREATE INDEX attrs_artifact_id ON blackboard_attributes(artifact_id);");
-        createStrings.push_back("CREATE INDEX attrs_attribute_type ON blackboard_attributes(attribute_type_id);");
-        createStrings.push_back("CREATE INDEX attrs_obj_id ON blackboard_attributes(obj_id);");
+        imageTableSchema.clear();
+        imageTableSchema.push_back("PRAGMA page_size=4096;");
+        imageTableSchema.push_back("PRAGMA synchronous=0;");
+        imageTableSchema.push_back("CREATE TABLE db_info(name TEXT PRIMARY KEY, version TEXT);");
+        imageTableSchema.push_back("CREATE TABLE image_info (type INTEGER, ssize INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE image_names (seq INTEGER PRIMARY KEY, name TEXT);");
+        imageTableSchema.push_back("CREATE TABLE vol_info (vol_id INTEGER PRIMARY KEY, sect_start INTEGER NOT NULL, sect_len INTEGER NOT NULL, description TEXT, flags INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE fs_info (fs_id INTEGER PRIMARY KEY, img_byte_offset INTEGER, vol_id INTEGER NOT NULL, fs_type INTEGER, block_size INTEGER, block_count INTEGER, root_inum INTEGER, first_inum INTEGER, last_inum INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE files (file_id INTEGER PRIMARY KEY, type_id INTEGER, name TEXT, par_file_id INTEGER, dir_type INTEGER, meta_type INTEGER, dir_flags INTEGER, meta_flags INTEGER, size INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, full_path TEXT);");
+        imageTableSchema.push_back("CREATE TABLE fs_files (file_id INTEGER PRIMARY KEY, fs_id INTEGER, fs_file_id INTEGER, attr_type INTEGER, attr_id INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE fs_blocks (fs_id INTEGER NOT NULL, file_id INTEGER NOT NULL, seq INTEGER, blk_start INTEGER NOT NULL, blk_len INTEGER NOT NULL);");
+        imageTableSchema.push_back("CREATE TABLE carved_files (file_id INTEGER PRIMARY KEY, vol_id INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE carved_sectors (file_id INTEGER, seq INTEGER, sect_start INTEGER, sect_len INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE derived_files (file_id INTEGER PRIMARY KEY, derivation_details TEXT);");
+        imageTableSchema.push_back("CREATE TABLE alloc_unalloc_map (vol_id INTEGER, unalloc_img_id INTEGER, unalloc_img_sect_start INTEGER, sect_len INTEGER, orig_img_sect_start INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE file_hashes (file_id INTEGER PRIMARY KEY, md5 TEXT, sha1 TEXT, sha2_256 TEXT, sha2_512 TEXT, known INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE modules (module_id INTEGER PRIMARY KEY, name TEXT UNIQUE NOT NULL, description TEXT);");
+        imageTableSchema.push_back("CREATE TABLE module_status (file_id INTEGER, module_id INTEGER, status INTEGER, PRIMARY KEY (file_id, module_id));");
+        imageTableSchema.push_back("CREATE TABLE unalloc_img_status (unalloc_img_id INTEGER PRIMARY KEY, status INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE unused_sectors (file_id INTEGER PRIMARY KEY, sect_start INTEGER, sect_len INTEGER, vol_id INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE blackboard_artifacts (artifact_id INTEGER PRIMARY KEY, obj_id INTEGER NOT NULL, artifact_type_id INTEGER);");
+        imageTableSchema.push_back("CREATE TABLE blackboard_attributes (artifact_id INTEGER NOT NULL, source TEXT, context TEXT, attribute_type_id INTEGER NOT NULL, value_type INTEGER NOT NULL, value_byte BLOB, value_text TEXT, value_int32 INTEGER, value_int64 INTEGER, value_double NUMERIC(20, 10), obj_id INTEGER NOT NULL);");
+        imageTableSchema.push_back("CREATE TABLE blackboard_artifact_types (artifact_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT);");
+        imageTableSchema.push_back("CREATE TABLE blackboard_attribute_types (attribute_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT);");
+        imageTableSchema.push_back("CREATE INDEX attrs_artifact_id ON blackboard_attributes(artifact_id);");
+        imageTableSchema.push_back("CREATE INDEX attrs_attribute_type ON blackboard_attributes(attribute_type_id);");
+        imageTableSchema.push_back("CREATE INDEX attrs_obj_id ON blackboard_attributes(obj_id);");
+
+        return imageTableSchema;
     }
-    sqlErrMsg = 0;
+}
+
+void SqlWrapper::OpenCreateSql(QString sqldbPath, sqlite3* sqlDB)
+{
+    bool doesFileExist = FileExists(sqldbPath.toStdString().c_str());
+    if(!doesFileExist)
+    {
+        QString dbname = sqldbPath.split("/").last();
+        if(sqlite3_open_v2(sqldbPath.toStdString().c_str(), &sqlDB, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL) == SQLITE_OK) // db is created
+        {
+            const char* tblString;
+            std::vector<const char *> tableStrings = CreateTableShema(dbname);
+            foreach(tblString, tableStrings)
+            {
+                PrepareSql(tblString);
+                StepSql();
+                FinalizeSql();
+            }
+            CloseSql();
+        }
+        else
+        {
+            DisplayError("1.1", "OPEN", sqlite3_errmsg(sqlDB));
+            FinalizeSql();
+            CloseSql();
+        }
+    }
+    else
+    {
+        DisplayError("1.0", "OPEN", "File Already Exists.");
+    }
+}
+void SqlWrapper::OpenSql(QString sqldbPath, sqlite3 *sqlDB)
+{
+    int sqlValue = -1;
+    //dbname = sqldbPath;
+    //sqldb = sqlDB;
+    sqlValue = sqlite3_open_v2(sqldbPath.toStdString().c_str(), &sqlDB, SQLITE_OPEN_READWRITE, NULL);
+    if(sqlValue != SQLITE_OK)
+    {
+        DisplayError("1.2", "OPEN", sqlite3_errmsg(sqlDB));
+    }
+}
+
+SqlWrapper::SqlWrapper(QString dbName, sqlite3 *sqlDB)
+{
+    // put stuff here on creation
+    dbname = dbName;
+    sqldb = sqlDB;
+}
+
+/*
+ *
+SqlWrapper::SqlWrapper(QString dbName) // open to create db if it doesn't exist
+{
     QString tmpPath = QDir(QCoreApplication::applicationDirPath()).absolutePath();
     tmpPath += "/data/";
     tmpPath += dbName;
@@ -113,9 +166,11 @@ SqlWrapper::SqlWrapper(sqlite3_stmt* sqlStatement, QString dbName) // open to wr
             DisplayError("1.0", "OPEN", sqlite3_errmsg(sqldb));
         sqlite3_free(sqlErrMsg);
 }
+*/
 SqlWrapper::~SqlWrapper(void)
 {
 }
+/*
 int SqlWrapper::SetBusyHandler(int busyHandler(void *, int))
 {
     return sqlite3_busy_handler(sqldb, busyHandler, sqldb);
@@ -125,22 +180,21 @@ int SqlWrapper::FileControl(int chunkSize)
 {
     return sqlite3_file_control(sqldb, NULL, SQLITE_FCNTL_CHUNK_SIZE, &chunkSize);
 }
-
+*/
+/*
 int SqlWrapper::PrepareSql(const char *sqlQuery)
 {
     sqlquery = sqlQuery;
     return sqlite3_prepare_v2(sqldb, sqlquery, -1, &sqlstatement, NULL);
 }
-/*
+*/
 void SqlWrapper::PrepareSql(const char* sqlQuery)
 {
-        sqlquery = sqlQuery;
-        if(sqlite3_prepare_v2(sqldb, sqlquery, -1, &sqlstatement, NULL) != SQLITE_OK) // sql statement was not prepared
+        if(sqlite3_prepare_v2(sqldb, sqlQuery, -1, &sqlstatement, NULL) != SQLITE_OK) // sql statement was not prepared
         {
                 DisplayError(errornumber, "PREPARE", sqlite3_errmsg(sqldb));
         }
 }
-*/
 void SqlWrapper::BindValue(int bindPlace, int bindValue)
 {
         bindplace = bindPlace;
@@ -243,9 +297,9 @@ sqlite3_int64 SqlWrapper::ReturnLastInsertRowID(void)
 {
         return sqlite3_last_insert_rowid(sqldb);
 }
-int SqlWrapper::StepSql(void)
+void SqlWrapper::StepSql(void)
 {
-        sqlcode = sqlite3_step(sqlstatement);
+        int sqlcode = sqlite3_step(sqlstatement);
         if(sqlcode != SQLITE_ROW && sqlcode != SQLITE_DONE)
         {
                 if(sqlcode == SQLITE_BUSY) DisplayError(errornumber, "STEP", "BUSY");
@@ -253,7 +307,7 @@ int SqlWrapper::StepSql(void)
                 else if(sqlcode == SQLITE_MISUSE) DisplayError(errornumber, "STEP", "MISUSE");
                 else DisplayError(errornumber, "STEP", "OTHER ISSUE");
         }
-        return sqlcode;
+        //return sqlcode;
 }
 
 int SqlWrapper::ExecuteSql(char **errmsg)
@@ -331,16 +385,40 @@ void SqlWrapper::SetErrorLog(SqlErrLog *errLog)
     errlog = errLog;
 }
 */
-void SqlWrapper::DisplayError(const char* errorNumber, const char* errorType, const char* errorValue)
+void SqlWrapper::DisplayError(QWidget* parent, QString errorNumber, QString errorType, QString errorValue)
 {
         QString tmpString = errorNumber;
-        //ErrorAlert* ealert;
         tmpString += ". SqlError: ";
         tmpString += errorType;
         tmpString += " Returned ";
         tmpString += errorValue;
         //errlog->log(SqlErrLog::Error, tmpString.toStdString().c_str());
-        fprintf(stderr, tmpString.toStdString().c_str());
-        //ealert = new ErrorAlert(tmpString);
-        //ealert->Launch();
+        QMessageBox::warning(parent, "Error", tmpString, QMessageBox::Ok);
+}
+void SqlWrapper::DisplayError(QString errorNumber, QString errorType, QString errorValue)
+{
+        QString tmpString = errorNumber;
+        tmpString += ". SqlError: ";
+        tmpString += errorType;
+        tmpString += " Returned ";
+        tmpString += errorValue;
+        //errlog->log(SqlErrLog::Error, tmpString.toStdString().c_str());
+}
+
+// Function: fileExists
+/**
+    Check if a file exists
+@param[in] filename - the name of the file to check
+
+@return    true if the file exists, else false
+
+*/
+bool SqlWrapper::FileExists(const std::string& filename)
+{
+    struct stat buf;
+    if (stat(filename.c_str(), &buf) != -1)
+    {
+        return true;
+    }
+    return false;
 }

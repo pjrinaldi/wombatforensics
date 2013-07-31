@@ -13,6 +13,7 @@
  * @param a_outpath Directory to store the database in. This
  * directory must already exist.
 */
+/*
 WombatTskImgDBSqlite::WombatTskImgDBSqlite(QString dbName)
 {
     m_db = NULL;
@@ -74,7 +75,7 @@ int WombatTskImgDBSqlite::dropTables()
     return 0;
 }
 */
-
+/*
 int WombatTskImgDBSqlite::initialize()
 {
     sqlObject = new SqlWrapper(dbname); // create the image database
@@ -85,6 +86,7 @@ int WombatTskImgDBSqlite::initialize()
     tmpPath += "wombatforensics.log";
     ret = frameworkLog->open(tmpPath.toStdString().c_str()); // modify the logdir path
      */
+/*
     //sqlObject->SetErrorLog(new SqlErrLog());
     map<int, TskArtifactNames> artTypes = TskImgDB::getAllArtifactTypes();
     for (map<int, TskArtifactNames>::iterator it = artTypes.begin(); it != artTypes.end(); it++) {
@@ -109,6 +111,7 @@ int WombatTskImgDBSqlite::initialize()
  * This method also configures the chunk size and the busy handler
  * for the newly opened database.
 */
+/*
 int WombatTskImgDBSqlite::open()
 {
     mainSqlObject = new SqlWrapper(sqlStatement, dbname);
@@ -206,6 +209,7 @@ int WombatTskImgDBSqlite::addImageName(char const *imgPath)
 /*
  * Adds the sector addresses of the volumes into the db.
  */
+/*
 int WombatTskImgDBSqlite::addVolumeInfo(const TSK_VS_PART_INFO * vs_part)
 {
     mainSqlObject->PrepSql();
@@ -259,6 +263,7 @@ int WombatTskImgDBSqlite::addFsInfo(int volId, int fsId, const TSK_FS_INFO * fs_
 /**
  * Given a file system and fs_file_id, return the file_id.
  */
+/*
 uint64_t WombatTskImgDBSqlite::getFileId(int a_fsId, uint64_t a_fsFileId) const
 {
     uint64_t fileId = 0;
@@ -458,6 +463,7 @@ int WombatTskImgDBSqlite::addFsFileInfo(int fileSystemID, const TSK_FS_FILE *fil
  * @param a_len The number of blocks in the run
  * @returns 1 on error
  */
+/*
 int WombatTskImgDBSqlite::addFsBlockInfo(int a_fsId, uint64_t a_fileId, int a_sequence, uint64_t a_blk_addr, uint64_t a_len)
 {
     mainSqlObject->PrepSql();
@@ -509,12 +515,14 @@ int WombatTskImgDBSqlite::addAllocUnallocMapInfo(int a_volID, int unallocImgID,
  *
  * @return Info on unallocated runs (or NULL on error).  Caller must free this when done.
  */
+/*
 SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
 {
     SectorRuns * sr = new SectorRuns();
 
     LOGINFO("WombatTskImgDBSqlite::getFreeSectors - Identifying Unallocated Sectors");
     /********** FIND the unallocated volumes *************/
+/*
     mainSqlObject->PrepSql();
     if(mainSqlObject->PrepareSql("SELECT vol_id, sect_start, sect_len, flags FROM vol_info;") == SQLITE_OK)
     {
@@ -558,6 +566,7 @@ SectorRuns * WombatTskImgDBSqlite::getFreeSectors() const
     }
 
     /*************** Find the unallocated blocks in each file system *************/
+/*
     // @@@ Need to make more dynamic
     int blk_size[32];
     memset(blk_size, 0, sizeof(blk_size));
@@ -786,7 +795,7 @@ std::vector<std::string> WombatTskImgDBSqlite::getImageNames() const
  * @param a_attrId The ID of the attribute for this file
  * @returns -1 on error
  */
-int WombatTskImgDBSqlite::getFileUniqueIdentifiers(uint64_t a_fileId, uint64_t &a_fsOffset, uint64_t &a_fsFileId, int &a_attrType, int &a_attrId) const
+/*int WombatTskImgDBSqlite::getFileUniqueIdentifiers(uint64_t a_fileId, uint64_t &a_fsOffset, uint64_t &a_fsFileId, int &a_attrType, int &a_attrId) const
 {
     mainSqlObject->PrepSql();
     if(mainSqlObject->PrepareSql("SELECT fs_file_id, attr_type, attr_id, fs_info.img_byte_offset FROM fs_files, fs_info WHERE file_id = ? AND fs_info.fs_id = fs_files.fs_id;") == SQLITE_OK)
@@ -819,6 +828,7 @@ int WombatTskImgDBSqlite::getFileUniqueIdentifiers(uint64_t a_fileId, uint64_t &
  * Get number of volumes in image.
  * @return Number of volumes in image or -1 on error
  */
+/*
 int WombatTskImgDBSqlite::getNumVolumes() const
 {
     int count = 0;
@@ -826,6 +836,7 @@ int WombatTskImgDBSqlite::getNumVolumes() const
     mainSqlObject->PrepareSql("SELECT count(*) from vol_info;");
 
     /********** Get the number of volumes *************/
+/*
     if(mainSqlObject->StepSql() == SQLITE_ROW)
     {
         count = (int)mainSqlObject->ReturnInt(0);
@@ -844,6 +855,7 @@ int WombatTskImgDBSqlite::getNumVolumes() const
  * Get number of files in image.
  * @return Number of files in image or -1 on error
  */
+/*
 int WombatTskImgDBSqlite::getNumFiles() const
 {
     std::string condition("");
@@ -853,12 +865,14 @@ int WombatTskImgDBSqlite::getNumFiles() const
 /**
  * @returns the session_id or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::getSessionID() const
 {
     int sessionId = -1;
     mainSqlObject->PrepSql();
 
     /********** FIND the unallocated volumes *************/
+/*
     mainSqlObject->PrepareSql("SELECT version from db_info WHERE name=\"SID\";");
     if(mainSqlObject->StepSql() == SQLITE_ROW)
     {
@@ -965,6 +979,7 @@ UnallocRun * WombatTskImgDBSqlite::getUnallocRun(int a_unalloc_img_id, int a_fil
  * @param fileId Carved file Id (output)
  * @returns 0 on success or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::addCarvedFileInfo(int vol_id, const char *name, uint64_t size,
                                       uint64_t *runStarts, uint64_t *runLengths, int numRuns, uint64_t & fileId)
 {
@@ -1042,6 +1057,7 @@ int WombatTskImgDBSqlite::addCarvedFileInfo(int vol_id, const char *name, uint64
  *
  * @returns 0 on success or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::addDerivedFileInfo(const std::string& name, const uint64_t parentId,
                                        const bool isDirectory, const uint64_t size,
                                        const std::string& details,
@@ -1093,6 +1109,7 @@ int WombatTskImgDBSqlite::addDerivedFileInfo(const std::string& name, const uint
  * Fills outBuffer with file IDs that match the name fileName.
  * Returns the number of file IDs written into outBuffer or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::getFileIds(char *a_fileName, uint64_t *a_outBuffer, int a_buffSize) const
 {
     int outIdx = 0;
@@ -1120,6 +1137,7 @@ int WombatTskImgDBSqlite::getFileIds(char *a_fileName, uint64_t *a_outBuffer, in
  * Return the minimum file id with status = READY_FOR_ANALYSIS in minFileId.
  * Return 0 on success, -1 if failed.
  */
+/*
 int WombatTskImgDBSqlite::getMinFileIdReadyForAnalysis(uint64_t & minFileId) const
 {
     minFileId = 0;
@@ -1145,6 +1163,7 @@ int WombatTskImgDBSqlite::getMinFileIdReadyForAnalysis(uint64_t & minFileId) con
  * Given the last file ID ready for analysis, find the largest file ID ready of analysis (in maxFileId)
  * Returns 0 on success or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::getMaxFileIdReadyForAnalysis(uint64_t a_lastFileId, uint64_t & maxFileId) const
 {
     maxFileId = 0;
@@ -1222,6 +1241,7 @@ SectorRuns * WombatTskImgDBSqlite::getFileSectors(uint64_t a_fileId) const
  * @param count - the number of times this handler has been
  * called for this blocking event.
  */
+/*
 int WombatTskImgDBSqlite::busyHandler(void * pDB, int count)
 {
     if (count < IMGDB_MAX_RETRY_COUNT)
@@ -1594,6 +1614,7 @@ std::vector<uint64_t> WombatTskImgDBSqlite::getFileIdsWorker(std::string tableNa
  * @returns The collection of file ids matching the selection criteria. Throws
  * TskException if database not initialized.
  */
+/*
 std::vector<uint64_t> WombatTskImgDBSqlite::getFileIds(const std::string& condition) const
 {
     std::vector<uint64_t> results;
@@ -1628,6 +1649,7 @@ std::vector<uint64_t> WombatTskImgDBSqlite::getFileIds(const std::string& condit
  * @returns The collection of file records matching the selection criteria. Throws
  * TskException if database not initialized.
  */
+/*
 const std::vector<TskFileRecord> WombatTskImgDBSqlite::getFileRecords(const std::string& condition) const
 {
 
@@ -1695,6 +1717,7 @@ const std::vector<TskFileRecord> WombatTskImgDBSqlite::getFileRecords(const std:
  * @param condition Must be a valid SQL string defining the selection criteria.
  * @returns The number of files matching the selection criteria.
  */
+/*
 int WombatTskImgDBSqlite::getFileCount(const std::string& condition) const
 {
     int result = 0;
@@ -1740,6 +1763,7 @@ int tsk_strnicmp(const char *s1, const char *s2, size_t N)
 
 /* Append condition to stmt to make a single SQL query.
  */
+/*
 void WombatTskImgDBSqlite::constructStmt(std::string& stmt, std::string condition) const
 {
     if (!condition.empty())
@@ -1757,6 +1781,7 @@ void WombatTskImgDBSqlite::constructStmt(std::string& stmt, std::string conditio
          * it is presumably extending the FROM clause with
          * one or more table names. In this case we need to add the comma to
          * the statement. */
+/*
         if (tsk_strnicmp(condition.c_str(), whereClause.c_str(), whereClause.length()) != 0 &&
             tsk_strnicmp(condition.c_str(), joinClause.c_str(), joinClause.length()) != 0 &&
             tsk_strnicmp(condition.c_str(), leftClause.c_str(), leftClause.length()) != 0 &&
@@ -1905,6 +1930,7 @@ std::string WombatTskImgDBSqlite::getCfileName(const uint64_t a_file_id) const
  * @param sectorSize Image sector size (output)
  * @returns 0 on success or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::getImageInfo(int & type, int & sectorSize) const
 {
     int rc = -1;
@@ -1934,6 +1960,7 @@ int WombatTskImgDBSqlite::getImageInfo(int & type, int & sectorSize) const
  * @param volumeInfoList A list of TskVolumeInfoRecord (output)
  * @returns 0 on success or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::getVolumeInfo(std::list<TskVolumeInfoRecord> & volumeInfoList) const
 {
     std::list<TskVolumeInfoRecord> list;
@@ -1968,6 +1995,7 @@ int WombatTskImgDBSqlite::getVolumeInfo(std::list<TskVolumeInfoRecord> & volumeI
  * @param fsInfoList A list of TskFsInfoRecord (output)
  * @returns 0 on success or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::getFsInfo(std::list<TskFsInfoRecord> & fsInfoList) const
 {
     std::list<TskFsInfoRecord> list;
@@ -2023,6 +2051,7 @@ static std::string getFileType(const char *name)
  * @param fileTypeInfoList A list of TskFileTypeRecord (output)
  * @returns 0 on success or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::getFileInfoSummary(std::list<TskFileTypeRecord> &fileTypeInfoList) const
 {
     std::stringstream stmt;
@@ -2037,6 +2066,7 @@ int WombatTskImgDBSqlite::getFileInfoSummary(std::list<TskFileTypeRecord> &fileT
  * @param fileTypeInfoList A list of TskFileTypeRecord (output)
  * @returns 0 on success or -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::getFileInfoSummary(FILE_TYPES fileType, std::list<TskFileTypeRecord> & fileTypeInfoList) const
 {
     stringstream stmt;
@@ -2051,6 +2081,7 @@ int WombatTskImgDBSqlite::getFileInfoSummary(FILE_TYPES fileType, std::list<TskF
  * @param fileTypeInfoList A list of TskFileTypeRecord (output)
  * @returns 0 on success of -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::getFileTypeRecords(const std::string& stmt, std::list<TskFileTypeRecord>& fileTypeInfoList) const
 {
 
@@ -2102,6 +2133,7 @@ int WombatTskImgDBSqlite::getFileTypeRecords(const std::string& stmt, std::list<
  * @param moduleId Module Id (output)
  * @returns 0 on success, -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::addModule(const std::string& name, const std::string& description, int & moduleId)
 {
 
@@ -2159,6 +2191,7 @@ int WombatTskImgDBSqlite::addModule(const std::string& name, const std::string& 
  * @param status Status of module
  * @returns 0 on success, -1 on error.
  */
+/*
 int WombatTskImgDBSqlite::setModuleStatus(uint64_t file_id, int module_id, int status)
 {
     int rc = -1;
@@ -2186,6 +2219,7 @@ int WombatTskImgDBSqlite::setModuleStatus(uint64_t file_id, int module_id, int s
  * @param moduleInfoList A list of TskModuleStatus (output)
  * @returns 0 on success, -1 on error.
 */
+/*
 int WombatTskImgDBSqlite::getModuleInfo(std::vector<TskModuleInfo> & moduleInfoList) const
 {
     int rc = -1;
@@ -2218,6 +2252,7 @@ int WombatTskImgDBSqlite::getModuleInfo(std::vector<TskModuleInfo> & moduleInfoL
  * @param moduleStatusList A list of TskModuleStatus (output)
  * @returns 0 on success, -1 on error.
 */
+/*
 int WombatTskImgDBSqlite::getModuleErrors(std::vector<TskModuleStatus> & moduleStatusList) const
 {
     int rc = -1;
@@ -2270,6 +2305,7 @@ int WombatTskImgDBSqlite::getModuleErrors(std::vector<TskModuleStatus> & moduleS
  * @param file_id file id
  * @returns file name as std::string
  */
+/*
 std::string WombatTskImgDBSqlite::getFileName(uint64_t file_id) const
 {
     std::string name;
@@ -2312,6 +2348,7 @@ TskImgDB::KNOWN_STATUS WombatTskImgDBSqlite::getKnownStatus(const uint64_t fileI
  * @param unallocImgId unalloc_img_id (output)
  * @returns -1 on error, 0 on success.
  */
+/*
 int WombatTskImgDBSqlite::addUnallocImg(int & unallocImgId)
 {
     int rc = -1;
@@ -2338,6 +2375,7 @@ int WombatTskImgDBSqlite::addUnallocImg(int & unallocImgId)
  * @param status status of unalloc_img_id
  * @returns -1 on error, 0 on success.
  */
+/*
 int WombatTskImgDBSqlite::setUnallocImgStatus(int unallocImgId, TskImgDB::UNALLOC_IMG_STATUS status)
 {
     int rc = -1;
@@ -2365,6 +2403,7 @@ int WombatTskImgDBSqlite::setUnallocImgStatus(int unallocImgId, TskImgDB::UNALLO
  * @param unallocImgId unalloc_img_id
  * @returns TskImgDB::UNALLOC_IMG_STATUS
  */
+/*
 TskImgDB::UNALLOC_IMG_STATUS WombatTskImgDBSqlite::getUnallocImgStatus(int unallocImgId) const
 {
 
@@ -2393,6 +2432,7 @@ TskImgDB::UNALLOC_IMG_STATUS WombatTskImgDBSqlite::getUnallocImgStatus(int unall
  * @param unallocImgStatusList A vector of TskUnallocImgStatusRecord (output)
  * @returns -1 on error, 0 on success.
  */
+/*
 int WombatTskImgDBSqlite::getAllUnallocImgStatus(std::vector<TskUnallocImgStatusRecord> & unallocImgStatusList) const
 {
     int rc = -1;
@@ -2426,6 +2466,7 @@ int WombatTskImgDBSqlite::getAllUnallocImgStatus(std::vector<TskUnallocImgStatus
  * @param unusedSectorsList A vector of TskUnusedSectorsRecord
  * @returns -1 on error, 0 on success.
  */
+/*
 int WombatTskImgDBSqlite::addUnusedSectors(int unallocImgId, std::vector<TskUnusedSectorsRecord> & unusedSectorsList)
 {
     assert(unallocImgId > 0);
@@ -2499,6 +2540,7 @@ int WombatTskImgDBSqlite::addUnusedSectors(int unallocImgId, std::vector<TskUnus
  * @param unusedSectorsList A vector of TskUnusedSectorsRecord (output)
  * @returns -1 on error, 0 on success.
  */
+/*
 int WombatTskImgDBSqlite::addUnusedSector(uint64_t sectStart, uint64_t sectEnd, int volId, std::vector<TskUnusedSectorsRecord> & unusedSectorsList)
 {
     assert(sectEnd > sectStart);
@@ -2587,6 +2629,7 @@ int WombatTskImgDBSqlite::addUnusedSector(uint64_t sectStart, uint64_t sectEnd, 
  * @param unusedSectorsRecord TskUnusedSectorsRecord (output)
  * @returns -1 on error, 0 on success.
  */
+/*
 int WombatTskImgDBSqlite::getUnusedSector(uint64_t fileId, TskUnusedSectorsRecord & unusedSectorsRecord) const
 {
     int rc = -1;
@@ -2625,6 +2668,7 @@ int WombatTskImgDBSqlite::getUnusedSector(uint64_t fileId, TskUnusedSectorsRecor
  * Add the given blackboard attribute to the database
  * @param attr input attribute. should be fully populated
  */
+/*
 void WombatTskImgDBSqlite::addBlackboardAttribute(TskBlackboardAttribute attr)
 {
     mainSqlObject->PrepSql();
@@ -2710,6 +2754,7 @@ void WombatTskImgDBSqlite::addBlackboardAttribute(TskBlackboardAttribute attr)
  * @param artifactTypeID artifact type id
  * @returns display name
  */
+/*
 string WombatTskImgDBSqlite::getArtifactTypeDisplayName(int artifactTypeID)
 {
     std::string displayName = "";
@@ -2743,6 +2788,7 @@ string WombatTskImgDBSqlite::getArtifactTypeDisplayName(int artifactTypeID)
  * @param artifactTypeString display name
  * @returns artifact type id
  */
+/*
 int WombatTskImgDBSqlite::getArtifactTypeID(string artifactTypeString){
 
     int typeID;
@@ -2777,6 +2823,7 @@ int WombatTskImgDBSqlite::getArtifactTypeID(string artifactTypeString){
  * @param artifactTypeID id
  * @returns artifact type name
  */
+/*
 string WombatTskImgDBSqlite::getArtifactTypeName(int artifactTypeID)
 {
     mainSqlObject->PrepSql();
@@ -2811,6 +2858,7 @@ string WombatTskImgDBSqlite::getArtifactTypeName(int artifactTypeID)
  * @param attributeTypeID attribute type id
  * @returns display name
  */
+/*
 string WombatTskImgDBSqlite::getAttributeTypeDisplayName(int attributeTypeID)
 {
 
@@ -2844,6 +2892,7 @@ string WombatTskImgDBSqlite::getAttributeTypeDisplayName(int attributeTypeID)
  * @param attributeTypeString display name
  * @returns attribute type id
  */
+/*
 int WombatTskImgDBSqlite::getAttributeTypeID(string attributeTypeString){
 
     int typeID;
@@ -2876,6 +2925,7 @@ int WombatTskImgDBSqlite::getAttributeTypeID(string attributeTypeString){
  * @param attributeTypeID id
  * @returns attribute type name
  */
+/*
 string WombatTskImgDBSqlite::getAttributeTypeName(int attributeTypeID)
 {
     std::string typeName = "";
@@ -2908,6 +2958,7 @@ string WombatTskImgDBSqlite::getAttributeTypeName(int attributeTypeID)
  * @param condition The SQL select where clause that should be used in the query.
  * @returns vector of matching artifacts
  */
+/*
 vector<TskBlackboardArtifact> WombatTskImgDBSqlite::getMatchingArtifacts(string condition)
 {
 
@@ -2942,6 +2993,7 @@ vector<TskBlackboardArtifact> WombatTskImgDBSqlite::getMatchingArtifacts(string 
  * @param condition where clause to use for matching
  * @returns vector of matching attributes
  */
+/*
 vector<TskBlackboardAttribute> WombatTskImgDBSqlite::getMatchingAttributes(string condition)
 {
 
@@ -2983,6 +3035,7 @@ vector<TskBlackboardAttribute> WombatTskImgDBSqlite::getMatchingAttributes(strin
  * @param file_id associated file id
  * @returns the new artifact
  */
+/*
 TskBlackboardArtifact WombatTskImgDBSqlite::createBlackboardArtifact(uint64_t file_id, int artifactTypeID)
 {
     uint64_t artifactId = 0;
@@ -3029,6 +3082,7 @@ TskBlackboardArtifact WombatTskImgDBSqlite::createBlackboardArtifact(uint64_t fi
  * @param displayName display name
  * @param typeID type id
  */
+/*
 void WombatTskImgDBSqlite::addArtifactType(int typeID, string artifactTypeName, string displayName)
 {
     //sqlObject->PrepSql();
@@ -3073,6 +3127,7 @@ void WombatTskImgDBSqlite::addArtifactType(int typeID, string artifactTypeName, 
  * @param displayName display name
  * @param typeID type id
  */
+/*
 void WombatTskImgDBSqlite::addAttributeType(int typeID, string attributeTypeName, string displayName)
 {
     sqlObject->PrepSql();
@@ -3116,6 +3171,7 @@ void WombatTskImgDBSqlite::addAttributeType(int typeID, string attributeTypeName
  * @param artifactTypeName type name
  * @param file_id file id
  */
+/*
 vector<TskBlackboardArtifact> WombatTskImgDBSqlite::getArtifactsHelper(uint64_t file_id, int artifactTypeId, string artifactTypeName)
 {
     vector<TskBlackboardArtifact> artifacts;
@@ -3182,4 +3238,4 @@ void WombatTskImgDBSqlite::executeStatement(const std::string &stmtToExecute, sq
         msg << caller << " : error executing " << stmtToExecute << " : " << sqlite3_errmsg(m_db);
         throw TskException(msg.str());
     }
-}
+}*/

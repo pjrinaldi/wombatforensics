@@ -9,7 +9,10 @@ public:
     WombatCaseDb(QString dbname);
     ~WombatCaseDb();
     int ReturnCaseCount(void);
+    int InsertCase(QString caseText);
+
 private:
+    sqlite3 *wombatdb;
     sqlite3_stmt *sqlStatement;
     SqlWrapper *wombatSqlObject;
 };
