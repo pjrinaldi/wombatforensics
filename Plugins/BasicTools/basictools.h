@@ -1,27 +1,17 @@
 #ifndef BASICTOOLS_H
 #define BASICTOOLS_H
 
-#include "interfaces.h"
-#include "sqlite3.h"
-#include <QObject>
+#include "../../interfaces.h"
 #include <QtPlugin>
-//#include "wombattskimagefiletsk.h"
-//#include "wombattskimgdbsqlite.h"
-//#include "tsk/framework/services/TskImgDBSqlite.h"
-//#include "tsk/framework/extraction/TskImageFileTsk.h"
-//#include "tsk/framework/services/TskSchedulerQueue.h"
-//#include "tsk/framework/file/TskFileManagerImpl.h"
-//#include "tsk/framework/services/TskSystemPropertiesImpl.h"
-#include <QStringList>
+#include <QObject>
 #include <QtWidgets>
+#include "sqlite3.h"
+#include <QStringList>
 #include <QFileDialog>
 
 class BasicTools : public QObject, public EvidenceInterface, public BasicToolsInterface, public TskFrameworkInterface
 {
-    Q_OBJECT
-#if QT_VERSION >= 0x050000
     Q_PLUGIN_METADATA(IID "wombat.forensics.BasicToolsInterface" FILE "BasicTools.json")
-#endif // QT_VERSION >= 0x050000
     Q_INTERFACES(EvidenceInterface BasicToolsInterface TskFrameworkInterface)
     
 public:

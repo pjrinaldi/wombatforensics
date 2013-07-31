@@ -43,6 +43,7 @@ WombatForensics::WombatForensics(QWidget *parent) :
         wombatCaseData->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
     pluginFileNames = locatePlugins();
+    loadPlugin("libbasictools.so");
 
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
     ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
@@ -62,27 +63,23 @@ QStringList WombatForensics::locatePlugins()
     QStringList tmpList;
     tmpList.clear();
     pluginsDir = QDir(qApp->applicationDirPath());
-
-    #if defined(Q_OS_WIN)
-        if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-            pluginsDir.cdUp();
-    #endif
-
     pluginsDir.cd("plugins");
-    QCoreApplication::addLibraryPath(pluginsDir.absolutePath());
 
     foreach(QString fileName, pluginsDir.entryList(QDir::Files))
     {
         tmpList.append(fileName);
+        //QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
+        //bool ret = loader.load();
+        //fprintf(stderr, "did it load: %i\n", ret);
     }
     return tmpList;
 }
 
 void WombatForensics::loadPlugin(QString fileName)
 {
-    pluginsDir = QDir(qApp->applicationDirPath());
+    QDir tmpDir = QDir(qApp->applicationDirPath());
 
-    pluginsDir.cd("plugins");
+    tmpDir.cd("plugins");
     /*
     foreach (QObject *plugin, QPluginLoader::staticInstances())
     {
@@ -90,9 +87,8 @@ void WombatForensics::loadPlugin(QString fileName)
         populateToolBox(plugin);
     }
 */
-    QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
-    if(!loader.isLoaded())
-    plugin = loader.instance();
+    QPluginLoader loader(tmpDir.absoluteFilePath(fileName));
+    QObject* plugin = loader.instance();
     if (plugin)
     {
         populateActions(plugin);
