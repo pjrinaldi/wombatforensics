@@ -11,8 +11,8 @@ TARGET = basictools
 INCLUDEPATH += .
 
 # Input
-HEADERS += basictools.h ../../interfaces.h
-SOURCES += basictools.cpp
+HEADERS += basictools.h ../../interfaces.h ../../wombatforensics.h ../../build/ui_wombatforensics.h
+SOURCES += basictools.cpp ../../wombatforensics.cpp
 RESOURCES += basictools.qrc
 DESTDIR = ../../../wombatforensics-output/debug/build/plugins
 

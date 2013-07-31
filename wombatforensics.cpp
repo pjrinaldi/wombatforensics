@@ -1,5 +1,5 @@
 #include "wombatforensics.h"
-#include "ui_wombatforensics.h"
+#include "../../build/ui_wombatforensics.h"
 #include <QPluginLoader>
 
 // static plugins are always available, dynamic are not.
