@@ -52,7 +52,7 @@
         <property name="tabSpacing">
          <number>6</number>
         </property>
-        <widget class="QWidget" name="page">
+        <widget class="QWidget" name="placeholderPage">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -68,7 +68,7 @@
           </sizepolicy>
          </property>
          <attribute name="label">
-          <string>Directory Tree</string>
+          <string/>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <property name="leftMargin">
@@ -88,31 +88,6 @@
             <property name="spacing">
              <number>0</number>
             </property>
-            <item>
-             <widget class="QTreeView" name="directoryTreeView">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>1</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-              <attribute name="headerVisible">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="headerDefaultSectionSize">
-               <number>0</number>
-              </attribute>
-             </widget>
-            </item>
            </layout>
           </item>
          </layout>
@@ -194,8 +169,14 @@
      <string>Evidence</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEvidence"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="movable">
@@ -263,6 +244,11 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>

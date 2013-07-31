@@ -6,7 +6,7 @@
 
 
 TEMPLATE = lib
-CONFIG += plugin static
+CONFIG += plugin
 QT       += widgets
 INCLUDEPATH += ../..
 HEADERS += basictools.h
@@ -40,7 +40,7 @@ OTHER_FILES += BasicTools.json
 #DESTDIR       = ../../plugandpaint/plugins
 
 # install
-#target.path = $$[QT_INSTALL_EXAMPLES]/widgets/tools/plugandpaint/plugins
+#target.path = ../../widgets/tools/plugandpaint/plugins
 #INSTALLS += target
 
 RESOURCES += \

@@ -10,6 +10,7 @@
 #include <QStandardItemModel>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QPluginLoader>
 
 #include "interfaces.h"
 #include "wombatcasedb.h"
@@ -35,12 +36,14 @@ private slots:
 private:
     Ui::WombatForensics *ui;
 
-    void loadPlugins();
+    void loadPlugin(QString fileName);
+    QStringList locatePlugins(void);
+    bool isPluginLoaded(QString pluginFileName);
     void populateActions(QObject *plugin);
     void populateToolBox(QObject *plugin);
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
 
-    int currentcaseid;
+    int64_t currentcaseid;
     QDir pluginsDir;
     QStringList pluginFileNames;
 };

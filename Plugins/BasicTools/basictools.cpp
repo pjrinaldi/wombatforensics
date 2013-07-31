@@ -17,7 +17,7 @@ QStringList BasicTools::evidenceToolboxIcons() const
 
 QStringList BasicTools::toolboxViews() const
 {
-    return QStringList() << tr("Directory Listing") << tr("File Signature Category");
+    return QStringList() << tr("Directory Listing") << tr("File Extension Category");
 }
 
 void BasicTools::addEvidence(int currentCaseID)
@@ -37,11 +37,17 @@ void BasicTools::remEvidence(int currentCaseID)
     // remove evidence.db file.
     // remove evidence_id from the cases table...
 }
-QWidget* BasicTools::setupToolBox() const
+QWidget* BasicTools::setupToolBoxDirectoryTree() const
 {
     QTreeView* directoryTreeView = new QTreeView();
 
     return directoryTreeView;
+}
+QWidget* BasicTools::setupToolBoxFileExtensionTree() const
+{
+    QTreeView* fileExtensionTreeView = new QTreeView();
+
+    return fileExtensionTreeView;
 }
 
 QWidget* BasicTools::setupColumnView() const
@@ -58,3 +64,5 @@ QWidget* BasicTools::setupTabWidget() const
 
     return directoryTreeTabWidget;
 }
+
+//Q_EXPORT_PLUGIN2(basictools, BasicTools)

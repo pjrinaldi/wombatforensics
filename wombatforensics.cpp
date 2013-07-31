@@ -7,9 +7,9 @@ WombatForensics::WombatForensics(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::WombatForensics)
 {
-    Q_INIT_RESOURCE(basictools);
+    //Q_INIT_RESOURCE(basictools);
     ui->setupUi(this);
-    wombatCaseData = new WombatCaseDb();
+    wombatCaseData = new WombatCaseDb(this);
     currentcaseid = -1;
     QDir testDir = QDir(qApp->applicationDirPath());
     testDir.mkdir("data");
@@ -19,59 +19,86 @@ WombatForensics::WombatForensics(QWidget *parent) :
     if(!doesFileExist)
     {
         const char* errstring = wombatCaseData->CreateCaseDB(tmpPath);
-        if(strcmp(errstring, "") == 0)
-        {
-            if(wombatCaseData->ReturnCaseCount() == 0)
-            {
-                ui->actionOpen_Case->setEnabled(false);
-                ui->actionOpen_Case_2->setEnabled(false);
-            }
-            else if(wombatCaseData->ReturnCaseCount() > 0)
-            {
-                ui->actionOpen_Case->setEnabled(true);
-                ui->actionOpen_Case_2->setEnabled(true);
-            }
-            else
-            {
-                wombatCaseData->DisplayError(this, "1.0", "File Error", "SqlDB does not exist/could not be created.");
-            }
-        }
-        else
-        {
+        if(strcmp(errstring, "") != 0)
             wombatCaseData->DisplayError(this, "1.0", "File Error", errstring);
-        }
     }
-    loadPlugins();
+    else
+    {
+        const char* errstring = wombatCaseData->OpenCaseDB(tmpPath);
+        if(strcmp(errstring, "") != 0)
+            wombatCaseData->DisplayError(this, "1.1", "SQL", errstring);
+    }
+    if(wombatCaseData->ReturnCaseCount() == 0)
+    {
+        ui->actionOpen_Case->setEnabled(false);
+        ui->actionOpen_Case_2->setEnabled(false);
+    }
+    else if(wombatCaseData->ReturnCaseCount() > 0)
+    {
+        ui->actionOpen_Case->setEnabled(true);
+        ui->actionOpen_Case_2->setEnabled(true);
+    }
+    else
+    {
+        wombatCaseData->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
+    }
+    pluginFileNames = locatePlugins();
+
+    ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
+    ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
 }
 
-void WombatForensics::loadPlugins()
+bool WombatForensics::isPluginLoaded(QString pluginFileName)
 {
+    QString fileName;
+    foreach(fileName, pluginFileNames)
+    {
+        if(pluginFileName == fileName)
+            loadPlugin(pluginFileName);
+    }
+}
+QStringList WombatForensics::locatePlugins()
+{
+    QStringList tmpList;
+    tmpList.clear();
+    pluginsDir = QDir(qApp->applicationDirPath());
+
+    #if defined(Q_OS_WIN)
+        if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+            pluginsDir.cdUp();
+    #endif
+
+    pluginsDir.cd("plugins");
+    QCoreApplication::addLibraryPath(pluginsDir.absolutePath());
+
+    foreach(QString fileName, pluginsDir.entryList(QDir::Files))
+    {
+        tmpList.append(fileName);
+    }
+    return tmpList;
+}
+
+void WombatForensics::loadPlugin(QString fileName)
+{
+    pluginsDir = QDir(qApp->applicationDirPath());
+
+    pluginsDir.cd("plugins");
+    /*
     foreach (QObject *plugin, QPluginLoader::staticInstances())
     {
         populateActions(plugin);
         populateToolBox(plugin);
     }
-
-    pluginsDir = QDir(qApp->applicationDirPath());
-
-#if defined(Q_OS_WIN)
-    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-        pluginsDir.cdUp();
-#endif
-    pluginsDir.cd("plugins");
-
-    foreach (QString fileName, pluginsDir.entryList(QDir::Files))
+*/
+    QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
+    if(!loader.isLoaded())
+    plugin = loader.instance();
+    if (plugin)
     {
-        QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
-        QObject *plugin = loader.instance();
-        if (plugin)
-        {
-            populateActions(plugin);
-            pluginFileNames += fileName;
-            populateToolBox(plugin);
-        }
+        populateActions(plugin);
+        //pluginFileNames += fileName;
+        populateToolBox(plugin);
     }
-    ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
 }
 
 void WombatForensics::populateActions(QObject *plugin)
@@ -89,7 +116,8 @@ void WombatForensics::populateToolBox(QObject *plugin)
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
     if(iBasicTools)
     {
-        ui->toolBox->addItem(iBasicTools->setupToolBox(), ((QStringList)iBasicTools->toolboxViews())[0]);
+        ui->toolBox->addItem(iBasicTools->setupToolBoxDirectoryTree(), ((QStringList)iBasicTools->toolboxViews())[0]);
+        ui->toolBox->addItem(iBasicTools->setupToolBoxFileExtensionTree(), ((QStringList)iBasicTools->toolboxViews())[1]);
     }
 }
 
@@ -128,6 +156,9 @@ void WombatForensics::alterEvidence()
 
 WombatForensics::~WombatForensics()
 {
+    const char* errmsg = wombatCaseData->CloseCaseDB();
+    if(strcmp(errmsg, "") != 0)
+        wombatCaseData->DisplayError(this, "1.5", "CASE DB CLOSE", errmsg);
     delete ui;
 }
 
@@ -157,6 +188,7 @@ void WombatForensics::on_actionNew_Case_triggered()
                 ui->actionOpen_Case->setEnabled(true);
                 ui->actionOpen_Case_2->setEnabled(true);
             }
+            isPluginLoaded("libbasictools.so");
         }
     }
 

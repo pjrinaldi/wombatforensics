@@ -30,7 +30,7 @@ HEADERS  += wombatforensics.h \
     wombatcasedb.h
 
 # LIBS    =   -Wl,-Bstatic -ltskframework -lewf -ltsk -lsqlite3 -Lplugins -lbasictools
-LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins -lbasictools
+LIBS    =   -ltskframework -lewf -lsqlite3 -ltsk -Lplugins
 
 FORMS    += wombatforensics.ui
 

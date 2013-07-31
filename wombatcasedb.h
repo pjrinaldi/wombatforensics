@@ -3,7 +3,7 @@
 
 #include "sqlite3.h"
 #include <QMessageBox>
-#include <string>
+#include <string.h>
 #include <cstring>
 #include <sstream>
 #include <iostream>
@@ -16,17 +16,20 @@
 class WombatCaseDb
 {
 public:
-    WombatCaseDb();
+    WombatCaseDb(QWidget *Parent);
     bool FileExists(const std::string& fileName);
     void DisplayError(QWidget *parent, QString errorNumber, QString errorType, QString errorValue);
     const char *CreateCaseDB(QString dbname);
+    const char *OpenCaseDB(QString dbname);
+    const char *CloseCaseDB();
     ~WombatCaseDb();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
-    int InsertCase(QString caseText);
+    int64_t InsertCase(QString caseText);
 
 private:
     sqlite3 *wombatdb;
+    QWidget *wombatparent;
     sqlite3_stmt *sqlstatement;
 };
 

@@ -64,7 +64,8 @@ public:
 
     virtual QStringList toolboxViews() const = 0;
     virtual QStringList evidenceToolboxIcons() const = 0;
-    virtual QWidget* setupToolBox() const = 0;
+    virtual QWidget* setupToolBoxDirectoryTree() const;
+    virtual QWidget* setupToolBoxFileExtensionTree() const;
     virtual QWidget* setupTabWidget() const = 0;
     virtual QWidget* setupColumnView() const = 0;
 };

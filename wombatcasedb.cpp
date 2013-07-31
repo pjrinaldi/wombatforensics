@@ -1,7 +1,8 @@
 #include "wombatcasedb.h"
 
-WombatCaseDb::WombatCaseDb()
+WombatCaseDb::WombatCaseDb(QWidget *Parent)
 {
+    wombatparent = Parent;
 }
 // Function: fileExists
 /**
@@ -68,6 +69,28 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
     return "";
 }
 
+const char* WombatCaseDb::OpenCaseDB(QString dbname)
+{
+    if(sqlite3_open(dbname.toStdString().c_str(), &wombatdb) != SQLITE_OK)
+        return sqlite3_errmsg(wombatdb);
+    else
+        return "";
+}
+
+const char* WombatCaseDb::CloseCaseDB()
+{
+    if(sqlite3_finalize(sqlstatement) == SQLITE_OK)
+    {
+        if(sqlite3_close(wombatdb) == SQLITE_OK)
+            return "";
+        else
+            return sqlite3_errmsg(wombatdb);
+    }
+    else
+        return sqlite3_errmsg(wombatdb);
+
+}
+
 WombatCaseDb::~WombatCaseDb()
 {
 
@@ -75,31 +98,41 @@ WombatCaseDb::~WombatCaseDb()
 
 int WombatCaseDb::ReturnCaseCount()
 {
-    int ret = 0;
-    /*
-    wombatSqlObject->OpenSql(wombatSqlObject->dbname, wombatSqlObject->sqldb);
-    wombatSqlObject->PrepareSql("SELECT COUNT(caseid) FROM cases;");
-    wombatSqlObject->StepSql();
-    ret = wombatSqlObject->ReturnInt(0);
-    wombatSqlObject->FinalizeSql();
-    wombatSqlObject->CloseSql();
-    */
+    int casecount = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM cases;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        int ret = sqlite3_step(sqlstatement);
+        if(ret != SQLITE_ROW && ret != SQLITE_DONE)
+            DisplayError(wombatparent, "1.3", "SQL Error. ", sqlite3_errmsg(wombatdb));
+        else
+            casecount = sqlite3_column_int(sqlstatement, 0);
+    }
+    else
+        DisplayError(wombatparent, "1.3", "SQL Error. ", sqlite3_errmsg(wombatdb));
 
-    return ret;
+    return casecount;
 }
 
-int WombatCaseDb::InsertCase(QString caseText)
+int64_t WombatCaseDb::InsertCase(QString caseText)
 {
-    int ret = 0;
-    /*
-    wombatSqlObject->OpenSql(wombatSqlObject->dbname, wombatSqlObject->sqldb);
-    wombatSqlObject->PrepareSql("INSERT INTO cases (casename) VALUES(?);");
-    wombatSqlObject->BindValue(1, caseText.toStdString().c_str());
-    wombatSqlObject->StepSql();
-    ret = wombatSqlObject->ReturnLastInsertRowID();
-    wombatSqlObject->FinalizeSql();
-    wombatSqlObject->CloseSql();
-    */
+    int64_t caseid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO cases (casename) VALUES(?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_text(sqlstatement, 1, caseText.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                caseid = sqlite3_last_insert_rowid(wombatdb);
+            }
+            else
+                DisplayError(wombatparent, "1.4", "INSERT CASE - RETURN CASEID", sqlite3_errmsg(wombatdb));
+        }
+        else
+            DisplayError(wombatparent, "1.4", "INSERT CASE - BIND CASENAME", sqlite3_errmsg(wombatdb));
+    }
+    else
+        DisplayError(wombatparent, "1.4", "INSERT CASE - PREPARE INSERT", sqlite3_errmsg(wombatdb));
 
-    return ret;
+    return caseid;
 }
