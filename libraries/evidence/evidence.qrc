@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/basic">
+        <file alias="treefolder">Resources/folder.png</file>
+        <file alias="addevidence">Resources/list-add.png</file>
+        <file alias="treefile">Resources/text-x-generic.png</file>
+        <file alias="remevidence">Resources/list-remove.png</file>
+        <file alias="treeimage">Resources/drive-harddisk.png</file>
+        <file alias="treepartition">Resources/package-x-generic.png</file>
+        <file alias="treefilemanager">Resources/system-file-manager.png</file>
+    </qresource>
+</RCC>
