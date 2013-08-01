@@ -1,19 +1,19 @@
-#ifndef BASICTOOLS_H
-#define BASICTOOLS_H
+#ifndef EVIDENCE_H
+#define EVIDENCE_H
 
-#include "../../interfaces.h"
+#include <main/interfaces.h>
+#include <sqlite3.h>
 #include <QtPlugin>
 #include <QObject>
 #include <QtWidgets>
-#include "sqlite3.h"
 #include <QStringList>
 #include <QFileDialog>
 
-class BasicTools : public QObject, public BasicToolsInterface
+class EvidencePlugin : public QObject, public EvidenceInterface
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "BasicToolsInterface" FILE "BasicTools.json")
-    Q_INTERFACES(BasicToolsInterface)
+    Q_PLUGIN_METADATA(IID "wombat.EvidenceInterface" FILE "evidence.json")
+    Q_INTERFACES(EvidenceInterface)
     
 public:
     //Evidence Interface Functions
@@ -23,21 +23,9 @@ public:
     void addEvidence(int currentCaseID);
     void remEvidence(int currentCaseID);
 
-    //BasicTools Interface Functions
-    QStringList toolboxViews() const;
-    QStringList evidenceToolboxIcons() const;
-
-    QWidget* setupToolBoxDirectoryTree() const;
-    QWidget* setupToolBoxFileExtensionTree() const;
-    QWidget* setupTabWidget() const;
-    QWidget* setupColumnView() const;
-
-    //TskFramework Interface Functions
-
 private:
-    sqlite3_stmt *sqlStatement;
     int currentcaseid;
 
 };
 
-#endif // BASICTOOLS_H
+#endif // EVIDENCE_H

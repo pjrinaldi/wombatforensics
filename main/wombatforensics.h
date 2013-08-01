@@ -14,6 +14,7 @@
 
 #include "interfaces.h"
 #include "wombatcasedb.h"
+#include "ui_wombatforensics.h"
 
 namespace Ui {
 class WombatForensics;

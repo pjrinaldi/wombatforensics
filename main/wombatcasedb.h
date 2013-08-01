@@ -1,7 +1,7 @@
 #ifndef WOMBATCASEDB_H
 #define WOMBATCASEDB_H
 
-#include "sqlite3.h"
+#include <sqlite3.h>
 #include <QMessageBox>
 #include <string.h>
 #include <cstring>

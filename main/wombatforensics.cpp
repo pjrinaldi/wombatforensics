@@ -1,5 +1,7 @@
+#include "interfaces.h"
 #include "wombatforensics.h"
-#include "../../build/ui_wombatforensics.h"
+#include "wombatcasedb.h"
+
 #include <QPluginLoader>
 
 // static plugins are always available, dynamic are not.
@@ -42,8 +44,8 @@ WombatForensics::WombatForensics(QWidget *parent) :
     {
         wombatCaseData->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
-    //pluginFileNames = locatePlugins();
-    loadPlugin("/home/pasquale/Projects/wombatforensics-output/wombatforensics-output/debug/build/plugins/libbasictools.so");
+    pluginFileNames = locatePlugins();
+    loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
 
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
     ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
@@ -95,7 +97,7 @@ void WombatForensics::loadPlugin(QString fileName)
     fprintf(stderr, "%s\n", loader.errorString().toStdString().c_str());
     if (plugin)
     {
-        //populateActions(plugin);
+        populateActions(plugin);
         //pluginFileNames += fileName;
         populateToolBox(plugin);
     }
@@ -103,23 +105,23 @@ void WombatForensics::loadPlugin(QString fileName)
 
 void WombatForensics::populateActions(QObject *plugin)
 {
-/*
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
     if (iEvidence)
     {
         addActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(alterEvidence()));
     }
-    */
 }
 
 void WombatForensics::populateToolBox(QObject *plugin)
 {
+    /*
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
     if(iBasicTools)
     {
         ui->toolBox->addItem(iBasicTools->setupToolBoxDirectoryTree(), ((QStringList)iBasicTools->toolboxViews())[0]);
         ui->toolBox->addItem(iBasicTools->setupToolBoxFileExtensionTree(), ((QStringList)iBasicTools->toolboxViews())[1]);
     }
+    */
 }
 
 void WombatForensics::addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
@@ -147,21 +149,19 @@ void WombatForensics::addActions(QObject *plugin, const QStringList &texts, cons
 
 void WombatForensics::alterEvidence()
 {
-    /*
     QAction *action = qobject_cast<QAction *>(sender());
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
         iEvidence->addEvidence(currentcaseid);
     else if(action->text() == tr("Remove Evidence"))
         iEvidence->remEvidence(currentcaseid);
-        */
 }
 
 WombatForensics::~WombatForensics()
 {
     const char* errmsg = wombatCaseData->CloseCaseDB();
-    if(strcmp(errmsg, "") != 0)
-        wombatCaseData->DisplayError(this, "1.5", "CASE DB CLOSE", errmsg);
+    //if(strcmp(errmsg, "") != 0)
+    //    wombatCaseData->DisplayError(this, "1.5", "CASE DB CLOSE", errmsg);
     delete ui;
 }
 
@@ -191,7 +191,7 @@ void WombatForensics::on_actionNew_Case_triggered()
                 ui->actionOpen_Case->setEnabled(true);
                 ui->actionOpen_Case_2->setEnabled(true);
             }
-            isPluginLoaded("libbasictools.so");
+            isPluginLoaded("libevidenceplugin.so");
         }
     }
 
