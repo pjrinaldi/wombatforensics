@@ -4,12 +4,10 @@
 
 #include <QPluginLoader>
 
-// static plugins are always available, dynamic are not.
 WombatForensics::WombatForensics(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::WombatForensics)
 {
-    //Q_INIT_RESOURCE(basictools);
     ui->setupUi(this);
     wombatCaseData = new WombatCaseDb(this);
     currentcaseid = -1;
@@ -45,7 +43,6 @@ WombatForensics::WombatForensics(QWidget *parent) :
         wombatCaseData->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
     pluginFileNames = locatePlugins();
-    //loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
 
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
     ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
@@ -176,8 +173,9 @@ void WombatForensics::on_actionNew_Case_triggered()
                 ui->actionOpen_Case->setEnabled(true);
                 ui->actionOpen_Case_2->setEnabled(true);
             }
-            isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
-            //isPluginLoaded("libevidenceplugin.so");
+            isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so"); // manually load evidence plugin
+            ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
+            ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
         }
     }
 

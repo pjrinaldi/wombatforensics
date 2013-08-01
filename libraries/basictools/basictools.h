@@ -1,28 +1,21 @@
 #ifndef BASICTOOLS_H
 #define BASICTOOLS_H
 
-#include "../../interfaces.h"
+#include "main/interfaces.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QtWidgets>
-#include "sqlite3.h"
+#include <sqlite3.h>
 #include <QStringList>
 #include <QFileDialog>
 
 class BasicTools : public QObject, public BasicToolsInterface
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "BasicToolsInterface" FILE "BasicTools.json")
+    Q_PLUGIN_METADATA(IID "wombat.BasicToolsInterface" FILE "basictools.json")
     Q_INTERFACES(BasicToolsInterface)
     
 public:
-    //Evidence Interface Functions
-    QStringList evidenceActions() const;
-    QStringList evidenceActionIcons() const;
-
-    void addEvidence(int currentCaseID);
-    void remEvidence(int currentCaseID);
-
     //BasicTools Interface Functions
     QStringList toolboxViews() const;
     QStringList evidenceToolboxIcons() const;
@@ -31,8 +24,6 @@ public:
     QWidget* setupToolBoxFileExtensionTree() const;
     QWidget* setupTabWidget() const;
     QWidget* setupColumnView() const;
-
-    //TskFramework Interface Functions
 
 private:
     sqlite3_stmt *sqlStatement;
