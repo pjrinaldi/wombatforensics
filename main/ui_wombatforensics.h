@@ -1,10 +1,3 @@
-/********************************************************************************
-** Form generated from reading UI file 'wombatforensics.ui'
-**
-** Created by: Qt User Interface Compiler version 5.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling UI file!
-********************************************************************************/
 
 #ifndef UI_WOMBATFORENSICS_H
 #define UI_WOMBATFORENSICS_H
@@ -123,7 +116,7 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_3);
 
-        toolBox->addItem(placeholderPage, QStringLiteral(""));
+        //toolBox->addItem(placeholderPage, QStringLiteral(""));
 
         horizontalLayout->addWidget(toolBox);
 
@@ -194,6 +187,7 @@ public:
 
 
         QMetaObject::connectSlotsByName(WombatForensics);
+
     } // setupUi
 
     void retranslateUi(QMainWindow *WombatForensics)

@@ -10,6 +10,8 @@ WombatForensics::WombatForensics(QWidget *parent) :
 {
     ui->setupUi(this);
     wombatCaseData = new WombatCaseDb(this);
+    connect(ui->actionNew_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionNew_Case_triggered()));
+    connect(ui->actionOpen_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionOpen_Case_triggered()));
     currentcaseid = -1;
     QDir testDir = QDir(qApp->applicationDirPath());
     testDir.mkdir("data");
@@ -98,14 +100,12 @@ void WombatForensics::populateActions(QObject *plugin)
 
 void WombatForensics::populateToolBox(QObject *plugin)
 {
-    /*
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
     if(iBasicTools)
     {
         ui->toolBox->addItem(iBasicTools->setupToolBoxDirectoryTree(), ((QStringList)iBasicTools->toolboxViews())[0]);
         ui->toolBox->addItem(iBasicTools->setupToolBoxFileExtensionTree(), ((QStringList)iBasicTools->toolboxViews())[1]);
     }
-    */
 }
 
 void WombatForensics::addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
@@ -174,6 +174,7 @@ void WombatForensics::on_actionNew_Case_triggered()
                 ui->actionOpen_Case_2->setEnabled(true);
             }
             isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so"); // manually load evidence plugin
+            isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so"); // manually load evidence plugin
             ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
         }
