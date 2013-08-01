@@ -1,1 +1,0 @@
-g++ -fPIC -shared -ltskframework -o libtskTestModule.so TestModule.cpp
