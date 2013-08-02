@@ -2,6 +2,7 @@
 #define BASICTOOLS_H
 
 #include "main/interfaces.h"
+#include "binviewwidget.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QtWidgets>
@@ -22,7 +23,8 @@ public:
 
     QWidget* setupToolBoxDirectoryTree() const;
     QWidget* setupToolBoxFileExtensionTree() const;
-    QWidget* setupTabWidget() const;
+    QWidget* setupHexTab() const;
+    QWidget* setupTxtTab() const;
     QWidget* setupColumnView() const;
 
 private:

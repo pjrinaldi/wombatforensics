@@ -30,11 +30,25 @@ QWidget* BasicTools::setupColumnView() const
     return directoryTreeColumnView;
 }
 
-QWidget* BasicTools::setupTabWidget() const
+QWidget* BasicTools::setupHexTab() const
 {
-    QTabWidget* directoryTreeTabWidget = new QTabWidget();
-    // probably add the generic tabs as well
+    // hex editor tab
+    QWidget* hexTab = new QWidget();
+    QVBoxLayout* hexLayout = new QVBoxLayout();
+    BinViewWidget* hexWidget = new BinViewWidget();
+    //BinViewModel* hexModel = 0;
+    // appears the model is set to open the file, then the widget sets the model.
+    hexWidget->setModel(0);
+    hexLayout->addWidget(hexWidget);
+    hexTab->setLayout(hexLayout);
 
-    return directoryTreeTabWidget;
+    return hexTab;
+}
+
+QWidget* BasicTools::setupTxtTab() const
+{
+    QWidget* txtTab = new QWidget();
+
+    return txtTab;
 }
 

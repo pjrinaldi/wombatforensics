@@ -10,8 +10,8 @@ WombatForensics::WombatForensics(QWidget *parent) :
 {
     ui->setupUi(this);
     wombatCaseData = new WombatCaseDb(this);
-    connect(ui->actionNew_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionNew_Case_triggered()));
-    connect(ui->actionOpen_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionOpen_Case_triggered()));
+    //connect(ui->actionNew_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionNew_Case_triggered()));
+    //connect(ui->actionOpen_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionOpen_Case_triggered()));
     currentcaseid = -1;
     QDir testDir = QDir(qApp->applicationDirPath());
     testDir.mkdir("data");
@@ -55,7 +55,7 @@ bool WombatForensics::isPluginLoaded(QString pluginFileName)
     QString fileName;
     foreach(fileName, pluginFileNames)
     {
-        if(pluginFileName == fileName)
+        if(fileName.compare(pluginFileName) == 0)
             loadPlugin(pluginFileName);
         else
             fprintf(stderr, "string compare failed.");
@@ -86,6 +86,7 @@ void WombatForensics::loadPlugin(QString fileName)
     {
         populateActions(plugin);
         populateToolBox(plugin);
+        populateTabWidget(plugin);
     }
 }
 
@@ -105,6 +106,15 @@ void WombatForensics::populateToolBox(QObject *plugin)
     {
         ui->toolBox->addItem(iBasicTools->setupToolBoxDirectoryTree(), ((QStringList)iBasicTools->toolboxViews())[0]);
         ui->toolBox->addItem(iBasicTools->setupToolBoxFileExtensionTree(), ((QStringList)iBasicTools->toolboxViews())[1]);
+    }
+}
+
+void WombatForensics::populateTabWidget(QObject *plugin)
+{
+    BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
+    if(iBasicTools)
+    {
+        ui->fileViewTabWidget->addTab(iBasicTools->setupHexTab(), "Hex View");
     }
 }
 

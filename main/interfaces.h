@@ -30,7 +30,8 @@ public:
     virtual QStringList toolboxViews() const = 0;
     virtual QWidget* setupToolBoxDirectoryTree() const = 0;
     virtual QWidget* setupToolBoxFileExtensionTree() const = 0;
-    virtual QWidget* setupTabWidget() const = 0;
+    virtual QWidget* setupHexTab() const = 0;
+    virtual QWidget* setupTxtTab() const = 0;
     virtual QWidget* setupColumnView() const = 0;
     virtual QStringList evidenceToolboxIcons() const = 0;
 };

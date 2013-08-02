@@ -7,8 +7,8 @@ TARGET = $$qtLibraryTarget(basictoolsplugin)
 INCLUDEPATH += ../../
 
 # Input
-HEADERS += basictools.h
-SOURCES += basictools.cpp
+HEADERS += basictools.h binviewwidget.h binviewmodel.h
+SOURCES += basictools.cpp binviewwidget.cpp binviewmodel.cpp
 RESOURCES += basictools.qrc
 DESTDIR = ../../build/plugins
 
