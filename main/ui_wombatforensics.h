@@ -116,8 +116,6 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_3);
 
-        //toolBox->addItem(placeholderPage, QStringLiteral(""));
-
         horizontalLayout->addWidget(toolBox);
 
         verticalLayout = new QVBoxLayout();

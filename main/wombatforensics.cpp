@@ -115,6 +115,7 @@ void WombatForensics::populateTabWidget(QObject *plugin)
     if(iBasicTools)
     {
         ui->fileViewTabWidget->addTab(iBasicTools->setupHexTab(), "Hex View");
+        ui->fileViewTabWidget->addTab(iBasicTools->setupTxtTab(), "Text View");
     }
 }
 

@@ -39,6 +39,7 @@ QWidget* BasicTools::setupHexTab() const
     //BinViewModel* hexModel = 0;
     // appears the model is set to open the file, then the widget sets the model.
     hexWidget->setModel(0);
+    hexLayout->setContentsMargins(0, 0, 0, 0);
     hexLayout->addWidget(hexWidget);
     hexTab->setLayout(hexLayout);
 
@@ -48,7 +49,12 @@ QWidget* BasicTools::setupHexTab() const
 QWidget* BasicTools::setupTxtTab() const
 {
     QWidget* txtTab = new QWidget();
-
+    QVBoxLayout* txtLayout = new QVBoxLayout();
+    QTextEdit* txtWidget = new QTextEdit();
+    txtLayout->setContentsMargins(0, 0, 0, 0);
+    txtLayout->addWidget(txtWidget);
+    txtTab->setLayout(txtLayout);
+    
     return txtTab;
 }
 
