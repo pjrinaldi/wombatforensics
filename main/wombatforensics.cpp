@@ -98,6 +98,7 @@ void WombatForensics::loadPlugin(QString fileName)
         populateToolBox(plugin);
         populateTabWidget(plugin);
         setupSleuthKitProperties(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-config.xml");
+        setupSleuthKitLog(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-log.xml");
     }
 }
 
@@ -237,4 +238,11 @@ void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString configFi
         iSleuthKit->SetupSystemProperties(configFileName);
     }
 }
-
+void WombatForensics::setupSleuthKitLog(QObject *plugin, QString logFileName)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+    {
+        iSleuthKit->SetupSystemLog(logFileName);
+    }
+}

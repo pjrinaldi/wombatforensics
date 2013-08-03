@@ -19,6 +19,7 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
 public:
     //SleuthKit Interface Functions
     void SetupSystemProperties(QString configFilePath);
+    void SetupSystemLog(QString logFilePath);
     //SetupImageDatabase() const;
 
     //QStringList evidenceActions() const;
@@ -30,6 +31,7 @@ public:
 private:
     int currentcaseid;
     TskSystemPropertiesImpl* systemproperties;
+    std::auto_ptr<Log> log;
 
 };
 

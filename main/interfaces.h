@@ -42,7 +42,7 @@ public:
     virtual ~SleuthKitInterface() {}
 
     virtual void SetupSystemProperties(QString configFilePath) = 0;
-
+    virtual void SetupSystemLog(QString logFilePath) = 0;
 };
 
 #define EvidenceInterface_iid "wombat.EvidenceInterface"
