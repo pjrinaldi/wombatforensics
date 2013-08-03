@@ -1,6 +1,18 @@
-#include <QtWidgets>
+#include "sleuthkit.h"
 
-#include "evidence.h"
+void SleuthKitPlugin::SetupSystemProperties(QString configFilePath) const
+{
+    try
+    {
+        systemproperties = new TskSystemPropertiesImpl();
+        systemproperties->initialize(configFilePath.toStdString());
+        TskServices::Instance().setSystemProperties(*systemproperties);
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Loading Config File config file: ", ex.message().c_str());
+    }
+}
 /*
 QStringList EvidencePlugin::evidenceActions() const
 {

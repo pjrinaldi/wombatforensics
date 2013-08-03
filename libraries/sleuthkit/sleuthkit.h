@@ -7,6 +7,7 @@
 #include <QtPlugin>
 #include <QObject>
 #include <QtWidgets>
+#include <QString>
 #include <QStringList>
 #include <QFileDialog>
 
@@ -18,6 +19,7 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
     
 public:
     //SleuthKit Interface Functions
+    void SetupSystemProperties(QString configFilePath) const;
     //SetupImageDatabase() const;
 
     //QStringList evidenceActions() const;
@@ -28,6 +30,7 @@ public:
 
 private:
     int currentcaseid;
+    TskSystemPropertiesImpl* systemproperties;
 
 };
 
