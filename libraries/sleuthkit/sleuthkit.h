@@ -5,6 +5,7 @@
 #include <sqlite3.h>
 #include <tsk/framework/framework.h>
 #include <tsk/framework/services/TskSystemPropertiesImpl.h>
+#include <tsk/framework/services/TskImgDBSqlite.h>
 #include <QtPlugin>
 #include <QObject>
 #include <QString>
@@ -20,6 +21,7 @@ public:
     //SleuthKit Interface Functions
     void SetupSystemProperties(QString configFilePath);
     void SetupSystemLog(QString logFilePath);
+    void SetupImageDatabase(QString imgDBPath);
     //SetupImageDatabase() const;
 
     //QStringList evidenceActions() const;
@@ -32,6 +34,7 @@ private:
     int currentcaseid;
     TskSystemPropertiesImpl* systemproperties;
     std::auto_ptr<Log> log;
+    std::auto_ptr<TskImgDB> imgdb;
 
 };
 

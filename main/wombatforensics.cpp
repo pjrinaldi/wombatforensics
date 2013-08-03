@@ -99,6 +99,7 @@ void WombatForensics::loadPlugin(QString fileName)
         populateTabWidget(plugin);
         setupSleuthKitProperties(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-config.xml");
         setupSleuthKitLog(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-log.xml");
+        setupSleuthKitImgDb(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-img.db");
     }
 }
 
@@ -244,5 +245,13 @@ void WombatForensics::setupSleuthKitLog(QObject *plugin, QString logFileName)
     if(iSleuthKit)
     {
         iSleuthKit->SetupSystemLog(logFileName);
+    }
+}
+void WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+    {
+        iSleuthKit->SetupImageDatabase(imgDBPath);
     }
 }

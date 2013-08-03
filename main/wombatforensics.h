@@ -45,6 +45,7 @@ private:
     void populateTabWidget(QObject *plugin);
     void setupSleuthKitProperties(QObject *plugin, QString configFileName);
     void setupSleuthKitLog(QObject *plugin, QString logFileName);
+    void setupSleuthKitImgDb(QObject *plugin, QString imgDBPath);
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
 
     int64_t currentcaseid;
