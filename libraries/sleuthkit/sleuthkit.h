@@ -4,12 +4,11 @@
 #include <main/interfaces.h>
 #include <sqlite3.h>
 #include <tsk/framework/framework.h>
+#include <tsk/framework/services/TskSystemPropertiesImpl.h>
 #include <QtPlugin>
 #include <QObject>
-#include <QtWidgets>
 #include <QString>
 #include <QStringList>
-#include <QFileDialog>
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {
@@ -19,7 +18,7 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
     
 public:
     //SleuthKit Interface Functions
-    void SetupSystemProperties(QString configFilePath) const;
+    void SetupSystemProperties(QString configFilePath);
     //SetupImageDatabase() const;
 
     //QStringList evidenceActions() const;

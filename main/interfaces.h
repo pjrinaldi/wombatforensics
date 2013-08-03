@@ -36,6 +36,15 @@ public:
     virtual QStringList evidenceToolboxIcons() const = 0;
 };
 
+class SleuthKitInterface
+{
+public:
+    virtual ~SleuthKitInterface() {}
+
+    virtual void SetupSystemProperties(QString configFilePath) = 0;
+
+};
+
 #define EvidenceInterface_iid "wombat.EvidenceInterface"
 
 Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
@@ -43,5 +52,8 @@ Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
 #define BasicToolsInterface_iid "wombat.BasicToolsInterface"
 
 Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)
-            
+
+#define SleuthKitInterface_iid "wombat.SleuthKitInterface"
+Q_DECLARE_INTERFACE(SleuthKitInterface, SleuthKitInterface_iid)
+
 #endif

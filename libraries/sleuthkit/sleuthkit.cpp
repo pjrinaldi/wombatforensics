@@ -1,12 +1,13 @@
 #include "sleuthkit.h"
 
-void SleuthKitPlugin::SetupSystemProperties(QString configFilePath) const
+void SleuthKitPlugin::SetupSystemProperties(QString configFilePath)
 {
     try
     {
         systemproperties = new TskSystemPropertiesImpl();
         systemproperties->initialize(configFilePath.toStdString());
         TskServices::Instance().setSystemProperties(*systemproperties);
+        fprintf(stderr, "Configuration File Loading was successful!");
     }
     catch(TskException &ex)
     {

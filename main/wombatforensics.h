@@ -43,6 +43,7 @@ private:
     void populateActions(QObject *plugin);
     void populateToolBox(QObject *plugin);
     void populateTabWidget(QObject *plugin);
+    void setupSleuthKitProperties(QObject *plugin, QString configFileName);
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
 
     int64_t currentcaseid;

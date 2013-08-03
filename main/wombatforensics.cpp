@@ -44,6 +44,7 @@ WombatForensics::WombatForensics(QWidget *parent) :
     {
         wombatCaseData->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
+    pluginFileNames.clear();
     pluginFileNames = locatePlugins();
 
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
@@ -52,14 +53,23 @@ WombatForensics::WombatForensics(QWidget *parent) :
 
 bool WombatForensics::isPluginLoaded(QString pluginFileName)
 {
+    int pluginexists = 0;
     QString fileName;
     foreach(fileName, pluginFileNames)
     {
         if(fileName.compare(pluginFileName) == 0)
+        {
             loadPlugin(pluginFileName);
-        else
-            fprintf(stderr, "string compare failed.");
+            pluginexists++;
+        }
     }
+    if(pluginexists <= 0)
+    {
+        fprintf(stderr, "string compare failed.");
+        return false;
+    }
+    else
+        return true;
 }
 QStringList WombatForensics::locatePlugins()
 {
@@ -87,6 +97,7 @@ void WombatForensics::loadPlugin(QString fileName)
         populateActions(plugin);
         populateToolBox(plugin);
         populateTabWidget(plugin);
+        setupSleuthKitProperties(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-config.xml");
     }
 }
 
@@ -185,7 +196,8 @@ void WombatForensics::on_actionNew_Case_triggered()
                 ui->actionOpen_Case_2->setEnabled(true);
             }
             isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so"); // manually load evidence plugin
-            isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so"); // manually load evidence plugin
+            isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so"); // manually load basictools plugin
+            isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so"); // manually load sleuthkit plugin
             ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
         }
@@ -206,14 +218,23 @@ void WombatForensics::on_actionOpen_Case_triggered()
         // open case here
         QStringList caseList;
         caseList.clear();
+        // populate case list here
         bool ok;
         QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
-        if(ok && !item.isEmpty())
+        if(ok && !item.isEmpty()) // open selected case
         {
            QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += item;
             this->setWindowTitle(tmpTitle);
         }
+    }
+}
+void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString configFileName)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+    {
+        iSleuthKit->SetupSystemProperties(configFileName);
     }
 }
 
