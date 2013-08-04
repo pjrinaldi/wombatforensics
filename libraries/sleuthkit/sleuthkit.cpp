@@ -38,8 +38,8 @@ void SleuthKitPlugin::SetupImageDatabase(QString imgDBPath)
         else
         {
             fprintf(stderr, "DB was Initialized Successfully!\n");
-            TskServices::Instance().setImgDB(*imgdb);
         }
+        TskServices::Instance().setImgDB(*imgdb);
         fprintf(stderr, "Loading ImageDB was Successful!\n");
     }
     catch(TskException &ex)
@@ -93,11 +93,11 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
     }
     catch(TskException &ex)
     {
-        imagefiletsk.extractFiles();
         fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
     }
     try
     {
+        imagefiletsk.extractFiles();
         fprintf(stderr, "Extracting Evidence was successful\n");
     }
     catch(TskException &ex)

@@ -103,6 +103,7 @@ void WombatForensics::loadPlugin(QString fileName)
         setupSleuthKitBlackboard(plugin);
         setupSleuthKitSchedulerQueue(plugin);
         setupSleuthKitFileManager(plugin);
+        sleuthKitLoadEvidence(plugin, "/home/pasquale/Projects/TestImages/1-extend-part/ext-part-test-2.dd");
     }
 }
 
