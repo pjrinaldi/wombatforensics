@@ -44,6 +44,10 @@ public:
     virtual void SetupSystemProperties(QString configFilePath) = 0;
     virtual void SetupSystemLog(QString logFilePath) = 0;
     virtual void SetupImageDatabase(QString imgDBPath) = 0;
+    virtual void SetupSystemBlackboard() = 0;
+    virtual void SetupSystemSchedulerQueue() = 0;
+    virtual void SetupSystemFileManager() = 0;
+    virtual void OpenEvidence(QString evidencePath) = 0;
 };
 
 #define EvidenceInterface_iid "wombat.EvidenceInterface"

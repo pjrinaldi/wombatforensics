@@ -46,6 +46,10 @@ private:
     void setupSleuthKitProperties(QObject *plugin, QString configFileName);
     void setupSleuthKitLog(QObject *plugin, QString logFileName);
     void setupSleuthKitImgDb(QObject *plugin, QString imgDBPath);
+    void setupSleuthKitBlackboard(QObject *plugin);
+    void setupSleuthKitSchedulerQueue(QObject *plugin);
+    void setupSleuthKitFileManager(QObject *plugin);
+    void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath);
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
 
     int64_t currentcaseid;

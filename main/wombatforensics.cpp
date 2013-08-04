@@ -99,7 +99,10 @@ void WombatForensics::loadPlugin(QString fileName)
         populateTabWidget(plugin);
         setupSleuthKitProperties(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-config.xml");
         setupSleuthKitLog(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-log.xml");
-        setupSleuthKitImgDb(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-img.db");
+        setupSleuthKitImgDb(plugin, "/home/pasquale/Projects/wombatforensics/build/data/");
+        setupSleuthKitBlackboard(plugin);
+        setupSleuthKitSchedulerQueue(plugin);
+        setupSleuthKitFileManager(plugin);
     }
 }
 
@@ -253,5 +256,37 @@ void WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath)
     if(iSleuthKit)
     {
         iSleuthKit->SetupImageDatabase(imgDBPath);
+    }
+}
+void WombatForensics::setupSleuthKitBlackboard(QObject *plugin)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+    {
+        iSleuthKit->SetupSystemBlackboard();
+    }
+}
+void WombatForensics::setupSleuthKitSchedulerQueue(QObject *plugin)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+    {
+        iSleuthKit->SetupSystemSchedulerQueue();
+    }
+}
+void WombatForensics::setupSleuthKitFileManager(QObject *plugin)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+    {
+        iSleuthKit->SetupSystemFileManager();
+    }
+}
+void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+    {
+        iSleuthKit->OpenEvidence(evidencePath);
     }
 }

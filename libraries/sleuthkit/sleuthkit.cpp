@@ -25,7 +25,7 @@ void SleuthKitPlugin::SetupSystemLog(QString logFilePath)
     }
     catch(TskException &ex)
     {
-        fprintf(stderr, "Loading Log File: ", ex.message().c_str());
+        fprintf(stderr, "Loading Log File: %s\n", ex.message().c_str());
     }
 }
 void SleuthKitPlugin::SetupImageDatabase(QString imgDBPath)
@@ -44,6 +44,64 @@ void SleuthKitPlugin::SetupImageDatabase(QString imgDBPath)
     }
     catch(TskException &ex)
     {
-        fprintf(stderr, "Loading ImageDB: ", ex.message().c_str());
+        fprintf(stderr, "Loading ImageDB: %s\n", ex.message().c_str());
+    }
+}
+void SleuthKitPlugin::SetupSystemBlackboard()
+{
+    try
+    {
+        TskServices::Instance().setBlackboard((TskBlackboard &)TskDBBlackboard::instance());
+        fprintf(stderr, "Loading Blackboard was successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Loading Blackboard: %s\n", ex.message().c_str());
+    }
+}
+void SleuthKitPlugin::SetupSystemSchedulerQueue()
+{
+    try
+    {
+        TskServices::Instance().setScheduler(scheduler);
+        fprintf(stderr, "Loading Scheduler was successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Loading Scheduler: %s\n", ex.message().c_str());
+    }
+}
+void SleuthKitPlugin::SetupSystemFileManager()
+{
+    try
+    {
+        TskServices::Instance().setFileManager(TskFileManagerImpl::instance());
+        fprintf(stderr, "Loading File Manager was successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Loading FileManager: %s\n", ex.message().c_str());
+    }
+}
+void SleuthKitPlugin::OpenEvidence(QString evidencePath)
+{
+    try
+    {
+        imagefiletsk.open(evidencePath.toStdString());
+        TskServices::Instance().setImageFile(imagefiletsk);
+        fprintf(stderr, "Opening Image File was successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        imagefiletsk.extractFiles();
+        fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
+    }
+    try
+    {
+        fprintf(stderr, "Extracting Evidence was successful\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }
 }
