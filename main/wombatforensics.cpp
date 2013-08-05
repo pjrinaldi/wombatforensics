@@ -177,7 +177,7 @@ void WombatForensics::alterEvidence()
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
     {
-        QString evidenceFilePath = iEvidence->addEvidence(currentcaseid);
+        QString evidenceFilePath = iEvidence->addEvidence();
         if(evidenceFilePath != "")
         {
             setupSleuthKitImgDb(sleuthkitplugin, currentcasedirpath, currentcaseevidencepath);
@@ -292,7 +292,17 @@ void WombatForensics::on_actionOpen_Case_triggered()
             {
                 wombatCaseData->DisplayError(this, "2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
             }
-            // FILL ALL GLOBAL VARIABLES WITH THEIR RESPECTIVE DATA/PATHS
+            userPath = currentcasedirpath;
+            userPath += "evidence/";
+            mkPath = (new QDir())->mkpath(userPath);
+            if(mkPath == true)
+            {
+                currentcaseevidencepath = userPath;
+            }
+            else
+            {
+                wombatCaseData->DisplayError(this, "2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
+            }
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
         }
     }

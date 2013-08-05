@@ -17,7 +17,7 @@ public:
     virtual QStringList evidenceActions() const = 0;
     virtual QStringList evidenceActionIcons() const = 0;
 
-    virtual QString addEvidence(int currentCaseID) = 0;
+    virtual QString addEvidence() = 0;
     virtual void remEvidence(int currentCaseID) = 0;
 
 };

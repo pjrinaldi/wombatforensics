@@ -12,11 +12,11 @@ QStringList EvidencePlugin::evidenceActionIcons() const
     return QStringList() << tr(":/basic/addevidence") << tr(":/basic/remevidence");
 }
 
-QString EvidencePlugin::addEvidence(int currentCaseID)
+QString EvidencePlugin::addEvidence()
 {
     QString evidenceFile = "";
     // add evidence here
-    currentcaseid = currentCaseID;
+    //currentcaseid = currentCaseID;
     evidenceFile = QFileDialog::getOpenFileName(0, tr("Select Evidence Item"), tr("./"));
 
     return evidenceFile;
