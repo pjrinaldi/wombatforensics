@@ -24,6 +24,7 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
         {
             fprintf(stderr, "Could not open file to write\n");
         }
+        tmpFile.close();
     }
     try
     {
