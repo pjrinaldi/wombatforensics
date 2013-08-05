@@ -14,6 +14,8 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QFile>
+#include <QXmlStreamWriter>
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {

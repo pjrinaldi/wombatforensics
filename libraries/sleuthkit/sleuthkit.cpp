@@ -4,6 +4,27 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
 {
     QString tmpPath = settingsPath;
     tmpPath += configFilePath;
+    QFile tmpFile(tmpPath);
+    fprintf(stderr, "TmpPath: %s\n", tmpPath.toStdString().c_str());
+    if(!tmpFile.exists()) // if tsk-config.xml does not exist, create and write it here
+    {
+        if(tmpFile.open(QFile::WriteOnly | QFile::Text))
+        {   
+            QXmlStreamWriter xml(&tmpFile);
+            xml.setAutoFormatting(true);
+            xml.writeStartDocument();
+            xml.writeStartElement("TSK_FRAMEWORK_CONFIG");
+            xml.writeStartElement("CONFIG_DIR");
+            xml.writeCharacters(tmpPath);
+            xml.writeEndElement();
+            xml.writeEndElement();
+            xml.writeEndDocument();
+        }
+        else
+        {
+            fprintf(stderr, "Could not open file to write\n");
+        }
+    }
     try
     {
         systemproperties = new TskSystemPropertiesImpl();
