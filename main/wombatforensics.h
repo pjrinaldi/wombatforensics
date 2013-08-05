@@ -55,6 +55,9 @@ private:
     int64_t currentcaseid;
     QDir pluginsDir;
     QStringList pluginFileNames;
+    QString currentcasedirpath;
+    QString wombatsettingspath;
+    QString wombatdatapath;
 };
 
 #endif // WOMBATFORENSICS_H

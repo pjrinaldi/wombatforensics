@@ -13,10 +13,17 @@ WombatForensics::WombatForensics(QWidget *parent) :
     //connect(ui->actionNew_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionNew_Case_triggered()));
     //connect(ui->actionOpen_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionOpen_Case_triggered()));
     currentcaseid = -1;
-    QDir testDir = QDir(qApp->applicationDirPath());
-    testDir.mkdir("data");
-    QString tmpPath = testDir.currentPath();
-    tmpPath += "/data/WombatData.db";
+    QString homePath = QDir::homePath();
+    homePath += "/WombatForensics/";
+    wombatsettingspath = homePath + "settings/";
+    wombatdatapath = homePath + "data/";
+    bool mkPath = (new QDir())->mkpath(wombatsettingspath);
+    if(mkPath == false)
+        wombatCaseData->DisplayError(this, "2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
+    mkPath = (new QDir())->mkpath(wombatdatapath);
+    if(mkPath == false)
+        wombatCaseData->DisplayError(this, "2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
+    QString tmpPath = wombatdatapath + "WombatData.db";
     bool doesFileExist = wombatCaseData->FileExists(tmpPath.toStdString());
     if(!doesFileExist)
     {
@@ -103,7 +110,7 @@ void WombatForensics::loadPlugin(QString fileName)
         setupSleuthKitBlackboard(plugin);
         setupSleuthKitSchedulerQueue(plugin);
         setupSleuthKitFileManager(plugin);
-        sleuthKitLoadEvidence(plugin, "/home/pasquale/Projects/TestImages/1-extend-part/ext-part-test-2.dd");
+        //sleuthKitLoadEvidence(plugin, "/home/pasquale/Projects/TestImages/1-extend-part/ext-part-test-2.dd"); done when add evidence
     }
 }
 
@@ -194,8 +201,23 @@ void WombatForensics::on_actionNew_Case_triggered()
 
             QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += text;
-            this->setWindowTitle(tmpTitle);
-
+            this->setWindowTitle(tmpTitle); // update application window.
+            // make Cases Folder
+            QString userPath = QDir::homePath();
+            userPath += "/Cases/";
+            userPath += QString::number(currentcaseid);
+            userPath += "-";
+            userPath += text;
+            userPath += "/";
+            bool mkPath = (new QDir())->mkpath(userPath);
+            if(mkPath == true)
+            {
+                currentcasedirpath = userPath;
+            }
+            else
+            {
+                wombatCaseData->DisplayError(this, "2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
+            }
             if(wombatCaseData->ReturnCaseCount() > 0)
             {
                 ui->actionOpen_Case->setEnabled(true);
