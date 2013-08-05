@@ -1,11 +1,13 @@
 #include "sleuthkit.h"
 
-void SleuthKitPlugin::SetupSystemProperties(QString configFilePath)
+void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString configFilePath)
 {
+    QString tmpPath = settingsPath;
+    tmpPath += configFilePath;
     try
     {
         systemproperties = new TskSystemPropertiesImpl();
-        systemproperties->initialize(configFilePath.toStdString());
+        systemproperties->initialize(tmpPath.toStdString());
         TskServices::Instance().setSystemProperties(*systemproperties);
         fprintf(stderr, "Configuration File Loading was successful!\n");
     }
@@ -15,15 +17,17 @@ void SleuthKitPlugin::SetupSystemProperties(QString configFilePath)
     }
     try
     {
-        SetSystemProperty(TskSystemProperties::OUT_DIR, "/home/pasquale/Projects/wombatforensics/build/data/");
+        SetSystemProperty(TskSystemProperties::OUT_DIR, settingsPath.toStdString());
     }
     catch(TskException &ex)
     {
         fprintf(stderr, "Setting out dir failed: %s\n", ex.message().c_str());
     }
 }
-void SleuthKitPlugin::SetupSystemLog(QString logFilePath)
+void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath)
 {
+    QString tmpPath = dataPath;
+    tmpPath += logFilePath;
     try
     {
         log = std::auto_ptr<Log>(new Log());

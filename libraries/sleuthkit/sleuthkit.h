@@ -23,8 +23,8 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
     
 public:
     //SleuthKit Interface Functions
-    void SetupSystemProperties(QString configFilePath);
-    void SetupSystemLog(QString logFilePath);
+    void SetupSystemProperties(QString settingsPath, QString configFilePath);
+    void SetupSystemLog(QString dataPath, QString logFilePath);
     void SetupImageDatabase(QString imgDBPath);
     void SetupSystemBlackboard();
     void SetupSystemSchedulerQueue();

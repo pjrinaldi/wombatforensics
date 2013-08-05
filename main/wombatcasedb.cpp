@@ -136,3 +136,46 @@ int64_t WombatCaseDb::InsertCase(QString caseText)
 
     return caseid;
 }
+
+QStringList WombatCaseDb::ReturnCaseNameList()
+{
+    QStringList tmpList;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT casename FROM cases ORDER by caseid;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        int ret = sqlite3_step(sqlstatement);
+        while(ret == SQLITE_ROW)
+        {
+            tmpList << (const char*)sqlite3_column_text(sqlstatement, 0);
+        }
+    }
+    else
+    {
+        DisplayError(wombatparent, "1.5", "RETURN CASE NAMES LIST", sqlite3_errmsg(wombatdb));
+    }
+
+    return tmpList;
+}
+
+int WombatCaseDb::ReturnCaseID(QString caseName)
+{
+    int caseid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT caseid FROM cases WHERE casename = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_text(sqlstatement, 1, caseName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                caseid = sqlite3_column_int(sqlstatement, 0);
+            }
+            else
+                DisplayError(wombatparent, "1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
+        }
+        else
+            DisplayError(wombatparent, "1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
+    }
+    else
+        DisplayError(wombatparent, "1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
+    
+    return caseid;
+}

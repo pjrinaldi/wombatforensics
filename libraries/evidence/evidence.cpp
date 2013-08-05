@@ -12,15 +12,14 @@ QStringList EvidencePlugin::evidenceActionIcons() const
     return QStringList() << tr(":/basic/addevidence") << tr(":/basic/remevidence");
 }
 
-void EvidencePlugin::addEvidence(int currentCaseID)
+QString EvidencePlugin::addEvidence(int currentCaseID)
 {
+    QString evidenceFile = "";
     // add evidence here
     currentcaseid = currentCaseID;
-    QString evidenceFile = QFileDialog::getOpenFileName(0, tr("Select Evidence Item"), tr("./"));
-    if (evidenceFile != "")
-    {
-        // make respective directories to store case information
-    }
+    evidenceFile = QFileDialog::getOpenFileName(0, tr("Select Evidence Item"), tr("./"));
+
+    return evidenceFile;
 }
 
 void EvidencePlugin::remEvidence(int currentCaseID)

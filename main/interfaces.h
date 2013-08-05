@@ -17,7 +17,7 @@ public:
     virtual QStringList evidenceActions() const = 0;
     virtual QStringList evidenceActionIcons() const = 0;
 
-    virtual void addEvidence(int currentCaseID) = 0;
+    virtual QString addEvidence(int currentCaseID) = 0;
     virtual void remEvidence(int currentCaseID) = 0;
 
 };
@@ -41,8 +41,8 @@ class SleuthKitInterface
 public:
     virtual ~SleuthKitInterface() {}
 
-    virtual void SetupSystemProperties(QString configFilePath) = 0;
-    virtual void SetupSystemLog(QString logFilePath) = 0;
+    virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
+    virtual void SetupSystemLog(QString dataPath, QString logFilePath) = 0;
     virtual void SetupImageDatabase(QString imgDBPath) = 0;
     virtual void SetupSystemBlackboard() = 0;
     virtual void SetupSystemSchedulerQueue() = 0;

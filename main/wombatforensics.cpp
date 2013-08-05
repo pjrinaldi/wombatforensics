@@ -17,12 +17,16 @@ WombatForensics::WombatForensics(QWidget *parent) :
     homePath += "/WombatForensics/";
     wombatsettingspath = homePath + "settings/";
     wombatdatapath = homePath + "data/";
+    wombatcasespath = homePath + "cases/";
     bool mkPath = (new QDir())->mkpath(wombatsettingspath);
     if(mkPath == false)
         wombatCaseData->DisplayError(this, "2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
     mkPath = (new QDir())->mkpath(wombatdatapath);
     if(mkPath == false)
         wombatCaseData->DisplayError(this, "2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
+    mkPath = (new QDir())->mkpath(wombatcasespath);
+    if(mkPath == false)
+        wombatCaseData->DisplayError(this, "2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
     QString tmpPath = wombatdatapath + "WombatData.db";
     bool doesFileExist = wombatCaseData->FileExists(tmpPath.toStdString());
     if(!doesFileExist)
@@ -93,7 +97,7 @@ QStringList WombatForensics::locatePlugins()
     return tmpList;
 }
 
-void WombatForensics::loadPlugin(QString fileName)
+QObject* WombatForensics::loadPlugin(QString fileName)
 {
    QPluginLoader loader(fileName);
     QObject* plugin = loader.instance();
@@ -104,14 +108,15 @@ void WombatForensics::loadPlugin(QString fileName)
         populateActions(plugin);
         populateToolBox(plugin);
         populateTabWidget(plugin);
-        setupSleuthKitProperties(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-config.xml");
-        setupSleuthKitLog(plugin, "/home/pasquale/Projects/wombatforensics/build/data/tsk-log.xml");
-        setupSleuthKitImgDb(plugin, "/home/pasquale/Projects/wombatforensics/build/data/");
+        setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
+        setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt");
+        setupSleuthKitImgDb(plugin, currentcasedirpath);
         setupSleuthKitBlackboard(plugin);
         setupSleuthKitSchedulerQueue(plugin);
         setupSleuthKitFileManager(plugin);
-        //sleuthKitLoadEvidence(plugin, "/home/pasquale/Projects/TestImages/1-extend-part/ext-part-test-2.dd"); done when add evidence
     }
+
+    return plugin;
 }
 
 void WombatForensics::populateActions(QObject *plugin)
@@ -171,7 +176,11 @@ void WombatForensics::alterEvidence()
     QAction *action = qobject_cast<QAction *>(sender());
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
-        iEvidence->addEvidence(currentcaseid);
+    {
+        QString evidenceFilePath = iEvidence->addEvidence(currentcaseid);
+        if(evidenceFilePath != "")
+            sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
+    }
     else if(action->text() == tr("Remove Evidence"))
         iEvidence->remEvidence(currentcaseid);
 }
@@ -203,8 +212,7 @@ void WombatForensics::on_actionNew_Case_triggered()
             tmpTitle += text;
             this->setWindowTitle(tmpTitle); // update application window.
             // make Cases Folder
-            QString userPath = QDir::homePath();
-            userPath += "/Cases/";
+            QString userPath = wombatcasespath;
             userPath += QString::number(currentcaseid);
             userPath += "-";
             userPath += text;
@@ -223,9 +231,9 @@ void WombatForensics::on_actionNew_Case_triggered()
                 ui->actionOpen_Case->setEnabled(true);
                 ui->actionOpen_Case_2->setEnabled(true);
             }
-            isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so"); // manually load evidence plugin
-            isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so"); // manually load basictools plugin
-            isPluginLoaded("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so"); // manually load sleuthkit plugin
+            evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so"); // manually load evidence plugin
+            basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so"); // manually load basictools plugin
+            sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so"); // manually load sleuthkit plugin
             ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
         }
@@ -247,30 +255,47 @@ void WombatForensics::on_actionOpen_Case_triggered()
         QStringList caseList;
         caseList.clear();
         // populate case list here
+        caseList = wombatCaseData->ReturnCaseNameList();
         bool ok;
         QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
         if(ok && !item.isEmpty()) // open selected case
         {
-           QString tmpTitle = "Wombat Forensics - ";
+            currentcaseid = wombatCaseData->ReturnCaseID(item);
+            QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += item;
             this->setWindowTitle(tmpTitle);
+            QString userPath = wombatcasespath;
+            userPath += QString::number(currentcaseid);
+            userPath += "-";
+            userPath += item;
+            userPath += "/";
+            bool mkPath = (new QDir())->mkpath(userPath);
+            if(mkPath == true)
+            {
+                currentcasedirpath = userPath;
+            }
+            else
+            {
+                wombatCaseData->DisplayError(this, "2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
+            }
+            // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
         }
     }
 }
-void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString configFileName)
+void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        iSleuthKit->SetupSystemProperties(configFileName);
+        iSleuthKit->SetupSystemProperties(settingsPath, configFileName);
     }
 }
-void WombatForensics::setupSleuthKitLog(QObject *plugin, QString logFileName)
+void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        iSleuthKit->SetupSystemLog(logFileName);
+        iSleuthKit->SetupSystemLog(dataPath, logFileName);
     }
 }
 void WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath)

@@ -3,6 +3,8 @@
 
 #include <sqlite3.h>
 #include <QMessageBox>
+#include <QStringList>
+#include <QString>
 #include <string.h>
 #include <cstring>
 #include <sstream>
@@ -26,6 +28,8 @@ public:
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
     int64_t InsertCase(QString caseText);
+    QStringList ReturnCaseNameList(void);
+    int ReturnCaseID(QString caseName);
 
 private:
     sqlite3 *wombatdb;

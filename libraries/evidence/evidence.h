@@ -20,7 +20,7 @@ public:
     QStringList evidenceActions() const;
     QStringList evidenceActionIcons() const;
 
-    void addEvidence(int currentCaseID);
+    QString addEvidence(int currentCaseID);
     void remEvidence(int currentCaseID);
 
 private:

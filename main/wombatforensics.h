@@ -37,14 +37,14 @@ private slots:
 private:
     Ui::WombatForensics *ui;
 
-    void loadPlugin(QString fileName);
+    QObject* loadPlugin(QString fileName);
     QStringList locatePlugins(void);
     bool isPluginLoaded(QString pluginFileName);
     void populateActions(QObject *plugin);
     void populateToolBox(QObject *plugin);
     void populateTabWidget(QObject *plugin);
-    void setupSleuthKitProperties(QObject *plugin, QString configFileName);
-    void setupSleuthKitLog(QObject *plugin, QString logFileName);
+    void setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName);
+    void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName);
     void setupSleuthKitImgDb(QObject *plugin, QString imgDBPath);
     void setupSleuthKitBlackboard(QObject *plugin);
     void setupSleuthKitSchedulerQueue(QObject *plugin);
@@ -58,6 +58,10 @@ private:
     QString currentcasedirpath;
     QString wombatsettingspath;
     QString wombatdatapath;
+    QString wombatcasespath;
+    QObject *basictoolsplugin;
+    QObject *evidenceplugin;
+    QObject *sleuthkitplugin;
 };
 
 #endif // WOMBATFORENSICS_H
