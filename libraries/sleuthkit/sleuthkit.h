@@ -42,7 +42,7 @@ private:
     TskSystemPropertiesImpl* systemproperties;
     std::auto_ptr<Log> log;
     std::auto_ptr<TskImgDB> imgdb;
-    TskImageFileTsk imagefiletsk;
+    //TskImageFileTsk imagefiletsk;
     TskSchedulerQueue scheduler;
 
 };

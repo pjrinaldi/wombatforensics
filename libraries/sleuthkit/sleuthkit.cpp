@@ -11,7 +11,15 @@ void SleuthKitPlugin::SetupSystemProperties(QString configFilePath)
     }
     catch(TskException &ex)
     {
-        fprintf(stderr, "Loading Config File config file: ", ex.message().c_str());
+        fprintf(stderr, "Loading Config File config file: %s\n", ex.message().c_str());
+    }
+    try
+    {
+        SetSystemProperty(TskSystemProperties::OUT_DIR, "/home/pasquale/Projects/wombatforensics/build/data/");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Setting out dir failed: %s\n", ex.message().c_str());
     }
 }
 void SleuthKitPlugin::SetupSystemLog(QString logFilePath)
@@ -85,6 +93,7 @@ void SleuthKitPlugin::SetupSystemFileManager()
 }
 void SleuthKitPlugin::OpenEvidence(QString evidencePath)
 {
+    TskImageFileTsk imagefiletsk;
     try
     {
         imagefiletsk.open(evidencePath.toStdString());
