@@ -45,7 +45,7 @@ private:
     void populateTabWidget(QObject *plugin);
     void setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName);
     void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName);
-    void setupSleuthKitImgDb(QObject *plugin, QString imgDBPath);
+    void setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);
     void setupSleuthKitBlackboard(QObject *plugin);
     void setupSleuthKitSchedulerQueue(QObject *plugin);
     void setupSleuthKitFileManager(QObject *plugin);
@@ -56,6 +56,7 @@ private:
     QDir pluginsDir;
     QStringList pluginFileNames;
     QString currentcasedirpath;
+    QString currentcaseevidencepath;
     QString wombatsettingspath;
     QString wombatdatapath;
     QString wombatcasespath;

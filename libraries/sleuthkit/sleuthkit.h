@@ -25,7 +25,7 @@ public:
     //SleuthKit Interface Functions
     void SetupSystemProperties(QString settingsPath, QString configFilePath);
     void SetupSystemLog(QString dataPath, QString logFilePath);
-    void SetupImageDatabase(QString imgDBPath);
+    void SetupImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void SetupSystemBlackboard();
     void SetupSystemSchedulerQueue();
     void SetupSystemFileManager();

@@ -37,7 +37,7 @@ using namespace std;
 class TSK_FRAMEWORK_API TskImgDBSqlite : public TskImgDB
 {
 public:
-    TskImgDBSqlite(const char * a_outpath);
+    TskImgDBSqlite(const char * a_outpath, const char* a_imgname);
     virtual ~ TskImgDBSqlite();
 
     virtual int initialize();

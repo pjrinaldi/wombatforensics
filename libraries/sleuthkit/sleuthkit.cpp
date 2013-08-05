@@ -31,7 +31,7 @@ void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath)
     try
     {
         log = std::auto_ptr<Log>(new Log());
-        log->open(logFilePath.toStdString().c_str());
+        log->open(tmpPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");
     }
@@ -40,11 +40,14 @@ void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath)
         fprintf(stderr, "Loading Log File: %s\n", ex.message().c_str());
     }
 }
-void SleuthKitPlugin::SetupImageDatabase(QString imgDBPath)
+void SleuthKitPlugin::SetupImageDatabase(QString imgDBPath, QString evidenceFilePath)
 {
+    QString evidenceFileName = evidenceFilePath.split("/").last();
+    evidenceFileName += ".db";
+
     try
     {
-        imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(imgDBPath.toStdString().c_str()));
+        imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(imgDBPath.toStdString().c_str(), evidenceFileName.toStdString().c_str()));
         if(imgdb->initialize() != 0)
             fprintf(stderr, "Error initializing db\n");
         else

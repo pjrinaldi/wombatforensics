@@ -45,7 +45,7 @@
  * @param a_outpath Directory to store the database in. This 
  * directory must already exist.
 */
-TskImgDBSqlite::TskImgDBSqlite(const char * a_outpath)
+TskImgDBSqlite::TskImgDBSqlite(const char * a_outpath, const char* a_imgname)
 {
     strncpy(m_outPath, a_outpath, 256);
     // ensure that the path ends with a '/'
@@ -55,7 +55,7 @@ TskImgDBSqlite::TskImgDBSqlite(const char * a_outpath)
         m_outPath[len1+1] = '\0';
     }
     strncpy(m_dbFilePath, m_outPath, 256);
-    strncat(m_dbFilePath, "image.db", 256);
+    strncat(m_dbFilePath, a_imgname, 256);
     m_db = NULL;
 }
 
