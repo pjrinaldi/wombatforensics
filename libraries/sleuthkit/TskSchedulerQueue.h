@@ -11,7 +11,7 @@
 #ifndef TSK_SCHEDULER_QUEUE
 #define TSK_SCHEDULER_QUEUE
 
-#include "Scheduler.h"
+#include <tsk/framework/services/Scheduler.h>
 #include <queue>
 
 /**

@@ -17,7 +17,7 @@
 #define _TSK_FILEMANAGERIMPL_H
 
 // Framework Includes
-#include "TskFileManager.h"
+#include <tsk/framework/file/TskFileManager.h>
 
 // Poco Includes
 #include "Poco/File.h"

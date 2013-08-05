@@ -17,12 +17,12 @@
 #define _TSK_DB_BLACKBOARD_H
 
 #include <string>
-#include "tsk/framework/utilities/TskException.h"
-#include "tsk/framework/services/TskBlackboard.h"
-#include "tsk/framework/services/TskImgDB.h"
-#include "tsk/framework/services/TskServices.h"
-#include "TskBlackboardArtifact.h"
-#include "TskBlackboardAttribute.h"
+#include <tsk/framework/utilities/TskException.h>
+#include <tsk/framework/services/TskBlackboard.h>
+#include <tsk/framework/services/TskImgDB.h>
+#include <tsk/framework/services/TskServices.h>
+#include <tsk/framework/services/TskBlackboardArtifact.h>
+#include <tsk/framework/services/TskBlackboardAttribute.h>
 
 
 /**

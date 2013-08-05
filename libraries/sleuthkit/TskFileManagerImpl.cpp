@@ -18,7 +18,7 @@
 
 // Framework includes
 #include "TskFileManagerImpl.h"
-#include "TskFileTsk.h"
+#include "tsk/framework/file/TskFileTsk.h"
 #include "tsk/framework/services/TskSystemProperties.h"
 #include "tsk/framework/services/TskServices.h"
 #include "tsk/framework/utilities/TskException.h"
@@ -76,7 +76,8 @@ void TskFileManagerImpl::initialize()
         LOGERROR(errorMsg.str());
         
         // Throw a framework specific exception
-        throw TskFileException(ex.message());
+        //throw TskFileException(ex.message());
+        fprintf(stderr, "TskFileException %s\n", ex.message().c_str());
     }
 }
 
@@ -222,7 +223,8 @@ void TskFileManagerImpl::saveFile(TskFile* fileToSave)
         {
             std::ostringstream msg;
             msg << "TskFileManagerImpl::saveFile : " << (fileType == TskImgDB::IMGDB_FILES_TYPE_CARVED ? "carved file" : "derived file") << " with file id = " << fileToSave->getId() << " does not exist in storage"; 
-            throw TskException(msg.str());
+            //throw TskException(msg.str());
+            fprintf(stderr, "TskException: %s\n", msg.str().c_str());
         }
     }
 }
@@ -233,12 +235,14 @@ void TskFileManagerImpl::copyFile(TskFile* fileToSave, const std::wstring& fileP
     {
         if (fileToSave == NULL)
         {
-			throw TskException("TskFile pointer is NULL.");
+	    //throw TskException("TskFile pointer is NULL.");
+            fprintf(stderr, "TskFile Pointer is NULL.\n");
         }
 
 		if (fileToSave->isDirectory())
 		{
-			throw TskException("Attempt to copy directory where file is expected.");
+                    fprintf(stderr, "Attempt to copy directory where file is expected.\n");
+		    //throw TskException("Attempt to copy directory where file is expected.");
 		}
 
         Poco::Path destPath(TskUtilities::toUTF8(filePath));
@@ -312,15 +316,17 @@ void TskFileManagerImpl::copyFile(TskFile* fileToSave, const std::wstring& fileP
     catch (TskFileException& tskEx)
     {
         // Rethrow the exception up to our caller
-        throw tskEx;
+        fprintf(stderr, "FileException: %s\n", tskEx.message().c_str());
     }
     catch (Poco::PathNotFoundException&)
     {
-        throw TskException("Path not found : " + fileToSave->getPath());
+        fprintf(stderr, "Path not found: %s\n", fileToSave->getPath().c_str());
+        //throw TskException("Path not found : " + fileToSave->getPath());
     }
     catch (std::exception & ex)
     {
-        throw ex;
+        fprintf(stderr, "StdException for file path.\n");
+        //throw ex;
     }
 }
 
@@ -328,17 +334,19 @@ void TskFileManagerImpl::copyDirectory(TskFile* directoryToCopy, const std::wstr
 {
 	if (directoryToCopy == NULL)
 	{
-		throw TskException("Directory pointer is NULL.");
+            fprintf(stderr, "Directory pointer is NULL.\n");
+	    //throw TskException("Directory pointer is NULL.");
 	}
 
 	if (!directoryToCopy->isDirectory())
 	{
-		throw TskException("File object to copy is not a directory.");
+            fprintf(stderr, "File object to copy is not a directory.\n");
+	    //throw TskException("File object to copy is not a directory.");
 	}
 
 	try
 	{
-		Poco::File destDir(TskUtilities::toUTF8(destinationPath));
+	    Poco::File destDir(TskUtilities::toUTF8(destinationPath));
 
         // If the destination directory exists it is replaced.
         if (destDir.exists())
@@ -371,7 +379,8 @@ void TskFileManagerImpl::copyDirectory(TskFile* directoryToCopy, const std::wstr
 				{
 				  std::stringstream msg;
 				  msg << "Failed to create file object for file id " << *it;
-				  throw TskException(msg.str());
+                                  fprintf(stderr, "Failed to create file object for file id: %d\n", (int)*it);
+				  //throw TskException(msg.str());
 				}
 
 				if (pFile->isDirectory() && bRecurse)
@@ -393,12 +402,14 @@ void TskFileManagerImpl::copyDirectory(TskFile* directoryToCopy, const std::wstr
 	}
     catch (TskException& tskEx)
     {
+        fprintf(stderr, "Tsk Exception.\n");
         // Rethrow the exception up to our caller
-        throw tskEx;
+        //throw tskEx;
     }
     catch (std::exception & ex)
     {
-        throw ex;
+        fprintf(stderr, "Std Exception.\n");
+        //throw ex;
     }
 }
 
@@ -412,7 +423,8 @@ void TskFileManagerImpl::addFile(const uint64_t fileId, std::istream& istr)
         delete pFile;
         std::stringstream msg;
         msg << "File id " << fileId << " already exists.";
-        throw TskFileException(msg.str());
+        fprintf(stderr, "Tsk File Exception: File id %d already exists.\n", (int)fileId);
+        //throw TskFileException(msg.str());
     }
     delete pFile;
 
@@ -433,7 +445,8 @@ void TskFileManagerImpl::addFile(const uint64_t fileId, std::istream& istr)
         std::wstringstream msg;
         msg << L"TskFileManagerImpl::addFile - Error saving file from stream : " << ex.displayText().c_str();
         LOGERROR(msg.str());
-        throw TskFileException("Error saving file from stream.");
+        fprintf(stderr, "Error saving file from stream.\n");
+        //throw TskFileException("Error saving file from stream.");
     }
 }
 
@@ -450,7 +463,8 @@ void TskFileManagerImpl::addFile(const uint64_t fileId, std::wstring& filePath)
         msg << L"TskFileManagerImpl::addFile - Error opening file " << TskUtilities::toUTF8(filePath).c_str()  
             << L" : " << ex.displayText().c_str();
         LOGERROR(msg.str());
-        throw TskFileException("Error opening input file.");
+        fprintf(stderr, "Error opening input file.\n");
+        //throw TskFileException("Error opening input file.");
     }
 }
 
@@ -461,7 +475,8 @@ void TskFileManagerImpl::deleteFile(TskFile* fileToDelete)
         if (fileToDelete == NULL)
         {
             LOGERROR(L"TskFileManagerImpl::deleteFile - Passed NULL file pointer.");
-            throw TskNullPointerException();
+            fprintf(stderr, "TskFileManagerImpl::deleteFile - Passed NULL file pointer.");
+            //throw TskNullPointerException();
         }
 
         if (fileToDelete->exists())
@@ -477,6 +492,7 @@ void TskFileManagerImpl::deleteFile(TskFile* fileToDelete)
             << fileToDelete->getPath().c_str() << L". Error: " << ex.displayText().c_str() << std::endl;
         LOGERROR(errorMsg.str());
 
-        throw TskFileException("Failed to delete file.");
+        fprintf(stderr, "Failed to delete file.");
+        //throw TskFileException("Failed to delete file.");
     }
 }

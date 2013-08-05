@@ -16,10 +16,10 @@
 #ifndef _TSK_IMAGEFILETSK_H
 #define _TSK_IMAGEFILETSK_H
 
-#include "TskImageFile.h"
-#include "tsk/framework/services/TskImgDB.h"
-#include "tsk/framework/services/Log.h"
-#include "tsk/libtsk.h"
+#include <tsk/framework/extraction/TskImageFile.h>
+#include <tsk/framework/services/TskImgDB.h>
+#include <tsk/framework/services/Log.h>
+#include <tsk/libtsk.h>
 
 #include <vector>
 #include <map>

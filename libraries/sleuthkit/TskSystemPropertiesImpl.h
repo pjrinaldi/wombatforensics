@@ -16,9 +16,9 @@
 #ifndef _TSK_SYSTEMPROPERTIESIMPL_H
 #define _TSK_SYSTEMPROPERTIESIMPL_H
 
-#include "tsk/framework/framework_i.h"
-#include "TskSystemProperties.h"
-#include "Poco/Util/AbstractConfiguration.h"
+#include <tsk/framework/framework_i.h>
+#include <tsk/framework/services/TskSystemProperties.h>
+#include <Poco/Util/AbstractConfiguration.h>
 #include <string>
 
 /**

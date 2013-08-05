@@ -27,7 +27,7 @@
 #include "Poco/Thread.h"
 
 #include "TskImgDBSqlite.h"
-#include "TskServices.h"
+#include "tsk/framework/services/TskServices.h"
 #include "tsk/framework/utilities/TskException.h"
 #include "TskDBBlackboard.h"
 
@@ -1786,7 +1786,8 @@ void TskImgDBSqlite::getCarvedFileInfo(const std::string& stmt, std::map<uint64_
 std::map<uint64_t, std::string> TskImgDBSqlite::getUniqueCarvedFiles(HASH_TYPE hashType) const
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "no database.");
+        //throw TskException("No database.");
 
     std::map<uint64_t, std::string> results;
 
@@ -1911,7 +1912,8 @@ std::vector<TskCarvedFileInfo> TskImgDBSqlite::getUniqueCarvedFilesInfo(HASH_TYP
     {
         std::ostringstream msg;
         msg << msgPrefix << "no database connection";
-        throw TskException(msg.str());
+        fprintf(stderr, msg.str().c_str());
+        //throw TskException(msg.str());
     }
 
     // Map the requested hash type to a file_hashes table column name.
@@ -1933,7 +1935,8 @@ std::vector<TskCarvedFileInfo> TskImgDBSqlite::getUniqueCarvedFilesInfo(HASH_TYP
     default:
         std::ostringstream msg;
         msg << msgPrefix << "unsupported hash type :" << hashType;
-        throw TskException(msg.str());
+        fprintf(stderr, msg.str().c_str());
+        //throw TskException(msg.str());
     }
 
     std::vector<TskCarvedFileInfo> carvedFileInfos;
@@ -2003,7 +2006,8 @@ std::vector<uint64_t> TskImgDBSqlite::getCarvedFileIds() const
 std::vector<uint64_t> TskImgDBSqlite::getUniqueFileIds(HASH_TYPE hashType) const
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB\n");
+        //throw TskException("No database.");
 
     std::vector<uint64_t> results;
 
@@ -2055,7 +2059,8 @@ std::vector<uint64_t> TskImgDBSqlite::getFileIds() const
 std::vector<uint64_t> TskImgDBSqlite::getFileIdsWorker(std::string tableName, const std::string condition) const
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB\n");
+        //throw TskException("No database.");
 
     std::vector<uint64_t> results;
 
@@ -2095,7 +2100,8 @@ std::vector<uint64_t> TskImgDBSqlite::getFileIdsWorker(std::string tableName, co
 std::vector<uint64_t> TskImgDBSqlite::getFileIds(const std::string& condition) const
 {
     if (!m_db)
-        throw TskException("Database not initialized.");
+        fprintf(stderr, "Database not Initialized.\n");
+        //throw TskException("Database not initialized.");
 
     std::vector<uint64_t> results;
 
@@ -2131,7 +2137,8 @@ std::vector<uint64_t> TskImgDBSqlite::getFileIds(const std::string& condition) c
 const std::vector<TskFileRecord> TskImgDBSqlite::getFileRecords(const std::string& condition) const
 {
     if (!m_db)
-        throw TskException("Database not initialized.");
+        fprintf(stderr, "DB not Initialized.\n");
+        //throw TskException("Database not initialized.");
 
     std::vector<TskFileRecord> results;
 
@@ -2200,7 +2207,8 @@ const std::vector<TskFileRecord> TskImgDBSqlite::getFileRecords(const std::strin
 int TskImgDBSqlite::getFileCount(const std::string& condition) const
 {
     if (!m_db)
-        throw TskException("Database not initialized.");
+        fprintf(stderr, "DB not intialized.\n");
+        //throw TskException("Database not initialized.");
 
     int result = 0;
 
@@ -2281,7 +2289,8 @@ void TskImgDBSqlite::constructStmt(std::string& stmt, std::string condition) con
 int TskImgDBSqlite::setHash(const uint64_t a_file_id, const TskImgDB::HASH_TYPE hashType, const std::string& hash) const 
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB\n");
+        //throw TskException("No database.");
 
     string hashTypeStr;
     switch (hashType) {
@@ -2380,7 +2389,8 @@ int TskImgDBSqlite::setHash(const uint64_t a_file_id, const TskImgDB::HASH_TYPE 
 std::string TskImgDBSqlite::getCfileName(const uint64_t a_file_id) const
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB.\n");
+        //throw TskException("No database.");
 
     std::string cfileName;
     stringstream stmt;
@@ -2927,7 +2937,8 @@ int TskImgDBSqlite::setUnallocImgStatus(int unallocImgId, TskImgDB::UNALLOC_IMG_
 TskImgDB::UNALLOC_IMG_STATUS TskImgDBSqlite::getUnallocImgStatus(int unallocImgId) const
 {
     if (!m_db)
-        throw TskException("Database not initialized.");
+        fprintf(stderr, "DB not initialized.\n");
+        //throw TskException("Database not initialized.");
 
     int status = 0;
     stringstream stmt;
@@ -3194,7 +3205,8 @@ int TskImgDBSqlite::getUnusedSector(uint64_t fileId, TskUnusedSectorsRecord & un
 void TskImgDBSqlite::addBlackboardAttribute(TskBlackboardAttribute attr)
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB.");
+        //throw TskException("No database.");
 
     std::stringstream str;
     char *item;
@@ -3248,13 +3260,15 @@ void TskImgDBSqlite::addBlackboardAttribute(TskBlackboardAttribute attr)
             if (!(result == SQLITE_ROW || result == SQLITE_DONE)) {
                 sqlite3_finalize(statement);
                 if (pBuf) delete [] pBuf;
-                throw TskException("TskImgDBSqlite::addBlackboardAttribute - Insert failed");
+                fprintf(stderr, "TskImgDBSqlite::addBlackboardAttribute - Insert failed.");
+                //throw TskException("TskImgDBSqlite::addBlackboardAttribute - Insert failed");
             }
         } else {
             std::wstringstream infoMessage;
             infoMessage << L"TskImgDBSqlite::addBlackboardAttribute - Error in sqlite3_bind_blob: " << sqlite3_errmsg(m_db);
             LOGERROR(infoMessage.str());
-            throw TskException("TskImgDBSqlite::addBlackboardAttribute - Insert failed");
+            fprintf(stderr, "TskImgDBSqlite::addBlackboardAttribute - Error in sqlite3_bind_blob: %s\n", sqlite3_errmsg(m_db));
+            //throw TskException("TskImgDBSqlite::addBlackboardAttribute - Insert failed");
         }
         sqlite3_finalize(statement);
         if (pBuf) delete [] pBuf;
@@ -3262,7 +3276,8 @@ void TskImgDBSqlite::addBlackboardAttribute(TskBlackboardAttribute attr)
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::addBlackboardAttribute - Error adding data to blackboard table: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::addBlackboardAttribute - Insert failed");
+        fprintf(stderr, "TskImgDBSqlite::addBlackboardAttribute - Insert failed");
+        //throw TskException("TskImgDBSqlite::addBlackboardAttribute - Insert failed");
     }
 }
 
@@ -3273,7 +3288,8 @@ void TskImgDBSqlite::addBlackboardAttribute(TskBlackboardAttribute attr)
  */
 string TskImgDBSqlite::getArtifactTypeDisplayName(int artifactTypeID){
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB\n");
+        //throw TskException("No database.");
 
     std::stringstream str;
     sqlite3_stmt * statement;
@@ -3290,7 +3306,8 @@ string TskImgDBSqlite::getArtifactTypeDisplayName(int artifactTypeID){
             std::wstringstream infoMessage;
             infoMessage << L"TskImgDBSqlite::getArtifactTypeDisplayName: " << sqlite3_errmsg(m_db);
             LOGERROR(infoMessage.str());
-            throw TskException("TskImgDBSqlite::getArtifactTypeDisplayName - No artifact type with that ID");
+            fprintf(stderr, "Sqlite: No artifact type with that id\n");
+            //throw TskException("TskImgDBSqlite::getArtifactTypeDisplayName - No artifact type with that ID");
         }
         sqlite3_finalize(statement);
         return displayName;
@@ -3299,7 +3316,8 @@ string TskImgDBSqlite::getArtifactTypeDisplayName(int artifactTypeID){
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::getArtifactTypeDisplayName: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::getArtifactTypeDisplayName - Select failed");
+        fprintf(stderr, "Sqlite: getartifacttypedisplayname - select failed.");
+        //throw TskException("TskImgDBSqlite::getArtifactTypeDisplayName - Select failed");
     }
 }
 
@@ -3310,7 +3328,8 @@ string TskImgDBSqlite::getArtifactTypeDisplayName(int artifactTypeID){
  */
 int TskImgDBSqlite::getArtifactTypeID(string artifactTypeString){
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB.");
+        //throw TskException("No database.");
 
     std::stringstream str;
     sqlite3_stmt * statement;
@@ -3327,7 +3346,8 @@ int TskImgDBSqlite::getArtifactTypeID(string artifactTypeString){
             std::wstringstream infoMessage;
             infoMessage << L"TskImgDBSqlite::getArtifactTypeID: " << sqlite3_errmsg(m_db);
             LOGERROR(infoMessage.str());
-            throw TskException("TskImgDBSqlite::getArtifactTypeID - No artifact type with that name");
+            fprintf(stderr, "Sqlite: getartifacttypeid - no artifact type with that name.");
+            //throw TskException("TskImgDBSqlite::getArtifactTypeID - No artifact type with that name");
         }
         sqlite3_finalize(statement);
         return typeID;
@@ -3336,7 +3356,8 @@ int TskImgDBSqlite::getArtifactTypeID(string artifactTypeString){
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::getArtifactTypeID: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::getArtifactTypeID - Select failed");
+        fprintf(stderr, "Sqlite: getartifactytpeid -  select failed.\n");
+        //throw TskException("TskImgDBSqlite::getArtifactTypeID - Select failed");
     }
 }
 
@@ -3347,7 +3368,8 @@ int TskImgDBSqlite::getArtifactTypeID(string artifactTypeString){
  */
 string TskImgDBSqlite::getArtifactTypeName(int artifactTypeID){
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB\n");
+        //throw TskException("No database.");
 
     std::stringstream str;
     sqlite3_stmt * statement;
@@ -3364,7 +3386,8 @@ string TskImgDBSqlite::getArtifactTypeName(int artifactTypeID){
             std::wstringstream infoMessage;
             infoMessage << L"TskImgDBSqlite::getArtifactTypeName: " << sqlite3_errmsg(m_db);
             LOGERROR(infoMessage.str());
-            throw TskException("TskImgDBSqlite::getArtifactTypeName - No artifact type with that ID");
+            fprintf(stderr, "sqlite: getartifactytpename - no artifact type with that id\n");
+            //throw TskException("TskImgDBSqlite::getArtifactTypeName - No artifact type with that ID");
         }
         sqlite3_finalize(statement);
         return typeName;
@@ -3373,7 +3396,8 @@ string TskImgDBSqlite::getArtifactTypeName(int artifactTypeID){
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::getArtifactTypeName: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::getArtifactTypeName - Select failed");
+        fprintf(stderr, "TskImgDBSqlite::getArtifactTypeName - Select failed");
+        //throw TskException("TskImgDBSqlite::getArtifactTypeName - Select failed");
     }
 }
 
@@ -3384,7 +3408,8 @@ string TskImgDBSqlite::getArtifactTypeName(int artifactTypeID){
  */
 string TskImgDBSqlite::getAttributeTypeDisplayName(int attributeTypeID){
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "NO DB");
+        //throw TskException("No database.");
 
     std::stringstream str;
     sqlite3_stmt * statement;
@@ -3401,7 +3426,8 @@ string TskImgDBSqlite::getAttributeTypeDisplayName(int attributeTypeID){
             std::wstringstream infoMessage;
             infoMessage << L"TskImgDBSqlite::getAttributeTypeDisplayName: " << sqlite3_errmsg(m_db);
             LOGERROR(infoMessage.str());
-            throw TskException("TskImgDBSqlite::getAttributeTypeDisplayName - No attribute type with that ID");
+            fprintf(stderr, "TskImgDBSqlite::getAttributeTypeDisplayName - No attribute type with that ID");
+            //throw TskException("TskImgDBSqlite::getAttributeTypeDisplayName - No attribute type with that ID");
         }
         sqlite3_finalize(statement);
         return displayName;
@@ -3410,7 +3436,8 @@ string TskImgDBSqlite::getAttributeTypeDisplayName(int attributeTypeID){
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::getAttributeTypeDisplayName: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::getAttributeTypeDisplayName - Select failed");
+        fprintf(stderr, "TskImgDBSqlite::getAttributeTypeDisplayName - Select failed");
+        //throw TskException("TskImgDBSqlite::getAttributeTypeDisplayName - Select failed");
     }
 }
 
@@ -3421,7 +3448,8 @@ string TskImgDBSqlite::getAttributeTypeDisplayName(int attributeTypeID){
  */
 int TskImgDBSqlite::getAttributeTypeID(string attributeTypeString){
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB");
+        //throw TskException("No database.");
 
     std::stringstream str;
     sqlite3_stmt * statement;
@@ -3438,7 +3466,8 @@ int TskImgDBSqlite::getAttributeTypeID(string attributeTypeString){
             std::wstringstream infoMessage;
             infoMessage << L"TskImgDBSqlite::getAttributeTypeID: " << sqlite3_errmsg(m_db);
             LOGERROR(infoMessage.str());
-            throw TskException("TskImgDBSqlite::getAttributeTypeID - No artifact type with that name");
+            fprintf(stderr, "TskImgDBSqlite::getAttributeTypeID - No artifact type with that name");
+            //throw TskException("TskImgDBSqlite::getAttributeTypeID - No artifact type with that name");
         }
         sqlite3_finalize(statement);
         return typeID;
@@ -3447,7 +3476,8 @@ int TskImgDBSqlite::getAttributeTypeID(string attributeTypeString){
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::getAttributeTypeID: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::getAttributeTypeID - Select failed");
+        fprintf(stderr, "TskImgDBSqlite::getAttributeTypeID - Select failed");
+        //throw TskException("TskImgDBSqlite::getAttributeTypeID - Select failed");
     }
 }
 
@@ -3458,7 +3488,8 @@ int TskImgDBSqlite::getAttributeTypeID(string attributeTypeString){
  */
 string TskImgDBSqlite::getAttributeTypeName(int attributeTypeID){
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "NO DB");
+        //throw TskException("No database.");
 
     std::stringstream str;
     sqlite3_stmt * statement;
@@ -3475,7 +3506,8 @@ string TskImgDBSqlite::getAttributeTypeName(int attributeTypeID){
             std::wstringstream infoMessage;
             infoMessage << L"TskImgDBSqlite::getAttributeTypeName: " << sqlite3_errmsg(m_db);
             LOGERROR(infoMessage.str());
-            throw TskException("TskImgDBSqlite::getAttributeTypeName - No attribute type with that ID");
+            fprintf(stderr, "TskImgDBSqlite::getAttributeTypeName - No attribute type with that ID");
+            //throw TskException("TskImgDBSqlite::getAttributeTypeName - No attribute type with that ID");
         }
         sqlite3_finalize(statement);
         return typeName;
@@ -3484,7 +3516,8 @@ string TskImgDBSqlite::getAttributeTypeName(int attributeTypeID){
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::getAttributeTypeName: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::getAttributeTypeName - Select failed");
+        fprintf(stderr, "TskImgDBSqlite::getAttributeTypeName - Select failed");
+        //throw TskException("TskImgDBSqlite::getAttributeTypeName - Select failed");
     }
 }
 
@@ -3496,7 +3529,8 @@ string TskImgDBSqlite::getAttributeTypeName(int attributeTypeID){
 vector<TskBlackboardArtifact> TskImgDBSqlite::getMatchingArtifacts(string condition)
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "NO DB");
+        //throw TskException("No database.");
     
     vector<TskBlackboardArtifact> artifacts;
     std::string stmt("SELECT blackboard_artifacts.artifact_id, blackboard_artifacts.obj_id, blackboard_artifacts.artifact_type_id FROM blackboard_artifacts");
@@ -3518,7 +3552,8 @@ vector<TskBlackboardArtifact> TskImgDBSqlite::getMatchingArtifacts(string condit
         std::wstringstream msg;
         msg << L"TskImgDBSqlite::getMatchingArtifacts - Error getting artifacts: " << sqlite3_errmsg(m_db);
         LOGERROR(msg.str());
-        throw TskException("TskImgDBSqlite::getMatchingArtifacts - Select failed");
+        fprintf(stderr, "TskImgDBSqlite::getMatchingArtifacts - Select failed");
+        //throw TskException("TskImgDBSqlite::getMatchingArtifacts - Select failed");
     }
     return artifacts;
 }
@@ -3531,7 +3566,8 @@ vector<TskBlackboardArtifact> TskImgDBSqlite::getMatchingArtifacts(string condit
 vector<TskBlackboardAttribute> TskImgDBSqlite::getMatchingAttributes(string condition)
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB.\n");
+        //throw TskException("No database.");
     
     vector<TskBlackboardAttribute> attributes;
     std::string stmt("SELECT blackboard_attributes.artifact_id, blackboard_attributes.source, blackboard_attributes.context, blackboard_attributes.attribute_type_id, blackboard_attributes.value_type, blackboard_attributes.value_byte, blackboard_attributes.value_text, blackboard_attributes.value_int32, blackboard_attributes.value_int64, blackboard_attributes.value_double, blackboard_attributes.obj_id FROM blackboard_attributes ");
@@ -3560,7 +3596,8 @@ vector<TskBlackboardAttribute> TskImgDBSqlite::getMatchingAttributes(string cond
         std::wstringstream msg;
         msg << L"TskImgDBSqlite::getMatchingAttributes - Error getting attributes: " << sqlite3_errmsg(m_db);
         LOGERROR(msg.str());
-        throw TskException("TskImgDBSqlite::getMatchingAttributes - Select failed");
+        fprintf(stderr, "TskImgDBSqlite::getMatchingAttributes - Select failed");
+        //throw TskException("TskImgDBSqlite::getMatchingAttributes - Select failed");
     }
     return attributes;
 }
@@ -3574,7 +3611,8 @@ vector<TskBlackboardAttribute> TskImgDBSqlite::getMatchingAttributes(string cond
 TskBlackboardArtifact TskImgDBSqlite::createBlackboardArtifact(uint64_t file_id, int artifactTypeID)
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "NO DB");
+        //throw TskException("No database.");
 
     uint64_t artifactId = 0;
     std::stringstream str;
@@ -3585,7 +3623,8 @@ TskBlackboardArtifact TskImgDBSqlite::createBlackboardArtifact(uint64_t file_id,
     if (sqlite3_prepare_v2(m_db, str.str().c_str(), -1, &statement, 0) == SQLITE_OK) {
         if (!(sqlite3_step(statement) == SQLITE_DONE)) {
             sqlite3_finalize(statement);
-            throw TskException("TskImgDBSqlite::addBlackboardInfo - Insert failed");
+            fprintf(stderr, "TskImgDBSqlite::addBlackboardInfo - Insert failed");
+            //throw TskException("TskImgDBSqlite::addBlackboardInfo - Insert failed");
         }
         // select max(artifact_id) from blackboard
         str.str("");
@@ -3599,14 +3638,16 @@ TskBlackboardArtifact TskImgDBSqlite::createBlackboardArtifact(uint64_t file_id,
             }
         } else {
             sqlite3_finalize(statement);
-            throw TskException("TskImgDBSqlite::newBlackboardArtifact - Select artifact_id failed");
+            fprintf(stderr, "TskImgDBSqlite::newBlackboardArtifact - Select artifact_id failed");
+            //throw TskException("TskImgDBSqlite::newBlackboardArtifact - Select artifact_id failed");
         }
         sqlite3_finalize(statement);
     } else {
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::newBlackboardArtifact - Error adding new artifact: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::newBlackboardArtifact - Insert failed");
+        fprintf(stderr, "TskImgDBSqlite::newBlackboardArtifact - Insert failed");
+        //throw TskException("TskImgDBSqlite::newBlackboardArtifact - Insert failed");
     }
 
     return TskImgDB::createArtifact(artifactId, file_id, artifactTypeID);
@@ -3621,7 +3662,8 @@ TskBlackboardArtifact TskImgDBSqlite::createBlackboardArtifact(uint64_t file_id,
 void TskImgDBSqlite::addArtifactType(int typeID, string artifactTypeName, string displayName)
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "NO DB.\n");
+        //throw TskException("No database.");
 
     std::stringstream str;
     sqlite3_stmt * statement;
@@ -3639,20 +3681,23 @@ void TskImgDBSqlite::addArtifactType(int typeID, string artifactTypeName, string
                     std::wstringstream infoMessage;
                     infoMessage << L"TskImgDBSqlite::addArtifactType - Error adding data to blackboard table: " << sqlite3_errmsg(m_db);
                     LOGERROR(infoMessage.str());
-                    throw TskException("TskImgDBSqlite::addArtifactType - Artifact type insert failed");
+                    fprintf(stderr, "TskImgDBSqlite::addArtifactType - Artifact type insert failed");
+                    //throw TskException("TskImgDBSqlite::addArtifactType - Artifact type insert failed");
                 }
             }
         }
         else{
             sqlite3_finalize(statement);
-            throw TskException("TskImgDBSqlite::addArtifactType - Artifact type with that name already exists");
+            fprintf(stderr, "TskImgDBSqlite::addArtifactType - Artifact type with that name already exists");
+            //throw TskException("TskImgDBSqlite::addArtifactType - Artifact type with that name already exists");
         }
         sqlite3_finalize(statement);
     } else {
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::addArtifactType - Error adding data to blackboard table: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::addArtifactType - Insert failed");
+        fprintf(stderr, "TskImgDBSqlite::addArtifactType - Insert failed");
+        //throw TskException("TskImgDBSqlite::addArtifactType - Insert failed");
     }
 }
 
@@ -3665,7 +3710,8 @@ void TskImgDBSqlite::addArtifactType(int typeID, string artifactTypeName, string
 void TskImgDBSqlite::addAttributeType(int typeID, string attributeTypeName, string displayName)
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "No DB.");
+        //throw TskException("No database.");
 
     std::stringstream str;
     sqlite3_stmt * statement;
@@ -3683,19 +3729,22 @@ void TskImgDBSqlite::addAttributeType(int typeID, string attributeTypeName, stri
                     std::wstringstream infoMessage;
                     infoMessage << L"TskImgDBSqlite::addAttributeType - Error adding data to blackboard table: " << sqlite3_errmsg(m_db);
                     LOGERROR(infoMessage.str());
-                    throw TskException("TskImgDBSqlite::addAttributeType - Attribute type insert failed");
+                    fprintf(stderr, "TskImgDBSqlite::addAttributeType - Attribute type insert failed");
+                    //throw TskException("TskImgDBSqlite::addAttributeType - Attribute type insert failed");
                 }
             }
         } else {
             sqlite3_finalize(statement);
-            throw TskException("TskImgDBSqlite::addAttributeType - Attribute type with that name already exists");
+            fprintf(stderr, "TskImgDBSqlite::addAttributeType - Attribute type with that name already exists");
+            //throw TskException("TskImgDBSqlite::addAttributeType - Attribute type with that name already exists");
         }
         sqlite3_finalize(statement);
     } else {
         std::wstringstream infoMessage;
         infoMessage << L"TskImgDBSqlite::addAttributeType - Error adding data to blackboard table: " << sqlite3_errmsg(m_db);
         LOGERROR(infoMessage.str());
-        throw TskException("TskImgDBSqlite::addAttributeType - Insert failed");
+        fprintf(stderr, "TskImgDBSqlite::addAttributeType - Insert failed");
+        // throw TskException("TskImgDBSqlite::addAttributeType - Insert failed");
     }
 }
 
@@ -3708,7 +3757,8 @@ void TskImgDBSqlite::addAttributeType(int typeID, string attributeTypeName, stri
 vector<TskBlackboardArtifact> TskImgDBSqlite::getArtifactsHelper(uint64_t file_id, int artifactTypeID, string artifactTypeName)
 {
     if (!m_db)
-        throw TskException("No database.");
+        fprintf(stderr, "NO DB");
+        //throw TskException("No database.");
     
     vector<TskBlackboardArtifact> artifacts;
     std::stringstream stmt;
@@ -3728,7 +3778,8 @@ vector<TskBlackboardArtifact> TskImgDBSqlite::getArtifactsHelper(uint64_t file_i
         std::wstringstream msg;
         msg << L"TskImgDBSqlite::getArtifactsHelper - Error getting artifacts: " << sqlite3_errmsg(m_db);
         LOGERROR(msg.str());
-        throw TskException("TskImgDBSqlite::getArtifactsHelper - Select failed");
+        fprintf(stderr, "TskImgDBSqlite::getArtifactsHelper - Select failed");
+        //throw TskException("TskImgDBSqlite::getArtifactsHelper - Select failed");
     }
     return artifacts;
 }
@@ -3736,7 +3787,8 @@ vector<TskBlackboardArtifact> TskImgDBSqlite::getArtifactsHelper(uint64_t file_i
 vector<int> TskImgDBSqlite::findAttributeTypes(int artifactTypeId)
 {
     if (!m_db) {
-        throw TskException("No database.");
+        fprintf(stderr, "NO DB");
+        //throw TskException("No database.");
     }
     vector<int> attrTypes;
     std::stringstream stmt;
@@ -3756,7 +3808,8 @@ vector<int> TskImgDBSqlite::findAttributeTypes(int artifactTypeId)
         std::wstringstream msg;
         msg << L"TskImgDBSqlite::findAttributeTypes - Error finding attribute types: " << sqlite3_errmsg(m_db);
         LOGERROR(msg.str());
-        throw TskException("TskImgDBSqlite::findAttributeTypes - Select failed");
+        fprintf(stderr, "TskImgDBSqlite::findAttributeTypes - Select failed");
+        //throw TskException("TskImgDBSqlite::findAttributeTypes - Select failed");
     }
     return attrTypes;
 }
@@ -3776,7 +3829,8 @@ void TskImgDBSqlite::executeStatement(const std::string &stmtToExecute, sqlite3_
         sqlite3_finalize(statement);
         std::ostringstream msg;
         msg << caller << " : error executing " << stmtToExecute << " : " << sqlite3_errmsg(m_db);
-        throw TskException(msg.str());
+        fprintf(stderr, msg.str().c_str());
+        //throw TskException(msg.str());
     }
 }
 

@@ -37,7 +37,8 @@ void TskSystemPropertiesImpl::initialize(const std::string &configfile)
     }
     catch (Poco::FileNotFoundException& )
     {
-        throw TskException("Configuration file not found : " + configfile);
+        fprintf(stderr, "Configuration file not found: %s\n", configfile.c_str());
+        //throw TskException("Configuration file not found : " + configfile);
     }
 }
 
@@ -50,7 +51,8 @@ void TskSystemPropertiesImpl::setProperty(const std::string &name, const std::st
 {
     if (!m_abstractConfig) 
     {
-        throw TskException("TskSystemPropertiesImpl::set - Configuration not initialized.");
+        fprintf(stderr, "TskSystemPropertiesImpl::set - Configuration not initialized.");
+        //throw TskException("TskSystemPropertiesImpl::set - Configuration not initialized.");
     } 
 
     m_abstractConfig->setString(name, value);
@@ -60,7 +62,8 @@ std::string TskSystemPropertiesImpl::getProperty(const std::string &name) const
 {
     if (!m_abstractConfig) 
     {
-        throw TskException("TskSystemPropertiesImpl::get - Configuration not initialized.");
+        fprintf(stderr, "TskSystemPropertiesImpl::get - Configuration not initialized.");
+        //throw TskException("TskSystemPropertiesImpl::get - Configuration not initialized.");
     }
 
     try 

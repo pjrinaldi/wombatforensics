@@ -19,15 +19,15 @@
 using namespace std;
 
 // Framework includes
-#include "tsk/framework/framework_i.h"
-#include "TskImgDB.h"
-#include "tsk/framework/utilities/SectorRuns.h"
-#include "tsk/framework/utilities/UnallocRun.h"
-#include "TskBlackboardArtifact.h"
-#include "TskBlackboardAttribute.h"
+#include <tsk/framework/framework_i.h>
+#include <tsk/framework/services/TskImgDB.h>
+#include <tsk/framework/utilities/SectorRuns.h>
+#include <tsk/framework/utilities/UnallocRun.h>
+#include <tsk/framework/services/TskBlackboardArtifact.h>
+#include <tsk/framework/services/TskBlackboardAttribute.h>
 
-#include "tsk/libtsk.h"
-#include "tsk/auto/sqlite3.h"
+#include <tsk/libtsk.h>
+#include <tsk/auto/sqlite3.h>
 
 /** 
  * Implementation of TskImgDB that uses SQLite to store the data.
