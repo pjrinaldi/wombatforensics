@@ -387,7 +387,13 @@ QStandardItemModel* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugi
 }
 void WombatForensics::dirTreeView_selectionChanged()
 {
+    fprintf(stderr, "Current index + 1: %d\n", currenttreeview->selectionModel()->currentIndex().column());
     fprintf(stderr, currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString().toStdString().c_str());
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(sleuthkitplugin);
+    if(iSleuthKit)
+    {
+        iSleuthKit->GetFileContents(currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString());
+    }
     // USE tSKiMAGEfILEtSK TSKSERVICES.iNSTANCE().GETIMAGEFILE()
     // GET FILENAME -> USE THAT TO GET FILEID, CALL IMAGEFILETSK->OPENFILE(FILEID)/IMAGEFILETSK->READFILE()->BUFFER()/ TXTVIEWER->READBUFFER()
     // or GET FILENAME -> FILEID -> TSKFILETSK->OPEN()->READ()->BUFFER() / TXTVIEWER->READBUFFER()

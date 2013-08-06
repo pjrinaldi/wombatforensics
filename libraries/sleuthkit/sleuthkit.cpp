@@ -151,6 +151,7 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     std::vector<TskFileRecord> fileRecordVector;
     fileidVector = imgdb->getFileIds();
     TskFileRecord tmpRecord;
+    // implement custom qstandarditem which has a fileid field
     QStandardItem *tmpItem;
     int ret;
     uint64_t tmpId;
@@ -196,4 +197,14 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         }
     }
     return model;
+}
+char* SleuthKitPlugin::GetFileContents(QString fileName)
+{
+    QString
+    int tmpId = imgdb->getFileIds(" where name = ? limit 1;")
+    // get fileid using filename.
+    // openfile(fileid)
+    // readfile(fileid)
+    // closefile(fileid)
+    // return buffer
 }

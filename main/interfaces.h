@@ -49,6 +49,7 @@ public:
     virtual void SetupSystemFileManager() = 0;
     virtual void OpenEvidence(QString evidencePath) = 0;
     virtual QStandardItemModel* GetCurrentImageDirectoryTree() = 0;
+    virtual char* GetFileContents(QString fileName) = 0;
 };
 
 #define EvidenceInterface_iid "wombat.EvidenceInterface"

@@ -34,6 +34,7 @@ public:
     void SetupSystemFileManager();
     void OpenEvidence(QString evidencePath);
     QStandardItemModel* GetCurrentImageDirectoryTree(void);
+    char* GetFileContents(QString fileName);
 
 
     //QStringList evidenceActions() const;
