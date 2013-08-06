@@ -16,6 +16,7 @@
 #include <QStringList>
 #include <QFile>
 #include <QXmlStreamWriter>
+#include <QStandardItemModel>
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {
@@ -32,6 +33,8 @@ public:
     void SetupSystemSchedulerQueue();
     void SetupSystemFileManager();
     void OpenEvidence(QString evidencePath);
+    QStandardItemModel* GetCurrentImageDirectoryTree(void);
+
 
     //QStringList evidenceActions() const;
     //QStringList evidenceActionIcons() const;

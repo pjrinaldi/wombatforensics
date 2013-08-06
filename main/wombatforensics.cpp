@@ -181,13 +181,18 @@ void WombatForensics::alterEvidence()
         fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
         if(evidenceFilePath != "")
         {
+            // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
             setupSleuthKitImgDb(sleuthkitplugin, currentcasedirpath, currentcaseevidencepath);
-            setupSleuthKitBlackboard();
+            setupSleuthKitBlackboard(sleuthkitplugin);
             wombatCaseData->InsertImage(evidenceName, currentcaseevidencepath, currentcaseid);
             sleuthKitLoadEvidence(sleuthkitplugin, currentcaseevidencepath);
-        }
+            QStandardItemModel *model = GetCurrentImageDirectoryTree(sleuthkitplugin);
+            // QWidget* treeView = ui->toolBox->findChild<QTreeView *>("directoryTreeView");
+            //ui->directoryTreeView->setModel(model);
+            // need to populate the directory tree entries
+       }
     }
     else if(action->text() == tr("Remove Evidence"))
         iEvidence->remEvidence(currentcaseid);
@@ -367,4 +372,15 @@ void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePat
     {
         iSleuthKit->OpenEvidence(evidencePath);
     }
+}
+
+QStandardItemModel* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+    {
+        return iSleuthKit->GetCurrentImageDirectoryTree();
+    }
+    else
+        return NULL;
 }

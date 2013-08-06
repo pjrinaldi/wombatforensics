@@ -143,3 +143,53 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }
 }
+
+QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
+{
+    std::vector<uint64_t> fileidVector;
+    std::vector<TskFileRecord> fileRecordVector;
+    fileidVector = imgdb->getFileIds();
+    TskFileRecord tmpRecord;
+    QStandardItem *tmpItem;
+    int ret;
+    uint64_t tmpId;
+    QStandardItemModel *model = new QStandardItemModel();
+    QStandardItem *rootNode = model->invisibleRootItem();
+    QList<QStandardItem*> itemList;
+    foreach(tmpId, fileidVector)
+    {
+        ret = imgdb->getFileRecord(tmpId, tmpRecord);
+        fileRecordVector.push_back(tmpRecord);
+    }
+    for(int i=0; i < (int)fileRecordVector.size(); i++)
+    {
+        itemList.append(new QStandardItem(QString(fileRecordVector[i].name.c_str())));
+    }
+    for(int i = 0; i < (int)fileRecordVector.size(); i++)
+    {
+        tmpItem = ((QStandardItem*)itemList[i]);
+        if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
+        {
+            tmpItem->setIcon(QIcon(":/treefolder"));
+        }
+        else
+        {
+            tmpItem->setIcon(QIcon(":/treefile"));
+        }
+        if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
+        {
+            rootNode->appendRow(tmpItem);
+        }
+    }
+    for(int i=0; i < (int)fileRecordVector.size(); i++)
+    {
+        tmpRecord = fileRecordVector[i];
+        tmpItem = itemList[i];
+        if(tmpRecord.parentFileId > 1)
+        {
+            //fprintf(stderr, "itemList[%d]->appendrow(itemList[%d])\n", tmpRecord.parentFileId, i);
+            ((QStandardItem*)itemList[tmpRecord.parentFileId-1])->appendRow(tmpItem);
+        }
+    }
+    return model;
+}
