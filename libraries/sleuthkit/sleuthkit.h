@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QXmlStreamWriter>
 #include <QStandardItemModel>
+#include "sleuthfileitem.h"
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {

@@ -152,12 +152,14 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     fileidVector = imgdb->getFileIds();
     TskFileRecord tmpRecord;
     // implement custom qstandarditem which has a fileid field
-    QStandardItem *tmpItem;
+    //QStandardItem *tmpItem;
+    SleuthFileItem *tmpItem2;
     int ret;
     uint64_t tmpId;
     QStandardItemModel *model = new QStandardItemModel();
     QStandardItem *rootNode = model->invisibleRootItem();
-    QList<QStandardItem*> itemList;
+    //QList<QStandardItem*> itemList;
+    QList<SleuthFileItem*> sleuthList;
     foreach(tmpId, fileidVector)
     {
         ret = imgdb->getFileRecord(tmpId, tmpRecord);
@@ -168,43 +170,50 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     fprintf(stderr, "record vector size: %d\n", fileRecordVector.size());
     for(int i=0; i < (int)fileRecordVector.size(); i++)
     {
-        itemList.append(new QStandardItem(QString(fileRecordVector[i].name.c_str())));
+        //itemList.append(new QStandardItem(QString(fileRecordVector[i].name.c_str())));
+        sleuthList.append(new SleuthFileItem(QString(fileRecordVector[i].name.c_str()), (int)fileRecordVector[i].fileId));
     }
     for(int i = 0; i < (int)fileRecordVector.size(); i++)
     {
-        tmpItem = ((QStandardItem*)itemList[i]);
+        //tmpItem = ((QStandardItem*)itemList[i]);
+        tmpItem2 = ((SleuthFileItem*)sleuthList[i]);
+
         if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
         {
-            tmpItem->setIcon(QIcon(":/basic/treefolder"));
+            tmpItem2->setIcon(QIcon(":/basic/treefolder"));
         }
         else
         {
-            tmpItem->setIcon(QIcon(":/basic/treefile"));
+            tmpItem2->setIcon(QIcon(":/basic/treefile"));
         }
         if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
         {
-            rootNode->appendRow(tmpItem);
+            rootNode->appendRow(tmpItem2);
         }
     }
     for(int i=0; i < (int)fileRecordVector.size(); i++)
     {
         tmpRecord = fileRecordVector[i];
-        tmpItem = itemList[i];
+        //tmpItem = itemList[i];
+        tmpItem2 = sleuthList[i];
         if(tmpRecord.parentFileId > 1)
         {
             fprintf(stderr, "itemList[%d]->appendrow(itemList[%d])\n", tmpRecord.parentFileId-1, i);
-            ((QStandardItem*)itemList[tmpRecord.parentFileId-1])->appendRow(tmpItem);
+            fprintf(stderr, "sleuthListId %d\n", sleuthList[i]->GetSleuthFileID());
+            //((QStandardItem*)itemList[tmpRecord.parentFileId-1])->appendRow(tmpItem);
+            ((SleuthFileItem*)sleuthList[tmpRecord.parentFileId-1])->appendRow(tmpItem2);
         }
     }
     return model;
 }
 char* SleuthKitPlugin::GetFileContents(QString fileName)
 {
-    QString
-    int tmpId = imgdb->getFileIds(" where name = ? limit 1;")
+    //QString
+    //int tmpId = imgdb->getFileIds(" where name = ? limit 1;")
     // get fileid using filename.
     // openfile(fileid)
     // readfile(fileid)
     // closefile(fileid)
-    // return buffer
+    // return buffe
+    return "";
 }

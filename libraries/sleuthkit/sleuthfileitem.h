@@ -5,13 +5,14 @@
 
 class SleuthFileItem : public QStandardItem
 {
+
 public:
-    SleuthFileItem();
+    SleuthFileItem(QString itemName, int fileID);
     int GetSleuthFileID();
-    void SetSleuthFileID(int fileid);
+    void SetSleuthFileID(int fileID);
 
 private:
-    sleuthfileid;
+    int sleuthfileid;
 };
 
 #endif // EVIDENCE_H
