@@ -15,7 +15,7 @@ WombatForensics::WombatForensics(QWidget *parent) :
     currentcaseid = -1;
     QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";
-    wombatsettingspath = homePath + "settings/";
+    wombatsettingspath = homePath + "settings";
     wombatdatapath = homePath + "data/";
     wombatcasespath = homePath + "cases/";
     bool mkPath = (new QDir())->mkpath(wombatsettingspath);
@@ -110,8 +110,6 @@ QObject* WombatForensics::loadPlugin(QString fileName)
         populateTabWidget(plugin);
         setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
         setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt");
-        //setupSleuthKitImgDb(plugin, currentcasedirpath);
-        //setupSleuthKitBlackboard(plugin); // move to after image creation
         setupSleuthKitSchedulerQueue(plugin);
         setupSleuthKitFileManager(plugin);
     }
@@ -184,14 +182,17 @@ void WombatForensics::alterEvidence()
             // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
-            setupSleuthKitImgDb(sleuthkitplugin, currentcasedirpath, currentcaseevidencepath);
+            setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
-            wombatCaseData->InsertImage(evidenceName, currentcaseevidencepath, currentcaseid);
-            sleuthKitLoadEvidence(sleuthkitplugin, currentcaseevidencepath);
-            QStandardItemModel *model = GetCurrentImageDirectoryTree(sleuthkitplugin);
-            // QWidget* treeView = ui->toolBox->findChild<QTreeView *>("directoryTreeView");
-            //ui->directoryTreeView->setModel(model);
+            wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
+            sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
             // need to populate the directory tree entries
+            QStandardItemModel *model = GetCurrentImageDirectoryTree(sleuthkitplugin);
+            currenttreeview = ui->toolBox->findChild<QTreeView *>("bt-dirTreeView");
+            fprintf(stderr, "My TreeView Name: %s\n", currenttreeview->objectName().toStdString().c_str());
+            currenttreeview->setHeaderHidden(true);
+            currenttreeview->setModel(model);
+            connect(currenttreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(dirTreeView_selectionChanged()));
        }
     }
     else if(action->text() == tr("Remove Evidence"))
@@ -383,4 +384,8 @@ QStandardItemModel* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugi
     }
     else
         return NULL;
+}
+void WombatForensics::dirTreeView_selectionChanged()
+{
+    fprintf(stderr, currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString().toStdString().c_str());
 }

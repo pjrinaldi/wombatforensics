@@ -33,6 +33,7 @@ private slots:
     void alterEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
+    void dirTreeView_selectionChanged();
 
 private:
     Ui::WombatForensics *ui;
@@ -64,6 +65,7 @@ private:
     QObject *basictoolsplugin;
     QObject *evidenceplugin;
     QObject *sleuthkitplugin;
+    QTreeView *currenttreeview;
 };
 
 #endif // WOMBATFORENSICS_H

@@ -3,6 +3,7 @@
 void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString configFilePath)
 {
     QString tmpPath = settingsPath;
+    tmpPath += "/";
     tmpPath += configFilePath;
     QFile tmpFile(tmpPath);
     fprintf(stderr, "TmpPath: %s\n", tmpPath.toStdString().c_str());
@@ -15,7 +16,7 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
             xml.writeStartDocument();
             xml.writeStartElement("TSK_FRAMEWORK_CONFIG");
             xml.writeStartElement("CONFIG_DIR");
-            xml.writeCharacters(tmpPath);
+            xml.writeCharacters(settingsPath);
             xml.writeEndElement();
             xml.writeEndElement();
             xml.writeEndDocument();
@@ -159,8 +160,11 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     foreach(tmpId, fileidVector)
     {
         ret = imgdb->getFileRecord(tmpId, tmpRecord);
+        fprintf(stderr, "FileId: %d\n", tmpId);
         fileRecordVector.push_back(tmpRecord);
+        fprintf(stderr, "File Id: %d - FileName: %s - Parent FileId: %d - dirtype: %d\n", tmpRecord.fileId, tmpRecord.name.c_str(), tmpRecord.parentFileId, tmpRecord.dirType);
     }
+    fprintf(stderr, "record vector size: %d\n", fileRecordVector.size());
     for(int i=0; i < (int)fileRecordVector.size(); i++)
     {
         itemList.append(new QStandardItem(QString(fileRecordVector[i].name.c_str())));
@@ -170,11 +174,11 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         tmpItem = ((QStandardItem*)itemList[i]);
         if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
         {
-            tmpItem->setIcon(QIcon(":/treefolder"));
+            tmpItem->setIcon(QIcon(":/basic/treefolder"));
         }
         else
         {
-            tmpItem->setIcon(QIcon(":/treefile"));
+            tmpItem->setIcon(QIcon(":/basic/treefile"));
         }
         if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
         {
@@ -187,7 +191,7 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         tmpItem = itemList[i];
         if(tmpRecord.parentFileId > 1)
         {
-            //fprintf(stderr, "itemList[%d]->appendrow(itemList[%d])\n", tmpRecord.parentFileId, i);
+            fprintf(stderr, "itemList[%d]->appendrow(itemList[%d])\n", tmpRecord.parentFileId-1, i);
             ((QStandardItem*)itemList[tmpRecord.parentFileId-1])->appendRow(tmpItem);
         }
     }

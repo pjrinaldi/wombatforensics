@@ -13,12 +13,14 @@ QStringList BasicTools::toolboxViews() const
 QWidget* BasicTools::setupToolBoxDirectoryTree() const
 {
     QTreeView* directoryTreeView = new QTreeView();
+    directoryTreeView->setObjectName("bt-dirTreeView");
 
     return directoryTreeView;
 }
 QWidget* BasicTools::setupToolBoxFileExtensionTree() const
 {
     QTreeView* fileExtensionTreeView = new QTreeView();
+    fileExtensionTreeView->setObjectName("bt-fileExtTreeView");
 
     return fileExtensionTreeView;
 }
