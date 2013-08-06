@@ -206,8 +206,12 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     }
     return model;
 }
-char* SleuthKitPlugin::GetFileContents(QString fileName)
+char* SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
 {
+    TskImageFileTsk tmpfile;
+    //tmpfile = TskServices::Instance().getImageFile();
+    //std::auto_ptr<TskImageFile> tmpFile = TskServices::Instance().getImageFile();
+    char* buffer;
     //QString
     //int tmpId = imgdb->getFileIds(" where name = ? limit 1;")
     // get fileid using filename.

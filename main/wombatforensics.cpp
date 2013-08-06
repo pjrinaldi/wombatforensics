@@ -187,12 +187,13 @@ void WombatForensics::alterEvidence()
             wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
             // need to populate the directory tree entries
-            QStandardItemModel *model = GetCurrentImageDirectoryTree(sleuthkitplugin);
+            currenttreemodel = GetCurrentImageDirectoryTree(sleuthkitplugin);
             currenttreeview = ui->toolBox->findChild<QTreeView *>("bt-dirTreeView");
             fprintf(stderr, "My TreeView Name: %s\n", currenttreeview->objectName().toStdString().c_str());
             currenttreeview->setHeaderHidden(true);
-            currenttreeview->setModel(model);
-            connect(currenttreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(dirTreeView_selectionChanged()));
+            currenttreeview->setModel(currenttreemodel);   
+            connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+            //connect(currenttreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(dirTreeView_selectionChanged()));
        }
     }
     else if(action->text() == tr("Remove Evidence"))
@@ -385,14 +386,14 @@ QStandardItemModel* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugi
     else
         return NULL;
 }
-void WombatForensics::dirTreeView_selectionChanged()
+void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    fprintf(stderr, "Current index + 1: %d\n", currenttreeview->selectionModel()->currentIndex().column());
-    fprintf(stderr, currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString().toStdString().c_str());
+    //fprintf(stderr, "Current index + 1: %d\n", currenttreeview->selectionModel()->currentIndex().column());
+    ///fprintf(stderr, currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString().toStdString().c_str());
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(sleuthkitplugin);
     if(iSleuthKit)
     {
-        iSleuthKit->GetFileContents(currenttreeview->selectionModel()->currentIndex().
+       char* tmpBuffer = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
         //iSleuthKit->GetFileContents(currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString());
     }
     // USE tSKiMAGEfILEtSK TSKSERVICES.iNSTANCE().GETIMAGEFILE()
