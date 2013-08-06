@@ -111,7 +111,7 @@ QObject* WombatForensics::loadPlugin(QString fileName)
         setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
         setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt");
         //setupSleuthKitImgDb(plugin, currentcasedirpath);
-        setupSleuthKitBlackboard(plugin);
+        //setupSleuthKitBlackboard(plugin); // move to after image creation
         setupSleuthKitSchedulerQueue(plugin);
         setupSleuthKitFileManager(plugin);
     }
@@ -178,9 +178,14 @@ void WombatForensics::alterEvidence()
     if(action->text() == tr("Add Evidence"))
     {
         QString evidenceFilePath = iEvidence->addEvidence();
+        fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
         if(evidenceFilePath != "")
         {
+            QString evidenceName = evidenceFilePath.split("/").last();
+            evidenceName += ".db";
             setupSleuthKitImgDb(sleuthkitplugin, currentcasedirpath, currentcaseevidencepath);
+            setupSleuthKitBlackboard();
+            wombatCaseData->InsertImage(evidenceName, currentcaseevidencepath, currentcaseid);
             sleuthKitLoadEvidence(sleuthkitplugin, currentcaseevidencepath);
         }
     }

@@ -180,7 +180,7 @@ int WombatCaseDb::ReturnCaseID(QString caseName)
     return caseid;
 }
 
-void WombatCaseDb::InsertImage(int caseID, QString imageName, QString imageFilePath)
+void WombatCaseDb::InsertImage(QString imageName, QString imageFilePath, int caseID)
 {
     if(sqlite3_prepare_v2(wombatdb, "INSERT INTO caseimages (imagefullpath, imagename, caseid) VALUES(?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
@@ -188,6 +188,18 @@ void WombatCaseDb::InsertImage(int caseID, QString imageName, QString imageFileP
         {
             if(sqlite3_bind_text(sqlstatement, 2, imageName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
             {
+                if(sqlite3_bind_int(sqlstatement, 3, caseID) == SQLITE_OK)
+                {
+                    int ret = sqlite3_step(sqlstatement);
+                    if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+                    {
+                        // it was successful
+                    }
+                    else
+                        DisplayError(wombatparent, "1.7", "INSERT IMAGE INTO CASE", sqlite3_errmsg(wombatdb));
+                }
+                else
+                    DisplayError(wombatparent, "1.7", "INSERT IMAGE INTO CASE", sqlite3_errmsg(wombatdb));
             }
             else
                 DisplayError(wombatparent, "1.7", "INSERT IMAGE INTO CASE", sqlite3_errmsg(wombatdb));
