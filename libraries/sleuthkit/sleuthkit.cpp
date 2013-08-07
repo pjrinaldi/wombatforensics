@@ -40,7 +40,7 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
     }
     try
     {
-        SetSystemProperty(TskSystemProperties::OUT_DIR, settingsPath.toStdString());
+        SetSystemProperty(TskSystemProperties::OUT_DIR, "/home/pasquale/WombatForensics/tmpfiles");
     }
     catch(TskException &ex)
     {
@@ -113,7 +113,7 @@ void SleuthKitPlugin::SetupSystemFileManager()
 {
     try
     {
-        TskServices::Instance().setFileManager(TskFileManagerImpl::instance());
+        TskServices::Instance().setFileManager(fileManager->instance());
         fprintf(stderr, "Loading File Manager was successful!\n");
     }
     catch(TskException &ex)
@@ -163,11 +163,11 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     foreach(tmpId, fileidVector)
     {
         ret = imgdb->getFileRecord(tmpId, tmpRecord);
-        fprintf(stderr, "FileId: %d\n", tmpId);
+        //fprintf(stderr, "FileId: %d\n", tmpId);
         fileRecordVector.push_back(tmpRecord);
-        fprintf(stderr, "File Id: %d - FileName: %s - Parent FileId: %d - dirtype: %d\n", tmpRecord.fileId, tmpRecord.name.c_str(), tmpRecord.parentFileId, tmpRecord.dirType);
+        //fprintf(stderr, "File Id: %d - FileName: %s - Parent FileId: %d - dirtype: %d\n", tmpRecord.fileId, tmpRecord.name.c_str(), tmpRecord.parentFileId, tmpRecord.dirType);
     }
-    fprintf(stderr, "record vector size: %d\n", fileRecordVector.size());
+    //fprintf(stderr, "record vector size: %d\n", fileRecordVector.size());
     for(int i=0; i < (int)fileRecordVector.size(); i++)
     {
         //itemList.append(new QStandardItem(QString(fileRecordVector[i].name.c_str())));
@@ -198,20 +198,59 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         tmpItem2 = sleuthList[i];
         if(tmpRecord.parentFileId > 1)
         {
-            fprintf(stderr, "itemList[%d]->appendrow(itemList[%d])\n", tmpRecord.parentFileId-1, i);
-            fprintf(stderr, "sleuthListId %d\n", sleuthList[i]->GetSleuthFileID());
+            //fprintf(stderr, "itemList[%d]->appendrow(itemList[%d])\n", tmpRecord.parentFileId-1, i);
+            //fprintf(stderr, "sleuthListId %d\n", sleuthList[i]->GetSleuthFileID());
             //((QStandardItem*)itemList[tmpRecord.parentFileId-1])->appendRow(tmpItem);
             ((SleuthFileItem*)sleuthList[tmpRecord.parentFileId-1])->appendRow(tmpItem2);
         }
     }
     return model;
 }
-char* SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
+char SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
 {
-    TskImageFileTsk tmpfile;
+    // TskFile *pFile
+    //  uint8_t byte = 0;
+    //  long byteCounts[256];
+    //  memset(byteCounts, 0, sizeof(long) * 256);
+    //  long totalBytes = 0;
+    //  char buffer[FILE_BUFFER_SIZE];
+    //  ssize_t bytesRead = 0;
+    //  do
+    //  {
+    //      memset(buffer, 0, FILE_BUFFER_SIZE);
+    //      bytesRead = pFile->read(buffer, FILE_BUFFER_SIZE);
+    //      if (bytesRead > 0)
+    //      {
+    //          for (int i = 0; i < bytesRead; ++i)
+    //          {
+    //              byte = static_cast<uint8_t>(buffer[i]);
+    //              byteCounts[byte]++;
+    //          }
+    //          totalBytes += bytesRead;
+    //      }
+    //  }
+    //
+    //
+    //
+    //fileManager = (TskFileManagerImpl*)TskServices::Instance().getFileManager();
+    TskFile *tmpFile = fileManager->getFile((uint64_t)fileItem->GetSleuthFileID());
+    fileManager->saveFile(tmpFile);
+    //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
+    //TskServices::Instance().getFileManager().saveFile(tmpFile);
+    uint8_t byte = 0;
+    long byteCounts[256];
+    memset(byteCounts, 0, sizeof(long) *256);
+    long totalBytes = 0;
+    // TskImageFileTsk tmpfile;
+    //int ret = (TskServices::Instance().getImageFile()).openFile((uint64_t)fileItem->GetSleuthFileID());
     //tmpfile = TskServices::Instance().getImageFile();
     //std::auto_ptr<TskImageFile> tmpFile = TskServices::Instance().getImageFile();
-    char* buffer;
+    char buffer[8192];
+    ssize_t bytesRead = 0;
+    memset(buffer, 0, 8192);
+    bytesRead = tmpFile->read(buffer, 8192);
+    return buffer[8192];
+    //int ret2 = (TskServices::Instance().getImageFile()).readFile(ret, 
     //QString
     //int tmpId = imgdb->getFileIds(" where name = ? limit 1;")
     // get fileid using filename.
@@ -219,5 +258,4 @@ char* SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
     // readfile(fileid)
     // closefile(fileid)
     // return buffe
-    return "";
 }

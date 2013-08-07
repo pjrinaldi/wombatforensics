@@ -35,7 +35,7 @@ public:
     void SetupSystemFileManager();
     void OpenEvidence(QString evidencePath);
     QStandardItemModel* GetCurrentImageDirectoryTree(void);
-    char* GetFileContents(SleuthFileItem* fileItem);
+    char GetFileContents(SleuthFileItem* fileItem);
 
 
     //QStringList evidenceActions() const;
@@ -47,6 +47,7 @@ public:
 private:
     int currentcaseid;
     TskSystemPropertiesImpl* systemproperties;
+    TskFileManagerImpl* fileManager;
     std::auto_ptr<Log> log;
     std::auto_ptr<TskImgDB> imgdb;
     TskSchedulerQueue scheduler;

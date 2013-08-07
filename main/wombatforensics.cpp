@@ -183,6 +183,7 @@ void WombatForensics::alterEvidence()
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
             setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
+            //setupSleuthKitFileManager(sleuthkitplugin);
             setupSleuthKitBlackboard(sleuthkitplugin);
             wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
@@ -393,7 +394,8 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(sleuthkitplugin);
     if(iSleuthKit)
     {
-       char* tmpBuffer = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
+       char tmpBuffer = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
+       //fprintf(stderr, QString.fromRawData((const char*)tmpBuffer, strlen((const char*)tmpBuffer)).toStdString().c_str());
         //iSleuthKit->GetFileContents(currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString());
     }
     // USE tSKiMAGEfILEtSK TSKSERVICES.iNSTANCE().GETIMAGEFILE()
