@@ -123,7 +123,7 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_3);
 
-        toolBox->addItem(placeholderPage, QStringLiteral(""));
+        //toolBox->addItem(placeholderPage, QStringLiteral(""));
 
         horizontalLayout->addWidget(toolBox);
 
