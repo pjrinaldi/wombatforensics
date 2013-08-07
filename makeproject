@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd ./main
+make
+cd ../libraries/basictools
+make
+cd ../evidence
+make
+cd ../sleuthkit
+make
+cd ../../build
+gdb wombatforensics

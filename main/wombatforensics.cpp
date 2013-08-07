@@ -44,12 +44,12 @@ WombatForensics::WombatForensics(QWidget *parent) :
     if(wombatCaseData->ReturnCaseCount() == 0)
     {
         ui->actionOpen_Case->setEnabled(false);
-        ui->actionOpen_Case_2->setEnabled(false);
+        //ui->actionOpen_Case_2->setEnabled(false);
     }
     else if(wombatCaseData->ReturnCaseCount() > 0)
     {
         ui->actionOpen_Case->setEnabled(true);
-        ui->actionOpen_Case_2->setEnabled(true);
+        //ui->actionOpen_Case_2->setEnabled(true);
     }
     else
     {
@@ -131,8 +131,8 @@ void WombatForensics::populateToolBox(QObject *plugin)
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
     if(iBasicTools)
     {
-        ui->toolBox->addItem(iBasicTools->setupToolBoxDirectoryTree(), ((QStringList)iBasicTools->toolboxViews())[0]);
-        ui->toolBox->addItem(iBasicTools->setupToolBoxFileExtensionTree(), ((QStringList)iBasicTools->toolboxViews())[1]);
+        //ui->toolBox->addItem(iBasicTools->setupToolBoxDirectoryTree(), ((QStringList)iBasicTools->toolboxViews())[0]);
+        //ui->toolBox->addItem(iBasicTools->setupToolBoxFileExtensionTree(), ((QStringList)iBasicTools->toolboxViews())[1]);
     }
 }
 
@@ -189,11 +189,11 @@ void WombatForensics::alterEvidence()
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
             // need to populate the directory tree entries
             currenttreemodel = GetCurrentImageDirectoryTree(sleuthkitplugin);
-            currenttreeview = ui->toolBox->findChild<QTreeView *>("bt-dirTreeView");
-            fprintf(stderr, "My TreeView Name: %s\n", currenttreeview->objectName().toStdString().c_str());
-            currenttreeview->setHeaderHidden(true);
-            currenttreeview->setModel(currenttreemodel);   
-            connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+            //currenttreeview = ui->toolBox->findChild<QTreeView *>("bt-dirTreeView");
+            //fprintf(stderr, "My TreeView Name: %s\n", currenttreeview->objectName().toStdString().c_str());
+            //currenttreeview->setHeaderHidden(true);
+            //currenttreeview->setModel(currenttreemodel);   
+            //connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
             //connect(currenttreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(dirTreeView_selectionChanged()));
        }
     }
@@ -256,7 +256,7 @@ void WombatForensics::on_actionNew_Case_triggered()
             if(wombatCaseData->ReturnCaseCount() > 0)
             {
                 ui->actionOpen_Case->setEnabled(true);
-                ui->actionOpen_Case_2->setEnabled(true);
+                //ui->actionOpen_Case_2->setEnabled(true);
             }
             evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so"); // manually load evidence plugin
             basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so"); // manually load basictools plugin
