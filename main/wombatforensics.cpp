@@ -4,9 +4,7 @@
 
 #include <QPluginLoader>
 
-WombatForensics::WombatForensics(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::WombatForensics)
+WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
     ui->setupUi(this);
     wombatCaseData = new WombatCaseDb(this);

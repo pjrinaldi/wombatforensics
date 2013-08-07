@@ -70,7 +70,7 @@ QWidget* BasicTools::setupDirTab()
     QVBoxLayout* dirLayout = new QVBoxLayout();
     dirtreeview = new QTreeView();
     dirtreeview->setObjectName("bt-dirtree");
-    dirLayout->SetContentsMargins(0, 0, 0, 0);
+    dirLayout->setContentsMargins(0, 0, 0, 0);
     dirLayout->addWidget(dirtreeview);
     dirTab->setLayout(dirLayout);
 
@@ -82,9 +82,9 @@ QWidget* BasicTools::setupTypTab()
     // file type (extension) tree tab
     QWidget* typTab = new  QWidget();
     QVBoxLayout* typLayout = new QVBoxLayout();
-    typLayout->SetContentsMargins(0, 0, 0, 0);
+    typLayout->setContentsMargins(0, 0, 0, 0);
     typtreeview = new QTreeView();
-    typetreeview->setObjectName("bt-typtree");
+    typtreeview->setObjectName("bt-typtree");
     typLayout->addWidget(typtreeview);
     typTab->setLayout(typLayout);
 
