@@ -32,17 +32,18 @@ QWidget* BasicTools::setupColumnView() const
     return directoryTreeColumnView;
 }
 
-QWidget* BasicTools::setupHexTab() const
+QWidget* BasicTools::setupHexTab()
 {
     // hex editor tab
     QWidget* hexTab = new QWidget();
     QVBoxLayout* hexLayout = new QVBoxLayout();
-    BinViewWidget* hexWidget = new BinViewWidget();
+    hexwidget = new BinViewWidget();
+    hexwidget->setObjectName("bt-hexView");
     //BinViewModel* hexModel = 0;
     // appears the model is set to open the file, then the widget sets the model.
-    hexWidget->setModel(0);
+    hexwidget->setModel(0);
     hexLayout->setContentsMargins(0, 0, 0, 0);
-    hexLayout->addWidget(hexWidget);
+    hexLayout->addWidget(hexwidget);
     hexTab->setLayout(hexLayout);
 
     return hexTab;
@@ -53,6 +54,7 @@ QWidget* BasicTools::setupTxtTab() const
     QWidget* txtTab = new QWidget();
     QVBoxLayout* txtLayout = new QVBoxLayout();
     QTextEdit* txtWidget = new QTextEdit();
+    txtWidget->setObjectName("bt-txtView");
     txtLayout->setContentsMargins(0, 0, 0, 0);
     txtLayout->addWidget(txtWidget);
     txtTab->setLayout(txtLayout);
@@ -60,3 +62,9 @@ QWidget* BasicTools::setupTxtTab() const
     return txtTab;
 }
 
+void BasicTools::LoadHexModel(QString tmpFilePath)
+{
+    hexmodel = new BinViewModel();
+    hexmodel->open(tmpFilePath);
+    hexwidget->setModel(hexmodel);
+}

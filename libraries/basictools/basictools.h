@@ -23,13 +23,16 @@ public:
 
     QWidget* setupToolBoxDirectoryTree() const;
     QWidget* setupToolBoxFileExtensionTree() const;
-    QWidget* setupHexTab() const;
+    QWidget* setupHexTab();
     QWidget* setupTxtTab() const;
     QWidget* setupColumnView() const;
+    void LoadHexModel(QString tmpFilePath);
 
 private:
     sqlite3_stmt *sqlStatement;
     int currentcaseid;
+    BinViewModel* hexmodel;
+    BinViewWidget* hexwidget;
 
 };
 

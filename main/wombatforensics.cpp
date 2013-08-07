@@ -394,11 +394,20 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(sleuthkitplugin);
     if(iSleuthKit)
     {
-       char tmpBuffer = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
+       QString tmpFilePath = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
+       LoadHexViewer(tmpFilePath);
        //fprintf(stderr, QString.fromRawData((const char*)tmpBuffer, strlen((const char*)tmpBuffer)).toStdString().c_str());
         //iSleuthKit->GetFileContents(currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString());
     }
     // USE tSKiMAGEfILEtSK TSKSERVICES.iNSTANCE().GETIMAGEFILE()
     // GET FILENAME -> USE THAT TO GET FILEID, CALL IMAGEFILETSK->OPENFILE(FILEID)/IMAGEFILETSK->READFILE()->BUFFER()/ TXTVIEWER->READBUFFER()
     // or GET FILENAME -> FILEID -> TSKFILETSK->OPEN()->READ()->BUFFER() / TXTVIEWER->READBUFFER()
+}
+void WombatForensics::LoadHexViewer(QString tmpFilePath)
+{
+    BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(basictoolsplugin);
+    if(iBasicTools)
+    {
+        iBasicTools->LoadHexModel(tmpFilePath);
+    }
 }

@@ -290,7 +290,7 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     }
     return model;
 }
-char SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
+QString SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
 {
     // TskFile *pFile
     //  uint8_t byte = 0;
@@ -317,16 +317,31 @@ char SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
     //
     //
     //fileManager = (TskFileManagerImpl*)TskServices::Instance().getFileManager();
-    TskFileTsk *tmpFile = (TskFileTsk*)TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
-    //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
+    //TskFileTsk *tmpFile = new TskFileTsk((uint64_t)fileItem->GetSleuthFileID());
+    //TskFileTsk *tmpFile = (TskFileTsk*)TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
+    //int ret = TskServices::Instance().getImageFile().openFile((uint64_t)fileItem->GetSleuthFileID());
+    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
     fprintf(stderr, "fileItem ID: %i\n", fileItem->GetSleuthFileID());
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
+    //QString tmpString = "home/pasquale/WombatForensics/tmpfiles";
+    //fileManager->copyFile(tmpFile, tmpString.toStdWString());
     //tmpFile->save();
     //tmpFile->save();
     //tmpFile->open();
     //TskServices::Instance().getFileManager().saveFile(tmpFile);
-    char buffer[8192];
-    return buffer[8192];
+    char buffer[32768];
+    ssize_t bytesRead = 0;
+    bytesRead = tmpFile->read(buffer, 32768);
+    QByteArray ba;
+    QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.dat");
+    qFile.open(QIODevice::ReadWrite);
+    QDataStream datastream(&ba, QIODevice::ReadWrite);
+    datastream.writeRawData((const char*) buffer, 32768);
+    QDataStream filestream(&qFile);
+    filestream.writeRawData((const char*) buffer, 32768);
+    return "/home/pasquale/WombatForensics/tmpfiles/tmp.dat";
+    //return buffer[32768];
+    //return buffer[];
     //tmpFile->open();
     //tmpFile->save();
     //tmpFile->close();

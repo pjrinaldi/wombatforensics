@@ -18,6 +18,8 @@
 #include <QFile>
 #include <QXmlStreamWriter>
 #include <QStandardItemModel>
+#include <QByteArray>
+#include <QDataStream>
 #include "sleuthfileitem.h"
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
@@ -36,7 +38,7 @@ public:
     void SetupSystemFileManager();
     void OpenEvidence(QString evidencePath);
     QStandardItemModel* GetCurrentImageDirectoryTree(void);
-    char GetFileContents(SleuthFileItem* fileItem);
+    QString GetFileContents(SleuthFileItem* fileItem);
 
 
     //QStringList evidenceActions() const;

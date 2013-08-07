@@ -20,13 +20,13 @@
 #include <string>
 
 // Framework includes
-#include "tsk/framework/file/TskFile.h"
-#include "tsk/framework/services/TskImgDB.h"
-#include "tsk/base/tsk_os.h"
+#include <tsk/framework/file/TskFile.h>
+#include <tsk/framework/services/TskImgDB.h>
+#include <tsk/base/tsk_os.h>
 
 // Poco includes
-#include "Poco/File.h"
-#include "Poco/FileStream.h"
+#include <Poco/File.h>
+#include <Poco/FileStream.h>
 
 /**
  * TskFileTsk is a Sleuthkit and Poco based implementation

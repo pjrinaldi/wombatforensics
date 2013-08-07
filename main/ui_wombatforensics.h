@@ -1,3 +1,10 @@
+/********************************************************************************
+** Form generated from reading UI file 'wombatforensics.ui'
+**
+** Created by: Qt User Interface Compiler version 5.1.0
+**
+** WARNING! All changes made in this file will be lost when recompiling UI file!
+********************************************************************************/
 
 #ifndef UI_WOMBATFORENSICS_H
 #define UI_WOMBATFORENSICS_H
@@ -94,15 +101,15 @@ public:
         horizontalLayout->setSizeConstraint(QLayout::SetNoConstraint);
         toolBox = new QToolBox(centralWidget);
         toolBox->setObjectName(QStringLiteral("toolBox"));
-        QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
+        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Expanding);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(toolBox->sizePolicy().hasHeightForWidth());
         toolBox->setSizePolicy(sizePolicy2);
-        toolBox->setMinimumSize(QSize(150, 0));
+        toolBox->setMinimumSize(QSize(170, 0));
         placeholderPage = new QWidget();
         placeholderPage->setObjectName(QStringLiteral("placeholderPage"));
-        placeholderPage->setGeometry(QRect(0, 0, 226, 452));
+        placeholderPage->setGeometry(QRect(0, 0, 170, 452));
         sizePolicy.setHeightForWidth(placeholderPage->sizePolicy().hasHeightForWidth());
         placeholderPage->setSizePolicy(sizePolicy);
         verticalLayout_2 = new QVBoxLayout(placeholderPage);
@@ -115,6 +122,8 @@ public:
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
 
         verticalLayout_2->addLayout(horizontalLayout_3);
+
+        toolBox->addItem(placeholderPage, QStringLiteral(""));
 
         horizontalLayout->addWidget(toolBox);
 
@@ -185,7 +194,6 @@ public:
 
 
         QMetaObject::connectSlotsByName(WombatForensics);
-
     } // setupUi
 
     void retranslateUi(QMainWindow *WombatForensics)
