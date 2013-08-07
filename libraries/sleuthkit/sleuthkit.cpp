@@ -233,8 +233,11 @@ char SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
     //
     //
     //fileManager = (TskFileManagerImpl*)TskServices::Instance().getFileManager();
-    TskFile *tmpFile = fileManager->getFile((uint64_t)fileItem->GetSleuthFileID());
-    fileManager->saveFile(tmpFile);
+    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
+    tmpFile->open();
+    tmpFile->save();
+    tmpFile->close();
+    //fileManager->saveFile(tmpFile);
     //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
     //TskServices::Instance().getFileManager().saveFile(tmpFile);
     uint8_t byte = 0;
