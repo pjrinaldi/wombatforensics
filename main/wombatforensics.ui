@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>WombatForensics</class>
+ <widget class="QMainWindow" name="WombatForensics">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,37 +11,19 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>WombatForensics</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
-    <property name="spacing">
-     <number>0</number>
-    </property>
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
-     <number>0</number>
-    </property>
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
       <widget class="QTabWidget" name="fileViewTabWidget"/>
-      <widget class="QTreeView" name="fileViewTreeView">
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
-       <property name="alternatingRowColors">
-        <bool>true</bool>
+      <widget class="QTabWidget" name="fileInfoTabWidget">
+       <property name="currentIndex">
+        <number>-1</number>
        </property>
       </widget>
      </widget>
@@ -108,8 +90,8 @@
   </widget>
   <action name="actionNew_Case">
    <property name="icon">
-    <iconset>
-     <normaloff>../Resources/document-new.png</normaloff>../Resources/document-new.png</iconset>
+    <iconset resource="wombat.qrc">
+        <normaloff>:/newcase</normaloff>:/newcase</iconset>
    </property>
    <property name="text">
     <string>New Case</string>
@@ -117,8 +99,8 @@
   </action>
   <action name="actionOpen_Case">
    <property name="icon">
-    <iconset>
-     <normaloff>../Resources/document-open.png</normaloff>../Resources/document-open.png</iconset>
+    <iconset resource="wombat.qrc">
+        <normaloff>:/opencase</normaloff>:/opencase</iconset>
    </property>
    <property name="text">
     <string>Open Case</string>

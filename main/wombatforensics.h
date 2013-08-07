@@ -42,8 +42,8 @@ private:
     QStringList locatePlugins(void);
     bool isPluginLoaded(QString pluginFileName);
     void populateActions(QObject *plugin);
-    void populateToolBox(QObject *plugin);
-    void populateTabWidget(QObject *plugin);
+    //void populateToolBox(QObject *plugin);
+    void populateTabWidgets(QObject *plugin);
     void setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName);
     void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName);
     void setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);
@@ -63,6 +63,7 @@ private:
     QString wombatsettingspath;
     QString wombatdatapath;
     QString wombatcasespath;
+    QString wombattmpfilepath;
     QObject *basictoolsplugin;
     QObject *evidenceplugin;
     QObject *sleuthkitplugin;

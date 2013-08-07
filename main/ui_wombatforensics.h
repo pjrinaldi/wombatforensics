@@ -21,7 +21,6 @@
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolBar>
-#include <QtWidgets/QTreeView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -37,7 +36,7 @@ public:
     QVBoxLayout *verticalLayout;
     QSplitter *splitter;
     QTabWidget *fileViewTabWidget;
-    QTreeView *fileViewTreeView;
+    QTabWidget *fileInfoTabWidget;
     QMenuBar *mainMenubar;
     QMenu *menuFile;
     QMenu *menuEvidence;
@@ -65,20 +64,16 @@ public:
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         verticalLayout = new QVBoxLayout(centralwidget);
-        verticalLayout->setSpacing(0);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
         splitter = new QSplitter(centralwidget);
         splitter->setObjectName(QStringLiteral("splitter"));
         splitter->setOrientation(Qt::Vertical);
         fileViewTabWidget = new QTabWidget(splitter);
         fileViewTabWidget->setObjectName(QStringLiteral("fileViewTabWidget"));
         splitter->addWidget(fileViewTabWidget);
-        fileViewTreeView = new QTreeView(splitter);
-        fileViewTreeView->setObjectName(QStringLiteral("fileViewTreeView"));
-        fileViewTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        fileViewTreeView->setAlternatingRowColors(true);
-        splitter->addWidget(fileViewTreeView);
+        fileInfoTabWidget = new QTabWidget(splitter);
+        fileInfoTabWidget->setObjectName(QStringLiteral("fileInfoTabWidget"));
+        splitter->addWidget(fileInfoTabWidget);
 
         verticalLayout->addWidget(splitter);
 
@@ -116,12 +111,15 @@ public:
 
         retranslateUi(WombatForensics);
 
+        fileInfoTabWidget->setCurrentIndex(-1);
+
+
         QMetaObject::connectSlotsByName(WombatForensics);
     } // setupUi
 
     void retranslateUi(QMainWindow *WombatForensics)
     {
-        WombatForensics->setWindowTitle(QApplication::translate("WombatForensics", "Wombat Forensics", 0));
+        WombatForensics->setWindowTitle(QApplication::translate("WombatForensics", "WombatForensics", 0));
         actionNew_Case->setText(QApplication::translate("WombatForensics", "New Case", 0));
         actionOpen_Case->setText(QApplication::translate("WombatForensics", "Open Case", 0));
         actionExit->setText(QApplication::translate("WombatForensics", "Exit", 0));

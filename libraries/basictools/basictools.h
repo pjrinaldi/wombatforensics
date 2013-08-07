@@ -18,14 +18,16 @@ class BasicTools : public QObject, public BasicToolsInterface
     
 public:
     //BasicTools Interface Functions
-    QStringList toolboxViews() const;
+    //QStringList toolboxViews() const;
     QStringList evidenceToolboxIcons() const;
 
-    QWidget* setupToolBoxDirectoryTree() const;
-    QWidget* setupToolBoxFileExtensionTree() const;
+    //QWidget* setupToolBoxDirectoryTree() const;
+    //QWidget* setupToolBoxFileExtensionTree() const;
     QWidget* setupHexTab();
     QWidget* setupTxtTab() const;
-    QWidget* setupColumnView() const;
+    QWidget* setupDirTab();
+    QWidget* setupTypTab();
+    //QWidget* setupColumnView() const;
     void LoadHexModel(QString tmpFilePath);
 
 private:
@@ -33,7 +35,8 @@ private:
     int currentcaseid;
     BinViewModel* hexmodel;
     BinViewWidget* hexwidget;
-
+    QTreeView* dirtreeview;
+    QTreeView* typtreeview;
 };
 
 #endif // BASICTOOLS_H

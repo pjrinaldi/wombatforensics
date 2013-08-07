@@ -10,14 +10,13 @@ WombatForensics::WombatForensics(QWidget *parent) :
 {
     ui->setupUi(this);
     wombatCaseData = new WombatCaseDb(this);
-    //connect(ui->actionNew_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionNew_Case_triggered()));
-    //connect(ui->actionOpen_Case_2, SIGNAL(triggered()), ui->menuEvidence, SLOT(on_actionOpen_Case_triggered()));
     currentcaseid = -1;
     QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";
     wombatsettingspath = homePath + "settings";
     wombatdatapath = homePath + "data/";
     wombatcasespath = homePath + "cases/";
+    wombattmpfilepath = homePath + "tmpfiles/";
     bool mkPath = (new QDir())->mkpath(wombatsettingspath);
     if(mkPath == false)
         wombatCaseData->DisplayError(this, "2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
@@ -27,6 +26,9 @@ WombatForensics::WombatForensics(QWidget *parent) :
     mkPath = (new QDir())->mkpath(wombatcasespath);
     if(mkPath == false)
         wombatCaseData->DisplayError(this, "2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
+    mkPath = (new QDir())->mkpath(wombattmpfilepath);
+    if(mkPath == false)
+        wombatCaseData->DisplayError(this, "2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     QString tmpPath = wombatdatapath + "WombatData.db";
     bool doesFileExist = wombatCaseData->FileExists(tmpPath.toStdString());
     if(!doesFileExist)
@@ -106,8 +108,8 @@ QObject* WombatForensics::loadPlugin(QString fileName)
     if (plugin)
     {
         populateActions(plugin);
-        populateToolBox(plugin);
-        populateTabWidget(plugin);
+        //populateToolBox(plugin);
+        populateTabWidgets(plugin);
         setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
         setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt");
         setupSleuthKitSchedulerQueue(plugin);
@@ -125,7 +127,8 @@ void WombatForensics::populateActions(QObject *plugin)
         addActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(alterEvidence()));
     }
 }
-
+//void WombatForensics::populate
+/*
 void WombatForensics::populateToolBox(QObject *plugin)
 {
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
@@ -135,14 +138,16 @@ void WombatForensics::populateToolBox(QObject *plugin)
         //ui->toolBox->addItem(iBasicTools->setupToolBoxFileExtensionTree(), ((QStringList)iBasicTools->toolboxViews())[1]);
     }
 }
-
-void WombatForensics::populateTabWidget(QObject *plugin)
+*/
+void WombatForensics::populateTabWidgets(QObject *plugin)
 {
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
     if(iBasicTools)
     {
         ui->fileViewTabWidget->addTab(iBasicTools->setupHexTab(), "Hex View");
         ui->fileViewTabWidget->addTab(iBasicTools->setupTxtTab(), "Text View");
+        ui->fileInfoTabWidget->addTab(iBasicTools->setupDirTab(), "Directory List");
+        ui->fileInfoTabWidget->addTab(iBasicTools->setupTypTab(), "File Type");
     }
 }
 

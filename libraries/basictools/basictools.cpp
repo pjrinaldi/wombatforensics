@@ -4,7 +4,7 @@ QStringList BasicTools::evidenceToolboxIcons() const
 {
     return QStringList() << tr(":/basictools/images/treefile") << tr(":/basictools/images/treefolder") << (":/basictools/images/treepartition") << tr(":/basictools/images/treefilemanager") << tr(":/basictools/images/treeimage");
 }
-
+/*
 QStringList BasicTools::toolboxViews() const
 {
     return QStringList() << tr("Directory Listing") << tr("File Extension Category");
@@ -24,14 +24,15 @@ QWidget* BasicTools::setupToolBoxFileExtensionTree() const
 
     return fileExtensionTreeView;
 }
-
+*/
+/*
 QWidget* BasicTools::setupColumnView() const
 {
     QColumnView* directoryTreeColumnView = new QColumnView();
 
     return directoryTreeColumnView;
 }
-
+*/
 QWidget* BasicTools::setupHexTab()
 {
     // hex editor tab
@@ -60,6 +61,34 @@ QWidget* BasicTools::setupTxtTab() const
     txtTab->setLayout(txtLayout);
     
     return txtTab;
+}
+
+QWidget* BasicTools::setupDirTab()
+{
+    //directory tree tab
+    QWidget* dirTab = new QWidget();
+    QVBoxLayout* dirLayout = new QVBoxLayout();
+    dirtreeview = new QTreeView();
+    dirtreeview->setObjectName("bt-dirtree");
+    dirLayout->SetContentsMargins(0, 0, 0, 0);
+    dirLayout->addWidget(dirtreeview);
+    dirTab->setLayout(dirLayout);
+
+    return dirTab;
+}
+
+QWidget* BasicTools::setupTypTab()
+{
+    // file type (extension) tree tab
+    QWidget* typTab = new  QWidget();
+    QVBoxLayout* typLayout = new QVBoxLayout();
+    typLayout->SetContentsMargins(0, 0, 0, 0);
+    typtreeview = new QTreeView();
+    typetreeview->setObjectName("bt-typtree");
+    typLayout->addWidget(typtreeview);
+    typTab->setLayout(typLayout);
+
+    return typTab;
 }
 
 void BasicTools::LoadHexModel(QString tmpFilePath)
