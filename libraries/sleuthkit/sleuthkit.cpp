@@ -18,6 +18,15 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
             xml.writeStartElement("CONFIG_DIR");
             xml.writeCharacters(settingsPath);
             xml.writeEndElement();
+            xml.writeStartElement("MODULE_DIR");
+            xml.writeCharacters("/usr/local/lib");
+            xml.writeEndElement();
+            xml.writeStartElement("MODULE_CONFIG_DIR");
+            xml.writeCharacters("/usr/local/share/tsk");
+            xml.writeEndElement();
+            xml.writeStartElement("PIPELINE_CONFIG_FILE");
+            xml.writeCharacters("#CONFIG_DIR#/tsk-pipe.xml");
+            xml.writeEndElement();
             xml.writeEndElement();
             xml.writeEndDocument();
         }
@@ -37,6 +46,46 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
     catch(TskException &ex)
     {
         fprintf(stderr, "Loading Config File config file: %s\n", ex.message().c_str());
+    }
+    tmpPath = settingsPath;
+    tmpPath += "/tsk-pipe.xml";
+    QFile pipeFile(tmpPath);
+    fprintf(stderr, "PipPath: %s\n", tmpPath.toStdString().c_str());
+    if(!pipeFile.exists()) // if tsk-pipe.xml does not exist, create and write it here
+    {
+        if(pipeFile.open(QFile::WriteOnly | QFile::Text))
+        {
+            QXmlStreamWriter pxml(&pipeFile);
+            pxml.setAutoFormatting(true);
+            pxml.writeStartDocument();
+            pxml.writeStartElement("PIPELINE_CONFIG");
+            pxml.writeStartElement("PIPELINE");
+            pxml.writeAttribute("type", "FileAnalysis");
+            pxml.writeStartElement("MODULE");
+            pxml.writeAttribute("order", "1");
+            pxml.writeAttribute("type", "plugin");
+            pxml.writeAttribute("location", "tskHashCalcModule");
+            pxml.writeEndElement();
+            pxml.writeStartElement("MODULE");
+            pxml.writeAttribute("order", "2");
+            pxml.writeAttribute("type", "plugin");
+            pxml.writeAttribute("location", "tskFileTypeSigModule");
+            pxml.writeEndElement();
+            pxml.writeEndElement();
+            pxml.writeEndElement();
+            pxml.writeEndDocument();
+        }
+        else
+            fprintf(stderr, "Could not open file for writing\n");
+        pipeFile.close();
+    }
+    try
+    {
+        SetSystemProperty(TskSystemProperties::PIPELINE_CONFIG_FILE, tmpPath.toStdString());
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "couldn't load pipeline: %s\n", ex.message().c_str());
     }
     try
     {
@@ -123,6 +172,17 @@ void SleuthKitPlugin::SetupSystemFileManager()
 }
 void SleuthKitPlugin::OpenEvidence(QString evidencePath)
 {
+    TskPipelineManager pipelineMgr;
+    TskPipeline *filePipeline;
+    try
+    {
+        filePipeline = pipelineMgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
+    }
+    catch(const TskException &ex)
+    {
+        fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
+    }
+
     TskImageFileTsk imagefiletsk;
     try
     {
@@ -142,6 +202,30 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
     catch(TskException &ex)
     {
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
+    }
+    TskSchedulerQueue::task_struct *task;
+    while((task = scheduler.nextTask()) != NULL)
+    {
+        try
+        {
+            if(task->task == Scheduler::FileAnalysis && filePipeline && !filePipeline->isEmpty())
+            {
+                filePipeline->run(task->id);
+            }
+            else
+            {
+                fprintf(stderr, "Skipping task: %s\n", task->task);
+            }
+            delete task;
+        }
+        catch(TskException &ex)
+        {
+            fprintf(stderr, "TskException: %s\n", ex.message().c_str());
+        }
+    }
+    if(filePipeline && !filePipeline->isEmpty())
+    {
+        filePipeline->logModuleExecutionTimes();
     }
 }
 
@@ -233,26 +317,35 @@ char SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
     //
     //
     //fileManager = (TskFileManagerImpl*)TskServices::Instance().getFileManager();
-    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
-    tmpFile->open();
-    tmpFile->save();
-    tmpFile->close();
+    TskFileTsk *tmpFile = (TskFileTsk*)TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
+    //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
+    fprintf(stderr, "fileItem ID: %i\n", fileItem->GetSleuthFileID());
+    fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
+    //tmpFile->save();
+    //tmpFile->save();
+    //tmpFile->open();
+    //TskServices::Instance().getFileManager().saveFile(tmpFile);
+    char buffer[8192];
+    return buffer[8192];
+    //tmpFile->open();
+    //tmpFile->save();
+    //tmpFile->close();
     //fileManager->saveFile(tmpFile);
     //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
     //TskServices::Instance().getFileManager().saveFile(tmpFile);
-    uint8_t byte = 0;
-    long byteCounts[256];
-    memset(byteCounts, 0, sizeof(long) *256);
-    long totalBytes = 0;
+    //uint8_t byte = 0;
+    //long byteCounts[256];
+    //memset(byteCounts, 0, sizeof(long) *256);
+    //long totalBytes = 0;
     // TskImageFileTsk tmpfile;
     //int ret = (TskServices::Instance().getImageFile()).openFile((uint64_t)fileItem->GetSleuthFileID());
     //tmpfile = TskServices::Instance().getImageFile();
     //std::auto_ptr<TskImageFile> tmpFile = TskServices::Instance().getImageFile();
-    char buffer[8192];
-    ssize_t bytesRead = 0;
-    memset(buffer, 0, 8192);
-    bytesRead = tmpFile->read(buffer, 8192);
-    return buffer[8192];
+    //char buffer[8192];
+    //ssize_t bytesRead = 0;
+    //memset(buffer, 0, 8192);
+    //bytesRead = tmpFile->read(buffer, 8192);
+    //return buffer[8192];
     //int ret2 = (TskServices::Instance().getImageFile()).readFile(ret, 
     //QString
     //int tmpId = imgdb->getFileIds(" where name = ? limit 1;")

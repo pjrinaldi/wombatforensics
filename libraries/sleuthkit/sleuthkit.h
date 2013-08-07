@@ -10,6 +10,7 @@
 #include "TskSchedulerQueue.h"
 #include "TskFileManagerImpl.h"
 #include "TskImageFileTsk.h"
+#include "TskFileTsk.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QString>
