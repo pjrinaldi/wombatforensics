@@ -27,14 +27,10 @@ class BasicToolsInterface
 public:
     virtual ~BasicToolsInterface() {}
 
-    //virtual QStringList toolboxViews() const = 0;
-    //virtual QWidget* setupToolBoxDirectoryTree() const = 0;
-    //virtual QWidget* setupToolBoxFileExtensionTree() const = 0;
     virtual QWidget* setupTypTab() = 0;
     virtual QWidget* setupDirTab() = 0;
     virtual QWidget* setupHexTab() = 0;
     virtual QWidget* setupTxtTab() const = 0;
-    //virtual QWidget* setupColumnView() const = 0;
     virtual QStringList evidenceToolboxIcons() const = 0;
     virtual void LoadHexModel(QString tmpFilePath) = 0;
 };
@@ -52,8 +48,7 @@ public:
     virtual void SetupSystemFileManager() = 0;
     virtual void OpenEvidence(QString evidencePath) = 0;
     virtual QStandardItemModel* GetCurrentImageDirectoryTree() = 0;
-    //virtual QString GetFileContents(SleuthFileItem *fileItem) = 0;
-    virtual QString GetFileContents(QStandardItem *fileItem) = 0;
+    virtual QString GetFileContents(int fileID) = 0;
 };
 
 #define EvidenceInterface_iid "wombat.EvidenceInterface"

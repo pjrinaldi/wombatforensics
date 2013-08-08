@@ -38,15 +38,7 @@ public:
     void SetupSystemFileManager();
     void OpenEvidence(QString evidencePath);
     QStandardItemModel* GetCurrentImageDirectoryTree(void);
-    //QString GetFileContents(SleuthFileItem* fileItem);
-    QString GetFileContents(QStandardItem* fileItem);
-
-
-    //QStringList evidenceActions() const;
-    //QStringList evidenceActionIcons() const;
-
-    //void addEvidence(int currentCaseID);
-    //void remEvidence(int currentCaseID);
+    QString GetFileContents(int fileID);
 
 private:
     int currentcaseid;
@@ -55,7 +47,6 @@ private:
     std::auto_ptr<Log> log;
     std::auto_ptr<TskImgDB> imgdb;
     TskSchedulerQueue scheduler;
-
 };
 
 #endif // SLEUTHKIT_H

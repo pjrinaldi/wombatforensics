@@ -241,6 +241,12 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     int ret;
     uint64_t tmpId;
     QStandardItemModel *model = new QStandardItemModel();
+    QStringList headerList;
+    headerList << "Item ID";
+    headerList << "Name";
+    headerList << "Full Path";
+    headerList << "MD5 Hash";
+    model->setHorizontalHeaderLabels(headerList);
     //SleuthFileItem* imgNode = new SleuthFileItem("imageNode", 0);
     //QStandardItem *imgNode = new QStandardItem("imageNode");
     QStandardItem *rootNode = model->invisibleRootItem();
@@ -263,9 +269,9 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         //sleuthList.clear()
         //itemList.append(new QStandardItem(QString(fileRecordVector[i].name.c_str())));
         //sleuthList.append(new SleuthFileItem(QString(fileRecordVector[i].name.c_str()), (int)fileRecordVector[i].fileId));
+        sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
         sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
         sleuthList << new QStandardItem(QString(fileRecordVector[i].fullPath.c_str()));
-        sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
         sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
         //sleuthList << new SleuthFileItem(QString(fileRecordVector[i].name.c_str()), (int)fileRecordVector[i].fileId);
         //sleuthList << new SleuthFileItem(QString(fileRecordVector[i].fullPath.c_str()), 0);
@@ -310,7 +316,8 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
 }
 
 //QString SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
-QString SleuthKitPlugin::GetFileContents(QStandardItem* fileItem)
+//QString SleuthKitPlugin::GetFileContents(QStandardItem* fileItem)
+QString SleuthKitPlugin::GetFileContents(int fileID)
 {
     // TskFile *pFile
     //  uint8_t byte = 0;
@@ -340,7 +347,9 @@ QString SleuthKitPlugin::GetFileContents(QStandardItem* fileItem)
     //TskFileTsk *tmpFile = new TskFileTsk((uint64_t)fileItem->GetSleuthFileID());
     //TskFileTsk *tmpFile = (TskFileTsk*)TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
     //int ret = TskServices::Instance().getImageFile().openFile((uint64_t)fileItem->GetSleuthFileID());
-    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->text().toInt());
+    //fprintf(stderr, "ID: %s\n", fileItem->text().toStdString().c_str());
+    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
+    //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->text().toInt());
     //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
     //fprintf(stderr, "fileItem ID: %i\n", fileItem->GetSleuthFileID());
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
