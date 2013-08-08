@@ -397,6 +397,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     if(iSleuthKit)
     {
         int selRow = index.row();
+        fprintf(stderr, "Row: %d\n", selRow);
         QStandardItem* idItem = currenttreemodel->item(selRow, 0);
         QString tmpText = idItem->data(Qt::DisplayRole).toString();
         //QString tmpText = ((QStandardItem*)currenttreemodel->itemFromIndex(index))->text();

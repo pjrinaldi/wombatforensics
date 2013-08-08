@@ -243,13 +243,15 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     headerList << "Item ID";
     headerList << "Name";
     headerList << "Full Path";
+    headerList << "Size";
+    headerList << "Created";
     headerList << "MD5 Hash";
     model->setHorizontalHeaderLabels(headerList);
-    QStandardItem *imgNode = new QStandardItem("get image name as Node");
+    //QStandardItem *imgNode = new QStandardItem("get image name as Node");
     // also need to get the partitions and volumes as nodes.
     QStandardItem *rootNode = model->invisibleRootItem();
     QList<QList<QStandardItem*> > treeList;
-    rootNode->appendRow(imgNode);
+    //rootNode->appendRow(imgNode);
     foreach(tmpId, fileidVector)
     {
         ret = imgdb->getFileRecord(tmpId, tmpRecord);
@@ -261,6 +263,9 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
         sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
         sleuthList << new QStandardItem(QString(fileRecordVector[i].fullPath.c_str()));
+        sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
+        sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
+        //sleuthList << new QStandardItem(QString(ctime(((const time_t*)fileRecordVector[i].crtime))));
         sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
         treeList.append(sleuthList);
     }
@@ -278,8 +283,8 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         }
         if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
         {
-            imgNode->appendRow(treeList[i]);
-            //rootNode->appendRow(treeList[i]);
+            //imgNode->appendRow(treeList[i]);
+            rootNode->appendRow(treeList[i]);
         }
     }
     for(int i=0; i < (int)fileRecordVector.size(); i++)
@@ -296,9 +301,6 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
 QString SleuthKitPlugin::GetFileContents(int fileID)
 {
     TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
-    //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->text().toInt());
-    //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
-    //fprintf(stderr, "fileItem ID: %i\n", fileItem->GetSleuthFileID());
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
     char buffer[32768];
     ssize_t bytesRead = 0;

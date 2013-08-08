@@ -4,6 +4,7 @@
 #include <main/interfaces.h>
 #include <sqlite3.h>
 #include <tsk/framework/framework.h>
+#include <time.h>
 #include "TskSystemPropertiesImpl.h"
 #include "TskImgDBSqlite.h"
 #include "TskDBBlackboard.h"
