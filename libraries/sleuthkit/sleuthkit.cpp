@@ -236,14 +236,19 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     fileidVector = imgdb->getFileIds();
     TskFileRecord tmpRecord;
     // implement custom qstandarditem which has a fileid field
-    //QStandardItem *tmpItem;
-    SleuthFileItem *tmpItem2;
+    QStandardItem *tmpItem2;
+    //SleuthFileItem* tmpItem2;
     int ret;
     uint64_t tmpId;
     QStandardItemModel *model = new QStandardItemModel();
+    //SleuthFileItem* imgNode = new SleuthFileItem("imageNode", 0);
+    //QStandardItem *imgNode = new QStandardItem("imageNode");
     QStandardItem *rootNode = model->invisibleRootItem();
-    //QList<QStandardItem*> itemList;
-    QList<SleuthFileItem*> sleuthList;
+    QList<QList<QStandardItem*> > treeList;
+    //QList<QList<SleuthFileItem*> > treeList;
+    //QList<SleuthFileItem*> sleuthList;
+    //QList<QStandardItem*> sleuthList;
+    //rootNode->appendRow(imgNode);
     foreach(tmpId, fileidVector)
     {
         ret = imgdb->getFileRecord(tmpId, tmpRecord);
@@ -254,13 +259,26 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     //fprintf(stderr, "record vector size: %d\n", fileRecordVector.size());
     for(int i=0; i < (int)fileRecordVector.size(); i++)
     {
+        QList<QStandardItem*> sleuthList;
+        //sleuthList.clear()
         //itemList.append(new QStandardItem(QString(fileRecordVector[i].name.c_str())));
-        sleuthList.append(new SleuthFileItem(QString(fileRecordVector[i].name.c_str()), (int)fileRecordVector[i].fileId));
+        //sleuthList.append(new SleuthFileItem(QString(fileRecordVector[i].name.c_str()), (int)fileRecordVector[i].fileId));
+        sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
+        sleuthList << new QStandardItem(QString(fileRecordVector[i].fullPath.c_str()));
+        sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
+        sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
+        //sleuthList << new SleuthFileItem(QString(fileRecordVector[i].name.c_str()), (int)fileRecordVector[i].fileId);
+        //sleuthList << new SleuthFileItem(QString(fileRecordVector[i].fullPath.c_str()), 0);
+        //sleuthList << new SleuthFileItem(QString::number((int)fileRecordVector[i].fileId), 0);
+        //sleuthList << new SleuthFileItem(QString(fileRecordVector[i].md5.c_str()), 0);
+        treeList.append(sleuthList);
     }
+    //treeList.append(sleuthList)
     for(int i = 0; i < (int)fileRecordVector.size(); i++)
     {
-        //tmpItem = ((QStandardItem*)itemList[i]);
-        tmpItem2 = ((SleuthFileItem*)sleuthList[i]);
+        /*
+        tmpItem2 = ((QStandardItem*)treeList[i][0]);
+        //tmpItem2 = ((SleuthFileItem*)treeList[i][0]);
 
         if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
         {
@@ -270,22 +288,24 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         {
             tmpItem2->setIcon(QIcon(":/basic/treefile"));
         }
+        */
         if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
         {
-            rootNode->appendRow(tmpItem2);
+            //rootNode->appendRow(tmpItem2);
+            rootNode->appendRow(treeList[i]);
         }
     }
     for(int i=0; i < (int)fileRecordVector.size(); i++)
     {
         tmpRecord = fileRecordVector[i];
-        //tmpItem = itemList[i];
-        tmpItem2 = sleuthList[i];
+        //tmpItem2 = ((QStandardItem*)treeList[i][0]);
+        //tmpItem2 = treeList[i][0];
         if(tmpRecord.parentFileId > 1)
         {
             //fprintf(stderr, "itemList[%d]->appendrow(itemList[%d])\n", tmpRecord.parentFileId-1, i);
             //fprintf(stderr, "sleuthListId %d\n", sleuthList[i]->GetSleuthFileID());
-            //((QStandardItem*)itemList[tmpRecord.parentFileId-1])->appendRow(tmpItem);
-            ((SleuthFileItem*)sleuthList[tmpRecord.parentFileId-1])->appendRow(tmpItem2);
+            ((QStandardItem*)treeList[tmpRecord.parentFileId-1].first())->appendRow(treeList[i]);
+            //((SleuthFileItem*)treeList[tmpRecord.parentFileId-1].first())->appendRow(tmpItem2);
         }
     }
     return model;

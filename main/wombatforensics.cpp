@@ -186,17 +186,16 @@ void WombatForensics::alterEvidence()
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
             setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
-            //setupSleuthKitFileManager(sleuthkitplugin);
             setupSleuthKitBlackboard(sleuthkitplugin);
             wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
             // need to populate the directory tree entries
             currenttreemodel = GetCurrentImageDirectoryTree(sleuthkitplugin);
-            //currenttreeview = ui->toolBox->findChild<QTreeView *>("bt-dirTreeView");
+            currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
             //fprintf(stderr, "My TreeView Name: %s\n", currenttreeview->objectName().toStdString().c_str());
             //currenttreeview->setHeaderHidden(true);
-            //currenttreeview->setModel(currenttreemodel);   
-            //connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+            currenttreeview->setModel(currenttreemodel);   
+            connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
             //connect(currenttreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(dirTreeView_selectionChanged()));
        }
     }
@@ -397,8 +396,8 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(sleuthkitplugin);
     if(iSleuthKit)
     {
-       QString tmpFilePath = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
-       LoadHexViewer(tmpFilePath);
+       //QString tmpFilePath = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
+       //LoadHexViewer(tmpFilePath);
        //fprintf(stderr, QString.fromRawData((const char*)tmpBuffer, strlen((const char*)tmpBuffer)).toStdString().c_str());
         //iSleuthKit->GetFileContents(currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString());
     }
