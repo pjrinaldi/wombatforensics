@@ -303,14 +303,19 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
     char buffer[32768];
+    char tbuffer[32768]
     ssize_t bytesRead = 0;
     bytesRead = tmpFile->read(buffer, 32768);
     QByteArray ba;
     QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.dat");
+    //QFile qtFile("/home/pasquale/WombatForensics/tmpfiles/tmp.txt");
     qFile.open(QIODevice::ReadWrite);
+    //qtFile.open(QIODevice::ReadWrite);
     QDataStream datastream(&ba, QIODevice::ReadWrite);
     datastream.writeRawData((const char*) buffer, 32768);
     QDataStream filestream(&qFile);
     filestream.writeRawData((const char*) buffer, 32768);
+    //QTextStream txtstream(&ba, QIODevice::ReadWrite);
+    //txtstream.readAll(
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.dat";
 }
