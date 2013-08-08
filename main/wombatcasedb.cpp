@@ -142,8 +142,7 @@ QStringList WombatCaseDb::ReturnCaseNameList()
     QStringList tmpList;
     if(sqlite3_prepare_v2(wombatdb, "SELECT casename FROM cases ORDER by caseid;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
-        int ret = sqlite3_step(sqlstatement);
-        while(ret == SQLITE_ROW)
+        while(sqlite3_step(sqlstatement) == SQLITE_ROW)
         {
             tmpList << (const char*)sqlite3_column_text(sqlstatement, 0);
         }
