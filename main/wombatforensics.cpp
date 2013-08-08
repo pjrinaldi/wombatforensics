@@ -396,6 +396,8 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(sleuthkitplugin);
     if(iSleuthKit)
     {
+        QString tmpFilePath = iSleuthKit->GetFileContents((QStandardItem*)currenttreemodel->itemFromIndex(index));
+        LoadHexViewer(tmpFilePath);
        //QString tmpFilePath = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
        //LoadHexViewer(tmpFilePath);
        //fprintf(stderr, QString.fromRawData((const char*)tmpBuffer, strlen((const char*)tmpBuffer)).toStdString().c_str());

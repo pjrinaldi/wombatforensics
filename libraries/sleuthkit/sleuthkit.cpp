@@ -276,8 +276,7 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     //treeList.append(sleuthList)
     for(int i = 0; i < (int)fileRecordVector.size(); i++)
     {
-        /*
-        tmpItem2 = ((QStandardItem*)treeList[i][0]);
+        tmpItem2 = ((QStandardItem*)treeList[i].first());
         //tmpItem2 = ((SleuthFileItem*)treeList[i][0]);
 
         if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
@@ -288,7 +287,6 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         {
             tmpItem2->setIcon(QIcon(":/basic/treefile"));
         }
-        */
         if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
         {
             //rootNode->appendRow(tmpItem2);
@@ -310,7 +308,9 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     }
     return model;
 }
-QString SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
+
+//QString SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
+QString SleuthKitPlugin::GetFileContents(QStandardItem* fileItem)
 {
     // TskFile *pFile
     //  uint8_t byte = 0;
@@ -340,8 +340,9 @@ QString SleuthKitPlugin::GetFileContents(SleuthFileItem* fileItem)
     //TskFileTsk *tmpFile = new TskFileTsk((uint64_t)fileItem->GetSleuthFileID());
     //TskFileTsk *tmpFile = (TskFileTsk*)TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
     //int ret = TskServices::Instance().getImageFile().openFile((uint64_t)fileItem->GetSleuthFileID());
-    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
-    fprintf(stderr, "fileItem ID: %i\n", fileItem->GetSleuthFileID());
+    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->text().toInt());
+    //TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileItem->GetSleuthFileID());
+    //fprintf(stderr, "fileItem ID: %i\n", fileItem->GetSleuthFileID());
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
     //QString tmpString = "home/pasquale/WombatForensics/tmpfiles";
     //fileManager->copyFile(tmpFile, tmpString.toStdWString());

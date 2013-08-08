@@ -52,7 +52,8 @@ public:
     virtual void SetupSystemFileManager() = 0;
     virtual void OpenEvidence(QString evidencePath) = 0;
     virtual QStandardItemModel* GetCurrentImageDirectoryTree() = 0;
-    virtual QString GetFileContents(SleuthFileItem *fileItem) = 0;
+    //virtual QString GetFileContents(SleuthFileItem *fileItem) = 0;
+    virtual QString GetFileContents(QStandardItem *fileItem) = 0;
 };
 
 #define EvidenceInterface_iid "wombat.EvidenceInterface"
