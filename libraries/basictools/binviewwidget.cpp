@@ -4,7 +4,12 @@
 #include <QScrollBar>
 
 #include "binviewmodel.h"
-
+//
+//
+// NEED TO FIGURE OUT WHAT PART OF EACH LINE IS THE ASCII REPRESENTATION.
+// THEN I NEED TO LOOP OVER THOSE VALUES AND IF QChar::isLetterOrNumber() is false, replace with '.'
+//
+//
 void BinViewWidget::calculateRowCount()
 {
     m_bytesCount = 0 == m_model ? 0 : m_model->size();
@@ -49,9 +54,9 @@ void BinViewWidget::prepareCharImage(QPainter* widgetPainter)
 //        if (c != 32)
 //        {
 //            bool allEmpty = true;
-
+//
 //            QRgb white = QColor(Qt::white).rgb();
-
+//
 //            for (int x = 0; x < m_charWidth; x++)
 //            {
 //                for (int y = 0; y < m_rowHeight; y++)
@@ -67,7 +72,7 @@ void BinViewWidget::prepareCharImage(QPainter* widgetPainter)
 //                    break;
 //                }
 //            }
-
+//
 //            if (allEmpty)
 //            {
 //                charPainter.drawText(x0, 0, m_charWidth, m_rowHeight, textFlags, QString(QChar(46)));
@@ -118,7 +123,7 @@ void BinViewWidget::paintEvent(QPaintEvent* /*event*/)
 //    int textPos = bytesPos + m_bytesPerLine * digitLength +
 //                  (0 == (m_bytesPerLine % 10) ? (m_bytesPerLine * 6 / 5) : (m_bytesPerLine * 5 / 4)) + 1;
 
-    QChar fillerChar(10 == m_radix ? ' ' : '0');
+    QChar fillerChar(10 == m_radix ? '.' : '0');
 
     for (qint64 row = firstRow; row < maxRow; row++)
     {
@@ -156,7 +161,7 @@ void BinViewWidget::paintEvent(QPaintEvent* /*event*/)
 
         for (int i = 0; i < line.length(); i++)
         {
-            painter.drawImage(i * m_charWidth, y, *m_charImage, line.at(i).unicode() * m_charWidth, 0, m_charWidth, m_rowHeight);
+            painter.drawImage(i * m_charWidth, y, *m_charImage, line.at(i).toLatin1() * m_charWidth, 0, m_charWidth, m_rowHeight);
         }
 
         int x0 = line.length() * m_charWidth;
