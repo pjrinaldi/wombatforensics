@@ -18,16 +18,12 @@ class BasicTools : public QObject, public BasicToolsInterface
     
 public:
     //BasicTools Interface Functions
-    //QStringList toolboxViews() const;
     QStringList evidenceToolboxIcons() const;
 
-    //QWidget* setupToolBoxDirectoryTree() const;
-    //QWidget* setupToolBoxFileExtensionTree() const;
     QWidget* setupHexTab();
     QWidget* setupTxtTab();
     QWidget* setupDirTab();
     QWidget* setupTypTab();
-    //QWidget* setupColumnView() const;
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
 

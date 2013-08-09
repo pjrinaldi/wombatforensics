@@ -42,7 +42,8 @@ public:
 
     virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
     virtual void SetupSystemLog(QString dataPath, QString logFilePath) = 0;
-    virtual void SetupImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
+    virtual QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
+    virtual void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
     virtual void SetupSystemBlackboard() = 0;
     virtual void SetupSystemSchedulerQueue() = 0;
     virtual void SetupSystemFileManager() = 0;

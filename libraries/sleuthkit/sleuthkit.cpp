@@ -112,7 +112,7 @@ void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath)
         fprintf(stderr, "Loading Log File: %s\n", ex.message().c_str());
     }
 }
-void SleuthKitPlugin::SetupImageDatabase(QString imgDBPath, QString evidenceFilePath)
+QString SleuthKitPlugin::SetupImageDatabase(QString imgDBPath, QString evidenceFilePath)
 {
     QString evidenceFileName = evidenceFilePath.split("/").last();
     evidenceFileName += ".db";
@@ -133,7 +133,32 @@ void SleuthKitPlugin::SetupImageDatabase(QString imgDBPath, QString evidenceFile
     {
         fprintf(stderr, "Loading ImageDB: %s\n", ex.message().c_str());
     }
+    return evidenceFilePath;
 }
+
+void SleuthKitPlugin::OpenImageDatabase(QString imgDBPath, QString evidenceFilePath)
+{
+    QString evidenceFileName = evidenceFilePath.split("/").last();
+    evidenceFileName += ".db";
+
+    try
+    {
+        imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(imgDBPath.toStdString().c_str(), evidenceFileName.toStdString().c_str()));
+        if(imgdb->open() != 0)
+            fprintf(stderr, "Error opening db\n");
+        else
+        {
+            fprintf(stderr, "DB was Opened Successfully!\n");
+        }
+        TskServices::Instance().setImgDB(*imgdb);
+        fprintf(stderr, "Loading ImageDB was Successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Loading ImageDB: %s\n", ex.message().c_str());
+    }
+}
+
 void SleuthKitPlugin::SetupSystemBlackboard()
 {
     try

@@ -106,7 +106,6 @@ QObject* WombatForensics::loadPlugin(QString fileName)
     if (plugin)
     {
         populateActions(plugin);
-        //populateToolBox(plugin);
         populateTabWidgets(plugin);
         setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
         setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt");
@@ -125,18 +124,6 @@ void WombatForensics::populateActions(QObject *plugin)
         addActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(alterEvidence()));
     }
 }
-//void WombatForensics::populate
-/*
-void WombatForensics::populateToolBox(QObject *plugin)
-{
-    BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
-    if(iBasicTools)
-    {
-        //ui->toolBox->addItem(iBasicTools->setupToolBoxDirectoryTree(), ((QStringList)iBasicTools->toolboxViews())[0]);
-        //ui->toolBox->addItem(iBasicTools->setupToolBoxFileExtensionTree(), ((QStringList)iBasicTools->toolboxViews())[1]);
-    }
-}
-*/
 void WombatForensics::populateTabWidgets(QObject *plugin)
 {
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
@@ -146,6 +133,7 @@ void WombatForensics::populateTabWidgets(QObject *plugin)
         ui->fileViewTabWidget->addTab(iBasicTools->setupTxtTab(), "Text View");
         ui->fileInfoTabWidget->addTab(iBasicTools->setupDirTab(), "Directory List");
         ui->fileInfoTabWidget->addTab(iBasicTools->setupTypTab(), "File Type");
+        SetupDirModel();
     }
 }
 
@@ -185,14 +173,15 @@ void WombatForensics::alterEvidence()
             // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
-            setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
+            currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
             wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
             // need to populate the directory tree entries
+            // NEED TO UPDATE SO IT GETS ROOT EVIDENCE ITEM, NOT THE MODEL SINCE THERE WILL ONLY BE ONE MODEL
             currenttreemodel = GetCurrentImageDirectoryTree(sleuthkitplugin);
             currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
-            currenttreeview->setModel(currenttreemodel);   
+            currenttreeview->setModel(currenttreemodel);
             connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
        }
     }
@@ -255,11 +244,10 @@ void WombatForensics::on_actionNew_Case_triggered()
             if(wombatCaseData->ReturnCaseCount() > 0)
             {
                 ui->actionOpen_Case->setEnabled(true);
-                //ui->actionOpen_Case_2->setEnabled(true);
             }
-            evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so"); // manually load evidence plugin
-            basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so"); // manually load basictools plugin
-            sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so"); // manually load sleuthkit plugin
+            evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
+            basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
+            sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
             ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
         }
@@ -321,19 +309,20 @@ void WombatForensics::on_actionOpen_Case_triggered()
             ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
-            QStringList caseimagedbList;
+            QString caseimage;
             QStringList caseimageList = wombatCaseData->ReturnCaseImages(currentcaseid); // fullimagepath list
             foreach(caseimage, caseimageList)
             {
-                QString tmpName = caseimage.split("/").last();
-                tmpName += ".db";
-                caseimagedbList << tmpName;
+                OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
+                setupSleuthKitBlackboard(sleuthkitplugin);
+                // LoadImageDataIntoBasicTools(); // treeview
             }
-
             // GET IMAGES FROM THE CASEIMAGES DB ENTRY...
             // NEED TO OPENSLEUTHKITDB -> RETURN DBNAME
             // NEED TO SETUPSLEUTHKITBLACKBOARD -> RETURN BLACKBOARD NAME
             // I WILL HAVE TO OPEN AND MANAGE 1 OF EACH OF THESE FOR EVERY IMAGE AND HOPE THEY DON'T INTERFERE
+            // I MIGHT NOT NEED A SEPARATE BB, ONCE AN IMAGE IS SET, THE BB WILL WORK
+            // I JUST NEED TO CALL BB EVERYTIME A NEW IMAGE IS SET AS ACTIVE IN THE TSK.
         /*
         if(evidenceFilePath != "")
         {
@@ -370,12 +359,21 @@ void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QStri
         iSleuthKit->SetupSystemLog(dataPath, logFileName);
     }
 }
-void WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath)
+QString WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        iSleuthKit->SetupImageDatabase(imgDBPath, evidenceFilePath);
+        return iSleuthKit->SetupImageDatabase(imgDBPath, evidenceFilePath);
+    }
+}
+
+void WombatForensics::OpenSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+    {
+        iSleuthKit->OpenImageDatabase(imgDBPath, evidenceFilePath);
     }
 }
 void WombatForensics::setupSleuthKitBlackboard(QObject *plugin)
@@ -423,8 +421,6 @@ QStandardItemModel* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugi
 }
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    //fprintf(stderr, "Current index + 1: %d\n", currenttreeview->selectionModel()->currentIndex().column());
-    ///fprintf(stderr, currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString().toStdString().c_str());
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(sleuthkitplugin);
     if(iSleuthKit)
     {
@@ -432,17 +428,11 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         fprintf(stderr, "Row: %d\n", selRow);
         QStandardItem* idItem = currenttreemodel->item(selRow, 0);
         QString tmpText = idItem->data(Qt::DisplayRole).toString();
-        //QString tmpText = ((QStandardItem*)currenttreemodel->itemFromIndex(index))->text();
         fprintf(stderr, "Text: %s\n", tmpText.toStdString().c_str());
         QString tmpFilePath = iSleuthKit->GetFileContents(tmpText.toInt());
-        //QString tmpFilePath = iSleuthKit->GetFileContents((QStandardItem*)currenttreemodel->itemFromIndex(index));
         LoadHexViewer(tmpFilePath);
         QString asciiText = iSleuthKit->GetFileTxtContents(tmpText.toInt());
         LoadTxtViewer(asciiText);
-       //QString tmpFilePath = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
-       //LoadHexViewer(tmpFilePath);
-       //fprintf(stderr, QString.fromRawData((const char*)tmpBuffer, strlen((const char*)tmpBuffer)).toStdString().c_str());
-        //iSleuthKit->GetFileContents(currenttreeview->selectionModel()->currentIndex().data(Qt::DisplayRole).toString());
     }
     // USE tSKiMAGEfILEtSK TSKSERVICES.iNSTANCE().GETIMAGEFILE()
     // GET FILENAME -> USE THAT TO GET FILEID, CALL IMAGEFILETSK->OPENFILE(FILEID)/IMAGEFILETSK->READFILE()->BUFFER()/ TXTVIEWER->READBUFFER()

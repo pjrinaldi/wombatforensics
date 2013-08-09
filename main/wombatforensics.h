@@ -42,11 +42,11 @@ private:
     QStringList locatePlugins(void);
     bool isPluginLoaded(QString pluginFileName);
     void populateActions(QObject *plugin);
-    //void populateToolBox(QObject *plugin);
     void populateTabWidgets(QObject *plugin);
     void setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName);
     void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName);
-    void setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);
+    QString setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);
+    void OpenSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);
     void setupSleuthKitBlackboard(QObject *plugin);
     void setupSleuthKitSchedulerQueue(QObject *plugin);
     void setupSleuthKitFileManager(QObject *plugin);
@@ -65,11 +65,14 @@ private:
     QString wombatdatapath;
     QString wombatcasespath;
     QString wombattmpfilepath;
+    QStringList currentsleuthimages;
     QObject *basictoolsplugin;
     QObject *evidenceplugin;
     QObject *sleuthkitplugin;
     QTreeView *currenttreeview;
     QStandardItemModel* currenttreemodel;
+    QStandardItemModel* wombatdirmodel;
+    QStandardItemModel* wombattypmodel;
 };
 
 #endif // WOMBATFORENSICS_H

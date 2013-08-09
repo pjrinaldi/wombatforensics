@@ -40,7 +40,6 @@ QWidget* BasicTools::setupDirTab()
     QVBoxLayout* dirLayout = new QVBoxLayout();
     dirtreeview = new QTreeView();
     dirtreeview->setObjectName("bt-dirtree");
-    //dirtreeview->selectionModel()->selectedRows();
     dirLayout->setContentsMargins(0, 0, 0, 0);
     dirLayout->addWidget(dirtreeview);
     dirTab->setLayout(dirLayout);
