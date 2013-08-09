@@ -70,5 +70,9 @@ void BasicTools::LoadHexModel(QString tmpFilePath)
 }
 void BasicTools::LoadTxtContent(QString asciiText)
 {
-    txtwidget->setPlainText(asciiText);
+    QFile tmpFile(asciiText);
+    tmpFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream stream(&tmpFile);
+    txtwidget->setPlainText(stream.readAll());
+    tmpFile.close();
 }

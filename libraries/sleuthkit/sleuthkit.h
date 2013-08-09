@@ -21,7 +21,6 @@
 #include <QStandardItemModel>
 #include <QByteArray>
 #include <QDataStream>
-#include "sleuthfileitem.h"
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {

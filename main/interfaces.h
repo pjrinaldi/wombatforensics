@@ -2,7 +2,6 @@
 #define INTERFACES_H
 
 #include <QtPlugin>
-#include "../libraries/sleuthkit/sleuthfileitem.h"
 class QStringList;
 class QObject;
 class QWidget;

@@ -312,7 +312,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     //QFile qtFile("/home/pasquale/WombatForensics/tmpfiles/tmp.txt");
     qFile.open(QIODevice::ReadWrite);
     qFile.write((const char*)buffer, 32768);
-    QString str((const char*)buffer);
+    //QString str((const char*)buffer);
 
     //qtFile.open(QIODevice::ReadWrite);
     //QDataStream datastream(&ba, QIODevice::ReadWrite);
@@ -330,9 +330,12 @@ QString SleuthKitPlugin::GetFileTxtContents(int fileID)
     char buffer[32768];
     ssize_t bytesRead = 0;
     bytesRead = tmpFile->read(buffer, 32768);
-    //QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.txt");
-    //qFile.open(QIODevice::ReadWrite);
-    QString str((const char*)buffer);
+    QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.txt");
+    qFile.open(QIODevice::ReadWrite);
+    qFile.write((const char*)buffer, 32768);
+    qFile.close();
+    return "/home/pasquale/WombatForensics/tmpfiles/tmp.txt";
+    //QString str((const char*)buffer);
 
-    return str;
+    //return str;
 }
