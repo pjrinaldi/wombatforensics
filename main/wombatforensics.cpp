@@ -133,7 +133,7 @@ void WombatForensics::populateTabWidgets(QObject *plugin)
         ui->fileViewTabWidget->addTab(iBasicTools->setupTxtTab(), "Text View");
         ui->fileInfoTabWidget->addTab(iBasicTools->setupDirTab(), "Directory List");
         ui->fileInfoTabWidget->addTab(iBasicTools->setupTypTab(), "File Type");
-        SetupDirModel(plugin);
+        SetupDirModel();
     }
 }
 
@@ -191,6 +191,10 @@ void WombatForensics::alterEvidence()
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
             // need to populate the directory tree entries
             // NEED TO UPDATE SO IT GETS ROOT EVIDENCE ITEM, NOT THE MODEL SINCE THERE WILL ONLY BE ONE MODEL
+            QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin);
+            QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
+            currentroot->appendRow(imageNode);
+            currenttreeview->setModel(wombatdirmodel);
             /*
             currenttreemodel = GetCurrentImageDirectoryTree(sleuthkitplugin);
             currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");

@@ -5,7 +5,7 @@
 class QStringList;
 class QObject;
 class QWidget;
-class QStandardItemModel;
+class QStandardItem;
 
 
 class EvidenceInterface 

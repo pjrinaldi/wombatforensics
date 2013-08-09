@@ -262,7 +262,7 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     std::vector<TskFileRecord> fileRecordVector;
     fileidVector = imgdb->getFileIds();
     TskFileRecord tmpRecord;
-    QStandardItem *imageNode = new QStandarItem("Image Name");
+    QStandardItem *imageNode = new QStandardItem("Image Name");
     int ret;
     uint64_t tmpId;
     // also need to get the partitions and volumes as nodes.
@@ -288,7 +288,7 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     }
     for(int i = 0; i < (int)fileRecordVector.size(); i++)
     {
-        tmpItem2 = ((QStandardItem*)treeList[i].first());
+        QStandardItem* tmpItem2 = ((QStandardItem*)treeList[i].first());
 
         if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
         {
