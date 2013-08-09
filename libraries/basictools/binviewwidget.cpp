@@ -48,7 +48,18 @@ void BinViewWidget::prepareCharImage(QPainter* widgetPainter)
     {
         int x0 = c * m_charWidth;
 
-        charPainter.drawText(x0, 0, m_charWidth, m_rowHeight, textFlags, QString(QChar(c)));
+        // possibly do if here, to see if QChar(c) is letter or number
+
+        QString tmpString = QChar(c);
+        if(c > 69)
+        {
+            if(QChar(c).isLetterOrNumber())
+                tmpString = QChar(c);
+            else
+                tmpString = '.';
+        }
+        charPainter.drawText(x0, 0, m_charWidth, m_rowHeight, textFlags, tmpString);
+        //charPainter.drawText(x0, 0, m_charWidth, m_rowHeight, textFlags, QString(QChar(c)));
 
 //        // draw dots instead of empty spaces
 //        if (c != 32)
@@ -161,7 +172,7 @@ void BinViewWidget::paintEvent(QPaintEvent* /*event*/)
 
         for (int i = 0; i < line.length(); i++)
         {
-            painter.drawImage(i * m_charWidth, y, *m_charImage, line.at(i).toLatin1() * m_charWidth, 0, m_charWidth, m_rowHeight);
+            painter.drawImage(i * m_charWidth, y, *m_charImage, line.at(i).unicode() * m_charWidth, 0, m_charWidth, m_rowHeight);
         }
 
         int x0 = line.length() * m_charWidth;
