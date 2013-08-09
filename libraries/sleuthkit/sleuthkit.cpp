@@ -257,6 +257,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
 
 QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
 {
+    /*
     std::vector<uint64_t> fileidVector;
     std::vector<TskFileRecord> fileRecordVector;
     fileidVector = imgdb->getFileIds();
@@ -322,6 +323,7 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         }
     }
     return model;
+    */
 }
 
 QString SleuthKitPlugin::GetFileContents(int fileID)

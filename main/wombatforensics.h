@@ -43,6 +43,7 @@ private:
     bool isPluginLoaded(QString pluginFileName);
     void populateActions(QObject *plugin);
     void populateTabWidgets(QObject *plugin);
+    void SetupDirModel(void);
     void setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName);
     void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName);
     QString setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);

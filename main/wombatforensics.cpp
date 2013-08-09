@@ -133,8 +133,20 @@ void WombatForensics::populateTabWidgets(QObject *plugin)
         ui->fileViewTabWidget->addTab(iBasicTools->setupTxtTab(), "Text View");
         ui->fileInfoTabWidget->addTab(iBasicTools->setupDirTab(), "Directory List");
         ui->fileInfoTabWidget->addTab(iBasicTools->setupTypTab(), "File Type");
-        SetupDirModel();
+        SetupDirModel(plugin);
     }
+}
+
+void WombatForensics::SetupDirModel(void)
+{
+    wombatdirmodel = new QStandardItemModel();
+    QStringList headerList;
+    headerList << "Item ID" << "Name" << "Full Path" << "Size" << "Created" << "MD5 Hash";
+    wombatdirmodel->setHorizontalHeaderLabels(headerList);
+    QStandardItem *evidenceNode = wombatdirmodel->invisibleRootItem();
+    currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
+    currenttreeview->setModel(wombatdirmodel);
+    connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
 }
 
 void WombatForensics::addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
@@ -179,10 +191,12 @@ void WombatForensics::alterEvidence()
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
             // need to populate the directory tree entries
             // NEED TO UPDATE SO IT GETS ROOT EVIDENCE ITEM, NOT THE MODEL SINCE THERE WILL ONLY BE ONE MODEL
+            /*
             currenttreemodel = GetCurrentImageDirectoryTree(sleuthkitplugin);
             currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
             currenttreeview->setModel(currenttreemodel);
             connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+            */
        }
     }
     else if(action->text() == tr("Remove Evidence"))
