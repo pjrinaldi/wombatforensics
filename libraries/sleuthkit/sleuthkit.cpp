@@ -216,13 +216,14 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
             {
                 fprintf(stderr, "Skipping task: %s\n", task->task);
             }
-            delete task;
+            //delete task;
         }
         catch(TskException &ex)
         {
             fprintf(stderr, "TskException: %s\n", ex.message().c_str());
         }
     }
+    delete task;
     if(filePipeline && !filePipeline->isEmpty())
     {
         filePipeline->logModuleExecutionTimes();
@@ -303,19 +304,35 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
     char buffer[32768];
-    char tbuffer[32768]
+    //char tbuffer[32768]
     ssize_t bytesRead = 0;
     bytesRead = tmpFile->read(buffer, 32768);
     QByteArray ba;
     QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.dat");
     //QFile qtFile("/home/pasquale/WombatForensics/tmpfiles/tmp.txt");
     qFile.open(QIODevice::ReadWrite);
+    qFile.write((const char*)buffer, 32768);
+    QString str((const char*)buffer);
+
     //qtFile.open(QIODevice::ReadWrite);
-    QDataStream datastream(&ba, QIODevice::ReadWrite);
-    datastream.writeRawData((const char*) buffer, 32768);
-    QDataStream filestream(&qFile);
-    filestream.writeRawData((const char*) buffer, 32768);
+    //QDataStream datastream(&ba, QIODevice::ReadWrite);
+    //datastream.writeRawData((const char*) buffer, 32768);
+    //QDataStream filestream(&qFile);
+    //filestream.writeRawData((const char*) buffer, 32768);
     //QTextStream txtstream(&ba, QIODevice::ReadWrite);
     //txtstream.readAll(
+    qFile.close();
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.dat";
+}
+QString SleuthKitPlugin::GetFileTxtContents(int fileID)
+{
+    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
+    char buffer[32768];
+    ssize_t bytesRead = 0;
+    bytesRead = tmpFile->read(buffer, 32768);
+    //QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.txt");
+    //qFile.open(QIODevice::ReadWrite);
+    QString str((const char*)buffer);
+
+    return str;
 }

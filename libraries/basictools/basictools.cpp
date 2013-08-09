@@ -20,14 +20,14 @@ QWidget* BasicTools::setupHexTab()
     return hexTab;
 }
 
-QWidget* BasicTools::setupTxtTab() const
+QWidget* BasicTools::setupTxtTab()
 {
     QWidget* txtTab = new QWidget();
     QVBoxLayout* txtLayout = new QVBoxLayout();
-    QTextEdit* txtWidget = new QTextEdit();
-    txtWidget->setObjectName("bt-txtView");
+    txtwidget = new QTextEdit();
+    txtwidget->setObjectName("bt-txtView");
     txtLayout->setContentsMargins(0, 0, 0, 0);
-    txtLayout->addWidget(txtWidget);
+    txtLayout->addWidget(txtwidget);
     txtTab->setLayout(txtLayout);
     
     return txtTab;
@@ -67,4 +67,8 @@ void BasicTools::LoadHexModel(QString tmpFilePath)
     hexmodel = new BinViewModel();
     hexmodel->open(tmpFilePath);
     hexwidget->setModel(hexmodel);
+}
+void BasicTools::LoadTxtContent(QString asciiText)
+{
+    txtwidget->setPlainText(asciiText);
 }

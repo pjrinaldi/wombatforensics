@@ -40,6 +40,7 @@ public:
     void OpenEvidence(QString evidencePath);
     QStandardItemModel* GetCurrentImageDirectoryTree(void);
     QString GetFileContents(int fileID);
+    QString GetFileTxtContents(int fileID);
 
 private:
     int currentcaseid;

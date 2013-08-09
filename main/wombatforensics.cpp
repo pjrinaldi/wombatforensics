@@ -205,7 +205,7 @@ void WombatForensics::alterEvidence()
 
 WombatForensics::~WombatForensics()
 {
-    const char* errmsg = wombatCaseData->CloseCaseDB();
+    //const char* errmsg = wombatCaseData->CloseCaseDB(); // this possibly caused glibc corrupted double-linked list
     delete ui;
 }
 
@@ -405,6 +405,8 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         QString tmpFilePath = iSleuthKit->GetFileContents(tmpText.toInt());
         //QString tmpFilePath = iSleuthKit->GetFileContents((QStandardItem*)currenttreemodel->itemFromIndex(index));
         LoadHexViewer(tmpFilePath);
+        QString asciiText = iSleuthKit->GetFileTxtContents(tmpText.toInt());
+        LoadTxtViewer(asciiText);
        //QString tmpFilePath = iSleuthKit->GetFileContents((SleuthFileItem*)currenttreemodel->itemFromIndex(index));
        //LoadHexViewer(tmpFilePath);
        //fprintf(stderr, QString.fromRawData((const char*)tmpBuffer, strlen((const char*)tmpBuffer)).toStdString().c_str());
@@ -420,5 +422,13 @@ void WombatForensics::LoadHexViewer(QString tmpFilePath)
     if(iBasicTools)
     {
         iBasicTools->LoadHexModel(tmpFilePath);
+    }
+}
+void WombatForensics::LoadTxtViewer(QString asciiText)
+{
+    BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(basictoolsplugin);
+    if(iBasicTools)
+    {
+        iBasicTools->LoadTxtContent(asciiText);
     }
 }

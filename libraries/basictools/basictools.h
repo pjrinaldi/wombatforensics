@@ -24,11 +24,12 @@ public:
     //QWidget* setupToolBoxDirectoryTree() const;
     //QWidget* setupToolBoxFileExtensionTree() const;
     QWidget* setupHexTab();
-    QWidget* setupTxtTab() const;
+    QWidget* setupTxtTab();
     QWidget* setupDirTab();
     QWidget* setupTypTab();
     //QWidget* setupColumnView() const;
     void LoadHexModel(QString tmpFilePath);
+    void LoadTxtContent(QString asciiText);
 
 private:
     sqlite3_stmt *sqlStatement;
@@ -37,6 +38,7 @@ private:
     BinViewWidget* hexwidget;
     QTreeView* dirtreeview;
     QTreeView* typtreeview;
+    QTextEdit* txtwidget;
 };
 
 #endif // BASICTOOLS_H

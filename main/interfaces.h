@@ -30,9 +30,10 @@ public:
     virtual QWidget* setupTypTab() = 0;
     virtual QWidget* setupDirTab() = 0;
     virtual QWidget* setupHexTab() = 0;
-    virtual QWidget* setupTxtTab() const = 0;
+    virtual QWidget* setupTxtTab() = 0;
     virtual QStringList evidenceToolboxIcons() const = 0;
     virtual void LoadHexModel(QString tmpFilePath) = 0;
+    virtual void LoadTxtContent(QString asciiText) = 0;
 };
 
 class SleuthKitInterface
@@ -49,6 +50,7 @@ public:
     virtual void OpenEvidence(QString evidencePath) = 0;
     virtual QStandardItemModel* GetCurrentImageDirectoryTree() = 0;
     virtual QString GetFileContents(int fileID) = 0;
+    virtual QString GetFileTxtContents(int fileID) = 0;
 };
 
 #define EvidenceInterface_iid "wombat.EvidenceInterface"
