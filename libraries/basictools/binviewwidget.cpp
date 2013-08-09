@@ -172,7 +172,7 @@ void BinViewWidget::paintEvent(QPaintEvent* /*event*/)
 
         for (int i = 0; i < line.length(); i++)
         {
-            painter.drawImage(i * m_charWidth, y, *m_charImage, line.at(i).unicode() * m_charWidth, 0, m_charWidth, m_rowHeight);
+            painter.drawImage(i * m_charWidth, y, *m_charImage, line.at(i).toLatin1() * m_charWidth, 0, m_charWidth, m_rowHeight);
         }
 
         int x0 = line.length() * m_charWidth;
