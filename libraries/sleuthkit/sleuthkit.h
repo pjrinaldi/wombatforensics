@@ -38,7 +38,8 @@ public:
     void SetupSystemSchedulerQueue();
     void SetupSystemFileManager();
     void OpenEvidence(QString evidencePath);
-    QStandardItemModel* GetCurrentImageDirectoryTree(void);
+    QStandardItem* GetCurrentImageDirectoryTree(void);
+    //QStandardItemModel* GetCurrentImageDirectoryTree(void);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
 

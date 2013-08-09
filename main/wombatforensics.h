@@ -53,7 +53,8 @@ private:
     void setupSleuthKitFileManager(QObject *plugin);
     void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath);
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
-    QStandardItemModel* GetCurrentImageDirectoryTree(QObject *plugin);
+    QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin);
+    //QStandardItemModel* GetCurrentImageDirectoryTree(QObject *plugin);
     void LoadHexViewer(QString tmpFilePath);
     void LoadTxtViewer(QString asciiText);
 

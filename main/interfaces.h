@@ -48,7 +48,8 @@ public:
     virtual void SetupSystemSchedulerQueue() = 0;
     virtual void SetupSystemFileManager() = 0;
     virtual void OpenEvidence(QString evidencePath) = 0;
-    virtual QStandardItemModel* GetCurrentImageDirectoryTree() = 0;
+    virtual QStandardItem* GetCurrentImageDirectoryTree() = 0;
+    //virtual QStandardItemModel* GetCurrentImageDirectoryTree() = 0;
     virtual QString GetFileContents(int fileID) = 0;
     virtual QString GetFileTxtContents(int fileID) = 0;
 };

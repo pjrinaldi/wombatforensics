@@ -330,6 +330,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
                 setupSleuthKitBlackboard(sleuthkitplugin);
                 // LoadImageDataIntoBasicTools(); // treeview
+                // GetCurrentImageDirectoryTree(); return standarditem to add to root...
             }
             // GET IMAGES FROM THE CASEIMAGES DB ENTRY...
             // NEED TO OPENSLEUTHKITDB -> RETURN DBNAME
@@ -423,7 +424,8 @@ void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePat
     }
 }
 
-QStandardItemModel* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin)
+//QStandardItemModel* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin)
+QStandardItem* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)

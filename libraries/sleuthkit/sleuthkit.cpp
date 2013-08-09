@@ -255,16 +255,16 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
     }
 }
 
-QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
+//QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
+QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree()
 {
     std::vector<uint64_t> fileidVector;
     std::vector<TskFileRecord> fileRecordVector;
     fileidVector = imgdb->getFileIds();
     TskFileRecord tmpRecord;
-    QStandardItem *imageNode;
+    QStandardItem *imageNode = new QStandarItem("Image Name");
     int ret;
     uint64_t tmpId;
-    //QStandardItem *imgNode = new QStandardItem("get image name as Node");
     // also need to get the partitions and volumes as nodes.
     QList<QList<QStandardItem*> > treeList;
     foreach(tmpId, fileidVector)
@@ -274,10 +274,12 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
     }
     for(int i=0; i < (int)fileRecordVector.size(); i++)
     {
+        QString fullPath = "Image Name/Partition #/Volume Name[FSTYPE]/[root]/";
+        fullPath += QString(fileRecordVector[i].fullPath.c_str());
         QList<QStandardItem*> sleuthList;
         sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
         sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
-        sleuthList << new QStandardItem(QString(fileRecordVector[i].fullPath.c_str()));
+        sleuthList << new QStandardItem(fullPath);
         sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
         sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
         //sleuthList << new QStandardItem(QString(ctime(((const time_t*)fileRecordVector[i].crtime))));
@@ -298,8 +300,7 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         }
         if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
         {
-            //imgNode->appendRow(treeList[i]);
-            rootNode->appendRow(treeList[i]);
+            imageNode->appendRow(treeList[i]);
         }
     }
     for(int i=0; i < (int)fileRecordVector.size(); i++)
@@ -310,6 +311,7 @@ QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
             ((QStandardItem*)treeList[tmpRecord.parentFileId-1].first())->appendRow(treeList[i]);
         }
     }
+    return imageNode;
    /*
     std::vector<uint64_t> fileidVector;
     std::vector<TskFileRecord> fileRecordVector;
