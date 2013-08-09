@@ -209,3 +209,26 @@ void WombatCaseDb::InsertImage(QString imageName, QString imageFilePath, int cas
     else
         DisplayError(wombatparent, "1.7", "INSERT IMAGE INTO CASE", sqlite3_errmsg(wombatdb));
 }
+
+QStringList WombatCaseDb::ReturnCaseImages(int caseID)
+{
+    QStringList tmpList;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT imagefullpath FROM caseimages WHERE caseid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, caseID) == SQLITE_OK)
+        {
+            while(sqlite3_step(sqlstatement) == SQLITE_ROW)
+            {
+                tmpList << (const char*)sqlite3_column_text(sqlstatement, 0);
+            }
+        }
+        else
+        {
+            DisplayError(wombatparent, "1.8", "RETURN CASE IMAGES", sqlite3_errmsg(wombatdb));
+        }
+    }
+    else
+        DisplayError(wombatparent, "1.8", "RETURN CASE IMAGES", sqlite3_errmsg(wombatdb));
+
+    return tmpList;
+}

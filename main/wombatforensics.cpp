@@ -192,11 +192,8 @@ void WombatForensics::alterEvidence()
             // need to populate the directory tree entries
             currenttreemodel = GetCurrentImageDirectoryTree(sleuthkitplugin);
             currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
-            //fprintf(stderr, "My TreeView Name: %s\n", currenttreeview->objectName().toStdString().c_str());
-            //currenttreeview->setHeaderHidden(true);
             currenttreeview->setModel(currenttreemodel);   
             connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
-            //connect(currenttreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(dirTreeView_selectionChanged()));
        }
     }
     else if(action->text() == tr("Remove Evidence"))
@@ -318,8 +315,43 @@ void WombatForensics::on_actionOpen_Case_triggered()
             {
                 wombatCaseData->DisplayError(this, "2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
+            evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
+            basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
+            sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
+            ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
+            ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
-        }
+            QStringList caseimagedbList;
+            QStringList caseimageList = wombatCaseData->ReturnCaseImages(currentcaseid); // fullimagepath list
+            foreach(caseimage, caseimageList)
+            {
+                QString tmpName = caseimage.split("/").last();
+                tmpName += ".db";
+                caseimagedbList << tmpName;
+            }
+
+            // GET IMAGES FROM THE CASEIMAGES DB ENTRY...
+            // NEED TO OPENSLEUTHKITDB -> RETURN DBNAME
+            // NEED TO SETUPSLEUTHKITBLACKBOARD -> RETURN BLACKBOARD NAME
+            // I WILL HAVE TO OPEN AND MANAGE 1 OF EACH OF THESE FOR EVERY IMAGE AND HOPE THEY DON'T INTERFERE
+        /*
+        if(evidenceFilePath != "")
+        {
+            // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
+            QString evidenceName = evidenceFilePath.split("/").last();
+            evidenceName += ".db";
+            setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
+            setupSleuthKitBlackboard(sleuthkitplugin);
+            wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
+            sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
+            // need to populate the directory tree entries
+            currenttreemodel = GetCurrentImageDirectoryTree(sleuthkitplugin);
+            currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
+            currenttreeview->setModel(currenttreemodel);   
+            connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+       }
+        */
+       }
     }
 }
 void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName)

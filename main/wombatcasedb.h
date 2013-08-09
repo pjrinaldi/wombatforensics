@@ -31,6 +31,7 @@ public:
     void InsertImage(QString imageName, QString imageFilePath, int caseID);
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
+    QStringList ReturnCaseImages(int caseID);
 
 private:
     sqlite3 *wombatdb;
