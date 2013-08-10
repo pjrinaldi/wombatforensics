@@ -255,7 +255,6 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
     }
 }
 
-//QStandardItemModel* SleuthKitPlugin::GetCurrentImageDirectoryTree()
 QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree()
 {
     std::vector<uint64_t> fileidVector;
@@ -312,73 +311,6 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree()
         }
     }
     return imageNode;
-   /*
-    std::vector<uint64_t> fileidVector;
-    std::vector<TskFileRecord> fileRecordVector;
-    fileidVector = imgdb->getFileIds();
-    TskFileRecord tmpRecord;
-    QStandardItem *tmpItem2;
-    int ret;
-    uint64_t tmpId;
-    QStandardItemModel *model = new QStandardItemModel();
-    QStringList headerList;
-    headerList << "Item ID";
-    headerList << "Name";
-    headerList << "Full Path";
-    headerList << "Size";
-    headerList << "Created";
-    headerList << "MD5 Hash";
-    model->setHorizontalHeaderLabels(headerList);
-    //QStandardItem *imgNode = new QStandardItem("get image name as Node");
-    // also need to get the partitions and volumes as nodes.
-    QStandardItem *rootNode = model->invisibleRootItem();
-    QList<QList<QStandardItem*> > treeList;
-    //rootNode->appendRow(imgNode);
-    foreach(tmpId, fileidVector)
-    {
-        ret = imgdb->getFileRecord(tmpId, tmpRecord);
-        fileRecordVector.push_back(tmpRecord);
-    }
-    for(int i=0; i < (int)fileRecordVector.size(); i++)
-    {
-        QList<QStandardItem*> sleuthList;
-        sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
-        sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
-        sleuthList << new QStandardItem(QString(fileRecordVector[i].fullPath.c_str()));
-        sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
-        sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
-        //sleuthList << new QStandardItem(QString(ctime(((const time_t*)fileRecordVector[i].crtime))));
-        sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
-        treeList.append(sleuthList);
-    }
-    for(int i = 0; i < (int)fileRecordVector.size(); i++)
-    {
-        tmpItem2 = ((QStandardItem*)treeList[i].first());
-
-        if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
-        {
-            tmpItem2->setIcon(QIcon(":/basic/treefolder"));
-        }
-        else
-        {
-            tmpItem2->setIcon(QIcon(":/basic/treefile"));
-        }
-        if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
-        {
-            //imgNode->appendRow(treeList[i]);
-            rootNode->appendRow(treeList[i]);
-        }
-    }
-    for(int i=0; i < (int)fileRecordVector.size(); i++)
-    {
-        tmpRecord = fileRecordVector[i];
-        if(tmpRecord.parentFileId > 1)
-        {
-            ((QStandardItem*)treeList[tmpRecord.parentFileId-1].first())->appendRow(treeList[i]);
-        }
-    }
-    return model;
-    */
 }
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
@@ -386,23 +318,12 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
     char buffer[32768];
-    //char tbuffer[32768]
     ssize_t bytesRead = 0;
     bytesRead = tmpFile->read(buffer, 32768);
     QByteArray ba;
     QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.dat");
-    //QFile qtFile("/home/pasquale/WombatForensics/tmpfiles/tmp.txt");
     qFile.open(QIODevice::ReadWrite);
     qFile.write((const char*)buffer, 32768);
-    //QString str((const char*)buffer);
-
-    //qtFile.open(QIODevice::ReadWrite);
-    //QDataStream datastream(&ba, QIODevice::ReadWrite);
-    //datastream.writeRawData((const char*) buffer, 32768);
-    //QDataStream filestream(&qFile);
-    //filestream.writeRawData((const char*) buffer, 32768);
-    //QTextStream txtstream(&ba, QIODevice::ReadWrite);
-    //txtstream.readAll(
     qFile.close();
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.dat";
 }
@@ -417,7 +338,4 @@ QString SleuthKitPlugin::GetFileTxtContents(int fileID)
     qFile.write((const char*)buffer, 32768);
     qFile.close();
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.txt";
-    //QString str((const char*)buffer);
-
-    //return str;
 }
