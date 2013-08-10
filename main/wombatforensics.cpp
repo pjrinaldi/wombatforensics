@@ -324,6 +324,11 @@ void WombatForensics::on_actionOpen_Case_triggered()
             {
                 OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
                 setupSleuthKitBlackboard(sleuthkitplugin);
+                QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin);
+                QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
+                currentroot->appendRow(imageNode);
+                currenttreeview->setModel(wombatdirmodel);
+                //LoadImageDataIntoBasicTools()
                 // LoadImageDataIntoBasicTools(); // treeview
                 // GetCurrentImageDirectoryTree(); return standarditem to add to root...
             }
