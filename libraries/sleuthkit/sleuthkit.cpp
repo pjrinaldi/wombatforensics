@@ -259,12 +259,39 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
 {
     std::vector<uint64_t> fileidVector;
     std::vector<TskFileRecord> fileRecordVector;
+    std::list<TskVolumeInfoRecord> volRecordList;
+    std::list<TskFsInfoRecord> fsInfoRecordList;
     fileidVector = imgdb->getFileIds();
     TskFileRecord tmpRecord;
+    TskVolumeInfoRecord volRecord;
+    TskFsInfoRecord fsInfoRecord;
     QStandardItem *imageNode = new QStandardItem(imageName);
     int ret;
     uint64_t tmpId;
     // also need to get the partitions and volumes as nodes.
+    ret = imgdb->getVolumeInfo(volRecordList);
+    foreach(volRecord, volRecordList)
+    {
+        // if volflag = 0, get description
+        // if volflag = 1, list as unallocated
+        fprintf(stderr, "Vol Description: %s - VolFlags: %d\n", volRecord.description.c_str(), volRecord.flags);
+        if(volRecord.flags == 0)
+        {
+            QStandardItem *volNode = new QStandardItem(QString(volRecord.description));
+        }
+        else if(volRecord.flags == 1)
+        {
+            QStandardItem *volNode = new QStandardItem("unallocated space");
+        }
+        else if(volRecord.flags == 2)
+        {
+            QStandardItem *volNode = new QStandardItem(QString(volRecord.description));
+        }
+        else
+        {
+            // don't display anything
+        }
+    }
     QList<QList<QStandardItem*> > treeList;
     foreach(tmpId, fileidVector)
     {
