@@ -255,13 +255,13 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
     }
 }
 
-QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree()
+QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
 {
     std::vector<uint64_t> fileidVector;
     std::vector<TskFileRecord> fileRecordVector;
     fileidVector = imgdb->getFileIds();
     TskFileRecord tmpRecord;
-    QStandardItem *imageNode = new QStandardItem("Image Name");
+    QStandardItem *imageNode = new QStandardItem(imageName);
     int ret;
     uint64_t tmpId;
     // also need to get the partitions and volumes as nodes.

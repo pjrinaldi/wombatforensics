@@ -188,7 +188,7 @@ void WombatForensics::alterEvidence()
             wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
             // need to populate the directory tree entries
-            QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin);
+            QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, evidenceFilePath.split("/").last());
             QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
             currentroot->appendRow(imageNode);
             currenttreeview->setModel(wombatdirmodel);
@@ -323,21 +323,13 @@ void WombatForensics::on_actionOpen_Case_triggered()
             foreach(caseimage, caseimageList)
             {
                 OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
+                fprintf(stderr, "Case Image: %s\n", caseimage.toStdString().c_str());
                 setupSleuthKitBlackboard(sleuthkitplugin);
-                QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin);
+                QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, caseimage.split("/").last());
                 QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
                 currentroot->appendRow(imageNode);
                 currenttreeview->setModel(wombatdirmodel);
-                //LoadImageDataIntoBasicTools()
-                // LoadImageDataIntoBasicTools(); // treeview
-                // GetCurrentImageDirectoryTree(); return standarditem to add to root...
             }
-            // GET IMAGES FROM THE CASEIMAGES DB ENTRY...
-            // NEED TO OPENSLEUTHKITDB -> RETURN DBNAME
-            // NEED TO SETUPSLEUTHKITBLACKBOARD -> RETURN BLACKBOARD NAME
-            // I WILL HAVE TO OPEN AND MANAGE 1 OF EACH OF THESE FOR EVERY IMAGE AND HOPE THEY DON'T INTERFERE
-            // I MIGHT NOT NEED A SEPARATE BB, ONCE AN IMAGE IS SET, THE BB WILL WORK
-            // I JUST NEED TO CALL BB EVERYTIME A NEW IMAGE IS SET AS ACTIVE IN THE TSK.
         /*
         if(evidenceFilePath != "")
         {
@@ -424,12 +416,12 @@ void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePat
     }
 }
 
-QStandardItem* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin)
+QStandardItem* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin, QString imageName)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        return iSleuthKit->GetCurrentImageDirectoryTree();
+        return iSleuthKit->GetCurrentImageDirectoryTree(imageName);
     }
     else
         return NULL;
