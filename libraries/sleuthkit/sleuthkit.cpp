@@ -265,6 +265,8 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
     TskFileRecord tmpRecord;
     TskVolumeInfoRecord volRecord;
     TskFsInfoRecord fsInfoRecord;
+    QStandardItem *fsNode;
+    QStandardItem *volNode;
     QStandardItem *imageNode = new QStandardItem(imageName);
     int ret;
     uint64_t tmpId;
@@ -275,21 +277,35 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
         // if volflag = 0, get description
         // if volflag = 1, list as unallocated
         fprintf(stderr, "Vol Description: %s - VolFlags: %d\n", volRecord.description.c_str(), volRecord.flags);
-        if(volRecord.flags == 0)
+        if(volRecord.flags >= 0 && volRecord.flags <= 2)
         {
-            QStandardItem *volNode = new QStandardItem(QString(volRecord.description));
-        }
-        else if(volRecord.flags == 1)
-        {
-            QStandardItem *volNode = new QStandardItem("unallocated space");
-        }
-        else if(volRecord.flags == 2)
-        {
-            QStandardItem *volNode = new QStandardItem(QString(volRecord.description));
-        }
-        else
-        {
-            // don't display anything
+            if(volRecord.flags == 0)
+            {
+                volNode = new QStandardItem(QString(volRecord.description));
+            }
+            else if(volRecord.flags == 1)
+            {
+                volNode = new QStandardItem("unallocated space");
+            }
+            else if(volRecord.flags == 2)
+            {
+                volNode = new QStandardItem(QString(volRecord.description));
+            }
+            else
+            {
+                // don't display anything
+            }
+            // for each volrecord, get fsinfo list
+            //imageNode->appendRow(volNode);
+            ret = imgdb->getFsInfo(fsInfoRecordList);
+            foreach(fsInfoRecord, fsInfoRecordList)
+            {
+                if(fsInfoRecord.vol_id == volRecord.vol_id)
+                {
+                    fsNode = new QStandardItem(QString::number(fsInfoRecord.fs_type));
+                    //volNode->appendRow(fsNode);
+                }
+            }
         }
     }
     QList<QList<QStandardItem*> > treeList;
@@ -326,6 +342,8 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
         }
         if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
         {
+            // getFileUniqueIdentifiers()
+            // if fs_id == fsFileId then add the file to fsNode
             imageNode->appendRow(treeList[i]);
         }
     }
