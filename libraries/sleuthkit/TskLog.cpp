@@ -1,3 +1,28 @@
+/*class StderrLog : public Log
+{
+    public:
+            StderrLog() : Log() {
+                    }
+            
+                ~StderrLog() {
+                    void log(Channel a_channel, const std::wstring &a_msg)
+                        
+                            {
+                                
+                                        Log::log(a_channel, a_msg);
+                                        
+                                                if (a_channel != Error) {
+                                                    
+                                                                return;
+                                                                
+                                                                        }
+                                                
+                                                        fprintf(stderr, "%S\n", a_msg.c_str());
+                                                        
+                                                            }
+                    
+};*/
+
 /*
  * The Sleuth Kit
  *

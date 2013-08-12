@@ -1,23 +1,11 @@
-/*
- * The Sleuth Kit
- *
- * Contact: Brian Carrier [carrier <at> sleuthkit [dot] org]
- * Copyright (c) 2010-2012 Basis Technology Corporation. All Rights
- * reserved.
- *
- * This software is distributed under the Common Public License 1.0
- */
+#ifndef TSKLOG_H
+#define TSKLOG_H
 
-#ifndef _OSS_LOG_H
-#define _OSS_LOG_H
-
-#include "tsk/framework/framework_i.h"
+#include "tsk/framework/services/Log.h"
 #include <time.h>
 #include <string>
 #include <iostream>
 #include <fstream>
-
-// @@@ TODO: Resolve circular references between TskServices.h and this header by replacing macros with inline functions in TskServices.h
 
 /**
  * \file Log.h
@@ -63,7 +51,7 @@
  * level, can call the logError(), etc. methods on the class or use the
  * LOGERROR() etc. macros, which will also get the Log service from TskServices.
  */
-class TSK_FRAMEWORK_API Log
+class TskLog : public Log
 {
 public:
     /** 
@@ -75,49 +63,14 @@ public:
         Info    ///< General debugging information
     };
 
-    Log();
-    virtual ~Log();
+    TskLog();
+    virtual ~TskLog();
 
-    /**
-     * Generate a log message with a given level (wide string).
-     * @param a_channel Level of log to make
-     * @param a_msg Message to record.
-     */
-    virtual void log(Channel a_channel, const std::wstring &a_msg);
-
-    /**
-     * Generate a log message with a given level (narrow string).
-     * @param a_channel Level of log to make
-     * @param a_msg Message to record.
-     */
-    virtual void log(Channel a_channel, const std::string &a_msg);
-
-    /**
-     * Generate a log message with a given level (printf-style arguments).
-     * @param a_channel Level of log to make
-     * @param format Message to record.
-     */
-    virtual void logf(Channel a_channel, char const *format, ...);
-
-
-    /**
-     * Log an error message.
-     * @param msg Message to log
-     */
-    void logError(const std::wstring &msg) { log(Log::Error, msg); };
-
-    /**
-     * Log a warning message.
-     * @param msg Message to log
-     */
+    virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
+    virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg);
+    void logError(int caseID, int imageID, int analysisType, const std::wstring &logMsg) { log(caseID, imageID, analysisType, TskLog::Error, logMsg); };
     void logWarn(const std::wstring &msg)  { log(Log::Warn,  msg); };
-
-    /**
-     * Log an info message.
-     * @param msg Message to log
-     */
     void logInfo(const std::wstring &msg)  { log(Log::Info,  msg); };
-
     int open(const wchar_t * a_logFileFullPath);
     int open(const char * a_outDir);
     int open();

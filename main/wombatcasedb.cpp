@@ -37,7 +37,7 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
 {
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
-    wombatTableSchema.push_back("CREATE TABLE log(logid INTEGER PRIMARY KEY, logchannel INTEGER, logmessage TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE log(logid INTEGER PRIMARY KEY, caseid INTEGER, imageid INTEGER, analysistype INTEGER, msgtype INTEGER, msgdatetime TEXT, logmsg TEXT);");
     wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, casename TEXT);");
     wombatTableSchema.push_back("CREATE TABLE caseimages(imageid INTEGER PRIMARY KEY, imagefullpath TEXT, imagename TEXT, caseid INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, settingname TEXT, settingvalue TEXT);");
