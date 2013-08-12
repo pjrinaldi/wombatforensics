@@ -309,8 +309,44 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
             {
                 if(fsInfoRecord.vol_id == volRecord.vol_id)
                 {
-                    fsNode = new QStandardItem(QString::number(fsInfoRecord.fs_type));
-                    currentFsPath = QString::number(fsInfoRecord.fs_type) + "/";
+                    QString fsType = "";
+                    // NEED TO DO SWITCH/CASE HERE TO GET FSTYPE
+                    if(fsInfoRecord.fs_type == 1)
+                        fsType = "NTFS";
+                    else if(fsInfoRecord.fs_type == 3)
+                        fsType = "FAT12";
+                    else if(fsInfoRecord.fs_type == 4)
+                        fsType = "FAT16";
+                    else if(fsInfoRecord.fs_type == 5)
+                        fsType = "FAT32";
+                    else if(fsInfoRecord.fs_type == 7)
+                        fsType = "UFS1";
+                    else if(fsInfoRecord.fs_type == 8)
+                        fsType = "UFS1B";
+                    else if(fsInfoRecord.fs_type == 9)
+                        fsType = "UFS2";
+                    else if(fsInfoRecord.fs_type == 11)
+                        fsType = "EXT2";
+                    else if(fsInfoRecord.fs_type == 12)
+                        fsType = "EXT3";
+                    else if(fsInfoRecord.fs_type == 14)
+                        fsType = "SWAP";
+                    else if(fsInfoRecord.fs_type == 16)
+                        fsType = "RAW";
+                    else if(fsInfoRecord.fs_type == 18)
+                        fsType = "ISO9660";
+                    else if(fsInfoRecord.fs_type == 20)
+                        fsType = "HFS";
+                    else if(fsInfoRecord.fs_type == 22)
+                        fsType = "EXT4";
+                    else if(fsInfoRecord.fs_type == 23)
+                        fsType = "YAFFS2";
+                    else if(fsInfoRecord.fs_type == 25)
+                        fsType = "UNSUPPORTED";
+                    else
+                        fsType = QString::number(fsInfoRecord.fs_type);
+                    fsNode = new QStandardItem(fsType);
+                    currentFsPath = fsType + "/";
                     volNode->appendRow(fsNode);
                     //BEGIN FILE ADD CODE
                     std::vector<uint64_t> fileidVector;
@@ -359,6 +395,7 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
                     {
                         //QString fullPath = "Image Name/Partition #/Volume Name[FSTYPE]/[root]/";
                         fullPath += currentVolPath + currentFsPath;
+                        // full path might contain more than i thought, to include unalloc and whatnot
                         fullPath += QString(fileRecordVector[i].fullPath.c_str());
                         QList<QStandardItem*> sleuthList;
                         sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
@@ -372,6 +409,7 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
                     }
                     for(int i = 0; i < (int)fileRecordVector.size(); i++)
                     {
+                        // NEED TO EXPAND FOR OTHER ICONS
                         QStandardItem* tmpItem2 = ((QStandardItem*)treeList[i].first());
                         if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
                         {
