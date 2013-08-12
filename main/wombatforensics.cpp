@@ -188,7 +188,7 @@ void WombatForensics::alterEvidence()
             wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
             // need to populate the directory tree entries
-            QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, evidenceFilePath.split("/").last());
+            QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());
             QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
             currentroot->appendRow(imageNode);
             currenttreeview->setModel(wombatdirmodel);
@@ -325,7 +325,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
                 fprintf(stderr, "Case Image: %s\n", caseimage.toStdString().c_str());
                 setupSleuthKitBlackboard(sleuthkitplugin);
-                QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, caseimage.split("/").last());
+                QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, caseimage.split("/").last());
                 QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
                 currentroot->appendRow(imageNode);
                 currenttreeview->setModel(wombatdirmodel);
@@ -416,12 +416,12 @@ void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePat
     }
 }
 
-QStandardItem* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin, QString imageName)
+QStandardItem* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        return iSleuthKit->GetCurrentImageDirectoryTree(imageName);
+        return iSleuthKit->GetCurrentImageDirectoryTree(imageDbPath, imageName);
     }
     else
         return NULL;

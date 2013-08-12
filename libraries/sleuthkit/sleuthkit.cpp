@@ -255,13 +255,16 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
     }
 }
 
-QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
+QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName)
 {
-    std::vector<uint64_t> fileidVector;
+    //std::vector<uint64_t> fileidVector;
     std::vector<TskFileRecord> fileRecordVector;
     std::list<TskVolumeInfoRecord> volRecordList;
     std::list<TskFsInfoRecord> fsInfoRecordList;
-    fileidVector = imgdb->getFileIds();
+    QString fullPath = imageName + "/";
+    QString currentVolPath = "";
+    QString currentFsPath = "";
+    //fileidVector = imgdb->getFileIds();
     TskFileRecord tmpRecord;
     TskVolumeInfoRecord volRecord;
     TskFsInfoRecord fsInfoRecord;
@@ -272,7 +275,7 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
     uint64_t tmpId;
     // also need to get the partitions and volumes as nodes.
     ret = imgdb->getVolumeInfo(volRecordList);
-    foreach(volRecord, volRecordList)
+    foreach(volRecord, volRecordList) // populates all vol's and fs's.  need to do a better loop where i add files to current vol/fs as they go.
     {
         // if volflag = 0, get description
         // if volflag = 1, list as unallocated
@@ -281,33 +284,125 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
         {
             if(volRecord.flags == 0)
             {
-                volNode = new QStandardItem(QString(volRecord.description));
+                volNode = new QStandardItem(QString::fromUtf8(volRecord.description.c_str()));
+                currentVolPath = QString::fromUtf8(volRecord.description.c_str()) + "/";
             }
             else if(volRecord.flags == 1)
             {
                 volNode = new QStandardItem("unallocated space");
+                currentVolPath = "unallocated space/";
             }
             else if(volRecord.flags == 2)
             {
-                volNode = new QStandardItem(QString(volRecord.description));
+                volNode = new QStandardItem(QString::fromUtf8(volRecord.description.c_str()));
+                currentVolPath = QString::fromUtf8(volRecord.description.c_str());
+                currentVolPath += "/";
             }
             else
             {
                 // don't display anything
             }
             // for each volrecord, get fsinfo list
-            //imageNode->appendRow(volNode);
+            imageNode->appendRow(volNode);
             ret = imgdb->getFsInfo(fsInfoRecordList);
             foreach(fsInfoRecord, fsInfoRecordList)
             {
                 if(fsInfoRecord.vol_id == volRecord.vol_id)
                 {
                     fsNode = new QStandardItem(QString::number(fsInfoRecord.fs_type));
-                    //volNode->appendRow(fsNode);
+                    currentFsPath = QString::number(fsInfoRecord.fs_type) + "/";
+                    volNode->appendRow(fsNode);
+                    //BEGIN FILE ADD CODE
+                    std::vector<uint64_t> fileidVector;
+                    //Create custom function to access this...
+                    sqlite3* tmpImgDB;
+                    QString tmpImgDbPath = imageDbPath + imageName + ".db";
+                    if(sqlite3_open(tmpImgDbPath.toStdString().c_str(), &tmpImgDB) == SQLITE_OK)
+                    {
+                        sqlite3_stmt* stmt;
+                        if(sqlite3_prepare_v2(tmpImgDB, "SELECT file_id FROM fs_files WHERE fs_id = ? ORDER BY file_id", -1, &stmt, 0) == SQLITE_OK)
+                        {
+                            if(sqlite3_bind_int(stmt, 1, fsInfoRecord.fs_id) == SQLITE_OK)
+                            {
+                                while(sqlite3_step(stmt) == SQLITE_ROW)
+                                {
+                                    uint64_t fileId = (uint64_t)sqlite3_column_int(stmt, 0);
+                                    fileidVector.push_back(fileId);
+                                }
+                                sqlite3_finalize(stmt);
+                            }
+                            else
+                            {
+                                //std::wstringstream infoMessage;
+                                //infoMessage << L"Get FsFileIds Failed: " << sqlite3_errmsg(imgdb);
+                                //LOGERROR(infoMessage.c_str());
+    
+                            }
+                        }
+                        else
+                        {
+                            //std::wstringstream infoMessage;
+                            //infoMessage << L"Get FsFileIds Failed: " << sqlite3_errmsg(imgdb);
+                            //LOGERROR(infoMessage.c_str());
+                        }
+                    }
+                    sqlite3_close(tmpImgDB);
+                    //end create custom function to access fileid
+                    //fileidVector = imgdb->getFsFileIds(tmpWhere.toStdString());
+                    QList<QList<QStandardItem*> > treeList;
+                    foreach(tmpId, fileidVector)
+                    {
+                        ret = imgdb->getFileRecord(tmpId, tmpRecord);
+                        fileRecordVector.push_back(tmpRecord);
+                    }
+                    for(int i=0; i < (int)fileRecordVector.size(); i++)
+                    {
+                        //QString fullPath = "Image Name/Partition #/Volume Name[FSTYPE]/[root]/";
+                        fullPath += currentVolPath + currentFsPath;
+                        fullPath += QString(fileRecordVector[i].fullPath.c_str());
+                        QList<QStandardItem*> sleuthList;
+                        sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
+                        sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
+                        sleuthList << new QStandardItem(fullPath);
+                        sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
+                        sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
+                        //sleuthList << new QStandardItem(QString(ctime(((const time_t*)fileRecordVector[i].crtime))));
+                        sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
+                        treeList.append(sleuthList);
+                    }
+                    for(int i = 0; i < (int)fileRecordVector.size(); i++)
+                    {
+                        QStandardItem* tmpItem2 = ((QStandardItem*)treeList[i].first());
+                        if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
+                        {
+                            tmpItem2->setIcon(QIcon(":/basic/treefolder"));
+                        }
+                        else
+                        {
+                            tmpItem2->setIcon(QIcon(":/basic/treefile"));
+                        }
+                        if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
+                        {
+                            fsNode->appendRow(treeList[i]);
+                            //imageNode->appendRow(treeList[i]);
+                        }
+                    }
+                    for(int i=0; i < (int)fileRecordVector.size(); i++)
+                    {
+                        tmpRecord = fileRecordVector[i];
+                        if(tmpRecord.parentFileId > 1)
+                        {
+                            ((QStandardItem*)treeList[tmpRecord.parentFileId-1].first())->appendRow(treeList[i]);
+                        }
+                    }
+                    //END FILE ADD CODE
                 }
+                //volNode->appendRow(fsNode);
             }
         }
+        //imageNode->appendRow(volNode);
     }
+    /*
     QList<QList<QStandardItem*> > treeList;
     foreach(tmpId, fileidVector)
     {
@@ -316,7 +411,8 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
     }
     for(int i=0; i < (int)fileRecordVector.size(); i++)
     {
-        QString fullPath = "Image Name/Partition #/Volume Name[FSTYPE]/[root]/";
+        //QString fullPath = "Image Name/Partition #/Volume Name[FSTYPE]/[root]/";
+        fullPath += currentVolPath + currentFsPath;
         fullPath += QString(fileRecordVector[i].fullPath.c_str());
         QList<QStandardItem*> sleuthList;
         sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
@@ -354,7 +450,7 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageName)
         {
             ((QStandardItem*)treeList[tmpRecord.parentFileId-1].first())->appendRow(treeList[i]);
         }
-    }
+    }*/
     return imageNode;
 }
 
