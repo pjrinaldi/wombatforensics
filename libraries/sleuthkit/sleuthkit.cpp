@@ -257,14 +257,12 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
 
 QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName)
 {
-    //std::vector<uint64_t> fileidVector;
     std::vector<TskFileRecord> fileRecordVector;
     std::list<TskVolumeInfoRecord> volRecordList;
     std::list<TskFsInfoRecord> fsInfoRecordList;
     QString fullPath = imageName + "/";
     QString currentVolPath = "";
     QString currentFsPath = "";
-    //fileidVector = imgdb->getFileIds();
     TskFileRecord tmpRecord;
     TskVolumeInfoRecord volRecord;
     TskFsInfoRecord fsInfoRecord;
@@ -275,7 +273,7 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
     uint64_t tmpId;
     // also need to get the partitions and volumes as nodes.
     ret = imgdb->getVolumeInfo(volRecordList);
-    foreach(volRecord, volRecordList) // populates all vol's and fs's.  need to do a better loop where i add files to current vol/fs as they go.
+    foreach(volRecord, volRecordList) // populates all vol's and fs's.
     {
         // if volflag = 0, get description
         // if volflag = 1, list as unallocated
@@ -384,7 +382,6 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
                     }
                     sqlite3_close(tmpImgDB);
                     //end create custom function to access fileid
-                    //fileidVector = imgdb->getFsFileIds(tmpWhere.toStdString());
                     QList<QList<QStandardItem*> > treeList;
                     foreach(tmpId, fileidVector)
                     {
@@ -422,7 +419,6 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
                         if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
                         {
                             fsNode->appendRow(treeList[i]);
-                            //imageNode->appendRow(treeList[i]);
                         }
                     }
                     for(int i=0; i < (int)fileRecordVector.size(); i++)
@@ -435,60 +431,9 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
                     }
                     //END FILE ADD CODE
                 }
-                //volNode->appendRow(fsNode);
             }
         }
-        //imageNode->appendRow(volNode);
     }
-    /*
-    QList<QList<QStandardItem*> > treeList;
-    foreach(tmpId, fileidVector)
-    {
-        ret = imgdb->getFileRecord(tmpId, tmpRecord);
-        fileRecordVector.push_back(tmpRecord);
-    }
-    for(int i=0; i < (int)fileRecordVector.size(); i++)
-    {
-        //QString fullPath = "Image Name/Partition #/Volume Name[FSTYPE]/[root]/";
-        fullPath += currentVolPath + currentFsPath;
-        fullPath += QString(fileRecordVector[i].fullPath.c_str());
-        QList<QStandardItem*> sleuthList;
-        sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
-        sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
-        sleuthList << new QStandardItem(fullPath);
-        sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
-        sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
-        //sleuthList << new QStandardItem(QString(ctime(((const time_t*)fileRecordVector[i].crtime))));
-        sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
-        treeList.append(sleuthList);
-    }
-    for(int i = 0; i < (int)fileRecordVector.size(); i++)
-    {
-        QStandardItem* tmpItem2 = ((QStandardItem*)treeList[i].first());
-
-        if(((TskFileRecord)fileRecordVector[i]).dirType == 3)
-        {
-            tmpItem2->setIcon(QIcon(":/basic/treefolder"));
-        }
-        else
-        {
-            tmpItem2->setIcon(QIcon(":/basic/treefile"));
-        }
-        if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
-        {
-            // getFileUniqueIdentifiers()
-            // if fs_id == fsFileId then add the file to fsNode
-            imageNode->appendRow(treeList[i]);
-        }
-    }
-    for(int i=0; i < (int)fileRecordVector.size(); i++)
-    {
-        tmpRecord = fileRecordVector[i];
-        if(tmpRecord.parentFileId > 1)
-        {
-            ((QStandardItem*)treeList[tmpRecord.parentFileId-1].first())->appendRow(treeList[i]);
-        }
-    }*/
     return imageNode;
 }
 
