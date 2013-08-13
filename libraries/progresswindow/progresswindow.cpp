@@ -1,9 +1,7 @@
 #include "progresswindow.h"
 #include "ui_progresswindow.h"
 
-ProgressWindow::ProgressWindow(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::ProgressWindow)
+ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::ProgressWindow)
 {
     ui->setupUi(this);
 }

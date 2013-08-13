@@ -53,15 +53,22 @@ public:
     virtual QString GetFileTxtContents(int fileID) = 0;
 };
 
-#define EvidenceInterface_iid "wombat.EvidenceInterface"
+class ProgressWindowInterface
+{
+public:
+    virtual ~ProgressWindowInterface() {}
+};
 
+#define EvidenceInterface_iid "wombat.EvidenceInterface"
 Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
 
 #define BasicToolsInterface_iid "wombat.BasicToolsInterface"
-
 Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)
 
 #define SleuthKitInterface_iid "wombat.SleuthKitInterface"
 Q_DECLARE_INTERFACE(SleuthKitInterface, SleuthKitInterface_iid)
+
+#define ProgressWindowInterface_iid "wombat.ProgressWindowInterface"
+Q_DECLARE_INTERFACE(ProgressWindowInterface, ProgressWindowInterface_iid)
 
 #endif
