@@ -10,3 +10,19 @@ ProgressWindow::~ProgressWindow()
 {
     delete ui;
 }
+
+QString ProgressWindow::progressWindowAction()
+{
+    return tr("View Progress Window...");
+}
+
+QString ProgressWindow::progressWindowIcon()
+{
+    return tr(":/progresswindow/window");
+}
+
+void ProgressWindow::ShowWindow()
+{
+    show();
+}
+

@@ -57,6 +57,11 @@ class ProgressWindowInterface
 {
 public:
     virtual ~ProgressWindowInterface() {}
+    virtual void SetupProgressWindow(QWidget* parent) = 0;
+
+    virtual QString progressWindowAction() = 0;
+    virtual QString progressWindowIcon() = 0;
+    virtual void ShowWindow() = 0;
 };
 
 #define EvidenceInterface_iid "wombat.EvidenceInterface"

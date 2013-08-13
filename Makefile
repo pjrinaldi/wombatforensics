@@ -7,5 +7,7 @@ buildall:
 	(cd libraries/basictools; $(MAKE))
 	@echo "looking into sleuthkit"
 	(cd libraries/sleuthkit; $(MAKE))
+	@echo "looking into progresswindow"
+	(cd libraries/progresswindow; $(MAKE))
 	@echo "looking into main"
 	(cd main; $(MAKE))
