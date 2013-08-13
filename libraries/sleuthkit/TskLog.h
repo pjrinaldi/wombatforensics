@@ -3,6 +3,7 @@
 
 #include "tsk/framework/services/Log.h"
 #include <time.h>
+#include <sqlite3.h>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -12,7 +13,8 @@
  * Interface and default logging infrastructure that enables applications and framework
  * to log to a single place.  
  */
-
+// MOVE THESE THREE DEFINES TO THE WOMBATFORENSICS.H FILE, USING A FUNCTION WHICH CALLS ISLEUTHKIT->TSK-SERVICES...
+// PASS ON THE RESPECTIVE VARIABLES SUCH AS CURRENTCASEID, ETC..
 /**
  * Macro that gets the log service and writes an error message in a
  * single statement. 
@@ -71,15 +73,15 @@ public:
     void logError(int caseID, int imageID, int analysisType, const std::wstring &logMsg) { log(caseID, imageID, analysisType, TskLog::Error, logMsg); };
     void logWarn(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Warn,  logMsg); };
     void logInfo(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Info,  logMsg); };
-    int open(const wchar_t * logFileFullPath);
-    int open(const char * outDir);
-    //int open();
+    int open(const wchar_t * logFileFullPath, const char* dbPath);
+    int open(const char * outDir, const char* dbPath);
     int close();
     const wchar_t * getLogPathW();
-    const char * getLogPath() { return logPath.c_str(); }
+    const char * getLogPath() { return logpath.c_str(); }
 
 protected:
-    std::string logPath;
-    std::ofstream outStream;
+    std::string logpath;
+    std::string dbpath;
+    std::ofstream outstream;
 };
 #endif
