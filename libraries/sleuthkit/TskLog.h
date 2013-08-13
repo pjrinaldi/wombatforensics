@@ -19,7 +19,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGERROR(msg) TskServices::Instance().getLog().log(Log::Error, msg)
+//#define LOGERROR(msg) TskServices::Instance().getLog().log(Log::Error, msg)
 
 /**
  * Macro that gets the log service and writes a warning message in a
@@ -27,7 +27,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGWARN(msg) TskServices::Instance().getLog().log(Log::Warn, msg)
+//#define LOGWARN(msg) TskServices::Instance().getLog().log(Log::Warn, msg)
 
 
 /**
@@ -36,7 +36,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGINFO(msg) TskServices::Instance().getLog().log(Log::Info, msg)
+//#define LOGINFO(msg) TskServices::Instance().getLog().log(Log::Info, msg)
 
 
 /**
@@ -69,17 +69,17 @@ public:
     virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
     virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg);
     void logError(int caseID, int imageID, int analysisType, const std::wstring &logMsg) { log(caseID, imageID, analysisType, TskLog::Error, logMsg); };
-    void logWarn(const std::wstring &msg)  { log(Log::Warn,  msg); };
-    void logInfo(const std::wstring &msg)  { log(Log::Info,  msg); };
-    int open(const wchar_t * a_logFileFullPath);
-    int open(const char * a_outDir);
-    int open();
+    void logWarn(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Warn,  logMsg); };
+    void logInfo(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Info,  logMsg); };
+    int open(const wchar_t * logFileFullPath);
+    int open(const char * outDir);
+    //int open();
     int close();
     const wchar_t * getLogPathW();
-    const char * getLogPath() { return m_filePath.c_str(); }
+    const char * getLogPath() { return logPath.c_str(); }
 
 protected:
-    std::string m_filePath;
-    std::ofstream m_outStream;
+    std::string logPath;
+    std::ofstream outStream;
 };
 #endif
