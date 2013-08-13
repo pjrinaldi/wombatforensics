@@ -1,9 +1,9 @@
 QT += widgets gui core
 CONFIG += debug
 
-HEADERS = interfaces.h wombatforensics.h wombatcasedb.h ui_wombatforensics.h
-SOURCES = main.cpp wombatforensics.cpp wombatcasedb.cpp
-RESOURCES += wombat.qrc
+HEADERS = interfaces.h wombatforensics.h wombatcasedb.h ui_wombatforensics.h progresswindow.h ui_progresswindow.h
+SOURCES = main.cpp wombatforensics.cpp wombatcasedb.cpp progresswindow.cpp
+RESOURCES += wombat.qrc progresswindow.qrc
 DESTDIR = ../build
 LIBS = -Lplugins -lsqlite3 -lewf -ltsk -ltskframework
 

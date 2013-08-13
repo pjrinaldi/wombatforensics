@@ -31,6 +31,7 @@ class Ui_WombatForensics
 public:
     QAction *actionNew_Case;
     QAction *actionOpen_Case;
+    QAction *actionView_Progress;
     QAction *actionExit;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
@@ -59,6 +60,11 @@ public:
         QIcon icon1;
         icon1.addFile(QStringLiteral(":/opencase"), QSize(), QIcon::Normal, QIcon::Off);
         actionOpen_Case->setIcon(icon1);
+        actionView_Progress = new QAction(WombatForensics);
+        actionView_Progress->setObjectName(QStringLiteral("actionView_Progress"));
+        QIcon icon2;
+        icon2.addFile(QStringLiteral(":/progresswindow/window"), QSize(), QIcon::Normal, QIcon::Off);
+        actionView_Progress->setIcon(icon2);
         actionExit = new QAction(WombatForensics);
         actionExit->setObjectName(QStringLiteral("actionExit"));
         centralwidget = new QWidget(WombatForensics);
@@ -105,9 +111,13 @@ public:
         menuFile->addAction(actionNew_Case);
         menuFile->addAction(actionOpen_Case);
         menuFile->addSeparator();
+        menuFile->addAction(actionView_Progress);
+        menuFile->addSeparator();
         menuFile->addAction(actionExit);
         mainToolBar->addAction(actionNew_Case);
         mainToolBar->addAction(actionOpen_Case);
+        mainToolBar->addSeparator();
+        mainToolBar->addAction(actionView_Progress);
 
         retranslateUi(WombatForensics);
 
@@ -122,6 +132,7 @@ public:
         WombatForensics->setWindowTitle(QApplication::translate("WombatForensics", "WombatForensics", 0));
         actionNew_Case->setText(QApplication::translate("WombatForensics", "New Case", 0));
         actionOpen_Case->setText(QApplication::translate("WombatForensics", "Open Case", 0));
+        actionView_Progress->setText(QApplication::translate("WombatForensics", "View Progress...", 0));
         actionExit->setText(QApplication::translate("WombatForensics", "Exit", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));

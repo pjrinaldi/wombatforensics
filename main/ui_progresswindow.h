@@ -110,7 +110,7 @@ public:
 
         progressBar = new QProgressBar(groupBox_3);
         progressBar->setObjectName(QStringLiteral("progressBar"));
-        progressBar->setValue(25);
+        progressBar->setValue(0);
         progressBar->setInvertedAppearance(false);
 
         gridLayout->addWidget(progressBar, 0, 1, 1, 1);

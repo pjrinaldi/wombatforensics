@@ -52,18 +52,18 @@ public:
     virtual QString GetFileContents(int fileID) = 0;
     virtual QString GetFileTxtContents(int fileID) = 0;
 };
-
+/*
 class ProgressWindowInterface
 {
 public:
     virtual ~ProgressWindowInterface() {}
     virtual void SetupProgressWindow(QWidget* parent) = 0;
 
-    virtual QString progressWindowAction() = 0;
-    virtual QString progressWindowIcon() = 0;
+    virtual QStringList progressWindowAction() = 0;
+    virtual QStringList progressWindowIcon() = 0;
     virtual void ShowWindow() = 0;
 };
-
+*/
 #define EvidenceInterface_iid "wombat.EvidenceInterface"
 Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
 
@@ -72,8 +72,8 @@ Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)
 
 #define SleuthKitInterface_iid "wombat.SleuthKitInterface"
 Q_DECLARE_INTERFACE(SleuthKitInterface, SleuthKitInterface_iid)
-
+/*
 #define ProgressWindowInterface_iid "wombat.ProgressWindowInterface"
 Q_DECLARE_INTERFACE(ProgressWindowInterface, ProgressWindowInterface_iid)
-
+*/
 #endif

@@ -49,6 +49,8 @@
     <addaction name="actionNew_Case"/>
     <addaction name="actionOpen_Case"/>
     <addaction name="separator"/>
+    <addaction name="actionView_Progress"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEvidence">
@@ -87,6 +89,8 @@
    </attribute>
    <addaction name="actionNew_Case"/>
    <addaction name="actionOpen_Case"/>
+   <addaction name="separator"/>
+   <addaction name="actionView_Progress"/>
   </widget>
   <action name="actionNew_Case">
    <property name="icon">
@@ -105,6 +109,15 @@
    <property name="text">
     <string>Open Case</string>
    </property>
+  </action>
+  <action name="actionView_Progress">
+      <property name="icon">
+          <iconset resource="progresswindow.qrc">
+              <normaloff>:/progresswindow/window</normaloff>:/progresswindow/window</iconset>
+      </property>
+      <property name="text">
+          <string>View Progress...</string>
+      </property>
   </action>
   <action name="actionExit">
    <property name="text">

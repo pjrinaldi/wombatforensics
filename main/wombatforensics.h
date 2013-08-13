@@ -15,6 +15,7 @@
 #include "interfaces.h"
 #include "wombatcasedb.h"
 #include "ui_wombatforensics.h"
+#include "progresswindow.h"
 
 namespace Ui {
 class WombatForensics;
@@ -28,11 +29,13 @@ public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
     WombatCaseDb *wombatCaseData;
+    ProgressWindow* wombatprogresswindow;
 
 private slots:
     void alterEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
+    void on_actionView_Progress_triggered();
     void dirTreeView_selectionChanged(const QModelIndex &index);
 
 private:
