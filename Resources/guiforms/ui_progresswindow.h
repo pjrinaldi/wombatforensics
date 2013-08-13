@@ -15,11 +15,14 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QProgressBar>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QVBoxLayout>
@@ -33,13 +36,21 @@ public:
     QHBoxLayout *horizontalLayout;
     QGroupBox *groupBox_2;
     QHBoxLayout *horizontalLayout_2;
-    QTreeView *treeView;
+    QTreeView *analysisTreeView;
     QGroupBox *groupBox_3;
     QVBoxLayout *verticalLayout_4;
     QVBoxLayout *verticalLayout_2;
-    QHBoxLayout *horizontalLayout_3;
+    QGridLayout *gridLayout;
+    QLineEdit *lineEdit_2;
+    QLineEdit *lineEdit_3;
     QLabel *label;
     QProgressBar *progressBar;
+    QLineEdit *lineEdit;
+    QLabel *label_2;
+    QLabel *label_4;
+    QLabel *label_3;
+    QSpacerItem *verticalSpacer;
+    QSpacerItem *verticalSpacer_2;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_3;
     QTableWidget *tableWidget;
@@ -49,7 +60,7 @@ public:
     {
         if (ProgressWindow->objectName().isEmpty())
             ProgressWindow->setObjectName(QStringLiteral("ProgressWindow"));
-        ProgressWindow->resize(919, 451);
+        ProgressWindow->resize(919, 292);
         verticalLayout = new QVBoxLayout(ProgressWindow);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         horizontalLayout = new QHBoxLayout();
@@ -59,10 +70,11 @@ public:
         horizontalLayout_2 = new QHBoxLayout(groupBox_2);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
-        treeView = new QTreeView(groupBox_2);
-        treeView->setObjectName(QStringLiteral("treeView"));
+        analysisTreeView = new QTreeView(groupBox_2);
+        analysisTreeView->setObjectName(QStringLiteral("analysisTreeView"));
+        analysisTreeView->header()->setVisible(false);
 
-        horizontalLayout_2->addWidget(treeView);
+        horizontalLayout_2->addWidget(analysisTreeView);
 
 
         horizontalLayout->addWidget(groupBox_2);
@@ -75,21 +87,66 @@ public:
         verticalLayout_4->setContentsMargins(0, 0, 0, 0);
         verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        gridLayout = new QGridLayout();
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setHorizontalSpacing(6);
+        gridLayout->setVerticalSpacing(1);
+        lineEdit_2 = new QLineEdit(groupBox_3);
+        lineEdit_2->setObjectName(QStringLiteral("lineEdit_2"));
+        lineEdit_2->setReadOnly(true);
+
+        gridLayout->addWidget(lineEdit_2, 2, 1, 1, 1);
+
+        lineEdit_3 = new QLineEdit(groupBox_3);
+        lineEdit_3->setObjectName(QStringLiteral("lineEdit_3"));
+        lineEdit_3->setReadOnly(true);
+
+        gridLayout->addWidget(lineEdit_3, 3, 1, 1, 1);
+
         label = new QLabel(groupBox_3);
         label->setObjectName(QStringLiteral("label"));
 
-        horizontalLayout_3->addWidget(label);
+        gridLayout->addWidget(label, 0, 0, 1, 1);
 
         progressBar = new QProgressBar(groupBox_3);
         progressBar->setObjectName(QStringLiteral("progressBar"));
-        progressBar->setValue(24);
+        progressBar->setValue(25);
+        progressBar->setInvertedAppearance(false);
 
-        horizontalLayout_3->addWidget(progressBar);
+        gridLayout->addWidget(progressBar, 0, 1, 1, 1);
+
+        lineEdit = new QLineEdit(groupBox_3);
+        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        lineEdit->setDragEnabled(false);
+        lineEdit->setReadOnly(true);
+
+        gridLayout->addWidget(lineEdit, 1, 1, 1, 1);
+
+        label_2 = new QLabel(groupBox_3);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        gridLayout->addWidget(label_2, 1, 0, 1, 1);
+
+        label_4 = new QLabel(groupBox_3);
+        label_4->setObjectName(QStringLiteral("label_4"));
+
+        gridLayout->addWidget(label_4, 3, 0, 1, 1);
+
+        label_3 = new QLabel(groupBox_3);
+        label_3->setObjectName(QStringLiteral("label_3"));
+
+        gridLayout->addWidget(label_3, 2, 0, 1, 1);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer, 4, 0, 1, 1);
+
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer_2, 4, 1, 1, 1);
 
 
-        verticalLayout_2->addLayout(horizontalLayout_3);
+        verticalLayout_2->addLayout(gridLayout);
 
 
         verticalLayout_4->addLayout(verticalLayout_2);
@@ -141,10 +198,13 @@ public:
 
     void retranslateUi(QDialog *ProgressWindow)
     {
-        ProgressWindow->setWindowTitle(QApplication::translate("ProgressWindow", "Dialog", 0));
+        ProgressWindow->setWindowTitle(QApplication::translate("ProgressWindow", "Progress Window", 0));
         groupBox_2->setTitle(QApplication::translate("ProgressWindow", "Processing Jobs", 0));
         groupBox_3->setTitle(QApplication::translate("ProgressWindow", "Job Progress", 0));
         label->setText(QApplication::translate("ProgressWindow", "Overall: ", 0));
+        label_2->setText(QApplication::translate("ProgressWindow", "<html><head/><body><p>Analysis State:</p></body></html>", 0));
+        label_4->setText(QApplication::translate("ProgressWindow", "Files Processed: ", 0));
+        label_3->setText(QApplication::translate("ProgressWindow", "Files Found:", 0));
         groupBox->setTitle(QApplication::translate("ProgressWindow", "Messages", 0));
         QTableWidgetItem *___qtablewidgetitem = tableWidget->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("ProgressWindow", "Type", 0));
