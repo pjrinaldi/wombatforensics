@@ -41,11 +41,11 @@ public:
     QVBoxLayout *verticalLayout_4;
     QVBoxLayout *verticalLayout_2;
     QGridLayout *gridLayout;
-    QLineEdit *lineEdit_2;
-    QLineEdit *lineEdit_3;
+    QLineEdit *filesFoundEdit;
+    QLineEdit *filesProcessedEdit;
     QLabel *label;
     QProgressBar *progressBar;
-    QLineEdit *lineEdit;
+    QLineEdit *analysisStateEdit;
     QLabel *label_2;
     QLabel *label_4;
     QLabel *label_3;
@@ -53,7 +53,7 @@ public:
     QSpacerItem *verticalSpacer_2;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_3;
-    QTableWidget *tableWidget;
+    QTableWidget *msgTableWidget;
     QDialogButtonBox *buttonBox;
 
     void setupUi(QDialog *ProgressWindow)
@@ -91,17 +91,17 @@ public:
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(6);
         gridLayout->setVerticalSpacing(1);
-        lineEdit_2 = new QLineEdit(groupBox_3);
-        lineEdit_2->setObjectName(QStringLiteral("lineEdit_2"));
-        lineEdit_2->setReadOnly(true);
+        filesFoundEdit = new QLineEdit(groupBox_3);
+        filesFoundEdit->setObjectName(QStringLiteral("filesFoundEdit"));
+        filesFoundEdit->setReadOnly(true);
 
-        gridLayout->addWidget(lineEdit_2, 2, 1, 1, 1);
+        gridLayout->addWidget(filesFoundEdit, 2, 1, 1, 1);
 
-        lineEdit_3 = new QLineEdit(groupBox_3);
-        lineEdit_3->setObjectName(QStringLiteral("lineEdit_3"));
-        lineEdit_3->setReadOnly(true);
+        filesProcessedEdit = new QLineEdit(groupBox_3);
+        filesProcessedEdit->setObjectName(QStringLiteral("filesProcessedEdit"));
+        filesProcessedEdit->setReadOnly(true);
 
-        gridLayout->addWidget(lineEdit_3, 3, 1, 1, 1);
+        gridLayout->addWidget(filesProcessedEdit, 3, 1, 1, 1);
 
         label = new QLabel(groupBox_3);
         label->setObjectName(QStringLiteral("label"));
@@ -115,12 +115,12 @@ public:
 
         gridLayout->addWidget(progressBar, 0, 1, 1, 1);
 
-        lineEdit = new QLineEdit(groupBox_3);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
-        lineEdit->setDragEnabled(false);
-        lineEdit->setReadOnly(true);
+        analysisStateEdit = new QLineEdit(groupBox_3);
+        analysisStateEdit->setObjectName(QStringLiteral("analysisStateEdit"));
+        analysisStateEdit->setDragEnabled(false);
+        analysisStateEdit->setReadOnly(true);
 
-        gridLayout->addWidget(lineEdit, 1, 1, 1, 1);
+        gridLayout->addWidget(analysisStateEdit, 1, 1, 1, 1);
 
         label_2 = new QLabel(groupBox_3);
         label_2->setObjectName(QStringLiteral("label_2"));
@@ -159,21 +159,21 @@ public:
         verticalLayout_3 = new QVBoxLayout(groupBox);
         verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
-        tableWidget = new QTableWidget(groupBox);
-        if (tableWidget->columnCount() < 2)
-            tableWidget->setColumnCount(2);
+        msgTableWidget = new QTableWidget(groupBox);
+        if (msgTableWidget->columnCount() < 2)
+            msgTableWidget->setColumnCount(2);
         QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
-        tableWidget->setHorizontalHeaderItem(0, __qtablewidgetitem);
+        msgTableWidget->setHorizontalHeaderItem(0, __qtablewidgetitem);
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
-        tableWidget->setHorizontalHeaderItem(1, __qtablewidgetitem1);
-        tableWidget->setObjectName(QStringLiteral("tableWidget"));
-        tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableWidget->horizontalHeader()->setVisible(true);
-        tableWidget->horizontalHeader()->setCascadingSectionResizes(false);
-        tableWidget->horizontalHeader()->setStretchLastSection(true);
-        tableWidget->verticalHeader()->setVisible(false);
+        msgTableWidget->setHorizontalHeaderItem(1, __qtablewidgetitem1);
+        msgTableWidget->setObjectName(QStringLiteral("msgTableWidget"));
+        msgTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        msgTableWidget->horizontalHeader()->setVisible(true);
+        msgTableWidget->horizontalHeader()->setCascadingSectionResizes(false);
+        msgTableWidget->horizontalHeader()->setStretchLastSection(true);
+        msgTableWidget->verticalHeader()->setVisible(false);
 
-        verticalLayout_3->addWidget(tableWidget);
+        verticalLayout_3->addWidget(msgTableWidget);
 
 
         horizontalLayout->addWidget(groupBox);
@@ -201,14 +201,14 @@ public:
         ProgressWindow->setWindowTitle(QApplication::translate("ProgressWindow", "Progress Window", 0));
         groupBox_2->setTitle(QApplication::translate("ProgressWindow", "Processing Jobs", 0));
         groupBox_3->setTitle(QApplication::translate("ProgressWindow", "Job Progress", 0));
-        label->setText(QApplication::translate("ProgressWindow", "Overall: ", 0));
-        label_2->setText(QApplication::translate("ProgressWindow", "<html><head/><body><p>Analysis State:</p></body></html>", 0));
+        label->setText(QApplication::translate("ProgressWindow", "Overall:", 0));
+        label_2->setText(QApplication::translate("ProgressWindow", "Analysis State:", 0));
         label_4->setText(QApplication::translate("ProgressWindow", "Files Processed: ", 0));
         label_3->setText(QApplication::translate("ProgressWindow", "Files Found:", 0));
         groupBox->setTitle(QApplication::translate("ProgressWindow", "Messages", 0));
-        QTableWidgetItem *___qtablewidgetitem = tableWidget->horizontalHeaderItem(0);
+        QTableWidgetItem *___qtablewidgetitem = msgTableWidget->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("ProgressWindow", "Type", 0));
-        QTableWidgetItem *___qtablewidgetitem1 = tableWidget->horizontalHeaderItem(1);
+        QTableWidgetItem *___qtablewidgetitem1 = msgTableWidget->horizontalHeaderItem(1);
         ___qtablewidgetitem1->setText(QApplication::translate("ProgressWindow", "Message", 0));
     } // retranslateUi
 

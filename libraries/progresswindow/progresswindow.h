@@ -19,6 +19,12 @@ class ProgressWindow : public QDialog, public ProgressWindowInterface
 public:
     explicit ProgressWindow(QWidget *parent = 0);
     ~ProgressWindow();
+    void UpdateProgressBar(int progressValue); // progressBar
+    void UpdateAnalysisState(QString stateValue); // analysisStateEdit
+    void UpdateFilesFound(QString filesfoundValue); // filesFoundEdit
+    void UpdateFilesProcessed(QString filesprocessedValue); // filesProcessedEdit
+    //void UpdateJobTreeView // analysisTreeView
+    void UpdateMessages(QString msgType, QString msgValue); // msgTableWidget
     
 private:
     Ui::ProgressWindow *ui;
