@@ -102,7 +102,7 @@ void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath)
     tmpPath += logFilePath;
     try
     {
-        log = std::auto_ptr<Log>(new Log());
+        log = std::auto_ptr<Log>(new TskLog());
         log->open(tmpPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");
@@ -223,6 +223,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
     {
         imagefiletsk.extractFiles();
         fprintf(stderr, "Extracting Evidence was successful\n");
+        // Get Number of Files found here and populate the progress window, so i need to pass the window through
     }
     catch(TskException &ex)
     {

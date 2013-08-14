@@ -32,6 +32,7 @@ public:
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
     QStringList ReturnCaseImages(int caseID);
+    std::string GetTime(void);
 
 private:
     sqlite3 *wombatdb;

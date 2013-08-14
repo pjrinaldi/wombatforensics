@@ -12,6 +12,7 @@
 #include "TskFileManagerImpl.h"
 #include "TskImageFileTsk.h"
 #include "TskFileTsk.h"
+#include "TskLog.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QString>

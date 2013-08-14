@@ -11,6 +11,9 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPluginLoader>
+#include <QTreeWidgetItem>
+#include <string>
+#include <QString>
 
 #include "interfaces.h"
 #include "wombatcasedb.h"
@@ -59,6 +62,7 @@ private:
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     void LoadHexViewer(QString tmpFilePath);
     void LoadTxtViewer(QString asciiText);
+    std::string GetTime(void);
 
     int64_t currentcaseid;
     QDir pluginsDir;

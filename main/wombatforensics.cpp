@@ -61,6 +61,21 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
 }
 
+std::string WombatForensics::GetTime()
+{
+    struct tm *newtime;
+    time_t aclock;
+
+    time(&aclock);   // Get time in seconds
+    newtime = localtime(&aclock);   // Convert time to struct tm form 
+    char timeStr[64];
+    snprintf(timeStr, 64, "%.2d/%.2d/%.2d %.2d:%.2d:%.2d",
+        newtime->tm_mon+1,newtime->tm_mday,newtime->tm_year % 100, 
+        newtime->tm_hour, newtime->tm_min, newtime->tm_sec);
+
+    return timeStr;
+}
+
 bool WombatForensics::isPluginLoaded(QString pluginFileName)
 {
     int pluginexists = 0;
@@ -122,13 +137,6 @@ void WombatForensics::populateActions(QObject *plugin)
     {
         addActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(alterEvidence()));
     }
-    /*
-    ProgressWindowInterface *iProgress = qobject_cast<ProgressWindowInterface *>(plugin);
-    if(iProgress)
-    {
-        addActions(plugin, iProgress->progressWindowAction(), iProgress->progressWindowIcon(), ui->mainToolBar, ui->menuFile, SLOT(showProgress()));
-    }
-    */
 }
 
 void WombatForensics::populateTabWidgets(QObject *plugin)
@@ -192,6 +200,13 @@ void WombatForensics::alterEvidence()
             // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
+            QString tmpString = "Image \"";
+            tmpString += evidenceName;
+            tmpString += "\" Added ";
+            tmpString += QString::fromStdString(GetTime());
+            QStringList tmpList;
+            tmpList << tmpString;
+            wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
             currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
             wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
@@ -206,14 +221,7 @@ void WombatForensics::alterEvidence()
     else if(action->text() == tr("Remove Evidence"))
         iEvidence->remEvidence(currentcaseid);
 }
-/*
-void WombatForensics::showProgress()
-{
-    QAction *action = qobject_cast<QAction *>(sender());
-    ProgressWindowInterface *iProgress = qobject_cast<ProgressWindowInterface *>(action->parent());
-    iProgress->ShowWindow();
-}
-*/
+
 WombatForensics::~WombatForensics()
 {
     //const char* errmsg = wombatCaseData->CloseCaseDB(); // this possibly caused glibc corrupted double-linked list
@@ -273,7 +281,6 @@ void WombatForensics::on_actionNew_Case_triggered()
             evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
             basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
             sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
- //           progresswindowplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libprogresswindowplugin.so");
             ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
         }
@@ -353,7 +360,6 @@ void WombatForensics::on_actionOpen_Case_triggered()
 
 void WombatForensics::on_actionView_Progress_triggered()
 {
-    //if(wombatprogresswindow->isVisible())
     wombatprogresswindow->show();
 }
 

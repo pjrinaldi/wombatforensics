@@ -12,6 +12,21 @@ WombatCaseDb::WombatCaseDb(QWidget *Parent)
 @return    true if the file exists, else false
 
 */
+std::string WombatCaseDb::GetTime()
+{
+    struct tm *newtime;
+    time_t aclock;
+
+    time(&aclock);   // Get time in seconds
+    newtime = localtime(&aclock);   // Convert time to struct tm form 
+    char timeStr[64];
+    snprintf(timeStr, 64, "%.2d/%.2d/%.2d %.2d:%.2d:%.2d",
+        newtime->tm_mon+1,newtime->tm_mday,newtime->tm_year % 100, 
+        newtime->tm_hour, newtime->tm_min, newtime->tm_sec);
+
+    return timeStr;
+}
+
 bool WombatCaseDb::FileExists(const std::string& filename)
 {
     struct stat buf;
@@ -38,9 +53,9 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
     wombatTableSchema.push_back("CREATE TABLE log(logid INTEGER PRIMARY KEY, caseid INTEGER, imageid INTEGER, analysistype INTEGER, msgtype INTEGER, msgdatetime TEXT, logmsg TEXT);");
-    wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, casename TEXT);");
-    wombatTableSchema.push_back("CREATE TABLE caseimages(imageid INTEGER PRIMARY KEY, imagefullpath TEXT, imagename TEXT, caseid INTEGER);");
-    wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, settingname TEXT, settingvalue TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, casename TEXT, creation TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE caseimages(imageid INTEGER PRIMARY KEY, imagefullpath TEXT, imagename TEXT, caseid INTEGER, creation TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, settingname TEXT, settingvalue TEXT, settingtype INT);");
 
     if(sqlite3_open(wombatdbname.toStdString().c_str(), &wombatdb) == SQLITE_OK)
     {
@@ -116,17 +131,22 @@ int WombatCaseDb::ReturnCaseCount()
 int64_t WombatCaseDb::InsertCase(QString caseText)
 {
     int64_t caseid = 0;
-    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO cases (casename) VALUES(?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO cases (casename, creation) VALUES(?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_text(sqlstatement, 1, caseText.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
-            int ret = sqlite3_step(sqlstatement);
-            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            if(sqlite3_bind_text(sqlstatement, 2, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
             {
-                caseid = sqlite3_last_insert_rowid(wombatdb);
+                int ret = sqlite3_step(sqlstatement);
+                if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+                {
+                    caseid = sqlite3_last_insert_rowid(wombatdb);
+                }
+                else
+                    DisplayError(wombatparent, "1.4", "INSERT CASE - RETURN CASEID", sqlite3_errmsg(wombatdb));
             }
             else
-                DisplayError(wombatparent, "1.4", "INSERT CASE - RETURN CASEID", sqlite3_errmsg(wombatdb));
+                DisplayError(wombatparent, "1.4", "INSERT CASE - BIND CREATION", sqlite3_errmsg(wombatdb));
         }
         else
             DisplayError(wombatparent, "1.4", "INSERT CASE - BIND CASENAME", sqlite3_errmsg(wombatdb));
