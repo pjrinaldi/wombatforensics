@@ -24,7 +24,7 @@
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTableWidget>
-#include <QtWidgets/QTreeView>
+#include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -36,7 +36,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QGroupBox *groupBox_2;
     QHBoxLayout *horizontalLayout_2;
-    QTreeView *analysisTreeView;
+    QTreeWidget *analysisTreeWidget;
     QGroupBox *groupBox_3;
     QVBoxLayout *verticalLayout_4;
     QVBoxLayout *verticalLayout_2;
@@ -70,11 +70,16 @@ public:
         horizontalLayout_2 = new QHBoxLayout(groupBox_2);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
-        analysisTreeView = new QTreeView(groupBox_2);
-        analysisTreeView->setObjectName(QStringLiteral("analysisTreeView"));
-        analysisTreeView->header()->setVisible(false);
+        analysisTreeWidget = new QTreeWidget(groupBox_2);
+        new QTreeWidgetItem(analysisTreeWidget);
+        new QTreeWidgetItem(analysisTreeWidget);
+        new QTreeWidgetItem(analysisTreeWidget);
+        analysisTreeWidget->setObjectName(QStringLiteral("analysisTreeWidget"));
+        analysisTreeWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        analysisTreeWidget->setProperty("showDropIndicator", QVariant(false));
+        analysisTreeWidget->header()->setVisible(false);
 
-        horizontalLayout_2->addWidget(analysisTreeView);
+        horizontalLayout_2->addWidget(analysisTreeWidget);
 
 
         horizontalLayout->addWidget(groupBox_2);
@@ -200,6 +205,19 @@ public:
     {
         ProgressWindow->setWindowTitle(QApplication::translate("ProgressWindow", "Progress Window", 0));
         groupBox_2->setTitle(QApplication::translate("ProgressWindow", "Processing Jobs", 0));
+        QTreeWidgetItem *___qtreewidgetitem = analysisTreeWidget->headerItem();
+        ___qtreewidgetitem->setText(0, QApplication::translate("ProgressWindow", "1", 0));
+
+        const bool __sortingEnabled = analysisTreeWidget->isSortingEnabled();
+        analysisTreeWidget->setSortingEnabled(false);
+        QTreeWidgetItem *___qtreewidgetitem1 = analysisTreeWidget->topLevelItem(0);
+        ___qtreewidgetitem1->setText(0, QApplication::translate("ProgressWindow", "Add Evidence Jobs", 0));
+        QTreeWidgetItem *___qtreewidgetitem2 = analysisTreeWidget->topLevelItem(1);
+        ___qtreewidgetitem2->setText(0, QApplication::translate("ProgressWindow", "Additional Analysis Jobs", 0));
+        QTreeWidgetItem *___qtreewidgetitem3 = analysisTreeWidget->topLevelItem(2);
+        ___qtreewidgetitem3->setText(0, QApplication::translate("ProgressWindow", "Remove Evidence Jobs", 0));
+        analysisTreeWidget->setSortingEnabled(__sortingEnabled);
+
         groupBox_3->setTitle(QApplication::translate("ProgressWindow", "Job Progress", 0));
         label->setText(QApplication::translate("ProgressWindow", "Overall:", 0));
         label_2->setText(QApplication::translate("ProgressWindow", "Analysis State:", 0));

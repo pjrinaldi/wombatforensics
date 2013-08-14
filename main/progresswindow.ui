@@ -35,10 +35,36 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QTreeView" name="analysisTreeView">
+         <widget class="QTreeWidget" name="analysisTreeWidget">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="showDropIndicator" stdset="0">
+           <bool>false</bool>
+          </property>
           <attribute name="headerVisible">
            <bool>false</bool>
           </attribute>
+          <column>
+           <property name="text">
+            <string>1</string>
+           </property>
+          </column>
+          <item>
+           <property name="text">
+            <string>Add Evidence Jobs</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Additional Analysis Jobs</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Remove Evidence Jobs</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>
