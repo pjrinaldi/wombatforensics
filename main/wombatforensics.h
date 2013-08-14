@@ -57,7 +57,7 @@ private:
     void setupSleuthKitBlackboard(QObject *plugin);
     void setupSleuthKitSchedulerQueue(QObject *plugin);
     void setupSleuthKitFileManager(QObject *plugin);
-    void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath);
+    void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow);
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     void LoadHexViewer(QString tmpFilePath);

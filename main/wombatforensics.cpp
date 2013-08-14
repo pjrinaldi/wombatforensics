@@ -207,10 +207,13 @@ void WombatForensics::alterEvidence()
             QStringList tmpList;
             tmpList << tmpString;
             wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
+            wombatprogresswindow->UpdateFilesFound(0);
+            wombatprogresswindow->UpdateFilesProcessed(0);
+            wombatprogresswindow->UpdateAnalysisState("Adding Image to Database");
             currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
             wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
-            sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
+            sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
             // need to populate the directory tree entries
             QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());
             QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
@@ -420,12 +423,12 @@ void WombatForensics::setupSleuthKitFileManager(QObject *plugin)
         iSleuthKit->SetupSystemFileManager();
     }
 }
-void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath)
+void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        iSleuthKit->OpenEvidence(evidencePath);
+        iSleuthKit->OpenEvidence(evidencePath, progressWindow);
     }
 }
 

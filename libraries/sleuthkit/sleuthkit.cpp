@@ -195,7 +195,7 @@ void SleuthKitPlugin::SetupSystemFileManager()
         fprintf(stderr, "Loading FileManager: %s\n", ex.message().c_str());
     }
 }
-void SleuthKitPlugin::OpenEvidence(QString evidencePath)
+void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
 {
     TskPipelineManager pipelineMgr;
     TskPipeline *filePipeline;
@@ -224,6 +224,9 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath)
         imagefiletsk.extractFiles();
         fprintf(stderr, "Extracting Evidence was successful\n");
         // Get Number of Files found here and populate the progress window, so i need to pass the window through
+        int fileCount = imgdb->getNumFiles();
+        progresswindow->UpdateFilesFound(QString::number(fileCount));
+        progresswindow->UpdateAnalysisState("Processing Files");
     }
     catch(TskException &ex)
     {

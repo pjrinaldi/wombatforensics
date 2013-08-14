@@ -2,6 +2,7 @@
 #define SLEUTHKIT_H
 
 #include <main/interfaces.h>
+#include <main/progresswindow.h>
 #include <sqlite3.h>
 #include <tsk/framework/framework.h>
 #include <time.h>
@@ -16,6 +17,7 @@
 #include <QtPlugin>
 #include <QObject>
 #include <QString>
+#include <string>
 #include <QStringList>
 #include <QFile>
 #include <QXmlStreamWriter>
@@ -38,7 +40,7 @@ public:
     void SetupSystemBlackboard();
     void SetupSystemSchedulerQueue();
     void SetupSystemFileManager();
-    void OpenEvidence(QString evidencePath);
+    void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
     QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
