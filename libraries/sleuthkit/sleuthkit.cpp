@@ -209,6 +209,8 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     }
 
     TskImageFileTsk imagefiletsk;
+    int fileCount = 0;
+    int processCount = 0;
     try
     {
         imagefiletsk.open(evidencePath.toStdString());
@@ -224,8 +226,9 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         imagefiletsk.extractFiles();
         fprintf(stderr, "Extracting Evidence was successful\n");
         // Get Number of Files found here and populate the progress window, so i need to pass the window through
-        int fileCount = imgdb->getNumFiles();
-        fprintf(stderr, "File Count: %d", fileCount);
+        fileCount = imgdb->getNumFiles();
+        fprintf(stderr, "File Count: %d\n", fileCount);
+        progresswindow->UpdateFilesProcessed("0");
         progresswindow->UpdateFilesFound(QString::number(fileCount));
         progresswindow->UpdateAnalysisState("Processing Files");
     }
@@ -252,6 +255,8 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         {
             fprintf(stderr, "TskException: %s\n", ex.message().c_str());
         }
+        processCount++;
+        progresswindow->UpdateFilesProcessed(QString::number(processCount));
     }
     delete task;
     if(filePipeline && !filePipeline->isEmpty())

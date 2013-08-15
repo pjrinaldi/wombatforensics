@@ -7,7 +7,7 @@ TARGET = $$qtLibraryTarget(sleuthkitplugin)
 INCLUDEPATH += ../../
 
 HEADERS += sleuthkit.h TskDBBlackboard.h TskFileManagerImpl.h TskImageFileTsk.h TskImgDBSqlite.h TskSchedulerQueue.h TskSystemPropertiesImpl.h TskFileTsk.h TskLog.h ../../main/progresswindow.h
-SOURCES += sleuthkit.cpp TskDBBlackboard.cpp TskFileManagerImpl.cpp TskImageFileTsk.cpp TskImgDBSqlite.cpp TskSchedulerQueue.cpp TskSystemPropertiesImpl.cpp TskFileTsk.cpp TskLog.cpp
+SOURCES += sleuthkit.cpp TskDBBlackboard.cpp TskFileManagerImpl.cpp TskImageFileTsk.cpp TskImgDBSqlite.cpp TskSchedulerQueue.cpp TskSystemPropertiesImpl.cpp TskFileTsk.cpp TskLog.cpp ../../main/progresswindow.cpp
 #RESOURCES += sleuthkit.qrc
 DESTDIR = ../../build/plugins
 

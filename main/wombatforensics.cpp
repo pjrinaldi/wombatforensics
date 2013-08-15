@@ -200,9 +200,8 @@ void WombatForensics::alterEvidence()
             // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
-            QString tmpString = "Image \"";
-            tmpString += evidenceName;
-            tmpString += "\" Added ";
+            QString tmpString = evidenceName;
+            tmpString += " - ";
             tmpString += QString::fromStdString(GetTime());
             QStringList tmpList;
             tmpList << tmpString;
