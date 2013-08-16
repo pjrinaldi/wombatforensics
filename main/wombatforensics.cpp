@@ -8,7 +8,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 {
     ui->setupUi(this);
     wombatCaseData = new WombatCaseDb(this);
-    wombatprogresswindow = new ProgressWindow(this);
+    wombatprogresswindow = new ProgressWindow();
+    wombatprogresswindow->setModal(false);
     currentcaseid = -1;
     QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";

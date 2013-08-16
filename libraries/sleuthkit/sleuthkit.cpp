@@ -258,6 +258,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         processCount++;
         progresswindow->UpdateFilesProcessed(QString::number(processCount));
     }
+    progresswindow->UpdateAnalysisState("Processing Finished");
     delete task;
     if(filePipeline && !filePipeline->isEmpty())
     {
