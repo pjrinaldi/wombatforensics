@@ -228,7 +228,6 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         // Get Number of Files found here and populate the progress window, so i need to pass the window through
         fileCount = imgdb->getNumFiles();
         fprintf(stderr, "File Count: %d\n", fileCount);
-        progresswindow->UpdateFilesProcessed("0");
         progresswindow->UpdateFilesFound(QString::number(fileCount));
         progresswindow->UpdateAnalysisState("Processing Files");
     }

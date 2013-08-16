@@ -13,6 +13,7 @@
 #include "TskFileManagerImpl.h"
 #include "TskImageFileTsk.h"
 #include "TskFileTsk.h"
+//#include "TskServices.h"
 #include "TskLog.h"
 #include <QtPlugin>
 #include <QObject>
@@ -24,6 +25,30 @@
 #include <QStandardItemModel>
 #include <QByteArray>
 #include <QDataStream>
+
+/**
+ * Macro that gets the log service and writes an error message in a
+ * single statement. 
+ * @param msg Message to log
+ * @returns void
+ */
+#define LOGERR(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Error, logMsg)
+
+/**
+ * Macro that gets the log service and writes a warning message in a
+ * single statement. 
+ * @param msg Message to log
+ * @returns void
+ */
+#define LOGWRN(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logWarn(caseID, imageID, analysisType, TskLog::Warn, logMsg)
+
+/**
+ * Macro that gets the log service and writes an info message in a
+ * single statement. 
+ * @param msg Message to log
+ * @returns void
+ */
+#define LOGINF(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Info, logMsg)
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {

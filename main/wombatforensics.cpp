@@ -207,8 +207,8 @@ void WombatForensics::alterEvidence()
             QStringList tmpList;
             tmpList << tmpString;
             wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
-            wombatprogresswindow->UpdateFilesFound(0);
-            wombatprogresswindow->UpdateFilesProcessed(0);
+            wombatprogresswindow->UpdateFilesFound("0");
+            wombatprogresswindow->UpdateFilesProcessed("0");
             wombatprogresswindow->UpdateAnalysisState("Adding Image to Database");
             currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
