@@ -27,30 +27,6 @@
 #include <QByteArray>
 #include <QDataStream>
 
-/**
- * Macro that gets the log service and writes an error message in a
- * single statement. 
- * @param msg Message to log
- * @returns void
- */
-#define LOGERROR(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Error, logMsg)
-
-/**
- * Macro that gets the log service and writes a warning message in a
- * single statement. 
- * @param msg Message to log
- * @returns void
- */
-#define LOGWARN(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logWarn(caseID, imageID, analysisType, TskLog::Warn, logMsg)
-
-/**
- * Macro that gets the log service and writes an info message in a
- * single statement. 
- * @param msg Message to log
- * @returns void
- */
-#define LOGINFO(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Info, logMsg)
-
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {
     Q_OBJECT

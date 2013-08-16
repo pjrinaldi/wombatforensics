@@ -39,7 +39,7 @@ TskServices &TskServices::Instance()
  * created that sends messages to stderr.
  * @returns log reference. 
  */
-Log& TskServices::getLog()
+TskLog& TskServices::getLog()
 {
     // create a default one if it has not been set yet
     if (!m_log) {
