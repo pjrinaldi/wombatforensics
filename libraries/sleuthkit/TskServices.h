@@ -19,6 +19,8 @@
 #include "tsk/framework/services/TskSystemProperties.h"
 #include "tsk/framework/file/TskFileManager.h"
 
+// NEED TO MAKE THE LOGERROR(MSG) SEND MY MESSAGE TO LOG FILE AND AUTOPOPULATE THE CASEID, IMAGEID, ANALYSISTYPE, ON ITS OWN.
+
 /**
  * Macro that gets the log service and writes an error message in a
  * single statement. 
