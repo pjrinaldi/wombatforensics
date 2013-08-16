@@ -1,7 +1,7 @@
 #ifndef TSKLOG_H
 #define TSKLOG_H
 
-#include "tsk/framework/services/Log.h"
+//#include "tsk/framework/services/Log.h"
 #include <time.h>
 #include <sqlite3.h>
 #include <string>
@@ -13,33 +13,6 @@
  * Interface and default logging infrastructure that enables applications and framework
  * to log to a single place.  
  */
-// MOVE THESE THREE DEFINES TO THE WOMBATFORENSICS.H FILE, USING A FUNCTION WHICH CALLS ISLEUTHKIT->TSK-SERVICES...
-// PASS ON THE RESPECTIVE VARIABLES SUCH AS CURRENTCASEID, ETC..
-/**
- * Macro that gets the log service and writes an error message in a
- * single statement. 
- * @param msg Message to log
- * @returns void
- */
-//#define LOGERROR(msg) TskServices::Instance().getLog().log(Log::Error, msg)
-
-/**
- * Macro that gets the log service and writes a warning message in a
- * single statement. 
- * @param msg Message to log
- * @returns void
- */
-//#define LOGWARN(msg) TskServices::Instance().getLog().log(Log::Warn, msg)
-
-
-/**
- * Macro that gets the log service and writes an info message in a
- * single statement. 
- * @param msg Message to log
- * @returns void
- */
-//#define LOGINFO(msg) TskServices::Instance().getLog().log(Log::Info, msg)
-
 
 /**
  * Logging class to enable the framework, apps that use it, and modules to
@@ -53,7 +26,7 @@
  * level, can call the logError(), etc. methods on the class or use the
  * LOGERROR() etc. macros, which will also get the Log service from TskServices.
  */
-class TskLog : public Log
+class TskLog
 {
 public:
     /** 

@@ -140,8 +140,6 @@ void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, con
     {
     }
     sqlite3_close(tmpImgDB);
-    //
-    // update or return progress window values (probably return values to wombatforensics, which calls progress window)
 }
 
 void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg)

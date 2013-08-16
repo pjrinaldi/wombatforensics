@@ -18,7 +18,8 @@
 
 #include <tsk/framework/extraction/TskImageFile.h>
 #include <tsk/framework/services/TskImgDB.h>
-#include <tsk/framework/services/Log.h>
+//#include <tsk/framework/services/Log.h>
+#include "TskLog.h"
 #include <tsk/libtsk.h>
 
 #include <vector>

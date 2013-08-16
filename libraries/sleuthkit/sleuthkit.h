@@ -4,7 +4,8 @@
 #include <main/interfaces.h>
 #include <main/progresswindow.h>
 #include <sqlite3.h>
-#include <tsk/framework/framework.h>
+#include "framework.h"
+//#include <tsk/framework/framework.h>
 #include <time.h>
 #include "TskSystemPropertiesImpl.h"
 #include "TskImgDBSqlite.h"
@@ -13,7 +14,7 @@
 #include "TskFileManagerImpl.h"
 #include "TskImageFileTsk.h"
 #include "TskFileTsk.h"
-//#include "TskServices.h"
+#include "TskServices.h"
 #include "TskLog.h"
 #include <QtPlugin>
 #include <QObject>
@@ -32,7 +33,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGERR(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Error, logMsg)
+#define LOGERROR(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Error, logMsg)
 
 /**
  * Macro that gets the log service and writes a warning message in a
@@ -40,7 +41,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGWRN(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logWarn(caseID, imageID, analysisType, TskLog::Warn, logMsg)
+#define LOGWARN(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logWarn(caseID, imageID, analysisType, TskLog::Warn, logMsg)
 
 /**
  * Macro that gets the log service and writes an info message in a
@@ -48,7 +49,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGINF(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Info, logMsg)
+#define LOGINFO(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Info, logMsg)
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {
@@ -74,7 +75,7 @@ private:
     int currentcaseid;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
-    std::auto_ptr<Log> log;
+    TskLog *log;
     std::auto_ptr<TskImgDB> imgdb;
     TskSchedulerQueue scheduler;
 };
