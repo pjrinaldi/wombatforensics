@@ -38,14 +38,19 @@ public:
         Info    ///< General debugging information
     };
 
-    TskLog();
+    TskLog(int caseID, int imageID, int analysisType);
     virtual ~TskLog();
 
-    virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
-    virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg);
+    void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
+    void log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg);
+    void log(Channel msgType, const std::wstring &logMsg);
+    void log(Channel msgType, const std::string &logMsg);
     void logError(int caseID, int imageID, int analysisType, const std::wstring &logMsg) { log(caseID, imageID, analysisType, TskLog::Error, logMsg); };
     void logWarn(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Warn,  logMsg); };
     void logInfo(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Info,  logMsg); };
+    void logError(const std::wstring &logMsg) { log(TskLog::Error, logMsg); };
+    void logWarn(const std::wstring &logMsg) { log(Tsk::Warn, logMsg); };
+    void logInfo(const std::wstring &logMsg) { log(Tsk::Info, logMsg); };
     int open(const wchar_t * logFileFullPath, const char* dbPath);
     int open(const char * outDir, const char* dbPath);
     int close();
@@ -56,5 +61,8 @@ protected:
     std::string logpath;
     std::string dbpath;
     std::ofstream outstream;
+    int caseid;
+    int imageid;
+    int analysistype;
 };
 #endif
