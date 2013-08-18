@@ -27,7 +27,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGERROR(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Error, logMsg)
+#define LOGERROR(logMsg) TskServices::Instance.getLog().log(TskLog::Error, logMsg)
 
 /**
  * Macro that gets the log service and writes a warning message in a
@@ -35,7 +35,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGWARN(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logWarn(caseID, imageID, analysisType, TskLog::Warn, logMsg)
+#define LOGWARN(logMsg) TskServices::Instance.getLog().log(TskLog::Warn, logMsg)
 
 /**
  * Macro that gets the log service and writes an info message in a
@@ -43,7 +43,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGINFO(caseID, imageID, analysisType, logMsg) TskServices::Instance.getLog().logError(caseID, imageID, analysisType, TskLog::Info, logMsg)
+#define LOGINFO(logMsg) TskServices::Instance.getLog().log(TskLog::Info, logMsg)
 /**
  * Provides singleton access to many framework services.  This is used
  * to register and access the classes that implement the services. 
