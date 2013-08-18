@@ -255,6 +255,8 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
             fprintf(stderr, "TskException: %s\n", ex.message().c_str());
         }
         processCount++;
+        int curprogress = (int)((((float)processCount)/(float)fileCount)*100);
+        progresswindow->UpdateProgressBar(curprogress);
         progresswindow->UpdateFilesProcessed(QString::number(processCount));
     }
     progresswindow->UpdateAnalysisState("Processing Finished");
