@@ -15,6 +15,29 @@
  */
 
 /**
+ * Macro that gets the log service and writes an error message in a
+ * single statement. 
+ * @param msg Message to log
+ * @returns void
+ */
+#define LOGERROR(logMsg) TskServices::Instance.getLog()->log(TskLog::Error, logMsg)
+/*
+ * Macro that gets the log service and writes a warning message in a
+ * single statement. 
+ * @param msg Message to log
+ * @returns void
+ */
+#define LOGWARN(logMsg) TskServices::Instance.getLog()->log(TskLog::Warn, logMsg)
+
+/**
+ * Macro that gets the log service and writes an info message in a
+ * single statement. 
+ * @param msg Message to log
+ * @returns void
+ */
+#define LOGINFO(logMsg) TskServices::Instance.getLog()->log(TskLog::Info, logMsg)
+
+/**
  * Logging class to enable the framework, apps that use it, and modules to
  * log error and warning messages.  The default implementation writes
  * the log messages to a file if open() was called or prints the messages to
@@ -38,7 +61,7 @@ public:
         Info    ///< General debugging information
     };
 
-    TskLog(int caseID, int imageID, int analysisType);
+    TskLog();
     virtual ~TskLog();
 
     void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
@@ -49,13 +72,16 @@ public:
     void logWarn(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Warn,  logMsg); };
     void logInfo(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Info,  logMsg); };
     void logError(const std::wstring &logMsg) { log(TskLog::Error, logMsg); };
-    void logWarn(const std::wstring &logMsg) { log(Tsk::Warn, logMsg); };
-    void logInfo(const std::wstring &logMsg) { log(Tsk::Info, logMsg); };
+    void logWarn(const std::wstring &logMsg) { log(TskLog::Warn, logMsg); };
+    void logInfo(const std::wstring &logMsg) { log(TskLog::Info, logMsg); };
     int open(const wchar_t * logFileFullPath, const char* dbPath);
     int open(const char * outDir, const char* dbPath);
     int close();
     const wchar_t * getLogPathW();
     const char * getLogPath() { return logpath.c_str(); }
+    void SetCaseID(int caseID);
+    void SetImageID(int imageID);
+    void SetAnalysisType(int analysisType);
 
 protected:
     std::string logpath;

@@ -96,12 +96,13 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
         fprintf(stderr, "Setting out dir failed: %s\n", ex.message().c_str());
     }
 }
-void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath)
+void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, int caseID, int imageID, int analysisType)
 {
     QString tmpPath = dataPath;
     tmpPath += logFilePath;
     try
     {
+        //log = new TskLog(caseID, imageID, analysisType);
         log = new TskLog();
         log->open(tmpPath.toStdString().c_str(), dataPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);

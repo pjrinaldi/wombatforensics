@@ -11,6 +11,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatprogresswindow = new ProgressWindow();
     wombatprogresswindow->setModal(false);
     currentcaseid = -1;
+    currentimageid = 0;
+    currentanalysistype = 0;
     QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";
     wombatsettingspath = homePath + "settings";
@@ -123,7 +125,7 @@ QObject* WombatForensics::loadPlugin(QString fileName)
         populateActions(plugin);
         populateTabWidgets(plugin);
         setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
-        setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt");
+        setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt", currentcaseid, currentimageid, currentanalysistype);
         setupSleuthKitSchedulerQueue(plugin);
         setupSleuthKitFileManager(plugin);
     }
@@ -374,12 +376,12 @@ void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString settings
         iSleuthKit->SetupSystemProperties(settingsPath, configFileName);
     }
 }
-void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName)
+void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, int64_t caseID, int64_t imageID, int analysisType)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        iSleuthKit->SetupSystemLog(dataPath, logFileName);
+        iSleuthKit->SetupSystemLog(dataPath, logFileName, (int)caseID, (int)imageID, analysisType);
     }
 }
 QString WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath)

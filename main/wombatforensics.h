@@ -51,7 +51,7 @@ private:
     void populateTabWidgets(QObject *plugin);
     void SetupDirModel(void);
     void setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName);
-    void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName);
+    void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, int64_t caseID, int64_t imageID, int analysisType);
     QString setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);
     void OpenSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);
     void setupSleuthKitBlackboard(QObject *plugin);
@@ -65,6 +65,8 @@ private:
     std::string GetTime(void);
 
     int64_t currentcaseid;
+    int64_t currentimageid;
+    int currentanalysistype;
     QDir pluginsDir;
     QStringList pluginFileNames;
     QString currentcasedirpath;

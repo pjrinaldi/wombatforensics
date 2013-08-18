@@ -22,11 +22,8 @@
 // @@@ imports for directory creation and deletion
 //#include "windows.h"
 
-TskLog::TskLog(int caseID, int imageID, int analysisType) : logpath(""), outstream()
+TskLog::TskLog() : logpath(""), outstream()
 {
-    caseid = caseID;
-    imageid = imageID;
-    analysistype = analysisType;
 }
 
 int TskLog::open(const wchar_t * logFileFullPath, const char* dbPath)
@@ -164,4 +161,16 @@ void TskLog::log(Channel msgType, const std::wstring &logMsg)
 void TskLog::log(Channel msgType, const std::string &logMsg)
 {
     log(caseid, imageid, analysistype, msgType, logMsg);
+}
+void TskLog::SetCaseID(int caseID)
+{
+    caseid = caseID;
+}
+void TskLog::SetImageID(int imageID)
+{
+    imageid = imageID;
+}
+void TskLog::SetAnalysisType(int analysisType)
+{
+    analysistype = analysisType;
 }
