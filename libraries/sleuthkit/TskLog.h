@@ -30,24 +30,26 @@ public:
     TskLog();
     virtual ~TskLog();
 
-    virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
-    virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg);
+    //virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
+    //virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg);
     //virtual void log(Channel msgType, const std::wstring &logMsg);
-    //virtual void log(Channel msgType, const std::string &logMsg);
-    void logError(int caseID, int imageID, int analysisType, const std::wstring &logMsg) { log(caseID, imageID, analysisType, Log::Error, logMsg); };
-    void logWarn(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, Log::Warn,  logMsg); };
-    void logInfo(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, Log::Info,  logMsg); };
+    void log(Channel msgType, const std::string &logMsg);
+    void dblog();
+    //void logError(int caseID, int imageID, int analysisType, const std::wstring &logMsg) { log(caseID, imageID, analysisType, Log::Error, logMsg); };
+    //void logWarn(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, Log::Warn,  logMsg); };
+    //void logInfo(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, Log::Info,  logMsg); };
     //void logError(const std::wstring &logMsg) { log(TskLog::Error, logMsg); };
     //void logWarn(const std::wstring &logMsg) { log(TskLog::Warn, logMsg); };
     //void logInfo(const std::wstring &logMsg) { log(TskLog::Info, logMsg); };
-    int open(const wchar_t * logFileFullPath, const char* dbPath);
-    int open(const char * outDir, const char* dbPath);
+    //int open(const wchar_t * logFileFullPath, const char* dbPath);
+    //int open(const char * outDir, const char* dbPath);
+    //int open(const char *outDir);
     //int close();
     //const wchar_t * getLogPathW();
     //const char * getLogPath() { return logpath.c_str(); }
-    void SetCaseID(int caseID);
-    void SetImageID(int imageID);
-    void SetAnalysisType(int analysisType);
+    //void SetCaseID(int caseID);
+    //void SetImageID(int imageID);
+    //void SetAnalysisType(int analysisType);
 
 protected:
     std::string logpath;

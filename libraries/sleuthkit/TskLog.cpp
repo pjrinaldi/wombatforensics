@@ -26,12 +26,23 @@
 TskLog::TskLog() : Log()
 {
 }
-
+/*
+int open(const char *outDir)
+{
+    Log::open(outDir);
+    fprintf(stderr, "MY OPEN FUNCTION CALL");
+    //LOGINFO("MY OPEN FUNCTION CALL");
+    
+    return 0;
+}
+*/
+/*
 int TskLog::open(const wchar_t * logFileFullPath, const char* dbPath)
 {
     return open(TskUtilities::toUTF8(logFileFullPath).c_str(), dbPath);
 }
-
+*/
+/*
 int TskLog::open(const char * logFileFullPath, const char* dbPath)
 {
     dbpath.assign(dbPath);
@@ -49,10 +60,10 @@ int TskLog::open(const char * logFileFullPath, const char* dbPath)
 
     logpath.assign(logFileFullPath);
     */
-
+/*
     return 0;
 }
-
+*/
 /**
  * Close the opened log file.
  * @returns 0 on success
@@ -72,9 +83,22 @@ TskLog::~TskLog()
 {
     Log::close();
 }
-
-void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg)
+void TskLog::log(Channel msgType, const std::string &logMsg)
 {
+    Log::log(msgType, logMsg);
+    fprintf(stderr, "MY LOG FUNCTION CALL\n");
+    dblog();
+    //LOGINFO("MY LOG function call");
+}
+/*
+void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg)
+*/
+void TskLog::dblog()
+{
+    int caseID = 0;
+    int imageID = 0;
+    int analysisType = 0;
+    outstream();
     std::string level;
     switch (msgType) {
     case Error:
@@ -147,13 +171,15 @@ void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, con
     }
     sqlite3_close(tmpImgDB);
     
-    Log::log(msgType, logMsg);
+    //Log::log(msgType, logMsg);
 }
-
+*/
+/*
 void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg)
 {
     log(caseID, imageID, analysisType, msgType, TskUtilities::toUTF8(logMsg));
 }
+*/
 /**
  * Return the path to the log file.
  * @returns path to log or NULL if log is going to STDERR
@@ -174,6 +200,7 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
     log(caseid, imageid, analysistype, msgType, logMsg);
 }
 */
+/*
 void TskLog::SetCaseID(int caseID)
 {
     caseid = caseID;
@@ -186,3 +213,4 @@ void TskLog::SetAnalysisType(int analysisType)
 {
     analysistype = analysisType;
 }
+*/
