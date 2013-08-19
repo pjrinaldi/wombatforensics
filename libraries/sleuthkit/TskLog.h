@@ -34,7 +34,7 @@ public:
     //virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg);
     //virtual void log(Channel msgType, const std::wstring &logMsg);
     void log(Channel msgType, const std::string &logMsg);
-    void dblog();
+    //void dblog();
     //void logError(int caseID, int imageID, int analysisType, const std::wstring &logMsg) { log(caseID, imageID, analysisType, Log::Error, logMsg); };
     //void logWarn(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, Log::Warn,  logMsg); };
     //void logInfo(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, Log::Info,  logMsg); };
