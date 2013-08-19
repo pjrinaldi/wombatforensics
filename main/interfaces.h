@@ -43,7 +43,7 @@ public:
     virtual ~SleuthKitInterface() {}
 
     virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
-    virtual void SetupSystemLog(QString dataPath, QString logFilePath) = 0;
+    virtual void SetupSystemLog(QString dataPath, QString logFilePath, int caseID, int imageID, int analysisType) = 0;
     virtual QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
     virtual void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
     virtual void SetupSystemBlackboard() = 0;
