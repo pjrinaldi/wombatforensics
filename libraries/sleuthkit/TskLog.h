@@ -3,6 +3,7 @@
 
 //#include "tsk/framework/services/Log.h"
 #include <time.h>
+#include <tsk/framework/framework_i.h>
 #include <sqlite3.h>
 #include <string>
 #include <iostream>
@@ -20,14 +21,14 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGERROR(logMsg) TskServices::Instance.getLog()->log(TskLog::Error, logMsg)
+#define LOGERROR(logMsg) TskServices::Instance().getLog().log(TskLog::Error, logMsg)
 /*
  * Macro that gets the log service and writes a warning message in a
  * single statement. 
  * @param msg Message to log
  * @returns void
  */
-#define LOGWARN(logMsg) TskServices::Instance.getLog()->log(TskLog::Warn, logMsg)
+#define LOGWARN(logMsg) TskServices::Instance().getLog().log(TskLog::Warn, logMsg)
 
 /**
  * Macro that gets the log service and writes an info message in a
@@ -35,7 +36,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGINFO(logMsg) TskServices::Instance.getLog()->log(TskLog::Info, logMsg)
+#define LOGINFO(logMsg) TskServices::Instance().getLog().log(TskLog::Info, logMsg)
 
 /**
  * Logging class to enable the framework, apps that use it, and modules to
@@ -64,10 +65,10 @@ public:
     TskLog();
     virtual ~TskLog();
 
-    void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
-    void log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg);
-    void log(Channel msgType, const std::wstring &logMsg);
-    void log(Channel msgType, const std::string &logMsg);
+    virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
+    virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg);
+    virtual void log(Channel msgType, const std::wstring &logMsg);
+    virtual void log(Channel msgType, const std::string &logMsg);
     void logError(int caseID, int imageID, int analysisType, const std::wstring &logMsg) { log(caseID, imageID, analysisType, TskLog::Error, logMsg); };
     void logWarn(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Warn,  logMsg); };
     void logInfo(int caseID, int imageID, int analysisType, const std::wstring &logMsg)  { log(caseID, imageID, analysisType, TskLog::Info,  logMsg); };

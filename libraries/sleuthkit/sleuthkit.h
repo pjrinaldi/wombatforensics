@@ -14,8 +14,8 @@
 #include "TskFileManagerImpl.h"
 #include "TskImageFileTsk.h"
 #include "TskFileTsk.h"
-#include "TskServices.h"
 #include "TskLog.h"
+#include "TskServices.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QString>
@@ -51,7 +51,7 @@ private:
     int currentcaseid;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
-    TskLog *log;
+    std::auto_ptr<TskLog> log;
     std::auto_ptr<TskImgDB> imgdb;
     TskSchedulerQueue scheduler;
 };

@@ -103,7 +103,7 @@ void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, int 
     try
     {
         //log = new TskLog(caseID, imageID, analysisType);
-        log = new TskLog();
+        log = std::auto_ptr<TskLog>(new TskLog());
         log->open(tmpPath.toStdString().c_str(), dataPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");
