@@ -5,7 +5,6 @@
 #include <main/progresswindow.h>
 #include <sqlite3.h>
 #include "framework.h"
-//#include <tsk/framework/framework.h>
 #include <time.h>
 #include "TskSystemPropertiesImpl.h"
 #include "TskImgDBSqlite.h"

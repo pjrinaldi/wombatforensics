@@ -21,7 +21,6 @@
 
 #include "TskServices.h"
 #include "TskLog.h"
-//#include "tsk/framework/services/Log.h"
 #include "tsk/framework/services/TskImgDB.h"
 #include "tsk/framework/services/Scheduler.h"
 #include "tsk/framework/services/TskSystemProperties.h"

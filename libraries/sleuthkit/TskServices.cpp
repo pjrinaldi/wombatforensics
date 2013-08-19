@@ -12,7 +12,7 @@
 
 #include "TskServices.h"
 #include "tsk/framework/utilities/TskException.h"
-#include "tsk/framework/services/TskSystemPropertiesImpl.h"
+#include "TskSystemPropertiesImpl.h"
 
 TskServices *TskServices::m_pInstance = NULL;
 

@@ -13,10 +13,10 @@
 
 #include "TskDBBlackboard.h"
 #include "tsk/framework/services/TskImgDB.h"
-#include "tsk/framework/services/TskServices.h"
-#include "tsk/framework/file/TskFileTsk.h"
+#include "TskServices.h"
+#include "TskFileTsk.h"
 #include "tsk/framework/file/TskFile.h"
-#include "tsk/framework/file/TskFileManagerImpl.h"
+#include "TskFileManagerImpl.h"
 
 TskDBBlackboard * TskDBBlackboard::m_pInstance = NULL;
 

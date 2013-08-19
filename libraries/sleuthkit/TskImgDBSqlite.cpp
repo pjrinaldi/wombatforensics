@@ -27,7 +27,7 @@
 #include "Poco/Thread.h"
 
 #include "TskImgDBSqlite.h"
-#include "tsk/framework/services/TskServices.h"
+#include "TskServices.h"
 #include "tsk/framework/utilities/TskException.h"
 #include "TskDBBlackboard.h"
 

@@ -1,7 +1,6 @@
 #ifndef TSKLOG_H
 #define TSKLOG_H
 
-//#include "tsk/framework/services/Log.h"
 #include <time.h>
 #include <tsk/framework/framework_i.h>
 #include <sqlite3.h>

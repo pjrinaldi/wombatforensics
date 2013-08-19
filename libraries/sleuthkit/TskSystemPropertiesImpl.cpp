@@ -17,8 +17,8 @@
 // Include the class definition first to ensure it does not depend on subsequent includes in this file.
 #include "TskSystemPropertiesImpl.h"
 
-#include "tsk/framework/services/Log.h"
-#include "tsk/framework/services/TskServices.h"
+#include "TskLog.h"
+#include "TskServices.h"
 #include "tsk/framework/utilities/TskUtilities.h"
 #include "tsk/framework/utilities/TskException.h"
 #include "Poco/Util/XMLConfiguration.h"
