@@ -4,7 +4,7 @@
 #include <main/interfaces.h>
 #include <main/progresswindow.h>
 #include <sqlite3.h>
-#include "framework.h"
+#include <tsk/framework/framework.h>
 #include <time.h>
 #include "TskSystemPropertiesImpl.h"
 #include "TskImgDBSqlite.h"
@@ -14,7 +14,6 @@
 #include "TskImageFileTsk.h"
 #include "TskFileTsk.h"
 #include "TskLog.h"
-#include "TskServices.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QString>

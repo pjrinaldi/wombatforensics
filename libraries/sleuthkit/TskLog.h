@@ -2,6 +2,7 @@
 #define TSKLOG_H
 
 #include <time.h>
+#include <tsk/framework/services/Log.h>
 #include <tsk/framework/framework_i.h>
 #include <sqlite3.h>
 #include <string>
@@ -20,14 +21,14 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGERROR(logMsg) TskServices::Instance().getLog().log(TskLog::Error, logMsg)
+//#define LOGERROR(logMsg) TskServices::Instance().getLog().log(TskLog::Error, logMsg)
 /*
  * Macro that gets the log service and writes a warning message in a
  * single statement. 
  * @param msg Message to log
  * @returns void
  */
-#define LOGWARN(logMsg) TskServices::Instance().getLog().log(TskLog::Warn, logMsg)
+//#define LOGWARN(logMsg) TskServices::Instance().getLog().log(TskLog::Warn, logMsg)
 
 /**
  * Macro that gets the log service and writes an info message in a
@@ -35,7 +36,7 @@
  * @param msg Message to log
  * @returns void
  */
-#define LOGINFO(logMsg) TskServices::Instance().getLog().log(TskLog::Info, logMsg)
+//#define LOGINFO(logMsg) TskServices::Instance().getLog().log(TskLog::Info, logMsg)
 
 /**
  * Logging class to enable the framework, apps that use it, and modules to
@@ -49,7 +50,7 @@
  * level, can call the logError(), etc. methods on the class or use the
  * LOGERROR() etc. macros, which will also get the Log service from TskServices.
  */
-class TskLog
+class TskLog : public Log
 {
 public:
     /** 

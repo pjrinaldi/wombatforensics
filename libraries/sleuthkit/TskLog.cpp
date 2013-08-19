@@ -22,7 +22,7 @@
 // @@@ imports for directory creation and deletion
 //#include "windows.h"
 
-TskLog::TskLog() : logpath(""), outstream()
+TskLog::TskLog() : Log(), logpath(""), outstream()
 {
 }
 
