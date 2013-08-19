@@ -49,7 +49,7 @@ private:
     int currentcaseid;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
-    std::auto_ptr<TskLog> log;
+    std::auto_ptr<Log> log;
     std::auto_ptr<TskImgDB> imgdb;
     TskSchedulerQueue scheduler;
 };

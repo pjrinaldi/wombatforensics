@@ -22,7 +22,8 @@
 // @@@ imports for directory creation and deletion
 //#include "windows.h"
 
-TskLog::TskLog() : Log(), logpath(""), outstream()
+//TskLog::TskLog() : Log(), logpath(""), outstream()
+TskLog::TskLog() : Log()
 {
 }
 
@@ -33,7 +34,11 @@ int TskLog::open(const wchar_t * logFileFullPath, const char* dbPath)
 
 int TskLog::open(const char * logFileFullPath, const char* dbPath)
 {
-    close(); // if needed
+    dbpath.assign(dbPath);
+
+    Log::open(logFileFullPath);
+    /*
+    Log::close(); // if needed
 
     try {
         outstream.open(logFileFullPath, std::ios::app);
@@ -43,7 +48,7 @@ int TskLog::open(const char * logFileFullPath, const char* dbPath)
     }
 
     logpath.assign(logFileFullPath);
-    dbpath.assign(dbPath);
+    */
 
     return 0;
 }
@@ -52,6 +57,7 @@ int TskLog::open(const char * logFileFullPath, const char* dbPath)
  * Close the opened log file.
  * @returns 0 on success
  */
+/*
 int TskLog::close()
 {
     outstream.close();
@@ -61,10 +67,10 @@ int TskLog::close()
     }
     return 0;
 }
-
+*/
 TskLog::~TskLog()
 {
-    close();
+    Log::close();
 }
 
 void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, const std::string &logMsg)
@@ -140,6 +146,8 @@ void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, con
     {
     }
     sqlite3_close(tmpImgDB);
+    
+    Log::log(msgType, logMsg);
 }
 
 void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg)
@@ -150,10 +158,13 @@ void TskLog::log(int caseID, int imageID, int analysisType, Channel msgType, con
  * Return the path to the log file.
  * @returns path to log or NULL if log is going to STDERR
  */
+/*
 const wchar_t * TskLog::getLogPathW()
 {
     return (const wchar_t *)TskUtilities::toUTF16(logpath).c_str();
 }
+*/
+/*
 void TskLog::log(Channel msgType, const std::wstring &logMsg)
 {
     log(caseid, imageid, analysistype, msgType, TskUtilities::toUTF8(logMsg));
@@ -162,6 +173,7 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
 {
     log(caseid, imageid, analysistype, msgType, logMsg);
 }
+*/
 void TskLog::SetCaseID(int caseID)
 {
     caseid = caseID;
