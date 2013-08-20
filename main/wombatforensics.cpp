@@ -31,7 +31,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     mkPath = (new QDir())->mkpath(wombattmpfilepath);
     if(mkPath == false)
         wombatCaseData->DisplayError(this, "2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
-    QString tmpPath = wombatdatapath + "WombatData.db";
+    QString logPath = wombatdatapath + "WombatLog.db";
+    bool logFileExist = wombatCaseData->FileExists(logPath.toStdString());
+    if(!logFileExist)
+    {
+        const char* errstring = wombatCaseData->CreateLogDB(logPath);
+        if(strcmp(errstring, "") != 0)
+            wombatCaseData->DisplayError(this, "1.0", "Log File Error", errstring);
+    }
+    QString tmpPath = wombatdatapath + "WombatCase.db";
     bool doesFileExist = wombatCaseData->FileExists(tmpPath.toStdString());
     if(!doesFileExist)
     {

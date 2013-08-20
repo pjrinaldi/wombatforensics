@@ -85,7 +85,7 @@ TskLog::~TskLog()
 }
 void TskLog::log(Channel msgType, const std::string &logMsg)
 {
-    std::string dbpath = "/home/pasquale/WombatForensics/data/WombatData.db";
+    std::string dbpath = "/home/pasquale/WombatForensics/data/WombatLog.db";
     Log::log(msgType, logMsg);
     fprintf(stderr, "MY LOG FUNCTION CALL\n");
     int caseID = 0;
@@ -118,7 +118,7 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
     if(sqlite3_open(dbpath.c_str(), &tmpImgDB) == SQLITE_OK)
     {
         sqlite3_stmt* stmt;
-        if(sqlite3_prepare_v2(tmpImgDB, "INSERT INTO log (caseid, imageid, analysistype, msgtype, msgdatetime, logmsg) VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, 0) == SQLITE_OK)
+        if(sqlite3_prepare_v2(tmpImgDB, "INSERT INTO log (caseid, imageid, analysistype, msgtype, msgdatetime, msg) VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, 0) == SQLITE_OK)
         {
             if(sqlite3_bind_int(stmt, 1, caseID) == SQLITE_OK)
             {
@@ -135,26 +135,40 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
                                     int ret = sqlite3_step(stmt);
                                     if(ret == SQLITE_ROW || ret == SQLITE_DONE)
                                     {
-                                        fprintf(stderr, "this should have worked...");
+                                        //fprintf(stderr, "this should have worked...");
                                     }
                                     else
                                     {
                                         fprintf(stderr, "Error: %s\n", sqlite3_errmsg(tmpImgDB));
                                     }
                                 }
+                                else
+                                    fprintf(stderr, "Error: %s\n", sqlite3_errmsg(tmpImgDB));
                             }
+                            else
+                                fprintf(stderr, "Error: %s\n", sqlite3_errmsg(tmpImgDB));
                         }
+                        else
+                            fprintf(stderr, "Error: %s\n", sqlite3_errmsg(tmpImgDB));
                     }
+                    else
+                        fprintf(stderr, "Error: %s\n", sqlite3_errmsg(tmpImgDB));
                 }
+                else
+                    fprintf(stderr, "Error: %s\n", sqlite3_errmsg(tmpImgDB));
             }
+            else
+                fprintf(stderr, "Error: %s\n", sqlite3_errmsg(tmpImgDB));
         }
         else
         {
+            fprintf(stderr, "Error: %s\n", sqlite3_errmsg(tmpImgDB));
         }
         sqlite3_finalize(stmt);
     }
     else
     {
+        fprintf(stderr, "Error: %s\n", sqlite3_errmsg(tmpImgDB));
     }
     sqlite3_close(tmpImgDB);
 

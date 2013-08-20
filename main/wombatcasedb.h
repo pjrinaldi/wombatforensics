@@ -21,6 +21,7 @@ public:
     WombatCaseDb(QWidget *Parent);
     bool FileExists(const std::string& fileName);
     void DisplayError(QWidget *parent, QString errorNumber, QString errorType, QString errorValue);
+    const char *CreateLogDB(QString dbname);
     const char *CreateCaseDB(QString dbname);
     const char *OpenCaseDB(QString dbname);
     const char *CloseCaseDB();
@@ -36,8 +37,10 @@ public:
 
 private:
     sqlite3 *wombatdb;
+    sqlite3 *logdb;
     QWidget *wombatparent;
     sqlite3_stmt *sqlstatement;
+    sqlite3_stmt *logstatement;
 };
 
 #endif // WOMBATCASEDB_H
