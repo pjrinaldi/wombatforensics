@@ -219,7 +219,7 @@ void WombatForensics::alterEvidence()
             wombatprogresswindow->UpdateAnalysisState("Adding Image to Database");
             currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
-            wombatCaseData->InsertImage(evidenceName, evidenceFilePath, wombatvariable->GetCaseID());
+            wombatvariable->SetImageID(wombatCaseData->InsertImage(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
             // need to populate the directory tree entries
             QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());

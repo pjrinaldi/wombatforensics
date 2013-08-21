@@ -29,7 +29,7 @@ public:
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
     int64_t InsertCase(QString caseText);
-    void InsertImage(QString imageName, QString imageFilePath, int caseID);
+    int64_t InsertImage(QString imageName, QString imageFilePath, int caseID);
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
     QStringList ReturnCaseImages(int caseID);
