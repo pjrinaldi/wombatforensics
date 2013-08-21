@@ -4,14 +4,7 @@ WombatCaseDb::WombatCaseDb(QWidget *Parent)
 {
     wombatparent = Parent;
 }
-// Function: fileExists
-/**
-    Check if a file exists
-@param[in] filename - the name of the file to check
 
-@return    true if the file exists, else false
-
-*/
 std::string WombatCaseDb::GetTime()
 {
     struct tm *newtime;
@@ -44,7 +37,6 @@ void WombatCaseDb::DisplayError(QWidget *parent, QString errorNumber, QString er
     tmpString += errorType;
     tmpString += " Returned ";
     tmpString += errorValue;
-    //errlog->log(SqlErrLog::Error, tmpString.toStdString().c_str());
     QMessageBox::warning(parent, "Error", tmpString, QMessageBox::Ok);
 }
 
@@ -52,9 +44,8 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
 {
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
-    wombatTableSchema.push_back("CREATE TABLE log(logid INTEGER PRIMARY KEY, caseid INTEGER, imageid INTEGER, analysistype INTEGER, msgtype INTEGER, msgdatetime TEXT, logmsg TEXT);");
     wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, casename TEXT, creation TEXT);");
-    wombatTableSchema.push_back("CREATE TABLE caseimages(imageid INTEGER PRIMARY KEY, imagefullpath TEXT, imagename TEXT, caseid INTEGER, creation TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE images(imageid INTEGER PRIMARY KEY, imagefullpath TEXT, imagename TEXT, caseid INTEGER, creation TEXT);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, settingname TEXT, settingvalue TEXT, settingtype INT);");
 
     if(sqlite3_open(wombatdbname.toStdString().c_str(), &wombatdb) == SQLITE_OK)
@@ -219,7 +210,7 @@ int WombatCaseDb::ReturnCaseID(QString caseName)
 
 void WombatCaseDb::InsertImage(QString imageName, QString imageFilePath, int caseID)
 {
-    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO caseimages (imagefullpath, imagename, caseid, creation) VALUES(?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO images (imagefullpath, imagename, caseid, creation) VALUES(?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_text(sqlstatement, 1, imageFilePath.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
@@ -256,7 +247,7 @@ void WombatCaseDb::InsertImage(QString imageName, QString imageFilePath, int cas
 QStringList WombatCaseDb::ReturnCaseImages(int caseID)
 {
     QStringList tmpList;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT imagefullpath FROM caseimages WHERE caseid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT imagefullpath FROM images WHERE caseid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(sqlstatement, 1, caseID) == SQLITE_OK)
         {
