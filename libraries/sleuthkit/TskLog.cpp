@@ -23,8 +23,9 @@
 //#include "windows.h"
 
 //TskLog::TskLog() : Log(), logpath(""), outstream()
-TskLog::TskLog() : Log()
+TskLog::TskLog(WombatVariable *logVariable) : Log()
 {
+    logvariable = logVariable;
 }
 /*
 int open(const char *outDir)
@@ -120,11 +121,14 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
         sqlite3_stmt* stmt;
         if(sqlite3_prepare_v2(tmpImgDB, "INSERT INTO log (caseid, imageid, analysistype, msgtype, msgdatetime, msg) VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, 0) == SQLITE_OK)
         {
-            if(sqlite3_bind_int(stmt, 1, caseID) == SQLITE_OK)
+            //if(sqlite3_bind_int(stmt, 1, caseID) == SQLITE_OK)
+            if(sqlite3_bind_int(stmt, 1, logvariable->GetCaseID()) == SQLITE_OK)
             {
-                if(sqlite3_bind_int(stmt, 2, imageID) == SQLITE_OK)
+                //if(sqlite3_bind_int(stmt, 2, imageID) == SQLITE_OK)
+                if(sqlite3_bind_int(stmt, 2, logvariable->GetImageID()) == SQLITE_OK)
                 {
-                    if(sqlite3_bind_int(stmt, 3, analysisType) == SQLITE_OK)
+                    //if(sqlite3_bind_int(stmt, 3, analysisType) == SQLITE_OK)
+                    if(sqlite3_bind_int(stmt, 3, logvariable->GetAnalysisType()) == SQLITE_OK)
                     {
                         if(sqlite3_bind_int(stmt, 4, msgType) == SQLITE_OK)
                         {

@@ -1,18 +1,22 @@
-#include "interfaces.h"
+//#include "interfaces.h"
 #include "wombatforensics.h"
-#include "wombatcasedb.h"
+//#include "wombatcasedb.h"
 
 #include <QPluginLoader>
 
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
     ui->setupUi(this);
+    wombatvariable = new WombatVariable();
     wombatCaseData = new WombatCaseDb(this);
     wombatprogresswindow = new ProgressWindow();
     wombatprogresswindow->setModal(false);
     currentcaseid = -1;
     currentimageid = 0;
     currentanalysistype = 0;
+    wombatvariable->SetCaseID(0);
+    wombatvariable->SetImageID(0);
+    wombatvariable->SetAnalysisType(0);
     QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";
     wombatsettingspath = homePath + "settings";
@@ -133,7 +137,8 @@ QObject* WombatForensics::loadPlugin(QString fileName)
         populateActions(plugin);
         populateTabWidgets(plugin);
         setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
-        setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt", currentcaseid, currentimageid, currentanalysistype);
+        setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt", wombatvariable);
+        //setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt", currentcaseid, currentimageid, currentanalysistype);
         setupSleuthKitSchedulerQueue(plugin);
         setupSleuthKitFileManager(plugin);
     }
@@ -222,7 +227,8 @@ void WombatForensics::alterEvidence()
             wombatprogresswindow->UpdateAnalysisState("Adding Image to Database");
             currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
-            wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
+            //wombatCaseData->InsertImage(evidenceName, evidenceFilePath, currentcaseid);
+            wombatCaseData->InsertImage(evidenceName, evidenceFilePath, wombatvariable->GetCaseID());
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
             // need to populate the directory tree entries
             QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());
@@ -232,7 +238,8 @@ void WombatForensics::alterEvidence()
        }
     }
     else if(action->text() == tr("Remove Evidence"))
-        iEvidence->remEvidence(currentcaseid);
+        iEvidence->remEvidence(wombatvariable->GetCaseID());
+        //iEvidence->remEvidence(currentcaseid);
 }
 
 WombatForensics::~WombatForensics()
@@ -245,7 +252,8 @@ void WombatForensics::on_actionNew_Case_triggered()
 {
     int ret = QMessageBox::Yes;
     // determine if a case is open
-    if(currentcaseid > 0) // a case is open, provide action dialog first
+    //if(currentcaseid > 0) // a case is open, provide action dialog first
+    if(wombatvariable->GetCaseID() > 0)
     {
         ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
     }
@@ -256,14 +264,16 @@ void WombatForensics::on_actionNew_Case_triggered()
         QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
         if(ok && !text.isEmpty())
         {
-            currentcaseid = wombatCaseData->InsertCase(text);
+            //currentcaseid = wombatCaseData->InsertCase(text);
+            wombatvariable->SetCaseID(wombatCaseData->InsertCase(text));
 
             QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += text;
             this->setWindowTitle(tmpTitle); // update application window.
             // make Cases Folder
             QString userPath = wombatcasespath;
-            userPath += QString::number(currentcaseid);
+            //userPath += QString::number(currentcaseid);
+            userPath += QString::number(wombatvariable->GetCaseID());
             userPath += "-";
             userPath += text;
             userPath += "/";
@@ -305,7 +315,8 @@ void WombatForensics::on_actionOpen_Case_triggered()
 {
     int ret = QMessageBox::Yes;
     // determine if a case is open
-    if(currentcaseid > 0) // a case is open, provide action dialog first
+    //if(currentcaseid > 0) // a case is open, provide action dialog first
+    if(wombatvariable->GetCaseID() > 0)
     {
         ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
     }
@@ -320,12 +331,14 @@ void WombatForensics::on_actionOpen_Case_triggered()
         QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
         if(ok && !item.isEmpty()) // open selected case
         {
-            currentcaseid = wombatCaseData->ReturnCaseID(item);
+            //currentcaseid = wombatCaseData->ReturnCaseID(item);
+            wombatvariable->SetCaseID(wombatCaseData->ReturnCaseID(item));
             QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += item;
             this->setWindowTitle(tmpTitle);
             QString userPath = wombatcasespath;
-            userPath += QString::number(currentcaseid);
+            //userPath += QString::number(currentcaseid);
+            userPath += QString::number(wombatvariable->GetCaseID());
             userPath += "-";
             userPath += item;
             userPath += "/";
@@ -356,7 +369,8 @@ void WombatForensics::on_actionOpen_Case_triggered()
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
             QString caseimage;
-            QStringList caseimageList = wombatCaseData->ReturnCaseImages(currentcaseid); // fullimagepath list
+            //QStringList caseimageList = wombatCaseData->ReturnCaseImages(currentcaseid); // fullimagepath list
+            QStringList caseimageList = wombatCaseData->ReturnCaseImages(wombatvariable->GetCaseID());
             foreach(caseimage, caseimageList)
             {
                 OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
@@ -384,12 +398,14 @@ void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString settings
         iSleuthKit->SetupSystemProperties(settingsPath, configFileName);
     }
 }
-void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, int64_t caseID, int64_t imageID, int analysisType)
+//void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, int64_t caseID, int64_t imageID, int analysisType)
+void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, WombatVariable *wombatVariable)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        iSleuthKit->SetupSystemLog(dataPath, logFileName, (int)caseID, (int)imageID, analysisType);
+        iSleuthKit->SetupSystemLog(dataPath, logFileName, wombatVariable);
+        //iSleuthKit->SetupSystemLog(dataPath, logFileName, (int)caseID, (int)imageID, analysisType);
     }
 }
 QString WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath)

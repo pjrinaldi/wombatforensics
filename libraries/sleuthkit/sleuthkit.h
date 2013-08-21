@@ -3,6 +3,7 @@
 
 #include <main/interfaces.h>
 #include <main/progresswindow.h>
+#include <main/wombatvariable.h>
 #include <sqlite3.h>
 #include <tsk/framework/framework.h>
 #include <time.h>
@@ -34,7 +35,8 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
 public:
     //SleuthKit Interface Functions
     void SetupSystemProperties(QString settingsPath, QString configFilePath);
-    void SetupSystemLog(QString dataPath, QString logFilePath, int caseID, int imageID, int analysisType);
+    //void SetupSystemLog(QString dataPath, QString logFilePath, int caseID, int imageID, int analysisType);
+    void SetupSystemLog(QString dataPath, QString logFilePath, WombatVariable *wombatVariable);
     QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void SetupSystemBlackboard();
@@ -47,6 +49,7 @@ public:
 
 private:
     int currentcaseid;
+    WombatVariable *sleuthvariable;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
     std::auto_ptr<Log> log;

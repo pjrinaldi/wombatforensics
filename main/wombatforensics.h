@@ -16,6 +16,7 @@
 #include <QString>
 
 #include "interfaces.h"
+#include "wombatvariable.h"
 #include "wombatcasedb.h"
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
@@ -32,6 +33,7 @@ public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
     WombatCaseDb *wombatCaseData;
+    WombatVariable *wombatvariable;
     ProgressWindow* wombatprogresswindow;
 
 private slots:
@@ -51,7 +53,8 @@ private:
     void populateTabWidgets(QObject *plugin);
     void SetupDirModel(void);
     void setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName);
-    void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, int64_t caseID, int64_t imageID, int analysisType);
+    void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, WombatVariable *wombatVariable);
+    //void setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, int64_t caseID, int64_t imageID, int analysisType);
     QString setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);
     void OpenSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath);
     void setupSleuthKitBlackboard(QObject *plugin);

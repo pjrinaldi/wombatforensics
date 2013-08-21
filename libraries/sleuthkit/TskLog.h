@@ -2,6 +2,7 @@
 #define TSKLOG_H
 
 #include <time.h>
+#include <main/wombatvariable.h>
 #include <tsk/framework/services/Log.h>
 #include <tsk/framework/framework_i.h>
 #include <sqlite3.h>
@@ -27,7 +28,7 @@ public:
     };
     */
 
-    TskLog();
+    TskLog(WombatVariable *logVariable);
     virtual ~TskLog();
 
     //virtual void log(int caseID, int imageID, int analysisType, Channel msgType, const std::wstring &logMsg);
@@ -58,5 +59,6 @@ protected:
     int caseid;
     int imageid;
     int analysistype;
+    WombatVariable *logvariable;
 };
 #endif
