@@ -206,15 +206,19 @@ public:
         ProgressWindow->setWindowTitle(QApplication::translate("ProgressWindow", "Progress Window", 0));
         groupBox_2->setTitle(QApplication::translate("ProgressWindow", "Processing Jobs", 0));
         QTreeWidgetItem *___qtreewidgetitem = analysisTreeWidget->headerItem();
-        ___qtreewidgetitem->setText(0, QApplication::translate("ProgressWindow", "1", 0));
+        ___qtreewidgetitem->setText(1, QApplication::translate("ProgressWindow", "Process ID", 0));
+        ___qtreewidgetitem->setText(0, QApplication::translate("ProgressWindow", "Job Type", 0));
 
         const bool __sortingEnabled = analysisTreeWidget->isSortingEnabled();
         analysisTreeWidget->setSortingEnabled(false);
         QTreeWidgetItem *___qtreewidgetitem1 = analysisTreeWidget->topLevelItem(0);
+        ___qtreewidgetitem1->setText(1, QApplication::translate("ProgressWindow", "0", 0));
         ___qtreewidgetitem1->setText(0, QApplication::translate("ProgressWindow", "Add Evidence Jobs", 0));
         QTreeWidgetItem *___qtreewidgetitem2 = analysisTreeWidget->topLevelItem(1);
+        ___qtreewidgetitem2->setText(1, QApplication::translate("ProgressWindow", "0", 0));
         ___qtreewidgetitem2->setText(0, QApplication::translate("ProgressWindow", "Additional Analysis Jobs", 0));
         QTreeWidgetItem *___qtreewidgetitem3 = analysisTreeWidget->topLevelItem(2);
+        ___qtreewidgetitem3->setText(1, QApplication::translate("ProgressWindow", "0", 0));
         ___qtreewidgetitem3->setText(0, QApplication::translate("ProgressWindow", "Remove Evidence Jobs", 0));
         analysisTreeWidget->setSortingEnabled(__sortingEnabled);
 

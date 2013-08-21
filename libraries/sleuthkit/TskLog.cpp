@@ -36,7 +36,7 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
 {
     std::string dbpath = "/home/pasquale/WombatForensics/data/WombatLog.db";
     Log::log(msgType, logMsg);
-    fprintf(stderr, "MY LOG FUNCTION CALL\n");
+    //fprintf(stderr, "MY LOG FUNCTION CALL\n");
     int caseID = 0;
     int imageID = 0;
     int analysisType = 0;

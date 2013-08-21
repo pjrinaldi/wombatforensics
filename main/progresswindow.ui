@@ -47,22 +47,36 @@
           </attribute>
           <column>
            <property name="text">
-            <string>1</string>
+            <string>Job Type</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Process ID</string>
            </property>
           </column>
           <item>
            <property name="text">
             <string>Add Evidence Jobs</string>
            </property>
+           <property name="text">
+            <string>0</string>
+           </property>
           </item>
           <item>
            <property name="text">
             <string>Additional Analysis Jobs</string>
            </property>
+           <property name="text">
+            <string>0</string>
+           </property>
           </item>
           <item>
            <property name="text">
             <string>Remove Evidence Jobs</string>
+           </property>
+           <property name="text">
+            <string>0</string>
            </property>
           </item>
          </widget>
