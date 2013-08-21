@@ -386,7 +386,7 @@ void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QStri
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        iSleuthKit->SetupSystemLog(dataPath, logFileName, wombatVariable);
+        iSleuthKit->SetupSystemLog(dataPath, logFileName, wombatprogresswindow, wombatVariable);
     }
 }
 QString WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath)

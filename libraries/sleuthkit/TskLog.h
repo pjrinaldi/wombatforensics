@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <main/wombatvariable.h>
+#include <main/progresswindow.h>
 #include <tsk/framework/services/Log.h>
 #include <tsk/framework/framework_i.h>
 #include <sqlite3.h>
@@ -14,7 +15,7 @@ class TskLog : public Log
 {
 public:
 
-    TskLog(WombatVariable *logVariable);
+    TskLog(ProgressWindow *progressWindow, WombatVariable *logVariable);
     virtual ~TskLog();
 
     void log(Channel msgType, const std::string &logMsg);
@@ -27,6 +28,7 @@ protected:
     int imageid;
     int analysistype;
     WombatVariable *logvariable;
+    ProgressWindow* progresswindow;
 
 };
 #endif

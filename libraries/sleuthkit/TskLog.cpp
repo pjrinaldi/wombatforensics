@@ -22,8 +22,9 @@
 // @@@ imports for directory creation and deletion
 //#include "windows.h"
 
-TskLog::TskLog(WombatVariable *logVariable) : Log()
+TskLog::TskLog(ProgressWindow *progressWindow, WombatVariable *logVariable) : Log()
 {
+    progresswindow = progressWindow;
     logvariable = logVariable;
 }
 

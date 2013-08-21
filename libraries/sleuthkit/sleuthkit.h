@@ -35,7 +35,7 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
 public:
     //SleuthKit Interface Functions
     void SetupSystemProperties(QString settingsPath, QString configFilePath);
-    void SetupSystemLog(QString dataPath, QString logFilePath, WombatVariable *wombatVariable);
+    void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable);
     QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void SetupSystemBlackboard();

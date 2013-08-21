@@ -96,13 +96,13 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
         fprintf(stderr, "Setting out dir failed: %s\n", ex.message().c_str());
     }
 }
-void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, WombatVariable *wombatVariable)
+void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable)
 {
     QString tmpPath = dataPath;
     tmpPath += logFilePath;
     try
     {
-        log = std::auto_ptr<Log>(new TskLog(wombatVariable));
+        log = std::auto_ptr<Log>(new TskLog(progressWindow, wombatVariable));
         log->open(tmpPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");
