@@ -44,7 +44,6 @@ public:
     virtual ~SleuthKitInterface() {}
 
     virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
-    //virtual void SetupSystemLog(QString dataPath, QString logFilePath, int caseID, int imageID, int analysisType) = 0;
     virtual void SetupSystemLog(QString dataPath, QString logFilePath, WombatVariable *wombatVariable) = 0;
     virtual QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
     virtual void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
@@ -56,18 +55,7 @@ public:
     virtual QString GetFileContents(int fileID) = 0;
     virtual QString GetFileTxtContents(int fileID) = 0;
 };
-/*
-class ProgressWindowInterface
-{
-public:
-    virtual ~ProgressWindowInterface() {}
-    virtual void SetupProgressWindow(QWidget* parent) = 0;
 
-    virtual QStringList progressWindowAction() = 0;
-    virtual QStringList progressWindowIcon() = 0;
-    virtual void ShowWindow() = 0;
-};
-*/
 #define EvidenceInterface_iid "wombat.EvidenceInterface"
 Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
 
@@ -76,8 +64,5 @@ Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)
 
 #define SleuthKitInterface_iid "wombat.SleuthKitInterface"
 Q_DECLARE_INTERFACE(SleuthKitInterface, SleuthKitInterface_iid)
-/*
-#define ProgressWindowInterface_iid "wombat.ProgressWindowInterface"
-Q_DECLARE_INTERFACE(ProgressWindowInterface, ProgressWindowInterface_iid)
-*/
+
 #endif

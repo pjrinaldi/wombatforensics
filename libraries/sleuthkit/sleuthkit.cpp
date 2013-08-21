@@ -96,7 +96,6 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
         fprintf(stderr, "Setting out dir failed: %s\n", ex.message().c_str());
     }
 }
-//void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, int caseID, int imageID, int analysisType)
 void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, WombatVariable *wombatVariable)
 {
     QString tmpPath = dataPath;
@@ -105,10 +104,6 @@ void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, Womb
     {
         log = std::auto_ptr<Log>(new TskLog(wombatVariable));
         log->open(tmpPath.toStdString().c_str());
-        //log->open(tmpPath.toStdString().c_str(), dataPath.toStdString().c_str());
-        //log->SetCaseID(caseID);
-        //log->SetImageID(imageID);
-        //log->SetAnalysisType(analysisType);
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");
     }
