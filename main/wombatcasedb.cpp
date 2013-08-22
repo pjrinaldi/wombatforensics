@@ -44,7 +44,7 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
 {
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
-    wombatTableSchema.push_back("CREATE TABLE case(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT);");
     wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, caseid INTEGER, evidence TEXT, start TEXT, end TEXT);");
     wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
@@ -124,7 +124,7 @@ WombatCaseDb::~WombatCaseDb()
 int WombatCaseDb::ReturnCaseCount()
 {
     int casecount = 0;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM case;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM cases;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         int ret = sqlite3_step(sqlstatement);
         if(ret == SQLITE_ROW || ret == SQLITE_DONE)
@@ -139,7 +139,7 @@ int WombatCaseDb::ReturnCaseCount()
 int WombatCaseDb::InsertCase(QString caseText)
 {
     int caseid = 0;
-    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO case (name, creation) VALUES(?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO cases (name, creation) VALUES(?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_text(sqlstatement, 1, caseText.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
@@ -168,7 +168,7 @@ int WombatCaseDb::InsertCase(QString caseText)
 QStringList WombatCaseDb::ReturnCaseNameList()
 {
     QStringList tmpList;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT name FROM case ORDER by caseid;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT name FROM cases ORDER by caseid;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         while(sqlite3_step(sqlstatement) == SQLITE_ROW)
         {
@@ -186,7 +186,7 @@ QStringList WombatCaseDb::ReturnCaseNameList()
 int WombatCaseDb::ReturnCaseID(QString caseName)
 {
     int caseid = 0;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT caseid FROM case WHERE name = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT caseid FROM cases WHERE name = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_text(sqlstatement, 1, caseName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
