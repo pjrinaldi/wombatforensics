@@ -9,7 +9,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatprogresswindow->setModal(false);
     wombatvariable->SetCaseID(0);
     wombatvariable->SetEvidenceID(0);
-    wombatvariable->SetAnalysisType(0);
+    wombatvariable->SetJobType(0);
     QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";
     wombatsettingspath = homePath + "settings";
@@ -211,7 +211,7 @@ void WombatForensics::alterEvidence()
             evidenceName += ".db";
             currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
-            wombatvariable->SetEvidenceID(wombatCaseData->InsertImage(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
+            wombatvariable->SetEvidenceID(wombatCaseData->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
             wombatvariable->SetJobID(wombatCaseData->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
             QString tmpString = evidenceName;
             tmpString += " - ";
@@ -238,6 +238,7 @@ void WombatForensics::alterEvidence()
 WombatForensics::~WombatForensics()
 {
     const char* errmsg = wombatCaseData->CloseCaseDB(); // this possibly caused glibc corrupted double-linked list
+    fprintf(stderr, "CloseDB: %s\n", errmsg);
     delete ui;
 }
 
@@ -356,7 +357,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
             QString caseimage;
-            QStringList caseimageList = wombatCaseData->ReturnCaseImages(wombatvariable->GetCaseID());
+            QStringList caseimageList = wombatCaseData->ReturnCaseEvidence(wombatvariable->GetCaseID());
             foreach(caseimage, caseimageList)
             {
                 OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
@@ -399,6 +400,8 @@ QString WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath,
     {
         return iSleuthKit->SetupImageDatabase(imgDBPath, evidenceFilePath);
     }
+    else
+        return "";
 }
 
 void WombatForensics::OpenSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath)

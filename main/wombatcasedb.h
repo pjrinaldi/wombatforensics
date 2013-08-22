@@ -28,11 +28,12 @@ public:
     ~WombatCaseDb();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
-    int64_t InsertCase(QString caseText);
-    int64_t InsertImage(QString imageName, QString imageFilePath, int caseID);
+    int InsertCase(QString caseText);
+    int InsertJob(int jobType, int caseID, int evidenceID);
+    int InsertEvidence(QString evidenceName, QString evidenceFilePath, int caseID);
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
-    QStringList ReturnCaseImages(int caseID);
+    QStringList ReturnCaseEvidence(int caseID);
     std::string GetTime(void);
 
 private:
