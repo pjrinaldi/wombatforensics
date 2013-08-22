@@ -127,9 +127,7 @@ int WombatCaseDb::ReturnCaseCount()
     if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM case;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         int ret = sqlite3_step(sqlstatement);
-        if(ret != SQLITE_ROW && ret != SQLITE_DONE)
-            DisplayError(wombatparent, "1.3", "SQL Error. ", sqlite3_errmsg(wombatdb));
-        else
+        if(ret == SQLITE_ROW || ret == SQLITE_DONE)
             casecount = sqlite3_column_int(sqlstatement, 0);
     }
     else
