@@ -37,10 +37,21 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
     std::string dbpath = "/home/pasquale/WombatForensics/data/WombatLog.db";
     Log::log(msgType, logMsg);
     //fprintf(stderr, "MY LOG FUNCTION CALL\n");
-    int caseID = 0;
-    int imageID = 0;
-    int analysisType = 0;
-   
+
+    if(logvariable->GetJobType() == 0) // add evidence
+    {
+        //progresswindow->UpdateMessageTable() // add to message table
+    }
+    else if(logvariable->GetJobType() == 1) // remove evidence
+    {
+    }
+    else if(logvariable->GetJobType() == 2) // additional analysis
+    {
+    }
+    else // figure out as i go
+    {
+    }
+
     struct tm *newtime;
     time_t aclock;
 
@@ -60,9 +71,9 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
         {
             if(sqlite3_bind_int(stmt, 1, logvariable->GetCaseID()) == SQLITE_OK)
             {
-                if(sqlite3_bind_int(stmt, 2, logvariable->GetImageID()) == SQLITE_OK)
+                if(sqlite3_bind_int(stmt, 2, logvariable->GetEvidenceID()) == SQLITE_OK)
                 {
-                    if(sqlite3_bind_int(stmt, 3, logvariable->GetAnalysisType()) == SQLITE_OK)
+                    if(sqlite3_bind_int(stmt, 3, logvariable->GetJobType()) == SQLITE_OK)
                     {
                         if(sqlite3_bind_int(stmt, 4, msgType) == SQLITE_OK)
                         {

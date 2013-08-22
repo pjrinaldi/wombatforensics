@@ -8,7 +8,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatprogresswindow = new ProgressWindow();
     wombatprogresswindow->setModal(false);
     wombatvariable->SetCaseID(0);
-    wombatvariable->SetImageID(0);
+    wombatvariable->SetEvidenceID(0);
     wombatvariable->SetAnalysisType(0);
     QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";
@@ -205,21 +205,24 @@ void WombatForensics::alterEvidence()
         fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
         if(evidenceFilePath != "")
         {
+            wombatvariable->SetJobType(0); // add evidence
             // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
+            currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
+            setupSleuthKitBlackboard(sleuthkitplugin);
+            wombatvariable->SetEvidenceID(wombatCaseData->InsertImage(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
+            wombatvariable->SetJobID(wombatCaseData->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
             QString tmpString = evidenceName;
             tmpString += " - ";
             tmpString += QString::fromStdString(GetTime());
             QStringList tmpList;
-            tmpList << tmpString;
+            tmpList << tmpString << QString::number(wombatvariable->GetJobID());
             wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
             wombatprogresswindow->UpdateFilesFound("0");
             wombatprogresswindow->UpdateFilesProcessed("0");
-            wombatprogresswindow->UpdateAnalysisState("Adding Image to Database");
-            currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
-            setupSleuthKitBlackboard(sleuthkitplugin);
-            wombatvariable->SetImageID(wombatCaseData->InsertImage(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
+            wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
+            wombatprogresswindow->show();
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
             // need to populate the directory tree entries
             QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());

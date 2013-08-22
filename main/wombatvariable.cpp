@@ -13,14 +13,19 @@ int WombatVariable::GetCaseID()
     return caseid;
 }
 
-int WombatVariable::GetImageID()
+int WombatVariable::GetJobID()
 {
-    return imageid;
+    return jobid;
 }
 
-int WombatVariable::GetAnalysisType()
+int WombatVariable::GetEvidenceID()
 {
-    return analysistype;
+    return evidenceid;
+}
+
+int WombatVariable::GetJobType()
+{
+    return jobtype;
 }
 
 void WombatVariable::SetCaseID(int caseID)
@@ -28,12 +33,17 @@ void WombatVariable::SetCaseID(int caseID)
     caseid = caseID;
 }
 
-void WombatVariable::SetImageID(int imageID)
+void WombatVariable::SetJobID(int jobID)
 {
-    imageid = imageID;
+    jobid = jobID;
 }
 
-void WombatVariable::SetAnalysisType(int analysisType)
+void WombatVariable::SetEvidenceID(int evidenceID)
 {
-    analysistype = analysisType;
+    evidenceid = evidenceID;
+}
+
+void WombatVariable::SetJobType(int jobType)
+{
+    jobtype = jobType;
 }

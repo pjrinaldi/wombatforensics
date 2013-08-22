@@ -6,16 +6,19 @@ class WombatVariable
 public:
     WombatVariable();
     int GetCaseID();
-    int GetImageID();
-    int GetAnalysisType();
+    int GetJobID();
+    int GetEvidenceID();
+    int GetJobType();
     void SetCaseID(int caseID);
-    void SetImageID(int imageID);
-    void SetAnalysisType(int analysisType);
+    void SetJobID(int jobID);
+    void SetEvidenceID(int evidenceID);
+    void SetJobType(int jobType);
     ~WombatVariable();
 
 private:
     int caseid;
-    int imageid;
-    int analysistype;
+    int evidenceid;
+    int jobtype;
+    int jobid;
 };
 #endif // WOMBATVARIABLE_H
