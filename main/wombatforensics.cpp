@@ -205,7 +205,7 @@ void WombatForensics::alterEvidence()
         fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
         if(evidenceFilePath != "")
         {
-            wombatvariable->SetJobType(0); // add evidence
+            wombatvariable->SetJobType(1); // add evidence
             // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
@@ -213,6 +213,8 @@ void WombatForensics::alterEvidence()
             setupSleuthKitBlackboard(sleuthkitplugin);
             wombatvariable->SetEvidenceID(wombatCaseData->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
             wombatvariable->SetJobID(wombatCaseData->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
+            LOGINFO("Adding Evidence Started.");
+            // UPDATE MESSAGETABLE(CASEID, EVIDENCEID, JOBID) WHEN JOB STARTS TO SHOW IT STARTED... WHICH SHOULD BE A SQL QUERY TO GET LOG ITEMS FOR IT.
             QString tmpString = evidenceName;
             tmpString += " - ";
             tmpString += QString::fromStdString(GetTime());

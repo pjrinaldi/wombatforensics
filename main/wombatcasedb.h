@@ -34,6 +34,7 @@ public:
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
     QStringList ReturnCaseEvidence(int caseID);
+    QStringList ReturnCaseEvidenceID(int caseID);
     std::string GetTime(void);
 
 private:

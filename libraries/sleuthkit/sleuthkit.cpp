@@ -258,7 +258,11 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         int curprogress = (int)((((float)processCount)/(float)fileCount)*100);
         progresswindow->UpdateProgressBar(curprogress);
         progresswindow->UpdateFilesProcessed(QString::number(processCount));
+        // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
     }
+    // IF FILESFOUND == FILESPROCESSED... THEN GET LOG COUNT FOR CASEID, EVIDENCEID, JOBID AND ENSURE THERE ARE NO ERROR'S
+    // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
+    // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
     progresswindow->UpdateAnalysisState("Processing Finished");
     delete task;
     if(filePipeline && !filePipeline->isEmpty())
