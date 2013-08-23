@@ -3,7 +3,7 @@
 ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::ProgressWindow)
 {
     ui->setupUi(this);
-    ui->analysisTreeWidget->hideColumn(2);
+    ui->analysisTreeWidget->hideColumn(1);
 }
 
 ProgressWindow::~ProgressWindow()
