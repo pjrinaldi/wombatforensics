@@ -37,7 +37,8 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
     std::string dbpath = "/home/pasquale/WombatForensics/data/WombatLog.db";
     Log::log(msgType, logMsg);
     //fprintf(stderr, "MY LOG FUNCTION CALL\n");
-
+    /*
+     * MIGHT NOT NEED THIS CODE IF I TAKE CARE OF IT OUTSIDE OF HERE
     if(logvariable->GetJobType() == 0) // add evidence
     {
         //progresswindow->UpdateMessageTable() // add to message table
@@ -51,6 +52,7 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
     else // figure out as i go
     {
     }
+    */
 
     struct tm *newtime;
     time_t aclock;

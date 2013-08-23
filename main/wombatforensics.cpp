@@ -213,7 +213,7 @@ void WombatForensics::alterEvidence()
             setupSleuthKitBlackboard(sleuthkitplugin);
             wombatvariable->SetEvidenceID(wombatCaseData->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
             wombatvariable->SetJobID(wombatCaseData->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
-            LOGINFO("Adding Evidence Started.");
+            SleuthKitLogEntry(sleuthkitplugin, "Adding Evidence Started.");
             // UPDATE MESSAGETABLE(CASEID, EVIDENCEID, JOBID) WHEN JOB STARTS TO SHOW IT STARTED... WHICH SHOULD BE A SQL QUERY TO GET LOG ITEMS FOR IT.
             QString tmpString = evidenceName;
             tmpString += " - ";
@@ -387,6 +387,14 @@ void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString settings
         iSleuthKit->SetupSystemProperties(settingsPath, configFileName);
     }
 }
+
+void WombatForensics::SleuthKitLogEntry(QObject *plugin, QString logMsg)
+{
+    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(iSleuthKit)
+        iSleuthKit->LogEntry(logMsg);
+}
+
 void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, WombatVariable *wombatVariable)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);

@@ -271,6 +271,11 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     }
 }
 
+void SleuthKitPlugin::LogEntry(QString logMsg)
+{
+    LOGINFO(logMsg.toStdString().c_str());
+}
+
 QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName)
 {
     std::vector<TskFileRecord> fileRecordVector;
