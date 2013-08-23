@@ -54,9 +54,11 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
         const char* tblString;
         foreach(tblString, wombatTableSchema)
         {
-            if(sqlite3_prepare_v2(wombatdb, tblString, -1, &sqlstatement, NULL) == SQLITE_OK)
+            sqlite3_stmt* tmpstmt;
+            //if(sqlite3_prepare_v2(wombatdb, tblString, -1, &sqlstatement, NULL) == SQLITE_OK)
+            if(sqlite3_prepare_v2(wombatdb, tblString, -1, &tmpstmt, NULL) == SQLITE_OK)
             {
-                int ret = sqlite3_step(sqlstatement);
+                int ret = sqlite3_step(tmpstmt);
                 if(ret != SQLITE_ROW && ret != SQLITE_DONE)
                 {
                     return sqlite3_errmsg(wombatdb);
@@ -66,6 +68,7 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
             {
                 return sqlite3_errmsg(wombatdb);
             }
+            sqlite3_finalize(tmpstmt);
         }
     }
     else
