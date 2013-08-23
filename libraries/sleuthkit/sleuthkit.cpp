@@ -283,8 +283,12 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
     QStandardItem *imageNode = new QStandardItem(imageName);
     int ret;
     uint64_t tmpId;
+    volRecordList.clear();
+    fileRecordVector.clear();
+    fsInfoRecordList.clear();
     // also need to get the partitions and volumes as nodes.
     ret = imgdb->getVolumeInfo(volRecordList);
+    //fprintf(stderr, "volrecordlist count: %d\n", volRecordList.count());
     foreach(volRecord, volRecordList) // populates all vol's and fs's.
     {
         // if volflag = 0, get description
@@ -292,12 +296,12 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
         fprintf(stderr, "Vol Description: %s - VolFlags: %d\n", volRecord.description.c_str(), volRecord.flags);
         if(volRecord.flags >= 0 && volRecord.flags <= 2)
         {
-            if(volRecord.flags == 0)
+            if(volRecord.flags == 1)
             {
                 volNode = new QStandardItem(QString::fromUtf8(volRecord.description.c_str()));
                 currentVolPath = QString::fromUtf8(volRecord.description.c_str()) + "/";
             }
-            else if(volRecord.flags == 1)
+            else if(volRecord.flags == 0)
             {
                 volNode = new QStandardItem("unallocated space");
                 currentVolPath = "unallocated space/";

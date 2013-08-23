@@ -67,7 +67,7 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
     if(sqlite3_open(dbpath.c_str(), &tmpImgDB) == SQLITE_OK)
     {
         sqlite3_stmt* stmt;
-        if(sqlite3_prepare_v2(tmpImgDB, "INSERT INTO log (caseid, imageid, analysistype, msgtype, msgdatetime, msg) VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, 0) == SQLITE_OK)
+        if(sqlite3_prepare_v2(tmpImgDB, "INSERT INTO log (caseid, evidenceid, analysistype, msgtype, msgdatetime, msg) VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, 0) == SQLITE_OK)
         {
             if(sqlite3_bind_int(stmt, 1, logvariable->GetCaseID()) == SQLITE_OK)
             {
