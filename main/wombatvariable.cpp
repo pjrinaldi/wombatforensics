@@ -1,7 +1,5 @@
 #include "wombatvariable.h"
 
-// ADD ENUMS FOR JOBSTATUS, JOBTYPE, ETC TO SIMPLIFY INTEGER ASSOCIATION AND READABILITY IN CODE
-
 WombatVariable::WombatVariable()
 {
 }

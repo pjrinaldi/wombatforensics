@@ -15,6 +15,9 @@ public:
     void SetJobType(int jobType);
     ~WombatVariable();
 
+    // ADD ENUMS FOR JOBSTATUS, JOBTYPE, ETC TO SIMPLIFY INTEGER ASSOCIATION AND READABILITY IN CODE
+    enum 
+
 private:
     int caseid;
     int evidenceid;
