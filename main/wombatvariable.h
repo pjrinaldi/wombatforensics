@@ -19,8 +19,9 @@ public:
     enum JobStatus
     {
         failed = 0,
-        complete = 1,
-        cancelled = 2
+        finish = 1,
+        finisherror = 2
+        cancelled = 3
     };
 
     enum JobType
