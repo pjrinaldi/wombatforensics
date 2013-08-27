@@ -83,7 +83,7 @@ const char* WombatCaseDb::CreateLogDB(QString dbname)
 {
     if(sqlite3_open(dbname.toStdString().c_str(), &logdb) == SQLITE_OK)
     {
-        if(sqlite3_prepare_v2(logdb, "CREATE TABLE log(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, analysistype INTEGER, msgtype INTEGER, msgdatetime TEXT, msg TEXT);", -1, &logstatement, NULL) == SQLITE_OK)
+        if(sqlite3_prepare_v2(logdb, "CREATE TABLE log(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msgdatetime TEXT, msg TEXT);", -1, &logstatement, NULL) == SQLITE_OK)
         {
             int ret = sqlite3_step(logstatement);
             if(ret != SQLITE_ROW && ret != SQLITE_DONE)

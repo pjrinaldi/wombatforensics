@@ -16,7 +16,19 @@ public:
     ~WombatVariable();
 
     // ADD ENUMS FOR JOBSTATUS, JOBTYPE, ETC TO SIMPLIFY INTEGER ASSOCIATION AND READABILITY IN CODE
-    enum 
+    enum JobStatus
+    {
+        failed = 0,
+        complete = 1,
+        cancelled = 2
+    };
+
+    enum JobType
+    {
+        generic = 0,
+        addevidence = 1,
+        remedvidence = 2
+    };
 
 private:
     int caseid;
