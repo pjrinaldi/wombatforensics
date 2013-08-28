@@ -196,8 +196,7 @@ void SleuthKitPlugin::SetupSystemFileManager()
     }
 }
 
-//void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
-void SleuthKitPlugin::OpenEvidence(void)
+void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
 {
     TskPipelineManager pipelineMgr;
     TskPipeline *filePipeline;
@@ -217,8 +216,7 @@ void SleuthKitPlugin::OpenEvidence(void)
     int processCount = 0;
     try
     {
-        imagefiletsk.open(evidencepath.toStdString());
-        //imagefiletsk.open(evidencePath.toStdString());
+        imagefiletsk.open(evidencePath.toStdString());
         TskServices::Instance().setImageFile(imagefiletsk);
         fprintf(stderr, "Opening Image File was successful!\n");
     }
@@ -233,10 +231,8 @@ void SleuthKitPlugin::OpenEvidence(void)
         // Get Number of Files found here and populate the progress window, so i need to pass the window through
         fileCount = imgdb->getNumFiles();
         fprintf(stderr, "File Count: %d\n", fileCount);
-        //progresswindow->UpdateFilesFound(QString::number(fileCount));
-        //evidenceprogress->UpdateFilesFound(QString::number(fileCount));
-        //progresswindow->UpdateAnalysisState("Processing Files");
-        //evidenceprogress->UpdateAnalysisState("Processing Files");
+        progresswindow->UpdateFilesFound(QString::number(fileCount));
+        progresswindow->UpdateAnalysisState("Processing Files");
     }
     catch(TskException &ex)
     {
@@ -263,17 +259,14 @@ void SleuthKitPlugin::OpenEvidence(void)
         }
         processCount++;
         int curprogress = (int)((((float)processCount)/(float)fileCount)*100);
-        //progresswindow->UpdateProgressBar(curprogress);
-        //evidenceprogress->UpdateProgressBar(curprogress);
-        //progresswindow->UpdateFilesProcessed(QString::number(processCount));
-        //evidenceprogress->UpdateFilesProcessed(QString::number(processCount));
+        progresswindow->UpdateProgressBar(curprogress);
+        progresswindow->UpdateFilesProcessed(QString::number(processCount));
         // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
     }
     // IF FILESFOUND == FILESPROCESSED... THEN GET LOG COUNT FOR CASEID, EVIDENCEID, JOBID AND ENSURE THERE ARE NO ERROR'S
     // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
     // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
-    //progresswindow->UpdateAnalysisState("Processing Finished");
-    //evidenceprogress->UpdateAnalysisState("Processing Finished");
+    progresswindow->UpdateAnalysisState("Processing Finished");
     delete task;
     if(filePipeline && !filePipeline->isEmpty())
     {
@@ -501,9 +494,4 @@ QString SleuthKitPlugin::GetFileTxtContents(int fileID)
     qFile.write((const char*)buffer, 32768);
     qFile.close();
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.txt";
-}
-
-void SleuthKitPlugin::moveToThread(QThread* targetThread)
-{
-    QObject::moveToThread(targetThread);
 }

@@ -42,17 +42,12 @@ public:
     void SetupSystemBlackboard();
     void SetupSystemSchedulerQueue();
     void SetupSystemFileManager();
-    //void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
+    void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
     void PrepEvidence(QString evidencePath);
     void LogEntry(QString logMsg);
     QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
-    void moveToThread(QThread* targetThread);
-
-public slots:
-    //void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
-    void OpenEvidence(void);
 
 private:
     int currentcaseid;
@@ -65,7 +60,5 @@ private:
     QString evidencepath;
     ProgressWindow* evidenceprogress;
 };
-
-Q_DECLARE_METATYPE(SleuthKitPlugin*)
 
 #endif // SLEUTHKIT_H
