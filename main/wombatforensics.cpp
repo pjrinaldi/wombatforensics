@@ -451,17 +451,10 @@ void WombatForensics::setupSleuthKitFileManager(QObject *plugin)
 }
 void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow)
 {
-    // THREAD/WORKER TEST CODE
-    QThread* thread = new QThread;
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-        iSleuthKit->PrepEvidence(evidencePath);
-        iSleuthKit->moveToThread(thread);
-        connect(thread, SIGNAL(started()), (QObject*)iSleuthKit, SLOT(OpenEvidence()), Qt::QueuedConnection);
-        connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()), Qt::QueuedConnection);
-        thread->start();
-        //iSleuthKit->OpenEvidence(evidencePath, progressWindow);
+       iSleuthKit->OpenEvidence(evidencePath, progressWindow);
     }
 }
 
