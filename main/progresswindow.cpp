@@ -4,6 +4,7 @@ ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
 {
     ui->setupUi(this);
     ui->analysisTreeWidget->hideColumn(1);
+    ui->msgTableWidget->setCurrentCell(0, 0, QItemSelectionModel::NoUpdate);
 }
 
 ProgressWindow::~ProgressWindow()

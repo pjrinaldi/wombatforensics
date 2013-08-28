@@ -241,6 +241,7 @@ void WombatForensics::alterEvidence()
 
 WombatForensics::~WombatForensics()
 {
+    wombatprogresswindow->~ProgressWindow();
     const char* errmsg = wombatCaseData->CloseCaseDB(); // this possibly caused glibc corrupted double-linked list
     fprintf(stderr, "CloseDB: %s\n", errmsg);
     delete ui;
