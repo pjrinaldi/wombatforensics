@@ -210,6 +210,8 @@ void SleuthKitPlugin::OpenEvidence(void)
         fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
     }
 
+    // POSSIBLY PUT THREADING INSIDE HERE AND CALL THE FILETSK STUFF INSTEAD OF THE SLEUTHKIT STUFF
+
     TskImageFileTsk imagefiletsk;
     int fileCount = 0;
     int processCount = 0;

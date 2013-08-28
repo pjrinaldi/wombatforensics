@@ -66,4 +66,6 @@ private:
     ProgressWindow* evidenceprogress;
 };
 
+Q_DECLARE_METATYPE(SleuthKitPlugin*)
+
 #endif // SLEUTHKIT_H
