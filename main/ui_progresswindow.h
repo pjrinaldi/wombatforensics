@@ -171,8 +171,14 @@ public:
         msgTableWidget->setHorizontalHeaderItem(0, __qtablewidgetitem);
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
         msgTableWidget->setHorizontalHeaderItem(1, __qtablewidgetitem1);
+        if (msgTableWidget->rowCount() < 5)
+            msgTableWidget->setRowCount(5);
         msgTableWidget->setObjectName(QStringLiteral("msgTableWidget"));
         msgTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        msgTableWidget->setSelectionMode(QAbstractItemView::NoSelection);
+        msgTableWidget->setShowGrid(false);
+        msgTableWidget->setCornerButtonEnabled(false);
+        msgTableWidget->setRowCount(5);
         msgTableWidget->horizontalHeader()->setVisible(true);
         msgTableWidget->horizontalHeader()->setCascadingSectionResizes(false);
         msgTableWidget->horizontalHeader()->setStretchLastSection(true);
