@@ -224,6 +224,8 @@ void WombatForensics::alterEvidence()
             wombatprogresswindow->UpdateFilesFound("0");
             wombatprogresswindow->UpdateFilesProcessed("0");
             wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
+            //QList<QStringList> = wombatCaseData->ReturnLogMessages(wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
+            wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
             wombatprogresswindow->show();
             sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
             // need to populate the directory tree entries

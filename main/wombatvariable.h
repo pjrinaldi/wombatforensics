@@ -20,7 +20,7 @@ public:
     {
         failed = 0,
         finish = 1,
-        finisherror = 2
+        finisherror = 2,
         cancelled = 3
     };
 
