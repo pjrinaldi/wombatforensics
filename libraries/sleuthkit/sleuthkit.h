@@ -43,6 +43,7 @@ public:
     void SetupSystemSchedulerQueue();
     void SetupSystemFileManager();
     //void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
+    void PrepEvidence(QString evidencePath);
     void LogEntry(QString logMsg);
     QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
     QString GetFileContents(int fileID);
@@ -50,7 +51,8 @@ public:
     void moveToThread(QThread* targetThread);
 
 public slots:
-    void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
+    //void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
+    void OpenEvidence(void);
 
 private:
     int currentcaseid;
@@ -60,6 +62,8 @@ private:
     std::auto_ptr<Log> log;
     std::auto_ptr<TskImgDB> imgdb;
     TskSchedulerQueue scheduler;
+    QString evidencepath;
+    ProgressWindow* evidenceprogress;
 };
 
 #endif // SLEUTHKIT_H

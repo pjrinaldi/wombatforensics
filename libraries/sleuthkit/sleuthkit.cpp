@@ -195,7 +195,9 @@ void SleuthKitPlugin::SetupSystemFileManager()
         fprintf(stderr, "Loading FileManager: %s\n", ex.message().c_str());
     }
 }
-void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
+
+//void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
+void SleuthKitPlugin::OpenEvidence(void)
 {
     TskPipelineManager pipelineMgr;
     TskPipeline *filePipeline;
@@ -213,7 +215,8 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     int processCount = 0;
     try
     {
-        imagefiletsk.open(evidencePath.toStdString());
+        imagefiletsk.open(evidencepath.toStdString());
+        //imagefiletsk.open(evidencePath.toStdString());
         TskServices::Instance().setImageFile(imagefiletsk);
         fprintf(stderr, "Opening Image File was successful!\n");
     }
@@ -228,8 +231,10 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         // Get Number of Files found here and populate the progress window, so i need to pass the window through
         fileCount = imgdb->getNumFiles();
         fprintf(stderr, "File Count: %d\n", fileCount);
-        progresswindow->UpdateFilesFound(QString::number(fileCount));
-        progresswindow->UpdateAnalysisState("Processing Files");
+        //progresswindow->UpdateFilesFound(QString::number(fileCount));
+        //evidenceprogress->UpdateFilesFound(QString::number(fileCount));
+        //progresswindow->UpdateAnalysisState("Processing Files");
+        //evidenceprogress->UpdateAnalysisState("Processing Files");
     }
     catch(TskException &ex)
     {
@@ -256,14 +261,17 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         }
         processCount++;
         int curprogress = (int)((((float)processCount)/(float)fileCount)*100);
-        progresswindow->UpdateProgressBar(curprogress);
-        progresswindow->UpdateFilesProcessed(QString::number(processCount));
+        //progresswindow->UpdateProgressBar(curprogress);
+        //evidenceprogress->UpdateProgressBar(curprogress);
+        //progresswindow->UpdateFilesProcessed(QString::number(processCount));
+        //evidenceprogress->UpdateFilesProcessed(QString::number(processCount));
         // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
     }
     // IF FILESFOUND == FILESPROCESSED... THEN GET LOG COUNT FOR CASEID, EVIDENCEID, JOBID AND ENSURE THERE ARE NO ERROR'S
     // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
     // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
-    progresswindow->UpdateAnalysisState("Processing Finished");
+    //progresswindow->UpdateAnalysisState("Processing Finished");
+    //evidenceprogress->UpdateAnalysisState("Processing Finished");
     delete task;
     if(filePipeline && !filePipeline->isEmpty())
     {
@@ -271,6 +279,10 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     }
 }
 
+void SleuthKitPlugin::PrepEvidence(QString evidencePath)
+{
+    evidencepath = evidencePath;
+}
 void SleuthKitPlugin::LogEntry(QString logMsg)
 {
     LOGINFO(logMsg.toStdString().c_str());
