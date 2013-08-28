@@ -25,6 +25,7 @@
 #include <QStandardItemModel>
 #include <QByteArray>
 #include <QDataStream>
+#include <QThread>
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {
@@ -41,11 +42,15 @@ public:
     void SetupSystemBlackboard();
     void SetupSystemSchedulerQueue();
     void SetupSystemFileManager();
-    void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
+    //void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
     void LogEntry(QString logMsg);
     QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
+    void moveToThread(QThread* targetThread);
+
+public slots:
+    void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
 
 private:
     int currentcaseid;

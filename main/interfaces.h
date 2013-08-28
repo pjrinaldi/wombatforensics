@@ -2,6 +2,7 @@
 #define INTERFACES_H
 
 #include <QtPlugin>
+#include <QThread>
 #include "progresswindow.h"
 #include "wombatvariable.h"
 
@@ -55,6 +56,8 @@ public:
     virtual QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName) = 0;
     virtual QString GetFileContents(int fileID) = 0;
     virtual QString GetFileTxtContents(int fileID) = 0;
+
+    virtual void moveToThread(QThread* targetThread) = 0;
 };
 
 #define EvidenceInterface_iid "wombat.EvidenceInterface"

@@ -488,3 +488,8 @@ QString SleuthKitPlugin::GetFileTxtContents(int fileID)
     qFile.close();
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.txt";
 }
+
+void SleuthKitPlugin::moveToThread(QThread* targetThread)
+{
+    QObject::moveToThread(targetThread);
+}

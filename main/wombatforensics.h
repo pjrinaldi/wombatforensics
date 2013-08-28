@@ -14,7 +14,7 @@
 #include <QTreeWidgetItem>
 #include <string>
 #include <QString>
-
+#include <QThread>
 #include "interfaces.h"
 #include "wombatvariable.h"
 #include "wombatcasedb.h"
