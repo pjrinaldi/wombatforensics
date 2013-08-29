@@ -513,3 +513,24 @@ QString SleuthKitPlugin::GetFileTxtContents(int fileID)
     qFile.close();
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.txt";
 }
+
+OpenEvidenceRunner::OpenEvidenceRunner(QString evidencePath)
+{
+    evidencepath = evidencePath;
+}
+
+void OpenEvidenceRunner::run()
+{
+    int fileCount = 0;
+    int processCount = 0;
+    try
+    {
+        imagefiletsk.open(evidencepath.toStdString());
+        TskServices::Instance().setImageFile(imagefiletsk);
+        fprintf(stderr, "Opening Image File was successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
+    }
+}

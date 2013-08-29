@@ -8,7 +8,6 @@
  * This software is distributed under the Common Public License 1.0
  */
 #include "TskScheduleRunner.h"
-
 /*
 #include "TskSchedulerQueue.h"
 
@@ -38,21 +37,18 @@ Scheduler::task_struct *TskSchedulerQueue::nextTask()
     return t;
 };
 */
-TskImageFileTsk OpenEvidenceRunner::OpenEvidenceRunner(QString evidencePath)
+OpenEvidenceRunner::OpenEvidenceRunner(QString evidencePath)
 {
     evidencepath = evidencePath;
-    run();
-
-    return imagefiletsk;
 }
 
-OpenEvidenceRunner::run()
+void OpenEvidenceRunner::run()
 {
     int fileCount = 0;
     int processCount = 0;
     try
     {
-        imagefiletsk.open(evidenceipath.toStdString());
+        imagefiletsk.open(evidencepath.toStdString());
         TskServices::Instance().setImageFile(imagefiletsk);
         fprintf(stderr, "Opening Image File was successful!\n");
     }

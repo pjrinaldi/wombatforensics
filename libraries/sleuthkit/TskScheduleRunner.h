@@ -11,6 +11,9 @@
 #ifndef TSK_SCHEDULERUNNER
 #define TSK_SCHEDULERUNNER
 
+#include <QThreadPool>
+#include "TskImageFileTsk.h"
+#include "TskServices.h"
 //#include <tsk/framework/services/Scheduler.h>
 //#include <queue>
 
@@ -32,8 +35,9 @@ private:
 class OpenEvidenceRunner  : public QRunnable
 {
 public:
-    TskImageFileTsk OpenEvidenceRunner(QString evidencePath);
+    OpenEvidenceRunner(QString evidencePath);
     void run();
+
 private:
     QString evidencepath;
     TskImageFileTsk imagefiletsk;
