@@ -210,10 +210,18 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     }
 
     // POSSIBLY PUT THREADING INSIDE HERE AND CALL THE FILETSK STUFF INSTEAD OF THE SLEUTHKIT STUFF
-
+    //
+    // OpenEvidenceThread(evidencePath)
+    //
+    // begin openevidence thread
+    OpenEvidenceRunner* openEvidence = new OpenEvidenceRunner(evidencePath);
     TskImageFileTsk imagefiletsk;
+    QThreadPool *threadpool = QThreadPool::globalInstance();
+    threadpool->start(openEvidence);
+    //imagefiletsk = openEvidence->GetImageFileTsk();
     int fileCount = 0;
     int processCount = 0;
+    /*
     try
     {
         imagefiletsk.open(evidencePath.toStdString());
@@ -224,6 +232,11 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     {
         fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
     }
+    */
+    // end open evidence thread
+    // ExtractFilesThread(imagefiletsk)
+    //
+    // begin extract files thread
     try
     {
         imagefiletsk.extractFiles();
@@ -238,6 +251,10 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     {
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }
+    // end extract files thread
+    // ExecuteTaskThread(task)
+    //
+    // begin execute task thread
     TskSchedulerQueue::task_struct *task;
     while((task = scheduler.nextTask()) != NULL)
     {
@@ -268,6 +285,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
     progresswindow->UpdateAnalysisState("Processing Finished");
     delete task;
+    // end execute task thread
     if(filePipeline && !filePipeline->isEmpty())
     {
         filePipeline->logModuleExecutionTimes();
