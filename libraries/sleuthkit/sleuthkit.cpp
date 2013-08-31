@@ -209,7 +209,9 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
     }
 
-    // POSSIBLY PUT THREADING INSIDE HERE AND CALL THE FILETSK STUFF INSTEAD OF THE SLEUTHKIT STUFF
+    int fileCount = 0;
+    int processCount = 0;
+   // POSSIBLY PUT THREADING INSIDE HERE AND CALL THE FILETSK STUFF INSTEAD OF THE SLEUTHKIT STUFF
     //
     // OpenEvidenceThread(evidencePath)
     //
@@ -218,9 +220,9 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     //TskImageFileTsk imagefiletsk;
     QThreadPool *threadpool = QThreadPool::globalInstance();
     threadpool->start(openEvidence);
+    fileCount = TskServices::Instance().getImgDB().getNumFiles();
+    fprintf(stderr, "File Count: %d\n", fileCount);
     //imagefiletsk = TskServices::Instance().getImageFile();
-    int fileCount = 0;
-    int processCount = 0;
     /*
     try
     {
@@ -253,8 +255,8 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }*/
     // end extract files thread
-    ExtractEvidenceRunner *extractEvidence = new ExtractEvidenceRunner();
-    threadpool->start(extractEvidence);
+    //ExtractEvidenceRunner *extractEvidence = new ExtractEvidenceRunner();
+    //threadpool->start(extractEvidence);
     // ExecuteTaskThread(task)
     //
     // begin execute task thread
@@ -536,7 +538,19 @@ void OpenEvidenceRunner::run()
     {
         fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
     }
+    try
+    {
+        imagefiletsk.extractFiles();
+        fprintf(stderr, "Extracting Evidence was successful\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
+    }
+
+
 }
+
 ExtractEvidenceRunner::ExtractEvidenceRunner()
 {
 }
@@ -544,8 +558,9 @@ void ExtractEvidenceRunner::run()
 {
     try
     {
-        TskImageFileTsk imagefiletsk = <TskImageFileTsk>TskServices::Instance().getImageFile();
-        imagefiletsk.extractFiles();
+        //TskImageFileTsk imagefiletsk = TskServices::Instance().getImageFile();
+        //imagefiletsk.extractFiles();
+        TskServices::Instance().getImageFile().extractFiles();
         fprintf(stderr, "Extracting Evidence was successful\n");
     }
     catch(TskException &ex)
