@@ -198,16 +198,6 @@ void SleuthKitPlugin::SetupSystemFileManager()
 
 void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
 {
-    TskPipelineManager pipelineMgr;
-    TskPipeline *filePipeline;
-    try
-    {
-        filePipeline = pipelineMgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
-    }
-    catch(const TskException &ex)
-    {
-        fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
-    }
 
     int fileCount = 0;
     int processCount = 0;
@@ -216,14 +206,19 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     // OpenEvidenceThread(evidencePath)
     //
     // begin openevidence thread
-    //OpenEvidenceRunner* openEvidence = new OpenEvidenceRunner(evidencePath);
-    TskImageFileTsk imagefiletsk;
-    //QThreadPool *threadpool = QThreadPool::globalInstance();
-    //threadpool->start(openEvidence);
-    //fileCount = TskServices::Instance().getImgDB().getNumFiles();
-    //fprintf(stderr, "File Count: %d\n", fileCount);
-    //imagefiletsk = TskServices::Instance().getImageFile();
+    OpenEvidenceRunner* openEvidence = new OpenEvidenceRunner(evidencePath);
+    //TskImageFileTsk imagefiletsk;
+    QThreadPool *threadpool = QThreadPool::globalInstance();
+    threadpool->start(openEvidence);
+    threadpool->waitForDone();
+    fileCount = TskServices::Instance().getImgDB().getNumFiles();
+    fprintf(stderr, "File Count: %d\n", fileCount);
     
+    progresswindow->UpdateFilesFound(QString::number(fileCount));
+    progresswindow->UpdateAnalysisState("Processing Files");
+
+    //imagefiletsk = TskServices::Instance().getImageFile();
+    /*
     try
     {
         imagefiletsk.open(evidencePath.toStdString());
@@ -234,12 +229,12 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     {
         fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
     }
-    
+    */
     // end open evidence thread
     // ExtractFilesThread(imagefiletsk)
     //
     // begin extract files thread
-    
+ /*   
     try
     {
         imagefiletsk.extractFiles();
@@ -255,16 +250,35 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }
     // end extract files thread
+    */
     //ExtractEvidenceRunner *extractEvidence = new ExtractEvidenceRunner();
     //threadpool->start(extractEvidence);
     // ExecuteTaskThread(task)
     //
     // begin execute task thread
-    std::queue<TskSchedulerQueue::task_struct*> taskqueue = scheduler.GetSchedulerQueue();
+    //std::queue<TskSchedulerQueue::task_struct> taskqueue = scheduler.GetSchedulerQueue();
     TskSchedulerQueue::task_struct *task;
 
+    progresscount = 0;
+    //QFutureWatcher<void> futurewatcher;
+    //QObject::connect(&futurewatcher, SIGNAL(finished()), progresswindow, SLOT(IncreaseCount()));
+
+    //futurewatcher.setFuture(QtConcurrent::map(taskqueue, RunTask));
+
+    //futurewatcher.waitForFinished();
+
     // NEED TO CALL QTCONCURRENT::MAP(TASKQUEUE, RUNTASK)
-    /*
+    //
+    TskPipelineManager pipelineMgr;
+    TskPipeline *filePipeline;
+    try
+    {
+        filePipeline = pipelineMgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
+    }
+    catch(const TskException &ex)
+    {
+        fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
+    }
     while((task = scheduler.nextTask()) != NULL)
     {
         try
@@ -289,21 +303,27 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         progresswindow->UpdateFilesProcessed(QString::number(processCount));
         // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
     }
-    */
+
     // IF FILESFOUND == FILESPROCESSED... THEN GET LOG COUNT FOR CASEID, EVIDENCEID, JOBID AND ENSURE THERE ARE NO ERROR'S
     // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
     // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
     progresswindow->UpdateAnalysisState("Processing Finished");
-    delete task;
+    //delete task;
     // end execute task thread
-    if(filePipeline && !filePipeline->isEmpty())
-    {
-        filePipeline->logModuleExecutionTimes();
-    }
 }
-
-void SleuthKitPlugin::RunTask(TskSchedulerQueue::task_struct* task)
+/*
+void SleuthKitPlugin::RunTask(TskSchedulerQueue::task_struct &task)
 {
+    TskPipelineManager pipelineMgr;
+    TskPipeline *filePipeline;
+    try
+    {
+        filePipeline = pipelineMgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
+    }
+    catch(const TskException &ex)
+    {
+        fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
+    }
     try
     {
         if(task->task == Scheduler::FileAnalysis && filePipeline && !filePipeline->isEmpty())
@@ -320,11 +340,18 @@ void SleuthKitPlugin::RunTask(TskSchedulerQueue::task_struct* task)
     {
         fprintf(stderr, "TskException: %s\n", ex.message().c_str());
     }
+    if(filePipeline && !filePipeline->isEmpty())
+    {
+        filePipeline->logModuleExecutionTimes();
+    }
 }
+*/
+/*
 void SleuthKitPlugin::PrepEvidence(QString evidencePath)
 {
     evidencepath = evidencePath;
 }
+*/
 void SleuthKitPlugin::LogEntry(QString logMsg)
 {
     LOGINFO(logMsg.toStdString().c_str());
@@ -542,7 +569,7 @@ QString SleuthKitPlugin::GetFileTxtContents(int fileID)
     qFile.close();
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.txt";
 }
-/*
+
 OpenEvidenceRunner::OpenEvidenceRunner(QString evidencePath)
 {
     evidencepath = evidencePath;
@@ -552,6 +579,7 @@ void OpenEvidenceRunner::run()
 {
     //int fileCount = 0;
     //int processCount = 0;
+    TskImageFileTsk imagefiletsk;
     try
     {
         imagefiletsk.open(evidencepath.toStdString());
@@ -574,7 +602,7 @@ void OpenEvidenceRunner::run()
 
 
 }
-
+/*
 ExtractEvidenceRunner::ExtractEvidenceRunner()
 {
 }

@@ -5,6 +5,7 @@ ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     ui->setupUi(this);
     ui->analysisTreeWidget->hideColumn(1);
     ui->msgTableWidget->setCurrentCell(-1, -1, QItemSelectionModel::NoUpdate);
+    counter = 0;
 }
 
 ProgressWindow::~ProgressWindow()
@@ -45,4 +46,9 @@ void ProgressWindow::UpdateMessageTable(QString msgType, QString msgValue) // ms
 void ProgressWindow::UpdateProgressBar(int progressValue) // progressBar
 {
     ui->progressBar->setValue(progressValue);
+}
+
+void ProgressWindow::StepProgress(void)
+{
+    counter++;
 }

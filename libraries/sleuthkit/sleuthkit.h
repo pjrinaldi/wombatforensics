@@ -25,8 +25,8 @@
 #include <QStandardItemModel>
 #include <QByteArray>
 #include <QDataStream>
-#include <QtConcurrent>
-//#include <QThreadPool>
+//#include <QtConcurrent>
+#include <QThreadPool>
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {
@@ -44,15 +44,16 @@ public:
     void SetupSystemSchedulerQueue();
     void SetupSystemFileManager();
     void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
-    void PrepEvidence(QString evidencePath);
+    //void PrepEvidence(QString evidencePath);
     void LogEntry(QString logMsg);
     QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
-    void TskSchedulerQueue::RunTask(task_struct* task); 
+    void RunTask(TskSchedulerQueue::task_struct &task); 
 
 private:
     int currentcaseid;
+    int progresscount;
     WombatVariable *sleuthvariable;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
@@ -61,8 +62,9 @@ private:
     TskSchedulerQueue scheduler;
     QString evidencepath;
     ProgressWindow* evidenceprogress;
+
 };
-/*
+
 class OpenEvidenceRunner : public QObject, public QRunnable
 {
     Q_OBJECT
@@ -72,12 +74,12 @@ public:
     void run();
 
 signals:
-    SetFileCount()
+    void SetFileCount(void);
 private:
     QString evidencepath;
     TskImageFileTsk imagefiletsk;
 };
-
+/*
 class ExtractEvidenceRunner : public QRunnable
 {
 public:

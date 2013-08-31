@@ -21,9 +21,13 @@ public:
     void UpdateMessageTable(QString msgType, QString msgValue); // msgTableWidget
     void UpdateProgressBar(int progressValue); // progressBar
     ~ProgressWindow();
-    
+
+private slots:
+    void StepProgress(void);
 private:
     Ui::ProgressWindow *ui;
+    int counter;
+
 };
 
 #endif // PROGRESSWINDOW_H
