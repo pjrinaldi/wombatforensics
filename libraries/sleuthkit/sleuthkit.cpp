@@ -215,10 +215,10 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     //
     // begin openevidence thread
     OpenEvidenceRunner* openEvidence = new OpenEvidenceRunner(evidencePath);
-    TskImageFileTsk imagefiletsk;
+    //TskImageFileTsk imagefiletsk;
     QThreadPool *threadpool = QThreadPool::globalInstance();
     threadpool->start(openEvidence);
-    //imagefiletsk = openEvidence->GetImageFileTsk();
+    //imagefiletsk = TskServices::Instance().getImageFile();
     int fileCount = 0;
     int processCount = 0;
     /*
@@ -237,6 +237,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     // ExtractFilesThread(imagefiletsk)
     //
     // begin extract files thread
+    /*
     try
     {
         imagefiletsk.extractFiles();
@@ -250,8 +251,10 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     catch(TskException &ex)
     {
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
-    }
+    }*/
     // end extract files thread
+    ExtractEvidenceRunner *extractEvidence = new ExtractEvidenceRunner();
+    threadpool->start(extractEvidence);
     // ExecuteTaskThread(task)
     //
     // begin execute task thread
@@ -536,4 +539,17 @@ void OpenEvidenceRunner::run()
 }
 ExtractEvidenceRunner::ExtractEvidenceRunner()
 {
+}
+void ExtractEvidenceRunner::run()
+{
+    try
+    {
+        TskImageFileTsk imagefiletsk = <TskImageFileTsk>TskServices::Instance().getImageFile();
+        imagefiletsk.extractFiles();
+        fprintf(stderr, "Extracting Evidence was successful\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
+    }
 }

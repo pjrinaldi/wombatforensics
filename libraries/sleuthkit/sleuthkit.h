@@ -15,7 +15,6 @@
 #include "TskImageFileTsk.h"
 #include "TskFileTsk.h"
 #include "TskLog.h"
-//#include "TskScheduleRunner.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QString>
@@ -27,7 +26,6 @@
 #include <QByteArray>
 #include <QDataStream>
 #include <QThreadPool>
-//#include <QThread>
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {
@@ -72,6 +70,15 @@ public:
 private:
     QString evidencepath;
     TskImageFileTsk imagefiletsk;
+};
+
+class ExtractEvidenceRunner : public QRunnable
+{
+public:
+    ExtractEvidenceRunner();
+    void run();
+private:
+
 };
 
 #endif // SLEUTHKIT_H
