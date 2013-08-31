@@ -534,3 +534,6 @@ void OpenEvidenceRunner::run()
         fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
     }
 }
+ExtractEvidenceRunner::ExtractEvidenceRunner()
+{
+}
