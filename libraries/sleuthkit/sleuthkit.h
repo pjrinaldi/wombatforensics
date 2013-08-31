@@ -25,7 +25,8 @@
 #include <QStandardItemModel>
 #include <QByteArray>
 #include <QDataStream>
-#include <QThreadPool>
+#include <QtConcurrent>
+//#include <QThreadPool>
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
 {
@@ -60,13 +61,17 @@ private:
     QString evidencepath;
     ProgressWindow* evidenceprogress;
 };
-
-class OpenEvidenceRunner : public QRunnable
+/*
+class OpenEvidenceRunner : public QObject, public QRunnable
 {
+    Q_OBJECT
+
 public:
     OpenEvidenceRunner(QString evidencePath);
     void run();
 
+signals:
+    SetFileCount()
 private:
     QString evidencepath;
     TskImageFileTsk imagefiletsk;
@@ -80,5 +85,5 @@ public:
 private:
 
 };
-
+*/
 #endif // SLEUTHKIT_H

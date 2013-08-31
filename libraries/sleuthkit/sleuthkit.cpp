@@ -211,19 +211,19 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
 
     int fileCount = 0;
     int processCount = 0;
-   // POSSIBLY PUT THREADING INSIDE HERE AND CALL THE FILETSK STUFF INSTEAD OF THE SLEUTHKIT STUFF
+    // POSSIBLY PUT THREADING INSIDE HERE AND CALL THE FILETSK STUFF INSTEAD OF THE SLEUTHKIT STUFF
     //
     // OpenEvidenceThread(evidencePath)
     //
     // begin openevidence thread
-    OpenEvidenceRunner* openEvidence = new OpenEvidenceRunner(evidencePath);
-    //TskImageFileTsk imagefiletsk;
-    QThreadPool *threadpool = QThreadPool::globalInstance();
-    threadpool->start(openEvidence);
-    fileCount = TskServices::Instance().getImgDB().getNumFiles();
-    fprintf(stderr, "File Count: %d\n", fileCount);
+    //OpenEvidenceRunner* openEvidence = new OpenEvidenceRunner(evidencePath);
+    TskImageFileTsk imagefiletsk;
+    //QThreadPool *threadpool = QThreadPool::globalInstance();
+    //threadpool->start(openEvidence);
+    //fileCount = TskServices::Instance().getImgDB().getNumFiles();
+    //fprintf(stderr, "File Count: %d\n", fileCount);
     //imagefiletsk = TskServices::Instance().getImageFile();
-    /*
+    
     try
     {
         imagefiletsk.open(evidencePath.toStdString());
@@ -234,12 +234,12 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     {
         fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
     }
-    */
+    
     // end open evidence thread
     // ExtractFilesThread(imagefiletsk)
     //
     // begin extract files thread
-    /*
+    
     try
     {
         imagefiletsk.extractFiles();
@@ -253,7 +253,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     catch(TskException &ex)
     {
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
-    }*/
+    }
     // end extract files thread
     //ExtractEvidenceRunner *extractEvidence = new ExtractEvidenceRunner();
     //threadpool->start(extractEvidence);
@@ -518,7 +518,7 @@ QString SleuthKitPlugin::GetFileTxtContents(int fileID)
     qFile.close();
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.txt";
 }
-
+/*
 OpenEvidenceRunner::OpenEvidenceRunner(QString evidencePath)
 {
     evidencepath = evidencePath;
@@ -526,8 +526,8 @@ OpenEvidenceRunner::OpenEvidenceRunner(QString evidencePath)
 
 void OpenEvidenceRunner::run()
 {
-    int fileCount = 0;
-    int processCount = 0;
+    //int fileCount = 0;
+    //int processCount = 0;
     try
     {
         imagefiletsk.open(evidencepath.toStdString());
@@ -568,3 +568,4 @@ void ExtractEvidenceRunner::run()
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }
 }
+*/
