@@ -206,6 +206,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     // OpenEvidenceThread(evidencePath)
     //
     // begin openevidence thread
+    PrepEvidence(evidencePath);
     OpenEvidenceRunner* openEvidence = new OpenEvidenceRunner(evidencePath);
     //TskImageFileTsk imagefiletsk;
     QThreadPool *threadpool = QThreadPool::globalInstance();
@@ -346,12 +347,12 @@ void SleuthKitPlugin::RunTask(TskSchedulerQueue::task_struct &task)
     }
 }
 */
-/*
+
 void SleuthKitPlugin::PrepEvidence(QString evidencePath)
 {
     evidencepath = evidencePath;
 }
-*/
+
 void SleuthKitPlugin::LogEntry(QString logMsg)
 {
     LOGINFO(logMsg.toStdString().c_str());
@@ -579,7 +580,7 @@ void OpenEvidenceRunner::run()
 {
     //int fileCount = 0;
     //int processCount = 0;
-    TskImageFileTsk imagefiletsk;
+    //TskImageFileTsk imagefiletsk;
     try
     {
         imagefiletsk.open(evidencepath.toStdString());
