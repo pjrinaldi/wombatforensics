@@ -1,6 +1,6 @@
 
 TEMPLATE = lib
-QT += core gui widgets
+QT += core concurrent gui widgets
 CONFIG += plugin
 CONFIG += debug
 TARGET = $$qtLibraryTarget(sleuthkitplugin)

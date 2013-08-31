@@ -23,6 +23,7 @@ class TSK_FRAMEWORK_API TskSchedulerQueue : public Scheduler {
 public:
     int schedule(Scheduler::TaskType task, uint64_t startId, uint64_t endId);
     task_struct *nextTask();
+    std::queue<task_struct *> GetSchedulerQueue() { return m_queue; }
 
 private:
     std::queue <task_struct *> m_queue;  

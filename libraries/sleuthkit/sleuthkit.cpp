@@ -260,7 +260,11 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     // ExecuteTaskThread(task)
     //
     // begin execute task thread
+    std::queue<TskSchedulerQueue::task_struct*> taskqueue = scheduler.GetSchedulerQueue();
     TskSchedulerQueue::task_struct *task;
+
+    // NEED TO CALL QTCONCURRENT::MAP(TASKQUEUE, RUNTASK)
+    /*
     while((task = scheduler.nextTask()) != NULL)
     {
         try
@@ -285,6 +289,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         progresswindow->UpdateFilesProcessed(QString::number(processCount));
         // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
     }
+    */
     // IF FILESFOUND == FILESPROCESSED... THEN GET LOG COUNT FOR CASEID, EVIDENCEID, JOBID AND ENSURE THERE ARE NO ERROR'S
     // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
     // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
@@ -297,6 +302,25 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     }
 }
 
+void SleuthKitPlugin::RunTask(TskSchedulerQueue::task_struct* task)
+{
+    try
+    {
+        if(task->task == Scheduler::FileAnalysis && filePipeline && !filePipeline->isEmpty())
+        {
+            filePipeline->run(task->id);
+        }
+        else
+        {
+            fprintf(stderr, "Skipping task: %s\n", task->task);
+        }
+        delete task;
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "TskException: %s\n", ex.message().c_str());
+    }
+}
 void SleuthKitPlugin::PrepEvidence(QString evidencePath)
 {
     evidencepath = evidencePath;

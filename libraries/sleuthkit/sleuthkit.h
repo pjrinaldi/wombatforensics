@@ -49,6 +49,7 @@ public:
     QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
+    void TskSchedulerQueue::RunTask(task_struct* task); 
 
 private:
     int currentcaseid;
