@@ -18,7 +18,6 @@
 
 // Framework includes
 #include "TskFileTsk.h"
-#include <tsk/framework/services/TskServices.h>
 #include <tsk/framework/utilities/TskException.h>
 #include <tsk/framework/utilities/TskUtilities.h>
 #include "TskFileManagerImpl.h"

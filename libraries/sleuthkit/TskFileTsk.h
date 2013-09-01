@@ -23,6 +23,8 @@
 #include <tsk/framework/file/TskFile.h>
 #include <tsk/framework/services/TskImgDB.h>
 #include <tsk/base/tsk_os.h>
+#include "TskLog.h"
+#include "TskServices.h"
 
 // Poco includes
 #include <Poco/File.h>

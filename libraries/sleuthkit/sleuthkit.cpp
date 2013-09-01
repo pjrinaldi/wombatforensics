@@ -102,7 +102,8 @@ void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, Prog
     tmpPath += logFilePath;
     try
     {
-        log = std::auto_ptr<Log>(new TskLog(progressWindow, wombatVariable));
+        log = std::auto_ptr<Log>(new TskLog(wombatVariable));
+        //log = std::auto_ptr<Log>(new TskLog(progressWindow, wombatVariable));
         log->open(tmpPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");

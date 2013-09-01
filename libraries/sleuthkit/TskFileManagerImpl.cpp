@@ -20,7 +20,7 @@
 #include "TskFileManagerImpl.h"
 #include "TskFileTsk.h"
 #include "tsk/framework/services/TskSystemProperties.h"
-#include "tsk/framework/services/TskServices.h"
+#include "TskServices.h"
 #include "tsk/framework/utilities/TskException.h"
 #include "tsk/framework/utilities/TskUtilities.h"
 

@@ -15,10 +15,12 @@ class TskLog : public Log
 {
 public:
 
-    TskLog(ProgressWindow *progressWindow, WombatVariable *logVariable);
+    TskLog(WombatVariable *logVariable);
+    TskLog();
     virtual ~TskLog();
 
     void log(Channel msgType, const std::string &logMsg);
+    void log(Channel msgType, const std::wstring &logMsg);
 
 protected:
     std::string logpath;
@@ -28,7 +30,5 @@ protected:
     int imageid;
     int analysistype;
     WombatVariable *logvariable;
-    ProgressWindow* progresswindow;
-
 };
 #endif
