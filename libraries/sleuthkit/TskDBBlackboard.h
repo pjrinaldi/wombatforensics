@@ -20,7 +20,7 @@
 #include <tsk/framework/utilities/TskException.h>
 #include <tsk/framework/services/TskBlackboard.h>
 #include <tsk/framework/services/TskImgDB.h>
-#include <tsk/framework/services/TskServices.h>
+#include "TskServices.h"
 #include <tsk/framework/services/TskBlackboardArtifact.h>
 #include <tsk/framework/services/TskBlackboardAttribute.h>
 

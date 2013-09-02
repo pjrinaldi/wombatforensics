@@ -13,7 +13,7 @@
 
 #include "TskDBBlackboard.h"
 #include "tsk/framework/services/TskImgDB.h"
-#include <tsk/framework/services/TskServices.h>
+#include "TskServices.h"
 #include "TskFileTsk.h"
 #include "tsk/framework/file/TskFile.h"
 #include "TskFileManagerImpl.h"

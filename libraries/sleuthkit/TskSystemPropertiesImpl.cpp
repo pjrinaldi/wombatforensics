@@ -18,7 +18,7 @@
 #include "TskSystemPropertiesImpl.h"
 
 #include "TskLog.h"
-#include "tsk/framework/services/TskServices.h"
+#include "TskServices.h"
 #include "tsk/framework/utilities/TskUtilities.h"
 #include "tsk/framework/utilities/TskException.h"
 #include "Poco/Util/XMLConfiguration.h"
