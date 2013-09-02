@@ -19,7 +19,7 @@
 #include <algorithm>
 
 #include "TskImageFileTsk.h"
-#include "TskAutoImpl.h"
+#include "tsk/framework/extraction/TskAutoImpl.h"
 #include "tsk/framework/utilities/TskUtilities.h"
 #include "tsk/framework/services/TskServices.h"
 #include "tsk/base/tsk_base_i.h"

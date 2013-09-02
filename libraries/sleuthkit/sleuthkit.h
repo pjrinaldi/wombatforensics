@@ -11,9 +11,9 @@
 #include "TskImgDBSqlite.h"
 #include "TskDBBlackboard.h"
 #include "TskSchedulerQueue.h"
-#include "TskFileManagerImpl.h"
+#include <tsk/framework/file/TskFileManagerImpl.h>
 #include "TskImageFileTsk.h"
-#include "TskFileTsk.h"
+#include <tsk/framework/file/TskFileTsk.h>
 #include "TskLog.h"
 #include <QtPlugin>
 #include <QObject>
