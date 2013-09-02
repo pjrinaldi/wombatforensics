@@ -197,6 +197,11 @@ void SleuthKitPlugin::SetupSystemFileManager()
     }
 }
 
+void SleuthKitPlugin::threadFinished()
+{
+    fprintf(stderr, "The Thread Finished. ");
+}
+
 void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
 {
 
@@ -209,8 +214,10 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     // begin openevidence thread
     PrepEvidence(evidencePath);
     OpenEvidenceRunner* openEvidence = new OpenEvidenceRunner(evidencePath);
+    openEvidence->setAutoDelete(false);
     //TskImageFileTsk imagefiletsk;
     QThreadPool *threadpool = QThreadPool::globalInstance();
+    connect(openEvidence, SIGNAL(Finished()), this,SLOT(threadFinished()), Qt::QueuedConnection); 
     threadpool->start(openEvidence);
     threadpool->waitForDone();
     fileCount = TskServices::Instance().getImgDB().getNumFiles();
@@ -293,7 +300,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
             {
                 fprintf(stderr, "Skipping task: %s\n", task->task);
             }
-            //delete task;
+            delete task;
         }
         catch(TskException &ex)
         {
@@ -310,7 +317,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
     // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
     progresswindow->UpdateAnalysisState("Processing Finished");
-    delete task;
+    //delete task;
     // end execute task thread
 }
 /*
@@ -579,9 +586,6 @@ OpenEvidenceRunner::OpenEvidenceRunner(QString evidencePath)
 
 void OpenEvidenceRunner::run()
 {
-    //int fileCount = 0;
-    //int processCount = 0;
-    //TskImageFileTsk imagefiletsk;
     try
     {
         imagefiletsk.open(evidencepath.toStdString());
@@ -601,8 +605,7 @@ void OpenEvidenceRunner::run()
     {
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }
-
-
+    emit Finished();
 }
 /*
 ExtractEvidenceRunner::ExtractEvidenceRunner()

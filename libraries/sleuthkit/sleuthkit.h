@@ -63,6 +63,8 @@ private:
     QString evidencepath;
     ProgressWindow* evidenceprogress;
 
+public slots:
+    void threadFinished(void);
 };
 
 class OpenEvidenceRunner : public QObject, public QRunnable
@@ -74,7 +76,7 @@ public:
     void run();
 
 signals:
-    void SetFileCount(void);
+    void Finished(void);
 private:
     QString evidencepath;
     TskImageFileTsk imagefiletsk;
