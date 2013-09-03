@@ -3,6 +3,7 @@
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
     ui->setupUi(this);
+    threadpool = QThreadPool::globalInstance();
     wombatvariable = new WombatVariable();
     wombatCaseData = new WombatCaseDb(this);
     wombatprogresswindow = new ProgressWindow();
@@ -237,8 +238,8 @@ void WombatForensics::alterEvidence()
     //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
     {
-        QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
-        //QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
+        //QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
+        QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
         //QString evidenceFilePath = iEvidence->addEvidence();
         //QFileDialog *filedialog = new QFileDialog(0, "Select Evidence Item", "./");
         //filedialog->setFileMode(QFileDialog::ExistingFile);
@@ -269,7 +270,11 @@ void WombatForensics::alterEvidence()
             //QList<QStringList> = wombatCaseData->ReturnLogMessages(wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
             wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
             wombatprogresswindow->show();
-            sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
+            PluginRunner* prun = new PluginRunner(this, sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
+            prun->setAutoDelete(false);
+            threadpool->start(prun);
+            threadpool->waitForDone();
+            //sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
             // need to populate the directory tree entries
             //
             //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());

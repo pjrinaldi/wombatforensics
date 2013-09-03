@@ -30,4 +30,6 @@ private:
 
 };
 
+Q_DECLARE_METATYPE(ProgressWindow*)
+
 #endif // PROGRESSWINDOW_H
