@@ -91,11 +91,12 @@
    <addaction name="actionOpen_Case"/>
    <addaction name="separator"/>
    <addaction name="actionView_Progress"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionNew_Case">
    <property name="icon">
-    <iconset resource="wombat.qrc">
-        <normaloff>:/newcase</normaloff>:/newcase</iconset>
+    <iconset>
+     <normaloff>:/newcase</normaloff>:/newcase</iconset>
    </property>
    <property name="text">
     <string>New Case</string>
@@ -103,21 +104,24 @@
   </action>
   <action name="actionOpen_Case">
    <property name="icon">
-    <iconset resource="wombat.qrc">
-        <normaloff>:/opencase</normaloff>:/opencase</iconset>
+    <iconset>
+     <normaloff>:/opencase</normaloff>:/opencase</iconset>
    </property>
    <property name="text">
     <string>Open Case</string>
    </property>
   </action>
   <action name="actionView_Progress">
-      <property name="icon">
-          <iconset resource="progresswindow.qrc">
-              <normaloff>:/progresswindow/window</normaloff>:/progresswindow/window</iconset>
-      </property>
-      <property name="text">
-          <string>View Progress...</string>
-      </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/progresswindow/window</normaloff>:/progresswindow/window</iconset>
+   </property>
+   <property name="text">
+    <string>View Progress...</string>
+   </property>
   </action>
   <action name="actionExit">
    <property name="text">

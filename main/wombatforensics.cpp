@@ -377,9 +377,12 @@ void WombatForensics::on_actionOpen_Case_triggered()
     }
 }
 
-void WombatForensics::on_actionView_Progress_triggered()
+void WombatForensics::on_actionView_Progress_triggered(bool checked)
 {
-    wombatprogresswindow->show();
+    if(!checked)
+        wombatprogresswindow->hide();
+    else
+        wombatprogresswindow->show();
 }
 
 void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName)

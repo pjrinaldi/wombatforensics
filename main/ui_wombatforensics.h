@@ -62,6 +62,7 @@ public:
         actionOpen_Case->setIcon(icon1);
         actionView_Progress = new QAction(WombatForensics);
         actionView_Progress->setObjectName(QStringLiteral("actionView_Progress"));
+        actionView_Progress->setCheckable(true);
         QIcon icon2;
         icon2.addFile(QStringLiteral(":/progresswindow/window"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_Progress->setIcon(icon2);
@@ -118,6 +119,7 @@ public:
         mainToolBar->addAction(actionOpen_Case);
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionView_Progress);
+        mainToolBar->addSeparator();
 
         retranslateUi(WombatForensics);
 

@@ -200,11 +200,20 @@ void SleuthKitPlugin::SetupSystemFileManager()
 void SleuthKitPlugin::threadFinished()
 {
     fprintf(stderr, "The Thread Finished. ");
+    QCoreApplication::processEvents();
+}
+
+void SleuthKitPlugin::UpdateProgress(int count, int progress)
+{
+    evidenceprogress->UpdateProgressBar(progress);
+    evidenceprogress->UpdateFilesProcessed(QString::number(count));
+    QCoreApplication::processEvents();
+    evidenceprogress->repaint();
 }
 
 void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
 {
-
+    evidenceprogress = progresswindow;
     int fileCount = 0;
     int processCount = 0;
     // POSSIBLY PUT THREADING INSIDE HERE AND CALL THE FILETSK STUFF INSTEAD OF THE SLEUTHKIT STUFF
@@ -217,7 +226,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     openEvidence->setAutoDelete(false);
     //TskImageFileTsk imagefiletsk;
     QThreadPool *threadpool = QThreadPool::globalInstance();
-    connect(openEvidence, SIGNAL(Finished()), this,SLOT(threadFinished()), Qt::QueuedConnection); 
+    connect(openEvidence, SIGNAL(Finished()), this, SLOT(threadFinished()), Qt::QueuedConnection); 
     threadpool->start(openEvidence);
     threadpool->waitForDone();
     fileCount = TskServices::Instance().getImgDB().getNumFiles();
@@ -226,6 +235,13 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     progresswindow->UpdateFilesFound(QString::number(fileCount));
     progresswindow->UpdateAnalysisState("Processing Files");
 
+    ProcessEvidenceRunner* processEvidence = new ProcessEvidenceRunner(fileCount);
+    processEvidence->setAutoDelete(false);
+    connect(processEvidence, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+    connect(processEvidence, SIGNAL(Finished()), this, SLOT(threadFinished()), Qt::QueuedConnection);
+    threadpool->start(processEvidence);
+    threadpool->waitForDone();
+    progresswindow->UpdateAnalysisState("Processing Finished");
     //imagefiletsk = TskServices::Instance().getImageFile();
     /*
     try
@@ -266,9 +282,8 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     //
     // begin execute task thread
     //std::queue<TskSchedulerQueue::task_struct> taskqueue = scheduler.GetSchedulerQueue();
-    TskSchedulerQueue::task_struct *task;
-
-    progresscount = 0;
+    //TskSchedulerQueue::task_struct *task;
+    //progresscount = 0;
     //QFutureWatcher<void> futurewatcher;
     //QObject::connect(&futurewatcher, SIGNAL(finished()), progresswindow, SLOT(IncreaseCount()));
 
@@ -278,6 +293,7 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
 
     // NEED TO CALL QTCONCURRENT::MAP(TASKQUEUE, RUNTASK)
     //
+    /*
     TskPipelineManager pipelineMgr;
     TskPipeline *filePipeline;
     try
@@ -317,7 +333,8 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
     // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
     progresswindow->UpdateAnalysisState("Processing Finished");
-    //delete task;
+    //delete task
+    */
     // end execute task thread
 }
 /*
@@ -607,22 +624,54 @@ void OpenEvidenceRunner::run()
     }
     emit Finished();
 }
-/*
-ExtractEvidenceRunner::ExtractEvidenceRunner()
+
+ProcessEvidenceRunner::ProcessEvidenceRunner(int filecount)
 {
+    fileCount = filecount;
 }
-void ExtractEvidenceRunner::run()
+
+void ProcessEvidenceRunner::run()
 {
+    TskSchedulerQueue::task_struct *task;
+    int progresscount = 0;
+    int processCount = 0;
+    TskPipelineManager pipelineMgr;
+    TskPipeline *filePipeline;
     try
     {
-        //TskImageFileTsk imagefiletsk = TskServices::Instance().getImageFile();
-        //imagefiletsk.extractFiles();
-        TskServices::Instance().getImageFile().extractFiles();
-        fprintf(stderr, "Extracting Evidence was successful\n");
+        filePipeline = pipelineMgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
     }
-    catch(TskException &ex)
+    catch(const TskException &ex)
     {
-        fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
+        fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
     }
+    while((task = TskServices::Instance().getScheduler().nextTask()) != NULL)
+    {
+        try
+        {
+            if(task->task == Scheduler::FileAnalysis && filePipeline && !filePipeline->isEmpty())
+            {
+                filePipeline->run(task->id);
+            }
+            else
+            {
+                fprintf(stderr, "Skipping task: %s\n", task->task);
+            }
+            delete task;
+        }
+        catch(TskException &ex)
+        {
+            fprintf(stderr, "TskException: %s\n", ex.message().c_str());
+        }
+        processCount++;
+        //fprintf(stderr, "Progress Count: %d\n", processCount);
+        int curprogress = (int)((((float)processCount)/(float)fileCount)*100);
+        QCoreApplication::processEvents();
+        emit UpdateStatus(processCount, curprogress);
+    }
+    emit Finished();
 }
-*/
+/*
+void ProcessEvidenceRunner::UpdateStatus(int count, int progress)
+{
+}*/

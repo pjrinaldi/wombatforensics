@@ -65,6 +65,7 @@ private:
 
 public slots:
     void threadFinished(void);
+    void UpdateProgress(int count, int progress);
 };
 
 class OpenEvidenceRunner : public QObject, public QRunnable
@@ -81,14 +82,19 @@ private:
     QString evidencepath;
     TskImageFileTsk imagefiletsk;
 };
-/*
-class ExtractEvidenceRunner : public QRunnable
-{
-public:
-    ExtractEvidenceRunner();
-    void run();
-private:
 
+class ProcessEvidenceRunner : public QObject, public QRunnable
+{
+    Q_OBJECT
+
+public:
+    ProcessEvidenceRunner(int filecount);
+    void run();
+signals:
+    void Finished(void);
+    void UpdateStatus(int count, int progress);
+private:
+    int fileCount;
 };
-*/
+
 #endif // SLEUTHKIT_H

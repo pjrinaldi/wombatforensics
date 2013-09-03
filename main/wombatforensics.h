@@ -40,7 +40,7 @@ private slots:
     void alterEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
-    void on_actionView_Progress_triggered();
+    void on_actionView_Progress_triggered(bool checked);
     void dirTreeView_selectionChanged(const QModelIndex &index);
 
 private:
