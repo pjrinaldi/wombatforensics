@@ -25,7 +25,6 @@
 #include <QStandardItemModel>
 #include <QByteArray>
 #include <QDataStream>
-//#include <QtConcurrent>
 #include <QThreadPool>
 
 class SleuthKitPlugin : public QObject, public SleuthKitInterface
@@ -49,7 +48,6 @@ public:
     QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
-    void RunTask(TskSchedulerQueue::task_struct &task); 
 
 private:
     int currentcaseid;

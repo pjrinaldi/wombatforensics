@@ -196,6 +196,7 @@ void WombatForensics::addActions(QObject *plugin, const QStringList &texts, cons
     }
 }
 
+/*
 void WombatForensics::dialogClosed(QString file)
 {
     QString evidenceFilePath = file;
@@ -233,15 +234,17 @@ void WombatForensics::dialogClosed(QString file)
         currenttreeview->setModel(wombatdirmodel);
     }
 }
+*/
+
 void WombatForensics::alterEvidence()
 {
     QAction *action = qobject_cast<QAction *>(sender());
     //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
     {
-        //wombatprogresswindow->show();
-        QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
-        //QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
+        wombatprogresswindow->show();
+        //QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
+        QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
         //QString evidenceFilePath = iEvidence->addEvidence();
         //QFileDialog *filedialog = new QFileDialog(0, "Select Evidence Item", "./");
         //filedialog->setFileMode(QFileDialog::ExistingFile);
@@ -254,6 +257,7 @@ void WombatForensics::alterEvidence()
             // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
             QString evidenceName = evidenceFilePath.split("/").last();
             evidenceName += ".db";
+            /*
             currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
             wombatvariable->SetEvidenceID(wombatCaseData->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
@@ -282,6 +286,7 @@ void WombatForensics::alterEvidence()
             //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
             //currentroot->appendRow(imageNode);
             //currenttreeview->setModel(wombatdirmodel);
+            */
        }//*/
     }
     else if(action->text() == tr("Remove Evidence"))
@@ -348,9 +353,9 @@ void WombatForensics::on_actionNew_Case_triggered()
             {
                 ui->actionOpen_Case->setEnabled(true);
             }
-            evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
-            basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
-            sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
+            //evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
+            //basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
+            //sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
             ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
         }
@@ -435,7 +440,7 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
     else
         wombatprogresswindow->show();
 }
-
+/*
 void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
@@ -510,9 +515,10 @@ void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePat
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-       iSleuthKit->OpenEvidence(evidencePath, wombatprogresswindow);
+       //iSleuthKit->OpenEvidence(evidencePath, wombatprogresswindow);
     }
 }
+*/
 
 QStandardItem* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName)
 {
