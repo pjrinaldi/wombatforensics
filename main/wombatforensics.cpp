@@ -199,7 +199,7 @@ void WombatForensics::addActions(QObject *plugin, const QStringList &texts, cons
 void WombatForensics::dialogClosed(QString file)
 {
     QString evidenceFilePath = file;
-    wombatprogresswindow->show();
+    //wombatprogresswindow->show();
     fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
     if(evidenceFilePath != "")
     {
@@ -239,7 +239,7 @@ void WombatForensics::alterEvidence()
     //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
     {
-        wombatprogresswindow->show();
+        //wombatprogresswindow->show();
         QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
         //QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
         //QString evidenceFilePath = iEvidence->addEvidence();
@@ -506,6 +506,7 @@ void WombatForensics::setupSleuthKitFileManager(QObject *plugin)
 //void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow)
 void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath)
 {
+    wombatprogresswindow->show();
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
