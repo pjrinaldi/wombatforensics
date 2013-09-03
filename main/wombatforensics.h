@@ -61,7 +61,8 @@ private:
     void setupSleuthKitBlackboard(QObject *plugin);
     void setupSleuthKitSchedulerQueue(QObject *plugin);
     void setupSleuthKitFileManager(QObject *plugin);
-    Q_INVOKABLE void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow);
+    //Q_INVOKABLE void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow);
+    Q_INVOKABLE void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath);
     void SleuthKitLogEntry(QObject *plugin, QString logMsg);
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
@@ -91,21 +92,19 @@ class PluginRunner : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    PluginRunner(QWidget* Parent, QObject* Plug, QString ePath, ProgressWindow* pWindow)
+    PluginRunner(QWidget* Parent, QObject* Plug, QString ePath)
     {
         currentplug = Plug;
         currentpath = ePath;
-        pwin = pWindow;
         parent = Parent;
     };
     void run()
     {
-        QMetaObject::invokeMethod(parent, "sleuthKitLoadEvidence", Qt::QueuedConnection, Q_ARG(QObject*, currentplug), Q_ARG(QString, currentpath), Q_ARG(ProgressWindow*, pwin));
+        QMetaObject::invokeMethod(parent, "sleuthKitLoadEvidence", Qt::QueuedConnection, Q_ARG(QObject*, currentplug), Q_ARG(QString, currentpath));
     };
 private:
     QObject *currentplug;
     QString currentpath;
-    ProgressWindow* pwin;
     QWidget* parent;
 };
 

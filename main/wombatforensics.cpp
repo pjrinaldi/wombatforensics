@@ -199,6 +199,7 @@ void WombatForensics::addActions(QObject *plugin, const QStringList &texts, cons
 void WombatForensics::dialogClosed(QString file)
 {
     QString evidenceFilePath = file;
+    wombatprogresswindow->show();
     fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
     if(evidenceFilePath != "")
     {
@@ -223,8 +224,8 @@ void WombatForensics::dialogClosed(QString file)
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
         //QList<QStringList> = wombatCaseData->ReturnLogMessages(wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
         wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
-        wombatprogresswindow->show();
-        sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
+        sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
+        //sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
         // need to populate the directory tree entries
         QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());
         QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
@@ -238,8 +239,9 @@ void WombatForensics::alterEvidence()
     //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
     {
-        //QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
-        QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
+        wombatprogresswindow->show();
+        QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
+        //QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
         //QString evidenceFilePath = iEvidence->addEvidence();
         //QFileDialog *filedialog = new QFileDialog(0, "Select Evidence Item", "./");
         //filedialog->setFileMode(QFileDialog::ExistingFile);
@@ -269,8 +271,7 @@ void WombatForensics::alterEvidence()
             wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
             //QList<QStringList> = wombatCaseData->ReturnLogMessages(wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
             wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
-            wombatprogresswindow->show();
-            PluginRunner* prun = new PluginRunner(this, sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
+            PluginRunner* prun = new PluginRunner(this, sleuthkitplugin, evidenceFilePath);
             prun->setAutoDelete(false);
             threadpool->start(prun);
             threadpool->waitForDone();
@@ -502,12 +503,13 @@ void WombatForensics::setupSleuthKitFileManager(QObject *plugin)
         iSleuthKit->SetupSystemFileManager();
     }
 }
-void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow)
+//void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow)
+void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
     {
-       iSleuthKit->OpenEvidence(evidencePath, progressWindow);
+       iSleuthKit->OpenEvidence(evidencePath, wombatprogresswindow);
     }
 }
 
