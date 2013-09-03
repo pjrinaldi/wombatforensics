@@ -200,15 +200,15 @@ void SleuthKitPlugin::SetupSystemFileManager()
 void SleuthKitPlugin::threadFinished()
 {
     fprintf(stderr, "The Thread Finished. ");
-    QCoreApplication::processEvents();
+    //QCoreApplication::processEvents();
 }
 
 void SleuthKitPlugin::UpdateProgress(int count, int progress)
 {
     evidenceprogress->UpdateProgressBar(progress);
     evidenceprogress->UpdateFilesProcessed(QString::number(count));
-    QCoreApplication::processEvents();
-    evidenceprogress->repaint();
+    //QCoreApplication::processEvents();
+    //evidenceprogress->repaint();
 }
 
 void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
