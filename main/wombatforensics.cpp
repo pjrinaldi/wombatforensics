@@ -198,10 +198,12 @@ void WombatForensics::addActions(QObject *plugin, const QStringList &texts, cons
 void WombatForensics::alterEvidence()
 {
     QAction *action = qobject_cast<QAction *>(sender());
-    EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
+    //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
     {
-        QString evidenceFilePath = iEvidence->addEvidence();
+        
+        QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
+        //QString evidenceFilePath = iEvidence->addEvidence();
         fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
         if(evidenceFilePath != "")
         {
@@ -236,7 +238,9 @@ void WombatForensics::alterEvidence()
        }
     }
     else if(action->text() == tr("Remove Evidence"))
-        iEvidence->remEvidence(wombatvariable->GetCaseID());
+    {
+        //iEvidence->remEvidence(wombatvariable->GetCaseID());
+    }
 }
 
 WombatForensics::~WombatForensics()
