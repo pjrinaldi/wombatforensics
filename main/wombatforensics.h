@@ -42,6 +42,7 @@ private slots:
     void on_actionOpen_Case_triggered();
     void on_actionView_Progress_triggered(bool checked);
     void dirTreeView_selectionChanged(const QModelIndex &index);
+    void dialogClosed(QString file);
 
 private:
     Ui::WombatForensics *ui;

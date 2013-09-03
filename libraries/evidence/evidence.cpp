@@ -18,6 +18,10 @@ QString EvidencePlugin::addEvidence()
     // add evidence here
     //currentcaseid = currentCaseID;
     evidenceFile = QFileDialog::getOpenFileName(0, tr("Select Evidence Item"), tr("./"));
+    // MY OWN DIALOG - SEE IF THIS FREES UP STUFF.
+    //QFileDialog *filedialog = new QFileDialog(0, "Select Evidence Item", "./");
+    //filedialog->setFileMode(QFileDialog::ExistingFile);
+    //filedialog->open(this, SLOT(dialogClosed(QString)));
 
     return evidenceFile;
 }
