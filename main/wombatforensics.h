@@ -32,7 +32,7 @@ class WombatForensics : public QMainWindow
 public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
-    WombatCaseDb *wombatCaseData;
+    WombatCaseDb *wombatcasedata;
     WombatVariable *wombatvariable;
     ProgressWindow* wombatprogresswindow;
 

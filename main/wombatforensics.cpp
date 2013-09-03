@@ -5,7 +5,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
     wombatvariable = new WombatVariable();
-    wombatCaseData = new WombatCaseDb(this);
+    wombatcasedata = new WombatCaseDb(this);
     wombatprogresswindow = new ProgressWindow();
     wombatprogresswindow->setModal(false);
     wombatvariable->SetCaseID(0);
@@ -19,49 +19,49 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombattmpfilepath = homePath + "tmpfiles/";
     bool mkPath = (new QDir())->mkpath(wombatsettingspath);
     if(mkPath == false)
-        wombatCaseData->DisplayError(this, "2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
+        wombatcasedata->DisplayError(this, "2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
     mkPath = (new QDir())->mkpath(wombatdatapath);
     if(mkPath == false)
-        wombatCaseData->DisplayError(this, "2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
+        wombatcasedata->DisplayError(this, "2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
     mkPath = (new QDir())->mkpath(wombatcasespath);
     if(mkPath == false)
-        wombatCaseData->DisplayError(this, "2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
+        wombatcasedata->DisplayError(this, "2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
     mkPath = (new QDir())->mkpath(wombattmpfilepath);
     if(mkPath == false)
-        wombatCaseData->DisplayError(this, "2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
+        wombatcasedata->DisplayError(this, "2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     QString logPath = wombatdatapath + "WombatLog.db";
-    bool logFileExist = wombatCaseData->FileExists(logPath.toStdString());
+    bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
     if(!logFileExist)
     {
-        const char* errstring = wombatCaseData->CreateLogDB(logPath);
+        const char* errstring = wombatcasedata->CreateLogDB(logPath);
         if(strcmp(errstring, "") != 0)
-            wombatCaseData->DisplayError(this, "1.0", "Log File Error", errstring);
+            wombatcasedata->DisplayError(this, "1.0", "Log File Error", errstring);
     }
     QString tmpPath = wombatdatapath + "WombatCase.db";
-    bool doesFileExist = wombatCaseData->FileExists(tmpPath.toStdString());
+    bool doesFileExist = wombatcasedata->FileExists(tmpPath.toStdString());
     if(!doesFileExist)
     {
-        const char* errstring = wombatCaseData->CreateCaseDB(tmpPath);
+        const char* errstring = wombatcasedata->CreateCaseDB(tmpPath);
         if(strcmp(errstring, "") != 0)
-            wombatCaseData->DisplayError(this, "1.0", "File Error", errstring);
+            wombatcasedata->DisplayError(this, "1.0", "File Error", errstring);
     }
     else
     {
-        const char* errstring = wombatCaseData->OpenCaseDB(tmpPath);
+        const char* errstring = wombatcasedata->OpenCaseDB(tmpPath);
         if(strcmp(errstring, "") != 0)
-            wombatCaseData->DisplayError(this, "1.1", "SQL", errstring);
+            wombatcasedata->DisplayError(this, "1.1", "SQL", errstring);
     }
-    if(wombatCaseData->ReturnCaseCount() == 0)
+    if(wombatcasedata->ReturnCaseCount() == 0)
     {
         ui->actionOpen_Case->setEnabled(false);
     }
-    else if(wombatCaseData->ReturnCaseCount() > 0)
+    else if(wombatcasedata->ReturnCaseCount() > 0)
     {
         ui->actionOpen_Case->setEnabled(true);
     }
     else
     {
-        wombatCaseData->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
+        wombatcasedata->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
     pluginFileNames.clear();
     pluginFileNames = locatePlugins();
@@ -119,7 +119,25 @@ QStringList WombatForensics::locatePlugins()
     }
     return tmpList;
 }
-
+QList<QObject*> WombatForensics::loadPlugins()
+{
+    QList<QObject*> tmplist;
+    tmplist.clear();
+    QString tmppath = qApp->applicationDirPath();
+    tmppath += "/plugins/";
+    QDir plugdir = QDir(tmppath);
+    foreach(QString filename, plugdir.entryList(QDir::Files))
+    {
+        QPluginLoader loader(plugdir.absoluteFilePath(filename));
+        QObject* plugin = loader.instance();
+        if(plugin)
+        {
+            populateActions(plugin);
+            tmplist.append(plugin);
+        }
+    }
+    return tmplist;
+}
 QObject* WombatForensics::loadPlugin(QString fileName)
 {
    QPluginLoader loader(fileName);
@@ -128,12 +146,12 @@ QObject* WombatForensics::loadPlugin(QString fileName)
         fprintf(stderr, "%s\n", loader.errorString().toStdString().c_str());
     if (plugin)
     {
-        populateActions(plugin);
-        populateTabWidgets(plugin);
-        setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
-        setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt", wombatvariable);
-        setupSleuthKitSchedulerQueue(plugin);
-        setupSleuthKitFileManager(plugin);
+        //populateActions(plugin);
+        //populateTabWidgets(plugin);
+        //setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
+        //setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt", wombatvariable);
+        //setupSleuthKitSchedulerQueue(plugin);
+        //setupSleuthKitFileManager(plugin);
     }
 
     return plugin;
@@ -210,8 +228,8 @@ void WombatForensics::dialogClosed(QString file)
         evidenceName += ".db";
         currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
         setupSleuthKitBlackboard(sleuthkitplugin);
-        wombatvariable->SetEvidenceID(wombatCaseData->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
-        wombatvariable->SetJobID(wombatCaseData->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
+        wombatvariable->SetEvidenceID(wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
+        wombatvariable->SetJobID(wombatcasedata->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
         SleuthKitLogEntry(sleuthkitplugin, "Adding Evidence Started.");
         // UPDATE MESSAGETABLE(CASEID, EVIDENCEID, JOBID) WHEN JOB STARTS TO SHOW IT STARTED... WHICH SHOULD BE A SQL QUERY TO GET LOG ITEMS FOR IT.
         QString tmpString = evidenceName;
@@ -223,7 +241,7 @@ void WombatForensics::dialogClosed(QString file)
         wombatprogresswindow->UpdateFilesFound("0");
         wombatprogresswindow->UpdateFilesProcessed("0");
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
-        //QList<QStringList> = wombatCaseData->ReturnLogMessages(wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
+        //QList<QStringList> = wombatcasedata->ReturnLogMessages(wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
         wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
         sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
         //sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
@@ -260,8 +278,8 @@ void WombatForensics::alterEvidence()
             /*
             currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
             setupSleuthKitBlackboard(sleuthkitplugin);
-            wombatvariable->SetEvidenceID(wombatCaseData->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
-            wombatvariable->SetJobID(wombatCaseData->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
+            wombatvariable->SetEvidenceID(wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
+            wombatvariable->SetJobID(wombatcasedata->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
             SleuthKitLogEntry(sleuthkitplugin, "Adding Evidence Started.");
             // UPDATE MESSAGETABLE(CASEID, EVIDENCEID, JOBID) WHEN JOB STARTS TO SHOW IT STARTED... WHICH SHOULD BE A SQL QUERY TO GET LOG ITEMS FOR IT.
             QString tmpString = evidenceName;
@@ -273,7 +291,7 @@ void WombatForensics::alterEvidence()
             wombatprogresswindow->UpdateFilesFound("0");
             wombatprogresswindow->UpdateFilesProcessed("0");
             wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
-            //QList<QStringList> = wombatCaseData->ReturnLogMessages(wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
+            //QList<QStringList> = wombatcasedata->ReturnLogMessages(wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
             wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
             PluginRunner* prun = new PluginRunner(this, sleuthkitplugin, evidenceFilePath);
             prun->setAutoDelete(false);
@@ -298,7 +316,7 @@ void WombatForensics::alterEvidence()
 WombatForensics::~WombatForensics()
 {
     wombatprogresswindow->~ProgressWindow();
-    const char* errmsg = wombatCaseData->CloseCaseDB(); // this possibly caused glibc corrupted double-linked list
+    const char* errmsg = wombatcasedata->CloseCaseDB(); // this possibly caused glibc corrupted double-linked list
     fprintf(stderr, "CloseDB: %s\n", errmsg);
     delete ui;
 }
@@ -318,7 +336,7 @@ void WombatForensics::on_actionNew_Case_triggered()
         QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
         if(ok && !text.isEmpty())
         {
-            wombatvariable->SetCaseID(wombatCaseData->InsertCase(text));
+            wombatvariable->SetCaseID(wombatcasedata->InsertCase(text));
 
             QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += text;
@@ -336,7 +354,7 @@ void WombatForensics::on_actionNew_Case_triggered()
             }
             else
             {
-                wombatCaseData->DisplayError(this, "2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
+                wombatcasedata->DisplayError(this, "2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
             }
             userPath = currentcasedirpath;
             userPath += "evidence/";
@@ -347,9 +365,9 @@ void WombatForensics::on_actionNew_Case_triggered()
             }
             else
             {
-                wombatCaseData->DisplayError(this, "2.0", "Case Evidence Folder Creation Failed", "Failed to create case evidence folder.");
+                wombatcasedata->DisplayError(this, "2.0", "Case Evidence Folder Creation Failed", "Failed to create case evidence folder.");
             }
-            if(wombatCaseData->ReturnCaseCount() > 0)
+            if(wombatcasedata->ReturnCaseCount() > 0)
             {
                 ui->actionOpen_Case->setEnabled(true);
             }
@@ -377,12 +395,12 @@ void WombatForensics::on_actionOpen_Case_triggered()
         QStringList caseList;
         caseList.clear();
         // populate case list here
-        caseList = wombatCaseData->ReturnCaseNameList();
+        caseList = wombatcasedata->ReturnCaseNameList();
         bool ok;
         QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
         if(ok && !item.isEmpty()) // open selected case
         {
-            wombatvariable->SetCaseID(wombatCaseData->ReturnCaseID(item));
+            wombatvariable->SetCaseID(wombatcasedata->ReturnCaseID(item));
             QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += item;
             this->setWindowTitle(tmpTitle);
@@ -398,7 +416,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
             }
             else
             {
-                wombatCaseData->DisplayError(this, "2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
+                wombatcasedata->DisplayError(this, "2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
             }
             userPath = currentcasedirpath;
             userPath += "evidence/";
@@ -409,7 +427,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
             }
             else
             {
-                wombatCaseData->DisplayError(this, "2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
+                wombatcasedata->DisplayError(this, "2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
             evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
             basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
@@ -418,7 +436,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
             QString caseimage;
-            QStringList caseimageList = wombatCaseData->ReturnCaseEvidence(wombatvariable->GetCaseID());
+            QStringList caseimageList = wombatcasedata->ReturnCaseEvidence(wombatvariable->GetCaseID());
             foreach(caseimage, caseimageList)
             {
                 OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
