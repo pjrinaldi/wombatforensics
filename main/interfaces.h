@@ -2,7 +2,7 @@
 #define INTERFACES_H
 
 #include <QtPlugin>
-#include <QThread>
+//#include <QThread>
 //#include "progresswindow.h"
 #include "wombatvariable.h"
 
@@ -25,6 +25,7 @@ public:
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
 };
+/*
 class ViewerInterface
 {
 public:
@@ -36,6 +37,7 @@ public:
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
 };
+*/
 /*
 class EvidenceInterface 
 {
@@ -50,6 +52,7 @@ public:
 
 };
 */
+/*
 class BasicToolsInterface
 {
 public:
@@ -63,7 +66,7 @@ public:
     virtual void LoadHexModel(QString tmpFilePath) = 0;
     virtual void LoadTxtContent(QString asciiText) = 0;
 };
-
+*/
 class SleuthKitInterface
 {
 public:
@@ -90,8 +93,8 @@ public:
 
 };
 
-#define ViewerInterface_iid "wombat.ViewerInterface"
-Q_DECLARE_INTERFACE(ViewerInterface, ViewerInterface_iid)
+//#define ViewerInterface_iid "wombat.ViewerInterface"
+//Q_DECLARE_INTERFACE(ViewerInterface, ViewerInterface_iid)
 
 #define PluginInterface_iid "wombat.PluginInterface"
 Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)
@@ -99,8 +102,8 @@ Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)
 //#define EvidenceInterface_iid "wombat.EvidenceInterface"
 //Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
 
-#define BasicToolsInterface_iid "wombat.BasicToolsInterface"
-Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)
+//#define BasicToolsInterface_iid "wombat.BasicToolsInterface"
+//Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)
 
 #define SleuthKitInterface_iid "wombat.SleuthKitInterface"
 Q_DECLARE_INTERFACE(SleuthKitInterface, SleuthKitInterface_iid)

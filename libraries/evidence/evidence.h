@@ -2,12 +2,14 @@
 #define EVIDENCE_H
 
 #include <main/interfaces.h>
-#include <sqlite3.h>
+//#include <sqlite3.h>
 #include <QtPlugin>
 #include <QObject>
-#include <QtWidgets>
+//#include <QtWidgets>
+#include <cstdio>
+#include <string>
 #include <QStringList>
-#include <QFileDialog>
+//#include <QFileDialog>
 
 class EvidencePlugin : public QObject, public PluginInterface
 {

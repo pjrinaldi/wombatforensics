@@ -213,6 +213,7 @@ void WombatForensics::PopulateActions(QObject *plugin)
 
 void WombatForensics::PopulateTabWidgets(QObject *plugin)
 {
+    /*
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
     if(iBasicTools)
     {
@@ -222,6 +223,7 @@ void WombatForensics::PopulateTabWidgets(QObject *plugin)
         ui->fileInfoTabWidget->addTab(iBasicTools->setupTypTab(), "File Type");
         SetupDirModel();
     }
+    */
 }
 
 void WombatForensics::SetupDirModel(void)

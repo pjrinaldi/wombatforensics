@@ -1,4 +1,4 @@
-#include <QtWidgets>
+//#include <QtWidgets>
 
 #include "evidence.h"
 
