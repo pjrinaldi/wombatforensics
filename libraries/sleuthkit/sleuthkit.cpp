@@ -1,6 +1,6 @@
 #include "sleuthkit.h"
 
-void SleuthKitPlugin::Initialize(WombatVariable* wombatVariable)
+void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
 {
     wombatvariable = wombatvariable;
 }

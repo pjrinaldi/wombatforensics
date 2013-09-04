@@ -33,7 +33,7 @@ public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
     WombatCaseDb *wombatcasedata;
-    WombatVariable *wombatvariable;
+    WombatVariable wombatvariable;
     ProgressWindow* wombatprogresswindow;
 
 private slots:
@@ -105,7 +105,7 @@ class PluginRunner : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    PluginRunner(QObject* curCaller,WombatVariable* wombatVariable, QString curMethod)
+    PluginRunner(QObject* curCaller,WombatVariable wombatVariable, QString curMethod)
     {
         currentcaller = curCaller;
         wombatvariable = wombatVariable;
@@ -113,13 +113,13 @@ public:
     };
     void run()
     {
-        qRegisterMetaType<WombatVariable*>("WombatVariable");
-        QMetaObject::invokeMethod(currentcaller, currentmethod.toStdString().c_str(), Qt::QueuedConnection, Q_ARG(WombatVariable*, wombatvariable));
+        qRegisterMetaType<WombatVariable>("WombatVariable");
+        QMetaObject::invokeMethod(currentcaller, currentmethod.toStdString().c_str(), Qt::QueuedConnection, Q_ARG(WombatVariable, wombatvariable));
     };
 private:
     QObject* currentcaller;
     QString currentmethod;
-    WombatVariable* wombatvariable;
+    WombatVariable wombatvariable;
 };
 
 #endif // WOMBATFORENSICS_H

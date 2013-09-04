@@ -35,7 +35,7 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
     
 public:
     //SleuthKit Interface Functions
-    Q_INVOKABLE void Initialize(WombatVariable* wombatVariable);
+    Q_INVOKABLE void Initialize(WombatVariable wombatVariable);
     void SetupSystemProperties(QString settingsPath, QString configFilePath);
     //void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable);
     QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath);
@@ -53,7 +53,7 @@ public:
 private:
     int currentcaseid;
     int progresscount;
-    WombatVariable* wombatvariable;
+    WombatVariable wombatvariable;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
     std::auto_ptr<Log> log;

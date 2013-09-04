@@ -44,7 +44,7 @@ class SleuthKitInterface
 public:
     virtual ~SleuthKitInterface() {}
 
-    virtual void Initialize(WombatVariable* wombatVariable) = 0;
+    virtual void Initialize(WombatVariable wombatVariable) = 0;
 
     virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
     //virtual void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable) = 0;

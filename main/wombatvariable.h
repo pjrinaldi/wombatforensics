@@ -68,6 +68,6 @@ private:
 
 };
 
-Q_DECLARE_METATYPE(WombatVariable*)
+Q_DECLARE_METATYPE(WombatVariable)
 
 #endif // WOMBATVARIABLE_H
