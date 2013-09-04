@@ -12,6 +12,20 @@ class QWidget;
 class QStandardItem;
 
 
+class PluginInterface
+{
+public:
+    virtual ~PluginInterface() {}
+
+    virtual QList<QStringList> PluginActions() const = 0;
+    virtual QList<QStringList> PluginActionIcons() const = 0;
+    virtual QStringList PluginMenus() const = 0;
+
+    virtual void Initialize() = 0;
+    virtual void Run(QString input) = 0;
+    virtual void Finalize() = 0;
+};
+/*
 class EvidenceInterface 
 {
 public:
@@ -24,7 +38,7 @@ public:
     virtual void remEvidence(int currentCaseID) = 0;
 
 };
-
+*/
 class BasicToolsInterface
 {
 public:
@@ -65,8 +79,11 @@ public:
 
 };
 
-#define EvidenceInterface_iid "wombat.EvidenceInterface"
-Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
+#define PluginInterface_iid "wombat.PluginInterface"
+Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)
+
+//#define EvidenceInterface_iid "wombat.EvidenceInterface"
+//Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
 
 #define BasicToolsInterface_iid "wombat.BasicToolsInterface"
 Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)

@@ -9,6 +9,21 @@
 #include <QStringList>
 #include <QFileDialog>
 
+class EvidencePlugin : public QObject, public PluginInterface
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "wombat.EvidenceInterface" FILE "evidence.json")
+    Q_INTERFACES(PluginInterface)
+public:
+    QList<QStringList> PluginActions() const;
+    QList<QStringList> PluginActionIcons() const;
+    QStringList PluginMenus() const;
+
+    void Initialize() {};
+    void Run(QString input);
+    void Finalize() {};
+};
+/*
 class EvidencePlugin : public QObject, public EvidenceInterface
 {
     Q_OBJECT
@@ -27,5 +42,5 @@ private:
     int currentcaseid;
 
 };
-
+*/
 #endif // EVIDENCE_H

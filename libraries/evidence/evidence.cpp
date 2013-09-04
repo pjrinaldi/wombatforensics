@@ -2,16 +2,40 @@
 
 #include "evidence.h"
 
-QStringList EvidencePlugin::evidenceActions() const
+QList<QStringList> EvidencePlugin::PluginActions() const
 {
-    return QStringList() << tr("Add Evidence") << tr("Remove Evidence");
+    QList<QStringList> tmpList;
+    tmpList.append(QStringList() << tr("Add Evidence") << tr("Remove Evidence"));
+
+    return tmpList;
 }
 
-QStringList EvidencePlugin::evidenceActionIcons() const
+QList<QStringList> EvidencePlugin::PluginActionIcons() const
 {
-    return QStringList() << tr(":/basic/addevidence") << tr(":/basic/remevidence");
+    QList<QStringList> tmpList;
+    tmpList.append(QStringList() << tr(":/basic/addevidence") << tr(":/basic/remevidence"));
+    
+    return tmpList;
+}
+QStringList EvidencePlugin::PluginMenus() const
+{
+    return QStringList() << tr("Evidence");
 }
 
+void EvidencePlugin::Run(QString input)
+{
+    foreach(QStringList actionList, PluginActions())
+    {
+        foreach(QString action, actionList)
+        {
+            if(input.compare(action) == 0)
+            {
+                fprintf(stderr, "Run with input: %s\n", input.toStdString().c_str());
+            }
+        }
+    }
+}
+/*
 QString EvidencePlugin::addEvidence()
 {
     QString evidenceFile = "";
@@ -32,3 +56,4 @@ void EvidencePlugin::remEvidence(int currentCaseID)
     // remove evidence.db file.
     // remove evidence_id from the cases table...
 }
+*/

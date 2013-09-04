@@ -37,6 +37,7 @@ public:
     ProgressWindow* wombatprogresswindow;
 
 private slots:
+    void RunPlugin();
     void AlterEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
@@ -73,7 +74,8 @@ private:
     Q_INVOKABLE void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath);
     void SleuthKitLogEntry(QObject *plugin, QString logMsg);
     */
-    void AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
+    void AddActions(QObject *plugin, const QStringList &menus, const QList<QStringList> &texts, const QList<QStringList> &icons, QToolBar *toolbar, QMenuBar *menu, QActionGroup *actionGroup = 0);
+    //void AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
     /*
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     void LoadHexViewer(QString tmpFilePath);

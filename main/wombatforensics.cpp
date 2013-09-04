@@ -4,7 +4,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 {
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
-    //wombatvariable = new WombatVariable();
     wombatcasedata = new WombatCaseDb(this);
     wombatprogresswindow = new ProgressWindow();
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
@@ -156,9 +155,14 @@ QList<QObject*> WombatForensics::LoadPlugins()
         QObject* plugin = loader.instance();
         if(plugin)
         {
-            PopulateActions(plugin);
-            PopulateTabWidgets(plugin);
-            tmplist.append(plugin);
+            PluginInterface* iplugin = qobject_cast<PluginInterface*>(plugin);
+            if(iplugin)
+            {
+                AddActions(plugin, iplugin->PluginMenus(), iplugin->PluginActions(), iplugin->PluginActionIcons(), ui->mainToolBar, ui->mainMenubar);
+                //PopulateActions(plugin);
+                //PopulateTabWidgets(plugin);
+                tmplist.append(plugin);
+            }
         }
     }
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
@@ -188,11 +192,19 @@ QObject* WombatForensics::loadPlugin(QString fileName)
 */
 void WombatForensics::PopulateActions(QObject *plugin)
 {
+    /*
+    PluginInterface ievidence = qobject_cast<PluginInterface*>(plugin);
+    if(ievidence)
+    {
+        AddActions(plugin, ievidence->pluginActions(), ievidence->evidenceActionIcons(), ui->mainToolBar, ui->mainMenuBar);
+    }
+    */
+    /*
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
     if (iEvidence)
     {
         AddActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(AlterEvidence()));
-    }
+    }*/
 }
 
 void WombatForensics::PopulateTabWidgets(QObject *plugin)
@@ -220,8 +232,47 @@ void WombatForensics::SetupDirModel(void)
     connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
 }
 
-void WombatForensics::AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
+void WombatForensics::RunPlugin()
 {
+    QAction *action = qobject_cast<QAction *>(sender());
+    PluginInterface* iplugin = qobject_cast<PluginInterface*>(action->parent());
+    //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
+    iplugin->Run(action->text());
+}
+
+//void WombatForensics::AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
+
+void WombatForensics::AddActions(QObject* plugin, const QStringList &menus, const QList<QStringList> &texts, const QList<QStringList> &icons, QToolBar* toolbar, QMenuBar* menu, QActionGroup* actionGroup)
+{
+    for(int i = 0; i < menus.count(); i++)
+    {
+        QMenu* tmpmenu = menu->addMenu(menus[i]);
+        for(int j = 0; j < texts.count(); j++)
+        {
+            QAction* action1 = new QAction(texts[i][j], plugin);
+            action1->setIcon(QIcon(icons[i][j]));
+            connect(action1, SIGNAL(triggered()), this, SLOT(RunPlugin()));
+            if(actionGroup)
+            {
+                action1->setCheckable(true);
+                actionGroup->addAction(action1);
+            }
+            toolbar->addAction(action1);
+            QAction* action2 = action1;
+            tmpmenu->addAction(action2);
+        }
+    }
+    /*
+    foreach(QStringList actionList, PluginActions())
+    {
+        foreach(QString action, actionList)
+        {
+            if(input.compare(action) == 0)
+            {
+                fprintf(stderr, "Run with input: %s\n", input.toStdString().c_str());
+            }
+     */ 
+    /*
     for(int i = 0; i < texts.count(); i++)
     {
         QAction *action1 = new QAction(texts[i], plugin);
@@ -241,6 +292,7 @@ void WombatForensics::AddActions(QObject *plugin, const QStringList &texts, cons
             actionGroup->addAction(action2);
         }
     }
+    */
 }
 
 /*
