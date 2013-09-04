@@ -4,6 +4,13 @@
 #include <QString>
 #include <QList>
 #include <QStringList>
+#include <QObject>
+
+struct PluginInfo
+{
+    QObject* plugin;
+    QString name;
+};
 
 struct WombatVariable
 {
@@ -55,7 +62,7 @@ struct WombatVariable
     int evidenceid;
     int jobtype;
     int jobid;
-    QList<QObject*> plugins;
+    QList<PluginInfo> pluginfo;
     QString casespath;
     QString casedirpath;
     QString evidencedirpath;

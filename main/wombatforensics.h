@@ -52,7 +52,7 @@ private:
     Ui::WombatForensics *ui;
 
     //QObject* loadPlugin(QString fileName);
-    QList <QObject*> LoadPlugins();
+    QList <PluginInfo> LoadPlugins();
     void PopulateActions(QObject *plugin);
     void PopulateTabWidgets(QObject *plugin);
     void SetupDirModel(void);

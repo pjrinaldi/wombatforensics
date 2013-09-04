@@ -66,7 +66,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //pluginFileNames.clear();
     //pluginFileNames = locatePlugins();
     //wombatplugins.clear();
-    wombatvariable.plugins = LoadPlugins();
+    wombatvariable.pluginfo = LoadPlugins();
     InitializeSleuthKit();
 }
 void WombatForensics::HideProgressWindow(bool checkedstate)
@@ -90,13 +90,13 @@ std::string WombatForensics::GetTime()
 
 void WombatForensics::InitializeSleuthKit()
 {
-    foreach(QObject* plugin, wombatvariable.plugins)
+    foreach(PluginInfo curinfo, wombatvariable.pluginfo)
     {
-        SleuthKitInterface* isleuthkit = qobject_cast<SleuthKitInterface*>(plugin);
+        SleuthKitInterface* isleuthkit = qobject_cast<SleuthKitInterface*>(curinfo.plugin);
         if(isleuthkit)
         {
 
-            PluginRunner* prunner = new PluginRunner(plugin, wombatvariable, "Initialize");
+            PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "Initialize");
             prunner->setAutoDelete(false);
             threadpool->start(prunner);
             threadpool->waitForDone();
@@ -142,9 +142,10 @@ QStringList WombatForensics::locatePlugins()
     return tmpList;
 }
 */
-QList<QObject*> WombatForensics::LoadPlugins()
+QList<PluginInfo> WombatForensics::LoadPlugins()
 {
-    QList<QObject*> tmplist;
+    QList<PluginInfo> tmplist;
+    PluginInfo tmpinfo;
     tmplist.clear();
     QString tmppath = qApp->applicationDirPath();
     tmppath += "/plugins/";
@@ -152,17 +153,20 @@ QList<QObject*> WombatForensics::LoadPlugins()
     foreach(QString filename, plugdir.entryList(QDir::Files))
     {
         QPluginLoader loader(plugdir.absoluteFilePath(filename));
-        QObject* plugin = loader.instance();
-        if(plugin)
+        tmpinfo.plugin = loader.instance();
+        if(tmpinfo.plugin)
         {
-            PluginInterface* iplugin = qobject_cast<PluginInterface*>(plugin);
-            if(iplugin)
-            {
-                AddActions(plugin, iplugin->PluginMenus(), iplugin->PluginActions(), iplugin->PluginActionIcons(), ui->mainToolBar, ui->mainMenubar);
+            //fprintf(stderr, "PluginMetaData: %s\n", loader.metaData().value("MetaData").toObject().value("name").toString().toStdString().c_str());
+            //PluginInterface* iplugin = qobject_cast<PluginInterface*>(plugin);
+            //if(iplugin)
+            //{
+                //AddActions(plugin, iplugin->PluginMenus(), iplugin->PluginActions(), iplugin->PluginActionIcons(), ui->mainToolBar, ui->mainMenubar);
                 //PopulateActions(plugin);
                 //PopulateTabWidgets(plugin);
-                tmplist.append(plugin);
-            }
+            tmpinfo.name = loader.metaData().value("MetaData").toObject().value("name").toString();
+            tmplist.append(tmpinfo);
+
+            //}
         }
     }
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());

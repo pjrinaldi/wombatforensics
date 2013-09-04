@@ -12,7 +12,7 @@
 class EvidencePlugin : public QObject, public PluginInterface
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "wombat.EvidenceInterface" FILE "evidence.json")
+    Q_PLUGIN_METADATA(IID "wombat.PluginInterface" FILE "evidence.json")
     Q_INTERFACES(PluginInterface)
 public:
     QList<QStringList> PluginActions() const;
