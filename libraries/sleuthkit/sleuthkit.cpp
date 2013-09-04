@@ -5,6 +5,8 @@ void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
     wombatvariable = wombatVariable;
     SetupSystemProperties();
     SetupLog();
+    SetupScheduler();
+    SetupFileManager();
 }
 
 void SleuthKitPlugin::SetupSystemProperties()
@@ -196,7 +198,8 @@ void SleuthKitPlugin::SetupSystemBlackboard()
         fprintf(stderr, "Loading Blackboard: %s\n", ex.message().c_str());
     }
 }
-void SleuthKitPlugin::SetupSystemSchedulerQueue()
+//void SleuthKitPlugin::SetupSystemSchedulerQueue()
+void SleuthKitPlugin::SetupScheduler()
 {
     try
     {
@@ -208,7 +211,8 @@ void SleuthKitPlugin::SetupSystemSchedulerQueue()
         fprintf(stderr, "Loading Scheduler: %s\n", ex.message().c_str());
     }
 }
-void SleuthKitPlugin::SetupSystemFileManager()
+//void SleuthKitPlugin::SetupSystemFileManager()
+void SleuthKitPlugin::SetupFileManager()
 {
     try
     {

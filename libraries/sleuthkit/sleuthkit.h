@@ -38,12 +38,14 @@ public:
     Q_INVOKABLE void Initialize(WombatVariable wombatVariable);
     void SetupSystemProperties();
     void SetupLog();
+    void SetupScheduler();
+    void SetupFileManager();
     //void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable);
     QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void SetupSystemBlackboard();
-    void SetupSystemSchedulerQueue();
-    void SetupSystemFileManager();
+    //void SetupSystemSchedulerQueue();
+    //void SetupSystemFileManager();
     //void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
     void PrepEvidence(QString evidencePath);
     void LogEntry(QString logMsg);

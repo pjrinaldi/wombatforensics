@@ -53,8 +53,10 @@ public:
     virtual QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
     virtual void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
     virtual void SetupSystemBlackboard() = 0;
-    virtual void SetupSystemSchedulerQueue() = 0;
-    virtual void SetupSystemFileManager() = 0;
+    //virtual void SetupSystemSchedulerQueue() = 0;
+    //virtual void SetupSystemFileManager() = 0;
+    virtual void SetupScheduler() = 0;
+    virtual void SetupFileManager() = 0;
     //virtual void OpenEvidence(QString evidencePath, ProgressWindow* progressWindow) = 0;
     virtual void LogEntry(QString logMsg) = 0;
     virtual QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName) = 0;
