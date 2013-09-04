@@ -10,7 +10,8 @@ ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
 
 ProgressWindow::~ProgressWindow()
 {
-    delete ui;
+    //this->close();
+    //delete ui;
 }
 
 

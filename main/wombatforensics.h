@@ -41,14 +41,21 @@ private slots:
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
     void on_actionView_Progress_triggered(bool checked);
-    void dirTreeView_selectionChanged(const QModelIndex &index);
-    void dialogClosed(QString file);
+    //void dirTreeView_selectionChanged(const QModelIndex &index);
+    //void dialogClosed(QString file);
 
+protected:
+    void closeEvent(QCloseEvent* event);
 private:
     Ui::WombatForensics *ui;
 
     QObject* loadPlugin(QString fileName);
+    QList <QObject*> loadPlugins();
     QThreadPool *threadpool;
+    void populateActions(QObject *plugin);
+    void populateTabWidgets(QObject *plugin);
+    void SetupDirModel(void);
+   /*
     QStringList locatePlugins(void);
     bool isPluginLoaded(QString pluginFileName);
     void populateActions(QObject *plugin);
@@ -64,24 +71,28 @@ private:
     //Q_INVOKABLE void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow);
     Q_INVOKABLE void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath);
     void SleuthKitLogEntry(QObject *plugin, QString logMsg);
+    */
     void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
+    /*
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     void LoadHexViewer(QString tmpFilePath);
     void LoadTxtViewer(QString asciiText);
+    */
     std::string GetTime(void);
 
-    QDir pluginsDir;
-    QStringList pluginFileNames;
+    QList<QObject*> wombatplugins;
+    //QDir pluginsDir;
+    //QStringList pluginFileNames;
     QString currentcasedirpath;
     QString currentcaseevidencepath;
     QString wombatsettingspath;
     QString wombatdatapath;
     QString wombatcasespath;
     QString wombattmpfilepath;
-    QStringList currentsleuthimages;
-    QObject *basictoolsplugin;
-    QObject *evidenceplugin;
-    QObject *sleuthkitplugin;
+    //QStringList currentsleuthimages;
+    //QObject *basictoolsplugin;
+    //QObject *evidenceplugin;
+    //QObject *sleuthkitplugin;
     QTreeView *currenttreeview;
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;

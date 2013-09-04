@@ -63,8 +63,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     {
         wombatcasedata->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
-    pluginFileNames.clear();
-    pluginFileNames = locatePlugins();
+    //pluginFileNames.clear();
+    //pluginFileNames = locatePlugins();
+    wombatplugins.clear();
+    wombatplugins = loadPlugins();
 
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
     ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
@@ -84,7 +86,7 @@ std::string WombatForensics::GetTime()
 
     return timeStr;
 }
-
+/*
 bool WombatForensics::isPluginLoaded(QString pluginFileName)
 {
     int pluginexists = 0;
@@ -119,6 +121,7 @@ QStringList WombatForensics::locatePlugins()
     }
     return tmpList;
 }
+*/
 QList<QObject*> WombatForensics::loadPlugins()
 {
     QList<QObject*> tmplist;
@@ -138,6 +141,7 @@ QList<QObject*> WombatForensics::loadPlugins()
     }
     return tmplist;
 }
+/*
 QObject* WombatForensics::loadPlugin(QString fileName)
 {
    QPluginLoader loader(fileName);
@@ -156,7 +160,7 @@ QObject* WombatForensics::loadPlugin(QString fileName)
 
     return plugin;
 }
-
+*/
 void WombatForensics::populateActions(QObject *plugin)
 {
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
@@ -315,10 +319,17 @@ void WombatForensics::alterEvidence()
 
 WombatForensics::~WombatForensics()
 {
-    wombatprogresswindow->~ProgressWindow();
-    const char* errmsg = wombatcasedata->CloseCaseDB(); // this possibly caused glibc corrupted double-linked list
-    fprintf(stderr, "CloseDB: %s\n", errmsg);
+    //wombatprogresswindow->~ProgressWindow();
+    //const char* errmsg = wombatcasedata->CloseCaseDB(); // this possibly caused glibc corrupted double-linked list
+    //fprintf(stderr, "CloseDB: %s\n", errmsg);
     delete ui;
+}
+
+void WombatForensics::closeEvent(QCloseEvent* event)
+{
+    wombatprogresswindow->close();
+    //const char* errmsg = wombatcasedata->CloseCaseDB();
+    //fprintf(stderr, "CloseDB: %s\n", errmsg);
 }
 
 void WombatForensics::on_actionNew_Case_triggered()
@@ -429,9 +440,9 @@ void WombatForensics::on_actionOpen_Case_triggered()
             {
                 wombatcasedata->DisplayError(this, "2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
-            evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
-            basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
-            sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
+            //evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
+            //basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
+            //sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
             ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
             ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
@@ -439,13 +450,13 @@ void WombatForensics::on_actionOpen_Case_triggered()
             QStringList caseimageList = wombatcasedata->ReturnCaseEvidence(wombatvariable->GetCaseID());
             foreach(caseimage, caseimageList)
             {
-                OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
+                //OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
                 fprintf(stderr, "Case Image: %s\n", caseimage.toStdString().c_str());
-                setupSleuthKitBlackboard(sleuthkitplugin);
-                QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, caseimage.split("/").last());
-                QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
-                currentroot->appendRow(imageNode);
-                currenttreeview->setModel(wombatdirmodel);
+                //setupSleuthKitBlackboard(sleuthkitplugin);
+                //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, caseimage.split("/").last());
+                //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
+                //currentroot->appendRow(imageNode);
+                //currenttreeview->setModel(wombatdirmodel);
             }
         }
     }
@@ -537,7 +548,7 @@ void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePat
     }
 }
 */
-
+/*
 QStandardItem* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
@@ -577,3 +588,4 @@ void WombatForensics::LoadTxtViewer(QString asciiText)
         iBasicTools->LoadTxtContent(asciiText);
     }
 }
+*/

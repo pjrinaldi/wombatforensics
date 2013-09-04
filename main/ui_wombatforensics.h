@@ -122,6 +122,7 @@ public:
         mainToolBar->addSeparator();
 
         retranslateUi(WombatForensics);
+        QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
 
         fileInfoTabWidget->setCurrentIndex(-1);
 

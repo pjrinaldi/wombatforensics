@@ -70,6 +70,7 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
             }
             sqlite3_finalize(tmpstmt);
         }
+        sqlite3_close(wombatdb);
     }
     else
     {
@@ -110,18 +111,26 @@ const char* WombatCaseDb::CloseCaseDB()
     if(sqlite3_finalize(sqlstatement) == SQLITE_OK)
     {
         if(sqlite3_close(wombatdb) == SQLITE_OK)
+        {
+            fprintf(stderr, "CloseDB was successful\n");
             return "";
+        }
         else
+        {
+            fprintf(stderr, "CloseDB: %s\n", sqlite3_errmsg(wombatdb));
             return sqlite3_errmsg(wombatdb);
+        }
     }
     else
+    {
+        fprintf(stderr, "CloseDB: %s\n", sqlite3_errmsg(wombatdb));
         return sqlite3_errmsg(wombatdb);
-
+    }
 }
 
 WombatCaseDb::~WombatCaseDb()
 {
-
+    CloseCaseDB();
 }
 
 int WombatCaseDb::ReturnCaseCount()
