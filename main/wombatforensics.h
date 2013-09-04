@@ -37,7 +37,7 @@ public:
     ProgressWindow* wombatprogresswindow;
 
 private slots:
-    void alterEvidence();
+    void AlterEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
     void on_actionView_Progress_triggered(bool checked);
@@ -50,11 +50,10 @@ protected:
 private:
     Ui::WombatForensics *ui;
 
-    QObject* loadPlugin(QString fileName);
-    QList <QObject*> loadPlugins();
-    QThreadPool *threadpool;
-    void populateActions(QObject *plugin);
-    void populateTabWidgets(QObject *plugin);
+    //QObject* loadPlugin(QString fileName);
+    QList <QObject*> LoadPlugins();
+    void PopulateActions(QObject *plugin);
+    void PopulateTabWidgets(QObject *plugin);
     void SetupDirModel(void);
    /*
     QStringList locatePlugins(void);
@@ -73,7 +72,7 @@ private:
     Q_INVOKABLE void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath);
     void SleuthKitLogEntry(QObject *plugin, QString logMsg);
     */
-    void addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
+    void AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
     /*
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     void LoadHexViewer(QString tmpFilePath);
@@ -81,15 +80,16 @@ private:
     */
     std::string GetTime(void);
 
-    QList<QObject*> wombatplugins;
+    //QList<QObject*> wombatplugins;
     //QDir pluginsDir;
+    QThreadPool *threadpool;
     //QStringList pluginFileNames;
-    QString currentcasedirpath;
-    QString currentcaseevidencepath;
-    QString wombatsettingspath;
-    QString wombatdatapath;
-    QString wombatcasespath;
-    QString wombattmpfilepath;
+    //QString currentcasedirpath;
+    //QString currentcaseevidencepath;
+    //QString wombatsettingspath;
+    //QString wombatdatapath;
+    //QString wombatcasespath;
+    //QString wombattmpfilepath;
     //QStringList currentsleuthimages;
     //QObject *basictoolsplugin;
     //QObject *evidenceplugin;

@@ -14,23 +14,23 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvariable->SetJobType(0);
     QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";
-    wombatsettingspath = homePath + "settings";
-    wombatdatapath = homePath + "data/";
-    wombatcasespath = homePath + "cases/";
-    wombattmpfilepath = homePath + "tmpfiles/";
-    bool mkPath = (new QDir())->mkpath(wombatsettingspath);
+    wombatvariable->SetSettingsPath(homePath + "settings");
+    wombatvariable->SetDataPath(homePath + "data/");
+    wombatvariable->SetCasesPath(homePath + "cases/");
+    wombatvariable->SetTmpFilePath(homePath + "tmpfiles/");
+    bool mkPath = (new QDir())->mkpath(wombatvariable->GetSettingsPath());
     if(mkPath == false)
         wombatcasedata->DisplayError(this, "2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatdatapath);
+    mkPath = (new QDir())->mkpath(wombatvariable->GetDataPath());
     if(mkPath == false)
         wombatcasedata->DisplayError(this, "2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatcasespath);
+    mkPath = (new QDir())->mkpath(wombatvariable->GetCasesPath());
     if(mkPath == false)
         wombatcasedata->DisplayError(this, "2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombattmpfilepath);
+    mkPath = (new QDir())->mkpath(wombatvariable->GetTmpFilePath());
     if(mkPath == false)
         wombatcasedata->DisplayError(this, "2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
-    QString logPath = wombatdatapath + "WombatLog.db";
+    QString logPath = wombatvariable->GetDataPath() + "WombatLog.db";
     bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
     if(!logFileExist)
     {
@@ -38,7 +38,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
         if(strcmp(errstring, "") != 0)
             wombatcasedata->DisplayError(this, "1.0", "Log File Error", errstring);
     }
-    QString tmpPath = wombatdatapath + "WombatCase.db";
+    QString tmpPath = wombatvariable->GetDataPath() + "WombatCase.db";
     bool doesFileExist = wombatcasedata->FileExists(tmpPath.toStdString());
     if(!doesFileExist)
     {
@@ -66,8 +66,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     }
     //pluginFileNames.clear();
     //pluginFileNames = locatePlugins();
-    wombatplugins.clear();
-    wombatplugins = loadPlugins();
+    //wombatplugins.clear();
+    wombatvariable->SetPlugins(LoadPlugins());
 
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
     ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
@@ -126,7 +126,7 @@ QStringList WombatForensics::locatePlugins()
     return tmpList;
 }
 */
-QList<QObject*> WombatForensics::loadPlugins()
+QList<QObject*> WombatForensics::LoadPlugins()
 {
     QList<QObject*> tmplist;
     tmplist.clear();
@@ -139,8 +139,8 @@ QList<QObject*> WombatForensics::loadPlugins()
         QObject* plugin = loader.instance();
         if(plugin)
         {
-            populateActions(plugin);
-            populateTabWidgets(plugin);
+            PopulateActions(plugin);
+            PopulateTabWidgets(plugin);
             tmplist.append(plugin);
         }
     }
@@ -166,16 +166,16 @@ QObject* WombatForensics::loadPlugin(QString fileName)
     return plugin;
 }
 */
-void WombatForensics::populateActions(QObject *plugin)
+void WombatForensics::PopulateActions(QObject *plugin)
 {
     EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
     if (iEvidence)
     {
-        addActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(alterEvidence()));
+        AddActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(alterEvidence()));
     }
 }
 
-void WombatForensics::populateTabWidgets(QObject *plugin)
+void WombatForensics::PopulateTabWidgets(QObject *plugin)
 {
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
     if(iBasicTools)
@@ -200,7 +200,7 @@ void WombatForensics::SetupDirModel(void)
     connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
 }
 
-void WombatForensics::addActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
+void WombatForensics::AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
 {
     for(int i = 0; i < texts.count(); i++)
     {
@@ -263,7 +263,7 @@ void WombatForensics::dialogClosed(QString file)
 }
 */
 
-void WombatForensics::alterEvidence()
+void WombatForensics::AlterEvidence()
 {
     QAction *action = qobject_cast<QAction *>(sender());
     //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
@@ -358,7 +358,7 @@ void WombatForensics::on_actionNew_Case_triggered()
             tmpTitle += text;
             this->setWindowTitle(tmpTitle); // update application window.
             // make Cases Folder
-            QString userPath = wombatcasespath;
+            QString userPath = wombatvariable->GetCasesPath();
             userPath += QString::number(wombatvariable->GetCaseID());
             userPath += "-";
             userPath += text;
@@ -366,18 +366,20 @@ void WombatForensics::on_actionNew_Case_triggered()
             bool mkPath = (new QDir())->mkpath(userPath);
             if(mkPath == true)
             {
-                currentcasedirpath = userPath;
+                wombatvariable->SetCaseDirPath(userPath);
+                //currentcasedirpath = userPath;
             }
             else
             {
                 wombatcasedata->DisplayError(this, "2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
             }
-            userPath = currentcasedirpath;
+            userPath = wombatvariable->GetCaseDirPath();
             userPath += "evidence/";
             mkPath = (new QDir())->mkpath(userPath);
             if(mkPath == true)
             {
-                currentcaseevidencepath = userPath;
+                wombatvariable->SetEvidenceDirPath(userPath);
+                //currentcaseevidencepath = userPath;
             }
             else
             {
@@ -420,7 +422,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
             QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += item;
             this->setWindowTitle(tmpTitle);
-            QString userPath = wombatcasespath;
+            QString userPath = wombatvariable->GetCasesPath();
             userPath += QString::number(wombatvariable->GetCaseID());
             userPath += "-";
             userPath += item;
@@ -428,18 +430,21 @@ void WombatForensics::on_actionOpen_Case_triggered()
             bool mkPath = (new QDir())->mkpath(userPath);
             if(mkPath == true)
             {
-                currentcasedirpath = userPath;
+                //currentcasedirpath = userPath;
+                wombatvariable->SetCaseDirPath(userPath);
             }
             else
             {
                 wombatcasedata->DisplayError(this, "2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
             }
-            userPath = currentcasedirpath;
+            userPath = wombatvariable->GetCaseDirPath();
+            //userPath = currentcasedirpath;
             userPath += "evidence/";
             mkPath = (new QDir())->mkpath(userPath);
             if(mkPath == true)
             {
-                currentcaseevidencepath = userPath;
+                wombatvariable->SetEvidenceDirPath(userPath);
+                //currentcaseevidencepath = userPath;
             }
             else
             {
