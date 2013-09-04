@@ -22,12 +22,17 @@ public:
     void UpdateProgressBar(int progressValue); // progressBar
     ~ProgressWindow();
 
+public slots:
+    void accept();
+
 private slots:
     void StepProgress(void);
+signals:
+    void HideProgressWindow(bool checkstate);
+
 private:
     Ui::ProgressWindow *ui;
     int counter;
-
 };
 
 Q_DECLARE_METATYPE(ProgressWindow*)

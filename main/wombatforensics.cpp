@@ -7,6 +7,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvariable = new WombatVariable();
     wombatcasedata = new WombatCaseDb(this);
     wombatprogresswindow = new ProgressWindow();
+    connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     wombatprogresswindow->setModal(false);
     wombatvariable->SetCaseID(0);
     wombatvariable->SetEvidenceID(0);
@@ -71,7 +72,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
     ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
 }
-
+void WombatForensics::HideProgressWindow(bool checkedstate)
+{
+    ui->actionView_Progress->setChecked(checkedstate);
+    //ui->actionView_Progress->triggered(false);
+}
 std::string WombatForensics::GetTime()
 {
     struct tm *newtime;
@@ -264,9 +269,9 @@ void WombatForensics::alterEvidence()
     //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     if(action->text() == tr("Add Evidence"))
     {
-        wombatprogresswindow->show();
         //QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
         QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
+        wombatprogresswindow->show();
         //QString evidenceFilePath = iEvidence->addEvidence();
         //QFileDialog *filedialog = new QFileDialog(0, "Select Evidence Item", "./");
         //filedialog->setFileMode(QFileDialog::ExistingFile);

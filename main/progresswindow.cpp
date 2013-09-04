@@ -14,7 +14,11 @@ ProgressWindow::~ProgressWindow()
     //delete ui;
 }
 
-
+void ProgressWindow::accept()
+{
+    //need to call signal/slot to set mainwindow button slot to unchecked...
+    emit HideProgressWindow(false);
+}
 void ProgressWindow::UpdateAnalysisState(QString analysisState) // analysisStateEdit
 {
     ui->analysisStateEdit->setText(analysisState);

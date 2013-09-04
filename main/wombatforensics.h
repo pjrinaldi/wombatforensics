@@ -43,6 +43,7 @@ private slots:
     void on_actionView_Progress_triggered(bool checked);
     //void dirTreeView_selectionChanged(const QModelIndex &index);
     //void dialogClosed(QString file);
+    void HideProgressWindow(bool checkstate);
 
 protected:
     void closeEvent(QCloseEvent* event);
