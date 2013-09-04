@@ -36,7 +36,8 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
 public:
     //SleuthKit Interface Functions
     Q_INVOKABLE void Initialize(WombatVariable wombatVariable);
-    void SetupSystemProperties(QString settingsPath, QString configFilePath);
+    void SetupSystemProperties();
+    void SetupLog();
     //void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable);
     QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath);

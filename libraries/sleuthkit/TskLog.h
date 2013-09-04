@@ -15,7 +15,7 @@ class TskLog : public Log
 {
 public:
 
-    TskLog(WombatVariable *logVariable);
+    TskLog(WombatVariable logVariable);
     TskLog();
     virtual ~TskLog();
 
@@ -29,6 +29,6 @@ protected:
     int caseid;
     int imageid;
     int analysistype;
-    WombatVariable *logvariable;
+    WombatVariable logvariable;
 };
 #endif

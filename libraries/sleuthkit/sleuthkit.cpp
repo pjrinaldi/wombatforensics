@@ -2,14 +2,15 @@
 
 void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
 {
-    wombatvariable = wombatvariable;
+    wombatvariable = wombatVariable;
+    SetupSystemProperties();
+    SetupLog();
 }
 
-void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString configFilePath)
+void SleuthKitPlugin::SetupSystemProperties()
 {
-    QString tmpPath = settingsPath;
-    tmpPath += "/";
-    tmpPath += configFilePath;
+    QString tmpPath = wombatvariable.settingspath;
+    tmpPath += "/tsk-config.xml";
     QFile tmpFile(tmpPath);
     fprintf(stderr, "TmpPath: %s\n", tmpPath.toStdString().c_str());
     if(!tmpFile.exists()) // if tsk-config.xml does not exist, create and write it here
@@ -21,7 +22,7 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
             xml.writeStartDocument();
             xml.writeStartElement("TSK_FRAMEWORK_CONFIG");
             xml.writeStartElement("CONFIG_DIR");
-            xml.writeCharacters(settingsPath);
+            xml.writeCharacters(wombatvariable.settingspath);
             xml.writeEndElement();
             xml.writeStartElement("MODULE_DIR");
             xml.writeCharacters("/usr/local/lib");
@@ -52,7 +53,7 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
     {
         fprintf(stderr, "Loading Config File config file: %s\n", ex.message().c_str());
     }
-    tmpPath = settingsPath;
+    tmpPath = wombatvariable.settingspath;
     tmpPath += "/tsk-pipe.xml";
     QFile pipeFile(tmpPath);
     fprintf(stderr, "PipPath: %s\n", tmpPath.toStdString().c_str());
@@ -99,6 +100,22 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
     catch(TskException &ex)
     {
         fprintf(stderr, "Setting out dir failed: %s\n", ex.message().c_str());
+    }
+}
+void SleuthKitPlugin::SetupLog()
+{
+    QString tmpPath = wombatvariable.datapath + "/tsk-log.txt";
+    try
+    {
+        log = std::auto_ptr<Log>(new TskLog(wombatvariable));
+        //log = std::auto_ptr<Log>(new TskLog(progressWindow, wombatVariable));
+        log->open(tmpPath.toStdString().c_str());
+        TskServices::Instance().setLog(*log);
+        fprintf(stderr, "Loading Log File was successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Loading Log File: %s\n", ex.message().c_str());
     }
 }
 /*

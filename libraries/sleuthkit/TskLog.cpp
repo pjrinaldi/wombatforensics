@@ -22,7 +22,7 @@
 // @@@ imports for directory creation and deletion
 //#include "windows.h"
 
-TskLog::TskLog(WombatVariable *logVariable) : Log()
+TskLog::TskLog(WombatVariable logVariable) : Log()
 {
     //progresswindow = progressWindow;
     logvariable = logVariable;
@@ -81,11 +81,11 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
         sqlite3_stmt* stmt;
         if(sqlite3_prepare_v2(tmpImgDB, "INSERT INTO log (caseid, evidenceid, jobid, msgtype, msgdatetime, msg) VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, 0) == SQLITE_OK)
         {
-            if(sqlite3_bind_int(stmt, 1, logvariable->GetCaseID()) == SQLITE_OK)
+            if(sqlite3_bind_int(stmt, 1, logvariable.caseid) == SQLITE_OK)
             {
-                if(sqlite3_bind_int(stmt, 2, logvariable->GetEvidenceID()) == SQLITE_OK)
+                if(sqlite3_bind_int(stmt, 2, logvariable.evidenceid) == SQLITE_OK)
                 {
-                    if(sqlite3_bind_int(stmt, 3, logvariable->GetJobID()) == SQLITE_OK)
+                    if(sqlite3_bind_int(stmt, 3, logvariable.jobid) == SQLITE_OK)
                     {
                         if(sqlite3_bind_int(stmt, 4, msgType) == SQLITE_OK)
                         {

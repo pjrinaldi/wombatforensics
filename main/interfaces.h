@@ -45,8 +45,10 @@ public:
     virtual ~SleuthKitInterface() {}
 
     virtual void Initialize(WombatVariable wombatVariable) = 0;
+    virtual void SetupSystemProperties() = 0;
+    virtual void SetupLog() = 0;
 
-    virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
+    //virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
     //virtual void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable) = 0;
     virtual QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
     virtual void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;

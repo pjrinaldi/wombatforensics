@@ -1,5 +1,5 @@
 #include "wombatvariable.h"
-
+/*
 WombatVariable::WombatVariable()
 {
     evidence.clear();
@@ -109,12 +109,14 @@ void WombatVariable::SetEvidenceDirPath(QString evidenceDirPath)
 {
     evidencedirpath = evidenceDirPath;
 }
-
+*/
+/*
 void WombatVariable::AddEvidence(QString evidence)
 {
-    evidence.append(evidence);
+    evidencelist.append(evidence);
 }
-
+*/
+/*
 void WombatVariable::SetSettingsPath(QString settingsPath)
 {
     settingspath = settingsPath;
@@ -129,3 +131,4 @@ void WombatVariable::SetTmpFilePath(QString tmpFilePath)
 {
     tmpfilepath = tmpFilePath;
 }
+*/
