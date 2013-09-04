@@ -75,7 +75,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 void WombatForensics::HideProgressWindow(bool checkedstate)
 {
     ui->actionView_Progress->setChecked(checkedstate);
-    //ui->actionView_Progress->triggered(false);
 }
 std::string WombatForensics::GetTime()
 {
@@ -141,6 +140,7 @@ QList<QObject*> WombatForensics::loadPlugins()
         if(plugin)
         {
             populateActions(plugin);
+            populateTabWidgets(plugin);
             tmplist.append(plugin);
         }
     }
