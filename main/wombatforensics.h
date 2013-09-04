@@ -55,6 +55,7 @@ private:
     void PopulateActions(QObject *plugin);
     void PopulateTabWidgets(QObject *plugin);
     void SetupDirModel(void);
+    void InitializeSleuthKit();
    /*
     QStringList locatePlugins(void);
     bool isPluginLoaded(QString pluginFileName);

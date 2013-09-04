@@ -68,9 +68,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //pluginFileNames = locatePlugins();
     //wombatplugins.clear();
     wombatvariable->SetPlugins(LoadPlugins());
-
-    ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
-    ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
+    InitializeSleuthKit();
 }
 void WombatForensics::HideProgressWindow(bool checkedstate)
 {
@@ -90,6 +88,19 @@ std::string WombatForensics::GetTime()
 
     return timeStr;
 }
+
+void WombatForensics::InitializeSleuthKit()
+{
+    foreach(QObject* plugin, wombatvariable->GetPlugins())
+    {
+        SleuthKitInterface* isleuthkit = qobject_cast<SleuthKitInterface*>(plugin);
+        if(isleuthkit)
+        {
+            fprintf(stderr, "sleuthkit exists");
+        }
+    }
+}
+
 /*
 bool WombatForensics::isPluginLoaded(QString pluginFileName)
 {
@@ -144,6 +155,9 @@ QList<QObject*> WombatForensics::LoadPlugins()
             tmplist.append(plugin);
         }
     }
+    ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
+    ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
+
     return tmplist;
 }
 /*
