@@ -17,14 +17,17 @@ class BasicTools : public QObject, public PluginInterface
     Q_INTERFACES(PluginInterface)
 
 public:
+    // plugin interface functions
     QList<QStringList> PluginActions() const;
     QList<QStringList> PluginActionIcons() const;
     QStringList PluginMenus() const;
     
-    void Initialize();
+    void Initialize() {};
     void Run(QString input);
     void Finalize() {};
-    //BasicTools Interface Functions
+
+    QStringList pluginstringlist = evidenceToolboxIcons();
+    //BasicTools Custom Functions
     QStringList evidenceToolboxIcons() const;
 
     QWidget* setupHexTab();
@@ -34,8 +37,6 @@ public:
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
 private:
-    //sqlite3_stmt *sqlStatement;
-    //int currentcaseid;
     BinViewModel* hexmodel;
     BinViewWidget* hexwidget;
     QTreeView* dirtreeview;

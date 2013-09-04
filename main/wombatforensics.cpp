@@ -67,7 +67,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //pluginFileNames = locatePlugins();
     //wombatplugins.clear();
     wombatvariable.pluginfo = LoadPlugins();
-    InitializeSleuthKit();
+    //InitializePlugins(); // may call this with the load plugins call
 }
 void WombatForensics::HideProgressWindow(bool checkedstate)
 {
@@ -165,6 +165,8 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
                 //PopulateTabWidgets(plugin);
             tmpinfo.name = loader.metaData().value("MetaData").toObject().value("name").toString();
             tmplist.append(tmpinfo);
+            AddActions(plugin, iplugin->PluginMenus(), iplugin->PluginActions(), iplugin->PluginActionIcons(), ui->mainToolBar, ui->MainMenubar);
+            PopulateTabWidgets(plugin);
 
             //}
         }
@@ -213,6 +215,8 @@ void WombatForensics::PopulateActions(QObject *plugin)
 
 void WombatForensics::PopulateTabWidgets(QObject *plugin)
 {
+    // i woud loop over the plugins, if name = wombat.BasicInterface then would call runplugin("")
+
     /*
     BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
     if(iBasicTools)

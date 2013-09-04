@@ -24,6 +24,7 @@ public:
     virtual void Initialize() = 0;
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
+    QStringList plugstringlist;
 };
 /*
 class ViewerInterface
