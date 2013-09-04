@@ -3,6 +3,7 @@
 ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::ProgressWindow)
 {
     ui->setupUi(this);
+    connect(ui->hideButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     ui->analysisTreeWidget->hideColumn(1);
     ui->msgTableWidget->setCurrentCell(-1, -1, QItemSelectionModel::NoUpdate);
     counter = 0;
@@ -14,8 +15,9 @@ ProgressWindow::~ProgressWindow()
     //delete ui;
 }
 
-void ProgressWindow::accept()
+void ProgressWindow::HideClicked()
 {
+    this->hide();
     //need to call signal/slot to set mainwindow button slot to unchecked...
     emit HideProgressWindow(false);
 }

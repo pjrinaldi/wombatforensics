@@ -22,11 +22,10 @@ public:
     void UpdateProgressBar(int progressValue); // progressBar
     ~ProgressWindow();
 
-public slots:
-    void accept();
 
 private slots:
     void StepProgress(void);
+    void HideClicked();
 signals:
     void HideProgressWindow(bool checkstate);
 

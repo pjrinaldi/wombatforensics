@@ -14,7 +14,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
@@ -22,6 +21,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QProgressBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTreeWidget>
@@ -54,7 +54,9 @@ public:
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_3;
     QTableWidget *msgTableWidget;
-    QDialogButtonBox *buttonBox;
+    QHBoxLayout *horizontalLayout_3;
+    QSpacerItem *horizontalSpacer;
+    QPushButton *hideButton;
 
     void setupUi(QDialog *ProgressWindow)
     {
@@ -192,17 +194,22 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        buttonBox = new QDialogButtonBox(ProgressWindow);
-        buttonBox->setObjectName(QStringLiteral("buttonBox"));
-        buttonBox->setOrientation(Qt::Horizontal);
-        buttonBox->setStandardButtons(QDialogButtonBox::Close);
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        verticalLayout->addWidget(buttonBox);
+        horizontalLayout_3->addItem(horizontalSpacer);
+
+        hideButton = new QPushButton(ProgressWindow);
+        hideButton->setObjectName(QStringLiteral("hideButton"));
+
+        horizontalLayout_3->addWidget(hideButton);
+
+
+        verticalLayout->addLayout(horizontalLayout_3);
 
 
         retranslateUi(ProgressWindow);
-        QObject::connect(buttonBox, SIGNAL(accepted()), ProgressWindow, SLOT(accept()));
-        QObject::connect(buttonBox, SIGNAL(rejected()), ProgressWindow, SLOT(reject()));
 
         QMetaObject::connectSlotsByName(ProgressWindow);
     } // setupUi
@@ -238,6 +245,7 @@ public:
         ___qtablewidgetitem->setText(QApplication::translate("ProgressWindow", "Type", 0));
         QTableWidgetItem *___qtablewidgetitem1 = msgTableWidget->horizontalHeaderItem(1);
         ___qtablewidgetitem1->setText(QApplication::translate("ProgressWindow", "Message", 0));
+        hideButton->setText(QApplication::translate("ProgressWindow", "Close", 0));
     } // retranslateUi
 
 };
