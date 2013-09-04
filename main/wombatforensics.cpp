@@ -96,6 +96,12 @@ void WombatForensics::InitializeSleuthKit()
         SleuthKitInterface* isleuthkit = qobject_cast<SleuthKitInterface*>(plugin);
         if(isleuthkit)
         {
+
+            PluginRunner* prunner = new PluginRunner(plugin, wombatvariable, "Initialize");
+            prunner->setAutoDelete(false);
+            threadpool->start(prunner);
+            threadpool->waitForDone();
+            //isleuthkit->Initialize(wombatvariable);
             fprintf(stderr, "sleuthkit exists");
         }
     }

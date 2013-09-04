@@ -5,7 +5,7 @@
 #include <QList>
 #include <QStringList>
 
-class WombatVariable
+struct WombatVariable
 {
 public:
     WombatVariable();
@@ -67,4 +67,7 @@ private:
     QString tmpfilepath;
 
 };
+
+Q_DECLARE_METATYPE(WombatVariable*)
+
 #endif // WOMBATVARIABLE_H

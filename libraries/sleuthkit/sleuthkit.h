@@ -2,7 +2,7 @@
 #define SLEUTHKIT_H
 
 #include <main/interfaces.h>
-#include <main/progresswindow.h>
+//#include <main/progresswindow.h>
 #include <main/wombatvariable.h>
 #include <sqlite3.h>
 #include <tsk/framework/framework.h>
@@ -35,14 +35,15 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
     
 public:
     //SleuthKit Interface Functions
+    Q_INVOKABLE void Initialize(WombatVariable* wombatVariable);
     void SetupSystemProperties(QString settingsPath, QString configFilePath);
-    void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable);
+    //void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable);
     QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void SetupSystemBlackboard();
     void SetupSystemSchedulerQueue();
     void SetupSystemFileManager();
-    void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
+    //void OpenEvidence(QString evidencePath, ProgressWindow* progresswindow);
     void PrepEvidence(QString evidencePath);
     void LogEntry(QString logMsg);
     QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
@@ -52,14 +53,14 @@ public:
 private:
     int currentcaseid;
     int progresscount;
-    WombatVariable *sleuthvariable;
+    WombatVariable* wombatvariable;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
     std::auto_ptr<Log> log;
     std::auto_ptr<TskImgDB> imgdb;
     TskSchedulerQueue scheduler;
     QString evidencepath;
-    ProgressWindow* evidenceprogress;
+    //ProgressWindow* evidenceprogress;
 
 public slots:
     void threadFinished(void);

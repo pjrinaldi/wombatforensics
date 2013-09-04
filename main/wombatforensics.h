@@ -105,20 +105,21 @@ class PluginRunner : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    PluginRunner(QWidget* Parent, QObject* Plug, QString ePath)
+    PluginRunner(QObject* curCaller,WombatVariable* wombatVariable, QString curMethod)
     {
-        currentplug = Plug;
-        currentpath = ePath;
-        parent = Parent;
+        currentcaller = curCaller;
+        wombatvariable = wombatVariable;
+        currentmethod = curMethod;
     };
     void run()
     {
-        QMetaObject::invokeMethod(parent, "sleuthKitLoadEvidence", Qt::QueuedConnection, Q_ARG(QObject*, currentplug), Q_ARG(QString, currentpath));
+        qRegisterMetaType<WombatVariable*>("WombatVariable");
+        QMetaObject::invokeMethod(currentcaller, currentmethod.toStdString().c_str(), Qt::QueuedConnection, Q_ARG(WombatVariable*, wombatvariable));
     };
 private:
-    QObject *currentplug;
-    QString currentpath;
-    QWidget* parent;
+    QObject* currentcaller;
+    QString currentmethod;
+    WombatVariable* wombatvariable;
 };
 
 #endif // WOMBATFORENSICS_H

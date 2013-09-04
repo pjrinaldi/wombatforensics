@@ -1,5 +1,10 @@
 #include "sleuthkit.h"
 
+void SleuthKitPlugin::Initialize(WombatVariable* wombatVariable)
+{
+    wombatvariable = wombatvariable;
+}
+
 void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString configFilePath)
 {
     QString tmpPath = settingsPath;
@@ -96,6 +101,7 @@ void SleuthKitPlugin::SetupSystemProperties(QString settingsPath, QString config
         fprintf(stderr, "Setting out dir failed: %s\n", ex.message().c_str());
     }
 }
+/*
 void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable)
 {
     QString tmpPath = dataPath;
@@ -113,6 +119,7 @@ void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, Prog
         fprintf(stderr, "Loading Log File: %s\n", ex.message().c_str());
     }
 }
+*/
 QString SleuthKitPlugin::SetupImageDatabase(QString imgDBPath, QString evidenceFilePath)
 {
     QString evidenceFileName = evidenceFilePath.split("/").last();
@@ -205,12 +212,12 @@ void SleuthKitPlugin::threadFinished()
 
 void SleuthKitPlugin::UpdateProgress(int count, int progress)
 {
-    evidenceprogress->UpdateProgressBar(progress);
-    evidenceprogress->UpdateFilesProcessed(QString::number(count));
+    //evidenceprogress->UpdateProgressBar(progress);
+    //evidenceprogress->UpdateFilesProcessed(QString::number(count));
     //QCoreApplication::processEvents();
     //evidenceprogress->repaint();
 }
-
+/*
 void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progresswindow)
 {
     evidenceprogress = progresswindow;
@@ -243,7 +250,6 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     threadpool->waitForDone();
     progresswindow->UpdateAnalysisState("Processing Finished");
     //imagefiletsk = TskServices::Instance().getImageFile();
-    /*
     try
     {
         imagefiletsk.open(evidencePath.toStdString());
@@ -254,12 +260,10 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     {
         fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
     }
-    */
     // end open evidence thread
     // ExtractFilesThread(imagefiletsk)
     //
     // begin extract files thread
- /*   
     try
     {
         imagefiletsk.extractFiles();
@@ -275,7 +279,6 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }
     // end extract files thread
-    */
     //ExtractEvidenceRunner *extractEvidence = new ExtractEvidenceRunner();
     //threadpool->start(extractEvidence);
     // ExecuteTaskThread(task)
@@ -293,7 +296,6 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
 
     // NEED TO CALL QTCONCURRENT::MAP(TASKQUEUE, RUNTASK)
     //
-    /*
     TskPipelineManager pipelineMgr;
     TskPipeline *filePipeline;
     try
@@ -334,9 +336,9 @@ void SleuthKitPlugin::OpenEvidence(QString evidencePath, ProgressWindow *progres
     // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
     progresswindow->UpdateAnalysisState("Processing Finished");
     //delete task
-    */
     // end execute task thread
 }
+*/
 /*
 void SleuthKitPlugin::RunTask(TskSchedulerQueue::task_struct &task)
 {

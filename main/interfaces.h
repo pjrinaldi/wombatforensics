@@ -3,7 +3,7 @@
 
 #include <QtPlugin>
 #include <QThread>
-#include "progresswindow.h"
+//#include "progresswindow.h"
 #include "wombatvariable.h"
 
 class QStringList;
@@ -44,14 +44,16 @@ class SleuthKitInterface
 public:
     virtual ~SleuthKitInterface() {}
 
+    virtual void Initialize(WombatVariable* wombatVariable) = 0;
+
     virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
-    virtual void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable) = 0;
+    //virtual void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable) = 0;
     virtual QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
     virtual void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
     virtual void SetupSystemBlackboard() = 0;
     virtual void SetupSystemSchedulerQueue() = 0;
     virtual void SetupSystemFileManager() = 0;
-    virtual void OpenEvidence(QString evidencePath, ProgressWindow* progressWindow) = 0;
+    //virtual void OpenEvidence(QString evidencePath, ProgressWindow* progressWindow) = 0;
     virtual void LogEntry(QString logMsg) = 0;
     virtual QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName) = 0;
     virtual QString GetFileContents(int fileID) = 0;
