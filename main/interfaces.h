@@ -2,6 +2,10 @@
 #define INTERFACES_H
 
 #include <QtPlugin>
+//#include <QtCore>
+#include <QVariant>
+#include <QList>
+#include <QMap>
 //#include <QThread>
 //#include "progresswindow.h"
 #include "wombatvariable.h"
@@ -17,14 +21,14 @@ class PluginInterface
 public:
     virtual ~PluginInterface() {}
 
-    virtual QList<QStringList> PluginActions() const = 0;
-    virtual QList<QStringList> PluginActionIcons() const = 0;
-    virtual QStringList PluginMenus() const = 0;
+    //virtual QList<QStringList> PluginActions() const = 0;
+    //virtual QList<QStringList> PluginActionIcons() const = 0;
+    //virtual QStringList PluginMenus() const = 0;
 
     virtual void Initialize() = 0;
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
-    QStringList plugstringlist;
+    QMap<QString, QMap<QString,QVariant> > plugmaplist;
 };
 /*
 class ViewerInterface

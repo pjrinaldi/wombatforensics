@@ -17,13 +17,15 @@ class EvidencePlugin : public QObject, public PluginInterface
     Q_PLUGIN_METADATA(IID "wombat.PluginInterface" FILE "evidence.json")
     Q_INTERFACES(PluginInterface)
 public:
-    QList<QStringList> PluginActions() const;
-    QList<QStringList> PluginActionIcons() const;
-    QStringList PluginMenus() const;
+    //QList<QStringList> PluginActions() const;
+    //QList<QStringList> PluginActionIcons() const;
+    //QStringList PluginMenus() const;
 
-    void Initialize() {};
+    void Initialize();
     void Run(QString input);
     void Finalize() {};
+
+    QMap<QString, QMap<QString, QVariant> > plugmap;
 };
 /*
 class EvidencePlugin : public QObject, public EvidenceInterface

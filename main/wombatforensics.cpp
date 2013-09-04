@@ -67,7 +67,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //pluginFileNames = locatePlugins();
     //wombatplugins.clear();
     wombatvariable.pluginfo = LoadPlugins();
-    //InitializePlugins(); // may call this with the load plugins call
+    InitializeSleuthKit();
 }
 void WombatForensics::HideProgressWindow(bool checkedstate)
 {
@@ -156,8 +156,22 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
         tmpinfo.plugin = loader.instance();
         if(tmpinfo.plugin)
         {
+            tmpinfo.name = loader.metaData().value("MetaData").toObject().value("name").toString();
+            tmplist.append(tmpinfo);
+            PluginInterface* iplugin = qobject_cast<PluginInterface*>(tmpinfo.plugin);
+            if(iplugin)
+            {
+                /*
+                QMap<QString, QVariant>::const_iterator i = map.constBegin();
+                while(i != map.constEnd())
+                {
+                    ++i;
+                }
+                */
+            }
+            /*
             //fprintf(stderr, "PluginMetaData: %s\n", loader.metaData().value("MetaData").toObject().value("name").toString().toStdString().c_str());
-            //PluginInterface* iplugin = qobject_cast<PluginInterface*>(plugin);
+            PluginInterface* iplugin = qobject_cast<PluginInterface*>(tmpinfo.plugin);
             //if(iplugin)
             //{
                 //AddActions(plugin, iplugin->PluginMenus(), iplugin->PluginActions(), iplugin->PluginActionIcons(), ui->mainToolBar, ui->mainMenubar);
@@ -165,14 +179,15 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
                 //PopulateTabWidgets(plugin);
             tmpinfo.name = loader.metaData().value("MetaData").toObject().value("name").toString();
             tmplist.append(tmpinfo);
-            AddActions(plugin, iplugin->PluginMenus(), iplugin->PluginActions(), iplugin->PluginActionIcons(), ui->mainToolBar, ui->MainMenubar);
-            PopulateTabWidgets(plugin);
+            AddActions(tmpinfo.plugin, iplugin->PluginMenus(), iplugin->PluginActions(), iplugin->PluginActionIcons(), ui->mainToolBar, ui->mainMenubar);
+            PopulateTabWidgets(tmpinfo.plugin);
+            */
 
             //}
         }
     }
-    ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
-    ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
+    //ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
+    //ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
 
     return tmplist;
 }

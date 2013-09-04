@@ -40,8 +40,6 @@ public:
     QTabWidget *fileInfoTabWidget;
     QMenuBar *mainMenubar;
     QMenu *menuFile;
-    QMenu *menuEvidence;
-    QMenu *menuSettings;
     QStatusBar *mainStatusbar;
     QToolBar *mainToolBar;
 
@@ -91,10 +89,6 @@ public:
         mainMenubar->setAcceptDrops(true);
         menuFile = new QMenu(mainMenubar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
-        menuEvidence = new QMenu(mainMenubar);
-        menuEvidence->setObjectName(QStringLiteral("menuEvidence"));
-        menuSettings = new QMenu(mainMenubar);
-        menuSettings->setObjectName(QStringLiteral("menuSettings"));
         WombatForensics->setMenuBar(mainMenubar);
         mainStatusbar = new QStatusBar(WombatForensics);
         mainStatusbar->setObjectName(QStringLiteral("mainStatusbar"));
@@ -107,8 +101,6 @@ public:
         WombatForensics->addToolBar(Qt::TopToolBarArea, mainToolBar);
 
         mainMenubar->addAction(menuFile->menuAction());
-        mainMenubar->addAction(menuEvidence->menuAction());
-        mainMenubar->addAction(menuSettings->menuAction());
         menuFile->addAction(actionNew_Case);
         menuFile->addAction(actionOpen_Case);
         menuFile->addSeparator();
@@ -138,8 +130,6 @@ public:
         actionView_Progress->setText(QApplication::translate("WombatForensics", "View Progress...", 0));
         actionExit->setText(QApplication::translate("WombatForensics", "Exit", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
-        menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
-        menuSettings->setTitle(QApplication::translate("WombatForensics", "Settings", 0));
         mainToolBar->setWindowTitle(QApplication::translate("WombatForensics", "toolBar", 0));
     } // retranslateUi
 
