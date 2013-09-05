@@ -93,13 +93,12 @@ void WombatForensics::InitializeSleuthKit()
         SleuthKitInterface* isleuthkit = qobject_cast<SleuthKitInterface*>(curinfo.plugin);
         if(isleuthkit)
         {
-
-            //PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "Initialize");
-            //prunner->setAutoDelete(false);
-            //threadpool->start(prunner);
-            //threadpool->waitForDone();
+            PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "Initialize");
+            prunner->setAutoDelete(false);
+            threadpool->start(prunner);
+            threadpool->waitForDone();
             //isleuthkit->Initialize(wombatvariable);
-            //fprintf(stderr, "sleuthkit exists");
+            fprintf(stderr, "sleuthkit exists");
         }
     }
 }
@@ -128,19 +127,9 @@ void WombatForensics::GetPluginMap(PluginMap testmap, QObject* caller)
         {
             fprintf(stderr, "i value: %s\n", i.value().toStringList()[0].toStdString().c_str());
             QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[1]), i.value().toStringList()[0], caller);
-            connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
+            connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin(WombatVariable wombatvariable)));
             ui->mainToolBar->addAction(tmpaction);
         }
-        /*
-        if(i.key().compare("viewtab") == 0)
-        {
-            QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
-            //tmptab->setParent(this);
-            //ui->fileViewTabWidget->addTab(iBasicTools->setupHexTab(), "Hex View");
-            fprintf(stderr, "i value: %s\n", tmptab->objectName().toStdString().c_str());
-            ui->fileViewTabWidget->addTab(tmptab, "Hex View");
-        }
-        */
         else
         {
             fprintf(stderr, "key text is: %s\n", i.key().toStdString().c_str());
@@ -216,24 +205,7 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
 
     return tmplist;
 }
-/*
-void WombatForensics::PopulateTabWidgets(QObject *plugin)
-{
-    // i woud loop over the plugins, if name = wombat.BasicInterface then would call runplugin("")
 
-    /*
-    BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(plugin);
-    if(iBasicTools)
-    {
-        ui->fileViewTabWidget->addTab(iBasicTools->setupHexTab(), "Hex View");
-        ui->fileViewTabWidget->addTab(iBasicTools->setupTxtTab(), "Text View");
-        ui->fileInfoTabWidget->addTab(iBasicTools->setupDirTab(), "Directory List");
-        ui->fileInfoTabWidget->addTab(iBasicTools->setupTypTab(), "File Type");
-        SetupDirModel();
-    }
-    */
-//}
-//*/
 void WombatForensics::SetupDirModel(void)
 {
     wombatdirmodel = new QStandardItemModel();
@@ -248,99 +220,18 @@ void WombatForensics::SetupDirModel(void)
 
 void WombatForensics::RunPlugin()
 {
+    /*
+     *  PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "Run");
+        prunner->setAutoDelete(false);
+        threadpool->start(prunner);
+        threadpool->waitForDone();
+     */ 
     QAction *action = qobject_cast<QAction *>(sender());
     PluginInterface* iplugin = qobject_cast<PluginInterface*>(action->parent());
     fprintf(stderr, "action text: %s\n", action->text().toStdString().c_str());
     iplugin->Run(action->text());
 }
-/*
-QMenu* WombatForensics::AddMenu(QString tmpstring)
-{
-    QMenu* tmpmenu = new QMenu(tmpstring);
-    return tmpmenu;
-}
 
-QAction* WombatForensics::AddMenuItem(QStringList tmplist)
-{
-    QAction* tmpaction = new QAction(QIcon(tmplist[2]), tmplist[1], this);
-    connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
-    return tmpaction;
-}
-void WombatForensics::AddToolButton(QAction* action)
-{
-    ui->mainToolBar->addAction(action);
-}
-
-void WombatForensics::ConnectWidget(QObject* object, const char* signal)
-{
-    connect(object, signal, this, SLOT(RunPlugin()));
-}
-
-void WombatForensics::AddViewTab(QWidget* widget, QString title)
-{
-    ui->fileViewTabWidget->addTab(widget, title);
-}
-
-void WombatForensics::AddInfoTab(QWidget* widget, QString title)
-{
-    ui->fileInfoTabWidget->addTab(widget, title);
-}
-*/
-//void WombatForensics::AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
-/*
-void WombatForensics::AddActions(QObject* plugin, const QStringList &menus, const QList<QStringList> &texts, const QList<QStringList> &icons, QToolBar* toolbar, QMenuBar* menu, QActionGroup* actionGroup)
-{
-    for(int i = 0; i < menus.count(); i++)
-    {
-        QMenu* tmpmenu = menu->addMenu(menus[i]);
-        for(int j = 0; j < texts.count(); j++)
-        {
-            QAction* action1 = new QAction(texts[i][j], plugin);
-            action1->setIcon(QIcon(icons[i][j]));
-            connect(action1, SIGNAL(triggered()), this, SLOT(RunPlugin()));
-            if(actionGroup)
-            {
-                action1->setCheckable(true);
-                actionGroup->addAction(action1);
-            }
-            toolbar->addAction(action1);
-            QAction* action2 = action1;
-            tmpmenu->addAction(action2);
-        }
-    }
-    /*
-    foreach(QStringList actionList, PluginActions())
-    {
-        foreach(QString action, actionList)
-        {
-            if(input.compare(action) == 0)
-            {
-                fprintf(stderr, "Run with input: %s\n", input.toStdString().c_str());
-            }
-     */ 
-    /*
-    for(int i = 0; i < texts.count(); i++)
-    {
-        QAction *action1 = new QAction(texts[i], plugin);
-        QAction *action2 = new QAction(texts[i], plugin);
-        action1->setIcon(QIcon(icons[i]));
-        action2->setIcon(QIcon(icons[i]));
-        connect(action1, SIGNAL(triggered()), this, member);
-        connect(action2, SIGNAL(triggered()), this, member);
-        toolbar->addAction(action1);
-        menu->addAction(action2);
-
-        if(actionGroup)
-        {
-            action1->setCheckable(true);
-            action2->setCheckable(true);
-            actionGroup->addAction(action1);
-            actionGroup->addAction(action2);
-        }
-    }
-    */
-//}
-//*/
 /*
 void WombatForensics::dialogClosed(QString file)
 {
@@ -507,11 +398,6 @@ void WombatForensics::on_actionNew_Case_triggered()
             {
                 ui->actionOpen_Case->setEnabled(true);
             }
-            //evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
-            //basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
-            //sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
-            //ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
-            //ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
         }
     }
 
@@ -568,11 +454,6 @@ void WombatForensics::on_actionOpen_Case_triggered()
             {
                 wombatcasedata->DisplayError(this, "2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
-            //evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
-            //basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
-            //sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
-            //ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
-            //ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
             QString caseimage;
             QStringList caseimageList = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid);
