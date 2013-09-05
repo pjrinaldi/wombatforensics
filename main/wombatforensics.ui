@@ -53,7 +53,16 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuEvidence">
+    <property name="title">
+     <string>Evidence</string>
+    </property>
+    <addaction name="actionAdd_Evidence"/>
+    <addaction name="actionRemove_Evidence"/>
+    <addaction name="separator"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEvidence"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusbar"/>
   <widget class="QToolBar" name="mainToolBar">
@@ -80,6 +89,7 @@
    <addaction name="separator"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
+   <addaction name="actionAdd_Evidence"/>
   </widget>
   <action name="actionNew_Case">
    <property name="icon">
@@ -116,6 +126,19 @@
     <string>Exit</string>
    </property>
   </action>
+  <action name="actionAdd_Evidence">
+      <property name="icon">
+          <iconset><normaloff>:/basic/addevidence</normaloff>:/basic/addevidence</iconset>
+    </property>
+   <property name="text">
+    <string>Add Evidence</string>
+   </property>
+  </action>
+  <action name="actionRemove_Evidence">
+   <property name="text">
+    <string>Remove Evidence</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -134,6 +157,12 @@
      <y>299</y>
     </hint>
    </hints>
+  </connection>
+  <connection>
+      <sender>actionAdd_Evidence</sender>
+      <signal>triggered()</signal>
+      <receiver>WombatForensics</receiver>
+      <slot>AddEvidence()</slot>
   </connection>
  </connections>
 </ui>

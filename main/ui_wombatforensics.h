@@ -33,6 +33,8 @@ public:
     QAction *actionOpen_Case;
     QAction *actionView_Progress;
     QAction *actionExit;
+    QAction *actionAdd_Evidence;
+    QAction *actionRemove_Evidence;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QSplitter *splitter;
@@ -40,6 +42,7 @@ public:
     QTabWidget *fileInfoTabWidget;
     QMenuBar *mainMenubar;
     QMenu *menuFile;
+    QMenu *menuEvidence;
     QStatusBar *mainStatusbar;
     QToolBar *mainToolBar;
 
@@ -66,6 +69,13 @@ public:
         actionView_Progress->setIcon(icon2);
         actionExit = new QAction(WombatForensics);
         actionExit->setObjectName(QStringLiteral("actionExit"));
+        actionAdd_Evidence = new QAction(WombatForensics);
+        actionAdd_Evidence->setObjectName(QStringLiteral("actionAdd_Evidence"));
+        QIcon icon3;
+        icon3.addFile(QStringLiteral(":/basic/addevidence"), QSize(), QIcon::Normal, QIcon::Off);
+        actionAdd_Evidence->setIcon(icon3);
+        actionRemove_Evidence = new QAction(WombatForensics);
+        actionRemove_Evidence->setObjectName(QStringLiteral("actionRemove_Evidence"));
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -89,6 +99,8 @@ public:
         mainMenubar->setAcceptDrops(true);
         menuFile = new QMenu(mainMenubar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
+        menuEvidence = new QMenu(mainMenubar);
+        menuEvidence->setObjectName(QStringLiteral("menuEvidence"));
         WombatForensics->setMenuBar(mainMenubar);
         mainStatusbar = new QStatusBar(WombatForensics);
         mainStatusbar->setObjectName(QStringLiteral("mainStatusbar"));
@@ -101,20 +113,26 @@ public:
         WombatForensics->addToolBar(Qt::TopToolBarArea, mainToolBar);
 
         mainMenubar->addAction(menuFile->menuAction());
+        mainMenubar->addAction(menuEvidence->menuAction());
         menuFile->addAction(actionNew_Case);
         menuFile->addAction(actionOpen_Case);
         menuFile->addSeparator();
         menuFile->addAction(actionView_Progress);
         menuFile->addSeparator();
         menuFile->addAction(actionExit);
+        menuEvidence->addAction(actionAdd_Evidence);
+        menuEvidence->addAction(actionRemove_Evidence);
+        menuEvidence->addSeparator();
         mainToolBar->addAction(actionNew_Case);
         mainToolBar->addAction(actionOpen_Case);
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionView_Progress);
         mainToolBar->addSeparator();
+        mainToolBar->addAction(actionAdd_Evidence);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
+        QObject::connect(actionAdd_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(AddEvidence()));
 
         fileInfoTabWidget->setCurrentIndex(-1);
 
@@ -129,7 +147,10 @@ public:
         actionOpen_Case->setText(QApplication::translate("WombatForensics", "Open Case", 0));
         actionView_Progress->setText(QApplication::translate("WombatForensics", "View Progress...", 0));
         actionExit->setText(QApplication::translate("WombatForensics", "Exit", 0));
+        actionAdd_Evidence->setText(QApplication::translate("WombatForensics", "Add Evidence", 0));
+        actionRemove_Evidence->setText(QApplication::translate("WombatForensics", "Remove Evidence", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
+        menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         mainToolBar->setWindowTitle(QApplication::translate("WombatForensics", "toolBar", 0));
     } // retranslateUi
 
