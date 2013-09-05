@@ -2,14 +2,41 @@
 
 /*QStringList BasicTools::evidenceToolboxIcons() const
 {
-    return QStringList() << tr(":/basictools/images/treefile") << tr(":/basictools/images/treefolder") << (":/basictools/images/treepartition") << tr(":/basictools/images/treefilemanager") << tr(":/basictools/images/treeimage");
+    return QStringList() << vtr(":/basictools/images/treefile") << tr(":/basictools/images/treefolder") << (":/basictools/images/treepartition") << tr(":/basictools/images/treefilemanager") << tr(":/basictools/images/treeimage");
 }*/
+PluginMap BasicTools::Initialize(WombatVariable wombatvariable)
+{
+    PluginMap mainmap;
+    plugmap.clear();
+    plugmap.insert("actions", QStringList() << "loadhex" << "loadtxt");
+    //plugmap.insert("icons", QStringList() << tr(":/basictools/images/treefile") << tr(":/basictools/images/treefolder") << (":/basictools/images/treepartition") << tr(":/basictools/images/treefilemanager") << tr(":/basictools/images/treeimage"));
+    QVariant hexvariant = VPtr<QWidget>::asQVariant(setupTxtTab());
+    plugmap.insert("viewtab", hexvariant);
+    mainmap.map = plugmap;
+    mastermap.map = plugmap;
+
+    return mainmap;
+}
+
+void BasicTools::Run(QString input)
+{
+    fprintf(stderr, "Map Size: %d\n", mastermap.map.size());
+    QStringList tmplist = mastermap.map["actions"].toStringList();
+    foreach(QString tmpstring, tmplist)
+    {
+        if(input.compare(tmpstring) == 0)
+        {
+            fprintf(stderr, "Run with input: %s\n", input.toStdString().c_str());
+        }
+    }
+}
+
 QWidget* BasicTools::setupHexTab()
 {
     // hex editor tab
     QWidget* hexTab = new QWidget();
     QVBoxLayout* hexLayout = new QVBoxLayout();
-    hexwidget = new BinViewWidget();
+    hexwidget = new BinViewWidget(hexTab);
     hexwidget->setObjectName("bt-hexView");
     // appears the model is set to open the file, then the widget sets the model.
     hexwidget->setModel(0);

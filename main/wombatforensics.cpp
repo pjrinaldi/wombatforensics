@@ -104,7 +104,7 @@ void WombatForensics::InitializeSleuthKit()
     }
 }
 
-void WombatForensics::TestMap(PluginMap testmap, QObject* caller)
+void WombatForensics::GetPluginMap(PluginMap testmap, QObject* caller)
 {
     fprintf(stderr, "Map Count: %d\n", testmap.map.size());
     QMap<QString, QVariant>::iterator i = testmap.map.begin();
@@ -130,6 +130,14 @@ void WombatForensics::TestMap(PluginMap testmap, QObject* caller)
             QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[1]), i.value().toStringList()[0], caller);
             connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
             ui->mainToolBar->addAction(tmpaction);
+        }
+        if(i.key().compare("viewtab") == 0)
+        {
+            QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
+            //tmptab->setParent(this);
+            //ui->fileViewTabWidget->addTab(iBasicTools->setupHexTab(), "Hex View");
+            fprintf(stderr, "i value: %s\n", tmptab->objectName().toStdString().c_str());
+            ui->fileViewTabWidget->addTab(tmptab, "Hex View");
         }
         else
         {
@@ -162,7 +170,7 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
                 fprintf(stderr, "plugin name: %s\n", tmpinfo.name.toStdString().c_str());
                 PluginRunner* prunner = new PluginRunner(tmpinfo.plugin, wombatvariable, "Initialize");
                 qRegisterMetaType<PluginMap>("PluginMap");
-                connect(prunner, SIGNAL(GetPluginMap(PluginMap, QObject*)), this, SLOT(TestMap(PluginMap, QObject*)), Qt::QueuedConnection);
+                connect(prunner, SIGNAL(GetPluginMap(PluginMap, QObject*)), this, SLOT(GetPluginMap(PluginMap, QObject*)), Qt::QueuedConnection);
                 prunner->setAutoDelete(false);
                 threadpool->start(prunner);
                 threadpool->waitForDone();

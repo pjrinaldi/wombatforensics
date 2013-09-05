@@ -53,7 +53,7 @@ private slots:
     //void AddViewTab(QWidget* widget, QString title);
     //void AddInfoTab(QWidget* widget, QString title);
     //void ConnectWidget(QObject* object, const char* signal);
-    void TestMap(PluginMap testmap, QObject* caller);
+    void GetPluginMap(PluginMap testmap, QObject* caller);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -83,7 +83,7 @@ private:
     Q_INVOKABLE void sleuthKitLoadEvidence(QObject *plugin, QString evidencePath);
     void SleuthKitLogEntry(QObject *plugin, QString logMsg);
     */
-    void AddActions(QObject *plugin, const QStringList &menus, const QList<QStringList> &texts, const QList<QStringList> &icons, QToolBar *toolbar, QMenuBar *menu, QActionGroup *actionGroup = 0);
+//    void AddActions(QObject *plugin, const QStringList &menus, const QList<QStringList> &texts, const QList<QStringList> &icons, QToolBar *toolbar, QMenuBar *menu, QActionGroup *actionGroup = 0);
     //void AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup = 0);
     /*
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
@@ -91,21 +91,7 @@ private:
     void LoadTxtViewer(QString asciiText);
     */
     std::string GetTime(void);
-
-    //QList<QObject*> wombatplugins;
-    //QDir pluginsDir;
     QThreadPool *threadpool;
-    //QStringList pluginFileNames;
-    //QString currentcasedirpath;
-    //QString currentcaseevidencepath;
-    //QString wombatsettingspath;
-    //QString wombatdatapath;
-    //QString wombatcasespath;
-    //QString wombattmpfilepath;
-    //QStringList currentsleuthimages;
-    //QObject *basictoolsplugin;
-    //QObject *evidenceplugin;
-    //QObject *sleuthkitplugin;
     QTreeView *currenttreeview;
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;

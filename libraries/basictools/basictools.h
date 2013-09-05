@@ -16,7 +16,7 @@ class BasicTools : public QObject, public PluginInterface
 
 public:
     // plugin interface functions
-    Q_INVOKABLE PluginMap Initialize(WombatVariable wombatvariable) {};
+    Q_INVOKABLE PluginMap Initialize(WombatVariable wombatvariable);
     Q_INVOKABLE void Run(QString input);
     void Finalize() {};
 
@@ -30,7 +30,9 @@ public:
     QWidget* setupTypTab();
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
+    QMap<QString, QVariant> plugmap;
 private:
+    PluginMap mastermap;
     BinViewModel* hexmodel;
     BinViewWidget* hexwidget;
     QTreeView* dirtreeview;
