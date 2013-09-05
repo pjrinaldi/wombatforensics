@@ -14,6 +14,13 @@ struct PluginInfo
     QString name;
 };
 
+struct ViewerMap
+{
+    QVariantMap map;
+    QStringList icons;
+    QString name;
+};
+
 struct PluginMap
 {
     QMap<QString, QVariant> map;

@@ -4,15 +4,35 @@
 {
     return QStringList() << vtr(":/basictools/images/treefile") << tr(":/basictools/images/treefolder") << (":/basictools/images/treepartition") << tr(":/basictools/images/treefilemanager") << tr(":/basictools/images/treeimage");
 }*/
-QVariantMap BasicTools::Initialize()
+QList<ViewerMap> BasicTools::Initialize()
 {
+    QList<ViewerMap> tmplist;
+    ViewerMap tmpviewmap;
     QVariantMap tmpmap;
-    QWidget* tmpwidget = setupTxtTab();
-    QVariant v = VPtr<QWidget>::asQVariant(tmpwidget);
+    QWidget* tmpwidget;
+    QVariant v;
     tmpmap.clear();
+    tmplist.clear();
+    tmpwidget = setupHexTab();
+    v = VPtr<QWidget>::asQVariant(tmpwidget);
+    tmpmap.insert("Hex View", v);
+    tmpviewmap.map = tmpmap;
+    tmpviewmap.name = "view";
+    tmplist.append(tmpviewmap);
+    tmpwidget = setupTxtTab();
+    v = VPtr<QWidget>::asQVariant(tmpwidget);
     tmpmap.insert("Text View", v);
+    tmpviewmap.map = tmpmap;
+    tmpviewmap.name = "view";
+    tmplist.append(tmpviewmap);
+    tmpwidget = setupDirTab();
+    v = VPtr<QWidget>::asQVariant(tmpwidget);
+    tmpmap.insert("dirlist", v);
+    tmpviewmap.map = tmpmap;
+    tmpviewmap.name = "list";
+    tmplist.append(tmpviewmap);
 
-    return tmpmap;
+    return tmplist;
     /*
     PluginMap mainmap;
     plugmap.clear();
@@ -29,6 +49,7 @@ QVariantMap BasicTools::Initialize()
 
 void BasicTools::Run(QString input)
 {
+    /*
     fprintf(stderr, "Map Size: %d\n", mastermap.map.size());
     QStringList tmplist = mastermap.map["actions"].toStringList();
     foreach(QString tmpstring, tmplist)
@@ -38,6 +59,7 @@ void BasicTools::Run(QString input)
             fprintf(stderr, "Run with input: %s\n", input.toStdString().c_str());
         }
     }
+    */
 }
 
 QWidget* BasicTools::setupHexTab()

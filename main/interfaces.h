@@ -43,11 +43,21 @@ class ViewerInterface
 public:
     virtual ~ViewerInterface() {}
 
+    virtual QList<ViewerMap> Initialize() = 0;
+    virtual void Run(QString input) = 0;
+    virtual void Finalize() = 0;
+};
+/*
+class ListInterface
+{
+public:
+    virtual ~ViewerInterface() {}
+
     virtual QVariantMap Initialize() = 0;
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
 };
-
+*/
 /*
 class BasicToolsInterface
 {

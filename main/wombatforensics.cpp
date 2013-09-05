@@ -131,6 +131,7 @@ void WombatForensics::GetPluginMap(PluginMap testmap, QObject* caller)
             connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
             ui->mainToolBar->addAction(tmpaction);
         }
+        /*
         if(i.key().compare("viewtab") == 0)
         {
             QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
@@ -139,6 +140,7 @@ void WombatForensics::GetPluginMap(PluginMap testmap, QObject* caller)
             fprintf(stderr, "i value: %s\n", tmptab->objectName().toStdString().c_str());
             ui->fileViewTabWidget->addTab(tmptab, "Hex View");
         }
+        */
         else
         {
             fprintf(stderr, "key text is: %s\n", i.key().toStdString().c_str());
@@ -179,14 +181,27 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
             if(iviewer)
             {
                 fprintf(stderr, "plugin name: %s\n", tmpinfo.name.toStdString().c_str());
-                QVariantMap tmpmap = iviewer->Initialize();
-                fprintf(stderr, "Map Count: %d\n", tmpmap.size());
-                QVariantMap::iterator i = tmpmap.begin();
-                while(i != tmpmap.end())
+                QList<ViewerMap> tmpviewlist = iviewer->Initialize();
+                foreach(ViewerMap tmpviewmap, tmpviewlist)
                 {
-                    QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
-                    ui->fileViewTabWidget->addTab(tmptab, i.key());
-                    ++i;
+                    //fprintf(stderr, "Map Count: %d\n", tmpviewmap.map.size());
+                    QVariantMap::iterator i = tmpviewmap.map.begin();
+                    fprintf(stderr, "key: %s\n", i.key().toStdString().c_str());
+                    while(i != tmpviewmap.map.end())
+                    {
+                        if(tmpviewmap.name.compare("view") == 0)
+                        {
+
+                            QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
+                            ui->fileViewTabWidget->addTab(tmptab, i.key());
+                        }
+                        if(tmpviewmap.name.compare("list") == 0)
+                        {
+                            QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
+                            ui->fileInfoTabWidget->addTab(tmptab, i.key());
+                        }
+                        ++i;
+                    }
                 }
             }
         }
