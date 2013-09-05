@@ -90,6 +90,7 @@
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
    <addaction name="actionAdd_Evidence"/>
+   <addaction name="actionRemove_Evidence"/>
   </widget>
   <action name="actionNew_Case">
    <property name="icon">
@@ -135,6 +136,9 @@
    </property>
   </action>
   <action name="actionRemove_Evidence">
+      <property name="icon">
+          <iconset><normaloff>:/basic/remevidence</normaloff>:/basic/remevidence</iconset>
+      </property>
    <property name="text">
     <string>Remove Evidence</string>
    </property>
@@ -163,6 +167,12 @@
       <signal>triggered()</signal>
       <receiver>WombatForensics</receiver>
       <slot>AddEvidence()</slot>
+  </connection>
+  <connection>
+      <sender>actionRemEvidence</sender>
+      <signal>triggered()</signal>
+      <receiver>WombatForensics</receiver>
+      <slot>RemEvidence()</slot>
   </connection>
  </connections>
 </ui>

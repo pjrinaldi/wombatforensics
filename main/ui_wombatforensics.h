@@ -76,6 +76,9 @@ public:
         actionAdd_Evidence->setIcon(icon3);
         actionRemove_Evidence = new QAction(WombatForensics);
         actionRemove_Evidence->setObjectName(QStringLiteral("actionRemove_Evidence"));
+        QIcon icon4;
+        icon4.addFile(QStringLiteral(":/basic/remevidence"), QSize(), QIcon::Normal, QIcon::Off);
+        actionRemove_Evidence->setIcon(icon4);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -129,6 +132,7 @@ public:
         mainToolBar->addAction(actionView_Progress);
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionAdd_Evidence);
+        mainToolBar->addAction(actionRemove_Evidence);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
