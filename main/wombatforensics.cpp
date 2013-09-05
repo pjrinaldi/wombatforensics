@@ -265,8 +265,32 @@ void WombatForensics::RunPlugin()
     iplugin->Run(action->text());
 }
 
-//void WombatForensics::AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
+void WombatForensics::AddMenu(QMenu* tmpmenu)
+{
+    ui->mainMenuBar->addMenu(menu);
+}
 
+void WombatForensics::AddToolButton(QAction* action)
+{
+    ui->mainToolBar->addAction(action);
+}
+
+void WombatForensics::ConnectWidget(QObject* object, const char* signal)
+{
+    connect(object, signal, this, SLOT(RunPlugin()));
+}
+
+void WombatForensics::AddViewTab(QWidget* widget, QString title)
+{
+    ui->fileViewTabWidget->addTab(widget, title);
+}
+
+void WombatForensics::AddInfoTab(QWidget* widget, QString title)
+{
+    ui->fileInfoTabWidget->addTab(widget, title);
+}
+//void WombatForensics::AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
+/*
 void WombatForensics::AddActions(QObject* plugin, const QStringList &menus, const QList<QStringList> &texts, const QList<QStringList> &icons, QToolBar* toolbar, QMenuBar* menu, QActionGroup* actionGroup)
 {
     for(int i = 0; i < menus.count(); i++)
@@ -319,7 +343,7 @@ void WombatForensics::AddActions(QObject* plugin, const QStringList &menus, cons
     }
     */
 }
-
+*/
 /*
 void WombatForensics::dialogClosed(QString file)
 {

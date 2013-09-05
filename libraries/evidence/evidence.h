@@ -5,7 +5,7 @@
 //#include <sqlite3.h>
 #include <QtPlugin>
 #include <QObject>
-//#include <QtWidgets>
+#include <QtWidgets>
 #include <cstdio>
 #include <string>
 #include <QStringList>

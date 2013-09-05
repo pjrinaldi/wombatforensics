@@ -25,10 +25,44 @@ QStringList EvidencePlugin::PluginMenus() const
 void EvidencePlugin::Initialize()
 {
     plugmap.clear();
+    // QMenu setup
+    QMenu tmpmenu;
+    QMap<QString, QVariant> tmpMap;
+    QVariant tmpvariant;
+    QAction* tmpaction = new QAction(tr("Add Evidence"));
+    tmpaction.setIcon(QIcon(tr(":/basic/addevidence")));
+    connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
+    tmpmenu->addAction(tmpaction);
+    tmpaction = new QAction(tr("RemoveEvidence"), this);
+    tmpaction.setIcon(QIcon(tr(":/basic/remevidence")));
+    tmpmenu->addAction(tmpaction);
+    tmpvariant = tmpmenu;
+    tmpMap.insert("addmenu", tmpvariant);
+    // QToolbuttonSetup
+    tmpaction = new QAction(tr("Add Evidence"));
+    tmpaction.setIcon(QIcon(tr(":/basic/remevidence")));
+    tmpMap.insert("add
+
+    /*
+        QMenu* tmpmenu = menu->addMenu(menus[i]);
+        for(int j = 0; j < texts.count(); j++)
+        {
+            QAction* action1 = new QAction(texts[i][j], plugin);
+            action1->setIcon(QIcon(icons[i][j]));
+            connect(action1, SIGNAL(triggered()), this, SLOT(RunPlugin()));
+            if(actionGroup)
+            {
+                action1->setCheckable(true);
+                actionGroup->addAction(action1);
+            }
+            toolbar->addAction(action1);
+            QAction* action2 = action1;
+            tmpmenu->addAction(action2);
+    plugmap.clear();
     QMap<QString, QVariant> tmpMap;
     tmpMap.insert("addevidence", ":/basic/addevidence");
     tmpMap.insert("remevidence", ":/basic/remevidence");
-    plugmap.insert("actionicons", tmpMap);
+    plugmap.insert("icons", tmpMap);
     tmpMap.clear();
     tmpMap.insert("addevidence", tr("Add Evidence"));
     tmpMap.insert("remevidence", tr("Remove Evidence"));
@@ -36,7 +70,7 @@ void EvidencePlugin::Initialize()
     tmpMap.clear();
     tmpMap.insert("evidencemenu", tr("Evidence"));
     plugmap.insert("menus", tmpMap);
-    tmpMap.clear();
+    tmpMap.clear();*/
 }
 void EvidencePlugin::Run(QString input)
 {/*

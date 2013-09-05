@@ -53,6 +53,10 @@ private:
 
     //QObject* loadPlugin(QString fileName);
     QList <PluginInfo> LoadPlugins();
+    void AddMenu(QMenu* menu);
+    void AddToolButton(QAction* action);
+    void AddViewerTab(QWidget* widget);
+    void AddListingTab(QWidget* widget);
     void PopulateActions(QObject *plugin);
     void PopulateTabWidgets(QObject *plugin);
     void SetupDirModel(void);

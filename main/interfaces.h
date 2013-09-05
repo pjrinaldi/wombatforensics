@@ -29,6 +29,8 @@ public:
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
     QMap<QString, QMap<QString,QVariant> > plugmaplist;
+    // standard qmap key values are "actionicons", "treeicons", "actions", "menus"
+    // so i should check for the qmap and call the respective function in the mainwindow
 };
 /*
 class ViewerInterface
