@@ -30,8 +30,7 @@ PluginMap EvidencePlugin::Initialize(WombatVariable wombatvariable)
     plugmap.clear();
     // QMenu setup
     plugmap.insert("addmenu", QString("Evidence"));
-    plugmap.insert("addmenuitem", QStringList() << "Evidence" << "Add Evidence" << tr(":/basic/addevidence"));
-    plugmap.insert("addmenuitem", QStringList() << "Evidence" << "Remove Evidence" << ":/basic/remevidence");
+    plugmap.insert("addmenuitem", QStringList() << "Evidence" << "Add Evidence" << tr(":/basic/addevidence") << "Remove Evidence" << ":/basic/remevidence");
     plugmap.insert("addtoolbutton", QStringList() << "Add Evidence" << tr(":/basic/addevidence"));
     mainmap.map = plugmap;
     return mainmap;

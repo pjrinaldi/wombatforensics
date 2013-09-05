@@ -151,8 +151,16 @@ void WombatForensics::TestMap(PluginMap testmap)
     while(i != testmap.map.end())
     {
         fprintf(stderr, "Key Text: %s\n", i.key().toStdString().c_str());
-        if(i.key().compare("addmenu") == 0)
+        if(i.key().compare("addmenuitem") == 0)
         {
+            int count = (i.value().toStringList().size() - 1)/2;
+            QMenu* tmpmenu = new QMenu(i.value().toStringList()[0]);
+            ui->mainMenubar->addMenu(tmpmenu);
+            for(int j = 1; j <= count; j++)
+            {
+                QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[(2*j-1)+1]), i.value().toStringList()[(2*j-1)], this);
+                tmpmenu->addAction(tmpaction);
+            }
             //ui->mainMenubar->addMenu();
             //ui->mainMenubar->addMenu(i.value<QMenu*>());
         }
