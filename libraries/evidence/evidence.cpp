@@ -26,19 +26,23 @@ void EvidencePlugin::Initialize(WombatVariable wombatvariable)
 {
     plugmap.clear();
     // QMenu setup
+    /*
     QMenu* tmpmenu;
-    QAction* tmpaction = new QAction(tr("Add Evidence"), wombatvariable.parent);
+    QAction* tmpaction = new QAction(tr("Add Evidence"), (QWidget*)wombatvariable.parent);
     tmpaction->setIcon(QIcon(tr(":/basic/addevidence")));
     connect(tmpaction, SIGNAL(triggered()), wombatvariable.parent, SLOT(RunPlugin()));
     tmpmenu->addAction(tmpaction);
-    tmpaction = new QAction(tr("RemoveEvidence"), wombatvariable.parent);
-    tmpaction->setIcon(QIcon(tr(":/basic/remevidence")));
-    tmpmenu->addAction(tmpaction);
+    QAction* tmpaction2 = new QAction(tr("Remove Evidence"), wombatvariable.parent);
+    tmpaction2->setIcon(QIcon(tr(":/basic/remevidence")));
+    connect(tmpaction2, SIGNAL(triggered()), wombatvariable.parent, SLOT(RunPlugin()));
+    tmpmenu->addAction(tmpaction2);
     QVariant tmpvariant = VPtr<QMenu>::asQVariant(tmpmenu);
-    plugmap.insert("addmenu", tmpvariant);
+    //plugmap.insert("addmenu", tmpvariant);
+    */
     // QToolbuttonSetup
-    tmpaction = new QAction(QIcon(tr(":/basic/remevidence")), tr("Add Evidence"), wombatvariable.parent);
-    tmpvariant = VPtr<QAction>::asQVariant(tmpaction);
+    QAction* tmpaction3 = new QAction(QIcon(tr(":/basic/addevidence")), tr("Add Evidence"), wombatvariable.parent);
+    //QVariant tmpvariant = VPtr<QMenu>::asQVariant(tmpmenu);
+    QVariant tmpvariant = VPtr<QAction>::asQVariant(tmpaction3);
     plugmap.insert("addtoolbutton", tmpvariant);
 
     /*

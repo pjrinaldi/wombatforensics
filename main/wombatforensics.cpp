@@ -168,6 +168,7 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
                 threadpool->start(prunner);
                 threadpool->waitForDone();
                 QMap<QString, QVariant>::iterator i = iplugin->plugmap.begin();
+                fprintf(stderr, "Key: %s\n", i.key().toStdString().c_str());
                 while(i != iplugin->plugmap.end())
                 {
                     if(i.key() == "addmenu")
@@ -175,8 +176,17 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
                         ui->mainMenubar->addMenu(VPtr<QMenu>::asPtr(i.value()));
                         //ui->mainMenubar->addMenu(i.value<QMenu*>());
                     }
-                    else if(i.key() == "addtoolbutton")
-                        ui->mainToolBar->addAction(VPtr<QAction>::asPtr(i.value()));
+                    else if(i.key().compare("addtoolbutton"))
+                    {
+                        QVariant v = i.value();
+                        QAction* tmpaction = VPtr<QAction>::asPtr(v);
+                        fprintf(stderr, "add toolbutton\n");
+                        ui->mainToolBar->addAction(tmpaction);
+                    }
+                    else
+                    {
+                        fprintf(stderr, "key text is: %s\n", i.key().toStdString().c_str());
+                    }
                     ++i;
                 }
                 /*
