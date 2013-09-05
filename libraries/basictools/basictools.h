@@ -6,9 +6,7 @@
 #include <QtPlugin>
 #include <QObject>
 #include <QtWidgets>
-//#include <sqlite3.h>
 #include <QStringList>
-//#include <QFileDialog>
 
 class BasicTools : public QObject, public PluginInterface
 {
@@ -18,14 +16,8 @@ class BasicTools : public QObject, public PluginInterface
 
 public:
     // plugin interface functions
-    //QList<QStringList> PluginActions() const;
-    //QList<QStringList> PluginActionIcons() const;
-    //QStringList PluginMenus() const;
-    
-    //Q_INVOKABLE void Initialize(WombatVariable wombatvariable) {};
     Q_INVOKABLE PluginMap Initialize(WombatVariable wombatvariable) {};
-    //Q_INVOKABLE QMap<QString, QVariant> Initialize(WombatVariable wombatvariable) {};
-    void Run(QString input);
+    Q_INVOKABLE void Run(QString input);
     void Finalize() {};
 
     //QStringList pluginstringlist = evidenceToolboxIcons();

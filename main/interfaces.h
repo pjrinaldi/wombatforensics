@@ -6,7 +6,6 @@
 #include <QVariant>
 #include <QList>
 #include <QMap>
-//#include <QThread>
 //#include "progresswindow.h"
 #include "wombatvariable.h"
 
@@ -15,6 +14,7 @@ class QObject;
 class QWidget;
 class QStandardItem;
 
+// might not need.
 template <class T> class VPtr
 {
 public:
@@ -33,19 +33,9 @@ class PluginInterface
 public:
     virtual ~PluginInterface() {}
 
-    //virtual QList<QStringList> PluginActions() const = 0;
-    //virtual QList<QStringList> PluginActionIcons() const = 0;
-    //virtual QStringList PluginMenus() const = 0;
-
     Q_INVOKABLE virtual PluginMap Initialize(WombatVariable wombatvariable) = 0;
-    //Q_INVOKABLE virtual QMap<QString, QVariant> Initialize(WombatVariable wombatvariable) = 0;
-    //Q_INVOKABLE virtual void Initialize(WombatVariable wombatvariable) = 0;
     Q_INVOKABLE virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
-    //virtual QMap<QString, QVariant> ReturnMap() = 0;
-    //QMap<QString, QVariant> plugmap;
-    // standard qmap key values are "actionicons", "treeicons", "actions", "menus"
-    // so i should check for the qmap and call the respective function in the mainwindow
 };
 /*
 class ViewerInterface
@@ -58,20 +48,6 @@ public:
     virtual void Initialize() = 0;
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
-};
-*/
-/*
-class EvidenceInterface 
-{
-public:
-    virtual ~EvidenceInterface() {}
-
-    virtual QStringList evidenceActions() const = 0;
-    virtual QStringList evidenceActionIcons() const = 0;
-
-    virtual QString addEvidence() = 0;
-    virtual void remEvidence(int currentCaseID) = 0;
-
 };
 */
 /*

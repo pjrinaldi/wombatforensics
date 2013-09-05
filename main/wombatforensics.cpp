@@ -64,9 +64,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     {
         wombatcasedata->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
-    //pluginFileNames.clear();
-    //pluginFileNames = locatePlugins();
-    //wombatplugins.clear();
     wombatvariable.pluginfo = LoadPlugins();
     InitializeSleuthKit();
 }
@@ -107,42 +104,6 @@ void WombatForensics::InitializeSleuthKit()
     }
 }
 
-/*
-bool WombatForensics::isPluginLoaded(QString pluginFileName)
-{
-    int pluginexists = 0;
-    QString fileName;
-    foreach(fileName, pluginFileNames)
-    {
-        if(fileName.compare(pluginFileName) == 0)
-        {
-            loadPlugin(pluginFileName);
-            pluginexists++;
-        }
-    }
-    if(pluginexists <= 0)
-    {
-        fprintf(stderr, "string compare failed.");
-        return false;
-    }
-    else
-        return true;
-}
-QStringList WombatForensics::locatePlugins()
-{
-    QStringList tmpList;
-    tmpList.clear();
-    QString tmpPath = qApp->applicationDirPath();
-    tmpPath += "/plugins/";
-    QDir plugDir = QDir(tmpPath);
-
-    foreach(QString fileName, plugDir.entryList(QDir::Files))
-    {
-        tmpList.append(plugDir.absoluteFilePath(fileName));
-    }
-    return tmpList;
-}
-*/
 void WombatForensics::TestMap(PluginMap testmap, QObject* caller)
 {
     fprintf(stderr, "Map Count: %d\n", testmap.map.size());
@@ -162,15 +123,10 @@ void WombatForensics::TestMap(PluginMap testmap, QObject* caller)
                 connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
                 tmpmenu->addAction(tmpaction);
             }
-            //ui->mainMenubar->addMenu();
-            //ui->mainMenubar->addMenu(i.value<QMenu*>());
         }
         if(i.key().compare("addtoolbutton") == 0)
         {
-            //QVariant v = i.value();
-            //QAction* tmpaction = VPtr<QAction>::asPtr(v);
             fprintf(stderr, "i value: %s\n", i.value().toStringList()[0].toStdString().c_str());
-            //ui->mainToolBar->addAction(tmpaction);
             QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[1]), i.value().toStringList()[0], caller);
             connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
             ui->mainToolBar->addAction(tmpaction);
@@ -210,97 +166,13 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
                 prunner->setAutoDelete(false);
                 threadpool->start(prunner);
                 threadpool->waitForDone();
-                //fprintf(stderr, "Map Count: %d\n", prunner->runnermap.map.size());
-                /*
-                QMap<QString, QVariant>::iterator i = iplugin->plugmap.begin();
-                fprintf(stderr, "Key: %s\n", i.key().toStdString().c_str());
-                while(i != iplugin->plugmap.end())
-                {
-                    if(i.key() == "addmenu")
-                    {
-                        //ui->mainMenubar->addMenu();
-                        //ui->mainMenubar->addMenu(i.value<QMenu*>());
-                    }
-                    else if(i.key().compare("addtoolbutton"))
-                    {
-                        //QVariant v = i.value();
-                        //QAction* tmpaction = VPtr<QAction>::asPtr(v);
-                        fprintf(stderr, "add toolbutton\n");
-                        //ui->mainToolBar->addAction(tmpaction);
-                    }
-                    else
-                    {
-                        fprintf(stderr, "key text is: %s\n", i.key().toStdString().c_str());
-                    }
-                    ++i;
-                }
-                /*
-                QMap<QString, QVariant>::const_iterator i = map.constBegin();
-                while(i != map.constEnd())
-                {
-                    ++i;
-                }
-                */
             }
-            /*
-            //fprintf(stderr, "PluginMetaData: %s\n", loader.metaData().value("MetaData").toObject().value("name").toString().toStdString().c_str());
-            PluginInterface* iplugin = qobject_cast<PluginInterface*>(tmpinfo.plugin);
-            //if(iplugin)
-            //{
-                //AddActions(plugin, iplugin->PluginMenus(), iplugin->PluginActions(), iplugin->PluginActionIcons(), ui->mainToolBar, ui->mainMenubar);
-                //PopulateActions(plugin);
-                //PopulateTabWidgets(plugin);
-            tmpinfo.name = loader.metaData().value("MetaData").toObject().value("name").toString();
-            tmplist.append(tmpinfo);
-            AddActions(tmpinfo.plugin, iplugin->PluginMenus(), iplugin->PluginActions(), iplugin->PluginActionIcons(), ui->mainToolBar, ui->mainMenubar);
-            PopulateTabWidgets(tmpinfo.plugin);
-            */
-
-            //}
         }
     }
-    //ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
-    //ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
 
     return tmplist;
 }
 /*
-QObject* WombatForensics::loadPlugin(QString fileName)
-{
-   QPluginLoader loader(fileName);
-    QObject* plugin = loader.instance();
-    if(!loader.isLoaded())
-        fprintf(stderr, "%s\n", loader.errorString().toStdString().c_str());
-    if (plugin)
-    {
-        //populateActions(plugin);
-        //populateTabWidgets(plugin);
-        //setupSleuthKitProperties(plugin, wombatsettingspath, "tsk-config.xml");
-        //setupSleuthKitLog(plugin, wombatdatapath, "tsk-log.txt", wombatvariable);
-        //setupSleuthKitSchedulerQueue(plugin);
-        //setupSleuthKitFileManager(plugin);
-    }
-
-    return plugin;
-}
-*/
-void WombatForensics::PopulateActions(QObject *plugin)
-{
-    /*
-    PluginInterface ievidence = qobject_cast<PluginInterface*>(plugin);
-    if(ievidence)
-    {
-        AddActions(plugin, ievidence->pluginActions(), ievidence->evidenceActionIcons(), ui->mainToolBar, ui->mainMenuBar);
-    }
-    */
-    /*
-    EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(plugin);
-    if (iEvidence)
-    {
-        AddActions(plugin, iEvidence->evidenceActions(), iEvidence->evidenceActionIcons(), ui->mainToolBar, ui->menuEvidence, SLOT(AlterEvidence()));
-    }*/
-}
-
 void WombatForensics::PopulateTabWidgets(QObject *plugin)
 {
     // i woud loop over the plugins, if name = wombat.BasicInterface then would call runplugin("")
@@ -316,8 +188,8 @@ void WombatForensics::PopulateTabWidgets(QObject *plugin)
         SetupDirModel();
     }
     */
-}
-
+//}
+//*/
 void WombatForensics::SetupDirModel(void)
 {
     wombatdirmodel = new QStandardItemModel();
@@ -335,9 +207,9 @@ void WombatForensics::RunPlugin()
     QAction *action = qobject_cast<QAction *>(sender());
     PluginInterface* iplugin = qobject_cast<PluginInterface*>(action->parent());
     fprintf(stderr, "action text: %s\n", action->text().toStdString().c_str());
-    //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     iplugin->Run(action->text());
 }
+/*
 QMenu* WombatForensics::AddMenu(QString tmpstring)
 {
     QMenu* tmpmenu = new QMenu(tmpstring);
@@ -369,6 +241,7 @@ void WombatForensics::AddInfoTab(QWidget* widget, QString title)
 {
     ui->fileInfoTabWidget->addTab(widget, title);
 }
+*/
 //void WombatForensics::AddActions(QObject *plugin, const QStringList &texts, const QStringList &icons, QToolBar *toolbar, QMenu *menu, const char *member, QActionGroup *actionGroup)
 /*
 void WombatForensics::AddActions(QObject* plugin, const QStringList &menus, const QList<QStringList> &texts, const QList<QStringList> &icons, QToolBar* toolbar, QMenuBar* menu, QActionGroup* actionGroup)
@@ -463,7 +336,7 @@ void WombatForensics::dialogClosed(QString file)
     }
 }
 */
-
+/*
 void WombatForensics::AlterEvidence()
 {
     QAction *action = qobject_cast<QAction *>(sender());
@@ -515,14 +388,14 @@ void WombatForensics::AlterEvidence()
             //currentroot->appendRow(imageNode);
             //currenttreeview->setModel(wombatdirmodel);
             */
-       }//*/
-    }
+       //}//*/
+    /*}
     else if(action->text() == tr("Remove Evidence"))
     {
         //iEvidence->remEvidence(wombatvariable.GetCaseID());
     }
 }
-
+*/
 WombatForensics::~WombatForensics()
 {
     //wombatprogresswindow->~ProgressWindow();

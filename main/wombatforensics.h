@@ -40,19 +40,19 @@ public:
 
 private slots:
     void RunPlugin();
-    void AlterEvidence();
+    //void AlterEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
     void on_actionView_Progress_triggered(bool checked);
     //void dirTreeView_selectionChanged(const QModelIndex &index);
     //void dialogClosed(QString file);
     void HideProgressWindow(bool checkstate);
-    QMenu* AddMenu(QString tmpmenu);
-    QAction* AddMenuItem(QStringList tmplist);
-    void AddToolButton(QAction* action);
-    void AddViewTab(QWidget* widget, QString title);
-    void AddInfoTab(QWidget* widget, QString title);
-    void ConnectWidget(QObject* object, const char* signal);
+    //QMenu* AddMenu(QString tmpmenu);
+    //QAction* AddMenuItem(QStringList tmplist);
+    //void AddToolButton(QAction* action);
+    //void AddViewTab(QWidget* widget, QString title);
+    //void AddInfoTab(QWidget* widget, QString title);
+    //void ConnectWidget(QObject* object, const char* signal);
     void TestMap(PluginMap testmap, QObject* caller);
 
 protected:
@@ -62,8 +62,8 @@ private:
 
     //QObject* loadPlugin(QString fileName);
     QList <PluginInfo> LoadPlugins();
-    void PopulateActions(QObject *plugin);
-    void PopulateTabWidgets(QObject *plugin);
+    //void PopulateActions(QObject *plugin);
+    //void PopulateTabWidgets(QObject *plugin);
     void SetupDirModel(void);
     void InitializeSleuthKit();
    /*
