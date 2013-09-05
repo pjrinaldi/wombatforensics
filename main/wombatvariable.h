@@ -5,11 +5,18 @@
 #include <QList>
 #include <QStringList>
 #include <QObject>
+#include <QVariant>
+#include <QMap>
 
 struct PluginInfo
 {
     QObject* plugin;
     QString name;
+};
+
+struct PluginMap
+{
+    QMap<QString, QVariant> map;
 };
 
 struct WombatVariable

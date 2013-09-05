@@ -22,9 +22,19 @@ QStringList EvidencePlugin::PluginMenus() const
     return QStringList() << tr("Evidence");
 }
 */
-void EvidencePlugin::Initialize(WombatVariable wombatvariable)
+//void EvidencePlugin::Initialize(WombatVariable wombatvariable)
+//QMap<QString, QVariant> EvidencePlugin::Initialize(WombatVariable wombatvariable)
+PluginMap EvidencePlugin::Initialize(WombatVariable wombatvariable)
 {
+    PluginMap mainmap;
     plugmap.clear();
+    // QMenu setup
+    plugmap.insert("addmenu", QString("Evidence"));
+    plugmap.insert("addmenuitem", QStringList() << "Evidence" << "Add Evidence" << tr(":/basic/addevidence"));
+    plugmap.insert("addmenuitem", QStringList() << "Evidence" << "Remove Evidence" << ":/basic/remevidence");
+    plugmap.insert("addtoolbutton", QStringList() << "Add Evidence" << tr(":/basic/addevidence"));
+    mainmap.map = plugmap;
+    return mainmap;
     // QMenu setup
     /*
     QMenu* tmpmenu;
@@ -40,10 +50,10 @@ void EvidencePlugin::Initialize(WombatVariable wombatvariable)
     //plugmap.insert("addmenu", tmpvariant);
     */
     // QToolbuttonSetup
-    QAction* tmpaction3 = new QAction(QIcon(tr(":/basic/addevidence")), tr("Add Evidence"), wombatvariable.parent);
-    //QVariant tmpvariant = VPtr<QMenu>::asQVariant(tmpmenu);
-    QVariant tmpvariant = VPtr<QAction>::asQVariant(tmpaction3);
-    plugmap.insert("addtoolbutton", tmpvariant);
+    //QAction* tmpaction3 = new QAction(QIcon(tr(":/basic/addevidence")), tr("Add Evidence"), wombatvariable.parent);
+    ////QVariant tmpvariant = VPtr<QMenu>::asQVariant(tmpmenu);
+    //QVariant tmpvariant = VPtr<QAction>::asQVariant(tmpaction3);
+    //plugmap.insert("addtoolbutton", tmpvariant);
 
     /*
         QMenu* tmpmenu = menu->addMenu(menus[i]);
@@ -73,6 +83,7 @@ void EvidencePlugin::Initialize(WombatVariable wombatvariable)
     tmpMap.insert("evidencemenu", tr("Evidence"));
     plugmap.insert("menus", tmpMap);
     tmpMap.clear();*/
+
 }
 
 void EvidencePlugin::Run(QString input)

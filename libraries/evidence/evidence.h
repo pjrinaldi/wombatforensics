@@ -25,11 +25,17 @@ public:
     //QList<QStringList> PluginActionIcons() const;
     //QStringList PluginMenus() const;
 
-    Q_INVOKABLE void Initialize(WombatVariable wombatvariable);
+    Q_INVOKABLE PluginMap Initialize(WombatVariable wombatvariable);
+    //Q_INVOKABLE QMap<QString, QVariant> Initialize(WombatVariable wombatvariable);
+    //Q_INVOKABLE void Initialize(WombatVariable wombatvariable);
     void Run(QString input);
     void Finalize() {};
+    //QMap<QString, QVariant> ReturnMap() {};
 
     QMap<QString, QVariant> plugmap;
+
+private:
+    QMap<QString, QVariant> pluginmap;
 };
 /*
 class EvidencePlugin : public QObject, public EvidenceInterface

@@ -22,7 +22,9 @@ public:
     //QList<QStringList> PluginActionIcons() const;
     //QStringList PluginMenus() const;
     
-    void Initialize(WombatVariable wombatvariable) {};
+    //Q_INVOKABLE void Initialize(WombatVariable wombatvariable) {};
+    Q_INVOKABLE PluginMap Initialize(WombatVariable wombatvariable) {};
+    //Q_INVOKABLE QMap<QString, QVariant> Initialize(WombatVariable wombatvariable) {};
     void Run(QString input);
     void Finalize() {};
 

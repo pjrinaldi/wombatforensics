@@ -143,8 +143,39 @@ QStringList WombatForensics::locatePlugins()
     return tmpList;
 }
 */
+void WombatForensics::TestMap(PluginMap testmap)
+{
+    fprintf(stderr, "Map Count: %d\n", testmap.map.size());
+    QMap<QString, QVariant>::iterator i = testmap.map.begin();
+    fprintf(stderr, "Key: %s\n", i.key().toStdString().c_str());
+    while(i != testmap.map.end())
+    {
+        fprintf(stderr, "Key Text: %s\n", i.key().toStdString().c_str());
+        if(i.key().compare("addmenu") == 0)
+        {
+            //ui->mainMenubar->addMenu();
+            //ui->mainMenubar->addMenu(i.value<QMenu*>());
+        }
+        if(i.key().compare("addtoolbutton") == 0)
+        {
+            //QVariant v = i.value();
+            //QAction* tmpaction = VPtr<QAction>::asPtr(v);
+            fprintf(stderr, "i value: %s\n", i.value().toStringList()[0].toStdString().c_str());
+            //ui->mainToolBar->addAction(tmpaction);
+            QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[1]), i.value().toStringList()[0], this);
+            ui->mainToolBar->addAction(tmpaction);
+        }
+        else
+        {
+            fprintf(stderr, "key text is: %s\n", i.key().toStdString().c_str());
+        }
+        ++i;
+    }
+}
+
 QList<PluginInfo> WombatForensics::LoadPlugins()
 {
+    QMap<QString, QVariant> tmpmap;
     QList<PluginInfo> tmplist;
     PluginInfo tmpinfo;
     tmplist.clear();
@@ -164,24 +195,28 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
             {
                 fprintf(stderr, "plugin name: %s\n", tmpinfo.name.toStdString().c_str());
                 PluginRunner* prunner = new PluginRunner(tmpinfo.plugin, wombatvariable, "Initialize");
+                qRegisterMetaType<PluginMap>("PluginMap");
+                connect(prunner, SIGNAL(GetPluginMap(PluginMap)), this, SLOT(TestMap(PluginMap)), Qt::QueuedConnection);
                 prunner->setAutoDelete(false);
                 threadpool->start(prunner);
                 threadpool->waitForDone();
+                //fprintf(stderr, "Map Count: %d\n", prunner->runnermap.map.size());
+                /*
                 QMap<QString, QVariant>::iterator i = iplugin->plugmap.begin();
                 fprintf(stderr, "Key: %s\n", i.key().toStdString().c_str());
                 while(i != iplugin->plugmap.end())
                 {
                     if(i.key() == "addmenu")
                     {
-                        ui->mainMenubar->addMenu(VPtr<QMenu>::asPtr(i.value()));
+                        //ui->mainMenubar->addMenu();
                         //ui->mainMenubar->addMenu(i.value<QMenu*>());
                     }
                     else if(i.key().compare("addtoolbutton"))
                     {
-                        QVariant v = i.value();
-                        QAction* tmpaction = VPtr<QAction>::asPtr(v);
+                        //QVariant v = i.value();
+                        //QAction* tmpaction = VPtr<QAction>::asPtr(v);
                         fprintf(stderr, "add toolbutton\n");
-                        ui->mainToolBar->addAction(tmpaction);
+                        //ui->mainToolBar->addAction(tmpaction);
                     }
                     else
                     {
@@ -292,12 +327,18 @@ void WombatForensics::RunPlugin()
     //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     iplugin->Run(action->text());
 }
-
-void WombatForensics::AddMenu(QMenu* tmpmenu)
+QMenu* WombatForensics::AddMenu(QString tmpstring)
 {
-    ui->mainMenubar->addMenu(tmpmenu);
+    QMenu* tmpmenu = new QMenu(tmpstring);
+    return tmpmenu;
 }
 
+QAction* WombatForensics::AddMenuItem(QStringList tmplist)
+{
+    QAction* tmpaction = new QAction(QIcon(tmplist[2]), tmplist[1], this);
+    connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
+    return tmpaction;
+}
 void WombatForensics::AddToolButton(QAction* action)
 {
     ui->mainToolBar->addAction(action);

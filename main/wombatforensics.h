@@ -12,6 +12,8 @@
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QTreeWidgetItem>
+#include <QMap>
+#include <QVariant>
 #include <string>
 #include <QString>
 #include <QThreadPool>
@@ -45,11 +47,13 @@ private slots:
     //void dirTreeView_selectionChanged(const QModelIndex &index);
     //void dialogClosed(QString file);
     void HideProgressWindow(bool checkstate);
-    void AddMenu(QMenu* menu);
+    QMenu* AddMenu(QString tmpmenu);
+    QAction* AddMenuItem(QStringList tmplist);
     void AddToolButton(QAction* action);
     void AddViewTab(QWidget* widget, QString title);
     void AddInfoTab(QWidget* widget, QString title);
     void ConnectWidget(QObject* object, const char* signal);
+    void TestMap(PluginMap testmap);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -118,11 +122,16 @@ public:
         wombatvariable = wombatVariable;
         currentmethod = curMethod;
     };
+    PluginMap runnermap;
     void run()
     {
         qRegisterMetaType<WombatVariable>("WombatVariable");
-        QMetaObject::invokeMethod(currentcaller, currentmethod.toStdString().c_str(), Qt::QueuedConnection, Q_ARG(WombatVariable, wombatvariable));
+        qRegisterMetaType<PluginMap>("PluginMap");
+        QMetaObject::invokeMethod(currentcaller, currentmethod.toStdString().c_str(), Qt::DirectConnection, Q_RETURN_ARG(PluginMap, runnermap), Q_ARG(WombatVariable, wombatvariable));
+        emit GetPluginMap(runnermap);
     };
+signals:
+    void GetPluginMap(PluginMap tmpmap);
 private:
     QObject* currentcaller;
     QString currentmethod;

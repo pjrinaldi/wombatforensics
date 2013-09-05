@@ -2,7 +2,7 @@
 #define INTERFACES_H
 
 #include <QtPlugin>
-//#include <QtCore>
+#include <QtCore>
 #include <QVariant>
 #include <QList>
 #include <QMap>
@@ -37,10 +37,13 @@ public:
     //virtual QList<QStringList> PluginActionIcons() const = 0;
     //virtual QStringList PluginMenus() const = 0;
 
-    virtual void Initialize(WombatVariable wombatvariable) = 0;
+    Q_INVOKABLE virtual PluginMap Initialize(WombatVariable wombatvariable) = 0;
+    //Q_INVOKABLE virtual QMap<QString, QVariant> Initialize(WombatVariable wombatvariable) = 0;
+    //Q_INVOKABLE virtual void Initialize(WombatVariable wombatvariable) = 0;
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
-    QMap<QString, QVariant> plugmap;
+    //virtual QMap<QString, QVariant> ReturnMap() = 0;
+    //QMap<QString, QVariant> plugmap;
     // standard qmap key values are "actionicons", "treeicons", "actions", "menus"
     // so i should check for the qmap and call the respective function in the mainwindow
 };
