@@ -18,12 +18,14 @@ QList<ViewerMap> BasicTools::Initialize()
     tmpmap.insert("Hex View", v);
     tmpviewmap.map = tmpmap;
     tmpviewmap.name = "view";
+    tmpmap.clear();
     tmplist.append(tmpviewmap);
     tmpwidget = setupTxtTab();
     v = VPtr<QWidget>::asQVariant(tmpwidget);
     tmpmap.insert("Text View", v);
     tmpviewmap.map = tmpmap;
     tmpviewmap.name = "view";
+    tmpmap.clear();
     tmplist.append(tmpviewmap);
     tmpwidget = setupDirTab();
     v = VPtr<QWidget>::asQVariant(tmpwidget);

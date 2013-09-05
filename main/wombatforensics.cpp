@@ -182,25 +182,32 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
             {
                 fprintf(stderr, "plugin name: %s\n", tmpinfo.name.toStdString().c_str());
                 QList<ViewerMap> tmpviewlist = iviewer->Initialize();
+                fprintf(stderr, "listview count: %d\n", tmpviewlist.size());
                 foreach(ViewerMap tmpviewmap, tmpviewlist)
                 {
-                    //fprintf(stderr, "Map Count: %d\n", tmpviewmap.map.size());
-                    QVariantMap::iterator i = tmpviewmap.map.begin();
-                    fprintf(stderr, "key: %s\n", i.key().toStdString().c_str());
-                    while(i != tmpviewmap.map.end())
+                    fprintf(stderr, "mapview count: %d\n", tmpviewmap.map.size());
+                    if(tmpviewmap.name.compare("view") == 0)
                     {
-                        if(tmpviewmap.name.compare("view") == 0)
+                        QVariantMap::iterator i = tmpviewmap.map.begin();
+                        //fprintf(stderr, "key: %s\n", i.key().toStdString().c_str());
+                        while(i != tmpviewmap.map.end())
                         {
-
+                            fprintf(stderr, "key: %s - name: %s\n", i.key().toStdString().c_str(), tmpviewmap.name.toStdString().c_str());
                             QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
                             ui->fileViewTabWidget->addTab(tmptab, i.key());
+                            ++i;
                         }
-                        if(tmpviewmap.name.compare("list") == 0)
+                    }
+                    if(tmpviewmap.name.compare("list") == 0)
+                    {
+                        QVariantMap::iterator i = tmpviewmap.map.begin();
+                        while(i != tmpviewmap.map.end())
                         {
+                            fprintf(stderr, "key: %s - name: %s\n", i.key().toStdString().c_str(), tmpviewmap.name.toStdString().c_str());
                             QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
                             ui->fileInfoTabWidget->addTab(tmptab, i.key());
+                            ++i;
                         }
-                        ++i;
                     }
                 }
             }
