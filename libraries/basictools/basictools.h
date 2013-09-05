@@ -1,23 +1,26 @@
 #ifndef BASICTOOLS_H
 #define BASICTOOLS_H
 
-#include "main/interfaces.h"
+#include <main/interfaces.h>
 #include "binviewwidget.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QtWidgets>
 #include <QStringList>
+#include <QVariantMap>
 
-class BasicTools : public QObject, public PluginInterface
+class BasicTools : public QObject, public ViewerInterface
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "wombat.PluginInterface" FILE "basictools.json")
-    Q_INTERFACES(PluginInterface)
+    Q_PLUGIN_METADATA(IID "wombat.ViewerInterface" FILE "basictools.json")
+    Q_INTERFACES(ViewerInterface)
 
 public:
     // plugin interface functions
-    Q_INVOKABLE PluginMap Initialize(WombatVariable wombatvariable);
-    Q_INVOKABLE void Run(QString input);
+    //Q_INVOKABLE PluginMap Initialize(WombatVariable wombatvariable);
+    QVariantMap Initialize();
+    void Run(QString input);
+    //Q_INVOKABLE void Run(QString input);
     void Finalize() {};
 
     //QStringList pluginstringlist = evidenceToolboxIcons();

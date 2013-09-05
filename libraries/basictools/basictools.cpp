@@ -4,8 +4,16 @@
 {
     return QStringList() << vtr(":/basictools/images/treefile") << tr(":/basictools/images/treefolder") << (":/basictools/images/treepartition") << tr(":/basictools/images/treefilemanager") << tr(":/basictools/images/treeimage");
 }*/
-PluginMap BasicTools::Initialize(WombatVariable wombatvariable)
+QVariantMap BasicTools::Initialize()
 {
+    QVariantMap tmpmap;
+    QWidget* tmpwidget = setupTxtTab();
+    QVariant v = VPtr<QWidget>::asQVariant(tmpwidget);
+    tmpmap.clear();
+    tmpmap.insert("Text View", v);
+
+    return tmpmap;
+    /*
     PluginMap mainmap;
     plugmap.clear();
     plugmap.insert("actions", QStringList() << "loadhex" << "loadtxt");
@@ -16,6 +24,7 @@ PluginMap BasicTools::Initialize(WombatVariable wombatvariable)
     mastermap.map = plugmap;
 
     return mainmap;
+    */
 }
 
 void BasicTools::Run(QString input)

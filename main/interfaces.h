@@ -37,19 +37,17 @@ public:
     Q_INVOKABLE virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
 };
-/*
+
 class ViewerInterface
 {
 public:
     virtual ~ViewerInterface() {}
 
-    virtual QList<QWidget*> setupViewerTabs() = 0;
-    virtual QList<QStringList> viewerIcons() const = 0;
-    virtual void Initialize() = 0;
+    virtual QVariantMap Initialize() = 0;
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
 };
-*/
+
 /*
 class BasicToolsInterface
 {
@@ -91,8 +89,8 @@ public:
 
 };
 
-//#define ViewerInterface_iid "wombat.ViewerInterface"
-//Q_DECLARE_INTERFACE(ViewerInterface, ViewerInterface_iid)
+#define ViewerInterface_iid "wombat.ViewerInterface"
+Q_DECLARE_INTERFACE(ViewerInterface, ViewerInterface_iid)
 
 #define PluginInterface_iid "wombat.PluginInterface"
 Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)

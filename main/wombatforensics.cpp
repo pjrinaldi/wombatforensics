@@ -175,6 +175,20 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
                 threadpool->start(prunner);
                 threadpool->waitForDone();
             }
+            ViewerInterface* iviewer = qobject_cast<ViewerInterface*>(tmpinfo.plugin);
+            if(iviewer)
+            {
+                fprintf(stderr, "plugin name: %s\n", tmpinfo.name.toStdString().c_str());
+                QVariantMap tmpmap = iviewer->Initialize();
+                fprintf(stderr, "Map Count: %d\n", tmpmap.size());
+                QVariantMap::iterator i = tmpmap.begin();
+                while(i != tmpmap.end())
+                {
+                    QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
+                    ui->fileViewTabWidget->addTab(tmptab, i.key());
+                    ++i;
+                }
+            }
         }
     }
 
