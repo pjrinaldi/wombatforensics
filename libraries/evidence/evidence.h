@@ -4,10 +4,6 @@
 #include <main/interfaces.h>
 #include <QtPlugin>
 #include <QObject>
-#include <QtWidgets>
-#include <QMenu>
-#include <QAction>
-#include <QToolButton>
 #include <cstdio>
 #include <string>
 #include <QStringList>

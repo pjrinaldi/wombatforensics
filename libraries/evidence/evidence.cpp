@@ -1,5 +1,5 @@
-
 #include "evidence.h"
+
 PluginMap EvidencePlugin::Initialize(WombatVariable wombatvariable)
 {
     PluginMap mainmap;

@@ -1,6 +1,6 @@
 
 TEMPLATE = lib
-QT += core gui widgets
+QT += core
 CONFIG += plugin
 CONFIG += debug
 TARGET = $$qtLibraryTarget(evidenceplugin)
