@@ -127,7 +127,7 @@ void WombatForensics::GetPluginMap(PluginMap testmap, QObject* caller)
         {
             fprintf(stderr, "i value: %s\n", i.value().toStringList()[0].toStdString().c_str());
             QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[1]), i.value().toStringList()[0], caller);
-            connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin(WombatVariable wombatvariable)));
+            connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
             ui->mainToolBar->addAction(tmpaction);
         }
         else

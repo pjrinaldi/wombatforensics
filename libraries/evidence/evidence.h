@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <string>
 #include <QStringList>
+#include <QFileDialog>
 #include <QVariant>
 
 class EvidencePlugin : public QObject, public PluginInterface
@@ -23,5 +24,6 @@ public:
 
 private:
     PluginMap mastermap;
+    WombatVariable mastervariable;
 };
 #endif // EVIDENCE_H

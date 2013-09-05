@@ -17,10 +17,17 @@ void EvidencePlugin::Run(QString input)
 {
     fprintf(stderr, "Map Size: %d\n", mastermap.map.size());
     QStringList tmplist = mastermap.map["actions"].toStringList();
+
+    if(input.compare("Add Evidence") == 0)
+    {
+        QString evidenceFilePath = QFileDialog::getOpenFileName((QWidget*)mastervariable.parent, tr("Select Evidence Item"), tr("./"));
+    }
+    /*
     foreach(QString tmpstring, tmplist)
     {
         if(input.compare(tmpstring) == 0)
             fprintf(stderr, "Run with input: %s\n", input.toStdString().c_str());
+            */
         /*
         //QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
         QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
