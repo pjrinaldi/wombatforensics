@@ -70,6 +70,7 @@ struct WombatVariable
     QString settingspath;
     QString datapath;
     QString tmpfilepath;
+    QObject* parent;
 
 };
 

@@ -45,6 +45,11 @@ private slots:
     //void dirTreeView_selectionChanged(const QModelIndex &index);
     //void dialogClosed(QString file);
     void HideProgressWindow(bool checkstate);
+    void AddMenu(QMenu* menu);
+    void AddToolButton(QAction* action);
+    void AddViewTab(QWidget* widget, QString title);
+    void AddInfoTab(QWidget* widget, QString title);
+    void ConnectWidget(QObject* object, const char* signal);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -53,10 +58,6 @@ private:
 
     //QObject* loadPlugin(QString fileName);
     QList <PluginInfo> LoadPlugins();
-    void AddMenu(QMenu* menu);
-    void AddToolButton(QAction* action);
-    void AddViewerTab(QWidget* widget);
-    void AddListingTab(QWidget* widget);
     void PopulateActions(QObject *plugin);
     void PopulateTabWidgets(QObject *plugin);
     void SetupDirModel(void);

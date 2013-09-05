@@ -15,6 +15,18 @@ class QObject;
 class QWidget;
 class QStandardItem;
 
+template <class T> class VPtr
+{
+public:
+    static T* asPtr(QVariant v)
+    {
+        return  (T *) v.value<void *>();
+    }
+    static QVariant asQVariant(T* ptr)
+    {
+        return qVariantFromValue((void *) ptr);
+    }
+};
 
 class PluginInterface
 {
@@ -25,10 +37,10 @@ public:
     //virtual QList<QStringList> PluginActionIcons() const = 0;
     //virtual QStringList PluginMenus() const = 0;
 
-    virtual void Initialize() = 0;
+    virtual void Initialize(WombatVariable wombatvariable) = 0;
     virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
-    QMap<QString, QMap<QString,QVariant> > plugmaplist;
+    QMap<QString, QVariant> plugmap;
     // standard qmap key values are "actionicons", "treeicons", "actions", "menus"
     // so i should check for the qmap and call the respective function in the mainwindow
 };

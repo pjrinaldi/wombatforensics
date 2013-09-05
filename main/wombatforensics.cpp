@@ -8,6 +8,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatprogresswindow = new ProgressWindow();
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     wombatprogresswindow->setModal(false);
+    wombatvariable.parent = this;
     wombatvariable.caseid = 0;
     wombatvariable.evidenceid = 0;
     wombatvariable.jobtype = 0;
@@ -96,12 +97,12 @@ void WombatForensics::InitializeSleuthKit()
         if(isleuthkit)
         {
 
-            PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "Initialize");
-            prunner->setAutoDelete(false);
-            threadpool->start(prunner);
-            threadpool->waitForDone();
+            //PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "Initialize");
+            //prunner->setAutoDelete(false);
+            //threadpool->start(prunner);
+            //threadpool->waitForDone();
             //isleuthkit->Initialize(wombatvariable);
-            fprintf(stderr, "sleuthkit exists");
+            //fprintf(stderr, "sleuthkit exists");
         }
     }
 }
@@ -161,6 +162,23 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
             PluginInterface* iplugin = qobject_cast<PluginInterface*>(tmpinfo.plugin);
             if(iplugin)
             {
+                fprintf(stderr, "plugin name: %s\n", tmpinfo.name.toStdString().c_str());
+                PluginRunner* prunner = new PluginRunner(tmpinfo.plugin, wombatvariable, "Initialize");
+                prunner->setAutoDelete(false);
+                threadpool->start(prunner);
+                threadpool->waitForDone();
+                QMap<QString, QVariant>::iterator i = iplugin->plugmap.begin();
+                while(i != iplugin->plugmap.end())
+                {
+                    if(i.key() == "addmenu")
+                    {
+                        ui->mainMenubar->addMenu(VPtr<QMenu>::asPtr(i.value()));
+                        //ui->mainMenubar->addMenu(i.value<QMenu*>());
+                    }
+                    else if(i.key() == "addtoolbutton")
+                        ui->mainToolBar->addAction(VPtr<QAction>::asPtr(i.value()));
+                    ++i;
+                }
                 /*
                 QMap<QString, QVariant>::const_iterator i = map.constBegin();
                 while(i != map.constEnd())
@@ -267,7 +285,7 @@ void WombatForensics::RunPlugin()
 
 void WombatForensics::AddMenu(QMenu* tmpmenu)
 {
-    ui->mainMenuBar->addMenu(menu);
+    ui->mainMenubar->addMenu(tmpmenu);
 }
 
 void WombatForensics::AddToolButton(QAction* action)
@@ -342,8 +360,8 @@ void WombatForensics::AddActions(QObject* plugin, const QStringList &menus, cons
         }
     }
     */
-}
-*/
+//}
+//*/
 /*
 void WombatForensics::dialogClosed(QString file)
 {
@@ -513,8 +531,8 @@ void WombatForensics::on_actionNew_Case_triggered()
             //evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
             //basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
             //sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
-            ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
-            ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
+            //ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
+            //ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
         }
     }
 
@@ -574,8 +592,8 @@ void WombatForensics::on_actionOpen_Case_triggered()
             //evidenceplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libevidenceplugin.so");
             //basictoolsplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libbasictoolsplugin.so");
             //sleuthkitplugin = loadPlugin("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
-            ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
-            ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
+            //ui->menuEvidence->setEnabled(!ui->menuEvidence->actions().isEmpty());
+            //ui->menuSettings->setEnabled(!ui->menuSettings->actions().isEmpty());
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
             QString caseimage;
             QStringList caseimageList = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid);

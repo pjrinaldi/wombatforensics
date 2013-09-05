@@ -1,9 +1,9 @@
 #include "basictools.h"
 
-QStringList BasicTools::evidenceToolboxIcons() const
+/*QStringList BasicTools::evidenceToolboxIcons() const
 {
     return QStringList() << tr(":/basictools/images/treefile") << tr(":/basictools/images/treefolder") << (":/basictools/images/treepartition") << tr(":/basictools/images/treefilemanager") << tr(":/basictools/images/treeimage");
-}
+}*/
 QWidget* BasicTools::setupHexTab()
 {
     // hex editor tab

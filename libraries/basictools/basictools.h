@@ -18,17 +18,17 @@ class BasicTools : public QObject, public PluginInterface
 
 public:
     // plugin interface functions
-    QList<QStringList> PluginActions() const;
-    QList<QStringList> PluginActionIcons() const;
-    QStringList PluginMenus() const;
+    //QList<QStringList> PluginActions() const;
+    //QList<QStringList> PluginActionIcons() const;
+    //QStringList PluginMenus() const;
     
-    void Initialize() {};
+    void Initialize(WombatVariable wombatvariable) {};
     void Run(QString input);
     void Finalize() {};
 
-    QStringList pluginstringlist = evidenceToolboxIcons();
+    //QStringList pluginstringlist = evidenceToolboxIcons();
     //BasicTools Custom Functions
-    QStringList evidenceToolboxIcons() const;
+    //QStringList evidenceToolboxIcons() const;
 
     QWidget* setupHexTab();
     QWidget* setupTxtTab();

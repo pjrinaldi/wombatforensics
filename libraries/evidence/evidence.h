@@ -6,9 +6,13 @@
 #include <QtPlugin>
 #include <QObject>
 #include <QtWidgets>
+#include <QMenu>
+#include <QAction>
+#include <QToolButton>
 #include <cstdio>
 #include <string>
 #include <QStringList>
+#include <QVariant>
 //#include <QFileDialog>
 
 class EvidencePlugin : public QObject, public PluginInterface
@@ -21,11 +25,11 @@ public:
     //QList<QStringList> PluginActionIcons() const;
     //QStringList PluginMenus() const;
 
-    void Initialize();
+    Q_INVOKABLE void Initialize(WombatVariable wombatvariable);
     void Run(QString input);
     void Finalize() {};
 
-    QMap<QString, QMap<QString, QVariant> > plugmap;
+    QMap<QString, QVariant> plugmap;
 };
 /*
 class EvidencePlugin : public QObject, public EvidenceInterface
