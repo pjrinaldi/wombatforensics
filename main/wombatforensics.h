@@ -53,7 +53,7 @@ private slots:
     void AddViewTab(QWidget* widget, QString title);
     void AddInfoTab(QWidget* widget, QString title);
     void ConnectWidget(QObject* object, const char* signal);
-    void TestMap(PluginMap testmap);
+    void TestMap(PluginMap testmap, QObject* caller);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -128,10 +128,10 @@ public:
         qRegisterMetaType<WombatVariable>("WombatVariable");
         qRegisterMetaType<PluginMap>("PluginMap");
         QMetaObject::invokeMethod(currentcaller, currentmethod.toStdString().c_str(), Qt::DirectConnection, Q_RETURN_ARG(PluginMap, runnermap), Q_ARG(WombatVariable, wombatvariable));
-        emit GetPluginMap(runnermap);
+        emit GetPluginMap(runnermap, currentcaller);
     };
 signals:
-    void GetPluginMap(PluginMap tmpmap);
+    void GetPluginMap(PluginMap tmpmap, QObject* caller);
 private:
     QObject* currentcaller;
     QString currentmethod;

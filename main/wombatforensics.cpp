@@ -143,7 +143,7 @@ QStringList WombatForensics::locatePlugins()
     return tmpList;
 }
 */
-void WombatForensics::TestMap(PluginMap testmap)
+void WombatForensics::TestMap(PluginMap testmap, QObject* caller)
 {
     fprintf(stderr, "Map Count: %d\n", testmap.map.size());
     QMap<QString, QVariant>::iterator i = testmap.map.begin();
@@ -158,7 +158,8 @@ void WombatForensics::TestMap(PluginMap testmap)
             ui->mainMenubar->addMenu(tmpmenu);
             for(int j = 1; j <= count; j++)
             {
-                QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[(2*j-1)+1]), i.value().toStringList()[(2*j-1)], this);
+                QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[(2*j-1)+1]), i.value().toStringList()[(2*j-1)], caller);
+                connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
                 tmpmenu->addAction(tmpaction);
             }
             //ui->mainMenubar->addMenu();
@@ -170,7 +171,8 @@ void WombatForensics::TestMap(PluginMap testmap)
             //QAction* tmpaction = VPtr<QAction>::asPtr(v);
             fprintf(stderr, "i value: %s\n", i.value().toStringList()[0].toStdString().c_str());
             //ui->mainToolBar->addAction(tmpaction);
-            QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[1]), i.value().toStringList()[0], this);
+            QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[1]), i.value().toStringList()[0], caller);
+            connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
             ui->mainToolBar->addAction(tmpaction);
         }
         else
@@ -204,7 +206,7 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
                 fprintf(stderr, "plugin name: %s\n", tmpinfo.name.toStdString().c_str());
                 PluginRunner* prunner = new PluginRunner(tmpinfo.plugin, wombatvariable, "Initialize");
                 qRegisterMetaType<PluginMap>("PluginMap");
-                connect(prunner, SIGNAL(GetPluginMap(PluginMap)), this, SLOT(TestMap(PluginMap)), Qt::QueuedConnection);
+                connect(prunner, SIGNAL(GetPluginMap(PluginMap, QObject*)), this, SLOT(TestMap(PluginMap, QObject*)), Qt::QueuedConnection);
                 prunner->setAutoDelete(false);
                 threadpool->start(prunner);
                 threadpool->waitForDone();
@@ -332,6 +334,7 @@ void WombatForensics::RunPlugin()
 {
     QAction *action = qobject_cast<QAction *>(sender());
     PluginInterface* iplugin = qobject_cast<PluginInterface*>(action->parent());
+    fprintf(stderr, "action text: %s\n", action->text().toStdString().c_str());
     //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
     iplugin->Run(action->text());
 }

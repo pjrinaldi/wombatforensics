@@ -17,6 +17,7 @@ struct PluginInfo
 struct PluginMap
 {
     QMap<QString, QVariant> map;
+    //PluginInterface* plugin;
 };
 
 struct WombatVariable

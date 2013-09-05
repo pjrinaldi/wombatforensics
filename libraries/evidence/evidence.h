@@ -28,7 +28,7 @@ public:
     Q_INVOKABLE PluginMap Initialize(WombatVariable wombatvariable);
     //Q_INVOKABLE QMap<QString, QVariant> Initialize(WombatVariable wombatvariable);
     //Q_INVOKABLE void Initialize(WombatVariable wombatvariable);
-    void Run(QString input);
+    Q_INVOKABLE void Run(QString input);
     void Finalize() {};
     //QMap<QString, QVariant> ReturnMap() {};
 
@@ -36,6 +36,7 @@ public:
 
 private:
     QMap<QString, QVariant> pluginmap;
+    PluginMap mastermap;
 };
 /*
 class EvidencePlugin : public QObject, public EvidenceInterface

@@ -32,7 +32,11 @@ PluginMap EvidencePlugin::Initialize(WombatVariable wombatvariable)
     plugmap.insert("addmenu", QString("Evidence"));
     plugmap.insert("addmenuitem", QStringList() << "Evidence" << "Add Evidence" << tr(":/basic/addevidence") << "Remove Evidence" << ":/basic/remevidence");
     plugmap.insert("addtoolbutton", QStringList() << "Add Evidence" << tr(":/basic/addevidence"));
+    plugmap.insert("actions", QStringList() << "Add Evidence" << "Remove Evidence");
     mainmap.map = plugmap;
+    //mainmap.plugin = this;
+    mastermap.map = plugmap;
+    //mastermap.plugin = this;
     return mainmap;
     // QMenu setup
     /*
@@ -86,7 +90,19 @@ PluginMap EvidencePlugin::Initialize(WombatVariable wombatvariable)
 }
 
 void EvidencePlugin::Run(QString input)
-{/*
+{
+    fprintf(stderr, "Map Size: %d\n", mastermap.map.size());
+    //QMap<QString, QVariant>::iterator i = mastermap.map.begin();
+    //fprintf(stderr, "Key: %s\n", i.key().toStdString().c_str());
+    QStringList tmplist = mastermap.map["actions"].toStringList();
+    foreach(QString tmpstring, tmplist)
+    {
+        if(input.compare(tmpstring) == 0)
+            fprintf(stderr, "Run with input: %s\n", input.toStdString().c_str());
+    }
+    //while(i != mastermap.map.end())
+    //{
+        /*
     foreach(QStringList actionList, PluginActions())
     {
         foreach(QString action, actionList)

@@ -40,7 +40,7 @@ public:
     Q_INVOKABLE virtual PluginMap Initialize(WombatVariable wombatvariable) = 0;
     //Q_INVOKABLE virtual QMap<QString, QVariant> Initialize(WombatVariable wombatvariable) = 0;
     //Q_INVOKABLE virtual void Initialize(WombatVariable wombatvariable) = 0;
-    virtual void Run(QString input) = 0;
+    Q_INVOKABLE virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
     //virtual QMap<QString, QVariant> ReturnMap() = 0;
     //QMap<QString, QVariant> plugmap;
