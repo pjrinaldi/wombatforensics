@@ -21,22 +21,22 @@
 
 // @@@ imports for directory creation and deletion
 //#include "windows.h"
-
+/*
 TskLog::TskLog(WombatVariable logVariable) : Log()
 {
-    //progresswindow = progressWindow;
     logvariable = logVariable;
 }
+*/
+/*
 TskLog::TskLog() : Log()
 {
-   // logvariable = 
 }
 
 TskLog::~TskLog()
 {
     Log::close();
 }
-
+*/
 void TskLog::log(Channel msgType, const std::wstring &logMsg)
 {
     log(msgType, TskUtilities::toUTF8(logMsg).c_str());

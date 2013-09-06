@@ -8,6 +8,8 @@ void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
     SetupScheduler();
     SetupFileManager();
     fprintf(stderr, "SleuthKit Existsi\n");
+    qRegisterMetaType<WombatVariable>("WombatVariable");
+    connect(this, SIGNAL(SetLogVariable(WombatVariable)), log, SLOT(LogVariable(WombatVariable)), Qt::DirectConnection);
 }
 
 void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
@@ -88,7 +90,8 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         }
         processcount++;
         emit UpdateStatus(filecount, processcount);
-        // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
+        emit UpdateMessageTable();
+       // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
     }
     // IF FILESFOUND == FILESPROCESSED... THEN GET LOG COUNT FOR CASEID, EVIDENCEID, JOBID AND ENSURE THERE ARE NO ERROR'S
     // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
@@ -202,7 +205,8 @@ void SleuthKitPlugin::SetupLog()
     QString tmpPath = wombatvariable.datapath + "/tsk-log.txt";
     try
     {
-        log = std::auto_ptr<Log>(new TskLog(wombatvariable));
+        log = new TskLog();
+        //log = std::auto_ptr<Log>(new TskLog(wombatvariable));
         log->open(tmpPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");
@@ -256,10 +260,12 @@ void SleuthKitPlugin::threadFinished()
 {
     fprintf(stderr, "The Thread Finished. ");
 }
+/*
 void SleuthKitPlugin::LogEntry(QString logMsg)
 {
     LOGINFO(logMsg.toStdString().c_str());
 }
+*/
 
 void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
 {

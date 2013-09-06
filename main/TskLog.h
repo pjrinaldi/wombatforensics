@@ -9,18 +9,28 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <QObject>
 
-class TskLog : public Log
+class TskLog : public QObject, public Log
 {
+    Q_OBJECT
 public:
 
-    TskLog(WombatVariable logVariable);
-    TskLog();
-    virtual ~TskLog();
+    //TskLog(WombatVariable logVariable);
+    TskLog() {};
+    virtual ~TskLog() 
+    {
+        Log::close();
+    };
 
     void log(Channel msgType, const std::string &logMsg);
     void log(Channel msgType, const std::wstring &logMsg);
-
+public slots:
+    void LogVariable(WombatVariable wombatVariable)
+    {
+        logvariable = wombatVariable;
+        fprintf(stderr, "Log got the variable and it has a caseid of: %d\n", logvariable.caseid);
+    };
 protected:
     std::string logpath;
     std::string dbpath;

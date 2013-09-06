@@ -40,6 +40,8 @@ public:
     SleuthKitPlugin* isleuthkit;
     BasicTools* ibasictools;
 
+signals:
+    void LogVariable(WombatVariable wombatVariable);
 private slots:
     void AddEvidence();
     void RemEvidence();
@@ -47,6 +49,7 @@ private slots:
     void on_actionOpen_Case_triggered();
     void on_actionView_Progress_triggered(bool checked);
     void UpdateProgress(int count, int processcount);
+    void UpdateMessageTable();
     void GetImageNode(QStandardItem* imageNode);
     void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);

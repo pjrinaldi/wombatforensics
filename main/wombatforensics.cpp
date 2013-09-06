@@ -10,7 +10,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ibasictools = new BasicTools();
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+    connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
     connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
+    qRegisterMetaType<WombatVariable>("WombatVariable");
+    connect(this, SIGNAL(LogVariable(WombatVariable)), isleuthkit, SLOT(GetLogVariable(WombatVariable)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
     wombatvariable.caseid = 0;
     wombatvariable.evidenceid = 0;
@@ -114,7 +117,6 @@ void WombatForensics::AddEvidence()
         QString evidenceName = evidenceFilePath.split("/").last();
         evidenceName += ".db";
         //currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
-        //setupSleuthKitBlackboard(sleuthkitplugin);
         wombatvariable.evidenceid = wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable.caseid);
         wombatvariable.evidencepath = evidenceFilePath;
         wombatvariable.evidencedbname = evidenceName;
@@ -130,10 +132,10 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->UpdateFilesFound("0");
         wombatprogresswindow->UpdateFilesProcessed("0");
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
+        emit LogVariable(wombatvariable);
         //QList<QStringList> = wombatcasedata->ReturnLogMessages(wombatvariable.GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
         wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
         ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
-        //trun->setAutoDelete(false);
         threadpool->start(trun);
         fprintf(stderr, "open evidence exists");
     }
@@ -151,11 +153,18 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     wombatprogresswindow->UpdateProgressBar(curprogress);
 }
 
+void WombatForensics::UpdateMessageTable()
+{
+
+    //update message table here
+}
+
 void WombatForensics::GetImageNode(QStandardItem* imagenode)
 {
     QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
     currentroot->appendRow(imagenode);
     currenttreeview->setModel(wombatdirmodel);
+    UpdateMessageTable();
 
 }
 void WombatForensics::SetupDirModel(void)

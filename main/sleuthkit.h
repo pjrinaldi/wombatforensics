@@ -42,7 +42,7 @@ public:
     void SetupBlackboard();
     Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
     void SetupSystemBlackboard();
-    void LogEntry(QString logMsg);
+    //void LogEntry(QString logMsg);
     //QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
     void GetImageTree(WombatVariable wombatvariable);
     //Q_INVOKABLE void GetImageTree(WombatVariable wombatVariable);
@@ -53,15 +53,22 @@ private:
     WombatVariable wombatvariable;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
-    std::auto_ptr<Log> log;
+    //std::auto_ptr<Log> log;
+    TskLog* log;
     std::auto_ptr<TskImgDB> imgdb;
     TskSchedulerQueue scheduler;
 
 public slots:
     void threadFinished(void);
+    void GetLogVariable(WombatVariable wvariable)
+    {
+        emit SetLogVariable(wvariable);
+    };
 signals:
     void UpdateStatus(int filecount, int processcount);
     void ReturnImageNode(QStandardItem* imagenode);
+    void UpdateMessageTable(void);
+    void SetLogVariable(WombatVariable wvariable);
 };
 
 #endif // SLEUTHKIT_H
