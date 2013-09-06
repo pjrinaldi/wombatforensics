@@ -21,6 +21,7 @@
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
 #include "sleuthkit.h"
+#include "basictools.h"
 
 namespace Ui {
 class WombatForensics;
@@ -37,15 +38,16 @@ public:
     WombatVariable wombatvariable;
     ProgressWindow* wombatprogresswindow;
     SleuthKitPlugin* isleuthkit;
+    BasicTools* ibasictools;
 
 private slots:
-    void RunPlugin();
     void AddEvidence();
     void RemEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
     void on_actionView_Progress_triggered(bool checked);
     void UpdateProgress(int count, int processcount);
+    void GetImageNode(QStandardItem* imageNode);
     void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);
 
@@ -58,11 +60,10 @@ private:
     void InitializeSleuthKit();
     
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
-    void LoadHexViewer(QString tmpFilePath);
-    void LoadTxtViewer(QString asciiText);
     std::string GetTime(void);
     QThreadPool *threadpool;
     QTreeView *currenttreeview;
+
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;
     QStandardItemModel* wombattypmodel;

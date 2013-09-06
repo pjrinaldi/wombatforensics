@@ -7,8 +7,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatcasedata = new WombatCaseDb(this);
     wombatprogresswindow = new ProgressWindow();
     isleuthkit = new SleuthKitPlugin();
+    ibasictools = new BasicTools();
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+    connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
     wombatvariable.caseid = 0;
     wombatvariable.evidenceid = 0;
@@ -65,6 +67,12 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     {
         wombatcasedata->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
+    ui->fileViewTabWidget->addTab(ibasictools->setupHexTab(), "Hex View");
+    ui->fileViewTabWidget->addTab(ibasictools->setupTxtTab(), "Text View");
+    ui->fileInfoTabWidget->addTab(ibasictools->setupDirTab(), "Directory List");
+    ui->fileInfoTabWidget->addTab(ibasictools->setupTypTab(), "File Type");
+    SetupDirModel();
+
     InitializeSleuthKit();
 }
 void WombatForensics::HideProgressWindow(bool checkedstate)
@@ -127,14 +135,7 @@ void WombatForensics::AddEvidence()
         ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
         //trun->setAutoDelete(false);
         threadpool->start(trun);
-        threadpool->waitForDone();
         fprintf(stderr, "open evidence exists");
-        // need to populate the directory tree entries
-        //
-        //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());
-        //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
-        //currentroot->appendRow(imageNode);
-        //currenttreeview->setModel(wombatdirmodel);
     }
 }
 
@@ -150,6 +151,13 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     wombatprogresswindow->UpdateProgressBar(curprogress);
 }
 
+void WombatForensics::GetImageNode(QStandardItem* imagenode)
+{
+    QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
+    currentroot->appendRow(imagenode);
+    currenttreeview->setModel(wombatdirmodel);
+
+}
 void WombatForensics::SetupDirModel(void)
 {
     wombatdirmodel = new QStandardItemModel();
@@ -173,8 +181,8 @@ WombatForensics::~WombatForensics()
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
     wombatprogresswindow->close();
-    const char* errmsg = wombatcasedata->CloseCaseDB();
-    fprintf(stderr, "CloseDB: %s\n", errmsg);
+    //const char* errmsg = wombatcasedata->CloseCaseDB();
+    //fprintf(stderr, "CloseDB: %s\n", errmsg);
 }
 
 void WombatForensics::on_actionNew_Case_triggered()
@@ -207,7 +215,6 @@ void WombatForensics::on_actionNew_Case_triggered()
             if(mkPath == true)
             {
                 wombatvariable.casedirpath = userPath;
-                //currentcasedirpath = userPath;
             }
             else
             {
@@ -219,7 +226,6 @@ void WombatForensics::on_actionNew_Case_triggered()
             if(mkPath == true)
             {
                 wombatvariable.evidencedirpath = userPath;
-                //currentcaseevidencepath = userPath;
             }
             else
             {
@@ -231,7 +237,6 @@ void WombatForensics::on_actionNew_Case_triggered()
             }
         }
     }
-
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()
@@ -314,44 +319,12 @@ void WombatForensics::SleuthKitLogEntry(QObject *plugin, QString logMsg)
         iSleuthKit->LogEntry(logMsg);
 }
 */
-/*
-QStandardItem* WombatForensics::GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName)
-{
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-    {
-        return iSleuthKit->GetCurrentImageDirectoryTree(imageDbPath, imageName);
-    }
-    else
-        return NULL;
-}
+
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(sleuthkitplugin);
-    if(iSleuthKit)
-    {
-        QString tmptext = index.sibling(index.row(), 0).data().toString();
-        fprintf(stderr, "Text: %s\n", tmptext.toStdString().c_str());
-        QString tmpFilePath = iSleuthKit->GetFileContents(tmptext.toInt());
-        LoadHexViewer(tmpFilePath);
-        QString asciiText = iSleuthKit->GetFileTxtContents(tmptext.toInt());
-        LoadTxtViewer(asciiText);
-    }
+    QString tmptext = index.sibling(index.row(), 0).data().toString();
+    QString tmpFilePath = isleuthkit->GetFileContents(tmptext.toInt());
+    ibasictools->LoadHexModel(tmpFilePath);
+    QString asciiText = isleuthkit->GetFileTxtContents(tmptext.toInt());
+    ibasictools->LoadTxtContent(asciiText);
 }
-void WombatForensics::LoadHexViewer(QString tmpFilePath)
-{
-    BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(basictoolsplugin);
-    if(iBasicTools)
-    {
-        iBasicTools->LoadHexModel(tmpFilePath);
-    }
-}
-void WombatForensics::LoadTxtViewer(QString asciiText)
-{
-    BasicToolsInterface *iBasicTools = qobject_cast<BasicToolsInterface *>(basictoolsplugin);
-    if(iBasicTools)
-    {
-        iBasicTools->LoadTxtContent(asciiText);
-    }
-}
-*/

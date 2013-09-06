@@ -78,7 +78,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
             }
             else
             {
-                fprintf(stderr, "Skipping task: %s\n", task->task);
+                fprintf(stderr, "Skipping task: %d\n", task->task);
             }
             delete task;
         }
@@ -90,7 +90,6 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         emit UpdateStatus(filecount, processcount);
         // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
     }
-    //delete task;
     // IF FILESFOUND == FILESPROCESSED... THEN GET LOG COUNT FOR CASEID, EVIDENCEID, JOBID AND ENSURE THERE ARE NO ERROR'S
     // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
     // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
@@ -100,7 +99,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     {
         filepipeline->logModuleExecutionTimes();
     }
-   // end execute task thread
+    GetImageTree(wombatvariable);
 }
 
 void SleuthKitPlugin::SetupSystemProperties()
@@ -262,12 +261,13 @@ void SleuthKitPlugin::LogEntry(QString logMsg)
     LOGINFO(logMsg.toStdString().c_str());
 }
 
-QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName)
+void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
 {
+    QString imagename = wombatvariable.evidencepath.split("/").last();
     std::vector<TskFileRecord> fileRecordVector;
     std::list<TskVolumeInfoRecord> volRecordList;
     std::list<TskFsInfoRecord> fsInfoRecordList;
-    QString fullPath = imageName + "/";
+    QString fullPath = imagename + "/";
     QString currentVolPath = "";
     QString currentFsPath = "";
     TskFileRecord tmpRecord;
@@ -275,7 +275,7 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
     TskFsInfoRecord fsInfoRecord;
     QStandardItem *fsNode;
     QStandardItem *volNode;
-    QStandardItem *imageNode = new QStandardItem(imageName);
+    QStandardItem *imageNode = new QStandardItem(imagename);
     int ret;
     uint64_t tmpId;
     volRecordList.clear();
@@ -361,7 +361,7 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
                     std::vector<uint64_t> fileidVector;
                     //Create custom function to access this...
                     sqlite3* tmpImgDB;
-                    QString tmpImgDbPath = imageDbPath + imageName + ".db";
+                    QString tmpImgDbPath = wombatvariable.evidencedirpath + imagename + ".db";
                     if(sqlite3_open(tmpImgDbPath.toStdString().c_str(), &tmpImgDB) == SQLITE_OK)
                     {
                         sqlite3_stmt* stmt;
@@ -445,7 +445,8 @@ QStandardItem* SleuthKitPlugin::GetCurrentImageDirectoryTree(QString imageDbPath
             }
         }
     }
-    return imageNode;
+    //return imageNode;
+    emit ReturnImageNode(imageNode);
 }
 
 QString SleuthKitPlugin::GetFileContents(int fileID)

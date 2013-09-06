@@ -2,6 +2,7 @@
 #define SLEUTHKIT_H
 
 #include "wombatvariable.h"
+#include "basictools.h"
 #include <sqlite3.h>
 #include <tsk/framework/framework.h>
 #include <time.h>
@@ -42,7 +43,9 @@ public:
     Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
     void SetupSystemBlackboard();
     void LogEntry(QString logMsg);
-    QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
+    //QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
+    void GetImageTree(WombatVariable wombatvariable);
+    //Q_INVOKABLE void GetImageTree(WombatVariable wombatVariable);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
 
@@ -58,6 +61,7 @@ public slots:
     void threadFinished(void);
 signals:
     void UpdateStatus(int filecount, int processcount);
+    void ReturnImageNode(QStandardItem* imagenode);
 };
 
 #endif // SLEUTHKIT_H
