@@ -27,7 +27,7 @@ public:
         return qVariantFromValue((void *) ptr);
     }
 };
-
+/*
 class PluginInterface
 {
 public:
@@ -37,7 +37,7 @@ public:
     Q_INVOKABLE virtual void Run(QString input) = 0;
     virtual void Finalize() = 0;
 };
-
+*/
 class ViewerInterface
 {
 public:
@@ -78,12 +78,12 @@ class SleuthKitInterface
 public:
     virtual ~SleuthKitInterface() {}
 
-    Q_INVOKABLE virtual void Initialize(WombatVariable wombatVariable) = 0;
+    virtual void Initialize(WombatVariable wombatVariable) = 0;
     //virtual void Run(QString input);
     //virtual void Finalize() {} = 0;
     virtual void SetupSystemProperties() = 0;
     virtual void SetupLog() = 0;
-    Q_INVOKABLE virtual void OpenEvidence(WombatVariable wombatVariable) = 0;
+    virtual void OpenEvidence(WombatVariable wombatVariable) = 0;
     //virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
     //virtual void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable) = 0;
     virtual QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
@@ -104,8 +104,8 @@ public:
 #define ViewerInterface_iid "wombat.ViewerInterface"
 Q_DECLARE_INTERFACE(ViewerInterface, ViewerInterface_iid)
 
-#define PluginInterface_iid "wombat.PluginInterface"
-Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)
+//#define PluginInterface_iid "wombat.PluginInterface"
+//Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)
 
 //#define EvidenceInterface_iid "wombat.EvidenceInterface"
 //Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)

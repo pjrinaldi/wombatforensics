@@ -3,7 +3,6 @@
 
 #include <time.h>
 #include <main/wombatvariable.h>
-//#include <main/progresswindow.h>
 #include <tsk/framework/services/Log.h>
 #include <tsk/framework/framework_i.h>
 #include <sqlite3.h>

@@ -8,7 +8,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatprogresswindow = new ProgressWindow();
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     wombatprogresswindow->setModal(false);
-    wombatvariable.parent = this;
     wombatvariable.caseid = 0;
     wombatvariable.evidenceid = 0;
     wombatvariable.jobtype = 0;
@@ -64,7 +63,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     {
         wombatcasedata->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
-    wombatvariable.pluginfo = LoadPlugins();
+    //wombatvariable.pluginfo = LoadPlugins();
     InitializeSleuthKit();
 }
 void WombatForensics::HideProgressWindow(bool checkedstate)
@@ -88,18 +87,20 @@ std::string WombatForensics::GetTime()
 
 void WombatForensics::InitializeSleuthKit()
 {
-    foreach(PluginInfo curinfo, wombatvariable.pluginfo)
+    QPluginLoader loader("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
+    QObject *plugin = loader.instance();
+    //foreach(PluginInfo curinfo, wombatvariable.pluginfo)
+    //{
+    SleuthKitInterface *isleuthkit = qobject_cast<SleuthKitInterface *>(plugin);
+    if(isleuthkit)
     {
-        SleuthKitInterface* isleuthkit = qobject_cast<SleuthKitInterface*>(curinfo.plugin);
-        if(isleuthkit)
-        {
-            PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "Initialize");
-            prunner->setAutoDelete(false);
-            threadpool->start(prunner);
-            threadpool->waitForDone();
-            fprintf(stderr, "sleuthkit exists");
-        }
+        PluginRunner* prunner = new PluginRunner(plugin, wombatvariable, "Initialize");
+        prunner->setAutoDelete(false);
+        threadpool->start(prunner);
+        threadpool->waitForDone();
+        fprintf(stderr, "sleuthkit exists");
     }
+    //}
 }
 
 void WombatForensics::AddEvidence()

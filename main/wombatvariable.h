@@ -28,7 +28,7 @@ struct PluginMap
 
 struct WombatVariable
 {
-    void AddEvidence(QString evidence) { evidencelist.append(evidence); };
+    //void AddEvidence(QString evidence) { evidencelist.append(evidence); };
 
     // ADD ENUMS FOR JOBSTATUS, JOBTYPE, ETC TO SIMPLIFY INTEGER ASSOCIATION AND READABILITY IN CODE
     enum JobStatus
@@ -60,7 +60,6 @@ struct WombatVariable
     QString settingspath;
     QString datapath;
     QString tmpfilepath;
-    QObject* parent;
 
 };
 
