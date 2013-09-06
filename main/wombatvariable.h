@@ -55,7 +55,7 @@ struct WombatVariable
     QString casedirpath;
     QString evidencedirpath;
     QString evidencepath;
-    QString evidencedbpath;
+    QString evidencedbname;
     QStringList evidencelist;
     QString settingspath;
     QString datapath;

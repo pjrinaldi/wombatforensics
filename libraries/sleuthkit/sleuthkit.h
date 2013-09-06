@@ -2,7 +2,6 @@
 #define SLEUTHKIT_H
 
 #include <main/interfaces.h>
-//#include <main/progresswindow.h>
 #include <main/wombatvariable.h>
 #include <sqlite3.h>
 #include <tsk/framework/framework.h>
@@ -56,8 +55,8 @@ public:
     QString GetFileTxtContents(int fileID);
 
 private:
-    int currentcaseid;
-    int progresscount;
+    //int currentcaseid;
+    //int progresscount;
     WombatVariable wombatvariable;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
@@ -69,9 +68,10 @@ private:
 
 public slots:
     void threadFinished(void);
-    void UpdateProgress(int count, int progress);
+signals:
+    void UpdateStatus(int filecount, int processcount);
 };
-
+/*
 class OpenEvidenceRunner : public QObject, public QRunnable
 {
     Q_OBJECT
@@ -100,5 +100,5 @@ signals:
 private:
     int fileCount;
 };
-
+*/
 #endif // SLEUTHKIT_H

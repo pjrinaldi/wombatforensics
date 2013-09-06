@@ -138,18 +138,14 @@ void WombatForensics::AddEvidence()
             if(isleuthkit)
             {
                 PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "OpenEvidence");
+                //connect(processEvidence, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+                connect(curinfo.plugin, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
                 prunner->setAutoDelete(false);
                 threadpool->start(prunner);
                 threadpool->waitForDone();
                 fprintf(stderr, "openevidence exists");
             }
         }
-        //PluginRunner *prun = new PluginRunner(this, sleuthkitplugin, evidenceFilePath
-        //PluginRunner* prun = new PluginRunner(this, sleuthkitplugin, evidenceFilePath);
-        //prun->setAutoDelete(false);
-        //threadpool->start(prun);
-        //threadpool->waitForDone();
-        //sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
         // need to populate the directory tree entries
         //
         //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());
@@ -163,6 +159,14 @@ void WombatForensics::RemEvidence()
 {
 }
 
+void WombatForensics::UpdateProgress(int filecount, int processcount)
+{
+    int curprogress = (int)((((float)processcount)/(float)filecount)*100);
+    wombatprogresswindow->UpdateFilesFound(QString::number(filecount));
+    wombatprogresswindow->UpdateFilesProcessed(QString::number(processcount));
+    wombatprogresswindow->UpdateProgressBar(curprogress);
+}
+/*
 void WombatForensics::GetPluginMap(PluginMap testmap, QObject* caller)
 {
     fprintf(stderr, "Map Count: %d\n", testmap.map.size());
@@ -197,24 +201,30 @@ void WombatForensics::GetPluginMap(PluginMap testmap, QObject* caller)
         ++i;
     }
 }
-
+*/
 QList<PluginInfo> WombatForensics::LoadPlugins()
 {
-    QMap<QString, QVariant> tmpmap;
+    //QMap<QString, QVariant> tmpmap;
     QList<PluginInfo> tmplist;
     PluginInfo tmpinfo;
     tmplist.clear();
     QString tmppath = qApp->applicationDirPath();
     tmppath += "/plugins/";
+    fprintf(stderr, "Plugin Directory: %s\n", tmppath.toStdString().c_str());
     QDir plugdir = QDir(tmppath);
     foreach(QString filename, plugdir.entryList(QDir::Files))
     {
         QPluginLoader loader(plugdir.absoluteFilePath(filename));
         tmpinfo.plugin = loader.instance();
+        fprintf(stderr, "Plugin Name: %s\n", loader.metaData().value("MetaData").toObject().value("name").toString().toStdString().c_str());
         if(tmpinfo.plugin)
         {
             tmpinfo.name = loader.metaData().value("MetaData").toObject().value("name").toString();
             tmplist.append(tmpinfo);
+        }
+    }
+    return tmplist;
+}
             /*
             PluginInterface* iplugin = qobject_cast<PluginInterface*>(tmpinfo.plugin);
             if(iplugin)
@@ -262,11 +272,11 @@ QList<PluginInfo> WombatForensics::LoadPlugins()
                 }
             }
             */
-        }
-    }
-
-    return tmplist;
-}
+//        }
+//    }
+//
+//    return tmplist;
+//}
 
 void WombatForensics::SetupDirModel(void)
 {

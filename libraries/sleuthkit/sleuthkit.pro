@@ -1,13 +1,13 @@
 
 TEMPLATE = lib
-QT += core concurrent gui widgets
+QT += core
 CONFIG += plugin
 CONFIG += debug
 TARGET = $$qtLibraryTarget(sleuthkitplugin)
 INCLUDEPATH += ../../
 
-HEADERS += sleuthkit.h TskDBBlackboard.h TskImageFileTsk.h TskImgDBSqlite.h TskSchedulerQueue.h TskSystemPropertiesImpl.h TskLog.h ../../main/progresswindow.h ../../main/wombatvariable.h
-SOURCES += sleuthkit.cpp TskDBBlackboard.cpp TskImageFileTsk.cpp TskImgDBSqlite.cpp TskSchedulerQueue.cpp TskSystemPropertiesImpl.cpp TskLog.cpp ../../main/progresswindow.cpp
+HEADERS += sleuthkit.h TskDBBlackboard.h TskImageFileTsk.h TskImgDBSqlite.h TskSchedulerQueue.h TskSystemPropertiesImpl.h TskLog.h ../../main/wombatvariable.h
+SOURCES += sleuthkit.cpp TskDBBlackboard.cpp TskImageFileTsk.cpp TskImgDBSqlite.cpp TskSchedulerQueue.cpp TskSystemPropertiesImpl.cpp TskLog.cpp
 #RESOURCES += sleuthkit.qrc
 DESTDIR = ../../build/plugins
 

@@ -46,6 +46,7 @@ private slots:
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
     void on_actionView_Progress_triggered(bool checked);
+    void UpdateProgress(int count, int processcount);
     //void dirTreeView_selectionChanged(const QModelIndex &index);
     //void dialogClosed(QString file);
     void HideProgressWindow(bool checkstate);
@@ -55,7 +56,7 @@ private slots:
     //void AddViewTab(QWidget* widget, QString title);
     //void AddInfoTab(QWidget* widget, QString title);
     //void ConnectWidget(QObject* object, const char* signal);
-    void GetPluginMap(PluginMap testmap, QObject* caller);
+    //void GetPluginMap(PluginMap testmap, QObject* caller);
 
 protected:
     void closeEvent(QCloseEvent* event);
