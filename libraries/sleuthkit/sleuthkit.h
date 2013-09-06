@@ -34,13 +34,13 @@ class SleuthKitPlugin : public QObject, public SleuthKitInterface
     
 public:
     //SleuthKit Interface Functions
-    void Initialize(WombatVariable wombatVariable);
+    Q_INVOKABLE void Initialize(WombatVariable wombatVariable);
     void SetupSystemProperties();
     void SetupLog();
     void SetupScheduler();
     void SetupFileManager();
     void SetupBlackboard();
-    void OpenEvidence(WombatVariable wombatVariable);
+    Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
     //void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable);
     QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath);
     void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath);

@@ -1,6 +1,7 @@
 #ifndef WOMBATFORENSICS_H
 #define WOMBATFORENSICS_H
 
+
 #include <QMainWindow>
 #include <QDir>
 #include <QStringList>
