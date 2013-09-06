@@ -276,6 +276,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
     QStandardItem *fsNode;
     QStandardItem *volNode;
     QStandardItem *imageNode = new QStandardItem(imagename);
+    imageNode->setIcon(QIcon(":/basic/treeimage"));
     int ret;
     uint64_t tmpId;
     volRecordList.clear();
@@ -294,16 +295,19 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
             if(volRecord.flags == 1)
             {
                 volNode = new QStandardItem(QString::fromUtf8(volRecord.description.c_str()));
+                volNode->setIcon(QIcon(":/basic/treefilemanager"));
                 currentVolPath = QString::fromUtf8(volRecord.description.c_str()) + "/";
             }
             else if(volRecord.flags == 0)
             {
                 volNode = new QStandardItem("unallocated space");
+                volNode->setIcon(QIcon(":/basic/treefilemanager"));
                 currentVolPath = "unallocated space/";
             }
             else if(volRecord.flags == 2)
             {
                 volNode = new QStandardItem(QString::fromUtf8(volRecord.description.c_str()));
+                volNode->setIcon(QIcon(":/basic/treefilemanager"));
                 currentVolPath = QString::fromUtf8(volRecord.description.c_str());
                 currentVolPath += "/";
             }
@@ -355,6 +359,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
                     else
                         fsType = QString::number(fsInfoRecord.fs_type);
                     fsNode = new QStandardItem(fsType);
+                    fsNode->setIcon(QIcon(":/basic/treepartition"));
                     currentFsPath = fsType + "/";
                     volNode->appendRow(fsNode);
                     //BEGIN FILE ADD CODE
@@ -454,8 +459,8 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
     char buffer[32768];
-    ssize_t bytesRead = 0;
-    bytesRead = tmpFile->read(buffer, 32768);
+    //ssize_t bytesRead = 0;
+    //bytesRead = tmpFile->read(buffer, 32768);
     QByteArray ba;
     QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.dat");
     qFile.open(QIODevice::ReadWrite);
@@ -467,8 +472,8 @@ QString SleuthKitPlugin::GetFileTxtContents(int fileID)
 {
     TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
     char buffer[32768];
-    ssize_t bytesRead = 0;
-    bytesRead = tmpFile->read(buffer, 32768);
+    //ssize_t bytesRead = 0;
+    //bytesRead = tmpFile->read(buffer, 32768);
     QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.txt");
     qFile.open(QIODevice::ReadWrite);
     qFile.write((const char*)buffer, 32768);
