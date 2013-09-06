@@ -43,9 +43,7 @@ public:
     Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
     void SetupSystemBlackboard();
     //void LogEntry(QString logMsg);
-    //QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName);
     void GetImageTree(WombatVariable wombatvariable);
-    //Q_INVOKABLE void GetImageTree(WombatVariable wombatVariable);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
 
@@ -53,7 +51,6 @@ private:
     WombatVariable wombatvariable;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
-    //std::auto_ptr<Log> log;
     TskLog* log;
     std::auto_ptr<TskImgDB> imgdb;
     TskSchedulerQueue scheduler;

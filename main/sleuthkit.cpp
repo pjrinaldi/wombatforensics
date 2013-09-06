@@ -206,7 +206,6 @@ void SleuthKitPlugin::SetupLog()
     try
     {
         log = new TskLog();
-        //log = std::auto_ptr<Log>(new TskLog(wombatvariable));
         log->open(tmpPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");

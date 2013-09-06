@@ -21,22 +21,7 @@
 
 // @@@ imports for directory creation and deletion
 //#include "windows.h"
-/*
-TskLog::TskLog(WombatVariable logVariable) : Log()
-{
-    logvariable = logVariable;
-}
-*/
-/*
-TskLog::TskLog() : Log()
-{
-}
 
-TskLog::~TskLog()
-{
-    Log::close();
-}
-*/
 void TskLog::log(Channel msgType, const std::wstring &logMsg)
 {
     log(msgType, TskUtilities::toUTF8(logMsg).c_str());
@@ -46,23 +31,6 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
 {
     std::string dbpath = "/home/pasquale/WombatForensics/data/WombatLog.db";
     Log::log(msgType, logMsg);
-    //fprintf(stderr, "MY LOG FUNCTION CALL\n");
-    /*
-     * MIGHT NOT NEED THIS CODE IF I TAKE CARE OF IT OUTSIDE OF HERE
-    if(logvariable->GetJobType() == 0) // add evidence
-    {
-        //progresswindow->UpdateMessageTable() // add to message table
-    }
-    else if(logvariable->GetJobType() == 1) // remove evidence
-    {
-    }
-    else if(logvariable->GetJobType() == 2) // additional analysis
-    {
-    }
-    else // figure out as i go
-    {
-    }
-    */
 
     struct tm *newtime;
     time_t aclock;

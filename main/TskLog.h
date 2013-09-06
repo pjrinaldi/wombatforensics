@@ -16,7 +16,6 @@ class TskLog : public QObject, public Log
     Q_OBJECT
 public:
 
-    //TskLog(WombatVariable logVariable);
     TskLog() {};
     virtual ~TskLog() 
     {
