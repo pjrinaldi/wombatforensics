@@ -6,7 +6,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     threadpool = QThreadPool::globalInstance();
     wombatcasedata = new WombatCaseDb(this);
     wombatprogresswindow = new ProgressWindow();
+    isleuthkit = new SleuthKitPlugin();
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
+    connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
     wombatvariable.caseid = 0;
     wombatvariable.evidenceid = 0;
@@ -87,19 +89,20 @@ std::string WombatForensics::GetTime()
 
 void WombatForensics::InitializeSleuthKit()
 {
-    QPluginLoader loader("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
-    QObject *plugin = loader.instance();
+    //QPluginLoader loader("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
+    //QObject *plugin = loader.instance();
     //foreach(PluginInfo curinfo, wombatvariable.pluginfo)
     //{
-    SleuthKitInterface *isleuthkit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(isleuthkit)
-    {
-        PluginRunner* prunner = new PluginRunner(plugin, wombatvariable, "Initialize");
-        prunner->setAutoDelete(false);
-        threadpool->start(prunner);
-        threadpool->waitForDone();
-        fprintf(stderr, "sleuthkit exists");
-    }
+    //SleuthKitInterface *isleuthkit = qobject_cast<SleuthKitInterface *>(plugin);
+    //if(isleuthkit)
+    //{
+    //PluginRunner* prunner = new PluginRunner(isleuthkit, wombatvariable, "Initialize");
+    ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", wombatvariable);
+    //initrunner->setAutoDelete(false);
+    threadpool->start(initrunner);
+    threadpool->waitForDone();
+    fprintf(stderr, "sleuthkit exists");
+    //}
     //}
 }
 
@@ -133,6 +136,7 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
         //QList<QStringList> = wombatcasedata->ReturnLogMessages(wombatvariable.GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
         wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
+        /*
         foreach(PluginInfo curinfo, wombatvariable.pluginfo)
         {
             SleuthKitInterface* isleuthkit = qobject_cast<SleuthKitInterface*>(curinfo.plugin);
@@ -146,7 +150,19 @@ void WombatForensics::AddEvidence()
                 threadpool->waitForDone();
                 fprintf(stderr, "openevidence exists");
             }
-        }
+        }    ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", wombatvariable);
+    //initrunner->setAutoDelete(false);
+    threadpool->start(initrunner);
+    threadpool->waitForDone();
+    fprintf(stderr, "sleuthkit exists");
+
+        */
+        //PluginRunner* prun = new PluginRunner(isleuthkit, wombatvariable, "OpenEvidence");
+        ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
+        //trun->setAutoDelete(false);
+        threadpool->start(trun);
+        //threadpool->waitForDone();
+        fprintf(stderr, "open evidence exists");
         // need to populate the directory tree entries
         //
         //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());
@@ -203,6 +219,7 @@ void WombatForensics::GetPluginMap(PluginMap testmap, QObject* caller)
     }
 }
 */
+/*
 QList<PluginInfo> WombatForensics::LoadPlugins()
 {
     //QMap<QString, QVariant> tmpmap;

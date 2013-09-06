@@ -70,7 +70,7 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
             }
             sqlite3_finalize(tmpstmt);
         }
-        sqlite3_close(wombatdb);
+        //sqlite3_close(wombatdb);
     }
     else
     {

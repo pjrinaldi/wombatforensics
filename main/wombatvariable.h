@@ -6,8 +6,8 @@
 #include <QStringList>
 #include <QObject>
 #include <QVariant>
-#include <QMap>
-
+//#include <QMap>
+/*
 struct PluginInfo
 {
     QObject* plugin;
@@ -25,7 +25,7 @@ struct PluginMap
 {
     QMap<QString, QVariant> map;
 };
-
+*/
 struct WombatVariable
 {
     //void AddEvidence(QString evidence) { evidencelist.append(evidence); };
@@ -50,7 +50,7 @@ struct WombatVariable
     int evidenceid;
     int jobtype;
     int jobid;
-    QList<PluginInfo> pluginfo;
+    //QList<PluginInfo> pluginfo;
     QString casespath;
     QString casedirpath;
     QString evidencedirpath;

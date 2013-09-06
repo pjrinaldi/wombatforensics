@@ -11,18 +11,20 @@
 #include <QStandardItemModel>
 #include <QInputDialog>
 #include <QMessageBox>
-#include <QPluginLoader>
+//#include <QPluginLoader>
 #include <QTreeWidgetItem>
-#include <QMap>
-#include <QVariant>
+//#include <QMap>
+//#include <QVariant>
 #include <string>
 #include <QString>
 #include <QThreadPool>
-#include "interfaces.h"
+//#include "interfaces.h"
+
 #include "wombatvariable.h"
 #include "wombatcasedb.h"
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
+#include "sleuthkit.h"
 
 namespace Ui {
 class WombatForensics;
@@ -38,6 +40,7 @@ public:
     WombatCaseDb *wombatcasedata;
     WombatVariable wombatvariable;
     ProgressWindow* wombatprogresswindow;
+    SleuthKitPlugin* isleuthkit;
 
 private slots:
     void RunPlugin();
@@ -65,7 +68,7 @@ private:
     Ui::WombatForensics *ui;
 
     //QObject* loadPlugin(QString fileName);
-    QList <PluginInfo> LoadPlugins();
+    //QList <PluginInfo> LoadPlugins();
     //void PopulateActions(QObject *plugin);
     //void PopulateTabWidgets(QObject *plugin);
     void SetupDirModel(void);
@@ -95,7 +98,7 @@ private:
     QStandardItemModel* wombatdirmodel;
     QStandardItemModel* wombattypmodel;
 };
-
+/*
 class PluginRunner : public QObject, public QRunnable
 {
     Q_OBJECT
@@ -120,6 +123,29 @@ signals:
 private:
     QObject* currentcaller;
     QString currentmethod;
+    WombatVariable wombatvariable;
+};
+*/
+class ThreadRunner : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    ThreadRunner(QObject* object, QString input, WombatVariable wVariable)
+    {
+        method = input;
+        caller = (SleuthKitPlugin*)object;
+        wombatvariable = wVariable;
+    };
+    void run()
+    {
+        if(method.compare("initialize") == 0)
+            caller->Initialize(wombatvariable);
+        if(method.compare("openevidence") == 0)
+            caller->OpenEvidence(wombatvariable);
+    };
+private:
+    QString method;
+    SleuthKitPlugin* caller;
     WombatVariable wombatvariable;
 };
 
