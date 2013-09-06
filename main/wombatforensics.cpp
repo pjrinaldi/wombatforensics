@@ -65,7 +65,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     {
         wombatcasedata->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
     }
-    //wombatvariable.pluginfo = LoadPlugins();
     InitializeSleuthKit();
 }
 void WombatForensics::HideProgressWindow(bool checkedstate)
@@ -89,21 +88,10 @@ std::string WombatForensics::GetTime()
 
 void WombatForensics::InitializeSleuthKit()
 {
-    //QPluginLoader loader("/home/pasquale/Projects/wombatforensics/build/plugins/libsleuthkitplugin.so");
-    //QObject *plugin = loader.instance();
-    //foreach(PluginInfo curinfo, wombatvariable.pluginfo)
-    //{
-    //SleuthKitInterface *isleuthkit = qobject_cast<SleuthKitInterface *>(plugin);
-    //if(isleuthkit)
-    //{
-    //PluginRunner* prunner = new PluginRunner(isleuthkit, wombatvariable, "Initialize");
     ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", wombatvariable);
-    //initrunner->setAutoDelete(false);
     threadpool->start(initrunner);
     threadpool->waitForDone();
     fprintf(stderr, "sleuthkit exists");
-    //}
-    //}
 }
 
 void WombatForensics::AddEvidence()
@@ -136,32 +124,10 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
         //QList<QStringList> = wombatcasedata->ReturnLogMessages(wombatvariable.GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
         wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
-        /*
-        foreach(PluginInfo curinfo, wombatvariable.pluginfo)
-        {
-            SleuthKitInterface* isleuthkit = qobject_cast<SleuthKitInterface*>(curinfo.plugin);
-            if(isleuthkit)
-            {
-                PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "OpenEvidence");
-                //connect(processEvidence, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
-                connect(curinfo.plugin, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
-                prunner->setAutoDelete(false);
-                threadpool->start(prunner);
-                threadpool->waitForDone();
-                fprintf(stderr, "openevidence exists");
-            }
-        }    ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", wombatvariable);
-    //initrunner->setAutoDelete(false);
-    threadpool->start(initrunner);
-    threadpool->waitForDone();
-    fprintf(stderr, "sleuthkit exists");
-
-        */
-        //PluginRunner* prun = new PluginRunner(isleuthkit, wombatvariable, "OpenEvidence");
         ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
         //trun->setAutoDelete(false);
         threadpool->start(trun);
-        //threadpool->waitForDone();
+        threadpool->waitForDone();
         fprintf(stderr, "open evidence exists");
         // need to populate the directory tree entries
         //
@@ -183,118 +149,6 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     wombatprogresswindow->UpdateFilesProcessed(QString::number(processcount));
     wombatprogresswindow->UpdateProgressBar(curprogress);
 }
-/*
-void WombatForensics::GetPluginMap(PluginMap testmap, QObject* caller)
-{
-    fprintf(stderr, "Map Count: %d\n", testmap.map.size());
-    QMap<QString, QVariant>::iterator i = testmap.map.begin();
-    fprintf(stderr, "Key: %s\n", i.key().toStdString().c_str());
-    while(i != testmap.map.end())
-    {
-        fprintf(stderr, "Key Text: %s\n", i.key().toStdString().c_str());
-        if(i.key().compare("addmenuitem") == 0)
-        {
-            int count = (i.value().toStringList().size() - 1)/2;
-            QMenu* tmpmenu = new QMenu(i.value().toStringList()[0]);
-            ui->mainMenubar->addMenu(tmpmenu);
-            for(int j = 1; j <= count; j++)
-            {
-                QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[(2*j-1)+1]), i.value().toStringList()[(2*j-1)], caller);
-                connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
-                tmpmenu->addAction(tmpaction);
-            }
-        }
-        if(i.key().compare("addtoolbutton") == 0)
-        {
-            fprintf(stderr, "i value: %s\n", i.value().toStringList()[0].toStdString().c_str());
-            QAction* tmpaction = new QAction(QIcon(i.value().toStringList()[1]), i.value().toStringList()[0], caller);
-            connect(tmpaction, SIGNAL(triggered()), this, SLOT(RunPlugin()));
-            ui->mainToolBar->addAction(tmpaction);
-        }
-        else
-        {
-            fprintf(stderr, "key text is: %s\n", i.key().toStdString().c_str());
-        }
-        ++i;
-    }
-}
-*/
-/*
-QList<PluginInfo> WombatForensics::LoadPlugins()
-{
-    //QMap<QString, QVariant> tmpmap;
-    QList<PluginInfo> tmplist;
-    PluginInfo tmpinfo;
-    tmplist.clear();
-    QString tmppath = qApp->applicationDirPath();
-    tmppath += "/plugins/";
-    fprintf(stderr, "Plugin Directory: %s\n", tmppath.toStdString().c_str());
-    QDir plugdir = QDir(tmppath);
-    foreach(QString filename, plugdir.entryList(QDir::Files))
-    {
-        QPluginLoader loader(plugdir.absoluteFilePath(filename));
-        tmpinfo.plugin = loader.instance();
-        fprintf(stderr, "Plugin Name: %s\n", loader.metaData().value("MetaData").toObject().value("name").toString().toStdString().c_str());
-        if(tmpinfo.plugin)
-        {
-            tmpinfo.name = loader.metaData().value("MetaData").toObject().value("name").toString();
-            tmplist.append(tmpinfo);
-        }
-    }
-    return tmplist;
-}
-            /*
-            PluginInterface* iplugin = qobject_cast<PluginInterface*>(tmpinfo.plugin);
-            if(iplugin)
-            {
-                fprintf(stderr, "plugin name: %s\n", tmpinfo.name.toStdString().c_str());
-                PluginRunner* prunner = new PluginRunner(tmpinfo.plugin, wombatvariable, "Initialize");
-                qRegisterMetaType<PluginMap>("PluginMap");
-                connect(prunner, SIGNAL(GetPluginMap(PluginMap, QObject*)), this, SLOT(GetPluginMap(PluginMap, QObject*)), Qt::QueuedConnection);
-                prunner->setAutoDelete(false);
-                threadpool->start(prunner);
-                threadpool->waitForDone();
-            }
-            ViewerInterface* iviewer = qobject_cast<ViewerInterface*>(tmpinfo.plugin);
-            if(iviewer)
-            {
-                fprintf(stderr, "plugin name: %s\n", tmpinfo.name.toStdString().c_str());
-                QList<ViewerMap> tmpviewlist = iviewer->Initialize();
-                fprintf(stderr, "listview count: %d\n", tmpviewlist.size());
-                foreach(ViewerMap tmpviewmap, tmpviewlist)
-                {
-                    fprintf(stderr, "mapview count: %d\n", tmpviewmap.map.size());
-                    if(tmpviewmap.name.compare("view") == 0)
-                    {
-                        QVariantMap::iterator i = tmpviewmap.map.begin();
-                        //fprintf(stderr, "key: %s\n", i.key().toStdString().c_str());
-                        while(i != tmpviewmap.map.end())
-                        {
-                            fprintf(stderr, "key: %s - name: %s\n", i.key().toStdString().c_str(), tmpviewmap.name.toStdString().c_str());
-                            QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
-                            ui->fileViewTabWidget->addTab(tmptab, i.key());
-                            ++i;
-                        }
-                    }
-                    if(tmpviewmap.name.compare("list") == 0)
-                    {
-                        QVariantMap::iterator i = tmpviewmap.map.begin();
-                        while(i != tmpviewmap.map.end())
-                        {
-                            fprintf(stderr, "key: %s - name: %s\n", i.key().toStdString().c_str(), tmpviewmap.name.toStdString().c_str());
-                            QWidget* tmptab = VPtr<QWidget>::asPtr(i.value());
-                            ui->fileInfoTabWidget->addTab(tmptab, i.key());
-                            ++i;
-                        }
-                    }
-                }
-            }
-            */
-//        }
-//    }
-//
-//    return tmplist;
-//}
 
 void WombatForensics::SetupDirModel(void)
 {
@@ -308,119 +162,6 @@ void WombatForensics::SetupDirModel(void)
     connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
 }
 
-void WombatForensics::RunPlugin()
-{
-    //PluginRunner* prunner = new PluginRunner(curinfo.plugin, wombatvariable, "Run");
-    //prunner->setAutoDelete(false);
-    //threadpool->start(prunner);
-    //threadpool->waitForDone();
-/*
-    QAction *action = qobject_cast<QAction *>(sender());
-    PluginInterface* iplugin = qobject_cast<PluginInterface*>(action->parent());
-    fprintf(stderr, "action text: %s\n", action->text().toStdString().c_str());
-    iplugin->Run(action->text());
-    */
-}
-
-/*
-void WombatForensics::dialogClosed(QString file)
-{
-    QString evidenceFilePath = file;
-    //wombatprogresswindow->show();
-    fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
-    if(evidenceFilePath != "")
-    {
-        wombatvariable.SetJobType(1); // add evidence
-        // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
-        QString evidenceName = evidenceFilePath.split("/").last();
-        evidenceName += ".db";
-        currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
-        setupSleuthKitBlackboard(sleuthkitplugin);
-        wombatvariable.SetEvidenceID(wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
-        wombatvariable.SetJobID(wombatcasedata->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
-        SleuthKitLogEntry(sleuthkitplugin, "Adding Evidence Started.");
-        // UPDATE MESSAGETABLE(CASEID, EVIDENCEID, JOBID) WHEN JOB STARTS TO SHOW IT STARTED... WHICH SHOULD BE A SQL QUERY TO GET LOG ITEMS FOR IT.
-        QString tmpString = evidenceName;
-        tmpString += " - ";
-        tmpString += QString::fromStdString(GetTime());
-        QStringList tmpList;
-        tmpList << tmpString << QString::number(wombatvariable.GetJobID());
-        wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
-        wombatprogresswindow->UpdateFilesFound("0");
-        wombatprogresswindow->UpdateFilesProcessed("0");
-        wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
-        //QList<QStringList> = wombatcasedata->ReturnLogMessages(wombatvariable.GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
-        wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
-        sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath);
-        //sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
-        // need to populate the directory tree entries
-        QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());
-        QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
-        currentroot->appendRow(imageNode);
-        currenttreeview->setModel(wombatdirmodel);
-    }
-}
-*/
-/*
-void WombatForensics::AlterEvidence()
-{
-    QAction *action = qobject_cast<QAction *>(sender());
-    //EvidenceInterface *iEvidence = qobject_cast<EvidenceInterface *>(action->parent());
-    if(action->text() == tr("Add Evidence"))
-    {
-        //QString evidenceFilePath = "/home/pasquale/Projects/TestImages/8-jpeg-search/8-jpeg-search.dd";
-        QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
-        wombatprogresswindow->show();
-        //QString evidenceFilePath = iEvidence->addEvidence();
-        //QFileDialog *filedialog = new QFileDialog(0, "Select Evidence Item", "./");
-        //filedialog->setFileMode(QFileDialog::ExistingFile);
-        //filedialog->open(this, SLOT(dialogClosed(QString)));
-        ///*
-        fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
-        if(evidenceFilePath != "")
-        {
-            wombatvariable.jobtype = 1; // add evidence
-            // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
-            QString evidenceName = evidenceFilePath.split("/").last();
-            evidenceName += ".db";
-            /*
-            currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
-            setupSleuthKitBlackboard(sleuthkitplugin);
-            wombatvariable.SetEvidenceID(wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable->GetCaseID()));
-            wombatvariable.SetJobID(wombatcasedata->InsertJob(wombatvariable->GetJobType(), wombatvariable->GetCaseID(), wombatvariable->GetEvidenceID()));
-            SleuthKitLogEntry(sleuthkitplugin, "Adding Evidence Started.");
-            // UPDATE MESSAGETABLE(CASEID, EVIDENCEID, JOBID) WHEN JOB STARTS TO SHOW IT STARTED... WHICH SHOULD BE A SQL QUERY TO GET LOG ITEMS FOR IT.
-            QString tmpString = evidenceName;
-            tmpString += " - ";
-            tmpString += QString::fromStdString(GetTime());
-            QStringList tmpList;
-            tmpList << tmpString << QString::number(wombatvariable.GetJobID());
-            wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
-            wombatprogresswindow->UpdateFilesFound("0");
-            wombatprogresswindow->UpdateFilesProcessed("0");
-            wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
-            //QList<QStringList> = wombatcasedata->ReturnLogMessages(wombatvariable.GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
-            wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
-            PluginRunner* prun = new PluginRunner(this, sleuthkitplugin, evidenceFilePath);
-            prun->setAutoDelete(false);
-            threadpool->start(prun);
-            threadpool->waitForDone();
-            //sleuthKitLoadEvidence(sleuthkitplugin, evidenceFilePath, wombatprogresswindow);
-            // need to populate the directory tree entries
-            //
-            //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath.split("/").last());
-            //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
-            //currentroot->appendRow(imageNode);
-            //currenttreeview->setModel(wombatdirmodel);
-            */
-       //}//*/
-    /*}
-    else if(action->text() == tr("Remove Evidence"))
-    {
-        //iEvidence->remEvidence(wombatvariable.GetCaseID());
-    }
-}
-*/
 WombatForensics::~WombatForensics()
 {
     //wombatprogresswindow->~ProgressWindow();
@@ -432,8 +173,8 @@ WombatForensics::~WombatForensics()
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
     wombatprogresswindow->close();
-    //const char* errmsg = wombatcasedata->CloseCaseDB();
-    //fprintf(stderr, "CloseDB: %s\n", errmsg);
+    const char* errmsg = wombatcasedata->CloseCaseDB();
+    fprintf(stderr, "CloseDB: %s\n", errmsg);
 }
 
 void WombatForensics::on_actionNew_Case_triggered()
@@ -524,7 +265,6 @@ void WombatForensics::on_actionOpen_Case_triggered()
             bool mkPath = (new QDir())->mkpath(userPath);
             if(mkPath == true)
             {
-                //currentcasedirpath = userPath;
                 wombatvariable.casedirpath = userPath;
             }
             else
@@ -532,13 +272,11 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 wombatcasedata->DisplayError(this, "2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
             }
             userPath = wombatvariable.casedirpath;
-            //userPath = currentcasedirpath;
             userPath += "evidence/";
             mkPath = (new QDir())->mkpath(userPath);
             if(mkPath == true)
             {
                 wombatvariable.evidencedirpath = userPath;
-                //currentcaseevidencepath = userPath;
             }
             else
             {
@@ -569,82 +307,11 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
         wombatprogresswindow->show();
 }
 /*
-void WombatForensics::setupSleuthKitProperties(QObject *plugin, QString settingsPath, QString configFileName)
-{
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-    {
-        iSleuthKit->SetupSystemProperties(settingsPath, configFileName);
-    }
-}
-
 void WombatForensics::SleuthKitLogEntry(QObject *plugin, QString logMsg)
 {
     SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
     if(iSleuthKit)
         iSleuthKit->LogEntry(logMsg);
-}
-
-void WombatForensics::setupSleuthKitLog(QObject *plugin, QString dataPath, QString logFileName, WombatVariable *wombatVariable)
-{
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-    {
-        iSleuthKit->SetupSystemLog(dataPath, logFileName, wombatprogresswindow, wombatVariable);
-    }
-}
-QString WombatForensics::setupSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath)
-{
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-    {
-        return iSleuthKit->SetupImageDatabase(imgDBPath, evidenceFilePath);
-    }
-    else
-        return "";
-}
-
-void WombatForensics::OpenSleuthKitImgDb(QObject *plugin, QString imgDBPath, QString evidenceFilePath)
-{
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-    {
-        iSleuthKit->OpenImageDatabase(imgDBPath, evidenceFilePath);
-    }
-}
-void WombatForensics::setupSleuthKitBlackboard(QObject *plugin)
-{
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-    {
-        iSleuthKit->SetupSystemBlackboard();
-    }
-}
-void WombatForensics::setupSleuthKitSchedulerQueue(QObject *plugin)
-{
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-    {
-        iSleuthKit->SetupSystemSchedulerQueue();
-    }
-}
-void WombatForensics::setupSleuthKitFileManager(QObject *plugin)
-{
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-    {
-        iSleuthKit->SetupSystemFileManager();
-    }
-}
-//void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath, ProgressWindow* progressWindow)
-void WombatForensics::sleuthKitLoadEvidence(QObject *plugin, QString evidencePath)
-{
-    wombatprogresswindow->show();
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-    {
-       //iSleuthKit->OpenEvidence(evidencePath, wombatprogresswindow);
-    }
 }
 */
 /*
