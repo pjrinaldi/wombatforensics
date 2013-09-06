@@ -40,6 +40,8 @@ public:
 
 private slots:
     void RunPlugin();
+    void AddEvidence();
+    void RemEvidence();
     //void AlterEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
@@ -102,16 +104,17 @@ public:
         wombatvariable = wombatVariable;
         currentmethod = curMethod;
     };
-    PluginMap runnermap;
+    //PluginMap runnermap;
     void run()
     {
         qRegisterMetaType<WombatVariable>("WombatVariable");
-        qRegisterMetaType<PluginMap>("PluginMap");
-        QMetaObject::invokeMethod(currentcaller, currentmethod.toStdString().c_str(), Qt::DirectConnection, Q_RETURN_ARG(PluginMap, runnermap), Q_ARG(WombatVariable, wombatvariable));
-        emit GetPluginMap(runnermap, currentcaller);
+        //qRegisterMetaType<PluginMap>("PluginMap");
+        QMetaObject::invokeMethod(currentcaller, currentmethod.toStdString().c_str(), Qt::QueuedConnection, Q_ARG(WombatVariable, wombatvariable));
+        //QMetaObject::invokeMethod(currentcaller, currentmethod.toStdString().c_str(), Qt::DirectConnection, Q_RETURN_ARG(PluginMap, runnermap), Q_ARG(WombatVariable, wombatvariable));
+        //emit GetPluginMap(runnermap, currentcaller);
     };
 signals:
-    void GetPluginMap(PluginMap tmpmap, QObject* caller);
+    //void GetPluginMap(PluginMap tmpmap, QObject* caller);
 private:
     QObject* currentcaller;
     QString currentmethod;

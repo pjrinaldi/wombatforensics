@@ -9,6 +9,184 @@ void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
     SetupFileManager();
 }
 
+void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
+{
+    wombatvariable = wombatVariable;
+    //QString evidenceFileName = evidenceFilePath.split("/").last();
+    //evidenceFileName += ".db";
+    try
+    {
+        imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.evidencepath.toStdString().c_str(), evidencedbname.toStdString().c_str()));
+        //imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(imgDBPath.toStdString().c_str(), evidenceFileName.toStdString().c_str()));
+        if(imgdb->initialize() != 0)
+            fprintf(stderr, "Error initializing db\n");
+        else
+        {
+            fprintf(stderr, "DB was Initialized Successfully!\n");
+        }
+        TskServices::Instance().setImgDB(*imgdb);
+        fprintf(stderr, "Loading ImageDB was Successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Loading ImageDB: %s\n", ex.message().c_str());
+    }
+/*
+    int fileCount = 0;
+    int processCount = 0;
+    // POSSIBLY PUT THREADING INSIDE HERE AND CALL THE FILETSK STUFF INSTEAD OF THE SLEUTHKIT STUFF
+    //
+    // OpenEvidenceThread(evidencePath)
+    //
+    // begin openevidence thread
+    PrepEvidence(evidencePath);
+    OpenEvidenceRunner* openEvidence = new OpenEvidenceRunner(evidencePath);
+    openEvidence->setAutoDelete(false);
+    //TskImageFileTsk imagefiletsk;
+    QThreadPool *threadpool = QThreadPool::globalInstance();
+    connect(openEvidence, SIGNAL(Finished()), this, SLOT(threadFinished()), Qt::QueuedConnection); 
+    threadpool->start(openEvidence);
+    threadpool->waitForDone();
+    fileCount = TskServices::Instance().getImgDB().getNumFiles();
+    fprintf(stderr, "File Count: %d\n", fileCount);
+    
+    progresswindow->UpdateFilesFound(QString::number(fileCount));
+    progresswindow->UpdateAnalysisState("Processing Files");
+
+    ProcessEvidenceRunner* processEvidence = new ProcessEvidenceRunner(fileCount);
+    processEvidence->setAutoDelete(false);
+    connect(processEvidence, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+    connect(processEvidence, SIGNAL(Finished()), this, SLOT(threadFinished()), Qt::QueuedConnection);
+    threadpool->start(processEvidence);
+    threadpool->waitForDone();
+    progresswindow->UpdateAnalysisState("Processing Finished");
+    //imagefiletsk = TskServices::Instance().getImageFile();
+    try
+    {
+        imagefiletsk.open(evidencePath.toStdString());
+        TskServices::Instance().setImageFile(imagefiletsk);
+        fprintf(stderr, "Opening Image File was successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
+    }
+    // end open evidence thread
+    // ExtractFilesThread(imagefiletsk)
+    //
+    // begin extract files thread
+    try
+    {
+        imagefiletsk.extractFiles();
+        fprintf(stderr, "Extracting Evidence was successful\n");
+        // Get Number of Files found here and populate the progress window, so i need to pass the window through
+        fileCount = imgdb->getNumFiles();
+        fprintf(stderr, "File Count: %d\n", fileCount);
+        progresswindow->UpdateFilesFound(QString::number(fileCount));
+        progresswindow->UpdateAnalysisState("Processing Files");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
+    }
+    // end extract files thread
+    //ExtractEvidenceRunner *extractEvidence = new ExtractEvidenceRunner();
+    //threadpool->start(extractEvidence);
+    // ExecuteTaskThread(task)
+    //
+    // begin execute task thread
+    //std::queue<TskSchedulerQueue::task_struct> taskqueue = scheduler.GetSchedulerQueue();
+    //TskSchedulerQueue::task_struct *task;
+    //progresscount = 0;
+    //QFutureWatcher<void> futurewatcher;
+    //QObject::connect(&futurewatcher, SIGNAL(finished()), progresswindow, SLOT(IncreaseCount()));
+
+    //futurewatcher.setFuture(QtConcurrent::map(taskqueue, RunTask));
+
+    //futurewatcher.waitForFinished();
+
+    // NEED TO CALL QTCONCURRENT::MAP(TASKQUEUE, RUNTASK)
+    //
+    TskPipelineManager pipelineMgr;
+    TskPipeline *filePipeline;
+    try
+    {
+        filePipeline = pipelineMgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
+    }
+    catch(const TskException &ex)
+    {
+        fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
+    }
+    while((task = scheduler.nextTask()) != NULL)
+    {
+        try
+        {
+            if(task->task == Scheduler::FileAnalysis && filePipeline && !filePipeline->isEmpty())
+            {
+                filePipeline->run(task->id);
+            }
+            else
+            {
+                fprintf(stderr, "Skipping task: %s\n", task->task);
+            }
+            delete task;
+        }
+        catch(TskException &ex)
+        {
+            fprintf(stderr, "TskException: %s\n", ex.message().c_str());
+        }
+        processCount++;
+        int curprogress = (int)((((float)processCount)/(float)fileCount)*100);
+        progresswindow->UpdateProgressBar(curprogress);
+        progresswindow->UpdateFilesProcessed(QString::number(processCount));
+        // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
+    }
+
+    // IF FILESFOUND == FILESPROCESSED... THEN GET LOG COUNT FOR CASEID, EVIDENCEID, JOBID AND ENSURE THERE ARE NO ERROR'S
+    // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
+    // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
+    progresswindow->UpdateAnalysisState("Processing Finished");
+    //delete task
+    // end execute task thread
+}
+*/
+/*
+void SleuthKitPlugin::RunTask(TskSchedulerQueue::task_struct &task)
+{
+    TskPipelineManager pipelineMgr;
+    TskPipeline *filePipeline;
+    try
+    {
+        filePipeline = pipelineMgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
+    }
+    catch(const TskException &ex)
+    {
+        fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
+    }
+    try
+    {
+        if(task->task == Scheduler::FileAnalysis && filePipeline && !filePipeline->isEmpty())
+        {
+            filePipeline->run(task->id);
+        }
+        else
+        {
+            fprintf(stderr, "Skipping task: %s\n", task->task);
+        }
+        delete task;
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "TskException: %s\n", ex.message().c_str());
+    }
+    if(filePipeline && !filePipeline->isEmpty())
+    {
+        filePipeline->logModuleExecutionTimes();
+    }
+
+ */
+}
+
 void SleuthKitPlugin::SetupSystemProperties()
 {
     QString tmpPath = wombatvariable.settingspath;
@@ -133,8 +311,6 @@ void SleuthKitPlugin::SetupSystemLog(QString dataPath, QString logFilePath, Prog
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");
     }
-    catch(TskException &ex)
-    {
         fprintf(stderr, "Loading Log File: %s\n", ex.message().c_str());
     }
 }
@@ -184,9 +360,11 @@ void SleuthKitPlugin::OpenImageDatabase(QString imgDBPath, QString evidenceFileP
     {
         fprintf(stderr, "Loading ImageDB: %s\n", ex.message().c_str());
     }
+    SetupBlackboard();
 }
 
-void SleuthKitPlugin::SetupSystemBlackboard()
+//void SleuthKitPlugin::SetupSystemBlackboard()
+void SleuthKitPlugin::SetupBlackboard()
 {
     try
     {
