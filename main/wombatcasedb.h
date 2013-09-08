@@ -31,10 +31,12 @@ public:
     int InsertCase(QString caseText);
     int InsertJob(int jobType, int caseID, int evidenceID);
     int InsertEvidence(QString evidenceName, QString evidenceFilePath, int caseID);
+    void InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg);
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
     QStringList ReturnCaseEvidence(int caseID);
     QStringList ReturnCaseEvidenceID(int caseID);
+    QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID);
     std::string GetTime(void);
 
 private:

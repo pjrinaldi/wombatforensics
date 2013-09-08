@@ -5,30 +5,9 @@
 #include <QList>
 #include <QStringList>
 #include <QObject>
-#include <QVariant>
-//#include <QMap>
-/*
-struct PluginInfo
-{
-    QObject* plugin;
-    QString name;
-};
 
-struct ViewerMap
-{
-    QVariantMap map;
-    QStringList icons;
-    QString name;
-};
-
-struct PluginMap
-{
-    QMap<QString, QVariant> map;
-};
-*/
 struct WombatVariable
 {
-    //void AddEvidence(QString evidence) { evidencelist.append(evidence); };
 
     // ADD ENUMS FOR JOBSTATUS, JOBTYPE, ETC TO SIMPLIFY INTEGER ASSOCIATION AND READABILITY IN CODE
     enum JobStatus
@@ -50,16 +29,16 @@ struct WombatVariable
     int evidenceid;
     int jobtype;
     int jobid;
-    //QList<PluginInfo> pluginfo;
     QString casespath;
     QString casedirpath;
     QString evidencedirpath;
     QString evidencepath;
-    QString evidencedbname;
-    QStringList evidencelist;
     QString settingspath;
     QString datapath;
     QString tmpfilepath;
+    QString evidencedbname;
+    QStringList evidencelist;
+    //QStringList msgtablelist; // may not need this variable
 
 };
 

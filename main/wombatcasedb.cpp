@@ -48,7 +48,7 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
     wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, caseid INTEGER, evidence TEXT, start TEXT, end TEXT);");
     wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
-
+    wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
     if(sqlite3_open(wombatdbname.toStdString().c_str(), &wombatdb) == SQLITE_OK)
     {
         const char* tblString;
@@ -353,3 +353,51 @@ QStringList WombatCaseDb::ReturnCaseEvidenceID(int caseID)
 
     return tmpList;
 }
+QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID)
+{
+    QStringList tmpstringlist;
+    QString tmptype;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT msgtype, msg FROM msglog WHERE caseid = ? AND evidenceid = ? and jobid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, jobid) == SQLITE_OK)
+        {
+            while(sqlite3_step(sqlstatement) == SQLITE_ROW)
+            {
+                if(sqlite3_column_int(sqlstatement, 0) == 0)
+                    tmptype = "[ERROR]";
+                else if(sqlite3_column_int(sqlstatement, 0) == 1)
+                    tmptype = "[WARN]";
+                else
+                    tmptype = "[INFO]";
+                tmpstringlist << tmptype << sqlite3_column_text(sqlstatement, 1);
+            }
+        }
+        else
+            DisplayError(wombatparent, "1.9", "RETURN MSGTABLE ENTIRES ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        DISPLAYERROR(wombatparent, "1.9", "RETURN MSGTABLE ENTRIES ", sqlite3_errmsg(wombatdb));
+
+    return tmpstringlist;
+}
+void InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg)
+{
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO msglog (caseid, evidenceid, jobid, msgtype, msg, datetime) VALUES(?, ?, ?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, jobid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 4, msgtype) == SQLITE_OK && sqlite3_bind_text(sqlstatment, 5, msg, -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 6, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                // do nothing, it was successful
+            }
+            else
+                DisplayError(wombatparent, "1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            DisplayError(wombatparent, "1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        DisplayError(wombatparent, "1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
+}
+

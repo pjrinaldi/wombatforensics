@@ -55,7 +55,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     {
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }
-    // Get Number of Files found here and populate the progress window, so i need to pass the window through
+    // Get Number of Files found here 
     filecount = imgdb->getNumFiles();
     emit UpdateStatus(filecount, processcount);
 

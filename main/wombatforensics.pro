@@ -5,7 +5,7 @@ HEADERS = wombatforensics.h wombatvariable.h wombatcasedb.h ui_wombatforensics.h
 SOURCES = main.cpp wombatforensics.cpp wombatcasedb.cpp progresswindow.cpp sleuthkit.cpp TskDBBlackboard.cpp TskImageFileTsk.cpp TskImgDBSqlite.cpp TskLog.cpp TskSystemPropertiesImpl.cpp TskSchedulerQueue.cpp basictools.cpp binviewmodel.cpp binviewwidget.cpp
 RESOURCES += wombat.qrc progresswindow.qrc
 DESTDIR = ../build
-LIBS = -lsqlite3 -lewf -ltsk -ltskframework -L/opt/Qt5.1.0/5.1.0/gcc_64/lib -lQt5Widgets -lQt5Gui -lQt5Core -static
+LIBS = -lsqlite3 -lewf -ltsk -ltskframework
 
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 mac:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)_debug

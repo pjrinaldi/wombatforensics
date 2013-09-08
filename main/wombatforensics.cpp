@@ -121,8 +121,7 @@ void WombatForensics::AddEvidence()
         wombatvariable.evidencepath = evidenceFilePath;
         wombatvariable.evidencedbname = evidenceName;
         wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
-        //SleuthKitLogEntry(sleuthkitplugin, "Adding Evidence Started.");
-        // UPDATE MESSAGETABLE(CASEID, EVIDENCEID, JOBID) WHEN JOB STARTS TO SHOW IT STARTED... WHICH SHOULD BE A SQL QUERY TO GET LOG ITEMS FOR IT.
+        emit LogVariable(wombatvariable);
         QString tmpString = evidenceName;
         tmpString += " - ";
         tmpString += QString::fromStdString(GetTime());
@@ -132,9 +131,8 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->UpdateFilesFound("0");
         wombatprogresswindow->UpdateFilesProcessed("0");
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
-        emit LogVariable(wombatvariable);
-        //QList<QStringList> = wombatcasedata->ReturnLogMessages(wombatvariable.GetCaseID(), wombatvariable->GetEvidenceID(), wombatvariable->GetJobID());
-        wombatprogresswindow->UpdateMessageTable("[INFO]", "Adding Evidence Started.");
+        LOGINFO("Adding Evidence Started");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, wombatvariable.datapath + "WombatLog.db", 2, "Adding Evidence Started");
         ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
         threadpool->start(trun);
         fprintf(stderr, "open evidence exists");
@@ -320,14 +318,6 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
     else
         wombatprogresswindow->show();
 }
-/*
-void WombatForensics::SleuthKitLogEntry(QObject *plugin, QString logMsg)
-{
-    SleuthKitInterface *iSleuthKit = qobject_cast<SleuthKitInterface *>(plugin);
-    if(iSleuthKit)
-        iSleuthKit->LogEntry(logMsg);
-}
-*/
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
