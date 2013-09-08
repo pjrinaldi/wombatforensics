@@ -14,13 +14,14 @@
 #include <vector>
 #include <QtWidgets>
 #include <QDir>
+#include <QObject>
 
-class WombatCaseDb
+class WombatCaseDb : public QObject
 {
+    Q_OBJECT
 public:
-    WombatCaseDb(QWidget *Parent);
+    WombatCaseDb();
     bool FileExists(const std::string& fileName);
-    void DisplayError(QWidget *parent, QString errorNumber, QString errorType, QString errorValue);
     const char *CreateLogDB(QString dbname);
     const char *CreateCaseDB(QString dbname);
     const char *OpenCaseDB(QString dbname);
@@ -38,11 +39,11 @@ public:
     QStringList ReturnCaseEvidenceID(int caseID);
     QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID);
     std::string GetTime(void);
-
+signals:
+    void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:
     sqlite3 *wombatdb;
     sqlite3 *logdb;
-    QWidget *wombatparent;
     sqlite3_stmt *sqlstatement;
     sqlite3_stmt *logstatement;
 };

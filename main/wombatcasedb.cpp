@@ -1,10 +1,5 @@
 #include "wombatcasedb.h"
 
-WombatCaseDb::WombatCaseDb(QWidget *Parent)
-{
-    wombatparent = Parent;
-}
-
 std::string WombatCaseDb::GetTime()
 {
     struct tm *newtime;
@@ -20,6 +15,10 @@ std::string WombatCaseDb::GetTime()
     return timeStr;
 }
 
+WombatCaseDb::WombatCaseDb()
+{
+}
+
 bool WombatCaseDb::FileExists(const std::string& filename)
 {
     struct stat buf;
@@ -28,16 +27,6 @@ bool WombatCaseDb::FileExists(const std::string& filename)
         return true;
     }
     return false;
-}
-
-void WombatCaseDb::DisplayError(QWidget *parent, QString errorNumber, QString errorType, QString errorValue)
-{
-    QString tmpString = errorNumber;
-    tmpString += ". SqlError: ";
-    tmpString += errorType;
-    tmpString += " Returned ";
-    tmpString += errorValue;
-    QMessageBox::warning(parent, "Error", tmpString, QMessageBox::Ok);
 }
 
 const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
@@ -143,7 +132,7 @@ int WombatCaseDb::ReturnCaseCount()
             casecount = sqlite3_column_int(sqlstatement, 0);
     }
     else
-        DisplayError(wombatparent, "1.3", "SQL Error. ", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.3", "SQL Error. ", sqlite3_errmsg(wombatdb));
 
     return casecount;
 }
@@ -163,16 +152,16 @@ int WombatCaseDb::InsertCase(QString caseText)
                     caseid = sqlite3_last_insert_rowid(wombatdb);
                 }
                 else
-                    DisplayError(wombatparent, "1.4", "INSERT CASE - RETURN CASEID", sqlite3_errmsg(wombatdb));
+                    emit DisplayError("1.4", "INSERT CASE - RETURN CASEID", sqlite3_errmsg(wombatdb));
             }
             else
-                DisplayError(wombatparent, "1.4", "INSERT CASE - BIND CREATION", sqlite3_errmsg(wombatdb));
+                emit DisplayError("1.4", "INSERT CASE - BIND CREATION", sqlite3_errmsg(wombatdb));
         }
         else
-            DisplayError(wombatparent, "1.4", "INSERT CASE - BIND CASENAME", sqlite3_errmsg(wombatdb));
+            emit DisplayError("1.4", "INSERT CASE - BIND CASENAME", sqlite3_errmsg(wombatdb));
     }
     else
-        DisplayError(wombatparent, "1.4", "INSERT CASE - PREPARE INSERT", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.4", "INSERT CASE - PREPARE INSERT", sqlite3_errmsg(wombatdb));
 
     return caseid;
 }
@@ -189,7 +178,7 @@ QStringList WombatCaseDb::ReturnCaseNameList()
     }
     else
     {
-        DisplayError(wombatparent, "1.5", "RETURN CASE NAMES LIST", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.5", "RETURN CASE NAMES LIST", sqlite3_errmsg(wombatdb));
     }
 
     return tmpList;
@@ -208,13 +197,13 @@ int WombatCaseDb::ReturnCaseID(QString caseName)
                 caseid = sqlite3_column_int(sqlstatement, 0);
             }
             else
-                DisplayError(wombatparent, "1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
+                emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
         }
         else
-            DisplayError(wombatparent, "1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
+            emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
     }
     else
-        DisplayError(wombatparent, "1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
     
     return caseid;
 }
@@ -250,22 +239,22 @@ int WombatCaseDb::InsertJob(int jobType, int caseID, int evidenceID)
                             jobid = sqlite3_last_insert_rowid(wombatdb);
                         }
                         else
-                            DisplayError(wombatparent, "1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+                            emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
                     }
                     else
-                        DisplayError(wombatparent, "1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+                        emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
                 }
                 else
-                    DisplayError(wombatparent, "1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+                    emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
             }
             else
-                DisplayError(wombatparent, "1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+                emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
         }
         else
-            DisplayError(wombatparent, "1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+            emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
     }
     else
-        DisplayError(wombatparent, "1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
     
     return jobid;
 }
@@ -290,22 +279,22 @@ int WombatCaseDb::InsertEvidence(QString evidenceName, QString evidenceFilePath,
                             evidenceid = sqlite3_last_insert_rowid(wombatdb);
                         }
                         else
-                            DisplayError(wombatparent, "1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+                            emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
                     }
                     else
-                        DisplayError(wombatparent, "1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+                        emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
                 }
                 else
-                    DisplayError(wombatparent, "1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+                    emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
             }
             else
-                DisplayError(wombatparent, "1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+                emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
         }
         else
-            DisplayError(wombatparent, "1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+            emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
     }
     else
-        DisplayError(wombatparent, "1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
 
     return evidenceid;
 }
@@ -324,11 +313,11 @@ QStringList WombatCaseDb::ReturnCaseEvidence(int caseID)
         }
         else
         {
-            DisplayError(wombatparent, "1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
+            emit DisplayError("1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
         }
     }
     else
-        DisplayError(wombatparent, "1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
 
     return tmpList;
 }
@@ -346,10 +335,10 @@ QStringList WombatCaseDb::ReturnCaseEvidenceID(int caseID)
             }
         }
         else
-            DisplayError(wombatparent, "1.2", "RETURN CASE EVIDENCE ID ", sqlite3_errmsg(wombatdb));
+            emit DisplayError("1.2", "RETURN CASE EVIDENCE ID ", sqlite3_errmsg(wombatdb));
     }
     else
-        DisplayError(wombatparent, "1.2", "RETURN CASE EVIDENCE ID ", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.2", "RETURN CASE EVIDENCE ID ", sqlite3_errmsg(wombatdb));
 
     return tmpList;
 }
@@ -373,10 +362,10 @@ QStringList WombatCaseDb::ReturnMessageTableEntries(int caseid, int evidenceid, 
             }
         }
         else
-            DisplayError(wombatparent, "1.9", "RETURN MSGTABLE ENTIRES ", sqlite3_errmsg(wombatdb));
+            emit DisplayError("1.9", "RETURN MSGTABLE ENTIRES ", sqlite3_errmsg(wombatdb));
     }
     else
-        DisplayError(wombatparent, "1.9", "RETURN MSGTABLE ENTRIES ", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.9", "RETURN MSGTABLE ENTRIES ", sqlite3_errmsg(wombatdb));
 
     return tmpstringlist;
 }
@@ -392,12 +381,12 @@ void WombatCaseDb::InsertMsg(int caseid, int evidenceid, int jobid, int msgtype,
                 // do nothing, it was successful
             }
             else
-                DisplayError(wombatparent, "1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
+                emit DisplayError("1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
         }
         else
-            DisplayError(wombatparent, "1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
+            emit DisplayError("1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
     }
     else
-        DisplayError(wombatparent, "1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
+        emit DisplayError("1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
 }
 

@@ -2,6 +2,7 @@
 #define SLEUTHKIT_H
 
 #include "wombatvariable.h"
+#include "wombatcasedb.h"
 #include "basictools.h"
 #include <sqlite3.h>
 #include <tsk/framework/framework.h>
@@ -31,7 +32,7 @@ class SleuthKitPlugin : public QObject
     Q_OBJECT
     
 public:
-    SleuthKitPlugin() {};
+    SleuthKitPlugin();
     ~SleuthKitPlugin() {};
     //SleuthKit Interface Functions
     Q_INVOKABLE void Initialize(WombatVariable wombatVariable);
@@ -49,6 +50,7 @@ public:
 
 private:
     WombatVariable wombatvariable;
+    WombatCaseDb* wombatdata;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
     TskLog* log;

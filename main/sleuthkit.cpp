@@ -1,5 +1,9 @@
 #include "sleuthkit.h"
 
+SleuthKitPlugin::SleuthKitPlugin()
+{
+    wombatdata = new WombatCaseDb();
+}
 void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
@@ -59,6 +63,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     filecount = imgdb->getNumFiles();
     emit UpdateStatus(filecount, processcount);
 
+    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Started");
     TskSchedulerQueue::task_struct *task;
     TskPipelineManager pipelinemgr;
     TskPipeline* filepipeline;
@@ -102,6 +107,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     {
         filepipeline->logModuleExecutionTimes();
     }
+    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
     GetImageTree(wombatvariable);
 }
 

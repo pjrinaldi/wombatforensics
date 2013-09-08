@@ -4,7 +4,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 {
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
-    wombatcasedata = new WombatCaseDb(this);
+    wombatcasedata = new WombatCaseDb();
     wombatprogresswindow = new ProgressWindow();
     isleuthkit = new SleuthKitPlugin();
     ibasictools = new BasicTools();
@@ -14,6 +14,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     qRegisterMetaType<WombatVariable>("WombatVariable");
     connect(this, SIGNAL(LogVariable(WombatVariable)), isleuthkit, SLOT(GetLogVariable(WombatVariable)), Qt::QueuedConnection);
+    connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     wombatprogresswindow->setModal(false);
     wombatvariable.caseid = 0;
     wombatvariable.evidenceid = 0;
@@ -26,23 +27,23 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvariable.tmpfilepath = homePath + "tmpfiles/";
     bool mkPath = (new QDir())->mkpath(wombatvariable.settingspath);
     if(mkPath == false)
-        wombatcasedata->DisplayError(this, "2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
+        DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
     mkPath = (new QDir())->mkpath(wombatvariable.datapath);
     if(mkPath == false)
-        wombatcasedata->DisplayError(this, "2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
+        DisplayError("2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
     mkPath = (new QDir())->mkpath(wombatvariable.casespath);
     if(mkPath == false)
-        wombatcasedata->DisplayError(this, "2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
+        DisplayError("2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
     mkPath = (new QDir())->mkpath(wombatvariable.tmpfilepath);
     if(mkPath == false)
-        wombatcasedata->DisplayError(this, "2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
+        DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     QString logPath = wombatvariable.datapath + "WombatLog.db";
     bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
     if(!logFileExist)
     {
         const char* errstring = wombatcasedata->CreateLogDB(logPath);
         if(strcmp(errstring, "") != 0)
-            wombatcasedata->DisplayError(this, "1.0", "Log File Error", errstring);
+            DisplayError("1.0", "Log File Error", errstring);
     }
     QString tmpPath = wombatvariable.datapath + "WombatCase.db";
     bool doesFileExist = wombatcasedata->FileExists(tmpPath.toStdString());
@@ -50,13 +51,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     {
         const char* errstring = wombatcasedata->CreateCaseDB(tmpPath);
         if(strcmp(errstring, "") != 0)
-            wombatcasedata->DisplayError(this, "1.0", "File Error", errstring);
+            DisplayError("1.0", "File Error", errstring);
     }
     else
     {
         const char* errstring = wombatcasedata->OpenCaseDB(tmpPath);
         if(strcmp(errstring, "") != 0)
-            wombatcasedata->DisplayError(this, "1.1", "SQL", errstring);
+            DisplayError("1.1", "SQL", errstring);
     }
     if(wombatcasedata->ReturnCaseCount() == 0)
     {
@@ -68,7 +69,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     }
     else
     {
-        wombatcasedata->DisplayError(this, "1.0", "Case Count", "Invalid Case Count returned.");
+        DisplayError("1.0", "Case Count", "Invalid Case Count returned.");
     }
     ui->fileViewTabWidget->addTab(ibasictools->setupHexTab(), "Hex View");
     ui->fileViewTabWidget->addTab(ibasictools->setupTxtTab(), "Text View");
@@ -159,11 +160,22 @@ void WombatForensics::UpdateMessageTable()
     // loop and populate it.
 }
 
+void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)
+{
+    QString tmpString = errorNumber;
+    tmpString += ". SqlError: ";
+    tmpString += errorType;
+    tmpString += " Returned ";
+    tmpString += errorValue;
+    QMessageBox::warning(this, "Error", tmpString, QMessageBox::Ok);
+}
+
 void WombatForensics::GetImageNode(QStandardItem* imagenode)
 {
     QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
     currentroot->appendRow(imagenode);
     currenttreeview->setModel(wombatdirmodel);
+    wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Completed");
     UpdateMessageTable();
 
 }
@@ -227,7 +239,7 @@ void WombatForensics::on_actionNew_Case_triggered()
             }
             else
             {
-                wombatcasedata->DisplayError(this, "2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
+                DisplayError("2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
             }
             userPath = wombatvariable.casedirpath;
             userPath += "evidence/";
@@ -238,7 +250,7 @@ void WombatForensics::on_actionNew_Case_triggered()
             }
             else
             {
-                wombatcasedata->DisplayError(this, "2.0", "Case Evidence Folder Creation Failed", "Failed to create case evidence folder.");
+                DisplayError("2.0", "Case Evidence Folder Creation Failed", "Failed to create case evidence folder.");
             }
             if(wombatcasedata->ReturnCaseCount() > 0)
             {
@@ -283,7 +295,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
             }
             else
             {
-                wombatcasedata->DisplayError(this, "2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
+                DisplayError("2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
             }
             userPath = wombatvariable.casedirpath;
             userPath += "evidence/";
@@ -294,7 +306,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
             }
             else
             {
-                wombatcasedata->DisplayError(this, "2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
+                DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
             QString caseimage;

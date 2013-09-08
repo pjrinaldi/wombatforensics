@@ -53,6 +53,7 @@ private slots:
     void GetImageNode(QStandardItem* imageNode);
     void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);
+    void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 
 protected:
     void closeEvent(QCloseEvent* event);
