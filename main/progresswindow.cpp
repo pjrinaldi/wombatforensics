@@ -43,9 +43,14 @@ void ProgressWindow::UpdateAnalysisTree(int parentIndex, QTreeWidgetItem *child)
     //ui->analysisTreeWidget->expand(itemAt(parentIndex)) // look online next time i'm online
     ui->analysisTreeWidget->setCurrentItem(child);
 }
-
-void ProgressWindow::UpdateMessageTable(QString msgType, QString msgValue) // msgTableWidget
+void ProgressWindow::ClearTableWidget()
 {
+    ui->msgTableWidget->clearContents();
+}
+
+void ProgressWindow::UpdateMessageTable(int currow, QString msgType, QString msgValue) // msgTableWidget
+{
+    ui->msgTableWidget->setCurrentCell(currow, 0, QItemSelectionModel::NoUpdate);
     ui->msgTableWidget->setItem(ui->msgTableWidget->currentRow() + 1, 0, new QTableWidgetItem(msgType));
     ui->msgTableWidget->setItem(ui->msgTableWidget->currentRow() + 1, 1, new QTableWidgetItem(msgValue));
 }

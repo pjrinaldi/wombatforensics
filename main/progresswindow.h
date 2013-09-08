@@ -18,8 +18,9 @@ public:
     void UpdateFilesFound(QString filesFound); // filesFoundEdit
     void UpdateFilesProcessed(QString filesProcessed); // filesProcessedEdit
     void UpdateAnalysisTree(int parentIndex, QTreeWidgetItem *child); // analysisTreeView
-    void UpdateMessageTable(QString msgType, QString msgValue); // msgTableWidget
+    void UpdateMessageTable(int currow, QString msgType, QString msgValue); // msgTableWidget
     void UpdateProgressBar(int progressValue); // progressBar
+    void ClearTableWidget();
     ~ProgressWindow();
 
 
