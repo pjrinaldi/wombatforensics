@@ -132,7 +132,7 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->UpdateFilesProcessed("0");
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
         LOGINFO("Adding Evidence Started");
-        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, wombatvariable.datapath + "WombatLog.db", 2, "Adding Evidence Started");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
         ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
         threadpool->start(trun);
         fprintf(stderr, "open evidence exists");
@@ -153,8 +153,10 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
 
 void WombatForensics::UpdateMessageTable()
 {
-
     //update message table here
+    //Get Msg Table Data....
+    // Clear Progresswindow Msg Table
+    // loop and populate it.
 }
 
 void WombatForensics::GetImageNode(QStandardItem* imagenode)

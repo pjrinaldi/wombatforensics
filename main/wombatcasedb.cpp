@@ -353,7 +353,7 @@ QStringList WombatCaseDb::ReturnCaseEvidenceID(int caseID)
 
     return tmpList;
 }
-QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID)
+QStringList WombatCaseDb::ReturnMessageTableEntries(int caseid, int evidenceid, int jobid)
 {
     QStringList tmpstringlist;
     QString tmptype;
@@ -369,22 +369,22 @@ QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID)
                     tmptype = "[WARN]";
                 else
                     tmptype = "[INFO]";
-                tmpstringlist << tmptype << sqlite3_column_text(sqlstatement, 1);
+                tmpstringlist << tmptype << QString((const char*)sqlite3_column_text(sqlstatement, 1));
             }
         }
         else
             DisplayError(wombatparent, "1.9", "RETURN MSGTABLE ENTIRES ", sqlite3_errmsg(wombatdb));
     }
     else
-        DISPLAYERROR(wombatparent, "1.9", "RETURN MSGTABLE ENTRIES ", sqlite3_errmsg(wombatdb));
+        DisplayError(wombatparent, "1.9", "RETURN MSGTABLE ENTRIES ", sqlite3_errmsg(wombatdb));
 
     return tmpstringlist;
 }
-void InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg)
+void WombatCaseDb::InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg)
 {
     if(sqlite3_prepare_v2(wombatdb, "INSERT INTO msglog (caseid, evidenceid, jobid, msgtype, msg, datetime) VALUES(?, ?, ?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
-        if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, jobid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 4, msgtype) == SQLITE_OK && sqlite3_bind_text(sqlstatment, 5, msg, -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 6, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, jobid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 4, msgtype) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 5, msg, -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 6, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
             int ret = sqlite3_step(sqlstatement);
             if(ret == SQLITE_ROW || ret == SQLITE_DONE)
