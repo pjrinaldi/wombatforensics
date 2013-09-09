@@ -155,19 +155,18 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
 void WombatForensics::UpdateMessageTable()
 {
     QStringList tmplist = wombatcasedata->ReturnMessageTableEntries(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid);
+    wombatprogresswindow->UpdateMessageTable(tmplist);
     //fprintf(stderr, "tmplist size: %d\n", tmplist.size());
+    /*
     wombatprogresswindow->ClearTableWidget();
     int a =-1;
     for(int i = 0; i < (tmplist.size() / 2); i++)
     {
+        //fprintf(stderr, "a: %d\n", a);
         //fprintf(stderr, "i: %d - tmplist value: %s\n", i, tmplist[i].toStdString().c_str());
         wombatprogresswindow->UpdateMessageTable(a, tmplist[(2*i)], tmplist[(2*i)+1]);
         a++;
-    }
-    //update message table here
-    //Get Msg Table Data....
-    // Clear Progresswindow Msg Table
-    // loop and populate it.
+    }*/
 }
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)

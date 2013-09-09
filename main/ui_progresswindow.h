@@ -185,6 +185,7 @@ public:
         msgTableWidget->horizontalHeader()->setCascadingSectionResizes(false);
         msgTableWidget->horizontalHeader()->setStretchLastSection(true);
         msgTableWidget->verticalHeader()->setVisible(false);
+        msgTableWidget->verticalHeader()->setDefaultSectionSize(16);
 
         verticalLayout_3->addWidget(msgTableWidget);
 

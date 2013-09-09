@@ -3,6 +3,7 @@
 
 #include "ui_progresswindow.h"
 #include <QDialog>
+#include <cstdio>
 
 namespace Ui {
 class ProgressWindow;
@@ -18,7 +19,8 @@ public:
     void UpdateFilesFound(QString filesFound); // filesFoundEdit
     void UpdateFilesProcessed(QString filesProcessed); // filesProcessedEdit
     void UpdateAnalysisTree(int parentIndex, QTreeWidgetItem *child); // analysisTreeView
-    void UpdateMessageTable(int currow, QString msgType, QString msgValue); // msgTableWidget
+    //void UpdateMessageTable(int currow, QString msgType, QString msgValue); // msgTableWidget
+    void UpdateMessageTable(QStringList msgList);
     void UpdateProgressBar(int progressValue); // progressBar
     void ClearTableWidget();
     ~ProgressWindow();

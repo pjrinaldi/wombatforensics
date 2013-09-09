@@ -48,11 +48,22 @@ void ProgressWindow::ClearTableWidget()
     ui->msgTableWidget->clearContents();
 }
 
-void ProgressWindow::UpdateMessageTable(int currow, QString msgType, QString msgValue) // msgTableWidget
+//void ProgressWindow::UpdateMessageTable(int currow, QString msgType, QString msgValue) // msgTableWidget
+void ProgressWindow::UpdateMessageTable(QStringList msglist)
 {
+    int currow = 0;
+    //fprintf(stderr, "currow: %d\n", currow);
     ui->msgTableWidget->setCurrentCell(currow, 0, QItemSelectionModel::NoUpdate);
-    ui->msgTableWidget->setItem(ui->msgTableWidget->currentRow() + 1, 0, new QTableWidgetItem(msgType));
-    ui->msgTableWidget->setItem(ui->msgTableWidget->currentRow() + 1, 1, new QTableWidgetItem(msgValue));
+    for(int i=0; i < (msglist.size() / 2); i++)
+    {
+        fprintf(stderr, "(row: %d) (msgtype, msgvalue), (%s, %s)\n", currow, msglist[(2*i)].toStdString().c_str(), msglist[(2*i+1)].toStdString().c_str());
+        ui->msgTableWidget->setItem(currow, 0, new QTableWidgetItem(msglist[(2*i)]));
+        ui->msgTableWidget->setItem(currow, 1, new QTableWidgetItem(msglist[(2*i +1)]));
+        //wombatprogresswindow->UpdateMessageTable(a, tmplist[(2*i)], tmplist[(2*i)+1]);
+        //ui->msgTableWidget->setItem(ui->msgTableWidget->currentRow() + 1, 0, new QTableWidgetItem(msgType));
+        //ui->msgTableWidget->setItem(ui->msgTableWidget->currentRow() + 1, 1, new QTableWidgetItem(msgValue));
+        currow++;
+    }
 }
 
 void ProgressWindow::UpdateProgressBar(int progressValue) // progressBar
