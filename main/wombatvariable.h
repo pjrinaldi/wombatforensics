@@ -37,8 +37,9 @@ struct WombatVariable
     QString datapath;
     QString tmpfilepath;
     QString evidencedbname;
-    QStringList evidencelist;
-    //QStringList msgtablelist; // may not need this variable
+    QStringList evidencepathlist;
+    QStringList evidencedbnamelist;
+    QList<int> evidenceidlist;
 
 };
 

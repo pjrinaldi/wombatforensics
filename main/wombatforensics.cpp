@@ -103,24 +103,25 @@ void WombatForensics::InitializeSleuthKit()
     ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", wombatvariable);
     threadpool->start(initrunner);
     threadpool->waitForDone();
-    fprintf(stderr, "sleuthkit exists");
+    //fprintf(stderr, "sleuthkit exists");
 }
 
 void WombatForensics::AddEvidence()
 {
     QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
     wombatprogresswindow->show();
-    fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
+    //fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
     if(evidenceFilePath != "")
     {
         wombatvariable.jobtype = 1; // add evidence
-        // MIGHT BE AN ISSUE WHEN YOU OPEN MORE THAN 1 EVIDENCE ITEM... HAVE TO TEST IT OUT AND SEE WHAT HAPPENS
         QString evidenceName = evidenceFilePath.split("/").last();
         evidenceName += ".db";
-        //currentsleuthimages << setupSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, evidenceFilePath);
         wombatvariable.evidenceid = wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable.caseid);
+        wombatvariable.evidenceidlist.append(wombatvariable.evidenceid);
         wombatvariable.evidencepath = evidenceFilePath;
+        wombatvariable.evidencepathlist << wombatvariable.evidencepath;
         wombatvariable.evidencedbname = evidenceName;
+        wombatvariable.evidencedbnamelist << wombatvariable.evidencedbname;
         wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
         emit LogVariable(wombatvariable);
         QString tmpString = evidenceName;
@@ -136,7 +137,7 @@ void WombatForensics::AddEvidence()
         wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
         ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
         threadpool->start(trun);
-        fprintf(stderr, "open evidence exists");
+        //fprintf(stderr, "open evidence exists");
     }
 }
 
@@ -156,17 +157,6 @@ void WombatForensics::UpdateMessageTable()
 {
     QStringList tmplist = wombatcasedata->ReturnMessageTableEntries(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid);
     wombatprogresswindow->UpdateMessageTable(tmplist);
-    //fprintf(stderr, "tmplist size: %d\n", tmplist.size());
-    /*
-    wombatprogresswindow->ClearTableWidget();
-    int a =-1;
-    for(int i = 0; i < (tmplist.size() / 2); i++)
-    {
-        //fprintf(stderr, "a: %d\n", a);
-        //fprintf(stderr, "i: %d - tmplist value: %s\n", i, tmplist[i].toStdString().c_str());
-        wombatprogresswindow->UpdateMessageTable(a, tmplist[(2*i)], tmplist[(2*i)+1]);
-        a++;
-    }*/
 }
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)
@@ -202,9 +192,6 @@ void WombatForensics::SetupDirModel(void)
 
 WombatForensics::~WombatForensics()
 {
-    //wombatprogresswindow->~ProgressWindow();
-    //const char* errmsg = wombatcasedata->CloseCaseDB(); // this possibly caused glibc corrupted double-linked list
-    //fprintf(stderr, "CloseDB: %s\n", errmsg);
     delete ui;
 }
 
@@ -318,10 +305,22 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
             // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
-            QString caseimage;
-            QStringList caseimageList = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid);
-            foreach(caseimage, caseimageList)
-            {
+            // OPEN EXISTING CASE: (PULL ALL INFO FROM SQL)
+            // GET LIST OF EXISTING EVIDENCEIDS, EVIDENCEPATHS, EVIDENCEDBNAMES, JOBID'S
+            // UPDATE DIRECTORY TREE WITH THE RESPECTIVE IMAGE NODES
+            // UPDATE PROGRESS WINDOW WITH THE RESPECTIVE TREE NODES SO MSG TABLE CAN BE UPDATED UPON CLICKING.
+            // IF A CASE WAS OPENED, THEN DON'T SET BLACKBOARD
+            // NEED TO SET CURRENT IMAGE - LOOK INTO UPDATING DBSCHEMA TO HOLD MULTIPLE IMAGES
+            // ALSO LOOK INTO SWITCHING FROM SQLITE TO SOMETHING MORE ROBUST SUCH AS POSTGRESQL OR MARIADB OR HADOOP
+            // POPULATE WOMBATVARIABLE WITH THE RESPECTIVE VALUES
+
+            //QString caseimage;
+            //QStringList caseimageList = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid);
+            //foreach(caseimage, caseimageList)
+            //{
+                // OPEN EXISTING IMAGE:
+                // UPDATE DIRECTORY TREE WITH THE RESPECTIVE IMAGE NODES
+                // POPULATE WOMBATVARIABLE WITH THE RESPECTIVE VALUES
                 //OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
                 fprintf(stderr, "Case Image: %s\n", caseimage.toStdString().c_str());
                 //setupSleuthKitBlackboard(sleuthkitplugin);
