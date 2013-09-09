@@ -32,7 +32,7 @@ class SleuthKitPlugin : public QObject
     Q_OBJECT
     
 public:
-    SleuthKitPlugin();
+    SleuthKitPlugin(WombatCaseDb* wombatcasedata);
     ~SleuthKitPlugin() {};
     //SleuthKit Interface Functions
     Q_INVOKABLE void Initialize(WombatVariable wombatVariable);
