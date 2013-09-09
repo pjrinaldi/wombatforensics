@@ -322,13 +322,13 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 // UPDATE DIRECTORY TREE WITH THE RESPECTIVE IMAGE NODES
                 // POPULATE WOMBATVARIABLE WITH THE RESPECTIVE VALUES
                 //OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
-                fprintf(stderr, "Case Image: %s\n", caseimage.toStdString().c_str());
+                //fprintf(stderr, "Case Image: %s\n", caseimage.toStdString().c_str());
                 //setupSleuthKitBlackboard(sleuthkitplugin);
                 //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, caseimage.split("/").last());
                 //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
                 //currentroot->appendRow(imageNode);
                 //currenttreeview->setModel(wombatdirmodel);
-            }
+            //}
         }
     }
 }
