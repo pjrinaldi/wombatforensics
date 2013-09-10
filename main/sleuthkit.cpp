@@ -50,8 +50,12 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         // copy was successful
         try
         {
-            imgdb->close();
-            imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str()));
+            // NEED TO FIGURE OUT HOW TO CLEAR THE IMGDB SO I CAN RESET IT
+            //delete ~imgdb;
+            //imgdb->~TskImgDB();
+            //imgdb->close();
+            imgdb.reset(new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str()));
+            //imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str()));
             imgdb->open();
             TskServices::Instance().setImgDB(*imgdb);
         }
