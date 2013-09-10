@@ -41,6 +41,7 @@ public:
     void SetupScheduler();
     void SetupFileManager();
     void SetupBlackboard();
+    void SetupImageDatabase();
     Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
     void SetupSystemBlackboard();
     //void LogEntry(QString logMsg);
@@ -55,6 +56,7 @@ private:
     TskFileManagerImpl* fileManager;
     TskLog* log;
     std::auto_ptr<TskImgDB> imgdb;
+    std::auto_ptr<TskImgDB> initialdb;
     TskSchedulerQueue scheduler;
 
 public slots:

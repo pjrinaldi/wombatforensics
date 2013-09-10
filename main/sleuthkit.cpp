@@ -11,14 +11,66 @@ void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
     SetupLog();
     SetupScheduler();
     SetupFileManager();
+    SetupImageDatabase();
+    SetupBlackboard();
     fprintf(stderr, "SleuthKit Existsi\n");
     qRegisterMetaType<WombatVariable>("WombatVariable");
     connect(this, SIGNAL(SetLogVariable(WombatVariable)), log, SLOT(LogVariable(WombatVariable)), Qt::DirectConnection);
 }
 
+void SleuthKitPlugin::SetupImageDatabase()
+{
+    // initialize dummy database to create copy new imagedb's from.
+    try
+    {
+        initialdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.datapath.toStdString().c_str(), "initial.db"));
+        if(initialdb->initialize() != 0)
+            fprintf(stderr, "Error initializing StarterDB\n");
+        else
+        {
+            fprintf(stderr, "Starter DB was Initialized Successfully!\n");
+        }
+        TskServices::Instance().setImgDB(*initialdb);
+        fprintf(stderr, "Loading Starter ImageDB was Successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Loading Starter ImageDB: %s\n", ex.message().c_str());
+    }
+}
+
 void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
+    QString oldstring = wombatvariable.datapath + "initial.db";
+    QString newstring = wombatvariable.evidencedirpath + wombatvariable.evidencedbname;
+    if(QFile::copy(oldstring.toStdString().c_str(), newstring.toStdString().c_str()))
+    {
+        fprintf(stderr, "File Copy Was Successful\n");
+        // copy was successful
+        try
+        {
+            imgdb->close();
+            imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str()));
+            imgdb->open();
+            TskServices::Instance().setImgDB(*imgdb);
+        }
+        catch(TskException &ex)
+        {
+            fprintf(stderr, "Loading ImageDB: %s\n", ex.message().c_str());
+        }
+    }
+    else
+    {
+        fprintf(stderr, "File Copy was NOT successful\n");
+        // copy was not successful
+        // exit out with error
+    }
+    fprintf(stderr, "Evidence ImgDB Path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
+    // perform file copy of existing db to this one.
+    // imgdb->open(at tmpstring location);
+    // TskServices::Instance().setImgDB(*imgdb);
+    /*
     QString tmpstring = wombatvariable.evidencedirpath + wombatvariable.evidencedbname;
     try
     {
@@ -36,7 +88,8 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     {
         fprintf(stderr, "Loading ImageDB: %s\n", ex.message().c_str());
     }
-    SetupBlackboard();
+    //SetupBlackboard();
+    */
     int filecount = 0;
     int processcount = 0;
     TskImageFileTsk imagefiletsk;
@@ -60,7 +113,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         fprintf(stderr, "Extracting Evidence: %s\n", ex.message().c_str());
     }
     // Get Number of Files found here 
-    filecount = imgdb->getNumFiles();
+    filecount = TskServices::Instance().getImgDB().getNumFiles();
     emit UpdateStatus(filecount, processcount);
 
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Started");
