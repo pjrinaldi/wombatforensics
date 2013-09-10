@@ -6,7 +6,7 @@ SOURCES = main.cpp wombatforensics.cpp wombatcasedb.cpp progresswindow.cpp sleut
 RESOURCES += wombat.qrc progresswindow.qrc
 DESTDIR = ./
 #DESTDIR = ../build
-LIBS = -lsqlite3 -lewf -ltsk -ltskframework
+LIBS = -lsqlite3 -lewf -ltsk -L/tmp -Wl,-rpath,/tmp -ltskframework
 
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 mac:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)_debug

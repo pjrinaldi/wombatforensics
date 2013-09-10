@@ -15,6 +15,7 @@
 #include "TskImageFileTsk.h"
 #include <tsk/framework/file/TskFileTsk.h>
 #include "TskLog.h"
+//#include "TskServicesImpl.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QString>
@@ -55,8 +56,11 @@ private:
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
     TskLog* log;
-    std::auto_ptr<TskImgDB> imgdb;
-    std::auto_ptr<TskImgDB> initialdb;
+    //std::auto_ptr<TskImgDB> imgdb;
+    //std::auto_ptr<TskImgDB> initialdb;
+    TskImgDBSqlite* initialdb;
+    TskImgDBSqlite* imgdb;
+    TskImgDBSqlite* tmpdb;
     TskSchedulerQueue scheduler;
 
 public slots:

@@ -23,7 +23,8 @@ void SleuthKitPlugin::SetupImageDatabase()
     // initialize dummy database to create copy new imagedb's from.
     try
     {
-        initialdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.datapath.toStdString().c_str(), "initial.db"));
+        initialdb = new TskImgDBSqlite(wombatvariable.datapath.toStdString().c_str(), "initial.db");
+        //initialdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.datapath.toStdString().c_str(), "initial.db"));
         if(initialdb->initialize() != 0)
             fprintf(stderr, "Error initializing StarterDB\n");
         else
@@ -54,14 +55,33 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
             //delete ~imgdb;
             //imgdb->~TskImgDB();
             //imgdb->close();
-            imgdb.reset(new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str()));
-            //imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str()));
-            imgdb->open();
-            TskServices::Instance().setImgDB(*imgdb);
+            tmpdb = new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str());
         }
         catch(TskException &ex)
         {
-            fprintf(stderr, "Loading ImageDB: %s\n", ex.message().c_str());
+            fprintf(stderr, "Tsk New Exception: %s\n", ex.message().c_str());
+        }
+        try
+        {
+            //initialdb = tmpdb;
+            //tmpdb
+            tmpdb->open();
+            //imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str()));
+            //tmpdb->open();
+        }
+        catch(TskException &ex)
+        {
+            fprintf(stderr, "Tsk Open Exception: %s\n", ex.message().c_str());
+        }
+        try
+        {
+            TskServices::Instance().setImgDB(*tmpdb);
+            //imgdb->open();
+            //TskServices::Instance().setImgDB(*imgdb);
+        }
+        catch(TskException &ex)
+        {
+            fprintf(stderr, "Services Set ImageDB: %s\n", ex.message().c_str());
         }
     }
     else
@@ -94,6 +114,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     }
     //SetupBlackboard();
     */
+    
     int filecount = 0;
     int processcount = 0;
     TskImageFileTsk imagefiletsk;
@@ -351,7 +372,8 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
     fileRecordVector.clear();
     fsInfoRecordList.clear();
     // also need to get the partitions and volumes as nodes.
-    ret = imgdb->getVolumeInfo(volRecordList);
+    ret = TskServices::Instance().getImgDB().getVolumeInfo(volRecordList);
+    //ret = imgdb->getVolumeInfo(volRecordList);
     //fprintf(stderr, "volrecordlist count: %d\n", volRecordList.count());
     foreach(volRecord, volRecordList) // populates all vol's and fs's.
     {
@@ -385,7 +407,8 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
             }
             // for each volrecord, get fsinfo list
             imageNode->appendRow(volNode);
-            ret = imgdb->getFsInfo(fsInfoRecordList);
+            ret = TskServices::Instance().getImgDB().getFsInfo(fsInfoRecordList);
+            //ret = imgdb->getFsInfo(fsInfoRecordList);
             foreach(fsInfoRecord, fsInfoRecordList)
             {
                 if(fsInfoRecord.vol_id == volRecord.vol_id)
@@ -469,7 +492,8 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
                     QList<QList<QStandardItem*> > treeList;
                     foreach(tmpId, fileidVector)
                     {
-                        ret = imgdb->getFileRecord(tmpId, tmpRecord);
+                        ret = TskServices::Instance().getImgDB().getFileRecord(tmpId, tmpRecord);
+                        //ret = imgdb->getFileRecord(tmpId, tmpRecord);
                         fileRecordVector.push_back(tmpRecord);
                     }
                     for(int i=0; i < (int)fileRecordVector.size(); i++)
