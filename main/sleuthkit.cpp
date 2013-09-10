@@ -51,10 +51,6 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         // copy was successful
         try
         {
-            // NEED TO FIGURE OUT HOW TO CLEAR THE IMGDB SO I CAN RESET IT
-            //delete ~imgdb;
-            //imgdb->~TskImgDB();
-            //imgdb->close();
             tmpdb = new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str());
         }
         catch(TskException &ex)
@@ -63,11 +59,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         }
         try
         {
-            //initialdb = tmpdb;
-            //tmpdb
             tmpdb->open();
-            //imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str()));
-            //tmpdb->open();
         }
         catch(TskException &ex)
         {
@@ -76,8 +68,6 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         try
         {
             TskServices::Instance().setImgDB(*tmpdb);
-            //imgdb->open();
-            //TskServices::Instance().setImgDB(*imgdb);
         }
         catch(TskException &ex)
         {
@@ -91,29 +81,6 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         // exit out with error
     }
     fprintf(stderr, "Evidence ImgDB Path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
-    // perform file copy of existing db to this one.
-    // imgdb->open(at tmpstring location);
-    // TskServices::Instance().setImgDB(*imgdb);
-    /*
-    QString tmpstring = wombatvariable.evidencedirpath + wombatvariable.evidencedbname;
-    try
-    {
-        imgdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str()));
-        if(imgdb->initialize() != 0)
-            fprintf(stderr, "Error initializing db\n");
-        else
-        {
-            fprintf(stderr, "DB was Initialized Successfully!\n");
-        }
-        TskServices::Instance().setImgDB(*imgdb);
-        fprintf(stderr, "Loading ImageDB was Successful!\n");
-    }
-    catch(TskException &ex)
-    {
-        fprintf(stderr, "Loading ImageDB: %s\n", ex.message().c_str());
-    }
-    //SetupBlackboard();
-    */
     
     int filecount = 0;
     int processcount = 0;
@@ -174,13 +141,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         processcount++;
         emit UpdateStatus(filecount, processcount);
         emit UpdateMessageTable();
-       // UPDATEMESSAGETABLE EVERY WHILE AND IF ERROR, SHOW IT 
     }
-    // IF FILESFOUND == FILESPROCESSED... THEN GET LOG COUNT FOR CASEID, EVIDENCEID, JOBID AND ENSURE THERE ARE NO ERROR'S
-    // IF NO ERRORS THEN SET JOB STATUS = COMPLETE
-    // IF NO ERRORS THEN LOGINFO("Add Evidence Finished at GetTime().");
-    //progresswindow->UpdateAnalysisState("Processing Finished");
-    
     if(filepipeline && !filepipeline->isEmpty())
     {
         filepipeline->logModuleExecutionTimes();
@@ -343,12 +304,7 @@ void SleuthKitPlugin::threadFinished()
 {
     fprintf(stderr, "The Thread Finished. ");
 }
-/*
-void SleuthKitPlugin::LogEntry(QString logMsg)
-{
-    LOGINFO(logMsg.toStdString().c_str());
-}
-*/
+
 
 void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
 {
