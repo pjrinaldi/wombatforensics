@@ -212,25 +212,14 @@ int WombatCaseDb::ReturnCaseID(QString caseName)
 int WombatCaseDb::InsertJob(int jobType, int caseID, int evidenceID)
 {
     int jobid = 0;
-    QStringList tmpList;
-    QString evidenceList = "";
-    tmpList = ReturnCaseEvidenceID(caseID);
-    tmpList << QString::number(evidenceID);
-    for (int i = 0; i < tmpList.count(); i++)
-    {
-        evidenceList += tmpList[i];
-        if(i < tmpList.count() - 1)
-            evidenceList += "::";
-    }
-    fprintf(stderr, "eList: %s\n", evidenceList.toStdString().c_str());
 
-    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO job (type, caseid, evidence, start) VALUES(?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO job (type, caseid, evidenceid, start) VALUES(?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(sqlstatement, 1, jobType) == SQLITE_OK)
         {
             if(sqlite3_bind_int(sqlstatement, 2, caseID) == SQLITE_OK)
             {
-                if(sqlite3_bind_text(sqlstatement, 3, evidenceList.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+                if(sqlite3_bind_int(sqlstatement, 3, evidenceID) == SQLITE_OK)
                 {
                     if(sqlite3_bind_text(sqlstatement, 4, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
                     {
@@ -342,6 +331,31 @@ QStringList WombatCaseDb::ReturnCaseEvidenceID(int caseID)
         emit DisplayError("1.2", "RETURN CASE EVIDENCE ID ", sqlite3_errmsg(wombatdb));
 
     return tmpList;
+}
+
+QStringList WombatCaseDb::ReturnCaseEvidenceAddJobID(int wombatvariable.caseid, QStringList evidenceidlist)
+{
+    QStringList tmplist;
+    foreach(QString evid, evidenceidlist)
+    {
+        if(sqlite3_prepare_v2(wombatdb, "SELECT jobid FROM job WHERE caseid = ? and evidenceid = ? and jobtype = 1;", -1, &sqlstatement, NULL) == SQLITE_OK)
+        {
+            if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evid) == SQLITE_OK)
+            {
+                while(sqlite3_step(sqlstatement) == SQLITE_ROW)
+                {
+                    tmplist << QString::number(sqlite3_column_int(sqlstatement, 0));
+                }
+            }
+            else
+                emit DisplayError("1.15", "RETURN CASE EVIDENCE ADD JOB ID ", sqlite3_errmsg(wombatdb));
+
+        }
+        else
+            emit DisplayError("1.15", "RETURN CASE EVIDENCE ADD JOB ID ", sqlite3_errmsg(wombatdb));
+    }
+
+    return tmplist;
 }
 
 QStringList WombatCaseDb::ReturnMessageTableEntries(int caseid, int evidenceid, int jobid)

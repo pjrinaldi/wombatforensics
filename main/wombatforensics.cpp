@@ -307,6 +307,8 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
             QStringList evidencepathlist = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid);
+            QStringList evidenceidlist = wombatcasedata->ReturnCaseEvidenceID(wombatvariable.caseid);
+            QStringList evidenceaddjoblist = wombatcasedata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist);
             // NEED EVIDENCE ID TO GET JOBID FOR ADD EVIDENCE SO I CAN REPOPULATE PROGRESSWINDOW MSG TABLE
             // GET EVIDENCE FULLPATH <LIST> - USE THAT TO GET THE DBNAME.DB FOR NEW TSKIMGDBSQLITE(EVIDENCEDIRPATH, EVIDENCEFULLPATH)
             // SET WOMBATVARIABLE VALUES... PASS THEM ONTO THE LOG
