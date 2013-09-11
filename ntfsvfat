@@ -39,3 +39,21 @@ This paper will begin describing what a file system is and the concepts that mos
 A file system is a system that manages storing, retrieving and updating files on a computer.
 
 COMPARE NTFS VS FAT AND THEN FILL IN EXPLANATIONS FROM WHAT'S IMPORTANT IN THE COMPARISON
+
+NTFS vs FAT32
+N - ability to recover from disk-related errors
+N - improved support for lareger hard disks
+N - better security through permissions and enryption
+F - no security
+F - 32GB file partition limit and 4GB - 2 bytes file limit.
+F - fluff free and simple file system that is well documented and keeps track of file locations.
+N - complex, undocumented at the at the raw bytes level and subject to change.
+F - file allocation table
+F - uses small file clusters to use space more effectively
+F - relocate root folder and use backup of FAT.
+N - file level encryption, sparse file support, disk usage quotas, distributed link tracking, file compression
+F - FAT is required for DOS or win9X
+N - required if need support for files over 4GB-2bytes, hard drives over 137GB in size and or security features.
+N - smaller RAM footprint, indexed design more efficient. (extra overhead of security checks, compression, encryption) (small clusters may fragment data cluster chains)
+N - transaction rollback, file-level permissions, fixes failing clusters on the fly.
+N - smaller cluster size than FAT32 above 8GB.  may include data of small files w/in directory level, bitmap structure is smaller than FAT32's dual FAT, (NTFS has large MFT strucutre) (larger per-file directory metadata space)
