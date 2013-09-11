@@ -34,10 +34,11 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
     wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT);");
-    wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, caseid INTEGER, evidence TEXT, start TEXT, end TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);");
     wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
     wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
+    wombatTableSchema.push_pack("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER);");
     if(sqlite3_open(wombatdbname.toStdString().c_str(), &wombatdb) == SQLITE_OK)
     {
         const char* tblString;
@@ -342,6 +343,7 @@ QStringList WombatCaseDb::ReturnCaseEvidenceID(int caseID)
 
     return tmpList;
 }
+
 QStringList WombatCaseDb::ReturnMessageTableEntries(int caseid, int evidenceid, int jobid)
 {
     QStringList tmpstringlist;
