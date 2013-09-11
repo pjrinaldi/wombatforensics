@@ -306,17 +306,40 @@ void WombatForensics::on_actionOpen_Case_triggered()
             {
                 DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
-            // POPULATE APP WITH ANY OPEN IMAGES AND MINIMAL SETTINGS
-            // OPEN EXISTING CASE: (PULL ALL INFO FROM SQL)
-            // GET LIST OF EXISTING EVIDENCEIDS, EVIDENCEPATHS, EVIDENCEDBNAMES, JOBID'S
-            // UPDATE DIRECTORY TREE WITH THE RESPECTIVE IMAGE NODES
-            // UPDATE PROGRESS WINDOW WITH THE RESPECTIVE TREE NODES SO MSG TABLE CAN BE UPDATED UPON CLICKING.
-            // IF A CASE WAS OPENED, THEN DON'T SET BLACKBOARD
-            // NEED TO SET CURRENT IMAGE - LOOK INTO UPDATING DBSCHEMA TO HOLD MULTIPLE IMAGES
-            // ALSO LOOK INTO SWITCHING FROM SQLITE TO SOMETHING MORE ROBUST SUCH AS POSTGRESQL OR MARIADB OR HADOOP
-            // POPULATE WOMBATVARIABLE WITH THE RESPECTIVE VALUES
-
-            //QString caseimage;
+            // NEED EVIDENCE ID TO GET JOBID FOR ADD EVIDENCE SO I CAN REPOPULATE PROGRESSWINDOW MSG TABLE
+            // GET EVIDENCE FULLPATH <LIST> - USE THAT TO GET THE DBNAME.DB FOR NEW TSKIMGDBSQLITE(EVIDENCEDIRPATH, EVIDENCEFULLPATH)
+            // SET WOMBATVARIABLE VALUES... PASS THEM ONTO THE LOG
+            // STORE ORIGINAL TREEVIEW ENTRIES IN A DB. SO I CAN RECALL THEM WHEN NEEDED.
+            // ONCE OPEN AND SETIMGDB, I CAN THEN CALL GETIMAGETREE AND REPOPULATE EVIDENCE IN EVIDENCE TREE.
+/*
+         wombatvariable.jobtype = 1; // add evidence
+        // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. IF THEY WANT TO OPEN A SECOND COPY
+        // THEN SET NEWEVIDENCENAME EVIDENCEFILEPATH.SPLIT("/").LAST() + "COPY.DB"
+        QString evidenceName = evidenceFilePath.split("/").last();
+        evidenceName += ".db";
+        wombatvariable.evidenceid = wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable.caseid);
+        wombatvariable.evidenceidlist.append(wombatvariable.evidenceid);
+        wombatvariable.evidencepath = evidenceFilePath;
+        wombatvariable.evidencepathlist << wombatvariable.evidencepath;
+        wombatvariable.evidencedbname = evidenceName;
+        wombatvariable.evidencedbnamelist << wombatvariable.evidencedbname;
+        wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
+        emit LogVariable(wombatvariable);
+        QString tmpString = evidenceName;
+        tmpString += " - ";
+        tmpString += QString::fromStdString(GetTime());
+        QStringList tmpList;
+        tmpList << tmpString << QString::number(wombatvariable.jobid);
+        wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
+        wombatprogresswindow->UpdateFilesFound("0");
+        wombatprogresswindow->UpdateFilesProcessed("0");
+        wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
+        LOGINFO("Adding Evidence Started");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
+        ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
+        threadpool->start(trun);
+*/
+           //QString caseimage;
             //QStringList caseimageList = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid);
             //foreach(caseimage, caseimageList)
             //{
