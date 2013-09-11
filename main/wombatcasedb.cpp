@@ -338,7 +338,7 @@ QStringList WombatCaseDb::ReturnCaseEvidenceAddJobID(int caseid, QStringList evi
     QStringList tmplist;
     foreach(QString evid, evidenceidlist)
     {
-        if(sqlite3_prepare_v2(wombatdb, "SELECT jobid FROM job WHERE caseid = ? and evidenceid = ? and jobtype = 1;", -1, &sqlstatement, NULL) == SQLITE_OK)
+        if(sqlite3_prepare_v2(wombatdb, "SELECT jobid FROM job WHERE caseid = ? and evidenceid = ? and type = 1;", -1, &sqlstatement, NULL) == SQLITE_OK)
         {
             if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evid.toInt()) == SQLITE_OK)
             {
