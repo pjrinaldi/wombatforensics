@@ -10,6 +10,23 @@ OUTLINE (working)
 6. are the feaetures/details necessary to forensically examine the computer.
 7. In what case would there be a use for either system from a user perspective and a forensic perspective
 
+USEFULE NOTES TO THINK ABOUT WHEN WRITING IT.
+
+essential data and non-essential data required to save and retrieve files.
+logical file address. slack space. unallocated space. wiping techniques.
+
+FAT Boot Sector Data
+
+cluster and sector addresses.
+
+directory entry/allocation
+
+ease to analyze fat file structure but limits with regards to file recovery and temporal-based auditing.
+
+NTFS everything is a file. MFT
+
+logical file system provides information on where data is stored on the physical disk
+
 PAPER (working)
 
 TITLE: A Comparison of the NTFS and FAT32 File Systems
@@ -20,3 +37,5 @@ This paper will begin describing what a file system is and the concepts that mos
 
 2. GENERAL FILE SYSTEM
 A file system is a system that manages storing, retrieving and updating files on a computer.
+
+COMPARE NTFS VS FAT AND THEN FILL IN EXPLANATIONS FROM WHAT'S IMPORTANT IN THE COMPARISON
