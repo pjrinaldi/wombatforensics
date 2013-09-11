@@ -15,7 +15,6 @@
 #include "TskImageFileTsk.h"
 #include <tsk/framework/file/TskFileTsk.h>
 #include "TskLog.h"
-//#include "TskServicesImpl.h"
 #include <QtPlugin>
 #include <QObject>
 #include <QString>
@@ -44,8 +43,8 @@ public:
     void SetupBlackboard();
     void SetupImageDatabase();
     Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
+    Q_INVOKABLE void PopulateCase(WombatVariable wombatVariable);
     void SetupSystemBlackboard();
-    //void LogEntry(QString logMsg);
     void GetImageTree(WombatVariable wombatvariable);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
@@ -56,8 +55,6 @@ private:
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
     TskLog* log;
-    //std::auto_ptr<TskImgDB> imgdb;
-    //std::auto_ptr<TskImgDB> initialdb;
     TskImgDBSqlite* initialdb;
     TskImgDBSqlite* imgdb;
     TskImgDBSqlite* tmpdb;

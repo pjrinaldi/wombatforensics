@@ -154,6 +154,68 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
     GetImageTree(wombatvariable);
 }
+void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
+{
+    wombatvariable = wombatVariable;
+    try
+    {
+        tmpdb = new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str());
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Tsk New Exception: %s\n", ex.message().c_str());
+    }
+    try
+    {
+        if(tmpdb->open() != 0)
+            fprintf(stderr, "Error intializing Evidence DB\n");
+        else
+        {
+            fprintf(stderr, "Evidence DB was initialized successfully\n");
+        }
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Tsk Open Exception: %s\n", ex.message().c_str());
+    }
+    try
+    {
+        TskServices::Instance().setImgDB(*tmpdb);
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Services Set ImageDB: %s\n", ex.message().c_str());
+    }
+    GetImageTree(wombatvariable);
+}
+            // GET EVIDENCE FULLPATH <LIST> - USE THAT TO GET THE DBNAME.DB FOR NEW TSKIMGDBSQLITE(EVIDENCEDIRPATH, EVIDENCEFULLPATH)
+            // SET WOMBATVARIABLE VALUES... PASS THEM ONTO THE LOG
+            // TREEVIEW ENTRIES ARE STORED IN A THE EVIDENCE TABLE OF WOMBATCASES.DB. SO I CAN RECALL THEM WHEN NEEDED.
+            // ONCE OPEN AND SETIMGDB, I CAN THEN CALL GETIMAGETREE AND REPOPULATE EVIDENCE IN EVIDENCE TREE.
+            // ENSURE JOBS TABLE HAS EVIDENCEID INSTEAD OF EVIDENCE LIST.
+            // ENSURE UPDATE END TIME IN JOB FIELD WHEN ITS DONE.
+            // THIS SHOULD BE ENOUGH FOR AN INITIAL TRIAL SETUP
+
+/*
+        // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. 
+        QString tmpString = evidenceName;
+        tmpString += " - ";
+        tmpString += QString::fromStdString(GetTime());
+        QStringList tmpList;
+        tmpList << tmpString << QString::number(wombatvariable.jobid);
+        wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
+        wombatprogresswindow->UpdateFilesFound("0");
+        wombatprogresswindow->UpdateFilesProcessed("0");
+        wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
+        LOGINFO("Adding Evidence Started");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
+*/
+                // UPDATE DIRECTORY TREE WITH THE RESPECTIVE IMAGE NODES
+                // POPULATE WOMBATVARIABLE WITH THE RESPECTIVE VALUES
+                //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, caseimage.split("/").last());
+                //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
+                //currentroot->appendRow(imageNode);
+                //currenttreeview->setModel(wombatdirmodel);
 
 void SleuthKitPlugin::SetupSystemProperties()
 {
