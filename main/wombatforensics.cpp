@@ -309,14 +309,18 @@ void WombatForensics::on_actionOpen_Case_triggered()
             QStringList evidencepathlist = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid); // fullpath dd list
             QStringList evidenceidlist = wombatcasedata->ReturnCaseEvidenceID(wombatvariable.caseid); // evidenceid list
             QStringList evidenceaddjoblist = wombatcasedata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // jobid list
-            foreach(QString evid, evidenceidlist)
+            for(int i=0; i < evidenceidlist.count(); i++)
             {
-                // set wombatvariable values.
-                // pass them onto the log for future actions.
+                wombatvariable.evidenceid = evidenceidlist[i].toInt();
+                wombatvariable.evidencepath = evidencepathlist[i];
+                wombatvariable.jobid = evidenceaddjoblist[i].toInt();
+                wombatvariable.evidencedbname = wombatvariable.evidencepath.split("/").last() + ".db";
+
+                emit LogVariable(wombatvariable);
+                ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "populatecase", wombatvariable);
+                threadpool->start(tmprun);
                 // update progresswindow with data.
-                // thread info to open/setImgDB and then call populate treeview values
             }
-            // NEED EVIDENCE ID TO GET JOBID FOR ADD EVIDENCE SO I CAN REPOPULATE PROGRESSWINDOW MSG TABLE
             // GET EVIDENCE FULLPATH <LIST> - USE THAT TO GET THE DBNAME.DB FOR NEW TSKIMGDBSQLITE(EVIDENCEDIRPATH, EVIDENCEFULLPATH)
             // SET WOMBATVARIABLE VALUES... PASS THEM ONTO THE LOG
             // TREEVIEW ENTRIES ARE STORED IN A THE EVIDENCE TABLE OF WOMBATCASES.DB. SO I CAN RECALL THEM WHEN NEEDED.
@@ -326,19 +330,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
             // THIS SHOULD BE ENOUGH FOR AN INITIAL TRIAL SETUP
 
 /*
-         wombatvariable.jobtype = 1; // add evidence
-        // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. IF THEY WANT TO OPEN A SECOND COPY
-        // THEN SET NEWEVIDENCENAME EVIDENCEFILEPATH.SPLIT("/").LAST() + "COPY.DB"
-        QString evidenceName = evidenceFilePath.split("/").last();
-        evidenceName += ".db";
-        wombatvariable.evidenceid = wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable.caseid);
-        wombatvariable.evidenceidlist.append(wombatvariable.evidenceid);
-        wombatvariable.evidencepath = evidenceFilePath;
-        wombatvariable.evidencepathlist << wombatvariable.evidencepath;
-        wombatvariable.evidencedbname = evidenceName;
-        wombatvariable.evidencedbnamelist << wombatvariable.evidencedbname;
-        wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
-        emit LogVariable(wombatvariable);
+        // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. 
         QString tmpString = evidenceName;
         tmpString += " - ";
         tmpString += QString::fromStdString(GetTime());
@@ -350,14 +342,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
         LOGINFO("Adding Evidence Started");
         wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
-        ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
-        threadpool->start(trun);
 */
-           //QString caseimage;
-            //QStringList caseimageList = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid);
-            //foreach(caseimage, caseimageList)
-            //{
-                // OPEN EXISTING IMAGE:
                 // UPDATE DIRECTORY TREE WITH THE RESPECTIVE IMAGE NODES
                 // POPULATE WOMBATVARIABLE WITH THE RESPECTIVE VALUES
                 //OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
@@ -367,7 +352,6 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
                 //currentroot->appendRow(imageNode);
                 //currenttreeview->setModel(wombatdirmodel);
-            //}
         }
     }
 }
