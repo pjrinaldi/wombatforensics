@@ -1,0 +1,13 @@
+CART REQUIREMENTS (key structures and storage mechanisms, file names and directories, file dates and times, file deletion, encryption, forensic implications) - These should be met in 2-7.
+
+OUTLINE (working)
+
+1. filesystem basics
+2. ntfs filesystem explanation to include key features
+3. fat32 filesystem explanation to include key features
+4. comparison of these features.
+5. are the features/details necessary to use the computer or are they overkill.
+6. are the feaetures/details necessary to forensically examine the computer.
+7. In what case would there be a use for either system from a user perspective and a forensic perspective
+
+PAPER (working)

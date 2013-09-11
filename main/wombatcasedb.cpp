@@ -38,7 +38,7 @@ const char* WombatCaseDb::CreateCaseDB(QString wombatdbname)
     wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
     wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
-    wombatTableSchema.push_pack("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER);");
+    wombatTableSchema.push_back("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER);");
     if(sqlite3_open(wombatdbname.toStdString().c_str(), &wombatdb) == SQLITE_OK)
     {
         const char* tblString;
@@ -333,14 +333,14 @@ QStringList WombatCaseDb::ReturnCaseEvidenceID(int caseID)
     return tmpList;
 }
 
-QStringList WombatCaseDb::ReturnCaseEvidenceAddJobID(int wombatvariable.caseid, QStringList evidenceidlist)
+QStringList WombatCaseDb::ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist)
 {
     QStringList tmplist;
     foreach(QString evid, evidenceidlist)
     {
         if(sqlite3_prepare_v2(wombatdb, "SELECT jobid FROM job WHERE caseid = ? and evidenceid = ? and jobtype = 1;", -1, &sqlstatement, NULL) == SQLITE_OK)
         {
-            if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evid) == SQLITE_OK)
+            if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evid.toInt()) == SQLITE_OK)
             {
                 while(sqlite3_step(sqlstatement) == SQLITE_ROW)
                 {

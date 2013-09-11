@@ -37,7 +37,7 @@ public:
     int ReturnCaseID(QString caseName);
     QStringList ReturnCaseEvidence(int caseID);
     QStringList ReturnCaseEvidenceID(int caseID);
-    QStringList ReturnCaseEvidenceAddJobID(int wombatvariable.caseid, QStringList evidenceidlist);
+    QStringList ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist);
     QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID);
     std::string GetTime(void);
 signals:
