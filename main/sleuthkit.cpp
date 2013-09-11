@@ -59,7 +59,12 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         }
         try
         {
-            tmpdb->open();
+            if(tmpdb->initialize() != 0)
+                fprintf(stderr, "Error intializing Evidence DB\n");
+            else
+            {
+                fprintf(stderr, "Evidence DB was initialized successfully\n");
+            }
         }
         catch(TskException &ex)
         {
@@ -78,7 +83,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     {
         fprintf(stderr, "File Copy was NOT successful\n");
         // copy was not successful
-        // exit out with error
+        // exit out with error that image already added...
     }
     fprintf(stderr, "Evidence ImgDB Path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
     

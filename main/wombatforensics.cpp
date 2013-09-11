@@ -114,6 +114,8 @@ void WombatForensics::AddEvidence()
     if(evidenceFilePath != "")
     {
         wombatvariable.jobtype = 1; // add evidence
+        // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. IF THEY WANT TO OPEN A SECOND COPY
+        // THEN SET NEWEVIDENCENAME EVIDENCEFILEPATH.SPLIT("/").LAST() + "COPY.DB"
         QString evidenceName = evidenceFilePath.split("/").last();
         evidenceName += ".db";
         wombatvariable.evidenceid = wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable.caseid);
