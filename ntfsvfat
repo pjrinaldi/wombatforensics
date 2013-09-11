@@ -57,3 +57,8 @@ N - required if need support for files over 4GB-2bytes, hard drives over 137GB i
 N - smaller RAM footprint, indexed design more efficient. (extra overhead of security checks, compression, encryption) (small clusters may fragment data cluster chains)
 N - transaction rollback, file-level permissions, fixes failing clusters on the fly.
 N - smaller cluster size than FAT32 above 8GB.  may include data of small files w/in directory level, bitmap structure is smaller than FAT32's dual FAT, (NTFS has large MFT strucutre) (larger per-file directory metadata space)
+N - NT >
+F - 95-XP
+
+
+FAT splits volume into clusters. cluster size is determined by the size of the volume. for FAT, cluster number must fit in 16 bits and must be apower of 2.
