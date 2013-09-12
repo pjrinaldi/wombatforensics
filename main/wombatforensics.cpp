@@ -343,15 +343,6 @@ void WombatForensics::on_actionOpen_Case_triggered()
         LOGINFO("Adding Evidence Started");
         wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
 */
-                // UPDATE DIRECTORY TREE WITH THE RESPECTIVE IMAGE NODES
-                // POPULATE WOMBATVARIABLE WITH THE RESPECTIVE VALUES
-                //OpenSleuthKitImgDb(sleuthkitplugin, currentcaseevidencepath, caseimage);
-                //fprintf(stderr, "Case Image: %s\n", caseimage.toStdString().c_str());
-                //setupSleuthKitBlackboard(sleuthkitplugin);
-                //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, caseimage.split("/").last());
-                //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
-                //currentroot->appendRow(imageNode);
-                //currenttreeview->setModel(wombatdirmodel);
         }
     }
 }
@@ -366,7 +357,8 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    QString tmptext = index.sibling(index.row(), 0).data().toString();
+    QString tmptext = index.sibling(index.row(), 1).data().toString();
+    fprintf(stderr, "unique id: %s\n", tmptext.toStdString().c_str());
     QString tmpFilePath = isleuthkit->GetFileContents(tmptext.toInt());
     ibasictools->LoadHexModel(tmpFilePath);
     QString asciiText = isleuthkit->GetFileTxtContents(tmptext.toInt());
