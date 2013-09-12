@@ -359,8 +359,9 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     QString tmptext = index.sibling(index.row(), 1).data().toString();
     fprintf(stderr, "unique id: %s\n", tmptext.toStdString().c_str());
-    QString tmpFilePath = isleuthkit->GetFileContents(tmptext.toInt());
+    int fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
+    QString tmpFilePath = isleuthkit->GetFileContents(fileid);
     ibasictools->LoadHexModel(tmpFilePath);
-    QString asciiText = isleuthkit->GetFileTxtContents(tmptext.toInt());
+    QString asciiText = isleuthkit->GetFileTxtContents(fileid);
     ibasictools->LoadTxtContent(asciiText);
 }

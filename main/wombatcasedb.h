@@ -37,6 +37,7 @@ public:
     void UpdateJobEnd(int jobid);
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
+    int ReturnObjectFileID(int objectid);
     QStringList ReturnCaseEvidence(int caseID);
     QStringList ReturnCaseEvidenceID(int caseID);
     QStringList ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist);

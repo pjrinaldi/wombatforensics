@@ -204,6 +204,30 @@ int WombatCaseDb::ReturnCaseID(QString caseName)
     return caseid;
 }
 
+int WombatCaseDb::ReturnObjectFileID(int objectid)
+{
+    int fileid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT fileid FROM objects WHERE objectid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, objectid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                fileid = sqlite3_column_int(sqlstatement, 0);
+            }
+            else
+                emit DisplayError("1.18", "RETURN OBJECT'S FILEID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.18", "RETURN OBJECT'S FILEID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.18", "RETURN OBJECT'S FILEID ", sqlite3_errmsg(wombatdb));
+
+    return fileid;
+}
+
 int WombatCaseDb::InsertJob(int jobType, int caseID, int evidenceID)
 {
     int jobid = 0;
@@ -403,7 +427,11 @@ void WombatCaseDb::UpdateJobEnd(int jobid)
         if(sqlite3_bind_text(sqlstatement, 1, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, jobid) == SQLITE_OK)
         {
             int ret = sqlite3_step(sqlstatement);
-            if(ret != SQLITE_ROW || ret != SQLITE_DONE)
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                // do nothing, it was successful
+            }
+            else
             {
                 emit DisplayError("1.16", "UPDATE FINISHED JOB ", sqlite3_errmsg(wombatdb));
             }
