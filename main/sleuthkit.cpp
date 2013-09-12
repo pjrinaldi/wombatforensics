@@ -24,7 +24,6 @@ void SleuthKitPlugin::SetupImageDatabase()
     try
     {
         initialdb = new TskImgDBSqlite(wombatvariable.datapath.toStdString().c_str(), "initial.db");
-        //initialdb = std::auto_ptr<TskImgDB>(new TskImgDBSqlite(wombatvariable.datapath.toStdString().c_str(), "initial.db"));
         if(initialdb->initialize() != 0)
             fprintf(stderr, "Error initializing StarterDB\n");
         else
@@ -152,6 +151,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         filepipeline->logModuleExecutionTimes();
     }
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
+    wombatdata->UpdateJobEnd(wombatvariable.jobid);
     GetImageTree(wombatvariable);
 }
 void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
@@ -210,12 +210,6 @@ void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
         LOGINFO("Adding Evidence Started");
         wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
 */
-                // UPDATE DIRECTORY TREE WITH THE RESPECTIVE IMAGE NODES
-                // POPULATE WOMBATVARIABLE WITH THE RESPECTIVE VALUES
-                //QStandardItem* imageNode = GetCurrentImageDirectoryTree(sleuthkitplugin, currentcaseevidencepath, caseimage.split("/").last());
-                //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
-                //currentroot->appendRow(imageNode);
-                //currenttreeview->setModel(wombatdirmodel);
 
 void SleuthKitPlugin::SetupSystemProperties()
 {
@@ -481,6 +475,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
                     //Create custom function to access this...
                     sqlite3* tmpImgDB;
                     QString tmpImgDbPath = wombatvariable.evidencedirpath + imagename + ".db";
+                    wombatvariable.objectidlist.clear();
                     if(sqlite3_open(tmpImgDbPath.toStdString().c_str(), &tmpImgDB) == SQLITE_OK)
                     {
                         sqlite3_stmt* stmt;
@@ -492,6 +487,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
                                 {
                                     uint64_t fileId = (uint64_t)sqlite3_column_int(stmt, 0);
                                     fileidVector.push_back(fileId);
+                                    wombatvariable.objectidlist.append(wombatdata->InsertObject(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileId));
                                 }
                                 sqlite3_finalize(stmt);
                             }
@@ -526,8 +522,9 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
                         // full path might contain more than i thought, to include unalloc and whatnot
                         fullPath += QString(fileRecordVector[i].fullPath.c_str());
                         QList<QStandardItem*> sleuthList;
-                        sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
+                        sleuthList << new QStandardItem(QString::number(wombatvariable.objectidlist[i]));
+                        //sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
                         sleuthList << new QStandardItem(fullPath);
                         sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
                         sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
@@ -565,7 +562,6 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
             }
         }
     }
-    //return imageNode;
     emit ReturnImageNode(imageNode);
 }
 

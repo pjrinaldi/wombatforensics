@@ -18,7 +18,6 @@ ProgressWindow::~ProgressWindow()
 void ProgressWindow::HideClicked()
 {
     this->hide();
-    //need to call signal/slot to set mainwindow button slot to unchecked...
     emit HideProgressWindow(false);
 }
 void ProgressWindow::UpdateAnalysisState(QString analysisState) // analysisStateEdit
@@ -48,7 +47,6 @@ void ProgressWindow::ClearTableWidget()
     ui->msgTableWidget->clearContents();
 }
 
-//void ProgressWindow::UpdateMessageTable(int currow, QString msgType, QString msgValue) // msgTableWidget
 void ProgressWindow::UpdateMessageTable(QStringList msglist)
 {
     int currow = 0;

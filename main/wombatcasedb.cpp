@@ -143,20 +143,15 @@ int WombatCaseDb::InsertCase(QString caseText)
     int caseid = 0;
     if(sqlite3_prepare_v2(wombatdb, "INSERT INTO cases (name, creation) VALUES(?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
-        if(sqlite3_bind_text(sqlstatement, 1, caseText.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        if(sqlite3_bind_text(sqlstatement, 1, caseText.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 2, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
-            if(sqlite3_bind_text(sqlstatement, 2, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
             {
-                int ret = sqlite3_step(sqlstatement);
-                if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-                {
-                    caseid = sqlite3_last_insert_rowid(wombatdb);
-                }
-                else
-                    emit DisplayError("1.4", "INSERT CASE - RETURN CASEID", sqlite3_errmsg(wombatdb));
+                caseid = sqlite3_last_insert_rowid(wombatdb);
             }
             else
-                emit DisplayError("1.4", "INSERT CASE - BIND CREATION", sqlite3_errmsg(wombatdb));
+                emit DisplayError("1.4", "INSERT CASE - RETURN CASEID", sqlite3_errmsg(wombatdb));
         }
         else
             emit DisplayError("1.4", "INSERT CASE - BIND CASENAME", sqlite3_errmsg(wombatdb));
@@ -215,27 +210,12 @@ int WombatCaseDb::InsertJob(int jobType, int caseID, int evidenceID)
 
     if(sqlite3_prepare_v2(wombatdb, "INSERT INTO job (type, caseid, evidenceid, start) VALUES(?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
-        if(sqlite3_bind_int(sqlstatement, 1, jobType) == SQLITE_OK)
+        if(sqlite3_bind_int(sqlstatement, 1, jobType) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, caseID) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, evidenceID) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 4, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
-            if(sqlite3_bind_int(sqlstatement, 2, caseID) == SQLITE_OK)
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
             {
-                if(sqlite3_bind_int(sqlstatement, 3, evidenceID) == SQLITE_OK)
-                {
-                    if(sqlite3_bind_text(sqlstatement, 4, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
-                    {
-                        int ret = sqlite3_step(sqlstatement);
-                        if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-                        {
-                            jobid = sqlite3_last_insert_rowid(wombatdb);
-                        }
-                        else
-                            emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
-                    }
-                    else
-                        emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
-                }
-                else
-                    emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+                jobid = sqlite3_last_insert_rowid(wombatdb);
             }
             else
                 emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
@@ -254,28 +234,13 @@ int WombatCaseDb::InsertEvidence(QString evidenceName, QString evidenceFilePath,
     int evidenceid = 0;
     if(sqlite3_prepare_v2(wombatdb, "INSERT INTO evidence (fullpath, name, caseid, creation) VALUES(?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
-        if(sqlite3_bind_text(sqlstatement, 1, evidenceFilePath.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        if(sqlite3_bind_text(sqlstatement, 1, evidenceFilePath.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 2, evidenceName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, caseID) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 4, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
-            if(sqlite3_bind_text(sqlstatement, 2, evidenceName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
             {
-                if(sqlite3_bind_int(sqlstatement, 3, caseID) == SQLITE_OK)
-                {
-                    if(sqlite3_bind_text(sqlstatement, 4, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
-                    {
-                        int ret = sqlite3_step(sqlstatement);
-                        if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-                        {
-                            // it was successful
-                            evidenceid = sqlite3_last_insert_rowid(wombatdb);
-                        }
-                        else
-                            emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
-                    }
-                    else
-                        emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
-                }
-                else
-                    emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+                // it was successful
+                evidenceid = sqlite3_last_insert_rowid(wombatdb);
             }
             else
                 emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
@@ -287,6 +252,31 @@ int WombatCaseDb::InsertEvidence(QString evidenceName, QString evidenceFilePath,
         emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
 
     return evidenceid;
+}
+
+int WombatCaseDb::InsertObject(int caseid, int evidenceid, int fileid)
+{
+    int objectid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO objects (caseid, evidenceid, fileid) VALUES(?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, fileid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                // it was successful
+                objectid = sqlite3_last_insert_rowid(wombatdb);
+            }
+            else
+               DisplayError("1.17", "INSERT OBJECT INTO CASE ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            DisplayError("1.17", "INSERT OBJECT INTO CASE ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        DisplayError("1.17", "INSERT OBJECT INTO CASE ", sqlite3_errmsg(wombatdb));
+
+    return objectid;
 }
 
 QStringList WombatCaseDb::ReturnCaseEvidence(int caseID)
@@ -406,3 +396,21 @@ void WombatCaseDb::InsertMsg(int caseid, int evidenceid, int jobid, int msgtype,
         emit DisplayError("1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
 }
 
+void WombatCaseDb::UpdateJobEnd(int jobid)
+{
+    if(sqlite3_prepare_v2(wombatdb, "UPDATE job SET end = ? where jobid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_text(sqlstatement, 1, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, jobid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret != SQLITE_ROW || ret != SQLITE_DONE)
+            {
+                emit DisplayError("1.16", "UPDATE FINISHED JOB ", sqlite3_errmsg(wombatdb));
+            }
+        }
+        else
+            emit DisplayError("1.16", "UPDATE FINISHED JOB ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.16", "UPDATE FINISHED JOB ", sqlite3_errmsg(wombatdb));
+}

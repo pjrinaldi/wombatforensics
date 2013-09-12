@@ -32,7 +32,9 @@ public:
     int InsertCase(QString caseText);
     int InsertJob(int jobType, int caseID, int evidenceID);
     int InsertEvidence(QString evidenceName, QString evidenceFilePath, int caseID);
+    int InsertObject(int caseid, int evidenceid, int fileid);
     void InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg);
+    void UpdateJobEnd(int jobid);
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
     QStringList ReturnCaseEvidence(int caseID);

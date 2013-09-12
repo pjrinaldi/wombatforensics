@@ -184,7 +184,7 @@ void WombatForensics::SetupDirModel(void)
 {
     wombatdirmodel = new QStandardItemModel();
     QStringList headerList;
-    headerList << "Item ID" << "Name" << "Full Path" << "Size" << "Created" << "MD5 Hash";
+    headerList << "Name" << "Unique ID" << "Full Path" << "Size" << "Created" << "MD5 Hash";
     wombatdirmodel->setHorizontalHeaderLabels(headerList);
     QStandardItem *evidenceNode = wombatdirmodel->invisibleRootItem();
     currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");

@@ -40,6 +40,7 @@ struct WombatVariable
     QStringList evidencepathlist;
     QStringList evidencedbnamelist;
     QList<int> evidenceidlist;
+    QList<int> objectidlist;
 
 };
 
