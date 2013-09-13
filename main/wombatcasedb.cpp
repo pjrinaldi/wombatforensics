@@ -228,6 +228,28 @@ int WombatCaseDb::ReturnObjectFileID(int objectid)
     return fileid;
 }
 
+int WombatCaseDb::ReturnObjectID(int caseid, int evidenceid, int fileid)
+{
+    int objectid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT objectid FROM objects WHERE caseid = ? AND evidenceid = ? AND fileid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, fileid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+                objectid = sqlite3_column_int(sqlstatement, 0);
+            else
+                emit DisplayError("1.19", "RETURN OBJECT ID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.19", "RETURN OBJECT ID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.19", "RETURN OBJECT ID ", sqlite3_errmsg(wombatdb));
+
+    return objectid;
+}
+
 int WombatCaseDb::InsertJob(int jobType, int caseID, int evidenceID)
 {
     int jobid = 0;

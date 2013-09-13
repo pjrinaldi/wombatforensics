@@ -176,7 +176,6 @@ void WombatForensics::GetImageNode(QStandardItem* imagenode)
     QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
     currentroot->appendRow(imagenode);
     currenttreeview->setModel(wombatdirmodel);
-    wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Completed");
     UpdateMessageTable();
 
 }
@@ -319,6 +318,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 emit LogVariable(wombatvariable);
                 ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "populatecase", wombatvariable);
                 threadpool->start(tmprun);
+                threadpool->waitForDone();
                 // update progresswindow with data.
             }
             // GET EVIDENCE FULLPATH <LIST> - USE THAT TO GET THE DBNAME.DB FOR NEW TSKIMGDBSQLITE(EVIDENCEDIRPATH, EVIDENCEFULLPATH)

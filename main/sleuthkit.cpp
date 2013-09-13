@@ -153,6 +153,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
     wombatdata->UpdateJobEnd(wombatvariable.jobid);
     GetImageTree(wombatvariable);
+    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Completed");
 }
 void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
 {
@@ -390,7 +391,6 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
     fsInfoRecordList.clear();
     // also need to get the partitions and volumes as nodes.
     ret = TskServices::Instance().getImgDB().getVolumeInfo(volRecordList);
-    //ret = imgdb->getVolumeInfo(volRecordList);
     //fprintf(stderr, "volrecordlist count: %d\n", volRecordList.count());
     foreach(volRecord, volRecordList) // populates all vol's and fs's.
     {
@@ -425,7 +425,6 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
             // for each volrecord, get fsinfo list
             imageNode->appendRow(volNode);
             ret = TskServices::Instance().getImgDB().getFsInfo(fsInfoRecordList);
-            //ret = imgdb->getFsInfo(fsInfoRecordList);
             foreach(fsInfoRecord, fsInfoRecordList)
             {
                 if(fsInfoRecord.vol_id == volRecord.vol_id)
@@ -523,7 +522,9 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
                         fullPath += QString(fileRecordVector[i].fullPath.c_str());
                         QList<QStandardItem*> sleuthList;
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
-                        sleuthList << new QStandardItem(QString::number(objectidlist[i]));
+                        fprintf(stderr, "FileRecordVectorSize: %d - ObjectIDListSize: %d\n", fileRecordVector.size(), objectidlist.count());
+                        sleuthList << new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
+                        //sleuthList << new QStandardItem(QString::number(objectidlist[i]));
                         //sleuthList << new QStandardItem(QString::number(wombatvariable.objectidlist[i]));
                         //sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
                         sleuthList << new QStandardItem(fullPath);

@@ -39,6 +39,7 @@ public:
     int ReturnCaseID(QString caseName);
     int ReturnObjectFileID(int objectid);
     QStringList ReturnCaseEvidence(int caseID);
+    int ReturnObjectID(int caseid, int evidenceid, int fileid);
     QStringList ReturnCaseEvidenceID(int caseID);
     QStringList ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist);
     QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID);
