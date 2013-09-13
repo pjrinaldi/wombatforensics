@@ -38,11 +38,13 @@ public:
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
     int ReturnObjectFileID(int objectid);
+    int ReturnObjectEvidenceID(int objectid);
     QStringList ReturnCaseEvidence(int caseID);
     int ReturnObjectID(int caseid, int evidenceid, int fileid);
     QStringList ReturnCaseEvidenceID(int caseID);
     QStringList ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist);
     QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID);
+    QStringList ReturnEvidenceData(int evidenceid);
     std::string GetTime(void);
 signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);

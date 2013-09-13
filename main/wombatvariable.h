@@ -29,6 +29,7 @@ struct WombatVariable
     int evidenceid;
     int jobtype;
     int jobid;
+    int fileid;
     QString casespath;
     QString casedirpath;
     QString evidencedirpath;

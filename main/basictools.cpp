@@ -57,6 +57,12 @@ QWidget* BasicTools::setupTypTab()
     return typTab;
 }
 
+void BasicTools::LoadFileContents(QString filepath)
+{
+    LoadHexModel(filepath + "tmp.dat");
+    LoadTxtContent(filepath + "tmp.txt");
+}
+
 void BasicTools::LoadHexModel(QString tmpFilePath)
 {
     hexmodel = new BinViewModel();

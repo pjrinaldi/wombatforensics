@@ -91,6 +91,8 @@ public:
             caller->OpenEvidence(wombatvariable);
         if(method.compare("populatecase") == 0)
             caller->PopulateCase(wombatvariable);
+        if(method.compare("showfile") == 0)
+            caller->ShowFile(wombatvariable);
     };
 private:
     QString method;

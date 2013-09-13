@@ -42,8 +42,10 @@ public:
     void SetupFileManager();
     void SetupBlackboard();
     void SetupImageDatabase();
+    void SetEvidenceDB(WombatVariable wombatVariable);
     Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
     Q_INVOKABLE void PopulateCase(WombatVariable wombatVariable);
+    Q_INVOKABLE void ShowFile(WombatVariable wombatVariable);
     void SetupSystemBlackboard();
     void GetImageTree(WombatVariable wombatvariable, int isAddEvidence);
     QString GetFileContents(int fileID);
@@ -71,6 +73,7 @@ signals:
     void ReturnImageNode(QStandardItem* imagenode);
     void UpdateMessageTable(void);
     void SetLogVariable(WombatVariable wvariable);
+    void LoadFileContents(QString filepath);
 };
 
 #endif // SLEUTHKIT_H

@@ -228,6 +228,28 @@ int WombatCaseDb::ReturnObjectFileID(int objectid)
     return fileid;
 }
 
+int WombatCaseDb::ReturnObjectEvidenceID(int objectid)
+{
+    int evidenceid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT evidenceid FROM objects WHERE objectid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, objectid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+                evidenceid = sqlite3_column_int(sqlstatement, 0);
+            else
+                emit DisplayError("1.20", "RETURN OBJECT EVIDENCEID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.20", "RETURN OBJECT EVIDENCEID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.20", "RETURN OBJECT EVIDENCEID ", sqlite3_errmsg(wombatdb));
+
+    return evidenceid;
+}
+
 int WombatCaseDb::ReturnObjectID(int caseid, int evidenceid, int fileid)
 {
     int objectid = 0;
@@ -394,6 +416,30 @@ QStringList WombatCaseDb::ReturnCaseEvidenceAddJobID(int caseid, QStringList evi
     return tmplist;
 }
 
+QStringList WombatCaseDb::ReturnEvidenceData(int evidenceid)
+{
+    QStringList tmplist;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT fullpath, name FROM evidence WHERE evidenceid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, evidenceid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                tmplist << QString((const char*)sqlite3_column_text(sqlstatement, 0));
+                tmplist << QString((const char*)sqlite3_column_text(sqlstatement, 1));
+            }
+            else
+                emit DisplayError("1.21", "RETURN EVIDENCE DATA ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.21", "RETURN EVIDENCE DATA ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.21", "RETURN EVIDENCE DATA ", sqlite3_errmsg(wombatdb));
+
+    return tmplist;
+}
 QStringList WombatCaseDb::ReturnMessageTableEntries(int caseid, int evidenceid, int jobid)
 {
     QStringList tmpstringlist;

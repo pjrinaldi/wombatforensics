@@ -22,6 +22,8 @@ public:
     QWidget* setupTypTab();
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
+public slots:
+    void LoadFileContents(QString filepath);
 private:
     BinViewModel* hexmodel;
     BinViewWidget* hexwidget;

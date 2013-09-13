@@ -15,6 +15,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     qRegisterMetaType<WombatVariable>("WombatVariable");
     connect(this, SIGNAL(LogVariable(WombatVariable)), isleuthkit, SLOT(GetLogVariable(WombatVariable)), Qt::QueuedConnection);
     connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
+    connect(isleuthkit, SIGNAL(LoadFileContents(QString)), ibasictools, SLOT(LoadFileContents(QString)), Qt::DirectConnection);
     wombatprogresswindow->setModal(false);
     wombatvariable.caseid = 0;
     wombatvariable.evidenceid = 0;
@@ -352,9 +353,16 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     QString tmptext = index.sibling(index.row(), 1).data().toString();
     fprintf(stderr, "unique id: %s\n", tmptext.toStdString().c_str());
-    int fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
-    QString tmpFilePath = isleuthkit->GetFileContents(fileid);
-    ibasictools->LoadHexModel(tmpFilePath);
-    QString asciiText = isleuthkit->GetFileTxtContents(fileid);
-    ibasictools->LoadTxtContent(asciiText);
+    wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmptext.toInt());
+    QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid);
+    wombatvariable.evidencepath = currentevidencelist[0];
+    wombatvariable.evidencedbname = currentevidencelist[1];
+    wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
+    ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvariable);
+    threadpool->start(tmprun);
+//dd    ThreadRunner* txtrun = new ThreadRunner(isleuthkit, "settxtview", wombatvariable);
+    //QString tmpFilePath = isleuthkit->GetFileContents(fileid);
+    //ibasictools->LoadHexModel(tmpFilePath);
+    //QString asciiText = isleuthkit->GetFileTxtContents(fileid);
+    //ibasictools->LoadTxtContent(asciiText);
 }

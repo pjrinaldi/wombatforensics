@@ -155,7 +155,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     GetImageTree(wombatvariable, 1);
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Completed");
 }
-void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
+void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
     try
@@ -187,16 +187,53 @@ void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
     {
         fprintf(stderr, "Services Set ImageDB: %s\n", ex.message().c_str());
     }
+}
+
+void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
+{
+    wombatvariable = wombatVariable;
+    SetEvidenceDB(wombatvariable);
+    GetFileContents(wombatvariable.fileid);
+    GetFileTxtContents(wombatvariable.fileid);
+    emit LoadFileContents(wombatvariable.tmpfilepath);
+}
+
+void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
+{
+    wombatvariable = wombatVariable;
+/*    wombatvariable = wombatVariable;
+    try
+    {
+        tmpdb = new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str());
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Tsk New Exception: %s\n", ex.message().c_str());
+    }
+    try
+    {
+        if(tmpdb->open() != 0)
+            fprintf(stderr, "Error intializing Evidence DB\n");
+        else
+        {
+            fprintf(stderr, "Evidence DB was initialized successfully\n");
+        }
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Tsk Open Exception: %s\n", ex.message().c_str());
+    }
+    try
+    {
+        TskServices::Instance().setImgDB(*tmpdb);
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Services Set ImageDB: %s\n", ex.message().c_str());
+    }*/
+    SetEvidenceDB(wombatvariable);
     GetImageTree(wombatvariable, 0);
 }
-            // GET EVIDENCE FULLPATH <LIST> - USE THAT TO GET THE DBNAME.DB FOR NEW TSKIMGDBSQLITE(EVIDENCEDIRPATH, EVIDENCEFULLPATH)
-            // SET WOMBATVARIABLE VALUES... PASS THEM ONTO THE LOG
-            // TREEVIEW ENTRIES ARE STORED IN A THE EVIDENCE TABLE OF WOMBATCASES.DB. SO I CAN RECALL THEM WHEN NEEDED.
-            // ONCE OPEN AND SETIMGDB, I CAN THEN CALL GETIMAGETREE AND REPOPULATE EVIDENCE IN EVIDENCE TREE.
-            // ENSURE JOBS TABLE HAS EVIDENCEID INSTEAD OF EVIDENCE LIST.
-            // ENSURE UPDATE END TIME IN JOB FIELD WHEN ITS DONE.
-            // THIS SHOULD BE ENOUGH FOR AN INITIAL TRIAL SETUP
-
 /*
         // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. 
         QString tmpString = evidenceName;
@@ -523,8 +560,6 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
                         //fprintf(stderr, "FileRecordVectorSize: %d - ObjectIDListSize: %d\n", fileRecordVector.size(), objectidlist.count());
                         sleuthList << new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
-                        //sleuthList << new QStandardItem(QString::number(objectidlist[i]));
-                        //sleuthList << new QStandardItem(QString::number(wombatvariable.objectidlist[i]));
                         //sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
                         sleuthList << new QStandardItem(fullPath);
                         sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
