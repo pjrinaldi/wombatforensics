@@ -318,7 +318,8 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 emit LogVariable(wombatvariable);
                 ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "populatecase", wombatvariable);
                 threadpool->start(tmprun);
-                threadpool->waitForDone();
+                threadpool->waitForDone(); // freezes gui, but otherwise works.
+                // might need to move this loop into the thread to free up gui.
                 // update progresswindow with data.
             }
             // GET EVIDENCE FULLPATH <LIST> - USE THAT TO GET THE DBNAME.DB FOR NEW TSKIMGDBSQLITE(EVIDENCEDIRPATH, EVIDENCEFULLPATH)

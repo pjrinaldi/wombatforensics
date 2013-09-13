@@ -517,9 +517,10 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
                     for(int i=0; i < (int)fileRecordVector.size(); i++)
                     {
                         //QString fullPath = "Image Name/Partition #/Volume Name[FSTYPE]/[root]/";
-                        fullPath += currentVolPath + currentFsPath;
+                        fullPath = imagename + "/" + currentVolPath + currentFsPath + QString(fileRecordVector[i].fullPath.c_str());
+                        //fullPath += currentVolPath + currentFsPath;
                         // full path might contain more than i thought, to include unalloc and whatnot
-                        fullPath += QString(fileRecordVector[i].fullPath.c_str());
+                        //fullPath += QString(fileRecordVector[i].fullPath.c_str());
                         QList<QStandardItem*> sleuthList;
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
                         fprintf(stderr, "FileRecordVectorSize: %d - ObjectIDListSize: %d\n", fileRecordVector.size(), objectidlist.count());
