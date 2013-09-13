@@ -111,7 +111,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     // Get Number of Files found here 
     filecount = TskServices::Instance().getImgDB().getNumFiles();
     emit UpdateStatus(filecount, processcount);
-
+    LOGINFO("Processing Evidence Started");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Started");
     TskSchedulerQueue::task_struct *task;
     TskPipelineManager pipelinemgr;
@@ -150,9 +150,11 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     {
         filepipeline->logModuleExecutionTimes();
     }
+    LOGINFO("Processing Evidence Finished");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
     wombatdata->UpdateJobEnd(wombatvariable.jobid);
     GetImageTree(wombatvariable, 1);
+    LOGINFO("Adding Evidence Completed");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Completed");
 }
 void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
@@ -201,38 +203,9 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
-/*    wombatvariable = wombatVariable;
-    try
-    {
-        tmpdb = new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str());
-    }
-    catch(TskException &ex)
-    {
-        fprintf(stderr, "Tsk New Exception: %s\n", ex.message().c_str());
-    }
-    try
-    {
-        if(tmpdb->open() != 0)
-            fprintf(stderr, "Error intializing Evidence DB\n");
-        else
-        {
-            fprintf(stderr, "Evidence DB was initialized successfully\n");
-        }
-    }
-    catch(TskException &ex)
-    {
-        fprintf(stderr, "Tsk Open Exception: %s\n", ex.message().c_str());
-    }
-    try
-    {
-        TskServices::Instance().setImgDB(*tmpdb);
-    }
-    catch(TskException &ex)
-    {
-        fprintf(stderr, "Services Set ImageDB: %s\n", ex.message().c_str());
-    }*/
     SetEvidenceDB(wombatvariable);
     GetImageTree(wombatvariable, 0);
+    emit PopulateProgressWindow(wombatvariable);
 }
 /*
         // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. 
