@@ -152,7 +152,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     }
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
     wombatdata->UpdateJobEnd(wombatvariable.jobid);
-    GetImageTree(wombatvariable);
+    GetImageTree(wombatvariable, 1);
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Completed");
 }
 void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
@@ -187,7 +187,7 @@ void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
     {
         fprintf(stderr, "Services Set ImageDB: %s\n", ex.message().c_str());
     }
-    GetImageTree(wombatvariable);
+    GetImageTree(wombatvariable, 0);
 }
             // GET EVIDENCE FULLPATH <LIST> - USE THAT TO GET THE DBNAME.DB FOR NEW TSKIMGDBSQLITE(EVIDENCEDIRPATH, EVIDENCEFULLPATH)
             // SET WOMBATVARIABLE VALUES... PASS THEM ONTO THE LOG
@@ -368,13 +368,13 @@ void SleuthKitPlugin::threadFinished()
 }
 
 
-void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
+void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvidence)
 {
     QString imagename = wombatvariable.evidencepath.split("/").last();
     std::vector<TskFileRecord> fileRecordVector;
     std::list<TskVolumeInfoRecord> volRecordList;
     std::list<TskFsInfoRecord> fsInfoRecordList;
-    QString fullPath = imagename + "/";
+    QString fullPath = "";
     QString currentVolPath = "";
     QString currentFsPath = "";
     TskFileRecord tmpRecord;
@@ -487,7 +487,8 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
                                 {
                                     uint64_t fileId = (uint64_t)sqlite3_column_int(stmt, 0);
                                     fileidVector.push_back(fileId);
-                                    objectidlist.append(wombatdata->InsertObject(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileId));
+                                    if(isAddEvidence == 1)
+                                        objectidlist.append(wombatdata->InsertObject(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileId));
                                 }
                                 sqlite3_finalize(stmt);
                             }
@@ -516,14 +517,11 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable)
                     }
                     for(int i=0; i < (int)fileRecordVector.size(); i++)
                     {
-                        //QString fullPath = "Image Name/Partition #/Volume Name[FSTYPE]/[root]/";
                         fullPath = imagename + "/" + currentVolPath + currentFsPath + QString(fileRecordVector[i].fullPath.c_str());
-                        //fullPath += currentVolPath + currentFsPath;
                         // full path might contain more than i thought, to include unalloc and whatnot
-                        //fullPath += QString(fileRecordVector[i].fullPath.c_str());
                         QList<QStandardItem*> sleuthList;
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
-                        fprintf(stderr, "FileRecordVectorSize: %d - ObjectIDListSize: %d\n", fileRecordVector.size(), objectidlist.count());
+                        //fprintf(stderr, "FileRecordVectorSize: %d - ObjectIDListSize: %d\n", fileRecordVector.size(), objectidlist.count());
                         sleuthList << new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
                         //sleuthList << new QStandardItem(QString::number(objectidlist[i]));
                         //sleuthList << new QStandardItem(QString::number(wombatvariable.objectidlist[i]));

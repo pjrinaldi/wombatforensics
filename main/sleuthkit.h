@@ -45,7 +45,7 @@ public:
     Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
     Q_INVOKABLE void PopulateCase(WombatVariable wombatVariable);
     void SetupSystemBlackboard();
-    void GetImageTree(WombatVariable wombatvariable);
+    void GetImageTree(WombatVariable wombatvariable, int isAddEvidence);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
 
