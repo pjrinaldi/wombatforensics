@@ -1,5 +1,5 @@
-#ifndef WOMBATCASEDB_H
-#define WOMBATCASEDB_H
+#ifndef WOMBATDATABASE_H
+#define WOMBATDATABASE_H
 
 #include <sqlite3.h>
 #include <QMessageBox>
@@ -16,17 +16,17 @@
 #include <QDir>
 #include <QObject>
 
-class WombatCaseDb : public QObject
+class WombatDatabase : public QObject
 {
     Q_OBJECT
 public:
-    WombatCaseDb();
+    WombatDatabase();
     bool FileExists(const std::string& fileName);
     const char *CreateLogDB(QString dbname);
     const char *CreateCaseDB(QString dbname);
     const char *OpenCaseDB(QString dbname);
     const char *CloseCaseDB();
-    ~WombatCaseDb();
+    ~WombatDatabase();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
     int InsertCase(QString caseText);
@@ -55,4 +55,4 @@ private:
     sqlite3_stmt *logstatement;
 };
 
-#endif // WOMBATCASEDB_H
+#endif // WOMBATDATABASE_H
