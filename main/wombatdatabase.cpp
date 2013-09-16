@@ -488,11 +488,11 @@ void WombatDatabase::InsertMsg(int caseid, int evidenceid, int jobid, int msgtyp
         emit DisplayError("1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
 }
 
-void WombatDatabase::UpdateJobEnd(int jobid)
+void WombatDatabase::UpdateJobEnd(int jobid, int filecount, int processcount)
 {
-    if(sqlite3_prepare_v2(wombatdb, "UPDATE job SET end = ? where jobid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "UPDATE job SET end = ? AND filecount = ? and processcount = ? WHERE jobid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
-        if(sqlite3_bind_text(sqlstatement, 1, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, jobid) == SQLITE_OK)
+        if(sqlite3_bind_text(sqlstatement, 1, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, filecount) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, processcount) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 4, jobid) == SQLITE_OK)
         {
             int ret = sqlite3_step(sqlstatement);
             if(ret == SQLITE_ROW || ret == SQLITE_DONE)
