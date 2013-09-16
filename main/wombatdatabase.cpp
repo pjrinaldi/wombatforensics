@@ -498,7 +498,7 @@ QStringList WombatDatabase::ReturnJobDetails(int jobid)
             int ret = sqlite3_step(sqlstatement);
             if(ret == SQLITE_ROW || ret == SQLITE_DONE)
             {
-                tmplist << sqlite3_column_text(sqlstatement, 0) << QString::number(sqlite3_column_int(sqlstatement, 1)) << QString::number(sqlite3_column_int(sqlstatement, 2));
+                tmplist << QString((const char*)sqlite3_column_text(sqlstatement, 0)) << QString::number(sqlite3_column_int(sqlstatement, 1)) << QString::number(sqlite3_column_int(sqlstatement, 2));
             }
             else
                 emit DisplayError("1.22", "RETURN JOB DETAILS ", sqlite3_errmsg(wombatdb));
