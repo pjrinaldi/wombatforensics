@@ -488,6 +488,30 @@ void WombatDatabase::InsertMsg(int caseid, int evidenceid, int jobid, int msgtyp
         emit DisplayError("1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
 }
 
+QStringList WombatDatabase::ReturnJobDetails(int jobid)
+{
+    QStringList tmplist;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT end, filecount, processcount FROM job WHERE jobid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, jobid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                tmplist << sqlite3_column_text(sqlstatement, 0) << QString::number(sqlite3_column_int(sqlstatement, 1)) << QString::number(sqlite3_column_int(sqlstatement, 2));
+            }
+            else
+                emit DisplayError("1.22", "RETURN JOB DETAILS ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.22", "RETURN JOB DETAILS ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.22", "RETURN JOB DETAILS ", sqlite3_errmsg(wombatdb));
+
+    return tmplist;
+}
+
 void WombatDatabase::UpdateJobEnd(int jobid, int filecount, int processcount)
 {
     if(sqlite3_prepare_v2(wombatdb, "UPDATE job SET end = ? AND filecount = ? and processcount = ? WHERE jobid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)

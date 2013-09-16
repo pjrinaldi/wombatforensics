@@ -30,6 +30,8 @@ struct WombatVariable
     int jobtype;
     int jobid;
     int fileid;
+    int filecount;
+    int processcount;
     QString casespath;
     QString casedirpath;
     QString evidencedirpath;

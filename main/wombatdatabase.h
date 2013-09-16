@@ -35,6 +35,7 @@ public:
     int InsertObject(int caseid, int evidenceid, int fileid);
     void InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg);
     void UpdateJobEnd(int jobid, int filecount, int processcount);
+    QStringList ReturnJobDetails(int jobid);
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
     int ReturnObjectFileID(int objectid);

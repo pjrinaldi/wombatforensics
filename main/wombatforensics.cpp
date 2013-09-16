@@ -166,7 +166,14 @@ void WombatForensics::UpdateMessageTable()
 
 void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
 {
-
+    QStringList joblist = wombatcasedata->ReturnJobDetails(wvariable.jobid);
+    QString tmpstring = wvariable.evidencedbname + " - " + "ladida";
+    QStringList tmplist;
+    tmplist << tmpstring << QString::number(wombatvariable.jobid);
+    wombatprogresswindow->UpdateAnalysisTree(0,  new QTreeWidgetItem(tmplist));
+    wombatprogresswindow->UpdateFilesFound("0");
+    wombatprogresswindow->UpdateFilesProcessed("0");
+    wombatprogresswindow->UpdateAnalysisState("Adding Evidence Finished");
 }
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)
