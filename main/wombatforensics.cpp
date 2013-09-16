@@ -17,6 +17,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     //connect(isleuthkit, SIGNAL(LoadFileContents(QString)), ibasictools, SLOT(LoadFileContents(QString)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(SendFileContents(QString)), Qt::QueuedConnection);
+    connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable)), this, SLOT(PopulateProgressWindow(WombatVariable)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
     wombatvariable.caseid = 0;
     wombatvariable.evidenceid = 0;
@@ -161,6 +162,11 @@ void WombatForensics::UpdateMessageTable()
 {
     QStringList tmplist = wombatcasedata->ReturnMessageTableEntries(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid);
     wombatprogresswindow->UpdateMessageTable(tmplist);
+}
+
+void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
+{
+
 }
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)

@@ -55,6 +55,7 @@ private slots:
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void SendFileContents(QString filepath);
+    void PopulateProgressWindow(WombatVariable wvariable);
 
 protected:
     void closeEvent(QCloseEvent* event);

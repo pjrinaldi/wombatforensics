@@ -207,20 +207,6 @@ void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
     GetImageTree(wombatvariable, 0);
     emit PopulateProgressWindow(wombatvariable);
 }
-/*
-        // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. 
-        QString tmpString = evidenceName;
-        tmpString += " - ";
-        tmpString += QString::fromStdString(GetTime());
-        QStringList tmpList;
-        tmpList << tmpString << QString::number(wombatvariable.jobid);
-        wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
-        wombatprogresswindow->UpdateFilesFound("0");
-        wombatprogresswindow->UpdateFilesProcessed("0");
-        wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
-        LOGINFO("Adding Evidence Started");
-        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
-*/
 
 void SleuthKitPlugin::SetupSystemProperties()
 {
