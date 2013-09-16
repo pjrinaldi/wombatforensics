@@ -17,7 +17,7 @@
 #include <QThreadPool>
 
 #include "wombatvariable.h"
-#include "wombatcasedb.h"
+#include "wombatdatabase.h"
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
 #include "sleuthkit.h"
@@ -34,7 +34,7 @@ class WombatForensics : public QMainWindow
 public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
-    WombatCaseDb *wombatcasedata;
+    WombatDatabase *wombatcasedata;
     WombatVariable wombatvariable;
     ProgressWindow* wombatprogresswindow;
     SleuthKitPlugin* isleuthkit;
@@ -54,6 +54,7 @@ private slots:
     void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
+    void SendFileContents(QString filepath);
 
 protected:
     void closeEvent(QCloseEvent* event);

@@ -1,6 +1,6 @@
 #include "sleuthkit.h"
 
-SleuthKitPlugin::SleuthKitPlugin(WombatCaseDb* wombatcasedata)
+SleuthKitPlugin::SleuthKitPlugin(WombatDatabase* wombatcasedata)
 {
     wombatdata = wombatcasedata; 
 }
