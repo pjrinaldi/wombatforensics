@@ -491,7 +491,7 @@ void WombatDatabase::InsertMsg(int caseid, int evidenceid, int jobid, int msgtyp
 QStringList WombatDatabase::ReturnJobDetails(int jobid)
 {
     QStringList tmplist;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT end, filecount, processcount FROM job WHERE jobid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT end, filecount, processcount, state FROM job WHERE jobid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(sqlstatement, 1, jobid) == SQLITE_OK)
         {
@@ -499,6 +499,10 @@ QStringList WombatDatabase::ReturnJobDetails(int jobid)
             if(ret == SQLITE_ROW || ret == SQLITE_DONE)
             {
                 tmplist << QString((const char*)sqlite3_column_text(sqlstatement, 0)) << QString::number(sqlite3_column_int(sqlstatement, 1)) << QString::number(sqlite3_column_int(sqlstatement, 2));
+                if(sqlite3_column_int(sqlstatement, 3) == 1)
+                    tmplist << "Adding Evidence Finished";
+                else
+                    tmplist << "Adding Evidence Finished with Errors";
             }
             else
                 emit DisplayError("1.22", "RETURN JOB DETAILS ", sqlite3_errmsg(wombatdb));

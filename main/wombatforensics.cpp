@@ -173,8 +173,9 @@ void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
     wombatprogresswindow->UpdateFilesFound(joblist[1]);
     wombatprogresswindow->UpdateFilesProcessed(joblist[2]);
     wombatprogresswindow->UpdateProgressBar(100);
-    wombatprogresswindow->UpdateAnalysisState("Adding Evidence Finished");
+    wombatprogresswindow->UpdateAnalysisState(joblist[3]);
 }
+
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)
 {
