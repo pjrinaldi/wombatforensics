@@ -343,20 +343,6 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 // might need to move this loop into the thread to free up gui.
                 // update progresswindow with data.
             }
-/*
-        // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. 
-        QString tmpString = evidenceName;
-        tmpString += " - ";
-        tmpString += QString::fromStdString(GetTime());
-        QStringList tmpList;
-        tmpList << tmpString << QString::number(wombatvariable.jobid);
-        wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
-        wombatprogresswindow->UpdateFilesFound("0");
-        wombatprogresswindow->UpdateFilesProcessed("0");
-        wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
-        LOGINFO("Adding Evidence Started");
-        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
-*/
         }
     }
 }
@@ -380,9 +366,4 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
     ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvariable);
     threadpool->start(tmprun);
-//dd    ThreadRunner* txtrun = new ThreadRunner(isleuthkit, "settxtview", wombatvariable);
-    //QString tmpFilePath = isleuthkit->GetFileContents(fileid);
-    //ibasictools->LoadHexModel(tmpFilePath);
-    //QString asciiText = isleuthkit->GetFileTxtContents(fileid);
-    //ibasictools->LoadTxtContent(asciiText);
 }
