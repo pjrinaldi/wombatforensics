@@ -152,6 +152,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     }
     LOGINFO("Processing Evidence Finished");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
+    fprintf(stderr, "File Count: %d - Process Count: %d\n", filecount, processcount);
     wombatdata->UpdateJobEnd(wombatvariable.jobid, filecount, processcount);
     GetImageTree(wombatvariable, 1);
     LOGINFO("Adding Evidence Completed");
