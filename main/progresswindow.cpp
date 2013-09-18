@@ -1,6 +1,6 @@
 #include "progresswindow.h"
 
-ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::ProgressWindow)
+ProgressWindow::ProgressWindow(QWidget *parent, WombatDatabase* wdata) : QDialog(parent), ui(new Ui::ProgressWindow)
 {
     ui->setupUi(this);
     connect(ui->hideButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
@@ -8,7 +8,7 @@ ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
     ui->analysisTreeWidget->hideColumn(1);
     ui->msgTableWidget->setCurrentCell(-1, -1, QItemSelectionModel::NoUpdate);
     counter = 0;
-    pdata = new WombatDatabase();
+    pdata = wdata;
 }
 
 ProgressWindow::~ProgressWindow()

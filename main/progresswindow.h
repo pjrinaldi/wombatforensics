@@ -15,7 +15,7 @@ class ProgressWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit ProgressWindow(QWidget *parent = 0);
+    explicit ProgressWindow(QWidget *parent = 0, WombatDatabase* wdata);
     void UpdateAnalysisState(QString analysisState); // analysisStateEdit
     void UpdateFilesFound(QString filesFound); // filesFoundEdit
     void UpdateFilesProcessed(QString filesProcessed); // filesProcessedEdit
