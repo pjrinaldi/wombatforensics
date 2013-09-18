@@ -29,14 +29,14 @@ public:
 private slots:
     void StepProgress(void);
     void HideClicked();
-    void JobClicked(QTreeWidgetItem* item, int col);
+    void JobClicked(QTreeWidgetItem* item);
 signals:
     void HideProgressWindow(bool checkstate);
 
 private:
     Ui::ProgressWindow *ui;
     int counter;
-    WombatDatabase* wombatdata;
+    WombatDatabase* pdata;
 };
 
 Q_DECLARE_METATYPE(ProgressWindow*)

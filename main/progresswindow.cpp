@@ -4,11 +4,11 @@ ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
 {
     ui->setupUi(this);
     connect(ui->hideButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
-    connect(ui->analysisTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(JobClicked(QTreeWidgetItem*, int)));
+    connect(ui->analysisTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(JobClicked(QTreeWidgetItem*)));
     ui->analysisTreeWidget->hideColumn(1);
     ui->msgTableWidget->setCurrentCell(-1, -1, QItemSelectionModel::NoUpdate);
     counter = 0;
-    wombatdata = new WombatDatabase();
+    pdata = new WombatDatabase();
 }
 
 ProgressWindow::~ProgressWindow()
@@ -23,14 +23,15 @@ void ProgressWindow::HideClicked()
     emit HideProgressWindow(false);
 }
 
-void ProgressWindow::JobClicked(QTreeWidgetItem* item, int col)
+void ProgressWindow::JobClicked(QTreeWidgetItem* item)
 {
-    QStringList joblist = wombatdata->ReturnJobDetails(item->data(1,0).toInt());
+    int jobid = item->data(1,0).toInt();
+    QStringList joblist = pdata->ReturnJobDetails(jobid);
     UpdateFilesFound(joblist[1]);
     UpdateFilesProcessed(joblist[2]);
     UpdateProgressBar(100);
     UpdateAnalysisState(joblist[3]);
-    QStringList tmplist = wombatdata->ReturnMessageTableEntries(wombatdata->ReturnJobCaseID(item->data(1,0).toInt()), wombatdata->ReturnJobEvidenceID(item->data(1,0).toInt()), item->data(1,0).toInt());
+    QStringList tmplist = pdata->ReturnMessageTableEntries(pdata->ReturnJobCaseID(jobid), pdata->ReturnJobEvidenceID(jobid), jobid);
     UpdateMessageTable(tmplist);
 }
 
