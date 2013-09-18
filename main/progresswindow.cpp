@@ -4,6 +4,7 @@ ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
 {
     ui->setupUi(this);
     connect(ui->hideButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->analysisTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(testClick(QTreeWidgetItem*, int)));
     //connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
     ui->analysisTreeWidget->hideColumn(1);
     ui->msgTableWidget->setCurrentCell(-1, -1, QItemSelectionModel::NoUpdate);
@@ -21,6 +22,12 @@ void ProgressWindow::HideClicked()
     this->hide();
     emit HideProgressWindow(false);
 }
+
+void ProgressWindow::testClick(QTreeWidgetItem* item, int col)
+{
+    fprintf(stderr, "Item String: %s - col: %d\n", item->data(1, 0).toString().toStdString().c_str(), col);
+}
+
 void ProgressWindow::UpdateAnalysisState(QString analysisState) // analysisStateEdit
 {
     ui->analysisStateEdit->setText(analysisState);

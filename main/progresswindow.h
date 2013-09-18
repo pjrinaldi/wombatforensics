@@ -29,6 +29,7 @@ public:
 private slots:
     void StepProgress(void);
     void HideClicked();
+    void testClick(QTreeWidgetItem* item, int col);
 signals:
     void HideProgressWindow(bool checkstate);
 
