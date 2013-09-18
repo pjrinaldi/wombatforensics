@@ -4,6 +4,7 @@ ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
 {
     ui->setupUi(this);
     connect(ui->hideButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    //connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
     ui->analysisTreeWidget->hideColumn(1);
     ui->msgTableWidget->setCurrentCell(-1, -1, QItemSelectionModel::NoUpdate);
     counter = 0;
