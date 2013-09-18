@@ -4,11 +4,11 @@ ProgressWindow::ProgressWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Pr
 {
     ui->setupUi(this);
     connect(ui->hideButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
-    connect(ui->analysisTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(testClick(QTreeWidgetItem*, int)));
-    //connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+    connect(ui->analysisTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(JobClicked(QTreeWidgetItem*, int)));
     ui->analysisTreeWidget->hideColumn(1);
     ui->msgTableWidget->setCurrentCell(-1, -1, QItemSelectionModel::NoUpdate);
     counter = 0;
+    wombatdata = new WombatDatabase();
 }
 
 ProgressWindow::~ProgressWindow()
@@ -23,11 +23,15 @@ void ProgressWindow::HideClicked()
     emit HideProgressWindow(false);
 }
 
-void ProgressWindow::testClick(QTreeWidgetItem* item, int col)
+void ProgressWindow::JobClicked(QTreeWidgetItem* item, int col)
 {
-    fprintf(stderr, "Item String: %s - col: %d\n", item->data(1, 0).toString().toStdString().c_str(), col);
-    // jobid is currently set wrong. it appears treewidgetitem overwrites jobid
-    fprintf(stderr, "Item String2: %s - col: %d\n", item->data(0, 0).toString().toStdString().c_str(), col);
+    QStringList joblist = wombatdata->ReturnJobDetails(item->data(1,0).toInt());
+    UpdateFilesFound(joblist[1]);
+    UpdateFilesProcessed(joblist[2]);
+    UpdateProgressBar(100);
+    UpdateAnalysisState(joblist[3]);
+    QStringList tmplist = wombatdata->ReturnMessageTableEntries(wombatdata->ReturnJobCaseID(item->data(1,0).toInt()), wombatdata->ReturnJobEvidenceID(item->data(1,0).toInt()), item->data(1,0).toInt());
+    UpdateMessageTable(tmplist);
 }
 
 void ProgressWindow::UpdateAnalysisState(QString analysisState) // analysisStateEdit

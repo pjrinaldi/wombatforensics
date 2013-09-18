@@ -2,6 +2,7 @@
 #define PROGRESSWINDOW_H
 
 #include "ui_progresswindow.h"
+#include "wombatdatabase.h"
 #include <QDialog>
 #include <cstdio>
 
@@ -19,7 +20,6 @@ public:
     void UpdateFilesFound(QString filesFound); // filesFoundEdit
     void UpdateFilesProcessed(QString filesProcessed); // filesProcessedEdit
     void UpdateAnalysisTree(int parentIndex, QTreeWidgetItem *child); // analysisTreeView
-    //void UpdateMessageTable(int currow, QString msgType, QString msgValue); // msgTableWidget
     void UpdateMessageTable(QStringList msgList);
     void UpdateProgressBar(int progressValue); // progressBar
     void ClearTableWidget();
@@ -29,13 +29,14 @@ public:
 private slots:
     void StepProgress(void);
     void HideClicked();
-    void testClick(QTreeWidgetItem* item, int col);
+    void JobClicked(QTreeWidgetItem* item, int col);
 signals:
     void HideProgressWindow(bool checkstate);
 
 private:
     Ui::ProgressWindow *ui;
     int counter;
+    WombatDatabase* wombatdata;
 };
 
 Q_DECLARE_METATYPE(ProgressWindow*)
