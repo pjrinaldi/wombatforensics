@@ -26,6 +26,7 @@ void ProgressWindow::HideClicked()
 void ProgressWindow::testClick(QTreeWidgetItem* item, int col)
 {
     fprintf(stderr, "Item String: %s - col: %d\n", item->data(1, 0).toString().toStdString().c_str(), col);
+    fprintf(stderr, "Item String2: %s - col: %d\n", item->data(0, 0).toString().toStdString().c_str(), col);
 }
 
 void ProgressWindow::UpdateAnalysisState(QString analysisState) // analysisStateEdit
