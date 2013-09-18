@@ -5,7 +5,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
     wombatcasedata = new WombatDatabase();
-    wombatprogresswindow = new ProgressWindow();
+    wombatprogresswindow = new ProgressWindow(wombatcasedata);
     isleuthkit = new SleuthKitPlugin(wombatcasedata);
     ibasictools = new BasicTools();
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);

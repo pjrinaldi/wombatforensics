@@ -1,6 +1,6 @@
 #include "progresswindow.h"
 
-ProgressWindow::ProgressWindow(QWidget *parent, WombatDatabase* wdata) : QDialog(parent), ui(new Ui::ProgressWindow)
+ProgressWindow::ProgressWindow(WombatDatabase* wdata, QWidget* parent) : QDialog(parent), ui(new Ui::ProgressWindow)
 {
     ui->setupUi(this);
     connect(ui->hideButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
