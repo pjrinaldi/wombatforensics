@@ -331,6 +331,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
             QStringList evidenceaddjoblist = wombatcasedata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // jobid list
             // call this from thread...//isleuthkit->PopulateCase(evidencepathlist, evidenceidlist, evidenceaddjoblist, wombatvariable);
             // once in thread on sleuthkit, do forloop below and call PopulateCase(wombatvariable);
+            
             for(int i=0; i < evidenceidlist.count(); i++)
             {
                 wombatvariable.evidenceid = evidenceidlist[i].toInt();
