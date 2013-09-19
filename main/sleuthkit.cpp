@@ -214,19 +214,10 @@ void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
         wombatvariable.jobid = evidenceaddjoblist[i].toInt();
         wombatvariable.evidencedbname = wombatvariable.evidencepath.split("/").last() + ".db";
         emit SetLogVariable(wombatvariable);
-        //emit LogVariable(wombatvariable);
-        //ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "populatecase", wombatvariable);
-        //threadpool->start(tmprun);
-        //threadpool->waitForDone(); // freezes gui, but otherwise works.
-        // might need to move this loop into the thread to free up gui.
         SetEvidenceDB(wombatvariable);
         GetImageTree(wombatvariable, 0);
         emit PopulateProgressWindow(wombatvariable);
-       // update progresswindow with data.
     }
-    //SetEvidenceDB(wombatvariable);
-    //GetImageTree(wombatvariable, 0);
-    //emit PopulateProgressWindow(wombatvariable);
 }
 
 void SleuthKitPlugin::SetupSystemProperties()
