@@ -33,9 +33,9 @@ const char* WombatDatabase::CreateCaseDB(QString wombatdbname)
 {
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
-    wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);");
-    wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT, deleted INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
     wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
     wombatTableSchema.push_back("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER);");
@@ -126,7 +126,7 @@ WombatDatabase::~WombatDatabase()
 int WombatDatabase::ReturnCaseCount()
 {
     int casecount = 0;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM cases;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         int ret = sqlite3_step(sqlstatement);
         if(ret == SQLITE_ROW || ret == SQLITE_DONE)
@@ -141,7 +141,7 @@ int WombatDatabase::ReturnCaseCount()
 int WombatDatabase::InsertCase(QString caseText)
 {
     int caseid = 0;
-    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO cases (name, creation) VALUES(?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO cases (name, creation, deleted) VALUES(?, ?, 0);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_text(sqlstatement, 1, caseText.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 2, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
@@ -165,7 +165,7 @@ int WombatDatabase::InsertCase(QString caseText)
 QStringList WombatDatabase::ReturnCaseNameList()
 {
     QStringList tmpList;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT name FROM cases ORDER by caseid;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT name FROM cases ORDER by caseid WHERE deleted = 0;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         while(sqlite3_step(sqlstatement) == SQLITE_ROW)
         {
@@ -300,7 +300,7 @@ int WombatDatabase::InsertJob(int jobType, int caseID, int evidenceID)
 int WombatDatabase::InsertEvidence(QString evidenceName, QString evidenceFilePath, int caseID)
 {
     int evidenceid = 0;
-    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO evidence (fullpath, name, caseid, creation) VALUES(?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO evidence (fullpath, name, caseid, creation, deleted) VALUES(?, ?, ?, ?, 0);", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_text(sqlstatement, 1, evidenceFilePath.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 2, evidenceName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, caseID) == SQLITE_OK && sqlite3_bind_text(sqlstatement, 4, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
@@ -350,7 +350,7 @@ int WombatDatabase::InsertObject(int caseid, int evidenceid, int fileid)
 QStringList WombatDatabase::ReturnCaseEvidence(int caseID)
 {
     QStringList tmpList;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT fullpath FROM evidence WHERE caseid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT fullpath FROM evidence WHERE caseid = ? AND deleted = 0;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(sqlstatement, 1, caseID) == SQLITE_OK)
         {
@@ -373,7 +373,7 @@ QStringList WombatDatabase::ReturnCaseEvidence(int caseID)
 QStringList WombatDatabase::ReturnCaseEvidenceID(int caseID)
 {
     QStringList tmpList;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT evidenceid FROM evidence WHERE caseid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT evidenceid FROM evidence WHERE caseid = ? AND deleted = 0;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(sqlstatement, 1, caseID) == SQLITE_OK)
         {
