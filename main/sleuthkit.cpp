@@ -204,9 +204,29 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
-    SetEvidenceDB(wombatvariable);
-    GetImageTree(wombatvariable, 0);
-    emit PopulateProgressWindow(wombatvariable);
+    QStringList evidencepathlist = wombatdata->ReturnCaseEvidence(wombatvariable.caseid); // fullpath dd list
+    QStringList evidenceidlist = wombatdata->ReturnCaseEvidenceID(wombatvariable.caseid); // evidenceid list
+    QStringList evidenceaddjoblist = wombatdata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // jobid list
+    for(int i=0; i < evidenceidlist.count(); i++)
+    {
+        wombatvariable.evidenceid = evidenceidlist[i].toInt();
+        wombatvariable.evidencepath = evidencepathlist[i];
+        wombatvariable.jobid = evidenceaddjoblist[i].toInt();
+        wombatvariable.evidencedbname = wombatvariable.evidencepath.split("/").last() + ".db";
+        emit SetLogVariable(wombatvariable);
+        //emit LogVariable(wombatvariable);
+        //ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "populatecase", wombatvariable);
+        //threadpool->start(tmprun);
+        //threadpool->waitForDone(); // freezes gui, but otherwise works.
+        // might need to move this loop into the thread to free up gui.
+        SetEvidenceDB(wombatvariable);
+        GetImageTree(wombatvariable, 0);
+        emit PopulateProgressWindow(wombatvariable);
+       // update progresswindow with data.
+    }
+    //SetEvidenceDB(wombatvariable);
+    //GetImageTree(wombatvariable, 0);
+    //emit PopulateProgressWindow(wombatvariable);
 }
 
 void SleuthKitPlugin::SetupSystemProperties()

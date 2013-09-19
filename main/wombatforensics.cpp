@@ -326,12 +326,14 @@ void WombatForensics::on_actionOpen_Case_triggered()
             {
                 DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
-            QStringList evidencepathlist = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid); // fullpath dd list
-            QStringList evidenceidlist = wombatcasedata->ReturnCaseEvidenceID(wombatvariable.caseid); // evidenceid list
-            QStringList evidenceaddjoblist = wombatcasedata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // jobid list
+            //QStringList evidencepathlist = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid); // fullpath dd list
+            //QStringList evidenceidlist = wombatcasedata->ReturnCaseEvidenceID(wombatvariable.caseid); // evidenceid list
+            //QStringList evidenceaddjoblist = wombatcasedata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // jobid list
             // call this from thread...//isleuthkit->PopulateCase(evidencepathlist, evidenceidlist, evidenceaddjoblist, wombatvariable);
             // once in thread on sleuthkit, do forloop below and call PopulateCase(wombatvariable);
-            
+            ThreadRunner* trun = new ThreadRunner(isleuthkit, "populatecase", wombatvariable);
+            threadpool->start(trun);
+            /*
             for(int i=0; i < evidenceidlist.count(); i++)
             {
                 wombatvariable.evidenceid = evidenceidlist[i].toInt();
@@ -346,6 +348,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
                 // might need to move this loop into the thread to free up gui.
                 // update progresswindow with data.
             }
+            */
         }
     }
 }
