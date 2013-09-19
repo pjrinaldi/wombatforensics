@@ -165,6 +165,7 @@ void WombatForensics::UpdateMessageTable()
 
 void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
 {
+    wombatvariable = wvariable;
     QStringList joblist = wombatcasedata->ReturnJobDetails(wvariable.jobid);
     QString tmpstring = wvariable.evidencedbname + " - " + joblist[0];
     QStringList tmplist;
@@ -174,6 +175,7 @@ void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
     wombatprogresswindow->UpdateFilesProcessed(joblist[2]);
     wombatprogresswindow->UpdateProgressBar(100);
     wombatprogresswindow->UpdateAnalysisState(joblist[3]);
+    UpdateMessageTable();
 }
 
 
