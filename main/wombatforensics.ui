@@ -169,7 +169,7 @@
       <slot>AddEvidence()</slot>
   </connection>
   <connection>
-      <sender>actionRemEvidence</sender>
+      <sender>actionRemove_Evidence</sender>
       <signal>triggered()</signal>
       <receiver>WombatForensics</receiver>
       <slot>RemEvidence()</slot>
