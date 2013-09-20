@@ -365,13 +365,17 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    QString tmptext = index.sibling(index.row(), 1).data().toString();
-    fprintf(stderr, "unique id: %s\n", tmptext.toStdString().c_str());
-    wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmptext.toInt());
-    QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid);
-    wombatvariable.evidencepath = currentevidencelist[0];
-    wombatvariable.evidencedbname = currentevidencelist[1];
-    wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
-    ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvariable);
-    threadpool->start(tmprun);
+    QString tmptext = "";
+    tmptext = index.sibling(index.row(), 1).data().toString();
+    fprintf(stderr, "unique id:'%s'\n", tmptext.toStdString().c_str());
+    if(tmptext != "")
+    {
+        wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmptext.toInt());
+        QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid);
+        wombatvariable.evidencepath = currentevidencelist[0];
+        wombatvariable.evidencedbname = currentevidencelist[1];
+        wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
+        ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvariable);
+        threadpool->start(tmprun);
+    }
 }
