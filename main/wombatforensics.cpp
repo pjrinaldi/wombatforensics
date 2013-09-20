@@ -156,7 +156,8 @@ void WombatForensics::RemEvidence()
     QString item = QInputDialog::getItem(this, tr("Remove Existing Evidence"), tr("Select Evidence to Remove: "), evidenceList, 0, false, &ok);
     if(ok && !item.isEmpty()) // open selected case
     {
-        //wombatcasedata->RemoveEvidence(item);
+        wombatcasedata->RemoveEvidence(item);
+        // STILL NEED TO REMOVE OR MOVE THE .DB NAME TO SOME OTHER PLACE (OR SIMPLY REMOVE THE EVIDENCE AND DELETE THE .DB FILE)
     }
 }
 

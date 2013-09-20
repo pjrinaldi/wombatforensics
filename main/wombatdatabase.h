@@ -44,6 +44,7 @@ public:
     int ReturnJobCaseID(int jobid);
     int ReturnJobEvidenceID(int jobid);
     int ReturnObjectID(int caseid, int evidenceid, int fileid);
+    void RemoveEvidence(QString evidencename);
     QStringList ReturnCaseEvidenceID(int caseID);
     QStringList ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist);
     QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID);
