@@ -24,11 +24,11 @@ public:
     int schedule(Scheduler::TaskType task, uint64_t startId, uint64_t endId);
     task_struct *nextTask();
     //std::queue <task_struct> GetSchedulerQueue() { return myqueue; }
+    std::vector<task_struct *> mapvector;
 
 private:
     std::queue <task_struct *> m_queue;
     //std::queue <task_struct> myqueue;
-    std::vector <task_struct *> mapvector;
 };
 
 

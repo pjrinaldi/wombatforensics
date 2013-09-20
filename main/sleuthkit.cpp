@@ -113,6 +113,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     emit UpdateStatus(filecount, processcount);
     LOGINFO("Processing Evidence Started");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Started");
+    /*
     TskSchedulerQueue::task_struct *task;
     TskPipelineManager pipelinemgr;
     TskPipeline* filepipeline;
@@ -124,6 +125,12 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     {
         fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
     }
+    */
+    QFutureWatcher<void> watcher;
+    watcher.setFuture(QtConcurrent::map(scheduler.mapvector, TaskMap));
+    watcher.waitForFinished();
+    // QT CONCURRENT TEST
+    /*
     while((task = scheduler.nextTask()) != NULL)
     {
         try
@@ -146,10 +153,13 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         emit UpdateStatus(filecount, processcount);
         emit UpdateMessageTable();
     }
+    */
+    /*
     if(filepipeline && !filepipeline->isEmpty())
     {
         filepipeline->logModuleExecutionTimes();
     }
+    */
     LOGINFO("Processing Evidence Finished");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
     fprintf(stderr, "File Count: %d - Process Count: %d\n", filecount, processcount);
@@ -158,6 +168,40 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     LOGINFO("Adding Evidence Completed");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Completed");
 }
+
+void SleuthKitPlugin::TaskMap(TskSchedulerQueue::task_struct &task)
+{
+    TskPipelineManager pipelinemgr;
+    TskPipeline* filepipeline;
+    try
+    {
+        filepipeline = pipelinemgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
+    }
+    catch(const TskException &ex)
+    {
+        fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
+    }
+    try
+    {
+        if(task.task == Scheduler::FileAnalysis && filepipeline && !filepipeline->isEmpty())
+        {
+            filepipeline->run(task.id);
+        }
+        else
+        {
+            fprintf(stderr, "Skipping task: %d\n", task.task);
+        }
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "TskException: %s\n", ex.message().c_str());
+    }
+    if(filepipeline && !filepipeline->isEmpty())
+    {
+        filepipeline->logModuleExecutionTimes();
+    }
+}
+
 void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;

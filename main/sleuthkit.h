@@ -26,6 +26,7 @@
 #include <QByteArray>
 #include <QDataStream>
 #include <QThreadPool>
+#include <QtConcurrent>
 
 class SleuthKitPlugin : public QObject
 {
@@ -50,6 +51,7 @@ public:
     void GetImageTree(WombatVariable wombatvariable, int isAddEvidence);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
+    void TaskMap(TskSchedulerQueue::task_struct &task);
 
 private:
     WombatVariable wombatvariable;
