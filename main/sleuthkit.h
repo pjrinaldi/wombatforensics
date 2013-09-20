@@ -83,49 +83,25 @@ class TaskRunner : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    TaskRunner(TskSchedulerQueue::task_struct* tmptask, TskPipeline* tmppipe, TskPipelineManager tmpmgr)
+    TaskRunner(TskSchedulerQueue::task_struct* tmptask, TskPipeline* tmppipe)
     {
         task = tmptask;
         filepipeline = tmppipe;
-        pipelinemgr = tmpmgr;
     }
     void run()
     {
-        //TskPipelineManager pipelinemgr;
-        //TskPipeline* filepipeline;
-        /*
         try
         {
-            filepipeline = pipelinemgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
-        }
-        catch(const TskException &ex)
-        {
-            fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
-        }
-        */
-        try
-        {
-            if(task->task == Scheduler::FileAnalysis && filepipeline && !filepipeline->isEmpty())
-            {
-                filepipeline->run(task->id);
-            }
-            else
-            {
-                fprintf(stderr, "Skipping task: %d\n", task->task);
-            }
+            fprintf(stderr, "task id: %d\n", task->id);
+            filepipeline->run(task->id);
         }
         catch(TskException &ex)
         {
             fprintf(stderr, "TskException: %s\n", ex.message().c_str());
         }
-        if(filepipeline && !filepipeline->isEmpty())
-        {
-            filepipeline->logModuleExecutionTimes();
-        }
     }
 private:
     TskSchedulerQueue::task_struct* task;
-    TskPipelineManager pipelinemgr;
     TskPipeline* filepipeline;
 };
 /*
