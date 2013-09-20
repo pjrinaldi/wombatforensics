@@ -83,14 +83,17 @@ class TaskRunner : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    TaskRunner(TskSchedulerQueue::task_struct* tmptask)
+    TaskRunner(TskSchedulerQueue::task_struct* tmptask, TskPipeline* tmppipe, TskPipelineManager tmpmgr)
     {
         task = tmptask;
+        filepipeline = tmppipe;
+        pipelinemgr = tmpmgr;
     }
     void run()
     {
-        TskPipelineManager pipelinemgr;
-        TskPipeline* filepipeline;
+        //TskPipelineManager pipelinemgr;
+        //TskPipeline* filepipeline;
+        /*
         try
         {
             filepipeline = pipelinemgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
@@ -99,6 +102,7 @@ public:
         {
             fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
         }
+        */
         try
         {
             if(task->task == Scheduler::FileAnalysis && filepipeline && !filepipeline->isEmpty())
@@ -121,6 +125,8 @@ public:
     }
 private:
     TskSchedulerQueue::task_struct* task;
+    TskPipelineManager pipelinemgr;
+    TskPipeline* filepipeline;
 };
 /*
 class ThreadRunner : public QObject, public QRunnable

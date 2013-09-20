@@ -113,7 +113,17 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     emit UpdateStatus(filecount, processcount);
     LOGINFO("Processing Evidence Started");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Started");
-    /*
+    TskPipelineManager pipelinemgr;
+    TskPipeline* filepipeline;
+    try
+    {
+        filepipeline = pipelinemgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
+    }
+    catch(const TskException &ex)
+    {
+        fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
+    }
+  /*
     TskSchedulerQueue::task_struct *task;
     TskPipelineManager pipelinemgr;
     TskPipeline* filepipeline;
@@ -128,12 +138,13 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     */
     // HOW ABOUT LOOP OF RUNNABLES...
     //
+
     for(int i=0; i < scheduler.mapvector.size(); i++)
     {
-        TaskRunner* trunner = new TaskRunner(scheduler.mapvector[i]);
+        TaskRunner* trunner = new TaskRunner(scheduler.mapvector[i], filepipeline, pipelinemgr);
         QThreadPool::globalInstance()->start(trunner);
-        QThreadPool::globalInstance()->waitForDone();
     }
+
     /*
     QFutureWatcher<void> watcher;
     std::vector<TskSchedulerQueue::task_struct* > tmpvector;

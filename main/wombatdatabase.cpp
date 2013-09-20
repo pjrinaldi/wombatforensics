@@ -165,7 +165,7 @@ int WombatDatabase::InsertCase(QString caseText)
 QStringList WombatDatabase::ReturnCaseNameList()
 {
     QStringList tmpList;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT name FROM cases ORDER by caseid WHERE deleted = 0;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT name FROM cases WHERE deleted = 0 ORDER by caseid;", -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         while(sqlite3_step(sqlstatement) == SQLITE_ROW)
         {
