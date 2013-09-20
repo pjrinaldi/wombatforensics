@@ -27,12 +27,23 @@ void ProgressWindow::JobClicked(QTreeWidgetItem* item)
 {
     int jobid = item->data(1,0).toInt();
     QStringList joblist = pdata->ReturnJobDetails(jobid);
-    UpdateFilesFound(joblist[1]);
-    UpdateFilesProcessed(joblist[2]);
-    UpdateProgressBar(100);
-    UpdateAnalysisState(joblist[3]);
-    QStringList tmplist = pdata->ReturnMessageTableEntries(pdata->ReturnJobCaseID(jobid), pdata->ReturnJobEvidenceID(jobid), jobid);
-    UpdateMessageTable(tmplist);
+    if(jobid == 0)
+    {
+        UpdateFilesFound("");
+        UpdateFilesProcessed("");
+        UpdateProgressBar(0);
+        UpdateAnalysisState("");
+        ClearTableWidget();
+    }
+    else
+    {
+        UpdateFilesFound(joblist[1]);
+        UpdateFilesProcessed(joblist[2]);
+        UpdateProgressBar(100);
+        UpdateAnalysisState(joblist[3]);
+        QStringList tmplist = pdata->ReturnMessageTableEntries(pdata->ReturnJobCaseID(jobid), pdata->ReturnJobEvidenceID(jobid), jobid);
+        UpdateMessageTable(tmplist);
+   }
 }
 
 void ProgressWindow::UpdateAnalysisState(QString analysisState) // analysisStateEdit
