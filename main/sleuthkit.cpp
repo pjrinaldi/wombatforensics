@@ -132,6 +132,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     {
         TaskRunner* trunner = new TaskRunner(scheduler.mapvector[i]);
         QThreadPool::globalInstance()->start(trunner);
+        QThreadPool::globalInstance()->waitForDone();
     }
     /*
     QFutureWatcher<void> watcher;
