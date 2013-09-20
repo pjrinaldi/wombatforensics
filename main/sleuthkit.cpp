@@ -127,7 +127,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     }
     // HOW ABOUT LOOP OF RUNNABLES...
     //
-
+    /*
     for(int i=0; i < scheduler.mapvector.size(); i++)
     {
         currenttask = scheduler.mapvector[i];
@@ -158,7 +158,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         //QThreadPool::globalInstance()->start(trunner);
     }
     delete currenttask;
-
+    */
     /*
     QFutureWatcher<void> watcher;
     std::vector<TskSchedulerQueue::task_struct* > tmpvector;
@@ -167,7 +167,6 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     watcher.waitForFinished();
     */
     // QT CONCURRENT TEST
-    /*
     while((task = scheduler.nextTask()) != NULL)
     {
         try
@@ -190,13 +189,10 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         emit UpdateStatus(filecount, processcount);
         emit UpdateMessageTable();
     }
-    */
-    /*
     if(filepipeline && !filepipeline->isEmpty())
     {
         filepipeline->logModuleExecutionTimes();
     }
-    */
     LOGINFO("Processing Evidence Finished");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
     fprintf(stderr, "File Count: %d - Process Count: %d\n", filecount, processcount);

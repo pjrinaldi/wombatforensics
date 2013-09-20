@@ -104,31 +104,4 @@ private:
     TskSchedulerQueue::task_struct* task;
     TskPipeline* filepipeline;
 };
-/*
-class ThreadRunner : public QObject, public QRunnable
-{
-    Q_OBJECT
-public:
-    ThreadRunner(QObject* object, QString input, WombatVariable wVariable)
-    {
-        method = input;
-        caller = (SleuthKitPlugin*)object;
-        wombatvariable = wVariable;
-    };
-    void run()
-    {
-        if(method.compare("initialize") == 0)
-            caller->Initialize(wombatvariable);
-        if(method.compare("openevidence") == 0)
-            caller->OpenEvidence(wombatvariable);
-        if(method.compare("populatecase") == 0)
-            caller->PopulateCase(wombatvariable);
-        if(method.compare("showfile") == 0)
-            caller->ShowFile(wombatvariable);
-    };
-private:
-    QString method;
-    SleuthKitPlugin* caller;
-    WombatVariable wombatvariable;
-};*/
 #endif // SLEUTHKIT_H
