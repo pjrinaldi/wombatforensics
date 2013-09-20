@@ -149,9 +149,10 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         {
             fprintf(stderr, "TskException: %s\n", ex.message().c_str());
         }
-        processcount++;
-        emit UpdateStatus(filecount, processcount);
-        emit UpdateMessageTable();
+
+        //processcount++;
+        //emit UpdateStatus(filecount, processcount);
+        //emit UpdateMessageTable();
 
         //TaskRunner* trunner = new TaskRunner(scheduler.mapvector[i], filepipeline);
         //QThreadPool::globalInstance()->start(trunner);
