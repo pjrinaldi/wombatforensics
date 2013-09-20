@@ -51,7 +51,7 @@ public:
     void GetImageTree(WombatVariable wombatvariable, int isAddEvidence);
     QString GetFileContents(int fileID);
     QString GetFileTxtContents(int fileID);
-    void TaskMap(TskSchedulerQueue::task_struct &task);
+    void TaskMap(TskSchedulerQueue::task_struct* &task);
 
 private:
     WombatVariable wombatvariable;
@@ -79,4 +79,74 @@ signals:
     void PopulateProgressWindow(WombatVariable wvariable);
 };
 
+class TaskRunner : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    TaskRunner(TskSchedulerQueue::task_struct* tmptask)
+    {
+        task = tmptask;
+    }
+    void run()
+    {
+        TskPipelineManager pipelinemgr;
+        TskPipeline* filepipeline;
+        try
+        {
+            filepipeline = pipelinemgr.createPipeline(TskPipelineManager::FILE_ANALYSIS_PIPELINE);
+        }
+        catch(const TskException &ex)
+        {
+            fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
+        }
+        try
+        {
+            if(task->task == Scheduler::FileAnalysis && filepipeline && !filepipeline->isEmpty())
+            {
+                filepipeline->run(task->id);
+            }
+            else
+            {
+                fprintf(stderr, "Skipping task: %d\n", task->task);
+            }
+        }
+        catch(TskException &ex)
+        {
+            fprintf(stderr, "TskException: %s\n", ex.message().c_str());
+        }
+        if(filepipeline && !filepipeline->isEmpty())
+        {
+            filepipeline->logModuleExecutionTimes();
+        }
+    }
+private:
+    TskSchedulerQueue::task_struct* task;
+};
+/*
+class ThreadRunner : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    ThreadRunner(QObject* object, QString input, WombatVariable wVariable)
+    {
+        method = input;
+        caller = (SleuthKitPlugin*)object;
+        wombatvariable = wVariable;
+    };
+    void run()
+    {
+        if(method.compare("initialize") == 0)
+            caller->Initialize(wombatvariable);
+        if(method.compare("openevidence") == 0)
+            caller->OpenEvidence(wombatvariable);
+        if(method.compare("populatecase") == 0)
+            caller->PopulateCase(wombatvariable);
+        if(method.compare("showfile") == 0)
+            caller->ShowFile(wombatvariable);
+    };
+private:
+    QString method;
+    SleuthKitPlugin* caller;
+    WombatVariable wombatvariable;
+};*/
 #endif // SLEUTHKIT_H

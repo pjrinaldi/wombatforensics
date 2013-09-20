@@ -126,9 +126,20 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         fprintf(stderr, "Error creating file analysis pipeline: %s\n", ex.message().c_str());
     }
     */
+    // HOW ABOUT LOOP OF RUNNABLES...
+    //
+    for(int i=0; i < scheduler.mapvector.size(); i++)
+    {
+        TaskRunner* trunner = new TaskRunner(scheduler.mapvector[i]);
+        QThreadPool::globalInstance()->start(trunner);
+    }
+    /*
     QFutureWatcher<void> watcher;
-    watcher.setFuture(QtConcurrent::map(scheduler.mapvector, TaskMap));
+    std::vector<TskSchedulerQueue::task_struct* > tmpvector;
+    watcher.setFuture(QtConcurrent::map(&tmpvector, &SleuthKitPlugin::TaskMap));
+    //watcher.setFuture(QtConcurrent::map(&((std::vector<TskSchedulerQueue::task_struct*>)scheduler.mapvector), &SleuthKitPlugin::TaskMap));
     watcher.waitForFinished();
+    */
     // QT CONCURRENT TEST
     /*
     while((task = scheduler.nextTask()) != NULL)
@@ -169,7 +180,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Completed");
 }
 
-void SleuthKitPlugin::TaskMap(TskSchedulerQueue::task_struct &task)
+void SleuthKitPlugin::TaskMap(TskSchedulerQueue::task_struct* &task)
 {
     TskPipelineManager pipelinemgr;
     TskPipeline* filepipeline;
@@ -183,13 +194,13 @@ void SleuthKitPlugin::TaskMap(TskSchedulerQueue::task_struct &task)
     }
     try
     {
-        if(task.task == Scheduler::FileAnalysis && filepipeline && !filepipeline->isEmpty())
+        if(task->task == Scheduler::FileAnalysis && filepipeline && !filepipeline->isEmpty())
         {
-            filepipeline->run(task.id);
+            filepipeline->run(task->id);
         }
         else
         {
-            fprintf(stderr, "Skipping task: %d\n", task.task);
+            fprintf(stderr, "Skipping task: %d\n", task->task);
         }
     }
     catch(TskException &ex)

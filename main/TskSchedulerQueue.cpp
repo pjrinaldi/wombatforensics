@@ -21,7 +21,7 @@ int TskSchedulerQueue::schedule(Scheduler::TaskType task, uint64_t startId, uint
         t->task = task;
         t->id = i;
         m_queue.push(t);
-        mapvector.append(t);
+        mapvector.push_back(t);
     }
     return 0;
 };
