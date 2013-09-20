@@ -28,6 +28,7 @@ public:
 private:
     std::queue <task_struct *> m_queue;
     //std::queue <task_struct> myqueue;
+    std::vector <task_struct *> mapvector;
 };
 
 
