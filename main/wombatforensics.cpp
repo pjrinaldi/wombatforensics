@@ -157,6 +157,13 @@ void WombatForensics::RemEvidence()
     if(ok && !item.isEmpty()) // open selected case
     {
         wombatcasedata->RemoveEvidence(item);
+        QString tmppath = wombatvariable.evidencedirpath + item.split("/").last() + ".db";
+        if(QFile::remove(tmppath))
+        {
+            fprintf(stderr, "file was removed");
+        }
+        else
+            fprintf(stderr, "file was not removed");
         // STILL NEED TO REMOVE OR MOVE THE .DB NAME TO SOME OTHER PLACE (OR SIMPLY REMOVE THE EVIDENCE AND DELETE THE .DB FILE)
     }
 }
