@@ -111,10 +111,11 @@ void WombatForensics::InitializeSleuthKit()
 void WombatForensics::AddEvidence()
 {
     QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
-    wombatprogresswindow->show();
     //fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
     if(evidenceFilePath != "")
     {
+        wombatprogresswindow->show();
+        wombatprogresswindow->ClearTableWidget();
         wombatvariable.jobtype = 1; // add evidence
         // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. IF THEY WANT TO OPEN A SECOND COPY
         // THEN SET NEWEVIDENCENAME EVIDENCEFILEPATH.SPLIT("/").LAST() + "COPY.DB"
@@ -147,6 +148,8 @@ void WombatForensics::AddEvidence()
 
 void WombatForensics::RemEvidence()
 {
+    wombatprogresswindow->ClearTableWidget();
+    wombatvariable.jobtype = 2; // remove evidence
     fprintf(stderr, "remove evidence\n");
     QStringList evidenceList;
     evidenceList.clear();
@@ -156,15 +159,34 @@ void WombatForensics::RemEvidence()
     QString item = QInputDialog::getItem(this, tr("Remove Existing Evidence"), tr("Select Evidence to Remove: "), evidenceList, 0, false, &ok);
     if(ok && !item.isEmpty()) // open selected case
     {
+        wombatvariable.evidenceid = wombatcasedata->ReturnEvidenceID(item);
+        wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
+        emit LogVariable(wombatvariable);
+        QString tmpstring = item.split("/").last() + " - " + QString::fromStdString(GetTime());
+        QStringList tmplist;
+        tmplist << tmpstring << QString::number(wombatvariable.jobid);
+        wombatprogresswindow->UpdateAnalysisTree(2, new QTreeWidgetItem(tmplist));
+        wombatprogresswindow->UpdateFilesFound("");
+        wombatprogresswindow->UpdateFilesProcessed("");
+        wombatprogresswindow->UpdateAnalysisState("Removing Evidence");
+        LOGINFO("Removing Evidence Started");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Removing Evidence Started");
+        UpdateMessageTable();
         wombatcasedata->RemoveEvidence(item);
+        wombatprogresswindow->UpdateProgressBar(50);
         QString tmppath = wombatvariable.evidencedirpath + item.split("/").last() + ".db";
         if(QFile::remove(tmppath))
         {
-            fprintf(stderr, "file was removed");
+            //fprintf(stderr, "file was removed");
         }
         else
-            fprintf(stderr, "file was not removed");
-        // STILL NEED TO REMOVE OR MOVE THE .DB NAME TO SOME OTHER PLACE (OR SIMPLY REMOVE THE EVIDENCE AND DELETE THE .DB FILE)
+            emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
+        wombatprogresswindow->UpdateProgressBar(100);
+        LOGINFO("Removing Evidence Finished");
+        wombatprogresswindow->UpdateAnalysisState("Removing Evidence Finished");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Removing Evidence Finished");
+        wombatcasedata->UpdateJobEnd(wombatvariable.jobid, 0, 0);
+        UpdateMessageTable();
     }
 }
 

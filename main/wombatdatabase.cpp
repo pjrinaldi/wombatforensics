@@ -440,6 +440,7 @@ QStringList WombatDatabase::ReturnEvidenceData(int evidenceid)
 
     return tmplist;
 }
+
 QStringList WombatDatabase::ReturnMessageTableEntries(int caseid, int evidenceid, int jobid)
 {
     QStringList tmpstringlist;
@@ -467,6 +468,7 @@ QStringList WombatDatabase::ReturnMessageTableEntries(int caseid, int evidenceid
 
     return tmpstringlist;
 }
+
 void WombatDatabase::InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg)
 {
     if(sqlite3_prepare_v2(wombatdb, "INSERT INTO msglog (caseid, evidenceid, jobid, msgtype, msg, datetime) VALUES(?, ?, ?, ?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
@@ -586,6 +588,7 @@ int WombatDatabase::ReturnJobEvidenceID(int jobid)
 
     return evidenceid;
 }
+
 void WombatDatabase::RemoveEvidence(QString evidencename)
 {
     if(sqlite3_prepare_v2(wombatdb, "UPDATE evidence SET deleted = 1 WHERE fullpath = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
@@ -606,3 +609,28 @@ void WombatDatabase::RemoveEvidence(QString evidencename)
     else
         emit DisplayError("1.25", "REMOVE EVIDENCE ", sqlite3_errmsg(wombatdb));
 }
+
+int WombatDatabase::ReturnEvidenceID(QString evidencename)
+{
+    int evidenceid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT evidenceid FROM evidence WHERE fullpath = ? and deleted = 0;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_text(sqlstatement, 1, evidencename.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                // do nothing, successful
+            }
+            else
+                emit DisplayError("1.26", "RETURN EVIDENCE ID FROM NAME ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.26", "RETURN EVIDENCE ID FROM NAME ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.26", "RETURN EVIDENCE ID FROM NAME ", sqlite3_errmsg(wombatdb));
+
+    return evidenceid;
+}
+

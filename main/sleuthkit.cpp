@@ -198,8 +198,8 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     fprintf(stderr, "File Count: %d - Process Count: %d\n", filecount, processcount);
     wombatdata->UpdateJobEnd(wombatvariable.jobid, filecount, processcount);
     GetImageTree(wombatvariable, 1);
-    LOGINFO("Adding Evidence Completed");
-    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Completed");
+    LOGINFO("Adding Evidence Finished");
+    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Finished");
 }
 
 void SleuthKitPlugin::TaskMap(TskSchedulerQueue::task_struct* &task)
