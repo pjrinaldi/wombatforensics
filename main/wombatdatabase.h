@@ -48,6 +48,7 @@ public:
     void RemoveEvidence(QString evidencename);
     QStringList ReturnCaseEvidenceID(int caseID);
     QStringList ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist);
+    QStringList ReturnCaseEvidenceRemJobID(int caseid, QStringList evidenceidlist);
     QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID);
     QStringList ReturnEvidenceData(int evidenceid);
     std::string GetTime(void);

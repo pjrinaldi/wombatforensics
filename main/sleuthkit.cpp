@@ -283,17 +283,27 @@ void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
     wombatvariable = wombatVariable;
     QStringList evidencepathlist = wombatdata->ReturnCaseEvidence(wombatvariable.caseid); // fullpath dd list
     QStringList evidenceidlist = wombatdata->ReturnCaseEvidenceID(wombatvariable.caseid); // evidenceid list
-    QStringList evidenceaddjoblist = wombatdata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // jobid list
+    QStringList activeevidenceidlist = wombatdata->ReturnCaseActiveEvidenceID(wombatvariable.caseid); // activeevidenceid list
+    // NEED TO MODIFY SO IT GETS JOB ID'S FOR ANY OF THE JOBTYPES, THEN USES THAT VARIABLE TO PUT IT IN THE RIGHT PLACE
+    QStringList evidenceaddjoblist = wombatdata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // add jobid list
+    QStringList evidenceremjoblist = wombatdata->ReturnCaseEvidenceRemJobID(wombatvariable.caseid, evidenceidlist); // rem jobid list
     for(int i=0; i < evidenceidlist.count(); i++)
     {
         wombatvariable.evidenceid = evidenceidlist[i].toInt();
         wombatvariable.evidencepath = evidencepathlist[i];
         wombatvariable.jobid = evidenceaddjoblist[i].toInt();
+        wombatvariable.jobtype = 1;
         wombatvariable.evidencedbname = wombatvariable.evidencepath.split("/").last() + ".db";
         emit SetLogVariable(wombatvariable);
         SetEvidenceDB(wombatvariable);
         GetImageTree(wombatvariable, 0);
         emit PopulateProgressWindow(wombatvariable);
+    }
+    for(int i=0; i < activeevidenceidlist.count(); i++)
+    {
+        wombatvariable.evidenceid = activeevidenceidlist[i].toInt();
+        wombatvariable.evidencepath = activeevidencepathlist[i];
+        wombatvariable.jobid = activeevidencepathlist[i];
     }
 }
 

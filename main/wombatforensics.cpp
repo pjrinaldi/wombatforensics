@@ -173,7 +173,7 @@ void WombatForensics::RemEvidence()
         wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Removing Evidence Started");
         UpdateMessageTable();
         wombatcasedata->RemoveEvidence(item);
-        wombatprogresswindow->UpdateProgressBar(50);
+        wombatprogresswindow->UpdateProgressBar(25);
         QString tmppath = wombatvariable.evidencedirpath + item.split("/").last() + ".db";
         if(QFile::remove(tmppath))
         {
@@ -181,6 +181,10 @@ void WombatForensics::RemEvidence()
         }
         else
             emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
+        wombatprogresswindow->UpdateProgressBar(50);
+        // refresh list here
+        wombatprogresswindow->UpdateProgressBar(75);
+        // refresh views here
         wombatprogresswindow->UpdateProgressBar(100);
         LOGINFO("Removing Evidence Finished");
         wombatprogresswindow->UpdateAnalysisState("Removing Evidence Finished");
@@ -206,12 +210,16 @@ void WombatForensics::UpdateMessageTable()
 
 void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
 {
+    int treebranch = 0;
     wombatvariable = wvariable;
     QStringList joblist = wombatcasedata->ReturnJobDetails(wvariable.jobid);
     QString tmpstring = wvariable.evidencedbname + " - " + joblist[0];
     QStringList tmplist;
     tmplist << tmpstring << QString::number(wvariable.jobid);
-    wombatprogresswindow->UpdateAnalysisTree(0,  new QTreeWidgetItem(tmplist));
+    if(wvariable.jobtype == 1) treebranch = 0;
+    else if(wvariable.jobtype == 2) treebranch = 2;
+    else treebranch = 1;
+    wombatprogresswindow->UpdateAnalysisTree(treebranch,  new QTreeWidgetItem(tmplist));
     wombatprogresswindow->UpdateFilesFound(joblist[1]);
     wombatprogresswindow->UpdateFilesProcessed(joblist[2]);
     wombatprogresswindow->UpdateProgressBar(100);
