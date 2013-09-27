@@ -414,18 +414,18 @@ QStringList WombatDatabase::ReturnCaseEvidenceID(int caseID)
     return tmpList;
 }
 
-QStringList WombatDatabase::ReturnCaseEvidenceJobIdType(int caseid, QStringList evidenceidlist)
+QStringList WombatDatabase::ReturnCaseEvidenceIdJobIdType(int caseid/*, QStringList evidenceidlist*/)
 {
     QStringList tmplist;
     //foreach(QString evid, evidenceidlist)
     //{
-        if(sqlite3_prepare_v2(wombatdb, /*"SELECT jobid,type FROM job WHERE caseid = ? and evidenceid = ?;"*/"SELECT jobid,type FROM job WHERE caseid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+        if(sqlite3_prepare_v2(wombatdb, /*"SELECT jobid,type FROM job WHERE caseid = ? and evidenceid = ?;"*/"SELECT jobid,type,evidenceid FROM job WHERE caseid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
         {
             if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK)//&& sqlite3_bind_int(sqlstatement, 2, evid.toInt()) == SQLITE_OK)
             {
                 while(sqlite3_step(sqlstatement) == SQLITE_ROW)
                 {
-                    tmplist << QString::number(sqlite3_column_int(sqlstatement, 0)) << QString::number(sqlite3_column_int(sqlstatement, 1));
+                    tmplist << QString::number(sqlite3_column_int(sqlstatement, 0)) << QString::number(sqlite3_column_int(sqlstatement, 1)) << QString::number(sqlite3_column_int(sqlstatement, 2));
                 }
             }
             else
@@ -690,7 +690,7 @@ int WombatDatabase::ReturnEvidenceID(QString evidencename)
             int ret = sqlite3_step(sqlstatement);
             if(ret == SQLITE_ROW || ret == SQLITE_DONE)
             {
-                // do nothing, successful
+                evidenceid = sqlite3_column_int(sqlstatement, 0);
             }
             else
                 emit DisplayError("1.26", "RETURN EVIDENCE ID FROM NAME ", sqlite3_errmsg(wombatdb));
@@ -704,3 +704,50 @@ int WombatDatabase::ReturnEvidenceID(QString evidencename)
     return evidenceid;
 }
 
+int WombatDatabase::ReturnEvidenceDeletedState(int evidenceid)
+{
+    int isdeleted = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT deleted FROM evidence WHERE evidenceid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, evidenceid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                isdeleted = sqlite3_column_int(sqlstatement, 0);
+            }
+            else
+                emit DisplayError("1.28", "RETURN EVIDENCE DELETED STATE FROM ID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.28", "RETURN EVIDENCE DELETED STATE FROM ID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.28", "RETURN EVIDENCE DELETED STATE FROM ID ", sqlite3_errmsg(wombatdb));
+
+    return isdeleted;
+}
+
+QString WombatDatabase::ReturnEvidencePath(int evidenceid)
+{
+    QString epath = "";
+    if(sqlite3_prepare_v2(wombatdb, "SELECT fullpath FROM evidence WHERE evidenceid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, evidenceid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(sqlstatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                epath = QString((const char*)sqlite3_column_text(sqlstatement, 0));
+            }
+            else
+                emit DisplayError("1.27", "RETURN EVIDENCE PATH FROM ID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.27", "RETURN EVIDENCE PATH FROM ID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.27", "RETURN EVIDENCE PATH FROM ID ", sqlite3_errmsg(wombatdb));
+
+    return epath;
+}

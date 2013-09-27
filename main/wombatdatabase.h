@@ -46,9 +46,11 @@ public:
     int ReturnJobEvidenceID(int jobid);
     int ReturnObjectID(int caseid, int evidenceid, int fileid);
     int ReturnEvidenceID(QString evidencename);
+    int ReturnEvidenceDeletedState(int evidenceid);
+    QString ReturnEvidencePath(int evidenceid);
     void RemoveEvidence(QString evidencename);
     QStringList ReturnCaseEvidenceID(int caseID);
-    QStringList ReturnCaseEvidenceJobIdType(int caseid, QStringList evidenceidlist);
+    QStringList ReturnCaseEvidenceIdJobIdType(int caseid/*, QStringList evidenceidlist*/);
     QStringList ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist);
     QStringList ReturnCaseEvidenceRemJobID(int caseid, QStringList evidenceidlist);
     QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID);
