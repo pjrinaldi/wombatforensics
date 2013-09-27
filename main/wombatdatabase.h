@@ -41,6 +41,7 @@ public:
     int ReturnObjectFileID(int objectid);
     int ReturnObjectEvidenceID(int objectid);
     QStringList ReturnCaseEvidence(int caseID);
+    QStringList ReturnCaseActiveEvidence(int caseID);
     int ReturnJobCaseID(int jobid);
     int ReturnJobEvidenceID(int jobid);
     int ReturnObjectID(int caseid, int evidenceid, int fileid);

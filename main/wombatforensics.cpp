@@ -154,7 +154,7 @@ void WombatForensics::RemEvidence()
     QStringList evidenceList;
     evidenceList.clear();
     // populate case list here
-    evidenceList = wombatcasedata->ReturnCaseEvidence(wombatvariable.caseid);
+    evidenceList = wombatcasedata->ReturnCaseActiveEvidence(wombatvariable.caseid);
     bool ok;
     QString item = QInputDialog::getItem(this, tr("Remove Existing Evidence"), tr("Select Evidence to Remove: "), evidenceList, 0, false, &ok);
     if(ok && !item.isEmpty()) // open selected case
