@@ -281,23 +281,11 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
-    // NEED TO BUILD A ACTIVEEVIDENCEIDLIST AND A EVIDENCEIDLIST TO RUN 2 LOOPS OR 1 AND IF/ELSE FOR COMPONENTS.
     QStringList evidencepathlist;
-    //QStringList evidencepathlist = wombatdata->ReturnCaseEvidence(wombatvariable.caseid); // fullpath dd list
-    //QStringList evidenceidlist = wombatdata->ReturnCaseEvidenceID(wombatvariable.caseid); // evidenceid list
-    //QStringList remevidenceidlist = wombatdata->ReturnCaseRemEvidenceID(wombatvariable.caseid); // activeevidenceid list
-    // NEED TO MODIFY SO IT GETS JOB ID'S FOR ANY OF THE JOBTYPES, THEN USES THAT VARIABLE TO PUT IT IN THE RIGHT PLACE
-    QStringList evidencejoblist = wombatdata->ReturnCaseEvidenceIdJobIdType(wombatvariable.caseid/*, evidenceidlist*/);
-    //QStringList evidenceaddjoblist = wombatdata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // add jobid list
-    //QStringList evidenceremjoblist = wombatdata->ReturnCaseEvidenceRemJobID(wombatvariable.caseid, evidenceidlist); // rem jobid list
-    //for(int i=0; i < evidenceidlist.count(); i++)
+    QStringList evidencejoblist = wombatdata->ReturnCaseEvidenceIdJobIdType(wombatvariable.caseid);
     int isevidencedeleted = 0;
     for(int i=0; i < (evidencejoblist.count() / 3); i++)
     {
-        /*
-        wombatvariable.evidenceid = evidenceidlist[i].toInt();
-        wombatvariable.evidencepath = evidencepathlist[i];
-        */
         wombatvariable.jobid = evidencejoblist[(3*i)].toInt();
         wombatvariable.jobtype = evidencejoblist[(3*i+1)].toInt();
         wombatvariable.evidenceid = evidencejoblist[(3*i)+2].toInt();

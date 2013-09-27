@@ -40,7 +40,6 @@ public:
     int ReturnCaseID(QString caseName);
     int ReturnObjectFileID(int objectid);
     int ReturnObjectEvidenceID(int objectid);
-    QStringList ReturnCaseEvidence(int caseID);
     QStringList ReturnCaseActiveEvidence(int caseID);
     int ReturnJobCaseID(int jobid);
     int ReturnJobEvidenceID(int jobid);
@@ -49,11 +48,8 @@ public:
     int ReturnEvidenceDeletedState(int evidenceid);
     QString ReturnEvidencePath(int evidenceid);
     void RemoveEvidence(QString evidencename);
-    QStringList ReturnCaseEvidenceID(int caseID);
-    QStringList ReturnCaseEvidenceIdJobIdType(int caseid/*, QStringList evidenceidlist*/);
-    QStringList ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist);
-    QStringList ReturnCaseEvidenceRemJobID(int caseid, QStringList evidenceidlist);
-    QStringList ReturnMessageTableEntries(/*int caseID, int evidenceID, int jobID*/int jobid);
+    QStringList ReturnCaseEvidenceIdJobIdType(int caseid);
+    QStringList ReturnMessageTableEntries(int jobid);
     QStringList ReturnEvidenceData(int evidenceid);
     std::string GetTime(void);
 signals:

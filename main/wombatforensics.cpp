@@ -205,7 +205,7 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
 void WombatForensics::UpdateMessageTable()
 {
     wombatprogresswindow->ClearTableWidget();
-    QStringList tmplist = wombatcasedata->ReturnMessageTableEntries(/*wombatvariable.caseid, wombatvariable.evidenceid,*/ wombatvariable.jobid);
+    QStringList tmplist = wombatcasedata->ReturnMessageTableEntries(wombatvariable.jobid);
     wombatprogresswindow->UpdateMessageTable(tmplist);
 }
 
