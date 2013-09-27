@@ -281,22 +281,27 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
+    // NEED TO BUILD A ACTIVEEVIDENCEIDLIST AND A EVIDENCEIDLIST TO RUN 2 LOOPS OR 1 AND IF/ELSE FOR COMPONENTS.
     QStringList evidencepathlist = wombatdata->ReturnCaseEvidence(wombatvariable.caseid); // fullpath dd list
     QStringList evidenceidlist = wombatdata->ReturnCaseEvidenceID(wombatvariable.caseid); // evidenceid list
-    QStringList remevidenceidlist = wombatdata->ReturnCaseRemEvidenceID(wombatvariable.caseid); // activeevidenceid list
+    //QStringList remevidenceidlist = wombatdata->ReturnCaseRemEvidenceID(wombatvariable.caseid); // activeevidenceid list
     // NEED TO MODIFY SO IT GETS JOB ID'S FOR ANY OF THE JOBTYPES, THEN USES THAT VARIABLE TO PUT IT IN THE RIGHT PLACE
-    QStringList evidenceaddjoblist = wombatdata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // add jobid list
-    QStringList evidenceremjoblist = wombatdata->ReturnCaseEvidenceRemJobID(wombatvariable.caseid, evidenceidlist); // rem jobid list
+    QStringList evidencejoblist = wombatdata->ReturnCaseEvidenceJobIdType(wombatvariable.caseid, evidenceidlist);
+    //QStringList evidenceaddjoblist = wombatdata->ReturnCaseEvidenceAddJobID(wombatvariable.caseid, evidenceidlist); // add jobid list
+    //QStringList evidenceremjoblist = wombatdata->ReturnCaseEvidenceRemJobID(wombatvariable.caseid, evidenceidlist); // rem jobid list
     for(int i=0; i < evidenceidlist.count(); i++)
     {
         wombatvariable.evidenceid = evidenceidlist[i].toInt();
         wombatvariable.evidencepath = evidencepathlist[i];
-        wombatvariable.jobid = evidenceaddjoblist[i].toInt();
-        wombatvariable.jobtype = 1;
+        wombatvariable.jobid = evidencejoblist[(2*i)].toInt();
+        wombatvariable.jobtype = evidencejoblist[(2*i+1)].toInt();
         wombatvariable.evidencedbname = wombatvariable.evidencepath.split("/").last() + ".db";
         emit SetLogVariable(wombatvariable);
-        SetEvidenceDB(wombatvariable);
-        GetImageTree(wombatvariable, 0);
+        if(wombatvariable.jobtype == 1)
+        {
+            SetEvidenceDB(wombatvariable);
+            GetImageTree(wombatvariable, 0);
+        }
         emit PopulateProgressWindow(wombatvariable);
     }
 }

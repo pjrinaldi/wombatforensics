@@ -220,9 +220,19 @@ void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
     else if(wvariable.jobtype == 2) treebranch = 2;
     else treebranch = 1;
     wombatprogresswindow->UpdateAnalysisTree(treebranch,  new QTreeWidgetItem(tmplist));
-    wombatprogresswindow->UpdateFilesFound(joblist[1]);
-    wombatprogresswindow->UpdateFilesProcessed(joblist[2]);
-    wombatprogresswindow->UpdateProgressBar(100);
+    if(wvariable.jobtype == 2)
+    {
+        wombatprogresswindow->UpdateFilesFound("");
+        wombatprogresswindow->UpdateFilesProcessed("");
+        wombatprogresswindow->UpdateProgressBar(100);
+    }
+    else
+    {
+        wombatprogresswindow->UpdateFilesFound(joblist[1]);
+        wombatprogresswindow->UpdateFilesProcessed(joblist[2]);
+        int finalprogress = (int)((((float)joblist[2].toInt())/(float)joblist[1].toInt())*100);
+        wombatprogresswindow->UpdateProgressBar(finalprogress);
+    }
     wombatprogresswindow->UpdateAnalysisState(joblist[3]);
     UpdateMessageTable();
 }
