@@ -204,6 +204,7 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
 
 void WombatForensics::UpdateMessageTable()
 {
+    wombatprogresswindow->ClearTableWidget();
     QStringList tmplist = wombatcasedata->ReturnMessageTableEntries(/*wombatvariable.caseid, wombatvariable.evidenceid,*/ wombatvariable.jobid);
     wombatprogresswindow->UpdateMessageTable(tmplist);
 }
@@ -222,9 +223,9 @@ void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
     wombatprogresswindow->UpdateAnalysisTree(treebranch,  new QTreeWidgetItem(tmplist));
     if(wvariable.jobtype == 2)
     {
+        wombatprogresswindow->UpdateProgressBar(100);
         wombatprogresswindow->UpdateFilesFound("");
         wombatprogresswindow->UpdateFilesProcessed("");
-        wombatprogresswindow->UpdateProgressBar(100);
     }
     else
     {
