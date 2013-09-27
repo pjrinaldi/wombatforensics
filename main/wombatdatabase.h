@@ -53,7 +53,7 @@ public:
     QStringList ReturnCaseEvidenceIdJobIdType(int caseid/*, QStringList evidenceidlist*/);
     QStringList ReturnCaseEvidenceAddJobID(int caseid, QStringList evidenceidlist);
     QStringList ReturnCaseEvidenceRemJobID(int caseid, QStringList evidenceidlist);
-    QStringList ReturnMessageTableEntries(int caseID, int evidenceID, int jobID);
+    QStringList ReturnMessageTableEntries(/*int caseID, int evidenceID, int jobID*/int jobid);
     QStringList ReturnEvidenceData(int evidenceid);
     std::string GetTime(void);
 signals:

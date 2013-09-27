@@ -41,7 +41,7 @@ void ProgressWindow::JobClicked(QTreeWidgetItem* item)
         UpdateFilesProcessed(joblist[2]);
         UpdateProgressBar(100);
         UpdateAnalysisState(joblist[3]);
-        QStringList tmplist = pdata->ReturnMessageTableEntries(pdata->ReturnJobCaseID(jobid), pdata->ReturnJobEvidenceID(jobid), jobid);
+        QStringList tmplist = pdata->ReturnMessageTableEntries(/*pdata->ReturnJobCaseID(jobid), pdata->ReturnJobEvidenceID(jobid),*/ jobid);
         UpdateMessageTable(tmplist);
    }
 }

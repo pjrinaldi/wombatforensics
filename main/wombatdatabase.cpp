@@ -511,13 +511,13 @@ QStringList WombatDatabase::ReturnEvidenceData(int evidenceid)
     return tmplist;
 }
 
-QStringList WombatDatabase::ReturnMessageTableEntries(int caseid, int evidenceid, int jobid)
+QStringList WombatDatabase::ReturnMessageTableEntries(/*int caseid, int evidenceid, int jobid*/int jobid)
 {
     QStringList tmpstringlist;
     QString tmptype;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT msgtype, msg FROM msglog WHERE caseid = ? AND evidenceid = ? and jobid = ?;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT msgtype, msg FROM msglog WHERE jobid = ?;"/*"SELECT msgtype, msg FROM msglog WHERE caseid = ? AND evidenceid = ? and jobid = ?;"*/, -1, &sqlstatement, NULL) == SQLITE_OK)
     {
-        if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, jobid) == SQLITE_OK)
+        if(/*sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, jobid)*/sqlite3_bind_int(sqlstatement, 1, jobid) == SQLITE_OK)
         {
             while(sqlite3_step(sqlstatement) == SQLITE_ROW)
             {
@@ -572,9 +572,9 @@ QStringList WombatDatabase::ReturnJobDetails(int jobid)
             {
                 tmplist << QString((const char*)sqlite3_column_text(sqlstatement, 0)) << QString::number(sqlite3_column_int(sqlstatement, 1)) << QString::number(sqlite3_column_int(sqlstatement, 2));
                 if(sqlite3_column_int(sqlstatement, 3) == 1)
-                    tmplist << "Adding Evidence Finished";
+                    tmplist << "Processing Finished";
                 else
-                    tmplist << "Adding Evidence Finished with Errors";
+                    tmplist << "Processing Finished with Errors";
             }
             else
                 emit DisplayError("1.22", "RETURN JOB DETAILS ", sqlite3_errmsg(wombatdb));
