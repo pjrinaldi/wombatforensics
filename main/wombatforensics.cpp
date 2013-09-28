@@ -184,7 +184,7 @@ void WombatForensics::RemEvidence()
         wombatprogresswindow->UpdateProgressBar(50);
         currenthexwidget = ui->fileViewTabWidget->findChild<BinViewWidget *>("bt-hexview");
         currenthexwidget->setModel(0);
-        currenttxtwidget = ui->fileViewTabWidget->findChild<QTextEdit*>("bt-textview");
+        currenttxtwidget = ui->fileViewTabWidget->findChild<QTextEdit*>("bt-txtview");
         currenttxtwidget->setPlainText("");
         wombatprogresswindow->UpdateProgressBar(75);
         // refresh views here
