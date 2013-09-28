@@ -69,6 +69,8 @@ private:
     std::string GetTime(void);
     QThreadPool *threadpool;
     QTreeView *currenttreeview;
+    QTextEdit* currenttxtwidget;
+    BinViewWidget* currenthexwidget;
 
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;

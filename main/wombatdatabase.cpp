@@ -347,6 +347,29 @@ int WombatDatabase::InsertObject(int caseid, int evidenceid, int fileid)
     return objectid;
 }
 
+QStringList WombatDatabase::ReturnCaseActiveEvidenceID(int caseID)
+{
+    QStringList tmpList;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT evidenceid,fullpath,name FROM evidence WHERE caseid = ? AND deleted = 0 ORDER BY evidenceid;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(sqlstatement, 1, caseID) == SQLITE_OK)
+        {
+            while(sqlite3_step(sqlstatement) == SQLITE_ROW)
+            {
+                tmpList << QString::number(sqlite3_column_int(sqlstatement, 0)) << (const char*)sqlite3_column_text(sqlstatement, 1) << (const char*)sqlite3_column_text(sqlstatement, 2);
+            }
+        }
+        else
+        {
+            emit DisplayError("1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
+        }
+    }
+    else
+        emit DisplayError("1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
+
+    return tmpList;
+}
+
 QStringList WombatDatabase::ReturnCaseActiveEvidence(int caseID)
 {
     QStringList tmpList;

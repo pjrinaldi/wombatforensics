@@ -182,9 +182,21 @@ void WombatForensics::RemEvidence()
         else
             emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
         wombatprogresswindow->UpdateProgressBar(50);
-        // refresh list here
+        currenthexwidget = ui->fileViewTabWidget->findChild<BinViewWidget *>("bt-hexview");
+        currenthexwidget->setModel(0);
+        currenttxtwidget = ui->fileViewTabWidget->findChild<QTextEdit*>("bt-textview");
+        currenttxtwidget->setPlainText("");
         wombatprogresswindow->UpdateProgressBar(75);
         // refresh views here
+        wombatdirmodel->clear();
+        QStringList headerList;
+        headerList << "Name" << "Unique ID" << "Full Path" << "Size" << "Created" << "MD5 Hash";
+        wombatdirmodel->setHorizontalHeaderLabels(headerList);
+        currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
+        currenttreeview->setModel(wombatdirmodel);
+        ThreadRunner* trun = new ThreadRunner(isleuthkit, "refreshtreeviews", wombatvariable);
+        threadpool->start(trun);
+        // need to re-add the existing evidence to case..
         wombatprogresswindow->UpdateProgressBar(100);
         LOGINFO("Removing Evidence Finished");
         wombatprogresswindow->UpdateAnalysisState("Removing Evidence Finished");

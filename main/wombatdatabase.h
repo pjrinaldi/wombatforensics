@@ -38,6 +38,7 @@ public:
     QStringList ReturnJobDetails(int jobid);
     QStringList ReturnCaseNameList(void);
     int ReturnCaseID(QString caseName);
+    QStringList ReturnCaseActiveEvidenceID(int caseid);
     int ReturnObjectFileID(int objectid);
     int ReturnObjectEvidenceID(int objectid);
     QStringList ReturnCaseActiveEvidence(int caseID);

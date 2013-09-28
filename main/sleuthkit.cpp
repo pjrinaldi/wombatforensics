@@ -278,6 +278,20 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     emit LoadFileContents(wombatvariable.tmpfilepath);
 }
 
+void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)
+{
+    wombatvariable = wombatVariable;
+    QStringList evidencelist = wombatdata->ReturnCaseActiveEvidenceID(wombatvariable.caseid);
+    for(int i=0; (i < evidencelist.count() / 3); i++)
+    {
+        wombatvariable.evidenceid = evidencelist[3*i].toInt();
+        wombatvariable.evidencepath = evidencelist[(3*i+1)];
+        wombatvariable.evidencedbname = evidencelist[(3*i+2)];
+        SetEvidenceDB(wombatvariable);
+        GetImageTree(wombatvariable, 0);
+    }
+}
+
 void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;

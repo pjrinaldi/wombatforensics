@@ -6,7 +6,7 @@ QWidget* BasicTools::setupHexTab()
     QWidget* hexTab = new QWidget();
     QVBoxLayout* hexLayout = new QVBoxLayout();
     hexwidget = new BinViewWidget(hexTab);
-    hexwidget->setObjectName("bt-hexView");
+    hexwidget->setObjectName("bt-hexview");
     // appears the model is set to open the file, then the widget sets the model.
     hexwidget->setModel(0);
     hexLayout->setContentsMargins(0, 0, 0, 0);
@@ -21,7 +21,7 @@ QWidget* BasicTools::setupTxtTab()
     QWidget* txtTab = new QWidget();
     QVBoxLayout* txtLayout = new QVBoxLayout();
     txtwidget = new QTextEdit();
-    txtwidget->setObjectName("bt-txtView");
+    txtwidget->setObjectName("bt-txtview");
     txtLayout->setContentsMargins(0, 0, 0, 0);
     txtLayout->addWidget(txtwidget);
     txtTab->setLayout(txtLayout);
