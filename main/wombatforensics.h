@@ -97,6 +97,8 @@ public:
             caller->PopulateCase(wombatvariable);
         if(method.compare("showfile") == 0)
             caller->ShowFile(wombatvariable);
+        if(method.compare("refreshtreeviews") == 0)
+            caller->RefreshTreeViews(wombatvariable);
     };
 private:
     QString method;
