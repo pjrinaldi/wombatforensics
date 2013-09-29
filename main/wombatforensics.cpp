@@ -299,8 +299,22 @@ WombatForensics::~WombatForensics()
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
     wombatprogresswindow->close();
+    RemoveTmpFiles();
     //const char* errmsg = wombatcasedata->CloseCaseDB();
     //fprintf(stderr, "CloseDB: %s\n", errmsg);
+}
+
+void WombatForensics::RemoveTmpFiles()
+{
+    QString tmppath = wombatvariable.tmpfilepath + "tmp.";
+    if(QFile::remove(tmppath + "txt"))
+    {
+        //fprintf(stderr, "file was removed");
+    }
+    if(QFile::remove(tmppath + "dat"))
+    {
+        // file was removed.
+    }
 }
 
 void WombatForensics::on_actionNew_Case_triggered()

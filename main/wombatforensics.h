@@ -65,6 +65,7 @@ private:
 
     void SetupDirModel(void);
     void InitializeSleuthKit();
+    void RemoveTmpFiles();
     
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     std::string GetTime(void);
