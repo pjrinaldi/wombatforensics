@@ -3,6 +3,8 @@
 
 
 #include <QMainWindow>
+#include <fstream>
+#include <iostream>
 #include <QDir>
 #include <QStringList>
 #include <QActionGroup>
@@ -65,6 +67,7 @@ private:
 
     void SetupDirModel(void);
     void InitializeSleuthKit();
+    void InitializeAppStructure();
     void RemoveTmpFiles();
     
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
@@ -73,6 +76,8 @@ private:
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;
+    ofstream tmptxtfile;
+    ofstream tmphexfile;
 
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;
