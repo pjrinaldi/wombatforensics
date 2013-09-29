@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
 #include <QDir>
 #include <QStringList>
 #include <QActionGroup>
@@ -76,8 +77,10 @@ private:
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;
-    ofstream tmptxtfile;
-    ofstream tmphexfile;
+    //ofstream tmptxtfile;
+    //ofstream tmphexfile;
+    FILE* tmptxtfile;
+    FILE* tmphexfile;
 
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;

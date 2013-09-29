@@ -123,6 +123,12 @@ void WombatForensics::InitializeAppStructure()
         DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     QString logPath = wombatvariable.datapath + "WombatLog.db";
     QString tmppath = wombatvariable.tmpfilepath + "tmp.txt";
+    tmptxtfile = fopen(tmppath.toStdString().c_str(), "w");
+    fclose(tmptxtfile);
+    tmppath = wombatvariable.tmpfilepath + "tmp.dat";
+    tmphexfile = fopen(tmppath.toStdString().c_str(), "w+");
+    fclose(tmphexfile);
+    /*
     tmptxtfile.open(tmppath.toStdString().c_str(), ios::in | ios::out | ios::trunc);
     if(tmptxtfile.fail())
         fprintf(stderr, "\n\nNot Creating File\n\n");
@@ -137,6 +143,7 @@ void WombatForensics::InitializeAppStructure()
     tmphexfile.flush();
     tmphexfile.close();
     fprintf(stderr, "path: %s\n", tmppath.toStdString().c_str());
+    */
     bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
     if(!logFileExist)
     {
