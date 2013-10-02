@@ -675,7 +675,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     char buffer[32768];
     ssize_t bytesRead = 0;
     bytesRead = tmpFile->read(buffer, 32768);
-    
+    // MIGHT WANT TO RETURN THE BUFFER OR FIGURE OUT THE BEST WAY TO WRITE THIS DATA...
     //QByteArray ba;
     //QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.dat");
     //qFile.open(QIODevice::ReadWrite);
