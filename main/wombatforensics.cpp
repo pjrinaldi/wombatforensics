@@ -22,64 +22,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvariable.evidenceid = 0;
     wombatvariable.jobtype = 0;
     InitializeAppStructure();
-/*    QString homePath = QDir::homePath();
-    homePath += "/WombatForensics/";
-    wombatvariable.settingspath = homePath + "settings";
-    wombatvariable.datapath = homePath + "data/";
-    wombatvariable.casespath = homePath + "cases/";
-    wombatvariable.tmpfilepath = homePath + "tmpfiles/";
-    bool mkPath = (new QDir())->mkpath(wombatvariable.settingspath);
-    if(mkPath == false)
-        DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvariable.datapath);
-    if(mkPath == false)
-        DisplayError("2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvariable.casespath);
-    if(mkPath == false)
-        DisplayError("2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvariable.tmpfilepath);
-    if(mkPath == false)
-        DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
-    QString logPath = wombatvariable.datapath + "WombatLog.db";
-    bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
-    if(!logFileExist)
-    {
-        const char* errstring = wombatcasedata->CreateLogDB(logPath);
-        if(strcmp(errstring, "") != 0)
-            DisplayError("1.0", "Log File Error", errstring);
-    }
-    QString tmpPath = wombatvariable.datapath + "WombatCase.db";
-    bool doesFileExist = wombatcasedata->FileExists(tmpPath.toStdString());
-    if(!doesFileExist)
-    {
-        const char* errstring = wombatcasedata->CreateCaseDB(tmpPath);
-        if(strcmp(errstring, "") != 0)
-            DisplayError("1.0", "File Error", errstring);
-    }
-    else
-    {
-        const char* errstring = wombatcasedata->OpenCaseDB(tmpPath);
-        if(strcmp(errstring, "") != 0)
-            DisplayError("1.1", "SQL", errstring);
-    }
-    if(wombatcasedata->ReturnCaseCount() == 0)
-    {
-        ui->actionOpen_Case->setEnabled(false);
-    }
-    else if(wombatcasedata->ReturnCaseCount() > 0)
-    {
-        ui->actionOpen_Case->setEnabled(true);
-    }
-    else
-    {
-        DisplayError("1.0", "Case Count", "Invalid Case Count returned.");
-    }
-    ui->fileViewTabWidget->addTab(ibasictools->setupHexTab(), "Hex View");
-    ui->fileViewTabWidget->addTab(ibasictools->setupTxtTab(), "Text View");
-    ui->fileInfoTabWidget->addTab(ibasictools->setupDirTab(), "Directory List");
-    ui->fileInfoTabWidget->addTab(ibasictools->setupTypTab(), "File Type");
-    SetupDirModel();
-*/
     InitializeSleuthKit();
 }
 void WombatForensics::HideProgressWindow(bool checkedstate)
@@ -126,24 +68,10 @@ void WombatForensics::InitializeAppStructure()
     tmptxtfile = fopen(tmppath.toStdString().c_str(), "w");
     fclose(tmptxtfile);
     tmppath = wombatvariable.tmpfilepath + "tmp.dat";
-    tmphexfile = fopen(tmppath.toStdString().c_str(), "w+");
+    tmphexfile = fopen(tmppath.toStdString().c_str(), "wb+");
+    fprintf(tmphexfile, "test");
     fclose(tmphexfile);
-    /*
-    tmptxtfile.open(tmppath.toStdString().c_str(), ios::in | ios::out | ios::trunc);
-    if(tmptxtfile.fail())
-        fprintf(stderr, "\n\nNot Creating File\n\n");
-    tmptxtfile << "a";
-    tmptxtfile.flush();
-    tmptxtfile.close();
-    fprintf(stderr, "path: %s\n", tmppath.toStdString().c_str());
-    tmppath = wombatvariable.tmpfilepath + "tmp.dat";
-    char buf[2];
-    tmphexfile.open(tmppath.toStdString().c_str(), ios::in | ios::out | ios::binary | ios::trunc);
-    tmphexfile.write(buf, 2);
-    tmphexfile.flush();
-    tmphexfile.close();
-    fprintf(stderr, "path: %s\n", tmppath.toStdString().c_str());
-    */
+
     bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
     if(!logFileExist)
     {
