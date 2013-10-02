@@ -670,14 +670,25 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
 {
-    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
-    fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
-    std::wstring tmppath = TskServices::Instance().getFileManager().getPath((uint64_t)fileID);
+    TskFile *tfile;
     try
     {
-        int tmpbytes = TskServices::Instace().getImageFile().readFile(
+        TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
+        tfile = tmpFile;
+        fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
+        std::wstring tmppath = TskServices::Instance().getFileManager().getPath((uint64_t)fileID);
+        fprintf(stderr, "TskFile Path: %s\n", tmppath.c_str());
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Get File Failed");
+    }
+    try
+    {
+        //int tmpbytes = TskServices::Instace().getImageFile().readFile(
         //int tmphandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
         //tmpFile->open();
+        tfile->save();
     }
     catch(TskException ex)
     {
