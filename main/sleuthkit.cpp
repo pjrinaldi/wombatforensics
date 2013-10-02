@@ -672,8 +672,10 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
 {
     TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
+
     // BASED OFF OF THE TMPFILE->GETID(), ->GETSIZE(), services->getImageFile(), imagefile->getByteData() and will need absolute byte, length
     //tmpFile->save();
+    /*
     char buffer[tmpFile->getSize()];
     ssize_t bytesRead = 0;
     if(tmpFile->exists())
@@ -692,6 +694,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     //qFile.open(QIODevice::ReadWrite);
     //qFile.write((const char*)buffer, 32768);
     //qFile.close();
+    // */
     return "/home/pasquale/WombatForensics/tmpfiles/tmp.dat";
 }
 QString SleuthKitPlugin::GetFileTxtContents(int fileID)
