@@ -678,6 +678,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
         std::wstring tmppath = TskServices::Instance().getFileManager().getPath((uint64_t)fileID);
         fprintf(stderr, "TskFile Path: %s\n", tmppath.c_str());
+        tmpFile->open();
     }
     catch(TskException ex)
     {
@@ -688,7 +689,6 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         //int tmpbytes = TskServices::Instace().getImageFile().readFile(
         //int tmphandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
         //tmpFile->open();
-        tfile->save();
     }
     catch(TskException ex)
     {
