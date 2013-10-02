@@ -692,7 +692,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     }
     catch(TskException ex)
     {
-        fprintf(stderr, "Error Opening File: %s\n", ex.what());
+        fprintf(stderr, "Error Saving File\n");
     }
     /*
      * tskfile->open calls int = TskServices::Instance().getImageFile().openFile(fileID);

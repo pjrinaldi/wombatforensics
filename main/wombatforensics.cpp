@@ -448,7 +448,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     QString tmptext = "";
     tmptext = index.sibling(index.row(), 1).data().toString();
-    //fprintf(stderr, "unique id:'%s'\n", tmptext.toStdString().c_str());
+    fprintf(stderr, "unique id:'%s'\n", tmptext.toStdString().c_str());
     if(tmptext != "")
     {
         wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmptext.toInt());
