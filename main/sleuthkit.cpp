@@ -672,9 +672,19 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
 {
     TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
     fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
-    char buffer[32768];
+    //tmpFile->save();
+    char buffer[tmpFile->getSize()];
     ssize_t bytesRead = 0;
-    bytesRead = tmpFile->read(buffer, 32768);
+    if(tmpFile->exists())
+        fprintf(stderr, "File exists.\n");
+    else
+        fprintf(stderr, "File doesn't exist\n");
+    tmpFile->open();
+    bytesRead = tmpFile->read(buffer, tmpFile->getSize());
+    //QByteArray tmpblob = tmpFile->read((const char*)buffer, 32768);
+
+    //ssize_t bytesRead = 0;
+    //bytesRead = tmpFile->read(buffer, 32768);
     // MIGHT WANT TO RETURN THE BUFFER OR FIGURE OUT THE BEST WAY TO WRITE THIS DATA...
     //QByteArray ba;
     //QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.dat");
