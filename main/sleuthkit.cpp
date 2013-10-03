@@ -690,7 +690,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
 {
-    TskFile* actionfile;
+    TskFileTsk* actionfile;
     /*
     try
     {
@@ -715,23 +715,30 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     {
         //TskFile* tfile;
         std::auto_ptr<TskFile> tfile(TskServices::Instance().getFileManager().getFile((uint64_t)fileID));
-        actionfile = tfile.get();
+        actionfile = (TskFileTsk*)tfile.get();
+        fprintf(stderr, "File Path: %s\n", TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str());
+        FILE* emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "w");
+        fclose(emptyfile);
         fprintf(stderr, "It Works So Far\n");
         if(!actionfile->exists())
         {
             fprintf(stderr, "File does not exist\n");
             TskFileManagerImpl::instance().saveFile(actionfile);
+            //actionfile->save();
         }
         else
             fprintf(stderr, "File exists\n");
+        //actionfile->save();
+        TskServices::Instance().getFileManager().saveFile(actionfile);
         //actionfile->open();
         //TskServices::Instance().getFileManager().saveFile(actionfile);
         //TskFileManagerImpl::instance().saveFile(actionfile);
         //actionfile->save();
+        //TskServices::Instance().getImgDB().commit();
     }
     catch(TskException ex)
     {
-        fprintf(stderr, "Didn't Work\n");
+        fprintf(stderr, "Didn't Work: %s\n", ex.what());
     }
     catch(std::exception ex)
     {
