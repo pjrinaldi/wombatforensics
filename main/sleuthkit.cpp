@@ -321,7 +321,7 @@ void SleuthKitPlugin::SetupSystemProperties()
     QString tmpPath = wombatvariable.settingspath;
     tmpPath += "/tsk-config.xml";
     QFile tmpFile(tmpPath);
-    fprintf(stderr, "TmpPath: %s\n", tmpPath.toStdString().c_str());
+    //fprintf(stderr, "TmpPath: %s\n", tmpPath.toStdString().c_str());
     if(!tmpFile.exists()) // if tsk-config.xml does not exist, create and write it here
     {
         if(tmpFile.open(QFile::WriteOnly | QFile::Text))
@@ -338,6 +338,12 @@ void SleuthKitPlugin::SetupSystemProperties()
             xml.writeEndElement();
             xml.writeStartElement("MODULE_CONFIG_DIR");
             xml.writeCharacters("/usr/local/share/tsk");
+            xml.writeEndElement();
+            xml.writeStartElement("OUT_DIR");
+            xml.writeCharacters(wombatvariable.tmpfilepath);
+            xml.writeEndElement();
+            xml.writeStartElement("SYSTEM_OUT_DIR");
+            xml.writeCharacters("#OUT_DIR#/SystemOutput");
             xml.writeEndElement();
             xml.writeStartElement("PIPELINE_CONFIG_FILE");
             xml.writeCharacters("#CONFIG_DIR#/tsk-pipe.xml");
@@ -402,6 +408,7 @@ void SleuthKitPlugin::SetupSystemProperties()
     {
         fprintf(stderr, "couldn't load pipeline: %s\n", ex.message().c_str());
     }
+    /*
     try
     {
         SetSystemProperty(TskSystemProperties::OUT_DIR, "/home/pasquale/WombatForensics/tmpfiles");
@@ -410,6 +417,7 @@ void SleuthKitPlugin::SetupSystemProperties()
     {
         fprintf(stderr, "Setting out dir failed: %s\n", ex.message().c_str());
     }
+    */
 }
 void SleuthKitPlugin::SetupLog()
 {

@@ -23,6 +23,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvariable.jobtype = 0;
     InitializeAppStructure();
     InitializeSleuthKit();
+    //InitializePostSleuthKitStructure();
 }
 void WombatForensics::HideProgressWindow(bool checkedstate)
 {
@@ -50,7 +51,7 @@ void WombatForensics::InitializeAppStructure()
     wombatvariable.settingspath = homePath + "settings";
     wombatvariable.datapath = homePath + "data/";
     wombatvariable.casespath = homePath + "cases/";
-    wombatvariable.tmpfilepath = homePath + "tmpfiles/";
+    wombatvariable.tmpfilepath = homePath + "tmpfiles";
     bool mkPath = (new QDir())->mkpath(wombatvariable.settingspath);
     if(mkPath == false)
         DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
@@ -64,10 +65,10 @@ void WombatForensics::InitializeAppStructure()
     if(mkPath == false)
         DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     QString logPath = wombatvariable.datapath + "WombatLog.db";
-    QString tmppath = wombatvariable.tmpfilepath + "tmp.txt";
+    QString tmppath = wombatvariable.tmpfilepath + "/tmp.txt";
     tmptxtfile = fopen(tmppath.toStdString().c_str(), "w");
     fclose(tmptxtfile);
-    tmppath = wombatvariable.tmpfilepath + "tmp.dat";
+    tmppath = wombatvariable.tmpfilepath + "/tmp.dat";
     tmphexfile = fopen(tmppath.toStdString().c_str(), "wb+");
     fprintf(tmphexfile, "test");
     fclose(tmphexfile);
@@ -317,7 +318,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
 
 void WombatForensics::RemoveTmpFiles()
 {
-    QString tmppath = wombatvariable.tmpfilepath + "tmp.";
+    QString tmppath = wombatvariable.tmpfilepath + "/tmp.";
     if(QFile::remove(tmppath + "txt"))
     {
         //fprintf(stderr, "file was removed");
