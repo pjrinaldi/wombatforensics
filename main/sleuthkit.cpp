@@ -684,11 +684,26 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     */
     try
     {
+        TskServices::Instance().getImgDB().begin();
+        fprintf(stderr, "ImgDB begin worked.\n");
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "ImgDB Begin failed\n");
+    }
+    try
+    {
         //TskFile* tfile;
         std::auto_ptr<TskFile> tfile(TskServices::Instance().getFileManager().getFile((uint64_t)fileID));
         actionfile = tfile.get();
         fprintf(stderr, "It Works So Far\n");
-        TskFileManagerImpl::instance().saveFile(actionfile);
+        if(!actionfile->exists())
+            fprintf(stderr, "File does not exist\n");
+        else
+            fprintf(stderr, "File exists\n");
+        //actionfile->open();
+        //TskServices::Instance().getFileManager().saveFile(actionfile);
+        //TskFileManagerImpl::instance().saveFile(actionfile);
         //actionfile->save();
     }
     catch(TskException ex)
