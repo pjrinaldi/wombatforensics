@@ -670,6 +670,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
 {
+    TskFile* actionfile;
     /*
     try
     {
@@ -684,15 +685,31 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     try
     {
         //TskFile* tfile;
-        TskFile* actionfile;
         std::auto_ptr<TskFile> tfile(TskServices::Instance().getFileManager().getFile((uint64_t)fileID));
         actionfile = tfile.get();
         fprintf(stderr, "It Works So Far\n");
+        TskFileManagerImpl::instance().saveFile(actionfile);
+        //actionfile->save();
     }
     catch(TskException ex)
     {
         fprintf(stderr, "Didn't Work\n");
     }
+    catch(std::exception ex)
+    {
+        fprintf(stderr, "Std Didn't Work\n");
+    }
+    /*
+    try
+    {
+        actionfile->open();
+        fprintf(stderr, "Open Worked\n");
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Open Didn't work\n");
+    }
+    */
     /*
     TskFile *tfile;
     try
