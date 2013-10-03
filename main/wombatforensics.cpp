@@ -23,12 +23,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvariable.jobtype = 0;
     InitializeAppStructure();
     InitializeSleuthKit();
-    //InitializePostSleuthKitStructure();
 }
+
 void WombatForensics::HideProgressWindow(bool checkedstate)
 {
     ui->actionView_Progress->setChecked(checkedstate);
 }
+
 std::string WombatForensics::GetTime()
 {
     struct tm *newtime;

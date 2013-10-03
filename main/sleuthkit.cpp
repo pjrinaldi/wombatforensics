@@ -400,6 +400,19 @@ void SleuthKitPlugin::SetupSystemProperties()
             fprintf(stderr, "Could not open file for writing\n");
         pipeFile.close();
     }
+    // make the output directories
+    if(!(new QDir())->mkpath(QString::fromStdString(GetSystemProperty(TskSystemProperties::OUT_DIR))))
+        fprintf(stderr, "out_dir failed\n");
+    if(!(new QDir())->mkpath(QString::fromStdString(GetSystemProperty(TskSystemProperties::SYSTEM_OUT_DIR))))
+        fprintf(stderr, "system_out_dir failed\n");
+    if(!(new QDir())->mkpath(QString::fromStdString(GetSystemProperty(TskSystemProperties::MODULE_OUT_DIR))))
+        fprintf(stderr, "module_out_dir failed\n");
+    /*
+    bool mkPath = (new QDir())->mkpath(wombatvariable.settingspath);
+    if(mkPath == false)
+        DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
+    */
+    /*
     try
     {
         SetSystemProperty(TskSystemProperties::PIPELINE_CONFIG_FILE, tmpPath.toStdString());
@@ -408,7 +421,6 @@ void SleuthKitPlugin::SetupSystemProperties()
     {
         fprintf(stderr, "couldn't load pipeline: %s\n", ex.message().c_str());
     }
-    /*
     try
     {
         SetSystemProperty(TskSystemProperties::OUT_DIR, "/home/pasquale/WombatForensics/tmpfiles");
@@ -692,7 +704,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     */
     try
     {
-        TskServices::Instance().getImgDB().begin();
+        //TskServices::Instance().getImgDB().begin();
         fprintf(stderr, "ImgDB begin worked.\n");
     }
     catch(TskException ex)
@@ -706,7 +718,10 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         actionfile = tfile.get();
         fprintf(stderr, "It Works So Far\n");
         if(!actionfile->exists())
+        {
             fprintf(stderr, "File does not exist\n");
+            TskFileManagerImpl::instance().saveFile(actionfile);
+        }
         else
             fprintf(stderr, "File exists\n");
         //actionfile->open();
