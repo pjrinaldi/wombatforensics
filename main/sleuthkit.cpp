@@ -717,19 +717,33 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         std::auto_ptr<TskFile> tfile(TskServices::Instance().getFileManager().getFile((uint64_t)fileID));
         actionfile = (TskFileTsk*)tfile.get();
         fprintf(stderr, "File Path: %s\n", TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str());
-        FILE* emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "w");
+        FILE* emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
+        //emptyfile.write
         fclose(emptyfile);
-        fprintf(stderr, "It Works So Far\n");
-        if(!actionfile->exists())
-        {
-            fprintf(stderr, "File does not exist\n");
-            TskFileManagerImpl::instance().saveFile(actionfile);
+        //fprintf(stderr, "It Works So Far\n");
+        //if(!actionfile->exists())
+        //{
+            int ihandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
+            fprintf(stderr, "ihandle: %d\n", ihandle);
+            int offset = 0;
+            int isopen = true;
+            char* buffer;
+            size_t count = 32768;
+            int bytesRead = TskServices::Instance().getImageFile().readFile(ihandle, offset, count, buffer);
+            emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
+            fwrite(buffer, sizeof(buffer), 1, emptyfile);
+            fclose(emptyfile);
+           //FILE* emptyfile = fopen(TskUtilities
+            //ssize_t bytesRead = 0;
+            //bytesRead = tmpFile->read(buffer, 32768);
+           //fprintf(stderr, "File does not exist\n");
+            //TskFileManagerImpl::instance().saveFile(actionfile);
             //actionfile->save();
-        }
-        else
-            fprintf(stderr, "File exists\n");
+        //}
+        //else
+            //fprintf(stderr, "File exists\n");
         //actionfile->save();
-        TskServices::Instance().getFileManager().saveFile(actionfile);
+        //TskServices::Instance().getFileManager().saveFile(actionfile);
         //actionfile->open();
         //TskServices::Instance().getFileManager().saveFile(actionfile);
         //TskFileManagerImpl::instance().saveFile(actionfile);
