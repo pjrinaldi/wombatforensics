@@ -44,6 +44,7 @@ public:
     void SetupBlackboard();
     void SetupImageDatabase();
     void SetEvidenceDB(WombatVariable wombatVariable);
+    void SetEvidenceImage(WombatVariable wombatVariable);
     Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
     Q_INVOKABLE void RefreshTreeViews(WombatVariable wombatVariable);
     Q_INVOKABLE void PopulateCase(WombatVariable wombatVariable);

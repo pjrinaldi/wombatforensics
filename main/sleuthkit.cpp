@@ -234,7 +234,21 @@ void SleuthKitPlugin::TaskMap(TskSchedulerQueue::task_struct* &task)
         filepipeline->logModuleExecutionTimes();
     }
 }
-
+void SleuthKitPlugin::SetEvidenceImage(WombatVariable wombatVariable)
+{
+    wombatvariable = wombatVariable;
+    TskImageFileTsk imagefiletsk;
+    try
+    {
+        imagefiletsk.open(wombatvariable.evidencepath.toStdString());
+        TskServices::Instance().setImageFile(imagefiletsk);
+        fprintf(stderr, "Opening Image File was successful!\n");
+    }
+    catch(TskException &ex)
+    {
+        fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
+    }
+}
 void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
@@ -273,6 +287,7 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
+    SetEvidenceImage(wombatvariable);
     GetFileContents(wombatvariable.fileid);
     GetFileTxtContents(wombatvariable.fileid);
     emit LoadFileContents(wombatvariable.tmpfilepath);
@@ -691,6 +706,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
 QString SleuthKitPlugin::GetFileContents(int fileID)
 {
     TskFileTsk* actionfile;
+    TskFile* tmpfile;
     /*
     try
     {
@@ -715,14 +731,17 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     {
         //TskFile* tfile;
         std::auto_ptr<TskFile> tfile(TskServices::Instance().getFileManager().getFile((uint64_t)fileID));
-        actionfile = (TskFileTsk*)tfile.get();
+        tmpfile = tfile.get();
+        //actionfile = (TskFileTsk*)tfile.get();
         fprintf(stderr, "File Path: %s\n", TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str());
         FILE* emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
         //emptyfile.write
         fclose(emptyfile);
+
         //fprintf(stderr, "It Works So Far\n");
         //if(!actionfile->exists())
         //{
+        /*
             int ihandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
             fprintf(stderr, "ihandle: %d\n", ihandle);
             int offset = 0;
@@ -733,6 +752,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
             emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
             fwrite(buffer, sizeof(buffer), 1, emptyfile);
             fclose(emptyfile);
+        */
            //FILE* emptyfile = fopen(TskUtilities
             //ssize_t bytesRead = 0;
             //bytesRead = tmpFile->read(buffer, 32768);
@@ -758,18 +778,18 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     {
         fprintf(stderr, "Std Didn't Work\n");
     }
-    /*
+    
     try
     {
-        actionfile->open();
+        //tmpfile->open();
+        //actionfile->open();
         fprintf(stderr, "Open Worked\n");
     }
     catch(TskException ex)
     {
         fprintf(stderr, "Open Didn't work\n");
     }
-    */
-    /*
+        /*
     TskFile *tfile;
     try
     {
@@ -784,16 +804,18 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     {
         fprintf(stderr, "Get File Failed");
     }
+    */
     try
     {
         //int tmpbytes = TskServices::Instace().getImageFile().readFile(
-        //int tmphandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
+        int tmphandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
         //tmpFile->open();
     }
     catch(TskException ex)
     {
         fprintf(stderr, "Error Saving File\n");
     }
+    /*
     */
     /*
      * tskfile->open calls int = TskServices::Instance().getImageFile().openFile(fileID);
