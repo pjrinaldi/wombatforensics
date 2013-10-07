@@ -436,7 +436,7 @@ void SleuthKitPlugin::SetupLog()
     QString tmpPath = wombatvariable.datapath + "/tsk-log.txt";
     try
     {
-        log = new TskLog();
+        log = new TskLog(wombatvariable.datapath.toStdString());
         log->open(tmpPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
         fprintf(stderr, "Loading Log File was successful!\n");

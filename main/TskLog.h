@@ -16,7 +16,11 @@ class TskLog : public QObject, public Log
     Q_OBJECT
 public:
 
-    TskLog() {};
+    TskLog(std::string datapath)
+    {
+        dbpath = datapath;
+        dbpath.append("WombatLog.db");
+    };
     virtual ~TskLog() 
     {
         Log::close();

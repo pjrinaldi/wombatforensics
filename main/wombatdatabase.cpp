@@ -45,7 +45,6 @@ const char* WombatDatabase::CreateCaseDB(QString wombatdbname)
         foreach(tblString, wombatTableSchema)
         {
             sqlite3_stmt* tmpstmt;
-            //if(sqlite3_prepare_v2(wombatdb, tblString, -1, &sqlstatement, NULL) == SQLITE_OK)
             if(sqlite3_prepare_v2(wombatdb, tblString, -1, &tmpstmt, NULL) == SQLITE_OK)
             {
                 int ret = sqlite3_step(tmpstmt);
