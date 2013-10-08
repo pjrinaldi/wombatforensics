@@ -727,7 +727,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         int bytesread = imgfile.readFile(handle, offset, 32768, buffer); // int handle, byte offset, bytelen buffer
         fprintf(stderr, "Bytes read: %d\n", bytesread);
         ofstream file;
-        file.open(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str());
+        file.open(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), ios::out | ios::binary);
         file.write(buffer, sizeof buffer);
         file.close();
         //int errval = TskServices::Instance().getImageFile().openFile(fileID);
