@@ -5,15 +5,8 @@
 #include "wombatdatabase.h"
 #include "basictools.h"
 #include <sqlite3.h>
-#include <tsk/framework/framework.h>
+#include "../sleuthkit/framework/tsk/framework/framework.h"
 #include <time.h>
-#include "TskSystemPropertiesImpl.h"
-#include "TskImgDBSqlite.h"
-#include "TskDBBlackboard.h"
-#include "TskSchedulerQueue.h"
-#include <tsk/framework/file/TskFileManagerImpl.h>
-#include "TskImageFileTsk.h"
-#include <tsk/framework/file/TskFileTsk.h>
 #include "TskLog.h"
 #include <QtPlugin>
 #include <QObject>
