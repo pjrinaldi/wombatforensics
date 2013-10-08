@@ -718,6 +718,8 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     }
     try
     {
+        // THIS WORKS, NEED TO BREAK UP CALLS INTO THEIR OWN TRY/CATCH AND THEN RETURN MY FILEPATH TO READ, WHICH SHOULD BE EASY
+        // SINCE I HAVE .GETPATH()
         imgfile.open(wombatvariable.evidencepath.toStdString());
         int handle = imgfile.openFile(fileID);
         int offset = 0;
