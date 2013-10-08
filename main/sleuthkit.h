@@ -5,7 +5,7 @@
 #include "wombatdatabase.h"
 #include "basictools.h"
 #include <sqlite3.h>
-#include "../sleuthkit/framework/tsk/framework/framework.h"
+#include "../sleuthkit/framework/tsk/framework/framework.h" // provides tsk framework
 #include <time.h>
 #include "TskLog.h"
 #include <QtPlugin>
