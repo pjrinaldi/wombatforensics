@@ -808,7 +808,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     try
     {
         //int tmpbytes = TskServices::Instace().getImageFile().readFile(
-        int tmphandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
+        //int tmphandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
         //tmpFile->open();
     }
     catch(TskException ex)
