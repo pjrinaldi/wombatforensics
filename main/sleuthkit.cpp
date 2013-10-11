@@ -241,6 +241,7 @@ void SleuthKitPlugin::SetEvidenceImage(WombatVariable wombatVariable)
     try
     {
         imagefiletsk.open(wombatvariable.evidencepath.toStdString());
+        //currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
         TskServices::Instance().setImageFile(imagefiletsk);
         fprintf(stderr, "Opening/Setting Image File was successful!\n");
     }
@@ -287,9 +288,10 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
-    SetEvidenceImage(wombatvariable);
-    GetFileContents(wombatvariable.fileid);
-    GetFileTxtContents(wombatvariable.fileid);
+    //SetEvidenceImage(wombatvariable);
+    wombatvariable.tmpfilepath = GetFileContents(wombatvariable.fileid);
+    fprintf(stderr, "tmpfilepath: %s\n", wombatvariable.tmpfilepath.toStdString().c_str());
+    //GetFileTxtContents(wombatvariable.fileid);
     emit LoadFileContents(wombatvariable.tmpfilepath);
 }
 
@@ -705,6 +707,77 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
 {
+    TskImageFileTsk currentimagefiletsk;
+    try
+    {
+        currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
+        TskServices::Instance().setImageFile(currentimagefiletsk);
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Error setfile: %s\n", ex.what());
+    }
+    int ihandle;
+    try
+    {
+        ihandle = TskServices::Instance().getImageFile().openFile(fileID);
+        fprintf(stderr, "getimagefile works...");
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Error getFile: %s\n", ex.what());
+    }
+    TskFile* tfile;
+    try
+    {
+        tfile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
+        fprintf(stderr, "get file from image works\n");
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Get File Error: %s\n", ex.what());
+    }
+    try
+    {
+    if(!tfile->exists())
+    {
+        /*
+        int offset = 0;
+        int isopen = true;
+        char* buffer;
+        size_t count = 32768;
+        int bytesread = TskServices::Instance().getImageFile().readFile(ihandle, offset, count, buffer);
+        FILE* emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
+        fwrite(buffer, sizeof(buffer), 1, emptyfile);
+        fclose(emptyfile);
+        fprintf(stderr, "Read file/write to fail worked. %s\n");
+        */
+        TskServices::Instance().getFileManager().saveFile(tfile);
+    }
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "read file/write to fail failed %s\n", ex.what());
+    }
+
+    return QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
+        //currentimagefiletsk = TskServices::Instance()
+        //
+        /*
+         //if(!actionfile->exists())
+        //{
+            int ihandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
+            fprintf(stderr, "ihandle: %d\n", ihandle);
+            int offset = 0;
+            int isopen = true;
+            char* buffer;
+            size_t count = 32768;
+            int bytesRead = TskServices::Instance().getImageFile().readFile(ihandle, offset, count, buffer);
+            emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
+            fwrite(buffer, sizeof(buffer), 1, emptyfile);
+            fclose(emptyfile);
+        */ 
+    /*
     TskImageFileTsk imgfile;
     TskFileTsk* afile;
     TskFile* tfile;
@@ -734,10 +807,12 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         //int errval = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
         //TskServices::Instance().getFileManager().saveFile((TskFileTsk*)tfile);
     }
-    catch(TskException ex)
+    ca
+    tch(TskException ex)
     {
         fprintf(stderr, "Error saveFile: %s\n", ex.what());
     }
+    */
     /*
     TskFileTsk* actionfile;
     TskFile* tmpfile;
@@ -873,7 +948,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     //qFile.close();
     // */
     
-    return "/home/pasquale/WombatForensics/tmpfiles/tmp.dat";
+    //return "/home/pasquale/WombatForensics/tmpfiles/tmp.dat";
 
 }
 QString SleuthKitPlugin::GetFileTxtContents(int fileID)
