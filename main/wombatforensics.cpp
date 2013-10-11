@@ -66,14 +66,6 @@ void WombatForensics::InitializeAppStructure()
     if(mkPath == false)
         DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     QString logPath = wombatvariable.datapath + "WombatLog.db";
-    QString tmppath = wombatvariable.tmpfilepath + "/tmp.txt";
-    tmptxtfile = fopen(tmppath.toStdString().c_str(), "w");
-    fclose(tmptxtfile);
-    tmppath = wombatvariable.tmpfilepath + "/tmp.dat";
-    tmphexfile = fopen(tmppath.toStdString().c_str(), "wb+");
-    fprintf(tmphexfile, "test");
-    fclose(tmphexfile);
-
     bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
     if(!logFileExist)
     {
@@ -319,15 +311,15 @@ void WombatForensics::closeEvent(QCloseEvent* event)
 
 void WombatForensics::RemoveTmpFiles()
 {
-    QString tmppath = wombatvariable.tmpfilepath + "/tmp.";
-    if(QFile::remove(tmppath + "txt"))
+    QString homePath = QDir::homePath();
+    homePath += "/WombatForensics/";
+    homePath += "tmpfiles/";
+    QDir tmpdir(homePath);
+    if(!tmpdir.removeRecursively())
     {
-        //fprintf(stderr, "file was removed");
+        DisplayError("2.7", "Tmp File Removal", "All tmp files may not have been removed. Please manually remove them to avoid evidence contamination.");
     }
-    if(QFile::remove(tmppath + "dat"))
-    {
-        // file was removed.
-    }
+    fprintf(stderr, "remove dir: %s\n", homePath.toStdString().c_str());
 }
 
 void WombatForensics::on_actionNew_Case_triggered()

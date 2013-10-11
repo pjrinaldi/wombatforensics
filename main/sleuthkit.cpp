@@ -234,22 +234,7 @@ void SleuthKitPlugin::TaskMap(TskSchedulerQueue::task_struct* &task)
         filepipeline->logModuleExecutionTimes();
     }
 }
-void SleuthKitPlugin::SetEvidenceImage(WombatVariable wombatVariable)
-{
-    wombatvariable = wombatVariable;
-    TskImageFileTsk imagefiletsk;
-    try
-    {
-        imagefiletsk.open(wombatvariable.evidencepath.toStdString());
-        //currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
-        TskServices::Instance().setImageFile(imagefiletsk);
-        fprintf(stderr, "Opening/Setting Image File was successful!\n");
-    }
-    catch(TskException &ex)
-    {
-        fprintf(stderr, "Opening Evidence: %s\n", ex.message().c_str());
-    }
-}
+
 void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
@@ -288,7 +273,6 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
-    //SetEvidenceImage(wombatvariable);
     wombatvariable.tmpfilepath = GetFileContents(wombatvariable.fileid);
     fprintf(stderr, "tmpfilepath: %s\n", wombatvariable.tmpfilepath.toStdString().c_str());
     //GetFileTxtContents(wombatvariable.fileid);
@@ -739,21 +723,10 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     }
     try
     {
-    if(!tfile->exists())
-    {
-        /*
-        int offset = 0;
-        int isopen = true;
-        char* buffer;
-        size_t count = 32768;
-        int bytesread = TskServices::Instance().getImageFile().readFile(ihandle, offset, count, buffer);
-        FILE* emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
-        fwrite(buffer, sizeof(buffer), 1, emptyfile);
-        fclose(emptyfile);
-        fprintf(stderr, "Read file/write to fail worked. %s\n");
-        */
-        TskServices::Instance().getFileManager().saveFile(tfile);
-    }
+        if(!tfile->exists())
+        {
+            TskServices::Instance().getFileManager().saveFile(tfile);
+        }
     }
     catch(TskException ex)
     {
@@ -761,205 +734,4 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     }
 
     return QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
-        //currentimagefiletsk = TskServices::Instance()
-        //
-        /*
-         //if(!actionfile->exists())
-        //{
-            int ihandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
-            fprintf(stderr, "ihandle: %d\n", ihandle);
-            int offset = 0;
-            int isopen = true;
-            char* buffer;
-            size_t count = 32768;
-            int bytesRead = TskServices::Instance().getImageFile().readFile(ihandle, offset, count, buffer);
-            emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
-            fwrite(buffer, sizeof(buffer), 1, emptyfile);
-            fclose(emptyfile);
-        */ 
-    /*
-    TskImageFileTsk imgfile;
-    TskFileTsk* afile;
-    TskFile* tfile;
-    try
-    {
-        tfile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "Error getFile: %s\n", ex.what());
-    }
-    try
-    {
-        // THIS WORKS, NEED TO BREAK UP CALLS INTO THEIR OWN TRY/CATCH AND THEN RETURN MY FILEPATH TO READ, WHICH SHOULD BE EASY
-        // SINCE I HAVE .GETPATH()
-        imgfile.open(wombatvariable.evidencepath.toStdString());
-        int handle = imgfile.openFile(fileID);
-        int offset = 0;
-        char buffer[32768];
-        int bytesread = imgfile.readFile(handle, offset, 32768, buffer); // int handle, byte offset, bytelen buffer
-        fprintf(stderr, "Bytes read: %d\n", bytesread);
-        ofstream file;
-        file.open(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), ios::out | ios::binary);
-        file.write(buffer, sizeof buffer);
-        file.close();
-        //int errval = TskServices::Instance().getImageFile().openFile(fileID);
-        //int errval = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
-        //TskServices::Instance().getFileManager().saveFile((TskFileTsk*)tfile);
-    }
-    ca
-    tch(TskException ex)
-    {
-        fprintf(stderr, "Error saveFile: %s\n", ex.what());
-    }
-    */
-    /*
-    TskFileTsk* actionfile;
-    TskFile* tmpfile;
-    try
-    {
-        int errval = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
-        fprintf(stderr, "Error: %d\n", errval);
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "Didn't Work");
-    }
-    try
-    {
-        //TskServices::Instance().getImgDB().begin();
-        fprintf(stderr, "ImgDB begin worked.\n");
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "ImgDB Begin failed\n");
-    }
-    try
-    {
-        //TskFile* tfile;
-        std::auto_ptr<TskFile> tfile(TskServices::Instance().getFileManager().getFile((uint64_t)fileID));
-        tmpfile = tfile.get();
-        //actionfile = (TskFileTsk*)tfile.get();
-        fprintf(stderr, "File Path: %s\n", TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str());
-        FILE* emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
-        //emptyfile.write
-        fclose(emptyfile);
-
-        //fprintf(stderr, "It Works So Far\n");
-        //if(!actionfile->exists())
-        //{
-            int ihandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
-            fprintf(stderr, "ihandle: %d\n", ihandle);
-            int offset = 0;
-            int isopen = true;
-            char* buffer;
-            size_t count = 32768;
-            int bytesRead = TskServices::Instance().getImageFile().readFile(ihandle, offset, count, buffer);
-            emptyfile = fopen(TskUtilities::toUTF8(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)).c_str(), "wb");
-            fwrite(buffer, sizeof(buffer), 1, emptyfile);
-            fclose(emptyfile);
-           //FILE* emptyfile = fopen(TskUtilities
-            //ssize_t bytesRead = 0;
-            //bytesRead = tmpFile->read(buffer, 32768);
-           //fprintf(stderr, "File does not exist\n");
-            //TskFileManagerImpl::instance().saveFile(actionfile);
-            //actionfile->save();
-        //}
-        //else
-            //fprintf(stderr, "File exists\n");
-        //actionfile->save();
-        //TskServices::Instance().getFileManager().saveFile(actionfile);
-        //actionfile->open();
-        //TskServices::Instance().getFileManager().saveFile(actionfile);
-        //TskFileManagerImpl::instance().saveFile(actionfile);
-        //actionfile->save();
-        //TskServices::Instance().getImgDB().commit();
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "Didn't Work: %s\n", ex.what());
-    }
-    catch(std::exception ex)
-    {
-        fprintf(stderr, "Std Didn't Work\n");
-    }
-    
-    try
-    {
-        //tmpfile->open();
-        //actionfile->open();
-        fprintf(stderr, "Open Worked\n");
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "Open Didn't work\n");
-    }
-    TskFile *tfile;
-    try
-    {
-        TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
-        tfile = tmpFile;
-        fprintf(stderr, "TskFile ID: %i :: GetSize: %i :: Name: %s\n", tmpFile->getId(), tmpFile->getSize(), tmpFile->getName().c_str());
-        std::wstring tmppath = TskServices::Instance().getFileManager().getPath((uint64_t)fileID);
-        fprintf(stderr, "TskFile Path: %s\n", tmppath.c_str());
-        tmpFile->open();
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "Get File Failed");
-    }
-    try
-    {
-        //int tmpbytes = TskServices::Instace().getImageFile().readFile(
-        //int tmphandle = TskServices::Instance().getImageFile().openFile((uint64_t)fileID);
-        //tmpFile->open();
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "Error Saving File\n");
-    }
-    */
-    /*
-     * tskfile->open calls int = TskServices::Instance().getImageFile().openFile(fileID);
-     * if (int == -1) error opening file
-     * tskfile->read(char* buf, const size_t count) calls 
-     */ 
-
-    // BASED OFF OF THE TMPFILE->GETID(), ->GETSIZE(), services->getImageFile(), imagefile->getByteData() and will need absolute byte, length
-    //tmpFile->save();
-    /*
-    char buffer[tmpFile->getSize()];
-    ssize_t bytesRead = 0;
-    if(tmpFile->exists())
-        fprintf(stderr, "File exists.\n");
-    else
-        fprintf(stderr, "File doesn't exist\n");
-    tmpFile->open();
-    bytesRead = tmpFile->read(buffer, tmpFile->getSize());
-    //QByteArray tmpblob = tmpFile->read((const char*)buffer, 32768);
-
-    //ssize_t bytesRead = 0;
-    //bytesRead = tmpFile->read(buffer, 32768);
-    // MIGHT WANT TO RETURN THE BUFFER OR FIGURE OUT THE BEST WAY TO WRITE THIS DATA...
-    //QByteArray ba;
-    //QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.dat");
-    //qFile.open(QIODevice::ReadWrite);
-    //qFile.write((const char*)buffer, 32768);
-    //qFile.close();
-    // */
-    
-    //return "/home/pasquale/WombatForensics/tmpfiles/tmp.dat";
-
-}
-QString SleuthKitPlugin::GetFileTxtContents(int fileID)
-{
-    TskFile *tmpFile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
-    char buffer[32768];
-    //ssize_t bytesRead = 0;
-    //bytesRead = tmpFile->read(buffer, 32768);
-    QFile qFile("/home/pasquale/WombatForensics/tmpfiles/tmp.txt");
-    qFile.open(QIODevice::ReadWrite);
-    qFile.write((const char*)buffer, 32768);
-    qFile.close();
-    return "/home/pasquale/WombatForensics/tmpfiles/tmp.txt";
 }

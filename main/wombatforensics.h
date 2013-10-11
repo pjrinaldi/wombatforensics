@@ -77,10 +77,6 @@ private:
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;
-    //ofstream tmptxtfile;
-    //ofstream tmphexfile;
-    FILE* tmptxtfile;
-    FILE* tmphexfile;
 
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;
