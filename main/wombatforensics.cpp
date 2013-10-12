@@ -276,21 +276,18 @@ void WombatForensics::GetImageNode(QStandardItem* imagenode)
     QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
     currentroot->appendRow(imagenode);
     currenttreeview->setModel(wombatdirmodel);
-    connect(wombatdirmodel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(ResizeColumns(const QModelIndex&, const QModelIndex&)), Qt::DirectConnection);
+    ResizeColumns(wombatdirmodel);
     UpdateMessageTable();
 
 }
 
-void WombatForensics::ResizeColumns(const QModelIndex& topleft, const QModelIndex& bottomright)
+void WombatForensics::ResizeColumns(QStandardItemModel* currentmodel)
 {
-    int firstcol = topleft.column();
-    int lastcol = bottomright.column();
-    do
+    for(int i=0; i < currentmodel->columnCount(); i++)
     {
-        currenttreeview->resizeColumnToContents(firstcol);
-        firstcol++;
+        currenttreeview->resizeColumnToContents(i);
     }
-    while(firstcol < lastcol);
+    fprintf(stderr, "Resizing Column\n");
 }
 
 void WombatForensics::SetupDirModel(void)
@@ -302,6 +299,7 @@ void WombatForensics::SetupDirModel(void)
     QStandardItem *evidenceNode = wombatdirmodel->invisibleRootItem();
     currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
     currenttreeview->setModel(wombatdirmodel);
+    ResizeColumns(wombatdirmodel);
     connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
 }
 
