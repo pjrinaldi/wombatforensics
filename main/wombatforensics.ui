@@ -61,8 +61,15 @@
     <addaction name="actionRemove_Evidence"/>
     <addaction name="separator"/>
    </widget>
+   <widget class="QMenu" name="menuAction">
+    <property name="title">
+        <string>Action</string>
+    </property>
+    <addaction name="actionExport_File"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEvidence"/>
+   <addaction name="menuAction"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusbar"/>
   <widget class="QToolBar" name="mainToolBar">
@@ -91,6 +98,8 @@
    <addaction name="separator"/>
    <addaction name="actionAdd_Evidence"/>
    <addaction name="actionRemove_Evidence"/>
+   <addaction name="separator"/>
+   <addaction name="actionExport_File"/>
   </widget>
   <action name="actionNew_Case">
    <property name="icon">
@@ -142,6 +151,14 @@
    <property name="text">
     <string>Remove Evidence</string>
    </property>
+  </action>
+  <action name="actionExport_File">
+    <property name="text">
+        <string>Export File</string>
+    </property>
+    <property name="icon">
+        <iconset><normaloff>:/basic/export</normaloff>:/basic/export</iconset>
+    </property>
   </action>
  </widget>
  <resources/>

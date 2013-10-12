@@ -642,12 +642,16 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                     }
                     for(int i=0; i < (int)fileRecordVector.size(); i++)
                     {
+                        QStandardItem* tmpitem;
                         fullPath = imagename + "/" + currentVolPath + currentFsPath + QString(fileRecordVector[i].fullPath.c_str());
                         // full path might contain more than i thought, to include unalloc and whatnot
                         QList<QStandardItem*> sleuthList;
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
                         //fprintf(stderr, "FileRecordVectorSize: %d - ObjectIDListSize: %d\n", fileRecordVector.size(), objectidlist.count());
-                        sleuthList << new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
+                        tmpitem = new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
+                        tmpitem->setCheckable(true);
+                        sleuthList << tmpitem;
+                        //sleuthList << new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
                         //sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
                         sleuthList << new QStandardItem(fullPath);
                         sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
@@ -731,6 +735,10 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     catch(TskException ex)
     {
         fprintf(stderr, "read file/write to fail failed %s\n", ex.what());
+    }
+    catch(std::exception ex)
+    {
+        fprintf(stderr, "read file/write to fail %s\n", ex.what());
     }
 
     return QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));

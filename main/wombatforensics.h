@@ -63,7 +63,6 @@ private slots:
     void ResizeColumns(QStandardItemModel* currentmodel);
     void ResizeViewColumns(const QModelIndex &index)
     {
-        //currenttreeview->resizeColumnToContents(index.column());
         ResizeColumns((QStandardItemModel*)index.model());
     }
 
