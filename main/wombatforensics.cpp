@@ -276,9 +276,23 @@ void WombatForensics::GetImageNode(QStandardItem* imagenode)
     QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
     currentroot->appendRow(imagenode);
     currenttreeview->setModel(wombatdirmodel);
+    connect(wombatdirmodel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(ResizeColumns(const QModelIndex&, const QModelIndex&)), Qt::DirectConnection);
     UpdateMessageTable();
 
 }
+
+void WombatForensics::ResizeColumns(const QModelIndex& topleft, const QModelIndex& bottomright)
+{
+    int firstcol = topleft.column();
+    int lastcol = bottomright.column();
+    do
+    {
+        currenttreeview->resizeColumnToContents(firstcol);
+        firstcol++;
+    }
+    while(firstcol < lastcol);
+}
+
 void WombatForensics::SetupDirModel(void)
 {
     wombatdirmodel = new QStandardItemModel();
