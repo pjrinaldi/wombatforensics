@@ -60,6 +60,12 @@ private slots:
     void SendFileContents(QString filepath);
     void PopulateProgressWindow(WombatVariable wvariable);
     void UpdateCaseData(WombatVariable wvariable);
+    void ResizeColumns(QStandardItemModel* currentmodel);
+    void ResizeViewColumns(const QModelIndex &index)
+    {
+        //currenttreeview->resizeColumnToContents(index.column());
+        ResizeColumns((QStandardItemModel*)index.model());
+    }
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -72,7 +78,6 @@ private:
     void RemoveTmpFiles();
     
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
-    void ResizeColumns(QStandardItemModel* currentmodel);
     std::string GetTime(void);
     QThreadPool *threadpool;
     QTreeView *currenttreeview;

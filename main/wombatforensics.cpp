@@ -285,6 +285,9 @@ void WombatForensics::ResizeColumns(QStandardItemModel* currentmodel)
 {
     for(int i=0; i < currentmodel->columnCount(); i++)
     {
+        // may need to compare treeview->model() == currentmodel) to determine what to set it to.
+        // depending on the design though, i may not need multiple layouts since the columns can be sorted.
+        // have to see as i go. for now its good.
         currenttreeview->resizeColumnToContents(i);
     }
     fprintf(stderr, "Resizing Column\n");
@@ -301,6 +304,7 @@ void WombatForensics::SetupDirModel(void)
     currenttreeview->setModel(wombatdirmodel);
     ResizeColumns(wombatdirmodel);
     connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+    connect(currenttreeview, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
 }
 
 void WombatForensics::SendFileContents(QString filepath)
