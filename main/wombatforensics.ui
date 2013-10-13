@@ -65,7 +65,7 @@
     <property name="title">
         <string>Action</string>
     </property>
-    <addaction name="actionExport_File"/>
+    <addaction name="actionExport_Evidence"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEvidence"/>
@@ -99,7 +99,7 @@
    <addaction name="actionAdd_Evidence"/>
    <addaction name="actionRemove_Evidence"/>
    <addaction name="separator"/>
-   <addaction name="actionExport_File"/>
+   <addaction name="actionExport_Evidence"/>
   </widget>
   <action name="actionNew_Case">
    <property name="icon">
@@ -152,9 +152,9 @@
     <string>Remove Evidence</string>
    </property>
   </action>
-  <action name="actionExport_File">
+  <action name="actionExport_Evidence">
     <property name="text">
-        <string>Export File</string>
+        <string>Export Evidence</string>
     </property>
     <property name="icon">
         <iconset><normaloff>:/basic/export</normaloff>:/basic/export</iconset>
@@ -190,6 +190,12 @@
       <signal>triggered()</signal>
       <receiver>WombatForensics</receiver>
       <slot>RemEvidence()</slot>
+  </connection>
+  <connection>
+      <sender>actionExport_Evidence</sender>
+      <signal>triggered()</signal>
+      <receiver>WombatForensics</receiver>
+      <slot>ExportEvidence()</slot>
   </connection>
  </connections>
 </ui>

@@ -48,6 +48,7 @@ signals:
 private slots:
     void AddEvidence();
     void RemEvidence();
+    void ExportEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
     void on_actionView_Progress_triggered(bool checked);

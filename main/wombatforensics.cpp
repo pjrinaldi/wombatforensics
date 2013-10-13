@@ -198,6 +198,13 @@ void WombatForensics::RemEvidence()
     }
 }
 
+void WombatForensics::ExportEvidence()
+{
+    // need to create dialog which asks to export "checked files (# checked) || selected file" asks for storage location, asks to keep original path
+    // then it should loop over file list and export files accordingly using copyFile
+    fprintf(stderr, "Export Evidence File(s) to chosen location\n");
+}
+
 void WombatForensics::UpdateCaseData(WombatVariable wvariable)
 {
     // refresh views here

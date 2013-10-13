@@ -35,7 +35,7 @@ public:
     QAction *actionExit;
     QAction *actionAdd_Evidence;
     QAction *actionRemove_Evidence;
-    QAction *actionExport_File;
+    QAction *actionExport_Evidence;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QSplitter *splitter;
@@ -81,11 +81,11 @@ public:
         QIcon icon4;
         icon4.addFile(QStringLiteral(":/basic/remevidence"), QSize(), QIcon::Normal, QIcon::Off);
         actionRemove_Evidence->setIcon(icon4);
-        actionExport_File = new QAction(WombatForensics);
-        actionExport_File->setObjectName(QStringLiteral("actionExport_File"));
+        actionExport_Evidence = new QAction(WombatForensics);
+        actionExport_Evidence->setObjectName(QStringLiteral("actionExport_Evidence"));
         QIcon icon5;
         icon5.addFile(QStringLiteral(":/basic/export"), QSize(), QIcon::Normal, QIcon::Off);
-        actionExport_File->setIcon(icon5);
+        actionExport_Evidence->setIcon(icon5);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -136,7 +136,7 @@ public:
         menuEvidence->addAction(actionAdd_Evidence);
         menuEvidence->addAction(actionRemove_Evidence);
         menuEvidence->addSeparator();
-        menuAction->addAction(actionExport_File);
+        menuAction->addAction(actionExport_Evidence);
         mainToolBar->addAction(actionNew_Case);
         mainToolBar->addAction(actionOpen_Case);
         mainToolBar->addSeparator();
@@ -145,12 +145,13 @@ public:
         mainToolBar->addAction(actionAdd_Evidence);
         mainToolBar->addAction(actionRemove_Evidence);
         mainToolBar->addSeparator();
-        mainToolBar->addAction(actionExport_File);
+        mainToolBar->addAction(actionExport_Evidence);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
         QObject::connect(actionAdd_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(AddEvidence()));
         QObject::connect(actionRemove_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(RemEvidence()));
+        QObject::connect(actionExport_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(ExportEvidence()));
 
         fileInfoTabWidget->setCurrentIndex(-1);
 
@@ -167,7 +168,7 @@ public:
         actionExit->setText(QApplication::translate("WombatForensics", "Exit", 0));
         actionAdd_Evidence->setText(QApplication::translate("WombatForensics", "Add Evidence", 0));
         actionRemove_Evidence->setText(QApplication::translate("WombatForensics", "Remove Evidence", 0));
-        actionExport_File->setText(QApplication::translate("WombatForensics", "Export File", 0));
+        actionExport_Evidence->setText(QApplication::translate("WombatForensics", "Export Evidence", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));
