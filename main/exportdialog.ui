@@ -52,7 +52,7 @@
      <item>
       <widget class="QGroupBox" name="groupBox_2">
        <property name="title">
-        <string>Export</string>
+        <string>Export File(s)</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
@@ -60,14 +60,27 @@
           <item>
            <widget class="QRadioButton" name="selectedFileRadioButton">
             <property name="text">
-             <string>Selected File</string>
+             <string>Selected</string>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">exportButtonGroup</string>
+            </attribute>
            </widget>
           </item>
           <item>
            <widget class="QRadioButton" name="checkedFileRadioButton">
             <property name="text">
-             <string>Checked File(s) [x files]</string>
+             <string>Checked (#)</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">exportButtonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="listedFileRadioButton">
+            <property name="text">
+             <string>Listed (#)</string>
             </property>
            </widget>
           </item>
@@ -115,6 +128,9 @@
           <property name="text">
            <string>Yes</string>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">pathButtonGroup</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -122,6 +138,9 @@
           <property name="text">
            <string>No</string>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">pathButtonGroup</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -192,5 +211,26 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ExportDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>255</x>
+     <y>278</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <buttongroups>
+  <buttongroup name="exportButtonGroup"/>
+  <buttongroup name="pathButtonGroup"/>
+ </buttongroups>
 </ui>
