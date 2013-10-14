@@ -89,6 +89,7 @@ public:
         horizontalLayout_2->addWidget(checkedFileRadioButton);
 
         listedFileRadioButton = new QRadioButton(groupBox_2);
+        exportButtonGroup->addButton(listedFileRadioButton);
         listedFileRadioButton->setObjectName(QStringLiteral("listedFileRadioButton"));
 
         horizontalLayout_2->addWidget(listedFileRadioButton);

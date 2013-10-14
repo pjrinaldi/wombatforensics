@@ -82,6 +82,9 @@
             <property name="text">
              <string>Listed (#)</string>
             </property>
+            <attribute name="buttonGroup">
+                <string notr="true">exportButtonGroup</string>
+            </attribute>
            </widget>
           </item>
          </layout>

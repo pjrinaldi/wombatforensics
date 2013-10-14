@@ -2,6 +2,8 @@
 #define EXPORTDIALOG_H
 
 #include <QDialog>
+#include <QFileDialog>
+#include <QDir>
 
 namespace Ui {
 class ExportDialog;
@@ -14,7 +16,10 @@ class ExportDialog : public QDialog
 public:
     explicit ExportDialog(QWidget *parent = 0);
     ~ExportDialog();
-    
+
+private slots:
+    void SelectDirectory(void);
+
 private:
     Ui::ExportDialog *ui;
 };

@@ -23,6 +23,7 @@
 #include "wombatdatabase.h"
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
+#include "exportdialog.h"
 #include "sleuthkit.h"
 #include "basictools.h"
 
@@ -40,6 +41,7 @@ public:
     WombatDatabase *wombatcasedata;
     WombatVariable wombatvariable;
     ProgressWindow* wombatprogresswindow;
+    ExportDialog* exportdialog;
     SleuthKitPlugin* isleuthkit;
     BasicTools* ibasictools;
 
