@@ -7,6 +7,7 @@ ExportDialog::ExportDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->browseButton, SIGNAL(clicked()), this, SLOT(SelectDirectory()));
+    connect(ui->exportButton, SIGNAL(clicked()), this, SLOT(ExportFiles()));
 }
 
 ExportDialog::~ExportDialog()
@@ -22,4 +23,10 @@ void ExportDialog::SelectDirectory()
         ui->exportDirectoryLineEdit->setText(dirname);
         fprintf(stderr, "Set Directory: %s\n", dirname.toStdString().c_str());
     }
+}
+
+void ExportDialog::ExportFiles()
+{
+    fprintf(stderr, "Export Files: \n");
+    this->close();
 }

@@ -6,6 +6,13 @@
 #include <QStringList>
 #include <QObject>
 
+struct FileExportData
+{
+    int id;
+    std::string name;
+    std::string fullpath;
+};
+
 struct WombatVariable
 {
 

@@ -198,12 +198,43 @@ void WombatForensics::RemEvidence()
     }
 }
 
+int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
+{
+    int curcount = checkcount;
+    //if(tmpitem->checkState() == 2)
+        //curcount++;
+
+    for(int i=0; i < tmpitem->rowCount(); ++i)
+    {
+        curcount = curcount + StandardItemCheckState(tmpitem->child(i), curcount);
+    }
+    return curcount;
+}
+
 void WombatForensics::ExportEvidence()
 {
-    int exportdata = 0;
+    int checkcount = 0;
+    std::vector<FileExportData> exportevidencelist;
+    checkcount = StandardItemCheckState(wombatdirmodel->invisibleRootItem(), 0);
+    fprintf(stderr, "Check Count: %i\n", checkcount);
+    
+    // model->rowcount();
+    // NEED INT LIST OF FILE ID'S, STRING LIST OF FULL PATH'S AND FILE NAME - BETTER OFF MAKING A EXPORT DATA STRUCTURE AND A LIST OF THESE STRUCTURES
+    // ITEM->CHECKSTATE RETURNS INT 0-UNCHECKED 2 - CHECKED 1-PARTIALLY CHECKED (HOPEFULLY WON'T NEED THIS ONE)
     // need to create dialog which asks to export "checked files (# checked) || selected file" asks for storage location, asks to keep original path
     // then it should loop over file list and export files accordingly using copyFile
     // need to send the current path, # checked files, selected file, and the list of files to export.
+    /*
+     * doStuffWithEveryItemInMyTree( tree->invisibleRootItem() );
+     *
+     * void doStuffWithEveryItemInMyTree( QTreeWidgetItem *item )
+     * {
+     *     // Do something with item ...
+     *
+     *         for( int i = 0; i < item->childCount(); ++i )
+     *                 doStuffWithEveryItemInMyTree( item->child(i) );
+     *                 }
+     */ 
     exportdialog = new ExportDialog(this);
     exportdialog->show();
     fprintf(stderr, "Export Evidence File(s) to chosen location\n");

@@ -19,6 +19,7 @@ public:
 
 private slots:
     void SelectDirectory(void);
+    void ExportFiles(void);
 
 private:
     Ui::ExportDialog *ui;

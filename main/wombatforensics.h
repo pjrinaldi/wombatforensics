@@ -12,6 +12,7 @@
 #include <QFileDialog>
 #include <QObject>
 #include <QStandardItemModel>
+#include <QStandardItem>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QTreeWidgetItem>
@@ -82,6 +83,7 @@ private:
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     std::string GetTime(void);
     QThreadPool *threadpool;
+    int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;
