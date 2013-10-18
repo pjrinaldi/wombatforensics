@@ -215,8 +215,19 @@ void WombatForensics::ExportEvidence()
 {
     int checkcount = 0;
     std::vector<FileExportData> exportevidencelist;
-    checkcount = StandardItemCheckState(wombatdirmodel->invisibleRootItem(), 0);
-    fprintf(stderr, "Check Count: %i\n", checkcount);
+    //checkcount = StandardItemCheckState(wombatdirmodel->invisibleRootItem(), 0);
+    // this root item gets through the invisible node, image name, volume, fs partition so that the rest is the files..
+    //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+    // I will need to iterate over the model to get this, starting with the invisible root item which would have 1 row per image. will need to use
+    // haschildren, rowcount to figure it out... I think i can get this to work now.
+    if(rootitem->hasChildren())
+    {
+        //QStandardItem* childitem = rootitem->child(0,0)
+        fprintf(stderr, "(row,col) count: (%i,%i)\n", rootitem->rowCount(), rootitem->columnCount());
+        fprintf(stderr, "it has children\n");
+        //if(((QStandardItem*)rootitem->child(0, 0))->hasChildren())
+            //fprintf(stderr, "(row, col) count: (%i, %i)\n", rootitem->child(0,1)->rowCount(), rootitem->child(0,1)->columnCount());
+    }
     
     // model->rowcount();
     // NEED INT LIST OF FILE ID'S, STRING LIST OF FULL PATH'S AND FILE NAME - BETTER OFF MAKING A EXPORT DATA STRUCTURE AND A LIST OF THESE STRUCTURES
