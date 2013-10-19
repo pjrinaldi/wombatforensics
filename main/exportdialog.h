@@ -26,6 +26,7 @@ private:
     Ui::ExportDialog *ui;
     int checkcount;
     int listcount;
+    QWidget* parentwidget;
 };
 
 #endif // EXPORTDIALOG_H

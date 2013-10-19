@@ -8,6 +8,20 @@
 
 struct FileExportData
 {
+    enum PathStatus
+    {
+        include = 0;
+        exclude = 1;
+    };
+
+    enum FileStatus
+    {
+        selected = 0;
+        checked = 1;
+        listed = 2;
+    };
+
+    std::string exportpath;
     int id;
     std::string name;
     std::string fullpath;
@@ -51,9 +65,11 @@ struct WombatVariable
     QStringList evidencedbnamelist;
     QList<int> evidenceidlist;
     QList<int> objectidlist;
+    FileExportData exportdata;
 
 };
 
 Q_DECLARE_METATYPE(WombatVariable)
+Q_DECLARE_METATYPE(FileExportData)
 
 #endif // WOMBATVARIABLE_H
