@@ -6,6 +6,8 @@
 #include <QDir>
 #include <QString>
 
+#include "wombatvariable.h"
+
 namespace Ui {
 class ExportDialog;
 }
@@ -21,6 +23,7 @@ public:
 private slots:
     void SelectDirectory(void);
     void ExportFiles(void);
+    void FileExport(FileExportData exportdata) {};
 
 private:
     Ui::ExportDialog *ui;

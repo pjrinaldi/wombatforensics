@@ -5,24 +5,27 @@
 #include <QList>
 #include <QStringList>
 #include <QObject>
+#include <vector>
 
 struct FileExportData
 {
     enum PathStatus
     {
-        include = 0;
-        exclude = 1;
+        include = 0,
+        exclude = 1
     };
 
     enum FileStatus
     {
-        selected = 0;
-        checked = 1;
-        listed = 2;
+        selected = 0,
+        checked = 1,
+        listed = 2
     };
 
     std::string exportpath;
     int id;
+    FileStatus filestatus;
+    PathStatus pathstatus;
     std::string name;
     std::string fullpath;
 };
@@ -66,6 +69,7 @@ struct WombatVariable
     QList<int> evidenceidlist;
     QList<int> objectidlist;
     FileExportData exportdata;
+    std::vector<FileExportData> exportdatalist;
 
 };
 

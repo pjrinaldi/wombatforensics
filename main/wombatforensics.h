@@ -1,7 +1,6 @@
 #ifndef WOMBATFORENSICS_H
 #define WOMBATFORENSICS_H
 
-
 #include <QMainWindow>
 #include <fstream>
 #include <iostream>
@@ -85,6 +84,7 @@ private:
     QThreadPool *threadpool;
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
+    void FileExport(FileExportData exportdata);
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;

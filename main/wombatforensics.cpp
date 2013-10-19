@@ -13,6 +13,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
     connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     qRegisterMetaType<WombatVariable>("WombatVariable");
+    qRegisterMetaType<FileExportData>("FileExportData");
     connect(this, SIGNAL(LogVariable(WombatVariable)), isleuthkit, SLOT(GetLogVariable(WombatVariable)), Qt::QueuedConnection);
     connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(SendFileContents(QString)), Qt::QueuedConnection);
@@ -237,7 +238,6 @@ void WombatForensics::ExportEvidence()
 {
     int checkcount = 0;
     int listcount = 0;
-    //std::vector<FileExportData> exportevidencelist;
 
     QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
     checkcount  = StandardItemCheckState(rootitem, checkcount);
@@ -250,8 +250,31 @@ void WombatForensics::ExportEvidence()
     // then it should loop over file list and export files accordingly using copyFile
     // need to send the current path, # checked files, selected file, and the list of files to export.
     exportdialog = new ExportDialog(this, checkcount, listcount);
+    connect(exportdialog, SIGNAL(exportdialog(FileExportData)), this, SLOT(FileExport(FileExportData)), Qt::DirectConnection);
     exportdialog->show();
     fprintf(stderr, "Export Evidence File(s) to chosen location\n");
+}
+
+void WombatForensics::FileExport(FileExportData exportdata)
+{
+    wombatvariable.exportdata = exportdata;
+    std::vector<FileExportData> exportevidencelist;
+    if(exportdata.filestatus == FileExportData::selected)
+    {
+        // get the currently selected file information
+        //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+    }
+    else if(exportdata.filestatus == FileExportData::checked)
+    {
+        // get the checked files and add them to the list.
+        //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+    }
+    else if(exportdata.filestatus == FileExportData::listed)
+    {
+        // get the files listed and add them to the list
+        //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+    }
+
 }
 
 void WombatForensics::UpdateCaseData(WombatVariable wvariable)

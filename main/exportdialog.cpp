@@ -39,6 +39,19 @@ void ExportDialog::SelectDirectory()
 void ExportDialog::ExportFiles()
 {
     fprintf(stderr, "Export Files: \n");
+    FileExportData exportdata;
+    exportdata.exportpath = ui->exportDirectoryLineEdit->text().toStdString();
+    if(ui->selectedFileRadioButton->isChecked())
+        exportdata.filestatus = FileExportData::selected;
+    if(ui->checkedFileRadioButton->isChecked())
+        exportdata.filestatus = FileExportData::checked;
+    if(ui->listedFileRadioButton->isChecked())
+        exportdata.filestatus = FileExportData::listed;
+    if(ui->includePathRadioButton->isChecked())
+        exportdata.pathstatus = FileExportData::include;
+    if(ui->excludePathRadioButton->isChecked())
+        exportdata.pathstatus = FileExportData::exclude;
     // send the choices back-> which set of files (selected,checked,listed), export path string, whether to include original path (include, exclude)
+    emit FileExport(exportdata);
     this->close();
 }
