@@ -261,9 +261,9 @@ void WombatForensics::FileExport(FileExportData exportdata)
     std::vector<FileExportData> exportevidencelist;
     if(exportdata.filestatus == FileExportData::selected)
     {
-        QItemSelectionModel* tmpselectmodel = new QItemSelectionModel(wombatdirmodel);
-        QStandardItem* curitem = wombatdirmodel->itemFromIndex(tmpselectmodel->selectedIndexes()[0]);
+        QStandardItem* curitem = wombatdirmodel->itemFromIndex(curselindex);
         fprintf(stderr, "Current Item: %s\n", curitem->text().toStdString().c_str());
+        fprintf(stderr, "EvidenceID: %i EvidencePath: %s\n", wombatvariable.evidenceid, wombatvariable.evidencepath.toStdString().c_str());
 
         // get the currently selected file information
         //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
@@ -540,6 +540,7 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     QString tmptext = "";
+    curselindex = index;
     tmptext = index.sibling(index.row(), 1).data().toString();
     fprintf(stderr, "unique id:'%s'\n", tmptext.toStdString().c_str());
     if(tmptext != "")

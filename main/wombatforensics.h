@@ -11,7 +11,6 @@
 #include <QFileDialog>
 #include <QObject>
 #include <QStandardItemModel>
-#include <QItemSelectionModel>
 #include <QStandardItem>
 #include <QInputDialog>
 #include <QMessageBox>
@@ -89,6 +88,7 @@ private:
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;
+    QModelIndex curselindex;
 
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;
