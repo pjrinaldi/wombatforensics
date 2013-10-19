@@ -263,7 +263,8 @@ void WombatForensics::FileExport(FileExportData exportdata)
     {
         QStandardItem* curitem = wombatdirmodel->itemFromIndex(curselindex);
         fprintf(stderr, "Current Item: %s\n", curitem->text().toStdString().c_str());
-        fprintf(stderr, "EvidenceID: %i EvidencePath: %s\n", wombatvariable.evidenceid, wombatvariable.evidencepath.toStdString().c_str());
+        fprintf(stderr, "FileID: %i EvidencePath: %s\n", wombatvariable.fileid, wombatvariable.evidencepath.toStdString().c_str());
+        // get fileid, then i can get the required variables such as full path, file name, etc...
 
         // get the currently selected file information
         //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
