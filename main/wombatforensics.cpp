@@ -223,50 +223,33 @@ int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcou
 
     return curcount;
 }
+int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount)
+{
+    int curcount = listcount;
+    if(tmpitem->hasChildren())
+        curcount = curcount + tmpitem->rowCount();
+    curcount++;
+
+    return curcount;
+}
 
 void WombatForensics::ExportEvidence()
 {
     int checkcount = 0;
-    std::vector<FileExportData> exportevidencelist;
+    int listcount = 0;
+    //std::vector<FileExportData> exportevidencelist;
 
     QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
     checkcount  = StandardItemCheckState(rootitem, checkcount);
     fprintf(stderr, "checked count: %i\n", checkcount);
-    //checkcount = StandardItemCheckState(wombatdirmodel->invisibleRootItem(), 0);
-    // this root item gets through the invisible node, image name, volume, fs partition so that the rest is the files..
-    //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
-    // I will need to iterate over the model to get this, starting with the invisible root item which would have 1 row per image. will need to use
-    // haschildren, rowcount to figure it out... I think i can get this to work now.
-    /*
-    if(rootitem->hasChildren())
-    {
-        for(int i=0; i < rootitem->rowCount(); i++)
-        {
-        //QStandardItem* childitem = rootitem->child(0,0)
-        fprintf(stderr, "(row,col) count: (%i,%i)\n", rootitem->rowCount(), rootitem->columnCount());
-        fprintf(stderr, "it has children\n");
-        //if(((QStandardItem*)rootitem->child(0, 0))->hasChildren())
-            //fprintf(stderr, "(row, col) count: (%i, %i)\n", rootitem->child(0,1)->rowCount(), rootitem->child(0,1)->columnCount());
-    }
-    */
-    // model->rowcount();
+    listcount = StandardItemListCount(rootitem, listcount);
+    fprintf(stderr, "listed item count: %i\n", listcount);
     // NEED INT LIST OF FILE ID'S, STRING LIST OF FULL PATH'S AND FILE NAME - BETTER OFF MAKING A EXPORT DATA STRUCTURE AND A LIST OF THESE STRUCTURES
     // ITEM->CHECKSTATE RETURNS INT 0-UNCHECKED 2 - CHECKED 1-PARTIALLY CHECKED (HOPEFULLY WON'T NEED THIS ONE)
     // need to create dialog which asks to export "checked files (# checked) || selected file" asks for storage location, asks to keep original path
     // then it should loop over file list and export files accordingly using copyFile
     // need to send the current path, # checked files, selected file, and the list of files to export.
-    /*
-     * doStuffWithEveryItemInMyTree( tree->invisibleRootItem() );
-     *
-     * void doStuffWithEveryItemInMyTree( QTreeWidgetItem *item )
-     * {
-     *     // Do something with item ...
-     *
-     *         for( int i = 0; i < item->childCount(); ++i )
-     *                 doStuffWithEveryItemInMyTree( item->child(i) );
-     *                 }
-     */ 
-    exportdialog = new ExportDialog(this);
+    exportdialog = new ExportDialog(this, checkcount, listcount);
     exportdialog->show();
     fprintf(stderr, "Export Evidence File(s) to chosen location\n");
 }

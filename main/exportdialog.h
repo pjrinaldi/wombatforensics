@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QFileDialog>
 #include <QDir>
+#include <QString>
 
 namespace Ui {
 class ExportDialog;
@@ -14,7 +15,7 @@ class ExportDialog : public QDialog
     Q_OBJECT
     
 public:
-    explicit ExportDialog(QWidget *parent = 0);
+    explicit ExportDialog(QWidget *parent = 0, int curcheckcount = 0, int curlistcount = 0);
     ~ExportDialog();
 
 private slots:
@@ -23,6 +24,8 @@ private slots:
 
 private:
     Ui::ExportDialog *ui;
+    int checkcount;
+    int listcount;
 };
 
 #endif // EXPORTDIALOG_H

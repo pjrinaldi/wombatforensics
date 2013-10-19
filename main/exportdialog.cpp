@@ -1,11 +1,17 @@
 #include "exportdialog.h"
 #include "ui_exportdialog.h"
 
-ExportDialog::ExportDialog(QWidget *parent) :
+ExportDialog::ExportDialog(QWidget *parent, int curcheckcount, int curlistcount) :
     QDialog(parent),
     ui(new Ui::ExportDialog)
 {
     ui->setupUi(this);
+    checkcount = curcheckcount;
+    QString checktext = QString("Checked (") + QString::number(checkcount) + QString(")");
+    listcount = curlistcount;
+    QString listtext = QString("Listed (") + QString::number(listcount) + QString(")");
+    ui->checkedFileRadioButton->setText(checktext);
+    ui->listedFileRadioButton->setText(listtext);
     connect(ui->browseButton, SIGNAL(clicked()), this, SLOT(SelectDirectory()));
     connect(ui->exportButton, SIGNAL(clicked()), this, SLOT(ExportFiles()));
 }

@@ -84,6 +84,7 @@ private:
     std::string GetTime(void);
     QThreadPool *threadpool;
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
+    int StandardItemListCount(QStandardItem* tmpitem, int listcount);
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;
