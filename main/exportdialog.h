@@ -20,10 +20,12 @@ public:
     explicit ExportDialog(QWidget *parent = 0, int curcheckcount = 0, int curlistcount = 0);
     ~ExportDialog();
 
+signals:
+    void FileExport(FileExportData exportdata);
+
 private slots:
     void SelectDirectory(void);
     void ExportFiles(void);
-    void FileExport(FileExportData exportdata) {};
 
 private:
     Ui::ExportDialog *ui;

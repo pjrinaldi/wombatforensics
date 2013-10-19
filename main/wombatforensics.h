@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QObject>
 #include <QStandardItemModel>
+#include <QItemSelectionModel>
 #include <QStandardItem>
 #include <QInputDialog>
 #include <QMessageBox>
@@ -68,6 +69,7 @@ private slots:
     {
         ResizeColumns((QStandardItemModel*)index.model());
     }
+    void FileExport(FileExportData exportdata);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -84,7 +86,6 @@ private:
     QThreadPool *threadpool;
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
-    void FileExport(FileExportData exportdata);
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;

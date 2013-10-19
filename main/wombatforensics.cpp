@@ -250,7 +250,7 @@ void WombatForensics::ExportEvidence()
     // then it should loop over file list and export files accordingly using copyFile
     // need to send the current path, # checked files, selected file, and the list of files to export.
     exportdialog = new ExportDialog(this, checkcount, listcount);
-    connect(exportdialog, SIGNAL(exportdialog(FileExportData)), this, SLOT(FileExport(FileExportData)), Qt::DirectConnection);
+    connect(exportdialog, SIGNAL(FileExport(FileExportData)), this, SLOT(FileExport(FileExportData)), Qt::DirectConnection);
     exportdialog->show();
     fprintf(stderr, "Export Evidence File(s) to chosen location\n");
 }
@@ -261,6 +261,10 @@ void WombatForensics::FileExport(FileExportData exportdata)
     std::vector<FileExportData> exportevidencelist;
     if(exportdata.filestatus == FileExportData::selected)
     {
+        QItemSelectionModel* tmpselectmodel = new QItemSelectionModel(wombatdirmodel);
+        QStandardItem* curitem = wombatdirmodel->itemFromIndex(tmpselectmodel->selectedIndexes()[0]);
+        fprintf(stderr, "Current Item: %s\n", curitem->text().toStdString().c_str());
+
         // get the currently selected file information
         //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
     }

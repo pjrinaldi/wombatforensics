@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QObject>
 #include <vector>
+#include <string>
 
 struct FileExportData
 {
