@@ -38,7 +38,6 @@ void ExportDialog::SelectDirectory()
 
 void ExportDialog::ExportFiles()
 {
-    fprintf(stderr, "Export Files: \n");
     FileExportData exportdata;
     exportdata.exportpath = ui->exportDirectoryLineEdit->text().toStdString();
     if(ui->selectedFileRadioButton->isChecked())

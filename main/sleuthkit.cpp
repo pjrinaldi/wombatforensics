@@ -284,9 +284,9 @@ void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
     SetEvidenceDB(wombatvariable);
     for(int i = 0; i < wombatvariable.exportdatalist.size(); i++)
     {
-        wombatvariable.tmpfilepath = GetFileContents(wombatvariable.exportdatalist[i].id);
-        ExportFile();
+        ExportFile(wombatvariable.exportdatalist[i].fullpath, wombatvariable.exportdatalist[i].id);
     }
+
 }
 void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)
 {
@@ -679,7 +679,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
     emit ReturnImageNode(imageNode);
 }
 
-void SleuthKitPlugin::ExportFile()
+void SleuthKitPlugin::ExportFile(std::string exportpath, int fileID)
 {
     TskImageFileTsk currentimagefiletsk;
     try
@@ -726,7 +726,21 @@ void SleuthKitPlugin::ExportFile()
     {
         fprintf(stderr, "read file/write to fail %s\n", ex.what());
     }
-
+    std::wstringstream ws;
+    ws << exportpath.c_str();
+    std::wstring wexportpath = ws.str();
+    try
+    {
+        TskServices::Instance().getFileManager().copyFile(tfile, wexportpath);
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "copy file to export location failed %s\n", ex.what());
+    }
+    catch(std::exception ex)
+    {
+        fprintf(stderr, "copy file to export location failed %s\n", ex.what());
+    }
 }
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
