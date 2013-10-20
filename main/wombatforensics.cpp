@@ -266,34 +266,36 @@ void WombatForensics::FileExport(FileExportData exportdata)
      *
      */ 
     std::vector<FileExportData> exportevidencelist;
-    exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt();
-    exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
-    if(exportdata.pathstatus == FileExportData::include)
-    {
-        exportdata.fullpath = exportdata.exportpath;
-        exportdata.fullpath += "/";
-        exportdata.fullpath += curselindex.sibling(curselindex.row(), 2).data().toString().toStdString(); // export path with original path
-    }
-    else if(exportdata.pathstatus == FileExportData::exclude)
-    {
-        exportdata.fullpath = exportdata.exportpath + "/" + exportdata.name; // export path without original path
-    }
-    fprintf(stderr, "export full path: %s\n", exportdata.fullpath.c_str());
     if(exportdata.filestatus == FileExportData::selected)
     {
-        wombatvariable.exportdatalist.push_back(exportdata);
-        //QStandardItem* curitem = wombatdirmodel->itemFromIndex(curselindex);
+        exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt();
+        exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
+        if(exportdata.pathstatus == FileExportData::include)
+        {
+            exportdata.fullpath = exportdata.exportpath;
+            exportdata.fullpath += "/";
+            exportdata.fullpath += curselindex.sibling(curselindex.row(), 2).data().toString().toStdString(); // export path with original path
+        }
+        else if(exportdata.pathstatus == FileExportData::exclude)
+        {
+            exportdata.fullpath = exportdata.exportpath + "/" + exportdata.name; // export path without original path
+        }
+        fprintf(stderr, "export full path: %s\n", exportdata.fullpath.c_str());
+
+        exportevidencelist.push_back(exportdata);
     }
     else if(exportdata.filestatus == FileExportData::checked)
     {
-        // get the checked files and add them to the list.
-        //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+        QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+        // loop over the items to get the checked only values and populate the exportdata.id/name/fullpath
+        // as done in standarditemcheckstate and exportevidence
     }
     else if(exportdata.filestatus == FileExportData::listed)
     {
         // get the files listed and add them to the list
         //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
     }
+    wombatvariable.exportdatalist = exportevidencelist;
 
     ThreadRunner* trun = new ThreadRunner(isleuthkit, "exportfiles", wombatvariable);
     threadpool->start(trun);

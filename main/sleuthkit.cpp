@@ -286,7 +286,6 @@ void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
     {
         ExportFile(wombatvariable.exportdatalist[i].fullpath, wombatvariable.exportdatalist[i].id);
     }
-
 }
 void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)
 {
