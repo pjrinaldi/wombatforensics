@@ -208,22 +208,54 @@ int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcou
         {
             curcount = curcount + StandardItemCheckState(tmpitem->child(i,1), checkcount);
         }
-        // run the checkstate function for the item
     }
-    //int curcount = checkcount;
-    //if(tmpitem->checkState() == 2)
-        //curcount++;
-    /*
-    for(int i=0; i < tmpitem->rowCount(); ++i)
-    {
-        curcount = curcount + StandardItemCheckState(tmpitem->child(i,1), curcount);
-    }
-    */
     if(tmpitem->checkState() == 2)
         curcount++;
 
     return curcount;
 }
+
+void WombatForensics::SetFileExportProperties(QStandardItem* tmpitem)
+{
+    std::vector<FileExportData> tmpexportlist;
+    if(tmpitem->hasChildren())
+    {
+        for(int i=0; i < tmpitem->rowCount(); i++)
+        {
+            SetFileExportProperties(tmpitem->child(i,1));
+        }
+    }
+    if(tmpitem->checkState() == 2) // if checked
+    {
+        FileExportData tmpexport;
+        exportdata.id = tmpitem // HOW DO I GET THE VALUE OF THIS ITEM???
+        // get properties for file, return exportdatalist? maybe such that wombatvariable.exportdatalist = this function()
+        /*
+         *
+         * std::vector<FileExportData> exportevidencelist;
+    if(exportdata.filestatus == FileExportData::selected)
+    {
+        exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt();
+        exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
+        if(exportdata.pathstatus == FileExportData::include)
+        {
+            exportdata.fullpath = exportdata.exportpath;
+            exportdata.fullpath += "/";
+            exportdata.fullpath += curselindex.sibling(curselindex.row(), 2).data().toString().toStdString(); // export path with original path
+        }
+        else if(exportdata.pathstatus == FileExportData::exclude)
+        {
+            exportdata.fullpath = exportdata.exportpath + "/" + exportdata.name; // export path without original path
+        }
+        fprintf(stderr, "export full path: %s\n", exportdata.fullpath.c_str());
+
+        exportevidencelist.push_back(exportdata);
+    }
+
+         */ 
+    }
+}
+
 int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount)
 {
     int curcount = listcount;
@@ -244,26 +276,15 @@ void WombatForensics::ExportEvidence()
     fprintf(stderr, "checked count: %i\n", checkcount);
     listcount = StandardItemListCount(rootitem, listcount);
     fprintf(stderr, "listed item count: %i\n", listcount);
-    // NEED INT LIST OF FILE ID'S, STRING LIST OF FULL PATH'S AND FILE NAME - BETTER OFF MAKING A EXPORT DATA STRUCTURE AND A LIST OF THESE STRUCTURES
-    // ITEM->CHECKSTATE RETURNS INT 0-UNCHECKED 2 - CHECKED 1-PARTIALLY CHECKED (HOPEFULLY WON'T NEED THIS ONE)
-    // need to create dialog which asks to export "checked files (# checked) || selected file" asks for storage location, asks to keep original path
-    // then it should loop over file list and export files accordingly using copyFile
-    // need to send the current path, # checked files, selected file, and the list of files to export.
     exportdialog = new ExportDialog(this, checkcount, listcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData)), this, SLOT(FileExport(FileExportData)), Qt::DirectConnection);
     exportdialog->show();
-    fprintf(stderr, "Export Evidence File(s) to chosen location\n");
 }
 
 void WombatForensics::FileExport(FileExportData exportdata)
 {
     /*
      * NEED TO SETUP THE PROGRESS WINDOW JOB FOR THIS EXPORT AND POPULATE IT ACCORDINGLY AS IT GOES THROUGH THE LOOPING PROCESS IN SLEUTHKIT...
-     */ 
-    /*
-     * NEED TO GET MY RESOURCES TOGETHER... wombatforensics.exportdata.filestatus/pathstatus/exportpath
-     * RESOURCES I NEED TO POPULATE...  wombatforensics.exportdata.id/name/fullpath
-     *
      */ 
     std::vector<FileExportData> exportevidencelist;
     if(exportdata.filestatus == FileExportData::selected)
@@ -287,13 +308,14 @@ void WombatForensics::FileExport(FileExportData exportdata)
     else if(exportdata.filestatus == FileExportData::checked)
     {
         QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+        exportevidencelist = SetFileExportProperties(rootitem);
         // loop over the items to get the checked only values and populate the exportdata.id/name/fullpath
         // as done in standarditemcheckstate and exportevidence
     }
     else if(exportdata.filestatus == FileExportData::listed)
     {
+        QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
         // get the files listed and add them to the list
-        //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
     }
     wombatvariable.exportdatalist = exportevidencelist;
 
