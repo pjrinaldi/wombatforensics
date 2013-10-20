@@ -41,6 +41,7 @@ public:
     Q_INVOKABLE void RefreshTreeViews(WombatVariable wombatVariable);
     Q_INVOKABLE void PopulateCase(WombatVariable wombatVariable);
     Q_INVOKABLE void ShowFile(WombatVariable wombatVariable);
+    Q_INVOKABLE void ExportFiles(WombatVariable wombatVariable);
     void SetupSystemBlackboard();
     void GetImageTree(WombatVariable wombatvariable, int isAddEvidence);
     QString GetFileContents(int fileID);

@@ -257,17 +257,22 @@ void WombatForensics::ExportEvidence()
 
 void WombatForensics::FileExport(FileExportData exportdata)
 {
-    wombatvariable.exportdata = exportdata;
+    /*
+     * NEED TO GET MY RESOURCES TOGETHER... wombatforensics.exportdata.filestatus/pathstatus/exportpath
+     * RESOURCES I NEED TO POPULATE...  wombatforensics.exportdata.id/name/fullpath
+     *
+     */ 
     std::vector<FileExportData> exportevidencelist;
+    exportdata.id = wombatvariable.fileid;
+    exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
+    if(exportdata.pathstatus == FileExportData::include)
+        exportdata.fullpath = curselindex.sibling(curselindex.row(), 2).data().toString().toStdString(); // original path = full path with name
+    else if(exportdata.pathstatus == FileExportData::exclude)
+        exportdata.fullpath = "";
     if(exportdata.filestatus == FileExportData::selected)
     {
-        QStandardItem* curitem = wombatdirmodel->itemFromIndex(curselindex);
-        fprintf(stderr, "Current Item: %s\n", curitem->text().toStdString().c_str());
-        fprintf(stderr, "FileID: %i EvidencePath: %s\n", wombatvariable.fileid, wombatvariable.evidencepath.toStdString().c_str());
-        // get fileid, then i can get the required variables such as full path, file name, etc...
-
-        // get the currently selected file information
-        //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+        wombatvariable.exportdatalist.push_back(exportdata);
+        //QStandardItem* curitem = wombatdirmodel->itemFromIndex(curselindex);
     }
     else if(exportdata.filestatus == FileExportData::checked)
     {
@@ -280,6 +285,8 @@ void WombatForensics::FileExport(FileExportData exportdata)
         //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
     }
 
+    ThreadRunner* trun = new ThreadRunner(isleuthkit, "exportfiles", wombatvariable);
+    threadpool->start(trun);
 }
 
 void WombatForensics::UpdateCaseData(WombatVariable wvariable)

@@ -279,6 +279,11 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     emit LoadFileContents(wombatvariable.tmpfilepath);
 }
 
+void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
+{
+    wombatvariable = wombatVariable;
+    // i'll need to setevidencedb, getfilecontents, copyfile in a loop over the exportdatalist
+}
 void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
@@ -408,29 +413,6 @@ void SleuthKitPlugin::SetupSystemProperties()
         fprintf(stderr, "system_out_dir failed\n");
     if(!(new QDir())->mkpath(QString::fromStdString(GetSystemProperty(TskSystemProperties::MODULE_OUT_DIR))))
         fprintf(stderr, "module_out_dir failed\n");
-    /*
-    bool mkPath = (new QDir())->mkpath(wombatvariable.settingspath);
-    if(mkPath == false)
-        DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
-    */
-    /*
-    try
-    {
-        SetSystemProperty(TskSystemProperties::PIPELINE_CONFIG_FILE, tmpPath.toStdString());
-    }
-    catch(TskException &ex)
-    {
-        fprintf(stderr, "couldn't load pipeline: %s\n", ex.message().c_str());
-    }
-    try
-    {
-        SetSystemProperty(TskSystemProperties::OUT_DIR, "/home/pasquale/WombatForensics/tmpfiles");
-    }
-    catch(TskException &ex)
-    {
-        fprintf(stderr, "Setting out dir failed: %s\n", ex.message().c_str());
-    }
-    */
 }
 void SleuthKitPlugin::SetupLog()
 {

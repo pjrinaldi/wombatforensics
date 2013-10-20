@@ -117,6 +117,8 @@ public:
             caller->ShowFile(wombatvariable);
         if(method.compare("refreshtreeviews") == 0)
             caller->RefreshTreeViews(wombatvariable);
+        if(method.compare("exportfiles") == 0)
+            caller->ExportFiles(wombatvariable);
     };
 private:
     QString method;
