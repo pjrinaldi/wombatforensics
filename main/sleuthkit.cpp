@@ -285,8 +285,8 @@ void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
     for(int i = 0; i < wombatvariable.exportdatalist.size(); i++)
     {
         wombatvariable.tmpfilepath = GetFileContents(wombatvariable.exportdatalist[i].id);
+        ExportFile();
     }
-    // i'll need to setevidencedb, getfilecontents, copyfile in a loop over the exportdatalist
 }
 void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)
 {
@@ -677,6 +677,56 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
         }
     }
     emit ReturnImageNode(imageNode);
+}
+
+void SleuthKitPlugin::ExportFile()
+{
+    TskImageFileTsk currentimagefiletsk;
+    try
+    {
+        currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
+        TskServices::Instance().setImageFile(currentimagefiletsk);
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Error setfile: %s\n", ex.what());
+    }
+    int ihandle;
+    try
+    {
+        ihandle = TskServices::Instance().getImageFile().openFile(fileID);
+        fprintf(stderr, "getimagefile works...");
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Error getFile: %s\n", ex.what());
+    }
+    TskFile* tfile;
+    try
+    {
+        tfile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
+        fprintf(stderr, "get file from image works\n");
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Get File Error: %s\n", ex.what());
+    }
+    try
+    {
+        if(!tfile->exists())
+        {
+            TskServices::Instance().getFileManager().saveFile(tfile);
+        }
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "read file/write to fail failed %s\n", ex.what());
+    }
+    catch(std::exception ex)
+    {
+        fprintf(stderr, "read file/write to fail %s\n", ex.what());
+    }
+
 }
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
