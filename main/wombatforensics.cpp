@@ -258,12 +258,15 @@ void WombatForensics::ExportEvidence()
 void WombatForensics::FileExport(FileExportData exportdata)
 {
     /*
+     * NEED TO SETUP THE PROGRESS WINDOW JOB FOR THIS EXPORT AND POPULATE IT ACCORDINGLY AS IT GOES THROUGH THE LOOPING PROCESS IN SLEUTHKIT...
+     */ 
+    /*
      * NEED TO GET MY RESOURCES TOGETHER... wombatforensics.exportdata.filestatus/pathstatus/exportpath
      * RESOURCES I NEED TO POPULATE...  wombatforensics.exportdata.id/name/fullpath
      *
      */ 
     std::vector<FileExportData> exportevidencelist;
-    exportdata.id = wombatvariable.fileid;
+    exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt();
     exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
     if(exportdata.pathstatus == FileExportData::include)
         exportdata.fullpath = curselindex.sibling(curselindex.row(), 2).data().toString().toStdString(); // original path = full path with name

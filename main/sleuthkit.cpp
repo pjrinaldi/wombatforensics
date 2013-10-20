@@ -275,13 +275,17 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     SetEvidenceDB(wombatvariable);
     wombatvariable.tmpfilepath = GetFileContents(wombatvariable.fileid);
     fprintf(stderr, "tmpfilepath: %s\n", wombatvariable.tmpfilepath.toStdString().c_str());
-    //GetFileTxtContents(wombatvariable.fileid);
     emit LoadFileContents(wombatvariable.tmpfilepath);
 }
 
 void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
+    SetEvidenceDB(wombatvariable);
+    for(int i = 0; i < wombatvariable.exportdatalist.size(); i++)
+    {
+        wombatvariable.tmpfilepath = GetFileContents(wombatvariable.exportdatalist[i].id);
+    }
     // i'll need to setevidencedb, getfilecontents, copyfile in a loop over the exportdatalist
 }
 void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)
