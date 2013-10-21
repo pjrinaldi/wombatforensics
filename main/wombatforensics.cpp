@@ -215,45 +215,35 @@ int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcou
     return curcount;
 }
 
-void WombatForensics::SetFileExportProperties(QStandardItem* tmpitem)
+std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport)
 {
     std::vector<FileExportData> tmpexportlist;
     if(tmpitem->hasChildren())
     {
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
-            SetFileExportProperties(tmpitem->child(i,1));
+            SetFileExportProperties(tmpitem->child(i,1), tmpexport);
         }
     }
     if(tmpitem->checkState() == 2) // if checked
     {
-        FileExportData tmpexport;
-        exportdata.id = tmpitem // HOW DO I GET THE VALUE OF THIS ITEM???
-        // get properties for file, return exportdatalist? maybe such that wombatvariable.exportdatalist = this function()
-        /*
-         *
-         * std::vector<FileExportData> exportevidencelist;
-    if(exportdata.filestatus == FileExportData::selected)
-    {
-        exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt();
-        exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
-        if(exportdata.pathstatus == FileExportData::include)
+        QModelIndex curindex = tmpitem->index();
+        tmpexport.id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // file id
+        tmpexport.name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
+        if(tmpexport.pathstatus == FileExportData::include)
         {
-            exportdata.fullpath = exportdata.exportpath;
-            exportdata.fullpath += "/";
-            exportdata.fullpath += curselindex.sibling(curselindex.row(), 2).data().toString().toStdString(); // export path with original path
+            tmpexport.fullpath = tmpexport.exportpath + "/" + curindex.sibling(curindex.row(), 2).data().toString().toStdString(); // export path with original path
         }
-        else if(exportdata.pathstatus == FileExportData::exclude)
+        else if(tmpexport.pathstatus == FileExportData::exclude)
         {
-            exportdata.fullpath = exportdata.exportpath + "/" + exportdata.name; // export path without original path
+            tmpexport.fullpath = tmpexport.exportpath + "/" + tmpexport.name; // export path without original path
         }
-        fprintf(stderr, "export full path: %s\n", exportdata.fullpath.c_str());
+        fprintf(stderr, "export full path checked: %s\n", tmpexport.fullpath.c_str());
 
-        exportevidencelist.push_back(exportdata);
+        tmpexportlist.push_back(tmpexport);
     }
 
-         */ 
-    }
+    return tmpexportlist;
 }
 
 int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount)
@@ -308,7 +298,7 @@ void WombatForensics::FileExport(FileExportData exportdata)
     else if(exportdata.filestatus == FileExportData::checked)
     {
         QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
-        exportevidencelist = SetFileExportProperties(rootitem);
+        exportevidencelist = SetFileExportProperties(rootitem, exportdata);
         // loop over the items to get the checked only values and populate the exportdata.id/name/fullpath
         // as done in standarditemcheckstate and exportevidence
     }
