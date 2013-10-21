@@ -260,10 +260,25 @@ void WombatForensics::ExportEvidence()
     int checkcount = 0;
     int listcount = 0;
 
-    QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
-    checkcount  = StandardItemCheckState(rootitem, checkcount);
+    QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();
+    //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+    for(int i = 0; i < rootitem->rowCount(); i++)
+    {
+        QStandardItem* imagenode = rootitem->child(i,0);
+        for(int j = 0; j < imagenode->rowCount(); j++)
+        {
+            QStandardItem* volumenode = imagenode->child(j,0);
+            for(int k = 0; k < volumenode->rowCount(); k++)
+            {
+                QStandardItem* fsnode = volumenode->child(k,0);
+                checkcount = StandardItemCheckState(fsnode, checkcount);
+                listcount = StandardItemListCount(fsnode, listcount);
+            }
+        }
+    }
+    //checkcount  = StandardItemCheckState(rootitem, checkcount);
     fprintf(stderr, "checked count: %i\n", checkcount);
-    listcount = StandardItemListCount(rootitem, listcount);
+    //listcount = StandardItemListCount(rootitem, listcount);
     fprintf(stderr, "listed item count: %i\n", listcount);
     exportdialog = new ExportDialog(this, checkcount, listcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData)), this, SLOT(FileExport(FileExportData)), Qt::DirectConnection);
@@ -296,8 +311,23 @@ void WombatForensics::FileExport(FileExportData exportdata)
     }
     else if(exportdata.filestatus == FileExportData::checked)
     {
-        QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
-        exportevidencelist = SetFileExportProperties(rootitem, exportdata, exportevidencelist);
+        // INSERT 3 FOR LOOP TO GO FROM IMAGE [CHILD(0,0)], VOLUME, PARITITION AND THEN TO RUN SETFILEEXPORT FUNCTION
+        //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
+        QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();
+        for(int i = 0; i < rootitem->rowCount(); i++) // loop over images
+        {
+            QStandardItem* imagenode = rootitem->child(i,0);
+            for(int j = 0; j < imagenode->rowCount(); j++) // loop over volume(s)
+            {
+                QStandardItem* volumenode = imagenode->child(j,0);
+                for(int k = 0; k < volumenode->rowCount(); k++)
+                {
+                    QStandardItem* fsnode = volumenode->child(k,0);
+                    exportevidencelist = SetFileExportProperties(fsnode, exportdata, exportevidencelist);
+                }
+            }
+        }
+        //exportevidencelist = SetFileExportProperties(rootitem, exportdata, exportevidencelist);
     }
     else if(exportdata.filestatus == FileExportData::listed)
     {
