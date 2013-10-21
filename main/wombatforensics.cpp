@@ -202,11 +202,12 @@ void WombatForensics::RemEvidence()
 int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
 {
     int curcount = checkcount;
+    fprintf(stderr, "curcount: %i\n", curcount);
     if(tmpitem->hasChildren())
     {
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
-            curcount = curcount + StandardItemCheckState(tmpitem->child(i,1), checkcount);
+            curcount = StandardItemCheckState(tmpitem->child(i,1), curcount);
         }
     }
     if(tmpitem->checkState() == 2)
@@ -249,7 +250,12 @@ int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount
 {
     int curcount = listcount;
     if(tmpitem->hasChildren())
-        curcount = curcount + tmpitem->rowCount();
+    {
+        for(int i=0; i < tmpitem->rowCount(); i++)
+        {
+            curcount = StandardItemListCount(tmpitem->child(i,1), curcount);
+        }
+    }
     curcount++;
 
     return curcount;
@@ -261,7 +267,6 @@ void WombatForensics::ExportEvidence()
     int listcount = 0;
 
     QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();
-    //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
     for(int i = 0; i < rootitem->rowCount(); i++)
     {
         QStandardItem* imagenode = rootitem->child(i,0);
@@ -276,9 +281,7 @@ void WombatForensics::ExportEvidence()
             }
         }
     }
-    //checkcount  = StandardItemCheckState(rootitem, checkcount);
     fprintf(stderr, "checked count: %i\n", checkcount);
-    //listcount = StandardItemListCount(rootitem, listcount);
     fprintf(stderr, "listed item count: %i\n", listcount);
     exportdialog = new ExportDialog(this, checkcount, listcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData)), this, SLOT(FileExport(FileExportData)), Qt::DirectConnection);
