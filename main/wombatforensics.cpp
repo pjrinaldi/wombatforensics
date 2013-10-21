@@ -298,8 +298,6 @@ void WombatForensics::FileExport(FileExportData exportdata)
     {
         QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
         exportevidencelist = SetFileExportProperties(rootitem, exportdata, exportevidencelist);
-        // loop over the items to get the checked only values and populate the exportdata.id/name/fullpath
-        // as done in standarditemcheckstate and exportevidence
     }
     else if(exportdata.filestatus == FileExportData::listed)
     {
