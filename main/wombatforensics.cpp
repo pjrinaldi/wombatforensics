@@ -215,14 +215,13 @@ int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcou
     return curcount;
 }
 
-std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport)
+std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData> tmpexportlist)
 {
-    std::vector<FileExportData> tmpexportlist;
     if(tmpitem->hasChildren())
     {
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
-            SetFileExportProperties(tmpitem->child(i,1), tmpexport);
+            tmpexportlist = SetFileExportProperties(tmpitem->child(i,1), tmpexport, tmpexportlist);
         }
     }
     if(tmpitem->checkState() == 2) // if checked
@@ -298,7 +297,7 @@ void WombatForensics::FileExport(FileExportData exportdata)
     else if(exportdata.filestatus == FileExportData::checked)
     {
         QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
-        exportevidencelist = SetFileExportProperties(rootitem, exportdata);
+        exportevidencelist = SetFileExportProperties(rootitem, exportdata, exportevidencelist);
         // loop over the items to get the checked only values and populate the exportdata.id/name/fullpath
         // as done in standarditemcheckstate and exportevidence
     }

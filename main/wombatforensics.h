@@ -85,7 +85,7 @@ private:
     QThreadPool *threadpool;
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
-    std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport);
+    std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;
