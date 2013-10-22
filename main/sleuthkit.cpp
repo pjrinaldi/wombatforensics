@@ -286,6 +286,7 @@ void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
     {
         // need to include the image information that i will associate with the exportdatalist[i].imagedd
         ExportFile(wombatvariable.exportdatalist[i].fullpath, wombatvariable.exportdatalist[i].id);
+        //ExportFile(wombatvariable.exportdatalist[i].fullpath, wombatvariable.exportdatalist[i].id);
     }
 }
 void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)
@@ -679,8 +680,9 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
     emit ReturnImageNode(imageNode);
 }
 
-void SleuthKitPlugin::ExportFile(std::string exportpath, int fileID)
+void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
 {
+    int fileID = wombatcasedata->ReturnObjectFileID(objectID); // file id
     TskImageFileTsk currentimagefiletsk;
     try
     {

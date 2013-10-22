@@ -227,8 +227,14 @@ std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardIt
     }
     if(tmpitem->checkState() == 2) // if checked
     {
+        // update evidence/file info for each item bit.
         QModelIndex curindex = tmpitem->index();
-        tmpexport.id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // file id
+        tmpexport.id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // unique object id
+        wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmpexport.id); // evidence id
+        QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
+        wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
+        wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
+        wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt()); // file id
         tmpexport.name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
         if(tmpexport.pathstatus == FileExportData::include)
         {
@@ -299,7 +305,7 @@ void WombatForensics::FileExport(FileExportData exportdata)
         // need to store the image's dd path, whatever i need to set the db correctly.
         // for image db, i need the evidencedirpath and evidencedbname.
         // for image dd, i need the evidencepath
-        exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt();
+        exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt(); // unique objectid
         exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
         if(exportdata.pathstatus == FileExportData::include)
         {
@@ -317,15 +323,13 @@ void WombatForensics::FileExport(FileExportData exportdata)
     }
     else if(exportdata.filestatus == FileExportData::checked)
     {
-        // INSERT 3 FOR LOOP TO GO FROM IMAGE [CHILD(0,0)], VOLUME, PARITITION AND THEN TO RUN SETFILEEXPORT FUNCTION
-        //QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
         QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();
         for(int i = 0; i < rootitem->rowCount(); i++) // loop over images
         {
             QStandardItem* imagenode = rootitem->child(i,0);
             for(int j = 0; j < imagenode->rowCount(); j++) // loop over volume(s)
             {
-                QStandardItem* volumenode = imagenode->child(j,0);
+                QStandardItem* volumenode = imagenode->child(j,0); // loop over partition(s)
                 for(int k = 0; k < volumenode->rowCount(); k++)
                 {
                     QStandardItem* fsnode = volumenode->child(k,0);
@@ -333,7 +337,6 @@ void WombatForensics::FileExport(FileExportData exportdata)
                 }
             }
         }
-        //exportevidencelist = SetFileExportProperties(rootitem, exportdata, exportevidencelist);
     }
     else if(exportdata.filestatus == FileExportData::listed)
     {
