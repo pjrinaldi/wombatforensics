@@ -680,7 +680,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
 
 void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
 {
-    int fileID = wombatcasedata->ReturnObjectFileID(objectID); // file id
+    int fileID = wombatdata->ReturnObjectFileID(objectID); // file id
     TskImageFileTsk currentimagefiletsk;
     try
     {

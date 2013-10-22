@@ -234,7 +234,7 @@ std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardIt
         QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
         wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
         wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
-        wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt()); // file id
+        wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmpexport.id); // file id
         tmpexport.name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
         if(tmpexport.pathstatus == FileExportData::include)
         {
