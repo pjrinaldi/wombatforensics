@@ -203,9 +203,13 @@ int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcou
         fprintf(stderr, "%s has %i children\n", tmpitem->text().toStdString().c_str(), tmpitem->rowCount());
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
-            curcount = StandardItemCheckState(tmpitem->child(i,1), curcount);
+            curcount = StandardItemCheckState(tmpitem->child(i,0), curcount);
         }
     }
+    QModelIndex curindex = tmpitem->index();
+    // getting there, the program crashes at fprintf, after 12 checkstate's, so i'll need to find out what is wrong with it.
+    if(((QStandardItemModel*)curindex.model())->itemFromIndex(curindex.sibling(curindex.row(),1))->text() != "")
+        fprintf(stderr, "checkstate: %i\n", ((QStandardItemModel*)curindex.model())->itemFromIndex(curindex.sibling(curindex.row(),1))->checkState());
     if(tmpitem->checkState() == 2)
     {
         fprintf(stderr, "%i - %s\n", curcount, tmpitem->text().toStdString().c_str());
