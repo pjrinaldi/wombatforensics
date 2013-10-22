@@ -200,13 +200,17 @@ int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcou
     int curcount = checkcount;
     if(tmpitem->hasChildren())
     {
+        fprintf(stderr, "%s has %i children\n", tmpitem->text().toStdString().c_str(), tmpitem->rowCount());
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
             curcount = StandardItemCheckState(tmpitem->child(i,1), curcount);
         }
     }
     if(tmpitem->checkState() == 2)
+    {
+        fprintf(stderr, "%i - %s\n", curcount, tmpitem->text().toStdString().c_str());
         curcount++;
+    }
 
     return curcount;
 }
@@ -215,9 +219,10 @@ std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardIt
 {
     if(tmpitem->hasChildren())
     {
+        //fprintf(stderr, "%s has %i children\n", tmpitem->text().toStdString().c_str(), tmpitem->rowCount);
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
-            tmpexportlist = SetFileExportProperties(tmpitem->child(i,1), tmpexport, tmpexportlist);
+            tmpexportlist = SetFileExportProperties(tmpitem->child(i,0), tmpexport, tmpexportlist);
         }
     }
     if(tmpitem->checkState() == 2) // if checked
@@ -250,16 +255,11 @@ std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardIt
 int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount)
 {
     int curcount = listcount;
-    QModelIndex curindex = tmpitem->index();
     if(tmpitem->hasChildren())
     {
-        fprintf(stderr, "%s has %i children.\n", curindex.sibling(curindex.row(),0).data().toString().toStdString().c_str(), tmpitem->rowCount());
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
-            QModelIndex childindex = tmpitem->child(i,1)->index();
-            curcount = StandardItemListCount(tmpitem->child(i,1), curcount);
-            fprintf(stderr, "name: %s - count: %i\n", childindex.sibling(childindex.row(), 0).data().toString().toStdString().c_str(), curcount);
-            //fprintf(stderr, "name: %s - count: %i\n", curindex.sibling(curindex.row(), 0).data().toString().toStdString().c_str(), curcount);
+            curcount = StandardItemListCount(tmpitem->child(i,0), curcount);
         }
     }
     curcount++;
