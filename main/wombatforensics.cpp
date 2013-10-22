@@ -200,21 +200,29 @@ int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcou
     int curcount = checkcount;
     if(tmpitem->hasChildren())
     {
-        fprintf(stderr, "%s has %i children\n", tmpitem->text().toStdString().c_str(), tmpitem->rowCount());
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
             curcount = StandardItemCheckState(tmpitem->child(i,0), curcount);
         }
     }
+    fprintf(stderr, "%s has %i columns.\n", tmpitem->text().toStdString().c_str(), tmpitem->columnCount());
+    /*
     QModelIndex curindex = tmpitem->index();
     // getting there, the program crashes at fprintf, after 12 checkstate's, so i'll need to find out what is wrong with it.
+    fprintf(stderr, "(row,col): (%i,%i)\n", curindex.row(), curindex.column());
+    //fprintf(stderr, "colcount: %i\n", tmpitem->columnCount());
     if(((QStandardItemModel*)curindex.model())->itemFromIndex(curindex.sibling(curindex.row(),1))->text() != "")
-        fprintf(stderr, "checkstate: %i\n", ((QStandardItemModel*)curindex.model())->itemFromIndex(curindex.sibling(curindex.row(),1))->checkState());
+    {
+        fprintf(stderr, "%s checkstate: %i\n", tmpitem->text().toStdString().c_str(), ((QStandardItemModel*)curindex.model())->itemFromIndex(curindex.sibling(curindex.row(),1))->checkState());
+    }
+    */
+    /*
     if(tmpitem->checkState() == 2)
     {
         fprintf(stderr, "%i - %s\n", curcount, tmpitem->text().toStdString().c_str());
         curcount++;
     }
+    */
 
     return curcount;
 }
@@ -286,8 +294,12 @@ void WombatForensics::ExportEvidence()
             for(int k = 0; k < volumenode->rowCount(); k++)
             {
                 QStandardItem* fsnode = volumenode->child(k,0);
-                checkcount = StandardItemCheckState(fsnode, checkcount);
-                listcount = StandardItemListCount(fsnode, listcount);
+                for(int m = 0; m < fsnode->rowCount(); m++)
+                {
+                    QStandardItem* filenode = fsnode->child(m,0);
+                    checkcount = StandardItemCheckState(filenode, checkcount);
+                    listcount = StandardItemListCount(filenode, listcount);
+                }
             }
         }
     }
