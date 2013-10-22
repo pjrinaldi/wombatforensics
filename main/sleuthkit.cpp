@@ -626,10 +626,19 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                     for(int i=0; i < (int)fileRecordVector.size(); i++)
                     {
                         QStandardItem* tmpitem;
-                        fullPath = imagename + "/" + currentVolPath + currentFsPath + QString(fileRecordVector[i].fullPath.c_str());
-                        // full path might contain more than i thought, to include unalloc and whatnot
                         QList<QStandardItem*> sleuthList;
-                        sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
+                        fullPath = imagename + "/" + currentVolPath + currentFsPath;
+                        if(fileRecordVector[i].parentFileId == 0)
+                        {
+                            fullPath += "root/";
+                            sleuthList << new QStandardItem(QString("root"));
+                        }
+                        else
+                        {
+                            fullPath += "root/" + QString(fileRecordVector[i].fullPath.c_str());
+                            sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
+                        }
+                        // full path might contain more than i thought, to include unalloc and whatnot
                         //fprintf(stderr, "FileRecordVectorSize: %d - ObjectIDListSize: %d\n", fileRecordVector.size(), objectidlist.count());
                         tmpitem = new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
                         tmpitem->setCheckable(true);
@@ -655,7 +664,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                         {
                             tmpItem2->setIcon(QIcon(":/basic/treefile"));
                         }
-                        if(((TskFileRecord)fileRecordVector[i]).parentFileId == 1)
+                        if(((TskFileRecord)fileRecordVector[i]).parentFileId == 0)
                         {
                             fsNode->appendRow(treeList[i]);
                         }
@@ -663,7 +672,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                     for(int i=0; i < (int)fileRecordVector.size(); i++)
                     {
                         tmpRecord = fileRecordVector[i];
-                        if(tmpRecord.parentFileId > 1)
+                        if(tmpRecord.parentFileId > 0)
                         {
                             ((QStandardItem*)treeList[tmpRecord.parentFileId-1].first())->appendRow(treeList[i]);
                         }
