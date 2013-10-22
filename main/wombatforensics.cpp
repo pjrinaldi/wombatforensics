@@ -117,7 +117,6 @@ void WombatForensics::InitializeSleuthKit()
 void WombatForensics::AddEvidence()
 {
     QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
-    //fprintf(stderr, "Evidence FilePath: %s\n", evidenceFilePath.toStdString().c_str());
     if(evidenceFilePath != "")
     {
         wombatprogresswindow->show();
@@ -148,7 +147,6 @@ void WombatForensics::AddEvidence()
         wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
         ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
         threadpool->start(trun);
-        //fprintf(stderr, "open evidence exists");
     }
 }
 
@@ -156,7 +154,6 @@ void WombatForensics::RemEvidence()
 {
     wombatprogresswindow->ClearTableWidget();
     wombatvariable.jobtype = 2; // remove evidence
-    fprintf(stderr, "remove evidence\n");
     QStringList evidenceList;
     evidenceList.clear();
     // populate case list here
@@ -183,7 +180,6 @@ void WombatForensics::RemEvidence()
         QString tmppath = wombatvariable.evidencedirpath + item.split("/").last() + ".db";
         if(QFile::remove(tmppath))
         {
-            //fprintf(stderr, "file was removed");
         }
         else
             emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
@@ -202,7 +198,6 @@ void WombatForensics::RemEvidence()
 int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
 {
     int curcount = checkcount;
-    fprintf(stderr, "curcount: %i\n", curcount);
     if(tmpitem->hasChildren())
     {
         for(int i=0; i < tmpitem->rowCount(); i++)
@@ -255,11 +250,16 @@ std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardIt
 int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount)
 {
     int curcount = listcount;
+    QModelIndex curindex = tmpitem->index();
     if(tmpitem->hasChildren())
     {
+        fprintf(stderr, "%s has %i children.\n", curindex.sibling(curindex.row(),0).data().toString().toStdString().c_str(), tmpitem->rowCount());
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
+            QModelIndex childindex = tmpitem->child(i,1)->index();
             curcount = StandardItemListCount(tmpitem->child(i,1), curcount);
+            fprintf(stderr, "name: %s - count: %i\n", childindex.sibling(childindex.row(), 0).data().toString().toStdString().c_str(), curcount);
+            //fprintf(stderr, "name: %s - count: %i\n", curindex.sibling(curindex.row(), 0).data().toString().toStdString().c_str(), curcount);
         }
     }
     curcount++;
@@ -302,9 +302,6 @@ void WombatForensics::FileExport(FileExportData exportdata)
     std::vector<FileExportData> exportevidencelist;
     if(exportdata.filestatus == FileExportData::selected)
     {
-        // need to store the image's dd path, whatever i need to set the db correctly.
-        // for image db, i need the evidencedirpath and evidencedbname.
-        // for image dd, i need the evidencepath
         exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt(); // unique objectid
         wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(exportdata.id); // evidence id
         QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
@@ -322,7 +319,7 @@ void WombatForensics::FileExport(FileExportData exportdata)
         {
             exportdata.fullpath = exportdata.exportpath + "/" + exportdata.name; // export path without original path
         }
-        fprintf(stderr, "export full path: %s\n", exportdata.fullpath.c_str());
+        fprintf(stderr, "export selected full path: %s\n", exportdata.fullpath.c_str());
 
         exportevidencelist.push_back(exportdata);
     }
@@ -446,7 +443,6 @@ void WombatForensics::ResizeColumns(QStandardItemModel* currentmodel)
         // have to see as i go. for now its good.
         currenttreeview->resizeColumnToContents(i);
     }
-    fprintf(stderr, "Resizing Column\n");
 }
 
 void WombatForensics::SetupDirModel(void)
@@ -478,7 +474,6 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     wombatprogresswindow->close();
     RemoveTmpFiles();
     //const char* errmsg = wombatcasedata->CloseCaseDB();
-    //fprintf(stderr, "CloseDB: %s\n", errmsg);
 }
 
 void WombatForensics::RemoveTmpFiles()
@@ -491,7 +486,6 @@ void WombatForensics::RemoveTmpFiles()
     {
         DisplayError("2.7", "Tmp File Removal", "All tmp files may not have been removed. Please manually remove them to avoid evidence contamination.");
     }
-    fprintf(stderr, "remove dir: %s\n", homePath.toStdString().c_str());
 }
 
 void WombatForensics::on_actionNew_Case_triggered()

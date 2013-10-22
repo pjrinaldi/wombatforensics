@@ -274,7 +274,6 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
     wombatvariable.tmpfilepath = GetFileContents(wombatvariable.fileid);
-    fprintf(stderr, "tmpfilepath: %s\n", wombatvariable.tmpfilepath.toStdString().c_str());
     emit LoadFileContents(wombatvariable.tmpfilepath);
 }
 
@@ -330,7 +329,6 @@ void SleuthKitPlugin::SetupSystemProperties()
     QString tmpPath = wombatvariable.settingspath;
     tmpPath += "/tsk-config.xml";
     QFile tmpFile(tmpPath);
-    //fprintf(stderr, "TmpPath: %s\n", tmpPath.toStdString().c_str());
     if(!tmpFile.exists()) // if tsk-config.xml does not exist, create and write it here
     {
         if(tmpFile.open(QFile::WriteOnly | QFile::Text))
