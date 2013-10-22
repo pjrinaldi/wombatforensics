@@ -198,6 +198,7 @@ void WombatForensics::RemEvidence()
 int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
 {
     int curcount = checkcount;
+    QModelIndex curindex = tmpitem->index();
     if(tmpitem->hasChildren())
     {
         for(int i=0; i < tmpitem->rowCount(); i++)
@@ -205,60 +206,50 @@ int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcou
             curcount = StandardItemCheckState(tmpitem->child(i,0), curcount);
         }
     }
-    fprintf(stderr, "%s has %i columns.\n", tmpitem->text().toStdString().c_str(), tmpitem->columnCount());
-    /*
-    QModelIndex curindex = tmpitem->index();
-    // getting there, the program crashes at fprintf, after 12 checkstate's, so i'll need to find out what is wrong with it.
-    fprintf(stderr, "(row,col): (%i,%i)\n", curindex.row(), curindex.column());
-    //fprintf(stderr, "colcount: %i\n", tmpitem->columnCount());
-    if(((QStandardItemModel*)curindex.model())->itemFromIndex(curindex.sibling(curindex.row(),1))->text() != "")
+    if(curindex.sibling(curindex.row(),1).flags().testFlag(Qt::ItemIsUserCheckable))
     {
-        fprintf(stderr, "%s checkstate: %i\n", tmpitem->text().toStdString().c_str(), ((QStandardItemModel*)curindex.model())->itemFromIndex(curindex.sibling(curindex.row(),1))->checkState());
+        if(tmpitem->parent()->child(curindex.row(), 1)->checkState())
+            curcount++;
     }
-    */
-    /*
-    if(tmpitem->checkState() == 2)
-    {
-        fprintf(stderr, "%i - %s\n", curcount, tmpitem->text().toStdString().c_str());
-        curcount++;
-    }
-    */
-
+    
     return curcount;
 }
 
 std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData> tmpexportlist)
 {
+    QModelIndex curindex = tmpitem->index();
     if(tmpitem->hasChildren())
     {
-        //fprintf(stderr, "%s has %i children\n", tmpitem->text().toStdString().c_str(), tmpitem->rowCount);
         for(int i=0; i < tmpitem->rowCount(); i++)
         {
             tmpexportlist = SetFileExportProperties(tmpitem->child(i,0), tmpexport, tmpexportlist);
         }
     }
-    if(tmpitem->checkState() == 2) // if checked
+    if(curindex.sibling(curindex.row(), 1).flags().testFlag(Qt::ItemIsUserCheckable))
     {
-        // update evidence/file info for each item bit.
-        QModelIndex curindex = tmpitem->index();
-        tmpexport.id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // unique object id
-        wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmpexport.id); // evidence id
-        QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
-        wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
-        wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
-        wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmpexport.id); // file id
-        tmpexport.name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
-        if(tmpexport.pathstatus == FileExportData::include)
+        if(tmpitem->parent()->child(curindex.row(), 1)->checkState())
         {
-            tmpexport.fullpath = tmpexport.exportpath + "/" + curindex.sibling(curindex.row(), 2).data().toString().toStdString(); // export path with original path
+            // update evidence/file info for each item bit.
+            tmpexport.id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // unique object id
+            wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmpexport.id); // evidence id
+            QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
+            wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
+            wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
+            wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmpexport.id); // file id
+            tmpexport.name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
+            if(tmpexport.pathstatus == FileExportData::include)
+            {
+                // export path with original path
+                tmpexport.fullpath = tmpexport.exportpath + "/" + curindex.sibling(curindex.row(), 2).data().toString().toStdString();
+            }
+            else if(tmpexport.pathstatus == FileExportData::exclude)
+            {
+                tmpexport.fullpath = tmpexport.exportpath + "/" + tmpexport.name; // export path without original path
+            }
+            fprintf(stderr, "export full path checked: %s\n", tmpexport.fullpath.c_str());
+    
+            tmpexportlist.push_back(tmpexport);
         }
-        else if(tmpexport.pathstatus == FileExportData::exclude)
-        {
-            tmpexport.fullpath = tmpexport.exportpath + "/" + tmpexport.name; // export path without original path
-        }
-        fprintf(stderr, "export full path checked: %s\n", tmpexport.fullpath.c_str());
-
-        tmpexportlist.push_back(tmpexport);
     }
 
     return tmpexportlist;

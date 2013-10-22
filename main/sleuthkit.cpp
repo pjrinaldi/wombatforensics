@@ -638,8 +638,6 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                             fullPath += "root/" + QString(fileRecordVector[i].fullPath.c_str());
                             sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
                         }
-                        // full path might contain more than i thought, to include unalloc and whatnot
-                        //fprintf(stderr, "FileRecordVectorSize: %d - ObjectIDListSize: %d\n", fileRecordVector.size(), objectidlist.count());
                         tmpitem = new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
                         tmpitem->setCheckable(true);
                         sleuthList << tmpitem;
