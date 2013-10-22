@@ -306,6 +306,11 @@ void WombatForensics::FileExport(FileExportData exportdata)
         // for image db, i need the evidencedirpath and evidencedbname.
         // for image dd, i need the evidencepath
         exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt(); // unique objectid
+        wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(exportdata.id); // evidence id
+        QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
+        wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
+        wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
+        wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(exportdata.id); // file id
         exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
         if(exportdata.pathstatus == FileExportData::include)
         {
