@@ -284,6 +284,7 @@ void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
     SetEvidenceDB(wombatvariable);
     for(int i = 0; i < wombatvariable.exportdatalist.size(); i++)
     {
+        // need to include the image information that i will associate with the exportdatalist[i].imagedd
         ExportFile(wombatvariable.exportdatalist[i].fullpath, wombatvariable.exportdatalist[i].id);
     }
 }

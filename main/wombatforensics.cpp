@@ -296,6 +296,9 @@ void WombatForensics::FileExport(FileExportData exportdata)
     std::vector<FileExportData> exportevidencelist;
     if(exportdata.filestatus == FileExportData::selected)
     {
+        // need to store the image's dd path, whatever i need to set the db correctly.
+        // for image db, i need the evidencedirpath and evidencedbname.
+        // for image dd, i need the evidencepath
         exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt();
         exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
         if(exportdata.pathstatus == FileExportData::include)
