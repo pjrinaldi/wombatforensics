@@ -59,8 +59,12 @@ QWidget* BasicTools::setupTypTab()
 
 void BasicTools::LoadFileContents(QString filepath)
 {
-    LoadHexModel(filepath);
-    LoadTxtContent(filepath);
+    QFileInfo pathinfo(filepath);
+    if(!pathinfo.isDir())
+    {
+        LoadHexModel(filepath);
+        LoadTxtContent(filepath);
+    }
 }
 
 void BasicTools::LoadHexModel(QString tmpFilePath)

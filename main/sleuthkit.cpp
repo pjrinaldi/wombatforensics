@@ -792,20 +792,29 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     {
         fprintf(stderr, "Get File Error: %s\n", ex.what());
     }
-    try
+    if(tfile->isDirectory())
     {
-        if(!tfile->exists())
+        bool tmpdir = (new QDir())->mkpath(QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)));
+        if(!tmpdir)
+            fprintf(stderr, "%s creation failed.\n");
+    }
+    else
+    {
+        try
         {
-            TskServices::Instance().getFileManager().saveFile(tfile);
+            if(!tfile->exists())
+            {
+                TskServices::Instance().getFileManager().saveFile(tfile);
+            }
         }
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "read file/write to fail failed %s\n", ex.what());
-    }
-    catch(std::exception ex)
-    {
-        fprintf(stderr, "read file/write to fail %s\n", ex.what());
+        catch(TskException ex)
+        {
+            fprintf(stderr, "read file/write to fail failed %s\n", ex.what());
+        }
+        catch(std::exception ex)
+        {
+            fprintf(stderr, "read file/write to fail %s\n", ex.what());
+        }
     }
 
     return QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
