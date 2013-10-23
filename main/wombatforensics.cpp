@@ -233,9 +233,11 @@ std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardIt
             tmpexport.id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // unique object id
             wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmpexport.id); // evidence id
             QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
-            wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
-            wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
-            wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmpexport.id); // file id
+            //wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
+            //wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
+            tmpexport.evidencepath = currentevidencelist[0].toStdString(); // evidence path
+            tmpexport.evidencedbname = currentevidencelist[1].toStdString(); // evidence db name
+            //wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmpexport.id); // file id
             tmpexport.name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
             if(tmpexport.pathstatus == FileExportData::include)
             {
@@ -254,7 +256,40 @@ std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardIt
 
     return tmpexportlist;
 }
+std::vector<FileExportData> WombatForensics::SetListExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData> tmpexportlist)
+{
+    QModelIndex curindex = tmpitem->index();
+    if(tmpitem->hasChildren())
+    {
+        for(int i = 0; i < tmpitem->rowCount(); i++)
+        {
+            tmpexportlist = SetListExportProperties(tmpitem->child(i, 0), tmpexport, tmpexportlist);
+        }
+    }
+    // get every item.
+    tmpexport.id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // unique object id
+    wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmpexport.id); // evidence id
+    QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
+    //wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
+    //wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
+    tmpexport.evidencepath = currentevidencelist[0].toStdString(); // evidence path
+    tmpexport.evidencedbname = currentevidencelist[1].toStdString(); // evidence db name
+    //wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmpexport.id); // file id
+    tmpexport.name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
+    if(tmpexport.pathstatus == FileExportData::include)
+    {
+        // export path with original path
+        tmpexport.fullpath = tmpexport.exportpath + "/" + curindex.sibling(curindex.row(), 2).data().toString().toStdString();
+    }
+    else if(tmpexport.pathstatus == FileExportData::exclude)
+    {
+        tmpexport.fullpath = tmpexport.exportpath + "/" + tmpexport.name; // export path without original path
+    }
+    fprintf(stderr, "export full path listed: %s\n", tmpexport.fullpath.c_str());
+    tmpexportlist.push_back(tmpexport);
 
+    return tmpexportlist;
+}
 int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount)
 {
     int curcount = listcount;
@@ -312,9 +347,11 @@ void WombatForensics::FileExport(FileExportData exportdata)
         exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt(); // unique objectid
         wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(exportdata.id); // evidence id
         QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
-        wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
-        wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
-        wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(exportdata.id); // file id
+        //wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
+        exportdata.evidencepath = currentevidencelist[0].toStdString(); // evidence path
+        //wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
+        exportdata.evidencedbname = currentevidencelist[1].toStdString(); // evidence db name
+        //wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(exportdata.id); // file id
         exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
         if(exportdata.pathstatus == FileExportData::include)
         {
@@ -349,8 +386,24 @@ void WombatForensics::FileExport(FileExportData exportdata)
     }
     else if(exportdata.filestatus == FileExportData::listed)
     {
-        QStandardItem* rootitem = wombatdirmodel->invisibleRootItem()->child(0,0)->child(0,0)->child(0,0);
-        // get the files listed and add them to the list
+        QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();
+        for(int i = 0; i < rootitem->rowCount(); i++) // loop over images
+        {
+            QStandardItem* imagenode = rootitem->child(i,0);
+            for(int j = 0; j < imagenode->rowCount(); j++) // loop over volumes
+            {
+                QStandardItem* volumenode = imagenode->child(j,0); // loop over partitions
+                for(int k = 0; k < volumenode->rowCount(); k++)
+                {
+                    QStandardItem* fsnode = volumenode->child(k,0); // file system node
+                    for(int m = 0; m < fsnode->rowCount(); m++)
+                    {
+                        QStandardItem* filenode = fsnode->child(m,0); // file system root node
+                        exportevidencelist = SetListExportProperties(filenode, exportdata, exportevidencelist);
+                    }
+                }
+            }
+        }
     }
     wombatvariable.exportdatalist = exportevidencelist;
 

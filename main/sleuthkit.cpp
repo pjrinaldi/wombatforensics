@@ -280,9 +280,11 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
-    SetEvidenceDB(wombatvariable);
     for(int i = 0; i < wombatvariable.exportdatalist.size(); i++)
     {
+        wombatvariable.evidencepath = QString::fromStdString(wombatvariable.exportdatalist[i].evidencepath);
+        wombatvariable.evidencedbname = QString::fromStdString(wombatvariable.exportdatalist[i].evidencedbname);
+        SetEvidenceDB(wombatvariable);
         ExportFile(wombatvariable.exportdatalist[i].fullpath, wombatvariable.exportdatalist[i].id);
     }
 }

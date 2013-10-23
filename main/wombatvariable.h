@@ -29,6 +29,8 @@ struct FileExportData
     PathStatus pathstatus;
     std::string name;
     std::string fullpath;
+    std::string evidencedbname;
+    std::string evidencepath;
 };
 
 struct WombatVariable
