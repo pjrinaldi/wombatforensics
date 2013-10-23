@@ -718,37 +718,47 @@ void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
     {
         fprintf(stderr, "Get File Error: %s\n", ex.what());
     }
-    try
+    if(tfile->isDirectory())
     {
-        if(!tfile->exists())
+        bool tmpdir = (new QDir())->mkpath(QString::fromStdString(exportpath));
+        if(!tmpdir)
+            fprintf(stderr, "%s creation failed.\n");
+        fprintf(stderr, "need to make the directory here...\n");
+    }
+    else
+    {
+        try
         {
-            TskServices::Instance().getFileManager().saveFile(tfile);
+            if(!tfile->exists())
+            {
+                TskServices::Instance().getFileManager().saveFile(tfile);
+            }
+        }
+        catch(TskException ex)
+        {
+            fprintf(stderr, "read file/write to fail failed %s\n", ex.what());
+        }
+        catch(std::exception ex)
+        {
+            fprintf(stderr, "read file/write to fail %s\n", ex.what());
+        }
+        std::wstringstream ws;
+        ws << exportpath.c_str();
+        std::wstring wexportpath = ws.str();
+        try
+        {
+            TskServices::Instance().getFileManager().copyFile(tfile, wexportpath);
+        }
+        catch(TskException ex)
+        {
+            fprintf(stderr, "copy file to export location failed %s\n", ex.what());
+        }
+        catch(std::exception ex)
+        {
+            fprintf(stderr, "copy file to export location failed %s\n", ex.what());
         }
     }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "read file/write to fail failed %s\n", ex.what());
-    }
-    catch(std::exception ex)
-    {
-        fprintf(stderr, "read file/write to fail %s\n", ex.what());
-    }
-    std::wstringstream ws;
-    ws << exportpath.c_str();
-    std::wstring wexportpath = ws.str();
-    try
-    {
-        TskServices::Instance().getFileManager().copyFile(tfile, wexportpath);
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "copy file to export location failed %s\n", ex.what());
-    }
-    catch(std::exception ex)
-    {
-        fprintf(stderr, "copy file to export location failed %s\n", ex.what());
-    }
-}
+}   
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
 {
