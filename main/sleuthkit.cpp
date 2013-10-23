@@ -1,5 +1,23 @@
 #include "sleuthkit.h"
 
+static std::string getFileType(const char *name)
+{
+    std::string filename = name;
+    size_t pos = filename.rfind('.');
+    if (pos != std::string::npos)
+    {
+        std::string suffix = filename.substr(pos);
+        std::string result;
+        for (size_t i=0; i < suffix.size(); i++)
+        {
+            result += (char)tolower(suffix[i]);
+        }
+        return result;
+    }
+    else
+        return std::string("");
+}
+
 SleuthKitPlugin::SleuthKitPlugin(WombatDatabase* wombatcasedata)
 {
     wombatdata = wombatcasedata; 
@@ -647,7 +665,47 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                         //sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
                         sleuthList << new QStandardItem(fullPath);
                         sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
-                        sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
+                        if(sqlite3_open(tmpImgDbPath.toStdString().c_str(), &tmpImgDB) == SQLITE_OK)
+                        {
+                            sqlite3_stmt* stmt;
+                            if(sqlite3_prepare_v2(tmpImgDB, "select value_text from blackboard_attributes where attribute_type_id = 62 and obj_id = ?;", -1, &stmt, 0) == SQLITE_OK)
+                            {
+                                if(sqlite3_bind_int(stmt, 1, (int)fileRecordVector[i].fileId) == SQLITE_OK)
+                                {
+                                    int ret = sqlite3_step(stmt);
+                                    if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+                                    {
+                                        sleuthList << new QStandardItem(QString((const char*)sqlite3_column_text(stmt, 0)));
+                                        /*
+                                        uint64_t fileId = (uint64_t)sqlite3_column_int(stmt, 0);
+                                        fileidVector.push_back(fileId);
+                                        if(isAddEvidence == 1)
+                                            objectidlist.append(wombatdata->InsertObject(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileId));
+                                        */
+                                    }
+                                    sqlite3_finalize(stmt);
+                                }
+                                else
+                                {
+                                    //std::wstringstream infoMessage;
+                                    //infoMessage << L"Get FsFileIds Failed: " << sqlite3_errmsg(imgdb);
+                                    //LOGERROR(infoMessage.c_str());
+                                }
+                            }
+                            else
+                            {
+                                //std::wstringstream infoMessage;
+                                //infoMessage << L"Get FsFileIds Failed: " << sqlite3_errmsg(imgdb);
+                                //LOGERROR(infoMessage.c_str());
+                            }
+                        }
+                        sqlite3_close(tmpImgDB);
+                        //sleuthList << new QStandardItem("signature");
+                        sleuthList << new QStandardItem(QString::fromStdString(getFileType(fileRecordVector[i].name.c_str())));
+                        QDateTime tmptime;
+                        tmptime.setTime_t(fileRecordVector[i].crtime);
+                        sleuthList << new QStandardItem(tmptime.toString(Qt::ISODate));
+                        //sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
                         //sleuthList << new QStandardItem(QString(ctime(((const time_t*)fileRecordVector[i].crtime))));
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
                         treeList.append(sleuthList);
