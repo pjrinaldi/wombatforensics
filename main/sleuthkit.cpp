@@ -661,7 +661,6 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                         tmpitem = new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
                         tmpitem->setCheckable(true);
                         sleuthList << tmpitem;
-                        //sleuthList << new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
                         //sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
                         sleuthList << new QStandardItem(fullPath);
                         sleuthList << new QStandardItem(QString::number(fileRecordVector[i].size));
@@ -676,12 +675,6 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                                     if(ret == SQLITE_ROW || ret == SQLITE_DONE)
                                     {
                                         sleuthList << new QStandardItem(QString((const char*)sqlite3_column_text(stmt, 0)));
-                                        /*
-                                        uint64_t fileId = (uint64_t)sqlite3_column_int(stmt, 0);
-                                        fileidVector.push_back(fileId);
-                                        if(isAddEvidence == 1)
-                                            objectidlist.append(wombatdata->InsertObject(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileId));
-                                        */
                                     }
                                     sqlite3_finalize(stmt);
                                 }
@@ -704,7 +697,9 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                         sleuthList << new QStandardItem(QString::fromStdString(getFileType(fileRecordVector[i].name.c_str())));
                         QDateTime tmptime;
                         tmptime.setTime_t(fileRecordVector[i].crtime);
+                        tmptime.setTimeSpec(Qt::UTC);
                         sleuthList << new QStandardItem(tmptime.toString(Qt::ISODate));
+                        fprintf(stderr, "time setting: %i\n", (int)tmptime.timeSpec());
                         //sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
                         //sleuthList << new QStandardItem(QString(ctime(((const time_t*)fileRecordVector[i].crtime))));
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
