@@ -65,6 +65,11 @@ void BasicTools::LoadFileContents(QString filepath)
         LoadHexModel(filepath);
         LoadTxtContent(filepath);
     }
+    else
+    {
+        hexwidget->setModel(0);
+        txtwidget->setPlainText("");
+    }
 }
 
 void BasicTools::LoadHexModel(QString tmpFilePath)

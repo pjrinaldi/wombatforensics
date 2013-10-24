@@ -17,6 +17,17 @@ static std::string getFileType(const char *name)
     else
         return std::string("");
 }
+QString DisplayTimeUTC(int unixtime)
+{
+    QDateTime tmptime;
+    QString tmpstring = "";
+    tmptime.setTime_t(unixtime);
+    tmptime.setTimeSpec(Qt::UTC);
+    if(tmptime.date().toString(Qt::ISODate).compare("1969-12-31") != 0)
+        tmpstring = tmptime.toString(Qt::ISODate);
+    
+    return tmpstring;
+}
 
 SleuthKitPlugin::SleuthKitPlugin(WombatDatabase* wombatcasedata)
 {
@@ -640,8 +651,10 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                     QList<QList<QStandardItem*> > treeList;
                     foreach(tmpId, fileidVector)
                     {
-                        ret = TskServices::Instance().getImgDB().getFileRecord(tmpId, tmpRecord);
-                        fileRecordVector.push_back(tmpRecord);
+                        TskFileRecord tmprecord;
+                        ret = TskServices::Instance().getImgDB().getFileRecord(tmpId, tmprecord);
+                        fprintf(stderr, "%s\n", tmprecord.md5.c_str());
+                        fileRecordVector.push_back(tmprecord);
                     }
                     for(int i=0; i < (int)fileRecordVector.size(); i++)
                     {
@@ -693,16 +706,13 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                             }
                         }
                         sqlite3_close(tmpImgDB);
-                        //sleuthList << new QStandardItem("signature");
                         sleuthList << new QStandardItem(QString::fromStdString(getFileType(fileRecordVector[i].name.c_str())));
-                        QDateTime tmptime;
-                        tmptime.setTime_t(fileRecordVector[i].crtime);
-                        tmptime.setTimeSpec(Qt::UTC);
-                        sleuthList << new QStandardItem(tmptime.toString(Qt::ISODate));
-                        fprintf(stderr, "time setting: %i\n", (int)tmptime.timeSpec());
-                        //sleuthList << new QStandardItem(QString::number(fileRecordVector[i].crtime));
-                        //sleuthList << new QStandardItem(QString(ctime(((const time_t*)fileRecordVector[i].crtime))));
+                        sleuthList << new QStandardItem(DisplayTimeUTC(fileRecordVector[i].crtime));
+                        sleuthList << new QStandardItem(DisplayTimeUTC(fileRecordVector[i].atime));
+                        sleuthList << new QStandardItem(DisplayTimeUTC(fileRecordVector[i].mtime));
+                        sleuthList << new QStandardItem(DisplayTimeUTC(fileRecordVector[i].ctime));
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
+                        fprintf(stderr, "%i - %s\n", i, fileRecordVector[i].md5.c_str());
                         treeList.append(sleuthList);
                     }
                     for(int i = 0; i < (int)fileRecordVector.size(); i++)

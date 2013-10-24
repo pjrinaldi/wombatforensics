@@ -421,7 +421,7 @@ void WombatForensics::UpdateCaseData(WombatVariable wvariable)
     // refresh treeviews here
     wombatdirmodel->clear();
     QStringList headerList;
-    headerList << "Name" << "Unique ID" << "Full Path" << "Size" << "Created" << "MD5 Hash";
+    headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     wombatdirmodel->setHorizontalHeaderLabels(headerList);
     currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
     currenttreeview->setModel(wombatdirmodel);
@@ -509,7 +509,7 @@ void WombatForensics::SetupDirModel(void)
 {
     wombatdirmodel = new QStandardItemModel();
     QStringList headerList;
-    headerList << "Name" << "Unique ID" << "Full Path" << "Size" << "Signature" << "Extension" << "Created" << "MD5 Hash";
+    headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     wombatdirmodel->setHorizontalHeaderLabels(headerList);
     QStandardItem *evidenceNode = wombatdirmodel->invisibleRootItem();
     currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
