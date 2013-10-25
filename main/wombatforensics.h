@@ -2,6 +2,7 @@
 #define WOMBATFORENSICS_H
 
 #include <QMainWindow>
+#include <memory>
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
@@ -47,9 +48,9 @@ public:
     ExportDialog* exportdialog;
     SleuthKitPlugin* isleuthkit;
     BasicTools* ibasictools;
-    WombatVariable* pwombatvariable;
-    FileExportData* pexportdata;
-    FileExportData* pexportlist;
+    std::<WombatVariable> pwombatvariable;
+    std::auto_ptr<FileExportData> pexportdata;
+    std::auto_ptr<FileExportData> pexportlist;
 
 signals:
     void LogVariable(WombatVariable* wombatVariable);
@@ -91,8 +92,8 @@ private:
     QThreadPool *threadpool;
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
-    std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
-    std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
+    std::auto_ptr<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
+    std::auto_ptr<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;
