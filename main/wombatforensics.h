@@ -27,6 +27,9 @@
 #include "sleuthkit.h"
 #include "basictools.h"
 
+Q_DECLARE_METATYPE(WombatVariable)
+Q_DECLARE_METATYPE(FileExportData)
+
 namespace Ui {
 class WombatForensics;
 }
@@ -44,9 +47,12 @@ public:
     ExportDialog* exportdialog;
     SleuthKitPlugin* isleuthkit;
     BasicTools* ibasictools;
+    WombatVariable* pwombatvariable;
+    FileExportData* pexportdata;
+    FileExportData* pexportlist;
 
 signals:
-    void LogVariable(WombatVariable wombatVariable);
+    void LogVariable(WombatVariable* wombatVariable);
 private slots:
     void AddEvidence();
     void RemEvidence();
@@ -68,7 +74,7 @@ private slots:
     {
         ResizeColumns((QStandardItemModel*)index.model());
     }
-    void FileExport(FileExportData exportdata);
+    void FileExport(FileExportData* exportdata);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -85,8 +91,8 @@ private:
     QThreadPool *threadpool;
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
-    std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
-    std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
+    std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
+    std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     BinViewWidget* currenthexwidget;
@@ -101,31 +107,31 @@ class ThreadRunner : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    ThreadRunner(QObject* object, QString input, WombatVariable wVariable)
+    ThreadRunner(QObject* object, QString input, WombatVariable* wVariable)
     {
         method = input;
         caller = (SleuthKitPlugin*)object;
-        wombatvariable = wVariable;
+        pwombatvariable = wVariable;
     };
     void run()
     {
         if(method.compare("initialize") == 0)
-            caller->Initialize(wombatvariable);
+            caller->Initialize(pwombatvariable);
         if(method.compare("openevidence") == 0)
-            caller->OpenEvidence(wombatvariable);
+            caller->OpenEvidence(pwombatvariable);
         if(method.compare("populatecase") == 0)
-            caller->PopulateCase(wombatvariable);
+            caller->PopulateCase(pwombatvariable);
         if(method.compare("showfile") == 0)
-            caller->ShowFile(wombatvariable);
+            caller->ShowFile(pwombatvariable);
         if(method.compare("refreshtreeviews") == 0)
-            caller->RefreshTreeViews(wombatvariable);
+            caller->RefreshTreeViews(pwombatvariable);
         if(method.compare("exportfiles") == 0)
-            caller->ExportFiles(wombatvariable);
+            caller->ExportFiles(pwombatvariable);
     };
 private:
     QString method;
     SleuthKitPlugin* caller;
-    WombatVariable wombatvariable;
+    WombatVariable* pwombatvariable;
 };
 
 #endif // WOMBATFORENSICS_H

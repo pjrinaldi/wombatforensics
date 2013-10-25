@@ -2,6 +2,7 @@
 
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
+    pwombatvariable = &wombatvariable;
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
     wombatcasedata = new WombatDatabase();
@@ -14,14 +15,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     qRegisterMetaType<WombatVariable>("WombatVariable");
     qRegisterMetaType<FileExportData>("FileExportData");
-    connect(this, SIGNAL(LogVariable(WombatVariable)), isleuthkit, SLOT(GetLogVariable(WombatVariable)), Qt::QueuedConnection);
+    connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
     connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(SendFileContents(QString)), Qt::QueuedConnection);
-    connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable)), this, SLOT(PopulateProgressWindow(WombatVariable)), Qt::QueuedConnection);
+    connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable*)), this, SLOT(PopulateProgressWindow(WombatVariable*)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
-    wombatvariable.caseid = 0;
-    wombatvariable.evidenceid = 0;
-    wombatvariable.jobtype = 0;
+    pwombatvariable->caseid = 0;
+    pwombatvariable->evidenceid = 0;
+    pwombatvariable->jobtype = 0;
     InitializeAppStructure();
     InitializeSleuthKit();
 }
@@ -48,25 +49,25 @@ std::string WombatForensics::GetTime()
 
 void WombatForensics::InitializeAppStructure()
 {
-    QString homePath = QDir::homePath();
+    std::string homePath = QDir::homePath().toStdString();
     homePath += "/WombatForensics/";
-    wombatvariable.settingspath = homePath + "settings";
-    wombatvariable.datapath = homePath + "data/";
-    wombatvariable.casespath = homePath + "cases/";
-    wombatvariable.tmpfilepath = homePath + "tmpfiles";
-    bool mkPath = (new QDir())->mkpath(wombatvariable.settingspath);
+    pwombatvariable->settingspath = homePath + "settings";
+    pwombatvariable->datapath = homePath + "data/";
+    pwombatvariable->casespath = homePath + "cases/";
+    pwombatvariable->tmpfilepath = homePath + "tmpfiles";
+    bool mkPath = (new QDir())->mkpath(QString::fromStdString(wombatvariable->settingspath));
     if(mkPath == false)
         DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvariable.datapath);
+    mkPath = (new QDir())->mkpath(QString::fromStdString(wombatvariable->datapath));
     if(mkPath == false)
         DisplayError("2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvariable.casespath);
+    mkPath = (new QDir())->mkpath(QString::fromStdString(wombatvariable->casespath));
     if(mkPath == false)
         DisplayError("2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvariable.tmpfilepath);
+    mkPath = (new QDir())->mkpath(QString::fromStdString(wombatvariable->tmpfilepath));
     if(mkPath == false)
         DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
-    QString logPath = wombatvariable.datapath + "WombatLog.db";
+    QString logPath = wombatvariable->datapath + "WombatLog.db";
     bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
     if(!logFileExist)
     {
@@ -74,8 +75,8 @@ void WombatForensics::InitializeAppStructure()
         if(strcmp(errstring, "") != 0)
             DisplayError("1.0", "Log File Error", errstring);
     }
-    QString tmpPath = wombatvariable.datapath + "WombatCase.db";
-    bool doesFileExist = wombatcasedata->FileExists(tmpPath.toStdString());
+    std::string tmpPath = wombatvariable->datapath + "WombatCase.db";
+    bool doesFileExist = wombatcasedata->FileExists(tmpPath);
     if(!doesFileExist)
     {
         const char* errstring = wombatcasedata->CreateCaseDB(tmpPath);
@@ -109,7 +110,7 @@ void WombatForensics::InitializeAppStructure()
 
 void WombatForensics::InitializeSleuthKit()
 {
-    ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", wombatvariable);
+    ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", pwombatvariable);
     threadpool->start(initrunner);
     threadpool->waitForDone();
 }
@@ -124,7 +125,9 @@ void WombatForensics::AddEvidence()
         wombatvariable.jobtype = 1; // add evidence
         // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. IF THEY WANT TO OPEN A SECOND COPY
         // THEN SET NEWEVIDENCENAME EVIDENCEFILEPATH.SPLIT("/").LAST() + "COPY.DB"
-        QString evidenceName = evidenceFilePath.split("/").last();
+        //int pos = evidenceFilePath.find_last_of("/");
+        std::string evidenceName = evidenceFilePath.substr(evidenceFilePath.find_last_of("/")+1);
+        //QString evidenceName = evidenceFilePath.split("/").last();
         evidenceName += ".db";
         wombatvariable.evidenceid = wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable.caseid);
         wombatvariable.evidenceidlist.append(wombatvariable.evidenceid);
