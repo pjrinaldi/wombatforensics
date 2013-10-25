@@ -1,16 +1,7 @@
 #include "wombatforensics.h"
 
-template<typename T>
-std::string toString(const T& value)
-{
-        std::ostringstream oss;
-            oss << value;
-                return oss.str();
-}
-
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
-    pwombatvariable = &wombatvariable;
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
     wombatcasedata = new WombatDatabase();
@@ -23,14 +14,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     qRegisterMetaType<WombatVariable>("WombatVariable");
     qRegisterMetaType<FileExportData>("FileExportData");
-    connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
+    connect(this, SIGNAL(LogVariable(WombatVariable)), isleuthkit, SLOT(GetLogVariable(WombatVariable)), Qt::QueuedConnection);
     connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(SendFileContents(QString)), Qt::QueuedConnection);
-    connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable*)), this, SLOT(PopulateProgressWindow(WombatVariable*)), Qt::QueuedConnection);
+    connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable)), this, SLOT(PopulateProgressWindow(WombatVariable)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
-    pwombatvariable->caseid = 0;
-    pwombatvariable->evidenceid = 0;
-    pwombatvariable->jobtype = 0;
+    wombatvariable.caseid = 0;
+    wombatvariable.evidenceid = 0;
+    wombatvariable.jobtype = 0;
     InitializeAppStructure();
     InitializeSleuthKit();
 }
@@ -57,25 +48,25 @@ std::string WombatForensics::GetTime()
 
 void WombatForensics::InitializeAppStructure()
 {
-    std::string homePath = QDir::homePath().toStdString();
+    QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";
-    pwombatvariable->settingspath = homePath + "settings";
-    pwombatvariable->datapath = homePath + "data/";
-    pwombatvariable->casespath = homePath + "cases/";
-    pwombatvariable->tmpfilepath = homePath + "tmpfiles";
-    bool mkPath = (new QDir())->mkpath(QString::fromStdString(wombatvariable->settingspath));
+    wombatvariable.settingspath = homePath + "settings";
+    wombatvariable.datapath = homePath + "data/";
+    wombatvariable.casespath = homePath + "cases/";
+    wombatvariable.tmpfilepath = homePath + "tmpfiles";
+    bool mkPath = (new QDir())->mkpath(wombatvariable.settingspath);
     if(mkPath == false)
         DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
-    mkPath = (new QDir())->mkpath(QString::fromStdString(wombatvariable->datapath));
+    mkPath = (new QDir())->mkpath(wombatvariable.datapath);
     if(mkPath == false)
         DisplayError("2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
-    mkPath = (new QDir())->mkpath(QString::fromStdString(wombatvariable->casespath));
+    mkPath = (new QDir())->mkpath(wombatvariable.casespath);
     if(mkPath == false)
         DisplayError("2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
-    mkPath = (new QDir())->mkpath(QString::fromStdString(wombatvariable->tmpfilepath));
+    mkPath = (new QDir())->mkpath(wombatvariable.tmpfilepath);
     if(mkPath == false)
         DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
-    QString logPath = wombatvariable->datapath + "WombatLog.db";
+    QString logPath = wombatvariable.datapath + "WombatLog.db";
     bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
     if(!logFileExist)
     {
@@ -83,8 +74,8 @@ void WombatForensics::InitializeAppStructure()
         if(strcmp(errstring, "") != 0)
             DisplayError("1.0", "Log File Error", errstring);
     }
-    std::string tmpPath = wombatvariable->datapath + "WombatCase.db";
-    bool doesFileExist = wombatcasedata->FileExists(tmpPath);
+    QString tmpPath = wombatvariable.datapath + "WombatCase.db";
+    bool doesFileExist = wombatcasedata->FileExists(tmpPath.toStdString());
     if(!doesFileExist)
     {
         const char* errstring = wombatcasedata->CreateCaseDB(tmpPath);
@@ -118,7 +109,7 @@ void WombatForensics::InitializeAppStructure()
 
 void WombatForensics::InitializeSleuthKit()
 {
-    ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", pwombatvariable);
+    ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", wombatvariable);
     threadpool->start(initrunner);
     threadpool->waitForDone();
 }
@@ -130,34 +121,31 @@ void WombatForensics::AddEvidence()
     {
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
-        pwombatvariable->jobtype = 1; // add evidence
+        wombatvariable.jobtype = 1; // add evidence
         // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. IF THEY WANT TO OPEN A SECOND COPY
         // THEN SET NEWEVIDENCENAME EVIDENCEFILEPATH.SPLIT("/").LAST() + "COPY.DB"
-        //int pos = evidenceFilePath.find_last_of("/");
-        std::string evidenceName = evidenceFilePath.substr(evidenceFilePath.find_last_of("/")+1);
-        //QString evidenceName = evidenceFilePath.split("/").last();
+        QString evidenceName = evidenceFilePath.split("/").last();
         evidenceName += ".db";
-        pwombatvariable->evidenceid = wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, pwombatvariable->caseid);
-        pwombatvariable->evidenceidlist.append(pwombatvariable->evidenceid);
-        pwombatvariable->evidencepath = evidenceFilePath;
-        pwombatvariable->evidencepathlist << pwombatvariable->evidencepath;
-        pwombatvariable->evidencedbname = evidenceName;
-        pwombatvariable->evidencedbnamelist << pwombatvariable->evidencedbname;
-        pwombatvariable->jobid = wombatcasedata->InsertJob(pwombatvariable->jobtype, pwombatvariable->caseid, pwombatvariable->evidenceid);
-        emit LogVariable(pwombatvariable);
-        std::string tmpString = evidenceName + " - " + GetTime();
-        //QString tmpString = evidenceName;
-        //tmpString += " - ";
-        //tmpString += QString::fromStdString(GetTime());
+        wombatvariable.evidenceid = wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvariable.caseid);
+        wombatvariable.evidenceidlist.append(wombatvariable.evidenceid);
+        wombatvariable.evidencepath = evidenceFilePath;
+        wombatvariable.evidencepathlist << wombatvariable.evidencepath;
+        wombatvariable.evidencedbname = evidenceName;
+        wombatvariable.evidencedbnamelist << wombatvariable.evidencedbname;
+        wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
+        emit LogVariable(wombatvariable);
+        QString tmpString = evidenceName;
+        tmpString += " - ";
+        tmpString += QString::fromStdString(GetTime());
         QStringList tmpList;
-        tmpList << QString::fromStdString(tmpString) << QString::number(pwombatvariable->jobid);
+        tmpList << tmpString << QString::number(wombatvariable.jobid);
         wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
         wombatprogresswindow->UpdateFilesFound("0");
         wombatprogresswindow->UpdateFilesProcessed("0");
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
         LOGINFO("Adding Evidence Started");
-        wombatcasedata->InsertMsg(pwombatvariable->caseid, pwombatvariable->evidenceid, pwombatvariable->jobid, 2, "Adding Evidence Started");
-        ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", pwombatvariable);
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
+        ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
         threadpool->start(trun);
     }
 }
@@ -165,44 +153,42 @@ void WombatForensics::AddEvidence()
 void WombatForensics::RemEvidence()
 {
     wombatprogresswindow->ClearTableWidget();
-    pwombatvariable->jobtype = 2; // remove evidence
+    wombatvariable.jobtype = 2; // remove evidence
     QStringList evidenceList;
     evidenceList.clear();
     // populate case list here
-    evidenceList = wombatcasedata->ReturnCaseActiveEvidence(pwombatvariable->caseid);
+    evidenceList = wombatcasedata->ReturnCaseActiveEvidence(wombatvariable.caseid);
     bool ok;
-
     QString item = QInputDialog::getItem(this, tr("Remove Existing Evidence"), tr("Select Evidence to Remove: "), evidenceList, 0, false, &ok);
     if(ok && !item.isEmpty()) // open selected case
     {
-        pwombatvariable->evidenceid = wombatcasedata->ReturnEvidenceID(item);
-        pwombatvariable->jobid = wombatcasedata->InsertJob(pwombatvariable->jobtype, pwombatvariable->caseid, pwombatvariable->evidenceid);
-        emit LogVariable(pwombatvariable);
-        std::string tmpstring = item.substr(item.find_last_of("/")+1) + " - " + GetTime();
-        //QString tmpstring = item.split("/").last() + " - " + QString::fromStdString(GetTime());
+        wombatvariable.evidenceid = wombatcasedata->ReturnEvidenceID(item);
+        wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
+        emit LogVariable(wombatvariable);
+        QString tmpstring = item.split("/").last() + " - " + QString::fromStdString(GetTime());
         QStringList tmplist;
-        tmplist << QString::fromStdString(tmpstring) << QString::number(pwombatvariable->jobid);
+        tmplist << tmpstring << QString::number(wombatvariable.jobid);
         wombatprogresswindow->UpdateAnalysisTree(2, new QTreeWidgetItem(tmplist));
         wombatprogresswindow->UpdateFilesFound("");
         wombatprogresswindow->UpdateFilesProcessed("");
         wombatprogresswindow->UpdateAnalysisState("Removing Evidence");
         LOGINFO("Removing Evidence Started");
-        wombatcasedata->InsertMsg(pwombatvariable->caseid, pwombatvariable->evidenceid, pwombatvariable->jobid, 2, "Removing Evidence Started");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Removing Evidence Started");
         UpdateMessageTable();
         wombatcasedata->RemoveEvidence(item);
         wombatprogresswindow->UpdateProgressBar(25);
-        QString tmppath = QString::fromStdString(pwombatvariable->evidencedirpath) + item.split("/").last() + ".db";
+        QString tmppath = wombatvariable.evidencedirpath + item.split("/").last() + ".db";
         if(QFile::remove(tmppath))
         {
         }
         else
             emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
         wombatprogresswindow->UpdateProgressBar(50);
-        UpdateCaseData(pwombatvariable);
+        UpdateCaseData(wombatvariable);
         wombatprogresswindow->UpdateProgressBar(75);
         LOGINFO("Removing Evidence Finished");
-        wombatcasedata->InsertMsg(pwombatvariable->caseid, pwombatvariable->evidenceid, pwombatvariable->jobid, 2, "Removing Evidence Finished");
-        wombatcasedata->UpdateJobEnd(pwombatvariable->jobid, 0, 0);
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Removing Evidence Finished");
+        wombatcasedata->UpdateJobEnd(wombatvariable.jobid, 0, 0);
         UpdateMessageTable();
         wombatprogresswindow->UpdateAnalysisState("Removing Evidence Finished");
         wombatprogresswindow->UpdateProgressBar(100);

@@ -1,12 +1,10 @@
 #ifndef WOMBATVARIABLE_H
 #define WOMBATVARIABLE_H
 
-/*
 #include <QString>
 #include <QList>
 #include <QStringList>
 #include <QObject>
-*/
 #include <vector>
 #include <string>
 
@@ -61,19 +59,6 @@ struct WombatVariable
     int fileid;
     int filecount;
     int processcount;
-    std::string casespath;
-    std::string casedirpath;
-    std::string evidencedirpath;
-    std::string evidencepath;
-    std::string settingspath;
-    std::string datapath;
-    std::string tmpfilepath;
-    std::string evidencedbname;
-    std::vector<std::string> evidencepathlist;
-    std::vector<std::string> evidencedbnamelist;
-    std::vector<int> evidenceidlist;
-    std::vector<int> objectidlist;
-    /*
     QString casespath;
     QString casedirpath;
     QString evidencedirpath;
@@ -86,13 +71,12 @@ struct WombatVariable
     QStringList evidencedbnamelist;
     QList<int> evidenceidlist;
     QList<int> objectidlist;
-    */
     FileExportData exportdata;
     std::vector<FileExportData> exportdatalist;
 
 };
-/*
+
 Q_DECLARE_METATYPE(WombatVariable)
 Q_DECLARE_METATYPE(FileExportData)
-*/
+
 #endif // WOMBATVARIABLE_H
