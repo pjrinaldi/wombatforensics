@@ -69,7 +69,7 @@ private slots:
     {
         ResizeColumns((QStandardItemModel*)index.model());
     }
-    void FileExport(FileExportData exportdata);
+    void FileExport(FileExportData &exportdata);
 
 protected:
     void closeEvent(QCloseEvent* event);

@@ -336,7 +336,7 @@ void WombatForensics::ExportEvidence()
     exportdialog->show();
 }
 
-void WombatForensics::FileExport(FileExportData exportdata)
+void WombatForensics::FileExport(FileExportData &exportdata)
 {
     /*
      * NEED TO SETUP THE PROGRESS WINDOW JOB FOR THIS EXPORT AND POPULATE IT ACCORDINGLY AS IT GOES THROUGH THE LOOPING PROCESS IN SLEUTHKIT...

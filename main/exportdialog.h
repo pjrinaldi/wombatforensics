@@ -21,7 +21,7 @@ public:
     ~ExportDialog();
 
 signals:
-    void FileExport(FileExportData exportdata);
+    void FileExport(FileExportData &exportdata);
 
 private slots:
     void SelectDirectory(void);
