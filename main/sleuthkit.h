@@ -71,7 +71,7 @@ signals:
     void UpdateMessageTable(void);
     void SetLogVariable(WombatVariable wvariable);
     void LoadFileContents(QString filepath);
-    void PopulateProgressWindow(const WombatVariable &wvariable);
+    void PopulateProgressWindow(WombatVariable wvariable);
 };
 
 class TaskRunner : public QObject, public QRunnable

@@ -61,15 +61,14 @@ private slots:
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void SendFileContents(QString filepath);
-    //void PopulateProgressWindow(WombatVariable wvariable);
-    void PopulateProgressWindow(const WombatVariable &wvariable);
+    void PopulateProgressWindow(WombatVariable wvariable);
     void UpdateCaseData(WombatVariable wvariable);
     void ResizeColumns(QStandardItemModel* currentmodel);
     void ResizeViewColumns(const QModelIndex &index)
     {
         ResizeColumns((QStandardItemModel*)index.model());
     }
-    void FileExport(FileExportData &exportdata);
+    void FileExport(FileExportData exportdata);
 
 protected:
     void closeEvent(QCloseEvent* event);
