@@ -17,7 +17,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(this, SIGNAL(LogVariable(WombatVariable)), isleuthkit, SLOT(GetLogVariable(WombatVariable)), Qt::QueuedConnection);
     connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(SendFileContents(QString)), Qt::QueuedConnection);
-    connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable)), this, SLOT(PopulateProgressWindow(WombatVariable)), Qt::QueuedConnection);
+    connect(isleuthkit, SIGNAL(PopulateProgressWindow(const WombatVariable)), this, SLOT(PopulateProgressWindow(const WombatVariable)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
     wombatvariable.caseid = 0;
     wombatvariable.evidenceid = 0;
@@ -444,10 +444,10 @@ void WombatForensics::UpdateMessageTable()
     wombatprogresswindow->UpdateMessageTable(tmplist);
 }
 
-void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
+void WombatForensics::PopulateProgressWindow(const WombatVariable &wvariable)
 {
     int treebranch = 0;
-    wombatvariable = wvariable;
+    //wombatvariable = wvariable;
     QStringList joblist = wombatcasedata->ReturnJobDetails(wvariable.jobid);
     QString tmpstring = wvariable.evidencedbname + " - " + joblist[0];
     QStringList tmplist;
