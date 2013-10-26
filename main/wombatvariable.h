@@ -71,6 +71,7 @@ struct WombatVariable
     QStringList evidencedbnamelist;
     QList<int> evidenceidlist;
     QList<int> objectidlist;
+    
     FileExportData exportdata;
     std::vector<FileExportData> exportdatalist;
 
