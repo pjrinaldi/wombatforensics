@@ -896,7 +896,8 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         }
         // NEED TO MV/RENAME FILE FROM FILEID TO UNIQUEID.
         // qstring oldfile = ../getpath() + fileID;
-        // qstring newfile = ../getpath() + uniqueid;
+        // wombatdata->ReturnObjectID(wvariable.caseid, evid, fileid);
+        // qstring newfile = ../getpath() + objectid;
         // qfile.rename(uniqueid)
     }
 
