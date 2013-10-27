@@ -309,23 +309,28 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
+    int processcount = 0;
     for(int i = 0; i < wombatvariable.exportdatalist.size(); i++)
     {
+        processcount++;
         wombatvariable.evidencepath = QString::fromStdString(wombatvariable.exportdatalist[i].evidencepath);
         wombatvariable.evidencedbname = QString::fromStdString(wombatvariable.exportdatalist[i].evidencedbname);
         SetEvidenceDB(wombatvariable);
         ExportFile(wombatvariable.exportdatalist[i].fullpath, wombatvariable.exportdatalist[i].id);
-        emit UpdateStatus(wombatvariable.exportdata.exportcount, i);
+        std::string tmpstring = wombatvariable.exportdatalist[i].fullpath + " Exported";
+        wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, tmpstring.c_str());
+        emit UpdateStatus(wombatvariable.exportdatalist[i].exportcount, processcount);
         emit UpdateMessageTable();
-        FinishExport(i);
     }
+    FinishExport(processcount);
 }
 
 void SleuthKitPlugin::FinishExport(int processcount)
 {
     LOGINFO("File Export Finished");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "File Export Finished");
-    wombatdata->UpdateJobEnd(wombatvariable.jobid, wombatvariable.exportdata.exportcount, processcount);
+    wombatdata->UpdateJobEnd(wombatvariable.jobid, wombatvariable.exportdatalist[0].exportcount, processcount);
+    emit UpdateMessageTable();
 }
 
 void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)

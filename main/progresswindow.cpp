@@ -73,7 +73,6 @@ void ProgressWindow::UpdateAnalysisTree(int parentIndex, QTreeWidgetItem *child)
 {
     ui->analysisTreeWidget->collapseAll();
     ui->analysisTreeWidget->topLevelItem(parentIndex)->addChild(child);
-    //ui->analysisTreeWidget->expand(itemAt(parentIndex)) // look online next time i'm online
     ui->analysisTreeWidget->setCurrentItem(child);
 }
 void ProgressWindow::ClearTableWidget()

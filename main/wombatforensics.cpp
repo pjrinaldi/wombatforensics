@@ -192,6 +192,7 @@ void WombatForensics::RemEvidence()
         UpdateMessageTable();
         wombatprogresswindow->UpdateAnalysisState("Removing Evidence Finished");
         wombatprogresswindow->UpdateProgressBar(100);
+        UpdateMessageTable();
     }
 }
 
@@ -279,7 +280,7 @@ std::vector<FileExportData> WombatForensics::SetListExportProperties(QStandardIt
     {
         tmpexport.fullpath = tmpexport.exportpath + "/" + tmpexport.name; // export path without original path
     }
-    fprintf(stderr, "export full path listed: %s\n", tmpexport.fullpath.c_str());
+    //fprintf(stderr, "export full path listed: %s\n", tmpexport.fullpath.c_str());
     tmpexportlist.push_back(tmpexport);
 
     return tmpexportlist;
@@ -454,9 +455,15 @@ void WombatForensics::UpdateMessageTable()
 void WombatForensics::PopulateProgressWindow(WombatVariable wvariable)
 {
     int treebranch = 0;
+    QString tmpstring;
     //wombatvariable = wvariable;
     QStringList joblist = wombatcasedata->ReturnJobDetails(wvariable.jobid);
-    QString tmpstring = wvariable.evidencedbname + " - " + joblist[0];
+    if(wvariable.jobtype == 1 || wvariable.jobtype == 2)
+        tmpstring = wvariable.evidencedbname + " - " + joblist[0];
+    else if(wvariable.jobtype == 3)
+        tmpstring = "File Export - " + joblist[0];
+    else
+        tmpstring = wvariable.evidencedbname + " - " + joblist[0];
     QStringList tmplist;
     tmplist << tmpstring << QString::number(wvariable.jobid);
     if(wvariable.jobtype == 1) treebranch = 0;
