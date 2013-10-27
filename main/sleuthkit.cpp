@@ -842,6 +842,7 @@ void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
 QString SleuthKitPlugin::GetFileContents(int fileID)
 {
     TskImageFileTsk currentimagefiletsk;
+    QString returnpath = "";
     try
     {
         currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
@@ -876,6 +877,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         bool tmpdir = (new QDir())->mkpath(QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)));
         if(!tmpdir)
             fprintf(stderr, "%s creation failed.\n");
+        returnpath = QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
     }
     else
     {
@@ -894,12 +896,30 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         {
             fprintf(stderr, "read file/write to fail %s\n", ex.what());
         }
-        // NEED TO MV/RENAME FILE FROM FILEID TO UNIQUEID.
-        // qstring oldfile = ../getpath() + fileID;
-        // wombatdata->ReturnObjectID(wvariable.caseid, evid, fileid);
-        // qstring newfile = ../getpath() + objectid;
-        // qfile.rename(uniqueid)
+        int objectid = wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, fileID);
+        if(objectid != (int)fileID)
+        {
+            QString oldfile = QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
+            QString filepath = oldfile.left(oldfile.lastIndexOf("/"));
+            QString newfile = filepath + "/" + QString::number(objectid);
+            QFile tmpfile(oldfile);
+            if(tmpfile.rename(newfile))
+            {
+                fprintf(stderr, "new file: %s\n", newfile.toStdString().c_str());
+                returnpath = newfile;
+            }
+            else
+            {
+                fprintf(stderr, "old file value: %s\n", oldfile.toStdString().c_str());
+                fprintf(stderr, "new file failed: %s\n", newfile.toStdString().c_str());
+            }
+        }
+        else
+        {
+            returnpath = QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
+            fprintf(stderr, "old == new: %s\n", returnpath.toStdString().c_str());
+        }
     }
 
-    return QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
+    return returnpath;
 }
