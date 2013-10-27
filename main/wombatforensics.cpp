@@ -233,11 +233,8 @@ std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardIt
             tmpexport.id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // unique object id
             wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmpexport.id); // evidence id
             QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
-            //wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
-            //wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
             tmpexport.evidencepath = currentevidencelist[0].toStdString(); // evidence path
             tmpexport.evidencedbname = currentevidencelist[1].toStdString(); // evidence db name
-            //wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmpexport.id); // file id
             tmpexport.name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
             if(tmpexport.pathstatus == FileExportData::include)
             {
@@ -270,11 +267,8 @@ std::vector<FileExportData> WombatForensics::SetListExportProperties(QStandardIt
     tmpexport.id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // unique object id
     wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmpexport.id); // evidence id
     QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
-    //wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
-    //wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
     tmpexport.evidencepath = currentevidencelist[0].toStdString(); // evidence path
     tmpexport.evidencedbname = currentevidencelist[1].toStdString(); // evidence db name
-    //wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmpexport.id); // file id
     tmpexport.name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
     if(tmpexport.pathstatus == FileExportData::include)
     {
@@ -340,18 +334,75 @@ void WombatForensics::FileExport(FileExportData exportdata)
 {
     /*
      * NEED TO SETUP THE PROGRESS WINDOW JOB FOR THIS EXPORT AND POPULATE IT ACCORDINGLY AS IT GOES THROUGH THE LOOPING PROCESS IN SLEUTHKIT...
-     */ 
+     *
+     * here is where i initialize the progresswindow settings...
+     *
+     * ADD SAMPLE
+         wombatprogresswindow->show();
+        wombatprogresswindow->ClearTableWidget();
+        wombatvariable.jobtype = 1; // add evidence
+        wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
+        emit LogVariable(wombatvariable);
+        QString tmpString = evidenceName;
+        tmpString += " - ";
+        tmpString += QString::fromStdString(GetTime());
+        QStringList tmpList;
+        tmpList << tmpString << QString::number(wombatvariable.jobid);
+        wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
+        wombatprogresswindow->UpdateFilesFound("0");
+        wombatprogresswindow->UpdateFilesProcessed("0");
+        wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
+        LOGINFO("Adding Evidence Started");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Started");
+        ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvariable);
+     *
+     * ADD SAMPLE
+     *
+     * REMOVE SAMPLE
+     *    wombatprogresswindow->ClearTableWidget();
+        wombatvariable.jobtype = 2; // remove evidence
+        wombatvariable.evidenceid = wombatcasedata->ReturnEvidenceID(item);
+        wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
+        emit LogVariable(wombatvariable);
+        QString tmpstring = item.split("/").last() + " - " + QString::fromStdString(GetTime());
+        QStringList tmplist;
+        tmplist << tmpstring << QString::number(wombatvariable.jobid);
+        wombatprogresswindow->UpdateAnalysisTree(2, new QTreeWidgetItem(tmplist));
+        wombatprogresswindow->UpdateFilesFound("");
+        wombatprogresswindow->UpdateFilesProcessed("");
+        wombatprogresswindow->UpdateAnalysisState("Removing Evidence");
+        LOGINFO("Removing Evidence Started");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Removing Evidence Started");
+        UpdateMessageTable();
+        wombatprogresswindow->UpdateProgressBar(25);
+        QString tmppath = wombatvariable.evidencedirpath + item.split("/").last() + ".db";
+        if(QFile::remove(tmppath))
+        {
+        }
+        else
+            emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
+        wombatprogresswindow->UpdateProgressBar(50);
+        wombatprogresswindow->UpdateProgressBar(75);
+        LOGINFO("Removing Evidence Finished");
+        wombatcasedata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Removing Evidence Finished");
+        wombatcasedata->UpdateJobEnd(wombatvariable.jobid, 0, 0);
+        UpdateMessageTable();
+        wombatprogresswindow->UpdateAnalysisState("Removing Evidence Finished");
+        wombatprogresswindow->UpdateProgressBar(100);
+    }
+}
+     * REMOVE SAMPLE
+     */
     std::vector<FileExportData> exportevidencelist;
+    int exportcount = 0;
     if(exportdata.filestatus == FileExportData::selected)
     {
+        exportcount = 1;
         exportdata.id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt(); // unique objectid
         wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(exportdata.id); // evidence id
         QStringList currentevidencelist = wombatcasedata->ReturnEvidenceData(wombatvariable.evidenceid); // evidence data
-        //wombatvariable.evidencepath = currentevidencelist[0]; // evidence path
         exportdata.evidencepath = currentevidencelist[0].toStdString(); // evidence path
-        //wombatvariable.evidencedbname = currentevidencelist[1]; // evidence db name
         exportdata.evidencedbname = currentevidencelist[1].toStdString(); // evidence db name
-        //wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(exportdata.id); // file id
         exportdata.name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
         if(exportdata.pathstatus == FileExportData::include)
         {
@@ -378,8 +429,13 @@ void WombatForensics::FileExport(FileExportData exportdata)
                 QStandardItem* volumenode = imagenode->child(j,0); // loop over partition(s)
                 for(int k = 0; k < volumenode->rowCount(); k++)
                 {
-                    QStandardItem* fsnode = volumenode->child(k,0);
-                    exportevidencelist = SetFileExportProperties(fsnode, exportdata, exportevidencelist);
+                    QStandardItem* fsnode = volumenode->child(k,0); // file system node
+                    for(int m = 0; m < fsnode->rowCount(); m++)
+                    {
+                        QStandardItem* filenode = fsnode->child(m,0); // file system root node
+                        exportcount = StandardItemCheckState(filenode, exportcount);
+                        exportevidencelist = SetFileExportProperties(filenode, exportdata, exportevidencelist);
+                    }
                 }
             }
         }
@@ -399,6 +455,7 @@ void WombatForensics::FileExport(FileExportData exportdata)
                     for(int m = 0; m < fsnode->rowCount(); m++)
                     {
                         QStandardItem* filenode = fsnode->child(m,0); // file system root node
+                        exportcount = StandardItemListCount(filenode, exportcount);
                         exportevidencelist = SetListExportProperties(filenode, exportdata, exportevidencelist);
                     }
                 }
@@ -406,6 +463,7 @@ void WombatForensics::FileExport(FileExportData exportdata)
         }
     }
     wombatvariable.exportdatalist = exportevidencelist;
+    fprintf(stderr, "export file count: %i\n", exportcount);
 
     ThreadRunner* trun = new ThreadRunner(isleuthkit, "exportfiles", wombatvariable);
     threadpool->start(trun);

@@ -49,7 +49,8 @@ struct WombatVariable
     {
         generic = 0,
         addevidence = 1,
-        remedvidence = 2
+        remedvidence = 2,
+        exportfiles = 3
     };
 
     int caseid;
