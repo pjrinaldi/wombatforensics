@@ -31,6 +31,7 @@ struct FileExportData
     std::string fullpath;
     std::string evidencedbname;
     std::string evidencepath;
+    int exportcount;
 };
 
 struct WombatVariable

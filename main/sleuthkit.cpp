@@ -315,8 +315,19 @@ void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
         wombatvariable.evidencedbname = QString::fromStdString(wombatvariable.exportdatalist[i].evidencedbname);
         SetEvidenceDB(wombatvariable);
         ExportFile(wombatvariable.exportdatalist[i].fullpath, wombatvariable.exportdatalist[i].id);
+        emit UpdateStatus(wombatvariable.exportdata.exportcount, i);
+        emit UpdateMessageTable();
+        FinishExport(i);
     }
 }
+
+void SleuthKitPlugin::FinishExport(int processcount)
+{
+    LOGINFO("File Export Finished");
+    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "File Export Finished");
+    wombatdata->UpdateJobEnd(wombatvariable.jobid, wombatvariable.exportdata.exportcount, processcount);
+}
+
 void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;

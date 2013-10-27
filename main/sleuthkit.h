@@ -58,6 +58,7 @@ private:
     TskImgDBSqlite* imgdb;
     TskImgDBSqlite* tmpdb;
     TskSchedulerQueue scheduler;
+    void FinishExport(int processcount);
 
 public slots:
     void threadFinished(void);
