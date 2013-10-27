@@ -894,6 +894,10 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         {
             fprintf(stderr, "read file/write to fail %s\n", ex.what());
         }
+        // NEED TO MV/RENAME FILE FROM FILEID TO UNIQUEID.
+        // qstring oldfile = ../getpath() + fileID;
+        // qstring newfile = ../getpath() + uniqueid;
+        // qfile.rename(uniqueid)
     }
 
     return QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
