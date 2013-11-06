@@ -872,12 +872,57 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     {
         fprintf(stderr, "Get File Error: %s\n", ex.what());
     }
+    // Saves the directory data stream from the image to a tmp file
     if(tfile->isDirectory())
     {
-        bool tmpdir = (new QDir())->mkpath(QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID)));
-        if(!tmpdir)
-            fprintf(stderr, "%s creation failed.\n");
-        returnpath = QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
+        try
+        {
+            const int FILE_BUFFER_SIZE = 8192;
+            QString tmpfile = QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
+            tmpfile += "dir.dat";
+            Poco::File destFile(tmpfile.toStdString());
+            //If the destination file exists it is replaced
+            if (destFile.exists())
+            {
+            destFile.remove();
+            }
+            // We read the content from the file and write it to the target
+            tfile->open();
+            // Create a new empty file.
+            destFile.createFile();
+            // Call File.read() to get the file content and write to new file.
+            Poco::FileOutputStream fos(destFile.path());
+            char buffer[FILE_BUFFER_SIZE];
+            int bytesRead = 0;
+            // Remember the offset the file was at when we were called.
+            TSK_OFF_T savedOffset = tfile->tell();
+            // Reset to start of file to ensure all content is saved.
+            tfile->seek(0, std::ios_base::beg);
+            do
+            {
+                memset(buffer, 0, FILE_BUFFER_SIZE);
+                bytesRead = tfile->read(buffer, FILE_BUFFER_SIZE);
+                if (bytesRead > 0)
+                    fos.write(buffer, bytesRead);
+            }
+            while (bytesRead > 0);
+            // Flush and close the output stream.
+            fos.flush();
+            fos.close();
+            // Restore the saved offset.
+            tfile->seek(savedOffset, std::ios_base::beg);
+            // Close the file
+            tfile->close();
+            returnpath = tmpfile;
+        }
+        catch(TskException ex)
+        {
+            fprintf(stderr, "dir save buffer to dir.dat file failed\n");
+        }
+        catch(std::exception ex)
+        {
+            fprintf(stderr, "dir save buffer to dir.dat file failed\n");
+        }
     }
     else
     {
@@ -912,6 +957,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
             {
                 fprintf(stderr, "old file value: %s\n", oldfile.toStdString().c_str());
                 fprintf(stderr, "new file failed: %s\n", newfile.toStdString().c_str());
+                // i'll need to return or log an error here somehow.
             }
         }
         else
