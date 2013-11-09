@@ -48,47 +48,44 @@ void BinViewWidget::prepareCharImage(QPainter* widgetPainter)
     {
         int x0 = c * m_charWidth;
 
-        // possibly do if here, to see if QChar(c) is letter or number
-
         QString tmpString = QChar(c);
-        if(c > 69)
-        {
-            if(QChar(c).isLetterOrNumber())
-                tmpString = QChar(c);
-            else
-                tmpString = '.';
-        }
+        if(QChar(c).isPrint())
+            tmpString = QChar(c);
+        else
+            tmpString = '.';
+        
         charPainter.drawText(x0, 0, m_charWidth, m_rowHeight, textFlags, tmpString);
         //charPainter.drawText(x0, 0, m_charWidth, m_rowHeight, textFlags, QString(QChar(c)));
+        /*
+        // draw dots instead of empty spaces
+        if (c != 32)
+        {
+            bool allEmpty = true;
 
-//        // draw dots instead of empty spaces
-//        if (c != 32)
-//        {
-//            bool allEmpty = true;
-//
-//            QRgb white = QColor(Qt::white).rgb();
-//
-//            for (int x = 0; x < m_charWidth; x++)
-//            {
-//                for (int y = 0; y < m_rowHeight; y++)
-//                {
-//                    if (m_charImage->pixel(x0 + x, y) != white)
-//                    {
-//                        allEmpty = false;
-//                        break;
-//                    }
-//                }
-//                if (!allEmpty)
-//                {
-//                    break;
-//                }
-//            }
-//
-//            if (allEmpty)
-//            {
-//                charPainter.drawText(x0, 0, m_charWidth, m_rowHeight, textFlags, QString(QChar(46)));
-//            }
-//        }
+            QRgb white = QColor(Qt::white).rgb();
+
+            for (int x = 0; x < m_charWidth; x++)
+            {
+                for (int y = 0; y < m_rowHeight; y++)
+                {
+                    if (m_charImage->pixel(x0 + x, y) != white)
+                    {
+                        allEmpty = false;
+                        break;
+                    }
+                }
+                if (!allEmpty)
+                {
+                    break;
+                }
+            }
+
+            if (allEmpty)
+            {
+                charPainter.drawText(x0, 0, m_charWidth, m_rowHeight, textFlags, QString(QChar(46)));
+            }
+        }
+        */
     }
 }
 
@@ -112,6 +109,10 @@ void BinViewWidget::paintEvent(QPaintEvent* /*event*/)
 
 //    painter.drawImage(0, 0, *m_charImage);
 //    return;
+
+    // my attempt at horizontal scrollbars
+    horizontalScrollBar()->setPageStep(m_charWidth);
+    horizontalScrollBar()->setRange(0, m_bytesPerLine);
 
     if (0 == m_rowHeight)
     {
