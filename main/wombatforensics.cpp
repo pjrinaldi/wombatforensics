@@ -680,6 +680,7 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
+    // QString imagename = wombatvariable.evidencepath.split("/").last();
     QString tmptext = "";
     curselindex = index;
     tmptext = index.sibling(index.row(), 1).data().toString();
@@ -691,7 +692,31 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         wombatvariable.evidencepath = currentevidencelist[0];
         wombatvariable.evidencedbname = currentevidencelist[1];
         wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
-        ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvariable);
-        threadpool->start(tmprun);
     }
+    else
+    {
+        tmptext = index.sibling(index.row(), 0).data().toString();
+        QStringList evidenceidlist = wombatcasedata->ReturnCaseActiveEvidenceID(wombatvariable.caseid);
+        for(int i=0; i < evidenceidlist.count() / 3; i++)
+        {
+            if(tmptext.compare(evidenceidlist[3*i+1].split("/").last()) == 0)
+            {
+                wombatvariable.evidenceid = evidenceidlist[3*i].toInt();
+                wombatvariable.evidencepath = evidenceidlist[3*i+1];
+                wombatvariable.evidencedbname = evidenceidlist[3*i+2];
+            }
+            
+        }
+        // need to do other tmptext.compare's to see whether it's volume or fs...
+        if(tmptext.compare(wombatvariable.evidencepath.split("/").last()) == 0)
+        {
+            wombatvariable.fileid = -1;
+        }
+        else
+        {
+            fprintf(stderr, "item text: %s\n", tmptext.toStdString().c_str());
+        }
+    }
+    ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvariable);
+    threadpool->start(tmprun);
 }

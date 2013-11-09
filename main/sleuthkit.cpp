@@ -302,7 +302,23 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
-    wombatvariable.tmpfilepath = GetFileContents(wombatvariable.fileid);
+    fprintf(stderr, "file id: %i\n", wombatvariable.fileid);
+    if(wombatvariable.fileid >= 0)
+        wombatvariable.tmpfilepath = GetFileContents(wombatvariable.fileid);
+    else if(wombatvariable.fileid == -1) // image file
+    {
+        wombatvariable.tmpfilepath = wombatvariable.evidencepath;
+        fprintf(stderr, "dd image path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
+        // QString imagename = wombatvariable.evidencepath.split("/").last();
+    }
+    else if(wombatvariable.fileid == -2) // volume file
+    {
+    }
+    else if(wombatvariable.fileid == -3) // file system file
+    {
+    }
+    else
+        wombatvariable.tmpfilepath = ""; // set to "" to load nothing.
     emit LoadFileContents(wombatvariable.tmpfilepath);
 }
 

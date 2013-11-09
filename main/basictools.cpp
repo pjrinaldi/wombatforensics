@@ -59,16 +59,25 @@ QWidget* BasicTools::setupTypTab()
 
 void BasicTools::LoadFileContents(QString filepath)
 {
-    QFileInfo pathinfo(filepath);
-    if(!pathinfo.isDir())
+    if(filepath != "")
     {
-        LoadHexModel(filepath);
-        LoadTxtContent(filepath);
+        QFileInfo pathinfo(filepath);
+        if(!pathinfo.isDir())
+        {
+            LoadHexModel(filepath);
+            LoadTxtContent(filepath);
+        }
+        else
+        {
+            hexwidget->setModel(0);
+            txtwidget->setPlainText("");
+        }
     }
     else
     {
         hexwidget->setModel(0);
         txtwidget->setPlainText("");
+        // load nothing here...
     }
 }
 
