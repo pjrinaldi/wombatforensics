@@ -4,12 +4,7 @@
 #include <QScrollBar>
 
 #include "binviewmodel.h"
-//
-//
-// NEED TO FIGURE OUT WHAT PART OF EACH LINE IS THE ASCII REPRESENTATION.
-// THEN I NEED TO LOOP OVER THOSE VALUES AND IF QChar::isLetterOrNumber() is false, replace with '.'
-//
-//
+
 void BinViewWidget::calculateRowCount()
 {
     m_bytesCount = 0 == m_model ? 0 : m_model->size();
