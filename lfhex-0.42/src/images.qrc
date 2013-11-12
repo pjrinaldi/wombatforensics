@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>img/exit.xbm</file>
+    <file>img/first.xbm</file>
+    <file>img/last.xbm</file>
+    <file>img/next.xbm</file>
+    <file>img/prev.xbm</file>
+</qresource>
+</RCC>

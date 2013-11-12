@@ -1,0 +1,25 @@
+------------------ lfhex build/install instructions --------------------------
+
+lfhex uses "qmake" for build management.
+
+Requirements:
+- You must have Qt 4.x or latter to compile/link lfhex.
+- You must have a compiler which is sane when using templates.
+- You must have flex and bison
+
+Build Instructions:
+% gunzip -c lfhex-x.x.tar.gz | tar xvf -
+% cd lfhex-x.x
+% qmake lfhex.pro
+% make 
+% su
+% make install
+
+If your platform does not support 64 bit file offsets then you will need to
+comment out a line in lfhex.pro before building.
+
+If your platform is big-endian and you would like the offset labels to be in
+big-endian you will have to uncomment a line in lfhex.pro before building.
+
+Please let me know if you have any difficulties building lfhex.
+- Salem <eyekode@yahoo.com>
