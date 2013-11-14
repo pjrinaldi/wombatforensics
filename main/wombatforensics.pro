@@ -3,10 +3,12 @@ CONFIG += debug
 
 INCLUDEPATH += ../sleuthkit/framework/tsk/framework/services/
 INCLUDEPATH += ../sleuthkit/framework/tsk/framework/extraction/
+INCLUDEPATH += ../lfhex-0.42/src/
 VPATH += ../sleuthkit/framework/tsk/framework/services/
 VPATH += ../sleuthkit/framework/tsk/framework/extraction/
-HEADERS = wombatforensics.h wombatvariable.h wombatdatabase.h ui_wombatforensics.h progresswindow.h ui_progresswindow.h sleuthkit.h TskDBBlackboard.h TskImageFileTsk.h TskImgDBSqlite.h TskLog.h TskSystemPropertiesImpl.h TskSchedulerQueue.h basictools.h binviewmodel.h binviewwidget.h ui_exportdialog.h exportdialog.h
-SOURCES = main.cpp wombatforensics.cpp wombatdatabase.cpp progresswindow.cpp sleuthkit.cpp TskDBBlackboard.cpp TskImageFileTsk.cpp TskImgDBSqlite.cpp TskLog.cpp TskSystemPropertiesImpl.cpp TskSchedulerQueue.cpp basictools.cpp binviewmodel.cpp binviewwidget.cpp exportdialog.cpp
+VPATH += ../lfhex-0.42/src/
+HEADERS = wombatforensics.h wombatvariable.h wombatdatabase.h ui_wombatforensics.h progresswindow.h ui_progresswindow.h sleuthkit.h TskDBBlackboard.h TskImageFileTsk.h TskImgDBSqlite.h TskLog.h TskSystemPropertiesImpl.h TskSchedulerQueue.h basictools.h binviewmodel.h binviewwidget.h ui_exportdialog.h exportdialog.h hexEditor.hpp box.hpp cursor.hpp delta.hpp grid.hpp offsetConstraint.hpp reader.hpp save.hpp translate.hpp
+SOURCES = main.cpp wombatforensics.cpp wombatdatabase.cpp progresswindow.cpp sleuthkit.cpp TskDBBlackboard.cpp TskImageFileTsk.cpp TskImgDBSqlite.cpp TskLog.cpp TskSystemPropertiesImpl.cpp TskSchedulerQueue.cpp basictools.cpp binviewmodel.cpp binviewwidget.cpp exportdialog.cpp hexEditor.cpp cursor.cpp delta.cpp grid.cpp offsetConstraint.cpp reader.cpp save.cpp translate.cpp
 RESOURCES += wombat.qrc progresswindow.qrc
 DESTDIR = ./
 #DESTDIR = ../build

@@ -948,7 +948,8 @@ void HexEditor::undo()
 void HexEditor::search( const QString& hexText, bool forwards )
 {
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
-  if( !hexText.length() || _reader.filename() == "" ) 
+  //if( !hexText.length() || _reader.filename() == "" )
+  if(!hexText.length() || QString(_reader.filename()).compare("") == 0)
     return;
   
   if( -1 != _delta.lower_bound(0) ) {

@@ -2,6 +2,7 @@
 #define BASICTOOLS_H
 
 #include "binviewwidget.h"
+#include "hexEditor.hpp"
 #include <QObject>
 #include <QtWidgets>
 #include <QStringList>
@@ -25,8 +26,12 @@ public:
 public slots:
     void LoadFileContents(QString filepath);
 private:
-    BinViewModel* hexmodel;
-    BinViewWidget* hexwidget;
+    HexEditor* hexwidget;
+    HexEditor* ascwidget;
+    QScrollBar* hexvsb;
+    QScrollBar* ascvsb;
+    //BinViewModel* hexmodel;
+    //BinViewWidget* hexwidget;
     QTreeView* dirtreeview;
     QTreeView* typtreeview;
     QTextEdit* txtwidget;

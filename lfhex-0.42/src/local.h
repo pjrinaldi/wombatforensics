@@ -22,7 +22,8 @@ typedef unsigned char uchar;
 
 using namespace std;
 
-#define C_STR(x) x.toAscii().constData()
+//#define C_STR(x) x.toAscii().constData()
+#define C_STR(x) x.toLatin1().constData()
 #define PROGRAM "lfhex"
 #define VERSION "0.42"
 #define PROGRAM_STRING PROGRAM " " VERSION

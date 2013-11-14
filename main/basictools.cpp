@@ -4,13 +4,37 @@ QWidget* BasicTools::setupHexTab()
 {
     // hex editor tab
     QWidget* hexTab = new QWidget();
-    QVBoxLayout* hexLayout = new QVBoxLayout();
+    QHBoxLayout* hexLayout = new QHBoxLayout();
+    hexwidget = new HexEditor(hexTab);
+    hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    hexLayout->addWidget(hexwidget);
+    hexvsb = new QScrollBar(hexTab);
+    hexLayout->addWidget(hexvsb);
+    hexvsb->setRange(0, 0);
+    /*
+     *
+     QWidget* h = new QWidget(this);
+       QHBoxLayout* l = new QHBoxLayout(h);
+     
+       hexEditor = new HexEditor(h);
+       hexEditor->setSizePolicy( QSizePolicy( QSizePolicy::Expanding,
+                         QSizePolicy::Expanding ) );
+       l->addWidget(hexEditor);
+       vsb = new QScrollBar(h);
+       l->addWidget(vsb);
+       vsb->setRange(0,0);
+     
+       setCentralWidget(h);
+     * 
+     */
+    /*
     hexwidget = new BinViewWidget(hexTab);
     hexwidget->setObjectName("bt-hexview");
     // appears the model is set to open the file, then the widget sets the model.
     hexwidget->setModel(0);
     hexLayout->setContentsMargins(0, 0, 0, 0);
     hexLayout->addWidget(hexwidget);
+    */
     hexTab->setLayout(hexLayout);
 
     return hexTab;
@@ -69,13 +93,13 @@ void BasicTools::LoadFileContents(QString filepath)
         }
         else
         {
-            hexwidget->setModel(0);
+            //hexwidget->setModel(0);
             txtwidget->setPlainText("");
         }
     }
     else
     {
-        hexwidget->setModel(0);
+        //hexwidget->setModel(0);
         txtwidget->setPlainText("");
         // load nothing here...
     }
@@ -83,9 +107,12 @@ void BasicTools::LoadFileContents(QString filepath)
 
 void BasicTools::LoadHexModel(QString tmpFilePath)
 {
+    hexwidget->open(tmpFilePath);
+    /*
     hexmodel = new BinViewModel();
     hexmodel->open(tmpFilePath);
     hexwidget->setModel(hexmodel);
+    */
 }
 void BasicTools::LoadTxtContent(QString asciiText)
 {

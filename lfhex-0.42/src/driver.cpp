@@ -23,9 +23,9 @@
 extern "C" {
   int optind;
 };
-#include "hexGui.hpp"
+//#include "hexGui.hpp"
 #include "local.h"
-#include "compareDlg.hpp"
+//#include "compareDlg.hpp"
 
 #define STUB(x) extern "C" { void x() {}}
 STUB(glXCreateGLXPixmapMESA);
