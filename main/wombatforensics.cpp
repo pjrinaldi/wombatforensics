@@ -104,6 +104,16 @@ void WombatForensics::InitializeAppStructure()
     ui->fileViewTabWidget->addTab(ibasictools->setupTxtTab(), "Text View");
     ui->fileInfoTabWidget->addTab(ibasictools->setupDirTab(), "Directory List");
     ui->fileInfoTabWidget->addTab(ibasictools->setupTypTab(), "File Type");
+    currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-hexview");
+    currentascwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-ascview");
+    connect(currenthexwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
+    //connect(vsb, SIGNAL(valueChanged(int)), hexEditor,SLOT(setTopLeftToPercent(int)));
+    connect(currenthexwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
+    connect(currenthexwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
+    connect(currentascwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
+    //connect(vsb, SIGNAL(valueChanged(int)), hexEditor,SLOT(setTopLeftToPercent(int)));
+    connect(currentascwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
+    connect(currentascwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
     SetupDirModel();
 }
 
@@ -422,8 +432,10 @@ void WombatForensics::FileExport(FileExportData exportdata)
 void WombatForensics::UpdateCaseData(WombatVariable wvariable)
 {
     // refresh views here
-    currenthexwidget = ui->fileViewTabWidget->findChild<BinViewWidget *>("bt-hexview");
-    currenthexwidget->setModel(0);
+    currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-hexview");
+    currentascwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-ascview");
+    //currenthexwidget = ui->fileViewTabWidget->findChild<BinViewWidget *>("bt-hexview");
+    //currenthexwidget->setModel(0);
     currenttxtwidget = ui->fileViewTabWidget->findChild<QTextEdit*>("bt-txtview");
     currenttxtwidget->setPlainText("");
     // refresh treeviews here

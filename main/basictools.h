@@ -25,6 +25,8 @@ public:
     void LoadTxtContent(QString asciiText);
 public slots:
     void LoadFileContents(QString filepath);
+    void setScrollBarRange(off_t low, off_t high);
+    void setScrollBarValue(off_t pos);
 private:
     HexEditor* hexwidget;
     HexEditor* ascwidget;

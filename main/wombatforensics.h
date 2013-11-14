@@ -89,7 +89,9 @@ private:
     std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
-    BinViewWidget* currenthexwidget;
+    HexEditor* currenthexwidget;
+    HexEditor* currentascwidget;
+    //BinViewWidget* currenthexwidget;
     QModelIndex curselindex;
 
     QStandardItemModel* currenttreemodel;

@@ -6,11 +6,22 @@ QWidget* BasicTools::setupHexTab()
     QWidget* hexTab = new QWidget();
     QHBoxLayout* hexLayout = new QHBoxLayout();
     hexwidget = new HexEditor(hexTab);
+    hexwidget->setObjectName("bt-hexview");
+    ascwidget = new HexEditor(hexTab);
+    ascwidget->setObjectName("bt-ascview");
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
     hexvsb = new QScrollBar(hexTab);
+    //hexLayout->addWidget(hexvsb);
+    hexLayout->addWidget(ascwidget);
+    //ascvsb = new QStrollBar(hexTab);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
+    //ascvsb->setRange(0, 0);
+
+    connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    connect(hexvsb, SIGNAL(valueChanged(int)), ascwidget, SLOT(setTopLeftToPercent(int)));
     /*
      *
      QWidget* h = new QWidget(this);
@@ -108,6 +119,8 @@ void BasicTools::LoadFileContents(QString filepath)
 void BasicTools::LoadHexModel(QString tmpFilePath)
 {
     hexwidget->open(tmpFilePath);
+    ascwidget->open(tmpFilePath);
+    ascwidget->setBaseASCII();
     /*
     hexmodel = new BinViewModel();
     hexmodel->open(tmpFilePath);
@@ -121,4 +134,22 @@ void BasicTools::LoadTxtContent(QString asciiText)
     QTextStream stream(&tmpFile);
     txtwidget->setPlainText(stream.readAll());
     tmpFile.close();
+}
+
+void BasicTools::setScrollBarRange(off_t low, off_t high)
+{
+   (void)low;(void)high;
+   // range must be contained in the space of an integer, just do 100
+   // increments
+   hexvsb->setRange(0,100);
+}
+
+void BasicTools::setScrollBarValue(off_t pos)
+{
+  // pos is the topLeft pos, set the scrollbar to the
+  // location of the last byte on the page
+  // Note: offsetToPercent now rounds up, so we don't
+  // have to worry about if this is the topLeft or bottom right
+  hexvsb->setValue(hexwidget->offsetToPercent(pos));
+  hexvsb->setValue(ascwidget->offsetToPercent(pos));
 }
