@@ -19,6 +19,8 @@ public:
     BasicTools() {};
     ~BasicTools() {};
 
+    off_t offset() const;
+
     QWidget* setupHexTab();
     QWidget* setupTxtTab();
     QWidget* setupDirTab();

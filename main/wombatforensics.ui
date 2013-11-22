@@ -20,7 +20,20 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QTabWidget" name="fileViewTabWidget"/>
+      <widget class="QTabWidget" name="fileViewTabWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>467</height>
+        </size>
+       </property>
+      </widget>
       <widget class="QTabWidget" name="fileInfoTabWidget">
        <property name="currentIndex">
         <number>-1</number>
@@ -63,7 +76,7 @@
    </widget>
    <widget class="QMenu" name="menuAction">
     <property name="title">
-        <string>Action</string>
+     <string>Action</string>
     </property>
     <addaction name="actionExport_Evidence"/>
    </widget>
@@ -137,28 +150,31 @@
    </property>
   </action>
   <action name="actionAdd_Evidence">
-      <property name="icon">
-          <iconset><normaloff>:/basic/addevidence</normaloff>:/basic/addevidence</iconset>
-    </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/basic/addevidence</normaloff>:/basic/addevidence</iconset>
+   </property>
    <property name="text">
     <string>Add Evidence</string>
    </property>
   </action>
   <action name="actionRemove_Evidence">
-      <property name="icon">
-          <iconset><normaloff>:/basic/remevidence</normaloff>:/basic/remevidence</iconset>
-      </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/basic/remevidence</normaloff>:/basic/remevidence</iconset>
+   </property>
    <property name="text">
     <string>Remove Evidence</string>
    </property>
   </action>
   <action name="actionExport_Evidence">
-    <property name="text">
-        <string>Export Evidence</string>
-    </property>
-    <property name="icon">
-        <iconset><normaloff>:/basic/export</normaloff>:/basic/export</iconset>
-    </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/basic/export</normaloff>:/basic/export</iconset>
+   </property>
+   <property name="text">
+    <string>Export Evidence</string>
+   </property>
   </action>
  </widget>
  <resources/>
@@ -180,22 +196,52 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionAdd_Evidence</sender>
-      <signal>triggered()</signal>
-      <receiver>WombatForensics</receiver>
-      <slot>AddEvidence()</slot>
+   <sender>actionAdd_Evidence</sender>
+   <signal>triggered()</signal>
+   <receiver>WombatForensics</receiver>
+   <slot>AddEvidence()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-      <sender>actionRemove_Evidence</sender>
-      <signal>triggered()</signal>
-      <receiver>WombatForensics</receiver>
-      <slot>RemEvidence()</slot>
+   <sender>actionRemove_Evidence</sender>
+   <signal>triggered()</signal>
+   <receiver>WombatForensics</receiver>
+   <slot>RemEvidence()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-      <sender>actionExport_Evidence</sender>
-      <signal>triggered()</signal>
-      <receiver>WombatForensics</receiver>
-      <slot>ExportEvidence()</slot>
+   <sender>actionExport_Evidence</sender>
+   <signal>triggered()</signal>
+   <receiver>WombatForensics</receiver>
+   <slot>ExportEvidence()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
  </connections>
 </ui>

@@ -95,6 +95,12 @@ public:
         splitter->setOrientation(Qt::Vertical);
         fileViewTabWidget = new QTabWidget(splitter);
         fileViewTabWidget->setObjectName(QStringLiteral("fileViewTabWidget"));
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(fileViewTabWidget->sizePolicy().hasHeightForWidth());
+        fileViewTabWidget->setSizePolicy(sizePolicy);
+        fileViewTabWidget->setMaximumSize(QSize(16777215, 467));
         splitter->addWidget(fileViewTabWidget);
         fileInfoTabWidget = new QTabWidget(splitter);
         fileInfoTabWidget->setObjectName(QStringLiteral("fileInfoTabWidget"));

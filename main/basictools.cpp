@@ -13,7 +13,7 @@ QWidget* BasicTools::setupHexTab()
     //ascwidget = new HexEditor(hexTab);
     //ascwidget->setObjectName("bt-ascview");
     //hexwidget->setMaximumWidth(200);
-    hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     //ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
     hexvsb = new QScrollBar(hexTab);
@@ -125,7 +125,7 @@ void BasicTools::LoadHexModel(QString tmpFilePath)
 {
     hexwidget->open(tmpFilePath);
     //hexwidget->setBaseHex();
-    //hexwidget->set2BPC();
+    hexwidget->set2BPC();
     //ascwidget->open(tmpFilePath);
     //ascwidget->setBaseASCII();
     //ascwidget->set1BPC();
