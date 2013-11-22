@@ -10,22 +10,23 @@ QWidget* BasicTools::setupHexTab()
     vline->setFrameShadow(QFrame::Sunken);
     hexwidget = new HexEditor(hexTab);
     hexwidget->setObjectName("bt-hexview");
-    ascwidget = new HexEditor(hexTab);
-    ascwidget->setObjectName("bt-ascview");
-    //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //ascwidget = new HexEditor(hexTab);
+    //ascwidget->setObjectName("bt-ascview");
+    //hexwidget->setMaximumWidth(200);
+    hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     //ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
     hexvsb = new QScrollBar(hexTab);
     hexLayout->addWidget(vline);
     //hexLayout->addWidget(hexvsb);
-    hexLayout->addWidget(ascwidget);
+    //hexLayout->addWidget(ascwidget);
     //ascvsb = new QStrollBar(hexTab);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
     //ascvsb->setRange(0, 0);
 
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
-    connect(hexvsb, SIGNAL(valueChanged(int)), ascwidget, SLOT(setTopLeftToPercent(int)));
+    //connect(hexvsb, SIGNAL(valueChanged(int)), ascwidget, SLOT(setTopLeftToPercent(int)));
     /*
      *
      QWidget* h = new QWidget(this);
@@ -123,11 +124,11 @@ void BasicTools::LoadFileContents(QString filepath)
 void BasicTools::LoadHexModel(QString tmpFilePath)
 {
     hexwidget->open(tmpFilePath);
-    hexwidget->setBaseHex();
-    hexwidget->set2BPC();
-    ascwidget->open(tmpFilePath);
-    ascwidget->setBaseASCII();
-    ascwidget->set1BPC();
+    //hexwidget->setBaseHex();
+    //hexwidget->set2BPC();
+    //ascwidget->open(tmpFilePath);
+    //ascwidget->setBaseASCII();
+    //ascwidget->set1BPC();
     /*
     hexmodel = new BinViewModel();
     hexmodel->open(tmpFilePath);
@@ -158,5 +159,5 @@ void BasicTools::setScrollBarValue(off_t pos)
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
   hexvsb->setValue(hexwidget->offsetToPercent(pos));
-  hexvsb->setValue(ascwidget->offsetToPercent(pos));
+  //hexvsb->setValue(ascwidget->offsetToPercent(pos));
 }
