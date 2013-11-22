@@ -59,6 +59,7 @@ HexEditor::HexEditor( QWidget * parent )
   setFocusPolicy(Qt::StrongFocus);
   // the first setBytesPerWord should not come before the first setFont()
   QFont font("fixed");
+  font.setStyleHint(QFont::TypeWriter);
   font.setFixedPitch(1);
   setFont( font );
   //setBackgroundRole( QPalette::HighlightedText );
@@ -754,6 +755,7 @@ void HexEditor::paintLabels( QPainter* paintPtr)
     ucptr = (uchar*)(&offset) + sizeof(off_t)-1;
     for(i=0;i<sizeof(off_t);++i) {
       label += Translate::ByteToHex(*ucptr--);
+      //label += Translate::ByteToChar(label, *ucptr--);
     }
 #endif
     label = label.mid(sizeof(off_t)*2-_offsetLabelBytes);
@@ -799,7 +801,8 @@ void HexEditor::paintEvent( QPaintEvent* e)
   drawSelection( paint );
   
   // Find the stop/start row/col idx's for the repaint
-  int totalWordWidth = wordWidth()+wordSpacing();
+  int totalWordWidth = wordWidth()+1;
+  //int totalWordWidth = wordWidth()+wordSpacing();
   int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );
   int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
   int row_stop  = min(_rows-1,e->rect().bottom() / lineSpacing());
