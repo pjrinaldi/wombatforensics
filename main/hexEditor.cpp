@@ -61,7 +61,8 @@ HexEditor::HexEditor( QWidget * parent )
   QFont font("fixed");
   font.setFixedPitch(1);
   setFont( font );
-  setBackgroundRole( QPalette::HighlightedText );
+  //setBackgroundRole( QPalette::HighlightedText );
+  //setStyleSheet("background-color: white;");
 }
 
 HexEditor::~HexEditor() 

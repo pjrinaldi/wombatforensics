@@ -10,6 +10,7 @@ QWidget* BasicTools::setupHexTab()
     vline->setFrameShadow(QFrame::Sunken);
     hexwidget = new HexEditor(hexTab);
     hexwidget->setObjectName("bt-hexview");
+    hexTab->setBackground(QBrush(Qt::white));
     //ascwidget = new HexEditor(hexTab);
     //ascwidget->setObjectName("bt-ascview");
     //hexwidget->setMaximumWidth(200);
