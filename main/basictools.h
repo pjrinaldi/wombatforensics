@@ -1,11 +1,13 @@
 #ifndef BASICTOOLS_H
 #define BASICTOOLS_H
 
-#include "binviewwidget.h"
+//#include "binviewwidget.h"
 #include "hexEditor.hpp"
 #include <QObject>
 #include <QtWidgets>
 #include <QStringList>
+#include <QSizePolicy>
+#include <QFrame>
 
 class BasicTools : public QObject
 {

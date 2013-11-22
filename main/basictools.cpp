@@ -4,15 +4,19 @@ QWidget* BasicTools::setupHexTab()
 {
     // hex editor tab
     QWidget* hexTab = new QWidget();
-    QHBoxLayout* hexLayout = new QHBoxLayout();
+    QHBoxLayout* hexLayout = new QHBoxLayout(hexTab);
+    QFrame* vline = new QFrame();
+    vline->setFrameShape(QFrame::VLine);
+    vline->setFrameShadow(QFrame::Sunken);
     hexwidget = new HexEditor(hexTab);
     hexwidget->setObjectName("bt-hexview");
     ascwidget = new HexEditor(hexTab);
     ascwidget->setObjectName("bt-ascview");
-    hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
     hexvsb = new QScrollBar(hexTab);
+    hexLayout->addWidget(vline);
     //hexLayout->addWidget(hexvsb);
     hexLayout->addWidget(ascwidget);
     //ascvsb = new QStrollBar(hexTab);
@@ -119,8 +123,11 @@ void BasicTools::LoadFileContents(QString filepath)
 void BasicTools::LoadHexModel(QString tmpFilePath)
 {
     hexwidget->open(tmpFilePath);
+    hexwidget->setBaseHex();
+    hexwidget->set2BPC();
     ascwidget->open(tmpFilePath);
     ascwidget->setBaseASCII();
+    ascwidget->set1BPC();
     /*
     hexmodel = new BinViewModel();
     hexmodel->open(tmpFilePath);
