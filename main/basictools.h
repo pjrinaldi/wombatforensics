@@ -1,7 +1,6 @@
 #ifndef BASICTOOLS_H
 #define BASICTOOLS_H
 
-//#include "binviewwidget.h"
 #include "hexEditor.hpp"
 #include <QObject>
 #include <QtWidgets>
@@ -36,8 +35,6 @@ private:
     HexEditor* ascwidget;
     QScrollBar* hexvsb;
     QScrollBar* ascvsb;
-    //BinViewModel* hexmodel;
-    //BinViewWidget* hexwidget;
     QTreeView* dirtreeview;
     QTreeView* typtreeview;
     QTextEdit* txtwidget;
