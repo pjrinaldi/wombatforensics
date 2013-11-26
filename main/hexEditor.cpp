@@ -1011,6 +1011,7 @@ void HexEditor::setBase(int base)
   switch(base) {
   case -1:
     // setup ascii editing mode
+    //_charsPerByte = 2;
     _charsPerByte = 1;
     break;
   case 2:

@@ -18,11 +18,9 @@ QWidget* BasicTools::setupHexTab()
     vline->setFrameShadow(QFrame::Sunken);
     hexwidget = new HexEditor(1, dumwidget);
     hexwidget->setObjectName("bt-hexview");
-    //hexwidget->myspacer = 1;
     //hexTab->setBackground(QBrush(Qt::white));
     ascwidget = new HexEditor(2, dumwidget);
     ascwidget->setObjectName("bt-ascview");
-    //ascwidget->myspacer = 2;
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
@@ -121,11 +119,11 @@ void BasicTools::LoadFileContents(QString filepath)
 void BasicTools::LoadHexModel(QString tmpFilePath)
 {
     hexwidget->open(tmpFilePath);
-    hexwidget->setBaseHex();
-    hexwidget->set2BPC();
     ascwidget->open(tmpFilePath);
     ascwidget->setBaseASCII();
     ascwidget->set1BPC();
+    hexwidget->set2BPC();
+    hexwidget->setBaseHex();
 }
 void BasicTools::LoadTxtContent(QString asciiText)
 {

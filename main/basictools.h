@@ -43,6 +43,7 @@ private:
     QTreeView* dirtreeview;
     QTreeView* typtreeview;
     QTextEdit* txtwidget;
+    QToolTip* seltip;
 };
 
 #endif // BASICTOOLS_H
