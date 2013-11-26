@@ -41,12 +41,11 @@
 class HexEditor : public QWidget {
   Q_OBJECT
 public:
-  HexEditor( QWidget * parent =0 );
+  HexEditor( int wordspacing, QWidget * parent =0 );
   ~HexEditor();
 
   // note: closeFile returns QMessageBox::{Yes,No,Cancel}
   int closeFile(bool force = false );
-  int myspacer;
   bool open(const QString& filename);
   // becomes "save as" if filename != ""
   bool save(QString filename = "");
@@ -126,6 +125,7 @@ public slots:
   void setBaseOctal();
   void setBaseBinary();
   void setBaseASCII();
+  void setwordspacing(int wordspacing);
 
 protected:
   //  void setOffsetLabels( off_t topLeft );

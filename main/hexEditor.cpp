@@ -43,7 +43,7 @@
 
 extern int errno;
 
-HexEditor::HexEditor( QWidget * parent )
+HexEditor::HexEditor( int wordspacing, QWidget * parent )
     : QWidget(parent)
 {
   _cols   = 5;
@@ -55,6 +55,7 @@ HexEditor::HexEditor( QWidget * parent )
   _bytesPerWord   = 2;
   _lastValidWord  = -1;
   _selection[SelectionStart] = _selection[SelectionEnd] = -1;
+  setwordspacing(wordspacing);
 
   setFocusPolicy(Qt::StrongFocus);
   // the first setBytesPerWord should not come before the first setFont()
@@ -680,10 +681,14 @@ void HexEditor::keyPressEvent( QKeyEvent *e )
   }
 }
 
+void HexEditor::setwordspacing(int wordspacing)
+{
+    _wordSpacing = wordspacing;
+}
+
 void HexEditor::resizeEvent( QResizeEvent * e )
 {
   int height= lineSpacing();
-  //int totalWordWidth = wordWidth() + myspacer;
   int totalWordWidth = wordWidth() + wordSpacing();
   int linewidth = e->size().width();
 
@@ -802,7 +807,6 @@ void HexEditor::paintEvent( QPaintEvent* e)
   drawSelection( paint );
   
   // Find the stop/start row/col idx's for the repaint
-  //int totalWordWidth = wordWidth() + myspacer;
   //int totalWordWidth = wordWidth()+1;
   int totalWordWidth = wordWidth()+wordSpacing();
   int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );

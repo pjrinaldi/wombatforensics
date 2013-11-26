@@ -16,15 +16,13 @@ QWidget* BasicTools::setupHexTab()
     QFrame* vline = new QFrame();
     vline->setFrameShape(QFrame::VLine);
     vline->setFrameShadow(QFrame::Sunken);
-    hexwidget = new HexEditor(dumwidget);
+    hexwidget = new HexEditor(1, dumwidget);
     hexwidget->setObjectName("bt-hexview");
-    hexwidget->myspacer = 1;
+    //hexwidget->myspacer = 1;
     //hexTab->setBackground(QBrush(Qt::white));
-    ascwidget = new HexEditor(dumwidget);
+    ascwidget = new HexEditor(2, dumwidget);
     ascwidget->setObjectName("bt-ascview");
-    ascwidget->myspacer = 2;
-    fprintf(stderr, "hexspacer: %d\n", hexwidget->myspacer);
-    fprintf(stderr, "ascspacer: %d\n", ascwidget->myspacer);
+    //ascwidget->myspacer = 2;
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
@@ -43,6 +41,7 @@ QWidget* BasicTools::setupHexTab()
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexvsb, SIGNAL(valueChanged(int)), ascwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
+    //connect(hexwidget, SIGNAL(selectionChanged(const QString &)), ascwidget, SLOT(selectionChanged(const QString &)));
     hexTab->setLayout(vlayout);
 
     return hexTab;
