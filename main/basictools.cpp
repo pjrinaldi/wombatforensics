@@ -21,11 +21,11 @@ QWidget* BasicTools::setupHexTab()
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
-    hexvsb = new QScrollBar(hexTab);
+    hexvsb = new QScrollBar(hexwidget);
     hexLayout->addWidget(vline);
     //hexLayout->addWidget(hexvsb);
     hexLayout->addWidget(ascwidget);
-    //ascvsb = new QStrollBar(hexTab);
+    //ascvsb = new QStrollBar(ascwidget);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
     //hexLayout->setStretch(0, 1);
@@ -33,6 +33,9 @@ QWidget* BasicTools::setupHexTab()
     //hexLayout->setStretch(2, 1);
     //ascvsb->setRange(0, 0);
 
+    connect(hexwidget, SIGNAL(rangeChanged(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
+    connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
+    connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexvsb, SIGNAL(valueChanged(int)), ascwidget, SLOT(setTopLeftToPercent(int)));
     hexTab->setLayout(hexLayout);
@@ -113,11 +116,6 @@ void BasicTools::LoadHexModel(QString tmpFilePath)
     ascwidget->open(tmpFilePath);
     ascwidget->setBaseASCII();
     ascwidget->set4BPC();
-    /*
-    hexmodel = new BinViewModel();
-    hexmodel->open(tmpFilePath);
-    hexwidget->setModel(hexmodel);
-    */
 }
 void BasicTools::LoadTxtContent(QString asciiText)
 {
