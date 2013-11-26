@@ -46,6 +46,7 @@ public:
 
   // note: closeFile returns QMessageBox::{Yes,No,Cancel}
   int closeFile(bool force = false );
+  int myspacer;
   bool open(const QString& filename);
   // becomes "save as" if filename != ""
   bool save(QString filename = "");

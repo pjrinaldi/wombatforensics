@@ -34,7 +34,7 @@ private:
     HexEditor* hexwidget;
     HexEditor* ascwidget;
     QScrollBar* hexvsb;
-    QScrollBar* ascvsb;
+    //QScrollBar* ascvsb;
     QTreeView* dirtreeview;
     QTreeView* typtreeview;
     QTextEdit* txtwidget;

@@ -10,9 +10,13 @@ QWidget* BasicTools::setupHexTab()
     vline->setFrameShadow(QFrame::Sunken);
     hexwidget = new HexEditor(hexTab);
     hexwidget->setObjectName("bt-hexview");
+    hexwidget->myspacer = 1;
     //hexTab->setBackground(QBrush(Qt::white));
     ascwidget = new HexEditor(hexTab);
     ascwidget->setObjectName("bt-ascview");
+    ascwidget->myspacer = 2;
+    fprintf(stderr, "hexspacer: %d\n", hexwidget->myspacer);
+    fprintf(stderr, "ascspacer: %d\n", ascwidget->myspacer);
     //hexwidget->setMaximumWidth(200);
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -24,34 +28,13 @@ QWidget* BasicTools::setupHexTab()
     //ascvsb = new QStrollBar(hexTab);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
+    //hexLayout->setStretch(0, 1);
+    //hexLayout->setStretch(1, 2);
+    //hexLayout->setStretch(2, 1);
     //ascvsb->setRange(0, 0);
 
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
-    //connect(hexvsb, SIGNAL(valueChanged(int)), ascwidget, SLOT(setTopLeftToPercent(int)));
-    /*
-     *
-     QWidget* h = new QWidget(this);
-       QHBoxLayout* l = new QHBoxLayout(h);
-     
-       hexEditor = new HexEditor(h);
-       hexEditor->setSizePolicy( QSizePolicy( QSizePolicy::Expanding,
-                         QSizePolicy::Expanding ) );
-       l->addWidget(hexEditor);
-       vsb = new QScrollBar(h);
-       l->addWidget(vsb);
-       vsb->setRange(0,0);
-     
-       setCentralWidget(h);
-     * 
-     */
-    /*
-    hexwidget = new BinViewWidget(hexTab);
-    hexwidget->setObjectName("bt-hexview");
-    // appears the model is set to open the file, then the widget sets the model.
-    hexwidget->setModel(0);
-    hexLayout->setContentsMargins(0, 0, 0, 0);
-    hexLayout->addWidget(hexwidget);
-    */
+    connect(hexvsb, SIGNAL(valueChanged(int)), ascwidget, SLOT(setTopLeftToPercent(int)));
     hexTab->setLayout(hexLayout);
 
     return hexTab;
@@ -129,7 +112,7 @@ void BasicTools::LoadHexModel(QString tmpFilePath)
     hexwidget->set2BPC();
     ascwidget->open(tmpFilePath);
     ascwidget->setBaseASCII();
-    ascwidget->set1BPC();
+    ascwidget->set4BPC();
     /*
     hexmodel = new BinViewModel();
     hexmodel->open(tmpFilePath);
@@ -160,5 +143,5 @@ void BasicTools::setScrollBarValue(off_t pos)
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
   hexvsb->setValue(hexwidget->offsetToPercent(pos));
-  //hexvsb->setValue(ascwidget->offsetToPercent(pos));
+  hexvsb->setValue(ascwidget->offsetToPercent(pos));
 }

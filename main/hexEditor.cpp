@@ -425,6 +425,7 @@ void HexEditor::prevPage()
 off_t HexEditor::localByteOffsetAtXY(off_t x, off_t y) 
 {
   off_t wordIdx;
+  //off_t wordLength = wordSpacing()+myspacer;
   off_t wordLength = wordSpacing()+wordWidth();
   off_t line = min(y/lineSpacing(),(off_t)linesPerPage());
   
@@ -683,7 +684,8 @@ void HexEditor::keyPressEvent( QKeyEvent *e )
 void HexEditor::resizeEvent( QResizeEvent * e )
 {
   int height= lineSpacing();
-  int totalWordWidth = wordWidth() + wordSpacing();
+  int totalWordWidth = wordWidth() + myspacer;
+  //int totalWordWidth = wordWidth() + wordSpacing();
   int linewidth = e->size().width();
 
   // don't let _rows or _cols drop below 1
@@ -801,7 +803,8 @@ void HexEditor::paintEvent( QPaintEvent* e)
   drawSelection( paint );
   
   // Find the stop/start row/col idx's for the repaint
-  int totalWordWidth = wordWidth()+1;
+  int totalWordWidth = wordWidth() + myspacer;
+  //int totalWordWidth = wordWidth()+1;
   //int totalWordWidth = wordWidth()+wordSpacing();
   int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );
   int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
