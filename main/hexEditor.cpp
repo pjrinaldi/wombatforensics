@@ -745,6 +745,7 @@ void HexEditor::paintLabels( QPainter* paintPtr)
   uchar *ucptr;
   QString label;
 
+
   for(int row = 0; row < _rows;++row) {
     label = "";
 #ifdef WORDS_BIGENDIAN
@@ -756,7 +757,6 @@ void HexEditor::paintLabels( QPainter* paintPtr)
     ucptr = (uchar*)(&offset) + sizeof(off_t)-1;
     for(i=0;i<sizeof(off_t);++i) {
       label += Translate::ByteToHex(*ucptr--);
-      //label += Translate::ByteToChar(label, *ucptr--);
     }
 #endif
     label = label.mid(sizeof(off_t)*2-_offsetLabelBytes);

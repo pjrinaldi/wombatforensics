@@ -4,53 +4,54 @@ QWidget* BasicTools::setupHexTab()
 {
     // hex editor tab
     QWidget* hexTab = new QWidget();
-    QHBoxLayout* hexLayout = new QHBoxLayout(hexTab);
-    QVBoxLayout* vlayout = new QVBoxLayout(hexTab);
+    QHBoxLayout* hexLayout = new QHBoxLayout();
+    QVBoxLayout* vlayout = new QVBoxLayout();
     QWidget* dumwidget = new QWidget();
-    QStatusBar* hstatus = new QStatusBar(hexTab);
+    hstatus = new QStatusBar(hexTab);
     hstatus->setSizeGripEnabled(false);
-    QLabel* selectedoffset = new QLabel("Offset: 00");
+    selectedoffset = new QLabel("Offset: 00");
+    selectedhex = new QLabel("Selection: ");
     hstatus->addWidget(selectedoffset);
+    hstatus->addWidget(selectedhex);
     QFrame* vline = new QFrame();
     vline->setFrameShape(QFrame::VLine);
     vline->setFrameShadow(QFrame::Sunken);
-    hexwidget = new HexEditor(hexTab);
+    hexwidget = new HexEditor(dumwidget);
     hexwidget->setObjectName("bt-hexview");
     hexwidget->myspacer = 1;
     //hexTab->setBackground(QBrush(Qt::white));
-    ascwidget = new HexEditor(hexTab);
+    ascwidget = new HexEditor(dumwidget);
     ascwidget->setObjectName("bt-ascview");
     ascwidget->myspacer = 2;
     fprintf(stderr, "hexspacer: %d\n", hexwidget->myspacer);
     fprintf(stderr, "ascspacer: %d\n", ascwidget->myspacer);
-    //hexwidget->setMaximumWidth(200);
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     ascwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
     hexvsb = new QScrollBar(hexwidget);
     hexLayout->addWidget(vline);
-    //hexLayout->addWidget(hexvsb);
     hexLayout->addWidget(ascwidget);
-    //ascvsb = new QStrollBar(ascwidget);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
     dumwidget->setLayout(hexLayout);
     vlayout->addWidget(dumwidget);
     vlayout->addWidget(hstatus);
-    //hexLayout->setStretch(0, 1);
-    //hexLayout->setStretch(1, 2);
-    //hexLayout->setStretch(2, 1);
-    //ascvsb->setRange(0, 0);
 
     connect(hexwidget, SIGNAL(rangeChanged(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexvsb, SIGNAL(valueChanged(int)), ascwidget, SLOT(setTopLeftToPercent(int)));
-    //hexTab->setLayout(hexLayout);
+    connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     hexTab->setLayout(vlayout);
 
     return hexTab;
+}
+
+void BasicTools::UpdateSelectValue(const QString &txt)
+{
+    QString tmptext = "Selected: " + txt;
+    selectedhex->setText(tmptext);
 }
 
 QWidget* BasicTools::setupTxtTab()
@@ -125,7 +126,7 @@ void BasicTools::LoadHexModel(QString tmpFilePath)
     hexwidget->set2BPC();
     ascwidget->open(tmpFilePath);
     ascwidget->setBaseASCII();
-    ascwidget->set4BPC();
+    ascwidget->set1BPC();
 }
 void BasicTools::LoadTxtContent(QString asciiText)
 {
@@ -134,6 +135,20 @@ void BasicTools::LoadTxtContent(QString asciiText)
     QTextStream stream(&tmpFile);
     txtwidget->setPlainText(stream.readAll());
     tmpFile.close();
+}
+
+void BasicTools::setOffsetLabel(off_t pos)
+{
+  QString label;
+  label = "Offset: ";
+  char    buffer[64];
+#if _LARGEFILE_SOURCE
+  sprintf(buffer,"0x%lx",pos);
+#else
+  sprintf(buffer,"0x%x",pos);
+#endif
+  label += buffer;
+  selectedoffset->setText(label);
 }
 
 void BasicTools::setScrollBarRange(off_t low, off_t high)
