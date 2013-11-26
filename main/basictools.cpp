@@ -5,6 +5,12 @@ QWidget* BasicTools::setupHexTab()
     // hex editor tab
     QWidget* hexTab = new QWidget();
     QHBoxLayout* hexLayout = new QHBoxLayout(hexTab);
+    QVBoxLayout* vlayout = new QVBoxLayout(hexTab);
+    QWidget* dumwidget = new QWidget();
+    QStatusBar* hstatus = new QStatusBar(hexTab);
+    hstatus->setSizeGripEnabled(false);
+    QLabel* selectedoffset = new QLabel("Offset: 00");
+    hstatus->addWidget(selectedoffset);
     QFrame* vline = new QFrame();
     vline->setFrameShape(QFrame::VLine);
     vline->setFrameShadow(QFrame::Sunken);
@@ -28,6 +34,9 @@ QWidget* BasicTools::setupHexTab()
     //ascvsb = new QStrollBar(ascwidget);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
+    dumwidget->setLayout(hexLayout);
+    vlayout->addWidget(dumwidget);
+    vlayout->addWidget(hstatus);
     //hexLayout->setStretch(0, 1);
     //hexLayout->setStretch(1, 2);
     //hexLayout->setStretch(2, 1);
@@ -38,7 +47,8 @@ QWidget* BasicTools::setupHexTab()
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexvsb, SIGNAL(valueChanged(int)), ascwidget, SLOT(setTopLeftToPercent(int)));
-    hexTab->setLayout(hexLayout);
+    //hexTab->setLayout(hexLayout);
+    hexTab->setLayout(vlayout);
 
     return hexTab;
 }
