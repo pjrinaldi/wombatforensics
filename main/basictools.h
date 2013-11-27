@@ -2,6 +2,7 @@
 #define BASICTOOLS_H
 
 #include "hexEditor.hpp"
+#include "translate.hpp"
 #include <QObject>
 #include <QtWidgets>
 #include <QStringList>
@@ -40,10 +41,13 @@ private:
     QStatusBar* hstatus;
     QLabel* selectedoffset;
     QLabel* selectedhex;
+    QLabel* selectedascii;
+    QLabel* selectedinteger;
+    QLabel* selectedfloat;
+    QLabel* selecteddouble;
     QTreeView* dirtreeview;
     QTreeView* typtreeview;
     QTextEdit* txtwidget;
-    QToolTip* seltip;
 };
 
 #endif // BASICTOOLS_H

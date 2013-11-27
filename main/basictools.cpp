@@ -10,9 +10,18 @@ QWidget* BasicTools::setupHexTab()
     hstatus = new QStatusBar(hexTab);
     hstatus->setSizeGripEnabled(false);
     selectedoffset = new QLabel("Offset: 00");
-    selectedhex = new QLabel("Selection: ");
+    selectedhex = new QLabel("Length: 0");
+    selectedascii = new QLabel("Ascii: ");
+    selectedinteger = new QLabel("Integer: ");
+    selectedfloat = new QLabel("Float: ");
+    selecteddouble = new QLabel("Double: ");
+    selectedoffset->setFrameStyle(QFrame::NoFrame || QFrame::VLine || QFrame::Plain);
     hstatus->addWidget(selectedoffset);
     hstatus->addWidget(selectedhex);
+    hstatus->addWidget(selectedascii);
+    hstatus->addWidget(selectedinteger);
+    hstatus->addWidget(selectedfloat);
+    hstatus->addWidget(selecteddouble);
     QFrame* vline = new QFrame();
     vline->setFrameShape(QFrame::VLine);
     vline->setFrameShadow(QFrame::Sunken);
@@ -47,8 +56,75 @@ QWidget* BasicTools::setupHexTab()
 
 void BasicTools::UpdateSelectValue(const QString &txt)
 {
-    QString tmptext = "Selected: " + txt;
+    // set hex (which i'll probably remove anyway since it's highlighted in same window)
+    int sellength = txt.size()/2;
+    QString tmptext = "Length: " + QString::number(sellength);
     selectedhex->setText(tmptext);
+    // get initial bytes value and then update ascii
+    std::vector<uchar> bytes;
+    Translate::HexToByte(bytes, txt);
+    QString ascii;
+    Translate::ByteToChar(ascii, bytes);
+    tmptext = "Ascii: " + ascii;
+    selectedascii->setText(tmptext);
+    QString strvalue;
+    uchar * ucharPtr;
+    // update the int entry:
+    // pad right with 0x00
+    int intvalue = 0;
+    ucharPtr = (uchar*) &intvalue;
+    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
+    strvalue.setNum(intvalue);
+    tmptext = "Int: " + strvalue;
+    selectedinteger->setText(tmptext);
+    // update float entry;
+    float fvalue;
+    ucharPtr = (uchar*)(&fvalue);
+    if(bytes.size() < sizeof(float) )
+    {
+        for(unsigned int i= 0; i < sizeof(float); ++i)
+        {
+            if( i < bytes.size() )
+            {
+                *ucharPtr++ = bytes[i];
+            }
+            else
+            {
+                *ucharPtr++ = 0x00;
+            }
+        }
+    }
+    else
+    {
+        memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
+    }
+    strvalue.setNum( fvalue );
+    tmptext = "Float: " + strvalue;
+    selectedfloat->setText(tmptext);
+    // update double
+    double dvalue;
+    ucharPtr = (uchar*)&dvalue;
+    if(bytes.size() < sizeof(double) )
+    {
+        for(unsigned int i= 0; i < sizeof(double); ++i)
+        {
+            if( i < bytes.size() )
+            {
+                *ucharPtr++ = bytes[i];
+            }
+            else
+            {
+                *ucharPtr++ = 0x00;
+            }
+        }
+    }
+    else
+    {
+        memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
+    }
+    strvalue.setNum( dvalue );
+    tmptext = "Double: " + strvalue;
+    selecteddouble->setText(tmptext);
 }
 
 QWidget* BasicTools::setupTxtTab()
