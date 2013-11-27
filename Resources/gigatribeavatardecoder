@@ -1,0 +1,1 @@
+for i in `ls *.xml`; do echo Procesing $i; cat $i | awk -F'<data>' '{print $2}' | awk -F '</data>' '{print $1}' | base64 -d - > $i.png;  done
