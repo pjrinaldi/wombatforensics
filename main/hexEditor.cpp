@@ -689,7 +689,7 @@ void HexEditor::setwordspacing(int wordspacing)
 void HexEditor::resizeEvent( QResizeEvent * e )
 {
   int height= lineSpacing();
-  int totalWordWidth = wordWidth() + wordSpacing();
+  int totalWordWidth = 2*wordWidth() + wordSpacing();
   int linewidth = e->size().width();
 
   // don't let _rows or _cols drop below 1
@@ -716,6 +716,11 @@ void HexEditor::resizeEvent( QResizeEvent * e )
 		     0,                        // y
 		     _leftMargin,              // width
 		     e->size().height());      // height
+
+  //calculate offset ascii bounding box
+  int asciileft = left + linewidth + 5;
+
+  _asciiBBox.setRect(asciileft, 0, linewidth, e->size().height());
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
@@ -752,21 +757,28 @@ void HexEditor::paintAscii(QPainter* paintPtr)
 
     // draw dividing line
     int x = size().width();
-    paintPtr->drawLine(x, topMargin(), x, height()-topMargin());
+    paintPtr->drawLine(10, topMargin(), 10, height()-topMargin());
     // draw ascii text
     for(int row = 0; row < _rows; ++row)
     {
 #ifdef WORDS_BIGENDIAN
+        mychar = (uchar)offset;
+        charvector.push_back(mychar);
+        /*
         for(i = 0, mychar = (uchar)offset; i < sizeof(off_t); ++i)
         {
             charvector.push_back(mychar);
         }
+        */
 #else
         mychar = (uchar)(offset) + sizeof(off_t)-1;
+        charvector.push_back(mychar);
+        /*
         for(i = 0; i < sizeof(off_t); ++i)
         {
             charvector.push_back(mychar);
         }
+        */
 #endif
         offset+=bytesPerLine();
         y+=lineSpacing();
@@ -778,7 +790,7 @@ void HexEditor::paintAscii(QPainter* paintPtr)
     for(int row = 0; row < _rows; ++row)
     {
         Translate::ByteToChar(ascii, (const std::vector<uchar>)charvector);
-        paintPtr->drawText(x + 2, y, ascii);
+        paintPtr->drawText(12, y, ascii);
         offset += bytesPerLine();
         y += lineSpacing();
     }
@@ -850,7 +862,7 @@ void HexEditor::paintEvent( QPaintEvent* e)
   
   // Find the stop/start row/col idx's for the repaint
   //int totalWordWidth = wordWidth()+1;
-  int totalWordWidth = wordWidth()+wordSpacing();
+  int totalWordWidth = 2*wordWidth()+wordSpacing();
   int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );
   int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
   int row_stop  = min(_rows-1,e->rect().bottom() / lineSpacing());
@@ -859,7 +871,10 @@ void HexEditor::paintEvent( QPaintEvent* e)
   // draw text in repaint event
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
-  paintAscii(&paint);
+  if(_asciiBBox.intersects(e->rect()))
+  {
+      paintAscii(&paint);
+  }
 }
 
 bool HexEditor::getDisplayText( QString& text )
