@@ -692,20 +692,23 @@ void HexEditor::resizeEvent( QResizeEvent * e )
 
   // don't let _rows or _cols drop below 1
   _rows = max(1,(e->size().height() - _topMargin)/height);
-  _cols = max(1,(e->size().width() - _leftMargin)/totalWordWidth);
+  _cols = max(1,(e->size().width()/2 - _leftMargin)/totalWordWidth);
   
   // now update the line && word bbox vectors
   _lineBBox.reserve(_rows);
   _wordBBox.reserve(_rows*_cols);
-  int top,left;
+  _asciiBBox.reserve(_rows*_cols);
+  int top,left, aleft;
   for(int r = 0; r < _rows; r++) {
     top = r*height + _topMargin;
     for(int c = 0; c < _cols; c++) {
       left = totalWordWidth*c + _leftMargin;
+      aleft = left + linewidth + 10;
       _wordBBox[r*_cols+c] = QRect(left,             //left
 				   top,              //top
 				   totalWordWidth,   //width
 				   height);          //height
+      _asciiBBox[r*_cols+c] = QRect(aleft, top, totalWordWidth, height);
     }
     _lineBBox[r] = QRect(_leftMargin,top,linewidth,height);
   }
@@ -715,10 +718,7 @@ void HexEditor::resizeEvent( QResizeEvent * e )
 		     _leftMargin,              // width
 		     e->size().height());      // height
 
-  //calculate offset ascii bounding box
-  int asciileft = left + linewidth + 5;
 
-  _asciiBBox.setRect(0, 0, linewidth, e->size().height());
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
@@ -746,6 +746,7 @@ void HexEditor::updateWord( off_t wordIdx )
 
 void HexEditor::paintAscii(QPainter* paintPtr)
 {
+    /*
     int y = _wordBBox[0].bottom();
     unsigned int i;
     uchar mychar;
@@ -763,11 +764,10 @@ void HexEditor::paintAscii(QPainter* paintPtr)
     int totalWordWidth = wordWidth()+wordSpacing();
     int row_start = max(0,(rect().top()-topMargin())/lineSpacing() );
     int col_start = max(0,(rect().right()+leftMargin()+20)/totalWordWidth);
-    int row_stop  = min(_rows-1, rect().bottom() / lineSpacing());
-    int col_stop  = min(_cols-1, rect().right() / totalWordWidth);
+    int row_stop  = min(_rows-1, (height()-topMargin()) / lineSpacing());
+    int col_stop  = min(_cols-1, (size().width() + leftMargin() + 25) / totalWordWidth);
 
     // draw text in repaint event
-    //drawTextRegion( paint, ascii, row_start, row_stop, col_start, col_stop );
     paintPtr->setPen(qApp->palette().foreground().color());
     for(int r = row_start; r <= row_stop; r++)
     {
@@ -777,15 +777,16 @@ void HexEditor::paintAscii(QPainter* paintPtr)
             if ( wordModified( widx ) )
             {
                 paintPtr->setPen(qApp->palette().link().color());
-	        paintPtr->drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), ascii.mid(widx*charsPerWord(),charsPerWord()) );
+	        paintPtr->drawText( _asciiBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), ascii.mid(widx*charsPerWord(),charsPerWord()) );
         	paintPtr->setPen(qApp->palette().foreground().color());
             }
             else
             {
-        	paintPtr->drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), ascii.mid(widx*charsPerWord(),charsPerWord()) );
+        	paintPtr->drawText( _asciiBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), ascii.mid(widx*charsPerWord(),charsPerWord()) );
             }
         }
     }
+    */
     
 /*
     for(int row = 0; row < _rows; ++row)
@@ -898,10 +899,25 @@ void HexEditor::paintEvent( QPaintEvent* e)
   // draw text in repaint event
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
+  // draw dividing line
+  paint.drawLine(e->rect().right()/2, topMargin(), e->rect().right()/2, height()-topMargin());
+  paintAscii(&paint);
+  QString ascii;
+  getDisplayAscii(ascii);
+
+  totalWordWidth = wordWidth() + wordSpacing();
+  row_start = max(0, (e->rect().top() - topMargin())/lineSpacing());
+  col_start = max(_cols-1, (e->rect().right()/2)/totalWordWidth);
+  row_stop = min(_rows-1, e->rect().bottom()/lineSpacing());
+  col_stop = min(_cols-1, e->rect().right()/totalWordWidth);
+
+  drawTextRegion(paint, ascii, row_start, row_stop, col_start, col_stop);
+  /*
   if(_asciiBBox.intersects(e->rect()))
   {
       paintAscii(&paint);
   }
+  */
 }
 
 bool HexEditor::getDisplayText( QString& text )

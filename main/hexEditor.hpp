@@ -217,7 +217,7 @@ protected:
   vector<QRect>       _lineBBox;
   vector<QRect>       _wordBBox;
   QRect               _labelBBox;
-  QRect               _asciiBBox;
+  vector<QRect>       _asciiBBox;
 
   int                 _linspacing;
   int                 _fontMaxWidth;
