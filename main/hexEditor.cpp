@@ -43,7 +43,7 @@
 
 extern int errno;
 
-HexEditor::HexEditor( int wordspacing, QWidget * parent )
+HexEditor::HexEditor( QWidget * parent )
     : QWidget(parent)
 {
   _cols   = 5;
@@ -51,11 +51,10 @@ HexEditor::HexEditor( int wordspacing, QWidget * parent )
   _charsPerByte   = 2;
   _base           = 16;
   _topLeft        = 0;
-  _topMargin = _wordSpacing    = 6;
+  _topMargin = _wordSpacing    = 1;
   _bytesPerWord   = 2;
   _lastValidWord  = -1;
   _selection[SelectionStart] = _selection[SelectionEnd] = -1;
-  setwordspacing(wordspacing);
 
   setFocusPolicy(Qt::StrongFocus);
   // the first setBytesPerWord should not come before the first setFont()
@@ -679,11 +678,6 @@ void HexEditor::keyPressEvent( QKeyEvent *e )
     e->ignore();
     break;
   }
-}
-
-void HexEditor::setwordspacing(int wordspacing)
-{
-    _wordSpacing = wordspacing;
 }
 
 void HexEditor::resizeEvent( QResizeEvent * e )

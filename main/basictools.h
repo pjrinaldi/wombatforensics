@@ -36,7 +36,6 @@ public slots:
     void UpdateSelectValue(const QString &txt);
 private:
     HexEditor* hexwidget;
-    HexEditor* ascwidget;
     QScrollBar* hexvsb;
     QStatusBar* hstatus;
     QLabel* selectedoffset;
