@@ -1177,7 +1177,7 @@ void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
         for(int c = col_start; c <= col_stop; c++)
         {
             int widx = r*_cols+c;
-	    paint.drawText(_asciiBBox[widx].left() + wordSpacing()/2, _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()));
+	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
         }
     }
 }
