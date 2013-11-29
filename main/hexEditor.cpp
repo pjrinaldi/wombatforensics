@@ -912,7 +912,7 @@ void HexEditor::paintEvent( QPaintEvent* e)
   row_start = max(0, (e->rect().top() - topMargin())/lineSpacing());
   col_start = max(0, (e->rect().left() - leftMargin() - e->rect().right()/2)/totalWordWidth);
   row_stop = min(_rows-1, e->rect().bottom()/lineSpacing());
-  col_stop = min(_acols-1, e->rect().right()/totalWordWidth);
+  col_stop = min(_cols-1, e->rect().right()/totalWordWidth);
 
   drawAsciiRegion(paint, ascii, row_start, row_stop, col_start, col_stop);
   /*
@@ -1006,7 +1006,7 @@ void HexEditor::cursorLeft()
 {
   off_t oldWordIdx = localWordOffset();
   // move the cursor
-  _cursor.decrByChar(1);
+  _cursor.decrByChar(2);
   // make sure the user can see the cursor
   seeCursor();
   // redraw where the cursor used to be
@@ -1017,7 +1017,7 @@ void HexEditor::cursorLeft()
 void HexEditor::cursorRight()
 {
   off_t oldWordIdx = localWordOffset();
-  _cursor.incrByChar(1);
+  _cursor.incrByChar(2);
   seeCursor();
   if( localWordOffset() != oldWordIdx ) 
     updateWord( oldWordIdx );
