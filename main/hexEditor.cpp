@@ -720,7 +720,7 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   //calculate offset ascii bounding box
   int asciileft = left + linewidth + 5;
 
-  _asciiBBox.setRect(asciileft, 0, linewidth, e->size().height());
+  _asciiBBox.setRect(0, 0, linewidth, e->size().height());
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
@@ -757,7 +757,7 @@ void HexEditor::paintAscii(QPainter* paintPtr)
 
     // draw dividing line
     int x = size().width();
-    paintPtr->drawLine(10, topMargin(), 10, height()-topMargin());
+    paintPtr->drawLine(leftMargin(), topMargin(), leftMargin(), height()-topMargin());
     // draw ascii text
     for(int row = 0; row < _rows; ++row)
     {
@@ -790,7 +790,7 @@ void HexEditor::paintAscii(QPainter* paintPtr)
     for(int row = 0; row < _rows; ++row)
     {
         Translate::ByteToChar(ascii, (const std::vector<uchar>)charvector);
-        paintPtr->drawText(12, y, ascii);
+        paintPtr->drawText(5, y, ascii);
         offset += bytesPerLine();
         y += lineSpacing();
     }
