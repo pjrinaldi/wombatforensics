@@ -741,6 +741,49 @@ void HexEditor::updateWord( off_t wordIdx )
     repaint(_wordBBox[wordIdx]);
 }
 
+void HexEditor::paintAscii(QPainter* paintPtr)
+{
+    int y = _wordBBox[0].bottom();
+    unsigned int i;
+    uchar mychar;
+    off_t offset = _topLeft;
+    std::vector<uchar> charvector;
+    QString ascii;
+
+    // draw dividing line
+    int x = size().width();
+    paintPtr->drawLine(x, topMargin(), x, height()-topMargin());
+    // draw ascii text
+    for(int row = 0; row < _rows; ++row)
+    {
+#ifdef WORDS_BIGENDIAN
+        for(i = 0, mychar = (uchar)offset; i < sizeof(off_t); ++i)
+        {
+            charvector.push_back(mychar);
+        }
+#else
+        mychar = (uchar)(offset) + sizeof(off_t)-1;
+        for(i = 0; i < sizeof(off_t); ++i)
+        {
+            charvector.push_back(mychar);
+        }
+#endif
+        offset+=bytesPerLine();
+        y+=lineSpacing();
+    }
+
+    offset = _topLeft;
+    y = _wordBBox[0].bottom();
+
+    for(int row = 0; row < _rows; ++row)
+    {
+        Translate::ByteToChar(ascii, (const std::vector<uchar>)charvector);
+        paintPtr->drawText(x + 2, y, ascii);
+        offset += bytesPerLine();
+        y += lineSpacing();
+    }
+}
+
 void HexEditor::paintLabels( QPainter* paintPtr) 
 {
   // ignore redraw range for first aproximation:
@@ -749,7 +792,6 @@ void HexEditor::paintLabels( QPainter* paintPtr)
   off_t offset = _topLeft;
   uchar *ucptr;
   QString label;
-
 
   for(int row = 0; row < _rows;++row) {
     label = "";
@@ -816,6 +858,8 @@ void HexEditor::paintEvent( QPaintEvent* e)
 
   // draw text in repaint event
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
+  // draw ascii text in repaint event
+  paintAscii(&paint);
 }
 
 bool HexEditor::getDisplayText( QString& text )

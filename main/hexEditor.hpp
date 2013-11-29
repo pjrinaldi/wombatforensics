@@ -186,6 +186,7 @@ protected:
   void updateWord       ( off_t wordIdx );
   void paintEvent       ( QPaintEvent*e );
   void paintLabels      ( QPainter*painter);
+  void paintAscii       (QPainter* painter);
   void focusInEvent     ( QFocusEvent*e );
   void focusOutEvent    ( QFocusEvent*e );
   void keyPressEvent    ( QKeyEvent *e );
@@ -216,6 +217,7 @@ protected:
   vector<QRect>       _lineBBox;
   vector<QRect>       _wordBBox;
   QRect               _labelBBox;
+  QRect               _asciiBBox;
 
   int                 _linspacing;
   int                 _fontMaxWidth;
