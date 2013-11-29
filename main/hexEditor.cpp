@@ -693,7 +693,6 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   // don't let _rows or _cols drop below 1
   _rows = max(1,(e->size().height() - _topMargin)/height);
   _cols = max(1,(e->size().width()/2 - _leftMargin)/totalWordWidth);
-  _acols = max(1, (e->size().width()/2 - _leftMargin)/totalWordWidth);
   
   // now update the line && word bbox vectors
   _lineBBox.reserve(_rows);
@@ -705,7 +704,7 @@ void HexEditor::resizeEvent( QResizeEvent * e )
     top = r*height + _topMargin;
     for(int c = 0; c < _cols; c++) {
       left = totalWordWidth*c + _leftMargin;
-      aleft = linewidth + totalWordWidth*c + 2;
+      aleft = linewidth + totalWordWidth*c + 5;
       _wordBBox[r*_cols+c] = QRect(left,             //left
 				   top,              //top
 				   totalWordWidth,   //width
@@ -713,7 +712,7 @@ void HexEditor::resizeEvent( QResizeEvent * e )
       _asciiBBox[r*_cols+c] = QRect(aleft, top, totalWordWidth, height);
     }
     _lineBBox[r] = QRect(_leftMargin,top,linewidth,height);
-    _alineBBox[r] = QRect(_leftMargin + linewidth , top, linewidth, height);
+    _alineBBox[r] = QRect(_leftMargin + linewidth , top, e->size().width() - _leftMargin, height);
   }
   // calculate offset label bounding box
   _labelBBox.setRect(0,                        // x
@@ -1179,7 +1178,6 @@ void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
         {
             int widx = r*_cols+c;
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing()/2, _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()));
-	    //paint.drawText(_asciiBBox[widx].left() + wordSpacing()/2, _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()));
         }
     }
 }
