@@ -175,6 +175,7 @@ protected:
     void getDisplayAscii(QString& txt);
     void drawCursor( QPainter& p );
     void drawSelection( QPainter& p );
+    void drawAsciiRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop);
     void drawTextRegion( QPainter& p, const QString& text,
 			 int row_start, int row_end,
 			 int col_start, int col_end );
@@ -226,6 +227,7 @@ protected:
   int                 _offsetLabelBytes;
 
   int                 _cols;
+  int                 _acols;
   int                 _rows;
   int                 _width;
   Cursor              _cursor; 
