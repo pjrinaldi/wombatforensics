@@ -45,11 +45,11 @@ public:
   ~HexEditor();
 
   // note: closeFile returns QMessageBox::{Yes,No,Cancel}
-  int closeFile(bool force = false );
+  //int closeFile(bool force = false );
   bool open(const QString& filename);
   // becomes "save as" if filename != ""
-  bool save(QString filename = "");
-  bool isModified() const;
+  //bool save(QString filename = "");
+  //bool isModified() const;
   QString filename() const;
   Reader * reader();
   off_t offset() const;
@@ -99,7 +99,7 @@ signals:
   void selectionChanged(const QString& selection);
 
 public slots:
-  bool browseLoadFile();
+  //bool browseLoadFile();
   void setOffset(off_t offset);     // sets cursor offset
   void setTopLeftToPercent( int percent ); // for setting pos from scroll
   //
@@ -117,8 +117,8 @@ public slots:
   void nextPage();
   void prevPage();
   void setFont(const QFont& font);
-  void undo();
-  void redo();
+  //void undo();
+  //void redo();
   void search(const QString& hexText, bool forwards);
   void setBase(int base); // only 2 8 16 acceptableO
   void setBaseHex();
@@ -172,6 +172,7 @@ protected:
   // drawing utilities
 protected:
     bool getDisplayText( QString& text );
+    void getDisplayAscii(QString& txt);
     void drawCursor( QPainter& p );
     void drawSelection( QPainter& p );
     void drawTextRegion( QPainter& p, const QString& text,

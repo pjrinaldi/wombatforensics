@@ -16,6 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+/*
+ * Copyright (C) 2013 Pasquale Rinaldi <pjrinaldi@gmail.com>
+ */ 
+
 #include <math.h>
 #include <assert.h>
 #include <stdio.h>
@@ -51,7 +55,7 @@ HexEditor::HexEditor( QWidget * parent )
   _charsPerByte   = 2;
   _base           = 16;
   _topLeft        = 0;
-  _topMargin = _wordSpacing    = 1;
+  _topMargin = _wordSpacing    = 6;
   _bytesPerWord   = 2;
   _lastValidWord  = -1;
   _selection[SelectionStart] = _selection[SelectionEnd] = -1;
@@ -62,20 +66,17 @@ HexEditor::HexEditor( QWidget * parent )
   font.setStyleHint(QFont::TypeWriter);
   font.setFixedPitch(1);
   setFont( font );
-  //setBackgroundRole( QPalette::HighlightedText );
-  //setStyleSheet("background-color: white;");
 }
 
 HexEditor::~HexEditor() 
 {
   _reader.close();
 }
-
+/*
 bool HexEditor::isModified() const
 {
   return ( _reader.is_open() && _delta.numEdits() );
 }
-
 bool HexEditor::save( QString filename )
 {
   if( !isModified() ) {
@@ -135,7 +136,7 @@ bool HexEditor::save( QString filename )
   setTopLeft(_topLeft);
   return true;
 }
-
+*/
 QString HexEditor::filename() const
 {
   return _reader.filename();
@@ -143,8 +144,10 @@ QString HexEditor::filename() const
 
 bool HexEditor::open( const QString & filename )
 {
+/*
   if( closeFile() == QMessageBox::Cancel )
     return false;
+*/
 
   if(!_reader.open(C_STR(filename))) {
     QMessageBox::critical( this, "HexEdit", 
@@ -153,7 +156,7 @@ bool HexEditor::open( const QString & filename )
 			   QMessageBox::Ok,0);
     return false;
   }
-  _delta.clear();           // reset modification tree
+//  _delta.clear();           // reset modification tree
 
   // set the new range for the scrollbar
   _cursor.setRange(0,_reader.size());
@@ -165,7 +168,7 @@ bool HexEditor::open( const QString & filename )
   setTopLeft(0);              // reset the GUI
   return true;
 }
-
+/*
 int HexEditor::closeFile(bool force) 
 {  
   int retval = QMessageBox::No;
@@ -191,7 +194,7 @@ int HexEditor::closeFile(bool force)
     save();
   return retval;
 }
-  
+*/  
 void HexEditor::setBytesPerWord( int nbytes )
 {
   _bytesPerWord = nbytes;
@@ -357,6 +360,7 @@ int HexEditor::offsetToPercent(
 }
 
 // public slots:
+/*
 bool HexEditor::browseLoadFile()
 {
   QString filename = QFileDialog::getOpenFileName();
@@ -364,7 +368,7 @@ bool HexEditor::browseLoadFile()
     return false;
   return open(filename);
 }
-
+*/
 QRect HexEditor::charBBox( off_t charIdx ) const {
   //  byteIdx =  charIdx/charsPerByte
   //  wordIdx =  byteIdx/bytesPerWord
@@ -683,8 +687,8 @@ void HexEditor::keyPressEvent( QKeyEvent *e )
 void HexEditor::resizeEvent( QResizeEvent * e )
 {
   int height= lineSpacing();
-  int totalWordWidth = 2*wordWidth() + wordSpacing();
-  int linewidth = e->size().width();
+  int totalWordWidth = wordWidth() + wordSpacing();
+  int linewidth = e->size().width()/2;
 
   // don't let _rows or _cols drop below 1
   _rows = max(1,(e->size().height() - _topMargin)/height);
@@ -747,32 +751,59 @@ void HexEditor::paintAscii(QPainter* paintPtr)
     uchar mychar;
     off_t offset = _topLeft;
     std::vector<uchar> charvector;
-    QString ascii;
 
     // draw dividing line
     int x = size().width();
-    paintPtr->drawLine(leftMargin(), topMargin(), leftMargin(), height()-topMargin());
+    paintPtr->drawLine(size().width()/2 + leftMargin() + 20, topMargin(), size().width()/2 + leftMargin() + 20, height()-topMargin());
     // draw ascii text
+    QString ascii;
+    getDisplayAscii(ascii);
+
+    // Find the stop/start row/col idx's for the repaint
+    int totalWordWidth = wordWidth()+wordSpacing();
+    int row_start = max(0,(rect().top()-topMargin())/lineSpacing() );
+    int col_start = max(0,(rect().right()+leftMargin()+20)/totalWordWidth);
+    int row_stop  = min(_rows-1, rect().bottom() / lineSpacing());
+    int col_stop  = min(_cols-1, rect().right() / totalWordWidth);
+
+    // draw text in repaint event
+    //drawTextRegion( paint, ascii, row_start, row_stop, col_start, col_stop );
+    paintPtr->setPen(qApp->palette().foreground().color());
+    for(int r = row_start; r <= row_stop; r++)
+    {
+        for(int c = col_start; c <= col_stop; c++)
+        {
+            int widx = r*_cols+c;
+            if ( wordModified( widx ) )
+            {
+                paintPtr->setPen(qApp->palette().link().color());
+	        paintPtr->drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), ascii.mid(widx*charsPerWord(),charsPerWord()) );
+        	paintPtr->setPen(qApp->palette().foreground().color());
+            }
+            else
+            {
+        	paintPtr->drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), ascii.mid(widx*charsPerWord(),charsPerWord()) );
+            }
+        }
+    }
+    
+/*
     for(int row = 0; row < _rows; ++row)
     {
 #ifdef WORDS_BIGENDIAN
         mychar = (uchar)offset;
         charvector.push_back(mychar);
-        /*
-        for(i = 0, mychar = (uchar)offset; i < sizeof(off_t); ++i)
-        {
-            charvector.push_back(mychar);
-        }
-        */
+        //for(i = 0, mychar = (uchar)offset; i < sizeof(off_t); ++i)
+        //{
+        //    charvector.push_back(mychar);
+        //}
 #else
         mychar = (uchar)(offset) + sizeof(off_t)-1;
         charvector.push_back(mychar);
-        /*
-        for(i = 0; i < sizeof(off_t); ++i)
-        {
-            charvector.push_back(mychar);
-        }
-        */
+        //for(i = 0; i < sizeof(off_t); ++i)
+        //{
+        //    charvector.push_back(mychar);
+        //}
 #endif
         offset+=bytesPerLine();
         y+=lineSpacing();
@@ -783,11 +814,13 @@ void HexEditor::paintAscii(QPainter* paintPtr)
 
     for(int row = 0; row < _rows; ++row)
     {
+        int asciileft = leftMargin() + 25 + size().width()/2;
         Translate::ByteToChar(ascii, (const std::vector<uchar>)charvector);
-        paintPtr->drawText(5, y, ascii);
+        paintPtr->drawText(asciileft, y, ascii);
         offset += bytesPerLine();
         y += lineSpacing();
     }
+*/
 }
 
 void HexEditor::paintLabels( QPainter* paintPtr) 
@@ -856,11 +889,11 @@ void HexEditor::paintEvent( QPaintEvent* e)
   
   // Find the stop/start row/col idx's for the repaint
   //int totalWordWidth = wordWidth()+1;
-  int totalWordWidth = 2*wordWidth()+wordSpacing();
+  int totalWordWidth = wordWidth()+wordSpacing();
   int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );
   int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
   int row_stop  = min(_rows-1,e->rect().bottom() / lineSpacing());
-  int col_stop  = min(_cols-1,e->rect().right() / totalWordWidth);
+  int col_stop  = min(_cols-1,(e->rect().right()/2) / totalWordWidth);
 
   // draw text in repaint event
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
@@ -892,6 +925,11 @@ bool HexEditor::getDisplayText( QString& text )
     return false;
   }
   return true;
+}
+
+void HexEditor::getDisplayAscii(QString& txt)
+{
+    Translate::ByteToChar(txt, _data);
 }
 
 bool HexEditor::wordModified ( off_t wordIdx ) const
@@ -984,7 +1022,7 @@ void HexEditor::cursorDown()
     updateWord( oldWordIdx );
   emit offsetChanged( _cursor.byteOffset() );
 }
-
+/*
 // slots for undo/redo.
 // note: it is necessary to reset topLeft to force a reread of the data.
 //
@@ -1007,7 +1045,7 @@ void HexEditor::undo()
   setSelection(SelectionStart,start);
   setSelection(SelectionEnd,end);
 }
-
+*/
 void HexEditor::search( const QString& hexText, bool forwards )
 {
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
