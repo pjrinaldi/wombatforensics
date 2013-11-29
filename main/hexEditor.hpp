@@ -138,7 +138,7 @@ protected:
   // calculate the rectangle which bounds the word at _offset+idx
   QRect  charBBox( off_t charIdx ) const;
   QRect  byteBBox( off_t byteIdx ) const;
-
+  QRect abyteBox(off_t byteIdx) const;
   // translate widget coord to word index
   int pointToWord(const QPoint& pt);
   QChar& pointToChar(const QPoint& pt);
@@ -187,7 +187,6 @@ protected:
   void updateWord       ( off_t wordIdx );
   void paintEvent       ( QPaintEvent*e );
   void paintLabels      ( QPainter*painter);
-  void paintAscii       (QPainter* painter);
   void focusInEvent     ( QFocusEvent*e );
   void focusOutEvent    ( QFocusEvent*e );
   void keyPressEvent    ( QKeyEvent *e );
@@ -228,7 +227,6 @@ protected:
   int                 _offsetLabelBytes;
 
   int                 _cols;
-  int                 _acols;
   int                 _rows;
   int                 _width;
   Cursor              _cursor; 

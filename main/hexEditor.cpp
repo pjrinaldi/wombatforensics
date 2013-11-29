@@ -392,6 +392,13 @@ QRect HexEditor::byteBBox( off_t byteIdx ) const {
 		lineSpacing() );
 }
 
+QRect HexEditor::abyteBox(off_t byteIdx) const
+{
+    int wordIdx = byteIdx/bytesPerWord();
+    int localByteIdx = byteIdx % bytesPerWord();
+    return QRect(_asciiBBox[wordIdx].left() + localByteIdx*fontMaxWidth() + wordSpacing(), _asciiBBox[wordIdx].top(), fontMaxWidth(), lineSpacing());
+}
+
 void HexEditor::setTopLeftToPercent( int percent )
 {
    setTopLeft( (_reader.size()/100)*percent );
@@ -469,9 +476,10 @@ void HexEditor::mousePressEvent( QMouseEvent* e )
 
   off_t byte_offset = localByteOffset();
   QRect bbox = byteBBox(byte_offset);
+  QRect abox = abyteBox(byte_offset);
   if( e->x() > bbox.right() ) {
     byte_offset++;
-  } 
+  }
   setSelection( SelectionStart, globalOffset( byte_offset ));
 }
 
@@ -481,6 +489,7 @@ void HexEditor::mouseMoveEvent( QMouseEvent* e )
 
   off_t byte_offset = localByteOffset();
   QRect bbox = byteBBox(byte_offset);
+  QRect abox = abyteBox(byte_offset);
   if(e->x() > bbox.right() ) {
     byte_offset++;
   }
@@ -494,6 +503,7 @@ void HexEditor::mouseReleaseEvent( QMouseEvent* e )
 
   off_t byte_offset = localByteOffset();
   QRect bbox = byteBBox(byte_offset);
+  QRect abox = abyteBox(byte_offset);
   if(e->x() > bbox.right() ) {
     byte_offset++;
   }
@@ -746,86 +756,6 @@ void HexEditor::updateWord( off_t wordIdx )
     repaint(_wordBBox[wordIdx]);
 }
 
-void HexEditor::paintAscii(QPainter* paintPtr)
-{
-    /*
-    int y = _wordBBox[0].bottom();
-    unsigned int i;
-    uchar mychar;
-    off_t offset = _topLeft;
-    std::vector<uchar> charvector;
-
-    // draw dividing line
-    int x = size().width();
-    paintPtr->drawLine(size().width()/2 + leftMargin() + 20, topMargin(), size().width()/2 + leftMargin() + 20, height()-topMargin());
-    // draw ascii text
-    QString ascii;
-    getDisplayAscii(ascii);
-
-    // Find the stop/start row/col idx's for the repaint
-    int totalWordWidth = wordWidth()+wordSpacing();
-    int row_start = max(0,(rect().top()-topMargin())/lineSpacing() );
-    int col_start = max(0,(rect().right()+leftMargin()+20)/totalWordWidth);
-    int row_stop  = min(_rows-1, (height()-topMargin()) / lineSpacing());
-    int col_stop  = min(_cols-1, (size().width() + leftMargin() + 25) / totalWordWidth);
-
-    // draw text in repaint event
-    paintPtr->setPen(qApp->palette().foreground().color());
-    for(int r = row_start; r <= row_stop; r++)
-    {
-        for(int c = col_start; c <= col_stop; c++)
-        {
-            int widx = r*_cols+c;
-            if ( wordModified( widx ) )
-            {
-                paintPtr->setPen(qApp->palette().link().color());
-	        paintPtr->drawText( _asciiBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), ascii.mid(widx*charsPerWord(),charsPerWord()) );
-        	paintPtr->setPen(qApp->palette().foreground().color());
-            }
-            else
-            {
-        	paintPtr->drawText( _asciiBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), ascii.mid(widx*charsPerWord(),charsPerWord()) );
-            }
-        }
-    }
-    */
-    
-/*
-    for(int row = 0; row < _rows; ++row)
-    {
-#ifdef WORDS_BIGENDIAN
-        mychar = (uchar)offset;
-        charvector.push_back(mychar);
-        //for(i = 0, mychar = (uchar)offset; i < sizeof(off_t); ++i)
-        //{
-        //    charvector.push_back(mychar);
-        //}
-#else
-        mychar = (uchar)(offset) + sizeof(off_t)-1;
-        charvector.push_back(mychar);
-        //for(i = 0; i < sizeof(off_t); ++i)
-        //{
-        //    charvector.push_back(mychar);
-        //}
-#endif
-        offset+=bytesPerLine();
-        y+=lineSpacing();
-    }
-
-    offset = _topLeft;
-    y = _wordBBox[0].bottom();
-
-    for(int row = 0; row < _rows; ++row)
-    {
-        int asciileft = leftMargin() + 25 + size().width()/2;
-        Translate::ByteToChar(ascii, (const std::vector<uchar>)charvector);
-        paintPtr->drawText(asciileft, y, ascii);
-        offset += bytesPerLine();
-        y += lineSpacing();
-    }
-*/
-}
-
 void HexEditor::paintLabels( QPainter* paintPtr) 
 {
   // ignore redraw range for first aproximation:
@@ -903,7 +833,6 @@ void HexEditor::paintEvent( QPaintEvent* e)
   // draw ascii text in repaint event
   // draw dividing line
   paint.drawLine(e->rect().right()/2, topMargin(), e->rect().right()/2, height()-topMargin());
-  //paintAscii(&paint);
   QString ascii;
   getDisplayAscii(ascii);
 
@@ -914,12 +843,6 @@ void HexEditor::paintEvent( QPaintEvent* e)
   col_stop = min(_cols-1, e->rect().right()/totalWordWidth);
 
   drawAsciiRegion(paint, ascii, row_start, row_stop, col_start, col_stop);
-  /*
-  if(_asciiBBox.intersects(e->rect()))
-  {
-      paintAscii(&paint);
-  }
-  */
 }
 
 bool HexEditor::getDisplayText( QString& text )
@@ -1005,7 +928,7 @@ void HexEditor::cursorLeft()
 {
   off_t oldWordIdx = localWordOffset();
   // move the cursor
-  _cursor.decrByChar(2);
+  _cursor.decrByChar(1);
   // make sure the user can see the cursor
   seeCursor();
   // redraw where the cursor used to be
@@ -1016,7 +939,7 @@ void HexEditor::cursorLeft()
 void HexEditor::cursorRight()
 {
   off_t oldWordIdx = localWordOffset();
-  _cursor.incrByChar(2);
+  _cursor.incrByChar(1);
   seeCursor();
   if( localWordOffset() != oldWordIdx ) 
     updateWord( oldWordIdx );
@@ -1220,8 +1143,11 @@ void HexEditor::drawSelection( QPainter& paint )
       off_t linestop = 
 	min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
       QRect bbox = byteBBox(start);
+      QRect abox = abyteBox(start);
       bbox.setRight( byteBBox(linestop).right() );
+      abox.setRight(abyteBox(linestop).right());
       paint.drawRect( bbox );
+      paint.drawRect(abox);
       start = linestop+1;
     }
   }

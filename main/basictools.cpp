@@ -15,7 +15,7 @@ QWidget* BasicTools::setupHexTab()
     selectedinteger = new QLabel("Integer: ");
     selectedfloat = new QLabel("Float: ");
     selecteddouble = new QLabel("Double: ");
-    selectedoffset->setFrameStyle(QFrame::NoFrame || QFrame::VLine || QFrame::Plain);
+    //selectedoffset->setFrameStyle(QFrame::NoFrame || QFrame::VLine || QFrame::Plain);
     hstatus->addWidget(selectedoffset);
     hstatus->addWidget(selectedhex);
     hstatus->addWidget(selectedascii);
