@@ -693,25 +693,27 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   // don't let _rows or _cols drop below 1
   _rows = max(1,(e->size().height() - _topMargin)/height);
   _cols = max(1,(e->size().width()/2 - _leftMargin)/totalWordWidth);
-  _acols = max(1, (e->size().width() - _leftMargin)/totalWordWidth);
+  _acols = max(1, (e->size().width()/2 - _leftMargin)/totalWordWidth);
   
   // now update the line && word bbox vectors
   _lineBBox.reserve(_rows);
+  _alineBBox.reserve(_rows);
   _wordBBox.reserve(_rows*_cols);
-  _asciiBBox.reserve(_rows*_acols);
+  _asciiBBox.reserve(_rows*_cols);
   int top,left, aleft;
   for(int r = 0; r < _rows; r++) {
     top = r*height + _topMargin;
     for(int c = 0; c < _cols; c++) {
       left = totalWordWidth*c + _leftMargin;
-      aleft = left + linewidth + 10;
+      aleft = linewidth + totalWordWidth*c + 2;
       _wordBBox[r*_cols+c] = QRect(left,             //left
 				   top,              //top
 				   totalWordWidth,   //width
 				   height);          //height
-      _asciiBBox[r*_acols+c] = QRect(aleft, top, totalWordWidth, height);
+      _asciiBBox[r*_cols+c] = QRect(aleft, top, totalWordWidth, height);
     }
     _lineBBox[r] = QRect(_leftMargin,top,linewidth,height);
+    _alineBBox[r] = QRect(_leftMargin + linewidth , top, linewidth, height);
   }
   // calculate offset label bounding box
   _labelBBox.setRect(0,                        // x
@@ -902,13 +904,13 @@ void HexEditor::paintEvent( QPaintEvent* e)
   // draw ascii text in repaint event
   // draw dividing line
   paint.drawLine(e->rect().right()/2, topMargin(), e->rect().right()/2, height()-topMargin());
-  paintAscii(&paint);
+  //paintAscii(&paint);
   QString ascii;
   getDisplayAscii(ascii);
 
   totalWordWidth = wordWidth() + wordSpacing();
   row_start = max(0, (e->rect().top() - topMargin())/lineSpacing());
-  col_start = max(0, (e->rect().right()/2)/totalWordWidth);
+  col_start = max(0, (e->rect().left() - leftMargin() - e->rect().right()/2)/totalWordWidth);
   row_stop = min(_rows-1, e->rect().bottom()/lineSpacing());
   col_stop = min(_acols-1, e->rect().right()/totalWordWidth);
 
@@ -1175,8 +1177,9 @@ void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
     {
         for(int c = col_start; c <= col_stop; c++)
         {
-            int widx = r*_acols+c;
+            int widx = r*_cols+c;
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing()/2, _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()));
+	    //paint.drawText(_asciiBBox[widx].left() + wordSpacing()/2, _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()));
         }
     }
 }
