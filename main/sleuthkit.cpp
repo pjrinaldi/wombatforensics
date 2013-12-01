@@ -313,9 +313,14 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     }
     else if(wombatvariable.fileid == -2) // volume file
     {
+        fprintf(stderr, "get volume sector info here and write to file");
+        //wombatvariable.tmpfilepath = GetVolumeContents();
+        // need to call sql to get sector start and sector length.
     }
     else if(wombatvariable.fileid == -3) // file system file
     {
+        // fs_info sql call provides root_inum and last inum.
+        // 
     }
     else
         wombatvariable.tmpfilepath = ""; // set to "" to load nothing.
@@ -854,6 +859,53 @@ void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
         }
     }
 }   
+/*    int ret;
+    uint64_t tmpId;
+    ret = TskServices::Instance().getImgDB().getVolumeInfo(volRecordList);
+    foreach(volRecord, volRecordList) // populates all vol's and fs's.
+    {
+        // if volflag = 0, get description
+        // if volflag = 1, list as unallocated
+        if(volRecord.flags >= 0 && volRecord.flags <= 2)
+        {
+            if(volRecord.flags == 1)
+            {
+                volNode = new QStandardItem(QString::fromUtf8(volRecord.description.c_str()));
+                volNode->setIcon(QIcon(":/basic/treefilemanager"));
+                currentVolPath = QString::fromUtf8(volRecord.description.c_str()) + "/";
+            }
+            else if(volRecord.flags == 0)
+            {
+                volNode = new QStandardItem("unallocated space");
+                volNode->setIcon(QIcon(":/basic/treefilemanager"));
+                currentVolPath = "unallocated space/";
+            }
+            else if(volRecord.flags == 2)
+            {
+                volNode = new QStandardItem(QString::fromUtf8(volRecord.description.c_str()));
+                volNode->setIcon(QIcon(":/basic/treefilemanager"));
+                currentVolPath = QString::fromUtf8(volRecord.description.c_str());
+                currentVolPath += "/";
+            }
+            ret = TskServices::Instance().getImgDB().getFsInfo(fsInfoRecordList);
+*/
+QStringList SleuthKitPlugin::GetVolumeContents(WombatVariable wombatVariable)
+{
+    wombatvariable = wombatVariable;
+    SetEvidenceDB(wombatvariable);
+    std::list<TskVolumeInfoRecord> vollist;
+    QStringList voldesclist;
+    TskVolumeInfoRecord volrecord;
+    int ret;
+    vollist.clear();
+    voldesclist.clear();
+    ret = TskServices::Instance().getImgDB().getVolumeInfo(vollist);
+    foreach(volrecord, vollist)
+    {
+        voldesclist << QString::fromUtf8(volrecord.description.c_str());
+    }
+    return voldesclist;
+}
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
 {

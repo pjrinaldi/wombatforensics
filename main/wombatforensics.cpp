@@ -709,6 +709,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     {
         tmptext = index.sibling(index.row(), 0).data().toString();
         QStringList evidenceidlist = wombatcasedata->ReturnCaseActiveEvidenceID(wombatvariable.caseid);
+        QStringList volumedesclist = isleuthkit->GetVolumeContents(wombatvariable);
         for(int i=0; i < evidenceidlist.count() / 3; i++)
         {
             if(tmptext.compare(evidenceidlist[3*i+1].split("/").last()) == 0)
@@ -717,7 +718,6 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
                 wombatvariable.evidencepath = evidenceidlist[3*i+1];
                 wombatvariable.evidencedbname = evidenceidlist[3*i+2];
             }
-            
         }
         // need to do other tmptext.compare's to see whether it's volume or fs...
         if(tmptext.compare(wombatvariable.evidencepath.split("/").last()) == 0)
@@ -727,6 +727,13 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         else
         {
             fprintf(stderr, "item text: %s\n", tmptext.toStdString().c_str());
+        }
+        for(int i=0; i < volumedesclist.count(); i++)
+        {
+            if(tmptext.compare(volumedesclist[i]) == 0)
+            {
+                wombatvariable.fileid = -2;
+            }
         }
     }
     ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvariable);
