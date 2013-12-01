@@ -314,7 +314,7 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     else if(wombatvariable.fileid == -2) // volume file
     {
         fprintf(stderr, "get volume sector info here and write to file");
-        //wombatvariable.tmpfilepath = GetVolumeContents();
+        wombatvariable.tmpfilepath = GetVolumeFilePath(wombatvariable.volid);
         // need to call sql to get sector start and sector length.
     }
     else if(wombatvariable.fileid == -3) // file system file
@@ -859,36 +859,7 @@ void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
         }
     }
 }   
-/*    int ret;
-    uint64_t tmpId;
-    ret = TskServices::Instance().getImgDB().getVolumeInfo(volRecordList);
-    foreach(volRecord, volRecordList) // populates all vol's and fs's.
-    {
-        // if volflag = 0, get description
-        // if volflag = 1, list as unallocated
-        if(volRecord.flags >= 0 && volRecord.flags <= 2)
-        {
-            if(volRecord.flags == 1)
-            {
-                volNode = new QStandardItem(QString::fromUtf8(volRecord.description.c_str()));
-                volNode->setIcon(QIcon(":/basic/treefilemanager"));
-                currentVolPath = QString::fromUtf8(volRecord.description.c_str()) + "/";
-            }
-            else if(volRecord.flags == 0)
-            {
-                volNode = new QStandardItem("unallocated space");
-                volNode->setIcon(QIcon(":/basic/treefilemanager"));
-                currentVolPath = "unallocated space/";
-            }
-            else if(volRecord.flags == 2)
-            {
-                volNode = new QStandardItem(QString::fromUtf8(volRecord.description.c_str()));
-                volNode->setIcon(QIcon(":/basic/treefilemanager"));
-                currentVolPath = QString::fromUtf8(volRecord.description.c_str());
-                currentVolPath += "/";
-            }
-            ret = TskServices::Instance().getImgDB().getFsInfo(fsInfoRecordList);
-*/
+
 QStringList SleuthKitPlugin::GetVolumeContents(WombatVariable wombatVariable)
 {
     wombatvariable = wombatVariable;
@@ -902,9 +873,41 @@ QStringList SleuthKitPlugin::GetVolumeContents(WombatVariable wombatVariable)
     ret = TskServices::Instance().getImgDB().getVolumeInfo(vollist);
     foreach(volrecord, vollist)
     {
-        voldesclist << QString::fromUtf8(volrecord.description.c_str());
+        voldesclist << QString::fromUtf8(volrecord.description.c_str()) << QString::number(volrecord.vol_id);
     }
     return voldesclist;
+}
+
+QString SleuthKitPlugin::GetVolumeFilePath(int volID)
+{
+    QString returnpath = "";
+    sqlite3* tmpImgDB;
+    int ret;
+    QString tmpImgDbPath = wombatvariable.evidencedirpath + imagename + ".db";
+    int64 secstart = -1;
+    int64 seclength = -1;
+    if(sqlite3_open(tmpImgDbPath.toStdString().c_str(), &tmpImgDB) == SQLITE_OK)
+    {
+        sqlite3_stmt* stmt;
+        if(sqlite3_prepare_v2(tmpImgDB, "SELECT sect_start, sect_length FROM vol_info WHERE vol_id = ?", -1, &stmt, 0) == SQLITE_OK)
+        {
+            if(sqlite3_bind_int(stmt, 1, volID) == SQLITE_OK)
+            {
+                ret = sqlite3_step(stmt);
+                if(ret == SQLITE_ROW || SQLITE_DONE)
+                {
+                    secstart = sqlite3_column_int64(stmt, 0);
+                    seclength = sqlite_column_int64(stmt, 1);
+                    //fileidVector.push_back(fileId);
+                    //if(isAddEvidence == 1)
+                    //{
+                        //objectidlist.append(wombatdata->InsertObject(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileId));
+                    //}
+                }
+            }
+        }
+    }
+    sqlite3_finalize(stmt);
 }
 
 QString SleuthKitPlugin::GetFileContents(int fileID)

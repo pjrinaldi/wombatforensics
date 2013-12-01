@@ -728,11 +728,12 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         {
             fprintf(stderr, "item text: %s\n", tmptext.toStdString().c_str());
         }
-        for(int i=0; i < volumedesclist.count(); i++)
+        for(int i=0; i < volumedesclist.count() / 2; i++)
         {
             if(tmptext.compare(volumedesclist[i]) == 0)
             {
                 wombatvariable.fileid = -2;
+                wombatvariable.volid = volumedesclist[2*i+1].toInt();
             }
         }
     }
