@@ -898,16 +898,33 @@ QString SleuthKitPlugin::GetVolumeFilePath(int volID)
                 {
                     secstart = sqlite3_column_int64(stmt, 0);
                     seclength = sqlite_column_int64(stmt, 1);
-                    //fileidVector.push_back(fileId);
-                    //if(isAddEvidence == 1)
-                    //{
-                        //objectidlist.append(wombatdata->InsertObject(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileId));
-                    //}
                 }
             }
         }
     }
     sqlite3_finalize(stmt);
+    TskImageFileTsk currentimagefiletsk;
+    char volbuffer[512*seclength];
+    try
+    {
+        currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
+        TskServices::Instance().setImageFile(currentimagefiletsk);
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Error set image file: %s\n", ex.what());
+    }
+    try
+    {
+        ret = TskServices::Instance().getImageFile().getSectorData((const uint64_t)secstart, (const uint64_t)seclength, volbuffer);
+        fprintf(stderr, "sector data return value: %i\n", ret);
+    }
+    catch(TskException ex)
+    {
+        printf(stderr, "Error getting sector data: %s\n", ex.what());
+    }
+    QString tmppath = wombatvariable.tmpfilepath + "/volbyte.dat";
+    QFile tmpfile(tmppath);
 }
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
@@ -955,7 +972,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
             //If the destination file exists it is replaced
             if (destFile.exists())
             {
-            destFile.remove();
+                destFile.remove();
             }
             // We read the content from the file and write it to the target
             tfile->open();
