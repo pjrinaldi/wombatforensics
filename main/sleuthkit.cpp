@@ -889,7 +889,7 @@ QString SleuthKitPlugin::GetVolumeFilePath(int volID)
     if(sqlite3_open(tmpImgDbPath.toStdString().c_str(), &tmpImgDB) == SQLITE_OK)
     {
         sqlite3_stmt* stmt;
-        if(sqlite3_prepare_v2(tmpImgDB, "SELECT sect_start, sect_length FROM vol_info WHERE vol_id = ?", -1, &stmt, 0) == SQLITE_OK)
+        if(sqlite3_prepare_v2(tmpImgDB, "SELECT sect_start, sect_len FROM vol_info WHERE vol_id = ?", -1, &stmt, 0) == SQLITE_OK)
         {
             if(sqlite3_bind_int(stmt, 1, volID) == SQLITE_OK)
             {
