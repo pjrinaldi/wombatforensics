@@ -31,7 +31,6 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
 {
     //dbpath = logvariable.datapath.toStdString();
     //dbpath.append("WombatLog.db");
-    fprintf(stderr, "DBPath: %s\n", dbpath.c_str());
     //std::string dbpath = "/home/pasquale/WombatForensics/data/WombatLog.db";
     Log::log(msgType, logMsg);
 

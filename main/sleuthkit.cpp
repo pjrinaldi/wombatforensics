@@ -313,7 +313,7 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     }
     else if(wombatvariable.fileid == -2) // volume file
     {
-        fprintf(stderr, "get volume sector info here and write to file");
+        fprintf(stderr, "get volume sector info here and write to file\n");
         wombatvariable.tmpfilepath = GetVolumeFilePath(wombatvariable.volid);
         // need to call sql to get sector start and sector length.
     }
@@ -883,9 +883,9 @@ QString SleuthKitPlugin::GetVolumeFilePath(int volID)
     QString returnpath = "";
     sqlite3* tmpImgDB;
     int ret;
-    QString tmpImgDbPath = wombatvariable.evidencedirpath + imagename + ".db";
-    int64 secstart = -1;
-    int64 seclength = -1;
+    QString tmpImgDbPath = wombatvariable.evidencedirpath + wombatvariable.evidencepath.split("/").last() + ".db";
+    uint64_t secstart = -1;
+    uint64_t seclength = -1;
     if(sqlite3_open(tmpImgDbPath.toStdString().c_str(), &tmpImgDB) == SQLITE_OK)
     {
         sqlite3_stmt* stmt;
@@ -897,12 +897,12 @@ QString SleuthKitPlugin::GetVolumeFilePath(int volID)
                 if(ret == SQLITE_ROW || SQLITE_DONE)
                 {
                     secstart = sqlite3_column_int64(stmt, 0);
-                    seclength = sqlite_column_int64(stmt, 1);
+                    seclength = sqlite3_column_int64(stmt, 1);
                 }
             }
         }
+        sqlite3_finalize(stmt);
     }
-    sqlite3_finalize(stmt);
     TskImageFileTsk currentimagefiletsk;
     char volbuffer[512*seclength];
     try
@@ -916,15 +916,22 @@ QString SleuthKitPlugin::GetVolumeFilePath(int volID)
     }
     try
     {
-        ret = TskServices::Instance().getImageFile().getSectorData((const uint64_t)secstart, (const uint64_t)seclength, volbuffer);
+        ret = TskServices::Instance().getImageFile().getSectorData(secstart, seclength, volbuffer);
         fprintf(stderr, "sector data return value: %i\n", ret);
     }
     catch(TskException ex)
     {
-        printf(stderr, "Error getting sector data: %s\n", ex.what());
+        fprintf(stderr, "Error getting sector data: %s\n", ex.what());
     }
-    QString tmppath = wombatvariable.tmpfilepath + "/volbyte.dat";
-    QFile tmpfile(tmppath);
+    if(ret > 0)
+    {
+        returnpath = wombatvariable.tmpfilepath + "/volbyte.dat";
+        ofstream tmpfile(returnpath.toStdString().c_str(), ios::out | ios::binary);
+        tmpfile.write(volbuffer, sizeof volbuffer);
+        tmpfile.close();
+    }
+
+    return returnpath;
 }
 
 QString SleuthKitPlugin::GetFileContents(int fileID)

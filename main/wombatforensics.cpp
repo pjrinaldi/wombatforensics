@@ -732,6 +732,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         {
             if(tmptext.compare(volumedesclist[i]) == 0)
             {
+                wombatvariable.evidenceid = 
                 wombatvariable.fileid = -2;
                 wombatvariable.volid = volumedesclist[2*i+1].toInt();
             }

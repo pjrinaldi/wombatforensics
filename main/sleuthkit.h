@@ -20,6 +20,7 @@
 #include <QDataStream>
 #include <QThreadPool>
 #include <QtConcurrent>
+#include <fstream>
 
 class SleuthKitPlugin : public QObject
 {
