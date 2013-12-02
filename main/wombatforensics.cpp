@@ -708,6 +708,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     else
     {
         tmptext = index.sibling(index.row(), 0).data().toString();
+        fprintf(stderr, "TMPTEXT: %s\n", tmptext.toStdString().c_str());
         QStringList evidenceidlist = wombatcasedata->ReturnCaseActiveEvidenceID(wombatvariable.caseid);
         QStringList volumedesclist = isleuthkit->GetVolumeContents(wombatvariable);
         for(int i=0; i < evidenceidlist.count() / 3; i++)
@@ -724,17 +725,33 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         {
             wombatvariable.fileid = -1;
         }
-        else
+        else // try one parent and see if it is a volume...
         {
-            fprintf(stderr, "item text: %s\n", tmptext.toStdString().c_str());
-        }
-        for(int i=0; i < volumedesclist.count() / 2; i++)
-        {
-            if(tmptext.compare(volumedesclist[i]) == 0)
+            QString parenttext = index.parent().sibling(index.row(), 0).data().toString();
+            for(int i=0; i < evidenceidlist.count() / 3; i++)
             {
-                wombatvariable.evidenceid = 
+                if(parenttext.compare(evidenceidlist[3*i+1].split("/").last()) == 0) // volume
+                {
+                    wombatvariable.evidenceid = evidenceidlist[3*i].toInt();
+                    wombatvariable.evidencepath = evidenceidlist[3*i+1];
+                    wombatvariable.evidencedbname = evidenceidlist[3*i+2];
+                }
+            }
+            bool isvolume = false;
+            for(int i=0; i < volumedesclist.count() / 2; i++)
+            {
+                if(tmptext.compare(volumedesclist[i]) == 0)
+                {
+                    isvolume = true;
+                    wombatvariable.volid = volumedesclist[2*i+1].toInt();
+                }
+            }
+            if(isvolume == true)
+            {
                 wombatvariable.fileid = -2;
-                wombatvariable.volid = volumedesclist[2*i+1].toInt();
+            }
+            else // try a file system fileid = -3
+            {
             }
         }
     }

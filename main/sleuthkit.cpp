@@ -916,6 +916,7 @@ QString SleuthKitPlugin::GetVolumeFilePath(int volID)
     }
     try
     {
+        // need to figure out why this fails... and returns -1
         ret = TskServices::Instance().getImageFile().getSectorData(secstart, seclength, volbuffer);
         fprintf(stderr, "sector data return value: %i\n", ret);
     }
