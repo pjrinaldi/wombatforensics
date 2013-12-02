@@ -46,7 +46,7 @@ public:
     void SetupSystemBlackboard();
     void GetImageTree(WombatVariable wombatvariable, int isAddEvidence);
     QString GetFileContents(int fileID);
-    QString GetVolumeFilePath(int volID);
+    QString GetVolumeFilePath(WombatVariable wombatVariable, int volID);
     QStringList GetVolumeContents(WombatVariable wombatVariable);
     void ExportFile(std::string tmppath, int objectID);
     void TaskMap(TskSchedulerQueue::task_struct* &task);

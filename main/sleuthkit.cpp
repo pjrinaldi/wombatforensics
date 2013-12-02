@@ -313,9 +313,7 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     }
     else if(wombatvariable.fileid == -2) // volume file
     {
-        fprintf(stderr, "get volume sector info here and write to file\n");
-        wombatvariable.tmpfilepath = GetVolumeFilePath(wombatvariable.volid);
-        // need to call sql to get sector start and sector length.
+        wombatvariable.tmpfilepath = GetVolumeFilePath(wombatvariable, wombatvariable.volid);
     }
     else if(wombatvariable.fileid == -3) // file system file
     {
@@ -878,8 +876,9 @@ QStringList SleuthKitPlugin::GetVolumeContents(WombatVariable wombatVariable)
     return voldesclist;
 }
 
-QString SleuthKitPlugin::GetVolumeFilePath(int volID)
+QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int volID)
 {
+    wombatvariable = wombatVariable;
     QString returnpath = "";
     sqlite3* tmpImgDB;
     int ret;
@@ -894,7 +893,7 @@ QString SleuthKitPlugin::GetVolumeFilePath(int volID)
             if(sqlite3_bind_int(stmt, 1, volID) == SQLITE_OK)
             {
                 ret = sqlite3_step(stmt);
-                if(ret == SQLITE_ROW || SQLITE_DONE)
+                if(ret == SQLITE_ROW || ret == SQLITE_DONE)
                 {
                     secstart = sqlite3_column_int64(stmt, 0);
                     seclength = sqlite3_column_int64(stmt, 1);
