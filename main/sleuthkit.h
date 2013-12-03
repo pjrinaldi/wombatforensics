@@ -21,6 +21,7 @@
 #include <QThreadPool>
 #include <QtConcurrent>
 #include <fstream>
+#include <cstdio>
 
 class SleuthKitPlugin : public QObject
 {

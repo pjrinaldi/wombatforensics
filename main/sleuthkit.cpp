@@ -300,20 +300,23 @@ void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
 
 void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 {
+    QString curtmpfilepath = "";
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
     fprintf(stderr, "file id: %i\n", wombatvariable.fileid);
     if(wombatvariable.fileid >= 0)
-        wombatvariable.tmpfilepath = GetFileContents(wombatvariable.fileid);
+        curtmpfilepath = GetFileContents(wombatvariable.fileid);
     else if(wombatvariable.fileid == -1) // image file
     {
-        wombatvariable.tmpfilepath = wombatvariable.evidencepath;
+        curtmpfilepath = wombatvariable.evidencepath;
         fprintf(stderr, "dd image path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
         // QString imagename = wombatvariable.evidencepath.split("/").last();
     }
     else if(wombatvariable.fileid == -2) // volume file
     {
-        wombatvariable.tmpfilepath = GetVolumeFilePath(wombatvariable, wombatvariable.volid);
+        curtmpfilepath = GetVolumeFilePath(wombatvariable, wombatvariable.volid);
+        fprintf(stderr, "tmp file path: %s\n", wombatvariable.tmpfilepath.toStdString().c_str());
+        fprintf(stderr, "vol file path %s\n", curtmpfilepath.toStdString().c_str());
     }
     else if(wombatvariable.fileid == -3) // file system file
     {
@@ -321,8 +324,8 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
         // 
     }
     else
-        wombatvariable.tmpfilepath = ""; // set to "" to load nothing.
-    emit LoadFileContents(wombatvariable.tmpfilepath);
+        curtmpfilepath = ""; // set to "" to load nothing.
+    emit LoadFileContents(curtmpfilepath);
 }
 
 void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
@@ -879,7 +882,6 @@ QStringList SleuthKitPlugin::GetVolumeContents(WombatVariable wombatVariable)
 QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int volID)
 {
     wombatvariable = wombatVariable;
-    QString returnpath = "";
     sqlite3* tmpImgDB;
     int ret;
     QString tmpImgDbPath = wombatvariable.evidencedirpath + wombatvariable.evidencepath.split("/").last() + ".db";
@@ -903,7 +905,8 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
         sqlite3_finalize(stmt);
     }
     TskImageFileTsk currentimagefiletsk;
-    char volbuffer[512*seclength];
+    //char volbuffer[512*seclength];
+    char volbuffer[seclength];
     try
     {
         currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
@@ -913,25 +916,32 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     {
         fprintf(stderr, "Error set image file: %s\n", ex.what());
     }
+    int retval;
     try
     {
         // need to figure out why this fails... and returns -1
-        ret = TskServices::Instance().getImageFile().getSectorData(secstart, seclength, volbuffer);
-        fprintf(stderr, "sector data return value: %i\n", ret);
+        retval = TskServices::Instance().getImageFile().getSectorData(secstart, seclength, volbuffer);
+        //fprintf(stderr, "sector data return value: %i\n", retval);
     }
     catch(TskException ex)
     {
         fprintf(stderr, "Error getting sector data: %s\n", ex.what());
     }
-    if(ret > 0)
+    if(retval > 0)
     {
-        returnpath = wombatvariable.tmpfilepath + "/volbyte.dat";
-        ofstream tmpfile(returnpath.toStdString().c_str(), ios::out | ios::binary);
+        FILE* tmpfile;
+        tmpfile = fopen("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat", "wb");
+        fwrite(volbuffer, sizeof(char), sizeof(volbuffer), tmpfile);
+        fclose(tmpfile);
+        /*
+        ofstream tmpfile("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat", ios::out | ios::binary);
+        //ofstream tmpfile(returnpath.toStdString().c_str(), ios::out | ios::binary);
         tmpfile.write(volbuffer, sizeof volbuffer);
         tmpfile.close();
+        */
     }
 
-    return returnpath;
+    return "/home/pasquale/WombatForensics/tmpfiles/volbyte.dat";
 }
 
 QString SleuthKitPlugin::GetFileContents(int fileID)
