@@ -906,7 +906,8 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     }
     TskImageFileTsk currentimagefiletsk;
     //char volbuffer[512*seclength];
-    char volbuffer[seclength];
+    char volbuffer[seclength-2];
+    //char volbuffer[512*(seclength-2)];
     try
     {
         currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
@@ -919,9 +920,11 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     int retval;
     try
     {
+        memset(volbuffer, 0, seclength-2);
+        //memset(volbuffer, 0, 512*(seclength-2));
         // need to figure out why this fails... and returns -1
         retval = TskServices::Instance().getImageFile().getSectorData(secstart, seclength, volbuffer);
-        //fprintf(stderr, "sector data return value: %i\n", retval);
+        fprintf(stderr, "sector data return value: %i\n", retval);
     }
     catch(TskException ex)
     {
@@ -929,14 +932,11 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     }
     if(retval > 0)
     {
-        std::string bufstring(volbuffer);
-        fprintf(stderr, "bufstring: %s\n", bufstring.c_str());
-        /*
+        //std::string bufstring(volbuffer);
         FILE* tmpfile;
         tmpfile = fopen("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat", "wb");
         fwrite(volbuffer, sizeof(char), sizeof(volbuffer), tmpfile);
         fclose(tmpfile);
-        */
         /*
         ofstream tmpfile("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat", ios::out | ios::binary);
         //ofstream tmpfile(returnpath.toStdString().c_str(), ios::out | ios::binary);
