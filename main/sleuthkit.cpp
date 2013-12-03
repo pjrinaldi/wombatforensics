@@ -905,9 +905,7 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
         sqlite3_finalize(stmt);
     }
     TskImageFileTsk currentimagefiletsk;
-    //char volbuffer[512*seclength];
-    char volbuffer[seclength-2];
-    //char volbuffer[512*(seclength-2)];
+    char volbuffer[seclength-1];
     try
     {
         currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
@@ -920,8 +918,7 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     int retval;
     try
     {
-        memset(volbuffer, 0, seclength-2);
-        //memset(volbuffer, 0, 512*(seclength-2));
+        memset(volbuffer, 0, seclength-1);
         // need to figure out why this fails... and returns -1
         retval = TskServices::Instance().getImageFile().getSectorData(secstart, seclength, volbuffer);
         fprintf(stderr, "sector data return value: %i\n", retval);
