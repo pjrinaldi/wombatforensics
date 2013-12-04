@@ -921,6 +921,9 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     int retval;
     try
     {
+        SectorRuns* sr = new SectorRuns();
+        sr->addRun(secstart, seclength, volID);
+        int retval = sr->getData(secstart, seclength, volbuffer);
         //SectorRun::SectorRun    
         // need to figure out why this fails... and returns -1
         //retval = TskServices::Instance().getImageFile().getByteData(bytestart, bytelen, volbuffer);
