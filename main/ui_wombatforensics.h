@@ -93,6 +93,7 @@ public:
         splitter = new QSplitter(centralwidget);
         splitter->setObjectName(QStringLiteral("splitter"));
         splitter->setOrientation(Qt::Vertical);
+        splitter->setChildrenCollapsible(false);
         fileViewTabWidget = new QTabWidget(splitter);
         fileViewTabWidget->setObjectName(QStringLiteral("fileViewTabWidget"));
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

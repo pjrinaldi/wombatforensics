@@ -142,11 +142,18 @@ QWidget* BasicTools::setupOmniTab()
     QVBoxLayout* piclayout = new QVBoxLayout();
     QVBoxLayout* vidlayout = new QVBoxLayout();
     QWebView* webview = new QWebView(omnitab);
+    //webview->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    webview->setGeometry(0, 0, 200, 150);
+    webview->setMinimumSize(200, 150);
+    webview->setBaseSize(200, 150);
     webview->setHtml("<b>hello</b>");
     webview->show();
     weblayout->addWidget(webview);
+    weblayout->setContentsMargins(0, 0, 0, 0);
     piclayout->addWidget(piclabel);
+    piclayout->setContentsMargins(0, 0, 0, 0);
     vidlayout->addWidget(vidlabel);
+    vidlayout->setContentsMargins(0, 0, 0, 0);
     webpage->setLayout(weblayout);
     picpage->setLayout(piclayout);
     vidpage->setLayout(vidlayout);
