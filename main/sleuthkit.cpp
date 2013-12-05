@@ -950,12 +950,12 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
         //tmpfile = fopen("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat", "wb");
         //fwrite(volbuffer, sizeof(char), sizeof(volbuffer), tmpfile);
         //fclose(tmpfile);
-        
+        /*
         ofstream tmpfile("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat", ios::out | ios::binary);
         //ofstream tmpfile(returnpath.toStdString().c_str(), ios::out | ios::binary);
         tmpfile.write(volbuffer, sizeof(volbuffer));
         tmpfile.close();
-        
+        */
     }
 
     return "/home/pasquale/WombatForensics/tmpfiles/volbyte.dat";
