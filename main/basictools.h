@@ -3,12 +3,17 @@
 
 #include "hexEditor.hpp"
 #include "translate.hpp"
+//#include "WidgetVideo.h"
 #include <QObject>
 #include <QtWidgets>
 #include <QStringList>
 #include <QSizePolicy>
 #include <QFrame>
 #include <QStatusBar>
+
+//class VlcInstance;
+//class VlcMedia;
+//class VlcMediaPlayer;
 
 class BasicTools : public QObject
 {
