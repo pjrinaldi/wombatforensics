@@ -1,4 +1,4 @@
-QT += widgets gui core concurrent
+QT += widgets gui core concurrent webkitwidgets
 CONFIG += debug
 
 INCLUDEPATH += ../sleuthkit/framework/tsk/framework/services/

@@ -136,13 +136,15 @@ QWidget* BasicTools::setupOmniTab()
     QWidget* webpage = new QWidget();
     QWidget* picpage = new QWidget();
     QWidget* vidpage = new QWidget();
-    QLabel* weblabel = new QLabel("Web View");
     QLabel* piclabel = new QLabel("Pic View");
     QLabel* vidlabel = new QLabel("Vid View");
     QVBoxLayout* weblayout = new QVBoxLayout();
     QVBoxLayout* piclayout = new QVBoxLayout();
     QVBoxLayout* vidlayout = new QVBoxLayout();
-    weblayout->addWidget(weblabel);
+    QWebView* webview = new QWebView(omnitab);
+    webview->setHtml("<b>hello</b>");
+    webview->show();
+    weblayout->addWidget(webview);
     piclayout->addWidget(piclabel);
     vidlayout->addWidget(vidlabel);
     webpage->setLayout(weblayout);
@@ -152,9 +154,12 @@ QWidget* BasicTools::setupOmniTab()
     omnistack->addWidget(webpage);
     omnistack->addWidget(picpage);
     omnistack->addWidget(vidpage);
+    omnistack->setCurrentWidget(webpage);
     QVBoxLayout* mainlayout = new QVBoxLayout();
     mainlayout->addLayout(omnistack);
     omnitab->setLayout(mainlayout);
+
+    return omnitab;
 }
 
 QWidget* BasicTools::setupDirTab()

@@ -102,6 +102,7 @@ void WombatForensics::InitializeAppStructure()
     }
     ui->fileViewTabWidget->addTab(ibasictools->setupHexTab(), "Hex View");
     ui->fileViewTabWidget->addTab(ibasictools->setupTxtTab(), "Text View");
+    ui->fileViewTabWidget->addTab(ibasictools->setupOmniTab(), "Omni View");
     ui->fileInfoTabWidget->addTab(ibasictools->setupDirTab(), "Directory List");
     ui->fileInfoTabWidget->addTab(ibasictools->setupTypTab(), "File Type");
     currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-hexview");

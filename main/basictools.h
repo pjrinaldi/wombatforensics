@@ -10,6 +10,8 @@
 #include <QSizePolicy>
 #include <QFrame>
 #include <QStatusBar>
+#include <QtWebKitWidgets>
+#include <QWebView>
 
 //class VlcInstance;
 //class VlcMedia;
