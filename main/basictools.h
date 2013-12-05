@@ -29,6 +29,7 @@ public:
 
     QWidget* setupHexTab();
     QWidget* setupTxtTab();
+    QWidget* setupOmniTab();
     QWidget* setupDirTab();
     QWidget* setupTypTab();
     void LoadHexModel(QString tmpFilePath);

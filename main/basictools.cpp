@@ -130,6 +130,33 @@ QWidget* BasicTools::setupTxtTab()
     return txtTab;
 }
 
+QWidget* BasicTools::setupOmniTab()
+{
+    QWidget* omnitab = new QWidget();
+    QWidget* webpage = new QWidget();
+    QWidget* picpage = new QWidget();
+    QWidget* vidpage = new QWidget();
+    QLabel* weblabel = new QLabel("Web View");
+    QLabel* piclabel = new QLabel("Pic View");
+    QLabel* vidlabel = new QLabel("Vid View");
+    QVBoxLayout* weblayout = new QVBoxLayout();
+    QVBoxLayout* piclayout = new QVBoxLayout();
+    QVBoxLayout* vidlayout = new QVBoxLayout();
+    weblayout->addWidget(weblabel);
+    piclayout->addWidget(piclabel);
+    vidlayout->addWidget(vidlabel);
+    webpage->setLayout(weblayout);
+    picpage->setLayout(piclayout);
+    vidpage->setLayout(vidlayout);
+    QStackedLayout* omnistack = new QStackedLayout();
+    omnistack->addWidget(webpage);
+    omnistack->addWidget(picpage);
+    omnistack->addWidget(vidpage);
+    QVBoxLayout* mainlayout = new QVBoxLayout();
+    mainlayout->addLayout(omnistack);
+    omnitab->setLayout(mainlayout);
+}
+
 QWidget* BasicTools::setupDirTab()
 {
     //directory tree tab
