@@ -34,11 +34,6 @@ QWidget* BasicTools::setupHexTab()
     vlayout->addWidget(dumwidget);
     vlayout->addWidget(hstatus);
 
-    connect(hexwidget, SIGNAL(rangeChanged(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
-    connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
-    connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
-    connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
-    connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     hexTab->setLayout(vlayout);
 
     return hexTab;
@@ -142,10 +137,9 @@ QWidget* BasicTools::setupOmniTab()
     QVBoxLayout* piclayout = new QVBoxLayout();
     QVBoxLayout* vidlayout = new QVBoxLayout();
     QWebView* webview = new QWebView(omnitab);
-    //webview->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    webview->setGeometry(0, 0, 200, 150);
-    webview->setMinimumSize(200, 150);
-    webview->setBaseSize(200, 150);
+    //webview->setGeometry(0, 0, 200, 150);
+    //webview->setMinimumSize(200, 150);
+    //webview->setBaseSize(200, 150);
     webview->setHtml("<b>hello</b>");
     webview->show();
     weblayout->addWidget(webview);

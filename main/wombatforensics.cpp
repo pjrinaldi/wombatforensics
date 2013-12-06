@@ -111,10 +111,10 @@ void WombatForensics::InitializeAppStructure()
     //connect(vsb, SIGNAL(valueChanged(int)), hexEditor,SLOT(setTopLeftToPercent(int)));
     connect(currenthexwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
     connect(currenthexwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
-    connect(currentascwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
+    //connect(currentascwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
     //connect(vsb, SIGNAL(valueChanged(int)), hexEditor,SLOT(setTopLeftToPercent(int)));
-    connect(currentascwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
-    connect(currentascwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
+    //connect(currentascwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
+    //connect(currentascwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
     SetupDirModel();
 }
 
