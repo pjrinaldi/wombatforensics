@@ -447,7 +447,7 @@ void SleuthKitPlugin::SetupSystemProperties()
     tmpPath = wombatvariable.settingspath;
     tmpPath += "/tsk-pipe.xml";
     QFile pipeFile(tmpPath);
-    fprintf(stderr, "PipPath: %s\n", tmpPath.toStdString().c_str());
+    //fprintf(stderr, "PipPath: %s\n", tmpPath.toStdString().c_str());
     if(!pipeFile.exists()) // if tsk-pipe.xml does not exist, create and write it here
     {
         if(pipeFile.open(QFile::WriteOnly | QFile::Text))
@@ -476,6 +476,38 @@ void SleuthKitPlugin::SetupSystemProperties()
             fprintf(stderr, "Could not open file for writing\n");
         pipeFile.close();
     }
+    tmpPath = wombatvariable.settingspath;
+    tmpPath += "/tsk-magicview.xml";
+    QFile magicFile(tmpPath);
+    if(!magicFile.exists()) // if tsk-magic.xml does not exist, create and write it here.
+    {
+        if(magicFile.open(QFile::WriteOnly | QFile::Text))
+        {
+            QXmlStreamWriter mxml(&magicFile);
+            mxml.setAutoFormatting(true);
+            mxml.writeStartDocument();
+            mxml.writeStartElement("magicview");
+            mxml.writeStartElement("signatures");
+            mxml.writeStartElement("signature");
+            mxml.writeAttribute("view", "web");
+            mxml.writeCharacters("HTML document");
+            mxml.writeStartElement("signature");
+            mxml.writeAttribute("view", "pic");
+            mxml.writeCharacters("JPEG image data");
+            mxml.writeEndElement(); // signature
+            mxml.writeStartElement("signature");
+            mxml.writeAttribute("view", "vid");
+            mxml.writeCharacters("MPEG sequence");
+            mxml.writeEndElement(); // signature
+            mxml.writeEndElement(); // signatures
+            mxml.writeEndElement(); // magicview
+            mxml.writeEndDocument();
+        }
+        else
+            fprintf(stderr, "Could not open magic file for writing\n");
+        magicFile.close();
+    }
+
     // make the output directories
     if(!(new QDir())->mkpath(QString::fromStdString(GetSystemProperty(TskSystemProperties::OUT_DIR))))
         fprintf(stderr, "out_dir failed\n");

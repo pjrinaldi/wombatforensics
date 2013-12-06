@@ -708,7 +708,10 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     else
     {
         tmptext = index.sibling(index.row(), 0).data().toString();
-        sigtext = index.sibling(index.row(), 4).data().toString(); // signature value which i need to compare to the db of known values
+        // traverse xml document for an element that contains the sigtext
+        // if one exists, get view attribute and then show the omniview set to the right page and populate the respective view
+        // if none exist, then hide the omni view
+        sigtext = index.sibling(index.row(), 4).data().toString(); // signature value which i need to compare to the xml of known values
         fprintf(stderr, "TMPTEXT: %s\n", tmptext.toStdString().c_str());
         QStringList evidenceidlist = wombatcasedata->ReturnCaseActiveEvidenceID(wombatvariable.caseid);
         QStringList volumedesclist = isleuthkit->GetVolumeContents(wombatvariable);
