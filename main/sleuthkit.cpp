@@ -1072,20 +1072,20 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
             QFile tmpfile(oldfile);
             if(tmpfile.rename(newfile))
             {
-                fprintf(stderr, "new file: %s\n", newfile.toStdString().c_str());
+                //fprintf(stderr, "new file: %s\n", newfile.toStdString().c_str());
                 returnpath = newfile;
             }
             else
             {
-                fprintf(stderr, "old file value: %s\n", oldfile.toStdString().c_str());
-                fprintf(stderr, "new file failed: %s\n", newfile.toStdString().c_str());
+                //fprintf(stderr, "old file value: %s\n", oldfile.toStdString().c_str());
+                //fprintf(stderr, "new file failed: %s\n", newfile.toStdString().c_str());
                 // i'll need to return or log an error here somehow.
             }
         }
         else
         {
             returnpath = QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));
-            fprintf(stderr, "old == new: %s\n", returnpath.toStdString().c_str());
+            //fprintf(stderr, "old == new: %s\n", returnpath.toStdString().c_str());
         }
     }
 

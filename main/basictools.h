@@ -36,6 +36,7 @@ public:
     QWidget* setupTypTab();
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
+    void LoadOmniContent(QString filePath);
 public slots:
     void LoadFileContents(QString filepath);
     void setScrollBarRange(off_t low, off_t high);

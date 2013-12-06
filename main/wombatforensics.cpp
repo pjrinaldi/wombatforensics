@@ -108,13 +108,8 @@ void WombatForensics::InitializeAppStructure()
     currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-hexview");
     currentascwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-ascview");
     connect(currenthexwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
-    //connect(vsb, SIGNAL(valueChanged(int)), hexEditor,SLOT(setTopLeftToPercent(int)));
     connect(currenthexwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
     connect(currenthexwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
-    //connect(currentascwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
-    //connect(vsb, SIGNAL(valueChanged(int)), hexEditor,SLOT(setTopLeftToPercent(int)));
-    //connect(currentascwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
-    //connect(currentascwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
     SetupDirModel();
 }
 
@@ -697,6 +692,9 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     QString tmptext = "";
     curselindex = index;
     tmptext = index.sibling(index.row(), 1).data().toString();
+    // pass fileid in sql to get the signature type
+    // or use index.sibling to get signature from the row.
+    // probably better to get the signature artifact id from sql.
     fprintf(stderr, "unique id:'%s'\n", tmptext.toStdString().c_str());
     if(tmptext != "")
     {

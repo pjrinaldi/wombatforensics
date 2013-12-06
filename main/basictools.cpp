@@ -137,9 +137,6 @@ QWidget* BasicTools::setupOmniTab()
     QVBoxLayout* piclayout = new QVBoxLayout();
     QVBoxLayout* vidlayout = new QVBoxLayout();
     QWebView* webview = new QWebView(omnitab);
-    //webview->setGeometry(0, 0, 200, 150);
-    //webview->setMinimumSize(200, 150);
-    //webview->setBaseSize(200, 150);
     webview->setHtml("<b>hello</b>");
     webview->show();
     weblayout->addWidget(webview);
@@ -200,6 +197,7 @@ void BasicTools::LoadFileContents(QString filepath)
         {
             LoadHexModel(filepath);
             LoadTxtContent(filepath);
+            LoadOmniContent(filepath);
         }
         else
         {
@@ -226,6 +224,10 @@ void BasicTools::LoadTxtContent(QString asciiText)
     QTextStream stream(&tmpFile);
     txtwidget->setPlainText(stream.readAll());
     tmpFile.close();
+}
+
+void BasicTools::LoadOmniContent(QString filePath)
+{
 }
 
 void BasicTools::setOffsetLabel(off_t pos)
