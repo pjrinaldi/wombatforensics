@@ -96,7 +96,7 @@ public:
         splitter->setChildrenCollapsible(false);
         fileViewTabWidget = new QTabWidget(splitter);
         fileViewTabWidget->setObjectName(QStringLiteral("fileViewTabWidget"));
-        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(fileViewTabWidget->sizePolicy().hasHeightForWidth());
