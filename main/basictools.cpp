@@ -197,7 +197,7 @@ void BasicTools::LoadFileContents(QString filepath)
         {
             LoadHexModel(filepath);
             LoadTxtContent(filepath);
-            LoadOmniContent(filepath);
+            LoadOmniContent(filepath); // possibly add a view type here: 1 - web, 2 - pic, 3 - vid
         }
         else
         {

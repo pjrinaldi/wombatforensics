@@ -690,6 +690,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     // QString imagename = wombatvariable.evidencepath.split("/").last();
     QString tmptext = "";
+    QString sigtext = "";
     curselindex = index;
     tmptext = index.sibling(index.row(), 1).data().toString();
     // pass fileid in sql to get the signature type
@@ -707,6 +708,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     else
     {
         tmptext = index.sibling(index.row(), 0).data().toString();
+        sigtext = index.sibling(index.row(), 4).data().toString(); // signature value which i need to compare to the db of known values
         fprintf(stderr, "TMPTEXT: %s\n", tmptext.toStdString().c_str());
         QStringList evidenceidlist = wombatcasedata->ReturnCaseActiveEvidenceID(wombatvariable.caseid);
         QStringList volumedesclist = isleuthkit->GetVolumeContents(wombatvariable);
