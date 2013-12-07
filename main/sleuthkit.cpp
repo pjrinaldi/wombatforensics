@@ -484,25 +484,24 @@ void SleuthKitPlugin::SetupSystemProperties()
     {
         if(magicFile.open(QFile::WriteOnly | QFile::Text))
         {
+            // 1 = web, 2 = pic, 3 = vid.
             QXmlStreamWriter mxml(&magicFile);
             mxml.setAutoFormatting(true);
             mxml.writeStartDocument();
-            mxml.writeStartElement("magicview");
-            mxml.writeStartElement("signatures");
+            mxml.writeStartElement("signatures"); // start signatures
             mxml.writeStartElement("signature"); // start signature
-            mxml.writeAttribute("viewer", "web");
+            mxml.writeAttribute("viewer", "1");
             mxml.writeCharacters("HTML document");
             mxml.writeEndElement(); // end signature
             mxml.writeStartElement("signature"); // start signature
-            mxml.writeAttribute("viewer", "pic");
+            mxml.writeAttribute("viewer", "2");
             mxml.writeCharacters("JPEG image data");
             mxml.writeEndElement(); // signature
             mxml.writeStartElement("signature"); // start signature
-            mxml.writeAttribute("viewer", "vid");
+            mxml.writeAttribute("viewer", "3");
             mxml.writeCharacters("MPEG sequence");
             mxml.writeEndElement(); // signature
             mxml.writeEndElement(); // signatures
-            mxml.writeEndElement(); // magicview
             mxml.writeEndDocument();
         }
         else

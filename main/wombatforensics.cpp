@@ -708,8 +708,21 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         // if one exists, get view attribute and then show the omniview set to the right page and populate the respective view
         // if none exist, then hide the omni view
         sigtext = index.sibling(index.row(), 4).data().toString(); // signature value which i need to compare to the xml of known values
-        fprintf(stderr, "TMPTEXT: %s\t SIGTEXT: %s\n", tmptext.toStdString().c_str(), sigtext.toStdString().c_str());
-        fprintf(stderr, "OmniView Type: %i\n", DetermineOmniView(sigtext));
+        int omnivalue = DetermineOmniView(sigtext);
+        if(omnivalue == 0)
+        {
+            ui->fileViewTabWidget->setTabEnabled(2, false);
+        }
+        else
+        {
+            ui->fileViewTabWidget->setTabEnabled(2, true);
+            if(omnivalue == 1)
+                currentomnistack->setCurrentIndex(0);
+            else if(omnivalue == 2)
+                currentomnistack->setCurrentIndex(1);
+            else if(omnivalue == 3)
+                currentomnistack->setCurrentIndex(2);
+        }
     }
     else
     {
@@ -781,13 +794,20 @@ int WombatForensics::DetermineOmniView(QString currentSignature)
                 // readElementText()->QString
                 if(reader.isStartElement() && reader.name() == "signature")
                 {
-                    fprintf(stderr, "Signature Attribute: '%s'\n", reader.attributes().value("viewer").toString().toStdString().c_str());
+                    if(currentSignature.toLower().compare(reader.readElementText().toLower()) == 0)
+                    {
+                        retvalue = reader.attributes().value("viewer").toString().toInt();
+                    }
                 }
             }
             if(reader.hasError())
                 fprintf(stderr, "Reader Error: %s\n", reader.errorString().toStdString().c_str());
             magicfile.close();
         }
+        else
+            fprintf(stderr, "Couldn't Read the omni file\n");
     }
+    else
+        fprintf(stderr, "Couldn't find the omni file\n");
     return retvalue;
 }
