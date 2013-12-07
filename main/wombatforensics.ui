@@ -83,9 +83,16 @@
     </property>
     <addaction name="actionExport_Evidence"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionManage_OmniViewer_Signatures"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEvidence"/>
    <addaction name="menuAction"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusbar"/>
   <widget class="QToolBar" name="mainToolBar">
@@ -177,6 +184,11 @@
    </property>
    <property name="text">
     <string>Export Evidence</string>
+   </property>
+  </action>
+  <action name="actionManage_OmniViewer_Signatures">
+   <property name="text">
+    <string>Manage OmniViewer Signatures</string>
    </property>
   </action>
  </widget>

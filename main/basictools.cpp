@@ -137,8 +137,9 @@ QWidget* BasicTools::setupOmniTab()
     QVBoxLayout* piclayout = new QVBoxLayout();
     QVBoxLayout* vidlayout = new QVBoxLayout();
     QWebView* webview = new QWebView(omnitab);
+    webview->setObjectName("bt-webview");
     webview->setHtml("<b>hello</b>");
-    webview->show();
+    //webview->show();
     weblayout->addWidget(webview);
     weblayout->setContentsMargins(0, 0, 0, 0);
     piclayout->addWidget(piclabel);

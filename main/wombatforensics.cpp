@@ -105,8 +105,9 @@ void WombatForensics::InitializeAppStructure()
     ui->fileViewTabWidget->addTab(ibasictools->setupOmniTab(), "Omni View");
     ui->fileInfoTabWidget->addTab(ibasictools->setupDirTab(), "Directory List");
     ui->fileInfoTabWidget->addTab(ibasictools->setupTypTab(), "File Type");
-    currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-hexview");
-    currentascwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-ascview");
+    currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor*>("bt-hexview");
+    currentwebview = ui->fileViewTabWidget->findChild<QWebView*>("bt-webview");
+    currentwebview->show();
     connect(currenthexwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
     connect(currenthexwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
     connect(currenthexwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
@@ -252,7 +253,7 @@ std::vector<FileExportData> WombatForensics::SetFileExportProperties(QStandardIt
             {
                 tmpexport.fullpath = tmpexport.exportpath + "/" + tmpexport.name; // export path without original path
             }
-            fprintf(stderr, "export full path checked: %s\n", tmpexport.fullpath.c_str());
+            //fprintf(stderr, "export full path checked: %s\n", tmpexport.fullpath.c_str());
     
             tmpexportlist.push_back(tmpexport);
         }
@@ -330,8 +331,8 @@ void WombatForensics::ExportEvidence()
             }
         }
     }
-    fprintf(stderr, "checked count: %i\n", checkcount);
-    fprintf(stderr, "listed item count: %i\n", listcount);
+    //fprintf(stderr, "checked count: %i\n", checkcount);
+    //fprintf(stderr, "listed item count: %i\n", listcount);
     exportdialog = new ExportDialog(this, checkcount, listcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData)), this, SLOT(FileExport(FileExportData)), Qt::DirectConnection);
     exportdialog->show();
@@ -359,7 +360,7 @@ void WombatForensics::FileExport(FileExportData exportdata)
         {
             exportdata.fullpath = exportdata.exportpath + "/" + exportdata.name; // export path without original path
         }
-        fprintf(stderr, "export selected full path: %s\n", exportdata.fullpath.c_str());
+        //fprintf(stderr, "export selected full path: %s\n", exportdata.fullpath.c_str());
 
         exportevidencelist.push_back(exportdata);
     }
@@ -428,11 +429,9 @@ void WombatForensics::FileExport(FileExportData exportdata)
 void WombatForensics::UpdateCaseData(WombatVariable wvariable)
 {
     // refresh views here
-    currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-hexview");
-    currentascwidget = ui->fileViewTabWidget->findChild<HexEditor *>("bt-ascview");
-    //currenthexwidget = ui->fileViewTabWidget->findChild<BinViewWidget *>("bt-hexview");
-    //currenthexwidget->setModel(0);
+    currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor*>("bt-hexview");
     currenttxtwidget = ui->fileViewTabWidget->findChild<QTextEdit*>("bt-txtview");
+    currentwebview = ui->fileViewTabWidget->findChild<QWebView*>("bt-webview");
     currenttxtwidget->setPlainText("");
     // refresh treeviews here
     wombatdirmodel->clear();
@@ -691,12 +690,12 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     // QString imagename = wombatvariable.evidencepath.split("/").last();
     QString tmptext = "";
     QString sigtext = "";
-    curselindex = index;
+    //curselindex = index;
     tmptext = index.sibling(index.row(), 1).data().toString();
     // pass fileid in sql to get the signature type
     // or use index.sibling to get signature from the row.
     // probably better to get the signature artifact id from sql.
-    fprintf(stderr, "unique id:'%s'\n", tmptext.toStdString().c_str());
+    //fprintf(stderr, "unique id:'%s'\n", tmptext.toStdString().c_str());
     if(tmptext != "")
     {
         wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmptext.toInt());
@@ -704,15 +703,16 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         wombatvariable.evidencepath = currentevidencelist[0];
         wombatvariable.evidencedbname = currentevidencelist[1];
         wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
-    }
-    else
-    {
-        tmptext = index.sibling(index.row(), 0).data().toString();
         // traverse xml document for an element that contains the sigtext
         // if one exists, get view attribute and then show the omniview set to the right page and populate the respective view
         // if none exist, then hide the omni view
         sigtext = index.sibling(index.row(), 4).data().toString(); // signature value which i need to compare to the xml of known values
-        fprintf(stderr, "TMPTEXT: %s\n", tmptext.toStdString().c_str());
+        fprintf(stderr, "TMPTEXT: %s\t SIGTEXT: %s\n", tmptext.toStdString().c_str(), sigtext.toStdString().c_str());
+        fprintf(stderr, "OmniView Type: %i\n", DetermineOmniView(sigtext));
+    }
+    else
+    {
+        tmptext = index.sibling(index.row(), 0).data().toString();
         QStringList evidenceidlist = wombatcasedata->ReturnCaseActiveEvidenceID(wombatvariable.caseid);
         QStringList volumedesclist = isleuthkit->GetVolumeContents(wombatvariable);
         for(int i=0; i < evidenceidlist.count() / 3; i++)
@@ -761,4 +761,29 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     }
     ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvariable);
     threadpool->start(tmprun);
+}
+
+int WombatForensics::DetermineOmniView(QString currentSignature)
+{
+    int retvalue = 0;
+    QString tmppath = wombatvariable.settingspath;
+    tmppath += "/tsk-magicview.xml";
+    QFile magicfile(tmppath);
+    if(magicfile.exists()) // if the xml exists, read it.
+    {
+        if(magicfile.open(QFile::ReadOnly | QFile::Text))
+        {
+            QXmlStreamReader reader(&magicfile);
+            while(!reader.atEnd())
+            {
+                if(reader.name() == "signature")
+                {
+                    fprintf(stderr, "Signature Element Found: %s\t%s\t%s\n", reader.name().toString().toStdString().c_str(), reader.attributes().value("view").toString().toStdString().c_str(), reader.readElementText().toStdString().c_str());
+                }
+                reader.readNext();
+            }
+            magicfile.close();
+        }
+    }
+    return retvalue;
 }

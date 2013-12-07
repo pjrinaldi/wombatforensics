@@ -87,11 +87,11 @@ private:
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
     std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
     std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
+    int DetermineOmniView(QString currentSignature);
     QTreeView *currenttreeview;
     QTextEdit* currenttxtwidget;
     HexEditor* currenthexwidget;
-    HexEditor* currentascwidget;
-    //BinViewWidget* currenthexwidget;
+    QWebView* currentwebview;
     QModelIndex curselindex;
 
     QStandardItemModel* currenttreemodel;

@@ -42,7 +42,7 @@ void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
     SetupFileManager();
     SetupImageDatabase();
     SetupBlackboard();
-    fprintf(stderr, "SleuthKit Existsi\n");
+    //fprintf(stderr, "SleuthKit Exists\n");
     qRegisterMetaType<WombatVariable>("WombatVariable");
     connect(this, SIGNAL(SetLogVariable(WombatVariable)), log, SLOT(LogVariable(WombatVariable)), Qt::DirectConnection);
 }
@@ -57,10 +57,10 @@ void SleuthKitPlugin::SetupImageDatabase()
             fprintf(stderr, "Error initializing StarterDB\n");
         else
         {
-            fprintf(stderr, "Starter DB was Initialized Successfully!\n");
+            //fprintf(stderr, "Starter DB was Initialized Successfully!\n");
         }
         TskServices::Instance().setImgDB(*initialdb);
-        fprintf(stderr, "Loading Starter ImageDB was Successful!\n");
+        //fprintf(stderr, "Loading Starter ImageDB was Successful!\n");
     }
     catch(TskException &ex)
     {
@@ -75,7 +75,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     QString newstring = wombatvariable.evidencedirpath + wombatvariable.evidencedbname;
     if(QFile::copy(oldstring.toStdString().c_str(), newstring.toStdString().c_str()))
     {
-        fprintf(stderr, "File Copy Was Successful\n");
+        //fprintf(stderr, "File Copy Was Successful\n");
         // copy was successful
         try
         {
@@ -91,7 +91,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
                 fprintf(stderr, "Error intializing Evidence DB\n");
             else
             {
-                fprintf(stderr, "Evidence DB was initialized successfully\n");
+                //fprintf(stderr, "Evidence DB was initialized successfully\n");
             }
         }
         catch(TskException &ex)
@@ -113,7 +113,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         // copy was not successful
         // exit out with error that image already added...
     }
-    fprintf(stderr, "Evidence ImgDB Path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
+    //fprintf(stderr, "Evidence ImgDB Path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
     
     int filecount = 0;
     int processcount = 0;
@@ -122,7 +122,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     {
         imagefiletsk.open(wombatvariable.evidencepath.toStdString());
         TskServices::Instance().setImageFile(imagefiletsk);
-        fprintf(stderr, "Opening Image File was successful!\n");
+        //fprintf(stderr, "Opening Image File was successful!\n");
     }
     catch(TskException &ex)
     {
@@ -131,7 +131,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     try
     {
         imagefiletsk.extractFiles();
-        fprintf(stderr, "Extracting Evidence was successful\n");
+        //fprintf(stderr, "Extracting Evidence was successful\n");
     }
     catch(TskException &ex)
     {
@@ -224,7 +224,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     }
     LOGINFO("Processing Evidence Finished");
     wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
-    fprintf(stderr, "File Count: %d - Process Count: %d\n", filecount, processcount);
+    //fprintf(stderr, "File Count: %d - Process Count: %d\n", filecount, processcount);
     wombatdata->UpdateJobEnd(wombatvariable.jobid, filecount, processcount);
     GetImageTree(wombatvariable, 1);
     LOGINFO("Adding Evidence Finished");
@@ -281,7 +281,7 @@ void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
             fprintf(stderr, "Error intializing Evidence DB\n");
         else
         {
-            fprintf(stderr, "Evidence DB was initialized successfully\n");
+            //fprintf(stderr, "Evidence DB was initialized successfully\n");
         }
     }
     catch(TskException &ex)
@@ -303,20 +303,21 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     QString curtmpfilepath = "";
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
-    fprintf(stderr, "file id: %i\n", wombatvariable.fileid);
+    //fprintf(stderr, "file id: %i\n", wombatvariable.fileid);
     if(wombatvariable.fileid >= 0)
         curtmpfilepath = GetFileContents(wombatvariable.fileid);
     else if(wombatvariable.fileid == -1) // image file
     {
+        // this won't work for e01 files, so i'll have to figure out how to read the damn thing in properly.
         curtmpfilepath = wombatvariable.evidencepath;
-        fprintf(stderr, "dd image path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
+        //fprintf(stderr, "dd image path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
         // QString imagename = wombatvariable.evidencepath.split("/").last();
     }
     else if(wombatvariable.fileid == -2) // volume file
     {
         curtmpfilepath = GetVolumeFilePath(wombatvariable, wombatvariable.volid);
-        fprintf(stderr, "tmp file path: %s\n", wombatvariable.tmpfilepath.toStdString().c_str());
-        fprintf(stderr, "vol file path %s\n", curtmpfilepath.toStdString().c_str());
+        //fprintf(stderr, "tmp file path: %s\n", wombatvariable.tmpfilepath.toStdString().c_str());
+        //fprintf(stderr, "vol file path %s\n", curtmpfilepath.toStdString().c_str());
     }
     else if(wombatvariable.fileid == -3) // file system file
     {
@@ -438,7 +439,7 @@ void SleuthKitPlugin::SetupSystemProperties()
         systemproperties = new TskSystemPropertiesImpl();
         systemproperties->initialize(tmpPath.toStdString());
         TskServices::Instance().setSystemProperties(*systemproperties);
-        fprintf(stderr, "Configuration File Loading was successful!\n");
+        //fprintf(stderr, "Configuration File Loading was successful!\n");
     }
     catch(TskException &ex)
     {
@@ -524,7 +525,7 @@ void SleuthKitPlugin::SetupLog()
         log = new TskLog(wombatvariable.datapath.toStdString());
         log->open(tmpPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
-        fprintf(stderr, "Loading Log File was successful!\n");
+        //fprintf(stderr, "Loading Log File was successful!\n");
     }
     catch(TskException &ex)
     {
@@ -537,7 +538,7 @@ void SleuthKitPlugin::SetupBlackboard()
     try
     {
         TskServices::Instance().setBlackboard((TskBlackboard &)TskDBBlackboard::instance());
-        fprintf(stderr, "Loading Blackboard was successful!\n");
+        //fprintf(stderr, "Loading Blackboard was successful!\n");
     }
     catch(TskException &ex)
     {
@@ -550,7 +551,7 @@ void SleuthKitPlugin::SetupScheduler()
     try
     {
         TskServices::Instance().setScheduler(scheduler);
-        fprintf(stderr, "Loading Scheduler was successful!\n");
+        //fprintf(stderr, "Loading Scheduler was successful!\n");
     }
     catch(TskException &ex)
     {
@@ -563,7 +564,7 @@ void SleuthKitPlugin::SetupFileManager()
     try
     {
         TskServices::Instance().setFileManager(fileManager->instance());
-        fprintf(stderr, "Loading File Manager was successful!\n");
+        //fprintf(stderr, "Loading File Manager was successful!\n");
     }
     catch(TskException &ex)
     {
@@ -605,7 +606,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
     {
         // if volflag = 0, get description
         // if volflag = 1, list as unallocated
-        fprintf(stderr, "Vol Description: %s - VolFlags: %d\n", volRecord.description.c_str(), volRecord.flags);
+        //fprintf(stderr, "Vol Description: %s - VolFlags: %d\n", volRecord.description.c_str(), volRecord.flags);
         if(volRecord.flags >= 0 && volRecord.flags <= 2)
         {
             if(volRecord.flags == 1)
@@ -723,7 +724,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                     {
                         TskFileRecord tmprecord;
                         ret = TskServices::Instance().getImgDB().getFileRecord(tmpId, tmprecord);
-                        fprintf(stderr, "%s\n", tmprecord.md5.c_str());
+                        //fprintf(stderr, "%s\n", tmprecord.md5.c_str());
                         fileRecordVector.push_back(tmprecord);
                     }
                     for(int i=0; i < (int)fileRecordVector.size(); i++)
@@ -782,7 +783,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                         sleuthList << new QStandardItem(DisplayTimeUTC(fileRecordVector[i].mtime));
                         sleuthList << new QStandardItem(DisplayTimeUTC(fileRecordVector[i].ctime));
                         sleuthList << new QStandardItem(QString(fileRecordVector[i].md5.c_str()));
-                        fprintf(stderr, "%i - %s\n", i, fileRecordVector[i].md5.c_str());
+                        //fprintf(stderr, "%i - %s\n", i, fileRecordVector[i].md5.c_str());
                         treeList.append(sleuthList);
                     }
                     for(int i = 0; i < (int)fileRecordVector.size(); i++)
@@ -835,7 +836,7 @@ void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
     try
     {
         ihandle = TskServices::Instance().getImageFile().openFile(fileID);
-        fprintf(stderr, "getimagefile works...");
+        //fprintf(stderr, "getimagefile works...");
     }
     catch(TskException ex)
     {
@@ -845,7 +846,7 @@ void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
     try
     {
         tfile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
-        fprintf(stderr, "get file from image works\n");
+        //fprintf(stderr, "get file from image works\n");
     }
     catch(TskException ex)
     {
@@ -856,7 +857,7 @@ void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
         bool tmpdir = (new QDir())->mkpath(QString::fromStdString(exportpath));
         if(!tmpdir)
             fprintf(stderr, "%s creation failed.\n");
-        fprintf(stderr, "need to make the directory here...\n");
+        //fprintf(stderr, "need to make the directory here...\n");
     }
     else
     {
