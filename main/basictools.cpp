@@ -138,7 +138,7 @@ QWidget* BasicTools::setupOmniTab()
     QVBoxLayout* vidlayout = new QVBoxLayout();
     QWebView* webview = new QWebView(omnitab);
     webview->setObjectName("bt-webview");
-    webview->setHtml("<b>hello</b>");
+    //webview->setHtml("<b>hello</b>");
     //webview->show();
     weblayout->addWidget(webview);
     weblayout->setContentsMargins(0, 0, 0, 0);
@@ -150,10 +150,11 @@ QWidget* BasicTools::setupOmniTab()
     picpage->setLayout(piclayout);
     vidpage->setLayout(vidlayout);
     QStackedLayout* omnistack = new QStackedLayout();
+    omnistack->setObjectName("bt-omnistack");
     omnistack->addWidget(webpage);
     omnistack->addWidget(picpage);
     omnistack->addWidget(vidpage);
-    omnistack->setCurrentWidget(webpage);
+    //omnistack->setCurrentWidget(webpage);
     QVBoxLayout* mainlayout = new QVBoxLayout();
     mainlayout->addLayout(omnistack);
     omnitab->setLayout(mainlayout);

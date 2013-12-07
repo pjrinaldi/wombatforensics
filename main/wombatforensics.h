@@ -92,6 +92,7 @@ private:
     QTextEdit* currenttxtwidget;
     HexEditor* currenthexwidget;
     QWebView* currentwebview;
+    QStackedLayout* currentomnistack;
     QModelIndex curselindex;
 
     QStandardItemModel* currenttreemodel;

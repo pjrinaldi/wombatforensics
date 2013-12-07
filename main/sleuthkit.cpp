@@ -489,15 +489,16 @@ void SleuthKitPlugin::SetupSystemProperties()
             mxml.writeStartDocument();
             mxml.writeStartElement("magicview");
             mxml.writeStartElement("signatures");
-            mxml.writeStartElement("signature");
-            mxml.writeAttribute("view", "web");
+            mxml.writeStartElement("signature"); // start signature
+            mxml.writeAttribute("viewer", "web");
             mxml.writeCharacters("HTML document");
-            mxml.writeStartElement("signature");
-            mxml.writeAttribute("view", "pic");
+            mxml.writeEndElement(); // end signature
+            mxml.writeStartElement("signature"); // start signature
+            mxml.writeAttribute("viewer", "pic");
             mxml.writeCharacters("JPEG image data");
             mxml.writeEndElement(); // signature
-            mxml.writeStartElement("signature");
-            mxml.writeAttribute("view", "vid");
+            mxml.writeStartElement("signature"); // start signature
+            mxml.writeAttribute("viewer", "vid");
             mxml.writeCharacters("MPEG sequence");
             mxml.writeEndElement(); // signature
             mxml.writeEndElement(); // signatures

@@ -106,6 +106,7 @@ void WombatForensics::InitializeAppStructure()
     ui->fileInfoTabWidget->addTab(ibasictools->setupDirTab(), "Directory List");
     ui->fileInfoTabWidget->addTab(ibasictools->setupTypTab(), "File Type");
     currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor*>("bt-hexview");
+    currentomnistack = ui->fileViewTabWidget->findChild<QStackedLayout*>("bt-omnistack");
     currentwebview = ui->fileViewTabWidget->findChild<QWebView*>("bt-webview");
     currentwebview->show();
     connect(currenthexwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
@@ -776,12 +777,15 @@ int WombatForensics::DetermineOmniView(QString currentSignature)
             QXmlStreamReader reader(&magicfile);
             while(!reader.atEnd())
             {
-                if(reader.name() == "signature")
-                {
-                    fprintf(stderr, "Signature Element Found: %s\t%s\t%s\n", reader.name().toString().toStdString().c_str(), reader.attributes().value("view").toString().toStdString().c_str(), reader.readElementText().toStdString().c_str());
-                }
                 reader.readNext();
+                // readElementText()->QString
+                if(reader.isStartElement() && reader.name() == "signature")
+                {
+                    fprintf(stderr, "Signature Attribute: '%s'\n", reader.attributes().value("viewer").toString().toStdString().c_str());
+                }
             }
+            if(reader.hasError())
+                fprintf(stderr, "Reader Error: %s\n", reader.errorString().toStdString().c_str());
             magicfile.close();
         }
     }
