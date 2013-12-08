@@ -546,7 +546,7 @@ void WombatForensics::SetupHexPage(void)
     hexwidget->setObjectName("bt-hexview");
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
-    hexvsb = new QScrollBar(ui->hexPage);//hexwidget);
+    hexvsb = new QScrollBar(hexwidget);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);

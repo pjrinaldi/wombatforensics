@@ -108,6 +108,7 @@ private:
     //QTextEdit* currenttxtwidget; // replace with a txt version of the hexeditor
     QModelIndex curselindex;
 
+    off_t offset() const;
     HexEditor* hexwidget;
     QScrollBar* hexvsb;
     QStatusBar* hstatus;
