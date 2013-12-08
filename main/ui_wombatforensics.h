@@ -132,14 +132,12 @@ public:
         hexPage->setObjectName(QStringLiteral("hexPage"));
         sizePolicy.setHeightForWidth(hexPage->sizePolicy().hasHeightForWidth());
         hexPage->setSizePolicy(sizePolicy);
-        hexPage->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
         viewerStack->addWidget(hexPage);
         textPage = new QWidget();
         textPage->setObjectName(QStringLiteral("textPage"));
         sizePolicy.setHeightForWidth(textPage->sizePolicy().hasHeightForWidth());
         textPage->setSizePolicy(sizePolicy);
         textPage->setAutoFillBackground(false);
-        textPage->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
         viewerStack->addWidget(textPage);
         omniPage = new QWidget();
         omniPage->setObjectName(QStringLiteral("omniPage"));

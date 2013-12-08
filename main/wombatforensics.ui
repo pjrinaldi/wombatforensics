@@ -64,9 +64,11 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
+
+        <!--<property name="styleSheet">
          <string notr="true">background-color: rgb(255, 255, 255);</string>
-        </property>
+        </property>-->
+
        </widget>
        <widget class="QWidget" name="textPage">
         <property name="sizePolicy">
@@ -78,9 +80,10 @@
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
-        <property name="styleSheet">
+        
+        <!--<property name="styleSheet">
          <string notr="true">background-color: rgb(255, 255, 255);</string>
-        </property>
+        </property>-->
        </widget>
        <widget class="QWidget" name="omniPage">
         <property name="sizePolicy">

@@ -543,6 +543,7 @@ void WombatForensics::SetupHexPage(void)
     hstatus->addWidget(selectedfloat);
     hstatus->addWidget(selecteddouble);
     hexwidget = new HexEditor(ui->hexPage);
+    hexwidget->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
     hexwidget->setObjectName("bt-hexview");
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
@@ -555,6 +556,8 @@ void WombatForensics::SetupHexPage(void)
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
+    connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
 }
 
 WombatForensics::~WombatForensics()
