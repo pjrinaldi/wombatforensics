@@ -11,6 +11,11 @@
         <file alias="treeimage">../Resources/drive-harddisk.png</file>
         <file alias="treepartition">../Resources/package-x-generic.png</file>
         <file alias="treefilemanager">../Resources/system-file-manager.png</file>
+    </qresource>
+    <qresource prefix="/bar">
+        <file alias="hexview">../Resources/hexeditor.png</file>
+        <file alias="txtview">../Resources/texteditor.png</file>
+        <file alias="omniview">../Resources/omniviewer.png</file>
 	<file alias="export">../Resources/format-indent-more.png</file>
     </qresource>
 </RCC>

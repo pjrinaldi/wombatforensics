@@ -291,6 +291,13 @@
         <attribute name="toolBarBreak">
             <bool>false</bool>
         </attribute>
+        <addaction name="actionViewHex"/>
+        <addaction name="actionViewTxt"/>
+        <addaction name="actionViewOmni"/>
+        <addaction name="separator"/>
+        <addaction name="actionView_Progress"/>
+        <addaction name="separator"/>
+        <addaction name="actionExport_Evidence"/>
     </widget>
     <action name="actionNew_Case">
         <property name="icon">
@@ -306,6 +313,39 @@
         </property>
         <property name="text">
             <string>Open Case</string>
+        </property>
+    </action>
+    <action name="actionViewHex">
+        <property name="checkable">
+            <bool>true</bool>
+        </property>
+        <property name="icon">
+            <iconset><normaloff>:/bar/hexview</normaloff>:/bar/hexview</iconset>
+        </property>
+        <property name="text">
+            <string>View Hex</string>
+        </property>
+    </action>
+    <action name="actionViewTxt">
+        <property name="checkable">
+            <bool>true</bool>
+        </property>
+        <property name="icon">
+            <iconset><normaloff>:/bar/txtview</normaloff>:/bar/txtview</iconset>
+        </property>
+        <property name="text">
+            <string>View Text</string>
+        </property>
+    </action>
+    <action name="actionViewOmni">
+        <property name="checkable">
+            <bool>true</bool>
+        </property>
+        <property name="icon">
+            <iconset><normaloff>:/bar/omniview</normaloff>:/bar/omnivew</iconset>
+        </property>
+        <property name="text">
+            <string>View Omni</string>
         </property>
     </action>
     <action name="actionView_Progress">
@@ -342,7 +382,7 @@
     </action>
     <action name="actionExport_Evidence">
         <property name="icon">
-            <iconset><normaloff>:/basic/export</normaloff>:/basic/export</iconset>
+            <iconset><normaloff>:/bar/export</normaloff>:/bar/export</iconset>
         </property>
         <property name="text">
             <string>Export Evidence</string>
