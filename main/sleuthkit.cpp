@@ -1011,7 +1011,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     try
     {
         ihandle = TskServices::Instance().getImageFile().openFile(fileID);
-        fprintf(stderr, "getimagefile works...");
+        //fprintf(stderr, "getimagefile works...");
     }
     catch(TskException ex)
     {
@@ -1021,7 +1021,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     try
     {
         tfile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
-        fprintf(stderr, "get file from image works\n");
+        //fprintf(stderr, "get file from image works\n");
     }
     catch(TskException ex)
     {

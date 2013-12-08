@@ -48,7 +48,7 @@ public:
     QWidget *textPage;
     QWidget *omniPage;
     QHBoxLayout *horizontalLayout_2;
-    QStackedWidget *stackedWidget;
+    QStackedWidget *omnistack;
     QWidget *webpage;
     QHBoxLayout *horizontalLayout_3;
     QWebView *webView;
@@ -126,15 +126,20 @@ public:
         viewerStack->setObjectName(QStringLiteral("viewerStack"));
         sizePolicy.setHeightForWidth(viewerStack->sizePolicy().hasHeightForWidth());
         viewerStack->setSizePolicy(sizePolicy);
+        viewerStack->setFrameShape(QFrame::StyledPanel);
+        viewerStack->setFrameShadow(QFrame::Sunken);
         hexPage = new QWidget();
         hexPage->setObjectName(QStringLiteral("hexPage"));
         sizePolicy.setHeightForWidth(hexPage->sizePolicy().hasHeightForWidth());
         hexPage->setSizePolicy(sizePolicy);
+        hexPage->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
         viewerStack->addWidget(hexPage);
         textPage = new QWidget();
         textPage->setObjectName(QStringLiteral("textPage"));
         sizePolicy.setHeightForWidth(textPage->sizePolicy().hasHeightForWidth());
         textPage->setSizePolicy(sizePolicy);
+        textPage->setAutoFillBackground(false);
+        textPage->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
         viewerStack->addWidget(textPage);
         omniPage = new QWidget();
         omniPage->setObjectName(QStringLiteral("omniPage"));
@@ -144,10 +149,10 @@ public:
         horizontalLayout_2->setSpacing(0);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
-        stackedWidget = new QStackedWidget(omniPage);
-        stackedWidget->setObjectName(QStringLiteral("stackedWidget"));
-        sizePolicy.setHeightForWidth(stackedWidget->sizePolicy().hasHeightForWidth());
-        stackedWidget->setSizePolicy(sizePolicy);
+        omnistack = new QStackedWidget(omniPage);
+        omnistack->setObjectName(QStringLiteral("omnistack"));
+        sizePolicy.setHeightForWidth(omnistack->sizePolicy().hasHeightForWidth());
+        omnistack->setSizePolicy(sizePolicy);
         webpage = new QWidget();
         webpage->setObjectName(QStringLiteral("webpage"));
         horizontalLayout_3 = new QHBoxLayout(webpage);
@@ -163,7 +168,7 @@ public:
 
         horizontalLayout_3->addWidget(webView);
 
-        stackedWidget->addWidget(webpage);
+        omnistack->addWidget(webpage);
         picpage = new QWidget();
         picpage->setObjectName(QStringLiteral("picpage"));
         sizePolicy.setHeightForWidth(picpage->sizePolicy().hasHeightForWidth());
@@ -179,7 +184,7 @@ public:
         scrollArea->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 782, 142));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 100, 30));
         sizePolicy.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents->setSizePolicy(sizePolicy);
         horizontalLayout_5 = new QHBoxLayout(scrollAreaWidgetContents);
@@ -198,14 +203,14 @@ public:
 
         horizontalLayout_4->addWidget(scrollArea);
 
-        stackedWidget->addWidget(picpage);
+        omnistack->addWidget(picpage);
         vidpage = new QWidget();
         vidpage->setObjectName(QStringLiteral("vidpage"));
         sizePolicy.setHeightForWidth(vidpage->sizePolicy().hasHeightForWidth());
         vidpage->setSizePolicy(sizePolicy);
-        stackedWidget->addWidget(vidpage);
+        omnistack->addWidget(vidpage);
 
-        horizontalLayout_2->addWidget(stackedWidget);
+        horizontalLayout_2->addWidget(omnistack);
 
         viewerStack->addWidget(omniPage);
         splitter->addWidget(viewerStack);

@@ -32,7 +32,7 @@ public slots:
     void LogVariable(WombatVariable wombatVariable)
     {
         logvariable = wombatVariable;
-        fprintf(stderr, "Log got the variable and it has a caseid of: %d\n", logvariable.caseid);
+        //fprintf(stderr, "Log got the variable and it has a caseid of: %d\n", logvariable.caseid);
     };
 protected:
     std::string logpath;

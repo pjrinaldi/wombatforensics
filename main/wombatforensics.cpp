@@ -7,7 +7,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatcasedata = new WombatDatabase();
     wombatprogresswindow = new ProgressWindow(wombatcasedata);
     isleuthkit = new SleuthKitPlugin(wombatcasedata);
-    //ibasictools = new BasicTools();
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
@@ -16,7 +15,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     qRegisterMetaType<FileExportData>("FileExportData");
     connect(this, SIGNAL(LogVariable(WombatVariable)), isleuthkit, SLOT(GetLogVariable(WombatVariable)), Qt::QueuedConnection);
     connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
-    connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(SendFileContents(QString)), Qt::QueuedConnection);
+    connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(LoadFileContents(QString)), Qt::QueuedConnection);
     connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable)), this, SLOT(PopulateProgressWindow(WombatVariable)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
     wombatvariable.caseid = 0;
@@ -100,29 +99,9 @@ void WombatForensics::InitializeAppStructure()
     {
         DisplayError("1.0", "Case Count", "Invalid Case Count returned.");
     }
-    SetupHexPage();
-    //ui->hexPage->addWidget(setupHexTab
-    //ui->viewerStack->
-    //currenthexwidget = ui->viewerStack->findChild<HexEditor*>("bt-hexview");
-    //currentomnistack = ui->viewerStack->findChild<QStackedLayout*>("bt-omnistack");
-    //currentwebview = ui->viewStack->findChild<QWebView*>("bt-webview");
-    /*
-    ui->fileViewTabWidget->addTab(ibasictools->setupHexTab(), "Hex View");
-    ui->fileViewTabWidget->addTab(ibasictools->setupTxtTab(), "Text View");
-    ui->fileViewTabWidget->addTab(ibasictools->setupOmniTab(), "Omni View");
-    ui->fileInfoTabWidget->addTab(ibasictools->setupDirTab(), "Directory List");
-    //ui->fileInfoTabWidget->addTab(ibasictools->setupTypTab(), "File Type");
-    */
-    //currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor*>("bt-hexview");
-    //currentomnistack = ui->fileViewTabWidget->findChild<QStackedLayout*>("bt-omnistack");
-    //currentwebview = ui->fileViewTabWidget->findChild<QWebView*>("bt-webview");
-    //currentwebview->show();
-    /*
-    connect(currenthexwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
-    connect(currenthexwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
-    connect(currenthexwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
-    */
     SetupDirModel();
+    SetupHexPage();
+    
 }
 
 void WombatForensics::InitializeSleuthKit()
@@ -440,18 +419,11 @@ void WombatForensics::FileExport(FileExportData exportdata)
 void WombatForensics::UpdateCaseData(WombatVariable wvariable)
 {
     // refresh views here
-    //currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor*>("bt-hexview");
-    //currenttxtwidget = ui->fileViewTabWidget->findChild<QTextEdit*>("bt-txtview");
-    //currentwebview = ui->fileViewTabWidget->findChild<QWebView*>("bt-webview");
-    //currenttxtwidget->setPlainText("");
-    // refresh treeviews here
     wombatdirmodel->clear();
     QStringList headerList;
     headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     wombatdirmodel->setHorizontalHeaderLabels(headerList);
-    currenttreeview  = ui->dirTreeView;
-    //currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
-    currenttreeview->setModel(wombatdirmodel);
+    ui->dirTreeView->setModel(wombatdirmodel);
     ThreadRunner* trun = new ThreadRunner(isleuthkit, "refreshtreeviews", wombatvariable);
     threadpool->start(trun);
 }
@@ -521,7 +493,7 @@ void WombatForensics::GetImageNode(QStandardItem* imagenode)
 {
     QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
     currentroot->appendRow(imagenode);
-    currenttreeview->setModel(wombatdirmodel);
+    ui->dirTreeView->setModel(wombatdirmodel);
     ResizeColumns(wombatdirmodel);
     UpdateMessageTable();
 
@@ -534,7 +506,7 @@ void WombatForensics::ResizeColumns(QStandardItemModel* currentmodel)
         // may need to compare treeview->model() == currentmodel) to determine what to set it to.
         // depending on the design though, i may not need multiple layouts since the columns can be sorted.
         // have to see as i go. for now its good.
-        currenttreeview->resizeColumnToContents(i);
+        ui->dirTreeView->resizeColumnToContents(i);
     }
 }
 
@@ -545,11 +517,10 @@ void WombatForensics::SetupDirModel(void)
     headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     wombatdirmodel->setHorizontalHeaderLabels(headerList);
     QStandardItem *evidenceNode = wombatdirmodel->invisibleRootItem();
-    currenttreeview = ui->dirTreeView;
-    currenttreeview->setModel(wombatdirmodel);
+    ui->dirTreeView->setModel(wombatdirmodel);
     ResizeColumns(wombatdirmodel);
-    connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
-    connect(currenttreeview, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
+    connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
 }
 
 void WombatForensics::SetupHexPage(void)
@@ -557,8 +528,6 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    //QVBoxLayout* vlayout = new QVBoxLayout();
-    //QWidget* dumwidget = new QWidget();
     hstatus = new QStatusBar(ui->hexPage);
     hstatus->setSizeGripEnabled(false);
     selectedoffset = new QLabel("Offset: 00");
@@ -577,16 +546,15 @@ void WombatForensics::SetupHexPage(void)
     hexwidget->setObjectName("bt-hexview");
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
-    hexvsb = new QScrollBar(hexwidget);
+    hexvsb = new QScrollBar(ui->hexPage);//hexwidget);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
     mainlayout->addWidget(hstatus);
-}
 
-void WombatForensics::SendFileContents(QString filepath)
-{
-    //ibasictools->LoadFileContents(filepath);
+    connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
+    connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
+    connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
 }
 
 WombatForensics::~WombatForensics()
@@ -752,11 +720,11 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         {
             //ui->fileViewTabWidget->setTabEnabled(2, true); // where i enable the omni button
             if(omnivalue == 1)
-                currentomnistack->setCurrentIndex(0);
+                ui->omnistack->setCurrentIndex(0);
             else if(omnivalue == 2)
-                currentomnistack->setCurrentIndex(1);
+                ui->omnistack->setCurrentIndex(1);
             else if(omnivalue == 3)
-                currentomnistack->setCurrentIndex(2);
+                ui->omnistack->setCurrentIndex(2);
         }
     }
     else
@@ -826,7 +794,6 @@ int WombatForensics::DetermineOmniView(QString currentSignature)
             while(!reader.atEnd())
             {
                 reader.readNext();
-                // readElementText()->QString
                 if(reader.isStartElement() && reader.name() == "signature")
                 {
                     if(currentSignature.toLower().compare(reader.readElementText().toLower()) == 0)

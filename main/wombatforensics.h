@@ -68,7 +68,6 @@ private slots:
     void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
-    void SendFileContents(QString filepath);
     void PopulateProgressWindow(WombatVariable wvariable);
     void UpdateCaseData(WombatVariable wvariable);
     void ResizeColumns(QStandardItemModel* currentmodel);
@@ -106,11 +105,7 @@ private:
     std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
     std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
     int DetermineOmniView(QString currentSignature);
-    QTreeView *currenttreeview;
     //QTextEdit* currenttxtwidget; // replace with a txt version of the hexeditor
-    HexEditor* currenthexwidget;
-    QWebView* currentwebview;
-    QStackedLayout* currentomnistack;
     QModelIndex curselindex;
 
     HexEditor* hexwidget;
