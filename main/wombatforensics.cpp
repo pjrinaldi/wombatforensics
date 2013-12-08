@@ -734,12 +734,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     // QString imagename = wombatvariable.evidencepath.split("/").last();
     QString tmptext = "";
     QString sigtext = "";
-    //curselindex = index;
     tmptext = index.sibling(index.row(), 1).data().toString();
-    // pass fileid in sql to get the signature type
-    // or use index.sibling to get signature from the row.
-    // probably better to get the signature artifact id from sql.
-    //fprintf(stderr, "unique id:'%s'\n", tmptext.toStdString().c_str());
     if(tmptext != "")
     {
         wombatvariable.evidenceid = wombatcasedata->ReturnObjectEvidenceID(tmptext.toInt());
@@ -747,18 +742,15 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         wombatvariable.evidencepath = currentevidencelist[0];
         wombatvariable.evidencedbname = currentevidencelist[1];
         wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
-        // traverse xml document for an element that contains the sigtext
-        // if one exists, get view attribute and then show the omniview set to the right page and populate the respective view
-        // if none exist, then hide the omni view
         sigtext = index.sibling(index.row(), 4).data().toString(); // signature value which i need to compare to the xml of known values
         int omnivalue = DetermineOmniView(sigtext);
         if(omnivalue == 0)
         {
-            //ui->fileViewTabWidget->setTabEnabled(2, false);
+            //ui->fileViewTabWidget->setTabEnabled(2, false); // where i disable the omni button 
         }
         else
         {
-            //ui->fileViewTabWidget->setTabEnabled(2, true);
+            //ui->fileViewTabWidget->setTabEnabled(2, true); // where i enable the omni button
             if(omnivalue == 1)
                 currentomnistack->setCurrentIndex(0);
             else if(omnivalue == 2)
@@ -853,4 +845,152 @@ int WombatForensics::DetermineOmniView(QString currentSignature)
     else
         fprintf(stderr, "Couldn't find the omni file\n");
     return retvalue;
+}
+
+void WombatForensics::UpdateSelectValue(const QString &txt)
+{
+    // set hex (which i'll probably remove anyway since it's highlighted in same window)
+    int sellength = txt.size()/2;
+    QString tmptext = "Length: " + QString::number(sellength);
+    selectedhex->setText(tmptext);
+    // get initial bytes value and then update ascii
+    std::vector<uchar> bytes;
+    Translate::HexToByte(bytes, txt);
+    QString ascii;
+    Translate::ByteToChar(ascii, bytes);
+    tmptext = "Ascii: " + ascii;
+    selectedascii->setText(tmptext);
+    QString strvalue;
+    uchar * ucharPtr;
+    // update the int entry:
+    // pad right with 0x00
+    int intvalue = 0;
+    ucharPtr = (uchar*) &intvalue;
+    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
+    strvalue.setNum(intvalue);
+    tmptext = "Int: " + strvalue;
+    selectedinteger->setText(tmptext);
+    // update float entry;
+    float fvalue;
+    ucharPtr = (uchar*)(&fvalue);
+    if(bytes.size() < sizeof(float) )
+    {
+        for(unsigned int i= 0; i < sizeof(float); ++i)
+        {
+            if( i < bytes.size() )
+            {
+                *ucharPtr++ = bytes[i];
+            }
+            else
+            {
+                *ucharPtr++ = 0x00;
+            }
+        }
+    }
+    else
+    {
+        memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
+    }
+    strvalue.setNum( fvalue );
+    tmptext = "Float: " + strvalue;
+    selectedfloat->setText(tmptext);
+    // update double
+    double dvalue;
+    ucharPtr = (uchar*)&dvalue;
+    if(bytes.size() < sizeof(double) )
+    {
+        for(unsigned int i= 0; i < sizeof(double); ++i)
+        {
+            if( i < bytes.size() )
+            {
+                *ucharPtr++ = bytes[i];
+            }
+            else
+            {
+                *ucharPtr++ = 0x00;
+            }
+        }
+    }
+    else
+    {
+        memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
+    }
+    strvalue.setNum( dvalue );
+    tmptext = "Double: " + strvalue;
+    selecteddouble->setText(tmptext);
+}
+
+void WombatForensics::LoadFileContents(QString filepath)
+{
+    if(filepath != "")
+    {
+        QFileInfo pathinfo(filepath);
+        if(!pathinfo.isDir())
+        {
+            LoadHexModel(filepath);
+            LoadTxtContent(filepath);
+            LoadOmniContent(filepath); // possibly add a view type here: 1 - web, 2 - pic, 3 - vid
+        }
+        else
+        {
+            //txtwidget->setPlainText("");
+        }
+    }
+    else
+    {
+        //txtwidget->setPlainText("");
+        // load nothing here...
+    }
+}
+
+void WombatForensics::LoadHexModel(QString tmpFilePath)
+{
+    hexwidget->open(tmpFilePath);
+    hexwidget->set2BPC();
+    hexwidget->setBaseHex();
+}
+void WombatForensics::LoadTxtContent(QString asciiText)
+{
+    /*
+    QFile tmpFile(asciiText);
+    tmpFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream stream(&tmpFile);
+    txtwidget->setPlainText(stream.readAll());
+    tmpFile.close();
+    */
+}
+
+void WombatForensics::LoadOmniContent(QString filePath)
+{
+}
+
+void WombatForensics::setOffsetLabel(off_t pos)
+{
+  QString label;
+  label = "Offset: ";
+  char    buffer[64];
+#if _LARGEFILE_SOURCE
+  sprintf(buffer,"0x%lx",pos);
+#else
+  sprintf(buffer,"0x%x",pos);
+#endif
+  label += buffer;
+  selectedoffset->setText(label);
+}
+
+void WombatForensics::setScrollBarRange(off_t low, off_t high)
+{
+   (void)low;(void)high;
+   // range must be contained in the space of an integer, just do 100
+   // increments
+   hexvsb->setRange(0,100);
+}
+
+void WombatForensics::setScrollBarValue(off_t pos)
+{
+  // pos is the topLeft pos, set the scrollbar to the
+  // location of the last byte on the page
+  // Note: offsetToPercent now rounds up, so we don't
+  // have to worry about if this is the topLeft or bottom right
+  hexvsb->setValue(hexwidget->offsetToPercent(pos));
 }

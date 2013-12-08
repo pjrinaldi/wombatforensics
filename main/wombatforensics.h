@@ -81,6 +81,7 @@ private slots:
     void setScrollBarValue(off_t pos);
     void setOffsetLabel(off_t pos);
     void UpdateSelectValue(const QString &txt);
+    void LoadFileContents(QString filepath);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -93,6 +94,10 @@ private:
     void InitializeAppStructure();
     void RemoveTmpFiles();
     
+    void LoadHexModel(QString tmpFilePath);
+    void LoadTxtContent(QString asciiText);
+    void LoadOmniContent(QString filePath);
+
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     std::string GetTime(void);
     QThreadPool *threadpool;
