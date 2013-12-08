@@ -10,18 +10,21 @@
 #define UI_WOMBATFORENSICS_H
 
 #include <QtCore/QVariant>
+#include <QtWebKitWidgets/QWebView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSplitter>
-#include <QtWidgets/QStatusBar>
-#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QToolBar>
-#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -38,17 +41,31 @@ public:
     QAction *actionExport_Evidence;
     QAction *actionManage_OmniViewer;
     QWidget *centralwidget;
-    QVBoxLayout *verticalLayout;
+    QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
-    QTabWidget *fileViewTabWidget;
-    QTabWidget *fileInfoTabWidget;
+    QStackedWidget *viewerStack;
+    QWidget *hexPage;
+    QWidget *textPage;
+    QWidget *omniPage;
+    QHBoxLayout *horizontalLayout_2;
+    QStackedWidget *stackedWidget;
+    QWidget *webpage;
+    QHBoxLayout *horizontalLayout_3;
+    QWebView *webView;
+    QWidget *picpage;
+    QHBoxLayout *horizontalLayout_4;
+    QScrollArea *scrollArea;
+    QWidget *scrollAreaWidgetContents;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *picViewer;
+    QWidget *vidpage;
+    QTreeView *dirTreeView;
     QMenuBar *mainMenubar;
     QMenu *menuFile;
     QMenu *menuEvidence;
     QMenu *menuAction;
     QMenu *menuSettings;
-    QStatusBar *mainStatusbar;
-    QToolBar *mainToolBar;
+    QToolBar *analysisToolBar;
 
     void setupUi(QMainWindow *WombatForensics)
     {
@@ -92,26 +109,115 @@ public:
         actionManage_OmniViewer->setObjectName(QStringLiteral("actionManage_OmniViewer"));
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
-        verticalLayout = new QVBoxLayout(centralwidget);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        horizontalLayout = new QHBoxLayout(centralwidget);
+        horizontalLayout->setSpacing(0);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
         splitter = new QSplitter(centralwidget);
         splitter->setObjectName(QStringLiteral("splitter"));
-        splitter->setOrientation(Qt::Vertical);
-        splitter->setChildrenCollapsible(false);
-        fileViewTabWidget = new QTabWidget(splitter);
-        fileViewTabWidget->setObjectName(QStringLiteral("fileViewTabWidget"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(fileViewTabWidget->sizePolicy().hasHeightForWidth());
-        fileViewTabWidget->setSizePolicy(sizePolicy);
-        fileViewTabWidget->setMaximumSize(QSize(16777215, 467));
-        splitter->addWidget(fileViewTabWidget);
-        fileInfoTabWidget = new QTabWidget(splitter);
-        fileInfoTabWidget->setObjectName(QStringLiteral("fileInfoTabWidget"));
-        splitter->addWidget(fileInfoTabWidget);
+        sizePolicy.setHeightForWidth(splitter->sizePolicy().hasHeightForWidth());
+        splitter->setSizePolicy(sizePolicy);
+        splitter->setOrientation(Qt::Vertical);
+        splitter->setChildrenCollapsible(false);
+        viewerStack = new QStackedWidget(splitter);
+        viewerStack->setObjectName(QStringLiteral("viewerStack"));
+        sizePolicy.setHeightForWidth(viewerStack->sizePolicy().hasHeightForWidth());
+        viewerStack->setSizePolicy(sizePolicy);
+        hexPage = new QWidget();
+        hexPage->setObjectName(QStringLiteral("hexPage"));
+        sizePolicy.setHeightForWidth(hexPage->sizePolicy().hasHeightForWidth());
+        hexPage->setSizePolicy(sizePolicy);
+        viewerStack->addWidget(hexPage);
+        textPage = new QWidget();
+        textPage->setObjectName(QStringLiteral("textPage"));
+        sizePolicy.setHeightForWidth(textPage->sizePolicy().hasHeightForWidth());
+        textPage->setSizePolicy(sizePolicy);
+        viewerStack->addWidget(textPage);
+        omniPage = new QWidget();
+        omniPage->setObjectName(QStringLiteral("omniPage"));
+        sizePolicy.setHeightForWidth(omniPage->sizePolicy().hasHeightForWidth());
+        omniPage->setSizePolicy(sizePolicy);
+        horizontalLayout_2 = new QHBoxLayout(omniPage);
+        horizontalLayout_2->setSpacing(0);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
+        stackedWidget = new QStackedWidget(omniPage);
+        stackedWidget->setObjectName(QStringLiteral("stackedWidget"));
+        sizePolicy.setHeightForWidth(stackedWidget->sizePolicy().hasHeightForWidth());
+        stackedWidget->setSizePolicy(sizePolicy);
+        webpage = new QWidget();
+        webpage->setObjectName(QStringLiteral("webpage"));
+        horizontalLayout_3 = new QHBoxLayout(webpage);
+        horizontalLayout_3->setSpacing(0);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
+        webView = new QWebView(webpage);
+        webView->setObjectName(QStringLiteral("webView"));
+        sizePolicy.setHeightForWidth(webView->sizePolicy().hasHeightForWidth());
+        webView->setSizePolicy(sizePolicy);
+        webView->setAcceptDrops(false);
+        webView->setUrl(QUrl(QStringLiteral("about:blank")));
 
-        verticalLayout->addWidget(splitter);
+        horizontalLayout_3->addWidget(webView);
+
+        stackedWidget->addWidget(webpage);
+        picpage = new QWidget();
+        picpage->setObjectName(QStringLiteral("picpage"));
+        sizePolicy.setHeightForWidth(picpage->sizePolicy().hasHeightForWidth());
+        picpage->setSizePolicy(sizePolicy);
+        horizontalLayout_4 = new QHBoxLayout(picpage);
+        horizontalLayout_4->setSpacing(0);
+        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
+        horizontalLayout_4->setContentsMargins(0, 0, 0, 0);
+        scrollArea = new QScrollArea(picpage);
+        scrollArea->setObjectName(QStringLiteral("scrollArea"));
+        scrollArea->setFrameShape(QFrame::NoFrame);
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+        scrollAreaWidgetContents = new QWidget();
+        scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 782, 142));
+        sizePolicy.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents->setSizePolicy(sizePolicy);
+        horizontalLayout_5 = new QHBoxLayout(scrollAreaWidgetContents);
+        horizontalLayout_5->setSpacing(0);
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
+        horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
+        picViewer = new QLabel(scrollAreaWidgetContents);
+        picViewer->setObjectName(QStringLiteral("picViewer"));
+        sizePolicy.setHeightForWidth(picViewer->sizePolicy().hasHeightForWidth());
+        picViewer->setSizePolicy(sizePolicy);
+        picViewer->setTextFormat(Qt::PlainText);
+
+        horizontalLayout_5->addWidget(picViewer);
+
+        scrollArea->setWidget(scrollAreaWidgetContents);
+
+        horizontalLayout_4->addWidget(scrollArea);
+
+        stackedWidget->addWidget(picpage);
+        vidpage = new QWidget();
+        vidpage->setObjectName(QStringLiteral("vidpage"));
+        sizePolicy.setHeightForWidth(vidpage->sizePolicy().hasHeightForWidth());
+        vidpage->setSizePolicy(sizePolicy);
+        stackedWidget->addWidget(vidpage);
+
+        horizontalLayout_2->addWidget(stackedWidget);
+
+        viewerStack->addWidget(omniPage);
+        splitter->addWidget(viewerStack);
+        dirTreeView = new QTreeView(splitter);
+        dirTreeView->setObjectName(QStringLiteral("dirTreeView"));
+        dirTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        dirTreeView->setProperty("showDropIndicator", QVariant(false));
+        dirTreeView->setAlternatingRowColors(true);
+        dirTreeView->setExpandsOnDoubleClick(false);
+        splitter->addWidget(dirTreeView);
+
+        horizontalLayout->addWidget(splitter);
 
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
@@ -127,15 +233,12 @@ public:
         menuSettings = new QMenu(mainMenubar);
         menuSettings->setObjectName(QStringLiteral("menuSettings"));
         WombatForensics->setMenuBar(mainMenubar);
-        mainStatusbar = new QStatusBar(WombatForensics);
-        mainStatusbar->setObjectName(QStringLiteral("mainStatusbar"));
-        WombatForensics->setStatusBar(mainStatusbar);
-        mainToolBar = new QToolBar(WombatForensics);
-        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
-        mainToolBar->setMovable(false);
-        mainToolBar->setAllowedAreas(Qt::TopToolBarArea);
-        mainToolBar->setFloatable(false);
-        WombatForensics->addToolBar(Qt::TopToolBarArea, mainToolBar);
+        analysisToolBar = new QToolBar(WombatForensics);
+        analysisToolBar->setObjectName(QStringLiteral("analysisToolBar"));
+        analysisToolBar->setMovable(false);
+        analysisToolBar->setAllowedAreas(Qt::NoToolBarArea);
+        analysisToolBar->setFloatable(false);
+        WombatForensics->addToolBar(Qt::TopToolBarArea, analysisToolBar);
 
         mainMenubar->addAction(menuFile->menuAction());
         mainMenubar->addAction(menuEvidence->menuAction());
@@ -152,24 +255,12 @@ public:
         menuEvidence->addSeparator();
         menuAction->addAction(actionExport_Evidence);
         menuSettings->addAction(actionManage_OmniViewer);
-        mainToolBar->addAction(actionNew_Case);
-        mainToolBar->addAction(actionOpen_Case);
-        mainToolBar->addSeparator();
-        mainToolBar->addAction(actionView_Progress);
-        mainToolBar->addSeparator();
-        mainToolBar->addAction(actionAdd_Evidence);
-        mainToolBar->addAction(actionRemove_Evidence);
-        mainToolBar->addSeparator();
-        mainToolBar->addAction(actionExport_Evidence);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
         QObject::connect(actionAdd_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(AddEvidence()));
         QObject::connect(actionRemove_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(RemEvidence()));
         QObject::connect(actionExport_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(ExportEvidence()));
-
-        fileInfoTabWidget->setCurrentIndex(-1);
-
 
         QMetaObject::connectSlotsByName(WombatForensics);
     } // setupUi
@@ -185,11 +276,12 @@ public:
         actionRemove_Evidence->setText(QApplication::translate("WombatForensics", "Remove Evidence", 0));
         actionExport_Evidence->setText(QApplication::translate("WombatForensics", "Export Evidence", 0));
         actionManage_OmniViewer->setText(QApplication::translate("WombatForensics", "Manage OmniViewer", 0));
+        picViewer->setText(QString());
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));
         menuSettings->setTitle(QApplication::translate("WombatForensics", "Settings", 0));
-        mainToolBar->setWindowTitle(QApplication::translate("WombatForensics", "toolBar", 0));
+        analysisToolBar->setWindowTitle(QApplication::translate("WombatForensics", "toolBar", 0));
     } // retranslateUi
 
 };

@@ -18,6 +18,14 @@
 #include <string>
 #include <QString>
 #include <QThreadPool>
+#include <QBoxLayout>
+#include <QtWidgets>
+#include <QStringList>
+#include <QSizePolicy>
+#include <QFrame>
+#include <QStatusBar>
+#include <QtWebKitWidgets>
+#include <QWebView>
 
 #include "wombatvariable.h"
 #include "wombatdatabase.h"
@@ -25,7 +33,8 @@
 #include "progresswindow.h"
 #include "exportdialog.h"
 #include "sleuthkit.h"
-#include "basictools.h"
+#include "hexEditor.hpp"
+#include "translate.hpp"
 
 namespace Ui {
 class WombatForensics;
@@ -43,7 +52,6 @@ public:
     ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
     SleuthKitPlugin* isleuthkit;
-    BasicTools* ibasictools;
 
 signals:
     void LogVariable(WombatVariable wombatVariable);
@@ -69,6 +77,10 @@ private slots:
         ResizeColumns((QStandardItemModel*)index.model());
     }
     void FileExport(FileExportData exportdata);
+    void setScrollBarRange(off_t low, off_t high);
+    void setScrollBarValue(off_t pos);
+    void setOffsetLabel(off_t pos);
+    void UpdateSelectValue(const QString &txt);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -76,6 +88,7 @@ private:
     Ui::WombatForensics *ui;
 
     void SetupDirModel(void);
+    void SetupHexPage();
     void InitializeSleuthKit();
     void InitializeAppStructure();
     void RemoveTmpFiles();
@@ -89,11 +102,21 @@ private:
     std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
     int DetermineOmniView(QString currentSignature);
     QTreeView *currenttreeview;
-    QTextEdit* currenttxtwidget;
+    //QTextEdit* currenttxtwidget; // replace with a txt version of the hexeditor
     HexEditor* currenthexwidget;
     QWebView* currentwebview;
     QStackedLayout* currentomnistack;
     QModelIndex curselindex;
+
+    HexEditor* hexwidget;
+    QScrollBar* hexvsb;
+    QStatusBar* hstatus;
+    QLabel* selectedoffset;
+    QLabel* selectedhex;
+    QLabel* selectedascii;
+    QLabel* selectedinteger;
+    QLabel* selectedfloat;
+    QLabel* selecteddouble;
 
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;

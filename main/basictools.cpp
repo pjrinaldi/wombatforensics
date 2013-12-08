@@ -1,5 +1,5 @@
 #include "basictools.h"
-
+/*
 QWidget* BasicTools::setupHexTab()
 {
     // hex editor tab
@@ -38,7 +38,7 @@ QWidget* BasicTools::setupHexTab()
 
     return hexTab;
 }
-
+*/
 void BasicTools::UpdateSelectValue(const QString &txt)
 {
     // set hex (which i'll probably remove anyway since it's highlighted in same window)
@@ -111,7 +111,7 @@ void BasicTools::UpdateSelectValue(const QString &txt)
     tmptext = "Double: " + strvalue;
     selecteddouble->setText(tmptext);
 }
-
+/*
 QWidget* BasicTools::setupTxtTab()
 {
     QWidget* txtTab = new QWidget();
@@ -124,7 +124,8 @@ QWidget* BasicTools::setupTxtTab()
     
     return txtTab;
 }
-
+*/
+/*
 QWidget* BasicTools::setupOmniTab()
 {
     QWidget* omnitab = new QWidget();
@@ -161,7 +162,8 @@ QWidget* BasicTools::setupOmniTab()
 
     return omnitab;
 }
-
+*/
+/*
 QWidget* BasicTools::setupDirTab()
 {
     //directory tree tab
@@ -175,7 +177,8 @@ QWidget* BasicTools::setupDirTab()
 
     return dirTab;
 }
-
+*/
+/*
 QWidget* BasicTools::setupTypTab()
 {
     // file type (extension) tree tab
@@ -189,7 +192,7 @@ QWidget* BasicTools::setupTypTab()
 
     return typTab;
 }
-
+*/
 void BasicTools::LoadFileContents(QString filepath)
 {
     if(filepath != "")

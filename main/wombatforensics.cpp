@@ -7,7 +7,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatcasedata = new WombatDatabase();
     wombatprogresswindow = new ProgressWindow(wombatcasedata);
     isleuthkit = new SleuthKitPlugin(wombatcasedata);
-    ibasictools = new BasicTools();
+    //ibasictools = new BasicTools();
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
@@ -100,18 +100,28 @@ void WombatForensics::InitializeAppStructure()
     {
         DisplayError("1.0", "Case Count", "Invalid Case Count returned.");
     }
+    SetupHexPage();
+    //ui->hexPage->addWidget(setupHexTab
+    //ui->viewerStack->
+    //currenthexwidget = ui->viewerStack->findChild<HexEditor*>("bt-hexview");
+    //currentomnistack = ui->viewerStack->findChild<QStackedLayout*>("bt-omnistack");
+    //currentwebview = ui->viewStack->findChild<QWebView*>("bt-webview");
+    /*
     ui->fileViewTabWidget->addTab(ibasictools->setupHexTab(), "Hex View");
     ui->fileViewTabWidget->addTab(ibasictools->setupTxtTab(), "Text View");
     ui->fileViewTabWidget->addTab(ibasictools->setupOmniTab(), "Omni View");
     ui->fileInfoTabWidget->addTab(ibasictools->setupDirTab(), "Directory List");
     //ui->fileInfoTabWidget->addTab(ibasictools->setupTypTab(), "File Type");
-    currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor*>("bt-hexview");
-    currentomnistack = ui->fileViewTabWidget->findChild<QStackedLayout*>("bt-omnistack");
-    currentwebview = ui->fileViewTabWidget->findChild<QWebView*>("bt-webview");
-    currentwebview->show();
+    */
+    //currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor*>("bt-hexview");
+    //currentomnistack = ui->fileViewTabWidget->findChild<QStackedLayout*>("bt-omnistack");
+    //currentwebview = ui->fileViewTabWidget->findChild<QWebView*>("bt-webview");
+    //currentwebview->show();
+    /*
     connect(currenthexwidget, SIGNAL(rangeChanged(off_t,off_t)), ibasictools, SLOT(setScrollBarRange(off_t,off_t)));
     connect(currenthexwidget, SIGNAL(topLeftChanged(off_t)), ibasictools, SLOT(setScrollBarValue(off_t)));
     connect(currenthexwidget, SIGNAL(offsetChanged(off_t)), ibasictools, SLOT(setOffsetLabel(off_t)));
+    */
     SetupDirModel();
 }
 
@@ -430,16 +440,17 @@ void WombatForensics::FileExport(FileExportData exportdata)
 void WombatForensics::UpdateCaseData(WombatVariable wvariable)
 {
     // refresh views here
-    currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor*>("bt-hexview");
-    currenttxtwidget = ui->fileViewTabWidget->findChild<QTextEdit*>("bt-txtview");
-    currentwebview = ui->fileViewTabWidget->findChild<QWebView*>("bt-webview");
-    currenttxtwidget->setPlainText("");
+    //currenthexwidget = ui->fileViewTabWidget->findChild<HexEditor*>("bt-hexview");
+    //currenttxtwidget = ui->fileViewTabWidget->findChild<QTextEdit*>("bt-txtview");
+    //currentwebview = ui->fileViewTabWidget->findChild<QWebView*>("bt-webview");
+    //currenttxtwidget->setPlainText("");
     // refresh treeviews here
     wombatdirmodel->clear();
     QStringList headerList;
     headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     wombatdirmodel->setHorizontalHeaderLabels(headerList);
-    currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
+    currenttreeview  = ui->dirTreeView;
+    //currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
     currenttreeview->setModel(wombatdirmodel);
     ThreadRunner* trun = new ThreadRunner(isleuthkit, "refreshtreeviews", wombatvariable);
     threadpool->start(trun);
@@ -534,16 +545,48 @@ void WombatForensics::SetupDirModel(void)
     headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     wombatdirmodel->setHorizontalHeaderLabels(headerList);
     QStandardItem *evidenceNode = wombatdirmodel->invisibleRootItem();
-    currenttreeview = ui->fileInfoTabWidget->findChild<QTreeView *>("bt-dirtree");
+    currenttreeview = ui->dirTreeView;
     currenttreeview->setModel(wombatdirmodel);
     ResizeColumns(wombatdirmodel);
     connect(currenttreeview, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
     connect(currenttreeview, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
 }
 
+void WombatForensics::SetupHexPage(void)
+{
+    // hex editor page
+    QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
+    QHBoxLayout* hexLayout = new QHBoxLayout();
+    //QVBoxLayout* vlayout = new QVBoxLayout();
+    //QWidget* dumwidget = new QWidget();
+    hstatus = new QStatusBar(ui->hexPage);
+    hstatus->setSizeGripEnabled(false);
+    selectedoffset = new QLabel("Offset: 00");
+    selectedhex = new QLabel("Length: 0");
+    selectedascii = new QLabel("Ascii: ");
+    selectedinteger = new QLabel("Integer: ");
+    selectedfloat = new QLabel("Float: ");
+    selecteddouble = new QLabel("Double: ");
+    hstatus->addWidget(selectedoffset);
+    hstatus->addWidget(selectedhex);
+    hstatus->addWidget(selectedascii);
+    hstatus->addWidget(selectedinteger);
+    hstatus->addWidget(selectedfloat);
+    hstatus->addWidget(selecteddouble);
+    hexwidget = new HexEditor(ui->hexPage);
+    hexwidget->setObjectName("bt-hexview");
+    hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    hexLayout->addWidget(hexwidget);
+    hexvsb = new QScrollBar(hexwidget);
+    hexLayout->addWidget(hexvsb);
+    hexvsb->setRange(0, 0);
+    mainlayout->addLayout(hexLayout);
+    mainlayout->addWidget(hstatus);
+}
+
 void WombatForensics::SendFileContents(QString filepath)
 {
-    ibasictools->LoadFileContents(filepath);
+    //ibasictools->LoadFileContents(filepath);
 }
 
 WombatForensics::~WombatForensics()
@@ -711,11 +754,11 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         int omnivalue = DetermineOmniView(sigtext);
         if(omnivalue == 0)
         {
-            ui->fileViewTabWidget->setTabEnabled(2, false);
+            //ui->fileViewTabWidget->setTabEnabled(2, false);
         }
         else
         {
-            ui->fileViewTabWidget->setTabEnabled(2, true);
+            //ui->fileViewTabWidget->setTabEnabled(2, true);
             if(omnivalue == 1)
                 currentomnistack->setCurrentIndex(0);
             else if(omnivalue == 2)
