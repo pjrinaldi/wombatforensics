@@ -723,11 +723,11 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         {
             //ui->fileViewTabWidget->setTabEnabled(2, true); // where i enable the omni button
             if(omnivalue == 1)
-                ui->omnistack->setCurrentIndex(0);
+                ui->viewerstack->setCurrentIndex(0);
             else if(omnivalue == 2)
-                ui->omnistack->setCurrentIndex(1);
+                ui->viewerstack->setCurrentIndex(1);
             else if(omnivalue == 3)
-                ui->omnistack->setCurrentIndex(2);
+                ui->viewerstack->setCurrentIndex(2);
         }
     }
     else
