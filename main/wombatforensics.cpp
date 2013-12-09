@@ -99,6 +99,10 @@ void WombatForensics::InitializeAppStructure()
     {
         DisplayError("1.0", "Case Count", "Invalid Case Count returned.");
     }
+    QList<int> sizelist;
+    sizelist.append(height()/2);
+    sizelist.append(height()/2);
+    ui->splitter->setSizes(sizelist);
     SetupDirModel();
     SetupHexPage();
     
