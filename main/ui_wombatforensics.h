@@ -239,6 +239,7 @@ public:
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
         analysisToolBar->setObjectName(QStringLiteral("analysisToolBar"));
+        analysisToolBar->setIconSize(QSize(16, 16));
         analysisToolBar->setMovable(false);
         analysisToolBar->setAllowedAreas(Qt::NoToolBarArea);
         analysisToolBar->setFloatable(false);
