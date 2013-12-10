@@ -712,7 +712,7 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
 {
     if(selaction == ui->actionViewHex)
     {
-        // show the 
+        // show the correct viewer page from stacked widget
         //fprintf(stderr, "Hex Button Text: %s\n", selaction->text().toStdString().c_str());
     }
     else if(selaction == ui->actionViewTxt)
