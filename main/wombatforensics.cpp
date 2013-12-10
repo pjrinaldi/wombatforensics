@@ -801,6 +801,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
                     wombatvariable.evidencedbname = evidenceidlist[3*i+2];
                 }
             }
+            fprintf(stderr, "evipath: %s\n", wombatvariable.evidencepath.toStdString().c_str());
             bool isvolume = false;
             for(int i=0; i < volumedesclist.count() / 2; i++)
             {

@@ -940,8 +940,8 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     TskImageFileTsk currentimagefiletsk;
     uint64_t bytelen = 512*(seclength - 1);
     uint64_t bytestart = 512*secstart;
-    //char volbuffer[bytelen];
-    char* volbuffer;
+    char volbuffer[bytelen + 1024];
+    //char* volbuffer;
     try
     {
         currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
@@ -951,17 +951,13 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     {
         fprintf(stderr, "Error set image file: %s\n", ex.what());
     }
-    int retval = -1;
+    int retval = 0;
     try
     {
-        //SectorRuns* sr = new SectorRuns();
-        //sr->addRun(secstart, seclength, volID);
-        //int retval = sr->getData(secstart, seclength, volbuffer);
-        //SectorRun::SectorRun    
         // need to figure out why this fails... and returns -1
-        //retval = TskServices::Instance().getImageFile().getByteData(bytestart, bytelen, volbuffer);
+        retval = TskServices::Instance().getImageFile().getByteData(bytestart, bytelen, volbuffer);
         //retval = TskServices::Instance().getImageFile().getSectorData(secstart, seclength-1, volbuffer);
-        //fprintf(stderr, "sector data return value: %i\n", retval);
+        fprintf(stderr, "sector data return value: %i\n", retval);
         if (retval == -1)
         {
         //std::wstringstream message;
