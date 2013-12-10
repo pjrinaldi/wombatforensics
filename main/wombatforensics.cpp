@@ -712,27 +712,18 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
 {
     if(selaction == ui->actionViewHex)
     {
-        fprintf(stderr, "Hex Button Text: %s\n", selaction->text().toStdString().c_str());
+        // show the 
+        //fprintf(stderr, "Hex Button Text: %s\n", selaction->text().toStdString().c_str());
     }
     else if(selaction == ui->actionViewTxt)
     {
-        fprintf(stderr, "Text Button Text: %s\n", selaction->text().toStdString().c_str());
+        //fprintf(stderr, "Text Button Text: %s\n", selaction->text().toStdString().c_str());
     }
     else if(selaction == ui->actionViewOmni)
     {
-        fprintf(stderr, "Omni Button Text: %s\n", selaction->text().toStdString().c_str());
+        //fprintf(stderr, "Omni Button Text: %s\n", selaction->text().toStdString().c_str());
     }
 }
-/*
-void WombatForensics::actionViewHexTriggered(bool checked)
-{
-    if(!checked)
-    {
-    }
-    else // 
-    {
-    }
-}*/
 
 void WombatForensics::on_actionView_Progress_triggered(bool checked)
 {
