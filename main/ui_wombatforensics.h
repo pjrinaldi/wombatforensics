@@ -85,21 +85,25 @@ public:
         actionViewHex = new QAction(WombatForensics);
         actionViewHex->setObjectName(QStringLiteral("actionViewHex"));
         actionViewHex->setCheckable(true);
+        actionViewHex->setChecked(true);
         QIcon icon2;
         icon2.addFile(QStringLiteral(":/bar/hexview"), QSize(), QIcon::Normal, QIcon::Off);
         actionViewHex->setIcon(icon2);
+        actionViewHex->setAutoRepeat(false);
         actionViewTxt = new QAction(WombatForensics);
         actionViewTxt->setObjectName(QStringLiteral("actionViewTxt"));
         actionViewTxt->setCheckable(true);
         QIcon icon3;
         icon3.addFile(QStringLiteral(":/bar/txtview"), QSize(), QIcon::Normal, QIcon::Off);
         actionViewTxt->setIcon(icon3);
+        actionViewTxt->setAutoRepeat(false);
         actionViewOmni = new QAction(WombatForensics);
         actionViewOmni->setObjectName(QStringLiteral("actionViewOmni"));
         actionViewOmni->setCheckable(true);
         QIcon icon4;
         icon4.addFile(QStringLiteral(":/bar/omniview"), QSize(), QIcon::Normal, QIcon::Off);
         actionViewOmni->setIcon(icon4);
+        actionViewOmni->setAutoRepeat(false);
         actionView_Progress = new QAction(WombatForensics);
         actionView_Progress->setObjectName(QStringLiteral("actionView_Progress"));
         actionView_Progress->setCheckable(true);
@@ -239,9 +243,9 @@ public:
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
         analysisToolBar->setObjectName(QStringLiteral("analysisToolBar"));
-        analysisToolBar->setIconSize(QSize(16, 16));
         analysisToolBar->setMovable(false);
         analysisToolBar->setAllowedAreas(Qt::NoToolBarArea);
+        analysisToolBar->setIconSize(QSize(16, 16));
         analysisToolBar->setFloatable(false);
         WombatForensics->addToolBar(Qt::TopToolBarArea, analysisToolBar);
 

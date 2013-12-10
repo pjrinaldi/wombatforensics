@@ -1,477 +1,498 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-<class>WombatForensics</class>
-<widget class="QMainWindow" name="WombatForensics">
-    <property name="geometry">
-        <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>800</width>
-            <height>600</height>
-        </rect>
+ <class>WombatForensics</class>
+ <widget class="QMainWindow" name="WombatForensics">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>WombatForensics</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
     </property>
-    <property name="windowTitle">
-        <string>WombatForensics</string>
+    <property name="leftMargin">
+     <number>0</number>
     </property>
-    <widget class="QWidget" name="centralwidget">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-            <property name="spacing">
-                <number>0</number>
-            </property>
-            <property name="leftMargin">
-                <number>0</number>
-            </property>
-            <property name="topMargin">
-                <number>0</number>
-            </property>
-            <property name="rightMargin">
-                <number>0</number>
-            </property>
-            <property name="bottomMargin">
-                <number>0</number>
-            </property>
-            <item>
-                <widget class="QSplitter" name="splitter">
-                    <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="orientation">
-                        <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="childrenCollapsible">
-                        <bool>false</bool>
-                    </property>
-					<widget class="QStackedWidget" name="viewerstack">
-						<property name="sizePolicy">
-							<sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-								<horstretch>0</horstretch>
-								<verstretch>0</verstretch>
-							</sizepolicy>
-						</property>
-						<property name="frameShape">
-							<enum>QFrame::StyledPanel</enum>
-						</property>
-						<property name="frameShadow">
-							<enum>QFrame::Sunken</enum>
-						</property>
-						<widget class="QWidget" name="hexPage">
-							<property name="sizePolicy">
-								<sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-									<horstretch>0</horstretch>
-									<verstretch>0</verstretch>
-								</sizepolicy>
-							</property>
-						</widget>
-						<widget class="QWidget" name="textPage">
-							<property name="sizePolicy">
-								<sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-									<horstretch>0</horstretch>
-									<verstretch>0</verstretch>
-								</sizepolicy>
-							</property>
-						</widget>
-						<widget class="QWidget" name="webpage">
-							<layout class="QHBoxLayout" name="horizontalLayout_3">
-								<property name="spacing">
-									<number>0</number>
-								</property>
-								<property name="leftMargin">
-									<number>0</number>
-								</property>
-								<property name="topMargin">
-									<number>0</number>
-								</property>
-								<property name="rightMargin">
-									<number>0</number>
-								</property>
-								<property name="bottomMargin">
-									<number>0</number>
-								</property>
-								<item>
-									<widget class="QWebView" name="webView">
-										<property name="sizePolicy">
-											<sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-												<horstretch>0</horstretch>
-												<verstretch>0</verstretch>
-											</sizepolicy>
-										</property>
-										<property name="acceptDrops">
-											<bool>false</bool>
-										</property>
-										<property name="url">
-											<url>
-												<string>about:blank</string>
-											</url>
-										</property>
-									</widget>
-								</item>
-							</layout>
-						</widget>
-						<widget class="QWidget" name="picpage">
-							<property name="sizePolicy">
-								<sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-									<horstretch>0</horstretch>
-									<verstretch>0</verstretch>
-								</sizepolicy>
-							</property>
-							<layout class="QHBoxLayout" name="horizontalLayout_4">
-								<property name="spacing">
-									<number>0</number>
-								</property>
-								<property name="leftMargin">
-									<number>0</number>
-								</property>
-								<property name="topMargin">
-									<number>0</number>
-								</property>
-								<property name="rightMargin">
-									<number>0</number>
-								</property>
-								<property name="bottomMargin">
-									<number>0</number>
-								</property>
-								<item>
-									<widget class="QScrollArea" name="scrollArea">
-										<property name="frameShape">
-											<enum>QFrame::NoFrame</enum>
-										</property>
-										<property name="widgetResizable">
-											<bool>true</bool>
-										</property>
-										<property name="alignment">
-											<set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-										</property>
-										<widget class="QWidget" name="scrollAreaWidgetContents">
-											<property name="geometry">
-												<rect>
-													<x>0</x>
-													<y>0</y>
-													<width>100</width>
-													<height>30</height>
-												</rect>
-											</property>
-											<property name="sizePolicy">
-												<sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-													<horstretch>0</horstretch>
-													<verstretch>0</verstretch>
-												</sizepolicy>
-											</property>
-											<layout class="QHBoxLayout" name="horizontalLayout_5">
-												<property name="spacing">
-													<number>0</number>
-												</property>
-												<property name="leftMargin">
-													<number>0</number>
-												</property>
-												<property name="topMargin">
-													<number>0</number>
-												</property>
-												<property name="rightMargin">
-													<number>0</number>
-												</property>
-												<property name="bottomMargin">
-													<number>0</number>
-												</property>
-												<item>
-													<widget class="QLabel" name="picViewer">
-														<property name="sizePolicy">
-															<sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-																<horstretch>0</horstretch>
-																<verstretch>0</verstretch>
-															</sizepolicy>
-														</property>
-														<property name="text">
-															<string/>
-														</property>
-														<property name="textFormat">
-															<enum>Qt::PlainText</enum>
-														</property>
-													</widget>
-												</item>
-											</layout>
-										</widget>
-									</widget>
-								</item>
-							</layout>
-						</widget>
-						<widget class="QWidget" name="vidpage">
-							<property name="sizePolicy">
-								<sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-									<horstretch>0</horstretch>
-									<verstretch>0</verstretch>
-								</sizepolicy>
-							</property>
-						</widget>
-					</widget>
-					<widget class="QTreeView" name="dirTreeView">
-						<property name="editTriggers">
-							<set>QAbstractItemView::NoEditTriggers</set>
-						</property>
-						<property name="showDropIndicator" stdset="0">
-							<bool>false</bool>
-						</property>
-						<property name="alternatingRowColors">
-							<bool>true</bool>
-						</property>
-						<property name="expandsOnDoubleClick">
-							<bool>false</bool>
-						</property>
-					</widget>
-				</widget>
-            </item>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QStackedWidget" name="viewerstack">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <widget class="QWidget" name="hexPage">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+       <widget class="QWidget" name="textPage">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+       <widget class="QWidget" name="webpage">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QWebView" name="webView">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="acceptDrops">
+            <bool>false</bool>
+           </property>
+           <property name="url">
+            <url>
+             <string>about:blank</string>
+            </url>
+           </property>
+          </widget>
+         </item>
         </layout>
-    </widget>
-    <widget class="QMenuBar" name="mainMenubar">
-        <property name="geometry">
-            <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>800</width>
-                <height>19</height>
-            </rect>
+       </widget>
+       <widget class="QWidget" name="picpage">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="acceptDrops">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QScrollArea" name="scrollArea">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="widgetResizable">
             <bool>true</bool>
-        </property>
-        <widget class="QMenu" name="menuFile">
-            <property name="title">
-                <string>File</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <widget class="QWidget" name="scrollAreaWidgetContents">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>100</width>
+              <height>30</height>
+             </rect>
             </property>
-            <addaction name="actionNew_Case"/>
-            <addaction name="actionOpen_Case"/>
-            <addaction name="separator"/>
-            <addaction name="actionView_Progress"/>
-            <addaction name="separator"/>
-            <addaction name="actionExit"/>
-        </widget>
-        <widget class="QMenu" name="menuEvidence">
-            <property name="title">
-                <string>Evidence</string>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <addaction name="actionAdd_Evidence"/>
-            <addaction name="actionRemove_Evidence"/>
-            <addaction name="separator"/>
-        </widget>
-        <widget class="QMenu" name="menuAction">
-            <property name="title">
-                <string>Action</string>
-            </property>
-            <addaction name="actionExport_Evidence"/>
-        </widget>
-        <widget class="QMenu" name="menuSettings">
-            <property name="title">
-                <string>Settings</string>
-            </property>
-            <addaction name="actionManage_OmniViewer"/>
-        </widget>
-        <addaction name="menuFile"/>
-        <addaction name="menuEvidence"/>
-        <addaction name="menuAction"/>
-        <addaction name="menuSettings"/>
-    </widget>
-    <widget class="QToolBar" name="analysisToolBar">
-        <property name="windowTitle">
-            <string>toolBar</string>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="picViewer">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textFormat">
+                <enum>Qt::PlainText</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="vidpage">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="iconSize">
-            <size>
-                <width>16</width>
-                <height>16</height>
-            </size>
-        </property>
-        <property name="movable">
-            <bool>false</bool>
-        </property>
-        <property name="allowedAreas">
-            <set>Qt::NoToolBarArea</set>
-        </property>
-        <property name="floatable">
-            <bool>false</bool>
-        </property>
-        <attribute name="toolBarArea">
-            <enum>TopToolBarArea</enum>
-        </attribute>
-        <attribute name="toolBarBreak">
-            <bool>false</bool>
-        </attribute>
-        <addaction name="actionViewHex"/>
-        <addaction name="actionViewTxt"/>
-        <addaction name="actionViewOmni"/>
-        <addaction name="separator"/>
-        <addaction name="actionView_Progress"/>
-        <addaction name="separator"/>
-        <addaction name="actionExport_Evidence"/>
-    </widget>
-    <action name="actionNew_Case">
-        <property name="icon">
-            <iconset><normaloff>:/newcase</normaloff>:/newcase</iconset>
-        </property>
-        <property name="text">
-            <string>New Case</string>
-        </property>
-    </action>
-    <action name="actionOpen_Case">
-        <property name="icon">
-            <iconset><normaloff>:/opencase</normaloff>:/opencase</iconset>
-        </property>
-        <property name="text">
-            <string>Open Case</string>
-        </property>
-    </action>
-    <action name="actionViewHex">
-        <property name="checkable">
-            <bool>true</bool>
-        </property>
-        <property name="icon">
-            <iconset><normaloff>:/bar/hexview</normaloff>:/bar/hexview</iconset>
-        </property>
-        <property name="text">
-            <string>View Hex</string>
-        </property>
-    </action>
-    <action name="actionViewTxt">
-        <property name="checkable">
-            <bool>true</bool>
-        </property>
-        <property name="icon">
-            <iconset><normaloff>:/bar/txtview</normaloff>:/bar/txtview</iconset>
-        </property>
-        <property name="text">
-            <string>View Text</string>
-        </property>
-    </action>
-    <action name="actionViewOmni">
-        <property name="checkable">
-            <bool>true</bool>
-        </property>
-        <property name="icon">
-            <iconset><normaloff>:/bar/omniview</normaloff>:/bar/omnivew</iconset>
-        </property>
-        <property name="text">
-            <string>View Omni</string>
-        </property>
-    </action>
-    <action name="actionView_Progress">
-        <property name="checkable">
-            <bool>true</bool>
-        </property>
-        <property name="icon">
-            <iconset><normaloff>:/progresswindow/window</normaloff>:/progresswindow/window</iconset>
-        </property>
-        <property name="text">
-            <string>View Progress...</string>
-        </property>
-    </action>
-    <action name="actionExit">
-        <property name="text">
-            <string>Exit</string>
-        </property>
-    </action>
-    <action name="actionAdd_Evidence">
-        <property name="icon">
-            <iconset><normaloff>:/basic/addevidence</normaloff>:/basic/addevidence</iconset>
-        </property>
-        <property name="text">
-            <string>Add Evidence</string>
-        </property>
-    </action>
-    <action name="actionRemove_Evidence">
-        <property name="icon">
-            <iconset><normaloff>:/basic/remevidence</normaloff>:/basic/remevidence</iconset>
-        </property>
-        <property name="text">
-            <string>Remove Evidence</string>
-        </property>
-    </action>
-    <action name="actionExport_Evidence">
-        <property name="icon">
-            <iconset><normaloff>:/bar/export</normaloff>:/bar/export</iconset>
-        </property>
-        <property name="text">
-            <string>Export Evidence</string>
-        </property>
-    </action>
-    <action name="actionManage_OmniViewer">
-        <property name="text">
-            <string>Manage OmniViewer</string>
-        </property>
-    </action>
-</widget>
-<customwidgets>
-    <customwidget>
-        <class>QWebView</class>
-        <extends>QWidget</extends>
-        <header>QtWebKitWidgets/QWebView</header>
-    </customwidget>
-</customwidgets>
-<resources/>
-<connections>
-    <connection>
-        <sender>actionExit</sender>
-        <signal>triggered()</signal>
-        <receiver>WombatForensics</receiver>
-        <slot>close()</slot>
-        <hints>
-            <hint type="sourcelabel">
-                <x>-1</x>
-                <y>-1</y>
-            </hint>
-            <hint type="destinationlabel">
-                <x>399</x>
-                <y>299</y>
-            </hint>
-        </hints>
-    </connection>
-    <connection>
-        <sender>actionAdd_Evidence</sender>
-        <signal>triggered()</signal>
-        <receiver>WombatForensics</receiver>
-        <slot>AddEvidence()</slot>
-        <hints>
-            <hint type="sourcelabel">
-                <x>-1</x>
-                <y>-1</y>
-            </hint>
-            <hint type="destinationlabel">
-                <x>20</x>
-                <y>20</y>
-            </hint>
-        </hints>
-    </connection>
-    <connection>
-        <sender>actionRemove_Evidence</sender>
-        <signal>triggered()</signal>
-        <receiver>WombatForensics</receiver>
-        <slot>RemEvidence()</slot>
-        <hints>
-            <hint type="sourcelabel">
-                <x>-1</x>
-                <y>-1</y>
-            </hint>
-            <hint type="destinationlabel">
-                <x>20</x>
-                <y>20</y>
-            </hint>
-        </hints>
-    </connection>
-    <connection>
-        <sender>actionExport_Evidence</sender>
-        <signal>triggered()</signal>
-        <receiver>WombatForensics</receiver>
-        <slot>ExportEvidence()</slot>
-        <hints>
-            <hint type="sourcelabel">
-                <x>-1</x>
-                <y>-1</y>
-            </hint>
-            <hint type="destinationlabel">
-                <x>20</x>
-                <y>20</y>
-            </hint>
-        </hints>
-    </connection>
-</connections>
+       </widget>
+      </widget>
+      <widget class="QTreeView" name="dirTreeView">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="showDropIndicator" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="expandsOnDoubleClick">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="mainMenubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="acceptDrops">
+    <bool>true</bool>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew_Case"/>
+    <addaction name="actionOpen_Case"/>
+    <addaction name="separator"/>
+    <addaction name="actionView_Progress"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuEvidence">
+    <property name="title">
+     <string>Evidence</string>
+    </property>
+    <addaction name="actionAdd_Evidence"/>
+    <addaction name="actionRemove_Evidence"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuAction">
+    <property name="title">
+     <string>Action</string>
+    </property>
+    <addaction name="actionExport_Evidence"/>
+   </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionManage_OmniViewer"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEvidence"/>
+   <addaction name="menuAction"/>
+   <addaction name="menuSettings"/>
+  </widget>
+  <widget class="QToolBar" name="analysisToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::NoToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionViewHex"/>
+   <addaction name="actionViewTxt"/>
+   <addaction name="actionViewOmni"/>
+   <addaction name="separator"/>
+   <addaction name="actionView_Progress"/>
+   <addaction name="separator"/>
+   <addaction name="actionExport_Evidence"/>
+  </widget>
+  <action name="actionNew_Case">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/newcase</normaloff>:/newcase</iconset>
+   </property>
+   <property name="text">
+    <string>New Case</string>
+   </property>
+  </action>
+  <action name="actionOpen_Case">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/opencase</normaloff>:/opencase</iconset>
+   </property>
+   <property name="text">
+    <string>Open Case</string>
+   </property>
+  </action>
+  <action name="actionViewHex">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/bar/hexview</normaloff>:/bar/hexview</iconset>
+   </property>
+   <property name="text">
+    <string>View Hex</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionViewTxt">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/bar/txtview</normaloff>:/bar/txtview</iconset>
+   </property>
+   <property name="text">
+    <string>View Text</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionViewOmni">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/bar/omniview</normaloff>:/bar/omniview</iconset>
+   </property>
+   <property name="text">
+    <string>View Omni</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionView_Progress">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/progresswindow/window</normaloff>:/progresswindow/window</iconset>
+   </property>
+   <property name="text">
+    <string>View Progress...</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionAdd_Evidence">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/basic/addevidence</normaloff>:/basic/addevidence</iconset>
+   </property>
+   <property name="text">
+    <string>Add Evidence</string>
+   </property>
+  </action>
+  <action name="actionRemove_Evidence">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/basic/remevidence</normaloff>:/basic/remevidence</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Evidence</string>
+   </property>
+  </action>
+  <action name="actionExport_Evidence">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/bar/export</normaloff>:/bar/export</iconset>
+   </property>
+   <property name="text">
+    <string>Export Evidence</string>
+   </property>
+  </action>
+  <action name="actionManage_OmniViewer">
+   <property name="text">
+    <string>Manage OmniViewer</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWebView</class>
+   <extends>QWidget</extends>
+   <header>QtWebKitWidgets/QWebView</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>WombatForensics</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAdd_Evidence</sender>
+   <signal>triggered()</signal>
+   <receiver>WombatForensics</receiver>
+   <slot>AddEvidence()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionRemove_Evidence</sender>
+   <signal>triggered()</signal>
+   <receiver>WombatForensics</receiver>
+   <slot>RemEvidence()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExport_Evidence</sender>
+   <signal>triggered()</signal>
+   <receiver>WombatForensics</receiver>
+   <slot>ExportEvidence()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

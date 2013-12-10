@@ -81,6 +81,7 @@ private slots:
     void setOffsetLabel(off_t pos);
     void UpdateSelectValue(const QString &txt);
     void LoadFileContents(QString filepath);
+    void ViewGroupTriggered(QAction* curaction); 
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -89,6 +90,7 @@ private:
 
     void SetupDirModel(void);
     void SetupHexPage();
+    void SetupToolbar(void);
     void InitializeSleuthKit();
     void InitializeAppStructure();
     void RemoveTmpFiles();
@@ -110,6 +112,7 @@ private:
 
     off_t offset() const;
     HexEditor* hexwidget;
+    QActionGroup* viewgroup;
     QScrollBar* hexvsb;
     QStatusBar* hstatus;
     QLabel* selectedoffset;
