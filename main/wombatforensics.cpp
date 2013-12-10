@@ -712,15 +712,20 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
 {
     if(selaction == ui->actionViewHex)
     {
+        ui->viewerstack->setCurrentIndex(0);
         // show the correct viewer page from stacked widget
         //fprintf(stderr, "Hex Button Text: %s\n", selaction->text().toStdString().c_str());
     }
     else if(selaction == ui->actionViewTxt)
     {
+        ui->viewerstack->setCurrentIndex(1);
         //fprintf(stderr, "Text Button Text: %s\n", selaction->text().toStdString().c_str());
     }
     else if(selaction == ui->actionViewOmni)
     {
+        ui->viewerstack->setCurrentIndex(wombatvariable.omnivalue + 1);
+        //int omnivalue = DetermineOmniView(wombatvariable.omnivalue);
+        //ui->viewerstack->setCurrentIndex(2);
         //fprintf(stderr, "Omni Button Text: %s\n", selaction->text().toStdString().c_str());
     }
 }
@@ -747,20 +752,22 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         wombatvariable.evidencedbname = currentevidencelist[1];
         wombatvariable.fileid = wombatcasedata->ReturnObjectFileID(tmptext.toInt());
         sigtext = index.sibling(index.row(), 4).data().toString(); // signature value which i need to compare to the xml of known values
-        int omnivalue = DetermineOmniView(sigtext);
-        if(omnivalue == 0)
+        wombatvariable.omnivalue = DetermineOmniView(sigtext);
+        if(wombatvariable.omnivalue == 0)
         {
             //ui->fileViewTabWidget->setTabEnabled(2, false); // where i disable the omni button 
         }
         else
         {
+            ui->viewerstack->setCurrentIndex(wombatvariable.omnivalue + 1);
             //ui->fileViewTabWidget->setTabEnabled(2, true); // where i enable the omni button
-            if(omnivalue == 1)
-                ui->viewerstack->setCurrentIndex(0);
-            else if(omnivalue == 2)
-                ui->viewerstack->setCurrentIndex(1);
-            else if(omnivalue == 3)
+            /*if(omnivalue == 1)
                 ui->viewerstack->setCurrentIndex(2);
+            else if(omnivalue == 2)
+                ui->viewerstack->setCurrentIndex(3);
+            else if(omnivalue == 3)
+                ui->viewerstack->setCurrentIndex(4);
+                */
         }
     }
     else
