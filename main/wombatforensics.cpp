@@ -714,7 +714,6 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
     {
         ui->viewerstack->setCurrentIndex(0);
         // show the correct viewer page from stacked widget
-        //fprintf(stderr, "Hex Button Text: %s\n", selaction->text().toStdString().c_str());
     }
     else if(selaction == ui->actionViewTxt)
     {
@@ -724,9 +723,6 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
     else if(selaction == ui->actionViewOmni)
     {
         ui->viewerstack->setCurrentIndex(wombatvariable.omnivalue + 1);
-        //int omnivalue = DetermineOmniView(wombatvariable.omnivalue);
-        //ui->viewerstack->setCurrentIndex(2);
-        //fprintf(stderr, "Omni Button Text: %s\n", selaction->text().toStdString().c_str());
     }
 }
 

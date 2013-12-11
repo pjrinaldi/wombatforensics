@@ -943,7 +943,7 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     //char volbuffer[bytelen + 1024];
     char* volbuffer;
     volbuffer = new char[seclength];
-    //memset(volbuffer, 0, seclength);
+    memset(volbuffer, 0, seclength);
 
     try
     {
@@ -995,6 +995,7 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
         tmpfile.close();
         */
     }
+    //delete volbuffer;
     //delete[] volbuffer;
     //free(volbuffer);
 
