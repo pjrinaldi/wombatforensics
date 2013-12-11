@@ -943,7 +943,7 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     //char volbuffer[bytelen + 1024];
     char* volbuffer;
     volbuffer = new char[seclength];
-    memset(volbuffer, 0, seclength);
+    //memset(volbuffer, 0, seclength);
 
     try
     {
@@ -963,13 +963,9 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
         fprintf(stderr, "sector data return value: %i\n", retval);
         if (retval == -1)
         {
-        //std::wstringstream message;
-        //message << L"TskImageFileTsk::getByteData - tsk_img_read -- start: " 
-            //<< byte_start << " -- len: " << byte_len
-            //<< "(" << tsk_error_get() << ")" << std::endl;
-        //LOGERROR(message.str());
-        //return -1;
         }
+        currentimagefiletsk.close();
+        TskServices::Instance().getImageFile().close();
     }
     catch(TskException ex)
     {
