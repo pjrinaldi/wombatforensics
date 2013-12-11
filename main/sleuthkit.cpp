@@ -940,10 +940,8 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     TskImageFileTsk currentimagefiletsk;
     uint64_t bytelen = 512*(seclength - 1);
     uint64_t bytestart = 512*secstart;
-    //char volbuffer[bytelen + 1024];
-    char* volbuffer;
-    volbuffer = new char[seclength];
-    //memset(volbuffer, 0, seclength);
+    char* volbuffer = NULL;
+    volbuffer = new char[bytelen+512];
 
     try
     {
@@ -958,14 +956,11 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
     try
     {
         // need to figure out why this fails... and returns -1
-        //retval = TskServices::Instance().getImageFile().getByteData(bytestart, bytelen, volbuffer);
         retval = TskServices::Instance().getImageFile().getSectorData(secstart, seclength-1, volbuffer);
         fprintf(stderr, "sector data return value: %i\n", retval);
         if (retval == -1)
         {
         }
-        currentimagefiletsk.close();
-        TskServices::Instance().getImageFile().close();
     }
     catch(TskException ex)
     {
@@ -977,23 +972,9 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
         tmpfile.open(QIODevice::WriteOnly);
         tmpfile.write(volbuffer, bytelen);
         tmpfile.close();
-        //std::string bufstring(volbuffer);
-        /*
-        FILE* tmpfile;
-        tmpfile = fopen("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat", "wb");
-        fwrite(volbuffer, sizeof(char), sizeof(volbuffer), tmpfile);
-        fclose(tmpfile);
-        */
-        /*
-        ofstream tmpfile("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat", ios::out | ios::binary);
-        //ofstream tmpfile(returnpath.toStdString().c_str(), ios::out | ios::binary);
-        tmpfile.write(volbuffer, sizeof(volbuffer));
-        tmpfile.close();
-        */
     }
+    delete[] volbuffer;
     //delete volbuffer;
-    //delete[] volbuffer;
-    //free(volbuffer);
 
     return "/home/pasquale/WombatForensics/tmpfiles/volbyte.dat";
 }
