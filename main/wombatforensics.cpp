@@ -496,11 +496,13 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::GetImageNode(QStandardItem* imagenode)
 {
+    setUpdatesEnabled(false);
     QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
     currentroot->appendRow(imagenode);
     ui->dirTreeView->setModel(wombatdirmodel);
     ResizeColumns(wombatdirmodel);
     UpdateMessageTable();
+    setUpdatesEnabled(true);
 
 }
 
