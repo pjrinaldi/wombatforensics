@@ -44,12 +44,7 @@ public:
   HexEditor( QWidget * parent =0 );
   ~HexEditor();
 
-  // note: closeFile returns QMessageBox::{Yes,No,Cancel}
-  //int closeFile(bool force = false );
   bool open(const QString& filename);
-  // becomes "save as" if filename != ""
-  //bool save(QString filename = "");
-  //bool isModified() const;
   QString filename() const;
   Reader * reader();
   off_t offset() const;
@@ -117,8 +112,6 @@ public slots:
   void nextPage();
   void prevPage();
   void setFont(const QFont& font);
-  //void undo();
-  //void redo();
   void search(const QString& hexText, bool forwards);
   void setBase(int base); // only 2 8 16 acceptableO
   void setBaseHex();
