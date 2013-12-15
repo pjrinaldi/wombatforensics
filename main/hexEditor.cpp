@@ -72,71 +72,7 @@ HexEditor::~HexEditor()
 {
   _reader.close();
 }
-/*
-bool HexEditor::isModified() const
-{
-  return ( _reader.is_open() && _delta.numEdits() );
-}
-bool HexEditor::save( QString filename )
-{
-  if( !isModified() ) {
-    QString errMsg = "Error, file is not open or has not been modified. "
-      "Aborting save.";
-    QMessageBox::warning(this,PROGRAM_STRING,errMsg);
-    return false;
-  }
 
-  if( filename != "" ) {
-    // copy open reader file to filename
-    QString oldFilename = _reader.filename();
-
-    if( oldFilename == "" )
-      return false;
-
-    _reader.close();
-    FILE* fin = fopen(C_STR(oldFilename),"r");
-    if( !fin ) {
-      QString errMsg = "Error opening \"" + oldFilename + "\" for reading: " +
-	strerror(errno);
-      QMessageBox::warning(this,PROGRAM_STRING,errMsg);
-      return false;
-    }
-    FILE* fout = fopen(C_STR(filename),"w");
-    if( !fout ) {
-      QString errMsg = "Error opening \"" + filename+ "\" for writing: " +
-	strerror(errno);
-      QMessageBox::warning(this,PROGRAM_STRING,errMsg);
-      fclose(fin);
-      return false;
-    }
-    int length;
-    uchar bytes[4096];
-    while( (length = fread(bytes,1,4096,fin)) ) {
-      fwrite( bytes, 1, length, fout );
-    }
-    fclose(fin);
-    fclose(fout);
-  } else {
-    filename = _reader.filename();
-    _reader.close();
-  }
-
-  if( filename == "" )
-    return false;
-
-  if( !_delta.numEdits() )
-    return false;
-
-  if( !writeDeltas(C_STR(filename),_delta) ) {
-    _reader.open(C_STR(filename));
-    return false;
-  }
-  _delta.clear();
-  _reader.open(C_STR(filename));
-  setTopLeft(_topLeft);
-  return true;
-}
-*/
 QString HexEditor::filename() const
 {
   return _reader.filename();
@@ -168,33 +104,7 @@ bool HexEditor::open( const QString & filename )
   setTopLeft(0);              // reset the GUI
   return true;
 }
-/*
-int HexEditor::closeFile(bool force) 
-{  
-  int retval = QMessageBox::No;
-  if( _delta.numEdits() ) {
-    QString message = 
-      "Save changes to \"" + QString(_reader.filename()) + "\"?";
-    if( force ) {
-      retval = QMessageBox::warning( this, 
-				     PROGRAM_STRING,
-				     message,
-				     QMessageBox::Yes,
-				     QMessageBox::No );
-    } else {
-      retval = QMessageBox::warning( this, 
-				     PROGRAM_STRING,
-				     message,
-				     QMessageBox::Yes,
-				     QMessageBox::No,
-				     QMessageBox::Cancel);
-    }
-  }
-  if( retval == QMessageBox::Yes ) 
-    save();
-  return retval;
-}
-*/  
+
 void HexEditor::setBytesPerWord( int nbytes )
 {
   _bytesPerWord = nbytes;
@@ -360,15 +270,7 @@ int HexEditor::offsetToPercent(
 }
 
 // public slots:
-/*
-bool HexEditor::browseLoadFile()
-{
-  QString filename = QFileDialog::getOpenFileName();
-  if( filename.isNull() ) 
-    return false;
-  return open(filename);
-}
-*/
+
 QRect HexEditor::charBBox( off_t charIdx ) const {
   //  byteIdx =  charIdx/charsPerByte
   //  wordIdx =  byteIdx/bytesPerWord
@@ -963,30 +865,7 @@ void HexEditor::cursorDown()
     updateWord( oldWordIdx );
   emit offsetChanged( _cursor.byteOffset() );
 }
-/*
-// slots for undo/redo.
-// note: it is necessary to reset topLeft to force a reread of the data.
-//
-void HexEditor::redo()
-{
-  _delta.redo();
-  setTopLeft(_topLeft);
-  off_t start = selectionStart();
-  off_t end   = selectionEnd();
-  setSelection(SelectionStart,start);
-  setSelection(SelectionEnd,end);
-}
 
-void HexEditor::undo()
-{
-  _delta.undo();
-  setTopLeft(_topLeft);
-  off_t start = selectionStart();
-  off_t end   = selectionEnd();
-  setSelection(SelectionStart,start);
-  setSelection(SelectionEnd,end);
-}
-*/
 void HexEditor::search( const QString& hexText, bool forwards )
 {
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
