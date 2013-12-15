@@ -577,7 +577,7 @@ void SleuthKitPlugin::threadFinished()
     fprintf(stderr, "The Thread Finished. ");
 }
 
-
+// This takes too long to populate. need to come up with a more efficient way to populate these values that won't take as long
 void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvidence)
 {
     QString imagename = wombatvariable.evidencepath.split("/").last();
