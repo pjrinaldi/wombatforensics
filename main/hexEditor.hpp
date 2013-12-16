@@ -19,6 +19,7 @@
 /*
  *
  * Copyright (C) 2013 Pasquale Rinaldi <pjrinaldi@gmail.com>
+ * Removed dependence on local.h since most of the file was not needed
  *
  */ 
 
@@ -39,7 +40,7 @@
 #include <sys/types.h>
 
 // Local headers
-#include "local.h"
+#include "translate.hpp"
 #include "reader.hpp"
 #include "cursor.hpp"
 

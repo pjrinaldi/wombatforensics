@@ -37,8 +37,6 @@
 #include <string>
 #include <iostream>
 
-#include "local.h"
-
 typedef vector<uchar> ReadBuffer;
 
 #ifdef __GNUC__

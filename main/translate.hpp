@@ -18,7 +18,9 @@
 #include <vector>
 #include <QString>
 
-#include "local.h"
+using namespace std;
+
+#define C_STR(x) x.toLatin1().constData()
 
 typedef unsigned char uchar;
 

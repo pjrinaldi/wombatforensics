@@ -20,6 +20,7 @@
 
 #include <sys/types.h>
 #include <QGroupBox>
+#include "translate.hpp"
 
 class QWidget;
 class QSpinBox;

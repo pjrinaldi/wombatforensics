@@ -22,7 +22,6 @@
 
 #include <algorithm> // for min<>()
 
-#include "local.h"
 #include "offsetConstraint.hpp"
 #include "box.hpp"
 

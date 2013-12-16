@@ -42,8 +42,6 @@
 #include <QMouseEvent>
 
 #include "hexEditor.hpp"
-#include "translate.hpp"
-#include "local.h"
 
 extern int errno;
 
@@ -759,7 +757,7 @@ void HexEditor::search( const QString& hexText, bool forwards )
       setOffset( forwards?selectionEnd():selectionStart()-1 );
       seeCursor();
   } else {
-    QMessageBox::information(this,PROGRAM_STRING,
+    QMessageBox::information(this,"Search Failed",
 			     "Could not find search data 0x" + hexText);
   }
   QApplication::restoreOverrideCursor();
