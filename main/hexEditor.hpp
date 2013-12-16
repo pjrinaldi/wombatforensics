@@ -15,6 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
+/*
+ *
+ * Copyright (C) 2013 Pasquale Rinaldi <pjrinaldi@gmail.com>
+ *
+ */ 
+
 #ifndef _HEX_EDITOR_
 #define _HEX_EDITOR_
 
@@ -34,9 +41,9 @@
 // Local headers
 #include "local.h"
 #include "reader.hpp"
-#include "delta.hpp"
+//#include "delta.hpp"
 #include "cursor.hpp"
-#include "save.hpp"
+//#include "save.hpp"
 
 class HexEditor : public QWidget {
   Q_OBJECT
@@ -45,6 +52,7 @@ public:
   ~HexEditor();
 
   bool open(const QString& filename);
+  //bool bigopen(startbyte, bytelen);
   QString filename() const;
   Reader * reader();
   off_t offset() const;
@@ -124,7 +132,7 @@ protected:
   void setTopLeft( off_t offset );
 
 protected:
-  bool wordModified( off_t widx ) const;
+  //bool wordModified( off_t widx ) const;
   // template setWord so I can call it with different types of string data
   template <class _vectType>
   void setWord( off_t wordIdx, const _vectType& str );
@@ -230,7 +238,7 @@ protected:
   // 
 
   // this class keeps track of modifications
-  DeltaMap            _delta;
+  //DeltaMap            _delta;
   
   // selection:
   off_t               _selection[2];
