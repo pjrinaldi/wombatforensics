@@ -388,7 +388,7 @@ void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
         wombatvariable.evidencepath = wombatdata->ReturnEvidencePath(wombatvariable.evidenceid);
         isevidencedeleted = wombatdata->ReturnEvidenceDeletedState(wombatvariable.evidenceid);
         wombatvariable.evidencedbname = wombatvariable.evidencepath.split("/").last() + ".db";
-        emit SetLogVariable(wombatvariable);
+        emit SetLogVariable(&wombatvariable);
         if(isevidencedeleted == 0 && wombatvariable.jobtype == 1)
         {
             SetEvidenceDB(wombatvariable);

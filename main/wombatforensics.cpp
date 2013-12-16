@@ -578,6 +578,14 @@ void WombatForensics::SetupToolbar(void)
     connect(viewgroup, SIGNAL(triggered(QAction*)), this, SLOT(ViewGroupTriggered(QAction*)));
 }
 
+int WombatForensics::ReturnVisibleViewerID(void)
+{
+    int currentviewerid = 0; // default is hex
+    fprintf(stderr, "visible view: %i\n", ui->viewerstack->currentIndex());
+    currentviewerid = ui->viewerstack->currentIndex();
+    return currentviewerid;
+}
+
 WombatForensics::~WombatForensics()
 {
     delete ui;
@@ -712,17 +720,18 @@ void WombatForensics::on_actionOpen_Case_triggered()
 
 void WombatForensics::ViewGroupTriggered(QAction* selaction)
 {
+    wombatvariable.omnivalue = 1;
     if(selaction == ui->actionViewHex)
     {
-        ui->viewerstack->setCurrentIndex(0);
+        ui->viewerstack->setCurrentIndex(0); // hex
         // show the correct viewer page from stacked widget
     }
     else if(selaction == ui->actionViewTxt)
     {
-        ui->viewerstack->setCurrentIndex(1);
+        ui->viewerstack->setCurrentIndex(1); // txt
         //fprintf(stderr, "Text Button Text: %s\n", selaction->text().toStdString().c_str());
     }
-    else if(selaction == ui->actionViewOmni)
+    else if(selaction == ui->actionViewOmni) // omni 3,4,5
     {
         ui->viewerstack->setCurrentIndex(wombatvariable.omnivalue + 1);
     }
@@ -738,6 +747,7 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
+    int tmpviewerid = ReturnVisibleViewerID();
     // need to figure out where to split the viewer loading...
     // NEED TO DETERMINE WHICH VIEWER IS VISIBLE AND THEN LOAD THE RESPECITIVE DATA ACCORDINGLY.
     // QString imagename = wombatvariable.evidencepath.split("/").last();

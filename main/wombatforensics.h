@@ -54,7 +54,7 @@ public:
     SleuthKitPlugin* isleuthkit;
 
 signals:
-    void LogVariable(WombatVariable wombatVariable);
+    void LogVariable(WombatVariable &wombatVariable);
 private slots:
     void AddEvidence();
     void RemEvidence();
@@ -101,7 +101,7 @@ private:
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     std::string GetTime(void);
     QThreadPool *threadpool;
-    int WhichViewerVisible();
+    int ReturnVisibleViewerID();
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
     std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
