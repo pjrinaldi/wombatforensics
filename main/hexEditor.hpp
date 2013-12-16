@@ -41,9 +41,7 @@
 // Local headers
 #include "local.h"
 #include "reader.hpp"
-//#include "delta.hpp"
 #include "cursor.hpp"
-//#include "save.hpp"
 
 class HexEditor : public QWidget {
   Q_OBJECT
@@ -102,7 +100,6 @@ signals:
   void selectionChanged(const QString& selection);
 
 public slots:
-  //bool browseLoadFile();
   void setOffset(off_t offset);     // sets cursor offset
   void setTopLeftToPercent( int percent ); // for setting pos from scroll
   //
@@ -132,10 +129,7 @@ protected:
   void setTopLeft( off_t offset );
 
 protected:
-  //bool wordModified( off_t widx ) const;
   // template setWord so I can call it with different types of string data
-  template <class _vectType>
-  void setWord( off_t wordIdx, const _vectType& str );
   // calculate the rectangle which bounds the word at _offset+idx
   QRect  charBBox( off_t charIdx ) const;
   QRect  byteBBox( off_t byteIdx ) const;
@@ -237,9 +231,6 @@ protected:
   // first byte of the word
   // 
 
-  // this class keeps track of modifications
-  //DeltaMap            _delta;
-  
   // selection:
   off_t               _selection[2];
 };

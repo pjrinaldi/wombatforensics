@@ -33,8 +33,6 @@
 
 #include <QApplication>
 #include <QMessageBox>
-//#include <QFileDialog>
-//#include <QProgressDialog>
 #include <QPainter>
 #include <QPixmap>
 #include <QFocusEvent>
@@ -82,11 +80,6 @@ QString HexEditor::filename() const
 
 bool HexEditor::open( const QString & filename )
 {
-/*
-  if( closeFile() == QMessageBox::Cancel )
-    return false;
-*/
-
   if(!_reader.open(C_STR(filename))) {
     QMessageBox::critical( this, "HexEdit", 
 			   "Error loading \"" + filename + "\"\n" +
@@ -94,7 +87,6 @@ bool HexEditor::open( const QString & filename )
 			   QMessageBox::Ok,0);
     return false;
   }
-//  _delta.clear();           // reset modification tree
 
   // set the new range for the scrollbar
   _cursor.setRange(0,_reader.size());
@@ -178,19 +170,8 @@ void HexEditor::setTopLeft( off_t offset )
      // update the labels
      //  setOffsetLabels(_topLeft);
      
-     //const Delta * delta;
-     
      _reader.seek(_topLeft);
      _reader.read(_data,bytesPerPage());
-     /*
-     // update data from delta map
-     for( offset = _delta.lower_bound(_topLeft); 
-	  (offset != -1) && (offset < _topLeft + bytesPerPage());
-	  offset = _delta.lower_bound(offset) ) {
-	delta = _delta.search(offset);
-	_data[offset++-_topLeft] = delta->newData()[0];
-     }
-     */
      
      repaint();
      emit topLeftChanged(_topLeft);
@@ -446,13 +427,9 @@ void HexEditor::setSelection(SelectionPos_e pos, off_t offset)
   } else {
     if( selectionEnd() > -1 && selectionEnd() <= _reader.size() ) {
       QString data;
-      //const Delta* delta;
       for(off_t i = selectionStart();
 	  i < selectionEnd();
 	  ++i) {
-	//if( (delta = _delta.search(i)) ) 
-	  //data += Translate::ByteToHex(delta->newData()[0]);
-	//else
 	  data += Translate::ByteToHex(_reader[i]);
       }
       emit selectionChanged( data );
@@ -469,97 +446,6 @@ void HexEditor::setSelection(SelectionPos_e pos, off_t offset)
 //
 void HexEditor::keyPressEvent( QKeyEvent *e )
 {
-  int key = e->key();
-
-  switch(_base) {
-  case -1:
-    // ascii
-    // range is taken from qnamespace.h
-    if( key >= Qt::Key_Space  && key <= Qt::Key_AsciiTilde ) {
-      seeCursor();
-      //vector<uchar> oldData;
-      //vector<uchar> newData;
-      //vector<uchar> chars;
-      
-      //oldData.push_back( *(_data.begin()+localByteOffset()) );
-      //Translate::ByteToChar(chars,oldData);
-      //chars[0] = key;
-      //Translate::CharToByte(newData,chars);
-      //_delta.insert( _cursor.byteOffset(), oldData, newData);
-      //_data[_cursor.byteOffset()-_topLeft] = newData[0];
-      cursorRight();
-      setSelection(SelectionStart,-1);
-      return;
-    }
-    break;
-  case 16:
-    if ( key >= 'A' && key <= 'F' ) {
-      key = tolower(key);
-    }
-    if ( (key >= 'a' && key <= 'f') ||
-	 (key >= '0' && key <= '9') ) {
-      //
-      // make sure we can see where the cursor is
-      //
-      seeCursor();
-      //vector<uchar> oldData;
-      //vector<uchar> newData;
-      //vector<uchar> hex;
-
-      //oldData.push_back( *(_data.begin()+localByteOffset()) );
-      //Translate::ByteToHex(hex,oldData);
-      //hex[_cursor.charOffset()] = key;
-      //Translate::HexToByte(newData,hex);
-
-      //_delta.insert( _cursor.byteOffset(), oldData, newData );
-      //_data[_cursor.byteOffset()-_topLeft] = newData[0];
-      // move to the next char
-      cursorRight();
-      setSelection(SelectionStart,-1);
-      return;
-    }
-    break;
-  case 8:
-    if( key >= '0' && key < '8' ) {
-      // valid octal key
-      seeCursor();
-      //vector<uchar> oldData;
-      //vector<uchar> newData;
-      //vector<uchar> octal;
-      
-      //oldData.push_back( *(_data.begin()+localByteOffset()) );
-      //Translate::ByteToOctal(octal,oldData);
-      //octal[_cursor.charOffset()] = key;
-      //Translate::OctalToByte(newData,octal);
-      
-      //_delta.insert( _cursor.byteOffset(), oldData, newData );
-      //_data[_cursor.byteOffset()-_topLeft] = newData[0];
-      cursorRight();
-      setSelection(SelectionStart,-1);
-      return;
-    }
-    break;
-  case 2:
-    if( key >= '0' && key < '2' ) {
-      // valid binary key
-      seeCursor();
-      //vector<uchar> oldData;
-      //vector<uchar> newData;
-      //vector<uchar> binary;
-      
-      //oldData.push_back( *(_data.begin()+localByteOffset()) );
-      //Translate::ByteToBinary(binary,oldData);
-      //binary[_cursor.charOffset()] = key;
-      //Translate::BinaryToByte(newData,binary);
-      
-      //_delta.insert( _cursor.byteOffset(), oldData, newData );
-      //_data[_cursor.byteOffset()-_topLeft] = newData[0];
-      cursorRight();
-      setSelection(SelectionStart,-1);
-      return;
-    }
-    break;
-  }
   switch ( e->key() ) {
   case Qt::Key_Left:
     cursorLeft();
@@ -769,14 +655,6 @@ void HexEditor::getDisplayAscii(QString& txt)
 {
     Translate::ByteToChar(txt, _data);
 }
-/*
-bool HexEditor::wordModified ( off_t wordIdx ) const
-{
-  off_t lboffset = wordIdx*bytesPerWord()+_topLeft;
-  //off_t nearest_offset = _delta.lower_bound(lboffset);
-  return ( nearest_offset != -1 && nearest_offset < lboffset+bytesPerWord() );
-}
-*/
 //
 // accessors for local offsets
 //
@@ -867,20 +745,9 @@ void HexEditor::search( const QString& hexText, bool forwards )
   //if( !hexText.length() || _reader.filename() == "" )
   if(!hexText.length() || QString(_reader.filename()).compare("") == 0)
     return;
-  /*
-  if( -1 != _delta.lower_bound(0) ) {
-    QMessageBox::information(this,PROGRAM_STRING,
-			     "Cannot search file with unsaved modifications.");
-    return;
-  }*/
 
   vector<uchar> data;
   Translate::HexToByte(data,hexText);
-//  QProgressDialog progress( "Searching...","Cancel", 0,
-//			    _reader.size(),this );
-//  progress.setWindowModality( Qt::WindowModal );
-//  progress.setWindowTitle(PROGRAM_STRING);
-//  progress.setValue(0);
   off_t pos;
   if( forwards ) {
       pos = _reader.findIndex(_cursor.byteOffset(),data,_reader.size()-1);
@@ -986,19 +853,10 @@ void HexEditor::drawTextRegion( QPainter& paint, const QString& text,
   paint.setPen(qApp->palette().foreground().color());
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
-      int widx = r*_cols+c;
-      /*
-      if ( wordModified( widx ) ) {
-	paint.setPen(qApp->palette().link().color());
-	paint.drawText( _wordBBox[widx].left() + wordSpacing()/2,
+        int widx = r*_cols+c;
+        paint.drawText( _wordBBox[widx].left() + wordSpacing()/2,
 			_wordBBox[widx].bottom(),
 			text.mid(widx*charsPerWord(),charsPerWord()) );
-	paint.setPen(qApp->palette().foreground().color());
-      } else {*/
-	paint.drawText( _wordBBox[widx].left() + wordSpacing()/2,
-			_wordBBox[widx].bottom(),
-			text.mid(widx*charsPerWord(),charsPerWord()) );
-      //}
     }
   }
 }
