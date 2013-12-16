@@ -63,6 +63,7 @@ struct WombatVariable
     int filecount;
     int processcount;
     int omnivalue = 1;
+    int visibleviewer = 0;
     QString casespath;
     QString casedirpath;
     QString evidencedirpath;

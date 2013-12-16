@@ -49,12 +49,13 @@ public:
     ~WombatForensics();
     WombatDatabase *wombatcasedata;
     WombatVariable wombatvariable;
+    WombatVariable* wombatvarptr;
     ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
     SleuthKitPlugin* isleuthkit;
 
 signals:
-    void LogVariable(WombatVariable &wombatVariable);
+    void LogVariable(WombatVariable* wombatVariable);
 private slots:
     void AddEvidence();
     void RemEvidence();

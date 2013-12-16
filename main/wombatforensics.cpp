@@ -13,14 +13,16 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     qRegisterMetaType<WombatVariable>("WombatVariable");
     qRegisterMetaType<FileExportData>("FileExportData");
-    connect(this, SIGNAL(LogVariable(WombatVariable)), isleuthkit, SLOT(GetLogVariable(WombatVariable)), Qt::QueuedConnection);
+    qRegisterMetaType<WombatVariable*>("WombatVariable*");
+    connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
     connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(LoadFileContents(QString)), Qt::QueuedConnection);
     connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable)), this, SLOT(PopulateProgressWindow(WombatVariable)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
-    wombatvariable.caseid = 0;
-    wombatvariable.evidenceid = 0;
-    wombatvariable.jobtype = 0;
+    wombatvarptr = &wombatvariable;
+    wombatvarptr->caseid = 0;
+    wombatvarptr->evidenceid = 0;
+    wombatvarptr->jobtype = 0;
     InitializeAppStructure();
     InitializeSleuthKit();
 }
@@ -135,7 +137,7 @@ void WombatForensics::AddEvidence()
         wombatvariable.evidencedbname = evidenceName;
         wombatvariable.evidencedbnamelist << wombatvariable.evidencedbname;
         wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
-        emit LogVariable(wombatvariable);
+        emit LogVariable(&wombatvariable);
         QString tmpString = evidenceName;
         tmpString += " - ";
         tmpString += QString::fromStdString(GetTime());
@@ -166,7 +168,7 @@ void WombatForensics::RemEvidence()
     {
         wombatvariable.evidenceid = wombatcasedata->ReturnEvidenceID(item);
         wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
-        emit LogVariable(wombatvariable);
+        emit LogVariable(&wombatvariable);
         QString tmpstring = item.split("/").last() + " - " + QString::fromStdString(GetTime());
         QStringList tmplist;
         tmplist << tmpstring << QString::number(wombatvariable.jobid);
@@ -407,7 +409,7 @@ void WombatForensics::FileExport(FileExportData exportdata)
     wombatprogresswindow->ClearTableWidget();
     wombatvariable.jobtype = 3; // export files
     wombatvariable.jobid = wombatcasedata->InsertJob(wombatvariable.jobtype, wombatvariable.caseid, wombatvariable.evidenceid);
-    emit LogVariable(wombatvariable);
+    emit LogVariable(&wombatvariable);
     QString tmpString = "File Export - " + QString::fromStdString(GetTime());
     QStringList tmpList;
     tmpList << tmpString << QString::number(wombatvariable.jobid);
@@ -580,10 +582,7 @@ void WombatForensics::SetupToolbar(void)
 
 int WombatForensics::ReturnVisibleViewerID(void)
 {
-    int currentviewerid = 0; // default is hex
-    fprintf(stderr, "visible view: %i\n", ui->viewerstack->currentIndex());
-    currentviewerid = ui->viewerstack->currentIndex();
-    return currentviewerid;
+    return ui->viewerstack->currentIndex();
 }
 
 WombatForensics::~WombatForensics()
@@ -720,6 +719,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
 
 void WombatForensics::ViewGroupTriggered(QAction* selaction)
 {
+    wombatvariable.visibleviewer = ReturnVisibleViewerID();
     wombatvariable.omnivalue = 1;
     if(selaction == ui->actionViewHex)
     {
@@ -747,7 +747,7 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    int tmpviewerid = ReturnVisibleViewerID();
+    wombatvariable.visibleviewer = ReturnVisibleViewerID();
     // need to figure out where to split the viewer loading...
     // NEED TO DETERMINE WHICH VIEWER IS VISIBLE AND THEN LOAD THE RESPECITIVE DATA ACCORDINGLY.
     // QString imagename = wombatvariable.evidencepath.split("/").last();

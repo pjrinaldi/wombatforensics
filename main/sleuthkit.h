@@ -65,9 +65,9 @@ private:
 
 public slots:
     void threadFinished(void);
-    void GetLogVariable(WombatVariable &wvariable)
+    void GetLogVariable(WombatVariable* wvariable)
     {
-        emit SetLogVariable(&wvariable);
+        emit SetLogVariable(wvariable);
     };
 signals:
     void UpdateStatus(int filecount, int processcount);
