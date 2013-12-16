@@ -94,7 +94,6 @@ private:
     void InitializeSleuthKit();
     void InitializeAppStructure();
     void RemoveTmpFiles();
-    
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
     void LoadOmniContent(QString filePath);
@@ -102,12 +101,13 @@ private:
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
     std::string GetTime(void);
     QThreadPool *threadpool;
+    int WhichViewerVisible();
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
     std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
     std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
     int DetermineOmniView(QString currentSignature);
-    //QTextEdit* currenttxtwidget; // replace with a txt version of the hexeditor
+    //QTextEdit* currenttxtwidget; // replace with a txt version of the hexeditor or implement partial load model here as well
     QModelIndex curselindex;
 
     off_t offset() const;

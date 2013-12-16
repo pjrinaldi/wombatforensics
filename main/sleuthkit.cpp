@@ -300,6 +300,9 @@ void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
 
 void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
 {
+    // HERE IS WHERE I NEED TO GET WHAT I NEED FOR EACH VIEWER.
+    // I NEED TO DETERMINE WHICH VIEWER IS VISIBLE AND THEN LOAD WHEN CLICKED.
+    /*
     QString curtmpfilepath = "";
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
@@ -327,6 +330,7 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     else
         curtmpfilepath = ""; // set to "" to load nothing.
     emit LoadFileContents(curtmpfilepath);
+    */
 }
 
 void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)

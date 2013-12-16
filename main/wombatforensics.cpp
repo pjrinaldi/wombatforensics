@@ -738,6 +738,8 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
+    // need to figure out where to split the viewer loading...
+    // NEED TO DETERMINE WHICH VIEWER IS VISIBLE AND THEN LOAD THE RESPECITIVE DATA ACCORDINGLY.
     // QString imagename = wombatvariable.evidencepath.split("/").last();
     QString tmptext = "";
     QString sigtext = "";
