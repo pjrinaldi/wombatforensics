@@ -47,7 +47,7 @@ class WombatForensics : public QMainWindow
 public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
-    WombatDatabase *wombatcasedata;
+    WombatDatabase* wombatcasedata;
     WombatVariable wombatvariable;
     WombatVariable* wombatvarptr;
     ProgressWindow* wombatprogresswindow;
@@ -69,14 +69,14 @@ private slots:
     void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
-    void PopulateProgressWindow(WombatVariable wvariable);
-    void UpdateCaseData(WombatVariable wvariable);
+    void PopulateProgressWindow(WombatVariable* wvariable);
+    void UpdateCaseData(void);
     void ResizeColumns(QStandardItemModel* currentmodel);
     void ResizeViewColumns(const QModelIndex &index)
     {
         ResizeColumns((QStandardItemModel*)index.model());
     }
-    void FileExport(FileExportData exportdata);
+    void FileExport(FileExportData* exportdata);
     void setScrollBarRange(off_t low, off_t high);
     void setScrollBarValue(off_t pos);
     void setOffsetLabel(off_t pos);
@@ -105,8 +105,8 @@ private:
     int ReturnVisibleViewerID();
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
-    std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
-    std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData tmpexport, std::vector<FileExportData>);
+    std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
+    std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
     int DetermineOmniView(QString currentSignature);
     //QTextEdit* currenttxtwidget; // replace with a txt version of the hexeditor or implement partial load model here as well
     QModelIndex curselindex;
@@ -132,7 +132,7 @@ class ThreadRunner : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    ThreadRunner(QObject* object, QString input, WombatVariable wVariable)
+    ThreadRunner(QObject* object, QString input, WombatVariable* wVariable)
     {
         method = input;
         caller = (SleuthKitPlugin*)object;
@@ -156,7 +156,7 @@ public:
 private:
     QString method;
     SleuthKitPlugin* caller;
-    WombatVariable wombatvariable;
+    WombatVariable* wombatvariable;
 };
 
 #endif // WOMBATFORENSICS_H

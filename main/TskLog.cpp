@@ -51,7 +51,7 @@ void TskLog::log(Channel msgType, const std::string &logMsg)
         sqlite3_stmt* stmt;
         if(sqlite3_prepare_v2(tmpImgDB, "INSERT INTO log (caseid, evidenceid, jobid, msgtype, msgdatetime, msg) VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, 0) == SQLITE_OK)
         {
-            if(sqlite3_bind_int(stmt, 1, logvariable->caseid) == SQLITE_OK && sqlite3_bind_int(stmt, 2, logvariable->evidenceid) == SQLITE_OK && sqlite3_bind_int(stmt, 3, logvariable->jobid) == SQLITE_OK && sqlite3_bind_int(stmt, 4, msgType) == SQLITE_OK && sqlite3_bind_text(stmt, 5, timeStr, -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(stmt, 6, logMsg.c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+            if(sqlite3_bind_int(stmt, 1, logvariable.caseid) == SQLITE_OK && sqlite3_bind_int(stmt, 2, logvariable.evidenceid) == SQLITE_OK && sqlite3_bind_int(stmt, 3, logvariable.jobid) == SQLITE_OK && sqlite3_bind_int(stmt, 4, msgType) == SQLITE_OK && sqlite3_bind_text(stmt, 5, timeStr, -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(stmt, 6, logMsg.c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
             {
                 int ret = sqlite3_step(stmt);
                 if(ret == SQLITE_ROW || ret == SQLITE_DONE)

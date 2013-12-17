@@ -33,7 +33,7 @@ SleuthKitPlugin::SleuthKitPlugin(WombatDatabase* wombatcasedata)
 {
     wombatdata = wombatcasedata; 
 }
-void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
+void SleuthKitPlugin::Initialize(WombatVariable* wombatVariable)
 {
     wombatvariable = wombatVariable;
     SetupSystemProperties();
@@ -43,8 +43,8 @@ void SleuthKitPlugin::Initialize(WombatVariable wombatVariable)
     SetupImageDatabase();
     SetupBlackboard();
     //fprintf(stderr, "SleuthKit Exists\n");
-    qRegisterMetaType<WombatVariable>("WombatVariable");
-    connect(this, SIGNAL(SetLogVariable(WombatVariable)), log, SLOT(LogVariable(WombatVariable)), Qt::DirectConnection);
+    qRegisterMetaType<WombatVariable*>("WombatVariable*");
+    connect(this, SIGNAL(SetLogVariable(WombatVariable*)), log, SLOT(LogVariable(WombatVariable*)), Qt::DirectConnection);
 }
 
 void SleuthKitPlugin::SetupImageDatabase()
@@ -52,7 +52,7 @@ void SleuthKitPlugin::SetupImageDatabase()
     // initialize dummy database to create copy new imagedb's from.
     try
     {
-        initialdb = new TskImgDBSqlite(wombatvariable.datapath.toStdString().c_str(), "initial.db");
+        initialdb = new TskImgDBSqlite(wombatvariable->datapath.toStdString().c_str(), "initial.db");
         if(initialdb->initialize() != 0)
             fprintf(stderr, "Error initializing StarterDB\n");
         else
@@ -68,18 +68,18 @@ void SleuthKitPlugin::SetupImageDatabase()
     }
 }
 
-void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
+void SleuthKitPlugin::OpenEvidence(WombatVariable* wombatVariable)
 {
     wombatvariable = wombatVariable;
-    QString oldstring = wombatvariable.datapath + "initial.db";
-    QString newstring = wombatvariable.evidencedirpath + wombatvariable.evidencedbname;
+    QString oldstring = wombatvariable->datapath + "initial.db";
+    QString newstring = wombatvariable->evidencedirpath + wombatvariable->evidencedbname;
     if(QFile::copy(oldstring.toStdString().c_str(), newstring.toStdString().c_str()))
     {
         //fprintf(stderr, "File Copy Was Successful\n");
         // copy was successful
         try
         {
-            tmpdb = new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str());
+            tmpdb = new TskImgDBSqlite(wombatvariable->evidencedirpath.toStdString().c_str(), wombatvariable->evidencedbname.toStdString().c_str());
         }
         catch(TskException &ex)
         {
@@ -113,14 +113,14 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         // copy was not successful
         // exit out with error that image already added...
     }
-    //fprintf(stderr, "Evidence ImgDB Path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
+    //fprintf(stderr, "Evidence ImgDB Path: %s\n", wombatvariable->evidencepath.toStdString().c_str());
     
     int filecount = 0;
     int processcount = 0;
     TskImageFileTsk imagefiletsk;
     try
     {
-        imagefiletsk.open(wombatvariable.evidencepath.toStdString());
+        imagefiletsk.open(wombatvariable->evidencepath.toStdString());
         TskServices::Instance().setImageFile(imagefiletsk);
         //fprintf(stderr, "Opening Image File was successful!\n");
     }
@@ -141,7 +141,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
     filecount = TskServices::Instance().getImgDB().getNumFiles();
     emit UpdateStatus(filecount, processcount);
     LOGINFO("Processing Evidence Started");
-    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Started");
+    wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, "Processing Evidence Started");
     TskSchedulerQueue::task_struct *task;
     TskPipelineManager pipelinemgr;
     TskPipeline* filepipeline;
@@ -223,12 +223,12 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable wombatVariable)
         filepipeline->logModuleExecutionTimes();
     }
     LOGINFO("Processing Evidence Finished");
-    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Processing Evidence Finished");
+    wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, "Processing Evidence Finished");
     //fprintf(stderr, "File Count: %d - Process Count: %d\n", filecount, processcount);
-    wombatdata->UpdateJobEnd(wombatvariable.jobid, filecount, processcount);
+    wombatdata->UpdateJobEnd(wombatvariable->jobid, filecount, processcount);
     GetImageTree(wombatvariable, 1);
     LOGINFO("Adding Evidence Finished");
-    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "Adding Evidence Finished");
+    wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, "Adding Evidence Finished");
 }
 
 void SleuthKitPlugin::TaskMap(TskSchedulerQueue::task_struct* &task)
@@ -264,12 +264,12 @@ void SleuthKitPlugin::TaskMap(TskSchedulerQueue::task_struct* &task)
     }
 }
 
-void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
+void SleuthKitPlugin::SetEvidenceDB(WombatVariable* wombatVariable)
 {
     wombatvariable = wombatVariable;
     try
     {
-        tmpdb = new TskImgDBSqlite(wombatvariable.evidencedirpath.toStdString().c_str(), wombatvariable.evidencedbname.toStdString().c_str());
+        tmpdb = new TskImgDBSqlite(wombatvariable->evidencedirpath.toStdString().c_str(), wombatvariable->evidencedbname.toStdString().c_str());
     }
     catch(TskException &ex)
     {
@@ -298,7 +298,7 @@ void SleuthKitPlugin::SetEvidenceDB(WombatVariable wombatVariable)
     }
 }
 
-void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
+void SleuthKitPlugin::ShowFile(WombatVariable* wombatVariable)
 {
     // HERE IS WHERE I NEED TO GET WHAT I NEED FOR EACH VIEWER.
     // I NEED TO DETERMINE WHICH VIEWER IS VISIBLE AND THEN LOAD WHEN CLICKED.
@@ -306,23 +306,23 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     QString curtmpfilepath = "";
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
-    //fprintf(stderr, "file id: %i\n", wombatvariable.fileid);
-    if(wombatvariable.fileid >= 0)
-        curtmpfilepath = GetFileContents(wombatvariable.fileid);
-    else if(wombatvariable.fileid == -1) // image file
+    //fprintf(stderr, "file id: %i\n", wombatvariable->fileid);
+    if(wombatvariable->fileid >= 0)
+        curtmpfilepath = GetFileContents(wombatvariable->fileid);
+    else if(wombatvariable->fileid == -1) // image file
     {
         // this won't work for e01 files, so i'll have to figure out how to read the damn thing in properly.
-        curtmpfilepath = wombatvariable.evidencepath;
-        //fprintf(stderr, "dd image path: %s\n", wombatvariable.evidencepath.toStdString().c_str());
-        // QString imagename = wombatvariable.evidencepath.split("/").last();
+        curtmpfilepath = wombatvariable->evidencepath;
+        //fprintf(stderr, "dd image path: %s\n", wombatvariable->evidencepath.toStdString().c_str());
+        // QString imagename = wombatvariable->evidencepath.split("/").last();
     }
-    else if(wombatvariable.fileid == -2) // volume file
+    else if(wombatvariable->fileid == -2) // volume file
     {
-        curtmpfilepath = GetVolumeFilePath(wombatvariable, wombatvariable.volid);
-        //fprintf(stderr, "tmp file path: %s\n", wombatvariable.tmpfilepath.toStdString().c_str());
+        curtmpfilepath = GetVolumeFilePath(wombatvariable-> wombatvariable->volid);
+        //fprintf(stderr, "tmp file path: %s\n", wombatvariable->tmpfilepath.toStdString().c_str());
         //fprintf(stderr, "vol file path %s\n", curtmpfilepath.toStdString().c_str());
     }
-    else if(wombatvariable.fileid == -3) // file system file
+    else if(wombatvariable->fileid == -3) // file system file
     {
         // fs_info sql call provides root_inum and last inum.
         // 
@@ -333,20 +333,20 @@ void SleuthKitPlugin::ShowFile(WombatVariable wombatVariable)
     */
 }
 
-void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
+void SleuthKitPlugin::ExportFiles(WombatVariable* wombatVariable)
 {
     wombatvariable = wombatVariable;
     int processcount = 0;
-    for(int i = 0; i < wombatvariable.exportdatalist.size(); i++)
+    for(int i = 0; i < wombatvariable->exportdatalist.size(); i++)
     {
         processcount++;
-        wombatvariable.evidencepath = QString::fromStdString(wombatvariable.exportdatalist[i].evidencepath);
-        wombatvariable.evidencedbname = QString::fromStdString(wombatvariable.exportdatalist[i].evidencedbname);
+        wombatvariable->evidencepath = QString::fromStdString(wombatvariable->exportdatalist[i].evidencepath);
+        wombatvariable->evidencedbname = QString::fromStdString(wombatvariable->exportdatalist[i].evidencedbname);
         SetEvidenceDB(wombatvariable);
-        ExportFile(wombatvariable.exportdatalist[i].fullpath, wombatvariable.exportdatalist[i].id);
-        std::string tmpstring = wombatvariable.exportdatalist[i].fullpath + " Exported";
-        wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, tmpstring.c_str());
-        emit UpdateStatus(wombatvariable.exportdatalist[i].exportcount, processcount);
+        ExportFile(wombatvariable->exportdatalist[i].fullpath, wombatvariable->exportdatalist[i].id);
+        std::string tmpstring = wombatvariable->exportdatalist[i].fullpath + " Exported";
+        wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, tmpstring.c_str());
+        emit UpdateStatus(wombatvariable->exportdatalist[i].exportcount, processcount);
         emit UpdateMessageTable();
     }
     FinishExport(processcount);
@@ -355,41 +355,41 @@ void SleuthKitPlugin::ExportFiles(WombatVariable wombatVariable)
 void SleuthKitPlugin::FinishExport(int processcount)
 {
     LOGINFO("File Export Finished");
-    wombatdata->InsertMsg(wombatvariable.caseid, wombatvariable.evidenceid, wombatvariable.jobid, 2, "File Export Finished");
-    wombatdata->UpdateJobEnd(wombatvariable.jobid, wombatvariable.exportdatalist[0].exportcount, processcount);
+    wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, "File Export Finished");
+    wombatdata->UpdateJobEnd(wombatvariable->jobid, wombatvariable->exportdatalist[0].exportcount, processcount);
     emit UpdateMessageTable();
 }
 
-void SleuthKitPlugin::RefreshTreeViews(WombatVariable wombatVariable)
+void SleuthKitPlugin::RefreshTreeViews(WombatVariable* wombatVariable)
 {
     wombatvariable = wombatVariable;
-    QStringList evidencelist = wombatdata->ReturnCaseActiveEvidenceID(wombatvariable.caseid);
+    QStringList evidencelist = wombatdata->ReturnCaseActiveEvidenceID(wombatvariable->caseid);
     for(int i=0; (i < evidencelist.count() / 3); i++)
     {
-        wombatvariable.evidenceid = evidencelist[3*i].toInt();
-        wombatvariable.evidencepath = evidencelist[(3*i+1)];
-        wombatvariable.evidencedbname = evidencelist[(3*i+2)];
+        wombatvariable->evidenceid = evidencelist[3*i].toInt();
+        wombatvariable->evidencepath = evidencelist[(3*i+1)];
+        wombatvariable->evidencedbname = evidencelist[(3*i+2)];
         SetEvidenceDB(wombatvariable);
         GetImageTree(wombatvariable, 0);
     }
 }
 
-void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
+void SleuthKitPlugin::PopulateCase(WombatVariable* wombatVariable)
 {
     wombatvariable = wombatVariable;
     QStringList evidencepathlist;
-    QStringList evidencejoblist = wombatdata->ReturnCaseEvidenceIdJobIdType(wombatvariable.caseid);
+    QStringList evidencejoblist = wombatdata->ReturnCaseEvidenceIdJobIdType(wombatvariable->caseid);
     int isevidencedeleted = 0;
     for(int i=0; i < (evidencejoblist.count() / 3); i++)
     {
-        wombatvariable.jobid = evidencejoblist[(3*i)].toInt();
-        wombatvariable.jobtype = evidencejoblist[(3*i+1)].toInt();
-        wombatvariable.evidenceid = evidencejoblist[(3*i)+2].toInt();
-        wombatvariable.evidencepath = wombatdata->ReturnEvidencePath(wombatvariable.evidenceid);
-        isevidencedeleted = wombatdata->ReturnEvidenceDeletedState(wombatvariable.evidenceid);
-        wombatvariable.evidencedbname = wombatvariable.evidencepath.split("/").last() + ".db";
-        emit SetLogVariable(&wombatvariable);
-        if(isevidencedeleted == 0 && wombatvariable.jobtype == 1)
+        wombatvariable->jobid = evidencejoblist[(3*i)].toInt();
+        wombatvariable->jobtype = evidencejoblist[(3*i+1)].toInt();
+        wombatvariable->evidenceid = evidencejoblist[(3*i)+2].toInt();
+        wombatvariable->evidencepath = wombatdata->ReturnEvidencePath(wombatvariable->evidenceid);
+        isevidencedeleted = wombatdata->ReturnEvidenceDeletedState(wombatvariable->evidenceid);
+        wombatvariable->evidencedbname = wombatvariable->evidencepath.split("/").last() + ".db";
+        emit SetLogVariable(wombatvariable);
+        if(isevidencedeleted == 0 && wombatvariable->jobtype == 1)
         {
             SetEvidenceDB(wombatvariable);
             GetImageTree(wombatvariable, 0);
@@ -400,7 +400,7 @@ void SleuthKitPlugin::PopulateCase(WombatVariable wombatVariable)
 
 void SleuthKitPlugin::SetupSystemProperties()
 {
-    QString tmpPath = wombatvariable.settingspath;
+    QString tmpPath = wombatvariable->settingspath;
     tmpPath += "/tsk-config.xml";
     QFile tmpFile(tmpPath);
     if(!tmpFile.exists()) // if tsk-config.xml does not exist, create and write it here
@@ -412,7 +412,7 @@ void SleuthKitPlugin::SetupSystemProperties()
             xml.writeStartDocument();
             xml.writeStartElement("TSK_FRAMEWORK_CONFIG");
             xml.writeStartElement("CONFIG_DIR");
-            xml.writeCharacters(wombatvariable.settingspath);
+            xml.writeCharacters(wombatvariable->settingspath);
             xml.writeEndElement();
             xml.writeStartElement("MODULE_DIR");
             xml.writeCharacters("/usr/local/lib");
@@ -421,7 +421,7 @@ void SleuthKitPlugin::SetupSystemProperties()
             xml.writeCharacters("/usr/local/share/tsk");
             xml.writeEndElement();
             xml.writeStartElement("OUT_DIR");
-            xml.writeCharacters(wombatvariable.tmpfilepath);
+            xml.writeCharacters(wombatvariable->tmpfilepath);
             xml.writeEndElement();
             xml.writeStartElement("SYSTEM_OUT_DIR");
             xml.writeCharacters("#OUT_DIR#/SystemOutput");
@@ -449,7 +449,7 @@ void SleuthKitPlugin::SetupSystemProperties()
     {
         fprintf(stderr, "Loading Config File config file: %s\n", ex.message().c_str());
     }
-    tmpPath = wombatvariable.settingspath;
+    tmpPath = wombatvariable->settingspath;
     tmpPath += "/tsk-pipe.xml";
     QFile pipeFile(tmpPath);
     //fprintf(stderr, "PipPath: %s\n", tmpPath.toStdString().c_str());
@@ -481,7 +481,7 @@ void SleuthKitPlugin::SetupSystemProperties()
             fprintf(stderr, "Could not open file for writing\n");
         pipeFile.close();
     }
-    tmpPath = wombatvariable.settingspath;
+    tmpPath = wombatvariable->settingspath;
     tmpPath += "/tsk-magicview.xml";
     QFile magicFile(tmpPath);
     if(!magicFile.exists()) // if tsk-magic.xml does not exist, create and write it here.
@@ -523,10 +523,10 @@ void SleuthKitPlugin::SetupSystemProperties()
 }
 void SleuthKitPlugin::SetupLog()
 {
-    QString tmpPath = wombatvariable.datapath + "/tsk-log.txt";
+    QString tmpPath = wombatvariable->datapath + "tsk-log.txt";
     try
     {
-        log = new TskLog(wombatvariable.datapath.toStdString());
+        log = new TskLog(wombatvariable->datapath.toStdString());
         log->open(tmpPath.toStdString().c_str());
         TskServices::Instance().setLog(*log);
         //fprintf(stderr, "Loading Log File was successful!\n");
@@ -582,9 +582,9 @@ void SleuthKitPlugin::threadFinished()
 }
 
 // This takes too long to populate. need to come up with a more efficient way to populate these values that won't take as long
-void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvidence)
+void SleuthKitPlugin::GetImageTree(WombatVariable* wombatvariable, int isAddEvidence)
 {
-    QString imagename = wombatvariable.evidencepath.split("/").last();
+    QString imagename = wombatvariable->evidencepath.split("/").last();
     std::vector<TskFileRecord> fileRecordVector;
     std::list<TskVolumeInfoRecord> volRecordList;
     std::list<TskFsInfoRecord> fsInfoRecordList;
@@ -687,7 +687,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                     std::vector<uint64_t> fileidVector;
                     //Create custom function to access this...
                     sqlite3* tmpImgDB;
-                    QString tmpImgDbPath = wombatvariable.evidencedirpath + imagename + ".db";
+                    QString tmpImgDbPath = wombatvariable->evidencedirpath + imagename + ".db";
                     QList<int> objectidlist;
                     objectidlist.clear();
                     if(sqlite3_open(tmpImgDbPath.toStdString().c_str(), &tmpImgDB) == SQLITE_OK)
@@ -702,7 +702,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                                     uint64_t fileId = (uint64_t)sqlite3_column_int(stmt, 0);
                                     fileidVector.push_back(fileId);
                                     if(isAddEvidence == 1)
-                                        objectidlist.append(wombatdata->InsertObject(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileId));
+                                        objectidlist.append(wombatdata->InsertObject(wombatvariable->caseid, wombatvariable->evidenceid, (int)fileId));
                                 }
                                 sqlite3_finalize(stmt);
                             }
@@ -746,7 +746,7 @@ void SleuthKitPlugin::GetImageTree(WombatVariable wombatvariable, int isAddEvide
                             fullPath += "root/" + QString(fileRecordVector[i].fullPath.c_str());
                             sleuthList << new QStandardItem(QString(fileRecordVector[i].name.c_str()));
                         }
-                        tmpitem = new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, (int)fileRecordVector[i].fileId)));
+                        tmpitem = new QStandardItem(QString::number(wombatdata->ReturnObjectID(wombatvariable->caseid, wombatvariable->evidenceid, (int)fileRecordVector[i].fileId)));
                         tmpitem->setCheckable(true);
                         sleuthList << tmpitem;
                         //sleuthList << new QStandardItem(QString::number((int)fileRecordVector[i].fileId));
@@ -829,7 +829,7 @@ void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
     TskImageFileTsk currentimagefiletsk;
     try
     {
-        currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
+        currentimagefiletsk.open(wombatvariable->evidencepath.toStdString());
         TskServices::Instance().setImageFile(currentimagefiletsk);
     }
     catch(TskException ex)
@@ -898,7 +898,7 @@ void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
     }
 }   
 
-QStringList SleuthKitPlugin::GetVolumeContents(WombatVariable wombatVariable)
+QStringList SleuthKitPlugin::GetVolumeContents(WombatVariable* wombatVariable)
 {
     wombatvariable = wombatVariable;
     SetEvidenceDB(wombatvariable);
@@ -916,12 +916,12 @@ QStringList SleuthKitPlugin::GetVolumeContents(WombatVariable wombatVariable)
     return voldesclist;
 }
 
-QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int volID)
+QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable* wombatVariable, int volID)
 {
     wombatvariable = wombatVariable;
     sqlite3* tmpImgDB;
     int ret;
-    QString tmpImgDbPath = wombatvariable.evidencedirpath + wombatvariable.evidencepath.split("/").last() + ".db";
+    QString tmpImgDbPath = wombatvariable->evidencedirpath + wombatvariable->evidencepath.split("/").last() + ".db";
     uint64_t secstart = -1;
     uint64_t seclength = -1;
     if(sqlite3_open(tmpImgDbPath.toStdString().c_str(), &tmpImgDB) == SQLITE_OK)
@@ -949,7 +949,7 @@ QString SleuthKitPlugin::GetVolumeFilePath(WombatVariable wombatVariable, int vo
 
     try
     {
-        currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
+        currentimagefiletsk.open(wombatvariable->evidencepath.toStdString());
         TskServices::Instance().setImageFile(currentimagefiletsk);
     }
     catch(TskException ex)
@@ -989,7 +989,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
     QString returnpath = "";
     try
     {
-        currentimagefiletsk.open(wombatvariable.evidencepath.toStdString());
+        currentimagefiletsk.open(wombatvariable->evidencepath.toStdString());
         TskServices::Instance().setImageFile(currentimagefiletsk);
     }
     catch(TskException ex)
@@ -1085,7 +1085,7 @@ QString SleuthKitPlugin::GetFileContents(int fileID)
         {
             fprintf(stderr, "read file/write to fail %s\n", ex.what());
         }
-        int objectid = wombatdata->ReturnObjectID(wombatvariable.caseid, wombatvariable.evidenceid, fileID);
+        int objectid = wombatdata->ReturnObjectID(wombatvariable->caseid, wombatvariable->evidenceid, fileID);
         if(objectid != (int)fileID)
         {
             QString oldfile = QString::fromStdWString(TskServices::Instance().getFileManager().getPath((uint64_t)fileID));

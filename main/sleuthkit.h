@@ -30,29 +30,30 @@ public:
     SleuthKitPlugin(WombatDatabase* wombatcasedata);
     ~SleuthKitPlugin() {};
     //SleuthKit Interface Functions
-    Q_INVOKABLE void Initialize(WombatVariable wombatVariable);
+    Q_INVOKABLE void Initialize(WombatVariable* wombatVariable);
     void SetupSystemProperties();
     void SetupLog();
     void SetupScheduler();
     void SetupFileManager();
     void SetupBlackboard();
     void SetupImageDatabase();
-    void SetEvidenceDB(WombatVariable wombatVariable);
-    Q_INVOKABLE void OpenEvidence(WombatVariable wombatVariable);
-    Q_INVOKABLE void RefreshTreeViews(WombatVariable wombatVariable);
-    Q_INVOKABLE void PopulateCase(WombatVariable wombatVariable);
-    Q_INVOKABLE void ShowFile(WombatVariable wombatVariable);
-    Q_INVOKABLE void ExportFiles(WombatVariable wombatVariable);
+    void SetEvidenceDB(WombatVariable* wombatVariable);
+    Q_INVOKABLE void OpenEvidence(WombatVariable* wombatVariable);
+    Q_INVOKABLE void RefreshTreeViews(WombatVariable* wombatVariable);
+    Q_INVOKABLE void PopulateCase(WombatVariable* wombatVariable);
+    Q_INVOKABLE void ShowFile(WombatVariable* wombatVariable);
+    Q_INVOKABLE void ExportFiles(WombatVariable* wombatVariable);
     void SetupSystemBlackboard();
-    void GetImageTree(WombatVariable wombatvariable, int isAddEvidence);
+    void GetImageTree(WombatVariable* wombatvariable, int isAddEvidence);
     QString GetFileContents(int fileID);
-    QString GetVolumeFilePath(WombatVariable wombatVariable, int volID);
-    QStringList GetVolumeContents(WombatVariable wombatVariable);
+    QString GetVolumeFilePath(WombatVariable* wombatVariable, int volID);
+    QStringList GetVolumeContents(WombatVariable* wombatVariable);
     void ExportFile(std::string tmppath, int objectID);
     void TaskMap(TskSchedulerQueue::task_struct* &task);
 
 private:
-    WombatVariable wombatvariable;
+    //WombatVariable wombatvariable;
+    WombatVariable* wombatvariable;
     WombatDatabase* wombatdata;
     TskSystemPropertiesImpl* systemproperties;
     TskFileManagerImpl* fileManager;
@@ -75,7 +76,7 @@ signals:
     void UpdateMessageTable(void);
     void SetLogVariable(WombatVariable* wvariable);
     void LoadFileContents(QString filepath);
-    void PopulateProgressWindow(WombatVariable wvariable);
+    void PopulateProgressWindow(WombatVariable* wvariable);
 };
 
 class TaskRunner : public QObject, public QRunnable
@@ -91,7 +92,7 @@ public:
     {
         try
         {
-            fprintf(stderr, "task id: %d\n", task->id);
+            fprintf(stderr, "task id: %i\n", (int)task->id);
             filepipeline->run(task->id);
         }
         catch(TskException &ex)

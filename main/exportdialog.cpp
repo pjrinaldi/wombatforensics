@@ -50,6 +50,6 @@ void ExportDialog::ExportFiles()
         exportdata.pathstatus = FileExportData::include;
     if(ui->excludePathRadioButton->isChecked())
         exportdata.pathstatus = FileExportData::exclude;
-    emit FileExport(exportdata);
+    emit FileExport(&exportdata);
     this->close();
 }
