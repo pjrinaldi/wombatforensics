@@ -582,6 +582,7 @@ void SleuthKitPlugin::threadFinished()
 }
 
 // This takes too long to populate. need to come up with a more efficient way to populate these values that won't take as long
+// Need to move the insertobject out of the get image tree function
 void SleuthKitPlugin::GetImageTree(WombatVariable* wombatvariable, int isAddEvidence)
 {
     QString imagename = wombatvariable->evidencepath.split("/").last();
