@@ -130,7 +130,7 @@ void SleuthKitPlugin::OpenEvidence(WombatVariable* wombatVariable)
     }
     try
     {
-        imagefiletsk.extractFiles();
+        imagefiletsk.extractFiles(); // modify this function to set my respective objectid's in my db's.
         //fprintf(stderr, "Extracting Evidence was successful\n");
     }
     catch(TskException &ex)

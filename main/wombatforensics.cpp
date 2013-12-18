@@ -132,6 +132,8 @@ void WombatForensics::AddEvidence()
         QString evidenceName = evidenceFilePath.split("/").last();
         evidenceName += ".db";
         wombatvarptr->evidenceid = wombatcasedata->InsertEvidence(evidenceName, evidenceFilePath, wombatvarptr->caseid);
+        // could set curimgobjid = InsertObject(caseid, evidenceid, 3, evidenceid); // set objectid here...
+        // start to build the basic tree here adding the image node...
         wombatvarptr->evidenceidlist.append(wombatvarptr->evidenceid);
         wombatvarptr->evidencepath = evidenceFilePath;
         wombatvarptr->evidencepathlist << wombatvarptr->evidencepath;
