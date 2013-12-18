@@ -646,6 +646,7 @@ void WombatForensics::on_actionNew_Case_triggered()
             {
                 DisplayError("2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
             }
+            // CREATE CASEID-CASENAME.DB RIGHT HERE.
             userPath = wombatvarptr->casedirpath;
             userPath += "evidence/";
             mkPath = (new QDir())->mkpath(userPath);

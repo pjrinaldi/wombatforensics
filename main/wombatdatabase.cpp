@@ -28,11 +28,12 @@ bool WombatDatabase::FileExists(const std::string& filename)
     }
     return false;
 }
-
+// CALLED THE CREATE WOMBATDB() TO INCLUDE CASES AND SETTINGS.
 const char* WombatDatabase::CreateCaseDB(QString wombatdbname)
 {
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
+    // MOVE THE JOB, EVIDENCE, MSGLOG, OBJECTS TO A "CASEID-CASENAME.DB" FILENAME IN THE CASE FOLDER
     wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);");
     wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT, deleted INTEGER);");
