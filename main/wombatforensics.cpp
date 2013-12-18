@@ -16,7 +16,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvarptr->evidenceid = 0;
     wombatvarptr->jobtype = 0;
     wombatvarptr->jobid = -1;
-    //qRegisterMetaType<WombatVariable>("WombatVariable");
     qRegisterMetaType<FileExportData*>("FileExportData*");
     qRegisterMetaType<WombatVariable*>("WombatVariable*");
     connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
@@ -721,6 +720,8 @@ void WombatForensics::on_actionOpen_Case_triggered()
 void WombatForensics::ViewGroupTriggered(QAction* selaction)
 {
     wombatvarptr->visibleviewer = ReturnVisibleViewerID();
+    // READ RESPECTIVE SIGNATURE HERE TO SET OMNIVALUE
+    // GET CURRENTLY SELECTED FILE AND IF IT'S A VALUE, THEN LOAD THE RESPECTIVE CONTENT.
     wombatvarptr->omnivalue = 1;
     if(selaction == ui->actionViewHex)
     {
@@ -748,8 +749,20 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
+    // NEED TO DETERMINE WHETHER TO ASSIGN OBJECT ID VALUE'S TO THE IMAGE/VOLUME/PARTITION FOR EASIER TRACKING
+    QString tmptext = "";
+    tmptext = index.sibling(index.row(), 1).data().toString(); // object id
+    if(tmptext != "") // txt has a value
+    {
+    }
+    //QString sigtext = "";
+    // I CAN EITHER GET THE SIGNATURE USING COMPARISON OR BY CALLING FILE AND MAGIC LIKE THE MODULE
+    // SELECTING ITEM GETS IT'S ID VALUES AND SET'S RESPECTIVE WOMBATVARPTR->VALUES
+    // GET THE RESPECTIVE VISIBLE VIEWER FROM THE VIEWER STACK.
+    // LOAD THE DATA INTO THE RESPECTIVE VIEWER.
+
+    /*
     wombatvarptr->visibleviewer = ReturnVisibleViewerID();
-    // need to figure out where to split the viewer loading...
     // NEED TO DETERMINE WHICH VIEWER IS VISIBLE AND THEN LOAD THE RESPECITIVE DATA ACCORDINGLY.
     // QString imagename = wombatvarptr->evidencepath.split("/").last();
     QString tmptext = "";
@@ -771,7 +784,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
         else
         {
             ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
-            //ui->fileViewTabWidget->setTabEnabled(2, true); // where i enable the omni button
+            //ui->fileViewTabWidget->setTabEnabled(2, true); // where i enable the omni button*/
             /*if(omnivalue == 1)
                 ui->viewerstack->setCurrentIndex(2);
             else if(omnivalue == 2)
@@ -779,7 +792,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
             else if(omnivalue == 3)
                 ui->viewerstack->setCurrentIndex(4);
                 */
-        }
+/*        }
     }
     else
     {
@@ -833,6 +846,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     }
     ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvarptr);
     threadpool->start(tmprun);
+    */
 }
 
 int WombatForensics::DetermineOmniView(QString currentSignature)

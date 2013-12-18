@@ -38,7 +38,7 @@ const char* WombatDatabase::CreateCaseDB(QString wombatdbname)
     wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT, deleted INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
     wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
-    wombatTableSchema.push_back("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER);");
+    wombatTableSchema.push_back("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER, partid INTEGER, volid INTEGER, imgID INTEGER);");
     if(sqlite3_open(wombatdbname.toStdString().c_str(), &wombatdb) == SQLITE_OK)
     {
         const char* tblString;
@@ -321,12 +321,22 @@ int WombatDatabase::InsertEvidence(QString evidenceName, QString evidenceFilePat
     return evidenceid;
 }
 
-int WombatDatabase::InsertObject(int caseid, int evidenceid, int fileid)
+int WombatDatabase::InsertObject(int caseid, int evidenceid, int itemtype, int curid)
 {
     int objectid = 0;
-    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO objects (caseid, evidenceid, fileid) VALUES(?, ?, ?);", -1, &sqlstatement, NULL) == SQLITE_OK)
+    std::string tmpquery = "INSERT INTO objects (caseid, evidenceid, ";
+    if(itemtype == 0) // item is file
+        tmpquery += "fileid";
+    else if(itemtype == 1) // item is partition
+        tmpquery += "partid";
+    else if(itemtype == 2) // item is a volume
+        tmpquery += "volid";
+    else if(itemtype == 3) // item is an image
+        tmpquery += "imgid";
+    tmpquery += ") VALUES(?, ?, ?);";
+    if(sqlite3_prepare_v2(wombatdb, tmpquery, -1, &sqlstatement, NULL) == SQLITE_OK)
     {
-        if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, fileid) == SQLITE_OK)
+        if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, curid) == SQLITE_OK)
         {
             int ret = sqlite3_step(sqlstatement);
             if(ret == SQLITE_ROW || ret == SQLITE_DONE)

@@ -64,6 +64,7 @@ struct WombatVariable
     int processcount = 0;
     int omnivalue = 1;
     int visibleviewer = 0;
+    int selectedobjectid = 0;
     QString casespath = "";
     QString casedirpath = "";
     QString evidencedirpath;
