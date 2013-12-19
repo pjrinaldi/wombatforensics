@@ -17,8 +17,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //wombatvarptr->evidenceobject.id = 0;
     //wombatvarptr->jobtype = 0;
     //wombatvarptr->jobid = -1;
-    qRegisterMetaType<FileExportData*>("FileExportData*");
-    qRegisterMetaType<WombatVariable*>("WombatVariable*");
+    //qRegisterMetaType<FileExportData*>("FileExportData*");
+    //qRegisterMetaType<WombatVariable*>("WombatVariable*");
     //connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     //connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(LoadFileContents(QString)), Qt::QueuedConnection);
@@ -167,6 +167,67 @@ void WombatForensics::InitializeCourseStructure()
     }
 }
 
+void WombatForensics::InitializeOpenCourse()
+{        
+    // open case here
+        QStringList caseList;
+        caseList.clear();
+        // populate case list here
+        caseList = wombatdatabase->ReturnCaseNameList();
+        bool ok;
+        QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
+        if(ok && !item.isEmpty()) // open selected case
+        {
+            wombatvarptr->caseobject.id = wombatdatabase->ReturnCaseID(item);
+            QString tmpTitle = "Wombat Forensics - ";
+            tmpTitle += item;
+            this->setWindowTitle(tmpTitle);
+            QString casestring = QString::number(wombatvarptr->caseobject.id) + "-" + item;
+            QString userPath = wombatvarptr->casespath + casestring + "/";
+            bool mkPath = (new QDir())->mkpath(userPath);
+            if(mkPath == true)
+            {
+                wombatvarptr->caseobject.dirpath = userPath;
+            }
+            else
+            {
+                DisplayError("2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
+            }
+            // CREATE CASEID-CASENAME.DB RIGHT HERE.
+            userPath = wombatvarptr->caseobject.dirpath;
+            QString casedbpath = userPath + casestring + ".db";
+            bool caseFileExist = wombatdatabase->FileExists(casedbpath.toStdString());
+            if(!caseFileExist)
+            {
+                const char* errstring = wombatdatabase->CreateCaseDB(casedbpath);
+                if(strcmp(errstring, "") != 0)
+                    DisplayError("1.2", "Course DB Creation Error", errstring);
+                else
+                    wombatvarptr->caseobject.dbname = userPath + casestring + ".db";
+            }
+            else
+            {
+                const char* errstring = wombatdatabase->OpenCaseDB(casedbpath);
+                if(strcmp(errstring, "") != 0)
+                    DisplayError("1.3", "SQL", errstring);
+                else
+                    wombatvarptr->caseobject.dbname = userPath + casestring + ".db";
+            }
+            userPath += "evidence/";
+            mkPath = (new QDir())->mkpath(userPath);
+            if(mkPath == true)
+            {
+                wombatvarptr->evidenceobject.dirpath = userPath;
+            }
+            else
+            {
+                DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
+            }
+            //ThreadRunner* trun = new ThreadRunner(isleuthkit, "populatecase", wombatvarptr);
+            //threadpool->start(trun);
+        }
+
+}
 void WombatForensics::InitializeWombatFramework()
 {
     // MIGHT NOT NEED TO INITIALIZE ANYTHING HERE.
@@ -186,7 +247,15 @@ void WombatForensics::AddEvidence()
     // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
     // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR
     // NEED TO CREATE THE EVIDENCE TSK DATABASE (EXTRACT EVIDENCE ACCORDING TO MODULES)
-    // FOR NOW I WON'T BUILD MODULES, I'LL JUST DESIGN A MULTI-THREADED APPROACH FOR IT AND ABSTRACT TO PLUGGABLE MODULES LATER.
+    // NEED TO BUILD DIRMODEL AS I GO AND POPULATE DIRTREEVIEW AS I GO WITH EACH FILE
+    // FOR NOW I WON'T BUILD MODULES, I'LL JUST DESIGN A MULTI-THREADED APPROACH FOR IT AND ABSTRACT TO PLUGGABLE MODULES LATER
+    wombatvarptr->evidenceobject.fullpath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
+    if(wombatvarptr->evidenceobject.fullpath != "")
+    {
+        wombatdatabase->InitializeEvidenceDatabase();
+        wombatprogresswindow->show();
+        wombatprogresswindow->ClearTableWidget();
+    }
     /*
     QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
     if(evidenceFilePath != "")
@@ -703,47 +772,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
     }
     if (ret == QMessageBox::Yes)
     {
-        // open case here
-        QStringList caseList;
-        caseList.clear();
-        // populate case list here
-        caseList = wombatdatabase->ReturnCaseNameList();
-        bool ok;
-        QString item = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), caseList, 0, false, &ok);
-        if(ok && !item.isEmpty()) // open selected case
-        {
-            wombatvarptr->caseobject.id = wombatdatabase->ReturnCaseID(item);
-            QString tmpTitle = "Wombat Forensics - ";
-            tmpTitle += item;
-            this->setWindowTitle(tmpTitle);
-            QString userPath = wombatvarptr->casespath;
-            userPath += QString::number(wombatvarptr->caseobject.id);
-            userPath += "-";
-            userPath += item;
-            userPath += "/";
-            bool mkPath = (new QDir())->mkpath(userPath);
-            if(mkPath == true)
-            {
-                wombatvarptr->caseobject.dirpath = userPath;
-            }
-            else
-            {
-                DisplayError("2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
-            }
-            userPath = wombatvarptr->caseobject.dirpath;
-            userPath += "evidence/";
-            mkPath = (new QDir())->mkpath(userPath);
-            if(mkPath == true)
-            {
-                wombatvarptr->evidenceobject.dirpath = userPath;
-            }
-            else
-            {
-                DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
-            }
-            //ThreadRunner* trun = new ThreadRunner(isleuthkit, "populatecase", wombatvarptr);
-            //threadpool->start(trun);
-        }
+        InitializeOpenCourse();
     }
 }
 

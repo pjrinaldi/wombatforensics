@@ -93,13 +93,14 @@ private:
     Ui::WombatForensics *ui;
 
     void SetupDirModel(void);
-    void SetupHexPage();
+    void SetupHexPage(void);
     void SetupToolbar(void);
-    //void InitializeSleuthKit();
-    void InitializeAppStructure();
-    void InitializeCourseStructure();
-    void InitializeWombatFramework();
-    void RemoveTmpFiles();
+    //void InitializeSleuthKit(void);
+    void InitializeAppStructure(void);
+    void InitializeCourseStructure(void);
+    void InitializeOpenCourse(void);
+    void InitializeWombatFramework(void);
+    void RemoveTmpFiles(void);
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
     void LoadOmniContent(QString filePath);

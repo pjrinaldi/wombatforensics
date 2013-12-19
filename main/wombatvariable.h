@@ -9,15 +9,7 @@
 #include <vector>
 #include <string>
 
-struct EvidenceObject
-{
-    int id;
-    QString dirpath;
-    QString fullpath;
-    QString dbname;
-};
-
-struct CaseObject
+struct ItemObject
 {
     int id;
     QString dirpath;
@@ -46,7 +38,7 @@ struct FileExportData
     PathStatus pathstatus;
     std::string name;
     std::string fullpath;
-    EvidenceObject evidenceobject;
+    ItemObject evidenceobject;
     //std::string evidencedbname;
     //std::string evidencepath;
     int exportcount;
@@ -98,10 +90,10 @@ struct WombatVariable
     //QStringList evidencedbnamelist;
     //QList<int> evidenceidlist;
     QList<int> objectidlist;
-    CaseObject caseobject;
+    ItemObject caseobject;
     //QVector<CaseObject*> caseobjectvector;
-    EvidenceObject evidenceobject;
-    QVector<EvidenceObject> evidenceobjectvector;
+    ItemObject evidenceobject;
+    QVector<ItemObject> evidenceobjectvector;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
 
