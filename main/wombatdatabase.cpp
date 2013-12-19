@@ -31,64 +31,54 @@ bool WombatDatabase::FileExists(const std::string& filename)
 // CALLED THE CREATE WOMBATDB() TO INCLUDE CASES AND SETTINGS.
 const char* WombatDatabase::CreateCaseDB(QString wombatdbname)
 {
+    /*
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
     // MOVE THE JOB, EVIDENCE, MSGLOG, OBJECTS TO A "CASEID-CASENAME.DB" FILENAME IN THE CASE FOLDER
-    wombatTableSchema.push_back("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);");
     wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT, deleted INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
     wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
     wombatTableSchema.push_back("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER, partid INTEGER, volid INTEGER, imgID INTEGER);");
+    */
+    return "";
+}
+const char* WombatDatabase::CreateAppDB(QString wombatdbname)
+{
+    sqlite3_stmt* tmpstmt;
     if(sqlite3_open(wombatdbname.toStdString().c_str(), &wombatdb) == SQLITE_OK)
     {
-        const char* tblString;
-        foreach(tblString, wombatTableSchema)
+        if(sqlite3_prepare_v2(wombatdb, "CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);", -1, &tmpstmt, NULL) == SQLITE_OK)
         {
-            sqlite3_stmt* tmpstmt;
-            if(sqlite3_prepare_v2(wombatdb, tblString, -1, &tmpstmt, NULL) == SQLITE_OK)
-            {
-                int ret = sqlite3_step(tmpstmt);
-                if(ret != SQLITE_ROW && ret != SQLITE_DONE)
-                {
-                    return sqlite3_errmsg(wombatdb);
-                }
-            }
-            else
+            int ret = sqlite3_step(tmpstmt);
+            if(ret != SQLITE_ROW && ret != SQLITE_DONE)
+                return sqlite3_errmsg(wombatdb);
+        }
+        else
+            return sqlite3_errmsg(wombatdb);
+        sqlite3_finalize(tmpstmt);
+    }
+    else
+        return sqlite3_errmsg(wombatdb);
+    
+    if(sqlite3_open(wombatdbname.toStdString().c_str(), &wombatdb) == SQLITE_OK)
+    {
+        if(sqlite3_prepare_v2(wombatdb, "CREATE TABLE log(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msgdatetime TEXT, msg TEXT);", -1, &tmpstmt, NULL) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(tmpstmt);
+            if(ret != SQLITE_ROW && ret != SQLITE_DONE)
             {
                 return sqlite3_errmsg(wombatdb);
             }
-            sqlite3_finalize(tmpstmt);
         }
-        //sqlite3_close(wombatdb);
     }
-    else
-    {
-        return sqlite3_errmsg(wombatdb);
-    }
+    sqlite3_finalize(tmpstmt);
+    //sqlite3_close(wombatdb); // I DON'T THINK I'LL CLOSE THIS CAUSE I OPEN IT JUST A LITTLE FARTHER DOWN.
 
     return "";
 }
 
-const char* WombatDatabase::CreateLogDB(QString dbname)
-{
-    if(sqlite3_open(dbname.toStdString().c_str(), &logdb) == SQLITE_OK)
-    {
-        if(sqlite3_prepare_v2(logdb, "CREATE TABLE log(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msgdatetime TEXT, msg TEXT);", -1, &logstatement, NULL) == SQLITE_OK)
-        {
-            int ret = sqlite3_step(logstatement);
-            if(ret != SQLITE_ROW && ret != SQLITE_DONE)
-            {
-                return sqlite3_errmsg(logdb);
-            }
-        }
-    }
-    sqlite3_finalize(logstatement);
-    sqlite3_close(logdb);
-    return "";
-}
-
-const char* WombatDatabase::OpenCaseDB(QString dbname)
+const char* WombatDatabase::OpenAppDB(QString dbname)
 {
     if(sqlite3_open(dbname.toStdString().c_str(), &wombatdb) != SQLITE_OK)
         return sqlite3_errmsg(wombatdb);
@@ -96,9 +86,9 @@ const char* WombatDatabase::OpenCaseDB(QString dbname)
         return "";
 }
 
-const char* WombatDatabase::CloseCaseDB()
+const char* WombatDatabase::CloseAppDB()
 {
-    if(sqlite3_finalize(sqlstatement) == SQLITE_OK)
+    if(sqlite3_finalize(wombatstatement) == SQLITE_OK)
     {
         if(sqlite3_close(wombatdb) == SQLITE_OK)
         {
@@ -120,17 +110,17 @@ const char* WombatDatabase::CloseCaseDB()
 
 WombatDatabase::~WombatDatabase()
 {
-    CloseCaseDB();
+    CloseAppDB();
 }
 
 int WombatDatabase::ReturnCaseCount()
 {
     int casecount = 0;
-    if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", -1, &wombatstatement, NULL) == SQLITE_OK)
     {
-        int ret = sqlite3_step(sqlstatement);
+        int ret = sqlite3_step(wombatstatement);
         if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-            casecount = sqlite3_column_int(sqlstatement, 0);
+            casecount = sqlite3_column_int(wombatstatement, 0);
     }
     else
         emit DisplayError("1.3", "SQL Error. ", sqlite3_errmsg(wombatdb));
@@ -335,7 +325,7 @@ int WombatDatabase::InsertObject(int caseid, int evidenceid, int itemtype, int c
     else if(itemtype == 3) // item is an image
         tmpquery += "imgid";
     tmpquery += ") VALUES(?, ?, ?);";
-    if(sqlite3_prepare_v2(wombatdb, tmpquery, -1, &sqlstatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(wombatdb, tmpquery.c_str(), -1, &sqlstatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(sqlstatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(sqlstatement, 3, curid) == SQLITE_OK)
         {

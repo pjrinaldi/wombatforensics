@@ -68,25 +68,17 @@ void WombatForensics::InitializeAppStructure()
     mkPath = (new QDir())->mkpath(wombatvarptr->tmpfilepath);
     if(mkPath == false)
         DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
-    QString logPath = wombatvarptr->datapath + "WombatLog.db";
-    bool logFileExist = wombatcasedata->FileExists(logPath.toStdString());
-    if(!logFileExist)
+    QString appPath = wombatvarptr->datapath + "WombatApp.db";
+    bool appFileExist = wombatcasedata->FileExists(appPath.toStdString());
+    if(!appFileExist)
     {
-        const char* errstring = wombatcasedata->CreateLogDB(logPath);
+        const char* errstring = wombatcasedata->CreateAppDB(appPath); // contains cases and log table.
         if(strcmp(errstring, "") != 0)
-            DisplayError("1.0", "Log File Error", errstring);
-    }
-    QString tmpPath = wombatvarptr->datapath + "WombatCase.db";
-    bool doesFileExist = wombatcasedata->FileExists(tmpPath.toStdString());
-    if(!doesFileExist)
-    {
-        const char* errstring = wombatcasedata->CreateCaseDB(tmpPath);
-        if(strcmp(errstring, "") != 0)
-            DisplayError("1.0", "File Error", errstring);
+            DisplayError("1.0", "App File Error", errstring);
     }
     else
     {
-        const char* errstring = wombatcasedata->OpenCaseDB(tmpPath);
+        const char* errstring = wombatcasedata->OpenAppDB(appPath);
         if(strcmp(errstring, "") != 0)
             DisplayError("1.1", "SQL", errstring);
     }

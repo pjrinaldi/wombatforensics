@@ -22,10 +22,11 @@ class WombatDatabase : public QObject
 public:
     WombatDatabase();
     bool FileExists(const std::string& fileName);
-    const char *CreateLogDB(QString dbname);
-    const char *CreateCaseDB(QString dbname);
-    const char *OpenCaseDB(QString dbname);
-    const char *CloseCaseDB();
+    const char* CreateAppDB(QString dbname);
+    const char* CreateCaseDB(QString dbname);
+    //const char* OpenCaseDB(QString dbname);
+    const char* OpenAppDB(QString dbname);
+    const char* CloseAppDB();
     ~WombatDatabase();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
@@ -57,9 +58,9 @@ signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:
     sqlite3 *wombatdb;
-    sqlite3 *logdb;
+    sqlite3 *casedb;
     sqlite3_stmt *sqlstatement;
-    sqlite3_stmt *logstatement;
+    sqlite3_stmt *wombatstatement;
 };
 
 #endif // WOMBATDATABASE_H
