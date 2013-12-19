@@ -110,8 +110,8 @@ private:
     int ReturnVisibleViewerID();
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
-    std::vector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
-    std::vector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, std::vector<FileExportData>);
+    QVector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData>);
+    QVector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData>);
     int DetermineOmniView(QString currentSignature);
     //QTextEdit* currenttxtwidget; // replace with a txt version of the hexeditor or implement partial load model here as well
     QModelIndex curselindex;

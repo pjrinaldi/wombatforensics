@@ -3,10 +3,27 @@
 
 #include <QString>
 #include <QList>
+#include <QVector>
 #include <QStringList>
 #include <QObject>
 #include <vector>
 #include <string>
+
+struct EvidenceObject
+{
+    int id;
+    QString dirpath;
+    QString fullpath;
+    QString dbname;
+};
+
+struct CaseObject
+{
+    int id;
+    QString dirpath;
+    QString fullpath;
+    QString dbname;
+};
 
 struct FileExportData
 {
@@ -29,25 +46,10 @@ struct FileExportData
     PathStatus pathstatus;
     std::string name;
     std::string fullpath;
-    std::string evidencedbname;
-    std::string evidencepath;
+    EvidenceObject evidenceobject;
+    //std::string evidencedbname;
+    //std::string evidencepath;
     int exportcount;
-};
-
-struct EvidenceObject
-{
-    int id;
-    QString dirpath;
-    QString fullpath;
-    QString dbname;
-};
-
-struct CaseObject
-{
-    int id;
-    QString dirpath;
-    QString fullpath;
-    QString dbname;
 };
 
 struct WombatVariable
