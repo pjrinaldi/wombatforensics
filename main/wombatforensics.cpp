@@ -4,7 +4,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 {
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
-    wombatdatabase = new WombatDatabase();
+    wombatvarptr = &wombatvariable;
+    wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework();
     wombatprogresswindow = new ProgressWindow(wombatdatabase);
     //isleuthkit = new SleuthKitPlugin(wombatdatabase);
@@ -12,7 +13,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     //connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
     //connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
-    wombatvarptr = &wombatvariable;
     wombatvarptr->caseobject.id = 0;
     //wombatvarptr->evidenceobject.id = 0;
     //wombatvarptr->jobtype = 0;

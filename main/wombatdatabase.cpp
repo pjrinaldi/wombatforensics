@@ -15,8 +15,9 @@ std::string WombatDatabase::GetTime()
     return timeStr;
 }
 
-WombatDatabase::WombatDatabase()
+WombatDatabase::WombatDatabase(WombatVariable* wombatvarptr)
 {
+    wombatptr = wombatvarptr;
 }
 
 bool WombatDatabase::FileExists(const std::string& filename)
@@ -136,6 +137,13 @@ const char* WombatDatabase::CloseAppDB()
 WombatDatabase::~WombatDatabase()
 {
     CloseAppDB();
+}
+
+void WombatDatabase::InitializeEvidenceDatabase()
+{
+    #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking
+    #define IMGDB_MAX_RETRY_COUNT 50    // how many times will we retry a SQL statement
+    #define IMGDB_RETRY_WAIT 100   // how long (in milliseconds) are we willing to wait between retries
 }
 
 int WombatDatabase::ReturnCaseCount()

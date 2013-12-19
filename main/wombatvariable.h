@@ -101,6 +101,6 @@ struct WombatVariable
 
 Q_DECLARE_METATYPE(WombatVariable)
 Q_DECLARE_METATYPE(FileExportData)
-Q_DECLARE_METATYPE(CaseObject)
-Q_DECLARE_METATYPE(EvidenceObject)
+Q_DECLARE_METATYPE(ItemObject)
+
 #endif // WOMBATVARIABLE_H

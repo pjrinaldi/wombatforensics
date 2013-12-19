@@ -16,17 +16,20 @@
 #include <QDir>
 #include <QObject>
 
+#include "wombatvariable.h"
+
 class WombatDatabase : public QObject
 {
     Q_OBJECT
 public:
-    WombatDatabase();
+    WombatDatabase(WombatVariable* wombatvarptr);
     bool FileExists(const std::string& fileName);
     const char* CreateAppDB(QString dbname);
     const char* CreateCaseDB(QString dbname);
     const char* OpenCaseDB(QString dbname);
     const char* OpenAppDB(QString dbname);
     const char* CloseAppDB();
+    void InitializeEvidenceDatabase(void);
     ~WombatDatabase();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
@@ -62,6 +65,7 @@ private:
     std::vector<sqlite3*> evidencedblist;
     sqlite3_stmt* casestatement;
     sqlite3_stmt* wombatstatement;
+    WombatVariable* wombatptr;
 };
 
 #endif // WOMBATDATABASE_H
