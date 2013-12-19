@@ -48,9 +48,10 @@ class WombatForensics : public QMainWindow
 public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
-    WombatDatabase* wombatcasedata;
+    WombatDatabase* wombatdatabase;
     WombatVariable wombatvariable;
     WombatVariable* wombatvarptr;
+    WombatFramework* wombatframework;
     ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
     //SleuthKitPlugin* isleuthkit;
