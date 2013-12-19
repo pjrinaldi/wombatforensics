@@ -29,16 +29,34 @@ bool WombatDatabase::FileExists(const std::string& filename)
     return false;
 }
 // CALLED THE CREATE WOMBATDB() TO INCLUDE CASES AND SETTINGS.
-const char* WombatDatabase::CreateCaseDB(QString wombatdbname)
+const char* WombatDatabase::CreateCaseDB(QString casedbname)
 {
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
-    // MOVE THE JOB, EVIDENCE, MSGLOG, OBJECTS TO A "CASEID-CASENAME.DB" FILENAME IN THE CASE FOLDER
     wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);");
     wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT, deleted INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
     wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
     wombatTableSchema.push_back("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER, partid INTEGER, volid INTEGER, imgID INTEGER);");
+
+    if(sqlite3_open(casedbname.toStdString().c_str(), &casedb) == SQLITE_OK)
+    {
+        const char* tblschema;
+        foreach(tblschema, wombatTableSchema)
+        {
+            if(sqlite3_prepare_v2(casedb, tblschema, -1, &casestatement, NULL) == SQLITE_OK)
+            {
+                int ret = sqlite3_step(casestatement);
+                if(ret != SQLITE_ROW && ret != SQLITE_DONE)
+                    return sqlite3_errmsg(casedb);
+            }
+            else
+                return sqlite3_errmsg(casedb);
+            sqlite3_finalize(casestatement);
+        }
+    }
+    else
+        return sqlite3_errmsg(casedb);
 
     return "";
 }
@@ -80,6 +98,14 @@ const char* WombatDatabase::CreateAppDB(QString wombatdbname)
 const char* WombatDatabase::OpenAppDB(QString dbname)
 {
     if(sqlite3_open(dbname.toStdString().c_str(), &wombatdb) != SQLITE_OK)
+        return sqlite3_errmsg(wombatdb);
+    else
+        return "";
+}
+
+const char* WombatDatabase::OpenCaseDB(QString dbname)
+{
+    if(sqlite3_open(dbname.toStdString().c_str(), &casedb) != SQLITE_OK)
         return sqlite3_errmsg(wombatdb);
     else
         return "";

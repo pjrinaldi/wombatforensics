@@ -34,6 +34,22 @@ struct FileExportData
     int exportcount;
 };
 
+struct EvidenceObject
+{
+    int id;
+    QString dirpath;
+    QString fullpath;
+    QString dbname;
+};
+
+struct CaseObject
+{
+    int id;
+    QString dirpath;
+    QString fullpath;
+    QString dbname;
+};
+
 struct WombatVariable
 {
 
@@ -54,8 +70,9 @@ struct WombatVariable
         exportfiles = 3
     };
 
-    int caseid;
-    int evidenceid;
+    // id values
+    //int caseid;
+    //int evidenceid;
     int jobtype;
     int jobid;
     int fileid;
@@ -65,25 +82,31 @@ struct WombatVariable
     int omnivalue;
     int visibleviewer;
     int selectedobjectid;
+    // directory/file paths
     QString casespath;
-    QString casedirpath;
-    QString evidencedirpath;
-    QString evidencepath;
+    //QString casedirpath;
+    //QString casedbpath;
+    //QString evidencedirpath;
+    //QString evidencepath;
     QString settingspath;
     QString datapath;
     QString tmpfilepath;
-    QString evidencedbname;
-    QStringList evidencepathlist;
-    QStringList evidencedbnamelist;
-    QList<int> evidenceidlist;
+    //QString evidencedbname;
+    //QStringList evidencepathlist;
+    //QStringList evidencedbnamelist;
+    //QList<int> evidenceidlist;
     QList<int> objectidlist;
-    
+    CaseObject caseobject;
+    //QVector<CaseObject*> caseobjectvector;
+    EvidenceObject evidenceobject;
+    QVector<EvidenceObject> evidenceobjectvector;
     FileExportData exportdata;
-    std::vector<FileExportData> exportdatalist;
+    QVector<FileExportData> exportdatavector;
 
 };
 
 Q_DECLARE_METATYPE(WombatVariable)
 Q_DECLARE_METATYPE(FileExportData)
-
+Q_DECLARE_METATYPE(CaseObject)
+Q_DECLARE_METATYPE(EvidenceObject)
 #endif // WOMBATVARIABLE_H

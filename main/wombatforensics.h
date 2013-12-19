@@ -50,6 +50,7 @@ public:
     ~WombatForensics();
     WombatDatabase* wombatdatabase;
     WombatVariable wombatvariable;
+    //CaseObject currentcaseobject;
     WombatVariable* wombatvarptr;
     WombatFramework* wombatframework;
     ProgressWindow* wombatprogresswindow;

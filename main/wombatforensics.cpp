@@ -13,7 +13,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
     //connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     wombatvarptr = &wombatvariable;
-    wombatvarptr->caseid = 0;
+    wombatvarptr->caseobject.id = 0;
     //wombatvarptr->evidenceid = 0;
     //wombatvarptr->jobtype = 0;
     //wombatvarptr->jobid = -1;
@@ -113,25 +113,25 @@ void WombatForensics::InitializeCourseStructure()
     QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
     if(ok && !text.isEmpty())
     {
-        wombatvarptr->caseid = wombatdatabase->InsertCase(text);
+        wombatvarptr->caseobject.id = wombatdatabase->InsertCase(text);
 
         QString tmpTitle = "Wombat Forensics - ";
         tmpTitle += text;
         this->setWindowTitle(tmpTitle); // update application window.
         // make Cases Folder
-        QString casestring = QString::number(wombatvarptr->caseid) + "-" + text;
+        QString casestring = QString::number(wombatvarptr->caseobject.id) + "-" + text;
         QString userPath = wombatvarptr->casespath + casestring + "/";
         bool mkPath = (new QDir())->mkpath(userPath);
         if(mkPath == true)
         {
-            wombatvarptr->casedirpath = userPath;
+            wombatvarptr->caseobject.dirpath = userPath;
         }
         else
         {
             DisplayError("2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
-        userPath = wombatvarptr->casedirpath;
+        userPath = wombatvarptr->caseobject.dirpath;
         QString casedbpath = userPath + casestring + ".db";
         bool caseFileExist = wombatdatabase->FileExists(casedbpath.toStdString());
         if(!caseFileExist)
@@ -139,18 +139,22 @@ void WombatForensics::InitializeCourseStructure()
             const char* errstring = wombatdatabase->CreateCaseDB(casedbpath);
             if(strcmp(errstring, "") != 0)
                 DisplayError("1.2", "Course DB Creation Error", errstring);
+            else
+                wombatvarptr->caseobject.dbname = userPath + casestring + ".db";
         }
         else
         {
             const char* errstring = wombatdatabase->OpenCaseDB(casedbpath);
             if(strcmp(errstring, "") != 0)
                 DisplayError("1.3", "SQL", errstring);
+            else
+                wombatvarptr->caseobject.dbname = userPath + casestring + ".db";
         }
         userPath += "evidence/";
         mkPath = (new QDir())->mkpath(userPath);
         if(mkPath == true)
         {
-            wombatvarptr->evidencedirpath = userPath;
+            wombatvarptr->evidenceobject.dirpath = userPath;
         }
         else
         {
@@ -179,6 +183,7 @@ void WombatForensics::InitializeSleuthKit()
 
 void WombatForensics::AddEvidence()
 {
+    /*
     QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
     if(evidenceFilePath != "")
     {
@@ -212,7 +217,8 @@ void WombatForensics::AddEvidence()
         wombatdatabase->InsertMsg(wombatvarptr->caseid, wombatvarptr->evidenceid, wombatvarptr->jobid, 2, "Adding Evidence Started");
         //ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvarptr);
         //threadpool->start(trun);
-    }
+        */
+    //}
 }
 
 void WombatForensics::RemEvidence()
@@ -679,7 +685,7 @@ void WombatForensics::on_actionNew_Case_triggered()
     }
     if (ret == QMessageBox::Yes)
     {
-        InitializeCourseStructure()
+        InitializeCourseStructure();
     }
 }
 
