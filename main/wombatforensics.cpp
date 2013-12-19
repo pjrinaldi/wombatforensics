@@ -105,6 +105,64 @@ void WombatForensics::InitializeAppStructure()
     SetupToolbar();
     
 }
+
+void WombatForensics::InitializeCourseStructure()
+{
+    // create new case here
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
+    if(ok && !text.isEmpty())
+    {
+        wombatvarptr->caseid = wombatdatabase->InsertCase(text);
+
+        QString tmpTitle = "Wombat Forensics - ";
+        tmpTitle += text;
+        this->setWindowTitle(tmpTitle); // update application window.
+        // make Cases Folder
+        QString casestring = QString::number(wombatvarptr->caseid) + "-" + text;
+        QString userPath = wombatvarptr->casespath + casestring + "/";
+        bool mkPath = (new QDir())->mkpath(userPath);
+        if(mkPath == true)
+        {
+            wombatvarptr->casedirpath = userPath;
+        }
+        else
+        {
+            DisplayError("2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
+        }
+        // CREATE CASEID-CASENAME.DB RIGHT HERE.
+        userPath = wombatvarptr->casedirpath;
+        QString casedbpath = userPath + casestring + ".db";
+        bool caseFileExist = wombatdatabase->FileExists(casedbpath.toStdString());
+        if(!caseFileExist)
+        {
+            const char* errstring = wombatdatabase->CreateCaseDB(casedbpath);
+            if(strcmp(errstring, "") != 0)
+                DisplayError("1.2", "Course DB Creation Error", errstring);
+        }
+        else
+        {
+            const char* errstring = wombatdatabase->OpenCaseDB(casedbpath);
+            if(strcmp(errstring, "") != 0)
+                DisplayError("1.3", "SQL", errstring);
+        }
+        userPath += "evidence/";
+        mkPath = (new QDir())->mkpath(userPath);
+        if(mkPath == true)
+        {
+            wombatvarptr->evidencedirpath = userPath;
+        }
+        else
+        {
+            DisplayError("2.0", "Case Evidence Folder Creation Failed", "Failed to create case evidence folder.");
+        }
+        if(wombatdatabase->ReturnCaseCount() > 0)
+        {
+            ui->actionOpen_Case->setEnabled(true);
+        }
+    }
+}
+
 void WombatForensics::InitializeWombatFramework()
 {
     // MIGHT NOT NEED TO INITIALIZE ANYTHING HERE.
@@ -621,48 +679,7 @@ void WombatForensics::on_actionNew_Case_triggered()
     }
     if (ret == QMessageBox::Yes)
     {
-        // create new case here
-        bool ok;
-        QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
-        if(ok && !text.isEmpty())
-        {
-            wombatvarptr->caseid = wombatdatabase->InsertCase(text);
-
-            QString tmpTitle = "Wombat Forensics - ";
-            tmpTitle += text;
-            this->setWindowTitle(tmpTitle); // update application window.
-            // make Cases Folder
-            QString userPath = wombatvarptr->casespath;
-            userPath += QString::number(wombatvarptr->caseid);
-            userPath += "-";
-            userPath += text;
-            userPath += "/";
-            bool mkPath = (new QDir())->mkpath(userPath);
-            if(mkPath == true)
-            {
-                wombatvarptr->casedirpath = userPath;
-            }
-            else
-            {
-                DisplayError("2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
-            }
-            // CREATE CASEID-CASENAME.DB RIGHT HERE.
-            userPath = wombatvarptr->casedirpath;
-            userPath += "evidence/";
-            mkPath = (new QDir())->mkpath(userPath);
-            if(mkPath == true)
-            {
-                wombatvarptr->evidencedirpath = userPath;
-            }
-            else
-            {
-                DisplayError("2.0", "Case Evidence Folder Creation Failed", "Failed to create case evidence folder.");
-            }
-            if(wombatdatabase->ReturnCaseCount() > 0)
-            {
-                ui->actionOpen_Case->setEnabled(true);
-            }
-        }
+        InitializeCourseStructure()
     }
 }
 

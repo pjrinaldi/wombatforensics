@@ -96,6 +96,7 @@ private:
     void SetupToolbar(void);
     //void InitializeSleuthKit();
     void InitializeAppStructure();
+    void InitializeCourseStructure();
     void InitializeWombatFramework();
     void RemoveTmpFiles();
     void LoadHexModel(QString tmpFilePath);

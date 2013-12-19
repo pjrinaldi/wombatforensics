@@ -24,7 +24,7 @@ public:
     bool FileExists(const std::string& fileName);
     const char* CreateAppDB(QString dbname);
     const char* CreateCaseDB(QString dbname);
-    //const char* OpenCaseDB(QString dbname);
+    const char* OpenCaseDB(QString dbname);
     const char* OpenAppDB(QString dbname);
     const char* CloseAppDB();
     ~WombatDatabase();
@@ -57,10 +57,11 @@ public:
 signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:
-    sqlite3 *wombatdb;
-    sqlite3 *casedb;
-    sqlite3_stmt *sqlstatement;
-    sqlite3_stmt *wombatstatement;
+    sqlite3* wombatdb;
+    sqlite3* casedb;
+    std::vector<sqlite3*> evidencedblist;
+    sqlite3_stmt* casestatement;
+    sqlite3_stmt* wombatstatement;
 };
 
 #endif // WOMBATDATABASE_H
