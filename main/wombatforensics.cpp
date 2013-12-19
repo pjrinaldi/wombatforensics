@@ -25,7 +25,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatprogresswindow->setModal(false);
     emit LogVariable(wombatvarptr);
     InitializeAppStructure();
-    InitializeSleuthKit();
+    //InitializeSleuthKit();
+    InitializeWombatFramework();
 }
 
 void WombatForensics::HideProgressWindow(bool checkedstate)

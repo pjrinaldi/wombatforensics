@@ -29,6 +29,7 @@
 
 #include "wombatvariable.h"
 #include "wombatdatabase.h"
+#include "wombatframework.h"
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
 #include "exportdialog.h"
@@ -94,6 +95,7 @@ private:
     void SetupToolbar(void);
     void InitializeSleuthKit();
     void InitializeAppStructure();
+    void InitializeWombatFramework();
     void RemoveTmpFiles();
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
