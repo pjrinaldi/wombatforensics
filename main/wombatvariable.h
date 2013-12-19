@@ -54,19 +54,19 @@ struct WombatVariable
         exportfiles = 3
     };
 
-    int caseid = 0;
-    int evidenceid = 0;
-    int jobtype = 0;
-    int jobid = 0;
-    int fileid = 0;
-    int volid = 0;
-    int filecount = 0;
-    int processcount = 0;
-    int omnivalue = 1;
-    int visibleviewer = 0;
-    int selectedobjectid = 0;
-    QString casespath = "";
-    QString casedirpath = "";
+    int caseid;
+    int evidenceid;
+    int jobtype;
+    int jobid;
+    int fileid;
+    int volid;
+    int filecount;
+    int processcount;
+    int omnivalue;
+    int visibleviewer;
+    int selectedobjectid;
+    QString casespath;
+    QString casedirpath;
     QString evidencedirpath;
     QString evidencepath;
     QString settingspath;

@@ -93,7 +93,7 @@ private:
     void SetupDirModel(void);
     void SetupHexPage();
     void SetupToolbar(void);
-    void InitializeSleuthKit();
+    //void InitializeSleuthKit();
     void InitializeAppStructure();
     void InitializeWombatFramework();
     void RemoveTmpFiles();

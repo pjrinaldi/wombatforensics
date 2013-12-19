@@ -104,6 +104,9 @@ void WombatForensics::InitializeAppStructure()
     SetupToolbar();
     
 }
+void WombatForensics::InitializeWombatFramework()
+{
+}
 /*
 void WombatForensics::InitializeSleuthKit()
 {*/
