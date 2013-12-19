@@ -6,11 +6,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     threadpool = QThreadPool::globalInstance();
     wombatcasedata = new WombatDatabase();
     wombatprogresswindow = new ProgressWindow(wombatcasedata);
-    isleuthkit = new SleuthKitPlugin(wombatcasedata);
+    //isleuthkit = new SleuthKitPlugin(wombatcasedata);
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
-    connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
-    connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
-    connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
+    //connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+    //connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
+    //connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     wombatvarptr = &wombatvariable;
     wombatvarptr->caseid = 0;
     wombatvarptr->evidenceid = 0;
@@ -18,10 +18,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvarptr->jobid = -1;
     qRegisterMetaType<FileExportData*>("FileExportData*");
     qRegisterMetaType<WombatVariable*>("WombatVariable*");
-    connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
+    //connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
     connect(wombatcasedata, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
-    connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(LoadFileContents(QString)), Qt::QueuedConnection);
-    connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable*)), this, SLOT(PopulateProgressWindow(WombatVariable*)), Qt::QueuedConnection);
+    //connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(LoadFileContents(QString)), Qt::QueuedConnection);
+    //connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable*)), this, SLOT(PopulateProgressWindow(WombatVariable*)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
     emit LogVariable(wombatvarptr);
     InitializeAppStructure();
@@ -104,13 +104,15 @@ void WombatForensics::InitializeAppStructure()
     SetupToolbar();
     
 }
-
+/*
 void WombatForensics::InitializeSleuthKit()
-{
+{*/
+    /*
     ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", wombatvarptr);
     threadpool->start(initrunner);
     threadpool->waitForDone();
-}
+    */
+/*}*/
 
 void WombatForensics::AddEvidence()
 {
@@ -143,10 +145,10 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->UpdateFilesFound("0");
         wombatprogresswindow->UpdateFilesProcessed("0");
         wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
-        LOGINFO("Adding Evidence Started");
+        //LOGINFO("Adding Evidence Started");
         wombatcasedata->InsertMsg(wombatvarptr->caseid, wombatvarptr->evidenceid, wombatvarptr->jobid, 2, "Adding Evidence Started");
-        ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvarptr);
-        threadpool->start(trun);
+        //ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvarptr);
+        //threadpool->start(trun);
     }
 }
 
@@ -172,7 +174,7 @@ void WombatForensics::RemEvidence()
         wombatprogresswindow->UpdateFilesFound("");
         wombatprogresswindow->UpdateFilesProcessed("");
         wombatprogresswindow->UpdateAnalysisState("Removing Evidence");
-        LOGINFO("Removing Evidence Started");
+        //LOGINFO("Removing Evidence Started");
         wombatcasedata->InsertMsg(wombatvarptr->caseid, wombatvarptr->evidenceid, wombatvarptr->jobid, 2, "Removing Evidence Started");
         UpdateMessageTable();
         wombatcasedata->RemoveEvidence(item);
@@ -186,7 +188,7 @@ void WombatForensics::RemEvidence()
         wombatprogresswindow->UpdateProgressBar(50);
         UpdateCaseData();
         wombatprogresswindow->UpdateProgressBar(75);
-        LOGINFO("Removing Evidence Finished");
+        //LOGINFO("Removing Evidence Finished");
         wombatcasedata->InsertMsg(wombatvarptr->caseid, wombatvarptr->evidenceid, wombatvarptr->jobid, 2, "Removing Evidence Finished");
         wombatcasedata->UpdateJobEnd(wombatvarptr->jobid, 0, 0);
         UpdateMessageTable();
@@ -413,10 +415,10 @@ void WombatForensics::FileExport(FileExportData* exportdata)
     wombatprogresswindow->UpdateFilesFound(QString::number(wombatvarptr->exportdata.exportcount));
     wombatprogresswindow->UpdateFilesProcessed("0");
     wombatprogresswindow->UpdateAnalysisState("Exporting Files");
-    LOGINFO("File Export Started");
+    //LOGINFO("File Export Started");
     wombatcasedata->InsertMsg(wombatvarptr->caseid, wombatvarptr->evidenceid, wombatvarptr->jobid, 2, "File Export Started");
-    ThreadRunner* trun = new ThreadRunner(isleuthkit, "exportfiles", wombatvarptr);
-    threadpool->start(trun);
+    //ThreadRunner* trun = new ThreadRunner(isleuthkit, "exportfiles", wombatvarptr);
+    //threadpool->start(trun);
 }
 
 void WombatForensics::UpdateCaseData()
@@ -427,8 +429,8 @@ void WombatForensics::UpdateCaseData()
     headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     wombatdirmodel->setHorizontalHeaderLabels(headerList);
     ui->dirTreeView->setModel(wombatdirmodel);
-    ThreadRunner* trun = new ThreadRunner(isleuthkit, "refreshtreeviews", wombatvarptr);
-    threadpool->start(trun);
+    //ThreadRunner* trun = new ThreadRunner(isleuthkit, "refreshtreeviews", wombatvarptr);
+    //threadpool->start(trun);
 }
 
 void WombatForensics::UpdateProgress(int filecount, int processcount)
@@ -707,8 +709,8 @@ void WombatForensics::on_actionOpen_Case_triggered()
             {
                 DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
             }
-            ThreadRunner* trun = new ThreadRunner(isleuthkit, "populatecase", wombatvarptr);
-            threadpool->start(trun);
+            //ThreadRunner* trun = new ThreadRunner(isleuthkit, "populatecase", wombatvarptr);
+            //threadpool->start(trun);
         }
     }
 }

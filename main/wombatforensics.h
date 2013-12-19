@@ -33,7 +33,7 @@
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
 #include "exportdialog.h"
-#include "sleuthkit.h"
+//#include "sleuthkit.h"
 #include "hexEditor.hpp"
 #include "translate.hpp"
 
@@ -53,7 +53,7 @@ public:
     WombatVariable* wombatvarptr;
     ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
-    SleuthKitPlugin* isleuthkit;
+    //SleuthKitPlugin* isleuthkit;
 
 signals:
     void LogVariable(WombatVariable* wombatVariable);
@@ -137,11 +137,12 @@ public:
     ThreadRunner(QObject* object, QString input, WombatVariable* wVariable)
     {
         method = input;
-        caller = (SleuthKitPlugin*)object;
+        //caller = (SleuthKitPlugin*)object;
         wombatvariable = wVariable;
     };
     void run()
     {
+        /*
         if(method.compare("initialize") == 0)
             caller->Initialize(wombatvariable);
         if(method.compare("openevidence") == 0)
@@ -154,10 +155,11 @@ public:
             caller->RefreshTreeViews(wombatvariable);
         if(method.compare("exportfiles") == 0)
             caller->ExportFiles(wombatvariable);
+        */
     };
 private:
     QString method;
-    SleuthKitPlugin* caller;
+    //SleuthKitPlugin* caller;
     WombatVariable* wombatvariable;
 };
 
