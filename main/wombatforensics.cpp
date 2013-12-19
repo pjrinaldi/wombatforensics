@@ -183,6 +183,10 @@ void WombatForensics::InitializeSleuthKit()
 
 void WombatForensics::AddEvidence()
 {
+    // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
+    // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR
+    // NEED TO CREATE THE EVIDENCE TSK DATABASE (EXTRACT EVIDENCE ACCORDING TO MODULES)
+    // FOR NOW I WON'T BUILD MODULES, I'LL JUST DESIGN A MULTI-THREADED APPROACH FOR IT AND ABSTRACT TO PLUGGABLE MODULES LATER.
     /*
     QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
     if(evidenceFilePath != "")
