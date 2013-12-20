@@ -94,6 +94,7 @@ struct WombatVariable
     //QList<int> evidenceidlist;
     QList<int> objectidlist;
     ItemObject caseobject;
+    QStringList casenamelist;
     //QVector<CaseObject*> caseobjectvector;
     ItemObject evidenceobject;
     QVector<ItemObject> evidenceobjectvector;

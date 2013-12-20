@@ -40,8 +40,10 @@ public:
     void InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg);
     void UpdateJobEnd(int jobid, int filecount, int processcount);
     QStringList ReturnJobDetails(int jobid);
-    QStringList ReturnCaseNameList(void);
-    int ReturnCaseID(QString caseName);
+    //QStringList ReturnCaseNameList(void);
+    void ReturnCaseNameList(void);
+    void ReturnCaseID(void);
+    //int ReturnCaseID(QString caseName);
     QStringList ReturnCaseActiveEvidenceID(int caseid);
     int ReturnObjectFileID(int objectid);
     int ReturnObjectEvidenceID(int objectid);

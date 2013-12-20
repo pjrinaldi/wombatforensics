@@ -181,14 +181,16 @@ void WombatDatabase::InsertCase()
         emit DisplayError("1.4", "INSERT CASE - PREPARE INSERT", sqlite3_errmsg(wombatdb));
 }
 
-QStringList WombatDatabase::ReturnCaseNameList()
+//QStringList WombatDatabase::ReturnCaseNameList()
+void WombatDatabase::ReturnCaseNameList()
 {
-    QStringList tmpList;
+    //QStringList tmpList;
     if(sqlite3_prepare_v2(wombatdb, "SELECT name FROM cases WHERE deleted = 0 ORDER by caseid;", -1, &casestatement, NULL) == SQLITE_OK)
     {
         while(sqlite3_step(casestatement) == SQLITE_ROW)
         {
-            tmpList << (const char*)sqlite3_column_text(casestatement, 0);
+            wombatptr->casenamelist << (const char*)sqlite3_column_text(casestatement, 0);
+            //tmpList << (const char*)sqlite3_column_text(casestatement, 0);
         }
     }
     else
@@ -196,20 +198,23 @@ QStringList WombatDatabase::ReturnCaseNameList()
         emit DisplayError("1.5", "RETURN CASE NAMES LIST", sqlite3_errmsg(wombatdb));
     }
 
-    return tmpList;
+    //return tmpList;
 }
 
-int WombatDatabase::ReturnCaseID(QString caseName)
+//int WombatDatabase::ReturnCaseID(QString caseName)
+void WombatDatabase::ReturnCaseID()
 {
-    int caseid = 0;
+    //int caseid = 0;
     if(sqlite3_prepare_v2(wombatdb, "SELECT caseid FROM cases WHERE name = ?;", -1, &casestatement, NULL) == SQLITE_OK)
     {
-        if(sqlite3_bind_text(casestatement, 1, caseName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        //if(sqlite3_bind_text(casestatement, 1, caseName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        if(sqlite3_bind_text(casestatement, 1, wombatptr->caseobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
             int ret = sqlite3_step(casestatement);
             if(ret == SQLITE_ROW || ret == SQLITE_DONE)
             {
-                caseid = sqlite3_column_int(casestatement, 0);
+                //caseid = sqlite3_column_int(casestatement, 0);
+                wombatptr->caseobject.id = sqlite3_column_int(casestatement, 0);
             }
             else
                 emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
@@ -220,7 +225,7 @@ int WombatDatabase::ReturnCaseID(QString caseName)
     else
         emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
     
-    return caseid;
+    //return caseid;
 }
 
 int WombatDatabase::ReturnObjectFileID(int objectid)
