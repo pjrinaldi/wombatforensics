@@ -25,6 +25,7 @@ public:
     WombatDatabase(WombatVariable* wombatvarptr);
     bool FileExists(const std::string& fileName);
     const char* CreateAppDB(QString dbname);
+    void CreateAppDB(void);
     const char* CreateCaseDB(QString dbname);
     const char* OpenCaseDB(QString dbname);
     const char* OpenAppDB(QString dbname);

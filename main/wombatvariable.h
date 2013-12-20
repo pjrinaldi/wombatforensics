@@ -85,6 +85,8 @@ struct WombatVariable
     QString settingspath;
     QString datapath;
     QString tmpfilepath;
+    QString curerrmsg;
+    QString wombatdbname;
     //QString evidencedbname;
     //QStringList evidencepathlist;
     //QStringList evidencedbnamelist;
