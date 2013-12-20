@@ -142,6 +142,290 @@ void WombatDatabase::InitializeEvidenceDatabase()
     #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking
     #define IMGDB_MAX_RETRY_COUNT 50    // how many times will we retry a SQL statement
     #define IMGDB_RETRY_WAIT 100   // how long (in milliseconds) are we willing to wait between retries
+/*
+ *
+    std::string stmt;
+
+    sqlite3_stmt *statement;
+
+    // set page size -- 4k is much faster on Windows than the default
+    executeStatement("PRAGMA page_size = 4096;", statement, "TskImgDBSqlite::initialize");
+    sqlite3_finalize(statement);
+
+    // we don't have a mechanism to recover from a crash anyway
+    executeStatement("PRAGMA synchronous = 0;", statement, "TskImgDBSqlite::initialize");
+    sqlite3_finalize(statement);
+
+    // ----- DB_INFO
+    stmt = "CREATE TABLE db_info (name TEXT PRIMARY KEY, version TEXT)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating db_info table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- IMAGE_INFO
+    stmt = "CREATE TABLE image_info (type INTEGER, ssize INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating image_info table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- IMAGE_NAMES
+    stmt = "CREATE TABLE image_names (seq INTEGER PRIMARY KEY, name TEXT)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating image_names table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- VOL_INFO
+    stmt = "CREATE TABLE vol_info (vol_id INTEGER PRIMARY KEY, sect_start INTEGER NOT NULL, "
+        "sect_len INTEGER NOT NULL, description TEXT, flags INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating vol_info table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- FS_INFO
+    stmt = "CREATE TABLE fs_info (fs_id INTEGER PRIMARY KEY, img_byte_offset INTEGER, "
+        "vol_id INTEGER NOT NULL, fs_type INTEGER, block_size INTEGER, "
+        "block_count INTEGER, root_inum INTEGER, first_inum INTEGER, last_inum INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str() , NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating fs_info table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- FILES
+    stmt = "CREATE TABLE files (file_id INTEGER PRIMARY KEY, type_id INTEGER, "
+        "name TEXT, par_file_id INTEGER, dir_type INTEGER, meta_type INTEGER, "
+        "dir_flags INTEGER, meta_flags INTEGER, size INTEGER, ctime INTEGER, "
+        "crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, "
+        "gid INTEGER, status INTEGER, full_path TEXT)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating files table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- FS_FILES
+    stmt = "CREATE TABLE fs_files (file_id INTEGER PRIMARY KEY, fs_id INTEGER, "
+        "fs_file_id INTEGER, attr_type INTEGER, attr_id INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
+    {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating fs_files table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- FS_BLOCKS
+    stmt = "CREATE TABLE fs_blocks (fs_id INTEGER NOT NULL, file_id INTEGER NOT NULL, seq INTEGER, "
+        "blk_start INTEGER NOT NULL, blk_len INTEGER NOT NULL)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
+    {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating fs_blocks table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- CARVED_FILES
+    stmt = "CREATE TABLE carved_files (file_id INTEGER PRIMARY KEY, vol_id INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
+    {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating carved_files table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- SECTOR_LIST
+    stmt = "CREATE TABLE carved_sectors ("
+        "file_id INTEGER, seq INTEGER, sect_start INTEGER, sect_len INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
+    {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating carved_sectors table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- DERIVED_FILES
+    stmt = "CREATE TABLE derived_files (file_id INTEGER PRIMARY KEY, derivation_details TEXT)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
+    {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating derived_files table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- ALLOC_UNALLOC_MAP
+    stmt = "CREATE TABLE alloc_unalloc_map (vol_id INTEGER, unalloc_img_id INTEGER, "
+        "unalloc_img_sect_start INTEGER, sect_len INTEGER, orig_img_sect_start INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK)
+    {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating alloc_unalloc_map table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- FILE_HASHES
+    stmt = "CREATE TABLE file_hashes (file_id INTEGER PRIMARY KEY, md5 TEXT, sha1 TEXT, sha2_256 TEXT, sha2_512 TEXT, known INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating file_hashes table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- MODULES
+    stmt = "CREATE TABLE modules (module_id INTEGER PRIMARY KEY, name TEXT UNIQUE NOT NULL, description TEXT)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating module table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- MODULE_STATUS
+    stmt = "CREATE TABLE module_status (file_id INTEGER, module_id INTEGER, status INTEGER, PRIMARY KEY (file_id, module_id))";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating module_status table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- UNALLOC_IMG_STATUS
+    stmt = "CREATE TABLE unalloc_img_status (unalloc_img_id INTEGER PRIMARY KEY, status INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating unalloc_img_status table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- UNUSED_SECTORS
+    stmt = "CREATE TABLE unused_sectors (file_id INTEGER PRIMARY KEY, sect_start INTEGER, sect_len INTEGER, vol_id INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating unused_sectors table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- BLACKBOARD_ARTIFACTS
+    stmt = "CREATE TABLE blackboard_artifacts (artifact_id INTEGER PRIMARY KEY, obj_id INTEGER NOT NULL, artifact_type_id INTEGER)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating blackboard_artifacts table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- BLACKBOARD_ATTRIBUTES
+    stmt = "CREATE TABLE blackboard_attributes (artifact_id INTEGER NOT NULL, source TEXT, context TEXT, attribute_type_id INTEGER NOT NULL, value_type INTEGER NOT NULL, "
+        "value_byte BLOB, value_text TEXT, value_int32 INTEGER, value_int64 INTEGER, value_double NUMERIC(20, 10), obj_id INTEGER NOT NULL)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating blackboard_attributes table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- BLACKBOARD_ARTIFACT_TYPES
+    stmt = "CREATE TABLE blackboard_artifact_types (artifact_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating blackboard_artifact_types table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- BLACKBOARD_ATTRIBUTE_TYPES
+    stmt = "CREATE TABLE blackboard_attribute_types (attribute_type_id INTEGER PRIMARY KEY, type_name TEXT, display_name TEXT)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating blackboard_attribute_types table: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    // ----- CREATE INDEXES
+    stmt = "CREATE INDEX attrs_artifact_id ON blackboard_attributes(artifact_id)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating attrs_artifact_id index: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    stmt = "CREATE INDEX attrs_attribute_type ON blackboard_attributes(attribute_type_id)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating attrs_attribute_type index: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    stmt = "CREATE INDEX attrs_obj_id ON blackboard_attributes(obj_id)";
+    if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
+        infoMessage << L"TskImgDBSqlite::initialize - Error creating attrs_obj_id index: " << errmsg;
+        LOGERROR(infoMessage.str());
+
+        sqlite3_free(errmsg);
+        return 1;
+    }
+
+    map<int, TskArtifactNames> artTypes = TskImgDB::getAllArtifactTypes();
+    for (map<int, TskArtifactNames>::iterator it = artTypes.begin(); it != artTypes.end(); it++) {
+        addArtifactType(it->first, it->second.typeName, it->second.displayName);
+    }
+    map<int, TskAttributeNames> attrTypes = TskImgDB::getAllAttributeTypes();
+    for (map<int, TskAttributeNames>::iterator it = attrTypes.begin(); it != attrTypes.end(); it++) {
+        addAttributeType(it->first, it->second.typeName, it->second.displayName);
+    }
+
+    addToolInfo("DBSchema", IMGDB_SCHEMA_VERSION);
+    LOGINFO(L"ImgDB Created.");
+
+    return 0;
+ */ 
 }
 
 int WombatDatabase::ReturnCaseCount()
@@ -181,39 +465,30 @@ void WombatDatabase::InsertCase()
         emit DisplayError("1.4", "INSERT CASE - PREPARE INSERT", sqlite3_errmsg(wombatdb));
 }
 
-//QStringList WombatDatabase::ReturnCaseNameList()
 void WombatDatabase::ReturnCaseNameList()
 {
-    //QStringList tmpList;
     if(sqlite3_prepare_v2(wombatdb, "SELECT name FROM cases WHERE deleted = 0 ORDER by caseid;", -1, &casestatement, NULL) == SQLITE_OK)
     {
         while(sqlite3_step(casestatement) == SQLITE_ROW)
         {
             wombatptr->casenamelist << (const char*)sqlite3_column_text(casestatement, 0);
-            //tmpList << (const char*)sqlite3_column_text(casestatement, 0);
         }
     }
     else
     {
         emit DisplayError("1.5", "RETURN CASE NAMES LIST", sqlite3_errmsg(wombatdb));
     }
-
-    //return tmpList;
 }
 
-//int WombatDatabase::ReturnCaseID(QString caseName)
 void WombatDatabase::ReturnCaseID()
 {
-    //int caseid = 0;
     if(sqlite3_prepare_v2(wombatdb, "SELECT caseid FROM cases WHERE name = ?;", -1, &casestatement, NULL) == SQLITE_OK)
     {
-        //if(sqlite3_bind_text(casestatement, 1, caseName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         if(sqlite3_bind_text(casestatement, 1, wombatptr->caseobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
             int ret = sqlite3_step(casestatement);
             if(ret == SQLITE_ROW || ret == SQLITE_DONE)
             {
-                //caseid = sqlite3_column_int(casestatement, 0);
                 wombatptr->caseobject.id = sqlite3_column_int(casestatement, 0);
             }
             else
@@ -224,8 +499,6 @@ void WombatDatabase::ReturnCaseID()
     }
     else
         emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
-    
-    //return caseid;
 }
 
 int WombatDatabase::ReturnObjectFileID(int objectid)

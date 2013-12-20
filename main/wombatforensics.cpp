@@ -166,7 +166,6 @@ void WombatForensics::InitializeOpenCourse()
         if(ok && !wombatvarptr->caseobject.name.isEmpty()) // open selected case
         {
             wombatdatabase->ReturnCaseID();
-            //wombatvarptr->caseobject.id = wombatdatabase->ReturnCaseID(item);
             QString tmpTitle = "Wombat Forensics - ";
             tmpTitle += wombatvarptr->caseobject.name;
             this->setWindowTitle(tmpTitle);
