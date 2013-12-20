@@ -32,13 +32,25 @@ bool WombatDatabase::FileExists(const std::string& filename)
 // CALLED THE CREATE WOMBATDB() TO INCLUDE CASES AND SETTINGS.
 void WombatDatabase::CreateCaseDB(void)
 {
+    #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking
+    #define IMGDB_MAX_RETRY_COUNT 50    // how many times will we retry a SQL statement
+    #define IMGDB_RETRY_WAIT 100   // how long (in milliseconds) are we willing to wait between retries
+    // set page size -- 4k is much faster on Windows than the default
+    //executeStatement("PRAGMA page_size = 4096;", casestatement, "TskImgDBSqlite::initialize");
+    //sqlite3_finalize(casestatement);
+
+    // we don't have a mechanism to recover from a crash anyway
+    //executeStatement("PRAGMA synchronous = 0;", casestatement, "TskImgDBSqlite::initialize");
+    //sqlite3_finalize(casestatement);
+    
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
     wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);");
-    wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT, deleted INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
+    wombatTableSchema.push_back("CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);");
+    wombatTableSchema.push_back("CREATE TABLE artifacts(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);");
     wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
-    wombatTableSchema.push_back("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER, partid INTEGER, volid INTEGER, imgID INTEGER);");
+    wombatTableSchema.push_back("CREATE TABLE data(objectid INTEGER PRIMARY KEY, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, flags INTEGER, size INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, indoenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);");
 
     if(sqlite3_open(wombatptr->caseobject.dbname.toStdString().c_str(), &casedb) == SQLITE_OK)
     {
@@ -61,6 +73,7 @@ void WombatDatabase::CreateCaseDB(void)
 
     wombatptr->curerrmsg = "";
 }
+
 void WombatDatabase::CreateAppDB()
 {
     sqlite3_stmt* tmpstmt;
@@ -139,24 +152,70 @@ WombatDatabase::~WombatDatabase()
 
 void WombatDatabase::InitializeEvidenceDatabase()
 {
+    /*
     #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking
     #define IMGDB_MAX_RETRY_COUNT 50    // how many times will we retry a SQL statement
     #define IMGDB_RETRY_WAIT 100   // how long (in milliseconds) are we willing to wait between retries
-/*
- *
-    std::string stmt;
 
-    sqlite3_stmt *statement;
-
+    sqlite3* cureviddencedb;
+    sqlite3_stmt* curstatement;
     // set page size -- 4k is much faster on Windows than the default
-    executeStatement("PRAGMA page_size = 4096;", statement, "TskImgDBSqlite::initialize");
-    sqlite3_finalize(statement);
+    executeStatement("PRAGMA page_size = 4096;", curstatement, "TskImgDBSqlite::initialize");
+    sqlite3_finalize(curstatement);
 
     // we don't have a mechanism to recover from a crash anyway
-    executeStatement("PRAGMA synchronous = 0;", statement, "TskImgDBSqlite::initialize");
-    sqlite3_finalize(statement);
+    executeStatement("PRAGMA synchronous = 0;", curstatement, "TskImgDBSqlite::initialize");
+    sqlite3_finalize(curstatement);
+    wombatptr->evidenceobject.dbname = wombatptr->evidenceobject.fullpath.split("/").last() + ".db";
 
-    // ----- DB_INFO
+    std::vector<const char *> wombatTableSchema;
+    wombatTableSchema.clear();
+    wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE evidence(evidenceid INTEGER PRIMARY KEY, fullpath TEXT, name TEXT, caseid INTEGER, creation TEXT, deleted INTEGER);");
+    wombatTableSchema.push_back("CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);");
+    wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE objects(objectid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, fileid INTEGER, partid INTEGER, volid INTEGER, imgID INTEGER);");
+
+    if(sqlite3_open(wombatptr->caseobject.dbname.toStdString().c_str(), &casedb) == SQLITE_OK)
+    {
+        const char* tblschema;
+        foreach(tblschema, wombatTableSchema)
+        {
+            if(sqlite3_prepare_v2(casedb, tblschema, -1, &casestatement, NULL) == SQLITE_OK)
+            {
+                int ret = sqlite3_step(casestatement);
+                if(ret != SQLITE_ROW && ret != SQLITE_DONE)
+                    wombatptr->curerrmsg = QString(sqlite3_errmsg(casedb));
+            }
+            else
+                wombatptr->curerrmsg = QString(sqlite3_errmsg(casedb));
+            sqlite3_finalize(casestatement);
+        }
+    }
+    else
+        wombatptr->curerrmsg = QString(sqlite3_errmsg(casedb));
+
+    wombatptr->curerrmsg = "";
+
+        QString evidenceName = evidenceFilePath.split("/").last();
+        evidenceName += ".db";
+    if(sqlite3_open(wombatptr->wombatdbname.toStdString().c_str(), &wombatdb) == SQLITE_OK)
+    {
+        if(sqlite3_prepare_v2(wombatdb, "CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);", -1, &tmpstmt, NULL) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(tmpstmt);
+            if(ret != SQLITE_ROW && ret != SQLITE_DONE)
+                wombatptr->curerrmsg = QString(sqlite3_errmsg(wombatdb));
+        }
+        else
+            wombatptr->curerrmsg = QString(sqlite3_errmsg(wombatdb));
+        sqlite3_finalize(tmpstmt);
+    }
+    else
+        wombatptr->curerrmsg = QString(sqlite3_errmsg(wombatdb));
+
+    if(sqlite3_exec(curevidencedb, "CREATE TABLE data (objectid INTEGER PRIMARY KEY, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, size INTEGER, sectorstart INTEGER, sectorlength INTEGER)", NULL, NULL, 
+
     stmt = "CREATE TABLE db_info (name TEXT PRIMARY KEY, version TEXT)";
     if (sqlite3_exec(m_db, stmt.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
         infoMessage << L"TskImgDBSqlite::initialize - Error creating db_info table: " << errmsg;

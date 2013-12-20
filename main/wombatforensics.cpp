@@ -226,10 +226,17 @@ void WombatForensics::AddEvidence()
     wombatvarptr->evidenceobject.fullpath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
     if(wombatvarptr->evidenceobject.fullpath != "")
     {
-        wombatdatabase->InitializeEvidenceDatabase();
+        // THIS IS TAKEN CARE OF IN MY REDUCED CASE.DB WHICH I OPEN AND INITIALIZE ALREADY...
+        // THIS IS WHERE I WILL NEED TO EXTRACT THE EVIDENCE AND POPULATE THE DB AND ANALYZE IT....
+        //wombatdatabase->InitializeEvidenceDatabase();
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
     }
+/*
+ *
+    wombatptr->evidenceobject.dbname = wombatptr->evidenceobject.fullpath.split("/").last() + ".db";
+
+ */ 
     /*
     QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
     if(evidenceFilePath != "")
