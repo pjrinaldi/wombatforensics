@@ -24,17 +24,16 @@ class WombatDatabase : public QObject
 public:
     WombatDatabase(WombatVariable* wombatvarptr);
     bool FileExists(const std::string& fileName);
-    const char* CreateAppDB(QString dbname);
     void CreateAppDB(void);
-    const char* CreateCaseDB(QString dbname);
-    const char* OpenCaseDB(QString dbname);
-    const char* OpenAppDB(QString dbname);
-    const char* CloseAppDB();
+    void CreateCaseDB(void);
+    void OpenCaseDB(void);
+    void OpenAppDB(void);
+    void CloseAppDB(void);
     void InitializeEvidenceDatabase(void);
     ~WombatDatabase();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
-    int InsertCase(QString caseText);
+    void InsertCase();
     int InsertJob(int jobType, int caseID, int evidenceID);
     int InsertEvidence(QString evidenceName, QString evidenceFilePath, int caseID);
     int InsertObject(int caseid, int evidenceid, int itemtype, int curid);

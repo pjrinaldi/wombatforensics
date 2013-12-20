@@ -12,6 +12,7 @@
 struct ItemObject
 {
     int id;
+    QString name;
     QString dirpath;
     QString fullpath;
     QString dbname;

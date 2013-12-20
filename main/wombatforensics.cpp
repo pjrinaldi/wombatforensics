@@ -75,15 +75,14 @@ void WombatForensics::InitializeAppStructure()
     if(!appFileExist)
     {
         wombatdatabase->CreateAppDB();
-        //wombatdatabase->CreateAppDB(wombatvarptr->wombatdbname); // contains cases and log table.
         if(wombatvarptr->curerrmsg.compare("") != 0)
             DisplayError("1.0", "App File Error", wombatvarptr->curerrmsg);
     }
     else
     {
-        const char* errstring = wombatdatabase->OpenAppDB(wombatvarptr->wombatdbname);
-        if(strcmp(errstring, "") != 0)
-            DisplayError("1.1", "SQL", errstring);
+        wombatdatabase->OpenAppDB();
+        if(wombatvarptr->curerrmsg.compare("") != 0)
+            DisplayError("1.1", "SQL", wombatvarptr->curerrmsg);
     }
     if(wombatdatabase->ReturnCaseCount() == 0)
     {
@@ -111,16 +110,17 @@ void WombatForensics::InitializeCourseStructure()
 {
     // create new case here
     bool ok;
-    QString text = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
-    if(ok && !text.isEmpty())
+    wombatvarptr->caseobject.name = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
+    if(ok && !wombatvarptr->caseobject.name.isEmpty())
     {
-        wombatvarptr->caseobject.id = wombatdatabase->InsertCase(text);
+        
+        wombatdatabase->InsertCase();
 
         QString tmpTitle = "Wombat Forensics - ";
-        tmpTitle += text;
+        tmpTitle += wombatvarptr->caseobject.name;
         this->setWindowTitle(tmpTitle); // update application window.
         // make Cases Folder
-        QString casestring = QString::number(wombatvarptr->caseobject.id) + "-" + text;
+        QString casestring = QString::number(wombatvarptr->caseobject.id) + "-" + wombatvarptr->caseobject.name;
         QString userPath = wombatvarptr->casespath + casestring + "/";
         bool mkPath = (new QDir())->mkpath(userPath);
         if(mkPath == true)
@@ -133,23 +133,18 @@ void WombatForensics::InitializeCourseStructure()
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         userPath = wombatvarptr->caseobject.dirpath;
-        QString casedbpath = userPath + casestring + ".db";
-        bool caseFileExist = wombatdatabase->FileExists(casedbpath.toStdString());
-        if(!caseFileExist)
+        wombatvarptr->caseobject.dbname = userPath + casestring + ".db";
+        if(!wombatdatabase->FileExists(wombatvarptr->caseobject.dbname.toStdString()))
         {
-            const char* errstring = wombatdatabase->CreateCaseDB(casedbpath);
-            if(strcmp(errstring, "") != 0)
-                DisplayError("1.2", "Course DB Creation Error", errstring);
-            else
-                wombatvarptr->caseobject.dbname = userPath + casestring + ".db";
+            wombatdatabase->CreateCaseDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.2", "Course DB Creation Error", wombatvarptr->curerrmsg);
         }
         else
         {
-            const char* errstring = wombatdatabase->OpenCaseDB(casedbpath);
-            if(strcmp(errstring, "") != 0)
-                DisplayError("1.3", "SQL", errstring);
-            else
-                wombatvarptr->caseobject.dbname = userPath + casestring + ".db";
+            wombatdatabase->OpenCaseDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
         userPath += "evidence/";
         mkPath = (new QDir())->mkpath(userPath);
@@ -200,17 +195,17 @@ void WombatForensics::InitializeOpenCourse()
             bool caseFileExist = wombatdatabase->FileExists(casedbpath.toStdString());
             if(!caseFileExist)
             {
-                const char* errstring = wombatdatabase->CreateCaseDB(casedbpath);
-                if(strcmp(errstring, "") != 0)
-                    DisplayError("1.2", "Course DB Creation Error", errstring);
+                wombatdatabase->CreateCaseDB();
+                if(wombatvarptr->curerrmsg.compare("") != 0)
+                    DisplayError("1.2", "Course DB Creation Error", wombatvarptr->curerrmsg);
                 else
                     wombatvarptr->caseobject.dbname = userPath + casestring + ".db";
             }
             else
             {
-                const char* errstring = wombatdatabase->OpenCaseDB(casedbpath);
-                if(strcmp(errstring, "") != 0)
-                    DisplayError("1.3", "SQL", errstring);
+                wombatdatabase->OpenCaseDB();
+                if(wombatvarptr->curerrmsg.compare("") != 0)
+                    DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
                 else
                     wombatvarptr->caseobject.dbname = userPath + casestring + ".db";
             }
