@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <tsk/libtsk.h>
 #include <QObject>
+
+#include "wombatvariable.h"
 // these files are included in libtsk.h
 /*#include "tsk/base/tsk_base.h"
 #include "tsk/img/tsk_img.h"
@@ -17,8 +19,14 @@ class WombatFramework : public QObject
 {
     Q_OBJECT
 public:
-    WombatFramework();
+    WombatFramework(WombatVariable* wombatvariable);
     ~WombatFramework();
+
+    void BuildEvidenceModel(void);
+    
+private:
+    WombatVariable* wombatptr;
+
 };
 
 #endif // WOMBATFRAMEWORK_H

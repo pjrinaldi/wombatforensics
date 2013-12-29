@@ -98,6 +98,7 @@ private:
     //void InitializeSleuthKit(void);
     void InitializeAppStructure(void);
     void InitializeCaseStructure(void);
+    void InitializeEvidenceStructure(void);
     void InitializeOpenCase(void);
     void InitializeWombatFramework(void);
     void RemoveTmpFiles(void);

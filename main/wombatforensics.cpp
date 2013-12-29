@@ -6,7 +6,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
     wombatdatabase = new WombatDatabase(wombatvarptr);
-    wombatframework = new WombatFramework();
+    wombatframework = new WombatFramework(wombatvarptr);
     wombatprogresswindow = new ProgressWindow(wombatdatabase);
     //isleuthkit = new SleuthKitPlugin(wombatdatabase);
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
@@ -216,19 +216,23 @@ void WombatForensics::InitializeSleuthKit()
     */
 /*}*/
 
-void WombatForensics::AddEvidence()
+void WombatForensics::InitializeEvidenceStructure()
 {
+    wombatframework->BuildEvidenceModel();
     // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
     // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR
     // NEED TO CREATE THE EVIDENCE TSK DATABASE (EXTRACT EVIDENCE ACCORDING TO MODULES)
     // NEED TO BUILD DIRMODEL AS I GO AND POPULATE DIRTREEVIEW AS I GO WITH EACH FILE
     // FOR NOW I WON'T BUILD MODULES, I'LL JUST DESIGN A MULTI-THREADED APPROACH FOR IT AND ABSTRACT TO PLUGGABLE MODULES LATER
+}
+
+void WombatForensics::AddEvidence()
+{
     wombatvarptr->evidenceobject.fullpath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
     if(wombatvarptr->evidenceobject.fullpath != "")
     {
-        // THIS IS TAKEN CARE OF IN MY REDUCED CASE.DB WHICH I OPEN AND INITIALIZE ALREADY...
-        // THIS IS WHERE I WILL NEED TO EXTRACT THE EVIDENCE AND POPULATE THE DB AND ANALYZE IT....
-        //wombatdatabase->InitializeEvidenceDatabase();
+        wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject);
+        InitializeEvidenceStructure();
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
     }
