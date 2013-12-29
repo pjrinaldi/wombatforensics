@@ -97,8 +97,8 @@ private:
     void SetupToolbar(void);
     //void InitializeSleuthKit(void);
     void InitializeAppStructure(void);
-    void InitializeCourseStructure(void);
-    void InitializeOpenCourse(void);
+    void InitializeCaseStructure(void);
+    void InitializeOpenCase(void);
     void InitializeWombatFramework(void);
     void RemoveTmpFiles(void);
     void LoadHexModel(QString tmpFilePath);

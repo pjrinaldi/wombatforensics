@@ -29,7 +29,7 @@ bool WombatDatabase::FileExists(const std::string& filename)
     }
     return false;
 }
-// CALLED THE CREATE WOMBATDB() TO INCLUDE CASES AND SETTINGS.
+
 void WombatDatabase::CreateCaseDB(void)
 {
     #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking

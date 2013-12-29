@@ -106,7 +106,7 @@ void WombatForensics::InitializeAppStructure()
     
 }
 
-void WombatForensics::InitializeCourseStructure()
+void WombatForensics::InitializeCaseStructure()
 {
     // create new case here
     bool ok;
@@ -154,7 +154,7 @@ void WombatForensics::InitializeCourseStructure()
     }
 }
 
-void WombatForensics::InitializeOpenCourse()
+void WombatForensics::InitializeOpenCase()
 {        
     // open case here
         wombatvarptr->casenamelist;
@@ -739,7 +739,7 @@ void WombatForensics::on_actionNew_Case_triggered()
     }
     if (ret == QMessageBox::Yes)
     {
-        InitializeCourseStructure();
+        InitializeCaseStructure();
     }
 }
 
@@ -753,7 +753,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
     }
     if (ret == QMessageBox::Yes)
     {
-        InitializeOpenCourse();
+        InitializeOpenCase();
     }
 }
 
