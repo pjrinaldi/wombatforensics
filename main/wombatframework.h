@@ -18,8 +18,9 @@ public:
 
     void BuildEvidenceModel(void);
     //TSK_IMG_INFO* OpenEvidenceImage(void);
-    //void OpenEvidenceImages(void);
-    void OpenEvidenceImages(ItemObject &itemobject);
+    //void OpenEvidenceImage(void);
+    //void OpenEvidenceImages(ItemObject &itemobject);
+    void OpenEvidenceImages(ItemObject itemobject);
     
 private:
     WombatVariable* wombatptr;

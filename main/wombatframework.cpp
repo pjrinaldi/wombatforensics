@@ -8,7 +8,7 @@ WombatFramework::~WombatFramework()
 {
 }
 /*
-void WombatFramework::OpenEvidenceImages() // open all evidence images.
+void WombatFramework::OpenEvidenceImage() // open all evidence images.
 {
     for(int j = 0; j < wombatptr->evidenceobjectvector.count(); j++)
     {
@@ -24,7 +24,7 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
     }
 }
 */
-void WombatFramework::OpenEvidenceImages(ItemObject &itemobject) // open all evidence images.
+void WombatFramework::OpenEvidenceImages(ItemObject itemobject) // open all evidence images.
 {
     const TSK_TCHAR** images;
     images = (const char**)malloc(itemobject.fullpathvector.size()*sizeof(char*));
@@ -39,14 +39,14 @@ void WombatFramework::OpenEvidenceImages(ItemObject &itemobject) // open all evi
 
 void WombatFramework::BuildEvidenceModel()
 {
-    QVector<ItemObject*> itemptrvector;
+    QVector<ItemObject> itemvector;
     for(int i = 0; i < wombatptr->evidenceobjectvector.count(); i++)
     {
-        itemptrvector.push_back(&(wombatptr->evidenceobjectvector[i]));
+        itemvector.append(wombatptr->evidenceobjectvector[i]);
     }
     QFutureWatcher<void> watcher;
-    watcher.setFuture(QtConcurrent::map(itemptrvector, OpenEvidenceImages));
-    //watcher.setFuture(QtConcurrent::map((ItemObject)(wombatptr->evidenceobjectvector), WombatFramework::OpenEvidenceImages));
+    watcher.setFuture(QtConcurrent::map(itemvector, &WombatFramework::OpenEvidenceImages));
+    //watcher.setFuture(QtConcurrent::map(wombatptr->evidenceobjectvector, WombatFramework::OpenEvidenceImages));
     watcher.waitForFinished();
     //OpenEvidenceImages(); // PROBABLY PUT THIS IN A MULTI-THREAD ENVIRONMENT.
     for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++) // for each evidence image info file.
