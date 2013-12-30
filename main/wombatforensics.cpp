@@ -218,7 +218,7 @@ void WombatForensics::InitializeSleuthKit()
 
 void WombatForensics::InitializeEvidenceStructure()
 {
-    wombatframework->BuildEvidenceModel(wombatvarptr);
+    wombatframework->BuildEvidenceModel();
     // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
     // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR
     // NEED TO CREATE THE EVIDENCE TSK DATABASE (EXTRACT EVIDENCE ACCORDING TO MODULES)
@@ -228,6 +228,7 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::AddEvidence()
 {
+    // possibly store the fullpathlist as stringlist and then convert it when i need it.
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     //wombatvarptr->evidenceobject.fullpathlist = QFileDialog::getOpenFileNames(this, tr("Select Evidence mage(s)"), tr("./"));
     //if(wombatvarptr->evidenceobject.fullpathlist.count())
