@@ -234,10 +234,10 @@ void WombatForensics::AddEvidence()
         
         for(int i=0; i < tmplist.count(); i++)
         {
-            wombatvarptr->evidenceobject.fullpathlist.push_back(tmplist[i].toStdString());
+            wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
-        wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject);
+        wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject); // add evidence to case evidence list
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
         InitializeEvidenceStructure();

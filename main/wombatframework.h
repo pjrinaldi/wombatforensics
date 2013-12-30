@@ -16,6 +16,8 @@ public:
     ~WombatFramework();
 
     void BuildEvidenceModel(void);
+    //TSK_IMG_INFO* OpenEvidenceImage(void);
+    void OpenEvidenceImages(void);
     
 private:
     WombatVariable* wombatptr;

@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 
+#include "tsk/libtsk.h"
 
 struct ItemObject
 {
@@ -18,7 +19,8 @@ struct ItemObject
     QStringList namelist;
     QString dirpath;
     QString fullpath;
-    std::vector<std::string> fullpathlist;
+    std::vector<std::string> fullpathvector;
+    TSK_IMG_INFO* imageinfo;
     QString dbname;
 };
 
