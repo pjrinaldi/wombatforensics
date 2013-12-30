@@ -9,18 +9,20 @@ WombatFramework::~WombatFramework()
 }
 void WombatFramework::BuildEvidenceModel()
 {
-    // attempt to open the image file
-    TSK_IMG_INFO* tmpimage;
-    fprintf(stderr, "full path count: %d\n", wombatptr->evidenceobject.itemcount);
-    fprintf(stderr, "full path string[1]: %s\n", wombatptr->evidenceobject.fullpathlist[1]);
-    fprintf(stderr, "full path string[0]: %s\n", wombatptr->evidenceobject.fullpathlist[0]);
-    tmpimage = tsk_img_open(wombatptr->evidenceobject.itemcount, wombatptr->evidenceobject.fullpathlist, TSK_IMG_TYPE_DETECT, 0);
+    TSK_IMG_INFO* tmpimage = NULL;
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(wombatptr->evidenceobject.fullpathlist.size()*sizeof(char*));
+    int i = 0;
+    for(std::vector<std::string>::iterator list_iter = wombatptr->evidenceobject.fullpathlist.begin(); list_iter != wombatptr->evidenceobject.fullpathlist.end(); list_iter++)
+    {
+        images[i++] = (*list_iter).c_str();
+    }
+    tmpimage = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
     if(tmpimage == NULL)
-        fprintf(stderr, "Image didn't open\n");
+        fprintf(stderr, "Image didn't open. add to log file as error.\n");
     else
-        fprintf(stderr, "Image opened. Shocking I know.\n");
+        fprintf(stderr, "Image %s opened. add to log file as info.\n", wombatptr->evidenceobject.fullpathlist[0].c_str());
     // NEED TO LAUNCH THIS IN A NEW THREAD TO KEEP GUI RESPONSIVE
-    //fprintf(stderr, "Evidence Path: %s\n", wombatptr->evidenceobject.fullpath.toStdString().c_str());
     // NEED TO OPEN THE IMAGE - img_open.c [tsk_img_open()]
     // NEED TO GET THE METADATA FOR THE IMAGE/VOLUMES/PARTITIONS/FILES SO I CAN POPULATE THE DIRECTORY TREE INFORMATION
 

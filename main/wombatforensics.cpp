@@ -228,35 +228,20 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::AddEvidence()
 {
-    // possibly store the fullpathlist as stringlist and then convert it when i need it.
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
-    //wombatvarptr->evidenceobject.fullpathlist = QFileDialog::getOpenFileNames(this, tr("Select Evidence mage(s)"), tr("./"));
-    //if(wombatvarptr->evidenceobject.fullpathlist.count())
     if(tmplist.count())
     {
+        
         for(int i=0; i < tmplist.count(); i++)
         {
-            wombatvarptr->evidenceobject.fullpathlist[i] = tmplist[i].toStdString().c_str();
-            //wombatvarptr->evidenceobject.fullpathlist.push_back(tmplist[i].toStdString().c_str());
+            wombatvarptr->evidenceobject.fullpathlist.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
-        fprintf(stderr, "item count: %d\n", wombatvarptr->evidenceobject.itemcount);
-        fprintf(stderr, "item path list: %s\n", wombatvarptr->evidenceobject.fullpathlist[0]);
         wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject);
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
         InitializeEvidenceStructure();
     }
-    /*
-    wombatvarptr->evidenceobject.fullpath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
-    if(wombatvarptr->evidenceobject.fullpath != "")
-    {
-        wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject);
-        InitializeEvidenceStructure();
-        wombatprogresswindow->show();
-        wombatprogresswindow->ClearTableWidget();
-    }
-    */
 /*
  *
     wombatptr->evidenceobject.dbname = wombatptr->evidenceobject.fullpath.split("/").last() + ".db";

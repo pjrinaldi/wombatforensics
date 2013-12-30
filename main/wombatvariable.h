@@ -9,7 +9,6 @@
 #include <vector>
 #include <string>
 
-#include "tsk/libtsk.h"
 
 struct ItemObject
 {
@@ -19,10 +18,7 @@ struct ItemObject
     QStringList namelist;
     QString dirpath;
     QString fullpath;
-    QStringList fullpathlist;
-    //std::list<std::string> fullpathlist;
-    // will convert as i need it from either qstringlist or the std::list...
-    //const char* fullpathlist[];
+    std::vector<std::string> fullpathlist;
     QString dbname;
 };
 
