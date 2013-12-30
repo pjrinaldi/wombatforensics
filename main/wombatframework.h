@@ -15,7 +15,7 @@ public:
     WombatFramework(WombatVariable* wombatvariable);
     ~WombatFramework();
 
-    void BuildEvidenceModel(void);
+    void BuildEvidenceModel(WombatVariable* wombatvariable);
     
 private:
     WombatVariable* wombatptr;

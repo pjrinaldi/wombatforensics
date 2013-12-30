@@ -218,7 +218,7 @@ void WombatForensics::InitializeSleuthKit()
 
 void WombatForensics::InitializeEvidenceStructure()
 {
-    wombatframework->BuildEvidenceModel();
+    wombatframework->BuildEvidenceModel(wombatvarptr);
     // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
     // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR
     // NEED TO CREATE THE EVIDENCE TSK DATABASE (EXTRACT EVIDENCE ACCORDING TO MODULES)
@@ -238,7 +238,9 @@ void WombatForensics::AddEvidence()
             wombatvarptr->evidenceobject.fullpathlist[i] = tmplist[i].toStdString().c_str();
             //wombatvarptr->evidenceobject.fullpathlist.push_back(tmplist[i].toStdString().c_str());
         }
-        //wombatvarptr->evidenceobject.itemcount = wombatvarptr->evidenceobject.fullpathlist.size();
+        wombatvarptr->evidenceobject.itemcount = tmplist.count();
+        fprintf(stderr, "item count: %d\n", wombatvarptr->evidenceobject.itemcount);
+        fprintf(stderr, "item path list: %s\n", wombatvarptr->evidenceobject.fullpathlist[0]);
         wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject);
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();

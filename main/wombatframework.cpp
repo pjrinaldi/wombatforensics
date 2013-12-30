@@ -7,12 +7,16 @@ WombatFramework::WombatFramework(WombatVariable* wombatvariable)
 WombatFramework::~WombatFramework()
 {
 }
-void WombatFramework::BuildEvidenceModel()
+void WombatFramework::BuildEvidenceModel(WombatVariable* wombatvarptr)
 {
+    //wombatptr = wombatvariable;
 
     // attempt to open the image file
     TSK_IMG_INFO* tmpimage;
-    tmpimage = tsk_img_open(wombatptr->evidenceobject.itemcount, wombatptr->evidenceobject.fullpathlist, TSK_IMG_TYPE_DETECT, 0);
+    fprintf(stderr, "full path count: %d\n", wombatvarptr->evidenceobject.itemcount);
+    fprintf(stderr, "full path string[1]: %s\n", wombatvarptr->evidenceobject.fullpathlist[1]);
+    fprintf(stderr, "full path string[0]: %s\n", wombatvarptr->evidenceobject.fullpathlist[0]);
+    tmpimage = tsk_img_open(wombatvarptr->evidenceobject.itemcount, wombatvarptr->evidenceobject.fullpathlist, TSK_IMG_TYPE_DETECT, 0);
     if(tmpimage == NULL)
         fprintf(stderr, "Image didn't open\n");
     else
