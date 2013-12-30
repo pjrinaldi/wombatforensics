@@ -17,8 +17,7 @@ public:
     ~WombatFramework();
 
     void BuildEvidenceModel(void);
-    //TSK_IMG_INFO* OpenEvidenceImage(void);
-    //void OpenEvidenceImage(void);
+    //void OpenEvidenceImages(void);
     //void OpenEvidenceImages(ItemObject &itemobject);
     void OpenEvidenceImages(ItemObject itemobject);
     
