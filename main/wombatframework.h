@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <tsk/libtsk.h>
 #include <QObject>
+#include <QtConcurrent>
 
 #include "wombatvariable.h"
 
@@ -17,7 +18,8 @@ public:
 
     void BuildEvidenceModel(void);
     //TSK_IMG_INFO* OpenEvidenceImage(void);
-    void OpenEvidenceImages(void);
+    //void OpenEvidenceImages(void);
+    void OpenEvidenceImages(ItemObject &itemobject);
     
 private:
     WombatVariable* wombatptr;
