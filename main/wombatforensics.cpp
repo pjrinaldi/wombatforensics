@@ -228,6 +228,23 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::AddEvidence()
 {
+    QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
+    //wombatvarptr->evidenceobject.fullpathlist = QFileDialog::getOpenFileNames(this, tr("Select Evidence mage(s)"), tr("./"));
+    //if(wombatvarptr->evidenceobject.fullpathlist.count())
+    if(tmplist.count())
+    {
+        for(int i=0; i < tmplist.count(); i++)
+        {
+            wombatvarptr->evidenceobject.fullpathlist[i] = tmplist[i].toStdString().c_str();
+            //wombatvarptr->evidenceobject.fullpathlist.push_back(tmplist[i].toStdString().c_str());
+        }
+        //wombatvarptr->evidenceobject.itemcount = wombatvarptr->evidenceobject.fullpathlist.size();
+        wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject);
+        wombatprogresswindow->show();
+        wombatprogresswindow->ClearTableWidget();
+        InitializeEvidenceStructure();
+    }
+    /*
     wombatvarptr->evidenceobject.fullpath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
     if(wombatvarptr->evidenceobject.fullpath != "")
     {
@@ -236,6 +253,7 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
     }
+    */
 /*
  *
     wombatptr->evidenceobject.dbname = wombatptr->evidenceobject.fullpath.split("/").last() + ".db";

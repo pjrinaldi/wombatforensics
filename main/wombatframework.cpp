@@ -9,9 +9,16 @@ WombatFramework::~WombatFramework()
 }
 void WombatFramework::BuildEvidenceModel()
 {
-    // NEED TO PROCESS THE IMAGE FILE
+
+    // attempt to open the image file
+    TSK_IMG_INFO* tmpimage;
+    tmpimage = tsk_img_open(wombatptr->evidenceobject.itemcount, wombatptr->evidenceobject.fullpathlist, TSK_IMG_TYPE_DETECT, 0);
+    if(tmpimage == NULL)
+        fprintf(stderr, "Image didn't open\n");
+    else
+        fprintf(stderr, "Image opened. Shocking I know.\n");
     // NEED TO LAUNCH THIS IN A NEW THREAD TO KEEP GUI RESPONSIVE
-    fprintf(stderr, "Evidence Path: %s\n", wombatptr->evidenceobject.fullpath.toStdString().c_str());
+    //fprintf(stderr, "Evidence Path: %s\n", wombatptr->evidenceobject.fullpath.toStdString().c_str());
     // NEED TO OPEN THE IMAGE - img_open.c [tsk_img_open()]
     // NEED TO GET THE METADATA FOR THE IMAGE/VOLUMES/PARTITIONS/FILES SO I CAN POPULATE THE DIRECTORY TREE INFORMATION
 

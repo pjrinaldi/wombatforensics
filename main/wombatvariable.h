@@ -9,12 +9,18 @@
 #include <vector>
 #include <string>
 
+#include "tsk/libtsk.h"
+
 struct ItemObject
 {
     int id;
+    int itemcount;
     QString name;
+    QStringList namelist;
     QString dirpath;
     QString fullpath;
+    //std::list<const char*> fullpathlist;
+    const char* fullpathlist[];
     QString dbname;
 };
 
