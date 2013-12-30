@@ -19,8 +19,10 @@ struct ItemObject
     QStringList namelist;
     QString dirpath;
     QString fullpath;
-    //std::list<const char*> fullpathlist;
-    const char* fullpathlist[];
+    QStringList fullpathlist;
+    //std::list<std::string> fullpathlist;
+    // will convert as i need it from either qstringlist or the std::list...
+    //const char* fullpathlist[];
     QString dbname;
 };
 
