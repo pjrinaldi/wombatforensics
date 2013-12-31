@@ -7,6 +7,20 @@ WombatFramework::WombatFramework(WombatVariable* wombatvariable)
 WombatFramework::~WombatFramework()
 {
 }
+
+void WombatFramework::OpenEvidenceImage() // open current evidence image
+{
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(wombatptr->evidenceobject.fullpathvector.size()*sizeof(char*));
+    int i = 0;
+    for(std::vector<std::string>::iterator list_iter = wombatptr->evidenceobject.fullpathvector.begin(); list_iter != wombatptr->evidenceobject.fullpathvector.end(); list_iter++)
+    {
+        images[i++] = (*list_iter).c_str();
+    }
+    wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
+    free(images);
+}
+
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
 {
     for(int j = 0; j < wombatptr->evidenceobjectvector.count(); j++)
@@ -38,6 +52,7 @@ void WombatFramework::OpenEvidenceImages(ItemObject itemobject) // open all evid
 
 void WombatFramework::BuildEvidenceModel()
 {
+    // COME BACK TO QTCONCURRENT AS I GET FARTHER ALONG AND RESEARCH MORE
     /*
     QVector<ItemObject> itemvector;
     for(int i = 0; i < wombatptr->evidenceobjectvector.count(); i++)

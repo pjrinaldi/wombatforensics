@@ -30,6 +30,7 @@ public:
     void OpenAppDB(void);
     void CloseAppDB(void);
     void InitializeEvidenceDatabase(void);
+    void InsertEvidenceObject(void);
     ~WombatDatabase();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);

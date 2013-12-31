@@ -218,7 +218,17 @@ void WombatForensics::InitializeSleuthKit()
 
 void WombatForensics::InitializeEvidenceStructure()
 {
-    wombatframework->BuildEvidenceModel();
+    wombatframework->OpenEvidenceImage();
+    if(wombatvarptr->evidenceobject.imageinfo == NULL)
+        fprintf(stderr, "log error here.\n");
+    else
+    {
+        fprintf(stderr, "log info here.\n");
+        wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
+        //wombatdatabase->InitializeEvidenceDatabase();
+        //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);
+    }
+    //wombatframework->BuildEvidenceModel();
     // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
     // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR
     // NEED TO CREATE THE EVIDENCE TSK DATABASE (EXTRACT EVIDENCE ACCORDING TO MODULES)
@@ -231,7 +241,7 @@ void WombatForensics::AddEvidence()
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
     {
-        
+        wombatvarptr->evidenceobject.name = tmplist[0].split("/").last();
         for(int i=0; i < tmplist.count(); i++)
         {
             wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
@@ -242,11 +252,7 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->ClearTableWidget();
         InitializeEvidenceStructure();
     }
-/*
- *
-    wombatptr->evidenceobject.dbname = wombatptr->evidenceobject.fullpath.split("/").last() + ".db";
-
- */ 
+    
     /*
     QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
     if(evidenceFilePath != "")
