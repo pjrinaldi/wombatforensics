@@ -225,6 +225,8 @@ void WombatForensics::InitializeEvidenceStructure()
     {
         fprintf(stderr, "log info here.\n");
         wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
+        // NEED TO START MY DIRECTORY MODEL AND STORE THE RESPECTIVE INFORMATION HERE.
+        //
         //wombatdatabase->InitializeEvidenceDatabase();
         //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);
     }

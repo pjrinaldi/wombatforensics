@@ -20,7 +20,11 @@ struct ItemObject
     QString dirpath;
     QString fullpath;
     std::vector<std::string> fullpathvector;
-    TSK_IMG_INFO* imageinfo;
+    TSK_IMG_INFO* imageinfo; // These may disappear when the image is closed, will have to test this concept
+    TSK_VS_INFO* volinfo;
+    std::vector<TSK_VS_INFO*> volinfovector;
+    TSK_VS_PART_INFO* partinfo; // may not need.
+    std::vector<TSK_VS_PART_INFO*> partinfovector; // may not need.
     QString dbname;
 };
 
