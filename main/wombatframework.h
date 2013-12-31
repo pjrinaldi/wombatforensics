@@ -17,9 +17,9 @@ public:
     ~WombatFramework();
 
     void BuildEvidenceModel(void);
-    //void OpenEvidenceImages(void);
+    void OpenEvidenceImages(void);
     //void OpenEvidenceImages(ItemObject &itemobject);
-    void OpenEvidenceImages(ItemObject itemobject);
+    //void OpenEvidenceImages(ItemObject itemobject);
     
 private:
     WombatVariable* wombatptr;
