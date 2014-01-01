@@ -29,8 +29,9 @@ public:
     void OpenCaseDB(void);
     void OpenAppDB(void);
     void CloseAppDB(void);
-    void InitializeEvidenceDatabase(void);
+    //void InitializeEvidenceDatabase(void);
     void InsertEvidenceObject(void);
+    void InsertVolumeObject(void);
     ~WombatDatabase();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);

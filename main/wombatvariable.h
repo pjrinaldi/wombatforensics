@@ -22,7 +22,6 @@ struct ItemObject
     std::vector<std::string> fullpathvector;
     TSK_IMG_INFO* imageinfo; // These may disappear when the image is closed, will have to test this concept
     TSK_VS_INFO* volinfo;
-    std::vector<TSK_VS_INFO*> volinfovector;
     TSK_VS_PART_INFO* partinfo; // may not need.
     std::vector<TSK_VS_PART_INFO*> partinfovector; // may not need.
     QString dbname;
@@ -107,7 +106,9 @@ struct WombatVariable
     QStringList casenamelist;
     //QVector<CaseObject*> caseobjectvector;
     ItemObject evidenceobject;
+    ItemObject volumeobject;
     QVector<ItemObject> evidenceobjectvector;
+    QVector<ItemObject> volumeobjectvector;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
 

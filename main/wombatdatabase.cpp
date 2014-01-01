@@ -150,6 +150,11 @@ WombatDatabase::~WombatDatabase()
     CloseAppDB();
 }
 
+void WombatDatabase::InsertVolumeObject()
+{
+    wombatptr->volumeobject.id = 0;
+}
+
 void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->evidenceobject.id = 0;
@@ -192,11 +197,11 @@ void WombatDatabase::InsertEvidenceObject()
         sqlite3_finalize(casestatement);
     }
 }
-
+/*
 void WombatDatabase::InitializeEvidenceDatabase()
 {
 }
-
+*/
 int WombatDatabase::ReturnCaseCount()
 {
     int casecount = 0;

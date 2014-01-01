@@ -21,6 +21,11 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     free(images);
 }
 
+void WombatFramework::OpenVolumeSystem() // open current volume system
+{
+    wombatptr->evidenceobject.volinfo = tsk_vs_open(wombatptr->evidenceobject.imageinfo, 0, TSK_VS_TYPE_DETECT);
+}
+
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
 {
     for(int j = 0; j < wombatptr->evidenceobjectvector.count(); j++)

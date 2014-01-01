@@ -227,6 +227,10 @@ void WombatForensics::InitializeEvidenceStructure()
         wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
         // NEED TO START MY DIRECTORY MODEL AND STORE THE RESPECTIVE INFORMATION HERE.
         //
+        wombatframework->GetVolumeInformation();
+        wombatdatabase->InsertVolumeObject(); // add volume to data
+        // NEED TO ADD VOLUME TO THE IMAGE MODEL
+        //
         //wombatdatabase->InitializeEvidenceDatabase();
         //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);
     }
