@@ -26,6 +26,12 @@ void WombatFramework::OpenVolumeSystem() // open current volume system
     wombatptr->evidenceobject.volinfo = tsk_vs_open(wombatptr->evidenceobject.imageinfo, 0, TSK_VS_TYPE_DETECT);
 }
 
+void WombatFramework::GetVolumeSystemName() // get the volume system name
+{
+    wombatptr->volumeobject.name = QString::fromUtf8(tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype));
+    wombatptr->volumeobjectvector.append(wombatptr->volumeobject);
+}
+
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
 {
     for(int j = 0; j < wombatptr->evidenceobjectvector.count(); j++)
@@ -41,19 +47,6 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
         free(images);
     }
 }
-/*
-void WombatFramework::OpenEvidenceImages(ItemObject itemobject) // open all evidence images.
-{
-    const TSK_TCHAR** images;
-    images = (const char**)malloc(itemobject.fullpathvector.size()*sizeof(char*));
-    int i = 0;
-    for(std::vector<std::string>::iterator list_iter = itemobject.fullpathvector.begin(); list_iter != itemobject.fullpathvector.end(); list_iter++)
-    {
-        images[i++] = (*list_iter).c_str();
-    }
-    itemobject.imageinfo = tsk_img_open(itemobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
-    free(images);
-}*/
 
 void WombatFramework::BuildEvidenceModel()
 {

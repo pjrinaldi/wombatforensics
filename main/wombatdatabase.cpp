@@ -153,6 +153,26 @@ WombatDatabase::~WombatDatabase()
 void WombatDatabase::InsertVolumeObject()
 {
     wombatptr->volumeobject.id = 0;
+    // might need to add endianordering INTEGER column
+    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (type, size, byteoffset, parentid, name) VALUES(?, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == NULL)
+    {
+        if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.volinfo->vstype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.volinfo->block_size) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.volinfo->offset) == SQLITE_OK && sqlite3_bind_int(casestatement, 4, wombatptr->evidenceobject.id) == SQLITE_OK && sqlite3_bind_text(casestatement, 5, wombatptr->volumeobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                wombatptr->volumeobject.id = sqlite3_last_insert_rowid(casedb);
+            }
+            else
+                emit DisplayError("1.6", "SQL Error: ", sqlite3_errmsg(casedb));
+
+        }
+        else
+            emit DisplayError("1.6", "SQL Error: ", sqlite3_errmsg(casedb));
+    }
+    else
+        emit DisplayError("1.6", "SQL Error: ", sqlite3_errmsg(casedb));
+    sqlite3_finalize(casestatement);
 }
 
 void WombatDatabase::InsertEvidenceObject()
