@@ -32,6 +32,7 @@ public:
     //void InitializeEvidenceDatabase(void);
     void InsertEvidenceObject(void);
     void InsertVolumeObject(void);
+    void InsertPartitionObjects(void);
     ~WombatDatabase();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);

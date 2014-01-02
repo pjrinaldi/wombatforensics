@@ -21,8 +21,8 @@ public:
     void OpenEvidenceImages(void); // might not need this functions, since re-opening a case can pull it's info from the db.
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);
-    //void GetVolumeInformation(void);
-    
+    void OpenPartitions(void);
+
 private:
     WombatVariable* wombatptr;
 };

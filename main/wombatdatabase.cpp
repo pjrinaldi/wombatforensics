@@ -175,6 +175,10 @@ void WombatDatabase::InsertVolumeObject()
     sqlite3_finalize(casestatement);
 }
 
+void WombatDatabase::InsertPartitionObjects()
+{
+}
+
 void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->evidenceobject.id = 0;
