@@ -22,6 +22,7 @@ public:
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);
     void OpenPartitions(void);
+    void OpenFileSystems(void);
 
 private:
     WombatVariable* wombatptr;

@@ -34,7 +34,15 @@ void WombatFramework::GetVolumeSystemName() // get the volume system name
 
 void WombatFramework::OpenPartitions() // open the partitions in the volume
 {
-    fprintf(stderr, "Number of Partitions: %d\n", wombatptr->evidenceobject.volinfo->part_count);
+    //fprintf(stderr, "Number of Partitions: %d\n", wombatptr->evidenceobject.volinfo->part_count);
+    for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
+    {
+        wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
+    }
+}
+
+void WombatFramework::OpenFileSystems() // open the filesystems in the image or partition
+{
 }
 
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
