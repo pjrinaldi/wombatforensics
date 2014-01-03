@@ -38,11 +38,13 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
     for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
     {
         wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
+        wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT));
     }
 }
 
 void WombatFramework::OpenFileSystems() // open the filesystems in the image or partition
 {
+    // may not need this function since i can open them when the partitions are added w/o having to reloop it.
 }
 
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
