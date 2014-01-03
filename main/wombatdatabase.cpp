@@ -154,7 +154,7 @@ void WombatDatabase::InsertVolumeObject()
 {
     wombatptr->volumeobject.id = 0;
     // might need to add endianordering INTEGER column
-    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (type, size, byteoffset, parentid, name) VALUES(?, ?, ?, ?, ?);", -1, &casestatement, NULL) == NULL)
+    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (type, size, byteoffset, parentid, name) VALUES(?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.volinfo->vstype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.volinfo->block_size) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.volinfo->offset) == SQLITE_OK && sqlite3_bind_int(casestatement, 4, wombatptr->evidenceobject.id) == SQLITE_OK && sqlite3_bind_text(casestatement, 5, wombatptr->volumeobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
@@ -205,6 +205,29 @@ void WombatDatabase::InsertPartitionObjects()
 
 void WombatDatabase::InsertFileSystemObjects()
 {
+    for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
+    {
+        wombatptr->filesystemobject.id = 0;
+        if(sqlite3_prepare_v2(casedb, "INSERT INTO data (type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
+        {
+            if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.fsinfovector[i]->ftype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.fsinfovector[i]->flags) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.fsinfovector[i]->offset) == SQLITE_OK && sqlite3_bind_int(casestatement, 4, wombatptr->partitionobjectvector[i].id) == SQLITE_OK && sqlite3_bind_int(casestatement, 5, wombatptr->evidenceobject.fsinfovector[i]->block_size) == SQLITE_OK && sqlite3_bind_int(casestatement, 6, wombatptr->evidenceobject.fsinfovector[i]->block_count) == SQLITE_OK && sqlite3_bind_int(casestatement, 7, wombatptr->evidenceobject.fsinfovector[i]->first_inum) == SQLITE_OK && sqlite3_bind_int(casestatement, 8, wombatptr->evidenceobject.fsinfovector[i]->last_inum) == SQLITE_OK && sqlite3_bind_int(casestatement, 9, wombatptr->evidenceobject.fsinfovector[i]->root_inum) == SQLITE_OK)
+            {
+                int ret =  sqlite3_step(casestatement);
+                if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+                {
+                    wombatptr->filesystemobject.id = sqlite3_last_insert_rowid(casedb);
+                }
+                else
+                    emit DisplayError("1.8", "SQL Error: ", sqlite3_errmsg(casedb));
+            }
+            else
+                emit DisplayError("1.8", "SQL Error: ", sqlite3_errmsg(casedb));
+        }
+        else
+            emit DisplayError("1.8", "SQL Error: ", sqlite3_errmsg(casedb));
+        sqlite3_finalize(casestatement);
+        wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
+    }
 }
 
 void WombatDatabase::InsertEvidenceObject()
