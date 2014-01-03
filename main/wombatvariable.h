@@ -110,7 +110,7 @@ struct WombatVariable
     ItemObject evidenceobject;
     ItemObject volumeobject;
     QVector<ItemObject> evidenceobjectvector;
-    QVector<ItemObject> volumeobjectvector;
+    QVector<ItemObject> volumeobjectvector; // may not need
     ItemObject partitionobject;
     QVector<ItemObject> partitionobjectvector;
     ItemObject filesystemobject;

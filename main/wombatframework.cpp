@@ -30,18 +30,28 @@ void WombatFramework::OpenVolumeSystem() // open current volume system
 
 void WombatFramework::GetVolumeSystemName() // get the volume system name
 {
-    wombatptr->volumeobject.name = QString::fromUtf8(tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype));
-    wombatptr->volumeobjectvector.append(wombatptr->volumeobject);
+    if(wombatptr->evidenceobject.volinfo == NULL)
+        wombatptr->volumeobject.name = "Dummy Volume";
+    else
+        wombatptr->volumeobject.name = QString::fromUtf8(tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype));
+    wombatptr->volumeobjectvector.append(wombatptr->volumeobject); // may not need.
 }
 
 void WombatFramework::OpenPartitions() // open the partitions in the volume
 {
     // MAY NEED TO CHECK IF VOLUME EXISTS, IF NOT THEN SHOULD GET FS FROM IMG INSTEAD OF VOL.
     //fprintf(stderr, "Number of Partitions: %d\n", wombatptr->evidenceobject.volinfo->part_count);
-    for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
+    if(wombatptr->evidenceobject.volinfo == NULL)
     {
-        wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
-        wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT));
+        wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_img(wombatptr->evidenceobject.imageinfo, 0, TSK_FS_TYPE_DETECT));
+    }
+    else
+    {
+        for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
+        {
+            wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
+            wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT));
+        }
     }
 }
 
