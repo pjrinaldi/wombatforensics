@@ -8,6 +8,7 @@
 #include <QObject>
 #include <vector>
 #include <string>
+#include <QStandardItemModel>
 
 #include "tsk/libtsk.h"
 
@@ -99,6 +100,7 @@ struct WombatVariable
     QString tmpfilepath;
     QString curerrmsg;
     QString wombatdbname;
+    QStandardItemModel* dirmodel;
     //QString evidencedbname;
     //QStringList evidencepathlist;
     //QStringList evidencedbnamelist;

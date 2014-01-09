@@ -73,10 +73,12 @@ private slots:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void PopulateProgressWindow(WombatVariable* wvariable);
     void UpdateCaseData(void);
-    void ResizeColumns(QStandardItemModel* currentmodel);
+    void ResizeColumns(void);
+   // void ResizeColumns(QStandardItemModel* currentmodel);
     void ResizeViewColumns(const QModelIndex &index)
     {
-        ResizeColumns((QStandardItemModel*)index.model());
+        //ResizeColumns((QStandardItemModel*)index.model());
+        ResizeColumns();
     }
     void FileExport(FileExportData* exportdata);
     void setScrollBarRange(off_t low, off_t high);
@@ -100,6 +102,7 @@ private:
     void InitializeEvidenceStructure(void);
     void InitializeOpenCase(void);
     void InitializeWombatFramework(void);
+    void InitializeDirModel(void);
     void RemoveTmpFiles(void);
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
@@ -129,6 +132,7 @@ private:
     QLabel* selectedfloat;
     QLabel* selecteddouble;
 
+    // NEED TO REMOVE THESE ONCE I GET MY FUNCTIONS DONE AND REMOVE THE OLD STRUCTURE
     QStandardItemModel* currenttreemodel;
     QStandardItemModel* wombatdirmodel;
     QStandardItemModel* wombattypmodel;

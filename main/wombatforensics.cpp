@@ -216,6 +216,20 @@ void WombatForensics::InitializeSleuthKit()
     */
 /*}*/
 
+void WombatForensics::InitializeDirModel()
+{
+    wombatvarptr->dirmodel = new QStandardItemModel();
+    QStringList headerList;
+    headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
+    wombatvarptr->dirmodel->setHorizontalHeaderLabels(headerList);
+    ui->dirTreeView->setModel(wombatvarptr->dirmodel);
+    ResizeColumns();
+    //QStandardItem *evidenceNode = wombatdirmodel->invisibleRootItem();
+    connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
+
+}
+
 void WombatForensics::InitializeEvidenceStructure()
 {
     wombatframework->OpenEvidenceImage();
@@ -263,6 +277,7 @@ void WombatForensics::AddEvidence()
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
         wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject); // add evidence to case evidence list
+        InitializeDirModel();
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
         InitializeEvidenceStructure();
@@ -649,19 +664,21 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::GetImageNode(QStandardItem* imagenode)
 {
+    /*
     setUpdatesEnabled(false);
     QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
     currentroot->appendRow(imagenode);
     ui->dirTreeView->setModel(wombatdirmodel);
-    ResizeColumns(wombatdirmodel);
+    //ResizeColumns(wombatdirmodel);
     UpdateMessageTable();
     setUpdatesEnabled(true);
-
+    */
 }
 
-void WombatForensics::ResizeColumns(QStandardItemModel* currentmodel)
+//void WombatForensics::ResizeColumns(QStandardItemModel* currentmodel)
+void WombatForensics::ResizeColumns(void)
 {
-    for(int i=0; i < currentmodel->columnCount(); i++)
+    for(int i=0; i < wombatvarptr->dirmodel->columnCount(); i++)
     {
         // may need to compare treeview->model() == currentmodel) to determine what to set it to.
         // depending on the design though, i may not need multiple layouts since the columns can be sorted.
@@ -672,6 +689,7 @@ void WombatForensics::ResizeColumns(QStandardItemModel* currentmodel)
 
 void WombatForensics::SetupDirModel(void)
 {
+    /*
     wombatdirmodel = new QStandardItemModel();
     QStringList headerList;
     headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
@@ -681,6 +699,7 @@ void WombatForensics::SetupDirModel(void)
     ResizeColumns(wombatdirmodel);
     connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
+    */
 }
 
 void WombatForensics::SetupHexPage(void)
