@@ -100,8 +100,8 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
-    SetupDirModel();
-    SetupHexPage();
+    //SetupDirModel();
+    //SetupHexPage();
     SetupToolbar();
     
 }
