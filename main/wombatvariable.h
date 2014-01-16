@@ -14,20 +14,20 @@
 
 struct ItemObject
 {
-    int id = 0;
-    int itemcount = 0;
-    QString name = "";
+    int id;
+    int itemcount;
+    QString name;
     QStringList namelist;
-    QString dirpath = "";
-    QString fullpath = "";
+    QString dirpath;
+    QString fullpath;
     std::vector<std::string> fullpathvector;
-    TSK_IMG_INFO* imageinfo = NULL; // These may disappear when the image is closed, will have to test this concept
-    TSK_VS_INFO* volinfo = NULL; // may not need..
+    TSK_IMG_INFO* imageinfo; // These may disappear when the image is closed, will have to test this concept
+    TSK_VS_INFO* volinfo; // may not need..
     std::vector<TSK_VS_INFO*> volinfovector; // should use instead of volinfo, simply search for volumes and add them based on the size and offset to search for another one...
     //TSK_VS_PART_INFO* partinfo; // may not need.
     std::vector<const TSK_VS_PART_INFO*> partinfovector; // may not need.
     std::vector<TSK_FS_INFO*> fsinfovector; 
-    QString dbname = "";
+    QString dbname;
 };
 
 struct FileExportData
