@@ -263,7 +263,7 @@ void WombatForensics::InitializeEvidenceStructure()
         wombatvarptr->volumeobjectvector.append(wombatvarptr->volumeobject); // add volume to case volume list
         wombatframework->OpenPartitions();
         wombatdatabase->InsertPartitionObjects();
-        // NEED TO ADD PARTITION TO THE IMAGE MODEL
+        // NEED TO ADD PARTITIONS TO THE IMAGE MODEL
         //
         wombatframework->OpenFileSystems();
         wombatdatabase->InsertFileSystemObjects();

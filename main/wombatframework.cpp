@@ -12,10 +12,10 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
 {
     const TSK_TCHAR** images;
     images = (const char**)malloc(wombatptr->evidenceobject.fullpathvector.size()*sizeof(char*));
-    int i = 0;
-    for(std::vector<std::string>::iterator list_iter = wombatptr->evidenceobject.fullpathvector.begin(); list_iter != wombatptr->evidenceobject.fullpathvector.end(); list_iter++)
+    for(int i=0; i < wombatptr->evidenceobject.fullpathvector.size(); i++)
     {
-        images[i++] = (*list_iter).c_str();
+        images[i] = wombatptr->evidenceobject.fullpathvector[i].c_str();
+        fprintf(stderr, "fpv: %s\n", wombatptr->evidenceobject.fullpathvector[i].c_str());
     }
     wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
     free(images);
@@ -66,10 +66,9 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
     {
         const TSK_TCHAR** images;
         images = (const char**)malloc(wombatptr->evidenceobjectvector[j].fullpathvector.size()*sizeof(char*));
-        int i = 0;
-        for(std::vector<std::string>::iterator list_iter = wombatptr->evidenceobjectvector[j].fullpathvector.begin(); list_iter != wombatptr->evidenceobjectvector[j].fullpathvector.end(); list_iter++)
+        for(int i=0; i < wombatptr->evidenceobjectvector[j].fullpathvector.size(); i++)
         {
-            images[i++] = (*list_iter).c_str();
+            images[i] = wombatptr->evidenceobjectvector[j].fullpathvector[i].c_str();
         }
         wombatptr->evidenceobjectvector[j].imageinfo = tsk_img_open(wombatptr->evidenceobjectvector[j].itemcount, images, TSK_IMG_TYPE_DETECT, 0);
         free(images);
