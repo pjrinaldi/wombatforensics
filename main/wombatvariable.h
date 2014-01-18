@@ -12,7 +12,33 @@
 
 #include "tsk/libtsk.h"
 
-struct ItemObject
+struct CaseObject
+{
+    int id;
+    QString name;
+    QString dbname;
+    QString dirpath;
+};
+
+struct VolumeObject
+{
+    int id;
+    QString name;
+};
+
+struct PartitionObject
+{
+    int id;
+    QString name;
+};
+
+struct FileSystemObject
+{
+    int id;
+    QString name;
+};
+
+struct EvidenceObject
 {
     int id;
     int itemcount;
@@ -23,8 +49,8 @@ struct ItemObject
     std::vector<std::string> fullpathvector;
     TSK_IMG_INFO* imageinfo; // These may disappear when the image is closed, will have to test this concept
     TSK_VS_INFO* volinfo; // may not need..
-    std::vector<TSK_VS_INFO*> volinfovector; // should use instead of volinfo, simply search for volumes and add them based on the size and offset to search for another one...
-    //TSK_VS_PART_INFO* partinfo; // may not need.
+    //std::vector<TSK_VS_INFO*> volinfovector; // should use instead of volinfo, simply search for volumes and add them based on the size and offset to search for another one...
+    TSK_VS_PART_INFO* partinfo; // may not need.
     std::vector<const TSK_VS_PART_INFO*> partinfovector; // may not need.
     std::vector<TSK_FS_INFO*> fsinfovector; 
     QString dbname;
@@ -51,7 +77,7 @@ struct FileExportData
     PathStatus pathstatus;
     std::string name;
     std::string fullpath;
-    ItemObject evidenceobject;
+    EvidenceObject evidenceobject;
     //std::string evidencedbname;
     //std::string evidencepath;
     int exportcount;
@@ -106,22 +132,26 @@ struct WombatVariable
     //QStringList evidencedbnamelist;
     //QList<int> evidenceidlist;
     QList<int> objectidlist;
-    ItemObject caseobject;
+    CaseObject caseobject;
     QStringList casenamelist;
-    ItemObject evidenceobject;
-    ItemObject volumeobject;
-    QVector<ItemObject> evidenceobjectvector;
-    QVector<ItemObject> volumeobjectvector; // may not need
-    ItemObject partitionobject;
-    QVector<ItemObject> partitionobjectvector;
-    ItemObject filesystemobject;
-    QVector<ItemObject> filesystemobjectvector;
+    EvidenceObject evidenceobject;
+    VolumeObject volumeobject;
+    QVector<EvidenceObject> evidenceobjectvector;
+    QVector<VolumeObject> volumeobjectvector; // may not need
+    PartitionObject partitionobject;
+    QVector<PartitionObject> partitionobjectvector;
+    FileSystemObject filesystemobject;
+    QVector<FileSystemObject> filesystemobjectvector;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
 };
 
 Q_DECLARE_METATYPE(WombatVariable)
 Q_DECLARE_METATYPE(FileExportData)
-Q_DECLARE_METATYPE(ItemObject)
+Q_DECLARE_METATYPE(CaseObject)
+Q_DECLARE_METATYPE(EvidenceObject)
+Q_DECLARE_METATYPE(PartitionObject)
+Q_DECLARE_METATYPE(VolumeObject)
+Q_DECLARE_METATYPE(FileSystemObject)
 
 #endif // WOMBATVARIABLE_H

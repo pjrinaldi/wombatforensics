@@ -199,6 +199,8 @@ void WombatForensics::InitializeOpenCase()
             }
             //ThreadRunner* trun = new ThreadRunner(isleuthkit, "populatecase", wombatvarptr);
             //threadpool->start(trun);
+
+            // NEED TO INITIALIZEEVIDENCEIMAGES() HERE
         }
 
 }
@@ -285,10 +287,12 @@ void WombatForensics::AddEvidence()
         wombatvarptr->evidenceobject.name = tmplist[0].split("/").last();
         for(int i=0; i < tmplist.count(); i++)
         {
+            fprintf(stderr, "fullpathvector: %s\n", tmplist[i].toStdString().c_str());
             wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
         wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject); // add evidence to case evidence list
+        fprintf(stderr, "eov count: %i\n", wombatvarptr->evidenceobjectvector.count());
         InitializeDirModel();
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
