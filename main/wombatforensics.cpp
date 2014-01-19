@@ -243,9 +243,9 @@ void WombatForensics::InitializeEvidenceStructure()
         fprintf(stderr, "log info here.\n");
         wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
         // NEED TO START MY DIRECTORY MODEL AND STORE THE RESPECTIVE INFORMATION HERE.
-        QStandardItem *imageNode = new QStandardItem(wombatvarptr->evidenceobject.name);
-        imageNode->setIcon(QIcon(":/basic/treeimage"));
-        wombatvarptr->dirmodel->invisibleRootItem()->appendRow(imageNode);
+        QStandardItem *imagenode = new QStandardItem(wombatvarptr->evidenceobject.name);
+        imagenode->setIcon(QIcon(":/basic/treeimage"));
+        wombatvarptr->dirmodel->invisibleRootItem()->appendRow(imagenode);
         ResizeColumns();
         //
         //setUpdatesEnabled(false);
@@ -261,6 +261,8 @@ void WombatForensics::InitializeEvidenceStructure()
         wombatdatabase->InsertVolumeObject(); // add volume to data
         // NEED TO ADD VOLUME TO THE IMAGE MODEL
         //
+        QStandardItem* volumenode = new QStandardItem(wombatvarptr->volumeobject.name);
+        volumenode->setIcon(QIcon(":/basic/treefilemanager"));
         wombatvarptr->volumeobjectvector.append(wombatvarptr->volumeobject); // add volume to case volume list
         wombatframework->OpenPartitions();
         wombatdatabase->InsertPartitionObjects();

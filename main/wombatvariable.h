@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 #include <QStandardItemModel>
-
+#include <QStandardItem>
 #include "tsk/libtsk.h"
 
 struct CaseObject
