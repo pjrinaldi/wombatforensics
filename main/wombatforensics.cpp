@@ -263,6 +263,7 @@ void WombatForensics::InitializeEvidenceStructure()
         //
         QStandardItem* volumenode = new QStandardItem(wombatvarptr->volumeobject.name);
         volumenode->setIcon(QIcon(":/basic/treefilemanager"));
+        imagenode->appendRow(volumenode);
         wombatvarptr->volumeobjectvector.append(wombatvarptr->volumeobject); // add volume to case volume list
         wombatframework->OpenPartitions();
         wombatdatabase->InsertPartitionObjects();
