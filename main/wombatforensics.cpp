@@ -27,6 +27,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //emit LogVariable(wombatvarptr);
     InitializeAppStructure();
     //InitializeSleuthKit();
+    InitializeDirModel();
     InitializeWombatFramework();
 }
 
@@ -293,7 +294,6 @@ void WombatForensics::AddEvidence()
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
         wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject); // add evidence to case evidence list
         fprintf(stderr, "eov count: %i\n", wombatvarptr->evidenceobjectvector.count());
-        InitializeDirModel();
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
         InitializeEvidenceStructure();
