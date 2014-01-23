@@ -54,6 +54,21 @@ struct EvidenceObject
     std::vector<const TSK_VS_PART_INFO*> partinfovector; // may not need.
     std::vector<TSK_FS_INFO*> fsinfovector; 
     QString dbname;
+    void Clear()
+    {
+        fullpath = "";
+        id = 0;
+        itemcount = 0;
+        namelist.clear();
+        dirpath = "";
+        fullpathvector.clear();
+        imageinfo = NULL;
+        volinfo = NULL;
+        partinfo = NULL;
+        partinfovector.clear();
+        fsinfovector.clear();
+        dbname = "";
+    };
 };
 
 struct FileExportData

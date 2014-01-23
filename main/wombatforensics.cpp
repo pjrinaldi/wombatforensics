@@ -285,6 +285,7 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::AddEvidence()
 {
+    wombatvarptr->evidenceobject.Clear(); // clear values of current evidence object to add a new one.
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
     {
