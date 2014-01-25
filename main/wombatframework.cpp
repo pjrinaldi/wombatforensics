@@ -47,10 +47,23 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
     }
     else
     {
-        for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
+        fprintf(stderr, "partitioncount: %i\n", wombatptr->evidenceobject.volinfo->part_count);
+        if(wombatptr->evidenceobject.volinfo->part_count > 0)
         {
-            wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
-            wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT));
+            for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
+            {
+                wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
+                TSK_FS_INFO* tmpfsinfo = tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT);
+                if(tmpfsinfo != NULL)
+                {
+                    fprintf(stderr, "Not Null FS info found\n");
+                    wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT));
+                }
+                else
+                {
+                    fprintf(stderr, "NULL fs info found\n");
+                }
+            }
         }
     }
 }
