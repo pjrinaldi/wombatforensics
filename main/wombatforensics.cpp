@@ -261,6 +261,7 @@ void WombatForensics::InitializeEvidenceStructure()
         wombatdatabase->InsertVolumeObject(); // add volume to data
         // NEED TO ADD VOLUME TO THE IMAGE MODEL
         //
+        // NEED TO COMBINE THE FILE SYSTEM AND PARTITION OBJECT INFORMATION INTO A DB ENTRY.
         QStandardItem* volumenode = new QStandardItem(wombatvarptr->volumeobject.name);
         volumenode->setIcon(QIcon(":/basic/treefilemanager"));
         imagenode->appendRow(volumenode);
@@ -268,17 +269,15 @@ void WombatForensics::InitializeEvidenceStructure()
         wombatframework->OpenPartitions();
         wombatdatabase->InsertPartitionObjects();
         // NEED TO ADD PARTITIONS TO THE IMAGE MODEL
-        //
+        /*
+        // will remove this once i combine it with partitions.
         //wombatframework->OpenFileSystems();
-        wombatdatabase->InsertFileSystemObjects();
+        //wombatdatabase->InsertFileSystemObjects();
         // ADD PARTITIONS AND FS HERE...
+        */
         for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
         {
             fprintf(stderr, "Part Name: %s\n", wombatvarptr->partitionobjectvector[i].name.toStdString().c_str());
-        }
-        for(int i=0; i < wombatvarptr->filesystemobjectvector.count(); i++)
-        {
-            fprintf(stderr, "FS Name: %s\n", wombatvarptr->filesystemobjectvector[i].name.toStdString().c_str());
         }
         //wombatdatabase->InitializeEvidenceDatabase();
         //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);

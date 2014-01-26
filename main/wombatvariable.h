@@ -31,13 +31,13 @@ struct PartitionObject
     int id;
     QString name;
 };
-
+/*
 struct FileSystemObject
 {
     int id;
     QString name;
 };
-
+*/
 struct EvidenceObject
 {
     int id;
@@ -156,8 +156,8 @@ struct WombatVariable
     QVector<VolumeObject> volumeobjectvector; // may not need
     PartitionObject partitionobject;
     QVector<PartitionObject> partitionobjectvector;
-    FileSystemObject filesystemobject;
-    QVector<FileSystemObject> filesystemobjectvector;
+    //FileSystemObject filesystemobject;
+    //QVector<FileSystemObject> filesystemobjectvector;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
 };
@@ -168,6 +168,6 @@ Q_DECLARE_METATYPE(CaseObject)
 Q_DECLARE_METATYPE(EvidenceObject)
 Q_DECLARE_METATYPE(PartitionObject)
 Q_DECLARE_METATYPE(VolumeObject)
-Q_DECLARE_METATYPE(FileSystemObject)
+//Q_DECLARE_METATYPE(FileSystemObject)
 
 #endif // WOMBATVARIABLE_H
