@@ -222,7 +222,8 @@ void WombatDatabase::InsertPartitionObjects()
         }
     }
 }
-
+// COMBINE PARTITION WITH THE FILESYSTEM OBJECTS
+/*
 void WombatDatabase::InsertFileSystemObjects()
 {
     for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
@@ -254,7 +255,7 @@ void WombatDatabase::InsertFileSystemObjects()
         }
     }
 }
-
+*/
 void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->evidenceobject.id = 0;
