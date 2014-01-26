@@ -67,7 +67,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
         }
     }
 }
-
+// DEFINITELY DON'T NEED THIS FUNCTION RIGHT NOW.
 void WombatFramework::OpenFileSystems() // open the filesystems in the image or partition
 {
     // may not need this function since i can open them when the partitions are added w/o having to reloop it.
