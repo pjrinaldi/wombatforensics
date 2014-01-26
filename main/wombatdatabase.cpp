@@ -228,6 +228,7 @@ void WombatDatabase::InsertFileSystemObjects()
     for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
     {
         fprintf(stderr, "i: %i\n", i);
+        wombatptr->filesystemobject.name = QString::fromUtf8(wombatptr->evidenceobject.fsinfovector[i]->duname);
         wombatptr->filesystemobject.id = 0;
         if(wombatptr->evidenceobject.fsinfovector[i] != NULL)
         {

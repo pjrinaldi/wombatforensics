@@ -51,12 +51,13 @@ struct EvidenceObject
     TSK_VS_INFO* volinfo; // may not need..
     //std::vector<TSK_VS_INFO*> volinfovector; // should use instead of volinfo, simply search for volumes and add them based on the size and offset to search for another one...
     TSK_VS_PART_INFO* partinfo; // may not need.
-    std::vector<const TSK_VS_PART_INFO*> partinfovector; // may not need.
+    std::vector<const TSK_VS_PART_INFO*> partinfovector;
     std::vector<TSK_FS_INFO*> fsinfovector; 
     QString dbname;
     void Clear()
     {
         fullpath = "";
+        name = "";
         id = 0;
         itemcount = 0;
         namelist.clear();

@@ -269,11 +269,16 @@ void WombatForensics::InitializeEvidenceStructure()
         wombatdatabase->InsertPartitionObjects();
         // NEED TO ADD PARTITIONS TO THE IMAGE MODEL
         //
-        wombatframework->OpenFileSystems();
+        //wombatframework->OpenFileSystems();
         wombatdatabase->InsertFileSystemObjects();
         // ADD PARTITIONS AND FS HERE...
+        for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
+        {
+            fprintf(stderr, "Part Name: %s\n", wombatvarptr->partitionobjectvector[i].name.toStdString().c_str());
+        }
         for(int i=0; i < wombatvarptr->filesystemobjectvector.count(); i++)
         {
+            fprintf(stderr, "FS Name: %s\n", wombatvarptr->filesystemobjectvector[i].name.toStdString().c_str());
         }
         //wombatdatabase->InitializeEvidenceDatabase();
         //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);
