@@ -272,7 +272,8 @@ void WombatForensics::InitializeEvidenceStructure()
         // NEED TO COMBINE THE FILE SYSTEM AND PARTITION OBJECT INFORMATION INTO A DB ENTRY.
         
         tmplist.clear(); // clear tmplist to reuse for volumes.
-        QStandardItem* tmpnode = new QStandardItem(QString::number(wombatvarptr->volumeobject.id));
+        tmpnode = NULL;
+        tmpnode = new QStandardItem(QString::number(wombatvarptr->volumeobject.id));
         tmpnode->setCheckable(true);
         tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
         tmplist << tmpnode << new QStandardItem(wombatvarptr->volumeobject.name);
