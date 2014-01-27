@@ -249,6 +249,7 @@ void WombatForensics::InitializeEvidenceStructure()
         tmpnode->setIcon(QIcon(":/basic/treeimage"));
         tmplist << tmpnode << new QStandardItem(wombatvarptr->evidenceobject.name);
         wombatvarptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
+        fprintf(stderr, "Index Name: %s\n", wombatvarptr->dirmodel->invisibleRootItem()->child(0,1)->data().toString().toStdString().c_str());
         /*
         QStandardItem *imagenode = new QStandardItem(wombatvarptr->evidenceobject.name);
         imagenode->setIcon(QIcon(":/basic/treeimage"));
