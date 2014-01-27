@@ -223,7 +223,7 @@ void WombatForensics::InitializeDirModel()
 {
     wombatvarptr->dirmodel = new QStandardItemModel();
     QStringList headerList;
-    headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
+    headerList << "Unique ID" << "Name" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     wombatvarptr->dirmodel->setHorizontalHeaderLabels(headerList);
     ui->dirTreeView->setModel(wombatvarptr->dirmodel);
     ResizeColumns();
@@ -243,18 +243,19 @@ void WombatForensics::InitializeEvidenceStructure()
         fprintf(stderr, "log info here.\n");
         wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
         // NEED TO START MY DIRECTORY MODEL AND STORE THE RESPECTIVE INFORMATION HERE.
+        QList<QStandardItem*> tmplist;
+        QStandardItem* tmpnode = new QStandardItem(QString::number(wombatvarptr->evidenceobject.id));
+        tmpnode->setCheckable(true);
+        tmpnode->setIcon(QIcon(":/basic/treeimage"));
+        tmplist << tmpnode << new QStandardItem(wombatvarptr->evidenceobject.name);
+        wombatvarptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
+        /*
         QStandardItem *imagenode = new QStandardItem(wombatvarptr->evidenceobject.name);
         imagenode->setIcon(QIcon(":/basic/treeimage"));
         wombatvarptr->dirmodel->invisibleRootItem()->appendRow(imagenode);
+        */
         ResizeColumns();
         //
-        //setUpdatesEnabled(false);
-        //QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
-        //currentroot->appendRow(imagenode);
-        //ui->dirTreeView->setModel(wombatdirmodel);
-        //ResizeColumns(wombatdirmodel);
-        //UpdateMessageTable();
-        //setUpdatesEnabled(true);
 
         wombatframework->OpenVolumeSystem();
         wombatframework->GetVolumeSystemName();
@@ -262,10 +263,15 @@ void WombatForensics::InitializeEvidenceStructure()
         // NEED TO ADD VOLUME TO THE IMAGE MODEL
         //
         // NEED TO COMBINE THE FILE SYSTEM AND PARTITION OBJECT INFORMATION INTO A DB ENTRY.
+        
+        //tmplist.clear();
+
+        /*
         QStandardItem* volumenode = new QStandardItem(wombatvarptr->volumeobject.name);
         volumenode->setIcon(QIcon(":/basic/treefilemanager"));
         imagenode->appendRow(volumenode);
         wombatvarptr->volumeobjectvector.append(wombatvarptr->volumeobject); // add volume to case volume list
+        */
         wombatframework->OpenPartitions();
         wombatdatabase->InsertPartitionObjects();
         // NEED TO ADD PARTITIONS TO THE IMAGE MODEL
