@@ -249,7 +249,13 @@ void WombatForensics::InitializeEvidenceStructure()
         tmpnode->setIcon(QIcon(":/basic/treeimage"));
         tmplist << tmpnode << new QStandardItem(wombatvarptr->evidenceobject.name);
         wombatvarptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
-        fprintf(stderr, "Index Name: %s\n", wombatvarptr->dirmodel->invisibleRootItem()->child(0,1)->data().toString().toStdString().c_str());
+        // AFTER I ADD THE NODE, I CAN REFERENCE IT WITH THE BELOW CODE BASED ON IT'S ID USING THE ZERO 0, SO ITS UNIQUE.
+        /*
+        QList<QStandardItem*> idstring = wombatvarptr->dirmodel->findItems(QString::number(wombatvarptr->evidenceobject.id), Qt::MatchExactly, 0);
+        QList<QStandardItem*> namestring = wombatvarptr->dirmodel->findItems(wombatvarptr->evidenceobject.name, Qt::MatchExactly, 1);
+        fprintf(stderr, "dirmodel item 0: %s\n", idstring[0]->text().toStdString().c_str());
+        fprintf(stderr, "dirmodel item 1: %s\n", namestring[0]->text().toStdString().c_str());
+        */
         /*
         QStandardItem *imagenode = new QStandardItem(wombatvarptr->evidenceobject.name);
         imagenode->setIcon(QIcon(":/basic/treeimage"));
@@ -265,8 +271,12 @@ void WombatForensics::InitializeEvidenceStructure()
         //
         // NEED TO COMBINE THE FILE SYSTEM AND PARTITION OBJECT INFORMATION INTO A DB ENTRY.
         
-        //tmplist.clear();
-
+        tmplist.clear(); // clear tmplist to reuse for volumes.
+        QStandardItem* tmpnode = new QStandardItem(QString::number(wombatvarptr->volumeobject.id));
+        tmpnode->setCheckable(true);
+        tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
+        tmplist << tmpnode << new QStandardItem(wombatvarptr->volumeobject.name);
+        wombatvarptr->dirmodel->findItems(QString::number(wombatvarptr->evidenceobject.id))[0]->appendRow(tmplist);
         /*
         QStandardItem* volumenode = new QStandardItem(wombatvarptr->volumeobject.name);
         volumenode->setIcon(QIcon(":/basic/treefilemanager"));
