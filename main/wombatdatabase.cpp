@@ -376,6 +376,11 @@ void WombatDatabase::ReturnCaseID()
         emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
 }
 
+void WombatDatabase::GetObjectType()
+{
+    // get type based on objecttype and type value.
+}
+
 int WombatDatabase::ReturnObjectFileID(int objectid)
 {
     int fileid = 0;

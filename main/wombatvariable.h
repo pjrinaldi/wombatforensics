@@ -99,6 +99,13 @@ struct FileExportData
     int exportcount;
 };
 
+struct SelectedObject
+{
+    int id;
+    int type;
+    int name;
+};
+
 struct WombatVariable
 {
 
@@ -130,7 +137,8 @@ struct WombatVariable
     int processcount;
     int omnivalue;
     int visibleviewer;
-    int selectedobjectid;
+    //int selectedobjectid;
+    //int selectedobjecttype;
     // directory/file paths
     QString casespath;
     //QString casedirpath;
@@ -158,6 +166,7 @@ struct WombatVariable
     QVector<PartitionObject> partitionobjectvector;
     //FileSystemObject filesystemobject;
     //QVector<FileSystemObject> filesystemobjectvector;
+    SelectedObject selectedobject;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
 };
@@ -169,5 +178,6 @@ Q_DECLARE_METATYPE(EvidenceObject)
 Q_DECLARE_METATYPE(PartitionObject)
 Q_DECLARE_METATYPE(VolumeObject)
 //Q_DECLARE_METATYPE(FileSystemObject)
+Q_DECLARE_METATYPE(SelectedObject);
 
 #endif // WOMBATVARIABLE_H

@@ -34,6 +34,7 @@ public:
     void InsertVolumeObject(void);
     void InsertPartitionObjects(void);
     void InsertFileSystemObjects(void);
+    void GetObjectType(void);
     ~WombatDatabase();
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);

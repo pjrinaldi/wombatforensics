@@ -884,13 +884,11 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    QString tmptext = "";
-    tmptext = index.sibling(index.row(), 0).data().toString(); // object id
-    fprintf(stderr, "DataID: %s\n", tmptext.toStdString().c_str());
-    if(tmptext != "") // txt has a value
-    {
-        // NEED TO DETERMINE THE DATA TYPE USING THE ID AND THEN DISPLAY RESPECTIVE INFORMATION IN VISIBLE WINDOW.
-    }
+    wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
+    //wombatvarptr->selectedobjectid = index.sibling(index.row(), 0).data().toInt(); // object id
+    wombatdatabase->GetObjectType();
+    // NEED TO DETERMINE THE DATA TYPE TO CALL THE CORRECT DATA TO UPDATE.
+    //
     //QString sigtext = "";
     // I CAN EITHER GET THE SIGNATURE USING COMPARISON OR BY CALLING FILE AND MAGIC LIKE THE MODULE
     // SELECTING ITEM GETS IT'S ID VALUES AND SET'S RESPECTIVE WOMBATVARPTR->VALUES
