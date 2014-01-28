@@ -14,6 +14,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
     //connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
+    wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
     //wombatvarptr->evidenceobject.id = 0;
     //wombatvarptr->jobtype = 0;
     //wombatvarptr->jobid = -1;
@@ -368,8 +369,38 @@ void WombatForensics::AddEvidence()
 
 void WombatForensics::UpdateViewer()
 {
+    wombatvarptr->visibleviewer = ReturnVisibleViewerID();
+    if(wombatvarptr->visibleviewer == 0) // hex
+        LoadHexContents();
+    else if(wombatvarptr->visibleviewer == 1) // txt
+        LoadTxtContents();
+    else if(wombatvarptr->visibleviewer == 2) // web
+        LoadWebContents();
+    else if(wombatvarptr->visibleviewer == 3) // pic
+        LoadImgContents();
+    else if(wombatvarptr->visibleviewer == 4) // vid
+        LoadVidContents();
 }
 
+void WombatForensics::LoadHexContents()
+{
+}
+
+void WombatForensics::LoadTxtContents()
+{
+}
+
+void WombatForensics::LoadWebContents()
+{
+}
+
+void WombatForensics::LoadImgContents()
+{
+}
+
+void WombatForensics::LoadVidContents()
+{
+}
 
 
 void WombatForensics::RemEvidence()
@@ -861,9 +892,12 @@ void WombatForensics::on_actionOpen_Case_triggered()
 void WombatForensics::ViewGroupTriggered(QAction* selaction)
 {
     wombatvarptr->visibleviewer = ReturnVisibleViewerID();
+    if(wombatvarptr->visibleviewer > 1) // if an omniviewer is visible, set the current omnivalue.
+        wombatvarptr->omnivalue = wombatvarptr->visibleviewer - 1; // may not need this since i can simply -1 it.
+
     // READ RESPECTIVE SIGNATURE HERE TO SET OMNIVALUE
     // GET CURRENTLY SELECTED FILE AND IF IT'S A VALUE, THEN LOAD THE RESPECTIVE CONTENT.
-    wombatvarptr->omnivalue = 1;
+    // wombatvarptr->omnivalue = 1;
     if(selaction == ui->actionViewHex)
     {
         ui->viewerstack->setCurrentIndex(0); // hex
@@ -876,7 +910,7 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
     }
     else if(selaction == ui->actionViewOmni) // omni 3,4,5
     {
-        ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
+        //ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
     }
     UpdateViewer();
 }
@@ -889,11 +923,23 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
         wombatprogresswindow->show();
 }
 
+void WombatForensics::UpdateOmniValue()
+{
+    if(wombatvarptr->selectedobject.type > 0 && wombatvarptr->selectedobject.type < 4)
+    {
+        wombatvarptr->omnivalue = 1;
+    }
+    else // if image - omnivalue = 2, video - omnivalue = 3.
+    {
+    }
+}
+
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
     //wombatvarptr->selectedobjectid = index.sibling(index.row(), 0).data().toInt(); // object id
-    wombatdatabase->GetObjectType();
+    wombatdatabase->GetObjectType(); // now i have selected object type.
+    UpdateOmniValue();
     UpdateViewer();
     // NEED TO DETERMINE THE DATA TYPE TO CALL THE CORRECT DATA TO UPDATE.
     //

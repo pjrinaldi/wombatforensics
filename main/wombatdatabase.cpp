@@ -50,7 +50,7 @@ void WombatDatabase::CreateCaseDB(void)
     wombatTableSchema.push_back("CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);");
     wombatTableSchema.push_back("CREATE TABLE artifacts(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);");
     wombatTableSchema.push_back("CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);");
-    wombatTableSchema.push_back("CREATE TABLE data(objectid INTEGER PRIMARY KEY, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, flags INTEGER, size INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, indoenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);");
+    wombatTableSchema.push_back("CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, flags INTEGER, size INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, indoenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);");
 
     if(sqlite3_open(wombatptr->caseobject.dbname.toStdString().c_str(), &casedb) == SQLITE_OK)
     {
@@ -154,7 +154,7 @@ void WombatDatabase::InsertVolumeObject()
 {
     wombatptr->volumeobject.id = 0;
     // might need to add endianordering INTEGER column
-    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (type, size, byteoffset, parentid, name) VALUES(?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
     {
         if(wombatptr->evidenceobject.volinfo != NULL)
         {
@@ -200,7 +200,7 @@ void WombatDatabase::InsertPartitionObjects()
         {
             wombatptr->partitionobject.name = QString::fromUtf8(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->desc);
             wombatptr->partitionobject.id = 0;
-            if(sqlite3_prepare_v2(casedb, "INSERT INTO data (type, flags, sectstart, sectlength, name, parentid) VALUES(10, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
+            if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
             {
                 if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.partinfovector[i]->flags) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.partinfovector[i]->start) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.partinfovector[i]->len) == SQLITE_OK && sqlite3_bind_text(casestatement, 4, wombatptr->evidenceobject.partinfovector[i]->desc, -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(casestatement, 5, wombatptr->volumeobject.id) == SQLITE_OK)
                 {
@@ -259,7 +259,7 @@ void WombatDatabase::InsertFileSystemObjects()
 void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->evidenceobject.id = 0;
-    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (type, size, name, fullpath) VALUES(?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, type, size, name, fullpath) VALUES(1, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.imageinfo->itype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.imageinfo->sector_size) == SQLITE_OK && sqlite3_bind_text(casestatement, 3, wombatptr->evidenceobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(casestatement, 4, wombatptr->evidenceobject.fullpathvector[0].c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
@@ -379,6 +379,23 @@ void WombatDatabase::ReturnCaseID()
 void WombatDatabase::GetObjectType()
 {
     // get type based on objecttype and type value.
+    if(sqlite3_prepare_v2(wombatdb, "SELECT objecttype FROM data WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, wombatptr->selectedobject.id) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                wombatptr->selectedobject.type = sqlite3_column_int(casestatement, 0);
+            }
+            else
+                emit DisplayError("2.1", "RETURN CURRENT CASE ID", sqlite3_errmsg(casedb));
+        }
+        else
+            emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
+    }
+    else
+        emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
 }
 
 int WombatDatabase::ReturnObjectFileID(int objectid)

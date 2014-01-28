@@ -104,6 +104,12 @@ private:
     void InitializeWombatFramework(void);
     void InitializeDirModel(void);
     void UpdateViewer(void);
+    void UpdateOmniValue(void);
+    void LoadHexContents(void);
+    void LoadTxtContents(void);
+    void LoadWebContents(void);
+    void LoadImgContents(void);
+    void LoadVidContents(void);
 
 
     void RemoveTmpFiles(void);
