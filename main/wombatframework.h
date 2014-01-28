@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <tsk/libtsk.h>
+#include "tsk/libtsk.h"
 #include <QObject>
 #include <QtConcurrent>
 

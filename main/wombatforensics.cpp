@@ -392,6 +392,11 @@ void WombatForensics::LoadTxtContents()
 
 void WombatForensics::LoadWebContents()
 {
+    fprintf(stderr, "selected type: %i\n", wombatvarptr->selectedobject.type);
+    if(wombatvarptr->selectedobject.type == 1)
+    {
+        ui->webView->setHtml(QStringLiteral("<b>hi</b>"));
+    }
 }
 
 void WombatForensics::LoadImgContents()
@@ -910,7 +915,7 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
     }
     else if(selaction == ui->actionViewOmni) // omni 3,4,5
     {
-        //ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
+        ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
     }
     UpdateViewer();
 }

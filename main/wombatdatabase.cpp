@@ -379,7 +379,7 @@ void WombatDatabase::ReturnCaseID()
 void WombatDatabase::GetObjectType()
 {
     // get type based on objecttype and type value.
-    if(sqlite3_prepare_v2(wombatdb, "SELECT objecttype FROM data WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(casedb, "SELECT objecttype FROM data WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(casestatement, 1, wombatptr->selectedobject.id) == SQLITE_OK)
         {
@@ -389,13 +389,14 @@ void WombatDatabase::GetObjectType()
                 wombatptr->selectedobject.type = sqlite3_column_int(casestatement, 0);
             }
             else
-                emit DisplayError("2.1", "RETURN CURRENT CASE ID", sqlite3_errmsg(casedb));
+                emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
         }
         else
             emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
     }
     else
         emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
+    sqlite3_finalize(casestatement);
 }
 
 int WombatDatabase::ReturnObjectFileID(int objectid)
