@@ -884,11 +884,12 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    // NEED TO DETERMINE WHETHER TO ASSIGN OBJECT ID VALUE'S TO THE IMAGE/VOLUME/PARTITION FOR EASIER TRACKING
     QString tmptext = "";
-    tmptext = index.sibling(index.row(), 1).data().toString(); // object id
+    tmptext = index.sibling(index.row(), 0).data().toString(); // object id
+    fprintf(stderr, "DataID: %s\n", tmptext.toStdString().c_str());
     if(tmptext != "") // txt has a value
     {
+        // NEED TO DETERMINE THE DATA TYPE USING THE ID AND THEN DISPLAY RESPECTIVE INFORMATION IN VISIBLE WINDOW.
     }
     //QString sigtext = "";
     // I CAN EITHER GET THE SIGNATURE USING COMPARISON OR BY CALLING FILE AND MAGIC LIKE THE MODULE
