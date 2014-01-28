@@ -297,6 +297,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNew_Case"/>
+   <addaction name="actionOpen_Case"/>
+   <addaction name="separator"/>
+   <addaction name="actionAdd_Evidence"/>
+   <addaction name="actionRemove_Evidence"/>
+   <addaction name="separator"/>
    <addaction name="actionViewHex"/>
    <addaction name="actionViewTxt"/>
    <addaction name="actionViewOmni"/>

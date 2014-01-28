@@ -264,6 +264,12 @@ public:
         menuEvidence->addSeparator();
         menuAction->addAction(actionExport_Evidence);
         menuSettings->addAction(actionManage_OmniViewer);
+        analysisToolBar->addAction(actionNew_Case);
+        analysisToolBar->addAction(actionOpen_Case);
+        analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionAdd_Evidence);
+        analysisToolBar->addAction(actionRemove_Evidence);
+        analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionViewHex);
         analysisToolBar->addAction(actionViewTxt);
         analysisToolBar->addAction(actionViewOmni);

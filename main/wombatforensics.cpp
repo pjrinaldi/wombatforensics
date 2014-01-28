@@ -878,6 +878,7 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
     {
         ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
     }
+    UpdateViewer();
 }
 
 void WombatForensics::on_actionView_Progress_triggered(bool checked)
