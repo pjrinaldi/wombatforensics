@@ -366,6 +366,12 @@ void WombatForensics::AddEvidence()
     //}
 }
 
+void WombatForensics::UpdateViewer()
+{
+}
+
+
+
 void WombatForensics::RemEvidence()
 {
     wombatprogresswindow->ClearTableWidget();
@@ -887,6 +893,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
     //wombatvarptr->selectedobjectid = index.sibling(index.row(), 0).data().toInt(); // object id
     wombatdatabase->GetObjectType();
+    UpdateViewer();
     // NEED TO DETERMINE THE DATA TYPE TO CALL THE CORRECT DATA TO UPDATE.
     //
     //QString sigtext = "";

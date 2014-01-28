@@ -103,6 +103,9 @@ private:
     void InitializeOpenCase(void);
     void InitializeWombatFramework(void);
     void InitializeDirModel(void);
+    void UpdateViewer(void);
+
+
     void RemoveTmpFiles(void);
     void LoadHexModel(QString tmpFilePath);
     void LoadTxtContent(QString asciiText);
