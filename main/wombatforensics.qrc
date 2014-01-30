@@ -18,4 +18,7 @@
         <file alias="omniview">../Resources/omniviewer.png</file>
 	<file alias="export">../Resources/format-indent-more.png</file>
     </qresource>
+    <qresource prefix="/html">
+        <file alias="infohtml">../Resources/information.html</file>
+    </qresource>
 </RCC>

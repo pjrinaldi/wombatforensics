@@ -392,10 +392,10 @@ void WombatForensics::LoadTxtContents()
 
 void WombatForensics::LoadWebContents()
 {
-    fprintf(stderr, "selected type: %i\n", wombatvarptr->selectedobject.type);
     if(wombatvarptr->selectedobject.type == 1)
     {
-        ui->webView->setHtml(QStringLiteral("<b>hi</b>"));
+        ui->webView->setUrl(QUrl("qrc:///html/infohtml"));
+        //ui->webView->setHtml(QStringLiteral("<b>hi</b>"));
     }
 }
 
