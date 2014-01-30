@@ -395,7 +395,13 @@ void WombatForensics::LoadWebContents()
     if(wombatvarptr->selectedobject.type == 1)
     {
         ui->webView->setUrl(QUrl("qrc:///html/infohtml"));
-        //ui->webView->setHtml(QStringLiteral("<b>hi</b>"));
+        QWebFrame* tmpframe = ui->webView->page()->mainFrame();
+        //QWebElement tmpdoc = tmpframe->documentElement();
+        QWebElement tmptitle = tmpframe->findFirstElement("#infotitle");
+        DisplayError("3.1", "Info Title Text: ", tmptitle.toPlainText());
+        //QWebElement tmptitle = tmpdoc.findFirst("#infotitle");
+        fprintf(stderr, "Title Text: %s\n", tmptitle.toPlainText().toStdString().c_str());
+        tmptitle.setPlainText("Image Title");
     }
 }
 

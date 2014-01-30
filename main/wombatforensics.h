@@ -26,6 +26,8 @@
 #include <QStatusBar>
 #include <QtWebKitWidgets>
 #include <QWebView>
+#include <QWebFrame>
+#include <QWebElement>
 
 #include "wombatvariable.h"
 #include "wombatdatabase.h"
