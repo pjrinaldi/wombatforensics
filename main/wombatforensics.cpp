@@ -9,6 +9,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatframework = new WombatFramework(wombatvarptr);
     wombatprogresswindow = new ProgressWindow(wombatdatabase);
     //isleuthkit = new SleuthKitPlugin(wombatdatabase);
+    connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     //connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     //connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
@@ -395,13 +396,6 @@ void WombatForensics::LoadWebContents()
     if(wombatvarptr->selectedobject.type == 1)
     {
         ui->webView->setUrl(QUrl("qrc:///html/infohtml"));
-        QWebFrame* tmpframe = ui->webView->page()->mainFrame();
-        //QWebElement tmpdoc = tmpframe->documentElement();
-        QWebElement tmptitle = tmpframe->findFirstElement("#infotitle");
-        DisplayError("3.1", "Info Title Text: ", tmptitle.toPlainText());
-        //QWebElement tmptitle = tmpdoc.findFirst("#infotitle");
-        fprintf(stderr, "Title Text: %s\n", tmptitle.toPlainText().toStdString().c_str());
-        tmptitle.setPlainText("Image Title");
     }
 }
 
@@ -413,6 +407,23 @@ void WombatForensics::LoadVidContents()
 {
 }
 
+void WombatForensics::LoadComplete(bool isok)
+{
+    // IT WORKS NOW. SO I HAVE TO WAIT TILL IT LOADS. WILL NEED TO WORK ON THREADING WHEN I OPEN A LARGER FILE
+    if(isok)
+    {
+        if(wombatvarptr->selectedobject.type == 1)
+        {
+            QWebFrame* tmpframe = ui->webView->page()->currentFrame();
+            //QWebElement tmpdoc = tmpframe->documentElement();
+            fprintf(stderr, "FrameText: %s\n", ui->webView->page()->mainFrame()->toPlainText().toStdString().c_str());
+            QWebElement tmptitle = tmpframe->findFirstElement("#infotitle");
+            //QWebElement tmptitle = tmpdoc.findFirst("#infotitle");
+            fprintf(stderr, "Title Text: %s\n", tmptitle.toPlainText().toStdString().c_str());
+            tmptitle.setPlainText("Image Title");
+        }
+    }
+}
 
 void WombatForensics::RemEvidence()
 {

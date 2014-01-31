@@ -88,7 +88,8 @@ private slots:
     void setOffsetLabel(off_t pos);
     void UpdateSelectValue(const QString &txt);
     void LoadFileContents(QString filepath);
-    void ViewGroupTriggered(QAction* curaction); 
+    void ViewGroupTriggered(QAction* curaction);
+    void LoadComplete(bool isok);
 
 protected:
     void closeEvent(QCloseEvent* event);
