@@ -18,6 +18,7 @@
 #include <string>
 #include <QString>
 #include <QThreadPool>
+#include <QFuture>
 #include <QBoxLayout>
 #include <QtWidgets>
 #include <QStringList>

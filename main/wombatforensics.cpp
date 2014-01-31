@@ -327,7 +327,8 @@ void WombatForensics::AddEvidence()
         fprintf(stderr, "eov count: %i\n", wombatvarptr->evidenceobjectvector.count());
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
-        InitializeEvidenceStructure();
+        QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
+        //InitializeEvidenceStructure();
     }
     
     /*
