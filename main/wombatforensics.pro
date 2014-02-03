@@ -1,6 +1,7 @@
 QT += widgets gui core concurrent webkitwidgets
-CONFIG += debug
-
+mac:CONFIG += debug app_bundle
+linux:CONFIG += debug
+mac:TEMPLATE = app
 #INCLUDEPATH += ../sleuthkit/framework/tsk/framework/services/
 #INCLUDEPATH += ../sleuthkit/framework/tsk/framework/extraction/
 INCLUDEPATH += ../sleuthkit/tsk/
@@ -21,13 +22,10 @@ SOURCES = main.cpp wombatforensics.cpp wombatdatabase.cpp wombatframework.cpp pr
 RESOURCES += wombatforensics.qrc progresswindow.qrc
 DESTDIR = ./
 #DESTDIR = ../build
-#LIBS = -lsqlite3 -lewf -ltsk -ltskframework
-LIBS = -lsqlite3 -lewf -ltsk
-#LIBS = -lsqlite3 -lewf -ltsk -ltskframework -L/home/pasquale/vlc-qt -lvlc-qt-widgets
-#LIBS = -lsqlite3 -lewf -ltsk -L/home/pasquale/libs -Wl,-rpath,/home/pasquale/libs -ltskframework
-
+mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -ltsk
+linux:LIBS = -lsqlite3 -lewf -ltsk
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
-mac:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)_debug
+#mac:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)_debug
 win32:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)d
 }
 
