@@ -416,7 +416,7 @@ void WombatForensics::LoadComplete(bool isok)
         if(wombatvarptr->selectedobject.type == 1)
         {
             QWebElement tmpdoc = ui->webView->page()->currentFrame()->documentElement();
-            tmpdoc.appendInside("<div id='infotitle'>image information</div><br/>");
+            tmpdoc.prependInside("<div id='infotitle'>image information</div><br/>");
             tmpdoc.appendInside("<div class='content'><span class='property'>image type:</span><span class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</span></div>");
             /*
             QWebFrame* tmpframe = ui->webView->page()->currentFrame();
