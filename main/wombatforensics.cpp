@@ -280,6 +280,7 @@ void WombatForensics::InitializeEvidenceStructure()
         tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
         tmplist << tmpnode << new QStandardItem(wombatvarptr->volumeobject.name);
         wombatvarptr->dirmodel->findItems(QString::number(wombatvarptr->evidenceobject.id))[0]->appendRow(tmplist);
+        ResizeColumns();
         /*
         QStandardItem* volumenode = new QStandardItem(wombatvarptr->volumeobject.name);
         volumenode->setIcon(QIcon(":/basic/treefilemanager"));
