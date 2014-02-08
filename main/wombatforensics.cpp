@@ -415,18 +415,9 @@ void WombatForensics::LoadComplete(bool isok)
     {
         if(wombatvarptr->selectedobject.type == 1)
         {
-            QWebElement tmpdoc = ui->webView->page()->currentFrame()->documentElement();
-            tmpdoc.lastChild().appendInside("<div id='infotitle'>image information</div><br/>");
-            tmpdoc.lastChild().appendInside("<div class='content'><span class='property'>image type:</span><span class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</span></div>");
-            /*
-            QWebFrame* tmpframe = ui->webView->page()->currentFrame();
-            //QWebElement tmpdoc = tmpframe->documentElement();
-            fprintf(stderr, "FrameText: %s\n", ui->webView->page()->mainFrame()->toPlainText().toStdString().c_str());
-            QWebElement tmptitle = tmpframe->findFirstElement("#infotitle");
-            //QWebElement tmptitle = tmpdoc.findFirst("#infotitle");
-            fprintf(stderr, "Title Text: %s\n", tmptitle.toPlainText().toStdString().c_str());
-            tmptitle.setPlainText("Image Title");
-            */
+            QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
+            tmpelement.appendInside("<div id='infotitle'>image information</div><br/>");
+            tmpelement.appendInside("<table><tr><td class='property'>image type:</td><td class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr><tr><td class='property'>size:</td><td class='pvalue'>" + QLocale::system().toString(((int)wombatvarptr->evidenceobject.imageinfo->size)) + " bytes</td></tr><tr><td class='property'>sector size: </td><td class='pvalue'>" + QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr><tr><td class='property'>sector count:</td><td class='pvalue'>" + QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size)) + " sectors</td></tr></table>");
         }
     }
 }

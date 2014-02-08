@@ -29,6 +29,7 @@
 #include <QWebView>
 #include <QWebFrame>
 #include <QWebElement>
+#include <QLocale>
 
 #include "wombatvariable.h"
 #include "wombatdatabase.h"
