@@ -424,8 +424,9 @@ void WombatForensics::LoadComplete(bool isok)
             tmpelement.appendInside("<table><tr><td class='property'>image type:</td><td class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr><tr><td class='property'>size:</td><td class='pvalue'>" + QLocale::system().toString(((int)wombatvarptr->evidenceobject.imageinfo->size)) + " bytes</td></tr><tr><td class='property'>sector size: </td><td class='pvalue'>" + QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr><tr><td class='property'>sector count:</td><td class='pvalue'>" + QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size)) + " sectors</td></tr><tr><td class='property'>Volume Type</td><td class='pvalue'>" + wombatvarptr->volumeobject.name + "</td></tr></table>");
             // if DOS partition table...
             GetDosBootCode();
+            fprintf(stderr, "oem name: %s\n", wombatvarptr->bootsectorlist[0].toStdString().c_str());
             tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
-            tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
+            tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
         }
     }
 }
@@ -439,10 +440,14 @@ void WombatForensics::GetDosBootCode()
     retval = tsk_img_read(wombatvarptr->evidenceobject.imageinfo, 0, wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
     if(retval > 0)
     {
+        fprintf(stderr, "Boot Buffer OEM: %s\n", std::string(wombatvarptr->evidenceobject.imageinfo->sector_size, *(wombatvarptr->bootbuffer)).c_str());
+        wombatvarptr->bootbytearray = QByteArray::fromRawData(wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
+        fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8)).toStdString().c_str());
+        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8));
         //fprintf(stderr, "filling bootbuffer worked\n");
-        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(0,3);
-        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(3,8);
-        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(11,1);
+        //wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(0,3);
+        //wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(3,8);
+        //wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(11,1);
     }
     else
         fprintf(stderr, "filling bootbuffer failed\n");
@@ -473,6 +478,79 @@ void WombatForensics::GetDosBootCode()
     //delete volbuffer;
 
     return "/home/pasquale/WombatForensics/tmpfiles/volbyte.dat";
+
+ *
+ *
+ *    // set hex (which i'll probably remove anyway since it's highlighted in same window)
+    int sellength = txt.size()/2;
+    QString tmptext = "Length: " + QString::number(sellength);
+    selectedhex->setText(tmptext);
+    // get initial bytes value and then update ascii
+    std::vector<uchar> bytes;
+    Translate::HexToByte(bytes, txt);
+    QString ascii;
+    Translate::ByteToChar(ascii, bytes);
+    tmptext = "Ascii: " + ascii;
+    selectedascii->setText(tmptext);
+    QString strvalue;
+    uchar * ucharPtr;
+    // update the int entry:
+    // pad right with 0x00
+    int intvalue = 0;
+    ucharPtr = (uchar*) &intvalue;
+    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
+    strvalue.setNum(intvalue);
+    tmptext = "Int: " + strvalue;
+    selectedinteger->setText(tmptext);
+    // update float entry;
+    float fvalue;
+    ucharPtr = (uchar*)(&fvalue);
+    if(bytes.size() < sizeof(float) )
+    {
+        for(unsigned int i= 0; i < sizeof(float); ++i)
+        {
+            if( i < bytes.size() )
+            {
+                *ucharPtr++ = bytes[i];
+            }
+            else
+            {
+                *ucharPtr++ = 0x00;
+            }
+        }
+    }
+    else
+    {
+        memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
+    }
+    strvalue.setNum( fvalue );
+    tmptext = "Float: " + strvalue;
+    selectedfloat->setText(tmptext);
+    // update double
+    double dvalue;
+    ucharPtr = (uchar*)&dvalue;
+    if(bytes.size() < sizeof(double) )
+    {
+        for(unsigned int i= 0; i < sizeof(double); ++i)
+        {
+            if( i < bytes.size() )
+            {
+                *ucharPtr++ = bytes[i];
+            }
+            else
+            {
+                *ucharPtr++ = 0x00;
+            }
+        }
+    }
+    else
+    {
+        memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
+    }
+    strvalue.setNum( dvalue );
+    tmptext = "Double: " + strvalue;
+    selecteddouble->setText(tmptext);
+
  */ 
 }
 

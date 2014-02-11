@@ -10,6 +10,7 @@
 #include <string>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QByteArray>
 #include "tsk/libtsk.h"
 
 struct CaseObject
@@ -170,6 +171,7 @@ struct WombatVariable
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
     QStringList bootsectorlist;
+    QByteArray bootbytearray;
     char* bootbuffer;
 };
 
