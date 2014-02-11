@@ -300,6 +300,7 @@ void WombatForensics::InitializeEvidenceStructure()
         {
             fprintf(stderr, "Part Name: %s\n", wombatvarptr->partitionobjectvector[i].name.toStdString().c_str());
         }
+        ResizeColumns();
         //wombatdatabase->InitializeEvidenceDatabase();
         //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);
     }
@@ -412,15 +413,67 @@ void WombatForensics::LoadVidContents()
 void WombatForensics::LoadComplete(bool isok)
 {
     // IT WORKS NOW. SO I HAVE TO WAIT TILL IT LOADS. WILL NEED TO WORK ON THREADING WHEN I OPEN A LARGER FILE
+    // NEED TO GET THIS INFORMATION FROM THE DB AND NOT THE IMAGEINFO VARIABLE WHICH MIGHT NOT EXIST AT THE MOMENT. OR I NEED TO POPULATE THE VARIABLE
+    // ON OPEN SO I CAN USE THE VARIABLES.
     if(isok)
     {
         if(wombatvarptr->selectedobject.type == 1)
         {
             QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             tmpelement.appendInside("<div id='infotitle'>image information</div><br/>");
-            tmpelement.appendInside("<table><tr><td class='property'>image type:</td><td class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr><tr><td class='property'>size:</td><td class='pvalue'>" + QLocale::system().toString(((int)wombatvarptr->evidenceobject.imageinfo->size)) + " bytes</td></tr><tr><td class='property'>sector size: </td><td class='pvalue'>" + QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr><tr><td class='property'>sector count:</td><td class='pvalue'>" + QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size)) + " sectors</td></tr></table>");
+            tmpelement.appendInside("<table><tr><td class='property'>image type:</td><td class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr><tr><td class='property'>size:</td><td class='pvalue'>" + QLocale::system().toString(((int)wombatvarptr->evidenceobject.imageinfo->size)) + " bytes</td></tr><tr><td class='property'>sector size: </td><td class='pvalue'>" + QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr><tr><td class='property'>sector count:</td><td class='pvalue'>" + QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size)) + " sectors</td></tr><tr><td class='property'>Volume Type</td><td class='pvalue'>" + wombatvarptr->volumeobject.name + "</td></tr></table>");
+            // if DOS partition table...
+            GetDosBootCode();
+            tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
+            tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
         }
     }
+}
+
+void WombatForensics::GetDosBootCode()
+{
+    int retval;
+    wombatvarptr->bootbuffer = NULL;
+    //char* bootbuffer = NULL;
+    wombatvarptr->bootbuffer = new char[wombatvarptr->evidenceobject.imageinfo->sector_size];
+    retval = tsk_img_read(wombatvarptr->evidenceobject.imageinfo, 0, wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
+    if(retval > 0)
+    {
+        //fprintf(stderr, "filling bootbuffer worked\n");
+        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(0,3);
+        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(3,8);
+        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(11,1);
+    }
+    else
+        fprintf(stderr, "filling bootbuffer failed\n");
+
+/*
+ *
+    uint64_t bytelen = 512*(seclength - 1);
+    uint64_t bytestart = 512*secstart;
+    char* volbuffer = NULL;
+    volbuffer = new char[bytelen+512];
+
+    {
+        // need to figure out why this fails... and returns -1
+        retval = TskServices::Instance().getImageFile().getSectorData(secstart, seclength-1, volbuffer);
+        fprintf(stderr, "sector data return value: %i\n", retval);
+        if (retval == -1)
+        {
+        }
+    }
+    if(retval > 0)
+    {
+        QFile tmpfile("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat");
+        tmpfile.open(QIODevice::WriteOnly);
+        tmpfile.write(volbuffer, bytelen);
+        tmpfile.close();
+    }
+    delete[] volbuffer;
+    //delete volbuffer;
+
+    return "/home/pasquale/WombatForensics/tmpfiles/volbyte.dat";
+ */ 
 }
 
 void WombatForensics::RemEvidence()

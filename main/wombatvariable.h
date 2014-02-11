@@ -169,6 +169,8 @@ struct WombatVariable
     SelectedObject selectedobject;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
+    QStringList bootsectorlist;
+    char* bootbuffer;
 };
 
 Q_DECLARE_METATYPE(WombatVariable)
