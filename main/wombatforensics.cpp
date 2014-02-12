@@ -426,9 +426,29 @@ void WombatForensics::LoadComplete(bool isok)
             // if boot code exists...
             GetDosBootCode();
             tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
-            tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
+            tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
         }
     }
+}
+
+QString WombatForensics::ByteArrayToInt(QByteArray ba)
+{
+    bool ok;
+    return QLocale::system().toString(ba.toInt(&ok));
+}
+
+QString WombatForensics::ByteArrayToHex(QByteArray ba)
+{
+    QString tmpstring = QString::fromUtf8(ba.toHex());
+    QString outstring = "";
+    for(int i=0; i < tmpstring.size() / 2; ++i)
+    {
+        outstring += tmpstring.at(2*i);
+        outstring += tmpstring.at(2*i+1);
+        outstring += " ";
+    }
+
+    return outstring;
 }
 
 void WombatForensics::GetDosBootCode()
@@ -441,10 +461,11 @@ void WombatForensics::GetDosBootCode()
     {
         wombatvarptr->bootbytearray = QByteArray::fromRawData(wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
         fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8)).toStdString().c_str());
-        qDebug() << "oem from byte array qdebug: " << wombatvarptr->bootbytearray.mid(3,8);
-        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(0,3).toHex());
+        //wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(0,3).toHex());
+        wombatvarptr->bootsectorlist << ByteArrayToHex(wombatvarptr->bootbytearray.mid(0,3));
         wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8));
-        qDebug() << "full byte array: " << QString::fromUtf8(wombatvarptr->bootbytearray);
+        wombatvarptr->bootsectorlist << ByteArrayToInt(wombatvarptr->bootbytearray.mid(11,2));
+        wombatvarptr->bootsectorlist << ByteArrayToInt(wombatvarptr->bootbytearray.mid(13,1));
     }
     else
         fprintf(stderr, "filling bootbuffer failed\n");
