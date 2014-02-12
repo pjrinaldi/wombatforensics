@@ -423,10 +423,10 @@ void WombatForensics::LoadComplete(bool isok)
             tmpelement.appendInside("<div id='infotitle'>image information</div><br/>");
             tmpelement.appendInside("<table><tr><td class='property'>image type:</td><td class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr><tr><td class='property'>size:</td><td class='pvalue'>" + QLocale::system().toString(((int)wombatvarptr->evidenceobject.imageinfo->size)) + " bytes</td></tr><tr><td class='property'>sector size: </td><td class='pvalue'>" + QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr><tr><td class='property'>sector count:</td><td class='pvalue'>" + QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size)) + " sectors</td></tr><tr><td class='property'>Volume Type</td><td class='pvalue'>" + wombatvarptr->volumeobject.name + "</td></tr></table>");
             // if DOS partition table...
+            // if boot code exists...
             GetDosBootCode();
-            fprintf(stderr, "oem name: %s\n", wombatvarptr->bootsectorlist[0].toStdString().c_str());
             tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
-            tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
+            tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
         }
     }
 }
@@ -435,19 +435,16 @@ void WombatForensics::GetDosBootCode()
 {
     int retval;
     wombatvarptr->bootbuffer = NULL;
-    //char* bootbuffer = NULL;
     wombatvarptr->bootbuffer = new char[wombatvarptr->evidenceobject.imageinfo->sector_size];
     retval = tsk_img_read(wombatvarptr->evidenceobject.imageinfo, 0, wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
     if(retval > 0)
     {
-        fprintf(stderr, "Boot Buffer OEM: %s\n", std::string(wombatvarptr->evidenceobject.imageinfo->sector_size, *(wombatvarptr->bootbuffer)).c_str());
         wombatvarptr->bootbytearray = QByteArray::fromRawData(wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
         fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8)).toStdString().c_str());
+        qDebug() << "oem from byte array qdebug: " << wombatvarptr->bootbytearray.mid(3,8);
+        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(0,3).toHex());
         wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8));
-        //fprintf(stderr, "filling bootbuffer worked\n");
-        //wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(0,3);
-        //wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(3,8);
-        //wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbuffer).mid(11,1);
+        qDebug() << "full byte array: " << QString::fromUtf8(wombatvarptr->bootbytearray);
     }
     else
         fprintf(stderr, "filling bootbuffer failed\n");

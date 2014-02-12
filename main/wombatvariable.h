@@ -11,6 +11,8 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QByteArray>
+#include <QDebug>
+
 #include "tsk/libtsk.h"
 
 struct CaseObject
