@@ -433,8 +433,19 @@ void WombatForensics::LoadComplete(bool isok)
 
 QString WombatForensics::ByteArrayToIntDisplay(QByteArray ba)
 {
+    //QString tmpstring = QString::fromUtf8(ba.toHex()
     bool ok;
-    return QLocale::system().toString(ba.toInt(&ok));
+    QDataStream ds(ba.toHex());
+    ds.setByteOrder(QDataStream::LittleEndian);
+    short tmp;
+    while(!ds.atEnd())
+    {
+    	ds >> tmp;
+    }
+    fprintf(stderr, "ba to int: %d\n", tmp);
+    //fprintf(stderr, "ba to int: %d\n", ba.toHex().toShort(&ok));
+    return QLocale::system().toString(ba.toHex().toShort(&ok));
+    //return QLocale::system().toString(ba.toInt(&ok));
 }
 
 QString WombatForensics::ByteArrayToHexDisplay(QByteArray ba)
