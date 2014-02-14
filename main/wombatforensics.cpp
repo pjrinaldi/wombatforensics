@@ -431,13 +431,13 @@ void WombatForensics::LoadComplete(bool isok)
     }
 }
 
-QString WombatForensics::ByteArrayToInt(QByteArray ba)
+QString WombatForensics::ByteArrayToIntDisplay(QByteArray ba)
 {
     bool ok;
     return QLocale::system().toString(ba.toInt(&ok));
 }
 
-QString WombatForensics::ByteArrayToHex(QByteArray ba)
+QString WombatForensics::ByteArrayToHexDisplay(QByteArray ba)
 {
     QString tmpstring = QString::fromUtf8(ba.toHex());
     QString outstring = "";
@@ -461,11 +461,10 @@ void WombatForensics::GetDosBootCode()
     {
         wombatvarptr->bootbytearray = QByteArray::fromRawData(wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
         fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8)).toStdString().c_str());
-        //wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(0,3).toHex());
-        wombatvarptr->bootsectorlist << ByteArrayToHex(wombatvarptr->bootbytearray.mid(0,3));
+        wombatvarptr->bootsectorlist << ByteArrayToHexDisplay(wombatvarptr->bootbytearray.mid(0,3));
         wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8));
-        wombatvarptr->bootsectorlist << ByteArrayToInt(wombatvarptr->bootbytearray.mid(11,2));
-        wombatvarptr->bootsectorlist << ByteArrayToInt(wombatvarptr->bootbytearray.mid(13,1));
+        wombatvarptr->bootsectorlist << ByteArrayToIntDisplay(wombatvarptr->bootbytearray.mid(11,2));
+        wombatvarptr->bootsectorlist << ByteArrayToIntDisplay(wombatvarptr->bootbytearray.mid(13,1));
     }
     else
         fprintf(stderr, "filling bootbuffer failed\n");

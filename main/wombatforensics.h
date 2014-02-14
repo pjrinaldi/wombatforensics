@@ -117,8 +117,8 @@ private:
     void LoadVidContents(void);
     void GetDosBootCode(void);
 
-    QString ByteArrayToHex(QByteArray ba);
-    QString ByteArrayToInt(QByteArray ba);
+    QString ByteArrayToHexDisplay(QByteArray ba);
+    QString ByteArrayToIntDisplay(QByteArray ba);
 
 
     void RemoveTmpFiles(void);
