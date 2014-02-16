@@ -422,6 +422,9 @@ void WombatForensics::LoadComplete(bool isok)
             QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             tmpelement.appendInside("<div id='infotitle'>image information</div><br/>");
             tmpelement.appendInside("<table><tr><td class='property'>image type:</td><td class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr><tr><td class='property'>size:</td><td class='pvalue'>" + QLocale::system().toString(((int)wombatvarptr->evidenceobject.imageinfo->size)) + " bytes</td></tr><tr><td class='property'>sector size: </td><td class='pvalue'>" + QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr><tr><td class='property'>sector count:</td><td class='pvalue'>" + QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size)) + " sectors</td></tr><tr><td class='property'>Volume Type</td><td class='pvalue'>" + wombatvarptr->volumeobject.name + "</td></tr></table>");
+            wombatframework->GetBootCode(); // determine boot type in this function and populate html string information into wombatvarptr value
+            // if no boot code/partition table, then simply return info to say no boot code present.
+            // OR POSSIBLY STATE WHAT THE IMAGE CONTAINS (PARTITION TABLE/SINGLE PARTITION ONLY)
             // if DOS partition table...
             // if boot code exists...
             // check for signature value at offset 510-511 to determine if its a dosmbr or something else. if its 0x55AA then its dos mbr
@@ -431,7 +434,7 @@ void WombatForensics::LoadComplete(bool isok)
             // and have no mbr present in first sector.
             // when you click on the partition, this is where the partition boot sector information will go.
             // MOVE ALL OF THIS CODE INTO WOMBATFRAMEWORK...
-            GetDosBootCode();
+            GetDosBootCode(); // move into getbootcode above
             tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
             tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
         }

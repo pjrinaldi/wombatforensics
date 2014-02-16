@@ -24,6 +24,8 @@ public:
     void OpenPartitions(void);
     void OpenFileSystems(void);
 
+    void GetBootCode(void);
+
 private:
     WombatVariable* wombatptr;
 };

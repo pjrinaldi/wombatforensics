@@ -88,6 +88,10 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
     }
 }
 
+void WombatFramework::GetBootCode() // deermine boot type and populate variable if exists otherwise populate wiht negative
+
+
+// BELOW FUNCTION CURRENTLY NOT USED
 void WombatFramework::BuildEvidenceModel()
 {
     // COME BACK TO QTCONCURRENT AS I GET FARTHER ALONG AND RESEARCH MORE
