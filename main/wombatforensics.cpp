@@ -431,40 +431,16 @@ void WombatForensics::LoadComplete(bool isok)
     }
 }
 
-QString WombatForensics::ByteArrayToIntDisplay(QByteArray ba)
+QString WombatForensics::ByteArrayToShortDisplay(QByteArray ba)
 {
-    /*
-     *
-    std::vector<uchar> bytes;
-    Translate::HexToByte(bytes, txt);
-    QString ascii;
-    Translate::ByteToChar(ascii, bytes);
-    tmptext = "Ascii: " + ascii;
-    selectedascii->setText(tmptext);
-    QString strvalue;
-    uchar * ucharPtr;
-    // update the int entry:
-    // pad right with 0x00
-    int intvalue = 0;
-    ucharPtr = (uchar*) &intvalue;
-    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
-    strvalue.setNum(intvalue);
-    tmptext = "Int: " + strvalue;
-    selectedinteger->setText(tmptext);
-     */
-    int intvalue = 0;
-    uchar* ucharPtr;
-    ucharPtr = (uchar*) &intvalue;
+    //memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
+    short intvalue = 0;
+    //uchar* ucharPtr;
+    //ucharPtr = (uchar*) &intvalue;
     memcpy(&intvalue, &ba.begin()[0], sizeof(short));
+    //memcpy(&intvalue, &ba.begin()[0], min((uint)sizeof(short), qstrlen(ba)));
     QString tmpstring = "";
     return tmpstring.setNum(intvalue);
-    qDebug() << tmpstring;
-    //QString tmpstring = QString::fromUtf8(ba.toHex()
-    //bool ok;
-    //short tmp;
-    //fprintf(stderr, "ba to int: %d\n", ba.toHex().toShort(&ok));
-    //return QLocale::system().toString(ba.toHex().toShort(&ok));
-    //return QLocale::system().toString(ba.toInt(&ok));
 }
 
 QString WombatForensics::ByteArrayToHexDisplay(QByteArray ba)
@@ -493,8 +469,8 @@ void WombatForensics::GetDosBootCode()
         fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8)).toStdString().c_str());
         wombatvarptr->bootsectorlist << ByteArrayToHexDisplay(wombatvarptr->bootbytearray.mid(0,3));
         wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8));
-        wombatvarptr->bootsectorlist << ByteArrayToIntDisplay(wombatvarptr->bootbytearray.mid(11,2));
-        wombatvarptr->bootsectorlist << ByteArrayToIntDisplay(wombatvarptr->bootbytearray.mid(13,1));
+        wombatvarptr->bootsectorlist << ByteArrayToShortDisplay(wombatvarptr->bootbytearray.mid(11,2));
+        wombatvarptr->bootsectorlist << ByteArrayToShortDisplay(wombatvarptr->bootbytearray.mid(13,1));
     }
     else
         fprintf(stderr, "filling bootbuffer failed\n");
