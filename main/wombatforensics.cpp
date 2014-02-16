@@ -425,6 +425,12 @@ void WombatForensics::LoadComplete(bool isok)
             // if DOS partition table...
             // if boot code exists...
             // check for signature value at offset 510-511 to determine if its a dosmbr or something else. if its 0x55AA then its dos mbr
+            // check for partition table and populate the values accordingly.
+            // the fs stuff i find at jump and oem and the others are for the filesystem/partition boot sector. this isn't valid when there is an mbr.
+            // need to determine if there is an mbr and then pull the partition table information from it. otherwise simply display the image info
+            // and have no mbr present in first sector.
+            // when you click on the partition, this is where the partition boot sector information will go.
+            // MOVE ALL OF THIS CODE INTO WOMBATFRAMEWORK...
             GetDosBootCode();
             tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
             tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
