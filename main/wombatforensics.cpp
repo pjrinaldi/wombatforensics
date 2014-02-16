@@ -74,7 +74,8 @@ void WombatForensics::InitializeAppStructure()
     if(mkPath == false)
         DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     wombatvarptr->wombatdbname = wombatvarptr->datapath + "WombatApp.db";
-    bool appFileExist = wombatdatabase->FileExists(wombatvarptr->wombatdbname.toStdString());
+    bool appFileExist = FileExists(wombatvarptr->wombatdbname.toStdString());
+    //bool appFileExist = wombatdatabase->FileExists(wombatvarptr->wombatdbname.toStdString());
     if(!appFileExist)
     {
         wombatdatabase->CreateAppDB();
@@ -132,7 +133,8 @@ void WombatForensics::InitializeCaseStructure()
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-        if(!wombatdatabase->FileExists(wombatvarptr->caseobject.dbname.toStdString()))
+        if(!FileExists(wombatvarptr->caseobject.dbname.toStdString()))
+        //if(!wombatdatabase->FileExists(wombatvarptr->caseobject.dbname.toStdString()))
         {
             wombatdatabase->CreateCaseDB();
             if(wombatvarptr->curerrmsg.compare("") != 0)
@@ -181,7 +183,8 @@ void WombatForensics::InitializeOpenCase()
             }
             // CREATE CASEID-CASENAME.DB RIGHT HERE.
             wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-            bool caseFileExist = wombatdatabase->FileExists(wombatvarptr->caseobject.dbname.toStdString());
+            bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
+            //bool caseFileExist = wombatdatabase->FileExists(wombatvarptr->caseobject.dbname.toStdString());
             if(!caseFileExist)
             {
                 wombatdatabase->CreateCaseDB();

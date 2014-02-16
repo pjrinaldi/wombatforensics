@@ -14,6 +14,7 @@
 #include <QDebug>
 
 #include "tsk/libtsk.h"
+#include "wombatfunctions.h"
 
 struct CaseObject
 {

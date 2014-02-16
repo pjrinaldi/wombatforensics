@@ -1,3 +1,5 @@
+#include "wombatfunctions.h"
+
 std::string GetTime()
 {
     struct tm *newtime;
