@@ -433,18 +433,37 @@ void WombatForensics::LoadComplete(bool isok)
 
 QString WombatForensics::ByteArrayToIntDisplay(QByteArray ba)
 {
+    /*
+     *
+    std::vector<uchar> bytes;
+    Translate::HexToByte(bytes, txt);
+    QString ascii;
+    Translate::ByteToChar(ascii, bytes);
+    tmptext = "Ascii: " + ascii;
+    selectedascii->setText(tmptext);
+    QString strvalue;
+    uchar * ucharPtr;
+    // update the int entry:
+    // pad right with 0x00
+    int intvalue = 0;
+    ucharPtr = (uchar*) &intvalue;
+    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
+    strvalue.setNum(intvalue);
+    tmptext = "Int: " + strvalue;
+    selectedinteger->setText(tmptext);
+     */
+    int intvalue = 0;
+    uchar* ucharPtr;
+    ucharPtr = (uchar*) &intvalue;
+    memcpy(&intvalue, &ba.begin()[0], sizeof(short));
+    QString tmpstring = "";
+    return tmpstring.setNum(intvalue);
+    qDebug() << tmpstring;
     //QString tmpstring = QString::fromUtf8(ba.toHex()
-    bool ok;
-    QDataStream ds(ba.toHex());
-    ds.setByteOrder(QDataStream::LittleEndian);
-    short tmp;
-    while(!ds.atEnd())
-    {
-    	ds >> tmp;
-    }
-    fprintf(stderr, "ba to int: %d\n", tmp);
+    //bool ok;
+    //short tmp;
     //fprintf(stderr, "ba to int: %d\n", ba.toHex().toShort(&ok));
-    return QLocale::system().toString(ba.toHex().toShort(&ok));
+    //return QLocale::system().toString(ba.toHex().toShort(&ok));
     //return QLocale::system().toString(ba.toInt(&ok));
 }
 
