@@ -1,7 +1,5 @@
-//#include "wombatforensics.h"
-//#include <QtPlugin>
-//#include <QApplication>
 #include "wombatinclude.h"
+#include "wombatforensics.h"
 
 int main(int argc, char *argv[])
 {

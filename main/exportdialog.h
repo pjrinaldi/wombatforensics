@@ -1,11 +1,7 @@
 #ifndef EXPORTDIALOG_H
 #define EXPORTDIALOG_H
 
-#include <QDialog>
-#include <QFileDialog>
-#include <QDir>
-#include <QString>
-
+#include "wombatinclude.h"
 #include "wombatvariable.h"
 
 namespace Ui {

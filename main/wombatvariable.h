@@ -1,6 +1,8 @@
 #ifndef WOMBATVARIABLE_H
 #define WOMBATVARIABLE_H
 
+#include "wombatinclude.h"
+
 struct CaseObject
 {
     int id;

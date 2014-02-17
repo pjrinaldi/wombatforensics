@@ -1,38 +1,7 @@
 #ifndef WOMBATFORENSICS_H
 #define WOMBATFORENSICS_H
 
-/*
-#include <QMainWindow>
-#include <fstream>
-#include <iostream>
-#include <stdio.h>
-#include <QDir>
-#include <QStringList>
-#include <QActionGroup>
-#include <QFileDialog>
-#include <QObject>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QTreeWidgetItem>
-#include <string>
-#include <QString>
-#include <QThreadPool>
-#include <QFuture>
-#include <QBoxLayout>
-#include <QtWidgets>
-#include <QStringList>
-#include <QSizePolicy>
-#include <QFrame>
-#include <QStatusBar>
-#include <QtWebKitWidgets>
-#include <QWebView>
-#include <QWebFrame>
-#include <QWebElement>
-#include <QDataStream>
-*/
-/*
+#include "wombatinclude.h"
 #include "wombatvariable.h"
 #include "wombatdatabase.h"
 #include "wombatframework.h"
@@ -41,10 +10,6 @@
 #include "progresswindow.h"
 #include "exportdialog.h"
 //#include "sleuthkit.h"
-#include "hexEditor.hpp"
-#include "translate.hpp"
-*/
-#include "wombatinclude.h"
 
 namespace Ui {
 class WombatForensics;
@@ -128,7 +93,6 @@ private:
     void LoadOmniContent(QString filePath);
 
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
-    //std::string GetTime(void);
     QThreadPool *threadpool;
     int ReturnVisibleViewerID();
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);

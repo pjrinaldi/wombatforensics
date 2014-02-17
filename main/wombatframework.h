@@ -1,16 +1,8 @@
 #ifndef WOMBATFRAMEWORK_H
 #define WOMBATFRAMEWORK_H
-/*
-#include <stdlib.h>
-#include <stdio.h>
-#include "tsk/libtsk.h"
-#include <QObject>
-#include <QtConcurrent>
-
-#include "wombatvariable.h"
-*/
 
 #include "wombatinclude.h"
+#include "wombatvariable.h"
 
 class WombatFramework : public QObject
 {

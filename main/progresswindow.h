@@ -1,10 +1,9 @@
 #ifndef PROGRESSWINDOW_H
 #define PROGRESSWINDOW_H
 
+#include "wombatinclude.h"
 #include "ui_progresswindow.h"
 #include "wombatdatabase.h"
-#include <QDialog>
-#include <cstdio>
 
 namespace Ui {
 class ProgressWindow;

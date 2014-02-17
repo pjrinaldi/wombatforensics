@@ -2,6 +2,8 @@
 #define WOMBATDATABASE_H
 
 #include "wombatinclude.h"
+#include "wombatvariable.h"
+#include "wombatfunctions.h"
 
 class WombatDatabase : public QObject
 {
