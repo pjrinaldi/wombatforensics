@@ -38,21 +38,6 @@ void WombatForensics::HideProgressWindow(bool checkedstate)
     ui->actionView_Progress->setChecked(checkedstate);
 }
 
-std::string WombatForensics::GetTime()
-{
-    struct tm *newtime;
-    time_t aclock;
-
-    time(&aclock);   // Get time in seconds
-    newtime = localtime(&aclock);   // Convert time to struct tm form 
-    char timeStr[64];
-    snprintf(timeStr, 64, "%.2d/%.2d/%.2d %.2d:%.2d:%.2d",
-        newtime->tm_mon+1,newtime->tm_mday,newtime->tm_year % 100, 
-        newtime->tm_hour, newtime->tm_min, newtime->tm_sec);
-
-    return timeStr;
-}
-
 void WombatForensics::InitializeAppStructure()
 {
     QString homePath = QDir::homePath();
@@ -75,7 +60,6 @@ void WombatForensics::InitializeAppStructure()
         DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     wombatvarptr->wombatdbname = wombatvarptr->datapath + "WombatApp.db";
     bool appFileExist = FileExists(wombatvarptr->wombatdbname.toStdString());
-    //bool appFileExist = wombatdatabase->FileExists(wombatvarptr->wombatdbname.toStdString());
     if(!appFileExist)
     {
         wombatdatabase->CreateAppDB();
@@ -134,7 +118,6 @@ void WombatForensics::InitializeCaseStructure()
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
         if(!FileExists(wombatvarptr->caseobject.dbname.toStdString()))
-        //if(!wombatdatabase->FileExists(wombatvarptr->caseobject.dbname.toStdString()))
         {
             wombatdatabase->CreateCaseDB();
             if(wombatvarptr->curerrmsg.compare("") != 0)
@@ -184,7 +167,6 @@ void WombatForensics::InitializeOpenCase()
             // CREATE CASEID-CASENAME.DB RIGHT HERE.
             wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
             bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
-            //bool caseFileExist = wombatdatabase->FileExists(wombatvarptr->caseobject.dbname.toStdString());
             if(!caseFileExist)
             {
                 wombatdatabase->CreateCaseDB();

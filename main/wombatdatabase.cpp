@@ -1,36 +1,10 @@
 #include "wombatdatabase.h"
-#include "wombatfunctions.h"
-/*
-std::string WombatDatabase::GetTime()
-{
-    struct tm *newtime;
-    time_t aclock;
 
-    time(&aclock);   // Get time in seconds
-    newtime = localtime(&aclock);   // Convert time to struct tm form 
-    char timeStr[64];
-    snprintf(timeStr, 64, "%.2d/%.2d/%.2d %.2d:%.2d:%.2d",
-        newtime->tm_mon+1,newtime->tm_mday,newtime->tm_year % 100, 
-        newtime->tm_hour, newtime->tm_min, newtime->tm_sec);
-
-    return timeStr;
-}
-*/
 WombatDatabase::WombatDatabase(WombatVariable* wombatvarptr)
 {
     wombatptr = wombatvarptr;
 }
-/*
-bool WombatDatabase::FileExists(const std::string& filename)
-{
-    struct stat buf;
-    if (stat(filename.c_str(), &buf) != -1)
-    {
-        return true;
-    }
-    return false;
-}
-*/
+
 void WombatDatabase::CreateCaseDB(void)
 {
     #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking

@@ -3,18 +3,10 @@
 
 #include <sqlite3.h>
 #include <QMessageBox>
-#include <QStringList>
-#include <QString>
-//#include <string.h>
-//#include <cstring>
 #include <sstream>
 #include <iostream>
-//#include <stdio.h>
-//#include <sys/stat.h>
-//#include <vector>
 #include <QtWidgets>
 #include <QDir>
-#include <QObject>
 
 #include "wombatvariable.h"
 
@@ -23,7 +15,6 @@ class WombatDatabase : public QObject
     Q_OBJECT
 public:
     WombatDatabase(WombatVariable* wombatvarptr);
-    bool FileExists(const std::string& fileName);
     void CreateAppDB(void);
     void CreateCaseDB(void);
     void OpenCaseDB(void);
@@ -63,7 +54,6 @@ public:
     QStringList ReturnCaseEvidenceIdJobIdType(int caseid);
     QStringList ReturnMessageTableEntries(int jobid);
     QStringList ReturnEvidenceData(int evidenceid);
-    std::string GetTime(void);
 signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:

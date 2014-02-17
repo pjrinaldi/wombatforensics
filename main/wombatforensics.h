@@ -34,6 +34,7 @@
 #include "wombatvariable.h"
 #include "wombatdatabase.h"
 #include "wombatframework.h"
+#include "wombatfunctions.h"
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
 #include "exportdialog.h"
@@ -127,7 +128,7 @@ private:
     void LoadOmniContent(QString filePath);
 
     QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
-    std::string GetTime(void);
+    //std::string GetTime(void);
     QThreadPool *threadpool;
     int ReturnVisibleViewerID();
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);

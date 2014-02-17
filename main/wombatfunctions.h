@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <sys/stat.h>
 
-std::string GetTime(void);
-bool FileExists(const std::string& filename);
+extern std::string GetTime(void);
+extern bool FileExists(const std::string& filename);
 
 #endif // wombatfunctions.h
