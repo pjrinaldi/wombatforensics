@@ -1,0 +1,50 @@
+#ifndef WOMBATINCLUDE_H
+#define WOMBATINCLUDE_H
+
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <QApplication>
+#include <QActionGroup>
+#include <QBoxLayout>
+#include <QByteArray>
+#include <QDebug>
+#include <QDialog>
+#include <QDir>
+#include <QFileDialog>
+#include <QFrame>
+#include <QFuture>
+#include <QInputDialog>
+#include <QList>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QObject>
+#include <QSizePolicy>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QStatusBar>
+#include <QString>
+#include <QStringList>
+#include <QThreadPool>
+#include <QTreeWidgetItem>
+#include <QVector>
+#include <QWebElement>
+#include <QWebFrame>
+#include <QWebView>
+#include <QtConcurrent>
+#include <QtPlugin>
+#include <QtWebKitWidgets>
+#include <QtWidgets>
+#include <sqlite3.h>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <sys/stat.h>
+#include <vector>
+
+#include "tsk/libtsk.h"
+#include "translate.hpp"
+#include "hexEditor.hpp"
+
+#endif // WOMBATINCLUDE_H
