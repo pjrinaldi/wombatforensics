@@ -3,11 +3,12 @@
 
 #include "wombatinclude.h"
 
-extern std::string GetTime(void);
-extern bool FileExists(const std::string& filename);
+std::string GetTime(void);
+bool FileExists(const std::string& filename);
 
 QString ByteArrayToHex(QByteArray ba);
 QString ByteArrayToHexDisplay(QByteArray ba);
 QString ByteArrayToShortDisplay(QByteArray ba);
+int CheckBitSet(unsigned char c, int n);
 
 #endif // wombatfunctions.h

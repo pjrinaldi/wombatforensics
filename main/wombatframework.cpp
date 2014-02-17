@@ -98,8 +98,14 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
     if(retval > 0)
     {
         wombatptr->bootbytearray = QByteArray::fromRawData(wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
-        qDebug() << ByteArrayToHexDisplay(wombatptr->bootbytearray.mid(510,2));
-        qDebug() << ByteArrayToHex(wombatptr->bootbytearray.mid(510,2));
+        qDebug() << ByteArrayToHex(wombatptr->bootbytearray.mid(510,2)); // nets my signature value to compare
+        if(QString::compare("55aa", ByteArrayToHex(wombatptr->bootbytearray.mid(510,2))) == 0) // its a boot sector
+        {
+            // determine if its got a partition table
+            // NEED TO CHECK THE 64 BYTE PARTITION TABLE FOR THE 1ST BYTE OF EACH 16 BYTE PARTITION ENTRY. IF ITS 80 THEN ITS BOOTABLE AND OLD, IF THE
+            // SEVENTH BIT IS ACTIVE (CHECK BYTE FUNCTION) THEN ITS A BOOT PARAMETER... SO NEED TO CHECK EACH AND ALSO CHECK THE PARTITION TYPE AGAINST
+            // A VALID ENTRY IN MY PARTITION TABLE MASK.
+        }
         //fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatptr->bootbytearray.mid(3,8)).toStdString().c_str());
         //wombatptr->bootsectorlist << ByteArrayToHexDisplay(wombatptr->bootbytearray.mid(0,3));
     }
