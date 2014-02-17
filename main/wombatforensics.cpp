@@ -426,32 +426,6 @@ void WombatForensics::LoadComplete(bool isok)
     }
 }
 
-QString WombatForensics::ByteArrayToShortDisplay(QByteArray ba)
-{
-    //memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
-    short intvalue = 0;
-    //uchar* ucharPtr;
-    //ucharPtr = (uchar*) &intvalue;
-    memcpy(&intvalue, &ba.begin()[0], sizeof(short));
-    //memcpy(&intvalue, &ba.begin()[0], min((uint)sizeof(short), qstrlen(ba)));
-    QString tmpstring = "";
-    return tmpstring.setNum(intvalue);
-}
-
-QString WombatForensics::ByteArrayToHexDisplay(QByteArray ba)
-{
-    QString tmpstring = QString::fromUtf8(ba.toHex());
-    QString outstring = "";
-    for(int i=0; i < tmpstring.size() / 2; ++i)
-    {
-        outstring += tmpstring.at(2*i);
-        outstring += tmpstring.at(2*i+1);
-        outstring += " ";
-    }
-
-    return outstring;
-}
-
 void WombatForensics::GetDosBootCode()
 {
     int retval;

@@ -1,14 +1,7 @@
 #ifndef WOMBATDATABASE_H
 #define WOMBATDATABASE_H
 
-#include <sqlite3.h>
-#include <QMessageBox>
-#include <sstream>
-#include <iostream>
-#include <QtWidgets>
-#include <QDir>
-
-#include "wombatvariable.h"
+#include "wombatinclude.h"
 
 class WombatDatabase : public QObject
 {

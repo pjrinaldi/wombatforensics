@@ -24,3 +24,25 @@ bool FileExists(const std::string& filename)
     }
     return false;
 }
+
+QString ByteArrayToShortDisplay(QByteArray ba)
+{
+    short intvalue = 0;
+    memcpy(&intvalue, &ba.begin()[0], sizeof(short));
+    QString tmpstring = "";
+    return tmpstring.setNum(intvalue);
+}
+
+QString ByteArrayToHexDisplay(QByteArray ba)
+{
+    QString tmpstring = QString::fromUtf8(ba.toHex());
+    QString outstring = "";
+    for(int i=0; i < tmpstring.size() / 2; ++i)
+    {
+        outstring += tmpstring.at(2*i);
+        outstring += tmpstring.at(2*i+1);
+        outstring += " ";
+    }
+
+    return outstring;
+}

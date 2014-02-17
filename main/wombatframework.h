@@ -1,6 +1,6 @@
 #ifndef WOMBATFRAMEWORK_H
 #define WOMBATFRAMEWORK_H
-
+/*
 #include <stdlib.h>
 #include <stdio.h>
 #include "tsk/libtsk.h"
@@ -8,6 +8,9 @@
 #include <QtConcurrent>
 
 #include "wombatvariable.h"
+*/
+
+#include "wombatinclude.h"
 
 class WombatFramework : public QObject
 {

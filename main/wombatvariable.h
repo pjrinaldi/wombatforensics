@@ -1,21 +1,6 @@
 #ifndef WOMBATVARIABLE_H
 #define WOMBATVARIABLE_H
 
-#include <QString>
-#include <QList>
-#include <QVector>
-#include <QStringList>
-#include <QObject>
-#include <vector>
-#include <string>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QByteArray>
-#include <QDebug>
-
-#include "tsk/libtsk.h"
-#include "wombatfunctions.h"
-
 struct CaseObject
 {
     int id;

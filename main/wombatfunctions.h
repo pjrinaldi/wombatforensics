@@ -1,11 +1,12 @@
 #ifndef WOMBATFUNCTIONS_H
 #define WOMBATFUNCTIONS_H
 
-#include <string>
-#include <cstdio>
-#include <sys/stat.h>
+#include "wombatinclude.h"
 
 extern std::string GetTime(void);
 extern bool FileExists(const std::string& filename);
+
+QString ByteArrayToHexDisplay(QByteArray ba);
+QString ByteArrayToShortDisplay(QByteArray ba);
 
 #endif // wombatfunctions.h

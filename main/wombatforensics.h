@@ -1,6 +1,7 @@
 #ifndef WOMBATFORENSICS_H
 #define WOMBATFORENSICS_H
 
+/*
 #include <QMainWindow>
 #include <fstream>
 #include <iostream>
@@ -30,7 +31,8 @@
 #include <QWebFrame>
 #include <QWebElement>
 #include <QDataStream>
-
+*/
+/*
 #include "wombatvariable.h"
 #include "wombatdatabase.h"
 #include "wombatframework.h"
@@ -41,6 +43,8 @@
 //#include "sleuthkit.h"
 #include "hexEditor.hpp"
 #include "translate.hpp"
+*/
+#include "wombatinclude.h"
 
 namespace Ui {
 class WombatForensics;
@@ -117,10 +121,6 @@ private:
     void LoadImgContents(void);
     void LoadVidContents(void);
     void GetDosBootCode(void);
-
-    QString ByteArrayToHexDisplay(QByteArray ba);
-    QString ByteArrayToShortDisplay(QByteArray ba);
-
 
     void RemoveTmpFiles(void);
     void LoadHexModel(QString tmpFilePath);
