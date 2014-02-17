@@ -85,7 +85,7 @@ private:
     void LoadWebContents(void);
     void LoadImgContents(void);
     void LoadVidContents(void);
-    void GetDosBootCode(void);
+    //void GetDosBootCode(void);
 
     void RemoveTmpFiles(void);
     void LoadHexModel(QString tmpFilePath);

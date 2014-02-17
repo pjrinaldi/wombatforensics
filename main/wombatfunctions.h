@@ -6,6 +6,7 @@
 extern std::string GetTime(void);
 extern bool FileExists(const std::string& filename);
 
+QString ByteArrayToHex(QByteArray ba);
 QString ByteArrayToHexDisplay(QByteArray ba);
 QString ByteArrayToShortDisplay(QByteArray ba);
 

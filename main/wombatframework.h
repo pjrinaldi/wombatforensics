@@ -2,6 +2,7 @@
 #define WOMBATFRAMEWORK_H
 
 #include "wombatinclude.h"
+#include "wombatfunctions.h"
 #include "wombatvariable.h"
 
 class WombatFramework : public QObject

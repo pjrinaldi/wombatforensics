@@ -33,7 +33,7 @@ QString ByteArrayToShortDisplay(QByteArray ba)
     return tmpstring.setNum(intvalue);
 }
 
-QString ByteArrayToHexDisplay(QByteArray ba)
+QString ByteArrayToHex(QByteArray ba)
 {
     QString tmpstring = QString::fromUtf8(ba.toHex());
     QString outstring = "";
@@ -41,7 +41,21 @@ QString ByteArrayToHexDisplay(QByteArray ba)
     {
         outstring += tmpstring.at(2*i);
         outstring += tmpstring.at(2*i+1);
-        outstring += " ";
+    }
+
+    return outstring;
+}
+
+QString ByteArrayToHexDisplay(QByteArray ba)
+{
+    QString tmpstring = QString::fromUtf8(ba.toHex());
+    QString outstring = "";
+    for(int i=0; i < tmpstring.size()/2; ++i)
+    {
+        outstring += tmpstring.at(2*i);
+        outstring += tmpstring.at(2*i+1);
+        if(i < tmpstring.size()/2 - 1)
+            outstring += " ";
     }
 
     return outstring;

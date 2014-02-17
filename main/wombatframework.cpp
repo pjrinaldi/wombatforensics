@@ -90,6 +90,158 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
 
 void WombatFramework::GetBootCode() // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
+    // get image boot sector and see what i've got.
+    int retval;
+    wombatptr->bootbuffer = NULL;
+    wombatptr->bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
+    retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
+    if(retval > 0)
+    {
+        wombatptr->bootbytearray = QByteArray::fromRawData(wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
+        qDebug() << ByteArrayToHexDisplay(wombatptr->bootbytearray.mid(510,2));
+        qDebug() << ByteArrayToHex(wombatptr->bootbytearray.mid(510,2));
+        //fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatptr->bootbytearray.mid(3,8)).toStdString().c_str());
+        //wombatptr->bootsectorlist << ByteArrayToHexDisplay(wombatptr->bootbytearray.mid(0,3));
+    }
+
+    /*
+     *
+        if(wombatvarptr->selectedobject.type == 1)
+        {
+            QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
+            tmpelement.appendInside("<div id='infotitle'>image information</div><br/>");
+            tmpelement.appendInside("<table><tr><td class='property'>image type:</td><td class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr><tr><td class='property'>size:</td><td class='pvalue'>" + QLocale::system().toString(((int)wombatvarptr->evidenceobject.imageinfo->size)) + " bytes</td></tr><tr><td class='property'>sector size: </td><td class='pvalue'>" + QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr><tr><td class='property'>sector count:</td><td class='pvalue'>" + QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size)) + " sectors</td></tr><tr><td class='property'>Volume Type</td><td class='pvalue'>" + wombatvarptr->volumeobject.name + "</td></tr></table>");
+            // if no boot code/partition table, then simply return info to say no boot code present.
+            // OR POSSIBLY STATE WHAT THE IMAGE CONTAINS (PARTITION TABLE/SINGLE PARTITION ONLY)
+            // if DOS partition table...
+            // if boot code exists...
+            // check for signature value at offset 510-511 to determine if its a dosmbr or something else. if its 0x55AA then its dos mbr
+            // check for partition table and populate the values accordingly.
+            // the fs stuff i find at jump and oem and the others are for the filesystem/partition boot sector. this isn't valid when there is an mbr.
+            // need to determine if there is an mbr and then pull the partition table information from it. otherwise simply display the image info
+            // and have no mbr present in first sector.
+            // when you click on the partition, this is where the partition boot sector information will go.
+            // MOVE ALL OF THIS CODE INTO WOMBATFRAMEWORK...
+            GetDosBootCode(); // move into getbootcode above
+            tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
+            tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
+void WombatForensics::GetDosBootCode()
+{
+    int retval;
+    wombatvarptr->bootbuffer = NULL;
+    wombatvarptr->bootbuffer = new char[wombatvarptr->evidenceobject.imageinfo->sector_size];
+    retval = tsk_img_read(wombatvarptr->evidenceobject.imageinfo, 0, wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
+    if(retval > 0)
+    {
+        wombatvarptr->bootbytearray = QByteArray::fromRawData(wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
+        fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8)).toStdString().c_str());
+        wombatvarptr->bootsectorlist << ByteArrayToHexDisplay(wombatvarptr->bootbytearray.mid(0,3));
+        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8));
+        wombatvarptr->bootsectorlist << ByteArrayToShortDisplay(wombatvarptr->bootbytearray.mid(11,2));
+        wombatvarptr->bootsectorlist << ByteArrayToShortDisplay(wombatvarptr->bootbytearray.mid(13,1));
+    }
+    else
+        fprintf(stderr, "filling bootbuffer failed\n");
+
+ *
+    uint64_t bytelen = 512*(seclength - 1);
+    uint64_t bytestart = 512*secstart;
+    char* volbuffer = NULL;
+    volbuffer = new char[bytelen+512];
+
+    {
+        // need to figure out why this fails... and returns -1
+        retval = TskServices::Instance().getImageFile().getSectorData(secstart, seclength-1, volbuffer);
+        fprintf(stderr, "sector data return value: %i\n", retval);
+        if (retval == -1)
+        {
+        }
+    }
+    if(retval > 0)
+    {
+        QFile tmpfile("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat");
+        tmpfile.open(QIODevice::WriteOnly);
+        tmpfile.write(volbuffer, bytelen);
+        tmpfile.close();
+    }
+    delete[] volbuffer;
+    //delete volbuffer;
+
+    return "/home/pasquale/WombatForensics/tmpfiles/volbyte.dat";
+
+ *
+ *
+ *    // set hex (which i'll probably remove anyway since it's highlighted in same window)
+    int sellength = txt.size()/2;
+    QString tmptext = "Length: " + QString::number(sellength);
+    selectedhex->setText(tmptext);
+    // get initial bytes value and then update ascii
+    std::vector<uchar> bytes;
+    Translate::HexToByte(bytes, txt);
+    QString ascii;
+    Translate::ByteToChar(ascii, bytes);
+    tmptext = "Ascii: " + ascii;
+    selectedascii->setText(tmptext);
+    QString strvalue;
+    uchar * ucharPtr;
+    // update the int entry:
+    // pad right with 0x00
+    int intvalue = 0;
+    ucharPtr = (uchar*) &intvalue;
+    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
+    strvalue.setNum(intvalue);
+    tmptext = "Int: " + strvalue;
+    selectedinteger->setText(tmptext);
+    // update float entry;
+    float fvalue;
+    ucharPtr = (uchar*)(&fvalue);
+    if(bytes.size() < sizeof(float) )
+    {
+        for(unsigned int i= 0; i < sizeof(float); ++i)
+        {
+            if( i < bytes.size() )
+            {
+                *ucharPtr++ = bytes[i];
+            }
+            else
+            {
+                *ucharPtr++ = 0x00;
+            }
+        }
+    }
+    else
+    {
+        memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
+    }
+    strvalue.setNum( fvalue );
+    tmptext = "Float: " + strvalue;
+    selectedfloat->setText(tmptext);
+    // update double
+    double dvalue;
+    ucharPtr = (uchar*)&dvalue;
+    if(bytes.size() < sizeof(double) )
+    {
+        for(unsigned int i= 0; i < sizeof(double); ++i)
+        {
+            if( i < bytes.size() )
+            {
+                *ucharPtr++ = bytes[i];
+            }
+            else
+            {
+                *ucharPtr++ = 0x00;
+            }
+        }
+    }
+    else
+    {
+        memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
+    }
+    strvalue.setNum( dvalue );
+    tmptext = "Double: " + strvalue;
+    selecteddouble->setText(tmptext);
+
+ */ 
 }
 
 // BELOW FUNCTION CURRENTLY NOT USED
