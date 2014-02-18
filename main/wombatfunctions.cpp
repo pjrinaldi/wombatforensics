@@ -33,6 +33,38 @@ QString ByteArrayToShortDisplay(QByteArray ba)
     return tmpstring.setNum(intvalue);
 }
 
+QString SingleByteToString(QByteArray ba, int base)
+{
+    short intvalue = 0;
+    memcpy(&intvalue, &ba.begin()[0], sizeof(short));
+    QString tmpstring = "";
+    tmpstring.setNum(intvalue, base);
+    if(base == 2 && tmpstring.size() < 8)
+    {
+    	int zerocount = 8 - tmpstring.size();
+	tmpstring.prepend(QString::fromStdString(std::string(zerocount, '0')));
+	return tmpstring;
+    }
+    else
+    	return tmpstring;
+}
+// NEED TO FIX THE BYTE ARRAY TO STRING TO ACCOUNT FOR THE LENGTH OF THE BYTE ARRAY...
+QString ByteArrayToString(QByteArray ba, int base)
+{
+    int intvalue = 0;
+    memcpy(&intvalue, &ba.begin()[0], sizeof(int));
+    QString tmpstring = "";
+    tmpstring.setNum(intvalue, base);
+    if(base == 2 && tmpstring.size() < 8)
+    {
+    	int zerocount = 8 - tmpstring.size();
+	tmpstring.prepend(QString::fromStdString(std::string(zerocount, '0')));
+	return tmpstring;
+    }
+    else
+    	return tmpstring;
+}
+
 QString ByteArrayToHex(QByteArray ba)
 {
     QString tmpstring = QString::fromUtf8(ba.toHex());
@@ -62,12 +94,7 @@ QString ByteArrayToHexDisplay(QByteArray ba)
 }
 
 
-
-/*
-int CheckByteBit(std::bitset<sizeof(short)> bits, int n)
-{
-}
-*/
+// COMPARE THE STRING VALUE TO DETERMINE IF ITS SET TO 1 OR NOT.
 int CheckBitSet(unsigned char c, int n)
 {
     static unsigned char mask[] = {1, 2, 4, 8, 16, 32, 64, 128};
