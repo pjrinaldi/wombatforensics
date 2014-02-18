@@ -60,9 +60,17 @@ QString ByteArrayToHexDisplay(QByteArray ba)
 
     return outstring;
 }
+
+
+
+/*
+int CheckByteBit(std::bitset<sizeof(short)> bits, int n)
+{
+}
+*/
 int CheckBitSet(unsigned char c, int n)
 {
-    static unsigned char mask[] = {128, 64, 32, 16, 8, 4, 2, 1};
-    return ((c & mask[n]) != 0)
-}
+    static unsigned char mask[] = {1, 2, 4, 8, 16, 32, 64, 128};
+    //static unsigned char mask[] = {128, 64, 32, 16, 8, 4, 2, 1};
+    return ((c & mask[n]) != 0);
 }

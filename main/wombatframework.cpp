@@ -92,6 +92,7 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
 {
     // get image boot sector and see what i've got.
     int retval;
+    bool ok;
     wombatptr->bootbuffer = NULL;
     wombatptr->bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
     retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
@@ -101,6 +102,13 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
         qDebug() << ByteArrayToHex(wombatptr->bootbytearray.mid(510,2)); // nets my signature value to compare
         if(QString::compare("55aa", ByteArrayToHex(wombatptr->bootbytearray.mid(510,2))) == 0) // its a boot sector
         {
+            qDebug() << "byte to examine: " << ByteArrayToHex(wombatptr->bootbytearray.mid(510,1));
+            qDebug() << "byte to examine in hex: " << wombatptr->bootbytearray.mid(510,1).toHex().toShort(&ok, 16);
+            //qDebug() << "byte to examine in hex: " << wombatptr->bootbytearray.mid(510,1).toInt(&ok, 16);
+            std::bitset<sizeof(short)*CHAR_BIT> bits(wombatptr->bootbytearray.mid(510,1).toHex().toShort(&ok, 16));
+            //std::bitset<sizeof(int)*CHAR_BIT> bits(wombatptr->bootbytearray.mid(510,1).toInt(&ok, 16));
+            qDebug() << "is bit set: " << bits[7];
+            //qDebug() << "is bit set: " << CheckBitSet(&(ByteArrayToHex(wombatptr->bootbytearray.mid(446,1)).toStdString().c_str()), 7);
             // determine if its got a partition table
             // NEED TO CHECK THE 64 BYTE PARTITION TABLE FOR THE 1ST BYTE OF EACH 16 BYTE PARTITION ENTRY. IF ITS 80 THEN ITS BOOTABLE AND OLD, IF THE
             // SEVENTH BIT IS ACTIVE (CHECK BYTE FUNCTION) THEN ITS A BOOT PARAMETER... SO NEED TO CHECK EACH AND ALSO CHECK THE PARTITION TYPE AGAINST

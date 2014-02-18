@@ -1,6 +1,7 @@
 #ifndef WOMBATINCLUDE_H
 #define WOMBATINCLUDE_H
 
+#include <bitset>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
