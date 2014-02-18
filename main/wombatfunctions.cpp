@@ -39,6 +39,7 @@ QString SingleByteToString(QByteArray ba, int base)
     memcpy(&intvalue, &ba.begin()[0], sizeof(short));
     QString tmpstring = "";
     tmpstring.setNum(intvalue, base);
+    qDebug() << "Temp Value: " << tmpstring;
     if(base == 2 && tmpstring.size() < 8)
     {
     	int zerocount = 8 - tmpstring.size();

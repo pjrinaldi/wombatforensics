@@ -106,12 +106,13 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
 	    qDebug() << "1. byte to hex: " << SingleByteToString(wombatptr->bootbytearray.mid(510,1), 16);
 	    qDebug() << "2. byte to Int: " << SingleByteToString(wombatptr->bootbytearray.mid(510,1), 10);
 	    qDebug() << "3. byte to Binary: " << SingleByteToString(wombatptr->bootbytearray.mid(510,1), 2);
+	    qDebug() << "4. bytearray number: " << QByteArray::number(10, 16);
+	    qDebug() << "5. byte (0x10) to binary: " << SingleByteToString(QByteArray::number(10, 16), 2);
             // determine if its got a partition table
             // NEED TO CHECK THE 64 BYTE PARTITION TABLE FOR THE 1ST BYTE OF EACH 16 BYTE PARTITION ENTRY. IF ITS 80 THEN ITS BOOTABLE AND OLD, IF THE
             // SEVENTH BIT IS ACTIVE (CHECK BYTE FUNCTION) THEN ITS A BOOT PARAMETER... SO NEED TO CHECK EACH AND ALSO CHECK THE PARTITION TYPE AGAINST
             // A VALID ENTRY IN MY PARTITION TABLE MASK.
         }
-        //fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatptr->bootbytearray.mid(3,8)).toStdString().c_str());
         //wombatptr->bootsectorlist << ByteArrayToHexDisplay(wombatptr->bootbytearray.mid(0,3));
     }
 
