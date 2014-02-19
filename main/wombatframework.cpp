@@ -108,22 +108,28 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
 
     int retval;
     bool ok;
-    //QString tmpstr = "";
-    //vector<uchar> vchar;
+    QString tmpstr = "";
     wombatptr->bootbuffer = NULL;
-    qDebug() << "Sector Size: " << wombatptr->evidenceobject.imageinfo->sector_size;
+    //qDebug() << "Sector Size: " << wombatptr->evidenceobject.imageinfo->sector_size;
     wombatptr->bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
     retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
     if(retval > 0)
     {
-        qDebug() << "Boot Buffer Length: " << strlen(wombatptr->bootbuffer);
+        //qDebug() << "Boot Buffer Length: " << strlen(wombatptr->bootbuffer);
         vector<uchar> vchar(wombatptr->bootbuffer, wombatptr->bootbuffer + wombatptr->evidenceobject.imageinfo->sector_size);
         for(int i=0; i < retval; i++)
         {
             vchar[i] = wombatptr->bootbuffer[i];
-            qDebug() << "vchar[" << i << "] " << vchar[i];
+            //qDebug() << "vchar[" << i << "] " << vchar[i];
         }
-        qDebug() << "vchar[510] " << vchar[510];
+        //qDebug() << "vchar[510] " << vchar[510];
+        //qDebug() << "vchar elements: " << vchar.size();
+        qDebug() << "Byte to Hex: " << Translate::ByteToHex(vchar[510]);
+        qDebug() << "Byte to Int: " << vchar[510];
+        vector<uchar> subchar;
+        subchar.push_back(vchar[510]);
+        Translate::ByteToBinary(tmpstr, subchar);
+        qDebug() << "Byte to Bin: " << tmpstr;
     }
        //qDebug() << "vchar[510]: " << vchar[510];
         // NEED TO LOOK AT READER/DATA STREAM THE BUFFER SOMEHOW...
