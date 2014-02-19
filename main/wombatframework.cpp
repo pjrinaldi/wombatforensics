@@ -90,14 +90,31 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
 
 void WombatFramework::GetBootCode() // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
+    //Reader tmpreader;
+    //vector<uchar> vchar;
+    
+    //size_t bytesread = tmpreader.read(vchar, wombatptr->evidenceobject.imageinfo->sector_size);
+    //qDebug() << "bytes read: " << bytesread;
+    //qDebug() << "1. byte to hex: " << Translate::ByteToHex(vchar[510]);
+    // LOOK AT WRITING TO BUFFER TO A FILE, STORING IT IN A READER AND THEN DOING MY TRANSLATIONS AND WHAT NOT FROM THERE...
     // get image boot sector and see what i've got.
+    /*
     int retval;
     bool ok;
+    //QString tmpstr = "";
+    //vector<uchar> vchar;
     wombatptr->bootbuffer = NULL;
     wombatptr->bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
     retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
     if(retval > 0)
     {
+        // NEED TO LOOK AT READER/DATA STREAM THE BUFFER SOMEHOW...
+        //unsigned char* ubuf = (unsigned char*)wombatptr->bootbuffer;
+        //vector<uchar> vchar(ubuf[510], ubuf[510] + strlen((const char*)wombatptr->bootbuffer[510]));
+        qDebug() << "1. byte to hex: " << Translate::ByteToHex(wombatptr->bootbuffer[510]);
+        qDebug() << "2. byte to int: " << QString(Translate::ByteToHex(wombatptr->bootbuffer[510]));
+        //Translate::ByteToBinary(tmpstr, vchar);
+        //qDebug() << "3. byte to binary: " << tmpstr;
         wombatptr->bootbytearray = QByteArray::fromRawData(wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
         qDebug() << ByteArrayToHex(wombatptr->bootbytearray.mid(510,2)); // nets my signature value to compare
         if(QString::compare("55aa", ByteArrayToHex(wombatptr->bootbytearray.mid(510,2))) == 0) // its a boot sector
@@ -112,10 +129,10 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
             // NEED TO CHECK THE 64 BYTE PARTITION TABLE FOR THE 1ST BYTE OF EACH 16 BYTE PARTITION ENTRY. IF ITS 80 THEN ITS BOOTABLE AND OLD, IF THE
             // SEVENTH BIT IS ACTIVE (CHECK BYTE FUNCTION) THEN ITS A BOOT PARAMETER... SO NEED TO CHECK EACH AND ALSO CHECK THE PARTITION TYPE AGAINST
             // A VALID ENTRY IN MY PARTITION TABLE MASK.
-        }
+        //}
         //wombatptr->bootsectorlist << ByteArrayToHexDisplay(wombatptr->bootbytearray.mid(0,3));
     }
-
+    */
     /*
      *
         if(wombatvarptr->selectedobject.type == 1)
