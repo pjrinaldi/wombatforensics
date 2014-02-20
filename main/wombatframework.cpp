@@ -90,55 +90,32 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
 
 void WombatFramework::GetBootCode() // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
-    //Reader tmpreader;
-    
-    //vector<uchar> vchar(wombatptr->bootbuffer, wombatptr->bootbuffer + strlen(wombatptr->bootbuffer));
-    /*
-    for(int i=0; i < wombatptr->); i++)
-    {
-        vchar[i] = wombatptr->bootbuffer[i];
-        qDebug() << vchar[i];
-    }*/
-    //qDebug() << vchar[510];
-    //size_t bytesread = tmpreader.read(vchar, wombatptr->evidenceobject.imageinfo->sector_size);
-    //qDebug() << "bytes read: " << bytesread;
-    //qDebug() << "1. byte to hex: " << Translate::ByteToHex(vchar[510]);
-    // LOOK AT WRITING TO BUFFER TO A FILE, STORING IT IN A READER AND THEN DOING MY TRANSLATIONS AND WHAT NOT FROM THERE...
-    // get image boot sector and see what i've got.
-
     int retval;
-    bool ok;
     QString tmpstr = "";
-    wombatptr->bootbuffer = NULL;
-    //qDebug() << "Sector Size: " << wombatptr->evidenceobject.imageinfo->sector_size;
-    wombatptr->bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
-    retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
+    char* bootbuffer = NULL;
+    wombatptr->rawbyteintvector.clear();
+    bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
+    retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
+    //wombatptr->bootbuffer = NULL;
+    //wombatptr->bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
+    //retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
     if(retval > 0)
     {
-        //qDebug() << "Boot Buffer Length: " << strlen(wombatptr->bootbuffer);
-        vector<uchar> vchar(wombatptr->bootbuffer, wombatptr->bootbuffer + wombatptr->evidenceobject.imageinfo->sector_size);
+        wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
+        //wombatptr->rawbyteintvector.resize(bootbuffer, bootbuffer + wombatptr->evidenceobject.imageinfo->sector_size);
+        //vector<uchar> vchar(wombatptr->bootbuffer, wombatptr->bootbuffer + wombatptr->evidenceobject.imageinfo->sector_size);
         for(int i=0; i < retval; i++)
         {
-            vchar[i] = wombatptr->bootbuffer[i];
-            //qDebug() << "vchar[" << i << "] " << vchar[i];
+            wombatptr->rawbyteintvector[i] = bootbuffer[i];
+            //vchar[i] = wombatptr->bootbuffer[i];
         }
-        //qDebug() << "vchar[510] " << vchar[510];
-        //qDebug() << "vchar elements: " << vchar.size();
-        qDebug() << "Byte to Hex: " << Translate::ByteToHex(vchar[510]);
-        qDebug() << "Byte to Int: " << vchar[510];
+        qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
+        qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
         vector<uchar> subchar;
-        subchar.push_back(vchar[510]);
+        subchar.push_back(wombatptr->rawbyteintvector[510]);
         Translate::ByteToBinary(tmpstr, subchar);
         qDebug() << "Byte to Bin: " << tmpstr;
     }
-       //qDebug() << "vchar[510]: " << vchar[510];
-        // NEED TO LOOK AT READER/DATA STREAM THE BUFFER SOMEHOW...
-        //unsigned char* ubuf = (unsigned char*)wombatptr->bootbuffer;
-        //vector<uchar> vchar(ubuf[510], ubuf[510] + strlen((const char*)wombatptr->bootbuffer[510]));
-        //qDebug() << "1. byte to hex: " << Translate::ByteToHex(wombatptr->bootbuffer[510]);
-        //qDebug() << "2. byte to int: " << QString(Translate::ByteToHex(wombatptr->bootbuffer[510]));
-        //Translate::ByteToBinary(tmpstr, vchar);
-        //qDebug() << "3. byte to binary: " << tmpstr;
         //wombatptr->bootbytearray = QByteArray::fromRawData(wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
         /*
         qDebug() << ByteArrayToHex(wombatptr->bootbytearray.mid(510,2)); // nets my signature value to compare
@@ -157,7 +134,6 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
         //}
         //wombatptr->bootsectorlist << ByteArrayToHexDisplay(wombatptr->bootbytearray.mid(0,3));
         */
-    //}
     /*
      *
         if(wombatvarptr->selectedobject.type == 1)

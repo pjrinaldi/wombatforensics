@@ -24,7 +24,7 @@ bool FileExists(const std::string& filename)
     }
     return false;
 }
-
+/*
 QString ByteArrayToShortDisplay(QByteArray ba)
 {
     short intvalue = 0;
@@ -101,4 +101,4 @@ int CheckBitSet(unsigned char c, int n)
     static unsigned char mask[] = {1, 2, 4, 8, 16, 32, 64, 128};
     //static unsigned char mask[] = {128, 64, 32, 16, 8, 4, 2, 1};
     return ((c & mask[n]) != 0);
-}
+}*/
