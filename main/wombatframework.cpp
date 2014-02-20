@@ -103,13 +103,18 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
         {
             wombatptr->rawbyteintvector[i] = bootbuffer[i];
         }
-        qDebug() << wombatptr->rawbyteintvector.begin()+510;
-        //BytesToBinary(wombatptr->rawbyteintvector.begin()+510, wombatptr->rawbyteintvector.begin()+511);
         //qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
         //qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
         vector<uchar> subchar;
         subchar.push_back(wombatptr->rawbyteintvector[510]);
-        Translate::ByteToBinary(tmpstr, subchar);
+        subchar.push_back(wombatptr->rawbyteintvector[511]);
+        Translate::ByteToHex(tmpstr, subchar);
+        qDebug() << "Byte to Hex: " << tmpstr;
+        if(QString::compare("55aa", tmpstr) == 0) // its a boot sector
+        {
+                // now to determine if its got a partition table
+        }
+        //Translate::ByteToBinary(tmpstr, subchar);
         //qDebug() << "Byte to Bin: " << tmpstr;
     }
         //wombatptr->bootbytearray = QByteArray::fromRawData(wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
