@@ -90,6 +90,14 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
 
 void WombatFramework::GetBootCode() // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
+    // while this byte reading and converting is great... to find out the boot information, i can pull it from my volume system information such as...
+    //
+    if(wombatptr->evidenceobject.volinfo != NULL)
+        qDebug() << tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype);
+    else // not a bootable volume
+    {
+        qDebug() << "Not a bootable volume.";
+    }
     int retval;
     QString tmpstr = "";
     char* bootbuffer = NULL;
