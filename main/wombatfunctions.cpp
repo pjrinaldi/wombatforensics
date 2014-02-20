@@ -25,6 +25,15 @@ bool FileExists(const std::string& filename)
     return false;
 }
 /*
+BytesToBinary(Iterator start, Iterator end)
+{
+    for(Iterator it = start; it != end; ++it)
+    {
+        qDebug() << "Byte to Hex: " << Translate::ByteToHex(it);
+    }
+}
+*/
+/*
 QString ByteArrayToShortDisplay(QByteArray ba)
 {
     short intvalue = 0;

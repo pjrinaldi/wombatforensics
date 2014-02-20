@@ -6,6 +6,18 @@
 std::string GetTime(void);
 bool FileExists(const std::string& filename);
 
+//template <typename Iterator>
+//BytesToBinary(Iterator start, Iterator end);
+/*
+template<typename T>
+void BytesToBinary(T start, T end)
+{
+    for(T it = start; it != end; ++it)
+    {
+        //qDebug() << "Byte to Hex: " << Translate::ByteToHex(it);
+        cout << it;
+    }
+};*/
 //QString ByteArrayToHex(QByteArray ba);
 //QString ByteArrayToHexDisplay(QByteArray ba);
 //QString ByteArrayToShortDisplay(QByteArray ba);

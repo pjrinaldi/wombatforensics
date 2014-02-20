@@ -96,25 +96,21 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
     wombatptr->rawbyteintvector.clear();
     bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
     retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
-    //wombatptr->bootbuffer = NULL;
-    //wombatptr->bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
-    //retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
     if(retval > 0)
     {
         wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
-        //wombatptr->rawbyteintvector.resize(bootbuffer, bootbuffer + wombatptr->evidenceobject.imageinfo->sector_size);
-        //vector<uchar> vchar(wombatptr->bootbuffer, wombatptr->bootbuffer + wombatptr->evidenceobject.imageinfo->sector_size);
         for(int i=0; i < retval; i++)
         {
             wombatptr->rawbyteintvector[i] = bootbuffer[i];
-            //vchar[i] = wombatptr->bootbuffer[i];
         }
-        qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
-        qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
+        qDebug() << wombatptr->rawbyteintvector.begin()+510;
+        //BytesToBinary(wombatptr->rawbyteintvector.begin()+510, wombatptr->rawbyteintvector.begin()+511);
+        //qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
+        //qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
         vector<uchar> subchar;
         subchar.push_back(wombatptr->rawbyteintvector[510]);
         Translate::ByteToBinary(tmpstr, subchar);
-        qDebug() << "Byte to Bin: " << tmpstr;
+        //qDebug() << "Byte to Bin: " << tmpstr;
     }
         //wombatptr->bootbytearray = QByteArray::fromRawData(wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
         /*
