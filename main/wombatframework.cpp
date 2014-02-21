@@ -96,7 +96,7 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
     {
         wombatptr->htmlcontent += "<tr><td class='property'>byte offset</td><td class='pvalue'>";
         wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->offset)  + "</td></tr>";
-        wombatptr->htmlcontent += "<tr><td class='property'>block size</td><td class='pvalue'";
+        wombatptr->htmlcontent += "<tr><td class='property'>block size</td><td class='pvalue'>";
         wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->block_size) + " bytes</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>endian ordering</td><td class='pvalue'>";
         if(wombatptr->evidenceobject.volinfo->endian == TSK_LIT_ENDIAN)
