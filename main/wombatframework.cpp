@@ -94,14 +94,21 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
     //
     if(wombatptr->evidenceobject.volinfo != NULL)
     {
-        wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>boot sector</div>";
+        //wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>boot sector</div>";
+        //wombatptr->htmlcontent += "<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr>";
+        //wombatptr->htmlcontent += "<tr class='odd'><td>0-0</td><td class='bvalue'></td><td class='desc'></td></tr>";
+        //wombatptr->htmlcontent += "<tr class='odd'><td colspan='3' class='bot'></td></tr></table>";
         // populate the boot sector table
     }
     else // not a bootable volume
     {
         wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>not a bootable volume</div>";
+        // block size, partition count, offset where volume system begins, endian - probably go in a table similar to the above one, not a byte offset one.
+        // not sure if i want to include the minimal amount of sector info since there are so few and it'll be repetative with the possible partition
+        // layout in the tree view
     }
     int retval;
+    //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
     QString tmpstr = "";
     char* bootbuffer = NULL;
     wombatptr->rawbyteintvector.clear();
