@@ -400,13 +400,25 @@ void WombatForensics::LoadComplete(bool isok)
     // IT WORKS NOW. SO I HAVE TO WAIT TILL IT LOADS. WILL NEED TO WORK ON THREADING WHEN I OPEN A LARGER FILE
     // NEED TO GET THIS INFORMATION FROM THE DB AND NOT THE IMAGEINFO VARIABLE WHICH MIGHT NOT EXIST AT THE MOMENT. OR I NEED TO POPULATE THE VARIABLE
     // ON OPEN SO I CAN USE THE VARIABLES.
+    wombatvarptr->htmlcontent = "";
     if(isok)
     {
         if(wombatvarptr->selectedobject.type == 1) // image file
         {
+            htmlcontent += "<div id='infotitle'>image information</div><br/>";
+            htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
+            htmlcontent += QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.infoimage->itype)) + "</td></tr>";
+            htmlcontent += "<tr><td class='property'>size:</td><td class='pvalue'>";
+            htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobject.imageinfo->size) + " bytes</td></tr>";
+            htmlcontent += "<tr><td class='property'>sector size:</td><td class='pvalue'>";
+            htmlcontent += QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr>";
+            htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
+            htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size));
+            // might not want to do the volume type one if there's no volume. have to think on it.
+            htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
+            htmlcontent += wombatvarptr->volumeobject.name + "</td></tr></table>;
             //QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
-            //tmpelement.appendInside("<div id='infotitle'>image information</div><br/>");
-            //tmpelement.appendInside("<table><tr><td class='property'>image type:</td><td class='pvalue'>" + QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr><tr><td class='property'>size:</td><td class='pvalue'>" + QLocale::system().toString(((int)wombatvarptr->evidenceobject.imageinfo->size)) + " bytes</td></tr><tr><td class='property'>sector size: </td><td class='pvalue'>" + QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr><tr><td class='property'>sector count:</td><td class='pvalue'>" + QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size)) + " sectors</td></tr><tr><td class='property'>Volume Type</td><td class='pvalue'>" + wombatvarptr->volumeobject.name + "</td></tr></table>");
+            //tmpelement.appendInside("");
             wombatframework->GetBootCode(); // determine boot type in this function and populate html string information into wombatvarptr value
             // if no boot code/partition table, then simply return info to say no boot code present.
             // OR POSSIBLY STATE WHAT THE IMAGE CONTAINS (PARTITION TABLE/SINGLE PARTITION ONLY)

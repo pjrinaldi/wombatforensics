@@ -160,10 +160,11 @@ struct WombatVariable
     SelectedObject selectedobject;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
-    QStringList bootsectorlist; // string of values to place in html template page
+    //QStringList bootsectorlist; // string of values to place in html template page
     QByteArray bootbytearray; // byte array of currently extracted rawdata -> clear() before each use
     //char* bootbuffer; // char buffer of raw data prior to converting bytearray -> set NULL before each use
     std::vector<uchar> rawbyteintvector;
+    QString htmlcontent;
 };
 
 Q_DECLARE_METATYPE(WombatVariable)
