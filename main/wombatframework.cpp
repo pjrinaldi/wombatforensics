@@ -94,7 +94,7 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
     //
     if(wombatptr->evidenceobject.volinfo != NULL)
     {
-        wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>" + QString(tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype))  + "</div>";
+        wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>boot sector</div>";
         // populate the boot sector table
     }
     else // not a bootable volume
