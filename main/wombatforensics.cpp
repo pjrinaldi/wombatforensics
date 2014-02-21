@@ -405,18 +405,18 @@ void WombatForensics::LoadComplete(bool isok)
     {
         if(wombatvarptr->selectedobject.type == 1) // image file
         {
-            htmlcontent += "<div id='infotitle'>image information</div><br/>";
-            htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
-            htmlcontent += QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.infoimage->itype)) + "</td></tr>";
-            htmlcontent += "<tr><td class='property'>size:</td><td class='pvalue'>";
-            htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobject.imageinfo->size) + " bytes</td></tr>";
-            htmlcontent += "<tr><td class='property'>sector size:</td><td class='pvalue'>";
-            htmlcontent += QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr>";
-            htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
-            htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size));
+            wombatvarptr->htmlcontent += "<div id='infotitle'>image information</div><br/>";
+            wombatvarptr->htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
+            wombatvarptr->htmlcontent += QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr>";
+            wombatvarptr->htmlcontent += "<tr><td class='property'>size:</td><td class='pvalue'>";
+            wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobject.imageinfo->size) + " bytes</td></tr>";
+            wombatvarptr->htmlcontent += "<tr><td class='property'>sector size:</td><td class='pvalue'>";
+            wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr>";
+            wombatvarptr->htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
+            wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size));
             // might not want to do the volume type one if there's no volume. have to think on it.
-            htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
-            htmlcontent += wombatvarptr->volumeobject.name + "</td></tr></table>;
+            wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
+            wombatvarptr->htmlcontent += wombatvarptr->volumeobject.name + "</td></tr></table>";
             //QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             //tmpelement.appendInside("");
             wombatframework->GetBootCode(); // determine boot type in this function and populate html string information into wombatvarptr value
