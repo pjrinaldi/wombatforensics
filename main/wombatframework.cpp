@@ -94,6 +94,18 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
     //
     if(wombatptr->evidenceobject.volinfo != NULL)
     {
+        wombatptr->htmlcontent += "<tr><td class='property'>byte offset</td><td class='pvalue'>";
+        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->offset)  + "</td></tr>";
+        wombatptr->htmlcontent += "<tr><td class='property'>block size</td><td class='pvalue'";
+        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->block_size) + " bytes</td></tr>";
+        wombatptr->htmlcontent += "<tr><td class='property'>endian ordering</td><td class='pvalue'>";
+        if(wombatptr->evidenceobject.volinfo->endian == TSK_LIT_ENDIAN)
+            wombatptr->htmlcontent += "little endian";
+        else
+            wombatptr->htmlcontent += "big endian";
+        wombatptr->htmlcontent += "</td></tr>";
+        wombatptr->htmlcontent += "<tr><td class='property'>partition count</td><td class='pvalue'>";
+        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->part_count) + "</td></tr>";
         //wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>boot sector</div>";
         //wombatptr->htmlcontent += "<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr>";
         //wombatptr->htmlcontent += "<tr class='odd'><td>0-0</td><td class='bvalue'></td><td class='desc'></td></tr>";

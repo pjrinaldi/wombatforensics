@@ -416,11 +416,11 @@ void WombatForensics::LoadComplete(bool isok)
             wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size));
             // might not want to do the volume type one if there's no volume. have to think on it.
             wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
-            // DO GETBOOTCODE() HERE AND THEN CLOSE IT OUT SINCE IT'S GOT SOME BOOT CODE INFO
-            wombatvarptr->htmlcontent += wombatvarptr->volumeobject.name + "</td></tr></table>";
+            wombatvarptr->htmlcontent += wombatvarptr->volumeobject.name + "</td></tr>";
+            wombatframework->GetBootCode(); // determine boot type in this function and populate html string information into wombatvarptr value
+            wombatvarptr->htmlcontent += "</table>";
             //QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             //tmpelement.appendInside("");
-            wombatframework->GetBootCode(); // determine boot type in this function and populate html string information into wombatvarptr value
             QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             tmpelement.appendInside(wombatvarptr->htmlcontent);
             // check for partition table and populate the values accordingly.
