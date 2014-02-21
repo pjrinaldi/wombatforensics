@@ -420,6 +420,8 @@ void WombatForensics::LoadComplete(bool isok)
             //QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             //tmpelement.appendInside("");
             wombatframework->GetBootCode(); // determine boot type in this function and populate html string information into wombatvarptr value
+            QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
+            tmpelement.appendInside(wombatvarptr->htmlcontent);
             // if no boot code/partition table, then simply return info to say no boot code present.
             // OR POSSIBLY STATE WHAT THE IMAGE CONTAINS (PARTITION TABLE/SINGLE PARTITION ONLY)
             // if DOS partition table...
