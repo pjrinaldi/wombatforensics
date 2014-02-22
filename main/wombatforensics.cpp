@@ -223,20 +223,10 @@ void WombatForensics::InitializeDirModel()
 void WombatForensics::InitializeEvidenceStructure()
 {
     wombatframework->OpenEvidenceImage();
-    if(wombatvarptr->evidenceobject.imageinfo == NULL)
-        fprintf(stderr, "log error here.\n");
-    else
-    {
-        fprintf(stderr, "log info here.\n");
-        wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
-        // NEED TO START MY DIRECTORY MODEL AND STORE THE RESPECTIVE INFORMATION HERE.
-        QList<QStandardItem*> tmplist;
-        QStandardItem* tmpnode = new QStandardItem(QString::number(wombatvarptr->evidenceobject.id));
-        tmpnode->setCheckable(true);
-        tmpnode->setIcon(QIcon(":/basic/treeimage"));
-        tmplist << tmpnode << new QStandardItem(wombatvarptr->evidenceobject.name);
-        wombatvarptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
-        // AFTER I ADD THE NODE, I CAN REFERENCE IT WITH THE BELOW CODE BASED ON IT'S ID USING THE ZERO 0, SO ITS UNIQUE.
+    wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
+    wombatdatabase->GetEvidenceObject(); // get evidence object from the db.
+    wombatframework->AddEvidenceNode(); // add evidence node to directory model
+        // AFTER I ADD THE NODE, I CAN REFERENCE IT WITH THE BELOW CODE BASED ON IT'S ID USING THE ZERO 0, SINCE ITS UNIQUE.
         /*
         QList<QStandardItem*> idstring = wombatvarptr->dirmodel->findItems(QString::number(wombatvarptr->evidenceobject.id), Qt::MatchExactly, 0);
         QList<QStandardItem*> namestring = wombatvarptr->dirmodel->findItems(wombatvarptr->evidenceobject.name, Qt::MatchExactly, 1);
@@ -248,16 +238,17 @@ void WombatForensics::InitializeEvidenceStructure()
         imagenode->setIcon(QIcon(":/basic/treeimage"));
         wombatvarptr->dirmodel->invisibleRootItem()->appendRow(imagenode);
         */
-        ResizeColumns();
+    ResizeColumns();
         //
 
-        wombatframework->OpenVolumeSystem();
-        wombatframework->GetVolumeSystemName();
-        wombatdatabase->InsertVolumeObject(); // add volume to data
+    wombatframework->OpenVolumeSystem();
+    wombatframework->GetVolumeSystemName();
+    wombatdatabase->InsertVolumeObject(); // add volume to data
         // NEED TO ADD VOLUME TO THE IMAGE MODEL
         //
         // NEED TO COMBINE THE FILE SYSTEM AND PARTITION OBJECT INFORMATION INTO A DB ENTRY.
-        
+        /* NO NEED TO PLACE A VOLUME OBJECT IN THE NODE TREE STRUCTURE...
+         * SIMPLY ADD THE PARTITION(S) TO THE IMAGE NODE
         tmplist.clear(); // clear tmplist to reuse for volumes.
         tmpnode = NULL;
         tmpnode = new QStandardItem(QString::number(wombatvarptr->volumeobject.id));
@@ -265,15 +256,9 @@ void WombatForensics::InitializeEvidenceStructure()
         tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
         tmplist << tmpnode << new QStandardItem(wombatvarptr->volumeobject.name);
         wombatvarptr->dirmodel->findItems(QString::number(wombatvarptr->evidenceobject.id))[0]->appendRow(tmplist);
-        ResizeColumns();
-        /*
-        QStandardItem* volumenode = new QStandardItem(wombatvarptr->volumeobject.name);
-        volumenode->setIcon(QIcon(":/basic/treefilemanager"));
-        imagenode->appendRow(volumenode);
-        wombatvarptr->volumeobjectvector.append(wombatvarptr->volumeobject); // add volume to case volume list
         */
-        wombatframework->OpenPartitions();
-        wombatdatabase->InsertPartitionObjects();
+    wombatframework->OpenPartitions();
+    wombatdatabase->InsertPartitionObjects();
         // NEED TO ADD PARTITIONS TO THE IMAGE MODEL
         /*
         // will remove this once i combine it with partitions.
@@ -281,14 +266,14 @@ void WombatForensics::InitializeEvidenceStructure()
         //wombatdatabase->InsertFileSystemObjects();
         // ADD PARTITIONS AND FS HERE...
         */
-        for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
-        {
-            fprintf(stderr, "Part Name: %s\n", wombatvarptr->partitionobjectvector[i].name.toStdString().c_str());
-        }
-        ResizeColumns();
+    for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
+    {
+        // PARTITION INFORMATION FROM TSK INFO   : FLAGS, LEN (# OF SECTORS), START, (FIRST SECTOR), DESC, SLOT_NUM, TABLE_NUM 
+        fprintf(stderr, "Part Name: %s\n", wombatvarptr->partitionobjectvector[i].name.toStdString().c_str());
+    }
+    ResizeColumns();
         //wombatdatabase->InitializeEvidenceDatabase();
         //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);
-    }
     //wombatframework->BuildEvidenceModel();
     // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
     // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR

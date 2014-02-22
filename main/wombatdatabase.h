@@ -17,11 +17,14 @@ public:
     void CloseAppDB(void);
     //void InitializeEvidenceDatabase(void);
     void InsertEvidenceObject(void);
+    void GetEvidenceObject(void);
     void InsertVolumeObject(void);
     void InsertPartitionObjects(void);
     void InsertFileSystemObjects(void);
     void GetObjectType(void);
     ~WombatDatabase();
+
+
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
     void InsertCase();

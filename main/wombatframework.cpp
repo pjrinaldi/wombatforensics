@@ -15,17 +15,29 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     for(int i=0; i < wombatptr->evidenceobject.fullpathvector.size(); i++)
     {
         images[i] = wombatptr->evidenceobject.fullpathvector[i].c_str();
-        fprintf(stderr, "fpv: %s\n", wombatptr->evidenceobject.fullpathvector[i].c_str());
+        //fprintf(stderr, "fpv: %s\n", wombatptr->evidenceobject.fullpathvector[i].c_str());
     }
     wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
+    if(wombatptr->evidenceobject.imageinfo == NULL)
+        qDebug() << "print image error here";
     free(images);
+}
+
+void WombatFramework::AddEvidenceNode() // add evidence node to the dirmodel
+{
+    QList<QStandardItem*> tmplist;
+    QStandardItem* tmpnode = new QStandardItem(QString::number(wombatptr->evidenceobject.id));
+    tmpnode->setCheckable(true);
+    tmpnode->setIcon(QIcon(":/basic/treeimage"));
+    tmplist << tmpnode << new QStandardItem(wombatptr->evidenceobject.name);
+    wombatptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
 }
 
 void WombatFramework::OpenVolumeSystem() // open current volume system
 {
     wombatptr->evidenceobject.volinfo = tsk_vs_open(wombatptr->evidenceobject.imageinfo, 0, TSK_VS_TYPE_DETECT);
-    if(wombatptr->evidenceobject.volinfo == NULL)
-        fprintf(stderr, "no volume, create dummy one.");
+    //if(wombatptr->evidenceobject.volinfo == NULL)
+        //fprintf(stderr, "no volume, create dummy one.");
 }
 
 void WombatFramework::GetVolumeSystemName() // get the volume system name
