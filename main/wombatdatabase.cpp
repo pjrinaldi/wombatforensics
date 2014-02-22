@@ -234,9 +234,9 @@ void WombatDatabase::InsertFileSystemObjects()
 void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->evidenceobject.id = 0;
-    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, type, size, name, fullpath) VALUES(1, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
     {
-        if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.imageinfo->itype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.imageinfo->sector_size) == SQLITE_OK && sqlite3_bind_text(casestatement, 3, wombatptr->evidenceobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(casestatement, 4, wombatptr->evidenceobject.fullpathvector[0].c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.imageinfo->itype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.imageinfo->size) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.imageinfo->sector_size) == SQLITE_OK && sqlite3_bind_text(casestatement, 4, wombatptr->evidenceobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(casestatement, 5, wombatptr->evidenceobject.fullpathvector[0].c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
             int ret = sqlite3_step(casestatement);
             if(ret == SQLITE_ROW || ret == SQLITE_DONE)
@@ -276,6 +276,7 @@ void WombatDatabase::InsertEvidenceObject()
 
 void WombatDatabase::GetEvidenceObject()
 {
+    // already have id and name from adding/opening the evidence
 }
 /*
 void WombatDatabase::InitializeEvidenceDatabase()
