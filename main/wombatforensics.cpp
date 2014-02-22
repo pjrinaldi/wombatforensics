@@ -418,7 +418,7 @@ void WombatForensics::LoadComplete(bool isok)
             wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
             wombatvarptr->htmlcontent += wombatvarptr->volumeobject.name + "</td></tr>";
             wombatframework->GetBootCode(); // determine boot type in this function and populate html string information into wombatvarptr value
-            wombatvarptr->htmlcontent += "</table>";
+            //wombatvarptr->htmlcontent += "</table>";
             //QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             //tmpelement.appendInside("");
             QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();

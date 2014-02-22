@@ -105,7 +105,7 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
             wombatptr->htmlcontent += "big endian";
         wombatptr->htmlcontent += "</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>partition count</td><td class='pvalue'>";
-        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->part_count) + "</td></tr>";
+        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->part_count) + "</td></tr></table>";
         //wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>boot sector</div>";
         //wombatptr->htmlcontent += "<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr>";
         //wombatptr->htmlcontent += "<tr class='odd'><td>0-0</td><td class='bvalue'></td><td class='desc'></td></tr>";
@@ -114,7 +114,7 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
     }
     else // not a bootable volume
     {
-        wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>not a bootable volume</div>";
+        wombatptr->htmlcontent += "</table><br/><br/><div class='tabletitle'>not a bootable volume</div>";
         // block size, partition count, offset where volume system begins, endian - probably go in a table similar to the above one, not a byte offset one.
         // not sure if i want to include the minimal amount of sector info since there are so few and it'll be repetative with the possible partition
         // layout in the tree view
