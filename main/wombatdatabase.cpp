@@ -360,7 +360,7 @@ void WombatDatabase::GetObjectType()
 {
     int ret;
     PrepareSql(casedb, casestatement, "SELECT objecttype FROM data WHERE objectid = ?;", "1");
-    BindValue(casestatement, 1, wombatptr->selectedobject.id);
+    BindValue(casestatement, 1, (int)wombatptr->selectedobject.id);
     StepSql(casestatement, ret);
     if(ret == SQLITE_ROW || ret == SQLITE_DONE)
         wombatptr->selectedobject.type = sqlite3_column_int(casestatement, 0);

@@ -260,10 +260,10 @@ void StepSql(sqlite3_stmt* sqlstatement, int &ret)
     ret = sqlite3_step(sqlstatement);
     if(ret != SQLITE_ROW && ret != SQLITE_DONE)
     {
-        if(ret == SQLITE_BUSY) qDebug() << "log error"; //DisplayError(errornumber, "STEP", "BUSY");
-        else if(ret == SQLITE_ERROR) qDebug() << "logerror"; //DisplayError(errornumber, "STEP", "ERROR");
-        else if(ret == SQLITE_MISUSE) qDebug() << "log error"; //DisplayError(errornumber, "STEP", "MISUSE");
-        else qDebug() << "logerror"; //DisplayError(errornumber, "STEP", "OTHER ISSUE");
+        if(ret == SQLITE_BUSY) qDebug() << "log error 1"; //DisplayError(errornumber, "STEP", "BUSY");
+        else if(ret == SQLITE_ERROR) qDebug() << "log error 2"; //DisplayError(errornumber, "STEP", "ERROR");
+        else if(ret == SQLITE_MISUSE) qDebug() << "log error 3"; //DisplayError(errornumber, "STEP", "MISUSE");
+        else qDebug() << "log error 4"; //DisplayError(errornumber, "STEP", "OTHER ISSUE");
     }
 }
 /*
