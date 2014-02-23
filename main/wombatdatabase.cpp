@@ -234,7 +234,7 @@ void WombatDatabase::InsertFileSystemObjects()
 void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->evidenceobject.id = 0;
-    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
+    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.imageinfo->itype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.imageinfo->size) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.imageinfo->sector_size) == SQLITE_OK && sqlite3_bind_text(casestatement, 4, wombatptr->evidenceobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(casestatement, 5, wombatptr->evidenceobject.fullpathvector[0].c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
         {
@@ -358,6 +358,14 @@ void WombatDatabase::ReturnCaseID()
 
 void WombatDatabase::GetObjectType()
 {
+    int ret;
+    PrepareSql(casedb, casestatement, "SELECT objecttype FROM data WHERE objectid = ?;", "1");
+    BindValue(casestatement, 1, wombatptr->selectedobject.id);
+    StepSql(casestatement, ret);
+    if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+        wombatptr->selectedobject.type = sqlite3_column_int(casestatement, 0);
+    FinalizeSql(casestatement);
+    /*
     // get type based on objecttype and type value.
     if(sqlite3_prepare_v2(casedb, "SELECT objecttype FROM data WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
     {
@@ -377,6 +385,7 @@ void WombatDatabase::GetObjectType()
     else
         emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
     sqlite3_finalize(casestatement);
+    */
 }
 
 int WombatDatabase::ReturnObjectFileID(int objectid)

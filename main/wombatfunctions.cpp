@@ -165,27 +165,23 @@ SqlObject::SqlObject(sqlite3_stmt* sqlStatement, const char* errorNumber)
         {
                 DisplayError("1.0", "PATH", " to the User Directory not Found");
         }
-}
-SqlObject::~SqlObject(void)
+}*/
+void PrepareSql(sqlite3* sqldb, sqlite3_stmt* sqlstatement, const char* sqlquery, const char* errornumber)
 {
+    if(sqlite3_prepare_v2(sqldb, sqlquery, -1, &sqlstatement, NULL) != SQLITE_OK) // sql statement was not prepared
+    {
+        // log an error, or figure out how to call display error here...
+        //DisplayError(errornumber, "PREPARE", sqlite3_errmsg(sqldb));
+    }
 }
-void SqlObject::PrepareSql(const char* sqlQuery)
+void BindValue(sqlite3_stmt* sqlstatement, int bindplace, int bindvalue)
 {
-        sqlquery = sqlQuery;
-        if(sqlite3_prepare_v2(sqldb, sqlquery, -1, &sqlstatement, NULL) != SQLITE_OK) // sql statement was not prepared
+        if(sqlite3_bind_int(sqlstatement, bindplace, bindvalue) != SQLITE_OK) // sql int bind failed
         {
-                DisplayError(errornumber, "PREPARE", sqlite3_errmsg(sqldb));
+                //DisplayError(errornumber, "BIND INT", "MISUSE");
         }
 }
-void SqlObject::BindValue(int bindPlace, int bindValue)
-{
-        bindplace = bindPlace;
-        bindint = bindValue;
-        if(sqlite3_bind_int(sqlstatement, bindplace, bindint) != SQLITE_OK) // sql int bind failed
-        {
-                DisplayError(errornumber, "BIND INT", "MISUSE");
-        }
-}
+/*
 void SqlObject::BindValue(int bindPlace, double bindValue)
 {
         bindplace = bindPlace;
@@ -258,19 +254,19 @@ const void* SqlObject::ReturnBlob(int returnPlace)
 int64 SqlObject::ReturnLastInsertRowID(void)
 {
         return sqlite3_last_insert_rowid(sqldb);
-}
-int SqlObject::StepSql(void)
+}*/
+void StepSql(sqlite3_stmt* sqlstatement, int &ret)
 {
-        sqlcode = sqlite3_step(sqlstatement);
-        if(sqlcode != SQLITE_ROW && sqlcode != SQLITE_DONE)
-        {
-                if(sqlcode == SQLITE_BUSY) DisplayError(errornumber, "STEP", "BUSY");
-                else if(sqlcode == SQLITE_ERROR) DisplayError(errornumber, "STEP", "ERROR");
-                else if(sqlcode == SQLITE_MISUSE) DisplayError(errornumber, "STEP", "MISUSE");
-                else DisplayError(errornumber, "STEP", "OTHER ISSUE");
-        }
-        return sqlcode;
+    ret = sqlite3_step(sqlstatement);
+    if(ret != SQLITE_ROW && ret != SQLITE_DONE)
+    {
+        if(ret == SQLITE_BUSY) qDebug() << "log error"; //DisplayError(errornumber, "STEP", "BUSY");
+        else if(ret == SQLITE_ERROR) qDebug() << "logerror"; //DisplayError(errornumber, "STEP", "ERROR");
+        else if(ret == SQLITE_MISUSE) qDebug() << "log error"; //DisplayError(errornumber, "STEP", "MISUSE");
+        else qDebug() << "logerror"; //DisplayError(errornumber, "STEP", "OTHER ISSUE");
+    }
 }
+/*
 void SqlObject::ClearBindings(void)
 {
         if(sqlite3_clear_bindings(sqlstatement) != SQLITE_OK)
@@ -284,14 +280,15 @@ void SqlObject::ResetSql(void)
         {
                 DisplayError(errornumber, "RESET", "ERROR");
         }
-}
-void SqlObject::FinalizeSql(void)
+}*/
+void FinalizeSql(sqlite3_stmt* sqlstatement)
 {
-        if(sqlite3_finalize(sqlstatement) != SQLITE_OK)
-        {
-                DisplayError(errornumber, "FINALIZE", "ERROR");
-        }
+    if(sqlite3_finalize(sqlstatement) != SQLITE_OK)
+    {
+        //DisplayError(errornumber, "FINALIZE", "ERROR");
+    }
 }
+/*
 void SqlObject::CloseSql(void)
 {
         sqlcode = sqlite3_close(sqldb);
