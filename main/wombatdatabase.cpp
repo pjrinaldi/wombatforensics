@@ -360,25 +360,26 @@ void WombatDatabase::GetObjectType()
 {
     QSqlDatabase cdb = QSqlDatabase::addDatabase("QSQLITE");
     cdb.setDatabaseName(wombatptr->caseobject.dbname);
-    cdb.open();
-    QSqlQuery cquery;
-    cquery.prepare("SELECT objecttype FROM data WHERE objectid = ?");
-    cquery.bindValue(0, wombatptr->selectedobject.id);
-    cquery.exec();
-    cquery.first();
-    qDebug() << cquery.value(0).toInt();
-    wombatptr->selectedobject.type = cquery.value(0).toInt();
-    // this isn't working??? its got to be something with the variable passing where one isn't passing correctly. probably copy of casestatement
-    /*
-    int ret = -1;
-    PrepareSql(casedb, casestatement, "SELECT objecttype FROM data WHERE objectid = ?;", "1");
-    qDebug() << "1. " << wombatptr->selectedobject.id;
-    BindInt(casedb, casestatement, 1, wombatptr->selectedobject.id);
-    ret = StepSql(casedb, casestatement);
-    if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-        wombatptr->selectedobject.type = sqlite3_column_int(casestatement, 0);
-    FinalizeSql(casestatement);
-    */
+    if(cdb.open()) // boolean
+    {
+        QSqlQuery cquery;
+        cquery.prepare("SELECT objecttype FROM data WHERE objectid = ?");
+        cquery.bindValue(0, wombatptr->selectedobject.id);
+        if(cquery.exec()) // boolean // commit, clear, finish
+        {
+            if(cquery.first()) // boolean // next, last, previous
+            {
+                qDebug() << "Return Value: " << cquery.value(0).toInt();
+                wombatptr->selectedobject.type = cquery.value(0).toInt(); // (complete) record, size (# of rows), seek (bool)
+            }
+            else
+                qDebug() << cdb.lastError().text();
+        }
+        else
+            qDebug() << cdb.lastError().text();
+    }
+    else
+        qDebug() << cdb.lastError().text();
     // get type based on objecttype and type value.
     /*
     if(sqlite3_prepare_v2(casedb, "SELECT objecttype FROM data WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
