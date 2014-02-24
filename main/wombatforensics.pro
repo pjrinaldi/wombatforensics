@@ -1,4 +1,4 @@
-QT += widgets gui core concurrent webkitwidgets
+QT += widgets gui core concurrent webkitwidgets sql
 mac:CONFIG += debug app_bundle
 linux:CONFIG += debug
 mac:TEMPLATE = app

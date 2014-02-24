@@ -21,6 +21,9 @@
 #include <QMessageBox>
 #include <QObject>
 #include <QSizePolicy>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QStatusBar>
@@ -36,13 +39,12 @@
 #include <QtPlugin>
 #include <QtWebKitWidgets>
 #include <QtWidgets>
+#include <sqlite3.h>
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <sys/stat.h>
-#include <vector>
-#include <sqlite3.h>
 
 #include "tsk/libtsk.h"
 #include "translate.hpp"
