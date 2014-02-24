@@ -24,7 +24,6 @@ public:
     void GetObjectType(void);
     ~WombatDatabase();
 
-
     int ReturnCaseCount(void);
     sqlite3* ReturnDB(QString dbname);
     void InsertCase();
@@ -52,6 +51,7 @@ public:
     QStringList ReturnCaseEvidenceIdJobIdType(int caseid);
     QStringList ReturnMessageTableEntries(int jobid);
     QStringList ReturnEvidenceData(int evidenceid);
+    QList<QVariantList> GetSqlResults(QString query, QVariantList invalues);
 signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:

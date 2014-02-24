@@ -24,6 +24,7 @@ bool FileExists(const std::string& filename)
     }
     return false;
 }
+
 /*
 BytesToBinary(Iterator start, Iterator end)
 {

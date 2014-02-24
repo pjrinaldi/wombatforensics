@@ -165,6 +165,7 @@ struct WombatVariable
     //char* bootbuffer; // char buffer of raw data prior to converting bytearray -> set NULL before each use
     std::vector<uchar> rawbyteintvector;
     QString htmlcontent;
+    QSqlDatabase casedb; // might make this a vector since i will add it when i open the case or just switch between them...
 };
 
 Q_DECLARE_METATYPE(WombatVariable)

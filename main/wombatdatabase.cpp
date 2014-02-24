@@ -5,6 +5,61 @@ WombatDatabase::WombatDatabase(WombatVariable* wombatvarptr)
     wombatptr = wombatvarptr;
 }
 
+QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList invalues)
+{
+    QList<QSqlRecord> tmplist;
+    wombatptr->casedb = QSqlDatabase::addDatabase("QSQLITE");
+    wombatptr->casedb.setDatabaseName(wombatptr->caseobject.dbname);
+    if(wombatptr->casedb.open())
+    {
+        QSqlQuery tmpquery;
+        tmpquery.prepare(query);
+        for(int i=0; i < invalues.count(); i++)
+        {
+            tmpquery.addBindValue(invalues[i]);
+        }
+        if(tmpquery.exec())
+        {
+            while(tmpquery.next())
+            {
+                tmplist.append(tmpquery.record();
+            }
+        }
+        else qDebug() << wombatptr->casedb.lastError().text();
+    }
+    else
+        qDebug() << wombatptr->casedb.lastError().text();
+
+/*
+ *  QSqlDatabase cdb = QSqlDatabase::addDatabase("QSQLITE");
+    cdb.setDatabaseName(wombatptr->caseobject.dbname);
+    if(cdb.open()) // boolean
+    {
+        QSqlQuery cquery;
+        cquery.prepare("SELECT objecttype FROM data WHERE objectid = ?");
+        cquery.bindValue(0, wombatptr->selectedobject.id); // addBindValue(value)
+        if(cquery.exec()) // boolean // commit, clear, finish
+        {
+            if(cquery.first()) // boolean // next, last, previous
+            {
+                qDebug() << "Return Value: " << cquery.value(0).toInt();
+                wombatptr->selectedobject.type = cquery.value(0).toInt(); // (complete) record, size (# of rows), seek (bool)
+            }
+            else
+                qDebug() << cdb.lastError().text();
+        }
+        else
+            qDebug() << cdb.lastError().text();
+    }
+    else
+        qDebug() << cdb.lastError().text();
+ *
+ */ 
+    tmplist.append(invalues);
+    
+    return tmplist;
+
+}
 void WombatDatabase::CreateCaseDB(void)
 {
     #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking
@@ -364,7 +419,7 @@ void WombatDatabase::GetObjectType()
     {
         QSqlQuery cquery;
         cquery.prepare("SELECT objecttype FROM data WHERE objectid = ?");
-        cquery.bindValue(0, wombatptr->selectedobject.id);
+        cquery.bindValue(0, wombatptr->selectedobject.id); // addBindValue(value)
         if(cquery.exec()) // boolean // commit, clear, finish
         {
             if(cquery.first()) // boolean // next, last, previous
