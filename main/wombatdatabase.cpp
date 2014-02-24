@@ -358,15 +358,17 @@ void WombatDatabase::ReturnCaseID()
 
 void WombatDatabase::GetObjectType()
 {
-    int ret;
+    // this isn't working??? its got to be something with the variable passing where one isn't passing correctly. probably copy of casestatement
+    int ret = -1;
     PrepareSql(casedb, casestatement, "SELECT objecttype FROM data WHERE objectid = ?;", "1");
-    BindValue(casestatement, 1, (int)wombatptr->selectedobject.id);
-    StepSql(casestatement, ret);
+    qDebug() << "1. " << wombatptr->selectedobject.id;
+    BindInt(casedb, casestatement, 1, wombatptr->selectedobject.id);
+    ret = StepSql(casedb, casestatement);
     if(ret == SQLITE_ROW || ret == SQLITE_DONE)
         wombatptr->selectedobject.type = sqlite3_column_int(casestatement, 0);
     FinalizeSql(casestatement);
-    /*
     // get type based on objecttype and type value.
+    /*
     if(sqlite3_prepare_v2(casedb, "SELECT objecttype FROM data WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
     {
         if(sqlite3_bind_int(casestatement, 1, wombatptr->selectedobject.id) == SQLITE_OK)

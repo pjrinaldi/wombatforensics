@@ -35,7 +35,7 @@ SqlObject(sqlite3_stmt* sqlStatement, const char* errorNumber, sqlite3* openDB);
 void SetSqlConstants(sqlite3* sqldb, sqlite3_stmt* sqlstatement);
 */
 void PrepareSql(sqlite3* sqldb, sqlite3_stmt* sqlstatement, const char* sqlquery, const char* errornumber);
-void BindValue(sqlite3_stmt* sqlstatement, int bindplace, int bindvalue);
+void BindInt(sqlite3* sqldb, sqlite3_stmt* sqlstatement, int bindplace, int bindvalue);
 /*
 void                    BindValue(int bindPlace, double bindValue);
 void                    BindValue(int bindPlace, int64 bindValue);
@@ -48,7 +48,7 @@ int64                   ReturnInt64(int returnPlace);
 const char*             ReturnText(int returnPlace);
 const void*             ReturnBlob(int returnPlace);
 */
-void StepSql(sqlite3_stmt* sqlstatement, int &ret);
+int StepSql(sqlite3* sqldb, sqlite3_stmt* sqlstatement);
 //void                    ClearBindings(void);
 //int64                   ReturnLastInsertRowID(void);
 //void ResetSql(void);

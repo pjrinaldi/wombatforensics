@@ -170,17 +170,89 @@ void PrepareSql(sqlite3* sqldb, sqlite3_stmt* sqlstatement, const char* sqlquery
 {
     if(sqlite3_prepare_v2(sqldb, sqlquery, -1, &sqlstatement, NULL) != SQLITE_OK) // sql statement was not prepared
     {
+        qDebug() << "prepare error: ";
         // log an error, or figure out how to call display error here...
         //DisplayError(errornumber, "PREPARE", sqlite3_errmsg(sqldb));
     }
+    else
+        qDebug() << "prepare was successful";
 }
-void BindValue(sqlite3_stmt* sqlstatement, int bindplace, int bindvalue)
+void BindInt(sqlite3* sqldb, sqlite3_stmt* sqlstatement, int bindplace, int bindvalue)
 {
-        if(sqlite3_bind_int(sqlstatement, bindplace, bindvalue) != SQLITE_OK) // sql int bind failed
-        {
-                //DisplayError(errornumber, "BIND INT", "MISUSE");
-        }
+    qDebug() << "2. " << bindvalue;
+    if(sqlite3_bind_int(sqlstatement, bindplace, bindvalue) != SQLITE_OK) // sql int bind failed
+    {
+        qDebug() << "bind failed: " << sqlite3_errmsg(sqldb);
+        //DisplayError(errornumber, "BIND INT", "MISUSE");
+    }
+    else
+        qDebug() << "bind successful";
 }
+int StepSql(sqlite3* sqldb, sqlite3_stmt* sqlstatement)
+{
+    int ret = -1;
+    while(1)
+    {
+        ret = sqlite3_step(sqlstatement);
+        if(ret == SQLITE_ROW)
+        {
+            qDebug() << "row result";
+        }
+        else if(ret == SQLITE_DONE)
+        {
+            qDebug() << "done";
+            break;
+        }
+        else
+        {
+            qDebug() << "error: " << sqlite3_errmsg(sqldb);
+            break;
+        }
+        /*
+        if(ret != SQLITE_ROW && ret != SQLITE_DONE)
+        {
+            if(ret == SQLITE_BUSY) qDebug() << "log error 1"; //DisplayError(errornumber, "STEP", "BUSY");
+            else if(ret == SQLITE_ERROR) qDebug() << "log error 2"; //DisplayError(errornumber, "STEP", "ERROR");
+            else if(ret == SQLITE_MISUSE) qDebug() << "log error 3"; //DisplayError(errornumber, "STEP", "MISUSE");
+            else qDebug() << "log error 4"; //DisplayError(errornumber, "STEP", "OTHER ISSUE");
+        }
+        else
+            qDebug() << "step successful";
+        */
+    }
+    return ret;
+}
+void FinalizeSql(sqlite3_stmt* sqlstatement)
+{
+    if(sqlite3_finalize(sqlstatement) != SQLITE_OK)
+    {
+        qDebug() << "finalize error";
+        //DisplayError(errornumber, "FINALIZE", "ERROR");
+    }
+    else
+        qDebug() << "finalize successful";
+}
+/*
+
+    if(sqlite3_prepare_v2(casedb, "SELECT objecttype FROM data WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, wombatptr->selectedobject.id) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                wombatptr->selectedobject.type = sqlite3_column_int(casestatement, 0);
+            }
+            else
+                emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
+        }
+        else
+            emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
+    }
+    else
+        emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
+    sqlite3_finalize(casestatement);
+*/
 /*
 void SqlObject::BindValue(int bindPlace, double bindValue)
 {
@@ -255,17 +327,7 @@ int64 SqlObject::ReturnLastInsertRowID(void)
 {
         return sqlite3_last_insert_rowid(sqldb);
 }*/
-void StepSql(sqlite3_stmt* sqlstatement, int &ret)
-{
-    ret = sqlite3_step(sqlstatement);
-    if(ret != SQLITE_ROW && ret != SQLITE_DONE)
-    {
-        if(ret == SQLITE_BUSY) qDebug() << "log error 1"; //DisplayError(errornumber, "STEP", "BUSY");
-        else if(ret == SQLITE_ERROR) qDebug() << "log error 2"; //DisplayError(errornumber, "STEP", "ERROR");
-        else if(ret == SQLITE_MISUSE) qDebug() << "log error 3"; //DisplayError(errornumber, "STEP", "MISUSE");
-        else qDebug() << "log error 4"; //DisplayError(errornumber, "STEP", "OTHER ISSUE");
-    }
-}
+
 /*
 void SqlObject::ClearBindings(void)
 {
@@ -281,13 +343,7 @@ void SqlObject::ResetSql(void)
                 DisplayError(errornumber, "RESET", "ERROR");
         }
 }*/
-void FinalizeSql(sqlite3_stmt* sqlstatement)
-{
-    if(sqlite3_finalize(sqlstatement) != SQLITE_OK)
-    {
-        //DisplayError(errornumber, "FINALIZE", "ERROR");
-    }
-}
+
 /*
 void SqlObject::CloseSql(void)
 {
