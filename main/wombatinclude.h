@@ -42,9 +42,9 @@
 #include <string>
 #include <sys/stat.h>
 #include <vector>
+#include <sqlite3.h>
 
 #include "tsk/libtsk.h"
-#include "tsk/auto/sqlite3.h"
 #include "translate.hpp"
 #include "hexEditor.hpp"
 
