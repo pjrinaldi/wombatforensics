@@ -8,21 +8,21 @@ WombatDatabase::WombatDatabase(WombatVariable* wombatvarptr)
 QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList invalues)
 {
     QList<QSqlRecord> tmplist;
-    wombatptr->casedb = QSqlDatabase::addDatabase("QSQLITE");
-    wombatptr->casedb.setDatabaseName(wombatptr->caseobject.dbname);
-    if(wombatptr->casedb.open())
+    //wombatptr->casedb = QSqlDatabase::addDatabase("QSQLITE");
+    //wombatptr->casedb.setDatabaseName(wombatptr->caseobject.dbname);
+    if(wombatptr->casedb.isOpen())
     {
-        QSqlQuery tmpquery;
-        tmpquery.prepare(query);
+        wombatptr->casequery.clear();
+        wombatptr->casequery.prepare(query);
         for(int i=0; i < invalues.count(); i++)
         {
-            tmpquery.addBindValue(invalues[i]);
+            wombatptr->casequery.addBindValue(invalues[i]);
         }
-        if(tmpquery.exec())
+        if(wombatptr->casequery.exec())
         {
-            while(tmpquery.next())
+            while(wombatptr->casequery.next())
             {
-                tmplist.append(tmpquery.record());
+                tmplist.append(wombatptr->casequery.record());
             }
         }
         else qDebug() << wombatptr->casedb.lastError().text();
@@ -72,7 +72,28 @@ void WombatDatabase::CreateCaseDB(void)
     // we don't have a mechanism to recover from a crash anyway
     //executeStatement("PRAGMA synchronous = 0;", casestatement, "TskImgDBSqlite::initialize");
     //sqlite3_finalize(casestatement);
-    
+    QStringList wombattableschema;
+    wombattableschema.clear();
+    wombattableschema << "CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);";
+    wombattableschema << "CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);";
+    wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
+    wombattableschema << "CREATE TABLE artifacts(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
+    wombattableschema << "CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);";
+    wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, flags INTEGER, childcount INTEGER, endian INTEGER, address INTEGER, size INTEGER, sectsize INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, indoenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);";
+    wombatptr->casedb = QSqlDatabase::addDatabase("QSQLITE");
+    wombatptr->casedb.setDatabaseName(wombatptr->caseobject.dbname);
+    if(wombatptr->casedb.open())
+    {
+        wombatptr->casequery.clear();
+        for(int i=0; i < wombattableschema.count(); i++)
+        {
+            wombatptr->casequery.exec(wombattableschema[i]);
+        }
+    }
+    else
+        qDebug() << wombatptr->casedb.lastError().text();
+
+/*    
     std::vector<const char *> wombatTableSchema;
     wombatTableSchema.clear();
     wombatTableSchema.push_back("CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);");
@@ -102,6 +123,7 @@ void WombatDatabase::CreateCaseDB(void)
         wombatptr->curerrmsg = QString(sqlite3_errmsg(casedb));
 
     wombatptr->curerrmsg = "";
+    */
 }
 
 void WombatDatabase::CreateAppDB()
@@ -147,10 +169,16 @@ void WombatDatabase::OpenAppDB()
 
 void WombatDatabase::OpenCaseDB()
 {
+    if(wombatptr->casedb.isOpen())
+        qDebug() << "case is open.";
+    else
+        qDebug() << wombatptr->casedb.lastError().text();
+    /*
     if(sqlite3_open(wombatptr->caseobject.dbname.toStdString().c_str(), &casedb) != SQLITE_OK)
         wombatptr->curerrmsg = QString(sqlite3_errmsg(casedb));
     else
         wombatptr->curerrmsg = "";
+    */
 }
 
 void WombatDatabase::CloseAppDB()

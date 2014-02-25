@@ -167,6 +167,7 @@ struct WombatVariable
     QString htmlcontent;
     QSqlDatabase casedb; // might make this a vector since i will add it when i open the case or just switch between them...
     QList<QSqlRecord> sqlrecords;
+    QSqlQuery casequery;
     QList<QVariant> bindvalues;
 };
 
