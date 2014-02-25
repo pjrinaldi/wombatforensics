@@ -166,6 +166,7 @@ struct WombatVariable
     std::vector<uchar> rawbyteintvector;
     QString htmlcontent;
     QSqlDatabase casedb; // might make this a vector since i will add it when i open the case or just switch between them...
+    QSqlDatabase appdb;
     QList<QSqlRecord> sqlrecords;
     QList<QVariant> bindvalues;
 };

@@ -22,6 +22,7 @@ public:
     void InsertPartitionObjects(void);
     void InsertFileSystemObjects(void);
     void GetObjectType(void);
+
     ~WombatDatabase();
 
     int ReturnCaseCount(void);
