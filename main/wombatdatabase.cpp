@@ -12,17 +12,18 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
     //wombatptr->casedb.setDatabaseName(wombatptr->caseobject.dbname);
     if(wombatptr->casedb.isOpen())
     {
-        wombatptr->casequery.clear();
-        wombatptr->casequery.prepare(query);
+        QSqlQuery casequery;
+        //wombatptr->casequery.clear();
+        casequery.prepare(query);
         for(int i=0; i < invalues.count(); i++)
         {
-            wombatptr->casequery.addBindValue(invalues[i]);
+            casequery.addBindValue(invalues[i]);
         }
-        if(wombatptr->casequery.exec())
+        if(casequery.exec())
         {
-            while(wombatptr->casequery.next())
+            while(casequery.next())
             {
-                tmplist.append(wombatptr->casequery.record());
+                tmplist.append(casequery.record());
             }
         }
         else qDebug() << wombatptr->casedb.lastError().text();
@@ -84,10 +85,11 @@ void WombatDatabase::CreateCaseDB(void)
     wombatptr->casedb.setDatabaseName(wombatptr->caseobject.dbname);
     if(wombatptr->casedb.open())
     {
-        wombatptr->casequery.clear();
+        QSqlQuery casequery;
+        //wombatptr->casequery.clear();
         for(int i=0; i < wombattableschema.count(); i++)
         {
-            wombatptr->casequery.exec(wombattableschema[i]);
+            casequery.exec(wombattableschema[i]);
         }
     }
     else
@@ -172,6 +174,7 @@ void WombatDatabase::OpenCaseDB()
     if(wombatptr->casedb.isOpen())
         qDebug() << "case is open.";
     else
+        wombatptr->casedb.open();
         qDebug() << wombatptr->casedb.lastError().text();
     /*
     if(sqlite3_open(wombatptr->caseobject.dbname.toStdString().c_str(), &casedb) != SQLITE_OK)
