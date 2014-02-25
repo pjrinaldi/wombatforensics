@@ -32,9 +32,73 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
 
 }
 
-int WombatDatabase::InsertSql(QString query, QVariantList invalues)
+void WombatDatabase::InsertSql(QString query, QVariantList invalues)
 {
-    
+   if(wombatptr->casedb.isOpen())
+   {
+       QSqlQuery casequery;
+       casequery.prepare(query);
+       for(int i=0; i < invalues.count(); i++)
+       {
+           casequery.addBindValue(invalues[i]);
+       }
+       if(casequery.exec())
+       {
+           while(casequery.next())
+           {
+               qDebug() << "successful insert with bind";
+           }
+       }
+       else
+           qDebug() << wombatptr->casedb.lastError().text();
+   }
+   else
+       qDebug() << wombatptr->casedb.lastError().text();
+}
+
+
+void WombatDatabase::InsertSql(QString query)
+{
+   if(wombatptr->casedb.isOpen())
+   {
+       QSqlQuery casequery;
+       casequery.prepare(query);
+       if(casequery.exec())
+       {
+           qDebug() << "successful query";
+       }
+       else
+           qDebug() << wombatptr->casedb.lastError().text();
+   }
+   else
+       qDebug() << wombatptr->casedb.lastError().text();
+}
+
+int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
+{
+   int tmpid = 0;
+   if(wombatptr->casedb.isOpen())
+   {
+       QSqlQuery casequery;
+       casequery.prepare(query);
+       for(int i=0; i < invalues.count(); i++)
+       {
+           casequery.addBindValue(invalues[i]);
+       }
+       if(casequery.exec())
+       {
+           while(casequery.next())
+           {
+               //tmpid = ... // do the return id here once i look it up.
+           }
+       }
+       else
+           qDebug() << wombatptr->casedb.lastError().text();
+   }
+   else
+       qDebug() << wombatptr->casedb.lastError().text();
+
+   return tmpid;
 }
 
 void WombatDatabase::CreateCaseDB(void)
@@ -155,8 +219,10 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->offset);
         wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
         wombatptr->bindvalues.append(wombatptr->volumeobject.name);
-        wombatptr->sqlrecords.clear();
-        wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);");
+        //wombatptr->sqlrecords.clear();
+        wombatptr->volumeobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+
+        //wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);");
         //wombatptr->volumeobject.id = wombatptr->casedb.lastInsertRowId(); // NEED TO LOOK THIS UP
     }
     else
@@ -165,8 +231,9 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
         wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
         wombatptr->bindvalues.append(wombatptr->volumeobject.name);
-        wombatptr->sqlrecords.clear();
-        wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, 240, ?, 0, ?, ?);");
+        wombatptr->volumeobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+        //wombatptr->sqlrecords.clear();
+        //wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, 240, ?, 0, ?, ?);");
         //wombatptr->volumeobject.id = wombatptr->casedb.lastInsertRowId(); // NEED TO LOOK THIS UP
     }
 }
@@ -185,10 +252,11 @@ void WombatDatabase::InsertPartitionObjects()
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->len);
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
             wombatptr->bindvalues.append(wombatptr->volumeobject.id);
-            wombatptr->sqlrecords.clear();
-            wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);");
+            wombatptr->partitionobject.id = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+            //wombatptr->sqlrecords.clear();
+            //wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);");
             //wombatptr->partitionobject.id = casedb.lastInsertRowId(); // NEED TO LOOK THIS UP
-           wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
+            wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
         }
     }
 }
@@ -226,6 +294,7 @@ void WombatDatabase::InsertFileSystemObjects()
     }
 }
 */
+
 void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->evidenceobject.id = 0;
@@ -234,37 +303,18 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.name);
-    wombatptr->bindvalues.append(wombatptr->evidenceobject.fullpathvector[0]);
-    wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);");
-    wombatptr->evidenceobject.id = casedb.lastinsertrowid() // NEED TO LOOK THIS UP
+    wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]));
+    wombatptr->evidenceobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+    //wombatptr->sqlrecords.clear();
+    //wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);");
+    //wombatptr->evidenceobject.id = casedb.lastinsertrowid() // NEED TO LOOK THIS UP
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
         wombatptr->bindvalues.clear();
         wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
-        wombatptr->bindvalues.append(wombatptr->evidenceobject.fullpathvector[i]);
+        wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[i]));
         wombatptr->bindvalues.append(i+1);
-        wombatptr->sqlrecords.clear();
-        // wombatptr->sqlrecords = // NEED A VOID WITH NO RETURN WHEN THERE ARE NO RETURNS
-        /*
-        if(sqlite3_prepare_v2(casedb, "INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
-        {
-            if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.id) == SQLITE_OK && sqlite3_bind_text(casestatement, 2, wombatptr->evidenceobject.fullpathvector[i].c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, (i+1)) == SQLITE_OK)
-            {
-                int ret = sqlite3_step(casestatement);
-                if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-                {
-                }
-                else
-                    emit DisplayError("1.5", "SQL Error: ", sqlite3_errmsg(casedb));
-            }
-            else
-                emit DisplayError("1.5", "SQL Error", sqlite3_errmsg(casedb));
-        }
-        else
-            emit DisplayError("1.5", "SQL Error ", sqlite3_errmsg(casedb));
-        sqlite3_finalize(casestatement);
-        */
+        InsertSql("INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", wombatptr->bindvalues);
     }
 }
 
@@ -277,9 +327,11 @@ void WombatDatabase::InitializeEvidenceDatabase()
 {
 }
 */
+
 int WombatDatabase::ReturnCaseCount()
 {
     int casecount = 0;
+    /*
     if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", -1, &wombatstatement, NULL) == SQLITE_OK)
     {
         int ret = sqlite3_step(wombatstatement);
@@ -288,6 +340,7 @@ int WombatDatabase::ReturnCaseCount()
     }
     else
         emit DisplayError("1.3", "SQL Error. ", sqlite3_errmsg(wombatdb));
+    */
 
     return casecount;
 }

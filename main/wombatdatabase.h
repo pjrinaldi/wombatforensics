@@ -55,7 +55,9 @@ public:
 
 
     QList<QSqlRecord> GetSqlResults(QString query, QVariantList invalues);
-    int InsertSql(QString query, QVariantList invalues);
+    int InsertSqlGetID(QString query, QVariantList invalues);
+    void InsertSql(QString query, QVariantList invalues);
+    void InsertSql(QString query);
 
 
 signals:
