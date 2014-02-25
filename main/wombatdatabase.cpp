@@ -305,9 +305,6 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->bindvalues.append(wombatptr->evidenceobject.name);
     wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]));
     wombatptr->evidenceobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-    //wombatptr->sqlrecords.clear();
-    //wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);");
-    //wombatptr->evidenceobject.id = casedb.lastinsertrowid() // NEED TO LOOK THIS UP
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
         wombatptr->bindvalues.clear();
@@ -332,80 +329,41 @@ int WombatDatabase::ReturnCaseCount()
 {
     wombatptr->bindvalues.clear();
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlRecords("SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", wombatptr->bindvalues);
-    
-    return wombatptr->sqlrecords[0].value(0)toInt();
-
-    /*
-    if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", -1, &wombatstatement, NULL) == SQLITE_OK)
-    {
-        int ret = sqlite3_step(wombatstatement);
-        if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-            casecount = sqlite3_column_int(wombatstatement, 0);
-    }
+    wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", wombatptr->bindvalues);
+    qDebug() << "Case Count: " << wombatptr->sqlrecords.count();
+    if(wombatptr->sqlrecords.count() > 0)
+        return wombatptr->sqlrecords[0].value(0).toInt();
     else
-        emit DisplayError("1.3", "SQL Error. ", sqlite3_errmsg(wombatdb));
-    */
-
-    //return casecount;
+        return 0;
 }
 
 void WombatDatabase::InsertCase()
 {
     wombatptr->caseobject.id = 0;
-    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO cases (name, creation, deleted) VALUES(?, ?, 0);", -1, &casestatement, NULL) == SQLITE_OK)
-    {
-        if(sqlite3_bind_text(casestatement, 1, wombatptr->caseobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(casestatement, 2, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
-        {
-            int ret = sqlite3_step(casestatement);
-            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-            {
-                wombatptr->caseobject.id = sqlite3_last_insert_rowid(wombatdb);
-            }
-            else
-                emit DisplayError("1.4", "INSERT CASE - RETURN CASEID", sqlite3_errmsg(wombatdb));
-        }
-        else
-            emit DisplayError("1.4", "INSERT CASE - BIND CASENAME", sqlite3_errmsg(wombatdb));
-    }
-    else
-        emit DisplayError("1.4", "INSERT CASE - PREPARE INSERT", sqlite3_errmsg(wombatdb));
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->caseobject.name);
+    wombatptr->bindvalues.append(QString::fromStdString(GetTime()));
+    wombatptr->caseobject.id = InsertSqlGetID("INSERT INTO cases (name, creation, deleted) VALUES(?, ?, 0);", wombatptr->bindvalues);
 }
 
 void WombatDatabase::ReturnCaseNameList()
 {
-    if(sqlite3_prepare_v2(wombatdb, "SELECT name FROM cases WHERE deleted = 0 ORDER by caseid;", -1, &casestatement, NULL) == SQLITE_OK)
+    wombatptr->bindvalues.clear();
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT name FROM cases WHERE deleted = 0 ORDER by caseid;", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
-        while(sqlite3_step(casestatement) == SQLITE_ROW)
-        {
-            wombatptr->casenamelist << (const char*)sqlite3_column_text(casestatement, 0);
-        }
-    }
-    else
-    {
-        emit DisplayError("1.5", "RETURN CASE NAMES LIST", sqlite3_errmsg(wombatdb));
+        wombatptr->casenamelist << wombatptr->sqlrecords[i].value(0).toString();
     }
 }
 
 void WombatDatabase::ReturnCaseID()
 {
-    if(sqlite3_prepare_v2(wombatdb, "SELECT caseid FROM cases WHERE name = ?;", -1, &casestatement, NULL) == SQLITE_OK)
-    {
-        if(sqlite3_bind_text(casestatement, 1, wombatptr->caseobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
-        {
-            int ret = sqlite3_step(casestatement);
-            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-            {
-                wombatptr->caseobject.id = sqlite3_column_int(casestatement, 0);
-            }
-            else
-                emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
-        }
-        else
-            emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
-    }
-    else
-        emit DisplayError("1.6", "RETURN CURRENT CASE ID", sqlite3_errmsg(wombatdb));
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->caseobject.name);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT caseid FROM cases WHERE name = ?;", wombatptr->bindvalues);
+    wombatptr->caseobject.id = wombatptr->sqlrecords[0].value(0).toInt();
 }
 
 void WombatDatabase::GetObjectType()
@@ -417,6 +375,7 @@ void WombatDatabase::GetObjectType()
     qDebug() << wombatptr->sqlrecords[0].value(0).toInt();
 }
 
+// not used will eventually be deleted.
 int WombatDatabase::ReturnObjectFileID(int objectid)
 {
     int fileid = 0;
