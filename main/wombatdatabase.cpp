@@ -86,12 +86,7 @@ int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
            casequery.addBindValue(invalues[i]);
        }
        if(casequery.exec())
-       {
-           while(casequery.next())
-           {
-               //tmpid = ... // do the return id here once i look it up.
-           }
-       }
+           tmpid = casequery.lastInsertId().toInt();
        else
            qDebug() << wombatptr->casedb.lastError().text();
    }
@@ -155,12 +150,6 @@ void WombatDatabase::OpenAppDB()
         qDebug() << "appdb is open";
     else
         qDebug() << wombatptr->appdb.lastError().text();
-    /*
-    if(sqlite3_open(wombatptr->wombatdbname.toStdString().c_str(), &wombatdb) != SQLITE_OK)
-        wombatptr->curerrmsg = QString(sqlite3_errmsg(wombatdb));
-    else
-        wombatptr->curerrmsg = QString("");
-    */
 }
 
 void WombatDatabase::OpenCaseDB()
@@ -170,12 +159,6 @@ void WombatDatabase::OpenCaseDB()
     else
         wombatptr->casedb.open();
         qDebug() << wombatptr->casedb.lastError().text();
-    /*
-    if(sqlite3_open(wombatptr->caseobject.dbname.toStdString().c_str(), &casedb) != SQLITE_OK)
-        wombatptr->curerrmsg = QString(sqlite3_errmsg(casedb));
-    else
-        wombatptr->curerrmsg = "";
-    */
 }
 
 void WombatDatabase::CloseAppDB()
@@ -219,11 +202,7 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->offset);
         wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
         wombatptr->bindvalues.append(wombatptr->volumeobject.name);
-        //wombatptr->sqlrecords.clear();
         wombatptr->volumeobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-
-        //wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);");
-        //wombatptr->volumeobject.id = wombatptr->casedb.lastInsertRowId(); // NEED TO LOOK THIS UP
     }
     else
     {
@@ -231,10 +210,7 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
         wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
         wombatptr->bindvalues.append(wombatptr->volumeobject.name);
-        wombatptr->volumeobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-        //wombatptr->sqlrecords.clear();
-        //wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, 240, ?, 0, ?, ?);");
-        //wombatptr->volumeobject.id = wombatptr->casedb.lastInsertRowId(); // NEED TO LOOK THIS UP
+        wombatptr->volumeobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, 240, ?, 0, ?, ?);", wombatptr->bindvalues);
     }
 }
 
