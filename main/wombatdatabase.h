@@ -52,7 +52,12 @@ public:
     QStringList ReturnCaseEvidenceIdJobIdType(int caseid);
     QStringList ReturnMessageTableEntries(int jobid);
     QStringList ReturnEvidenceData(int evidenceid);
+
+
     QList<QSqlRecord> GetSqlResults(QString query, QVariantList invalues);
+    int InsertSql(QString query, QVariantList invalues);
+
+
 signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:

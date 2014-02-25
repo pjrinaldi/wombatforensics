@@ -28,36 +28,15 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
     else
         qDebug() << wombatptr->casedb.lastError().text();
 
-/*
- *  QSqlDatabase cdb = QSqlDatabase::addDatabase("QSQLITE");
-    cdb.setDatabaseName(wombatptr->caseobject.dbname);
-    if(cdb.open()) // boolean
-    {
-        QSqlQuery cquery;
-        cquery.prepare("SELECT objecttype FROM data WHERE objectid = ?");
-        cquery.bindValue(0, wombatptr->selectedobject.id); // addBindValue(value)
-        if(cquery.exec()) // boolean // commit, clear, finish
-        {
-            if(cquery.first()) // boolean // next, last, previous
-            {
-                qDebug() << "Return Value: " << cquery.value(0).toInt();
-                wombatptr->selectedobject.type = cquery.value(0).toInt(); // (complete) record, size (# of rows), seek (bool)
-            }
-            else
-                qDebug() << cdb.lastError().text();
-        }
-        else
-            qDebug() << cdb.lastError().text();
-    }
-    else
-        qDebug() << cdb.lastError().text();
- *
- */ 
-    //tmplist.append(invalues);
-    
     return tmplist;
 
 }
+
+int WombatDatabase::InsertSql(QString query, QVariantList invalues)
+{
+    
+}
+
 void WombatDatabase::CreateCaseDB(void)
 {
     #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking
@@ -108,10 +87,16 @@ void WombatDatabase::CreateAppDB()
 
 void WombatDatabase::OpenAppDB()
 {
+    if(wombatptr->appdb.isOpen())
+        qDebug() << "appdb is open";
+    else
+        qDebug() << wombatptr->appdb.lastError().text();
+    /*
     if(sqlite3_open(wombatptr->wombatdbname.toStdString().c_str(), &wombatdb) != SQLITE_OK)
         wombatptr->curerrmsg = QString(sqlite3_errmsg(wombatdb));
     else
         wombatptr->curerrmsg = QString("");
+    */
 }
 
 void WombatDatabase::OpenCaseDB()
@@ -131,6 +116,7 @@ void WombatDatabase::OpenCaseDB()
 
 void WombatDatabase::CloseAppDB()
 {
+    /*
     if(sqlite3_finalize(wombatstatement) == SQLITE_OK)
     {
         if(sqlite3_close(wombatdb) == SQLITE_OK)
@@ -149,6 +135,7 @@ void WombatDatabase::CloseAppDB()
         fprintf(stderr, "CloseDB: %s\n", sqlite3_errmsg(wombatdb));
         wombatptr->curerrmsg = QString(sqlite3_errmsg(wombatdb));
     }
+    */
 }
 
 WombatDatabase::~WombatDatabase()
@@ -158,44 +145,30 @@ WombatDatabase::~WombatDatabase()
 
 void WombatDatabase::InsertVolumeObject()
 {
-    wombatptr->volumeobject.id = 0;
     // might need to add endianordering INTEGER column
-    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
+    wombatptr->volumeobject.id = 0;
+    if(wombatptr->evidenceobject.volinfo != NULL)
     {
-        if(wombatptr->evidenceobject.volinfo != NULL)
-        {
-            if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.volinfo->vstype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.volinfo->block_size) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.volinfo->offset) == SQLITE_OK && sqlite3_bind_int(casestatement, 4, wombatptr->evidenceobject.id) == SQLITE_OK && sqlite3_bind_text(casestatement, 5, wombatptr->volumeobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
-            {
-                int ret = sqlite3_step(casestatement);
-                if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-                {
-                    wombatptr->volumeobject.id = sqlite3_last_insert_rowid(casedb);
-                }
-                else
-                    emit DisplayError("1.6", "SQL Error: ", sqlite3_errmsg(casedb));
-            }
-            else
-                emit DisplayError("1.6", "SQL Error: ", sqlite3_errmsg(casedb));
-        }
-        else
-        {
-            if(sqlite3_bind_int(casestatement, 1, 240) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.imageinfo->sector_size) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, 0) == SQLITE_OK && sqlite3_bind_int(casestatement, 4, wombatptr->evidenceobject.id) == SQLITE_OK && sqlite3_bind_text(casestatement, 5, wombatptr->volumeobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
-            {
-                int ret = sqlite3_step(casestatement);
-                if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-                {
-                    wombatptr->volumeobject.id = sqlite3_last_insert_rowid(casedb);
-                }
-                else
-                    emit DisplayError("1.6", "SQL Error: ", sqlite3_errmsg(casedb));
-            }
-            else
-                emit DisplayError("1.6", "SQL Error: ", sqlite3_errmsg(casedb));
-        }
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->vstype);
+        wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->block_size);
+        wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->offset);
+        wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
+        wombatptr->bindvalues.append(wombatptr->volumeobject.name);
+        wombatptr->sqlrecords.clear();
+        wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);");
+        //wombatptr->volumeobject.id = wombatptr->casedb.lastInsertRowId(); // NEED TO LOOK THIS UP
     }
     else
-        emit DisplayError("1.6", "SQL Error: ", sqlite3_errmsg(casedb));
-    sqlite3_finalize(casestatement);
+    {
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
+        wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
+        wombatptr->bindvalues.append(wombatptr->volumeobject.name);
+        wombatptr->sqlrecords.clear();
+        wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, 240, ?, 0, ?, ?);");
+        //wombatptr->volumeobject.id = wombatptr->casedb.lastInsertRowId(); // NEED TO LOOK THIS UP
+    }
 }
 
 void WombatDatabase::InsertPartitionObjects()
@@ -206,25 +179,16 @@ void WombatDatabase::InsertPartitionObjects()
         {
             wombatptr->partitionobject.name = QString::fromUtf8(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->desc);
             wombatptr->partitionobject.id = 0;
-            if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
-            {
-                if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.partinfovector[i]->flags) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.partinfovector[i]->start) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.partinfovector[i]->len) == SQLITE_OK && sqlite3_bind_text(casestatement, 4, wombatptr->evidenceobject.partinfovector[i]->desc, -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(casestatement, 5, wombatptr->volumeobject.id) == SQLITE_OK)
-                {
-                    int ret = sqlite3_step(casestatement);
-                    if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-                    {
-                        wombatptr->partitionobject.id = sqlite3_last_insert_rowid(casedb);
-                    }
-                    else
-                        emit DisplayError("1.7", "SQL Error: ", sqlite3_errmsg(casedb));
-                }
-                else
-                    emit DisplayError("1.7", "SQL Error: ", sqlite3_errmsg(casedb));
-            }
-            else
-                emit DisplayError("1.7", "SQL Error: ", sqlite3_errmsg(casedb));
-            sqlite3_finalize(casestatement);
-            wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
+            wombatptr->bindvalues.clear();
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->flags);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->start);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->len);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
+            wombatptr->bindvalues.append(wombatptr->volumeobject.id);
+            wombatptr->sqlrecords.clear();
+            wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);");
+            //wombatptr->partitionobject.id = casedb.lastInsertRowId(); // NEED TO LOOK THIS UP
+           wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
         }
     }
 }
@@ -265,26 +229,24 @@ void WombatDatabase::InsertFileSystemObjects()
 void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->evidenceobject.id = 0;
-    if(sqlite3_prepare_v2(casedb, "INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
-    {
-        if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.imageinfo->itype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.imageinfo->size) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.imageinfo->sector_size) == SQLITE_OK && sqlite3_bind_text(casestatement, 4, wombatptr->evidenceobject.name.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(casestatement, 5, wombatptr->evidenceobject.fullpathvector[0].c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
-        {
-            int ret = sqlite3_step(casestatement);
-            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-            {
-                wombatptr->evidenceobject.id = sqlite3_last_insert_rowid(casedb);
-            }
-            else
-                qDebug() << sqlite3_errmsg(casedb);//emit DisplayError("1.4", "SQL Error: ", sqlite3_errmsg(casedb));
-        }
-        else
-            qDebug() << sqlite3_errmsg(casedb);//emit DisplayError("1.4", "SQL Error: ", sqlite3_errmsg(casedb));
-    }
-    else
-        emit DisplayError("1.4", "SQL Error ", sqlite3_errmsg(casedb));
-    sqlite3_finalize(casestatement);
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->itype);
+    wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->size);
+    wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
+    wombatptr->bindvalues.append(wombatptr->evidenceobject.name);
+    wombatptr->bindvalues.append(wombatptr->evidenceobject.fullpathvector[0]);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);");
+    wombatptr->evidenceobject.id = casedb.lastinsertrowid() // NEED TO LOOK THIS UP
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
+        wombatptr->bindvalues.append(wombatptr->evidenceobject.fullpathvector[i]);
+        wombatptr->bindvalues.append(i+1);
+        wombatptr->sqlrecords.clear();
+        // wombatptr->sqlrecords = // NEED A VOID WITH NO RETURN WHEN THERE ARE NO RETURNS
+        /*
         if(sqlite3_prepare_v2(casedb, "INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
         {
             if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.id) == SQLITE_OK && sqlite3_bind_text(casestatement, 2, wombatptr->evidenceobject.fullpathvector[i].c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, (i+1)) == SQLITE_OK)
@@ -302,6 +264,7 @@ void WombatDatabase::InsertEvidenceObject()
         else
             emit DisplayError("1.5", "SQL Error ", sqlite3_errmsg(casedb));
         sqlite3_finalize(casestatement);
+        */
     }
 }
 
@@ -394,52 +357,6 @@ void WombatDatabase::GetObjectType()
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT objecttype FROM data WHERE objectid = ?", wombatptr->bindvalues);
     qDebug() << wombatptr->sqlrecords[0].value(0).toInt();
-    //GetSqlResults(QString query, QVariantList invalues)
-    /*
-    QSqlDatabase cdb = QSqlDatabase::addDatabase("QSQLITE");
-    cdb.setDatabaseName(wombatptr->caseobject.dbname);
-    if(cdb.open()) // boolean
-    {
-        QSqlQuery cquery;
-        cquery.prepare("SELECT objecttype FROM data WHERE objectid = ?");
-        cquery.bindValue(0, wombatptr->selectedobject.id); // addBindValue(value)
-        if(cquery.exec()) // boolean // commit, clear, finish
-        {
-            if(cquery.first()) // boolean // next, last, previous
-            {
-                qDebug() << "Return Value: " << cquery.value(0).toInt();
-                wombatptr->selectedobject.type = cquery.value(0).toInt(); // (complete) record, size (# of rows), seek (bool)
-            }
-            else
-                qDebug() << cdb.lastError().text();
-        }
-        else
-            qDebug() << cdb.lastError().text();
-    }
-    else
-        qDebug() << cdb.lastError().text();
-    */
-    // get type based on objecttype and type value.
-    /*
-    if(sqlite3_prepare_v2(casedb, "SELECT objecttype FROM data WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
-    {
-        if(sqlite3_bind_int(casestatement, 1, wombatptr->selectedobject.id) == SQLITE_OK)
-        {
-            int ret = sqlite3_step(casestatement);
-            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-            {
-                wombatptr->selectedobject.type = sqlite3_column_int(casestatement, 0);
-            }
-            else
-                emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
-        }
-        else
-            emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
-    }
-    else
-        emit DisplayError("2.1", "RETURN SELECTED OBJECT TYPE", sqlite3_errmsg(casedb));
-    sqlite3_finalize(casestatement);
-    */
 }
 
 int WombatDatabase::ReturnObjectFileID(int objectid)
