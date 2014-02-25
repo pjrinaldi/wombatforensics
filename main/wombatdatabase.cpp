@@ -22,7 +22,7 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
         {
             while(tmpquery.next())
             {
-                tmplist.append(tmpquery.record();
+                tmplist.append(tmpquery.record());
             }
         }
         else qDebug() << wombatptr->casedb.lastError().text();
@@ -55,7 +55,7 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
         qDebug() << cdb.lastError().text();
  *
  */ 
-    tmplist.append(invalues);
+    //tmplist.append(invalues);
     
     return tmplist;
 
@@ -413,6 +413,13 @@ void WombatDatabase::ReturnCaseID()
 
 void WombatDatabase::GetObjectType()
 {
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->selectedobject.id);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    qDebug() << wombatptr->sqlrecords[0].value(0).toInt();
+    //GetSqlResults(QString query, QVariantList invalues)
+    /*
     QSqlDatabase cdb = QSqlDatabase::addDatabase("QSQLITE");
     cdb.setDatabaseName(wombatptr->caseobject.dbname);
     if(cdb.open()) // boolean
@@ -435,6 +442,7 @@ void WombatDatabase::GetObjectType()
     }
     else
         qDebug() << cdb.lastError().text();
+    */
     // get type based on objecttype and type value.
     /*
     if(sqlite3_prepare_v2(casedb, "SELECT objecttype FROM data WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)

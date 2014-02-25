@@ -24,6 +24,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QStatusBar>
