@@ -330,7 +330,12 @@ void WombatDatabase::InitializeEvidenceDatabase()
 
 int WombatDatabase::ReturnCaseCount()
 {
-    int casecount = 0;
+    wombatptr->bindvalues.clear();
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlRecords("SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", wombatptr->bindvalues);
+    
+    return wombatptr->sqlrecords[0].value(0)toInt();
+
     /*
     if(sqlite3_prepare_v2(wombatdb, "SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", -1, &wombatstatement, NULL) == SQLITE_OK)
     {
@@ -342,7 +347,7 @@ int WombatDatabase::ReturnCaseCount()
         emit DisplayError("1.3", "SQL Error. ", sqlite3_errmsg(wombatdb));
     */
 
-    return casecount;
+    //return casecount;
 }
 
 void WombatDatabase::InsertCase()
