@@ -259,11 +259,12 @@ void WombatForensics::InitializeEvidenceStructure()
         */
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
+    wombatdatabase->InsertFileSystemObjects();
+    wombatframework->AddPartitionNodes();
         // NEED TO ADD PARTITIONS TO THE IMAGE MODEL
         /*
         // will remove this once i combine it with partitions.
         //wombatframework->OpenFileSystems();
-        //wombatdatabase->InsertFileSystemObjects();
         // ADD PARTITIONS AND FS HERE...
         */
     for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
@@ -271,6 +272,7 @@ void WombatForensics::InitializeEvidenceStructure()
         // PARTITION INFORMATION FROM TSK INFO   : FLAGS, LEN (# OF SECTORS), START, (FIRST SECTOR), DESC, SLOT_NUM, TABLE_NUM 
         fprintf(stderr, "Part Name: %s\n", wombatvarptr->partitionobjectvector[i].name.toStdString().c_str());
     }
+
     ResizeColumns();
         //wombatdatabase->InitializeEvidenceDatabase();
         //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);

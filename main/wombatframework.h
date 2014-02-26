@@ -19,6 +19,7 @@ public:
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);
     void OpenPartitions(void);
+    void AddPartitionNodes(void);
     void OpenFileSystems(void);
 
     void GetBootCode(void);

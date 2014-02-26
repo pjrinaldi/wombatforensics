@@ -229,47 +229,35 @@ void WombatDatabase::InsertPartitionObjects()
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
             wombatptr->bindvalues.append(wombatptr->volumeobject.id);
             wombatptr->partitionobject.id = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-            //wombatptr->sqlrecords.clear();
-            //wombatptr->sqlrecords = GetSqlRecords("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);");
-            //wombatptr->partitionobject.id = casedb.lastInsertRowId(); // NEED TO LOOK THIS UP
             wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
         }
     }
 }
-// COMBINE PARTITION WITH THE FILESYSTEM OBJECTS
-/*
 void WombatDatabase::InsertFileSystemObjects()
 {
-    for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
+    qDebug() << "fsinfo vector count: " << wombatptr->evidenceobject.fsinfovector.size();
+    if(wombatptr->evidenceobject.fsinfovector.size() > 0)
     {
-        fprintf(stderr, "i: %i\n", i);
-        //wombatptr->filesystemobject.name = QString::fromUtf8(wombatptr->evidenceobject.fsinfovector[i]->duname);
-        wombatptr->filesystemobject.id = 0;
-        if(wombatptr->evidenceobject.fsinfovector[i] != NULL)
+        for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
         {
-            if(sqlite3_prepare_v2(casedb, "INSERT INTO data (type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
-            {
-                if(sqlite3_bind_int(casestatement, 1, wombatptr->evidenceobject.fsinfovector[i]->ftype) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, wombatptr->evidenceobject.fsinfovector[i]->flags) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, wombatptr->evidenceobject.fsinfovector[i]->offset) == SQLITE_OK && sqlite3_bind_int(casestatement, 4, wombatptr->volumeobject.id) == SQLITE_OK && sqlite3_bind_int(casestatement, 5, wombatptr->evidenceobject.fsinfovector[i]->block_size) == SQLITE_OK && sqlite3_bind_int(casestatement, 6, wombatptr->evidenceobject.fsinfovector[i]->block_count) == SQLITE_OK && sqlite3_bind_int(casestatement, 7, wombatptr->evidenceobject.fsinfovector[i]->first_inum) == SQLITE_OK && sqlite3_bind_int(casestatement, 8, wombatptr->evidenceobject.fsinfovector[i]->last_inum) == SQLITE_OK && sqlite3_bind_int(casestatement, 9, wombatptr->evidenceobject.fsinfovector[i]->root_inum) == SQLITE_OK)
-                {
-                    int ret =  sqlite3_step(casestatement);
-                    if(ret == SQLITE_ROW || ret == SQLITE_DONE)
-                    {
-                        wombatptr->filesystemobject.id = sqlite3_last_insert_rowid(casedb);
-                    }
-                    else
-                        emit DisplayError("1.8", "SQL Error: ", sqlite3_errmsg(casedb));
-                }
-                else
-                    emit DisplayError("1.8", "SQL Error: ", sqlite3_errmsg(casedb));
-            }
-            else
-                emit DisplayError("1.8", "SQL Error: ", sqlite3_errmsg(casedb));
-            sqlite3_finalize(casestatement);
+            wombatptr->filesystemobject.name = QString::fromUtf8(wombatptr->evidenceobject.fsinfovector[i]->duname);
+            wombatptr->filesystemobject.id = 0;
+            wombatptr->bindvalues.clear();
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->ftype);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->flags);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->offset);
+            wombatptr->bindvalues.append(wombatptr->volumeobject.id);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->block_size);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->block_count);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->first_inum);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->last_inum);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->root_inum);
+            wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
             wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
+            qDebug() << wombatptr->evidenceobject.fsinfovector[i]->duname;
         }
     }
 }
-*/
 
 void WombatDatabase::InsertEvidenceObject()
 {
