@@ -54,8 +54,7 @@ void WombatFramework::GetVolumeSystemName() // get the volume system name
 void WombatFramework::OpenPartitions() // open the partitions in the volume
 {
     wombatptr->evidenceobject.fsinfovector.clear();
-    // MAY NEED TO CHECK IF VOLUME EXISTS, IF NOT THEN SHOULD GET FS FROM IMG INSTEAD OF VOL.
-    //fprintf(stderr, "Number of Partitions: %d\n", wombatptr->evidenceobject.volinfo->part_count);
+    // CHECK IF VOLUME EXISTS, IF NOT THEN SHOULD GET FS FROM IMG INSTEAD OF VOL.
     if(wombatptr->evidenceobject.volinfo == NULL)
     {
         wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_img(wombatptr->evidenceobject.imageinfo, 0, TSK_FS_TYPE_DETECT));
