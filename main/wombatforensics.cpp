@@ -147,53 +147,55 @@ void WombatForensics::InitializeCaseStructure()
 }
 
 void WombatForensics::InitializeOpenCase()
-{        
+{
     // open case here
-        wombatvarptr->casenamelist;
-        wombatvarptr->casenamelist.clear();
-        // populate case list here
-        wombatdatabase->ReturnCaseNameList();
-        bool ok;
-        wombatvarptr->caseobject.name = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), wombatvarptr->casenamelist, 0, false, &ok);
-        if(ok && !wombatvarptr->caseobject.name.isEmpty()) // open selected case
+    wombatvarptr->casenamelist;
+    wombatvarptr->casenamelist.clear();
+    // populate case list here
+    wombatdatabase->ReturnCaseNameList();
+    bool ok;
+    wombatvarptr->caseobject.name = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), wombatvarptr->casenamelist, 0, false, &ok);
+    if(ok && !wombatvarptr->caseobject.name.isEmpty()) // open selected case
+    {
+        wombatdatabase->ReturnCaseID();
+        QString tmpTitle = "Wombat Forensics - ";
+        tmpTitle += wombatvarptr->caseobject.name;
+        this->setWindowTitle(tmpTitle);
+        QString casestring = QString::number(wombatvarptr->caseobject.id) + "-" + wombatvarptr->caseobject.name;
+        wombatvarptr->caseobject.dirpath = wombatvarptr->casespath + casestring + "/";
+        bool mkPath = (new QDir())->mkpath(wombatvarptr->caseobject.dirpath);
+        if(mkPath == false)
         {
-            wombatdatabase->ReturnCaseID();
-            QString tmpTitle = "Wombat Forensics - ";
-            tmpTitle += wombatvarptr->caseobject.name;
-            this->setWindowTitle(tmpTitle);
-            QString casestring = QString::number(wombatvarptr->caseobject.id) + "-" + wombatvarptr->caseobject.name;
-            wombatvarptr->caseobject.dirpath = wombatvarptr->casespath + casestring + "/";
-            bool mkPath = (new QDir())->mkpath(wombatvarptr->caseobject.dirpath);
-            if(mkPath == false)
-            {
-                DisplayError("2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
-            }
-            // CREATE CASEID-CASENAME.DB RIGHT HERE.
-            wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-            bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
-            if(!caseFileExist)
-            {
-                wombatdatabase->CreateCaseDB();
-                if(wombatvarptr->curerrmsg.compare("") != 0)
-                    DisplayError("1.2", "Course DB Creation Error", wombatvarptr->curerrmsg);
-            }
-            else
-            {
-                wombatdatabase->OpenCaseDB();
-                if(wombatvarptr->curerrmsg.compare("") != 0)
-                    DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
-            }
-            wombatvarptr->evidenceobject.dirpath = wombatvarptr->caseobject.dirpath += "evidence/";
-            mkPath = (new QDir())->mkpath(wombatvarptr->evidenceobject.dirpath);
-            if(mkPath == false)
-            {
-                DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
-            }
+            DisplayError("2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
+        }
+        // CREATE CASEID-CASENAME.DB RIGHT HERE.
+        wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
+        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE"); // may not need this
+        wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
+        bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
+        if(!caseFileExist)
+        {
+            wombatdatabase->CreateCaseDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.2", "Course DB Creation Error", wombatvarptr->curerrmsg);
+        }
+        else
+        {
+            wombatdatabase->OpenCaseDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
+        }
+        wombatvarptr->evidenceobject.dirpath = wombatvarptr->caseobject.dirpath += "evidence/";
+        mkPath = (new QDir())->mkpath(wombatvarptr->evidenceobject.dirpath);
+        if(mkPath == false)
+        {
+            DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
+        }
             //ThreadRunner* trun = new ThreadRunner(isleuthkit, "populatecase", wombatvarptr);
             //threadpool->start(trun);
 
             // NEED TO INITIALIZEEVIDENCEIMAGES() HERE
-        }
+    }
 
 }
 void WombatForensics::InitializeWombatFramework()
