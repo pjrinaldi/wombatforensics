@@ -145,7 +145,7 @@ void WombatDatabase::OpenAppDB()
     if(wombatptr->appdb.isOpen())
         qDebug() << "appdb is open";
     else
-        qDebug() << wombatptr->appdb.lastError().text();
+        wombatptr->appdb.open();
 }
 
 void WombatDatabase::OpenCaseDB()
@@ -154,7 +154,6 @@ void WombatDatabase::OpenCaseDB()
         qDebug() << "case is open.";
     else
         wombatptr->casedb.open();
-        qDebug() << wombatptr->casedb.lastError().text();
 }
 
 void WombatDatabase::CloseAppDB()
@@ -284,46 +283,81 @@ void WombatDatabase::InitializeEvidenceDatabase()
 {
 }
 */
+/*       QSqlQuery casequery;
+       casequery.prepare(query);
+       if(casequery.exec())
+       {
+           qDebug() << "successful query";
+       }
+       else
+           qDebug() << wombatptr->casedb.lastError().text();
+   }
+   else
+       qDebug() << wombatptr->casedb.lastError().text();
 
-int WombatDatabase::ReturnCaseCount()
+ */ 
+int WombatDatabase::ReturnCaseCount() // from appdb
 {
-    wombatptr->bindvalues.clear();
-    wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", wombatptr->bindvalues);
-    qDebug() << "Case Count: " << wombatptr->sqlrecords.count();
-    if(wombatptr->sqlrecords.count() > 0)
-        return wombatptr->sqlrecords[0].value(0).toInt();
+    QSqlQuery appquery("SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", wombatptr->appdb);
+    if(appquery.first())
+        return appquery.value(0).toInt();
     else
-        return 0;
+        qDebug() << wombatptr->appdb.lastError().text();
+    
+    return 0;
+
 }
 
 void WombatDatabase::InsertCase()
 {
-    wombatptr->caseobject.id = 0;
-    wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(wombatptr->caseobject.name);
-    wombatptr->bindvalues.append(QString::fromStdString(GetTime()));
-    wombatptr->caseobject.id = InsertSqlGetID("INSERT INTO cases (name, creation, deleted) VALUES(?, ?, 0);", wombatptr->bindvalues);
+    QSqlQuery appquery(wombatptr->appdb);
+    appquery.prepare("INSERT INTO cases (name, creation, deleted) VALUES(?, ?, 0);");
+    appquery.addBindValue(wombatptr->caseobject.name);
+    appquery.addBindValue(QString::fromStdString(GetTime()));
+    if(appquery.exec())
+        if(appquery.first())
+            wombatptr->caseobject.id = appquery.lastInsertId().toInt();
+        else
+            qDebug() << wombatptr->appdb.lastError().text();
+    else
+        qDebug() << "insert case failed: " << wombatptr->appdb.lastError().text();
 }
 
 void WombatDatabase::ReturnCaseNameList()
 {
+    QSqlQuery appquery(wombatptr->appdb);
+    if(appquery.exec())
+    {
+        while(appquery.next())
+            wombatptr->casenamelist << appquery.value(0).toString();
+    }
+    else
+        qDebug() << wombatptr->appdb.lastError().text();
+    /*
     wombatptr->bindvalues.clear();
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT name FROM cases WHERE deleted = 0 ORDER by caseid;", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         wombatptr->casenamelist << wombatptr->sqlrecords[i].value(0).toString();
-    }
+    }*/
 }
 
 void WombatDatabase::ReturnCaseID()
 {
+    QSqlQuery appquery(wombatptr->appdb);
+    appquery.prepare("SELECT caseid FROM cases WHERE name = ?;");
+    appquery.addBindValue(wombatptr->caseobject.name);
+    if(appquery.exec())
+        wombatptr->caseobject.id = appquery.value(0).toInt();
+    else
+        qDebug() << wombatptr->appdb.lastError().text();
+    /*
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->caseobject.name);
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT caseid FROM cases WHERE name = ?;", wombatptr->bindvalues);
-    wombatptr->caseobject.id = wombatptr->sqlrecords[0].value(0).toInt();
+    wombatptr->caseobject.id = wombatptr->sqlrecords[0].value(0).toInt();*/
 }
 
 void WombatDatabase::GetObjectType()
@@ -336,6 +370,7 @@ void WombatDatabase::GetObjectType()
 }
 
 // not used will eventually be deleted.
+/*
 int WombatDatabase::ReturnObjectFileID(int objectid)
 {
     int fileid = 0;
@@ -820,4 +855,4 @@ QString WombatDatabase::ReturnEvidencePath(int evidenceid)
         emit DisplayError("1.27", "RETURN EVIDENCE PATH FROM ID ", sqlite3_errmsg(wombatdb));
 
     return epath;
-}
+}*/

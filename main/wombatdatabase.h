@@ -26,7 +26,7 @@ public:
     ~WombatDatabase();
 
     int ReturnCaseCount(void);
-    sqlite3* ReturnDB(QString dbname);
+    //sqlite3* ReturnDB(QString dbname);
     void InsertCase();
     int InsertJob(int jobType, int caseID, int evidenceID);
     int InsertEvidence(QString evidenceName, QString evidenceFilePath, int caseID);
@@ -63,11 +63,11 @@ public:
 signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:
-    sqlite3* wombatdb;
-    sqlite3* casedb;
-    std::vector<sqlite3*> evidencedblist;
-    sqlite3_stmt* casestatement;
-    sqlite3_stmt* wombatstatement;
+    //sqlite3* wombatdb;
+    //sqlite3* casedb;
+    //std::vector<sqlite3*> evidencedblist;
+    //sqlite3_stmt* casestatement;
+    //sqlite3_stmt* wombatstatement;
     WombatVariable* wombatptr;
 };
 
