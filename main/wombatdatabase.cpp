@@ -199,7 +199,7 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.clear();
         wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->vstype);
         wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->block_size);
-        wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->offset);
+        wombatptr->bindvalues.append((int)wombatptr->evidenceobject.volinfo->offset);
         wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
         wombatptr->bindvalues.append(wombatptr->volumeobject.name);
         wombatptr->volumeobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
@@ -224,8 +224,8 @@ void WombatDatabase::InsertPartitionObjects()
             wombatptr->partitionobject.id = 0;
             wombatptr->bindvalues.clear();
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->flags);
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->start);
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->len);
+            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->start);
+            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->len);
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
             wombatptr->bindvalues.append(wombatptr->volumeobject.id);
             wombatptr->partitionobject.id = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
@@ -245,13 +245,13 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->bindvalues.clear();
             wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->ftype);
             wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->flags);
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->offset);
+            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->offset);
             wombatptr->bindvalues.append(wombatptr->volumeobject.id);
             wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->block_size);
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->block_count);
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->first_inum);
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->last_inum);
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->root_inum);
+            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->block_count);
+            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->first_inum);
+            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->last_inum);
+            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
             wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
             wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
             qDebug() << wombatptr->evidenceobject.fsinfovector[i]->duname;
@@ -264,7 +264,7 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->evidenceobject.id = 0;
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->itype);
-    wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->size);
+    wombatptr->bindvalues.append((int)wombatptr->evidenceobject.imageinfo->size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.name);
     wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]));
