@@ -131,9 +131,9 @@ void WombatDatabase::CreateCaseDB(void)
 
 void WombatDatabase::CreateAppDB()
 {
-    if(wombatptr->appdb.open())
+    if(!wombatptr->appdb.open())
     {
-        QSqlQuery appquery;
+        QSqlQuery appquery(wombatptr->appdb);
         appquery.exec("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
     }
     else
@@ -315,10 +315,7 @@ void WombatDatabase::InsertCase()
     appquery.addBindValue(wombatptr->caseobject.name);
     appquery.addBindValue(QString::fromStdString(GetTime()));
     if(appquery.exec())
-        if(appquery.first())
-            wombatptr->caseobject.id = appquery.lastInsertId().toInt();
-        else
-            qDebug() << wombatptr->appdb.lastError().text();
+        wombatptr->caseobject.id = appquery.lastInsertId().toInt();
     else
         qDebug() << "insert case failed: " << wombatptr->appdb.lastError().text();
 }
@@ -333,14 +330,6 @@ void WombatDatabase::ReturnCaseNameList()
     }
     else
         qDebug() << wombatptr->appdb.lastError().text();
-    /*
-    wombatptr->bindvalues.clear();
-    wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT name FROM cases WHERE deleted = 0 ORDER by caseid;", wombatptr->bindvalues);
-    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-    {
-        wombatptr->casenamelist << wombatptr->sqlrecords[i].value(0).toString();
-    }*/
 }
 
 void WombatDatabase::ReturnCaseID()
@@ -349,15 +338,12 @@ void WombatDatabase::ReturnCaseID()
     appquery.prepare("SELECT caseid FROM cases WHERE name = ?;");
     appquery.addBindValue(wombatptr->caseobject.name);
     if(appquery.exec())
-        wombatptr->caseobject.id = appquery.value(0).toInt();
+        if(appquery.first())
+            wombatptr->caseobject.id = appquery.value(0).toInt();
+        else
+            qDebug() << wombatptr->appdb.lastError().text();
     else
         qDebug() << wombatptr->appdb.lastError().text();
-    /*
-    wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(wombatptr->caseobject.name);
-    wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT caseid FROM cases WHERE name = ?;", wombatptr->bindvalues);
-    wombatptr->caseobject.id = wombatptr->sqlrecords[0].value(0).toInt();*/
 }
 
 void WombatDatabase::GetObjectType()

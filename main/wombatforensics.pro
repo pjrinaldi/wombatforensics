@@ -15,8 +15,10 @@ SOURCES = main.cpp wombatforensics.cpp wombatdatabase.cpp wombatframework.cpp wo
 RESOURCES += wombatforensics.qrc progresswindow.qrc
 DESTDIR = ./
 mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk 
+#mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk 
 #mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk -L/opt/Qt5.1.0/5.1.0/gcc_64/plugins/sqldrivers -lqsqlite
-linux:LIBS = -lsqlite3 -lewf -ltsk 
+linux:LIBS = -lewf -ltsk 
+#linux:LIBS = -lsqlite3 -lewf -ltsk 
 #linux:LIBS = -lsqlite3 -lewf -ltsk -lqsqlite 
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 win32:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)d
