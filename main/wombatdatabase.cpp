@@ -323,7 +323,7 @@ void WombatDatabase::InsertCase()
 void WombatDatabase::ReturnCaseNameList()
 {
     QSqlQuery appquery(wombatptr->appdb);
-    if(appquery.exec())
+    if(appquery.exec("SELECT name FROM cases WHERE deleted = 0 ORDER BY caseid;"))
     {
         while(appquery.next())
             wombatptr->casenamelist << appquery.value(0).toString();
