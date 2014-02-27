@@ -116,8 +116,6 @@ void WombatDatabase::CreateCaseDB(void)
     wombattableschema << "CREATE TABLE artifacts(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
     wombattableschema << "CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);";
     wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, flags INTEGER, childcount INTEGER, endian INTEGER, address INTEGER, size INTEGER, sectsize INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, indoenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);";
-    wombatptr->casedb = QSqlDatabase::addDatabase("QSQLITE");
-    wombatptr->casedb.setDatabaseName(wombatptr->caseobject.dbname);
     if(wombatptr->casedb.open())
     {
         QSqlQuery casequery;
@@ -133,8 +131,6 @@ void WombatDatabase::CreateCaseDB(void)
 
 void WombatDatabase::CreateAppDB()
 {
-    wombatptr->appdb = QSqlDatabase::addDatabase("QSQLITE");
-    wombatptr->appdb.setDatabaseName(wombatptr->wombatdbname);
     if(wombatptr->appdb.open())
     {
         QSqlQuery appquery;

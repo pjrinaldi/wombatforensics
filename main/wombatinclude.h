@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include <QObject>
 #include <QSizePolicy>
+#include <QtSql/QtSql>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>

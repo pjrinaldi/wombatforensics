@@ -3,6 +3,7 @@
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
     ui->setupUi(this);
+    qDebug() << QSqlDatabase::drivers();
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
     wombatdatabase = new WombatDatabase(wombatvarptr);
@@ -59,6 +60,8 @@ void WombatForensics::InitializeAppStructure()
     if(mkPath == false)
         DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     wombatvarptr->wombatdbname = wombatvarptr->datapath + "WombatApp.db";
+    wombatvarptr->appdb = QSqlDatabase::addDatabase("QSQLITE");
+    wombatvarptr->appdb.setDatabaseName(wombatvarptr->wombatdbname);
     bool appFileExist = FileExists(wombatvarptr->wombatdbname.toStdString());
     if(!appFileExist)
     {
@@ -117,6 +120,8 @@ void WombatForensics::InitializeCaseStructure()
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
+        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE");
+        wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
         if(!FileExists(wombatvarptr->caseobject.dbname.toStdString()))
         {
             wombatdatabase->CreateCaseDB();
