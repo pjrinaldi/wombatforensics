@@ -131,7 +131,7 @@ void WombatDatabase::CreateCaseDB(void)
 
 void WombatDatabase::CreateAppDB()
 {
-    if(!wombatptr->appdb.open())
+    if(wombatptr->appdb.open())
     {
         QSqlQuery appquery(wombatptr->appdb);
         appquery.exec("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
