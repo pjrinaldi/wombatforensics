@@ -248,16 +248,12 @@ void WombatForensics::InitializeEvidenceStructure()
         /* NO NEED TO PLACE A VOLUME OBJECT IN THE NODE TREE STRUCTURE...
          * SIMPLY ADD THE PARTITION(S)/FILE SYSTEM(S) TO THE IMAGE NODE
         tmplist.clear(); // clear tmplist to reuse for volumes.
-        tmpnode = NULL;
-        tmpnode = new QStandardItem(QString::number(wombatvarptr->volumeobject.id));
-        tmpnode->setCheckable(true);
-        tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
-        tmplist << tmpnode << new QStandardItem(wombatvarptr->volumeobject.name);
-        wombatvarptr->dirmodel->findItems(QString::number(wombatvarptr->evidenceobject.id))[0]->appendRow(tmplist);
         */
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
+    wombatdatabase->GetPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
+    wombatdatabase->GetFileSystemObjects();
     wombatframework->AddPartitionNodes();
         // NEED TO ADD PARTITIONS TO THE IMAGE MODEL
         /*
@@ -265,12 +261,11 @@ void WombatForensics::InitializeEvidenceStructure()
         //wombatframework->OpenFileSystems();
         // ADD PARTITIONS AND FS HERE...
         */
-    for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
+    /*for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
     {
         // PARTITION INFORMATION FROM TSK INFO   : FLAGS, LEN (# OF SECTORS), START, (FIRST SECTOR), DESC, SLOT_NUM, TABLE_NUM 
         fprintf(stderr, "Part Name: %s\n", wombatvarptr->partitionobjectvector[i].name.toStdString().c_str());
-    }
-
+    }*/
     ResizeColumns();
         //wombatdatabase->InitializeEvidenceDatabase();
         //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);

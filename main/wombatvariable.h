@@ -17,6 +17,7 @@ struct VolumeObject
     int objecttype;
     int type;
     int blocksize;
+    int childcount;
     int byteoffset;
     int parentid;
     QString name;
@@ -36,6 +37,16 @@ struct PartitionObject
 struct FileSystemObject
 {
     int id;
+    int objecttype;
+    int type;
+    int flags;
+    int byteoffset;
+    int parentid;
+    int size;
+    int blockcount;
+    int firstinum;
+    int lastinum;
+    int rootinum;
     QString name;
 };
 
