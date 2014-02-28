@@ -35,6 +35,12 @@ void WombatFramework::AddEvidenceNode() // add evidence node to the dirmodel
 
 void WombatFramework::AddPartitionNodes() // add partition/fs nodes to the image node
 {
+    if(wombatptr->partitionobjectvector.count() > 0)
+    {
+        qDebug() << " part count: " << wombatptr->partitionobjectvector.count() << "fs count: " << wombatptr->filesystemobjectvector.count();
+    }
+    else
+        qDebug() << "no partitions...";
     // LOOP OVER PARITTION VECTOR COUNT
 
 }
