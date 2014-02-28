@@ -32,9 +32,13 @@ void WombatFramework::AddEvidenceNode() // add evidence node to the dirmodel
     tmplist << tmpnode << new QStandardItem(wombatptr->evidenceobject.name);
     wombatptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
 }
+
 void WombatFramework::AddPartitionNodes() // add partition/fs nodes to the image node
 {
+    // LOOP OVER PARITTION VECTOR COUNT
+
 }
+
 void WombatFramework::OpenVolumeSystem() // open current volume system
 {
     wombatptr->evidenceobject.volinfo = tsk_vs_open(wombatptr->evidenceobject.imageinfo, 0, TSK_VS_TYPE_DETECT);

@@ -215,8 +215,8 @@ void WombatDatabase::GetVolumeObject()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, type, size, byteoffset, parentid, childcount, name FROM data WHERE parentid = ? and objecttype = 2", wombatptr->bindvalues);
-    wombatptr->volumeobject.objecttype = wombatptr->sqlrecords[0].value(0).toInt();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, type, size, byteoffset, parentid, childcount, name FROM data WHERE parentid = ? and objecttype = 2", wombatptr->bindvalues);
+    wombatptr->volumeobject.id = wombatptr->sqlrecords[0].value(0).toInt();
     wombatptr->volumeobject.type = wombatptr->sqlrecords[0].value(1).toInt();
     wombatptr->volumeobject.blocksize = wombatptr->sqlrecords[0].value(2).toInt();
     wombatptr->volumeobject.byteoffset = wombatptr->sqlrecords[0].value(3).toInt();
@@ -251,10 +251,10 @@ void WombatDatabase::GetPartitionObjects()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->volumeobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, flags, secstart, sectlength, name, parentid FROM data WHERE parentid = ? ORDER BY objectid", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, secstart, sectlength, name, parentid FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
-        wombatptr->partitionobject.objecttype = wombatptr->sqlrecords[i].value(0).toInt();
+        wombatptr->partitionobject.id = wombatptr->sqlrecords[i].value(0).toInt();
         wombatptr->partitionobject.flags = wombatptr->sqlrecords[i].value(1).toInt();
         wombatptr->partitionobject.sectstart = wombatptr->sqlrecords[i].value(2).toInt();
         wombatptr->partitionobject.sectlength = wombatptr->sqlrecords[i].value(3).toInt();
@@ -271,7 +271,7 @@ void WombatDatabase::InsertFileSystemObjects()
     {
         for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
         {
-            wombatptr->filesystemobject.name = QString::fromUtf8(wombatptr->evidenceobject.fsinfovector[i]->duname);
+            wombatptr->filesystemobject.name = QString::fromUtf8(wombatptr->evidenceobject.fsinfovector[i]->duname); // duname = data unit name (clusters)
             wombatptr->filesystemobject.id = 0;
             wombatptr->bindvalues.clear();
             wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->ftype);
@@ -283,7 +283,7 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->first_inum);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->last_inum);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
-            wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+            wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
             wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
             qDebug() << wombatptr->evidenceobject.fsinfovector[i]->duname;
         }
@@ -292,6 +292,25 @@ void WombatDatabase::InsertFileSystemObjects()
 
 void WombatDatabase::GetFileSystemObjects()
 {
+    wombatptr->filesystemobjectvector.clear();
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->volumeobject.id);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum FROM data WHERE parentid = ? and objecttype = 4 ORDER BY objectid", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        wombatptr->filesystemobject.id = wombatptr->sqlrecords[i].value(0).toInt(); 
+        wombatptr->filesystemobject.type = wombatptr->sqlrecords[i].value(1).toInt();
+        wombatptr->filesystemobject.flags = wombatptr->sqlrecords[i].value(2).toInt();
+        wombatptr->filesystemobject.byteoffset = wombatptr->sqlrecords[i].value(3).toInt();
+        wombatptr->filesystemobject.parentid = wombatptr->sqlrecords[i].value(4).toInt();
+        wombatptr->filesystemobject.size = wombatptr->sqlrecords[i].value(5).toInt();
+        wombatptr->filesystemobject.blockcount = wombatptr->sqlrecords[i].value(6).toInt();
+        wombatptr->filesystemobject.firstinum = wombatptr->sqlrecords[i].value(7).toInt();
+        wombatptr->filesystemobject.lastinum = wombatptr->sqlrecords[i].value(8).toInt();
+        wombatptr->filesystemobject.rootinum = wombatptr->sqlrecords[i].value(9).toInt();
+        wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
+    }
 }
 
 void WombatDatabase::InsertEvidenceObject()
