@@ -289,7 +289,6 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
-        //InitializeEvidenceStructure();
     }
     
     /*
@@ -1064,6 +1063,7 @@ void WombatForensics::UpdateOmniValue()
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
+    qDebug() << "selected id: " << index.sibling(index.row(), 0).data().toInt();
     wombatdatabase->GetObjectType(); // now i have selected object type.
     UpdateOmniValue();
     UpdateViewer();
