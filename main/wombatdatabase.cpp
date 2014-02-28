@@ -209,7 +209,7 @@ void WombatDatabase::InsertVolumeObject()
     }
 }
 
-void WombatDatabase::GetVolumeSystemObject()
+void WombatDatabase::GetVolumeObject()
 {
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->volumeobject.id);
@@ -294,7 +294,7 @@ void WombatDatabase::GetEvidenceObject()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = wombatptr->GetSqlResults("SELECT objecttype, type, size, sectsize, name, fullpath FROM data WHERE objectid = ?;", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, type, size, sectsize, name, fullpath FROM data WHERE objectid = ?;", wombatptr->bindvalues);
     wombatptr->evidenceobject.objecttype = wombatptr->sqlrecords[0].value(0).toInt();
     wombatptr->evidenceobject.type = wombatptr->sqlrecords[0].value(1).toInt();
     wombatptr->evidenceobject.size = wombatptr->sqlrecords[0].value(2).toInt();

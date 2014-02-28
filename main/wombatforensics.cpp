@@ -565,12 +565,12 @@ void WombatForensics::RemEvidence()
         UpdateMessageTable();
         //wombatdatabase->RemoveEvidence(item);
         wombatprogresswindow->UpdateProgressBar(25);
-        QString tmppath = wombatvarptr->evidenceobject.dirpath + item.split("/").last() + ".db";
-        if(QFile::remove(tmppath))
-        {
-        }
-        else
-            emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
+        //QString tmppath = wombatvarptr->evidenceobject.dirpath + item.split("/").last() + ".db";
+        //if(QFile::remove(tmppath))
+        //{
+        //}
+        //else
+            //emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
         wombatprogresswindow->UpdateProgressBar(50);
         UpdateCaseData();
         wombatprogresswindow->UpdateProgressBar(75);
