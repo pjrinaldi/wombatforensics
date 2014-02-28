@@ -209,6 +209,20 @@ void WombatDatabase::InsertVolumeObject()
     }
 }
 
+void WombatDatabase::GetVolumeSystemObject()
+{
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->volumeobject.id);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, type, size, byteoffset, parentid, name FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    wombatptr->volumeobject.objecttype = wombatptr->sqlrecords[0].value(0).toInt();
+    wombatptr->volumeobject.type = wombatptr->sqlrecords[0].value(1).toInt();
+    wombatptr->volumeobject.blocksize = wombatptr->sqlrecords[0].value(2).toInt();
+    wombatptr->volumeobject.byteoffset = wombatptr->sqlrecords[0].value(3).toInt();
+    wombatptr->volumeobject.parentid = wombatptr->sqlrecords[0].value(4).toInt();
+    wombatptr->volumeobject.name = wombatptr->sqlrecords[0].value(5).toString();
+}
+
 void WombatDatabase::InsertPartitionObjects()
 {
     if(wombatptr->evidenceobject.volinfo != NULL)
@@ -277,25 +291,32 @@ void WombatDatabase::InsertEvidenceObject()
 void WombatDatabase::GetEvidenceObject()
 {
     // already have id and name from adding/opening the evidence
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = wombatptr->GetSqlResults("SELECT objecttype, type, size, sectsize, name, fullpath FROM data WHERE objectid = ?;", wombatptr->bindvalues);
+    wombatptr->evidenceobject.objecttype = wombatptr->sqlrecords[0].value(0).toInt();
+    wombatptr->evidenceobject.type = wombatptr->sqlrecords[0].value(1).toInt();
+    wombatptr->evidenceobject.size = wombatptr->sqlrecords[0].value(2).toInt();
+    wombatptr->evidenceobject.sectsize = wombatptr->sqlrecords[0].value(3).toInt();
+    wombatptr->evidenceobject.name = wombatptr->sqlrecords[0].value(4).toString();
+    wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[0].value(5).toString();
 }
+
+void WombatDatabase::GetEvidenceObjects()
+{
+    for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
+    {
+        // need a way to call getevidenceobject() for each evidencevectorobject
+    }
+}
+
 /*
 void WombatDatabase::InitializeEvidenceDatabase()
 {
 }
 */
-/*       QSqlQuery casequery;
-       casequery.prepare(query);
-       if(casequery.exec())
-       {
-           qDebug() << "successful query";
-       }
-       else
-           qDebug() << wombatptr->casedb.lastError().text();
-   }
-   else
-       qDebug() << wombatptr->casedb.lastError().text();
 
- */ 
 int WombatDatabase::ReturnCaseCount() // from appdb
 {
     QSqlQuery appquery("SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", wombatptr->appdb);
@@ -352,7 +373,7 @@ void WombatDatabase::GetObjectType()
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT objecttype FROM data WHERE objectid = ?", wombatptr->bindvalues);
-    qDebug() << wombatptr->sqlrecords[0].value(0).toInt();
+    wombatptr->selectedobject.type = wombatptr->sqlrecords[0].value(0).toInt();
 }
 
 // not used will eventually be deleted.

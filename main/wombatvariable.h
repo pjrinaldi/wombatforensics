@@ -14,12 +14,22 @@ struct CaseObject
 struct VolumeObject
 {
     int id;
+    int objecttype;
+    int type;
+    int blocksize;
+    int byteoffset;
+    int parentid;
     QString name;
 };
 
 struct PartitionObject
 {
     int id;
+    int objecttype;
+    int flags;
+    int sectstart;
+    int sectlength;
+    int parentid;
     QString name;
 };
 
@@ -32,11 +42,14 @@ struct FileSystemObject
 struct EvidenceObject
 {
     int id;
+    int type;
+    int objecttype;
     int itemcount;
     QString name;
+    int size;
+    int sectsize;
     QStringList namelist;
-    QString dirpath;
-    QString fullpath;
+    QString fullpath; 
     std::vector<std::string> fullpathvector;
     TSK_IMG_INFO* imageinfo; // These may disappear when the image is closed, will have to test this concept
     TSK_VS_INFO* volinfo; // may not need..
@@ -50,9 +63,12 @@ struct EvidenceObject
         fullpath = "";
         name = "";
         id = 0;
+        type = 0;
         itemcount = 0;
+        size = 0;
+        sectsize = 0;
         namelist.clear();
-        dirpath = "";
+        //dirpath = "";
         fullpathvector.clear();
         imageinfo = NULL;
         volinfo = NULL;
@@ -118,8 +134,6 @@ struct WombatVariable
     };
 
     // id values
-    //int caseid;
-    //int evidenceid;
     int jobtype;
     int jobid;
     int fileid;
@@ -128,24 +142,13 @@ struct WombatVariable
     int processcount;
     int omnivalue;
     int visibleviewer;
-    //int selectedobjectid;
-    //int selectedobjecttype;
-    // directory/file paths
     QString casespath;
-    //QString casedirpath;
-    //QString casedbpath;
-    //QString evidencedirpath;
-    //QString evidencepath;
     QString settingspath;
     QString datapath;
     QString tmpfilepath;
     QString curerrmsg;
     QString wombatdbname;
     QStandardItemModel* dirmodel;
-    //QString evidencedbname;
-    //QStringList evidencepathlist;
-    //QStringList evidencedbnamelist;
-    //QList<int> evidenceidlist;
     QList<int> objectidlist;
     CaseObject caseobject;
     QStringList casenamelist;
@@ -160,12 +163,10 @@ struct WombatVariable
     SelectedObject selectedobject;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
-    //QStringList bootsectorlist; // string of values to place in html template page
     QByteArray bootbytearray; // byte array of currently extracted rawdata -> clear() before each use
-    //char* bootbuffer; // char buffer of raw data prior to converting bytearray -> set NULL before each use
     std::vector<uchar> rawbyteintvector;
     QString htmlcontent;
-    QSqlDatabase casedb; // might make this a vector since i will add it when i open the case or just switch between them...
+    QSqlDatabase casedb;
     QSqlDatabase appdb;
     QList<QSqlRecord> sqlrecords;
     QList<QVariant> bindvalues;

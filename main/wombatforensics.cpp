@@ -133,12 +133,12 @@ void WombatForensics::InitializeCaseStructure()
             if(wombatvarptr->curerrmsg.compare("") != 0)
                 DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
-        wombatvarptr->evidenceobject.dirpath = wombatvarptr->caseobject.dirpath + "evidence/";
-        mkPath = (new QDir())->mkpath(wombatvarptr->evidenceobject.dirpath);
-        if(mkPath == false)
-        {
-            DisplayError("2.0", "Case Evidence Folder Creation Failed", "Failed to create case evidence folder.");
-        }
+        //wombatvarptr->evidenceobject.dirpath = wombatvarptr->caseobject.dirpath + "evidence/";
+        //mkPath = (new QDir())->mkpath(wombatvarptr->evidenceobject.dirpath);
+        //if(mkPath == false)
+        //{
+        //    DisplayError("2.0", "Case Evidence Folder Creation Failed", "Failed to create case evidence folder.");
+        //}
         if(wombatdatabase->ReturnCaseCount() > 0)
         {
             ui->actionOpen_Case->setEnabled(true);
@@ -185,7 +185,8 @@ void WombatForensics::InitializeOpenCase()
             if(wombatvarptr->curerrmsg.compare("") != 0)
                 DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
-        wombatvarptr->evidenceobject.dirpath = wombatvarptr->caseobject.dirpath += "evidence/";
+        wombatdatabase->GetEvidenceObjects();
+        /*wombatvarptr->evidenceobject.dirpath = wombatvarptr->caseobject.dirpath += "evidence/";
         mkPath = (new QDir())->mkpath(wombatvarptr->evidenceobject.dirpath);
         if(mkPath == false)
         {
@@ -193,7 +194,7 @@ void WombatForensics::InitializeOpenCase()
         }
             //ThreadRunner* trun = new ThreadRunner(isleuthkit, "populatecase", wombatvarptr);
             //threadpool->start(trun);
-
+        */
             // NEED TO INITIALIZEEVIDENCEIMAGES() HERE
     }
 
@@ -220,7 +221,6 @@ void WombatForensics::InitializeDirModel()
     wombatvarptr->dirmodel->setHorizontalHeaderLabels(headerList);
     ui->dirTreeView->setModel(wombatvarptr->dirmodel);
     ResizeColumns();
-    //QStandardItem *evidenceNode = wombatdirmodel->invisibleRootItem();
     connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
 
@@ -239,22 +239,14 @@ void WombatForensics::InitializeEvidenceStructure()
         fprintf(stderr, "dirmodel item 0: %s\n", idstring[0]->text().toStdString().c_str());
         fprintf(stderr, "dirmodel item 1: %s\n", namestring[0]->text().toStdString().c_str());
         */
-        /*
-        QStandardItem *imagenode = new QStandardItem(wombatvarptr->evidenceobject.name);
-        imagenode->setIcon(QIcon(":/basic/treeimage"));
-        wombatvarptr->dirmodel->invisibleRootItem()->appendRow(imagenode);
-        */
     ResizeColumns();
-        //
-
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
     wombatdatabase->InsertVolumeObject(); // add volume to data
-        // NEED TO ADD VOLUME TO THE IMAGE MODEL
-        //
+    wombatdatabase->GetVolumeObject();
         // NEED TO COMBINE THE FILE SYSTEM AND PARTITION OBJECT INFORMATION INTO A DB ENTRY.
         /* NO NEED TO PLACE A VOLUME OBJECT IN THE NODE TREE STRUCTURE...
-         * SIMPLY ADD THE PARTITION(S) TO THE IMAGE NODE
+         * SIMPLY ADD THE PARTITION(S)/FILE SYSTEM(S) TO THE IMAGE NODE
         tmplist.clear(); // clear tmplist to reuse for volumes.
         tmpnode = NULL;
         tmpnode = new QStandardItem(QString::number(wombatvarptr->volumeobject.id));
@@ -1083,7 +1075,6 @@ void WombatForensics::UpdateOmniValue()
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
-    //wombatvarptr->selectedobjectid = index.sibling(index.row(), 0).data().toInt(); // object id
     wombatdatabase->GetObjectType(); // now i have selected object type.
     UpdateOmniValue();
     UpdateViewer();

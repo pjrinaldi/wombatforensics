@@ -41,7 +41,6 @@
 #include <QtPlugin>
 #include <QtWebKitWidgets>
 #include <QtWidgets>
-//#include <sqlite3.h>
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
