@@ -198,7 +198,7 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append((int)wombatptr->evidenceobject.volinfo->offset);
         wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
         wombatptr->bindvalues.append(wombatptr->volumeobject.name);
-        wombatptr->volumeobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, childcount, size, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+        wombatptr->volumeobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, childcount, byteoffset, parentid, name) VALUES(2, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
     }
     else
     {
