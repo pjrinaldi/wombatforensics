@@ -244,8 +244,8 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->GetPartitionObjects();
     wombatdatabase->GetFileSystemObjects();
 
-    wombatframework->AddEvidenceNode(); // add evidence node to directory model
-    wombatframework->AddPartitionNodes();
+    wombatframework->AddEvidenceNodes(); // add evidence node to directory model
+    //wombatframework->AddPartitionNodes();
     ResizeColumns();
     /*for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
     {

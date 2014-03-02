@@ -23,19 +23,24 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     free(images);
 }
 
-void WombatFramework::AddEvidenceNode() // add evidence node to the dirmodel
+void WombatFramework::AddEvidenceNodes() // add evidence node to the dirmodel
 {
-    QList<QStandardItem*> tmplist;
-    QStandardItem* tmpnode = new QStandardItem(QString::number(wombatptr->evidenceobject.id));
-    tmpnode->setCheckable(true);
-    tmpnode->setIcon(QIcon(":/basic/treeimage"));
-    tmplist << tmpnode << new QStandardItem(wombatptr->evidenceobject.name);
-    wombatptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
+    wombatptr->dirmodel->clear();
+    for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
+    {
+        QList<QStandardItem*> tmplist;
+        QStandardItem* tmpnode = new QStandardItem(QString::number(wombatptr->evidenceobjectvector[i].id));
+        tmpnode->setCheckable(true);
+        tmpnode->setIcon(QIcon(":/basic/treeimage"));
+        tmplist << tmpnode << new QStandardItem(wombatptr->evidenceobjectvector[i].name);
+        wombatptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
+        AddPartitionNodes(i);
+    }
 }
 
-void WombatFramework::AddPartitionNodes() // add partition/fs nodes to the image node
+void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes to the image node
 {
-    QList<QStandardItem*> evidnode = wombatptr->dirmodel->findItems(QString::number(wombatptr->evidenceobject.id), Qt::MatchExactly, 0);
+    QList<QStandardItem*> evidnode = wombatptr->dirmodel->findItems(QString::number(wombatptr->evidenceobjectvector[increment].id), Qt::MatchExactly, 0);
     QList<QStandardItem*> tmplist;
     QStandardItem* tmpnode;
     QString tmpstring = "";
