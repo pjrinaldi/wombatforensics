@@ -229,6 +229,7 @@ void WombatDatabase::InsertPartitionObjects()
 {
     if(wombatptr->evidenceobject.volinfo != NULL)
     {
+        qDebug() << "part count when insert: " << wombatptr->evidenceobject.volinfo->part_count;
         for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
         {
             wombatptr->partitionobject.name = QString::fromUtf8(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->desc);
@@ -240,7 +241,7 @@ void WombatDatabase::InsertPartitionObjects()
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
             wombatptr->bindvalues.append(wombatptr->volumeobject.id);
             wombatptr->partitionobject.id = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-            wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
+            //wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
         }
     }
 }
@@ -250,8 +251,10 @@ void WombatDatabase::GetPartitionObjects()
     wombatptr->partitionobjectvector.clear();
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->volumeobject.id);
+    qDebug() << "add bindval volobj id: " << wombatptr->volumeobject.id;
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, secstart, sectlength, name, parentid FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, sectstart, sectlength, name, parentid FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
+    qDebug() << "(get part obj) sqlrecord count : " << wombatptr->sqlrecords.count();
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         wombatptr->partitionobject.id = wombatptr->sqlrecords[i].value(0).toInt();
@@ -266,7 +269,7 @@ void WombatDatabase::GetPartitionObjects()
 
 void WombatDatabase::InsertFileSystemObjects()
 {
-    qDebug() << "fsinfo vector count: " << wombatptr->evidenceobject.fsinfovector.size();
+    qDebug() << "(insert fs) fsinfo vector count: " << wombatptr->evidenceobject.fsinfovector.size();
     if(wombatptr->evidenceobject.fsinfovector.size() > 0)
     {
         for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)

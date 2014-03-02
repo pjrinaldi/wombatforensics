@@ -35,8 +35,8 @@ void WombatFramework::AddEvidenceNode() // add evidence node to the dirmodel
 
 void WombatFramework::AddPartitionNodes() // add partition/fs nodes to the image node
 {
-    qDebug() << " part count: " << wombatptr->volumeobject.childcount;
-    qDebug() << " part count: " << wombatptr->partitionobjectvector.count() << "fs count: " << wombatptr->filesystemobjectvector.count();
+    qDebug() << " vol part count: " << wombatptr->volumeobject.childcount;
+    qDebug() << " part part count: " << wombatptr->partitionobjectvector.count() << "fs count: " << wombatptr->filesystemobjectvector.count();
     if(wombatptr->partitionobjectvector.count() > 0)
     {
     }
@@ -79,14 +79,14 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
             {
                 wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
                 TSK_FS_INFO* tmpfsinfo = tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT);
+                qDebug() << "part flags for " << i << ": " << wombatptr->evidenceobject.partinfovector[i]->flags;
                 if(tmpfsinfo != NULL)
                 {
-                    fprintf(stderr, "Not Null FS info found\n");
                     wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT));
+                    qDebug() << "fs type for " << i << ": " << tsk_fs_type_toname(tmpfsinfo->ftype);
                 }
                 else
                 {
-                    fprintf(stderr, "NULL fs info found\n");
                 }
             }
         }
