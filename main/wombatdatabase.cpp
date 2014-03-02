@@ -232,15 +232,17 @@ void WombatDatabase::InsertPartitionObjects()
     {
         for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
         {
-            wombatptr->partitionobject.name = QString::fromUtf8(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->desc);
-            wombatptr->partitionobject.id = 0;
+            //wombatptr->partitionobject.name = QString::fromUtf8(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->desc);
+            //wombatptr->partitionobject.id = 0;
+            wombatptr->currentpartitionid = 0;
             wombatptr->bindvalues.clear();
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->flags);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->start);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->len);
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
             wombatptr->bindvalues.append(wombatptr->volumeobject.id);
-            wombatptr->partitionobject.id = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+            wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+            //wombatptr->partitionobject.id = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
             //wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
         }
     }
@@ -316,18 +318,21 @@ void WombatDatabase::GetFileSystemObjects()
 
 void WombatDatabase::InsertEvidenceObject()
 {
-    wombatptr->evidenceobject.id = 0;
+    //wombatptr->evidenceobject.id = 0;
+    wombatptr->currentevidenceid = 0;
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->itype);
     wombatptr->bindvalues.append((int)wombatptr->evidenceobject.imageinfo->size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
-    wombatptr->bindvalues.append(wombatptr->evidenceobject.name);
+    wombatptr->bindvalues.append(wombatptr->currentevidence.name);
+    //wombatptr->bindvalues.append(wombatptr->evidenceobject.name);
     wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]));
-    wombatptr->evidenceobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+    wombatptr->currentevidencid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+    //wombatptr->evidenceobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
         wombatptr->bindvalues.clear();
-        wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
+        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
         wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[i]));
         wombatptr->bindvalues.append(i+1);
         InsertSql("INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", wombatptr->bindvalues);
@@ -336,10 +341,9 @@ void WombatDatabase::InsertEvidenceObject()
 
 void WombatDatabase::GetEvidenceObject()
 {
-    //wombatptr->evidenceobjectvector.clear();
     // already have id and name from adding/opening the evidence
     wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
+    wombatptr->bindvalues.append(wombatptr->currentevidenceid);
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, type, size, sectsize, name, fullpath, objectid FROM data WHERE objectid = ?;", wombatptr->bindvalues);
     wombatptr->evidenceobject.objecttype = wombatptr->sqlrecords[0].value(0).toInt();
@@ -349,7 +353,6 @@ void WombatDatabase::GetEvidenceObject()
     wombatptr->evidenceobject.name = wombatptr->sqlrecords[0].value(4).toString();
     wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[0].value(5).toString();
     wombatptr->evidenceobject.objectid = wombatptr->sqlrecords[0].value(6).toInt();
-    //wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
 }
 
 void WombatDatabase::GetEvidenceObjects()

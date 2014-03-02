@@ -154,6 +154,11 @@ struct WombatVariable
     int processcount;
     int omnivalue;
     int visibleviewer;
+    int currentevidenceid;
+    int currentvolumeid;
+    int currentpartitionid;
+    int currentfilesystemid;
+    QString currentevidencename;
     QString casespath;
     QString settingspath;
     QString datapath;

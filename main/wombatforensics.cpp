@@ -230,7 +230,8 @@ void WombatForensics::InitializeEvidenceStructure()
 {
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
-    wombatdatabase->GetEvidenceObject(); // get evidence object from the db.
+    wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
+    //wombatdatabase->GetEvidenceObject(); // get evidence object from the db.
     wombatframework->AddEvidenceNode(); // add evidence node to directory model
         // AFTER I ADD THE NODE, I CAN REFERENCE IT WITH THE BELOW CODE BASED ON IT'S ID USING THE ZERO 0, SINCE ITS UNIQUE.
         /*
@@ -277,7 +278,8 @@ void WombatForensics::AddEvidence()
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
     {
-        wombatvarptr->evidenceobject.name = tmplist[0].split("/").last();
+        wombatvarptr->currentevidencename = tmplist[0].split("/").last();
+        //wombatvarptr->evidenceobject.name = tmplist[0].split("/").last();
         for(int i=0; i < tmplist.count(); i++)
         {
             fprintf(stderr, "fullpathvector: %s\n", tmplist[i].toStdString().c_str());
