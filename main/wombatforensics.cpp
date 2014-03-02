@@ -232,46 +232,29 @@ void WombatForensics::InitializeEvidenceStructure()
     // ONCE ALL OPEN AND INSERTED, THEN I CAN GET THEM AND POPULATE MY VECTOR OBJECTS
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
-    wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
-    //wombatdatabase->GetEvidenceObject(); // get evidence object from the db.
-    wombatframework->AddEvidenceNode(); // add evidence node to directory model
-        // AFTER I ADD THE NODE, I CAN REFERENCE IT WITH THE BELOW CODE BASED ON IT'S ID USING THE ZERO 0, SINCE ITS UNIQUE.
-        /*
-        QList<QStandardItem*> idstring = wombatvarptr->dirmodel->findItems(QString::number(wombatvarptr->evidenceobject.id), Qt::MatchExactly, 0);
-        QList<QStandardItem*> namestring = wombatvarptr->dirmodel->findItems(wombatvarptr->evidenceobject.name, Qt::MatchExactly, 1);
-        fprintf(stderr, "dirmodel item 0: %s\n", idstring[0]->text().toStdString().c_str());
-        fprintf(stderr, "dirmodel item 1: %s\n", namestring[0]->text().toStdString().c_str());
-        */
-    ResizeColumns();
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
     wombatdatabase->InsertVolumeObject(); // add volume to data
-    wombatdatabase->GetVolumeObject();
-        // NEED TO COMBINE THE FILE SYSTEM AND PARTITION OBJECT INFORMATION INTO A DB ENTRY.
-        /* NO NEED TO PLACE A VOLUME OBJECT IN THE NODE TREE STRUCTURE...
-         * SIMPLY ADD THE PARTITION(S)/FILE SYSTEM(S) TO THE IMAGE NODE
-        tmplist.clear(); // clear tmplist to reuse for volumes.
-        */
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
-    wombatdatabase->GetPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
+
+    wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
+    wombatdatabase->GetVolumeObject();
+    wombatdatabase->GetPartitionObjects();
     wombatdatabase->GetFileSystemObjects();
+
+    wombatframework->AddEvidenceNode(); // add evidence node to directory model
     wombatframework->AddPartitionNodes();
+    ResizeColumns();
     /*for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
     {
         // PARTITION INFORMATION FROM TSK INFO   : FLAGS, LEN (# OF SECTORS), START, (FIRST SECTOR), DESC, SLOT_NUM, TABLE_NUM 
         fprintf(stderr, "Part Name: %s\n", wombatvarptr->partitionobjectvector[i].name.toStdString().c_str());
     }*/
-    ResizeColumns();
         //wombatdatabase->InitializeEvidenceDatabase();
         //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);
     //wombatframework->BuildEvidenceModel();
-    // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
-    // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR
-    // NEED TO CREATE THE EVIDENCE TSK DATABASE (EXTRACT EVIDENCE ACCORDING TO MODULES)
-    // NEED TO BUILD DIRMODEL AS I GO AND POPULATE DIRTREEVIEW AS I GO WITH EACH FILE
-    // FOR NOW I WON'T BUILD MODULES, I'LL JUST DESIGN A MULTI-THREADED APPROACH FOR IT AND ABSTRACT TO PLUGGABLE MODULES LATER
 }
 
 void WombatForensics::AddEvidence()
