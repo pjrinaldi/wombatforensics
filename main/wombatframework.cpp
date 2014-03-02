@@ -35,20 +35,42 @@ void WombatFramework::AddEvidenceNode() // add evidence node to the dirmodel
 
 void WombatFramework::AddPartitionNodes() // add partition/fs nodes to the image node
 {
-    qDebug() << " vol part count: " << wombatptr->volumeobject.childcount;
-    qDebug() << " part part count: " << wombatptr->partitionobjectvector.count() << "fs count: " << wombatptr->filesystemobjectvector.count();
+    QList<QStandardItem*> evidnode = wombatptr->dirmodel->findItems(QString::number(wombatptr->evidenceobject.id), Qt::MatchExactly, 0);
+    QList<QStandardItem*> tmplist;
+    QStandardItem* tmpnode;
+    QString tmpstring = "";
     if(wombatptr->partitionobjectvector.count() > 0)
     {
         for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
         {
-            qDebug() << wombatptr->partitionobjectvector[i].name << " [" << wombatptr->partitionobjectvector[i].sectstart << "-" << wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength << "]";
-            // if partition flag is 1, there is a file system. if 2: unalloc, 3: meta, 4: part table
-            // need to add the nodes here now that i've got partitions working.
+            tmplist.clear();
+            tmpstring = "";
+            tmpnode = NULL;
+            tmpnode = new QStandardItem(QString::number(wombatptr->partitionobjectvector[i].id));
+            tmpnode->setCheckable(true);
+            tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
+            int sectend = wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength - 1;
+            QString tmpstring = wombatptr->partitionobjectvector[i].name + " [" + QString::number(wombatptr->partitionobjectvector[i].sectstart) + "-" + QString::number(sectend) + "]";
+            tmplist << tmpnode << new QStandardItem(tmpstring);
+            evidnode[0]->appendRow(tmplist);
         }
     }
     else
-        qDebug() << "no partitions...";
-    // LOOP OVER PARITTION VECTOR COUNT
+    {
+        for(int i=0; i < wombatptr->filesystemobjectvector.count(); i++)
+        {
+            tmplist.clear();
+            tmpstring = "";
+            tmpnode = NULL;
+            tmpnode = new QStandardItem(QString::number(wombatptr->filesystemobjectvector[i].id));
+            tmpnode->setCheckable(true);
+            tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
+            int sectend = wombatptr->filesystemobjectvector[i].blocksize * wombatptr->filesystemobjectvector[i].blockcount;
+            QString tmpstring = wombatptr->filesystemobjectvector[i].name + " [" + QString::number(wombatptr->filesystemobjectvector[i].byteoffset) + "-" + QString::number(sectend) + "]";
+            tmplist << tmpnode << new QStandardItem(tmpstring);
+            evidnode[0]->appendRow(tmplist);
+        }
+    }
 
 }
 
@@ -85,11 +107,9 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
             {
                 wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
                 TSK_FS_INFO* tmpfsinfo = tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT);
-                qDebug() << "part flags for " << i << ": " << wombatptr->evidenceobject.partinfovector[i]->flags;
                 if(tmpfsinfo != NULL)
                 {
                     wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT));
-                    qDebug() << "fs type for " << i << ": " << tsk_fs_type_toname(tmpfsinfo->ftype);
                 }
                 else
                 {
@@ -172,7 +192,6 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
         subchar.push_back(wombatptr->rawbyteintvector[510]);
         subchar.push_back(wombatptr->rawbyteintvector[511]);
         Translate::ByteToHex(tmpstr, subchar);
-        qDebug() << "Byte to Hex: " << tmpstr;
         if(QString::compare("55aa", tmpstr) == 0) // its a boot sector
         {
                 // now to determine if its got a partition table

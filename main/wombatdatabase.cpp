@@ -231,7 +231,7 @@ void WombatDatabase::InsertPartitionObjects()
     {
         for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
         {
-            wombatptr->partitionobject.name = QString::fromUtf8(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->desc).remove('"');
+            wombatptr->partitionobject.name = QString::fromUtf8(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->desc);
             wombatptr->partitionobject.id = 0;
             wombatptr->bindvalues.clear();
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->flags);
@@ -266,12 +266,11 @@ void WombatDatabase::GetPartitionObjects()
 
 void WombatDatabase::InsertFileSystemObjects()
 {
-    qDebug() << "(insert fs) fsinfo vector count: " << wombatptr->evidenceobject.fsinfovector.size();
     if(wombatptr->evidenceobject.fsinfovector.size() > 0)
     {
         for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
         {
-            wombatptr->filesystemobject.name = QString::fromUtf8(wombatptr->evidenceobject.fsinfovector[i]->duname); // duname = data unit name (clusters)
+            wombatptr->filesystemobject.name = QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype)); // duname = data unit name (clusters)
             wombatptr->filesystemobject.id = 0;
             wombatptr->bindvalues.clear();
             wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->ftype);
@@ -285,7 +284,6 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
             wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
             wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
-            qDebug() << wombatptr->evidenceobject.fsinfovector[i]->duname;
         }
     }
 }
@@ -304,7 +302,7 @@ void WombatDatabase::GetFileSystemObjects()
         wombatptr->filesystemobject.flags = wombatptr->sqlrecords[i].value(2).toInt();
         wombatptr->filesystemobject.byteoffset = wombatptr->sqlrecords[i].value(3).toInt();
         wombatptr->filesystemobject.parentid = wombatptr->sqlrecords[i].value(4).toInt();
-        wombatptr->filesystemobject.size = wombatptr->sqlrecords[i].value(5).toInt();
+        wombatptr->filesystemobject.blocksize = wombatptr->sqlrecords[i].value(5).toInt();
         wombatptr->filesystemobject.blockcount = wombatptr->sqlrecords[i].value(6).toInt();
         wombatptr->filesystemobject.firstinum = wombatptr->sqlrecords[i].value(7).toInt();
         wombatptr->filesystemobject.lastinum = wombatptr->sqlrecords[i].value(8).toInt();

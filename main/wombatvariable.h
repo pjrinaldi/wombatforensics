@@ -42,6 +42,7 @@ struct FileSystemObject
     int flags;
     int byteoffset;
     int parentid;
+    int blocksize;
     int size;
     int blockcount;
     int firstinum;
