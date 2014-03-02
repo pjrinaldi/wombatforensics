@@ -215,7 +215,7 @@ void WombatDatabase::GetVolumeObject()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, type, size, byteoffset, parentid, childcount, name FROM data WHERE parentid = ? and objecttype = 2", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, type, size, byteoffset, parentid, childcount, name, objecttype FROM data WHERE parentid = ? and objecttype = 2", wombatptr->bindvalues);
     wombatptr->volumeobject.id = wombatptr->sqlrecords[0].value(0).toInt();
     wombatptr->volumeobject.type = wombatptr->sqlrecords[0].value(1).toInt();
     wombatptr->volumeobject.blocksize = wombatptr->sqlrecords[0].value(2).toInt();
@@ -223,6 +223,7 @@ void WombatDatabase::GetVolumeObject()
     wombatptr->volumeobject.parentid = wombatptr->sqlrecords[0].value(4).toInt();
     wombatptr->volumeobject.childcount = wombatptr->sqlrecords[0].value(5).toInt();
     wombatptr->volumeobject.name = wombatptr->sqlrecords[0].value(6).toString();
+    wombatptr->volumeobject.objecttype = wombatptr->sqlrecords[0].value(7).toString();
 }
 
 void WombatDatabase::InsertPartitionObjects()
@@ -251,7 +252,7 @@ void WombatDatabase::GetPartitionObjects()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->volumeobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, sectstart, sectlength, name, parentid FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, sectstart, sectlength, name, parentid, objecttype FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         wombatptr->partitionobject.id = wombatptr->sqlrecords[i].value(0).toInt();
@@ -260,6 +261,7 @@ void WombatDatabase::GetPartitionObjects()
         wombatptr->partitionobject.sectlength = wombatptr->sqlrecords[i].value(3).toInt();
         wombatptr->partitionobject.name = wombatptr->sqlrecords[i].value(4).toString();
         wombatptr->partitionobject.parentid = wombatptr->sqlrecords[i].value(5).toInt();
+        wombatptr->partitionobject.objecttype = wombatptr->sqlrecords[i].value(6).toInt();
         wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
     }
 }
@@ -283,7 +285,7 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->last_inum);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
             wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-            wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
+            //wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
         }
     }
 }
@@ -294,7 +296,7 @@ void WombatDatabase::GetFileSystemObjects()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->volumeobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum FROM data WHERE parentid = ? and objecttype = 4 ORDER BY objectid", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinumi, objecttype FROM data WHERE parentid = ? and objecttype = 4 ORDER BY objectid", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         wombatptr->filesystemobject.id = wombatptr->sqlrecords[i].value(0).toInt(); 
@@ -307,6 +309,7 @@ void WombatDatabase::GetFileSystemObjects()
         wombatptr->filesystemobject.firstinum = wombatptr->sqlrecords[i].value(7).toInt();
         wombatptr->filesystemobject.lastinum = wombatptr->sqlrecords[i].value(8).toInt();
         wombatptr->filesystemobject.rootinum = wombatptr->sqlrecords[i].value(9).toInt();
+        wombatptr->filesystemobject.objecttype = wombatptr->sqlrecords[i].value(10).toInt();
         wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
     }
 }
@@ -333,24 +336,38 @@ void WombatDatabase::InsertEvidenceObject()
 
 void WombatDatabase::GetEvidenceObject()
 {
+    //wombatptr->evidenceobjectvector.clear();
     // already have id and name from adding/opening the evidence
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, type, size, sectsize, name, fullpath FROM data WHERE objectid = ?;", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, type, size, sectsize, name, fullpath, objectid FROM data WHERE objectid = ?;", wombatptr->bindvalues);
     wombatptr->evidenceobject.objecttype = wombatptr->sqlrecords[0].value(0).toInt();
     wombatptr->evidenceobject.type = wombatptr->sqlrecords[0].value(1).toInt();
     wombatptr->evidenceobject.size = wombatptr->sqlrecords[0].value(2).toInt();
     wombatptr->evidenceobject.sectsize = wombatptr->sqlrecords[0].value(3).toInt();
     wombatptr->evidenceobject.name = wombatptr->sqlrecords[0].value(4).toString();
     wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[0].value(5).toString();
+    wombatptr->evidenceobject.objectid = wombatptr->sqlrecords[0].value(6).toInt();
+    //wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
 }
 
 void WombatDatabase::GetEvidenceObjects()
 {
-    for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
+    wombatptr->evidenceobjectvector.clear();
+    wombatptr->bindvalues.clear();
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, objecttype, type, size, sectsize, name, fullpath FROM data WHERE objecttype = 1;", wombatptr->bindvalues());
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
-        // need a way to call getevidenceobject() for each evidencevectorobject
+        wombatptr->evidenceobject.objectid = wombatptr->sqlrecords[i].value(0).toInt();
+        wombatptr->evidenceobject.objecttype = wombatptr->sqlrecords[i].value(1).toInt();
+        wombatptr->evidenceobject.type = wombatptr->sqlrecords[i].value(2).toInt();
+        wombatptr->evidenceobject.size = wombatptr->sqlrecords[i].value(3).toInt();
+        wombatptr->evidenceobject.sectsize = wombatptr->sqlrecords[i].value(4).toInt();
+        wombatptr->evidenceobject.name = wombatptr->sqlrecords[i].value(5).toString();
+        wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[i].value(6).toString();
+        wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
     }
 }
 
