@@ -39,6 +39,10 @@ void WombatFramework::AddPartitionNodes() // add partition/fs nodes to the image
     qDebug() << " part part count: " << wombatptr->partitionobjectvector.count() << "fs count: " << wombatptr->filesystemobjectvector.count();
     if(wombatptr->partitionobjectvector.count() > 0)
     {
+        for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
+        {
+            // if partition flag is 1, there is a file system. if 2: unalloc, 3: meta, 4: part table
+        }
     }
     else
         qDebug() << "no partitions...";
