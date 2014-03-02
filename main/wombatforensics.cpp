@@ -228,6 +228,8 @@ void WombatForensics::InitializeDirModel()
 
 void WombatForensics::InitializeEvidenceStructure()
 {
+    // NEED TO OPEN ITEM/ INSERT ITEM...
+    // ONCE ALL OPEN AND INSERTED, THEN I CAN GET THEM AND POPULATE MY VECTOR OBJECTS
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case

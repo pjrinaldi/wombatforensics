@@ -84,10 +84,10 @@ void WombatFramework::OpenVolumeSystem() // open current volume system
 void WombatFramework::GetVolumeSystemName() // get the volume system name
 {
     if(wombatptr->evidenceobject.volinfo == NULL)
-        wombatptr->volumeobject.name = "Dummy Volume";
+        wombatptr->currentvolumename = "Dummy Volume";
     else
-        wombatptr->volumeobject.name = QString::fromUtf8(tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype));
-    wombatptr->volumeobjectvector.append(wombatptr->volumeobject); // may not need.
+        wombatptr->currentvolumename = QString::fromUtf8(tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype));
+    //wombatptr->volumeobjectvector.append(wombatptr->volumeobject); // may not need.
 }
 
 void WombatFramework::OpenPartitions() // open the partitions in the volume
