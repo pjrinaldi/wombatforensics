@@ -297,9 +297,9 @@ void WombatDatabase::InsertFileSystemObjects()
 
 void WombatDatabase::GetFileSystemObjects()
 {
+    wombatptr->filesystemobjectvector.clear();
     for(int j=0; j < wombatptr->volumeobjectvector.count(); j++)
     {
-        wombatptr->filesystemobjectvector.clear();
         wombatptr->bindvalues.clear();
         wombatptr->bindvalues.append(wombatptr->volumeobjectvector[j].id);
         wombatptr->sqlrecords.clear();

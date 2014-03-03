@@ -43,8 +43,8 @@ void WombatFramework::AddEvidenceNodes() // add evidence node to the dirmodel
 
 void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes to the image node
 {
+    qDebug() << "current evidenceobjectvector item: " << increment;
     QList<QStandardItem*> evidnode = wombatptr->dirmodel->findItems(QString::number(wombatptr->evidenceobjectvector[increment].id), Qt::MatchExactly, 0);
-    qDebug() << "evidnode count: " << evidnode.count();
     QList<QStandardItem*> tmplist;
     QStandardItem* tmpnode;
     QString tmpstring = "";
