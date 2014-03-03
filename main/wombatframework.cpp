@@ -15,7 +15,6 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     for(int i=0; i < wombatptr->evidenceobject.fullpathvector.size(); i++)
     {
         images[i] = wombatptr->evidenceobject.fullpathvector[i].c_str();
-        //fprintf(stderr, "fpv: %s\n", wombatptr->evidenceobject.fullpathvector[i].c_str());
     }
     wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
     if(wombatptr->evidenceobject.imageinfo == NULL)
@@ -125,8 +124,6 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
 void WombatFramework::OpenVolumeSystem() // open current volume system
 {
     wombatptr->evidenceobject.volinfo = tsk_vs_open(wombatptr->evidenceobject.imageinfo, 0, TSK_VS_TYPE_DETECT);
-    //if(wombatptr->evidenceobject.volinfo == NULL)
-        //fprintf(stderr, "no volume, create dummy one.");
 }
 
 void WombatFramework::GetVolumeSystemName() // get the volume system name
@@ -148,7 +145,6 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
     }
     else
     {
-        fprintf(stderr, "partitioncount: %i\n", wombatptr->evidenceobject.volinfo->part_count);
         if(wombatptr->evidenceobject.volinfo->part_count > 0)
         {
             for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
@@ -222,6 +218,7 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
     }
     int retval;
     //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
+    /*
     QString tmpstr = "";
     char* bootbuffer = NULL;
     wombatptr->rawbyteintvector.clear();
@@ -234,6 +231,8 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
         {
             wombatptr->rawbyteintvector[i] = bootbuffer[i];
         }
+        delete[] bootbuffer;
+        // delete bootbuffer;
         //qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
         //qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
         vector<uchar> subchar;
@@ -247,7 +246,8 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
         //Translate::ByteToBinary(tmpstr, subchar);
         //qDebug() << "Byte to Bin: " << tmpstr;
     }
-        //wombatptr->bootbytearray = QByteArray::fromRawData(wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
+    // older stuff here. use the above for what i need to do.
+        //wombatptr->bootbytearray = QByteArray::fromRawData(wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);*/
         /*
         qDebug() << ByteArrayToHex(wombatptr->bootbytearray.mid(510,2)); // nets my signature value to compare
         if(QString::compare("55aa", ByteArrayToHex(wombatptr->bootbytearray.mid(510,2))) == 0) // its a boot sector

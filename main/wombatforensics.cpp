@@ -228,8 +228,6 @@ void WombatForensics::InitializeDirModel()
 
 void WombatForensics::InitializeEvidenceStructure()
 {
-    // NEED TO BREAK UP ADDING NEW EVIDENCE TO A CASE AND OPENING A CASE TO LOAD ALL EVIDENCE
-    // ISSUES WITH THE INSERTING OF OBJECTS FOR THE PARENT ID NOT WORKING
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     wombatframework->OpenVolumeSystem();
@@ -245,8 +243,6 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->GetFileSystemObjects();
 
     wombatframework->AddEvidenceNodes(); // add evidence node to directory model
-    //wombatframework->AddPartitionNodes();
-    //ResizeColumns();
 }
 
 void WombatForensics::AddEvidence()
@@ -256,19 +252,15 @@ void WombatForensics::AddEvidence()
     if(tmplist.count())
     {
         wombatvarptr->currentevidencename = tmplist[0].split("/").last();
-        //wombatvarptr->evidenceobject.name = tmplist[0].split("/").last();
         for(int i=0; i < tmplist.count(); i++)
         {
             fprintf(stderr, "fullpathvector: %s\n", tmplist[i].toStdString().c_str());
             wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
-        //wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject); // add evidence to case evidence list
-        //fprintf(stderr, "eov count: %i\n", wombatvarptr->evidenceobjectvector.count());
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
-        //wombatframework->AddEvidenceNodes();
         ResizeColumns();
     }
     
