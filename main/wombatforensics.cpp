@@ -246,7 +246,7 @@ void WombatForensics::InitializeEvidenceStructure()
 
     wombatframework->AddEvidenceNodes(); // add evidence node to directory model
     //wombatframework->AddPartitionNodes();
-    ResizeColumns();
+    //ResizeColumns();
 }
 
 void WombatForensics::AddEvidence()
@@ -268,6 +268,7 @@ void WombatForensics::AddEvidence()
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
+        ResizeColumns();
     }
     
     /*

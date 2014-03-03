@@ -51,6 +51,7 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
     {
         if(wombatptr->evidenceobjectvector[increment].id == wombatptr->volumeobjectvector[j].parentid)
         {
+            qDebug() << wombatptr->volumeobjectvector[j].childcount;
             if(wombatptr->volumeobjectvector[j].childcount > 0)
             {
                 for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
