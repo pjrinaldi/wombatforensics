@@ -239,7 +239,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertFileSystemObjects();
 
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
-    wombatdatabase->GetVolumeObject();
+    wombatdatabase->GetVolumeObjects();
     wombatdatabase->GetPartitionObjects();
     wombatdatabase->GetFileSystemObjects();
 

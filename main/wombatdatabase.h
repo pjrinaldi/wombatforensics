@@ -19,7 +19,7 @@ public:
     void GetEvidenceObject(void);
     void GetEvidenceObjects(void);
     void InsertVolumeObject(void);
-    void GetVolumeObject(void);
+    void GetVolumeObjects(void);
     void InsertPartitionObjects(void);
     void GetPartitionObjects(void);
     void InsertFileSystemObjects(void);

@@ -44,40 +44,71 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
     QList<QStandardItem*> tmplist;
     QStandardItem* tmpnode;
     QString tmpstring = "";
-    // IT ERRORS HERE BECAUSE IT DOESN'T UNDERSTAND WHICH IS WHICH FOR PARTITION COUNT CHECK. NEED TO ERROR CHECK AGAINST THE PARENTID????
-    if(wombatptr->partitionobjectvector.count() > 0)
+    for(int j=0; j < wombatptr->volumeobjectvector.count(); j++)
     {
-        for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
+        if(wombatptr->evidenceobjectvector[increment].id == wombatptr->volumeobjectvector[j].parentid)
         {
-            tmplist.clear();
-            tmpstring = "";
-            tmpnode = NULL;
-            tmpnode = new QStandardItem(QString::number(wombatptr->partitionobjectvector[i].id));
-            tmpnode->setCheckable(true);
-            tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
-            int sectend = wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength - 1;
-            QString tmpstring = wombatptr->partitionobjectvector[i].name + " [" + QString::number(wombatptr->partitionobjectvector[i].sectstart) + "-" + QString::number(sectend) + "]";
-            tmplist << tmpnode << new QStandardItem(tmpstring);
-            evidnode[0]->appendRow(tmplist);
+            for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
+            {
+                if(wombatptr->volumeobjectvector[j].id == wombatptr->partitionobjectvector[i].parentid)
+                {
+                    tmplist.clear();
+                    tmpstring = "";
+                    tmpnode = NULL;
+                    tmpnode = new QStandardItem(QString::number(wombatptr->partitionobjectvector[i].id));
+                    tmpnode->setCheckable(true);
+                    tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
+                    int sectend = wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength - 1;
+                    QString tmpstring = wombatptr->partitionobjectvector[i].name + " [" + QString::number(wombatptr->partitionobjectvector[i].sectstart) + "-" + QString::number(sectend) + "]";
+                    tmplist << tmpnode << new QStandardItem(tmpstring);
+                    evidnode[0]->appendRow(tmplist);
+                }
+            }
+            for(int i=0; i < wombatptr->filesystemobjectvector.count(); i++)
+            {
+                if(wombatptr->volumeobjectvector[increment].id == wombatptr->filesystemobjectvector[i].parentid)
+                {
+                    tmplist.clear();
+                    tmpstring = "";
+                    tmpnode = NULL;
+                    tmpnode = new QStandardItem(QString::number(wombatptr->filesystemobjectvector[i].id));
+                    tmpnode->setCheckable(true);
+                    tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
+                    int sectend = wombatptr->filesystemobjectvector[i].blocksize * wombatptr->filesystemobjectvector[i].blockcount;
+                    QString tmpstring = wombatptr->filesystemobjectvector[i].name + " [" + QString::number(wombatptr->filesystemobjectvector[i].byteoffset) + "-" + QString::number(sectend) + "]";
+                    tmplist << tmpnode << new QStandardItem(tmpstring);
+                    evidnode[0]->appendRow(tmplist);
+                }
+            }
         }
     }
-    else
+    /*
+    for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
     {
-        for(int i=0; i < wombatptr->filesystemobjectvector.count(); i++)
-        {
-            tmplist.clear();
-            tmpstring = "";
-            tmpnode = NULL;
-            tmpnode = new QStandardItem(QString::number(wombatptr->filesystemobjectvector[i].id));
-            tmpnode->setCheckable(true);
-            tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
-            int sectend = wombatptr->filesystemobjectvector[i].blocksize * wombatptr->filesystemobjectvector[i].blockcount;
-            QString tmpstring = wombatptr->filesystemobjectvector[i].name + " [" + QString::number(wombatptr->filesystemobjectvector[i].byteoffset) + "-" + QString::number(sectend) + "]";
-            tmplist << tmpnode << new QStandardItem(tmpstring);
-            evidnode[0]->appendRow(tmplist);
-        }
+        tmplist.clear();
+        tmpstring = "";
+        tmpnode = NULL;
+        tmpnode = new QStandardItem(QString::number(wombatptr->partitionobjectvector[i].id));
+        tmpnode->setCheckable(true);
+        tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
+        int sectend = wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength - 1;
+        QString tmpstring = wombatptr->partitionobjectvector[i].name + " [" + QString::number(wombatptr->partitionobjectvector[i].sectstart) + "-" + QString::number(sectend) + "]";
+        tmplist << tmpnode << new QStandardItem(tmpstring);
+        evidnode[0]->appendRow(tmplist);
     }
-
+    for(int i=0; i < wombatptr->filesystemobjectvector.count(); i++)
+    {
+        tmplist.clear();
+        tmpstring = "";
+        tmpnode = NULL;
+        tmpnode = new QStandardItem(QString::number(wombatptr->filesystemobjectvector[i].id));
+        tmpnode->setCheckable(true);
+        tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
+        int sectend = wombatptr->filesystemobjectvector[i].blocksize * wombatptr->filesystemobjectvector[i].blockcount;
+        QString tmpstring = wombatptr->filesystemobjectvector[i].name + " [" + QString::number(wombatptr->filesystemobjectvector[i].byteoffset) + "-" + QString::number(sectend) + "]";
+        tmplist << tmpnode << new QStandardItem(tmpstring);
+        evidnode[0]->appendRow(tmplist);
+    }*/
 }
 
 void WombatFramework::OpenVolumeSystem() // open current volume system

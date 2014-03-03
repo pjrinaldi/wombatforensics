@@ -173,7 +173,7 @@ struct WombatVariable
     EvidenceObject evidenceobject;
     VolumeObject volumeobject;
     QVector<EvidenceObject> evidenceobjectvector;
-    QVector<VolumeObject> volumeobjectvector; // may not need
+    QVector<VolumeObject> volumeobjectvector;
     PartitionObject partitionobject;
     QVector<PartitionObject> partitionobjectvector;
     FileSystemObject filesystemobject;
