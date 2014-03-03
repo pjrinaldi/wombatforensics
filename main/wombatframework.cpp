@@ -44,6 +44,7 @@ void WombatFramework::AddEvidenceNodes() // add evidence node to the dirmodel
 void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes to the image node
 {
     QList<QStandardItem*> evidnode = wombatptr->dirmodel->findItems(QString::number(wombatptr->evidenceobjectvector[increment].id), Qt::MatchExactly, 0);
+    qDebug() << "evidnode count: " << evidnode.count();
     QList<QStandardItem*> tmplist;
     QStandardItem* tmpnode;
     QString tmpstring = "";
@@ -51,7 +52,7 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
     {
         if(wombatptr->evidenceobjectvector[increment].id == wombatptr->volumeobjectvector[j].parentid)
         {
-            qDebug() << wombatptr->volumeobjectvector[j].childcount;
+            qDebug() << "vol part children count: " << wombatptr->volumeobjectvector[j].childcount;
             if(wombatptr->volumeobjectvector[j].childcount > 0)
             {
                 for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
@@ -73,10 +74,15 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
             }
             else
             {
+                qDebug() << "fs count: " << wombatptr->filesystemobjectvector.count();
                 for(int i=0; i < wombatptr->filesystemobjectvector.count(); i++)
                 {
+                    qDebug() << "into fs loop";
+                    qDebug() << "vol id: " << wombatptr->volumeobjectvector[j].id;
+                    qDebug() << "fs parent id: " << wombatptr->filesystemobjectvector[i].parentid;
                     if(wombatptr->volumeobjectvector[j].id == wombatptr->filesystemobjectvector[i].parentid)
                     {
+                        qDebug() << "into fs if statement";
                         tmplist.clear();
                         tmpstring = "";
                         tmpnode = NULL;
@@ -88,6 +94,8 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
                         tmplist << tmpnode << new QStandardItem(tmpstring);
                         evidnode[0]->appendRow(tmplist);
                     }
+                    else
+                        qDebug() << "fs if failed";
                 }
             }
         }
