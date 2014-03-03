@@ -29,7 +29,6 @@ void WombatFramework::AddEvidenceNodes() // add evidence node to the dirmodel
     QStringList headerList;
     headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     wombatptr->dirmodel->setHorizontalHeaderLabels(headerList);
-    //ui->dirTreeView->setModel(wombatdirmodel);
     for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
     {
         QList<QStandardItem*> tmplist;
