@@ -20,7 +20,7 @@ public:
     void GetVolumeSystemName(void);
     void OpenPartitions(void);
     void AddPartitionNodes(int increment);
-    void OpenFileSystems(void);
+    void CloseInfoStructures(void);
 
     void GetBootCode(void);
 

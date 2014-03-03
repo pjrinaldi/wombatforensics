@@ -237,6 +237,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
 
+    wombatframework->CloseInfoStructures(); // set info ptr's to NULL and then close the items with tsk_close_
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
     wombatdatabase->GetVolumeObjects();
     wombatdatabase->GetPartitionObjects();

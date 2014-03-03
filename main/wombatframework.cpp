@@ -92,33 +92,6 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
             }
         }
     }
-    /*
-    for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
-    {
-        tmplist.clear();
-        tmpstring = "";
-        tmpnode = NULL;
-        tmpnode = new QStandardItem(QString::number(wombatptr->partitionobjectvector[i].id));
-        tmpnode->setCheckable(true);
-        tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
-        int sectend = wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength - 1;
-        QString tmpstring = wombatptr->partitionobjectvector[i].name + " [" + QString::number(wombatptr->partitionobjectvector[i].sectstart) + "-" + QString::number(sectend) + "]";
-        tmplist << tmpnode << new QStandardItem(tmpstring);
-        evidnode[0]->appendRow(tmplist);
-    }
-    for(int i=0; i < wombatptr->filesystemobjectvector.count(); i++)
-    {
-        tmplist.clear();
-        tmpstring = "";
-        tmpnode = NULL;
-        tmpnode = new QStandardItem(QString::number(wombatptr->filesystemobjectvector[i].id));
-        tmpnode->setCheckable(true);
-        tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
-        int sectend = wombatptr->filesystemobjectvector[i].blocksize * wombatptr->filesystemobjectvector[i].blockcount;
-        QString tmpstring = wombatptr->filesystemobjectvector[i].name + " [" + QString::number(wombatptr->filesystemobjectvector[i].byteoffset) + "-" + QString::number(sectend) + "]";
-        tmplist << tmpnode << new QStandardItem(tmpstring);
-        evidnode[0]->appendRow(tmplist);
-    }*/
 }
 
 void WombatFramework::OpenVolumeSystem() // open current volume system
@@ -132,7 +105,6 @@ void WombatFramework::GetVolumeSystemName() // get the volume system name
         wombatptr->currentvolumename = "Dummy Volume";
     else
         wombatptr->currentvolumename = QString::fromUtf8(tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype));
-    //wombatptr->volumeobjectvector.append(wombatptr->volumeobject); // may not need.
 }
 
 void WombatFramework::OpenPartitions() // open the partitions in the volume
@@ -162,11 +134,6 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
         }
     }
 }
-// DEFINITELY DON'T NEED THIS FUNCTION RIGHT NOW.
-void WombatFramework::OpenFileSystems() // open the filesystems in the image or partition
-{
-    // may not need this function since i can open them when the partitions are added w/o having to reloop it.
-}
 
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
 {
@@ -183,10 +150,42 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
     }
 }
 
+void WombatFramework::CloseInfoStructures() // close all open info structures
+{
+    for(int j=0; j < wombatptr->evidenceobjectvector.count(); j++)
+    {
+        for(int i=0; i < wombatptr->evidenceobjectvector[j].fsinfovector.size(); i++)
+        {
+            if(wombatptr->evidenceobjectvector[j].fsinfovector[i] != NULL)
+            {
+                tsk_fs_close(wombatptr->evidenceobjectvector[j].fsinfovector[i]);
+                wombatptr->evidenceobjectvector[j].fsinfovector[i] = NULL;
+            }
+        }
+        wombatptr->evidenceobjectvector[j].fsinfovector.clear();
+        for(int i=0; i < wombatptr->evidenceobject.partinfovector.size(); i++)
+        {
+            wombatptr->evidenceobjectvector[j].partinfovector[i] = NULL;
+        }
+        wombatptr->evidenceobjectvector[j].partinfovector.clear();
+        if(wombatptr->evidenceobjectvector[j].volinfo != NULL)
+        {
+            tsk_vs_close(wombatptr->evidenceobjectvector[j].volinfo);
+            wombatptr->evidenceobjectvector[j].volinfo = NULL;
+        }
+        if(wombatptr->evidenceobjectvector[j].imageinfo != NULL)
+        {
+            tsk_img_close(wombatptr->evidenceobjectvector[j].imageinfo);
+            wombatptr->evidenceobjectvector[j].imageinfo = NULL;
+        }
+    }
+}
+
 void WombatFramework::GetBootCode() // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
     // while this byte reading and converting is great... to find out the boot information, i can pull it from my volume system information such as...
-    //
+    // NEED TO REPLACE ALL INFO WITH OBJECT VALUES...
+    /*
     if(wombatptr->evidenceobject.volinfo != NULL)
     {
         wombatptr->htmlcontent += "<tr><td class='property'>byte offset</td><td class='pvalue'>";
@@ -217,7 +216,7 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
         // layout in the tree view
     }
     int retval;
-    //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
+    //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");*/
     /*
     QString tmpstr = "";
     char* bootbuffer = NULL;
