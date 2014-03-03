@@ -229,6 +229,7 @@ void WombatForensics::InitializeDirModel()
 void WombatForensics::InitializeEvidenceStructure()
 {
     // NEED TO BREAK UP ADDING NEW EVIDENCE TO A CASE AND OPENING A CASE TO LOAD ALL EVIDENCE
+    // ISSUES WITH THE INSERTING OF OBJECTS FOR THE PARENT ID NOT WORKING
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     wombatframework->OpenVolumeSystem();
