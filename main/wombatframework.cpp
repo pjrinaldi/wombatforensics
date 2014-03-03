@@ -75,7 +75,7 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
             {
                 for(int i=0; i < wombatptr->filesystemobjectvector.count(); i++)
                 {
-                    if(wombatptr->volumeobjectvector[increment].id == wombatptr->filesystemobjectvector[i].parentid)
+                    if(wombatptr->volumeobjectvector[j].id == wombatptr->filesystemobjectvector[i].parentid)
                     {
                         tmplist.clear();
                         tmpstring = "";
