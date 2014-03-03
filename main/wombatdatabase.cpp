@@ -188,7 +188,6 @@ WombatDatabase::~WombatDatabase()
 void WombatDatabase::InsertVolumeObject()
 {
     // might need to add endianordering INTEGER column
-    //wombatptr->volumeobject.id = 0;
     wombatptr->currentvolumeid = 0;
     if(wombatptr->evidenceobject.volinfo != NULL)
     {
@@ -215,7 +214,6 @@ void WombatDatabase::GetVolumeObject()
 {
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-    //wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT objectid, type, size, byteoffset, parentid, childcount, name, objecttype FROM data WHERE parentid = ? and objecttype = 2", wombatptr->bindvalues);
     wombatptr->volumeobject.id = wombatptr->sqlrecords[0].value(0).toInt();
@@ -234,8 +232,6 @@ void WombatDatabase::InsertPartitionObjects()
     {
         for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
         {
-            //wombatptr->partitionobject.name = QString::fromUtf8(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->desc);
-            //wombatptr->partitionobject.id = 0;
             wombatptr->currentpartitionid = 0;
             wombatptr->bindvalues.clear();
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->flags);
@@ -244,8 +240,6 @@ void WombatDatabase::InsertPartitionObjects()
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
             wombatptr->bindvalues.append(wombatptr->currentvolumeid);
             wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-            //wombatptr->partitionobject.id = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid) VALUES(3, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-            //wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
         }
     }
 }
@@ -276,7 +270,7 @@ void WombatDatabase::InsertFileSystemObjects()
     {
         for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
         {
-            wombatptr->filesystemobject.name = QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype)); // duname = data unit name (clusters)
+            wombatptr->filesystemobject.name = QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype));
             wombatptr->currentfilesystemid = 0;
             wombatptr->bindvalues.clear();
             wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->ftype);
@@ -289,7 +283,6 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->last_inum);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
             wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, flags, byteoffset, parentid, size, blockcount, firstinum, lastinum, rootinum) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-            //wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
         }
     }
 }
@@ -320,17 +313,14 @@ void WombatDatabase::GetFileSystemObjects()
 
 void WombatDatabase::InsertEvidenceObject()
 {
-    //wombatptr->evidenceobject.id = 0;
     wombatptr->currentevidenceid = 0;
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->itype);
     wombatptr->bindvalues.append((int)wombatptr->evidenceobject.imageinfo->size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
     wombatptr->bindvalues.append(wombatptr->currentevidencename);
-    //wombatptr->bindvalues.append(wombatptr->evidenceobject.name);
     wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]));
     wombatptr->currentevidenceid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-    //wombatptr->evidenceobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
         wombatptr->bindvalues.clear();

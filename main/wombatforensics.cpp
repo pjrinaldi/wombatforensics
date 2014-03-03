@@ -228,8 +228,7 @@ void WombatForensics::InitializeDirModel()
 
 void WombatForensics::InitializeEvidenceStructure()
 {
-    // NEED TO OPEN ITEM/ INSERT ITEM...
-    // ONCE ALL OPEN AND INSERTED, THEN I CAN GET THEM AND POPULATE MY VECTOR OBJECTS
+    // NEED TO BREAK UP ADDING NEW EVIDENCE TO A CASE AND OPENING A CASE TO LOAD ALL EVIDENCE
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     wombatframework->OpenVolumeSystem();
@@ -247,14 +246,6 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->AddEvidenceNodes(); // add evidence node to directory model
     //wombatframework->AddPartitionNodes();
     ResizeColumns();
-    /*for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
-    {
-        // PARTITION INFORMATION FROM TSK INFO   : FLAGS, LEN (# OF SECTORS), START, (FIRST SECTOR), DESC, SLOT_NUM, TABLE_NUM 
-        fprintf(stderr, "Part Name: %s\n", wombatvarptr->partitionobjectvector[i].name.toStdString().c_str());
-    }*/
-        //wombatdatabase->InitializeEvidenceDatabase();
-        //fprintf(stderr, "Image Type: %d\n", wombatvarptr->evidenceobject.imageinfo->itype);
-    //wombatframework->BuildEvidenceModel();
 }
 
 void WombatForensics::AddEvidence()
@@ -271,8 +262,8 @@ void WombatForensics::AddEvidence()
             wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
-        wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject); // add evidence to case evidence list
-        fprintf(stderr, "eov count: %i\n", wombatvarptr->evidenceobjectvector.count());
+        //wombatvarptr->evidenceobjectvector.append(wombatvarptr->evidenceobject); // add evidence to case evidence list
+        //fprintf(stderr, "eov count: %i\n", wombatvarptr->evidenceobjectvector.count());
         wombatprogresswindow->show();
         wombatprogresswindow->ClearTableWidget();
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);

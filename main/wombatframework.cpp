@@ -44,6 +44,7 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
     QList<QStandardItem*> tmplist;
     QStandardItem* tmpnode;
     QString tmpstring = "";
+    // IT ERRORS HERE BECAUSE IT DOESN'T UNDERSTAND WHICH IS WHICH FOR PARTITION COUNT CHECK. NEED TO ERROR CHECK AGAINST THE PARENTID????
     if(wombatptr->partitionobjectvector.count() > 0)
     {
         for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
