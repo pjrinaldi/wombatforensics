@@ -236,8 +236,8 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
-
     wombatframework->CloseInfoStructures(); // set info ptr's to NULL and then close the items with tsk_close_
+
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
     wombatdatabase->GetVolumeObjects();
     wombatdatabase->GetPartitionObjects();
@@ -344,27 +344,36 @@ void WombatForensics::LoadVidContents()
 
 void WombatForensics::LoadComplete(bool isok)
 {
-    // IT WORKS NOW. SO I HAVE TO WAIT TILL IT LOADS. WILL NEED TO WORK ON THREADING WHEN I OPEN A LARGER FILE
-    // NEED TO GET THIS INFORMATION FROM THE DB AND NOT THE IMAGEINFO VARIABLE WHICH MIGHT NOT EXIST AT THE MOMENT. OR I NEED TO POPULATE THE VARIABLE
-    // ON OPEN SO I CAN USE THE VARIABLES.
-    /*
     wombatvarptr->htmlcontent = "";
     if(isok)
     {
         if(wombatvarptr->selectedobject.type == 1) // image file
         {
+            int curidx = -1;
+            for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
+            {
+                if(wombatvarptr->evidenceobjectvector[i].id == wombatvarptr->selectedobject.id)
+                    curidx = i;
+            }
+            if(curidx > -1) // id is from valid evidence
+            {
             wombatvarptr->htmlcontent += "<div id='infotitle'>image information</div><br/>";
             wombatvarptr->htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr>";
+            wombatvarptr->htmlcontent += wombatvarptr->evidenceobjectvector[curidx].type + "</td></tr>";
+            //wombatvarptr->htmlcontent += QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>size:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobject.imageinfo->size) + " bytes</td></tr>";
+            wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobjectvector[curidx].size) + " bytes</td></tr>";
+            //wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobject.imageinfo->size) + " bytes</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>sector size:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr>";
+            wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->evidenceobjectvector[curidx].sectsize) + " bytes</td></tr>";
+            //wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size));
+            wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobjectvector[curidx].size/(float)wombatvarptr->evidenceobjectvector[curidx].sectsize));
+            //wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size));
+            wombatvarptr->htmlcontent += " sectors</td></tr>";
             // might not want to do the volume type one if there's no volume. have to think on it.
-            wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += wombatvarptr->volumeobject.name + "</td></tr>";
+            //wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
+            //wombatvarptr->htmlcontent += wombatvarptr->volumeobject.name + "</td></tr>";
             wombatframework->GetBootCode(); // determine boot type in this function and populate html string information into wombatvarptr value
             //wombatvarptr->htmlcontent += "</table>";
             //QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
@@ -378,128 +387,57 @@ void WombatForensics::LoadComplete(bool isok)
             // when you click on the partition, this is where the partition boot sector information will go.
             //tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
             //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
-        }
-    }*/
-}
-/*
-void WombatForensics::GetDosBootCode()
-{
-    int retval;
-    wombatvarptr->bootbuffer = NULL;
-    wombatvarptr->bootbuffer = new char[wombatvarptr->evidenceobject.imageinfo->sector_size];
-    retval = tsk_img_read(wombatvarptr->evidenceobject.imageinfo, 0, wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
-    if(retval > 0)
-    {
-        wombatvarptr->bootbytearray = QByteArray::fromRawData(wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
-        fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8)).toStdString().c_str());
-        wombatvarptr->bootsectorlist << ByteArrayToHexDisplay(wombatvarptr->bootbytearray.mid(0,3));
-        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8));
-        wombatvarptr->bootsectorlist << ByteArrayToShortDisplay(wombatvarptr->bootbytearray.mid(11,2));
-        wombatvarptr->bootsectorlist << ByteArrayToShortDisplay(wombatvarptr->bootbytearray.mid(13,1));
-    }
-    else
-        fprintf(stderr, "filling bootbuffer failed\n");
-
- *
-    uint64_t bytelen = 512*(seclength - 1);
-    uint64_t bytestart = 512*secstart;
-    char* volbuffer = NULL;
-    volbuffer = new char[bytelen+512];
-
-    {
-        // need to figure out why this fails... and returns -1
-        retval = TskServices::Instance().getImageFile().getSectorData(secstart, seclength-1, volbuffer);
-        fprintf(stderr, "sector data return value: %i\n", retval);
-        if (retval == -1)
-        {
-        }
-    }
-    if(retval > 0)
-    {
-        QFile tmpfile("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat");
-        tmpfile.open(QIODevice::WriteOnly);
-        tmpfile.write(volbuffer, bytelen);
-        tmpfile.close();
-    }
-    delete[] volbuffer;
-    //delete volbuffer;
-
-    return "/home/pasquale/WombatForensics/tmpfiles/volbyte.dat";
-
- *
- *
- *    // set hex (which i'll probably remove anyway since it's highlighted in same window)
-    int sellength = txt.size()/2;
-    QString tmptext = "Length: " + QString::number(sellength);
-    selectedhex->setText(tmptext);
-    // get initial bytes value and then update ascii
-    std::vector<uchar> bytes;
-    Translate::HexToByte(bytes, txt);
-    QString ascii;
-    Translate::ByteToChar(ascii, bytes);
-    tmptext = "Ascii: " + ascii;
-    selectedascii->setText(tmptext);
-    QString strvalue;
-    uchar * ucharPtr;
-    // update the int entry:
-    // pad right with 0x00
-    int intvalue = 0;
-    ucharPtr = (uchar*) &intvalue;
-    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
-    strvalue.setNum(intvalue);
-    tmptext = "Int: " + strvalue;
-    selectedinteger->setText(tmptext);
-    // update float entry;
-    float fvalue;
-    ucharPtr = (uchar*)(&fvalue);
-    if(bytes.size() < sizeof(float) )
-    {
-        for(unsigned int i= 0; i < sizeof(float); ++i)
-        {
-            if( i < bytes.size() )
-            {
-                *ucharPtr++ = bytes[i];
             }
             else
-            {
-                *ucharPtr++ = 0x00;
-            }
+                qDebug() << "Serious error since the item selected type was evidence and isn't any of the evidence.";
         }
-    }
-    else
-    {
-        memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
-    }
-    strvalue.setNum( fvalue );
-    tmptext = "Float: " + strvalue;
-    selectedfloat->setText(tmptext);
-    // update double
-    double dvalue;
-    ucharPtr = (uchar*)&dvalue;
-    if(bytes.size() < sizeof(double) )
-    {
-        for(unsigned int i= 0; i < sizeof(double); ++i)
+        else if(wombatvarptr->selectedobject.type == 2) // volume file (it should never be a volume since i don't add it to the image tree)
         {
-            if( i < bytes.size() )
+            int curidx = -1;
+            for(int i=0; i < wombatvarptr->volumeobjectvector.count(); i++)
             {
-                *ucharPtr++ = bytes[i];
+                if(wombatvarptr->volumeobjectvector[i].id == wombatvarptr->selectedobject.id)
+                    curidx = i;
+            }
+            if(curidx > -1) // id is from valid volume
+            {
             }
             else
+                qDebug() << "Serious error since the item selected type was volume and isn't any of the volumes.";
+        }
+        else if(wombatvarptr->selectedobject.type == 3) // partition file
+        {
+            int curidx = -1;
+            for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
             {
-                *ucharPtr++ = 0x00;
+                if(wombatvarptr->partitionobjectvector[i].id == wombatvarptr->selectedobject.id)
+                    curidx = i;
             }
+            if(curidx > -1) // id is from valid partition
+            {
+            }
+            else
+                qDebug() << "Serious error since the item selected type was partition and isn't any of the partitions.";
+        }
+        else if(wombatvarptr->selectedobject.type == 4) // file system file
+        {
+            int curidx = -1;
+            for(int i=0; i < wombatvarptr->filesystemobjectvector.count(); i++)
+            {
+                if(wombatvarptr->filesystemobjectvector[i].id == wombatvarptr->selectedobject.id)
+                    curidx = i;
+            }
+            if(curidx > -1) // id is from a valid file system
+            {
+            }
+            else
+                qDebug() << "Serious error since the item selected type was file system and isn't any of the file systems.";
+        }
+        else // implement for files, directories etc.. as i go.
+        {
         }
     }
-    else
-    {
-        memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
-    }
-    strvalue.setNum( dvalue );
-    tmptext = "Double: " + strvalue;
-    selecteddouble->setText(tmptext);
-
 }
-*/
 
 void WombatForensics::RemEvidence()
 {
@@ -1039,7 +977,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
     //qDebug() << "selected id: " << index.sibling(index.row(), 0).data().toInt();
-    //wombatdatabase->GetObjectType(); // now i have selected object type.
+    wombatdatabase->GetObjectType(); // now i have selectedobject.type.
     UpdateOmniValue();
     UpdateViewer();
     // NEED TO DETERMINE THE DATA TYPE TO CALL THE CORRECT DATA TO UPDATE.

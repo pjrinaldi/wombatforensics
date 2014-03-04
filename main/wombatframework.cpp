@@ -183,6 +183,7 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
 
 void WombatFramework::GetBootCode() // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
+    //if(wombatptr->evidenceobjectvector
     // while this byte reading and converting is great... to find out the boot information, i can pull it from my volume system information such as...
     // NEED TO REPLACE ALL INFO WITH OBJECT VALUES...
     /*
