@@ -236,12 +236,14 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
-    wombatframework->CloseInfoStructures(); // set info ptr's to NULL and then close the items with tsk_close_
 
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
     wombatdatabase->GetVolumeObjects();
     wombatdatabase->GetPartitionObjects();
     wombatdatabase->GetFileSystemObjects();
+    
+    //wombatframework->CloseInfoStructures(); // set info ptr's to NULL and then close the items with tsk_close_
+    // errors out since it runs during a thread. will need to call this from outside the thread, probably after resize columns or when thread completes
 
     wombatframework->AddEvidenceNodes(); // add evidence node to directory model
 }
@@ -359,8 +361,8 @@ void WombatForensics::LoadComplete(bool isok)
             {
             wombatvarptr->htmlcontent += "<div id='infotitle'>image information</div><br/>";
             wombatvarptr->htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += wombatvarptr->evidenceobjectvector[curidx].type + "</td></tr>";
-            //wombatvarptr->htmlcontent += QString(tsk_img_type_todesc(wombatvarptr->evidenceobject.imageinfo->itype)) + "</td></tr>";
+            //wombatvarptr->htmlcontent += wombatvarptr->evidenceobjectvector[curidx].type + "</td></tr>";
+            wombatvarptr->htmlcontent += QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatvarptr->evidenceobjectvector[curidx].type)) + "</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>size:</td><td class='pvalue'>";
             wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobjectvector[curidx].size) + " bytes</td></tr>";
             //wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobject.imageinfo->size) + " bytes</td></tr>";

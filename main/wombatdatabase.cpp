@@ -111,7 +111,7 @@ void WombatDatabase::CreateCaseDB(void)
     QStringList wombattableschema;
     wombattableschema.clear();
     wombattableschema << "CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start TEXT, end TEXT);";
-    wombattableschema << "CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INT);";
+    wombattableschema << "CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INTEGER);";
     wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
     wombattableschema << "CREATE TABLE artifacts(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
     wombattableschema << "CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, msgtype INTEGER, msg TEXT, datetime TEXT);";
@@ -326,7 +326,7 @@ void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->currentevidenceid = 0;
     wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(QString(tsk_img_type_todesc(wombatptr->evidenceobject.imageinfo->itype)));
+    wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->itype);
     wombatptr->bindvalues.append((int)wombatptr->evidenceobject.imageinfo->size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
     wombatptr->bindvalues.append(wombatptr->currentevidencename);
