@@ -326,7 +326,7 @@ void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->currentevidenceid = 0;
     wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->itype);
+    wombatptr->bindvalues.append(QString(tsk_img_type_todesc(wombatptr->evidenceobject.imageinfo->itype)));
     wombatptr->bindvalues.append((int)wombatptr->evidenceobject.imageinfo->size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
     wombatptr->bindvalues.append(wombatptr->currentevidencename);
