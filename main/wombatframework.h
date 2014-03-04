@@ -22,7 +22,7 @@ public:
     void AddPartitionNodes(int increment);
     void CloseInfoStructures(void);
 
-    void GetBootCode(void);
+    void GetBootCode(int idx);
 
 private:
     WombatVariable* wombatptr;

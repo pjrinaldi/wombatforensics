@@ -181,33 +181,41 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
     }
 }
 
-void WombatFramework::GetBootCode() // deermine boot type and populate variable if exists otherwise populate wiht negative
+void WombatFramework::GetBootCode(int idx) // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
-    //if(wombatptr->evidenceobjectvector
-    // while this byte reading and converting is great... to find out the boot information, i can pull it from my volume system information such as...
-    // NEED TO REPLACE ALL INFO WITH OBJECT VALUES...
-    /*
-    if(wombatptr->evidenceobject.volinfo != NULL)
+    int volidx = -1;
+    for(int i=0; i < wombatptr->volumeobjectvector.count(); i++)
+    {
+        if(wombatptr->selectedobject.id == wombatptr->volumeobjectvector[i].parentid) // boot volume exists
+            volidx = i;
+    }
+    if(volidx > -1) // boot volume exists
     {
         wombatptr->htmlcontent += "<tr><td class='property'>byte offset</td><td class='pvalue'>";
-        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->offset)  + "</td></tr>";
+        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->volumeobjectvector[volidx].byteoffset) + "</td></tr>";
+        //wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->offset)  + "</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>block size</td><td class='pvalue'>";
-        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->block_size) + " bytes</td></tr>";
+        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->volumeobjectvector[volidx].blocksize) + " bytes</td></tr>";
+        //wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->block_size) + " bytes</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>endian ordering</td><td class='pvalue'>";
+        /*
         if(wombatptr->evidenceobject.volinfo->endian == TSK_LIT_ENDIAN)
             wombatptr->htmlcontent += "little endian";
         else
             wombatptr->htmlcontent += "big endian";
+        */
         wombatptr->htmlcontent += "</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>partition count</td><td class='pvalue'>";
-        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->part_count) + "</td></tr></table>";
+        wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->volumeobjectvector[volidx].childcount) + "</td></tr></table>";
+        //wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->part_count) + "</td></tr></table>";
+
         //wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>boot sector</div>";
         //wombatptr->htmlcontent += "<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr>";
         //wombatptr->htmlcontent += "<tr class='odd'><td>0-0</td><td class='bvalue'></td><td class='desc'></td></tr>";
         //wombatptr->htmlcontent += "<tr class='odd'><td colspan='3' class='bot'></td></tr></table>";
         // populate the boot sector table
         // PARTITION INFORMATION I NEED TO RECORD: ACTIVE/BOOTABLE, PARTITION TYPE, LBA OF FIRST ABSOLUTE SECTOR OF PARTITION,# OF SECTORS IN PARTITION
-        // PARTITION INFORMATION FROM TSK INFO   : FLAGS, LEN (# OF SECTORS), START, (FIRST SECTOR), DESC, SLOT_NUM, TABLE_NUM 
+        // PARTITION INFORMATION FROM TSK INFO   : FLAGS, LEN (# OF SECTORS), START, (FIRST SECTOR), DESC, SLOT_NUM, TABLE_NUM
     }
     else // not a bootable volume
     {
@@ -216,6 +224,9 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
         // not sure if i want to include the minimal amount of sector info since there are so few and it'll be repetative with the possible partition
         // layout in the tree view
     }
+}
+// OLD STUFF THAT IS USEFULL INFO FOR HOW TO GET THINGS, BUT NOT USED IN THIS CODE RIGHT NOW
+    /*
     int retval;
     //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");*/
     /*
@@ -246,162 +257,7 @@ void WombatFramework::GetBootCode() // deermine boot type and populate variable 
         //Translate::ByteToBinary(tmpstr, subchar);
         //qDebug() << "Byte to Bin: " << tmpstr;
     }
-    // older stuff here. use the above for what i need to do.
-        //wombatptr->bootbytearray = QByteArray::fromRawData(wombatptr->bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);*/
-        /*
-        qDebug() << ByteArrayToHex(wombatptr->bootbytearray.mid(510,2)); // nets my signature value to compare
-        if(QString::compare("55aa", ByteArrayToHex(wombatptr->bootbytearray.mid(510,2))) == 0) // its a boot sector
-        {
-            qDebug() << "byte to examine: " << ByteArrayToHex(wombatptr->bootbytearray.mid(510,1));
-	    qDebug() << "1. byte to hex: " << SingleByteToString(wombatptr->bootbytearray.mid(510,1), 16);
-	    qDebug() << "2. byte to Int: " << SingleByteToString(wombatptr->bootbytearray.mid(510,1), 10);
-	    qDebug() << "3. byte to Binary: " << SingleByteToString(wombatptr->bootbytearray.mid(510,1), 2);
-	    qDebug() << "4. bytearray number: " << QByteArray::number(10, 16);
-	    qDebug() << "5. byte (0x10) to binary: " << SingleByteToString(QByteArray::number(10, 16), 2);
-            // determine if its got a partition table
-            // NEED TO CHECK THE 64 BYTE PARTITION TABLE FOR THE 1ST BYTE OF EACH 16 BYTE PARTITION ENTRY. IF ITS 80 THEN ITS BOOTABLE AND OLD, IF THE
-            // SEVENTH BIT IS ACTIVE (CHECK BYTE FUNCTION) THEN ITS A BOOT PARAMETER... SO NEED TO CHECK EACH AND ALSO CHECK THE PARTITION TYPE AGAINST
-            // A VALID ENTRY IN MY PARTITION TABLE MASK.
-        //}
-        //wombatptr->bootsectorlist << ByteArrayToHexDisplay(wombatptr->bootbytearray.mid(0,3));
-        */
-    /*
-     *
-        if(wombatvarptr->selectedobject.type == 1)
-        {
-            QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
-            // if no boot code/partition table, then simply return info to say no boot code present.
-            // OR POSSIBLY STATE WHAT THE IMAGE CONTAINS (PARTITION TABLE/SINGLE PARTITION ONLY)
-            // if DOS partition table...
-            // if boot code exists...
-            // check for signature value at offset 510-511 to determine if its a dosmbr or something else. if its 0x55AA then its dos mbr
-            // check for partition table and populate the values accordingly.
-            // the fs stuff i find at jump and oem and the others are for the filesystem/partition boot sector. this isn't valid when there is an mbr.
-            // need to determine if there is an mbr and then pull the partition table information from it. otherwise simply display the image info
-            // and have no mbr present in first sector.
-            // when you click on the partition, this is where the partition boot sector information will go.
-            // MOVE ALL OF THIS CODE INTO WOMBATFRAMEWORK...
-            GetDosBootCode(); // move into getbootcode above
-            tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
-            tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
-void WombatForensics::GetDosBootCode()
-{
-    int retval;
-    wombatvarptr->bootbuffer = NULL;
-    wombatvarptr->bootbuffer = new char[wombatvarptr->evidenceobject.imageinfo->sector_size];
-    retval = tsk_img_read(wombatvarptr->evidenceobject.imageinfo, 0, wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
-    if(retval > 0)
-    {
-        wombatvarptr->bootbytearray = QByteArray::fromRawData(wombatvarptr->bootbuffer, wombatvarptr->evidenceobject.imageinfo->sector_size);
-        fprintf(stderr, "oem from byte array: %s\n", QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8)).toStdString().c_str());
-        wombatvarptr->bootsectorlist << ByteArrayToHexDisplay(wombatvarptr->bootbytearray.mid(0,3));
-        wombatvarptr->bootsectorlist << QString::fromUtf8(wombatvarptr->bootbytearray.mid(3,8));
-        wombatvarptr->bootsectorlist << ByteArrayToShortDisplay(wombatvarptr->bootbytearray.mid(11,2));
-        wombatvarptr->bootsectorlist << ByteArrayToShortDisplay(wombatvarptr->bootbytearray.mid(13,1));
-    }
-    else
-        fprintf(stderr, "filling bootbuffer failed\n");
-
- *
-    uint64_t bytelen = 512*(seclength - 1);
-    uint64_t bytestart = 512*secstart;
-    char* volbuffer = NULL;
-    volbuffer = new char[bytelen+512];
-
-    {
-        // need to figure out why this fails... and returns -1
-        retval = TskServices::Instance().getImageFile().getSectorData(secstart, seclength-1, volbuffer);
-        fprintf(stderr, "sector data return value: %i\n", retval);
-        if (retval == -1)
-        {
-        }
-    }
-    if(retval > 0)
-    {
-        QFile tmpfile("/home/pasquale/WombatForensics/tmpfiles/volbyte.dat");
-        tmpfile.open(QIODevice::WriteOnly);
-        tmpfile.write(volbuffer, bytelen);
-        tmpfile.close();
-    }
-    delete[] volbuffer;
-    //delete volbuffer;
-
-    return "/home/pasquale/WombatForensics/tmpfiles/volbyte.dat";
-
- *
- *
- *    // set hex (which i'll probably remove anyway since it's highlighted in same window)
-    int sellength = txt.size()/2;
-    QString tmptext = "Length: " + QString::number(sellength);
-    selectedhex->setText(tmptext);
-    // get initial bytes value and then update ascii
-    std::vector<uchar> bytes;
-    Translate::HexToByte(bytes, txt);
-    QString ascii;
-    Translate::ByteToChar(ascii, bytes);
-    tmptext = "Ascii: " + ascii;
-    selectedascii->setText(tmptext);
-    QString strvalue;
-    uchar * ucharPtr;
-    // update the int entry:
-    // pad right with 0x00
-    int intvalue = 0;
-    ucharPtr = (uchar*) &intvalue;
-    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
-    strvalue.setNum(intvalue);
-    tmptext = "Int: " + strvalue;
-    selectedinteger->setText(tmptext);
-    // update float entry;
-    float fvalue;
-    ucharPtr = (uchar*)(&fvalue);
-    if(bytes.size() < sizeof(float) )
-    {
-        for(unsigned int i= 0; i < sizeof(float); ++i)
-        {
-            if( i < bytes.size() )
-            {
-                *ucharPtr++ = bytes[i];
-            }
-            else
-            {
-                *ucharPtr++ = 0x00;
-            }
-        }
-    }
-    else
-    {
-        memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
-    }
-    strvalue.setNum( fvalue );
-    tmptext = "Float: " + strvalue;
-    selectedfloat->setText(tmptext);
-    // update double
-    double dvalue;
-    ucharPtr = (uchar*)&dvalue;
-    if(bytes.size() < sizeof(double) )
-    {
-        for(unsigned int i= 0; i < sizeof(double); ++i)
-        {
-            if( i < bytes.size() )
-            {
-                *ucharPtr++ = bytes[i];
-            }
-            else
-            {
-                *ucharPtr++ = 0x00;
-            }
-        }
-    }
-    else
-    {
-        memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
-    }
-    strvalue.setNum( dvalue );
-    tmptext = "Double: " + strvalue;
-    selecteddouble->setText(tmptext);
-
- */ 
-}
+    */
 
 // BELOW FUNCTION CURRENTLY NOT USED
 void WombatFramework::BuildEvidenceModel()

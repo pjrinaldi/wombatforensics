@@ -374,12 +374,10 @@ void WombatForensics::LoadComplete(bool isok)
             // might not want to do the volume type one if there's no volume. have to think on it.
             //wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
             //wombatvarptr->htmlcontent += wombatvarptr->volumeobject.name + "</td></tr>";
-            wombatframework->GetBootCode(); // determine boot type in this function and populate html string information into wombatvarptr value
-            //wombatvarptr->htmlcontent += "</table>";
-            //QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
-            //tmpelement.appendInside("");
+            wombatframework->GetBootCode(curidx); // determine boot type in this function and populate html string information into wombatvarptr value
             QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             tmpelement.appendInside(wombatvarptr->htmlcontent);
+
             // check for partition table and populate the values accordingly.
             // the fs stuff i find at jump and oem and the others are for the filesystem/partition boot sector. this isn't valid when there is an mbr.
             // need to determine if there is an mbr and then pull the partition table information from it. otherwise simply display the image info
