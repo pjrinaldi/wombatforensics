@@ -87,6 +87,35 @@ bool Reader::openimage(std::vector<std::string> imagesfullpath)
     if(wombatptr->evidenceobject.imageinfo == NULL)
         qDebug() << "print image error here";
     free(images);*/
+    /*
+    QString tmpstr = "";
+    char* bootbuffer = NULL;
+    wombatptr->rawbyteintvector.clear();
+    bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
+    retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
+    if(retval > 0)
+    {
+        wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
+        for(int i=0; i < retval; i++)
+        {
+            wombatptr->rawbyteintvector[i] = bootbuffer[i];
+        }
+        delete[] bootbuffer;
+        // delete bootbuffer;
+        //qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
+        //qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
+        vector<uchar> subchar;
+        subchar.push_back(wombatptr->rawbyteintvector[510]);
+        subchar.push_back(wombatptr->rawbyteintvector[511]);
+        Translate::ByteToHex(tmpstr, subchar);
+        if(QString::compare("55aa", tmpstr) == 0) // its a boot sector
+        {
+                // now to determine if its got a partition table
+        }
+        //Translate::ByteToBinary(tmpstr, subchar);
+        //qDebug() << "Byte to Bin: " << tmpstr;
+    }
+    */
 }
 
 bool Reader::open( const string& filename )

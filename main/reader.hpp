@@ -39,6 +39,7 @@
 
 #include "tsk/libtsk.h"
 #include <QDebug>
+
 typedef vector<uchar> ReadBuffer;
 
 #ifdef __GNUC__

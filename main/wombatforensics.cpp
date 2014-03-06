@@ -1163,7 +1163,7 @@ void WombatForensics::LoadFileContents(QString filepath)
 
 void WombatForensics::LoadHexModel(QString tmpFilePath)
 {
-    // tsk_img_open() then tsk_img_read()
+    // tsk_img_open() then tsk_img_read() hexwidget->openimage(var1, var2, etc...)
     hexwidget->open(tmpFilePath);
     hexwidget->set2BPC();
     hexwidget->setBaseHex();
