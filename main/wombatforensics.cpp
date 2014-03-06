@@ -242,9 +242,6 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->GetPartitionObjects();
     wombatdatabase->GetFileSystemObjects();
     
-    //wombatframework->CloseInfoStructures(); // set info ptr's to NULL and then close the items with tsk_close_
-    // errors out since it runs during a thread. will need to call this from outside the thread, probably after resize columns or when thread completes
-
     wombatframework->AddEvidenceNodes(); // add evidence node to directory model
 }
 
@@ -262,9 +259,10 @@ void WombatForensics::AddEvidence()
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
         //wombatprogresswindow->show();
-        //wombatprogresswindow->ClearTableWidget();
+        //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
         ResizeColumns();
+        wombatframework->CloseInfoStructures();
     }
     
     /*
