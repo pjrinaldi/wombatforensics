@@ -76,6 +76,11 @@ QString HexEditor::filename() const
   return _reader.filename();
 }
 
+bool HexEditor::OpenImage()
+{
+    return false;
+}
+
 bool HexEditor::open( const QString & filename )
 {
   if(!_reader.open(C_STR(filename))) {

@@ -63,6 +63,32 @@ Reader::~Reader()
 // public methods
 //
 
+bool Reader::openimage(std::vector<std::string> imagesfullpath)
+{
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(imagesfullpath.size()*sizeof(char*));
+    for(int i=0; i < imagesfullpath.size(); i++)
+        images[i] = imagesfullpath[i].c_str();
+    imageinfo = tsk_img_open(imagesfullpath.size(), images, TSK_IMG_TYPE_DETECT, 0);
+    if(imageinfo == NULL)
+        qDebug() << "image failed to open";
+    else
+    {
+    }
+    free(images);
+    /*
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(wombatptr->evidenceobject.fullpathvector.size()*sizeof(char*));
+    for(int i=0; i < wombatptr->evidenceobject.fullpathvector.size(); i++)
+    {
+        images[i] = wombatptr->evidenceobject.fullpathvector[i].c_str();
+    }
+    wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
+    if(wombatptr->evidenceobject.imageinfo == NULL)
+        qDebug() << "print image error here";
+    free(images);*/
+}
+
 bool Reader::open( const string& filename )
 {
   // clear old data

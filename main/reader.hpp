@@ -37,6 +37,8 @@
 #include <string>
 #include <iostream>
 
+#include "tsk/libtsk.h"
+#include <QDebug>
 typedef vector<uchar> ReadBuffer;
 
 #ifdef __GNUC__
@@ -50,6 +52,7 @@ class Reader {
   ~Reader();
 
   bool open(const string& filename);
+  bool openimage(std::vector<std::string> imagefullpaths);
   bool close();
   bool eof();
   bool is_open() const;
@@ -88,6 +91,7 @@ class Reader {
   off_t         _maxPages;       // maximum number of pages which could be currently loaded
   off_t         _freePages;     // number of free pages
   vector< uchar *> _data;
+  TSK_IMG_INFO* imageinfo;
 };
 
 #endif

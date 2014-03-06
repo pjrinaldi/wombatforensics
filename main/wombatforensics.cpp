@@ -320,6 +320,7 @@ void WombatForensics::UpdateViewer()
 
 void WombatForensics::LoadHexContents()
 {
+    int curidx = wombatframework->DetermineVectorIndex();
     if(wombatvarptr->selectedobject.type == 1) // image file
     {
     }
@@ -1162,6 +1163,7 @@ void WombatForensics::LoadFileContents(QString filepath)
 
 void WombatForensics::LoadHexModel(QString tmpFilePath)
 {
+    // tsk_img_open() then tsk_img_read()
     hexwidget->open(tmpFilePath);
     hexwidget->set2BPC();
     hexwidget->setBaseHex();
