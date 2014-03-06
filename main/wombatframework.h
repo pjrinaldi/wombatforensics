@@ -23,6 +23,7 @@ public:
     void CloseInfoStructures(void);
 
     void GetBootCode(int idx);
+    int DetermineVectorIndex(void);
 
 private:
     WombatVariable* wombatptr;

@@ -259,6 +259,48 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
     }
     */
 
+int WombatFramework::DetermineVectorIndex()
+{
+    int curidx = -1;
+    if(wombatptr->selectedobject.type == 1) // image file
+    {
+        for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
+        {
+            if(wombatptr->evidenceobjectvector[i].id == wombatptr->selectedobject.id)
+                curidx = i;
+        }
+    }
+    else if(wombatptr->selectedobject.type == 2) // volume file (it should never be a volume since i don't add it to the image tree)
+    {
+        for(int i=0; i < wombatptr->volumeobjectvector.count(); i++)
+        {
+            if(wombatptr->volumeobjectvector[i].id == wombatptr->selectedobject.id)
+                curidx = i;
+        }
+    }
+    else if(wombatptr->selectedobject.type == 3) // partition file
+    {
+        for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
+        {
+            if(wombatptr->partitionobjectvector[i].id == wombatptr->selectedobject.id)
+                curidx = i;
+        }
+    }
+    else if(wombatptr->selectedobject.type == 4) // file system file
+    {
+        for(int i=0; i < wombatptr->filesystemobjectvector.count(); i++)
+        {
+            if(wombatptr->filesystemobjectvector[i].id == wombatptr->selectedobject.id)
+                curidx = i;
+        }
+    }
+    else // implement for files, directories etc.. as i go.
+    {
+    }
+
+    return curidx;
+}
+
 // BELOW FUNCTION CURRENTLY NOT USED
 void WombatFramework::BuildEvidenceModel()
 {

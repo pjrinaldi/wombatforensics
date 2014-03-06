@@ -261,8 +261,8 @@ void WombatForensics::AddEvidence()
             wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
-        wombatprogresswindow->show();
-        wombatprogresswindow->ClearTableWidget();
+        //wombatprogresswindow->show();
+        //wombatprogresswindow->ClearTableWidget();
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
         ResizeColumns();
     }
@@ -322,6 +322,9 @@ void WombatForensics::UpdateViewer()
 
 void WombatForensics::LoadHexContents()
 {
+    if(wombatvarptr->selectedobject.type == 1) // image file
+    {
+    }
 }
 
 void WombatForensics::LoadTxtContents()
@@ -347,31 +350,20 @@ void WombatForensics::LoadVidContents()
 void WombatForensics::LoadComplete(bool isok)
 {
     wombatvarptr->htmlcontent = "";
-    if(isok)
+    int curidx = wombatframework->DetermineVectorIndex();
+    if(isok && curidx > -1)
     {
         if(wombatvarptr->selectedobject.type == 1) // image file
         {
-            int curidx = -1;
-            for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
-            {
-                if(wombatvarptr->evidenceobjectvector[i].id == wombatvarptr->selectedobject.id)
-                    curidx = i;
-            }
-            if(curidx > -1) // id is from valid evidence
-            {
             wombatvarptr->htmlcontent += "<div id='infotitle'>image information</div><br/>";
             wombatvarptr->htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
-            //wombatvarptr->htmlcontent += wombatvarptr->evidenceobjectvector[curidx].type + "</td></tr>";
             wombatvarptr->htmlcontent += QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatvarptr->evidenceobjectvector[curidx].type)) + "</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>size:</td><td class='pvalue'>";
             wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobjectvector[curidx].size) + " bytes</td></tr>";
-            //wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobject.imageinfo->size) + " bytes</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>sector size:</td><td class='pvalue'>";
             wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->evidenceobjectvector[curidx].sectsize) + " bytes</td></tr>";
-            //wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->evidenceobject.imageinfo->sector_size) + " bytes</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
             wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobjectvector[curidx].size/(float)wombatvarptr->evidenceobjectvector[curidx].sectsize));
-            //wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobject.imageinfo->size/(float)wombatvarptr->evidenceobject.imageinfo->sector_size));
             wombatvarptr->htmlcontent += " sectors</td></tr>";
             // might not want to do the volume type one if there's no volume. have to think on it.
             //wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
@@ -380,58 +372,22 @@ void WombatForensics::LoadComplete(bool isok)
             QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             tmpelement.appendInside(wombatvarptr->htmlcontent);
 
-            // check for partition table and populate the values accordingly.
-            // the fs stuff i find at jump and oem and the others are for the filesystem/partition boot sector. this isn't valid when there is an mbr.
-            // need to determine if there is an mbr and then pull the partition table information from it. otherwise simply display the image info
-            // and have no mbr present in first sector.
-            // when you click on the partition, this is where the partition boot sector information will go.
-            //tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
-            //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
-            }
-            else
-                qDebug() << "Serious error since the item selected type was evidence and isn't any of the evidence.";
+                // check for partition table and populate the values accordingly.
+                // the fs stuff i find at jump and oem and the others are for the filesystem/partition boot sector. this isn't valid when there is an mbr.
+                // need to determine if there is an mbr and then pull the partition table information from it. otherwise simply display the image info
+                // and have no mbr present in first sector.
+                // when you click on the partition, this is where the partition boot sector information will go.
+                //tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
+                //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
         }
         else if(wombatvarptr->selectedobject.type == 2) // volume file (it should never be a volume since i don't add it to the image tree)
         {
-            int curidx = -1;
-            for(int i=0; i < wombatvarptr->volumeobjectvector.count(); i++)
-            {
-                if(wombatvarptr->volumeobjectvector[i].id == wombatvarptr->selectedobject.id)
-                    curidx = i;
-            }
-            if(curidx > -1) // id is from valid volume
-            {
-            }
-            else
-                qDebug() << "Serious error since the item selected type was volume and isn't any of the volumes.";
         }
         else if(wombatvarptr->selectedobject.type == 3) // partition file
         {
-            int curidx = -1;
-            for(int i=0; i < wombatvarptr->partitionobjectvector.count(); i++)
-            {
-                if(wombatvarptr->partitionobjectvector[i].id == wombatvarptr->selectedobject.id)
-                    curidx = i;
-            }
-            if(curidx > -1) // id is from valid partition
-            {
-            }
-            else
-                qDebug() << "Serious error since the item selected type was partition and isn't any of the partitions.";
         }
         else if(wombatvarptr->selectedobject.type == 4) // file system file
         {
-            int curidx = -1;
-            for(int i=0; i < wombatvarptr->filesystemobjectvector.count(); i++)
-            {
-                if(wombatvarptr->filesystemobjectvector[i].id == wombatvarptr->selectedobject.id)
-                    curidx = i;
-            }
-            if(curidx > -1) // id is from a valid file system
-            {
-            }
-            else
-                qDebug() << "Serious error since the item selected type was file system and isn't any of the file systems.";
         }
         else // implement for files, directories etc.. as i go.
         {
