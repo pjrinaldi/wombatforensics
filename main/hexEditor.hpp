@@ -51,7 +51,7 @@ public:
   ~HexEditor();
 
   bool open(const QString& filename);
-  bool OpenImage(void);
+  bool openimage(void);
   //bool bigopen(startbyte, bytelen);
   QString filename() const;
   Reader * reader();

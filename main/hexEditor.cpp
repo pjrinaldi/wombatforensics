@@ -76,7 +76,7 @@ QString HexEditor::filename() const
   return _reader.filename();
 }
 
-bool HexEditor::OpenImage()
+bool HexEditor::openimage()
 {
     return false;
 }

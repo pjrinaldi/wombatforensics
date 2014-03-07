@@ -59,6 +59,7 @@ class Reader {
   bool is_open() const;
   
   size_t read( ReadBuffer& v, size_t numBytes );
+  size_t readimage(ReadBuffer& v, size_t numbytes);
   off_t  seek( off_t offset );
   off_t tell() const; // returns the current offset or -1 if !open
   off_t size() const;
@@ -74,6 +75,7 @@ class Reader {
  protected:
   bool dataIsAtOffset( const vector<uchar>& data, off_t pos );
   bool loadPage(off_t pageIdx);
+  bool loadimagepage(off_t pageIdx);
   bool freePage(off_t pageIdx);
   off_t nFreePages() const;
   off_t& nFreePages();

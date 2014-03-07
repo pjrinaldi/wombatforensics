@@ -16,6 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+/*
+ * Updates to enable editor to open a forensic image.
+ * Copyright (C) 2014 Pasquale J. Rinaldi, Jr. <pjrinaldi@gmail.com>
+ */ 
+
 #include <stdexcept>
 #include <algorithm>
 #include <new>
@@ -74,48 +79,17 @@ bool Reader::openimage(std::vector<std::string> imagesfullpath)
         qDebug() << "image failed to open";
     else
     {
+        off_t filesize = imageinfo->size;
+        _size = filesize;
+        off_t npages = filesize/_pageSize + 1;
+        _data.resize(npages);
+        fill(_data.begin(), _data.begin()+npages, (uchar*)0 );
+        _is_open = true;
+        _firstPage = _lastPage = 0;
+        return loadimagepage(0);
     }
     free(images);
-    /*
-    const TSK_TCHAR** images;
-    images = (const char**)malloc(wombatptr->evidenceobject.fullpathvector.size()*sizeof(char*));
-    for(int i=0; i < wombatptr->evidenceobject.fullpathvector.size(); i++)
-    {
-        images[i] = wombatptr->evidenceobject.fullpathvector[i].c_str();
-    }
-    wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
-    if(wombatptr->evidenceobject.imageinfo == NULL)
-        qDebug() << "print image error here";
-    free(images);*/
-    /*
-    QString tmpstr = "";
-    char* bootbuffer = NULL;
-    wombatptr->rawbyteintvector.clear();
-    bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
-    retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
-    if(retval > 0)
-    {
-        wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
-        for(int i=0; i < retval; i++)
-        {
-            wombatptr->rawbyteintvector[i] = bootbuffer[i];
-        }
-        delete[] bootbuffer;
-        // delete bootbuffer;
-        //qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
-        //qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
-        vector<uchar> subchar;
-        subchar.push_back(wombatptr->rawbyteintvector[510]);
-        subchar.push_back(wombatptr->rawbyteintvector[511]);
-        Translate::ByteToHex(tmpstr, subchar);
-        if(QString::compare("55aa", tmpstr) == 0) // its a boot sector
-        {
-                // now to determine if its got a partition table
-        }
-        //Translate::ByteToBinary(tmpstr, subchar);
-        //qDebug() << "Byte to Bin: " << tmpstr;
-    }
-    */
+
 }
 
 bool Reader::open( const string& filename )
@@ -181,6 +155,80 @@ bool Reader::close()
 bool Reader::is_open() const
 {
   return _is_open;
+}
+    /*
+    QString tmpstr = "";
+    char* bootbuffer = NULL;
+    wombatptr->rawbyteintvector.clear();
+    bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
+    retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
+    if(retval > 0)
+    {
+        wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
+        for(int i=0; i < retval; i++)
+        {
+            wombatptr->rawbyteintvector[i] = bootbuffer[i];
+        }
+        delete[] bootbuffer;
+        // delete bootbuffer;
+        //qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
+        //qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
+        vector<uchar> subchar;
+        subchar.push_back(wombatptr->rawbyteintvector[510]);
+        subchar.push_back(wombatptr->rawbyteintvector[511]);
+        Translate::ByteToHex(tmpstr, subchar);
+        if(QString::compare("55aa", tmpstr) == 0) // its a boot sector
+        {
+                // now to determine if its got a partition table
+        }
+        //Translate::ByteToBinary(tmpstr, subchar);
+        //qDebug() << "Byte to Bin: " << tmpstr;
+    }
+    */
+size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
+{
+    int lastPageIdx = 0;
+    size_t bytesread;
+    // MODIFY THIS TO WHERE IT'S NOT LOADING THE WHOLE IMAGE, BUT ONLY A PAGE'S WORTH..., IF ANYTHING AT ALL HERE
+    if(_offset+numbytes >= size())
+    {
+        _eof = true;
+        lastPageIdx = _data.size()-1;
+        bytesread = size() - tell();
+        numbytes = bytesread;
+    }
+    else
+    {
+        lastPageIdx = (_offset+numBytes)/_pageSize;
+        bytesread = numBytes;
+    }
+
+    if(!numbytes)
+        return numbytes;
+    v.erase(v.begin(), v.end());
+    v.reserve(v.size() + numbytes);
+    for(int page = _offset/_pageSize; page <= lastPageIdx; page++)
+    {
+        try
+        {
+            loadimagepage(page);
+        }
+        catch(bad_alloc)
+        {
+            qDebug() << " out of memory.";
+            return(_offset/_pageSize - page)*_pageSize;
+        }
+        int start = _offset%_pageSize;
+        int stop  = (page == lastPageIdx)? start+numBytes: _pageSize;
+        for(int i = start; i < stop; i++)
+        {
+            v.push_back(_data[page][i]);
+        }
+        numBytes -= stop-start;
+        _offset  += stop-start;
+    }
+
+    return bytesRead;
 }
 
 size_t Reader::read(vector<uchar>& v, size_t numBytes)
@@ -280,6 +328,39 @@ const char* Reader::filename() const
 //
 // Protected member fn's
 //
+
+bool Reader::loadimagepage(off_t pageIdx)
+{
+    if(!is_open())
+        return false;
+    if(_data[pageIdx] != 0)
+        return true;
+    if(!nFreePages())
+    {
+        if(abs(_firstPage - pageIdx) > abs(_lastPage - pageIdx))
+            while(!freePage(_firstPage++));
+        else
+            while(!freePage(_firstPage++));
+    }
+    _data[pageIdx] = new uchar[_pageSize];
+    --nFreePages();
+
+    //tsk img read from new offset...
+    off_t retval = tsk_img_read(imageinfo, pageIdx*_pageSize, _data[pageIdx], _pageSize);
+    if(retval)
+    {
+        if(pageIdx < _firstPage)
+            _firstPage = pageIdx;
+        if(pageIdx > _lastPage)
+            _lastPage = pageIdx;
+    }
+
+    return retval;
+    /*if(retval > 0)dd
+        wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
+            wombatptr->rawbyteintvector[i] = bootbuffer[i];
+*/
+}
 
 bool Reader::loadPage(off_t pageIdx)
 {
