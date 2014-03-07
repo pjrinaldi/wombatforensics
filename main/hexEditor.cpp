@@ -79,7 +79,8 @@ QString HexEditor::filename() const
 
 bool HexEditor::openimage(const QString& filename, TSK_IMG_INFO* imginfo)
 {
-    if(!_reader.openimage(C_STR(filename), imginfo))
+    memcpy(&tskimg, &imginfo, sizeof(imginfo));
+    if(!_reader.openimage(C_STR(filename), tskimg))
     {
         qDebug() << "error in reader openimage";
     }

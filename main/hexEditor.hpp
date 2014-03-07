@@ -194,7 +194,7 @@ protected:
 
 protected:
   Reader              _reader;
-
+  TSK_IMG_INFO*       tskimg;
   int                 _wordSpacing;
   int                 _wordWidth;
   int                 _lineSpacing;
