@@ -11,10 +11,13 @@ WombatFramework::~WombatFramework()
 void WombatFramework::OpenEvidenceImage() // open current evidence image
 {
     const TSK_TCHAR** images;
+    qDebug()  << "fullpathvector count: " << wombatptr->evidenceobject.fullpathvector.size();
     images = (const char**)malloc(wombatptr->evidenceobject.fullpathvector.size()*sizeof(char*));
     for(int i=0; i < wombatptr->evidenceobject.fullpathvector.size(); i++)
     {
+        qDebug() << "fullpathvector[" << i << "] = " << QString::fromStdString(wombatptr->evidenceobject.fullpathvector[i]);
         images[i] = wombatptr->evidenceobject.fullpathvector[i].c_str();
+        qDebug() << "images[" << i << "] = " << images[i];
     }
     wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
     if(wombatptr->evidenceobject.imageinfo == NULL)

@@ -51,7 +51,8 @@ public:
   ~HexEditor();
 
   bool open(const QString& filename);
-  bool openimage(std::vector<std::string> imagesfullpath);
+  bool openimage(const QString& filename, TSK_IMG_INFO* imginfo);
+  //bool openimage(std::vector<std::string> imagesfullpath);
   //bool bigopen(startbyte, bytelen);
   QString filename() const;
   Reader * reader();

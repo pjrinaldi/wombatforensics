@@ -252,15 +252,18 @@ void WombatForensics::AddEvidence()
     // might need to call these to a global tmp and then store it after initializeevidencestructure...
     // NEED TO CHECK WHAT GETEVIDENCEOBJECTS() RETURNS FOR A TEST IMAGE OPEN...
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
+    qDebug() << "tmplist count: " << tmplist.count();
     if(tmplist.count())
     {
         wombatvarptr->currentevidencename = tmplist[0].split("/").last();
+        qDebug() << "tmplist count 2: " << tmplist.count();
         for(int i=0; i < tmplist.count(); i++)
         {
             fprintf(stderr, "fullpathvector[%i]: %s\n", i, tmplist[i].toStdString().c_str());
             wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
+        qDebug() << " ptr itemcount: " << wombatvarptr->evidenceobject.itemcount;
         //wombatprogresswindow->show();
         //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
@@ -324,11 +327,21 @@ void WombatForensics::UpdateViewer()
 void WombatForensics::LoadHexContents()
 {
     int curidx = wombatframework->DetermineVectorIndex();
+    wombatvarptr->evidenceobject.Clear();
+    wombatvarptr->evidenceobject = wombatvarptr->evidenceobjectvector[curidx];
+    qDebug() << "evid fullpathsize: " << wombatvarptr->evidenceobject.fullpathvector.size();
+    qDebug() << "evid fullpath: " << QString::fromStdString(wombatvarptr->evidenceobject.fullpathvector[0]);
+    qDebug() << "evid itemcount: " << wombatvarptr->evidenceobject.itemcount;
+    wombatvarptr->evidenceobject.itemcount = wombatvarptr->evidenceobject.fullpathvector.size();
+    qDebug() << "evid itemcount 15: " << wombatvarptr->evidenceobject.itemcount;
+    wombatframework->OpenEvidenceImage();
     if(wombatvarptr->selectedobject.type == 1) // image file
     {
         // tsk_img_open() then tsk_img_read() hexwidget->openimage(var1, var2, etc...)
         //hexwidget->open(tmpFilePath);
-        hexwidget->openimage(wombatvarptr->evidenceobjectvector[curidx].fullpathvector);
+        qDebug() << "curidx evid fullpath count: " << wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
+        //hexwidget->openimage(wombatvarptr->evidenceobjectvector[curidx].fullpathvector);
+        hexwidget->openimage(QString::fromStdString(wombatvarptr->evidenceobject.fullpathvector[0]), wombatvarptr->evidenceobject.imageinfo);
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
 

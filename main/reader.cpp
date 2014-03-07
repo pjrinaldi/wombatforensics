@@ -68,6 +68,26 @@ Reader::~Reader()
 // public methods
 //
 
+bool Reader::openimage(const string& filename, TSK_IMG_INFO* imageinfo)
+{
+    qDebug() << tsk_img_type_todesc(imageinfo->itype);
+    //imageinfo = imginfo;
+    if(imageinfo == NULL)
+        return false;
+    else
+    {
+        off_t filesize = imageinfo->size;
+        _size = filesize;
+        _filename = filename;
+        off_t npages = filesize/_pageSize + 1;
+        _data.resize(npages);
+        fill(_data.begin(), _data.begin()+npages, (uchar*)0);
+        _is_open = true;
+        _firstPage = _lastPage = 0;
+        return loadimagepage(0);
+    }
+}
+/*
 bool Reader::openimage(std::vector<std::string> imagesfullpath)
 {
     const TSK_TCHAR** images;
@@ -78,6 +98,7 @@ bool Reader::openimage(std::vector<std::string> imagesfullpath)
         images[i] = imagesfullpath[i].c_str();
         qDebug() << "image[" << i << "] = " << images[i];
     }
+    qDebug() << "num images: " << imagesfullpath.size() << " images size: " << images;
     imageinfo = tsk_img_open(imagesfullpath.size(), images, TSK_IMG_TYPE_DETECT, 0);
     if(imageinfo == NULL)
         qDebug() << "image failed to open";
@@ -95,6 +116,7 @@ bool Reader::openimage(std::vector<std::string> imagesfullpath)
     free(images);
 
 }
+*/
 
 bool Reader::open( const string& filename )
 {

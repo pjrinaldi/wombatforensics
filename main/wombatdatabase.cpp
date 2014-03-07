@@ -332,6 +332,7 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->bindvalues.append(wombatptr->currentevidencename);
     wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]));
     wombatptr->currentevidenceid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath) VALUES(1, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+    qDebug() << "item count 2: " << wombatptr->evidenceobject.itemcount;
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
         wombatptr->bindvalues.clear();
@@ -368,9 +369,11 @@ void WombatDatabase::GetEvidenceObject()
 void WombatDatabase::GetEvidenceObjects()
 {
     wombatptr->evidenceobjectvector.clear();
+    wombatptr->evidenceobject.Clear();
     wombatptr->bindvalues.clear();
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT objectid, objecttype, type, size, sectsize, name, fullpath FROM data WHERE objecttype = 1;", wombatptr->bindvalues);
+    qDebug() << "evid sqlrecords count: " << wombatptr->sqlrecords.count();
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         wombatptr->evidenceobject.id = wombatptr->sqlrecords[i].value(0).toInt();
@@ -382,12 +385,14 @@ void WombatDatabase::GetEvidenceObjects()
         wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[i].value(6).toString();
         wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
     }
+    qDebug() << "evidobjvec count: " << wombatptr->evidenceobjectvector.count();
     for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
     {
         wombatptr->bindvalues.clear();
         wombatptr->sqlrecords.clear();
         wombatptr->bindvalues.append(wombatptr->evidenceobjectvector[i].id);
         wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
+        qDebug() << "fullpath sqlrecords count: " << wombatptr->sqlrecords.count();
         for(int j=0; j < wombatptr->sqlrecords.count(); j++)
             wombatptr->evidenceobjectvector[i].fullpathvector.push_back(wombatptr->sqlrecords[j].value(0).toString().toStdString());
     }

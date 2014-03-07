@@ -53,7 +53,8 @@ class Reader {
   ~Reader();
 
   bool open(const string& filename);
-  bool openimage(std::vector<std::string> imagefullpaths);
+  bool openimage(const string& filename, TSK_IMG_INFO* imginfo);
+  //bool openimage(std::vector<std::string> imagefullpaths);
   bool close();
   bool eof();
   bool is_open() const;
