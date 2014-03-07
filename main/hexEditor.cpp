@@ -64,6 +64,7 @@ HexEditor::HexEditor( QWidget * parent )
   font.setStyleHint(QFont::TypeWriter);
   font.setFixedPitch(1);
   setFont( font );
+  //_reader = new Reader();
 }
 
 HexEditor::~HexEditor() 

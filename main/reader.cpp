@@ -54,8 +54,8 @@ Reader::Reader( const string& filename, off_t npages, off_t pageSize )
   _firstPage = -1;
   _lastPage  = -1;
 
-  if( !filename.empty() )
-    open(filename);
+  //if( !filename.empty() )
+    //open(filename);
 }
 
 Reader::~Reader()
@@ -70,22 +70,28 @@ Reader::~Reader()
 
 bool Reader::openimage(const string& filename, TSK_IMG_INFO* imageinfo)
 {
+    /*if( is_open() )
+    {
+        close();
+        if( is_open() ) // only occurs if close somehow fails. 
+            return false;
+    } else {
+        _is_open = false;
+    }*/
+
     qDebug() << tsk_img_type_todesc(imageinfo->itype);
     //imageinfo = imginfo;
     if(imageinfo == NULL)
         return false;
-    else
-    {
-        off_t filesize = imageinfo->size;
-        _size = filesize;
-        _filename = filename;
-        off_t npages = filesize/_pageSize + 1;
-        _data.resize(npages);
-        fill(_data.begin(), _data.begin()+npages, (uchar*)0);
-        _is_open = true;
-        _firstPage = _lastPage = 0;
-        return loadimagepage(0);
-    }
+    off_t filesize = imageinfo->size;
+    _size = filesize;
+    _filename = filename;
+    off_t npages = filesize/_pageSize + 1;
+    _data.resize(npages);
+    fill(_data.begin(), _data.begin()+npages, (uchar*)0);
+    _is_open = true;
+    _firstPage = _lastPage = 0;
+    return loadimagepage(0);
 }
 /*
 bool Reader::openimage(std::vector<std::string> imagesfullpath)
@@ -157,25 +163,33 @@ bool Reader::open( const string& filename )
 
 bool Reader::close()
 {
+    if(!is_open())
+        return false;
+ /*
   if( !is_open() ) {
     _error = "attempted to close non-open reader.";
     return false;
   }
+  */
 
-  _filename = "";
-  _error    = "";
+  //_filename = "";
+  //_error    = "";
+  /*
   if( EOF == fclose(_fptr) ) {
     _error = strerror(errno);
     return false;
   }
+  */
   // free data pages
-  vector<uchar*>::iterator itr;
-  for( itr = _data.begin(); itr != _data.end(); ++itr )
-    delete [] (*itr);
-  _is_open = false;
-  _firstPage = _lastPage = -1;
-  _freePages = _maxPages;
-  return true;
+  /*
+    vector<uchar*>::iterator itr;
+    for( itr = _data.begin(); itr != _data.end(); ++itr )
+        delete [] (*itr);
+    */
+    _is_open = false;
+    _firstPage = _lastPage = -1;
+    _freePages = _maxPages;
+    return true;
 }
 
 bool Reader::is_open() const
