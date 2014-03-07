@@ -72,8 +72,12 @@ bool Reader::openimage(std::vector<std::string> imagesfullpath)
 {
     const TSK_TCHAR** images;
     images = (const char**)malloc(imagesfullpath.size()*sizeof(char*));
+    qDebug() << "images full path count: " << imagesfullpath.size();
     for(int i=0; i < imagesfullpath.size(); i++)
+    {
         images[i] = imagesfullpath[i].c_str();
+        qDebug() << "image[" << i << "] = " << images[i];
+    }
     imageinfo = tsk_img_open(imagesfullpath.size(), images, TSK_IMG_TYPE_DETECT, 0);
     if(imageinfo == NULL)
         qDebug() << "image failed to open";

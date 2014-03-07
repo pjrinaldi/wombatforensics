@@ -248,13 +248,16 @@ void WombatForensics::InitializeEvidenceStructure()
 void WombatForensics::AddEvidence()
 {
     wombatvarptr->evidenceobject.Clear(); // clear values of current evidence object to add a new one.
+    qDebug() << "fullpathvector count after clear: " << wombatvarptr->evidenceobject.fullpathvector.size();
+    // might need to call these to a global tmp and then store it after initializeevidencestructure...
+    // NEED TO CHECK WHAT GETEVIDENCEOBJECTS() RETURNS FOR A TEST IMAGE OPEN...
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
     {
         wombatvarptr->currentevidencename = tmplist[0].split("/").last();
         for(int i=0; i < tmplist.count(); i++)
         {
-            fprintf(stderr, "fullpathvector: %s\n", tmplist[i].toStdString().c_str());
+            fprintf(stderr, "fullpathvector[%i]: %s\n", i, tmplist[i].toStdString().c_str());
             wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();

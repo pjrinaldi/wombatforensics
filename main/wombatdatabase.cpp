@@ -382,10 +382,10 @@ void WombatDatabase::GetEvidenceObjects()
         wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[i].value(6).toString();
         wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
     }
-    wombatptr->bindvalues.clear();
-    wombatptr->sqlrecords.clear();
     for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
     {
+        wombatptr->bindvalues.clear();
+        wombatptr->sqlrecords.clear();
         wombatptr->bindvalues.append(wombatptr->evidenceobjectvector[i].id);
         wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
         for(int j=0; j < wombatptr->sqlrecords.count(); j++)
