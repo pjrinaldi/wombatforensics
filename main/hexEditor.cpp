@@ -76,9 +76,22 @@ QString HexEditor::filename() const
   return _reader.filename();
 }
 
-bool HexEditor::openimage()
+bool HexEditor::openimage(std::vector<std::string> imagesfullpath)
 {
-    return false;
+    if(!_reader.openimage(imagesfullpath))
+    {
+        QMessageBox::critical(this, "HexEdit", "Error Loading \"" + QString::fromStdString(imagesfullpath[0]) + "\"\n" + _reader.lastError(), QMessageBox::Ok,0);
+        return false;
+    }
+    _cursor.setRange(0, _reader.size());
+    _cursor.setCharsPerByte(_charsPerByte);
+    setSelection(SelectionStart, -1);
+    setSelection(SelectionEnd, -1);
+    emit rangeChanged(0, _reader.size()/bytesPerLine());
+    calculateFontMetrics();
+    setTopLeft(0);
+
+    return true;
 }
 
 bool HexEditor::open( const QString & filename )

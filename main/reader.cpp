@@ -199,8 +199,8 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
     }
     else
     {
-        lastPageIdx = (_offset+numBytes)/_pageSize;
-        bytesread = numBytes;
+        lastPageIdx = (_offset+numbytes)/_pageSize;
+        bytesread = numbytes;
     }
 
     if(!numbytes)
@@ -219,16 +219,16 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
             return(_offset/_pageSize - page)*_pageSize;
         }
         int start = _offset%_pageSize;
-        int stop  = (page == lastPageIdx)? start+numBytes: _pageSize;
+        int stop  = (page == lastPageIdx)? start+numbytes: _pageSize;
         for(int i = start; i < stop; i++)
         {
             v.push_back(_data[page][i]);
         }
-        numBytes -= stop-start;
+        numbytes -= stop-start;
         _offset  += stop-start;
     }
 
-    return bytesRead;
+    return bytesread;
 }
 
 size_t Reader::read(vector<uchar>& v, size_t numBytes)
@@ -346,7 +346,7 @@ bool Reader::loadimagepage(off_t pageIdx)
     --nFreePages();
 
     //tsk img read from new offset...
-    off_t retval = tsk_img_read(imageinfo, pageIdx*_pageSize, _data[pageIdx], _pageSize);
+    off_t retval = tsk_img_read(imageinfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     if(retval)
     {
         if(pageIdx < _firstPage)

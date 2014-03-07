@@ -356,6 +356,13 @@ void WombatDatabase::GetEvidenceObject()
     wombatptr->evidenceobject.name = wombatptr->sqlrecords[0].value(4).toString();
     wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[0].value(5).toString();
     wombatptr->evidenceobject.id = wombatptr->sqlrecords[0].value(6).toInt();
+    wombatptr->bindvalues.clear();
+    wombatptr->evidenceobject.fullpathvector.clear();
+    wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+        wombatptr->evidenceobject.fullpathvector.push_back(wombatptr->sqlrecords[i].value(0).toString().toStdString());
 }
 
 void WombatDatabase::GetEvidenceObjects()
@@ -374,6 +381,15 @@ void WombatDatabase::GetEvidenceObjects()
         wombatptr->evidenceobject.name = wombatptr->sqlrecords[i].value(5).toString();
         wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[i].value(6).toString();
         wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
+    }
+    wombatptr->bindvalues.clear();
+    wombatptr->sqlrecords.clear();
+    for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
+    {
+        wombatptr->bindvalues.append(wombatptr->evidenceobjectvector[i].id);
+        wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
+        for(int j=0; j < wombatptr->sqlrecords.count(); j++)
+            wombatptr->evidenceobjectvector[i].fullpathvector.push_back(wombatptr->sqlrecords[j].value(0).toString().toStdString());
     }
 }
 

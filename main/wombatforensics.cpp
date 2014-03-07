@@ -323,6 +323,12 @@ void WombatForensics::LoadHexContents()
     int curidx = wombatframework->DetermineVectorIndex();
     if(wombatvarptr->selectedobject.type == 1) // image file
     {
+        // tsk_img_open() then tsk_img_read() hexwidget->openimage(var1, var2, etc...)
+        //hexwidget->open(tmpFilePath);
+        hexwidget->openimage(wombatvarptr->evidenceobjectvector[curidx].fullpathvector);
+        hexwidget->set2BPC();
+        hexwidget->setBaseHex();
+
     }
 }
 
@@ -1164,7 +1170,8 @@ void WombatForensics::LoadFileContents(QString filepath)
 void WombatForensics::LoadHexModel(QString tmpFilePath)
 {
     // tsk_img_open() then tsk_img_read() hexwidget->openimage(var1, var2, etc...)
-    hexwidget->open(tmpFilePath);
+    //hexwidget->open(tmpFilePath);
+    //hexwidget->openimage(wombatvarptr->evidenceobjectvector[
     hexwidget->set2BPC();
     hexwidget->setBaseHex();
 }
