@@ -36,9 +36,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
-
-#include "tsk/libtsk.h"
-#include <QDebug>
+#include "tskvariable.h"
 
 typedef vector<uchar> ReadBuffer;
 
