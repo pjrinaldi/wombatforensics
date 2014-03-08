@@ -47,11 +47,12 @@
 class HexEditor : public QWidget {
   Q_OBJECT
 public:
-  HexEditor( QWidget * parent =0 );
+  HexEditor( QWidget * parent =0, TskObject* tskobject = NULL );
   ~HexEditor();
 
   bool open(const QString& filename);
-  bool openimage(const QString& filename, TSK_IMG_INFO* imginfo);
+  bool openimage();
+  //bool openimage(const QString& filename, TSK_IMG_INFO* imginfo);
   //bool openimage(std::vector<std::string> imagesfullpath);
   //bool bigopen(startbyte, bytelen);
   QString filename() const;
@@ -94,6 +95,8 @@ protected:
   off_t   localWordOffset() const;
   off_t   localCharOffset() const;
   off_t   localLineOffset() const;
+
+  TskObject* tskptr;
  
 signals:
   // attach to know when line ranges change (for a scrollbar)

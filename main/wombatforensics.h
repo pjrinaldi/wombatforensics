@@ -25,6 +25,8 @@ public:
     WombatDatabase* wombatdatabase;
     WombatVariable wombatvariable;
     WombatVariable* wombatvarptr;
+    TskObject tskobject;
+    TskObject* tskobjptr;
     WombatFramework* wombatframework;
     ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;

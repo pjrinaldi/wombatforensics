@@ -45,9 +45,10 @@
 
 extern int errno;
 
-HexEditor::HexEditor( QWidget * parent )
+HexEditor::HexEditor( QWidget * parent, TskObject* tskobjptr )
     : QWidget(parent)
 {
+    tskptr = tskobjptr;
   _cols   = 5;
   _rows   = 10;
   _charsPerByte   = 2;
@@ -77,6 +78,7 @@ QString HexEditor::filename() const
   return _reader.filename();
 }
 
+/*
 bool HexEditor::openimage(const QString& filename, TSK_IMG_INFO* imginfo)
 {
     memcpy(&tskimg, &imginfo, sizeof(imginfo));
@@ -93,7 +95,7 @@ bool HexEditor::openimage(const QString& filename, TSK_IMG_INFO* imginfo)
     setTopLeft(0);
 
     return true;
-}
+}*/
 /*
 bool HexEditor::openimage(std::vector<std::string> imagesfullpath)
 {
@@ -112,8 +114,26 @@ bool HexEditor::openimage(std::vector<std::string> imagesfullpath)
     setTopLeft(0);
 
     return true;
+}*/
+
+bool HexEditor::openimage()
+{
+    qDebug() << "sector size: " << tskptr->readimginfo->sector_size;
+    if(!_reader.openimage(tskptr))
+    {
+        qDebug() << "error with reader openimage";
+    }
+    _cursor.setRange(0, _reader.size());
+    _cursor.setCharsPerByte(_charsPerByte);
+    setSelection(SelectionStart, -1);
+    setSelection(SelectionEnd, -1);
+    emit rangeChanged(0, _reader.size()/bytesPerLine());
+    calculateFontMetrics();
+    setTopLeft(0);
+
+    return true;
 }
-*/
+
 bool HexEditor::open( const QString & filename )
 {
   if(!_reader.open(C_STR(filename))) {

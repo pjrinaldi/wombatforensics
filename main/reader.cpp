@@ -67,9 +67,9 @@ Reader::~Reader()
 //
 // public methods
 //
-
+/*
 bool Reader::openimage(const string& filename, TSK_IMG_INFO* imageinfo)
-{
+{*/
     /*if( is_open() )
     {
         close();
@@ -78,7 +78,7 @@ bool Reader::openimage(const string& filename, TSK_IMG_INFO* imageinfo)
     } else {
         _is_open = false;
     }*/
-
+/*
     qDebug() << tsk_img_type_todesc(imageinfo->itype);
     //imageinfo = imginfo;
     if(imageinfo == NULL)
@@ -92,7 +92,7 @@ bool Reader::openimage(const string& filename, TSK_IMG_INFO* imageinfo)
     _is_open = true;
     _firstPage = _lastPage = 0;
     return loadimagepage(0);
-}
+}*/
 /*
 bool Reader::openimage(std::vector<std::string> imagesfullpath)
 {
@@ -159,6 +159,19 @@ bool Reader::open( const string& filename )
   _is_open = true;
   _firstPage = _lastPage = 0;
   return loadPage(0);
+}
+
+bool Reader::openimage(TskObject* tskpointer)
+{
+    tskptr = tskpointer;
+    _filename = "test.txt";
+    _size = tskptr->readimginfo->size;
+    off_t npages = _size/_pageSize +1;
+    _data.resize(npages);
+    fill(_data.begin(), _data.begin()+npages, (uchar*)0);
+    _is_open = true;
+    _firstPage = _lastPage = 0;
+    return loadimagepage(0);
 }
 
 bool Reader::close()
@@ -386,7 +399,8 @@ bool Reader::loadimagepage(off_t pageIdx)
     --nFreePages();
 
     //tsk img read from new offset...
-    off_t retval = tsk_img_read(imageinfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+    off_t retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+    //off_t retval = tsk_img_read(imageinfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     if(retval)
     {
         if(pageIdx < _firstPage)
@@ -396,7 +410,7 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
 
     return retval;
-    /*if(retval > 0)dd
+    /*if(retval > 0)
         wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
             wombatptr->rawbyteintvector[i] = bootbuffer[i];
 */

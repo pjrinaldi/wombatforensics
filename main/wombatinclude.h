@@ -47,7 +47,7 @@
 #include <string>
 #include <sys/stat.h>
 
-#include "tsk/libtsk.h"
+#include "tskvariable.h"
 #include "translate.hpp"
 #include "hexEditor.hpp"
 

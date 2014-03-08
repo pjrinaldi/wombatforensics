@@ -36,6 +36,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+
 #include "tskvariable.h"
 
 typedef vector<uchar> ReadBuffer;
@@ -51,7 +52,8 @@ class Reader {
   ~Reader();
 
   bool open(const string& filename);
-  bool openimage(const string& filename, TSK_IMG_INFO* imginfo);
+  bool openimage(TskObject* tskobject);
+  //bool openimage(const string& filename, TSK_IMG_INFO* imginfo);
   //bool openimage(std::vector<std::string> imagefullpaths);
   bool close();
   bool eof();
@@ -93,7 +95,7 @@ class Reader {
   off_t         _maxPages;       // maximum number of pages which could be currently loaded
   off_t         _freePages;     // number of free pages
   vector< uchar *> _data;
-  TSK_IMG_INFO* imageinfo;
+  TskObject* tskptr;
 };
 
 #endif

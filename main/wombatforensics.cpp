@@ -5,6 +5,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
+    tskobjptr = &tskobject;
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
     wombatprogresswindow = new ProgressWindow(wombatdatabase);
@@ -91,7 +92,7 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
     //SetupDirModel();
-    //SetupHexPage();
+    SetupHexPage();
     SetupToolbar();
     
 }
@@ -327,24 +328,27 @@ void WombatForensics::UpdateViewer()
 void WombatForensics::LoadHexContents()
 {
     int curidx = wombatframework->DetermineVectorIndex();
-    wombatvarptr->evidenceobject.Clear();
-    wombatvarptr->evidenceobject = wombatvarptr->evidenceobjectvector[curidx];
-    qDebug() << "evid fullpathsize: " << wombatvarptr->evidenceobject.fullpathvector.size();
-    qDebug() << "evid fullpath: " << QString::fromStdString(wombatvarptr->evidenceobject.fullpathvector[0]);
-    qDebug() << "evid itemcount: " << wombatvarptr->evidenceobject.itemcount;
-    wombatvarptr->evidenceobject.itemcount = wombatvarptr->evidenceobject.fullpathvector.size();
-    qDebug() << "evid itemcount 15: " << wombatvarptr->evidenceobject.itemcount;
-    wombatframework->OpenEvidenceImage();
+
     if(wombatvarptr->selectedobject.type == 1) // image file
     {
+        tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
+        tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
+        for(int i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
+        {
+            tskobjptr->imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
+        }
+        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+        if(tskobjptr->readimginfo == NULL)
+            qDebug() << "print image error here";
+        free(tskobjptr->imagepartspath);
+
         // tsk_img_open() then tsk_img_read() hexwidget->openimage(var1, var2, etc...)
         //hexwidget->open(tmpFilePath);
-        qDebug() << "curidx evid fullpath count: " << wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
         //hexwidget->openimage(wombatvarptr->evidenceobjectvector[curidx].fullpathvector);
-        hexwidget->openimage(QString::fromStdString(wombatvarptr->evidenceobject.fullpathvector[0]), wombatvarptr->evidenceobject.imageinfo);
+        //hexwidget->openimage(QString::fromStdString(wombatvarptr->evidenceobject.fullpathvector[0]), wombatvarptr->evidenceobject.imageinfo);
+        hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
-
     }
 }
 
@@ -819,7 +823,7 @@ void WombatForensics::SetupHexPage(void)
     hstatus->addWidget(selectedinteger);
     hstatus->addWidget(selectedfloat);
     hstatus->addWidget(selecteddouble);
-    hexwidget = new HexEditor(ui->hexPage);
+    hexwidget = new HexEditor(ui->hexPage, tskobjptr);
     hexwidget->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
     hexwidget->setObjectName("bt-hexview");
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
