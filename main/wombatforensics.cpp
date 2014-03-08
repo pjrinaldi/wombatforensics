@@ -342,7 +342,6 @@ void WombatForensics::LoadHexContents()
             qDebug() << "print image error here";
         free(tskobjptr->imagepartspath);
 
-        // tsk_img_open() then tsk_img_read() hexwidget->openimage(var1, var2, etc...)
         //hexwidget->open(tmpFilePath);
         //hexwidget->openimage(wombatvarptr->evidenceobjectvector[curidx].fullpathvector);
         //hexwidget->openimage(QString::fromStdString(wombatvarptr->evidenceobject.fullpathvector[0]), wombatvarptr->evidenceobject.imageinfo);
