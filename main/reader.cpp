@@ -338,6 +338,19 @@ bool Reader::eof()
 {
   return (is_open())? _eof : 0;
 }
+
+off_t Reader::seekimage(off_t offset)
+{
+    if(!is_open())
+        return -1;
+
+    _eof = false;
+    _offset = max(min(offset, size()-1), (off_t)0);
+
+    return _offset;
+    //_offset = tsk_img_read(tskptr->readimginfo, _offset, 
+}
+
 off_t Reader::seek(off_t offset)
 {
   if( !is_open() )
@@ -347,12 +360,14 @@ off_t Reader::seek(off_t offset)
   _eof = false;
 
   _offset = max( min( offset, size()-1 ), (off_t)0);
+  /*
   if( fseek(_fptr, _offset, SEEK_SET) ) {
     _error = "Seek to offset:";
     _error += _offset;
     _error += " failed.";
     return -1;
-  }
+  }*/
+
   assert(_offset == ftell(_fptr));
   return _offset;
 }

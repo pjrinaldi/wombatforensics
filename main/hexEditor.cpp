@@ -225,9 +225,10 @@ void HexEditor::setTopLeft( off_t offset )
      _topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //  setOffsetLabels(_topLeft);
-     
-     _reader.seek(_topLeft);
-     _reader.read(_data,bytesPerPage());
+     _reader.seekimage(_topLeft);
+     //_reader.seek(_topLeft);
+     _reader.readimage(_data,bytesPerPage());
+     //_reader.read(_data,bytesPerPage());
      
      repaint();
      emit topLeftChanged(_topLeft);

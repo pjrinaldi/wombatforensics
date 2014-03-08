@@ -61,6 +61,7 @@ class Reader {
   
   size_t read( ReadBuffer& v, size_t numBytes );
   size_t readimage(ReadBuffer& v, size_t numbytes);
+  off_t seekimage(off_t offset);
   off_t  seek( off_t offset );
   off_t tell() const; // returns the current offset or -1 if !open
   off_t size() const;
