@@ -24,6 +24,7 @@ public:
 
     void GetBootCode(int idx);
     int DetermineVectorIndex(void);
+    void OpenParentImage(void);
 
 private:
     WombatVariable* wombatptr;

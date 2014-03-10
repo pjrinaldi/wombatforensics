@@ -357,6 +357,7 @@ void WombatDatabase::GetEvidenceObject()
     wombatptr->evidenceobject.name = wombatptr->sqlrecords[0].value(4).toString();
     wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[0].value(5).toString();
     wombatptr->evidenceobject.id = wombatptr->sqlrecords[0].value(6).toInt();
+    wombatptr->evidenceobject.parentid = NULL;
     wombatptr->bindvalues.clear();
     wombatptr->evidenceobject.fullpathvector.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
@@ -383,6 +384,7 @@ void WombatDatabase::GetEvidenceObjects()
         wombatptr->evidenceobject.sectsize = wombatptr->sqlrecords[i].value(4).toInt();
         wombatptr->evidenceobject.name = wombatptr->sqlrecords[i].value(5).toString();
         wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[i].value(6).toString();
+        wombatptr->evidenceobject.parentid = NULL;
         wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
     }
     qDebug() << "evidobjvec count: " << wombatptr->evidenceobjectvector.count();

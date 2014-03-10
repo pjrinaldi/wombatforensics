@@ -60,6 +60,7 @@ struct EvidenceObject
     QString name;
     int size;
     int sectsize;
+    int parentid;
     QStringList namelist;
     QString fullpath; 
     std::vector<std::string> fullpathvector;
@@ -81,6 +82,7 @@ struct EvidenceObject
         sectsize = 0;
         namelist.clear();
         //dirpath = "";
+        parentid = NULL;
         fullpathvector.clear();
         imageinfo = NULL;
         volinfo = NULL;

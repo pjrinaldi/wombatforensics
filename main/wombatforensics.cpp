@@ -348,6 +348,40 @@ void WombatForensics::LoadHexContents()
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
     }
+    else if(wombatvarptr->selectedobject.type == 3) // partition object
+    {
+        // need to get the volume parent and then the image parent , so i can open the image from bytes...
+        // need to do a self looping query, where i use the parentid and check if its null, if its not null, then run it again.
+        // else return imageid and then loop over evidenceobjectvector for index. then loop over fullpathvector to get the
+        // imagepartspath and open the respective image.
+        // THEN I'LL HAVE TO GET THE OFFSET AND LENGTH FOR THE PARTITION...
+        qDebug() << "Partition Object";
+    }
+    else if(wombatvarptr->selectedobject.type == 4) // fs object
+    {
+        qDebug() << "File System Object";
+        /*
+         *int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
+{
+    int curcount = checkcount;
+    QModelIndex curindex = tmpitem->index();
+    if(tmpitem->hasChildren())
+    {
+        for(int i=0; i < tmpitem->rowCount(); i++)
+        {
+            curcount = StandardItemCheckState(tmpitem->child(i,0), curcount);
+        }
+    }
+    if(curindex.sibling(curindex.row(),1).flags().testFlag(Qt::ItemIsUserCheckable))
+    {
+        if(tmpitem->parent()->child(curindex.row(), 1)->checkState())
+            curcount++;
+    }
+    
+    return curcount;
+}
+         */ 
+    }
 }
 
 void WombatForensics::LoadTxtContents()
