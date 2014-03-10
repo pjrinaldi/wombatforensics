@@ -334,9 +334,9 @@ void WombatForensics::LoadHexContents()
 
     if(wombatvarptr->selectedobject.type == 1) // image file
     {
+        OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id);
         tskobjptr->offset = 0;
         tskobjptr->length = tskobjptr->readimginfo->size;
-        OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id);
         /*
         tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
         tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
@@ -347,8 +347,8 @@ void WombatForensics::LoadHexContents()
         tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
         if(tskobjptr->readimginfo == NULL)
             qDebug() << "print image error here";
-        free(tskobjptr->imagepartspath);
-        hexwidget->openimage();
+        free(tskobjptr->imagepartspath);*/
+        /*hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();*/
     }
@@ -363,12 +363,15 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.type == 4) // fs object
     {
-        tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
-        tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
         // set tskobjptr->offset and tskobjptr->length here prior to calling this...
         OpenParentImage(wombatvarptr->filesystemobjectvector[curidx].parimgid);
+        tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
+        tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
         qDebug() << "File System Object";
     }
+    hexwidget->openimage();
+    hexwidget->set2BPC();
+    hexwidget->setBaseHex();
 }
 
 void WombatForensics::LoadTxtContents()
@@ -457,9 +460,9 @@ void WombatForensics::OpenParentImage(int imgid)
     if(tskobjptr->readimginfo == NULL)
         qDebug() << "print image error here";
     free(tskobjptr->imagepartspath);
-    hexwidget->openimage(); // need to add the offset and length to tskobject prior to calling openimage.
-    hexwidget->set2BPC();
-    hexwidget->setBaseHex();
+    //hexwidget->openimage(); // need to add the offset and length to tskobject prior to calling openimage.
+    //hexwidget->set2BPC();
+    //hexwidget->setBaseHex();
 }
 
 void WombatForensics::RemEvidence()
