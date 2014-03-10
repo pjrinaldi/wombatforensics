@@ -262,7 +262,7 @@ void WombatDatabase::GetPartitionObjects()
         wombatptr->bindvalues.clear();
         wombatptr->bindvalues.append(wombatptr->volumeobjectvector[j].id);
         wombatptr->sqlrecords.clear();
-        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, sectstart, sectlength, size, name, parentid, parimgid, objecttype FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
+        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, sectstart, sectlength, name, size, parentid, parimgid, objecttype FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
         for(int i=0; i < wombatptr->sqlrecords.count(); i++)
         {
             wombatptr->partitionobject.id = wombatptr->sqlrecords[i].value(0).toInt();
