@@ -188,7 +188,7 @@ struct WombatVariable
     SelectedObject selectedobject;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
-    QByteArray bootbytearray; // byte array of currently extracted rawdata -> clear() before each use
+    // QByteArray bootbytearray; // byte array of currently extracted rawdata -> clear() before each use [don't think i use this anymore]
     std::vector<uchar> rawbyteintvector;
     QString htmlcontent;
     QSqlDatabase casedb;
