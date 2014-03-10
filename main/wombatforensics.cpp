@@ -336,7 +336,8 @@ void WombatForensics::LoadHexContents()
     {
         OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id);
         tskobjptr->offset = 0;
-        tskobjptr->length = tskobjptr->readimginfo->size;
+        tskobjptr->length = wombatvarptr->evidenceobjectvector[curidx].size;
+        //tskobjptr->length = tskobjptr->readimginfo->size;
         /*
         tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
         tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
