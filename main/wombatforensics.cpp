@@ -6,6 +6,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
     tskobjptr = &tskobject;
+    tskobjptr->readimginfo = NULL;
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
     wombatprogresswindow = new ProgressWindow(wombatdatabase);
@@ -327,6 +328,8 @@ void WombatForensics::UpdateViewer()
 
 void WombatForensics::LoadHexContents()
 {
+    if(tskobjptr->readimginfo != NULL)
+        tsk_img_close(tskobjptr->readimginfo);
     int curidx = wombatframework->DetermineVectorIndex();
 
     if(wombatvarptr->selectedobject.type == 1) // image file
@@ -341,10 +344,6 @@ void WombatForensics::LoadHexContents()
         if(tskobjptr->readimginfo == NULL)
             qDebug() << "print image error here";
         free(tskobjptr->imagepartspath);
-
-        //hexwidget->open(tmpFilePath);
-        //hexwidget->openimage(wombatvarptr->evidenceobjectvector[curidx].fullpathvector);
-        //hexwidget->openimage(QString::fromStdString(wombatvarptr->evidenceobject.fullpathvector[0]), wombatvarptr->evidenceobject.imageinfo);
         hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();

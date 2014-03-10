@@ -67,63 +67,6 @@ Reader::~Reader()
 //
 // public methods
 //
-/*
-bool Reader::openimage(const string& filename, TSK_IMG_INFO* imageinfo)
-{*/
-    /*if( is_open() )
-    {
-        close();
-        if( is_open() ) // only occurs if close somehow fails. 
-            return false;
-    } else {
-        _is_open = false;
-    }*/
-/*
-    qDebug() << tsk_img_type_todesc(imageinfo->itype);
-    //imageinfo = imginfo;
-    if(imageinfo == NULL)
-        return false;
-    off_t filesize = imageinfo->size;
-    _size = filesize;
-    _filename = filename;
-    off_t npages = filesize/_pageSize + 1;
-    _data.resize(npages);
-    fill(_data.begin(), _data.begin()+npages, (uchar*)0);
-    _is_open = true;
-    _firstPage = _lastPage = 0;
-    return loadimagepage(0);
-}*/
-/*
-bool Reader::openimage(std::vector<std::string> imagesfullpath)
-{
-    const TSK_TCHAR** images;
-    images = (const char**)malloc(imagesfullpath.size()*sizeof(char*));
-    qDebug() << "images full path count: " << imagesfullpath.size();
-    for(int i=0; i < imagesfullpath.size(); i++)
-    {
-        images[i] = imagesfullpath[i].c_str();
-        qDebug() << "image[" << i << "] = " << images[i];
-    }
-    qDebug() << "num images: " << imagesfullpath.size() << " images size: " << images;
-    imageinfo = tsk_img_open(imagesfullpath.size(), images, TSK_IMG_TYPE_DETECT, 0);
-    if(imageinfo == NULL)
-        qDebug() << "image failed to open";
-    else
-    {
-        off_t filesize = imageinfo->size;
-        _size = filesize;
-        off_t npages = filesize/_pageSize + 1;
-        _data.resize(npages);
-        fill(_data.begin(), _data.begin()+npages, (uchar*)0 );
-        _is_open = true;
-        _firstPage = _lastPage = 0;
-        return loadimagepage(0);
-    }
-    free(images);
-
-}
-*/
-
 bool Reader::open( const string& filename )
 {
   // clear old data
@@ -164,6 +107,8 @@ bool Reader::open( const string& filename )
 bool Reader::openimage(TskObject* tskpointer)
 {
     tskptr = tskpointer;
+    if(is_open())
+        close();
     _filename = "test.txt";
     _size = tskptr->readimginfo->size;
     off_t npages = _size/_pageSize +1;
@@ -171,6 +116,7 @@ bool Reader::openimage(TskObject* tskpointer)
     fill(_data.begin(), _data.begin()+npages, (uchar*)0);
     _is_open = true;
     _firstPage = _lastPage = 0;
+
     return loadimagepage(0);
 }
 
@@ -185,8 +131,8 @@ bool Reader::close()
   }
   */
 
-  //_filename = "";
-  //_error    = "";
+    _filename = "";
+    _error = "";
   /*
   if( EOF == fclose(_fptr) ) {
     _error = strerror(errno);
@@ -194,11 +140,10 @@ bool Reader::close()
   }
   */
   // free data pages
-  /*
     vector<uchar*>::iterator itr;
     for( itr = _data.begin(); itr != _data.end(); ++itr )
         delete [] (*itr);
-    */
+
     _is_open = false;
     _firstPage = _lastPage = -1;
     _freePages = _maxPages;
@@ -209,35 +154,7 @@ bool Reader::is_open() const
 {
   return _is_open;
 }
-    /*
-    QString tmpstr = "";
-    char* bootbuffer = NULL;
-    wombatptr->rawbyteintvector.clear();
-    bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
-    retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
-    if(retval > 0)
-    {
-        wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
-        for(int i=0; i < retval; i++)
-        {
-            wombatptr->rawbyteintvector[i] = bootbuffer[i];
-        }
-        delete[] bootbuffer;
-        // delete bootbuffer;
-        //qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
-        //qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
-        vector<uchar> subchar;
-        subchar.push_back(wombatptr->rawbyteintvector[510]);
-        subchar.push_back(wombatptr->rawbyteintvector[511]);
-        Translate::ByteToHex(tmpstr, subchar);
-        if(QString::compare("55aa", tmpstr) == 0) // its a boot sector
-        {
-                // now to determine if its got a partition table
-        }
-        //Translate::ByteToBinary(tmpstr, subchar);
-        //qDebug() << "Byte to Bin: " << tmpstr;
-    }
-    */
+
 size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
 {
     int lastPageIdx = 0;
