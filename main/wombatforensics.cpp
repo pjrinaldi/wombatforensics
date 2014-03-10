@@ -355,6 +355,8 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.type == 3) // partition object
     {
+        OpenParentImage(wombatvarptr->partitionobjectvector[curidx].parimgid);
+        tskobjptr->offset = wombatvarptr->partitionobjectvector[curidx].
         // need to get the volume parent and then the image parent , so i can open the image from bytes...
         // need to do a self looping query, where i use the parentid and check if its null, if its not null, then run it again.
         // else return imageid and then loop over evidenceobjectvector for index. then loop over fullpathvector to get the

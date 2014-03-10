@@ -65,8 +65,10 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
                         tmpnode = new QStandardItem(QString::number(wombatptr->partitionobjectvector[i].id));
                         tmpnode->setCheckable(true);
                         tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
+                        int bytestart = wombatptr->partitionobjectvector[i].secstart * wombatptr->partitionobjectvector[i].blocksize;
+                        int byteend = wombatptr->partitionobjectvector[i].blocksize * (wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength - 1);
                         int sectend = wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength - 1;
-                        QString tmpstring = wombatptr->partitionobjectvector[i].name + " [" + QString::number(wombatptr->partitionobjectvector[i].sectstart) + "-" + QString::number(sectend) + "]";
+                        QString tmpstring = wombatptr->partitionobjectvector[i].name + " [" + QString::number(bytestart) + "-" + QString::number(byteend) + "]";
                         tmplist << tmpnode << new QStandardItem(tmpstring);
                         evidnode[0]->appendRow(tmplist);
                     }

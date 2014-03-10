@@ -246,9 +246,10 @@ void WombatDatabase::InsertPartitionObjects()
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->start);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->len);
             wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
+            wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->block_size);
             wombatptr->bindvalues.append(wombatptr->currentvolumeid);
             wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-            wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, parentid, parimgid) VALUES(3, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+            wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, size, parentid, parimgid) VALUES(3, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
         }
     }
 }
@@ -261,7 +262,7 @@ void WombatDatabase::GetPartitionObjects()
         wombatptr->bindvalues.clear();
         wombatptr->bindvalues.append(wombatptr->volumeobjectvector[j].id);
         wombatptr->sqlrecords.clear();
-        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, sectstart, sectlength, name, parentid, parimgid, objecttype FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
+        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, sectstart, sectlength, size, name, parentid, parimgid, objecttype FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
         for(int i=0; i < wombatptr->sqlrecords.count(); i++)
         {
             wombatptr->partitionobject.id = wombatptr->sqlrecords[i].value(0).toInt();
@@ -269,9 +270,10 @@ void WombatDatabase::GetPartitionObjects()
             wombatptr->partitionobject.sectstart = wombatptr->sqlrecords[i].value(2).toInt();
             wombatptr->partitionobject.sectlength = wombatptr->sqlrecords[i].value(3).toInt();
             wombatptr->partitionobject.name = wombatptr->sqlrecords[i].value(4).toString();
-            wombatptr->partitionobject.parentid = wombatptr->sqlrecords[i].value(5).toInt();
-            wombatptr->partitionobject.parimgid = wombatptr->sqlrecords[i].value(6).toInt();
-            wombatptr->partitionobject.objecttype = wombatptr->sqlrecords[i].value(7).toInt();
+            wombatptr->partitionobject.blocksize = wombatptr->sqlrecords[i].value(5).toInt();
+            wombatptr->partitionobject.parentid = wombatptr->sqlrecords[i].value(6).toInt();
+            wombatptr->partitionobject.parimgid = wombatptr->sqlrecords[i].value(7).toInt();
+            wombatptr->partitionobject.objecttype = wombatptr->sqlrecords[i].value(8).toInt();
             wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
         }
     }

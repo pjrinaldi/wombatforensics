@@ -31,6 +31,7 @@ struct PartitionObject
     int flags;
     int sectstart;
     int sectlength;
+    int blocksize;
     int parentid;
     int parimgid;
     QString name;
