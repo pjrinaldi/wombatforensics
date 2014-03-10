@@ -334,6 +334,10 @@ void WombatForensics::LoadHexContents()
 
     if(wombatvarptr->selectedobject.type == 1) // image file
     {
+        tskobjptr->offset = 0;
+        tskobjptr->length = tskobjptr->readimginfo->size;
+        OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id);
+        /*
         tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
         tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
         for(int i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
@@ -346,7 +350,7 @@ void WombatForensics::LoadHexContents()
         free(tskobjptr->imagepartspath);
         hexwidget->openimage();
         hexwidget->set2BPC();
-        hexwidget->setBaseHex();
+        hexwidget->setBaseHex();*/
     }
     else if(wombatvarptr->selectedobject.type == 3) // partition object
     {
@@ -359,30 +363,11 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.type == 4) // fs object
     {
-        wombatframework->OpenParentImage(curidx);
-        // just need to add parimgid to sql
+        tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
+        tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
+        // set tskobjptr->offset and tskobjptr->length here prior to calling this...
+        OpenParentImage(wombatvarptr->filesystemobjectvector[curidx].parimgid);
         qDebug() << "File System Object";
-        /*
-         *int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
-{
-    int curcount = checkcount;
-    QModelIndex curindex = tmpitem->index();
-    if(tmpitem->hasChildren())
-    {
-        for(int i=0; i < tmpitem->rowCount(); i++)
-        {
-            curcount = StandardItemCheckState(tmpitem->child(i,0), curcount);
-        }
-    }
-    if(curindex.sibling(curindex.row(),1).flags().testFlag(Qt::ItemIsUserCheckable))
-    {
-        if(tmpitem->parent()->child(curindex.row(), 1)->checkState())
-            curcount++;
-    }
-    
-    return curcount;
-}
-         */ 
     }
 }
 
@@ -452,6 +437,29 @@ void WombatForensics::LoadComplete(bool isok)
         {
         }
     }
+}
+
+void WombatForensics::OpenParentImage(int imgid)
+{
+    int curidx = -1;
+    for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
+    {
+        if(imgid == wombatvarptr->evidenceobjectvector[i].id)
+            curidx = i;
+    }
+    tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
+    tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
+    for(int i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
+    {
+        tskobjptr->imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
+    }
+    tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    if(tskobjptr->readimginfo == NULL)
+        qDebug() << "print image error here";
+    free(tskobjptr->imagepartspath);
+    hexwidget->openimage(); // need to add the offset and length to tskobject prior to calling openimage.
+    hexwidget->set2BPC();
+    hexwidget->setBaseHex();
 }
 
 void WombatForensics::RemEvidence()

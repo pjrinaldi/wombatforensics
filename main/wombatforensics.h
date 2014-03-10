@@ -50,10 +50,10 @@ private slots:
     void PopulateProgressWindow(WombatVariable* wvariable);
     void UpdateCaseData(void);
     void ResizeColumns(void);
+    void OpenParentImage(int imgid);
    // void ResizeColumns(QStandardItemModel* currentmodel);
     void ResizeViewColumns(const QModelIndex &index)
     {
-        //ResizeColumns((QStandardItemModel*)index.model());
         ResizeColumns();
     }
     void FileExport(FileExportData* exportdata);

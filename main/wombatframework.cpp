@@ -303,7 +303,30 @@ int WombatFramework::DetermineVectorIndex()
 
     return curidx;
 }
-
+/*
+void WombatFramework::OpenParentImage(int imgid)
+{
+    int curidx = -1;
+    for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
+    {
+        if(imgid == wombatvarptr->evidenceobjectvector[i].id)
+            curidx = i;
+    }
+    tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
+    tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
+    for(int i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
+    {
+        tskobjptr->imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
+    }
+    tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    if(tskobjptr->readimginfo == NULL)
+        qDebug() << "print image error here";
+    free(tskobjptr->imagepartspath);
+    hexwidget->openimage(); // need to add the offset and length to tskobject prior to calling openimage.
+    hexwidget->set2BPC();
+    hexwidget->setBaseHex();
+}
+*/
 // BELOW FUNCTION CURRENTLY NOT USED
 void WombatFramework::BuildEvidenceModel()
 {

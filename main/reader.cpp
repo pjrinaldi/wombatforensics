@@ -110,7 +110,9 @@ bool Reader::openimage(TskObject* tskpointer)
     if(is_open())
         close();
     _filename = "test.txt";
-    _size = tskptr->readimginfo->size;
+    // NEED TO SET THE SIZE FROM _SIZE = TSKPTR->LENGTH;
+    //_size = tskptr->readimginfo->size;
+    _size = tskptr->length;
     off_t npages = _size/_pageSize +1;
     _data.resize(npages);
     fill(_data.begin(), _data.begin()+npages, (uchar*)0);
@@ -331,7 +333,8 @@ bool Reader::loadimagepage(off_t pageIdx)
     --nFreePages();
 
     //tsk img read from new offset...
-    off_t retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+    // possibly need to make it pageidx*_pagesize + tskptr->offset for the imageoffset.
+    off_t retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     //off_t retval = tsk_img_read(imageinfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     if(retval)
     {
