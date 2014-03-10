@@ -304,31 +304,6 @@ int WombatFramework::DetermineVectorIndex()
     return curidx;
 }
 
-void WombatFramework::OpenParentImage()
-{
-    for(int i=0; i < 
-}
-
-         /*int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
-{
-    int curcount = checkcount;
-    QModelIndex curindex = tmpitem->index();
-    if(tmpitem->hasChildren())
-    {
-        for(int i=0; i < tmpitem->rowCount(); i++)
-        {
-            curcount = StandardItemCheckState(tmpitem->child(i,0), curcount);
-        }
-    }
-    if(curindex.sibling(curindex.row(),1).flags().testFlag(Qt::ItemIsUserCheckable))
-    {
-        if(tmpitem->parent()->child(curindex.row(), 1)->checkState())
-            curcount++;
-    }
-    
-    return curcount;
-}
-         */
 // BELOW FUNCTION CURRENTLY NOT USED
 void WombatFramework::BuildEvidenceModel()
 {

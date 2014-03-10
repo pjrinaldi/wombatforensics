@@ -20,6 +20,7 @@ struct VolumeObject
     int childcount;
     int byteoffset;
     int parentid;
+    int parimgid;
     QString name;
 };
 
@@ -31,6 +32,7 @@ struct PartitionObject
     int sectstart;
     int sectlength;
     int parentid;
+    int parimgid;
     QString name;
 };
 
@@ -42,6 +44,7 @@ struct FileSystemObject
     int flags;
     int byteoffset;
     int parentid;
+    int parimgid;
     int blocksize;
     int size;
     int blockcount;
@@ -61,6 +64,7 @@ struct EvidenceObject
     int size;
     int sectsize;
     int parentid;
+    int parimgid;
     QStringList namelist;
     QString fullpath; 
     std::vector<std::string> fullpathvector;

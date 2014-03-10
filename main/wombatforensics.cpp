@@ -359,6 +359,8 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.type == 4) // fs object
     {
+        wombatframework->OpenParentImage(curidx);
+        // just need to add parimgid to sql
         qDebug() << "File System Object";
         /*
          *int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
