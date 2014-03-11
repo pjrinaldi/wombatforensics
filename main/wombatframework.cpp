@@ -66,8 +66,7 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
                         tmpnode->setCheckable(true);
                         tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
                         int bytestart = wombatptr->partitionobjectvector[i].sectstart * wombatptr->partitionobjectvector[i].blocksize;
-                        int byteend = wombatptr->partitionobjectvector[i].blocksize * (wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength - 1);
-                        int sectend = wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength - 1;
+                        int byteend = wombatptr->partitionobjectvector[i].blocksize * (wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength) - 1;
                         QString tmpstring = wombatptr->partitionobjectvector[i].name + " [" + QString::number(bytestart) + "-" + QString::number(byteend) + "]";
                         tmplist << tmpnode << new QStandardItem(tmpstring);
                         evidnode[0]->appendRow(tmplist);
@@ -86,8 +85,8 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
                         tmpnode = new QStandardItem(QString::number(wombatptr->filesystemobjectvector[i].id));
                         tmpnode->setCheckable(true);
                         tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
-                        int sectend = wombatptr->filesystemobjectvector[i].blocksize * wombatptr->filesystemobjectvector[i].blockcount;
-                        QString tmpstring = wombatptr->filesystemobjectvector[i].name + " [" + QString::number(wombatptr->filesystemobjectvector[i].byteoffset) + "-" + QString::number(sectend) + "]";
+                        int byteend = wombatptr->filesystemobjectvector[i].blocksize * wombatptr->filesystemobjectvector[i].blockcount;
+                        QString tmpstring = wombatptr->filesystemobjectvector[i].name + " [" + QString::number(wombatptr->filesystemobjectvector[i].byteoffset) + "-" + QString::number(byteend) + "]";
                         tmplist << tmpnode << new QStandardItem(tmpstring);
                         evidnode[0]->appendRow(tmplist);
                     }

@@ -568,7 +568,11 @@ void HexEditor::paintLabels( QPainter* paintPtr)
   unsigned int i;
   off_t offset = _topLeft;
   uchar *ucptr;
+  uchar* offsetptr;
   QString label;
+
+  // offset correction so the offset is showing the valid hex for the object loaded.
+  offset = offset + tskptr->offset;
 
   for(int row = 0; row < _rows;++row) {
     label = "";
