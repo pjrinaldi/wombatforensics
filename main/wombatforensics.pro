@@ -1,5 +1,5 @@
 QT += widgets gui core concurrent webkitwidgets sql
-#QT += -opengl -qtquick
+QT -= opengl quick network qml
 mac:CONFIG += debug app_bundle
 linux:CONFIG += debug
 mac:TEMPLATE = app

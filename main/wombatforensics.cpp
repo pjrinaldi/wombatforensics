@@ -21,7 +21,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //wombatvarptr->evidenceobject.id = 0;
     //wombatvarptr->jobtype = 0;
     //wombatvarptr->jobid = -1;
-    //qRegisterMetaType<FileExportData*>("FileExportData*");
     //qRegisterMetaType<WombatVariable*>("WombatVariable*");
     //connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
