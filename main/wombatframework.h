@@ -19,6 +19,7 @@ public:
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);
     void OpenPartitions(void);
+    void OpenFiles(void);
     void AddPartitionNodes(int increment);
     void CloseInfoStructures(void);
 

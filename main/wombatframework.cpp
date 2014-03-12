@@ -154,6 +154,12 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
     }
 }
 
+void WombatFramework::OpenFiles() // open the files and add to file info vector
+{
+    // tsk_fs_dir_walk the fsinfovector[i] objects to get the tsk_fs_file and tsk_fs_dir info objects and add them to the
+    // fileinfovector
+}
+
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
 {
     for(int j = 0; j < wombatptr->evidenceobjectvector.count(); j++)

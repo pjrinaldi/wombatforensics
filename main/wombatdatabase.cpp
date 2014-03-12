@@ -279,6 +279,10 @@ void WombatDatabase::GetPartitionObjects()
     }
 }
 
+void WombatDatabase::InsertFileObjects() // loop over fileinfovector and add to db.
+{
+}
+
 void WombatDatabase::InsertFileSystemObjects()
 {
     if(wombatptr->evidenceobject.fsinfovector.size() > 0)

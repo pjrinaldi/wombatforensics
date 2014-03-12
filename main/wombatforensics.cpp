@@ -238,6 +238,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
 
+    wombatframework->OpenFiles();
     wombatdatabase->InsertFileObjects(); // tsk_fs_dir_walk and recursively loop over all the directories/files
     // starting with the root_inum. need to just qdebug some test data and see what it does...
 

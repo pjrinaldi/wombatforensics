@@ -55,6 +55,11 @@ struct FileSystemObject
     QString name;
 };
 
+struct FileObject
+{
+    // file and dir data stored here... metaVAR and/or nameVAR if they duplicate.
+};
+
 struct EvidenceObject
 {
     int id;
@@ -75,6 +80,9 @@ struct EvidenceObject
     TSK_VS_PART_INFO* partinfo; // may not need.
     std::vector<const TSK_VS_PART_INFO*> partinfovector;
     std::vector<TSK_FS_INFO*> fsinfovector; 
+    TSK_FS_FILE* fileinfo;
+    TSK_FS_DIR* dirinfo;
+    std::vector<void*> dirfileinfovector;
     QString dbname;
     void Clear()
     {
@@ -185,6 +193,7 @@ struct WombatVariable
     QVector<PartitionObject> partitionobjectvector;
     FileSystemObject filesystemobject;
     QVector<FileSystemObject> filesystemobjectvector;
+    QVector<FileObject> fileobjectvector;
     SelectedObject selectedobject;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
@@ -204,6 +213,7 @@ Q_DECLARE_METATYPE(EvidenceObject)
 Q_DECLARE_METATYPE(PartitionObject)
 Q_DECLARE_METATYPE(VolumeObject)
 Q_DECLARE_METATYPE(FileSystemObject)
+Q_DECLARE_METATYPE(FileObject);
 Q_DECLARE_METATYPE(SelectedObject);
 
 #endif // WOMBATVARIABLE_H

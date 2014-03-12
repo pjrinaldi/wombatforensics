@@ -23,6 +23,7 @@ public:
     void InsertPartitionObjects(void);
     void GetPartitionObjects(void);
     void InsertFileSystemObjects(void);
+    void InsertFileObjects(void);
     void GetFileSystemObjects(void);
     void GetObjectType(void);
 
