@@ -238,6 +238,9 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
 
+    wombatdatabase->InsertFileObjects(); // tsk_fs_dir_walk and recursively loop over all the directories/files
+    // starting with the root_inum.
+
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
     wombatdatabase->GetVolumeObjects();
     wombatdatabase->GetPartitionObjects();
