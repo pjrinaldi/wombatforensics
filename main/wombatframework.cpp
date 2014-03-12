@@ -98,6 +98,21 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
     }
 }
 
+/*
+ * LoadChildren(qstandarditem* item, selected.id)
+ * if(selected.id.childcount > 0)
+ * fileobjectvector<fileobject>, fileobject has the respective file data including childcount and parentid.
+ * expand a parent, children need to looped so they'yre children can be loaded.
+ * need to determine what fileobject will contain.
+ * loop over the nodes where parentid = selected.id
+ * add nodes
+ *
+void WombatFramework::AddFileNodes(int curidx)
+{
+    QList<QStandardItem*>
+}
+ */ 
+
 void WombatFramework::OpenVolumeSystem() // open current volume system
 {
     wombatptr->evidenceobject.volinfo = tsk_vs_open(wombatptr->evidenceobject.imageinfo, 0, TSK_VS_TYPE_DETECT);
