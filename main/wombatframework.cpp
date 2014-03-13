@@ -218,10 +218,8 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
     {
         wombatptr->htmlcontent += "<tr><td class='property'>byte offset</td><td class='pvalue'>";
         wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->volumeobjectvector[volidx].byteoffset) + "</td></tr>";
-        //wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->offset)  + "</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>block size</td><td class='pvalue'>";
         wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->volumeobjectvector[volidx].blocksize) + " bytes</td></tr>";
-        //wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->block_size) + " bytes</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>endian ordering</td><td class='pvalue'>";
         /*
         if(wombatptr->evidenceobject.volinfo->endian == TSK_LIT_ENDIAN)
@@ -232,8 +230,6 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
         wombatptr->htmlcontent += "</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>partition count</td><td class='pvalue'>";
         wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->volumeobjectvector[volidx].childcount) + "</td></tr></table>";
-        //wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->evidenceobject.volinfo->part_count) + "</td></tr></table>";
-
         //wombatptr->htmlcontent += "<br/><br/><div class='tabletitle'>boot sector</div>";
         //wombatptr->htmlcontent += "<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr>";
         //wombatptr->htmlcontent += "<tr class='odd'><td>0-0</td><td class='bvalue'></td><td class='desc'></td></tr>";
@@ -250,39 +246,6 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
         // layout in the tree view
     }
 }
-// OLD STUFF THAT IS USEFULL INFO FOR HOW TO GET THINGS, BUT NOT USED IN THIS CODE RIGHT NOW
-    /*
-    int retval;
-    //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");*/
-    /*
-    QString tmpstr = "";
-    char* bootbuffer = NULL;
-    wombatptr->rawbyteintvector.clear();
-    bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
-    retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
-    if(retval > 0)
-    {
-        wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
-        for(int i=0; i < retval; i++)
-        {
-            wombatptr->rawbyteintvector[i] = bootbuffer[i];
-        }
-        delete[] bootbuffer;
-        // delete bootbuffer;
-        //qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
-        //qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
-        vector<uchar> subchar;
-        subchar.push_back(wombatptr->rawbyteintvector[510]);
-        subchar.push_back(wombatptr->rawbyteintvector[511]);
-        Translate::ByteToHex(tmpstr, subchar);
-        if(QString::compare("55aa", tmpstr) == 0) // its a boot sector
-        {
-                // now to determine if its got a partition table
-        }
-        //Translate::ByteToBinary(tmpstr, subchar);
-        //qDebug() << "Byte to Bin: " << tmpstr;
-    }
-    */
 
 int WombatFramework::DetermineVectorIndex()
 {
@@ -324,71 +287,4 @@ int WombatFramework::DetermineVectorIndex()
     }
 
     return curidx;
-}
-/*
-void WombatFramework::OpenParentImage(int imgid)
-{
-    int curidx = -1;
-    for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
-    {
-        if(imgid == wombatvarptr->evidenceobjectvector[i].id)
-            curidx = i;
-    }
-    tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
-    tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
-    for(int i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
-    {
-        tskobjptr->imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
-    }
-    tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    if(tskobjptr->readimginfo == NULL)
-        qDebug() << "print image error here";
-    free(tskobjptr->imagepartspath);
-    hexwidget->openimage(); // need to add the offset and length to tskobject prior to calling openimage.
-    hexwidget->set2BPC();
-    hexwidget->setBaseHex();
-}
-*/
-// BELOW FUNCTION CURRENTLY NOT USED
-void WombatFramework::BuildEvidenceModel()
-{
-    // COME BACK TO QTCONCURRENT AS I GET FARTHER ALONG AND RESEARCH MORE
-    /*
-    QVector<ItemObject> itemvector;
-    for(int i = 0; i < wombatptr->evidenceobjectvector.count(); i++)
-    {
-        itemvector.append(wombatptr->evidenceobjectvector[i]);
-    }
-    QFutureWatcher<void> watcher;
-    watcher.setFuture(QtConcurrent::map(itemvector, &WombatFramework::OpenEvidenceImages));
-    //watcher.setFuture(QtConcurrent::map(wombatptr->evidenceobjectvector, WombatFramework::OpenEvidenceImages));
-    watcher.waitForFinished();
-    */
-    OpenEvidenceImages(); // PROBABLY PUT THIS IN A MULTI-THREAD ENVIRONMENT.
-    for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++) // for each evidence image info file.
-    {
-        if(wombatptr->evidenceobjectvector[i].imageinfo == NULL)
-            fprintf(stderr, "Image didn't open. add to log file as error.\n");
-        else
-            fprintf(stderr, "Image %s opened. add to log file as info.\n", wombatptr->evidenceobjectvector[i].fullpathvector[0].c_str());
-    }
-    // NEED TO LAUNCH THIS IN A NEW THREAD TO KEEP GUI RESPONSIVE
-    // NEED TO OPEN THE IMAGE - img_open.c [tsk_img_open()]
-    // NEED TO GET THE METADATA FOR THE IMAGE/VOLUMES/PARTITIONS/FILES SO I CAN POPULATE THE DIRECTORY TREE INFORMATION
-
-
-    // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
-    // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR
-    // NEED TO CREATE THE EVIDENCE TSK DATABASE (EXTRACT EVIDENCE ACCORDING TO MODULES)
-    // NEED TO BUILD DIRMODEL AS I GO AND POPULATE DIRTREEVIEW AS I GO WITH EACH FILE
-    // FOR NOW I WON'T BUILD MODULES, I'LL JUST DESIGN A MULTI-THREADED APPROACH FOR IT AND ABSTRACT TO PLUGGABLE MODULES LATER
-
-    /*
-    QFutureWatcher<void> watcher;
-    std::vector<TskSchedulerQueue::task_struct* > tmpvector;
-    watcher.setFuture(QtConcurrent::map(&tmpvector, &SleuthKitPlugin::TaskMap));
-    //watcher.setFuture(QtConcurrent::map(&((std::vector<TskSchedulerQueue::task_struct*>)scheduler.mapvector), &SleuthKitPlugin::TaskMap));
-    watcher.waitForFinished();
-    */
-    // QT CONCURRENT TEST
 }

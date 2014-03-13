@@ -139,6 +139,7 @@ void WombatForensics::RemEvidence()
         UpdateMessageTable();
     }*/
 }
+-------------
 interfaces.h
 -------------
 #ifndef INTERFACES_H
@@ -260,5 +261,876 @@ Q_DECLARE_INTERFACE(ViewerInterface, ViewerInterface_iid)
 Q_DECLARE_INTERFACE(SleuthKitInterface, SleuthKitInterface_iid)
 
 #endif
+-------------
+sluethkit.h
+-------------
+#ifndef SLEUTHKIT_H 
+#define SLEUTHKIT_H
+
+#include "wombatvariable.h"
+#include "wombatdatabase.h"
+#include <sqlite3.h>
+#include "../sleuthkit/framework/tsk/framework/framework.h" // provides tsk framework
+#include <time.h>
+#include "TskLog.h"
+#include <QtPlugin>
+#include <QObject>
+#include <QString>
+#include <string>
+#include <QStringList>
+#include <QFile>
+#include <QXmlStreamWriter>
+#include <QStandardItemModel>
+#include <QByteArray>
+#include <QDataStream>
+#include <QThreadPool>
+#include <QtConcurrent>
+#include <fstream>
+#include <cstdio>
+
+class SleuthKitPlugin : public QObject
+{
+    Q_OBJECT
+    
+public:
+    SleuthKitPlugin(WombatDatabase* wombatcasedata);
+    ~SleuthKitPlugin() {};
+    //SleuthKit Interface Functions
+    Q_INVOKABLE void Initialize(WombatVariable* wombatVariable);
+    void SetupSystemProperties();
+    void SetupLog();
+    void SetupScheduler();
+    void SetupFileManager();
+    void SetupBlackboard();
+    void SetupImageDatabase();
+    void SetEvidenceDB(WombatVariable* wombatVariable);
+    Q_INVOKABLE void OpenEvidence(WombatVariable* wombatVariable);
+    Q_INVOKABLE void RefreshTreeViews(WombatVariable* wombatVariable);
+    Q_INVOKABLE void PopulateCase(WombatVariable* wombatVariable);
+    Q_INVOKABLE void ShowFile(WombatVariable* wombatVariable);
+    Q_INVOKABLE void ExportFiles(WombatVariable* wombatVariable);
+    void SetupSystemBlackboard();
+    void GetImageTree(WombatVariable* wombatvariable, int isAddEvidence);
+    QString GetFileContents(int fileID);
+    QString GetVolumeFilePath(WombatVariable* wombatVariable, int volID);
+    QStringList GetVolumeContents(WombatVariable* wombatVariable);
+    void ExportFile(std::string tmppath, int objectID);
+    void TaskMap(TskSchedulerQueue::task_struct* &task);
+
+private:
+    //WombatVariable wombatvariable;
+    WombatVariable* wombatvariable;
+    WombatDatabase* wombatdata;
+    TskSystemPropertiesImpl* systemproperties;
+    TskFileManagerImpl* fileManager;
+    TskLog* log;
+    TskImgDBSqlite* initialdb;
+    TskImgDBSqlite* imgdb;
+    TskImgDBSqlite* tmpdb;
+    TskSchedulerQueue scheduler;
+    void FinishExport(int processcount);
+
+public slots:
+    void threadFinished(void);
+    void GetLogVariable(WombatVariable* wvariable)
+    {
+        emit SetLogVariable(wvariable);
+    };
+signals:
+    void UpdateStatus(int filecount, int processcount);
+    void ReturnImageNode(QStandardItem* imagenode);
+    void UpdateMessageTable(void);
+    void SetLogVariable(WombatVariable* wvariable);
+    void LoadFileContents(QString filepath);
+    void PopulateProgressWindow(WombatVariable* wvariable);
+};
+
+class TaskRunner : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    TaskRunner(TskSchedulerQueue::task_struct* tmptask, TskPipeline* tmppipe)
+    {
+        task = tmptask;
+        filepipeline = tmppipe;
+    }
+    void run()
+    {
+        try
+        {
+            fprintf(stderr, "task id: %i\n", (int)task->id);
+            filepipeline->run(task->id);
+        }
+        catch(TskException &ex)
+        {
+            fprintf(stderr, "TskException: %s\n", ex.message().c_str());
+        }
+    }
+private:
+    TskSchedulerQueue::task_struct* task;
+    TskPipeline* filepipeline;
+};
+#endif // SLEUTHKIT_H
+
+------------------------
+TskLog.h
+------------------------
+#ifndef TSKLOG_H
+#define TSKLOG_H
+
+#include <time.h>
+#include "../../../../../main/wombatvariable.h"
+#include "Log.h"
+#include "../framework_i.h"
+#include <sqlite3.h>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <QObject>
+
+class TskLog : public QObject, public Log
+{
+    Q_OBJECT
+public:
+
+    TskLog(std::string datapath)
+    {
+        dbpath = datapath;
+        dbpath.append("WombatLog.db");
+    };
+    virtual ~TskLog() 
+    {
+        Log::close();
+    };
+
+    void log(Channel msgType, const std::string &logMsg);
+    void log(Channel msgType, const std::wstring &logMsg);
+public slots:
+    void LogVariable(WombatVariable* wombatVariable)
+    {
+        logvariable = *wombatVariable;
+        //fprintf(stderr, "Log got the variable and it has a caseid of: %d\n", logvariable.caseid);
+    };
+protected:
+    std::string logpath;
+    std::string dbpath;
+    std::ofstream outstream;
+    int caseid;
+    int imageid;
+    int analysistype;
+    WombatVariable logvariable;
+};
+#endif
+-----------------
+wombatdatabase.h
+-----------------
+    /*
+    int InsertJob(int jobType, int caseID, int evidenceID);
+    int InsertEvidence(QString evidenceName, QString evidenceFilePath, int caseID);
+    int InsertObject(int caseid, int evidenceid, int itemtype, int curid);
+    void InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg);
+    void UpdateJobEnd(int jobid, int filecount, int processcount);
+    QStringList ReturnJobDetails(int jobid);
+    */
+        /*
+    QStringList ReturnCaseActiveEvidenceID(int caseid);
+    int ReturnObjectFileID(int objectid);
+    int ReturnObjectEvidenceID(int objectid);
+    QStringList ReturnCaseActiveEvidence(int caseID);
+    int ReturnJobCaseID(int jobid);
+    int ReturnJobEvidenceID(int jobid);
+    int ReturnObjectID(int caseid, int evidenceid, int fileid);
+    int ReturnEvidenceID(QString evidencename);
+    int ReturnEvidenceDeletedState(int evidenceid);
+    QString ReturnEvidencePath(int evidenceid);
+    void RemoveEvidence(QString evidencename);
+    QStringList ReturnCaseEvidenceIdJobIdType(int caseid);
+    QStringList ReturnMessageTableEntries(int jobid);
+    QStringList ReturnEvidenceData(int evidenceid);
+    */
+-------------------
+wombatdatabase.cpp
+-------------------
+
+// not used will eventually be deleted.
+/*
+int WombatDatabase::ReturnObjectFileID(int objectid)
+{
+    int fileid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT fileid FROM objects WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, objectid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                fileid = sqlite3_column_int(casestatement, 0);
+            }
+            else
+                emit DisplayError("1.18", "RETURN OBJECT'S FILEID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.18", "RETURN OBJECT'S FILEID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.18", "RETURN OBJECT'S FILEID ", sqlite3_errmsg(wombatdb));
+
+    return fileid;
+}
+
+int WombatDatabase::ReturnObjectEvidenceID(int objectid)
+{
+    int evidenceid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT evidenceid FROM objects WHERE objectid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, objectid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+                evidenceid = sqlite3_column_int(casestatement, 0);
+            else
+                emit DisplayError("1.20", "RETURN OBJECT EVIDENCEID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.20", "RETURN OBJECT EVIDENCEID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.20", "RETURN OBJECT EVIDENCEID ", sqlite3_errmsg(wombatdb));
+
+    return evidenceid;
+}
+
+int WombatDatabase::ReturnObjectID(int caseid, int evidenceid, int fileid)
+{
+    int objectid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT objectid FROM objects WHERE caseid = ? AND evidenceid = ? AND fileid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, fileid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+                objectid = sqlite3_column_int(casestatement, 0);
+            else
+                emit DisplayError("1.19", "RETURN OBJECT ID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.19", "RETURN OBJECT ID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.19", "RETURN OBJECT ID ", sqlite3_errmsg(wombatdb));
+
+    return objectid;
+}
+
+int WombatDatabase::InsertJob(int jobType, int caseID, int evidenceID)
+{
+    int jobid = 0;
+
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO job (type, caseid, evidenceid, start) VALUES(?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, jobType) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, caseID) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, evidenceID) == SQLITE_OK && sqlite3_bind_text(casestatement, 4, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                jobid = sqlite3_last_insert_rowid(wombatdb);
+            }
+            else
+                emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.4", "INSERT JOB ", sqlite3_errmsg(wombatdb));
+    
+    return jobid;
+}
+
+int WombatDatabase::InsertEvidence(QString evidenceName, QString evidenceFilePath, int caseID)
+{
+    int evidenceid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO evidence (fullpath, name, caseid, creation, deleted) VALUES(?, ?, ?, ?, 0);", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_text(casestatement, 1, evidenceFilePath.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(casestatement, 2, evidenceName.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, caseID) == SQLITE_OK && sqlite3_bind_text(casestatement, 4, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                // it was successful
+                evidenceid = sqlite3_last_insert_rowid(wombatdb);
+            }
+            else
+                emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.7", "INSERT EVIDENCE INTO CASE", sqlite3_errmsg(wombatdb));
+
+    return evidenceid;
+}
+
+int WombatDatabase::InsertObject(int caseid, int evidenceid, int itemtype, int curid)
+{
+    int objectid = 0;
+    std::string tmpquery = "INSERT INTO objects (caseid, evidenceid, ";
+    if(itemtype == 0) // item is file
+        tmpquery += "fileid";
+    else if(itemtype == 1) // item is partition
+        tmpquery += "partid";
+    else if(itemtype == 2) // item is a volume
+        tmpquery += "volid";
+    else if(itemtype == 3) // item is an image
+        tmpquery += "imgid";
+    tmpquery += ") VALUES(?, ?, ?);";
+    if(sqlite3_prepare_v2(wombatdb, tmpquery.c_str(), -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, curid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                // it was successful
+                objectid = sqlite3_last_insert_rowid(wombatdb);
+            }
+            else
+               DisplayError("1.17", "INSERT OBJECT INTO CASE ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            DisplayError("1.17", "INSERT OBJECT INTO CASE ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        DisplayError("1.17", "INSERT OBJECT INTO CASE ", sqlite3_errmsg(wombatdb));
+
+    return objectid;
+}
+
+QStringList WombatDatabase::ReturnCaseActiveEvidenceID(int caseID)
+{
+    QStringList tmpList;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT evidenceid,fullpath,name FROM evidence WHERE caseid = ? AND deleted = 0 ORDER BY evidenceid;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, caseID) == SQLITE_OK)
+        {
+            while(sqlite3_step(casestatement) == SQLITE_ROW)
+            {
+                tmpList << QString::number(sqlite3_column_int(casestatement, 0)) << (const char*)sqlite3_column_text(casestatement, 1) << (const char*)sqlite3_column_text(casestatement, 2);
+            }
+        }
+        else
+        {
+            emit DisplayError("1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
+        }
+    }
+    else
+        emit DisplayError("1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
+
+    return tmpList;
+}
+
+QStringList WombatDatabase::ReturnCaseActiveEvidence(int caseID)
+{
+    QStringList tmpList;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT fullpath FROM evidence WHERE caseid = ? AND deleted = 0 ORDER BY evidenceid;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, caseID) == SQLITE_OK)
+        {
+            while(sqlite3_step(casestatement) == SQLITE_ROW)
+            {
+                tmpList << (const char*)sqlite3_column_text(casestatement, 0);
+            }
+        }
+        else
+        {
+            emit DisplayError("1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
+        }
+    }
+    else
+        emit DisplayError("1.8", "RETURN CASE EVIDENCE", sqlite3_errmsg(wombatdb));
+
+    return tmpList;
+}
+
+QStringList WombatDatabase::ReturnCaseEvidenceIdJobIdType(int caseid)
+{
+    QStringList tmplist;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT jobid,type,evidenceid FROM job WHERE caseid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, caseid) == SQLITE_OK)
+        {
+            while(sqlite3_step(casestatement) == SQLITE_ROW)
+            {
+                tmplist << QString::number(sqlite3_column_int(casestatement, 0)) << QString::number(sqlite3_column_int(casestatement, 1)) << QString::number(sqlite3_column_int(casestatement, 2));
+            }
+        }
+        else
+            emit DisplayError("1.15", "RETURN CASE EVIDENCE ADD JOB ID/TYPE ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.15", "RETURN CASE EVIDENCE ADD JOB ID/TYPE ", sqlite3_errmsg(wombatdb));
+
+    return tmplist;
+}
+
+QStringList WombatDatabase::ReturnEvidenceData(int evidenceid)
+{
+    QStringList tmplist;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT fullpath, name FROM evidence WHERE evidenceid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, evidenceid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                tmplist << QString((const char*)sqlite3_column_text(casestatement, 0));
+                tmplist << QString((const char*)sqlite3_column_text(casestatement, 1));
+            }
+            else
+                emit DisplayError("1.21", "RETURN EVIDENCE DATA ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.21", "RETURN EVIDENCE DATA ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.21", "RETURN EVIDENCE DATA ", sqlite3_errmsg(wombatdb));
+
+    return tmplist;
+}
+
+QStringList WombatDatabase::ReturnMessageTableEntries(int jobid)
+{
+    QStringList tmpstringlist;
+    QString tmptype;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT msgtype, msg FROM msglog WHERE jobid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, jobid) == SQLITE_OK)
+        {
+            while(sqlite3_step(casestatement) == SQLITE_ROW)
+            {
+                if(sqlite3_column_int(casestatement, 0) == 0)
+                    tmptype = "[ERROR]";
+                else if(sqlite3_column_int(casestatement, 0) == 1)
+                    tmptype = "[WARN]";
+                else
+                    tmptype = "[INFO]";
+                tmpstringlist << tmptype << QString((const char*)sqlite3_column_text(casestatement, 1));
+            }
+        }
+        else
+            emit DisplayError("1.9", "RETURN MSGTABLE ENTIRES ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.9", "RETURN MSGTABLE ENTRIES ", sqlite3_errmsg(wombatdb));
+
+    return tmpstringlist;
+}
+
+void WombatDatabase::InsertMsg(int caseid, int evidenceid, int jobid, int msgtype, const char* msg)
+{
+    if(sqlite3_prepare_v2(wombatdb, "INSERT INTO msglog (caseid, evidenceid, jobid, msgtype, msg, datetime) VALUES(?, ?, ?, ?, ?, ?);", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, caseid) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, evidenceid) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, jobid) == SQLITE_OK && sqlite3_bind_int(casestatement, 4, msgtype) == SQLITE_OK && sqlite3_bind_text(casestatement, 5, msg, -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_text(casestatement, 6, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                // do nothing, it was successful
+            }
+            else
+                emit DisplayError("1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.10", "INSERT MSG ", sqlite3_errmsg(wombatdb));
+}
+
+QStringList WombatDatabase::ReturnJobDetails(int jobid)
+{
+    QStringList tmplist;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT end, filecount, processcount, state FROM job WHERE jobid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, jobid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                tmplist << QString((const char*)sqlite3_column_text(casestatement, 0)) << QString::number(sqlite3_column_int(casestatement, 1)) << QString::number(sqlite3_column_int(casestatement, 2));
+                if(sqlite3_column_int(casestatement, 3) == 1)
+                    tmplist << "Processing Finished";
+                else
+                    tmplist << "Processing Finished with Errors";
+            }
+            else
+                emit DisplayError("1.22", "RETURN JOB DETAILS ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.22", "RETURN JOB DETAILS ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.22", "RETURN JOB DETAILS ", sqlite3_errmsg(wombatdb));
+
+    return tmplist;
+}
+
+void WombatDatabase::UpdateJobEnd(int jobid, int filecount, int processcount)
+{
+    if(sqlite3_prepare_v2(wombatdb, "UPDATE job SET end = ?, filecount = ?, processcount = ?, state = 1 WHERE jobid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_text(casestatement, 1, GetTime().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK && sqlite3_bind_int(casestatement, 2, filecount) == SQLITE_OK && sqlite3_bind_int(casestatement, 3, processcount) == SQLITE_OK && sqlite3_bind_int(casestatement, 4, jobid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                // do nothing, it was successful
+            }
+            else
+            {
+                emit DisplayError("1.16", "UPDATE FINISHED JOB ", sqlite3_errmsg(wombatdb));
+            }
+        }
+        else
+            emit DisplayError("1.16", "UPDATE FINISHED JOB ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.16", "UPDATE FINISHED JOB ", sqlite3_errmsg(wombatdb));
+}
+
+int WombatDatabase::ReturnJobCaseID(int jobid)
+{
+    int caseid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT caseid FROM job WHERE jobid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, jobid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                caseid = sqlite3_column_int(casestatement, 0);
+            }
+            else
+                emit DisplayError("1.23", "RETURN JOB CASE ID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.23", "RETURN JOB CASE ID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.23", "RETURN JOB CASE ID ", sqlite3_errmsg(wombatdb));
+
+    return caseid;
+}
+
+int WombatDatabase::ReturnJobEvidenceID(int jobid)
+{
+    int evidenceid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT evidenceid FROM job WHERE jobid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, jobid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                evidenceid = sqlite3_column_int(casestatement, 0);
+            }
+            else
+                emit DisplayError("1.24", "RETURN JOB EVIDENCE ID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.24", "RETURN JOB EVIDENCE ID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.24", "RETURN JOB EVIDENCE ID ", sqlite3_errmsg(wombatdb));
+
+    return evidenceid;
+}
+
+void WombatDatabase::RemoveEvidence(QString evidencename)
+{
+    if(sqlite3_prepare_v2(wombatdb, "UPDATE evidence SET deleted = 1 WHERE fullpath = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_text(casestatement, 1, evidencename.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                // do nothing, successful
+            }
+            else
+                emit DisplayError("1.25", "REMOVE EVIDENCE ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.25", "REMOVE EVIDENCE ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.25", "REMOVE EVIDENCE ", sqlite3_errmsg(wombatdb));
+}
+
+int WombatDatabase::ReturnEvidenceID(QString evidencename)
+{
+    int evidenceid = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT evidenceid FROM evidence WHERE fullpath = ? and deleted = 0;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_text(casestatement, 1, evidencename.toStdString().c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                evidenceid = sqlite3_column_int(casestatement, 0);
+            }
+            else
+                emit DisplayError("1.26", "RETURN EVIDENCE ID FROM NAME ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.26", "RETURN EVIDENCE ID FROM NAME ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.26", "RETURN EVIDENCE ID FROM NAME ", sqlite3_errmsg(wombatdb));
+
+    return evidenceid;
+}
+
+int WombatDatabase::ReturnEvidenceDeletedState(int evidenceid)
+{
+    int isdeleted = 0;
+    if(sqlite3_prepare_v2(wombatdb, "SELECT deleted FROM evidence WHERE evidenceid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, evidenceid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                isdeleted = sqlite3_column_int(casestatement, 0);
+            }
+            else
+                emit DisplayError("1.28", "RETURN EVIDENCE DELETED STATE FROM ID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.28", "RETURN EVIDENCE DELETED STATE FROM ID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.28", "RETURN EVIDENCE DELETED STATE FROM ID ", sqlite3_errmsg(wombatdb));
+
+    return isdeleted;
+}
+
+QString WombatDatabase::ReturnEvidencePath(int evidenceid)
+{
+    QString epath = "";
+    if(sqlite3_prepare_v2(wombatdb, "SELECT fullpath FROM evidence WHERE evidenceid = ?;", -1, &casestatement, NULL) == SQLITE_OK)
+    {
+        if(sqlite3_bind_int(casestatement, 1, evidenceid) == SQLITE_OK)
+        {
+            int ret = sqlite3_step(casestatement);
+            if(ret == SQLITE_ROW || ret == SQLITE_DONE)
+            {
+                epath = QString((const char*)sqlite3_column_text(casestatement, 0));
+            }
+            else
+                emit DisplayError("1.27", "RETURN EVIDENCE PATH FROM ID ", sqlite3_errmsg(wombatdb));
+        }
+        else
+            emit DisplayError("1.27", "RETURN EVIDENCE PATH FROM ID ", sqlite3_errmsg(wombatdb));
+    }
+    else
+        emit DisplayError("1.27", "RETURN EVIDENCE PATH FROM ID ", sqlite3_errmsg(wombatdb));
+
+    return epath;
+}*/
+---------------------
+wombatframework.cpp
+---------------------
+// OLD STUFF THAT IS USEFULL INFO FOR HOW TO GET THINGS, BUT NOT USED IN THIS CODE RIGHT NOW
+    /*
+    int retval;
+    //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");*/
+    /*
+    QString tmpstr = "";
+    char* bootbuffer = NULL;
+    wombatptr->rawbyteintvector.clear();
+    bootbuffer = new char[wombatptr->evidenceobject.imageinfo->sector_size];
+    retval = tsk_img_read(wombatptr->evidenceobject.imageinfo, 0, bootbuffer, wombatptr->evidenceobject.imageinfo->sector_size);
+    if(retval > 0)
+    {
+        wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
+        for(int i=0; i < retval; i++)
+        {
+            wombatptr->rawbyteintvector[i] = bootbuffer[i];
+        }
+        delete[] bootbuffer;
+        // delete bootbuffer;
+        //qDebug() << "Byte to Hex: " << Translate::ByteToHex(wombatptr->rawbyteintvector[510]);
+        //qDebug() << "Byte to Int: " << wombatptr->rawbyteintvector[510];
+        vector<uchar> subchar;
+        subchar.push_back(wombatptr->rawbyteintvector[510]);
+        subchar.push_back(wombatptr->rawbyteintvector[511]);
+        Translate::ByteToHex(tmpstr, subchar);
+        if(QString::compare("55aa", tmpstr) == 0) // its a boot sector
+        {
+                // now to determine if its got a partition table
+        }
+        //Translate::ByteToBinary(tmpstr, subchar);
+        //qDebug() << "Byte to Bin: " << tmpstr;
+    }
+    */
+// BELOW FUNCTION CURRENTLY NOT USED
+void WombatFramework::BuildEvidenceModel()
+{
+    // COME BACK TO QTCONCURRENT AS I GET FARTHER ALONG AND RESEARCH MORE
+    /*
+    QVector<ItemObject> itemvector;
+    for(int i = 0; i < wombatptr->evidenceobjectvector.count(); i++)
+    {
+        itemvector.append(wombatptr->evidenceobjectvector[i]);
+    }
+    QFutureWatcher<void> watcher;
+    watcher.setFuture(QtConcurrent::map(itemvector, &WombatFramework::OpenEvidenceImages));
+    //watcher.setFuture(QtConcurrent::map(wombatptr->evidenceobjectvector, WombatFramework::OpenEvidenceImages));
+    watcher.waitForFinished();
+    */
+    OpenEvidenceImages(); // PROBABLY PUT THIS IN A MULTI-THREAD ENVIRONMENT.
+    for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++) // for each evidence image info file.
+    {
+        if(wombatptr->evidenceobjectvector[i].imageinfo == NULL)
+            fprintf(stderr, "Image didn't open. add to log file as error.\n");
+        else
+            fprintf(stderr, "Image %s opened. add to log file as info.\n", wombatptr->evidenceobjectvector[i].fullpathvector[0].c_str());
+    }
+    // NEED TO LAUNCH THIS IN A NEW THREAD TO KEEP GUI RESPONSIVE
+    // NEED TO OPEN THE IMAGE - img_open.c [tsk_img_open()]
+    // NEED TO GET THE METADATA FOR THE IMAGE/VOLUMES/PARTITIONS/FILES SO I CAN POPULATE THE DIRECTORY TREE INFORMATION
 
 
+    // NEED TO ADD THE EVIDENCE ITEM TO THE DATABASE
+    // POPULATE THE WOMBATVARPTR FOR THE EVIDENCEOBJECT VECTOR
+    // NEED TO CREATE THE EVIDENCE TSK DATABASE (EXTRACT EVIDENCE ACCORDING TO MODULES)
+    // NEED TO BUILD DIRMODEL AS I GO AND POPULATE DIRTREEVIEW AS I GO WITH EACH FILE
+    // FOR NOW I WON'T BUILD MODULES, I'LL JUST DESIGN A MULTI-THREADED APPROACH FOR IT AND ABSTRACT TO PLUGGABLE MODULES LATER
+
+    /*
+    QFutureWatcher<void> watcher;
+    std::vector<TskSchedulerQueue::task_struct* > tmpvector;
+    watcher.setFuture(QtConcurrent::map(&tmpvector, &SleuthKitPlugin::TaskMap));
+    //watcher.setFuture(QtConcurrent::map(&((std::vector<TskSchedulerQueue::task_struct*>)scheduler.mapvector), &SleuthKitPlugin::TaskMap));
+    watcher.waitForFinished();
+    */
+    // QT CONCURRENT TEST
+}
+------------------------------
+wombatfunctions.h
+------------------------------
+
+//template <typename Iterator>
+//BytesToBinary(Iterator start, Iterator end);
+/*
+template<typename T>
+void BytesToBinary(T start, T end)
+{
+    for(T it = start; it != end; ++it)
+    {
+        //qDebug() << "Byte to Hex: " << Translate::ByteToHex(it);
+        cout << it;
+    }
+};*/
+//QString ByteArrayToHex(QByteArray ba);
+//QString ByteArrayToHexDisplay(QByteArray ba);
+//QString ByteArrayToShortDisplay(QByteArray ba);
+//QString ByteArrayToString(QByteArray ba, int base);
+//QString SingleByteToString(QByteArray ba, int base);
+//int CheckBitSet(unsigned char c, int n);
+------------------------
+wombatfunctions.cpp
+------------------------
+
+/*
+BytesToBinary(Iterator start, Iterator end)
+{
+    for(Iterator it = start; it != end; ++it)
+    {
+        qDebug() << "Byte to Hex: " << Translate::ByteToHex(it);
+    }
+}
+*/
+/*
+QString ByteArrayToShortDisplay(QByteArray ba)
+{
+    short intvalue = 0;
+    memcpy(&intvalue, &ba.begin()[0], sizeof(short));
+    QString tmpstring = "";
+    return tmpstring.setNum(intvalue);
+}
+
+QString SingleByteToString(QByteArray ba, int base)
+{
+    short intvalue = 0;
+    memcpy(&intvalue, &ba.begin()[0], sizeof(short));
+    QString tmpstring = "";
+    tmpstring.setNum(intvalue, base);
+    qDebug() << "Temp Value: " << tmpstring;
+    if(base == 2 && tmpstring.size() < 8)
+    {
+    	int zerocount = 8 - tmpstring.size();
+	tmpstring.prepend(QString::fromStdString(std::string(zerocount, '0')));
+	return tmpstring;
+    }
+    else
+    	return tmpstring;
+}
+// NEED TO FIX THE BYTE ARRAY TO STRING TO ACCOUNT FOR THE LENGTH OF THE BYTE ARRAY...
+QString ByteArrayToString(QByteArray ba, int base)
+{
+    int intvalue = 0;
+    memcpy(&intvalue, &ba.begin()[0], sizeof(int));
+    QString tmpstring = "";
+    tmpstring.setNum(intvalue, base);
+    if(base == 2 && tmpstring.size() < 8)
+    {
+    	int zerocount = 8 - tmpstring.size();
+	tmpstring.prepend(QString::fromStdString(std::string(zerocount, '0')));
+	return tmpstring;
+    }
+    else
+    	return tmpstring;
+}
+
+QString ByteArrayToHex(QByteArray ba)
+{
+    QString tmpstring = QString::fromUtf8(ba.toHex());
+    QString outstring = "";
+    for(int i=0; i < tmpstring.size() / 2; ++i)
+    {
+        outstring += tmpstring.at(2*i);
+        outstring += tmpstring.at(2*i+1);
+    }
+
+    return outstring;
+}
+
+QString ByteArrayToHexDisplay(QByteArray ba)
+{
+    QString tmpstring = QString::fromUtf8(ba.toHex());
+    QString outstring = "";
+    for(int i=0; i < tmpstring.size()/2; ++i)
+    {
+        outstring += tmpstring.at(2*i);
+        outstring += tmpstring.at(2*i+1);
+        if(i < tmpstring.size()/2 - 1)
+            outstring += " ";
+    }
+
+    return outstring;
+}
+
+
+// COMPARE THE STRING VALUE TO DETERMINE IF ITS SET TO 1 OR NOT.
+int CheckBitSet(unsigned char c, int n)
+{
+    static unsigned char mask[] = {1, 2, 4, 8, 16, 32, 64, 128};
+    //static unsigned char mask[] = {128, 64, 32, 16, 8, 4, 2, 1};
+    return ((c & mask[n]) != 0);
+}*/
+--------------------------
+
+--------------------------

@@ -25,11 +25,9 @@ public:
 
     void GetBootCode(int idx);
     int DetermineVectorIndex(void);
-    //void OpenParentImage(int imgid);
 
 private:
     WombatVariable* wombatptr;
-    //TskObject* tskptr;
 };
 
 #endif // WOMBATFRAMEWORK_H

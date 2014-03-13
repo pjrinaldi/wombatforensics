@@ -94,7 +94,6 @@ struct EvidenceObject
         size = 0;
         sectsize = 0;
         namelist.clear();
-        //dirpath = "";
         parentid = NULL;
         fullpathvector.clear();
         imageinfo = NULL;
@@ -128,8 +127,6 @@ struct FileExportData
     std::string name;
     std::string fullpath;
     EvidenceObject evidenceobject;
-    //std::string evidencedbname;
-    //std::string evidencepath;
     int exportcount;
 };
 
