@@ -1,0 +1,264 @@
+wombatforensics class
+----------------------
+connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
+connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
+connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
+connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(LoadFileContents(QString)), Qt::QueuedConnection);
+connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable*)), this, SLOT(PopulateProgressWindow(WombatVariable*)), Qt::QueuedConnection);
+emit LogVariable(wombatvarptr);
+/*
+    wombatvarptr->visibleviewer = ReturnVisibleViewerID();
+    // NEED TO DETERMINE WHICH VIEWER IS VISIBLE AND THEN LOAD THE RESPECITIVE DATA ACCORDINGLY.
+    // QString imagename = wombatvarptr->evidencepath.split("/").last();
+    QString tmptext = "";
+    QString sigtext = "";
+    tmptext = index.sibling(index.row(), 1).data().toString();
+    if(tmptext != "")
+    {
+        wombatvarptr->evidenceobject.id = wombatdatabase->ReturnObjectEvidenceID(tmptext.toInt());
+        QStringList currentevidencelist = wombatdatabase->ReturnEvidenceData(wombatvarptr->evidenceobject.id);
+        wombatvarptr->evidencepath = currentevidencelist[0];
+        wombatvarptr->evidenceobject.dbname = currentevidencelist[1];
+        wombatvarptr->fileid = wombatdatabase->ReturnObjectFileID(tmptext.toInt());
+        sigtext = index.sibling(index.row(), 4).data().toString(); // signature value which i need to compare to the xml of known values
+        wombatvarptr->omnivalue = DetermineOmniView(sigtext);
+        if(wombatvarptr->omnivalue == 0)
+        {
+            //ui->fileViewTabWidget->setTabEnabled(2, false); // where i disable the omni button 
+        }
+        else
+        {
+            ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
+            //ui->fileViewTabWidget->setTabEnabled(2, true); // where i enable the omni button*/
+            /*if(omnivalue == 1)
+                ui->viewerstack->setCurrentIndex(2);
+            else if(omnivalue == 2)
+                ui->viewerstack->setCurrentIndex(3);
+            else if(omnivalue == 3)
+                ui->viewerstack->setCurrentIndex(4);
+                */
+/*        }
+    }
+    else
+    {
+        tmptext = index.sibling(index.row(), 0).data().toString();
+        QStringList evidenceobject.idlist = wombatdatabase->ReturnCaseActiveEvidenceID(wombatvarptr->caseobject.id);
+        QStringList volumedesclist = isleuthkit->GetVolumeContents(wombatvarptr);
+        for(int i=0; i < evidenceobject.idlist.count() / 3; i++)
+        {
+            if(tmptext.compare(evidenceobject.idlist[3*i+1].split("/").last()) == 0)
+            {
+                wombatvarptr->evidenceobject.id = evidenceobject.idlist[3*i].toInt();
+                wombatvarptr->evidencepath = evidenceobject.idlist[3*i+1];
+                wombatvarptr->evidenceobject.dbname = evidenceobject.idlist[3*i+2];
+            }
+        }
+        // need to do other tmptext.compare's to see whether it's volume or fs...
+        if(tmptext.compare(wombatvarptr->evidencepath.split("/").last()) == 0)
+        {
+            wombatvarptr->fileid = -1;
+        }
+        else // try one parent and see if it is a volume...
+        {
+            QString parenttext = index.parent().sibling(index.row(), 0).data().toString();
+            for(int i=0; i < evidenceobject.idlist.count() / 3; i++)
+            {
+                if(parenttext.compare(evidenceobject.idlist[3*i+1].split("/").last()) == 0) // volume
+                {
+                    wombatvarptr->evidenceobject.id = evidenceobject.idlist[3*i].toInt();
+                    wombatvarptr->evidencepath = evidenceobject.idlist[3*i+1];
+                    wombatvarptr->evidenceobject.dbname = evidenceobject.idlist[3*i+2];
+                }
+            }
+            fprintf(stderr, "evipath: %s\n", wombatvarptr->evidencepath.toStdString().c_str());
+            bool isvolume = false;
+            for(int i=0; i < volumedesclist.count() / 2; i++)
+            {
+                if(tmptext.compare(volumedesclist[i]) == 0)
+                {
+                    isvolume = true;
+                    wombatvarptr->volid = volumedesclist[2*i+1].toInt();
+                }
+            }
+            if(isvolume == true)
+            {
+                wombatvarptr->fileid = -2;
+            }
+            else // try a file system fileid = -3
+            {
+            }
+        }
+    }
+    ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvarptr);
+    threadpool->start(tmprun);
+    */
+void WombatForensics::RemEvidence()
+{
+    /*
+    wombatprogresswindow->ClearTableWidget();
+    wombatvarptr->jobtype = 2; // remove evidence
+    QStringList evidenceList;
+    evidenceList.clear();
+    // populate case list here
+    //evidenceList = wombatdatabase->ReturnCaseActiveEvidence(wombatvarptr->caseobject.id);
+    bool ok;
+    QString item = QInputDialog::getItem(this, tr("Remove Existing Evidence"), tr("Select Evidence to Remove: "), evidenceList, 0, false, &ok);
+    if(ok && !item.isEmpty()) // open selected case
+    {
+        //wombatvarptr->evidenceobject.id = wombatdatabase->ReturnEvidenceID(item);
+        //wombatvarptr->jobid = wombatdatabase->InsertJob(wombatvarptr->jobtype, wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id);
+        emit LogVariable(wombatvarptr);
+        QString tmpstring = item.split("/").last() + " - " + QString::fromStdString(GetTime());
+        QStringList tmplist;
+        tmplist << tmpstring << QString::number(wombatvarptr->jobid);
+        wombatprogresswindow->UpdateAnalysisTree(2, new QTreeWidgetItem(tmplist));
+        wombatprogresswindow->UpdateFilesFound("");
+        wombatprogresswindow->UpdateFilesProcessed("");
+        wombatprogresswindow->UpdateAnalysisState("Removing Evidence");
+        //LOGINFO("Removing Evidence Started");
+        //wombatdatabase->InsertMsg(wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id, wombatvarptr->jobid, 2, "Removing Evidence Started");
+        UpdateMessageTable();
+        //wombatdatabase->RemoveEvidence(item);
+        wombatprogresswindow->UpdateProgressBar(25);
+        //QString tmppath = wombatvarptr->evidenceobject.dirpath + item.split("/").last() + ".db";
+        //if(QFile::remove(tmppath))
+        //{
+        //}
+        //else
+            //emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
+        wombatprogresswindow->UpdateProgressBar(50);
+        UpdateCaseData();
+        wombatprogresswindow->UpdateProgressBar(75);
+        //LOGINFO("Removing Evidence Finished");
+        //wombatdatabase->InsertMsg(wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id, wombatvarptr->jobid, 2, "Removing Evidence Finished");
+        //wombatdatabase->UpdateJobEnd(wombatvarptr->jobid, 0, 0);
+        UpdateMessageTable();
+        wombatprogresswindow->UpdateAnalysisState("Removing Evidence Finished");
+        wombatprogresswindow->UpdateProgressBar(100);
+        UpdateMessageTable();
+    }*/
+}
+interfaces.h
+-------------
+#ifndef INTERFACES_H
+#define INTERFACES_H
+
+#include <QtPlugin>
+#include <QtCore>
+#include <QVariant>
+#include <QList>
+#include <QMap>
+//#include "progresswindow.h"
+#include "wombatvariable.h"
+
+class QStringList;
+class QObject;
+class QWidget;
+class QStandardItem;
+
+// might not need.
+template <class T> class VPtr
+{
+public:
+    static T* asPtr(QVariant v)
+    {
+        return  (T *) v.value<void *>();
+    }
+    static QVariant asQVariant(T* ptr)
+    {
+        return qVariantFromValue((void *) ptr);
+    }
+};
+/*
+class PluginInterface
+{
+public:
+    virtual ~PluginInterface() {}
+
+    Q_INVOKABLE virtual PluginMap Initialize(WombatVariable wombatvariable) = 0;
+    Q_INVOKABLE virtual void Run(QString input) = 0;
+    virtual void Finalize() = 0;
+};
+*/
+class ViewerInterface
+{
+public:
+    virtual ~ViewerInterface() {}
+
+    virtual QList<ViewerMap> Initialize() = 0;
+    virtual void Run(QString input) = 0;
+    virtual void Finalize() = 0;
+};
+/*
+class ListInterface
+{
+public:
+    virtual ~ViewerInterface() {}
+
+    virtual QVariantMap Initialize() = 0;
+    virtual void Run(QString input) = 0;
+    virtual void Finalize() = 0;
+};
+*/
+/*
+class BasicToolsInterface
+{
+public:
+    virtual ~BasicToolsInterface() {}
+
+    virtual QWidget* setupTypTab() = 0;
+    virtual QWidget* setupDirTab() = 0;
+    virtual QWidget* setupHexTab() = 0;
+    virtual QWidget* setupTxtTab() = 0;
+    virtual QStringList evidenceToolboxIcons() const = 0;
+    virtual void LoadHexModel(QString tmpFilePath) = 0;
+    virtual void LoadTxtContent(QString asciiText) = 0;
+};
+*/
+class SleuthKitInterface
+{
+public:
+    virtual ~SleuthKitInterface() {}
+
+    virtual void Initialize(WombatVariable wombatVariable) = 0;
+    //virtual void Run(QString input);
+    //virtual void Finalize() {} = 0;
+    virtual void SetupSystemProperties() = 0;
+    virtual void SetupLog() = 0;
+    virtual void OpenEvidence(WombatVariable wombatVariable) = 0;
+    //virtual void SetupSystemProperties(QString settingsPath, QString configFilePath) = 0;
+    //virtual void SetupSystemLog(QString dataPath, QString logFilePath, ProgressWindow* progressWindow, WombatVariable *wombatVariable) = 0;
+    virtual QString SetupImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
+    virtual void OpenImageDatabase(QString imgDBPath, QString evidenceFilePath) = 0;
+    virtual void SetupSystemBlackboard() = 0;
+    //virtual void SetupSystemSchedulerQueue() = 0;
+    //virtual void SetupSystemFileManager() = 0;
+    virtual void SetupScheduler() = 0;
+    virtual void SetupFileManager() = 0;
+    //virtual void OpenEvidence(QString evidencePath, ProgressWindow* progressWindow) = 0;
+    virtual void LogEntry(QString logMsg) = 0;
+    virtual QStandardItem* GetCurrentImageDirectoryTree(QString imageDbPath, QString imageName) = 0;
+    virtual QString GetFileContents(int fileID) = 0;
+    virtual QString GetFileTxtContents(int fileID) = 0;
+
+};
+
+#define ViewerInterface_iid "wombat.ViewerInterface"
+Q_DECLARE_INTERFACE(ViewerInterface, ViewerInterface_iid)
+
+//#define PluginInterface_iid "wombat.PluginInterface"
+//Q_DECLARE_INTERFACE(PluginInterface, PluginInterface_iid)
+
+//#define EvidenceInterface_iid "wombat.EvidenceInterface"
+//Q_DECLARE_INTERFACE(EvidenceInterface, EvidenceInterface_iid)
+
+//#define BasicToolsInterface_iid "wombat.BasicToolsInterface"
+//Q_DECLARE_INTERFACE(BasicToolsInterface, BasicToolsInterface_iid)
+
+#define SleuthKitInterface_iid "wombat.SleuthKitInterface"
+Q_DECLARE_INTERFACE(SleuthKitInterface, SleuthKitInterface_iid)
+
+#endif
+
+

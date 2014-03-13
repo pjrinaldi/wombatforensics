@@ -10,26 +10,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
     wombatprogresswindow = new ProgressWindow(wombatdatabase);
-    //isleuthkit = new SleuthKitPlugin(wombatdatabase);
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
-    //connect(isleuthkit, SIGNAL(UpdateStatus(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
-    //connect(isleuthkit, SIGNAL(UpdateMessageTable()), this, SLOT(UpdateMessageTable()), Qt::QueuedConnection);
-    //connect(isleuthkit, SIGNAL(ReturnImageNode(QStandardItem*)), this, SLOT(GetImageNode(QStandardItem*)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
     wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
-    //wombatvarptr->evidenceobject.id = 0;
-    //wombatvarptr->jobtype = 0;
-    //wombatvarptr->jobid = -1;
-    //qRegisterMetaType<WombatVariable*>("WombatVariable*");
-    //connect(this, SIGNAL(LogVariable(WombatVariable*)), isleuthkit, SLOT(GetLogVariable(WombatVariable*)), Qt::QueuedConnection);
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
-    //connect(isleuthkit, SIGNAL(LoadFileContents(QString)), this, SLOT(LoadFileContents(QString)), Qt::QueuedConnection);
-    //connect(isleuthkit, SIGNAL(PopulateProgressWindow(WombatVariable*)), this, SLOT(PopulateProgressWindow(WombatVariable*)), Qt::QueuedConnection);
     wombatprogresswindow->setModal(false);
-    //emit LogVariable(wombatvarptr);
     InitializeAppStructure();
-    //InitializeSleuthKit();
     InitializeDirModel();
     InitializeWombatFramework();
 }
@@ -91,10 +78,8 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
-    //SetupDirModel();
     SetupHexPage();
     SetupToolbar();
-    
 }
 
 void WombatForensics::InitializeCaseStructure()
@@ -104,9 +89,7 @@ void WombatForensics::InitializeCaseStructure()
     wombatvarptr->caseobject.name = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
     if(ok && !wombatvarptr->caseobject.name.isEmpty())
     {
-        
         wombatdatabase->InsertCase();
-
         QString tmpTitle = "Wombat Forensics - ";
         tmpTitle += wombatvarptr->caseobject.name;
         this->setWindowTitle(tmpTitle); // update application window.
@@ -134,12 +117,6 @@ void WombatForensics::InitializeCaseStructure()
             if(wombatvarptr->curerrmsg.compare("") != 0)
                 DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
-        //wombatvarptr->evidenceobject.dirpath = wombatvarptr->caseobject.dirpath + "evidence/";
-        //mkPath = (new QDir())->mkpath(wombatvarptr->evidenceobject.dirpath);
-        //if(mkPath == false)
-        //{
-        //    DisplayError("2.0", "Case Evidence Folder Creation Failed", "Failed to create case evidence folder.");
-        //}
         if(wombatdatabase->ReturnCaseCount() > 0)
         {
             ui->actionOpen_Case->setEnabled(true);
@@ -187,16 +164,7 @@ void WombatForensics::InitializeOpenCase()
                 DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
         wombatdatabase->GetEvidenceObjects();
-        /*wombatvarptr->evidenceobject.dirpath = wombatvarptr->caseobject.dirpath += "evidence/";
-        mkPath = (new QDir())->mkpath(wombatvarptr->evidenceobject.dirpath);
-        if(mkPath == false)
-        {
-            DisplayError("2.0", "Case Evidence Folder Check Failed", "Case Evidence folder did not exist.");
-        }
-            //ThreadRunner* trun = new ThreadRunner(isleuthkit, "populatecase", wombatvarptr);
-            //threadpool->start(trun);
-        */
-            // NEED TO INITIALIZEEVIDENCEIMAGES() HERE
+        // NEED TO INITIALIZEEVIDENCEIMAGES() HERE
     }
 
 }
@@ -204,15 +172,6 @@ void WombatForensics::InitializeWombatFramework()
 {
     // MIGHT NOT NEED TO INITIALIZE ANYTHING HERE.
 }
-/*
-void WombatForensics::InitializeSleuthKit()
-{*/
-    /*
-    ThreadRunner* initrunner = new ThreadRunner(isleuthkit, "initialize", wombatvarptr);
-    threadpool->start(initrunner);
-    threadpool->waitForDone();
-    */
-/*}*/
 
 void WombatForensics::InitializeDirModel()
 {
@@ -275,43 +234,6 @@ void WombatForensics::AddEvidence()
         ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
-    
-    /*
-    QString evidenceFilePath = QFileDialog::getOpenFileName(this, tr("Select Evidence Item"), tr("./"));
-    if(evidenceFilePath != "")
-    {
-        wombatprogresswindow->show();
-        wombatprogresswindow->ClearTableWidget();
-        wombatvarptr->jobtype = 1; // add evidence
-        // DETERMINE IF THE EVIDENCE NAME EXISTS, IF IT DOES THEN PROMPT USER THAT ITS OPEN ALREADY. IF THEY WANT TO OPEN A SECOND COPY
-        // THEN SET NEWEVIDENCENAME EVIDENCEFILEPATH.SPLIT("/").LAST() + "COPY.DB"
-        QString evidenceName = evidenceFilePath.split("/").last();
-        evidenceName += ".db";
-        wombatvarptr->evidenceobject.id = wombatdatabase->InsertEvidence(evidenceName, evidenceFilePath, wombatvarptr->caseobject.id);
-        // could set curimgobjid = InsertObject(caseobject.id, evidenceobject.id, 3, evidenceobject.id); // set objectid here...
-        // start to build the basic tree here adding the image node...
-        wombatvarptr->evidenceobject.idlist.append(wombatvarptr->evidenceobject.id);
-        wombatvarptr->evidencepath = evidenceFilePath;
-        wombatvarptr->evidencepathlist << wombatvarptr->evidencepath;
-        wombatvarptr->evidenceobject.dbname = evidenceName;
-        wombatvarptr->evidencedbnamelist << wombatvarptr->evidenceobject.dbname;
-        wombatvarptr->jobid = wombatdatabase->InsertJob(wombatvarptr->jobtype, wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id);
-        emit LogVariable(wombatvarptr);
-        QString tmpString = evidenceName;
-        tmpString += " - ";
-        tmpString += QString::fromStdString(GetTime());
-        QStringList tmpList;
-        tmpList << tmpString << QString::number(wombatvarptr->jobid);
-        wombatprogresswindow->UpdateAnalysisTree(0, new QTreeWidgetItem(tmpList));
-        wombatprogresswindow->UpdateFilesFound("0");
-        wombatprogresswindow->UpdateFilesProcessed("0");
-        wombatprogresswindow->UpdateAnalysisState("Adding Evidence to Database");
-        //LOGINFO("Adding Evidence Started");
-        wombatdatabase->InsertMsg(wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id, wombatvarptr->jobid, 2, "Adding Evidence Started");
-        //ThreadRunner* trun = new ThreadRunner(isleuthkit, "openevidence", wombatvarptr);
-        //threadpool->start(trun);
-        */
-    //}
 }
 
 void WombatForensics::UpdateViewer()
@@ -340,21 +262,6 @@ void WombatForensics::LoadHexContents()
         OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id);
         tskobjptr->offset = 0;
         tskobjptr->length = wombatvarptr->evidenceobjectvector[curidx].size;
-        //tskobjptr->length = tskobjptr->readimginfo->size;
-        /*
-        tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
-        tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
-        for(int i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
-        {
-            tskobjptr->imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
-        }
-        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-        if(tskobjptr->readimginfo == NULL)
-            qDebug() << "print image error here";
-        free(tskobjptr->imagepartspath);*/
-        /*hexwidget->openimage();
-        hexwidget->set2BPC();
-        hexwidget->setBaseHex();*/
     }
     else if(wombatvarptr->selectedobject.type == 3) // partition object
     {
@@ -467,55 +374,10 @@ void WombatForensics::OpenParentImage(int imgid)
     if(tskobjptr->readimginfo == NULL)
         qDebug() << "print image error here";
     free(tskobjptr->imagepartspath);
-    //hexwidget->openimage(); // need to add the offset and length to tskobject prior to calling openimage.
-    //hexwidget->set2BPC();
-    //hexwidget->setBaseHex();
 }
 
 void WombatForensics::RemEvidence()
 {
-    wombatprogresswindow->ClearTableWidget();
-    wombatvarptr->jobtype = 2; // remove evidence
-    QStringList evidenceList;
-    evidenceList.clear();
-    // populate case list here
-    //evidenceList = wombatdatabase->ReturnCaseActiveEvidence(wombatvarptr->caseobject.id);
-    bool ok;
-    QString item = QInputDialog::getItem(this, tr("Remove Existing Evidence"), tr("Select Evidence to Remove: "), evidenceList, 0, false, &ok);
-    if(ok && !item.isEmpty()) // open selected case
-    {
-        //wombatvarptr->evidenceobject.id = wombatdatabase->ReturnEvidenceID(item);
-        //wombatvarptr->jobid = wombatdatabase->InsertJob(wombatvarptr->jobtype, wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id);
-        emit LogVariable(wombatvarptr);
-        QString tmpstring = item.split("/").last() + " - " + QString::fromStdString(GetTime());
-        QStringList tmplist;
-        tmplist << tmpstring << QString::number(wombatvarptr->jobid);
-        wombatprogresswindow->UpdateAnalysisTree(2, new QTreeWidgetItem(tmplist));
-        wombatprogresswindow->UpdateFilesFound("");
-        wombatprogresswindow->UpdateFilesProcessed("");
-        wombatprogresswindow->UpdateAnalysisState("Removing Evidence");
-        //LOGINFO("Removing Evidence Started");
-        //wombatdatabase->InsertMsg(wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id, wombatvarptr->jobid, 2, "Removing Evidence Started");
-        UpdateMessageTable();
-        //wombatdatabase->RemoveEvidence(item);
-        wombatprogresswindow->UpdateProgressBar(25);
-        //QString tmppath = wombatvarptr->evidenceobject.dirpath + item.split("/").last() + ".db";
-        //if(QFile::remove(tmppath))
-        //{
-        //}
-        //else
-            //emit DisplayError("2.1", "Evidence DB File was NOT Removed", "");
-        wombatprogresswindow->UpdateProgressBar(50);
-        UpdateCaseData();
-        wombatprogresswindow->UpdateProgressBar(75);
-        //LOGINFO("Removing Evidence Finished");
-        //wombatdatabase->InsertMsg(wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id, wombatvarptr->jobid, 2, "Removing Evidence Finished");
-        //wombatdatabase->UpdateJobEnd(wombatvarptr->jobid, 0, 0);
-        UpdateMessageTable();
-        wombatprogresswindow->UpdateAnalysisState("Removing Evidence Finished");
-        wombatprogresswindow->UpdateProgressBar(100);
-        UpdateMessageTable();
-    }
 }
 
 int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
@@ -626,7 +488,7 @@ int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount
 }
 
 void WombatForensics::ExportEvidence()
-{
+{/*
     int checkcount = 0;
     int listcount = 0;
 
@@ -649,15 +511,13 @@ void WombatForensics::ExportEvidence()
             }
         }
     }
-    //fprintf(stderr, "checked count: %i\n", checkcount);
-    //fprintf(stderr, "listed item count: %i\n", listcount);
     exportdialog = new ExportDialog(this, checkcount, listcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
-    exportdialog->show();
+    exportdialog->show();*/
 }
 
 void WombatForensics::FileExport(FileExportData* exportdata)
-{
+{/*
     QVector<FileExportData> exportevidencelist;
     if(exportdata->filestatus == FileExportData::selected)
     {
@@ -678,8 +538,6 @@ void WombatForensics::FileExport(FileExportData* exportdata)
         {
             exportdata->fullpath = exportdata->exportpath + "/" + exportdata->name; // export path without original path
         }
-        //fprintf(stderr, "export selected full path: %s\n", exportdata.fullpath.c_str());
-
         exportevidencelist.push_back(*exportdata);
     }
     else if(exportdata->filestatus == FileExportData::checked)
@@ -741,19 +599,7 @@ void WombatForensics::FileExport(FileExportData* exportdata)
     //LOGINFO("File Export Started");
     //wombatdatabase->InsertMsg(wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id, wombatvarptr->jobid, 2, "File Export Started");
     //ThreadRunner* trun = new ThreadRunner(isleuthkit, "exportfiles", wombatvarptr);
-    //threadpool->start(trun);
-}
-
-void WombatForensics::UpdateCaseData()
-{
-    // refresh views here
-    wombatdirmodel->clear();
-    QStringList headerList;
-    headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
-    wombatdirmodel->setHorizontalHeaderLabels(headerList);
-    ui->dirTreeView->setModel(wombatdirmodel);
-    //ThreadRunner* trun = new ThreadRunner(isleuthkit, "refreshtreeviews", wombatvarptr);
-    //threadpool->start(trun);
+    //threadpool->start(trun);*/
 }
 
 void WombatForensics::UpdateProgress(int filecount, int processcount)
@@ -816,20 +662,6 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
     QMessageBox::warning(this, "Error", tmpString, QMessageBox::Ok);
 }
 
-void WombatForensics::GetImageNode(QStandardItem* imagenode)
-{
-    /*
-    setUpdatesEnabled(false);
-    QStandardItem* currentroot = wombatdirmodel->invisibleRootItem();
-    currentroot->appendRow(imagenode);
-    ui->dirTreeView->setModel(wombatdirmodel);
-    //ResizeColumns(wombatdirmodel);
-    UpdateMessageTable();
-    setUpdatesEnabled(true);
-    */
-}
-
-//void WombatForensics::ResizeColumns(QStandardItemModel* currentmodel)
 void WombatForensics::ResizeColumns(void)
 {
     for(int i=0; i < wombatvarptr->dirmodel->columnCount(); i++)
@@ -839,21 +671,6 @@ void WombatForensics::ResizeColumns(void)
         // have to see as i go. for now its good.
         ui->dirTreeView->resizeColumnToContents(i);
     }
-}
-
-void WombatForensics::SetupDirModel(void)
-{
-    /*
-    wombatdirmodel = new QStandardItemModel();
-    QStringList headerList;
-    headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
-    wombatdirmodel->setHorizontalHeaderLabels(headerList);
-    QStandardItem *evidenceNode = wombatdirmodel->invisibleRootItem();
-    ui->dirTreeView->setModel(wombatdirmodel);
-    ResizeColumns(wombatdirmodel);
-    connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
-    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
-    */
 }
 
 void WombatForensics::SetupHexPage(void)
@@ -978,7 +795,6 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
     else if(selaction == ui->actionViewTxt)
     {
         ui->viewerstack->setCurrentIndex(1); // txt
-        //fprintf(stderr, "Text Button Text: %s\n", selaction->text().toStdString().c_str());
     }
     else if(selaction == ui->actionViewOmni) // omni 3,4,5
     {
@@ -1009,7 +825,6 @@ void WombatForensics::UpdateOmniValue()
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
-    //qDebug() << "selected id: " << index.sibling(index.row(), 0).data().toInt();
     wombatdatabase->GetObjectType(); // now i have selectedobject.type.
     UpdateOmniValue();
     UpdateViewer();
@@ -1020,93 +835,6 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     // SELECTING ITEM GETS IT'S ID VALUES AND SET'S RESPECTIVE WOMBATVARPTR->VALUES
     // GET THE RESPECTIVE VISIBLE VIEWER FROM THE VIEWER STACK.
     // LOAD THE DATA INTO THE RESPECTIVE VIEWER.
-
-    /*
-    wombatvarptr->visibleviewer = ReturnVisibleViewerID();
-    // NEED TO DETERMINE WHICH VIEWER IS VISIBLE AND THEN LOAD THE RESPECITIVE DATA ACCORDINGLY.
-    // QString imagename = wombatvarptr->evidencepath.split("/").last();
-    QString tmptext = "";
-    QString sigtext = "";
-    tmptext = index.sibling(index.row(), 1).data().toString();
-    if(tmptext != "")
-    {
-        wombatvarptr->evidenceobject.id = wombatdatabase->ReturnObjectEvidenceID(tmptext.toInt());
-        QStringList currentevidencelist = wombatdatabase->ReturnEvidenceData(wombatvarptr->evidenceobject.id);
-        wombatvarptr->evidencepath = currentevidencelist[0];
-        wombatvarptr->evidenceobject.dbname = currentevidencelist[1];
-        wombatvarptr->fileid = wombatdatabase->ReturnObjectFileID(tmptext.toInt());
-        sigtext = index.sibling(index.row(), 4).data().toString(); // signature value which i need to compare to the xml of known values
-        wombatvarptr->omnivalue = DetermineOmniView(sigtext);
-        if(wombatvarptr->omnivalue == 0)
-        {
-            //ui->fileViewTabWidget->setTabEnabled(2, false); // where i disable the omni button 
-        }
-        else
-        {
-            ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
-            //ui->fileViewTabWidget->setTabEnabled(2, true); // where i enable the omni button*/
-            /*if(omnivalue == 1)
-                ui->viewerstack->setCurrentIndex(2);
-            else if(omnivalue == 2)
-                ui->viewerstack->setCurrentIndex(3);
-            else if(omnivalue == 3)
-                ui->viewerstack->setCurrentIndex(4);
-                */
-/*        }
-    }
-    else
-    {
-        tmptext = index.sibling(index.row(), 0).data().toString();
-        QStringList evidenceobject.idlist = wombatdatabase->ReturnCaseActiveEvidenceID(wombatvarptr->caseobject.id);
-        QStringList volumedesclist = isleuthkit->GetVolumeContents(wombatvarptr);
-        for(int i=0; i < evidenceobject.idlist.count() / 3; i++)
-        {
-            if(tmptext.compare(evidenceobject.idlist[3*i+1].split("/").last()) == 0)
-            {
-                wombatvarptr->evidenceobject.id = evidenceobject.idlist[3*i].toInt();
-                wombatvarptr->evidencepath = evidenceobject.idlist[3*i+1];
-                wombatvarptr->evidenceobject.dbname = evidenceobject.idlist[3*i+2];
-            }
-        }
-        // need to do other tmptext.compare's to see whether it's volume or fs...
-        if(tmptext.compare(wombatvarptr->evidencepath.split("/").last()) == 0)
-        {
-            wombatvarptr->fileid = -1;
-        }
-        else // try one parent and see if it is a volume...
-        {
-            QString parenttext = index.parent().sibling(index.row(), 0).data().toString();
-            for(int i=0; i < evidenceobject.idlist.count() / 3; i++)
-            {
-                if(parenttext.compare(evidenceobject.idlist[3*i+1].split("/").last()) == 0) // volume
-                {
-                    wombatvarptr->evidenceobject.id = evidenceobject.idlist[3*i].toInt();
-                    wombatvarptr->evidencepath = evidenceobject.idlist[3*i+1];
-                    wombatvarptr->evidenceobject.dbname = evidenceobject.idlist[3*i+2];
-                }
-            }
-            fprintf(stderr, "evipath: %s\n", wombatvarptr->evidencepath.toStdString().c_str());
-            bool isvolume = false;
-            for(int i=0; i < volumedesclist.count() / 2; i++)
-            {
-                if(tmptext.compare(volumedesclist[i]) == 0)
-                {
-                    isvolume = true;
-                    wombatvarptr->volid = volumedesclist[2*i+1].toInt();
-                }
-            }
-            if(isvolume == true)
-            {
-                wombatvarptr->fileid = -2;
-            }
-            else // try a file system fileid = -3
-            {
-            }
-        }
-    }
-    ThreadRunner* tmprun = new ThreadRunner(isleuthkit, "showfile", wombatvarptr);
-    threadpool->start(tmprun);
-    */
 }
 
 int WombatForensics::DetermineOmniView(QString currentSignature)
@@ -1214,52 +942,6 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     strvalue.setNum( dvalue );
     tmptext = "Double: " + strvalue;
     selecteddouble->setText(tmptext);
-}
-
-void WombatForensics::LoadFileContents(QString filepath)
-{
-    if(filepath != "")
-    {
-        QFileInfo pathinfo(filepath);
-        if(!pathinfo.isDir())
-        {
-            LoadHexModel(filepath);
-            LoadTxtContent(filepath);
-            LoadOmniContent(filepath); // possibly add a view type here: 1 - web, 2 - pic, 3 - vid
-        }
-        else
-        {
-            //txtwidget->setPlainText("");
-        }
-    }
-    else
-    {
-        //txtwidget->setPlainText("");
-        // load nothing here...
-    }
-}
-
-void WombatForensics::LoadHexModel(QString tmpFilePath)
-{
-    // tsk_img_open() then tsk_img_read() hexwidget->openimage(var1, var2, etc...)
-    //hexwidget->open(tmpFilePath);
-    //hexwidget->openimage(wombatvarptr->evidenceobjectvector[
-    hexwidget->set2BPC();
-    hexwidget->setBaseHex();
-}
-void WombatForensics::LoadTxtContent(QString asciiText)
-{
-    /*
-    QFile tmpFile(asciiText);
-    tmpFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QTextStream stream(&tmpFile);
-    txtwidget->setPlainText(stream.readAll());
-    tmpFile.close();
-    */
-}
-
-void WombatForensics::LoadOmniContent(QString filePath)
-{
 }
 
 void WombatForensics::setOffsetLabel(off_t pos)
