@@ -159,8 +159,9 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     uint8_t walkreturn = 1;
     for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
     {
-        walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE, ;
+        walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE, dirwalktest, NULL);
     }
+    // check out load_named_dir_walk() in fs_dir.c file for some hints on TSK_FS_FILE* and what to do with it.
     // tsk_fs_dir_walk(TSK_FS_INFO* fsinfovector, TSK_INUM_T a_addr, TSK_FS_DIR_WALK_FLAG_ENUM, TSK_FS_DIR_WALK_CB callfunction, void* ptr to data that is passed to the callback
     //
     // tsk_fs_dir_walk the fsinfovector[i] objects to get the tsk_fs_file and tsk_fs_dir info objects and add them to the
