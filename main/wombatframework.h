@@ -25,7 +25,6 @@ public:
 
     void GetBootCode(int idx);
     int DetermineVectorIndex(void);
-    TSK_WALK_RET_ENUM dirwalktest(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 
 private:
     WombatVariable* wombatptr;
