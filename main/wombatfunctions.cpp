@@ -28,5 +28,7 @@ bool FileExists(const std::string& filename)
 TSK_WALK_RET_ENUM dirwalktest(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     qDebug() << "FS File Name: " << tmpfile->name->name;
+    qDebug() << "FS File Type: " << tmpfile->name->type;
+    qDebug() << "FS File Parent: " << tmpfile->name->par_addr;
     return TSK_WALK_CONT;
 }
