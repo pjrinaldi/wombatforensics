@@ -144,7 +144,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
                 TSK_FS_INFO* tmpfsinfo = tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT);
                 if(tmpfsinfo != NULL)
                 {
-                    wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT));
+                    wombatptr->evidenceobject.fsinfovector.push_back(tmpfsinfo);
                 }
                 else
                 {
@@ -156,6 +156,11 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
 
 void WombatFramework::OpenFiles() // open the files and add to file info vector
 {
+    uint8_t walkreturn = 1;
+    for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
+    {
+        walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE, ;
+    }
     // tsk_fs_dir_walk(TSK_FS_INFO* fsinfovector, TSK_INUM_T a_addr, TSK_FS_DIR_WALK_FLAG_ENUM, TSK_FS_DIR_WALK_CB callfunction, void* ptr to data that is passed to the callback
     //
     // tsk_fs_dir_walk the fsinfovector[i] objects to get the tsk_fs_file and tsk_fs_dir info objects and add them to the
