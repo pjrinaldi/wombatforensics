@@ -198,7 +198,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertFileSystemObjects();
 
     wombatframework->OpenFiles();
-    wombatdatabase->InsertFileObjects(); // tsk_fs_dir_walk and recursively loop over all the directories/files
+    //wombatdatabase->InsertFileObjects(); // tsk_fs_dir_walk and recursively loop over all the directories/files
     // starting with the root_inum. need to just qdebug some test data and see what it does...
 
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
