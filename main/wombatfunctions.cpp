@@ -33,6 +33,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     qDebug() << "FS File Type: " << tmpfile->name->type;
     qDebug() << "FS File Parent: " << tmpfile->name->par_addr;
     qDebug() << "Accessed Time: " << tmpfile->meta->atime;
-    tsk_fs_time_to_str(tmpfile->meta->atime, buf);
+    qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
     return TSK_WALK_CONT;
 }
