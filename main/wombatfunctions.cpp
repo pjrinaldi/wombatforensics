@@ -27,8 +27,12 @@ bool FileExists(const std::string& filename)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    char buf[128];
+    // "Unique ID" << "Name" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     qDebug() << "FS File Name: " << tmpfile->name->name;
     qDebug() << "FS File Type: " << tmpfile->name->type;
     qDebug() << "FS File Parent: " << tmpfile->name->par_addr;
+    qDebug() << "Accessed Time: " << tmpfile->meta->atime;
+    tsk_fs_time_to_str(tmpfile->meta->atime, buf);
     return TSK_WALK_CONT;
 }
