@@ -57,6 +57,24 @@ struct FileSystemObject
 
 struct FileObject
 {
+    // "Name" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
+    int id;
+    int type;
+    int objecttype;
+    int nameflags;
+    QString name;
+    int metaaddress;
+    int paraddress;
+    QString shortname;
+    int address;
+    QString atime;
+    QString crtime;
+    QString ctime;
+    QString mtime;
+    int metaflags;
+    int size;
+    int parentid;
+    int parimgid;
     // file and dir data stored here... metaVAR and/or nameVAR if they duplicate.
 };
 
