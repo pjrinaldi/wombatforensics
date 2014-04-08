@@ -112,7 +112,7 @@ struct EvidenceObject
         size = 0;
         sectsize = 0;
         namelist.clear();
-        parentid = NULL;
+        parentid = 0;
         fullpathvector.clear();
         imageinfo = NULL;
         volinfo = NULL;
