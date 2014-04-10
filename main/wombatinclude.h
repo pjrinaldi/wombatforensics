@@ -4,6 +4,7 @@
 #include <bitset>
 #include <cstdio>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <QApplication>
 #include <QActionGroup>

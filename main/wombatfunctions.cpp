@@ -36,26 +36,13 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     qDebug() << "Accessed Time: " << tmpfile->meta->atime;
     qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
-    qDebug() << "MD5 Return Value: " << retval;
-    qDebug() << "MD5 Begin: ";
+    char sbuf[17];
+    int sint = 0;
     for(int i=0; i < 16; i++)
     {
-        fprintf(stderr, "%02x", hashresults.md5_digest[i]);
+        sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
     }
-    qDebug() << "MD5 End: ";
-    //const int charcount = sizeof(hashresults.md5_digest);
-    //QString tmpstring = QString::fromLatin1((const char*)(hashresults.md5_digest), charcount);
+    qDebug() << "MD5 Hash: " << QString(sbuf);
 
-    /*
-    QString tmpstring = "";
-    for(int i=0; i < 16; i++)
-    {
-        tmpstring += hashresults.md5_digest[i];
-    }*/
-    //qDebug() << "MD5 of File: " << tmpstring;
-    //qDebug() << QString((const char*)(hashresults.md5_digest));
-    //QString hashstring(reinterpret_cast<const char*>(hashresults->md5_digest), 16);
-    //qDebug() << "MD5 of File: " << QString::fromLatin1((const char*)(hashresults.md5_digest), 16);
-    //uint8_t retval = tsk_fs_file_hash_calc(TSK_FS_FILE* tmpfile, TSK_FS_HASH_RESULTS* hashresults, TSK_BASE_HASH_ENUM tmpflags);
     return TSK_WALK_CONT;
 }
