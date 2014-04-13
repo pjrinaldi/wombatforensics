@@ -33,7 +33,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     qDebug() << "FS File Name: " << tmpfile->name->name;
     qDebug() << "FS File Type: " << tmpfile->name->type;
     qDebug() << "FS File Parent: " << tmpfile->name->par_addr;
-    qDebug() << "Accessed Time: " << tmpfile->meta->atime;
+    //qDebug() << "Accessed Time: " << tmpfile->meta->atime;
     qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     char sbuf[17];
