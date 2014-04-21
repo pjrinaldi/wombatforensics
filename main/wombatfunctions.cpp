@@ -47,6 +47,14 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     qDebug() << "MD5 Hash: " << QString(sbuf);
 
+    if(fcasedb.isOpen())
+        qDebug() << "case is open";
+    else
+        qDebug() << "case isn't open";
+    QSqlQuery fquery;
+    fquery.exec("select name from data");
+    qDebug() << "number of columns: " << fquery.record().count();
+    qDebug() << "column value: " << fquery.record().value(0).toString();
     /*
      *        wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
         wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE"); // may not need this
