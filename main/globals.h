@@ -4,5 +4,5 @@
 #include "wombatinclude.h"
 
 extern QSqlDatabase fcasedb;
-
+extern QString fdbname;
 #endif

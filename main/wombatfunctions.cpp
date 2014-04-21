@@ -30,11 +30,11 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     char buf[128];
     TSK_FS_HASH_RESULTS hashresults;
     // "Name" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
-    qDebug() << "FS File Name: " << tmpfile->name->name;
-    qDebug() << "FS File Type: " << tmpfile->name->type;
-    qDebug() << "FS File Parent: " << tmpfile->name->par_addr;
+    //qDebug() << "FS File Name: " << tmpfile->name->name;
+    //qDebug() << "FS File Type: " << tmpfile->name->type;
+    //qDebug() << "FS File Parent: " << tmpfile->name->par_addr;
     //qDebug() << "Accessed Time: " << tmpfile->meta->atime;
-    qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
+    //qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     // HERE IS WHERE I NEED TO STORE THE VALUES IN THE EVIDENCEOBJECT.DIRFILEINFOVECTOR
     // possibly, not sure since i'm iterating over the files continuously, i should probably just add straight to the db here.
@@ -45,26 +45,71 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     {
         sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
     }
-    qDebug() << "MD5 Hash: " << QString(sbuf);
+    QString tmpstring = QString(sbuf);
 
-    qDebug() << "fcasedb valid: " << fcasedb.isValid();
-    if(fcasedb.isOpen())
-        qDebug() << "case is open";
+    // GLOBAL FCASEDB WORKS. NOW TO STORE THE VALUE WHERE IT NEEDS TO GO.
+    if(fcasedb.isValid() && fcasedb.isOpen())
+    {
+        QSqlQuery fquery;
+        fquery.prepare("INSERT INTO data(objecttype, type, name, atime, ctime, crtime, mtime, md5, size, address, parentid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        fquery.addBindValue((int)tmpfile->name->type);
+        fquery.addBindValue(tmpfile->name->name);
+        fquery.addBindValue((int)tmpfile->meta->atime);
+        fquery.addBindValue((int)tmpfile->meta->ctime);
+        fquery.addBindValue((int)tmpfile->meta->crtime);
+        fquery.addBindValue((int)tmpfile->meta->mtime);
+        fquery.addBindValue(tmpstring);
+        fquery.addBindValue((int)tmpfile->meta->size);
+        fquery.addBindValue((int)tmpfile->meta->addr);
+        fquery.addBindValue((int)tmpfile->name->par_addr);
+        if(fquery.exec())
+        {
+            while(fquery.next())
+            {
+                qDebug() << "successful insert for file: " << tmpfile->name->name;
+            }
+        }
+        else
+            qDebug() << fcasedb.lastError().text();
+    }
     else
-        qDebug() << "case isn't open";
-    QSqlQuery fquery;
-    fquery.exec("select name from data");
-    qDebug() << "number of columns: " << fquery.record().count();
-    qDebug() << "column value: " << fquery.record().value(0).toString();
-    // NOT WORKING PERFECTLY, probably due to the sqlquery value being wrong...
+        qDebug() << fcasedb.lastError().text();
     /*
-     *        wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE"); // may not need this
-        wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
-    if(wombatptr->casedb.isOpen())
-        qDebug() << "case is open.";
-    else
-        wombatptr->casedb.open();
+     * wombatptr->currentevidenceid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath, parimgid) VALUES(1, ?, ?, ?, ?, ?, NULL);", wombatptr->bindvalues);
+    qDebug() << "item count 2: " << wombatptr->evidenceobject.itemcount;
+    for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
+    {
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+        wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[i]));
+        wombatptr->bindvalues.append(i+1);
+        InsertSql("INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", wombatptr->bindvalues);
+    }
+
+     * void WombatDatabase::InsertSql(QString query, QVariantList invalues)
+     *
+{
+   if(wombatptr->casedb.isOpen())
+   {
+       QSqlQuery casequery;
+       casequery.prepare(query);
+       for(int i=0; i < invalues.count(); i++)
+       {
+           casequery.addBindValue(invalues[i]);
+       }
+       if(casequery.exec())
+       {
+           while(casequery.next())
+           {
+               qDebug() << "successful insert with bind";
+           }
+       }
+       else
+           qDebug() << wombatptr->casedb.lastError().text();
+   }
+   else
+       qDebug() << wombatptr->casedb.lastError().text();
+}
 
      *
      *

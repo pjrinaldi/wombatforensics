@@ -117,6 +117,7 @@ void WombatForensics::InitializeCaseStructure()
             if(wombatvarptr->curerrmsg.compare("") != 0)
                 DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
+        fcasedb = wombatvarptr->casedb;
         if(wombatdatabase->ReturnCaseCount() > 0)
         {
             ui->actionOpen_Case->setEnabled(true);
