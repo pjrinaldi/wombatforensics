@@ -2,6 +2,7 @@
 #define WOMBATFUNCTIONS_H
 
 #include "wombatinclude.h"
+#include "globals.h"
 
 std::string GetTime(void);
 bool FileExists(const std::string& filename);

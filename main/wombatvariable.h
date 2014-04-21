@@ -98,9 +98,9 @@ struct EvidenceObject
     TSK_VS_PART_INFO* partinfo; // may not need.
     std::vector<const TSK_VS_PART_INFO*> partinfovector;
     std::vector<TSK_FS_INFO*> fsinfovector; 
-    TSK_FS_FILE* fileinfo;
-    TSK_FS_DIR* dirinfo;
-    std::vector<void*> dirfileinfovector;
+    TSK_FS_FILE* fileinfo; // may not need
+    TSK_FS_DIR* dirinfo; // may not need
+    std::vector<void*> dirfileinfovector; // may not need.
     QString dbname;
     void Clear()
     {

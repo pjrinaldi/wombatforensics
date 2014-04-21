@@ -9,6 +9,7 @@
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
 #include "exportdialog.h"
+#include "globals.h"
 
 namespace Ui {
 class WombatForensics;

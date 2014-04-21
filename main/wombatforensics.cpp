@@ -163,6 +163,7 @@ void WombatForensics::InitializeOpenCase()
             if(wombatvarptr->curerrmsg.compare("") != 0)
                 DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
+        fcasedb = wombatvarptr->casedb;
         wombatdatabase->GetEvidenceObjects();
         // NEED TO INITIALIZEEVIDENCEIMAGES() HERE
     }
@@ -198,7 +199,8 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertFileSystemObjects();
 
     wombatframework->OpenFiles();
-    //wombatdatabase->InsertFileObjects(); // tsk_fs_dir_walk and recursively loop over all the directories/files
+    //wombatdatabase->InsertFileObjects(); // tsk_fs_dir_walk and recursively loop over all the directories/files this should not be needed.
+    // this should be done for each file in the function defined as the callback...
     // starting with the root_inum. need to just qdebug some test data and see what it does...
 
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
@@ -230,6 +232,7 @@ void WombatForensics::AddEvidence()
         qDebug() << " ptr itemcount: " << wombatvarptr->evidenceobject.itemcount;
         //wombatprogresswindow->show();
         //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
+        // MIGHT WANT THIS FUNCTION AS NOT A NEW THREAD, RATHER MAKE EACH SUB FUNCTION A NEW THREAD..
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
         ResizeColumns();
         wombatframework->CloseInfoStructures();
