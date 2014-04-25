@@ -48,19 +48,32 @@ void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
         fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
         if(tmpfile->name != NULL)
         {
+            /*
             fquery.addBindValue((int)tmpfile->name->type);
             fquery.addBindValue(tmpfile->name->name);
             fquery.addBindValue((int)tmpfile->name->par_addr);
+            */
+            fquery.addBindValue(1);
+            fquery.addBindValue("name");
+            fquery.addBindValue(2);
         }
         fquery.addBindValue(QString(tmppath));
         if(tmpfile->meta != NULL)
         {
+            fquery.addBindValue(3);
+            fquery.addBindValue(3);
+            fquery.addBindValue(3);
+            fquery.addBindValue(3);
+            fquery.addBindValue(3);
+            fquery.addBindValue(3);
+            /*
             fquery.addBindValue((int)tmpfile->meta->atime);
             fquery.addBindValue((int)tmpfile->meta->ctime);
             fquery.addBindValue((int)tmpfile->meta->crtime);
             fquery.addBindValue((int)tmpfile->meta->mtime);
             fquery.addBindValue((int)tmpfile->meta->size);
             fquery.addBindValue((int)tmpfile->meta->addr);
+            */
         }
         fquery.addBindValue(tmpstring);
         if(fquery.exec())
