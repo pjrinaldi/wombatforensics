@@ -27,7 +27,7 @@ bool FileExists(const std::string& filename)
 
 void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-    qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
+    //qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
     /*
     char buf[128];
     TSK_FS_HASH_RESULTS hashresults;
