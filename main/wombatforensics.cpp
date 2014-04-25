@@ -202,7 +202,10 @@ void WombatForensics::InitializeEvidenceStructure()
     // SHOULD PROBABLY LAUNCH OPENFILES IN A NEW THREAD. THE PROBLEM IS, IF I USE DIR WALK, I CAN'T CONTROL THE THREADING
     // OF EACH FILE. I NEED TO MANUALLY PERFORM MY OWN DIR WALK. SO I CAN PROPERLY THREAD THIS OUT
     // MAINTAIN GUI PERFORMANCE AND SPAWN THE THREADS FOR EACH FILE.
-    wombatframework->OpenFiles();
+    //
+    //wombatframework->OpenFiles();
+    QFuture<void> openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
+    //
     // OPEN FILES INCLUDES WALKING FILE TREE->ADDING TO DB->GETTING DB INFO->ADDING TO NODE TREE.
     //wombatdatabase->InsertFileObjects(); // tsk_fs_dir_walk and recursively loop over all the directories/files this should not be needed.
     // this should be done for each file in the function defined as the callback...
