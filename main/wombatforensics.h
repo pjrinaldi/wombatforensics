@@ -84,7 +84,7 @@ private:
     void RemoveTmpFiles(void);
 
     //QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
-    QThreadPool *threadpool;
+    //QThreadPool* threadpool;
     int ReturnVisibleViewerID();
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);

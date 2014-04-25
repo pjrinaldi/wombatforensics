@@ -5,4 +5,5 @@
 
 extern QSqlDatabase fcasedb;
 extern QString fdbname;
+extern QThreadPool* threadpool;
 #endif
