@@ -28,6 +28,7 @@ bool FileExists(const std::string& filename)
 void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
+    /*
     char buf[128];
     TSK_FS_HASH_RESULTS hashresults;
     //qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
@@ -39,7 +40,8 @@ void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
         sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
     }
     QString tmpstring = QString(sbuf);
-
+    */
+    QString tmpstring = "";
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         QSqlQuery fquery;
