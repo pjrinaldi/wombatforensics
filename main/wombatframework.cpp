@@ -11,17 +11,19 @@ WombatFramework::~WombatFramework()
 void WombatFramework::OpenEvidenceImage() // open current evidence image
 {
     const TSK_TCHAR** images;
-    qDebug()  << "fullpathvector count: " << wombatptr->evidenceobject.fullpathvector.size();
+    //qDebug()  << "fullpathvector count: " << wombatptr->evidenceobject.fullpathvector.size();
     images = (const char**)malloc(wombatptr->evidenceobject.fullpathvector.size()*sizeof(char*));
     for(int i=0; i < wombatptr->evidenceobject.fullpathvector.size(); i++)
     {
-        qDebug() << "fullpathvector[" << i << "] = " << QString::fromStdString(wombatptr->evidenceobject.fullpathvector[i]);
+        //qDebug() << "fullpathvector[" << i << "] = " << QString::fromStdString(wombatptr->evidenceobject.fullpathvector[i]);
         images[i] = wombatptr->evidenceobject.fullpathvector[i].c_str();
-        qDebug() << "images[" << i << "] = " << images[i];
+        //qDebug() << "images[" << i << "] = " << images[i];
     }
     wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
     if(wombatptr->evidenceobject.imageinfo == NULL)
-        qDebug() << "print image error here";
+    {
+        //qDebug() << "print image error here";
+    }
     free(images);
 }
 
@@ -91,7 +93,9 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
                         evidnode[0]->appendRow(tmplist);
                     }
                     else
-                        qDebug() << "fs if failed";
+                    {
+                        //qDebug() << "fs if failed";
+                    }
                 }
             }
         }
@@ -160,7 +164,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
     for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
     {
-        qDebug() << "Root_inum: " << wombatptr->evidenceobject.fsinfovector[i]->root_inum;
+        //qDebug() << "Root_inum: " << wombatptr->evidenceobject.fsinfovector[i]->root_inum;
         if(fcasedb.transaction())
         {
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);

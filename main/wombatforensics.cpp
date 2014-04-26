@@ -222,27 +222,27 @@ void WombatForensics::InitializeEvidenceStructure()
 void WombatForensics::AddEvidence()
 {
     wombatvarptr->evidenceobject.Clear(); // clear values of current evidence object to add a new one.
-    qDebug() << "fullpathvector count after clear: " << wombatvarptr->evidenceobject.fullpathvector.size();
+    //qDebug() << "fullpathvector count after clear: " << wombatvarptr->evidenceobject.fullpathvector.size();
     // might need to call these to a global tmp and then store it after initializeevidencestructure...
     // NEED TO CHECK WHAT GETEVIDENCEOBJECTS() RETURNS FOR A TEST IMAGE OPEN...
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
-    qDebug() << "tmplist count: " << tmplist.count();
+    //qDebug() << "tmplist count: " << tmplist.count();
     if(tmplist.count())
     {
         wombatvarptr->currentevidencename = tmplist[0].split("/").last();
-        qDebug() << "tmplist count 2: " << tmplist.count();
+        //qDebug() << "tmplist count 2: " << tmplist.count();
         for(int i=0; i < tmplist.count(); i++)
         {
             fprintf(stderr, "fullpathvector[%i]: %s\n", i, tmplist[i].toStdString().c_str());
             wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
-        qDebug() << " ptr itemcount: " << wombatvarptr->evidenceobject.itemcount;
+        //qDebug() << " ptr itemcount: " << wombatvarptr->evidenceobject.itemcount;
         //wombatprogresswindow->show();
         //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
         // MIGHT WANT THIS FUNCTION AS NOT A NEW THREAD, RATHER MAKE EACH SUB FUNCTION A NEW THREAD..
-        InitializeEvidenceStructure();
-        //QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
+        //InitializeEvidenceStructure();
+        QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
         ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
@@ -285,7 +285,7 @@ void WombatForensics::LoadHexContents()
         // else return imageid and then loop over evidenceobjectvector for index. then loop over fullpathvector to get the
         // imagepartspath and open the respective image.
         // THEN I'LL HAVE TO GET THE OFFSET AND LENGTH FOR THE PARTITION...
-        qDebug() << "Partition Object";
+        //qDebug() << "Partition Object";
     }
     else if(wombatvarptr->selectedobject.type == 4) // fs object
     {
@@ -293,7 +293,7 @@ void WombatForensics::LoadHexContents()
         OpenParentImage(wombatvarptr->filesystemobjectvector[curidx].parimgid);
         tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
         tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
-        qDebug() << "File System Object";
+        //qDebug() << "File System Object";
     }
     hexwidget->openimage();
     hexwidget->set2BPC();
@@ -384,7 +384,9 @@ void WombatForensics::OpenParentImage(int imgid)
     }
     tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     if(tskobjptr->readimginfo == NULL)
-        qDebug() << "print image error here";
+    {
+        //qDebug() << "print image error here";
+    }
     free(tskobjptr->imagepartspath);
 }
 

@@ -23,10 +23,15 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
                 tmplist.append(casequery.record());
             }
         }
-        else qDebug() << wombatptr->casedb.lastError().text();
+        else
+        {
+            //qDebug() << wombatptr->casedb.lastError().text();
+        }
     }
     else
-        qDebug() << wombatptr->casedb.lastError().text();
+    {
+        //qDebug() << wombatptr->casedb.lastError().text();
+    }
 
     return tmplist;
 
@@ -46,14 +51,18 @@ void WombatDatabase::InsertSql(QString query, QVariantList invalues)
        {
            while(casequery.next())
            {
-               qDebug() << "successful insert with bind";
+               //qDebug() << "successful insert with bind";
            }
        }
        else
-           qDebug() << wombatptr->casedb.lastError().text();
+       {
+           //qDebug() << wombatptr->casedb.lastError().text();
+       }
    }
    else
-       qDebug() << wombatptr->casedb.lastError().text();
+   {
+       //qDebug() << wombatptr->casedb.lastError().text();
+   }
 }
 
 
@@ -65,13 +74,17 @@ void WombatDatabase::InsertSql(QString query)
        casequery.prepare(query);
        if(casequery.exec())
        {
-           qDebug() << "successful query";
+           //qDebug() << "successful query";
        }
        else
-           qDebug() << wombatptr->casedb.lastError().text();
+       {
+           //qDebug() << wombatptr->casedb.lastError().text();
+       }
    }
    else
-       qDebug() << wombatptr->casedb.lastError().text();
+   {
+       //qDebug() << wombatptr->casedb.lastError().text();
+   }
 }
 
 int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
@@ -88,10 +101,14 @@ int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
        if(casequery.exec())
            tmpid = casequery.lastInsertId().toInt();
        else
-           qDebug() << wombatptr->casedb.lastError().text();
+       {
+           //qDebug() << wombatptr->casedb.lastError().text();
+       }
    }
    else
-       qDebug() << wombatptr->casedb.lastError().text();
+   {
+       //qDebug() << wombatptr->casedb.lastError().text();
+   }
 
    return tmpid;
 }
@@ -125,7 +142,9 @@ void WombatDatabase::CreateCaseDB(void)
         }
     }
     else
-        qDebug() << wombatptr->casedb.lastError().text();
+    {
+        //qDebug() << wombatptr->casedb.lastError().text();
+    }
 
 }
 
@@ -137,13 +156,17 @@ void WombatDatabase::CreateAppDB()
         appquery.exec("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
     }
     else
-        qDebug() << wombatptr->appdb.lastError().text();
+    {
+        //qDebug() << wombatptr->appdb.lastError().text();
+    }
 }
 
 void WombatDatabase::OpenAppDB()
 {
     if(wombatptr->appdb.isOpen())
-        qDebug() << "appdb is open";
+    {
+        //qDebug() << "appdb is open";
+    }
     else
         wombatptr->appdb.open();
 }
@@ -151,7 +174,9 @@ void WombatDatabase::OpenAppDB()
 void WombatDatabase::OpenCaseDB()
 {
     if(wombatptr->casedb.isOpen())
-        qDebug() << "case is open.";
+    {
+        //qDebug() << "case is open.";
+    }
     else
         wombatptr->casedb.open();
 }
@@ -345,7 +370,7 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->bindvalues.append(wombatptr->currentevidencename);
     wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]));
     wombatptr->currentevidenceid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath, parimgid) VALUES(1, ?, ?, ?, ?, ?, NULL);", wombatptr->bindvalues);
-    qDebug() << "item count 2: " << wombatptr->evidenceobject.itemcount;
+    //qDebug() << "item count 2: " << wombatptr->evidenceobject.itemcount;
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
         wombatptr->bindvalues.clear();
@@ -387,7 +412,7 @@ void WombatDatabase::GetEvidenceObjects()
     wombatptr->bindvalues.clear();
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT objectid, objecttype, type, size, sectsize, name, fullpath FROM data WHERE objecttype = 1;", wombatptr->bindvalues);
-    qDebug() << "evid sqlrecords count: " << wombatptr->sqlrecords.count();
+    //qDebug() << "evid sqlrecords count: " << wombatptr->sqlrecords.count();
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         wombatptr->evidenceobject.id = wombatptr->sqlrecords[i].value(0).toInt();
@@ -400,14 +425,14 @@ void WombatDatabase::GetEvidenceObjects()
         wombatptr->evidenceobject.parimgid = NULL;
         wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
     }
-    qDebug() << "evidobjvec count: " << wombatptr->evidenceobjectvector.count();
+    //qDebug() << "evidobjvec count: " << wombatptr->evidenceobjectvector.count();
     for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
     {
         wombatptr->bindvalues.clear();
         wombatptr->sqlrecords.clear();
         wombatptr->bindvalues.append(wombatptr->evidenceobjectvector[i].id);
         wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
-        qDebug() << "fullpath sqlrecords count: " << wombatptr->sqlrecords.count();
+        //qDebug() << "fullpath sqlrecords count: " << wombatptr->sqlrecords.count();
         for(int j=0; j < wombatptr->sqlrecords.count(); j++)
             wombatptr->evidenceobjectvector[i].fullpathvector.push_back(wombatptr->sqlrecords[j].value(0).toString().toStdString());
     }
@@ -419,7 +444,9 @@ int WombatDatabase::ReturnCaseCount() // from appdb
     if(appquery.first())
         return appquery.value(0).toInt();
     else
-        qDebug() << wombatptr->appdb.lastError().text();
+    {
+        //qDebug() << wombatptr->appdb.lastError().text();
+    }
     
     return 0;
 
@@ -434,7 +461,9 @@ void WombatDatabase::InsertCase()
     if(appquery.exec())
         wombatptr->caseobject.id = appquery.lastInsertId().toInt();
     else
-        qDebug() << "insert case failed: " << wombatptr->appdb.lastError().text();
+    {
+        //qDebug() << "insert case failed: " << wombatptr->appdb.lastError().text();
+    }
 }
 
 void WombatDatabase::ReturnCaseNameList()
@@ -446,7 +475,9 @@ void WombatDatabase::ReturnCaseNameList()
             wombatptr->casenamelist << appquery.value(0).toString();
     }
     else
-        qDebug() << wombatptr->appdb.lastError().text();
+    {
+        //qDebug() << wombatptr->appdb.lastError().text();
+    }
 }
 
 void WombatDatabase::ReturnCaseID()
@@ -458,9 +489,13 @@ void WombatDatabase::ReturnCaseID()
         if(appquery.first())
             wombatptr->caseobject.id = appquery.value(0).toInt();
         else
-            qDebug() << wombatptr->appdb.lastError().text();
+        {
+            //qDebug() << wombatptr->appdb.lastError().text();
+        }
     else
-        qDebug() << wombatptr->appdb.lastError().text();
+    {
+        //qDebug() << wombatptr->appdb.lastError().text();
+    }
 }
 
 void WombatDatabase::GetObjectType()
