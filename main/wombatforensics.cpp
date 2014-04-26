@@ -749,6 +749,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
 {
     wombatprogresswindow->close();
     RemoveTmpFiles();
+    // USE THIS FUNCTION AND PRINCIPLE TO BUILD THE PROGRESS WINDOW FUNCTIONALITY.
     if(ProcessingComplete())
     {
         qDebug() << "All threads are done";
