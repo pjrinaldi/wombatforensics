@@ -749,6 +749,14 @@ void WombatForensics::closeEvent(QCloseEvent* event)
 {
     wombatprogresswindow->close();
     RemoveTmpFiles();
+    if(ProcessingComplete())
+    {
+        qDebug() << "All threads are done";
+    }
+    else
+    {
+        qDebug() << "All threads aren't done yet.";
+    }
     //const char* errmsg = wombatdatabase->CloseCaseDB();
 }
 

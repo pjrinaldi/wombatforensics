@@ -25,12 +25,25 @@ bool FileExists(const std::string& filename)
     return false;
 }
 
+bool ProcessingComplete()
+{
+    bool processingcomplete = false;
+    for(int i = 0; i < threadvector.count(); i++)
+    {
+        processingcomplete = threadvector[i].isFinished();
+    }
+    
+    return processingcomplete;
+}
+
 void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     //qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
     /*
     char buf[128];
     TSK_FS_HASH_RESULTS hashresults;
+    // TO CALCULATE THE HASH, I CAN LOOP OVER THE INUM AND APPLY THIS FUNCTION SET TO EACH TMPFILE I GET IN A SEPARATE
+    // FUNCTION
     //qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     char sbuf[17];
@@ -87,6 +100,7 @@ void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
         {
             //qDebug() << fcasedb.lastError().text();
         }
+        fquery.finish();
     }
     else
     {
@@ -101,7 +115,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     // inum_count from tsk_fs_info gives the total number of files.
     // i then need to for loop over this, get each file and its values, thread it out and store it in the db.
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, tmpfile, tmppath, tmpptr);
-    //tmpfuture.waitForFinished();
+    threadvector.append(tmpfuture);
 
     return TSK_WALK_CONT;
 }
