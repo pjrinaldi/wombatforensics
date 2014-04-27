@@ -26,6 +26,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QSqlQueryModel>
 #include <QSqlRecord>
 #include <QStandardItem>
 #include <QStandardItemModel>

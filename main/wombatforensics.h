@@ -59,6 +59,7 @@ private slots:
     void UpdateSelectValue(const QString &txt);
     void ViewGroupTriggered(QAction* curaction);
     void LoadComplete(bool isok);
+    void InitializeQueryModel(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -73,6 +74,7 @@ private:
     void InitializeOpenCase(void);
     void InitializeWombatFramework(void);
     void InitializeDirModel(void);
+    //void InitializeQueryModel(void);
     void UpdateViewer(void);
     void UpdateOmniValue(void);
     void LoadHexContents(void);

@@ -17,7 +17,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     wombatprogresswindow->setModal(false);
     InitializeAppStructure();
-    InitializeDirModel();
+    //InitializeDirModel();
+    //InitializeQueryModel();
     InitializeWombatFramework();
 }
 
@@ -188,6 +189,17 @@ void WombatForensics::InitializeDirModel()
 
 }
 
+void WombatForensics::InitializeQueryModel()
+{
+    QSqlQueryModel* tmpmodel = new QSqlQueryModel();
+    tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data");
+    tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Type"));
+    tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Name"));
+
+    ui->dirTreeView->setModel(tmpmodel);
+}
+
 void WombatForensics::InitializeEvidenceStructure()
 {
     wombatframework->OpenEvidenceImage();
@@ -198,25 +210,16 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
-
-    // SHOULD PROBABLY LAUNCH OPENFILES IN A NEW THREAD. THE PROBLEM IS, IF I USE DIR WALK, I CAN'T CONTROL THE THREADING
-    // OF EACH FILE. I NEED TO MANUALLY PERFORM MY OWN DIR WALK. SO I CAN PROPERLY THREAD THIS OUT
-    // MAINTAIN GUI PERFORMANCE AND SPAWN THE THREADS FOR EACH FILE.
-    //
     wombatframework->OpenFiles();
-    //QFuture<void> openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
-    //
     // OPEN FILES INCLUDES WALKING FILE TREE->ADDING TO DB->GETTING DB INFO->ADDING TO NODE TREE.
-    //wombatdatabase->InsertFileObjects(); // tsk_fs_dir_walk and recursively loop over all the directories/files this should not be needed.
-    // this should be done for each file in the function defined as the callback...
-    // starting with the root_inum. need to just qdebug some test data and see what it does...
-
+    // MIGHT BE ABLE TO GET RID OF THE BELOW FUNCTIONS IF I CAN GET MY QUERYMODEL WORKING...
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
     wombatdatabase->GetVolumeObjects();
     wombatdatabase->GetPartitionObjects();
     wombatdatabase->GetFileSystemObjects();
-    
-    wombatframework->AddEvidenceNodes(); // add evidence node to directory model
+
+    //InitializeQueryModel();
+    //wombatframework->AddEvidenceNodes(); // add evidence node to directory model
 }
 
 void WombatForensics::AddEvidence()
@@ -240,10 +243,16 @@ void WombatForensics::AddEvidence()
         //qDebug() << " ptr itemcount: " << wombatvarptr->evidenceobject.itemcount;
         //wombatprogresswindow->show();
         //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
-        // MIGHT WANT THIS FUNCTION AS NOT A NEW THREAD, RATHER MAKE EACH SUB FUNCTION A NEW THREAD..
-        //InitializeEvidenceStructure();
+        // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
+        QFutureWatcher<void> watcher1;
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
-        ResizeColumns();
+        connect(&watcher1, SIGNAL(finished()), this, SLOT(InitializeQueryModel()));
+        watcher1.setFuture(future1);
+
+        // SHOULD GO HERE, BUT IT NEEDS TO LAUNCH WHEN THE THREADS ARE DONE...
+        // FOR NOW I'LL PUT IT IN THE OFFSHOOT THREAD.
+        //InitializeQueryModel();
+        //ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
 }

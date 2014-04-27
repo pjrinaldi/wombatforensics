@@ -110,10 +110,6 @@ void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-    // I CAN USE CONCURRENT METHOD, THREADPOOL RUNNABLE METHOD OR BUILD MY OWN THREAD FUNCTION ITSELF.
-    // FIRST I NEED TO GET OUT OF THIS WALK FUNCTION, SINCE IT CONSTRICTS WHAT I CAN DO.
-    // inum_count from tsk_fs_info gives the total number of files.
-    // i then need to for loop over this, get each file and its values, thread it out and store it in the db.
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, tmpfile, tmppath, tmpptr);
     threadvector.append(tmpfuture);
 
