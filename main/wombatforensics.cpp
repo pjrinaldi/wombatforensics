@@ -17,6 +17,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     wombatprogresswindow->setModal(false);
     InitializeAppStructure();
+    connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::DirectConnection);
     //InitializeDirModel();
     //InitializeQueryModel();
     InitializeWombatFramework();
@@ -191,6 +192,8 @@ void WombatForensics::InitializeDirModel()
 
 void WombatForensics::InitializeQueryModel()
 {
+    fcasedb.commit();
+    qDebug() << "Query Thread has finished!";
     QSqlQueryModel* tmpmodel = new QSqlQueryModel();
     tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data");
     tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -218,6 +221,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->GetPartitionObjects();
     wombatdatabase->GetFileSystemObjects();
 
+    qDebug() << "In evidence strucutre function!";
     //InitializeQueryModel();
     //wombatframework->AddEvidenceNodes(); // add evidence node to directory model
 }
@@ -244,10 +248,15 @@ void WombatForensics::AddEvidence()
         //wombatprogresswindow->show();
         //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
         // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
+        /*
         QFutureWatcher<void> watcher1;
+        connect(&watcher1, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::DirectConnection);
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
-        connect(&watcher1, SIGNAL(finished()), this, SLOT(InitializeQueryModel()));
         watcher1.setFuture(future1);
+        */
+
+        sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
+        sqlwatcher.setFuture(sqlfuture);
 
         // SHOULD GO HERE, BUT IT NEEDS TO LAUNCH WHEN THE THREADS ARE DONE...
         // FOR NOW I'LL PUT IT IN THE OFFSHOOT THREAD.

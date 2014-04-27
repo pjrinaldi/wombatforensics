@@ -16,6 +16,7 @@
 #include <QFileDialog>
 #include <QFrame>
 #include <QFuture>
+#include <QFutureWatcher>
 #include <QInputDialog>
 #include <QList>
 #include <QMainWindow>

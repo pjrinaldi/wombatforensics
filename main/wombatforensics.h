@@ -95,6 +95,9 @@ private:
     int DetermineOmniView(QString currentSignature);
     QModelIndex curselindex;
 
+    QFuture<void> sqlfuture;
+    QFutureWatcher<void> sqlwatcher;
+
     off_t offset() const;
     HexEditor* hexwidget;
     QActionGroup* viewgroup;

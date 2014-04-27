@@ -169,7 +169,8 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
         }
     }
-    fcasedb.commit();
+    //fcasedb.commit();
+    //qDebug() << "sql commit run.";
 }
 
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
