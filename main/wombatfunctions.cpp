@@ -39,7 +39,7 @@ bool ProcessingComplete()
 //void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
 {
-    //qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
+    qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
     /*
     char buf[128];
     TSK_FS_HASH_RESULTS hashresults;

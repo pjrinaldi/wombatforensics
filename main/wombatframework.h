@@ -22,7 +22,7 @@ public:
     void OpenFiles(void);
     void AddPartitionNodes(int increment);
     void CloseInfoStructures(void);
-    void ProcessFile(uint64_t inodeaddress);
+    void ProcessFile(uint64_t inodeaddress, TSK_FS_INFO* fsinfo);
 
     void GetBootCode(int idx);
     int DetermineVectorIndex(void);

@@ -195,8 +195,9 @@ void WombatForensics::InitializeDirModel()
 
 void WombatForensics::InitializeQueryModel()
 {
-    fcasedb.commit();
     qDebug() << "Query Thread has finished!";
+    /*
+    fcasedb.commit();
     QSqlQueryModel* tmpmodel = new QSqlQueryModel();
     tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data", fcasedb);
     tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -204,6 +205,7 @@ void WombatForensics::InitializeQueryModel()
     tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Name"));
 
     ui->dirTreeView->setModel(tmpmodel);
+    */
 }
 
 void WombatForensics::InitializeEvidenceStructure()
@@ -216,9 +218,9 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
-    //openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
-    //openwatcher.setFuture(openfuture);
-    wombatframework->OpenFiles();
+    openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
+    openwatcher.setFuture(openfuture);
+    //wombatframework->OpenFiles();
     // OPEN FILES INCLUDES WALKING FILE TREE->ADDING TO DB->GETTING DB INFO->ADDING TO NODE TREE.
     // MIGHT BE ABLE TO GET RID OF THE BELOW FUNCTIONS IF I CAN GET MY QUERYMODEL WORKING...
     //wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
@@ -259,9 +261,11 @@ void WombatForensics::AddEvidence()
 
         // SHOULD GO HERE, BUT IT NEEDS TO LAUNCH WHEN THE THREADS ARE DONE...
         // FOR NOW I'LL PUT IT IN THE OFFSHOOT THREAD.
+        // if i call these in concurrent::runs-> then they shouldn't run until the end...?
         //InitializeQueryModel();
         //ResizeColumns();
-        wombatframework->CloseInfoStructures();
+        // the below must be called when all threads are done and i don't need the variable anymore.
+        //wombatframework->CloseInfoStructures();
     }
 }
 
