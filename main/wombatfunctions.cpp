@@ -57,7 +57,7 @@ void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
     QString tmpstring = "";
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
-        QSqlQuery fquery;
+        QSqlQuery fquery(fcasedb);
         fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
         if(tmpfile->name != NULL)
         {
@@ -110,7 +110,9 @@ void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    QFutureWatcher<void> tmpwatcher;
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, tmpfile, tmppath, tmpptr);
+    filewatcher.setFuture(tmpfuture);
     threadvector.append(tmpfuture);
 
     return TSK_WALK_CONT;

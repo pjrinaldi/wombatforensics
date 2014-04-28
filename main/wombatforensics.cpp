@@ -17,7 +17,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     wombatprogresswindow->setModal(false);
     InitializeAppStructure();
-    connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::DirectConnection);
+    connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+    connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //InitializeDirModel();
     //InitializeQueryModel();
     InitializeWombatFramework();
@@ -105,7 +106,7 @@ void WombatForensics::InitializeCaseStructure()
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE"); // may not need this
+        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
         wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
         if(!FileExists(wombatvarptr->caseobject.dbname.toStdString()))
         {
@@ -151,7 +152,7 @@ void WombatForensics::InitializeOpenCase()
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE"); // may not need this
+        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
         wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
         bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
         if(!caseFileExist)
@@ -195,7 +196,7 @@ void WombatForensics::InitializeQueryModel()
     fcasedb.commit();
     qDebug() << "Query Thread has finished!";
     QSqlQueryModel* tmpmodel = new QSqlQueryModel();
-    tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data");
+    tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data", fcasedb);
     tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
     tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Type"));
     tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Name"));
@@ -776,7 +777,8 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     {
         qDebug() << "All threads aren't done yet.";
     }
-    //const char* errmsg = wombatdatabase->CloseCaseDB();
+    wombatdatabase->CloseCaseDB();
+    wombatdatabase->CloseAppDB();
 }
 
 void WombatForensics::RemoveTmpFiles()

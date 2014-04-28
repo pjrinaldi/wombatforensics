@@ -15,6 +15,7 @@ public:
     void OpenCaseDB(void);
     void OpenAppDB(void);
     void CloseAppDB(void);
+    void CloseCaseDB(void);
     void InsertEvidenceObject(void);
     void GetEvidenceObject(void);
     void GetEvidenceObjects(void);

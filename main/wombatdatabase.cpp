@@ -10,7 +10,7 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
     QList<QSqlRecord> tmplist;
     if(wombatptr->casedb.isOpen())
     {
-        QSqlQuery casequery;
+        QSqlQuery casequery(wombatptr->casedb);
         casequery.prepare(query);
         for(int i=0; i < invalues.count(); i++)
         {
@@ -27,6 +27,7 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
         {
             //qDebug() << wombatptr->casedb.lastError().text();
         }
+        casequery.finish();
     }
     else
     {
@@ -41,7 +42,7 @@ void WombatDatabase::InsertSql(QString query, QVariantList invalues)
 {
    if(wombatptr->casedb.isOpen())
    {
-       QSqlQuery casequery;
+       QSqlQuery casequery(wombatptr->casedb);
        casequery.prepare(query);
        for(int i=0; i < invalues.count(); i++)
        {
@@ -58,6 +59,7 @@ void WombatDatabase::InsertSql(QString query, QVariantList invalues)
        {
            //qDebug() << wombatptr->casedb.lastError().text();
        }
+       casequery.finish();
    }
    else
    {
@@ -70,7 +72,7 @@ void WombatDatabase::InsertSql(QString query)
 {
    if(wombatptr->casedb.isOpen())
    {
-       QSqlQuery casequery;
+       QSqlQuery casequery(wombatptr->casedb);
        casequery.prepare(query);
        if(casequery.exec())
        {
@@ -80,6 +82,7 @@ void WombatDatabase::InsertSql(QString query)
        {
            //qDebug() << wombatptr->casedb.lastError().text();
        }
+       casequery.finish();
    }
    else
    {
@@ -92,7 +95,7 @@ int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
    int tmpid = 0;
    if(wombatptr->casedb.isOpen())
    {
-       QSqlQuery casequery;
+       QSqlQuery casequery(wombatptr->casedb);
        casequery.prepare(query);
        for(int i=0; i < invalues.count(); i++)
        {
@@ -104,6 +107,7 @@ int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
        {
            //qDebug() << wombatptr->casedb.lastError().text();
        }
+       casequery.finish();
    }
    else
    {
@@ -135,11 +139,14 @@ void WombatDatabase::CreateCaseDB(void)
     wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, parimgid INTEGER, flags INTEGER, childcount INTEGER, endian INTEGER, address INTEGER, size INTEGER, sectsize INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, indoenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);";
     if(wombatptr->casedb.open())
     {
-        QSqlQuery casequery;
+        QSqlQuery casequery(wombatptr->casedb);
+        wombatptr->casedb.transaction();
         for(int i=0; i < wombattableschema.count(); i++)
         {
             casequery.exec(wombattableschema[i]);
         }
+        wombatptr->casedb.commit();
+        casequery.finish();
     }
     else
     {
@@ -154,6 +161,7 @@ void WombatDatabase::CreateAppDB()
     {
         QSqlQuery appquery(wombatptr->appdb);
         appquery.exec("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
+        appquery.finish();
     }
     else
     {
@@ -183,26 +191,26 @@ void WombatDatabase::OpenCaseDB()
 
 void WombatDatabase::CloseAppDB()
 {
-    /*
-    if(sqlite3_finalize(wombatstatement) == SQLITE_OK)
+    qDebug() << "AppDB closing";
+    if(wombatptr->appdb.isOpen())
     {
-        if(sqlite3_close(wombatdb) == SQLITE_OK)
-        {
-            //fprintf(stderr, "CloseDB was successful\n");
-            wombatptr->curerrmsg = "";
-        }
-        else
-        {
-            fprintf(stderr, "CloseDB: %s\n", sqlite3_errmsg(wombatdb));
-            wombatptr->curerrmsg = QString(sqlite3_errmsg(wombatdb));
-        }
+        wombatptr->appdb.close();
+        wombatptr->appdb = QSqlDatabase();
+        //delete wombatptr->appdb;
+        QSqlDatabase::removeDatabase("wombatapp");
     }
-    else
-    {
-        fprintf(stderr, "CloseDB: %s\n", sqlite3_errmsg(wombatdb));
-        wombatptr->curerrmsg = QString(sqlite3_errmsg(wombatdb));
-    }
-    */
+}
+
+void WombatDatabase::CloseCaseDB()
+{
+    qDebug() << "CaseDB Closing";
+    if(wombatptr->casedb.isOpen())
+        wombatptr->casedb.close();
+    if(fcasedb.isOpen())
+        fcasedb.close();
+    wombatptr->casedb = QSqlDatabase();
+    fcasedb = QSqlDatabase();
+    QSqlDatabase::removeDatabase("casedb");
 }
 
 WombatDatabase::~WombatDatabase()
@@ -440,15 +448,17 @@ void WombatDatabase::GetEvidenceObjects()
 
 int WombatDatabase::ReturnCaseCount() // from appdb
 {
+    int retval = 0;
     QSqlQuery appquery("SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", wombatptr->appdb);
     if(appquery.first())
-        return appquery.value(0).toInt();
+        retval = appquery.value(0).toInt();
     else
     {
         //qDebug() << wombatptr->appdb.lastError().text();
     }
-    
-    return 0;
+    appquery.finish();
+
+    return retval;
 
 }
 
@@ -464,6 +474,7 @@ void WombatDatabase::InsertCase()
     {
         //qDebug() << "insert case failed: " << wombatptr->appdb.lastError().text();
     }
+    appquery.finish();
 }
 
 void WombatDatabase::ReturnCaseNameList()
@@ -478,6 +489,7 @@ void WombatDatabase::ReturnCaseNameList()
     {
         //qDebug() << wombatptr->appdb.lastError().text();
     }
+    appquery.finish();
 }
 
 void WombatDatabase::ReturnCaseID()
@@ -496,6 +508,7 @@ void WombatDatabase::ReturnCaseID()
     {
         //qDebug() << wombatptr->appdb.lastError().text();
     }
+    appquery.finish();
 }
 
 void WombatDatabase::GetObjectType()
