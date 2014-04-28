@@ -160,6 +160,25 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
 
 void WombatFramework::OpenFiles() // open the files and add to file info vector
 {
+    // NEED TO CALL MY OWN WALK FUNCTION...
+    for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
+    {
+        if(fcasedb.transaction())
+        {
+            for(uint64_t j=0; j < wombatptr->evidenceobject.fsinfovector[i].inum_count; j++)
+            {
+               // LAUNCH EACH INUM FILE IN ITS OWN THREAD, THIS FUNCTION WILL GET THE INFO AND STORE IT IN THE DB.
+               // THIS SHOULD BE ABLE TO COMBINE THE GET FILE, GET VALUES, STORE VALUES, CLOSE FILE
+                QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatFramework::ProcessFile, j);
+                filewatcher.setFuture(tmpfuture);
+            }
+        }
+
+        qDebug() << "first inum: " << wombatptr->evidenceobject.fsinfovector[i]->first_inum;
+        qDebug() << "last inum: " << wombatptr->evidenceobject.fsinfovector[i]->last_inum;
+        qDebug() << "inum count: " << wombatptr->evidenceobject.fsinfovector[i]->inum_count;
+    }
+    /*
     uint8_t walkreturn = 1;
     int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
     for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
@@ -169,9 +188,116 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
         }
     }
+    */
     //emit(
     //fcasedb.commit();
     //qDebug() << "sql commit run.";
+}
+
+void WombatFramework::ProcessFile(uint64_t inodeaddress)
+{
+    /*
+     *
+     *    //char buf[128];
+    TSK_FS_HASH_RESULTS hashresults;
+    // TO CALCULATE THE HASH, I CAN LOOP OVER THE INUM AND APPLY THIS FUNCTION SET TO EACH TMPFILE I GET IN A SEPARATE
+    // FUNCTION
+    //qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
+    uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
+    char sbuf[17];
+    int sint = 0;
+    for(int i=0; i < 16; i++)
+    {
+        sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
+    }
+    QString tmpstring = QString(sbuf);
+
+    QVector<QString> filestrings;
+    if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
+    else filestrings.append(QString("unknown.wbt"));
+    filestrings.append(QString(tmppath));
+    filestrings.append(tmpstring);
+
+    QVector<int> fileints;
+
+    if(tmpfile->name != NULL)
+    {
+        fileints.append((int)tmpfile->name->type);
+        fileints.append((int)tmpfile->name->par_addr);
+    }
+    else
+    {
+        fileints.append(0);
+        fileints.append(0);
+    }
+    if(tmpfile->meta != NULL)
+    {
+        fileints.append((int)tmpfile->meta->atime);
+        fileints.append((int)tmpfile->meta->ctime);
+        fileints.append((int)tmpfile->meta->crtime);
+        fileints.append((int)tmpfile->meta->mtime);
+        fileints.append((int)tmpfile->meta->size);
+        fileints.append((int)tmpfile->meta->addr);
+    }
+    else
+    {
+        fileints.append(0);
+        fileints.append(0);
+        fileints.append(0);
+        fileints.append(0);
+        fileints.append(0);
+        fileints.append(0);
+    }
+
+    QFutureWatcher<void> tmpwatcher;
+    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints);
+    //QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, tmpfile, tmppath, tmpptr);
+    filewatcher.setFuture(tmpfuture);
+    threadvector.append(tmpfuture);
+     if(fcasedb.isValid() && fcasedb.isOpen())
+    {
+        QSqlQuery fquery(fcasedb);
+        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        fquery.addBindValue(tmpints[0]);
+        fquery.addBindValue(tmpstrings[0]);
+        fquery.addBindValue(tmpints[1]);
+        fquery.addBindValue(tmpstrings[1]);
+        fquery.addBindValue(tmpints[2]);
+        fquery.addBindValue(tmpints[3]);
+        fquery.addBindValue(tmpints[4]);
+        fquery.addBindValue(tmpints[5]);
+        fquery.addBindValue(tmpints[6]);
+        fquery.addBindValue(tmpints[7]);
+        fquery.addBindValue(tmpstrings[2]);
+
+        if(tmpfile->name != NULL)
+        {
+            fquery.addBindValue((int)tmpfile->name->type);
+            fquery.addBindValue(QString(tmpfile->name->name));
+            fquery.addBindValue((int)tmpfile->name->par_addr);
+        }
+        fquery.addBindValue(QString(tmppath));
+        if(tmpfile->meta != NULL)
+        {
+            fquery.addBindValue((int)tmpfile->meta->atime);
+            fquery.addBindValue((int)tmpfile->meta->ctime);
+            fquery.addBindValue((int)tmpfile->meta->crtime);
+            fquery.addBindValue((int)tmpfile->meta->mtime);
+            fquery.addBindValue((int)tmpfile->meta->size);
+            fquery.addBindValue((int)tmpfile->meta->addr);
+        }
+        fquery.addBindValue(tmpstring);
+        */
+        /*
+        fquery.exec();
+        fquery.finish();
+    }
+    else
+    {
+        //qDebug() << fcasedb.lastError().text();
+    }
+
+     */ 
 }
 
 void WombatFramework::OpenEvidenceImages() // open all evidence images.

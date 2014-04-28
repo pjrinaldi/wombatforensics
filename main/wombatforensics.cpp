@@ -216,17 +216,17 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
-    openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
-    openwatcher.setFuture(openfuture);
-    //wombatframework->OpenFiles();
+    //openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
+    //openwatcher.setFuture(openfuture);
+    wombatframework->OpenFiles();
     // OPEN FILES INCLUDES WALKING FILE TREE->ADDING TO DB->GETTING DB INFO->ADDING TO NODE TREE.
     // MIGHT BE ABLE TO GET RID OF THE BELOW FUNCTIONS IF I CAN GET MY QUERYMODEL WORKING...
-    wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
-    wombatdatabase->GetVolumeObjects();
-    wombatdatabase->GetPartitionObjects();
-    wombatdatabase->GetFileSystemObjects();
+    //wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
+    //wombatdatabase->GetVolumeObjects();
+    //wombatdatabase->GetPartitionObjects();
+    //wombatdatabase->GetFileSystemObjects();
 
-    qDebug() << "In evidence strucutre function!";
+    qDebug() << "In evidence structure function!";
     //InitializeQueryModel();
     //wombatframework->AddEvidenceNodes(); // add evidence node to directory model
 }
@@ -253,12 +253,6 @@ void WombatForensics::AddEvidence()
         //wombatprogresswindow->show();
         //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
         // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
-        /*
-        QFutureWatcher<void> watcher1;
-        connect(&watcher1, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-        QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
-        watcher1.setFuture(future1);
-        */
 
         sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
         sqlwatcher.setFuture(sqlfuture);
