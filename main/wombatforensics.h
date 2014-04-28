@@ -60,6 +60,7 @@ private slots:
     void ViewGroupTriggered(QAction* curaction);
     void LoadComplete(bool isok);
     void InitializeQueryModel(void);
+    void UpdateTree(void);
 
 protected:
     void closeEvent(QCloseEvent* event);

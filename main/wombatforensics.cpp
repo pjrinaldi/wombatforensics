@@ -193,9 +193,22 @@ void WombatForensics::InitializeDirModel()
 
 }
 
+void WombatForensics::UpdateTree()
+{
+    fcasedb.commit();
+    QSqlQueryModel* tmpmodel = new QSqlQueryModel();
+    tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data", fcasedb);
+    tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Type"));
+    tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Name"));
+
+    ui->dirTreeView->setModel(tmpmodel);
+}
+
 void WombatForensics::InitializeQueryModel()
 {
     qDebug() << "Query Thread has finished!";
+    openfuture = QtConcurrent::run(this, &WombatForensics::UpdateTree);
     /*
     fcasedb.commit();
     QSqlQueryModel* tmpmodel = new QSqlQueryModel();
