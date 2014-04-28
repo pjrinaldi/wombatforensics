@@ -39,7 +39,8 @@ bool ProcessingComplete()
 //void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
 {
-    qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
+    //qDebug() << "Files Found: " << filesfound << " Processed: " << filesprocessed;
+    //qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
     /*
     char buf[128];
     TSK_FS_HASH_RESULTS hashresults;
@@ -93,6 +94,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
         */
         fquery.exec();
         fquery.finish();
+        filesprocessed++;
     }
     else
     {
@@ -158,6 +160,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     //QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, tmpfile, tmppath, tmpptr);
     filewatcher.setFuture(tmpfuture);
     threadvector.append(tmpfuture);
+    filesfound++;
 
     return TSK_WALK_CONT;
 }

@@ -207,8 +207,25 @@ void WombatForensics::UpdateTree()
 
 void WombatForensics::InitializeQueryModel()
 {
-    qDebug() << "Query Thread has finished!";
-    openfuture = QtConcurrent::run(this, &WombatForensics::UpdateTree);
+    qDebug() << "QueryModel";
+    fcasedb.commit();
+    qDebug() << "temp db commit finished";
+    if(ProcessingComplete())
+    {
+        qDebug() << "All threads have finished.";
+        fcasedb.commit();
+        qDebug() << "DB Commit finished.";
+        QSqlQueryModel* tmpmodel = new QSqlQueryModel();
+        tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data", fcasedb);
+        tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
+        tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Type"));
+        tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Name"));
+
+        ui->dirTreeView->setModel(tmpmodel);
+    }
+    UpdateProgress(filesfound, filesprocessed);
+    // qDebug() << "Query Thread has finished!";
+    // openfuture = QtConcurrent::run(this, &WombatForensics::UpdateTree);
     /*
     fcasedb.commit();
     QSqlQueryModel* tmpmodel = new QSqlQueryModel();
@@ -231,9 +248,9 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
-    openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
-    openwatcher.setFuture(openfuture);
-    //wombatframework->OpenFiles();
+    //  openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
+    //  openwatcher.setFuture(openfuture);
+    wombatframework->OpenFiles();
     // OPEN FILES INCLUDES WALKING FILE TREE->ADDING TO DB->GETTING DB INFO->ADDING TO NODE TREE.
     // MIGHT BE ABLE TO GET RID OF THE BELOW FUNCTIONS IF I CAN GET MY QUERYMODEL WORKING...
     //wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
@@ -265,8 +282,8 @@ void WombatForensics::AddEvidence()
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
         //qDebug() << " ptr itemcount: " << wombatvarptr->evidenceobject.itemcount;
-        //wombatprogresswindow->show();
-        //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
+        wombatprogresswindow->show();
+        wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
         // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
 
         sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);

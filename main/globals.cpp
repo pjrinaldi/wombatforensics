@@ -5,3 +5,5 @@ QString fdbname = "t.db";
 QThreadPool* threadpool = NULL;
 QVector<QFuture<void> > threadvector;
 QFutureWatcher<void> filewatcher;
+int filesfound = 0;
+int filesprocessed = 0;

@@ -160,6 +160,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
 
 void WombatFramework::OpenFiles() // open the files and add to file info vector
 {
+    /*
     // NEED TO CALL MY OWN WALK FUNCTION...
     for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
     {
@@ -179,7 +180,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         //qDebug() << "last inum: " << wombatptr->evidenceobject.fsinfovector[i]->last_inum;
         //qDebug() << "inum count: " << wombatptr->evidenceobject.fsinfovector[i]->inum_count;
     }
-    /*
+    */
     uint8_t walkreturn = 1;
     int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
     for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
@@ -189,7 +190,6 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
         }
     }
-    */
     //emit(
     //fcasedb.commit();
     //qDebug() << "sql commit run.";

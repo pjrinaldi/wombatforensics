@@ -8,5 +8,7 @@ extern QString fdbname;
 extern QThreadPool* threadpool;
 extern QVector<QFuture<void> > threadvector;
 extern QFutureWatcher<void> filewatcher;
+extern int filesfound;
+extern int filesprocessed;
 
 #endif
