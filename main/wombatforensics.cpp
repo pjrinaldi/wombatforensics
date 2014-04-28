@@ -18,6 +18,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatprogresswindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+    connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //InitializeDirModel();
     //InitializeQueryModel();
@@ -26,6 +27,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 
 void WombatForensics::HideProgressWindow(bool checkedstate)
 {
+    InitializeQueryModel();
     ui->actionView_Progress->setChecked(checkedstate);
 }
 
@@ -214,7 +216,9 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
-    wombatframework->OpenFiles();
+    openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
+    openwatcher.setFuture(openfuture);
+    //wombatframework->OpenFiles();
     // OPEN FILES INCLUDES WALKING FILE TREE->ADDING TO DB->GETTING DB INFO->ADDING TO NODE TREE.
     // MIGHT BE ABLE TO GET RID OF THE BELOW FUNCTIONS IF I CAN GET MY QUERYMODEL WORKING...
     wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
@@ -251,7 +255,7 @@ void WombatForensics::AddEvidence()
         // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
         /*
         QFutureWatcher<void> watcher1;
-        connect(&watcher1, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::DirectConnection);
+        connect(&watcher1, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
         QFuture<void> future1 = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
         watcher1.setFuture(future1);
         */
