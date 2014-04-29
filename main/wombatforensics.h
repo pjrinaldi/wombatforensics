@@ -15,7 +15,7 @@ namespace Ui {
 class WombatForensics;
 }
 
-InterfaceSignals* isignals;
+//InterfaceSignals* isignals;
 
 class WombatForensics : public QMainWindow
 {

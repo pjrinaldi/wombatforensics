@@ -53,7 +53,7 @@
 #include "tskvariable.h"
 #include "translate.hpp"
 #include "hexEditor.hpp"
-#include "tsk/img/tsk_img_i.h"
-#include "tsk/fs/tsk_fs_i.h"
+#include "img/tsk_img_i.h"
+#include "fs/tsk_fs_i.h"
 
 #endif // WOMBATINCLUDE_H

@@ -24,10 +24,7 @@ public:
     void ProgUpd(void) { emit(ProgressUpdate(filesfound, filesprocessed)); }
 
 signals:
-    void ProgressUpdate(int filecount, int processcount)
-    {
-        //qDebug() << "Global progress update worked...";
-    };
+    void ProgressUpdate(int filecount, int processcount);
 
 private:
     //InterfaceSignals(const InterfaceSignals&);

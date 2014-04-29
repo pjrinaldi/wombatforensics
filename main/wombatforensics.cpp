@@ -13,7 +13,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     isignals = new InterfaceSignals();
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
-    connect(isignals, SIGNAL(UpdateProgress(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(ProgressUpdate(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
     wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
