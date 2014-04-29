@@ -10,9 +10,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
     wombatprogresswindow = new ProgressWindow(wombatdatabase);
+    isignals = new InterfaceSignals();
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
-    connect(InterfaceSignals::instance(), SIGNAL(UpdateProgress(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(UpdateProgress(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
     wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
@@ -224,7 +225,7 @@ void WombatForensics::InitializeQueryModel()
 
         ui->dirTreeView->setModel(tmpmodel);
     }
-    UpdateProgress(filesfound, filesprocessed);
+    // UpdateProgress(filesfound, filesprocessed);
     // qDebug() << "Query Thread has finished!";
     // openfuture = QtConcurrent::run(this, &WombatForensics::UpdateTree);
     /*
@@ -670,6 +671,7 @@ void WombatForensics::FileExport(FileExportData* exportdata)
 
 void WombatForensics::UpdateProgress(int filecount, int processcount)
 {
+    qDebug() << "Global Class Called This to AutoUpdate!!!";
     int curprogress = (int)((((float)processcount)/(float)filecount)*100);
     wombatprogresswindow->UpdateFilesFound(QString::number(filecount));
     wombatprogresswindow->UpdateFilesProcessed(QString::number(processcount));
