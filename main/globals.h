@@ -17,23 +17,14 @@ class InterfaceSignals : public QObject
 public:
     InterfaceSignals() { };
     ~InterfaceSignals() { };
-    //static void init() { if (_instance == 0) _instance = new InterfaceSignals(); }
-    //static void term() { delete _instance; }
-    //static InterfaceSignals* instance() { return _instance; }
 
     void ProgUpd(void) { emit(ProgressUpdate(filesfound, filesprocessed)); }
 
 signals:
     void ProgressUpdate(int filecount, int processcount);
 
-private:
-    //InterfaceSignals(const InterfaceSignals&);
-    //InterfaceSignals& operator=(const InterfaceSignals&);
-
-    //static InterfaceSignals* _instance;
 };
 
 extern InterfaceSignals* isignals;
-//extern InterfaceSignals* InterfaceSignals::_instance = 0;
 
 #endif
