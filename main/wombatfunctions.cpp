@@ -95,6 +95,8 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
         fquery.exec();
         fquery.finish();
         filesprocessed++;
+        InterfaceSignals::instance()->ProgUpd();
+        
     }
     else
     {
