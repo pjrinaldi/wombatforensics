@@ -232,6 +232,7 @@ void WombatForensics::InitializeQueryModel()
         tmpmodel->setHeaderData(10, Qt::Horizontal, tr("MD5 Hash"));
 
         ui->dirTreeView->setModel(tmpmodel);
+        ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
 }

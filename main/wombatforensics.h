@@ -133,6 +133,9 @@ public:
         QVariant value = QSqlQueryModel::data(index, role);
         if(value.isValid() && role == Qt::DisplayRole)
         {
+            if(index.column() == 0)
+            {
+            }
             if(index.column() >= 6 && index.column() <= 9)
             {
                 char buf[128];
@@ -146,7 +149,80 @@ public:
         return value;
     };
 };
+/*
+ *C++
+ *
+     virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
+     //virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+     //virtual void setEditorData ( QWidget * editor, const QModelIndex & index );
+ *
+ *Qt::ItemFlags checkablesqlquerymodel::flags ( const QModelIndex & index ) const
+{
+    if(!index.isValid())
+        return 0;
+ 
+    if(index.column()==0)
+    {
+        return  Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    }
+    else
+    {
+        return QAbstractItemModel::flags(index);
+    }
+ *
+ *
+ *
+ * You probably need to add Qt::ItemIsUserCheckable to your flags for that column.
 
+You should implement data() and setData() in your model for the Qt::CheckStateRole of the first column. Return (or accept) a Qt::CheckState value: code needs to worry about getting it in/out of the database.
+
+The standard delegate will then draw a check box in the cell with the check state specified by the data(Qt::CheckStateRole) value.
+ *
+ * PYTHON
+ *class CheckboxSqlModel(QtSql.QSqlQueryModel):
+    def __init__(self, column):
+        super(CheckboxSqlModel, self).__init__()
+        self.column = column
+        self.checkboxes = list() #List of checkbox states
+        self.first = list() #Used to initialize checkboxes
+
+    #Make column editable
+    def flags(self, index):
+        flags = QtSql.QSqlQueryModel.flags(self, index)
+        if index.column() == self.column:
+            flags |= QtCore.Qt.ItemIsUserCheckable
+        return flags
+
+    def data(self, index, role=QtCore.Qt.DisplayRole):
+        row = index.row()
+        if index.column() == self.column and role == QtCore.Qt.CheckStateRole:
+            #Used to initialize
+            if row not in self.first :
+                index = self.createIndex(row, self.column)
+                self.first.append(row)
+                self.checkboxes.append(False)
+                return QtCore.Qt.Unchecked
+            #if checked
+            elif self.checkboxes[row]:
+                return QtCore.Qt.Checked
+            else:
+                return QtCore.Qt.Unchecked
+        else:
+            return QtSql.QSqlQueryModel.data(self, index, role)
+
+    def setData(self, index, value, role=QtCore.Qt.DisplayRole):
+        row = index.row()
+        if index.column() == self.column and role == QtCore.Qt.CheckStateRole:
+            if value.toBool():
+                self.checkboxes[row] = True
+            else:
+                self.checkboxes[row] = False
+            self.dataChanged.emit(index, index)
+            return True
+        else:
+            return False;
+ *
+ */ 
 /*
 class ThreadRunner : public QObject, public QRunnable
 {
