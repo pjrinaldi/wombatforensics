@@ -120,6 +120,33 @@ private:
     //QStandardItemModel* wombatdirmodel;
     //QStandardItemModel* wombattypmodel;
 };
+
+class FileViewSqlModel : public QSqlQueryModel
+{
+    Q_OBJECT
+
+public:
+    FileViewSqlModel(QObject* parent = 0) : QSqlQueryModel(parent) {};
+
+    QVariant data(const QModelIndex &index, int role) const
+    {
+        QVariant value = QSqlQueryModel::data(index, role);
+        if(value.isValid() && role == Qt::DisplayRole)
+        {
+            if(index.column() >= 6 && index.column() <= 9)
+            {
+                char buf[128];
+                QString tmpstr = QString(tsk_fs_time_to_str(value.toInt(), buf));
+                //delete[] buf;
+
+                return tmpstr;
+            }
+        }
+
+        return value;
+    };
+};
+
 /*
 class ThreadRunner : public QObject, public QRunnable
 {

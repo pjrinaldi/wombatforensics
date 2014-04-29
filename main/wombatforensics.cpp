@@ -193,21 +193,23 @@ void WombatForensics::InitializeDirModel()
 
 }
 
+// CURRENTLY FUNCTION IS NOT USED.
 void WombatForensics::UpdateTree()
 {
+    /*
     fcasedb.commit();
-    QSqlQueryModel* tmpmodel = new QSqlQueryModel();
+    FileViewSqlModel* tmpmodel = new FileViewSqlModel();
     tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data", fcasedb);
     tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
     tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Type"));
     tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Name"));
 
     ui->dirTreeView->setModel(tmpmodel);
+    */
 }
 
 void WombatForensics::InitializeQueryModel()
 {
-    qDebug() << "QueryModel";
     fcasedb.commit();
     qDebug() << "temp db commit finished";
     if(ProcessingComplete())
@@ -215,13 +217,22 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
-        QSqlQueryModel* tmpmodel = new QSqlQueryModel();
-        tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data", fcasedb);
+        FileViewSqlModel* tmpmodel = new FileViewSqlModel();
+        tmpmodel->setQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5 FROM data", fcasedb);
         tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
-        tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Type"));
-        tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Name"));
+        tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Name"));
+        tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Full Path"));
+        tmpmodel->setHeaderData(3, Qt::Horizontal, tr("Size (bytes)"));
+        tmpmodel->setHeaderData(4, Qt::Horizontal, tr("Signature"));
+        tmpmodel->setHeaderData(5, Qt::Horizontal, tr("Extension"));
+        tmpmodel->setHeaderData(6, Qt::Horizontal, tr("Created (UTC)"));
+        tmpmodel->setHeaderData(7, Qt::Horizontal, tr("Accessed (UTC)"));
+        tmpmodel->setHeaderData(8, Qt::Horizontal, tr("Modified (UTC)"));
+        tmpmodel->setHeaderData(9, Qt::Horizontal, tr("Status Changed (UTC)"));
+        tmpmodel->setHeaderData(10, Qt::Horizontal, tr("MD5 Hash"));
 
         ui->dirTreeView->setModel(tmpmodel);
+        wombatframework->CloseInfoStructures();
     }
 }
 
@@ -784,6 +795,7 @@ WombatForensics::~WombatForensics()
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
+    ((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
     wombatprogresswindow->close();
     RemoveTmpFiles();
     // USE THIS FUNCTION AND PRINCIPLE TO BUILD THE PROGRESS WINDOW FUNCTIONALITY.
