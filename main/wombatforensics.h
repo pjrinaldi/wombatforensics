@@ -100,8 +100,8 @@ private:
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
-    QFuture<void> openfuture;
-    QFutureWatcher<void> openwatcher;
+    //QFuture<void> openfuture;
+    //QFutureWatcher<void> openwatcher;
 
     off_t offset() const;
     HexEditor* hexwidget;

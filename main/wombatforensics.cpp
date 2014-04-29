@@ -19,17 +19,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     wombatprogresswindow->setModal(false);
     InitializeAppStructure();
-    //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+    connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    //connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+    connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //InitializeDirModel();
-    //InitializeQueryModel();
     InitializeWombatFramework();
 }
 
 void WombatForensics::HideProgressWindow(bool checkedstate)
 {
-    InitializeQueryModel();
     ui->actionView_Progress->setChecked(checkedstate);
 }
 
@@ -225,19 +223,6 @@ void WombatForensics::InitializeQueryModel()
 
         ui->dirTreeView->setModel(tmpmodel);
     }
-    // UpdateProgress(filesfound, filesprocessed);
-    // qDebug() << "Query Thread has finished!";
-    // openfuture = QtConcurrent::run(this, &WombatForensics::UpdateTree);
-    /*
-    fcasedb.commit();
-    QSqlQueryModel* tmpmodel = new QSqlQueryModel();
-    tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data", fcasedb);
-    tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Type"));
-    tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Name"));
-
-    ui->dirTreeView->setModel(tmpmodel);
-    */
 }
 
 void WombatForensics::InitializeEvidenceStructure()
@@ -261,7 +246,6 @@ void WombatForensics::InitializeEvidenceStructure()
     //wombatdatabase->GetFileSystemObjects();
 
     qDebug() << "In evidence structure function!";
-    //InitializeQueryModel();
     //wombatframework->AddEvidenceNodes(); // add evidence node to directory model
 }
 
@@ -294,7 +278,6 @@ void WombatForensics::AddEvidence()
         // SHOULD GO HERE, BUT IT NEEDS TO LAUNCH WHEN THE THREADS ARE DONE...
         // FOR NOW I'LL PUT IT IN THE OFFSHOOT THREAD.
         // if i call these in concurrent::runs-> then they shouldn't run until the end...?
-        //InitializeQueryModel();
         //ResizeColumns();
         // the below must be called when all threads are done and i don't need the variable anymore.
         //wombatframework->CloseInfoStructures();

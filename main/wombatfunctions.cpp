@@ -36,27 +36,8 @@ bool ProcessingComplete()
     return processingcomplete;
 }
 
-//void ProcessFile(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
 {
-    //qDebug() << "Files Found: " << filesfound << " Processed: " << filesprocessed;
-    //qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
-    /*
-    char buf[128];
-    TSK_FS_HASH_RESULTS hashresults;
-    // TO CALCULATE THE HASH, I CAN LOOP OVER THE INUM AND APPLY THIS FUNCTION SET TO EACH TMPFILE I GET IN A SEPARATE
-    // FUNCTION
-    //qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
-    uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
-    char sbuf[17];
-    int sint = 0;
-    for(int i=0; i < 16; i++)
-    {
-        sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
-    }
-    QString tmpstring = QString(sbuf);
-    */
-    QString tmpstring = "";
 
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
@@ -73,25 +54,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
         fquery.addBindValue(tmpints[6]);
         fquery.addBindValue(tmpints[7]);
         fquery.addBindValue(tmpstrings[2]);
-        /*
-        if(tmpfile->name != NULL)
-        {
-            fquery.addBindValue((int)tmpfile->name->type);
-            fquery.addBindValue(QString(tmpfile->name->name));
-            fquery.addBindValue((int)tmpfile->name->par_addr);
-        }
-        fquery.addBindValue(QString(tmppath));
-        if(tmpfile->meta != NULL)
-        {
-            fquery.addBindValue((int)tmpfile->meta->atime);
-            fquery.addBindValue((int)tmpfile->meta->ctime);
-            fquery.addBindValue((int)tmpfile->meta->crtime);
-            fquery.addBindValue((int)tmpfile->meta->mtime);
-            fquery.addBindValue((int)tmpfile->meta->size);
-            fquery.addBindValue((int)tmpfile->meta->addr);
-        }
-        fquery.addBindValue(tmpstring);
-        */
+        
         fquery.exec();
         fquery.finish();
         filesprocessed++;
@@ -108,9 +71,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 {
     //char buf[128];
     TSK_FS_HASH_RESULTS hashresults;
-    // TO CALCULATE THE HASH, I CAN LOOP OVER THE INUM AND APPLY THIS FUNCTION SET TO EACH TMPFILE I GET IN A SEPARATE
-    // FUNCTION
-    //qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf);
+    //qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf); // need to call this function for
+    // dates and times when i get the variable and want to display it.
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     char sbuf[17];
     int sint = 0;
@@ -157,9 +119,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         fileints.append(0);
     }
 
-    QFutureWatcher<void> tmpwatcher;
+    //QFutureWatcher<void> tmpwatcher;
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints);
-    //QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, tmpfile, tmppath, tmpptr);
     filewatcher.setFuture(tmpfuture);
     threadvector.append(tmpfuture);
     filesfound++;

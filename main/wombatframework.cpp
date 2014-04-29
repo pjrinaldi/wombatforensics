@@ -161,7 +161,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
 void WombatFramework::OpenFiles() // open the files and add to file info vector
 {
     /*
-    // NEED TO CALL MY OWN WALK FUNCTION...
+    // MY OWN WALK FUNCTION... I THINK THE TSK DIR WALK WORKS BETTER
     for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
     {
         if(fcasedb.transaction())
@@ -190,8 +190,6 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
         }
     }
-    //fcasedb.commit();
-    //qDebug() << "sql commit run.";
 }
 
 void WombatFramework::ProcessFile(uint64_t inodeaddress, TSK_FS_INFO* fsinfo)
