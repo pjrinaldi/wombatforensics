@@ -654,7 +654,7 @@ void WombatForensics::FileExport(FileExportData* exportdata)
 
 void WombatForensics::UpdateProgress(int filecount, int processcount)
 {
-    qDebug() << "Global Class Called This to AutoUpdate!!!";
+    //qDebug() << "Global Class Called This to AutoUpdate!!!";
     int curprogress = (int)((((float)processcount)/(float)filecount)*100);
     wombatprogresswindow->UpdateFilesFound(QString::number(filecount));
     wombatprogresswindow->UpdateFilesProcessed(QString::number(processcount));
