@@ -140,13 +140,22 @@ public:
             {
                 char buf[128];
                 QString tmpstr = QString(tsk_fs_time_to_str(value.toInt(), buf));
-                //delete[] buf;
 
                 return tmpstr;
             }
         }
 
         return value;
+    };
+
+    Qt::ItemFlags flags(const QModelIndex &index) const
+    {
+        if(index.column() == 0)
+        {
+            return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+        }
+        else
+            return QAbstractItemModel::flags(index);
     };
 };
 /*

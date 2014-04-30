@@ -727,7 +727,7 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
-    for(int i=0; i < wombatvarptr->dirmodel->columnCount(); i++)
+    for(int i=0; i < ((FileViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
     {
         // may need to compare treeview->model() == currentmodel) to determine what to set it to.
         // depending on the design though, i may not need multiple layouts since the columns can be sorted.
