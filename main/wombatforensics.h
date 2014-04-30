@@ -128,14 +128,25 @@ class FileViewSqlModel : public QSqlQueryModel
 public:
     FileViewSqlModel(QObject* parent = 0) : QSqlQueryModel(parent) {};
 
+    QSet<QPersistentModelIndex> checklist;
+
     QVariant data(const QModelIndex &index, int role) const
     {
         QVariant value = QSqlQueryModel::data(index, role);
-        if(value.isValid() && role == Qt::DisplayRole)
+        if(value.isValid())
         {
             if(index.column() == 0)
+                return QSqlQueryModel::data(index, Qt::CheckStateRole);
+        }
+        if(role == Qt::DisplayRole)
+        {
+            if(index.column() == 0)
+                return QSqlQueryModel::data(index, Qt::CheckStateRole);
+            /*if(index.column() == 0)
             {
-            }
+                return 
+                //return checklist.contains(index) ? Qt::Checked : Qt::Unchecked;
+            }*/
             if(index.column() >= 6 && index.column() <= 9)
             {
                 char buf[128];
@@ -143,6 +154,16 @@ public:
 
                 return tmpstr;
             }
+        }
+        
+        //QAbstractModelItem* item = static_cast<QAbstractItem*>(index.internalPointer());
+
+        if(value.isValid() && role == Qt::CheckStateRole && index.column() == 0)
+        {
+            return checklist.contains(index) ? Qt::Checked : Qt::Unchecked;
+            //return static_cast<int>(shouldbechecked ? Qt::Checked : Qt::Unchecked);
+            //return value.toUInt();
+            // Qt::CheckState state = static_cast<Qt::CheckState>(model->data(index, Qt::CheckStateRole).toUInt());
         }
 
         return value;
@@ -152,10 +173,20 @@ public:
     {
         if(index.column() == 0)
         {
-            return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+            return QSqlQueryModel::flags(index) | Qt::ItemIsUserCheckable;
         }
         else
-            return QAbstractItemModel::flags(index);
+            return QSqlQueryModel::flags(index);
+    };
+
+    bool setData(const QModelIndex &index, const QVariant &value, int role)
+    {
+        if(role == Qt::CheckStateRole)
+        {
+            emit dataChanged(index, index);
+            return true;
+        }
+        return QSqlQueryModel::setData(index, value, role);
     };
 };
 /*
