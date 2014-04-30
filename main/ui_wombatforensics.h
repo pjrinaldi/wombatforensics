@@ -23,6 +23,7 @@
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidget>
@@ -66,6 +67,7 @@ public:
     QMenu *menuAction;
     QMenu *menuSettings;
     QToolBar *analysisToolBar;
+    QStatusBar *mainStatusBar;
 
     void setupUi(QMainWindow *WombatForensics)
     {
@@ -248,6 +250,9 @@ public:
         analysisToolBar->setIconSize(QSize(16, 16));
         analysisToolBar->setFloatable(false);
         WombatForensics->addToolBar(Qt::TopToolBarArea, analysisToolBar);
+        mainStatusBar = new QStatusBar(WombatForensics);
+        mainStatusBar->setObjectName(QStringLiteral("mainStatusBar"));
+        WombatForensics->setStatusBar(mainStatusBar);
 
         mainMenubar->addAction(menuFile->menuAction());
         mainMenubar->addAction(menuEvidence->menuAction());

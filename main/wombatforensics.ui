@@ -311,6 +311,7 @@
    <addaction name="separator"/>
    <addaction name="actionExport_Evidence"/>
   </widget>
+  <widget class="QStatusBar" name="mainStatusBar" />
   <action name="actionNew_Case">
    <property name="icon">
     <iconset>
