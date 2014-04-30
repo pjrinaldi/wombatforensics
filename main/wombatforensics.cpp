@@ -231,7 +231,12 @@ void WombatForensics::InitializeQueryModel()
         tmpmodel->setHeaderData(9, Qt::Horizontal, tr("Status Changed (UTC)"));
         tmpmodel->setHeaderData(10, Qt::Horizontal, tr("MD5 Hash"));
 
-        ui->dirTreeView->setModel(tmpmodel);
+        //ui->dirTreeView->setModel(tmpmodel);
+
+        checkableproxy = new CheckableProxyModel(this);
+        checkableproxy->setSourceModel(tmpmodel);
+        ui->dirTreeView->setModel(checkableproxy);
+
         ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
@@ -796,7 +801,8 @@ WombatForensics::~WombatForensics()
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
-    ((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
+    ((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
+    //((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
     wombatprogresswindow->close();
     RemoveTmpFiles();
     // USE THIS FUNCTION AND PRINCIPLE TO BUILD THE PROGRESS WINDOW FUNCTIONALITY.

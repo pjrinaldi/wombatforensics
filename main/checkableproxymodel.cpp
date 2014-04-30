@@ -21,7 +21,7 @@
 #include <QtDebug>
 #include <QTimer>
 #include <QQueue>
-#include "delayedexecutiontimer.h"
+//#include "delayedexecutiontimer.h"
 
 
 #ifdef CHECKABLEPROXYMODEL_DEBUG
@@ -60,16 +60,16 @@ private:
 
 CheckableProxyModel::CheckableProxyModel(QObject *parent) :
     QSortFilterProxyModel(parent),
-    m_cleanupTimer(new DelayedExecutionTimer(30000, 1000, this)),
+    //m_cleanupTimer(new DelayedExecutionTimer(30000, 1000, this)),
     m_periodicalCleanupTimer(new QTimer(this))
 {
     m_baseState.defaultChildState = CheckableProxyModel::Unchecked;
     m_baseState.nodeState = CheckableProxyModel::Unchecked;
 
     setDynamicSortFilter(true);
-    connect (m_cleanupTimer, SIGNAL(triggered()), SLOT(cleanupStorage()));
+    //connect (m_cleanupTimer, SIGNAL(triggered()), SLOT(cleanupStorage()));
 
-    connect (m_periodicalCleanupTimer, SIGNAL(timeout()), m_cleanupTimer, SLOT(trigger()));
+    //connect (m_periodicalCleanupTimer, SIGNAL(timeout()), m_cleanupTimer, SLOT(trigger()));
     m_periodicalCleanupTimer->setInterval(5 * 60 * 1000); // 5 minutes
     m_periodicalCleanupTimer->start();
 }
@@ -271,7 +271,7 @@ Qt::CheckState CheckableProxyModel::getCombinedChildrenCheckState(QModelIndex so
 #ifdef CHECKABLEPROXYMODEL_DEBUG
         qDebug() << "schedule hash cleanup";
 #endif
-        m_cleanupTimer->trigger();
+        //m_cleanupTimer->trigger();
     }
     return state;
 }
