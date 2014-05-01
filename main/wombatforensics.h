@@ -116,6 +116,8 @@ private:
     QLabel* selectedinteger;
     QLabel* selectedfloat;
     QLabel* selecteddouble;
+    QProgressBar* mainprogress;
+    QLabel* filecountlabel;
 
     // NEED TO REMOVE THESE ONCE I GET MY FUNCTIONS DONE AND REMOVE THE OLD STRUCTURE
     //QStandardItemModel* currenttreemodel;

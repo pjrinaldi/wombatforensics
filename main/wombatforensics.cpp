@@ -5,6 +5,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
+    this->statusBar()->setSizeGripEnabled(true);
+    mainprogress = new QProgressBar(this);
+    this->statusBar()->addPermanentWidget(mainprogress, 0);
+    this->statusBar()->removeWidget(mainprogress);
+    filecountlabel = new QLabel(this);
+    filecountlabel->setText("Files: 0");
+    this->statusBar()->addWidget(filecountlabel, 0);
+    this->statusBar()->removeWidget(filecountlabel);
     tskobjptr = &tskobject;
     tskobjptr->readimginfo = NULL;
     wombatdatabase = new WombatDatabase(wombatvarptr);
@@ -285,8 +293,11 @@ void WombatForensics::AddEvidence()
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
         //qDebug() << " ptr itemcount: " << wombatvarptr->evidenceobject.itemcount;
-        wombatprogresswindow->show();
-        wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
+        // REPLACE WITH PROGRESSBAR/STATUSBAR
+        this->statusBar()->addPermanentWidget(mainprogress, 0);
+        this->mainprogress->show();
+        //wombatprogresswindow->show();
+        //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
         // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
 
         sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
@@ -751,6 +762,7 @@ void WombatForensics::SetupHexPage(void)
     selectedoffset = new QLabel(this);
     selectedhex = new QLabel(this);
     selectedoffset->setText("Offset: 00");
+    selectedoffset->setAlignment(Qt::AlignBottom);
     selectedhex->setText("Length: 0");
     //selectedoffset = new QLabel("Offset: 00");
     //selectedhex = new QLabel("Length: 0");
@@ -758,8 +770,8 @@ void WombatForensics::SetupHexPage(void)
     selectedinteger = new QLabel("Integer: ");
     selectedfloat = new QLabel("Float: ");
     selecteddouble = new QLabel("Double: ");
-    hstatus->addPermanentWidget(selectedoffset);
-    hstatus->addPermanentWidget(selectedhex);
+    hstatus->addWidget(selectedoffset);
+    hstatus->addWidget(selectedhex);
     hstatus->addWidget(selectedascii);
     hstatus->addWidget(selectedinteger);
     hstatus->addWidget(selectedfloat);
@@ -805,7 +817,8 @@ WombatForensics::~WombatForensics()
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
-    ((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
+    if(checkableproxy->sourceModel() != NULL)
+        ((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
     //((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
     wombatprogresswindow->close();
     RemoveTmpFiles();
