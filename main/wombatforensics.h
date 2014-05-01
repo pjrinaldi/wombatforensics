@@ -125,6 +125,109 @@ private:
     //QStandardItemModel* wombattypmodel;
 };
 
+
+
+/*
+ *class MyProxy : public QAbstractProxyModel {
+public: 
+MyProxy() : QAbstractProxyModel(){} 
+QModelIndex mapToSource(const QModelIndex &proxyIndex) const {
+if(!proxyIndex.isValid()) return QModelIndex(); 
+int c = columnFromIndex(proxyIndex); 
+int r = rowFromIndex(proxyIndex); 
+return sourceModel()->index(r,c); 
+} 
+
+QModelIndex mapFromSource(const QModelIndex &sourceIndex) const {
+if(!sourceIndex.isValid()) return QModelIndex(); 
+if(sourceIndex.column()==0) 
+return createIndex(sourceIndex.row(), 0, calculateId(sourceIndex));
+return createIndex(0, 0, calculateId(sourceIndex)); 
+} 
+int columnCount(const QModelIndex &parent = QModelIndex()) const { 
+return 1; 
+} 
+int rowCount(const QModelIndex &parent = QModelIndex()) const { 
+if(!parent.isValid()) 
+return qMin(0x10000, sourceModel()->rowCount()); 
+int c = mapToSource(parent).column(); 
+if(c==sourceModel()->columnCount()-1) 
+return 0; 
+return 1; 
+} 
+QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const {
+if(parent.isValid()) { 
+// if parent is valid then in the source model 
+// we want to receive the same row but the next column, provided that row==0 && col==0
+// otherwise the index is not valid 
+if(row!=0 || column!=0) return QModelIndex(); 
+return createIndex(row, column, (int)parent.internalId()+1); 
+} 
+if(column!=0) return QModelIndex(); 
+// parent is not valid thus we can calculate the id the same way as for the source model 
+return createIndex(row, 0, calculateId(row, 0)); 
+} 
+QModelIndex parent(const QModelIndex &child) const { 
+if(!child.isValid()) 
+return QModelIndex(); 
+// parent of an index in the source model is the same row but previous column 
+int c = mapToSource(child).column(); 
+int r = mapToSource(child).row(); 
+if(c==0){ 
+// if original column == 0 then there is no parent 
+return QModelIndex(); 
+} 
+c -= 1; 
+if(c==0){ 
+return createIndex(r, 0, calculateId(r, c)); 
+} 
+return createIndex(0, 0, calculateId(r, c)); 
+} 
+private: 
+int columnFromIndex(const QModelIndex &proxyIndex) const {
+quint32 id = proxyIndex.internalId();
+int c = (id & 0xffff);
+return c;
+}
+int rowFromIndex(const QModelIndex &proxyIndex) const {
+quint32 id = proxyIndex.internalId();
+int r = (id & 0xffff0000) >> 16;
+return r;
+}
+int calculateId(const QModelIndex &sourceIndex) const {
+quint32 r = sourceIndex.row();
+quint32 c = sourceIndex.column();
+return calculateId(r, c);
+}
+int calculateId(quint32 r, quint32 c) const{
+return (((r & 0xffff) << 16) | (c & 0xffff));
+}
+};
+
+int main(int argc, char **argv) {
+QApplication app(argc, argv);
+QTreeView tv;
+QStandardItemModel model(40,20);
+for(int i=0; i<model.rowCount(); i++){
+for(int j=0; j<model.columnCount(); j++){
+model.setData(model.index(i,j), qrand() % 100, Qt::DisplayRole);
+}
+}
+MyProxy proxy;
+proxy.setSourceModel(&model);
+tv.setModel(&proxy);
+tv.show();
+QTableView orig;
+orig.setModel(&model);
+orig.show();
+return app.exec();
+}
+ *
+ *
+ */ 
+
+
+
 class FileViewSqlModel : public QSqlQueryModel
 {
     Q_OBJECT
@@ -132,7 +235,7 @@ class FileViewSqlModel : public QSqlQueryModel
 public:
     FileViewSqlModel(QObject* parent = 0) : QSqlQueryModel(parent) {};
 
-    QSet<QPersistentModelIndex> checklist;
+    //QSet<QPersistentModelIndex> checklist;
 
     QVariant data(const QModelIndex &index, int role) const
     {
