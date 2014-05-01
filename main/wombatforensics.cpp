@@ -7,6 +7,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvarptr = &wombatvariable;
     this->statusBar()->setSizeGripEnabled(true);
     mainprogress = new QProgressBar(this);
+    int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
+    mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
     this->statusBar()->addPermanentWidget(mainprogress, 0);
     this->statusBar()->removeWidget(mainprogress);
     filecountlabel = new QLabel(this);
@@ -296,6 +298,9 @@ void WombatForensics::AddEvidence()
         // REPLACE WITH PROGRESSBAR/STATUSBAR
         this->statusBar()->addPermanentWidget(mainprogress, 0);
         this->mainprogress->show();
+        int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
+        mainprogress->setValue(curprogress);
+        mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
         //wombatprogresswindow->show();
         //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
         // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
@@ -684,9 +689,11 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
 {
     //qDebug() << "Global Class Called This to AutoUpdate!!!";
     int curprogress = (int)((((float)processcount)/(float)filecount)*100);
-    wombatprogresswindow->UpdateFilesFound(QString::number(filecount));
-    wombatprogresswindow->UpdateFilesProcessed(QString::number(processcount));
-    wombatprogresswindow->UpdateProgressBar(curprogress);
+    mainprogress->setValue(curprogress);
+    mainprogress->setFormat("Processed " + QString::number(processcount) + " of " + QString::number(filecount) + " " + QString::number(curprogress) + "%");
+    //wombatprogresswindow->UpdateFilesFound(QString::number(filecount));
+    //wombatprogresswindow->UpdateFilesProcessed(QString::number(processcount));
+    //wombatprogresswindow->UpdateProgressBar(curprogress);
 }
 
 void WombatForensics::UpdateMessageTable()
