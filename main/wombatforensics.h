@@ -79,7 +79,6 @@ private:
     void InitializeOpenCase(void);
     void InitializeWombatFramework(void);
     void InitializeDirModel(void);
-    //void InitializeQueryModel(void);
     void UpdateViewer(void);
     void UpdateOmniValue(void);
     void LoadHexContents(void);
