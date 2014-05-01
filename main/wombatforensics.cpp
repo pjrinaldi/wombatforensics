@@ -5,6 +5,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->setupUi(this);
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
+    this->menuBar()->hide();
     this->statusBar()->setSizeGripEnabled(true);
     mainprogress = new QProgressBar(this);
     int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
