@@ -34,6 +34,7 @@ public:
     ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
     CheckableProxyModel* checkableproxy;
+    TreeProxy* treeproxy;
 
 signals:
     void LogVariable(WombatVariable* wombatVariable);
@@ -123,7 +124,7 @@ private:
     //QStandardItemModel* wombatdirmodel;
     //QStandardItemModel* wombattypmodel;
 };
-
+/*
 class TreeProxy : public QAbstractProxyModel
 {
 public:
@@ -137,11 +138,12 @@ public:
     };
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const
     {
+        // modify this to map in a tree...
         if(!sourceIndex.isValid()) return QModelIndex();
         if(sourceIndex.column()==0)
             return createIndex(sourceIndex.row(), 0, calculateId(sourceIndex));
         return createIndex(0, 0, calculateId(sourceIndex));
-    }; 
+    };
     int columnCount(const QModelIndex &parent = QModelIndex()) const
     {
         return 1;
@@ -212,7 +214,7 @@ private:
         return (((r & 0xffff) << 16) | (c & 0xffff));
     };
 };
-
+*/
 class FileViewSqlModel : public QSqlQueryModel
 {
     Q_OBJECT
