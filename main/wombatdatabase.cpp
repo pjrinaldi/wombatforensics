@@ -325,6 +325,8 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->filesystemobject.name = QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype));
             wombatptr->currentfilesystemid = 0;
             wombatptr->bindvalues.clear();
+            wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype)).toUpper());
+            wombatptr->bindvalues.append(QString("/"));
             wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->ftype);
             wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->flags);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->offset);
@@ -335,7 +337,7 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->first_inum);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->last_inum);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
-            wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (objecttype, type, flags, byteoffset, parentid, parimgid, size, blockcount, firstinum, lastinum, rootinum) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+            wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blockcount, firstinum, lastinum, rootinum) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
         }
     }
 }

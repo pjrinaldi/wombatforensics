@@ -85,7 +85,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     QVector<QString> filestrings;
     if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
     else filestrings.append(QString("unknown.wbt"));
-    filestrings.append(QString(tmppath));
+    filestrings.append(QString("/") + QString(tmppath));
     filestrings.append(tmpstring);
 
     QVector<int> fileints;

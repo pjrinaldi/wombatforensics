@@ -272,7 +272,6 @@ void WombatForensics::InitializeEvidenceStructure()
     //wombatdatabase->GetPartitionObjects();
     //wombatdatabase->GetFileSystemObjects();
 
-    qDebug() << "In evidence structure function!";
     //wombatframework->AddEvidenceNodes(); // add evidence node to directory model
 }
 
