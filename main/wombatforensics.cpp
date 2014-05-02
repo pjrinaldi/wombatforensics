@@ -247,9 +247,10 @@ void WombatForensics::InitializeQueryModel()
         treeproxy = new TreeProxy();
         checkableproxy = new CheckableProxyModel(this);
         treeproxy->setSourceModel(tmpmodel);
-        ui->dirTreeView->setModel(treeproxy);
+        checkableproxy->setSourceModel(treeproxy);
+        //ui->dirTreeView->setModel(treeproxy);
         //checkableproxy->setSourceModel(tmpmodel);
-        //ui->dirTreeView->setModel(checkableproxy);
+        ui->dirTreeView->setModel(checkableproxy);
 
         ResizeColumns();
         wombatframework->CloseInfoStructures();
