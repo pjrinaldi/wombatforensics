@@ -26,6 +26,9 @@ linux:LIBS = -lewf -ltsk
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 win32:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)d
 }
+#win32:RC_ICONS = wombat_32.ico
+#mac:ICON = myapp.ico
+#linux:
 
 #install
 target.path = ./

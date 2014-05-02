@@ -188,7 +188,7 @@ public:
     ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
     CheckableProxyModel* checkableproxy;
-    TreeProxy* treeproxy;
+    //TreeProxy* treeproxy;
 
 signals:
     void LogVariable(WombatVariable* wombatVariable);

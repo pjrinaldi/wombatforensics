@@ -246,12 +246,12 @@ void WombatForensics::InitializeQueryModel()
 
         //ui->dirTreeView->setModel(tmpmodel);
 
-        treeproxy = new TreeProxy();
+        //treeproxy = new TreeProxy();
         checkableproxy = new CheckableProxyModel(this);
-        treeproxy->setSourceModel(tmpmodel);
-        checkableproxy->setSourceModel(treeproxy);
+        //treeproxy->setSourceModel(tmpmodel);
+        //checkableproxy->setSourceModel(treeproxy);
         //ui->dirTreeView->setModel(treeproxy);
-        //checkableproxy->setSourceModel(tmpmodel);
+        checkableproxy->setSourceModel(tmpmodel);
         ui->dirTreeView->setModel(checkableproxy);
 
         ResizeColumns();
@@ -833,8 +833,8 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     if(ui->dirTreeView->model() != NULL)
     {
         if(checkableproxy->sourceModel() != NULL)
-            ((FileViewSqlModel*)treeproxy->sourceModel())->clear(); // clear sql so db can be closed.
-            //((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
+            //((FileViewSqlModel*)treeproxy->sourceModel())->clear(); // clear sql so db can be closed.
+            ((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
     }
     //((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
     wombatprogresswindow->close();
