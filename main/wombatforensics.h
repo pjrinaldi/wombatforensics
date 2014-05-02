@@ -24,9 +24,9 @@ class TreeProxy : public QSortFilterProxyModel
     };
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
     {
+        qDebug() << QSortFilterProxyModel::data(index, role);//index.sibling(index.row(), 0).data().toInt(); // object id
         return QSortFilterProxyModel::data(index, role);
     };
-
 };
 /*
 class TreeProxy : public QAbstractProxyModel
