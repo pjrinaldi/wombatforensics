@@ -24,8 +24,12 @@ class TreeProxy : public QSortFilterProxyModel
     };
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
     {
-        qDebug() << QSortFilterProxyModel::data(index, role); // object id
+        //qDebug() << QSortFilterProxyModel::data(index, role); // object id
         return QSortFilterProxyModel::data(index, role);
+    };
+    bool setData(const QModelIndex &index, const QVariant &value, int role)
+    {
+        return QSortFilterProxyModel::setData(index, value, role);
     };
 };
 /*

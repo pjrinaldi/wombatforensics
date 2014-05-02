@@ -831,7 +831,8 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     if(ui->dirTreeView->model() != NULL)
     {
         if(checkableproxy->sourceModel() != NULL)
-            ((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
+            ((FileViewSqlModel*)treeproxy->sourceModel())->clear(); // clear sql so db can be closed.
+            //((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
     }
     //((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
     wombatprogresswindow->close();
