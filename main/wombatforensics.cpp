@@ -8,8 +8,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->menuBar()->hide();
     this->statusBar()->setSizeGripEnabled(true);
     mainprogress = new QProgressBar(this);
+    //mainprogress->setMaximumHeight(15);
     int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
     mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
+    //this->statusBar()->setMaximumHeight(15);
     this->statusBar()->addPermanentWidget(mainprogress, 0);
     this->statusBar()->removeWidget(mainprogress);
     filecountlabel = new QLabel(this);
