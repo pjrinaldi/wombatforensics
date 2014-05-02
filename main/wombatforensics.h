@@ -12,11 +12,161 @@
 #include "globals.h"
 #include "checkableproxymodel.h"
 
+class TreeProxy : public QSortFilterProxyModel
+{
+    QModelIndex mapToSource(const QModelIndex &proxyIndex) const
+    {
+        return proxyIndex;
+    };
+    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const
+    {
+        return sourceIndex;
+    };
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+    {
+        return QSortFilterProxyModel::data(index, role);
+    };
+
+};
+/*
+class TreeProxy : public QAbstractProxyModel
+{
+public:
+    TreeProxy() : QAbstractProxyModel() {};
+    QModelIndex mapToSource(const QModelIndex &proxyIndex) const
+    {
+    };
+    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const
+    {
+    };
+    QModelIndex index(int row, int column, const QModelIndex &parentIndex = QModelIndex()) const
+    {
+    };
+    QModelIndex parent(const QModelIndex &child) const
+    {
+    };
+    int rowCount(const QModelIndex &parent = QModelIndex()) const
+    {
+    };
+    int columnCount(const QModelIndex &parent = QModelIndex()) const
+    {
+    };
+    QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const
+    {
+        QVariant value = QAbstractProxyModel::data(proxyIndex, role);
+        /*
+        QVariant value = QSqlQueryModel::data(index, role);
+        if(value.isValid() && role == Qt::DisplayRole)
+        {
+            if(index.column() >= 6 && index.column() <= 9)
+            {
+                char buf[128];
+                QString tmpstr = QString(tsk_fs_time_to_str(value.toInt(), buf));
+
+                return tmpstr;
+            }
+        }
+        */
+//        return value;
+//    };
+    //QVariant headerData(int 
+//};
+    /*
+    QModelIndex mapToSource(const QModelIndex &proxyIndex) const
+    {
+        return QModelIndex();
+        if(!proxyIndex.isValid()) return QModelIndex();
+        int c = columnFromIndex(proxyIndex);
+        int r = rowFromIndex(proxyIndex);
+        return sourceModel()->index(r,c);
+    };
+    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const
+    {
+        // modify this to map in a tree...
+        if(!sourceIndex.isValid()) return QModelIndex();
+        if(sourceIndex.column()==0)
+            return createIndex(sourceIndex.row(), 0, calculateId(sourceIndex));
+        
+        return createIndex(0, 0, calculateId(sourceIndex));
+        return QModelIndex();
+    };
+    int columnCount(const QModelIndex &parent = QModelIndex()) const
+    {
+        return 1;
+    };
+    int rowCount(const QModelIndex &parent = QModelIndex()) const
+    {
+        if(!parent.isValid())
+            return qMin(0x10000, sourceModel()->rowCount());
+        int c = mapToSource(parent).column();
+        if(c==sourceModel()->columnCount()-1)
+            return 0;
+        return 1;
+    };
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const
+    {
+        if(parent.isValid()
+        {
+            // if parent is valid then in the source model
+            // we want to receive the same row but the next column, provided that row==0 && col==0
+            // otherwise the index is not valid 
+            if(row!=0 || column!=0) return QModelIndex();
+            return createIndex(row, column, (int)parent.internalId()+1);
+        }
+        if(column!=0) return QModelIndex();
+        // parent is not valid thus we can calculate the id the same way as for the source model 
+        return createIndex(row, 0, calculateId(row, 0));
+        return QModelIndex();
+    };
+    QModelIndex parent(const QModelIndex &child) const
+    {
+        if(!child.isValid())
+            return QModelIndex();
+        // parent of an index in the source model is the same row but previous column 
+        int c = mapToSource(child).column();
+        int r = mapToSource(child).row();
+        if(c==0)
+        {
+            // if original column == 0 then there is no parent 
+            return QModelIndex();
+        }
+        c -= 1;
+        if(c==0)
+        {
+            return createIndex(r, 0, calculateId(r, c));
+        }
+        return createIndex(0, 0, calculateId(r, c));
+    };
+private: 
+    int columnFromIndex(const QModelIndex &proxyIndex) const
+    {
+        quint32 id = proxyIndex.internalId();
+        int c = (id & 0xffff);
+        return c;
+    };
+    int rowFromIndex(const QModelIndex &proxyIndex) const
+    {
+        quint32 id = proxyIndex.internalId();
+        int r = (id & 0xffff0000) >> 16;
+        return r;
+    };
+    int calculateId(const QModelIndex &sourceIndex) const
+    {
+        quint32 r = sourceIndex.row();
+        quint32 c = sourceIndex.column();
+        return calculateId(r, c);
+    };
+    int calculateId(quint32 r, quint32 c) const
+    {
+        return (((r & 0xffff) << 16) | (c & 0xffff));
+    };
+};*/
+
+
+
 namespace Ui {
 class WombatForensics;
 }
-
-//InterfaceSignals* isignals;
 
 class WombatForensics : public QMainWindow
 {
