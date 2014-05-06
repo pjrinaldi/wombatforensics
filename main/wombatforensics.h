@@ -12,6 +12,7 @@
 #include "globals.h"
 #include "checkableproxymodel.h"
 
+/*
 class TreeProxy : public QSortFilterProxyModel
 {
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const
@@ -31,7 +32,7 @@ class TreeProxy : public QSortFilterProxyModel
     {
         return QSortFilterProxyModel::setData(index, value, role);
     };
-};
+};*/
 /*
 class TreeProxy : public QAbstractProxyModel
 {
@@ -201,6 +202,7 @@ private slots:
     void on_actionView_Progress_triggered(bool checked);
     void UpdateProgress(int count, int processcount);
     void UpdateMessageTable();
+    void CheckedSelectionChanged();
     void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);

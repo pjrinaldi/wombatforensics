@@ -250,6 +250,7 @@ void WombatForensics::InitializeQueryModel()
 
         //treeproxy = new TreeProxy();
         checkableproxy = new CheckableProxyModel(this);
+        connect(checkableproxy, SIGNAL(checkedNodesChanged()), this, SLOT(CheckedSelectionChanged()), Qt::DirectConnection);
         //treeproxy->setSourceModel(tmpmodel);
         //checkableproxy->setSourceModel(treeproxy);
         //ui->dirTreeView->setModel(treeproxy);
@@ -259,6 +260,11 @@ void WombatForensics::InitializeQueryModel()
         ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
+}
+
+void WombatForensics::CheckedSelectionChanged()
+{
+    qDebug() << "selection stuff can happen now.";
 }
 
 void WombatForensics::InitializeEvidenceStructure()
@@ -941,6 +947,7 @@ void WombatForensics::UpdateOmniValue()
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
+    qDebug() << "selection changed before mapping.";
     QModelIndex srcindex = checkableproxy->mapToSource(index);
     qDebug() << "selection changed: " << srcindex.sibling(srcindex.row(), 0).data().toInt();
     //wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
