@@ -197,6 +197,8 @@ void WombatForensics::InitializeWombatFramework()
 
 void WombatForensics::InitializeDirModel()
 {
+    // OLD MODEL, NOT USED NOW. REPLACED BY SQLTABLEMODEL AND SORTFILTERPROXYMODEL
+    /*
     wombatvarptr->dirmodel = new QStandardItemModel();
     QStringList headerList;
     headerList << "Unique ID" << "Name" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
@@ -207,7 +209,7 @@ void WombatForensics::InitializeDirModel()
     connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
-
+*/
 }
 
 // CURRENTLY FUNCTION IS NOT USED.
@@ -257,7 +259,9 @@ void WombatForensics::InitializeQueryModel()
         //ui->dirTreeView->setModel(treeproxy);
         checkableproxy->setSourceModel(tmpmodel);
         ui->dirTreeView->setModel(checkableproxy);
-
+        connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+        connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+        connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
         ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
