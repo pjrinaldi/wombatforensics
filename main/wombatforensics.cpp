@@ -941,10 +941,12 @@ void WombatForensics::UpdateOmniValue()
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
-    wombatdatabase->GetObjectType(); // now i have selectedobject.type.
-    UpdateOmniValue();
-    UpdateViewer();
+    QModelIndex srcindex = checkableproxy->mapToSource(index);
+    qDebug() << "selection changed: " << srcindex.sibling(srcindex.row(), 0).data().toInt();
+    //wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
+    //wombatdatabase->GetObjectType(); // now i have selectedobject.type.
+    //UpdateOmniValue();
+    //UpdateViewer();
     // NEED TO DETERMINE THE DATA TYPE TO CALL THE CORRECT DATA TO UPDATE.
     //
     //QString sigtext = "";
