@@ -202,7 +202,8 @@ private slots:
     void on_actionView_Progress_triggered(bool checked);
     void UpdateProgress(int count, int processcount);
     void UpdateMessageTable();
-    void CheckedSelectionChanged();
+    void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
+    void CurrentChanged(const QModelIndex &selindex, const QModelIndex &previndex);
     void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);

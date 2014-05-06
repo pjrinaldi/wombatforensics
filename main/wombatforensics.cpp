@@ -203,6 +203,8 @@ void WombatForensics::InitializeDirModel()
     wombatvarptr->dirmodel->setHorizontalHeaderLabels(headerList);
     ui->dirTreeView->setModel(wombatvarptr->dirmodel);
     ResizeColumns();
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
 
@@ -250,7 +252,6 @@ void WombatForensics::InitializeQueryModel()
 
         //treeproxy = new TreeProxy();
         checkableproxy = new CheckableProxyModel(this);
-        connect(checkableproxy, SIGNAL(checkedNodesChanged()), this, SLOT(CheckedSelectionChanged()), Qt::DirectConnection);
         //treeproxy->setSourceModel(tmpmodel);
         //checkableproxy->setSourceModel(treeproxy);
         //ui->dirTreeView->setModel(treeproxy);
@@ -262,9 +263,14 @@ void WombatForensics::InitializeQueryModel()
     }
 }
 
-void WombatForensics::CheckedSelectionChanged()
+void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
     qDebug() << "selection stuff can happen now.";
+}
+
+void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIndex &previndex)
+{
+    qDebug() << "current index changed.";
 }
 
 void WombatForensics::InitializeEvidenceStructure()
