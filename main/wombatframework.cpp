@@ -339,6 +339,8 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
 
 int WombatFramework::DetermineVectorIndex()
 {
+    // the objectvectors and objects were replaced. i need to get it straight from the sql call...
+    // so i shouldn't need this function or the currentidx since i can just get the sql call with the id.
     int curidx = -1;
     if(wombatptr->selectedobject.type == 1) // image file
     {

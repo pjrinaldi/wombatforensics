@@ -153,6 +153,13 @@ struct SelectedObject
     int id;
     int type;
     int name;
+    int size;
+    int parimgid;
+    int sectstart;
+    int sectlength;
+    int blocksize;
+    int blockcount;
+    int byteoffset;
 };
 
 struct WombatVariable

@@ -260,8 +260,8 @@ void WombatForensics::InitializeQueryModel()
         checkableproxy->setSourceModel(tmpmodel);
         ui->dirTreeView->setModel(checkableproxy);
         connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
-        connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
-        connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
+        //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+        //connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
         ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
@@ -360,19 +360,24 @@ void WombatForensics::LoadHexContents()
 {
     if(tskobjptr->readimginfo != NULL)
         tsk_img_close(tskobjptr->readimginfo);
-    int curidx = wombatframework->DetermineVectorIndex();
+    // int curidx = wombatframework->DetermineVectorIndex(); // shouldn't need this, since i'm pulling from sql.
 
     if(wombatvarptr->selectedobject.type == 1) // image file
     {
-        OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id);
+        OpenParentImage(wombatvarptr->selectedobject.id);
+        // OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id); 
         tskobjptr->offset = 0;
-        tskobjptr->length = wombatvarptr->evidenceobjectvector[curidx].size;
+        tskobjptr->length = wombatvarptr->selectedobject.size;
+        //tskobjptr->length = wombatvarptr->evidenceobjectvector[curidx].size;
     }
     else if(wombatvarptr->selectedobject.type == 3) // partition object
     {
-        OpenParentImage(wombatvarptr->partitionobjectvector[curidx].parimgid);
-        tskobjptr->offset = wombatvarptr->partitionobjectvector[curidx].sectstart * wombatvarptr->partitionobjectvector[curidx].blocksize;
-        tskobjptr->length = wombatvarptr->partitionobjectvector[curidx].sectlength * wombatvarptr->partitionobjectvector[curidx].blocksize;
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        //OpenParentImage(wombatvarptr->partitionobjectvector[curidx].parimgid);
+        //tskobjptr->offset = wombatvarptr->partitionobjectvector[curidx].sectstart * wombatvarptr->partitionobjectvector[curidx].blocksize;
+        tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.blocksize;
+        //tskobjptr->length = wombatvarptr->partitionobjectvector[curidx].sectlength * wombatvarptr->partitionobjectvector[curidx].blocksize;
+        tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.blocksize;
         // need to get the volume parent and then the image parent , so i can open the image from bytes...
         // need to do a self looping query, where i use the parentid and check if its null, if its not null, then run it again.
         // else return imageid and then loop over evidenceobjectvector for index. then loop over fullpathvector to get the
@@ -383,9 +388,12 @@ void WombatForensics::LoadHexContents()
     else if(wombatvarptr->selectedobject.type == 4) // fs object
     {
         // set tskobjptr->offset and tskobjptr->length here prior to calling this...
-        OpenParentImage(wombatvarptr->filesystemobjectvector[curidx].parimgid);
-        tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
-        tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        //OpenParentImage(wombatvarptr->filesystemobjectvector[curidx].parimgid);
+        tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
+        //tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
+        tskobjptr->length = wombatvarptr->selectedobject.blocksize * wombatvarptr->selectedobject.blockcount;
+        //tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
         //qDebug() << "File System Object";
     }
     hexwidget->openimage();
@@ -959,11 +967,12 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     qDebug() << "selection changed before mapping.";
     QModelIndex srcindex = checkableproxy->mapToSource(index);
-    qDebug() << "selection changed: " << srcindex.sibling(srcindex.row(), 0).data().toInt();
-    //wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
-    //wombatdatabase->GetObjectType(); // now i have selectedobject.type.
-    //UpdateOmniValue();
-    //UpdateViewer();
+    qDebug() << "selection changed id: " << srcindex.sibling(srcindex.row(), 0).data().toInt();
+    wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
+    wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
+    qDebug() << "selected id: " << wombatvarptr->selectedobject.id << " type: " << wombatvarptr->selectedobject.type;
+    UpdateOmniValue();
+    UpdateViewer();
     // NEED TO DETERMINE THE DATA TYPE TO CALL THE CORRECT DATA TO UPDATE.
     //
     //QString sigtext = "";

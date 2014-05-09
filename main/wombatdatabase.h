@@ -26,7 +26,7 @@ public:
     void InsertFileSystemObjects(void);
     void InsertFileObjects(void);
     void GetFileSystemObjects(void);
-    void GetObjectType(void);
+    void GetObjectValues(void);
 
     ~WombatDatabase();
 

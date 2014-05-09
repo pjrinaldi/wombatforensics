@@ -513,11 +513,18 @@ void WombatDatabase::ReturnCaseID()
     appquery.finish();
 }
 
-void WombatDatabase::GetObjectType()
+void WombatDatabase::GetObjectValues()
 {
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, blocksize, blockcount, byteoffset FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->selectedobject.type = wombatptr->sqlrecords[0].value(0).toInt();
+    wombatptr->selectedobject.size = wombatptr->sqlrecords[0].value(1).toInt();
+    wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(2).toInt();
+    wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(3).toInt();
+    wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(4).toInt();
+    wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(5).toInt();
+    wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(6).toInt();
+    wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(7).toInt();
 }
