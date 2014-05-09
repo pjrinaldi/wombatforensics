@@ -10,6 +10,7 @@ extern QVector<QFuture<void> > threadvector;
 extern QFutureWatcher<void> filewatcher;
 extern int filesfound;
 extern int filesprocessed;
+extern int currentevidenceid;
 
 class InterfaceSignals : public QObject
 {

@@ -396,6 +396,11 @@ void WombatForensics::LoadHexContents()
         //tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
         //qDebug() << "File System Object";
     }
+    else if(wombatvarptr->selectedobject.type == 5) // file object
+    {
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
+    }
     hexwidget->openimage();
     hexwidget->set2BPC();
     hexwidget->setBaseHex();
