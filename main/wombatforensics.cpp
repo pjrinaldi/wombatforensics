@@ -236,6 +236,7 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
+        wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
         FileViewSqlModel* tmpmodel = new FileViewSqlModel();
         tmpmodel->setQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5 FROM data", fcasedb);
         tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -399,6 +400,7 @@ void WombatForensics::LoadHexContents()
     else if(wombatvarptr->selectedobject.type == 5) // file object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        //tskobjptr->offset = 
         //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
     }
     hexwidget->openimage();
@@ -476,7 +478,8 @@ void WombatForensics::LoadComplete(bool isok)
 
 void WombatForensics::OpenParentImage(int imgid)
 {
-    int curidx = -1;
+    int curidx = 0;
+    qDebug() << "evidobjvec.count: " << wombatvarptr->evidenceobjectvector.count();
     for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
     {
         if(imgid == wombatvarptr->evidenceobjectvector[i].id)

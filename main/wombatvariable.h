@@ -10,7 +10,7 @@ struct CaseObject
     QString dbname;
     QString dirpath;
 };
-
+/*
 struct VolumeObject
 {
     int id;
@@ -77,7 +77,7 @@ struct FileObject
     int parimgid;
     // file and dir data stored here... metaVAR and/or nameVAR if they duplicate.
 };
-
+*/
 struct EvidenceObject
 {
     int id;
@@ -203,19 +203,19 @@ struct WombatVariable
     QString tmpfilepath;
     QString curerrmsg;
     QString wombatdbname;
-    QStandardItemModel* dirmodel;
+    //QStandardItemModel* dirmodel;
     QList<int> objectidlist;
     CaseObject caseobject;
     QStringList casenamelist;
     EvidenceObject evidenceobject;
-    VolumeObject volumeobject;
+    //VolumeObject volumeobject;
     QVector<EvidenceObject> evidenceobjectvector;
-    QVector<VolumeObject> volumeobjectvector;
-    PartitionObject partitionobject;
-    QVector<PartitionObject> partitionobjectvector;
-    FileSystemObject filesystemobject;
-    QVector<FileSystemObject> filesystemobjectvector;
-    QVector<FileObject> fileobjectvector;
+    //QVector<VolumeObject> volumeobjectvector;
+    //PartitionObject partitionobject;
+    //QVector<PartitionObject> partitionobjectvector;
+    //FileSystemObject filesystemobject;
+    //QVector<FileSystemObject> filesystemobjectvector;
+    //QVector<FileObject> fileobjectvector;
     SelectedObject selectedobject;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
@@ -232,10 +232,10 @@ Q_DECLARE_METATYPE(WombatVariable)
 Q_DECLARE_METATYPE(FileExportData)
 Q_DECLARE_METATYPE(CaseObject)
 Q_DECLARE_METATYPE(EvidenceObject)
-Q_DECLARE_METATYPE(PartitionObject)
-Q_DECLARE_METATYPE(VolumeObject)
-Q_DECLARE_METATYPE(FileSystemObject)
-Q_DECLARE_METATYPE(FileObject);
+//Q_DECLARE_METATYPE(PartitionObject)
+//Q_DECLARE_METATYPE(VolumeObject)
+//Q_DECLARE_METATYPE(FileSystemObject)
+//Q_DECLARE_METATYPE(FileObject);
 Q_DECLARE_METATYPE(SelectedObject);
 
 #endif // WOMBATVARIABLE_H

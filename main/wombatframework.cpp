@@ -29,6 +29,7 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
 
 void WombatFramework::AddEvidenceNodes() // add evidence node to the dirmodel
 {
+    /*
     wombatptr->dirmodel->clear();
     QStringList headerList;
     headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
@@ -43,10 +44,12 @@ void WombatFramework::AddEvidenceNodes() // add evidence node to the dirmodel
         wombatptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
         AddPartitionNodes(i);
     }
+    */
 }
 
 void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes to the image node
 {
+    /*
     QList<QStandardItem*> evidnode = wombatptr->dirmodel->findItems(QString::number(wombatptr->evidenceobjectvector[increment].id), Qt::MatchExactly, 0);
     QList<QStandardItem*> tmplist;
     QStandardItem* tmpnode;
@@ -99,7 +102,7 @@ void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes
                 }
             }
         }
-    }
+    }*/
 }
 
 /*
@@ -298,6 +301,7 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
 
 void WombatFramework::GetBootCode(int idx) // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
+    /*
     int volidx = -1;
     for(int i=0; i < wombatptr->volumeobjectvector.count(); i++)
     {
@@ -317,6 +321,7 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
         else
             wombatptr->htmlcontent += "big endian";
         */
+    /*
         wombatptr->htmlcontent += "</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>partition count</td><td class='pvalue'>";
         wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->volumeobjectvector[volidx].childcount) + "</td></tr></table>";
@@ -334,11 +339,12 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
         // block size, partition count, offset where volume system begins, endian - probably go in a table similar to the above one, not a byte offset one.
         // not sure if i want to include the minimal amount of sector info since there are so few and it'll be repetative with the possible partition
         // layout in the tree view
-    }
+    }*/
 }
 
 int WombatFramework::DetermineVectorIndex()
 {
+    /*
     // the objectvectors and objects were replaced. i need to get it straight from the sql call...
     // so i shouldn't need this function or the currentidx since i can just get the sql call with the id.
     int curidx = -1;
@@ -379,4 +385,6 @@ int WombatFramework::DetermineVectorIndex()
     }
 
     return curidx;
+    */
+    return 0;
 }
