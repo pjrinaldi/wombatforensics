@@ -393,7 +393,7 @@ void WombatForensics::LoadHexContents()
         //OpenParentImage(wombatvarptr->filesystemobjectvector[curidx].parimgid);
         tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
         //tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
-        tskobjptr->length = wombatvarptr->selectedobject.blocksize * wombatvarptr->selectedobject.blockcount;
+        tskobjptr->length = wombatvarptr->selectedobject.size * wombatvarptr->selectedobject.blockcount;
         //tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
         //qDebug() << "File System Object";
     }
@@ -403,9 +403,12 @@ void WombatForensics::LoadHexContents()
         //tskobjptr->offset = 
         //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
     }
-    hexwidget->openimage();
-    hexwidget->set2BPC();
-    hexwidget->setBaseHex();
+    if(wombatvarptr->selectedobject.type != 2)
+    {
+        hexwidget->openimage();
+        hexwidget->set2BPC();
+        hexwidget->setBaseHex();
+    }
 }
 
 void WombatForensics::LoadTxtContents()
@@ -976,7 +979,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     qDebug() << "selection changed before mapping.";
     QModelIndex srcindex = checkableproxy->mapToSource(index);
     qDebug() << "selection changed id: " << srcindex.sibling(srcindex.row(), 0).data().toInt();
-    wombatvarptr->selectedobject.id = index.sibling(index.row(), 0).data().toInt(); // object id
+    wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
     wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
     qDebug() << "selected id: " << wombatvarptr->selectedobject.id << " type: " << wombatvarptr->selectedobject.type;
     UpdateOmniValue();
