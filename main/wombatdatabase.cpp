@@ -524,7 +524,7 @@ void WombatDatabase::GetObjectValues()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->selectedobject.type = wombatptr->sqlrecords[0].value(0).toInt();
     wombatptr->selectedobject.size = wombatptr->sqlrecords[0].value(1).toInt();
     wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(2).toInt();
@@ -533,4 +533,5 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.blocksize = wombatptr->sqlrecords[0].value(5).toInt();
     wombatptr->selectedobject.blockcount = wombatptr->sqlrecords[0].value(6).toInt();
     wombatptr->selectedobject.byteoffset = wombatptr->sqlrecords[0].value(7).toInt();
+    wombatptr->selectedobject.address = wombatptr->sqlrecords[0].value(8).toInt();
 }

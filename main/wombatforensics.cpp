@@ -384,7 +384,6 @@ void WombatForensics::LoadHexContents()
         // else return imageid and then loop over evidenceobjectvector for index. then loop over fullpathvector to get the
         // imagepartspath and open the respective image.
         // THEN I'LL HAVE TO GET THE OFFSET AND LENGTH FOR THE PARTITION...
-        //qDebug() << "Partition Object";
     }
     else if(wombatvarptr->selectedobject.type == 4) // fs object
     {
@@ -399,7 +398,11 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.type == 5) // file object
     {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        OpenParentImage(wombatvarptr->selectedobject.parimgid); // NEED TO ALSO INCLUDE FS PARENT AND OPEN IT...
+        // OpenParentFileSystem(imgobject...) - calls tsk_fs_open_img()
+        // individual file store's address and size in the db right now.
+        // STORE IMG -> GET FILE SYSTEM -> FS_FILE_OPEN_META(FS, NULL, INUM)
+        // FILE gets address (inum) and size (filesize) from db.
         //tskobjptr->offset = 
         //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
     }

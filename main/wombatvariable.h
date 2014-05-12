@@ -160,6 +160,7 @@ struct SelectedObject
     int blocksize;
     int blockcount;
     int byteoffset;
+    int address;
 };
 
 struct WombatVariable
