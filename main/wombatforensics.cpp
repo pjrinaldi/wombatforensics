@@ -524,6 +524,7 @@ void WombatForensics::OpenParentFileSystem()
 void WombatForensics::OpenFileSystemFile()
 {
     qDebug() << "fs file inum: " << tskobjptr->address;
+    qDebug() << "fs file length: " << tskobjptr->length;
     tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
 }
 
