@@ -413,6 +413,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = 0; // i think this is the start of the file!!!!!!!
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;
+        qDebug() << wombatvarptr->selectedobject.name << "(" << wombatvarptr->selectedobject.id << "): wombatvarptr->selectedobject.address (inum): " << wombatvarptr->selectedobject.address;
         tskobjptr->length = wombatvarptr->selectedobject.size;
         //tskobjptr->offset = 
         //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
@@ -1005,6 +1006,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     qDebug() << "selection changed before mapping.";
     QModelIndex srcindex = checkableproxy->mapToSource(index);
     qDebug() << "selection changed id: " << srcindex.sibling(srcindex.row(), 0).data().toInt();
+    qDebug() << "proxyid: " << index.sibling(index.row(), 0).data().toInt();
     wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
     wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
     qDebug() << "selected id: " << wombatvarptr->selectedobject.id << " type: " << wombatvarptr->selectedobject.type;
