@@ -278,6 +278,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
 void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIndex &previndex)
 {
     qDebug() << "current index changed.";
+    //dirTreeView_selectionChanged(curindex);
 }
 
 void WombatForensics::InitializeEvidenceStructure()
