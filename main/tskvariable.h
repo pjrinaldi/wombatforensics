@@ -11,5 +11,7 @@ struct TskObject
     int offset;
     int length;
     TSK_IMG_INFO* readimginfo;
+    TSK_FS_INFO* readfsinfo;
+    TSK_FS_FILE* readfileinfo;
 };
 #endif // TSKVARIABLE_H

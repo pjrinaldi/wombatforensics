@@ -22,6 +22,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //this->statusBar()->removeWidget(filecountlabel);
     tskobjptr = &tskobject;
     tskobjptr->readimginfo = NULL;
+    tskobjptr->readfsinfo = NULL;
+    tskobjptr->readfileinfo = NULL;
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
     wombatprogresswindow = new ProgressWindow(wombatdatabase);
@@ -398,7 +400,8 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.type == 5) // file object
     {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid); // NEED TO ALSO INCLUDE FS PARENT AND OPEN IT...
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        OpenParentFileSystem();
         // OpenParentFileSystem(imgobject...) - calls tsk_fs_open_img()
         // individual file store's address and size in the db right now.
         // STORE IMG -> GET FILE SYSTEM -> FS_FILE_OPEN_META(FS, NULL, INUM)
@@ -503,6 +506,11 @@ void WombatForensics::OpenParentImage(int imgid)
         //qDebug() << "print image error here";
     }
     free(tskobjptr->imagepartspath);
+}
+
+void WombatForensics::OpenParentFileSystem()
+{
+    tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, 0, TSK_FS_TYPE_DETECT);
 }
 
 void WombatForensics::RemEvidence()

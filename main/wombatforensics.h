@@ -210,6 +210,7 @@ private slots:
     void PopulateProgressWindow(WombatVariable* wvariable);
     void ResizeColumns(void);
     void OpenParentImage(int imgid);
+    void OpenParentFileSystem(void);
     void ResizeViewColumns(const QModelIndex &index)
     {
         ResizeColumns();
