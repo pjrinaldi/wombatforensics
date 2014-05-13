@@ -363,6 +363,10 @@ void WombatForensics::LoadHexContents()
 {
     if(tskobjptr->readimginfo != NULL)
         tsk_img_close(tskobjptr->readimginfo);
+    if(tskobjptr->readfsinfo != NULL)
+        tsk_fs_close(tskobjptr->readfsinfo);
+    if(tskobjptr->readfileinfo != NULL)
+        tsk_fs_file_close(tskobjptr->readfileinfo);
     // int curidx = wombatframework->DetermineVectorIndex(); // shouldn't need this, since i'm pulling from sql.
 
     if(wombatvarptr->selectedobject.type == 1) // image file
@@ -497,7 +501,7 @@ void WombatForensics::LoadComplete(bool isok)
 void WombatForensics::OpenParentImage(int imgid)
 {
     int curidx = 0;
-    qDebug() << "evidobjvec.count: " << wombatvarptr->evidenceobjectvector.count();
+    //qDebug() << "evidobjvec.count: " << wombatvarptr->evidenceobjectvector.count();
     for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
     {
         if(imgid == wombatvarptr->evidenceobjectvector[i].id)
@@ -527,6 +531,7 @@ void WombatForensics::OpenFileSystemFile()
     qDebug() << "fs file inum: " << tskobjptr->address;
     qDebug() << "fs file length: " << tskobjptr->length;
     tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
+    qDebug() << "file info inum: " << tskobjptr->readfileinfo->meta->addr;
 }
 
 void WombatForensics::RemEvidence()
@@ -1003,20 +1008,20 @@ void WombatForensics::UpdateOmniValue()
 
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
-    qDebug() << "selection changed before mapping.";
+    //qDebug() << "selection changed before mapping.";
     QModelIndex srcindex = checkableproxy->mapToSource(index);
-    qDebug() << "selection changed id: " << srcindex.sibling(srcindex.row(), 0).data().toInt();
-    qDebug() << "proxyid: " << index.sibling(index.row(), 0).data().toInt();
+    //qDebug() << "selection changed id: " << srcindex.sibling(srcindex.row(), 0).data().toInt();
+    //qDebug() << "proxyid: " << index.sibling(index.row(), 0).data().toInt();
     wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
     wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
-    qDebug() << "selected id: " << wombatvarptr->selectedobject.id << " type: " << wombatvarptr->selectedobject.type;
+    //qDebug() << "selected id: " << wombatvarptr->selectedobject.id << " type: " << wombatvarptr->selectedobject.type;
     UpdateOmniValue();
     UpdateViewer();
     // NEED TO DETERMINE THE DATA TYPE TO CALL THE CORRECT DATA TO UPDATE.
     //
     //QString sigtext = "";
     // I CAN EITHER GET THE SIGNATURE USING COMPARISON OR BY CALLING FILE AND MAGIC LIKE THE MODULE
-    // SELECTING ITEM GETS IT'S ID VALUES AND SET'S RESPECTIVE WOMBATVARPTR->VALUES
+    /// SELECTING ITEM GETS IT'S ID VALUES AND SET'S RESPECTIVE WOMBATVARPTR->VALUES
     // GET THE RESPECTIVE VISIBLE VIEWER FROM THE VIEWER STACK.
     // LOAD THE DATA INTO THE RESPECTIVE VIEWER.
 }

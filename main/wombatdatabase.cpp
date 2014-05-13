@@ -521,7 +521,7 @@ void WombatDatabase::ReturnCaseID()
 
 void WombatDatabase::GetObjectValues()
 {
-    qDebug() << "wbtdb wombatptr->selectedobject.id: " << wombatptr->selectedobject.id;
+    //qDebug() << "wbtdb wombatptr->selectedobject.id: " << wombatptr->selectedobject.id;
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();
