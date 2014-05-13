@@ -186,7 +186,7 @@ public:
     TskObject tskobject;
     TskObject* tskobjptr;
     WombatFramework* wombatframework;
-    ProgressWindow* wombatprogresswindow;
+    //ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
     CheckableProxyModel* checkableproxy;
     //TreeProxy* treeproxy;

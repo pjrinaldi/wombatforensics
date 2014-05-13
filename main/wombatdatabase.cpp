@@ -535,4 +535,5 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.blockcount = wombatptr->sqlrecords[0].value(6).toInt();
     wombatptr->selectedobject.byteoffset = wombatptr->sqlrecords[0].value(7).toInt();
     wombatptr->selectedobject.address = wombatptr->sqlrecords[0].value(8).toInt();
+    //qDebug() << "wombatptr->selectedobject.address (inum): " << wombatptr->selectedobject.address;
 }

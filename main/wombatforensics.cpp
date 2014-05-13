@@ -26,15 +26,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tskobjptr->readfileinfo = NULL;
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
-    wombatprogresswindow = new ProgressWindow(wombatdatabase);
+    //wombatprogresswindow = new ProgressWindow(wombatdatabase);
     isignals = new InterfaceSignals();
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
-    connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
+    //connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
     wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
-    wombatprogresswindow->setModal(false);
+    //wombatprogresswindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
@@ -410,16 +410,16 @@ void WombatForensics::LoadHexContents()
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         OpenParentFileSystem();
+        tskobjptr->offset = 0; // i think this is the start of the file!!!!!!!
+        tskobjptr->objecttype = 5;
+        tskobjptr->address = wombatvarptr->selectedobject.address;
+        tskobjptr->length = wombatvarptr->selectedobject.size;
         OpenFileSystemFile();
         // OpenParentFileSystem(imgobject...) - calls tsk_fs_open_img()
         // individual file store's address and size in the db right now.
         // STORE IMG -> GET FILE SYSTEM -> FS_FILE_OPEN_META(FS, NULL, INUM)
         // FILE gets address (inum) and size (filesize) from db.
-        tskobjptr->offset = 0; // i think this is the start of the file!!!!!!!
-        tskobjptr->objecttype = 5;
-        tskobjptr->address = wombatvarptr->selectedobject.address;
-        qDebug() << wombatvarptr->selectedobject.name << "(" << wombatvarptr->selectedobject.id << "): wombatvarptr->selectedobject.address (inum): " << wombatvarptr->selectedobject.address;
-        tskobjptr->length = wombatvarptr->selectedobject.size;
+        //qDebug() << wombatvarptr->selectedobject.name << "(" << wombatvarptr->selectedobject.id << "): wombatvarptr->selectedobject.address (inum): " << wombatvarptr->selectedobject.address;
         //tskobjptr->offset = 
         //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
     }
@@ -529,10 +529,10 @@ void WombatForensics::OpenParentFileSystem()
 
 void WombatForensics::OpenFileSystemFile()
 {
-    qDebug() << "fs file inum: " << tskobjptr->address;
-    qDebug() << "fs file length: " << tskobjptr->length;
+    //qDebug() << "fs file inum: " << tskobjptr->address;
+    //qDebug() << "fs file length: " << tskobjptr->length;
     tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
-    qDebug() << "file info inum: " << tskobjptr->readfileinfo->meta->addr;
+    //qDebug() << "file info inum: " << tskobjptr->readfileinfo->meta->addr;
 }
 
 void WombatForensics::RemEvidence()
@@ -774,7 +774,7 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
 
 void WombatForensics::UpdateMessageTable()
 {
-    wombatprogresswindow->ClearTableWidget();
+    //wombatprogresswindow->ClearTableWidget();
     //QStringList tmplist = wombatdatabase->ReturnMessageTableEntries(wombatvarptr->jobid);
     //wombatprogresswindow->UpdateMessageTable(tmplist);
 }
@@ -795,12 +795,12 @@ void WombatForensics::PopulateProgressWindow(WombatVariable* wvariable)
     if(wvariable->jobtype == 1) treebranch = 0;
     else if(wvariable->jobtype == 2) treebranch = 2;
     else treebranch = 1;
-    wombatprogresswindow->UpdateAnalysisTree(treebranch,  new QTreeWidgetItem(tmplist));
+    //wombatprogresswindow->UpdateAnalysisTree(treebranch,  new QTreeWidgetItem(tmplist));
     if(wvariable->jobtype == 2)
     {
-        wombatprogresswindow->UpdateProgressBar(100);
-        wombatprogresswindow->UpdateFilesFound("");
-        wombatprogresswindow->UpdateFilesProcessed("");
+        //wombatprogresswindow->UpdateProgressBar(100);
+        //wombatprogresswindow->UpdateFilesFound("");
+        //wombatprogresswindow->UpdateFilesProcessed("");
     }
     else
     {
@@ -908,7 +908,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
             ((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
     }
     //((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
-    wombatprogresswindow->close();
+    //wombatprogresswindow->close();
     RemoveTmpFiles();
     // USE THIS FUNCTION AND PRINCIPLE TO BUILD THE PROGRESS WINDOW FUNCTIONALITY.
     if(ProcessingComplete())
@@ -989,11 +989,12 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
 }
 
 void WombatForensics::on_actionView_Progress_triggered(bool checked)
-{
+{/*
     if(!checked)
         wombatprogresswindow->hide();
     else
         wombatprogresswindow->show();
+    */
 }
 
 void WombatForensics::UpdateOmniValue()
