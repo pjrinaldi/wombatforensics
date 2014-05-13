@@ -334,8 +334,15 @@ bool Reader::loadimagepage(off_t pageIdx)
 
     //tsk img read from new offset...
     // possibly need to make it pageidx*_pagesize + tskptr->offset for the imageoffset.
-    off_t retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
-    //off_t retval = tsk_img_read(imageinfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+    if(tskptr->objecttype < 5)
+    {
+        off_t retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+        //off_t retval = tsk_img_read(imageinfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+    }
+    else
+    {
+        ssize_t retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+    }
     if(retval)
     {
         if(pageIdx < _firstPage)

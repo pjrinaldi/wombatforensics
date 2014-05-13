@@ -370,6 +370,7 @@ void WombatForensics::LoadHexContents()
         OpenParentImage(wombatvarptr->selectedobject.id);
         // OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id); 
         tskobjptr->offset = 0;
+        tskobjptr->objecttype = 1;
         tskobjptr->length = wombatvarptr->selectedobject.size;
         //tskobjptr->length = wombatvarptr->evidenceobjectvector[curidx].size;
     }
@@ -378,6 +379,7 @@ void WombatForensics::LoadHexContents()
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         //OpenParentImage(wombatvarptr->partitionobjectvector[curidx].parimgid);
         //tskobjptr->offset = wombatvarptr->partitionobjectvector[curidx].sectstart * wombatvarptr->partitionobjectvector[curidx].blocksize;
+        tskobjptr->objecttype = 3;
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.blocksize;
         //tskobjptr->length = wombatvarptr->partitionobjectvector[curidx].sectlength * wombatvarptr->partitionobjectvector[curidx].blocksize;
         tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.blocksize;
@@ -393,6 +395,7 @@ void WombatForensics::LoadHexContents()
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         //OpenParentImage(wombatvarptr->filesystemobjectvector[curidx].parimgid);
         tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
+        tskobjptr->objecttype = 4;
         //tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
         tskobjptr->length = wombatvarptr->selectedobject.size * wombatvarptr->selectedobject.blockcount;
         //tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
@@ -402,10 +405,15 @@ void WombatForensics::LoadHexContents()
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         OpenParentFileSystem();
+        OpenFileSystemFile();
         // OpenParentFileSystem(imgobject...) - calls tsk_fs_open_img()
         // individual file store's address and size in the db right now.
         // STORE IMG -> GET FILE SYSTEM -> FS_FILE_OPEN_META(FS, NULL, INUM)
         // FILE gets address (inum) and size (filesize) from db.
+        tskobjptr->offset = 0; // i think this is the start of the file!!!!!!!
+        tskobjptr->objecttype = 5;
+        tskobjptr->address = wombatvarptr->selectedobject.address;
+        tskobjptr->length = wombatvarptr->selectedobject.size;
         //tskobjptr->offset = 
         //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
     }
@@ -511,6 +519,12 @@ void WombatForensics::OpenParentImage(int imgid)
 void WombatForensics::OpenParentFileSystem()
 {
     tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, 0, TSK_FS_TYPE_DETECT);
+}
+
+void WombatForensics::OpenFileSystemFile()
+{
+    qDebug() << "fs file inum: " << tskobjptr->address;
+    tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
 }
 
 void WombatForensics::RemEvidence()

@@ -10,6 +10,8 @@ struct TskObject
     int partcount;
     int offset;
     int length;
+    int address;
+    int objecttype;
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;

@@ -211,6 +211,7 @@ private slots:
     void ResizeColumns(void);
     void OpenParentImage(int imgid);
     void OpenParentFileSystem(void);
+    void OpenFileSystemFile(void);
     void ResizeViewColumns(const QModelIndex &index)
     {
         ResizeColumns();
