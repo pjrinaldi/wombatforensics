@@ -240,7 +240,7 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "DB Commit finished.";
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
         FileViewSqlModel* tmpmodel = new FileViewSqlModel();
-        tmpmodel->setQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5 FROM data", fcasedb);
+        tmpmodel->setQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data", fcasedb);
         tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
         tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Name"));
         tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Full Path"));
@@ -252,6 +252,7 @@ void WombatForensics::InitializeQueryModel()
         tmpmodel->setHeaderData(8, Qt::Horizontal, tr("Modified (UTC)"));
         tmpmodel->setHeaderData(9, Qt::Horizontal, tr("Status Changed (UTC)"));
         tmpmodel->setHeaderData(10, Qt::Horizontal, tr("MD5 Hash"));
+        tmpmodel->removeColumns(11, 1, QModelIndex());
 
         //ui->dirTreeView->setModel(tmpmodel);
 
