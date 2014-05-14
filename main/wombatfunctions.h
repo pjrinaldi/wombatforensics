@@ -5,6 +5,7 @@
 #include "globals.h"
 
 std::string GetTime(void);
+char* TskTimeToStringUTC(time_t time, char buf[128]);
 bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
 void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints);

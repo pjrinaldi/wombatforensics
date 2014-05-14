@@ -15,6 +15,21 @@ std::string GetTime()
     return timeStr;
 }
 
+char* TskTimeToStringUTC(time_t time, char buf[128])
+{
+    buf[0] = '\0';
+    if (time <= 0) {
+        strncpy(buf, "0000-00-00 00:00:00", 128);
+    }
+    else {
+        //struct tm *tmTime = localtime(&time);
+        struct tm *tmTime = gmtime(&time);
+
+        snprintf(buf, 128, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d", (int) tmTime->tm_year + 1900, (int) tmTime->tm_mon + 1, (int) tmTime->tm_mday, tmTime->tm_hour, (int) tmTime->tm_min, (int) tmTime->tm_sec);//, tzname[(tmTime->tm_isdst == 0) ? 0 : 1]);
+    }
+    return buf;
+}
+
 bool FileExists(const std::string& filename)
 {
     struct stat buf;

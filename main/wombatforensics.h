@@ -299,7 +299,8 @@ public:
             if(index.column() >= 6 && index.column() <= 9)
             {
                 char buf[128];
-                QString tmpstr = QString(tsk_fs_time_to_str(value.toInt(), buf));
+                //QString tmpstr = QString(tsk_fs_time_to_str(value.toInt(), buf));
+                QString tmpstr = QString(TskTimeToStringUTC(value.toInt(), buf));
 
                 return tmpstr;
             }
