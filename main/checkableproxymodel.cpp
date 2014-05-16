@@ -84,9 +84,10 @@ Qt::ItemFlags CheckableProxyModel::flags(const QModelIndex &index) const
     Qt::ItemFlags flags = sourceIndex.flags();
     if (index.column() == 0) {
         flags |= Qt::ItemIsUserCheckable;
-        if (sourceIndex.model()->hasChildren(sourceIndex)) {
-            flags |= Qt::ItemIsTristate;
-        }
+        //if (sourceIndex.model()->hasChildren(sourceIndex)) {
+        //if(index.model()->hasChildren(index)) {
+        //    flags |= Qt::ItemIsTristate;
+        //}
     }
 
     return flags;
@@ -106,6 +107,7 @@ void CheckableProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
 QVariant CheckableProxyModel::data(const QModelIndex &index, int role) const
 {
     QModelIndex sourceIndex = mapToSource(index);
+    //probably need to call the abstractproxymodel maptosource...
 
     if (index.column() == 0 && role == Qt::CheckStateRole) {
         return QVariant(resolveCheckStateRole(sourceIndex));
@@ -126,13 +128,21 @@ bool CheckableProxyModel::setData(const QModelIndex &index, const QVariant &valu
 
     return QSortFilterProxyModel::sourceModel()->setData(sourceIndex, value, role);
 }
-
+/*
 QModelIndex CheckableProxyModel::mapFromSource(const QModelIndex &sourceindex) const
 {
-    qDebug() << "should be source index parentid: " << sourceindex.sibling(sourceindex.row(), 11).data().toInt();
-    //if(sourceindex.sibling(sourceindex.row(), 11)
     return QModelIndex();
-    /*
+    //qDebug() << "should be source index id: " << sourceindex.sibling(sourceindex.row(), 0).data().toInt();
+    //QModelIndex *p = new QModelIndex(createIndex(sourceindex.sibling(sourceindex.row(), 5).data().toInt(), 0));
+    //return createIndex(sourceindex.row(), sourceindex.column(), sourceindex.sibling(sourceindex.row(), 5).data().toInt());
+    //if(sourceindex.sibling(sourceindex.row(), 11)
+    if()
+    {
+    }
+    else
+    {
+        return QModelIndex();
+    }
         // which group did we put this row into?
         QString group = whichGroup(sourceIndex.row());
         int groupNo = groups.indexOf(group);
@@ -143,13 +153,11 @@ QModelIndex CheckableProxyModel::mapFromSource(const QModelIndex &sourceindex) c
             QModelIndex *p = new QModelIndex(createIndex(groupNo, 0, NULL));
             return createIndex(sourceRowToGroupRow[sourceIndex.row()], sourceIndex.column()+1, &p); // accomodate virtual column
         }
-    */
 }
 
 QModelIndex CheckableProxyModel::mapToSource(const QModelIndex &proxyindex) const
 {
     return QModelIndex();
-    /*
         if (proxyIndex.internalPointer() != NULL) {
 
             int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
@@ -162,8 +170,8 @@ QModelIndex CheckableProxyModel::mapToSource(const QModelIndex &proxyindex) cons
                                         QModelIndex());
         } 
         return QModelIndex();
-    */
 }
+*/
 
 Qt::CheckState CheckableProxyModel::resolveCheckStateRole(QModelIndex sourceIndex) const
 {
