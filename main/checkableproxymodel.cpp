@@ -127,6 +127,41 @@ bool CheckableProxyModel::setData(const QModelIndex &index, const QVariant &valu
     return QSortFilterProxyModel::sourceModel()->setData(sourceIndex, value, role);
 }
 
+QModelIndex CheckableProxyModel::mapFromSource(const QModelIndex &sourceindex) const
+{
+    return QModelIndex();
+    /*
+        // which group did we put this row into?
+        QString group = whichGroup(sourceIndex.row());
+        int groupNo = groups.indexOf(group);
+
+        if (groupNo < 0) {
+            return QModelIndex();
+        } else {
+            QModelIndex *p = new QModelIndex(createIndex(groupNo, 0, NULL));
+            return createIndex(sourceRowToGroupRow[sourceIndex.row()], sourceIndex.column()+1, &p); // accomodate virtual column
+        }
+    */
+}
+
+QModelIndex CheckableProxyModel::mapToSource(const QModelIndex &proxyindex) const
+{
+    return QModelIndex();
+    /*
+        if (proxyIndex.internalPointer() != NULL) {
+
+            int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
+            if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0) {
+                return QModelIndex();
+            }
+
+            return sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()),
+                                        proxyIndex.column()-1, // accomodate virtual column
+                                        QModelIndex());
+        } 
+        return QModelIndex();
+    */
+}
 
 Qt::CheckState CheckableProxyModel::resolveCheckStateRole(QModelIndex sourceIndex) const
 {
