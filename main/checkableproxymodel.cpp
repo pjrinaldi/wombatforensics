@@ -129,6 +129,8 @@ bool CheckableProxyModel::setData(const QModelIndex &index, const QVariant &valu
 
 QModelIndex CheckableProxyModel::mapFromSource(const QModelIndex &sourceindex) const
 {
+    qDebug() << "should be source index parentid: " << sourceindex.sibling(sourceindex.row(), 11).data().toInt();
+    //if(sourceindex.sibling(sourceindex.row(), 11)
     return QModelIndex();
     /*
         // which group did we put this row into?
