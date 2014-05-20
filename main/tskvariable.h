@@ -1,7 +1,8 @@
 #ifndef TSKVARIABLE_H
 #define TSKVARIABLE_H
 
-#include "tsk/libtsk.h"
+#include <libtsk>
+//#include "tsk/libtsk.h"
 #include <QDebug>
 
 struct TskObject
