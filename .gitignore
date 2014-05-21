@@ -1,0 +1,7 @@
+Makefile
+sleuthkit/
+*.o
+qrc*.o
+qrc*.cpp
+moc*.cpp
+wombatforensics
