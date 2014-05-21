@@ -1,5 +1,7 @@
 Makefile
 sleuthkit/
+Resources/guiforms/
+AFFLIBv3/
 *.o
 qrc*.o
 qrc*.cpp
