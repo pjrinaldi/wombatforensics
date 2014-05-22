@@ -7,3 +7,4 @@ qrc*.o
 qrc*.cpp
 moc*.cpp
 wombatforensics
+*.swp
