@@ -310,4 +310,17 @@ public:
     };
 };
 
+class TreeViewSqlModel : public QAbstractItemModel
+{
+    Q_OBJECT
+
+public:
+    TreeViewSqlModel(QObject* parent = 0) : QAbstractItemModel(parent) {};
+
+    QVariant data(const QModelIndex &index, int role) const
+    {
+
+    };
+};
+
 #endif // WOMBATFORENSICS_H
