@@ -323,6 +323,7 @@ public:
     };
     // need to reimplement index(), parent(), rowCount(), columnCount(), hasChildren(), flags(), data(), headerdata()
     // from qabstractitemmodel. index.parent use createIndex() to genereate indexes for others to use/reference
+    // fetchmore() can also be implemented to when a branch in the tree model is expanded. 
 };
 
 #endif // WOMBATFORENSICS_H
