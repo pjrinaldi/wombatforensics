@@ -321,6 +321,8 @@ public:
     {
 
     };
+    // need to reimplement index(), parent(), rowCount(), columnCount(), hasChildren(), flags(), data(), headerdata()
+    // from qabstractitemmodel. index.parent use createIndex() to genereate indexes for others to use/reference
 };
 
 #endif // WOMBATFORENSICS_H
