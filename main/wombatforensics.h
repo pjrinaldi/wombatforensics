@@ -456,6 +456,59 @@ public:
 private:
     void SetupModelData(const QStringList &lines, TreeItem* parent)
     {
+        QList<TreeItem*> parents;
+        QList<int> indentations;
+        parents << parent;
+        indentations << 0;
+
+        int number = 0;
+
+        while(number < lines.count())
+        {
+            int position = 0;
+            while(position < lines[number].length())
+            {
+                if(lines[number].mid(position,1) != " ")
+                    break;
+                position++;
+            }
+
+            QString linedata = lines[number].mid(position).trimmed();
+
+            if(!lineData.isEmpty())
+            {
+                // read the columnm data from the rest of the line
+                QStringList columnStrings = lineData.split("\t", QString::SkipEmptyParts);
+                QList<QVariant> columnData;
+                for(int column = 0; column < columnStrings.count(); ++column)
+                    columdata << columnStrings[column];
+
+                if(position > indentations.last())
+                {
+                    // the last child of the current parent is now the new parent
+                    // unless the current parent has no children
+                    if(parents.last()->childCount > 0)
+                    {
+                        parents << parents.last()->child(parents.last()->childCount()-1);
+                        indentation << position;
+                    }
+
+                }
+                else
+                {
+                    while(position < indentations.last() && parents.count() > 0)
+                    {
+                        parents.pop_back();
+                        indentations.pop_back();
+                    }
+                }
+
+                // append a new item to the current parent's list of children
+                parents.last()->appendChild(new TreeItem(columnData, parents.last()));
+            }
+
+            ++number;
+        }
     };
 
     TreeItem* rootitem;
@@ -463,5 +516,22 @@ private:
     // from qabstractitemmodel. index.parent use createIndex() to genereate indexes for others to use/reference
     // fetchmore() can also be implemented to when a branch in the tree model is expanded. 
 };
-
+/*
+ *        wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
+        FileViewSqlModel* tmpmodel = new FileViewSqlModel();
+        tmpmodel->setQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data", fcasedb);
+        tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
+        tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Name"));
+        tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Full Path"));
+        tmpmodel->setHeaderData(3, Qt::Horizontal, tr("Size (bytes)"));
+        tmpmodel->setHeaderData(4, Qt::Horizontal, tr("Signature"));
+        tmpmodel->setHeaderData(5, Qt::Horizontal, tr("Extension"));
+        tmpmodel->setHeaderData(6, Qt::Horizontal, tr("Created (UTC)"));
+        tmpmodel->setHeaderData(7, Qt::Horizontal, tr("Accessed (UTC)"));
+        tmpmodel->setHeaderData(8, Qt::Horizontal, tr("Modified (UTC)"));
+        tmpmodel->setHeaderData(9, Qt::Horizontal, tr("Status Changed (UTC)"));
+        tmpmodel->setHeaderData(10, Qt::Horizontal, tr("MD5 Hash"));
+        tmpmodel->removeColumns(11, 1, QModelIndex());
+ *
+ */ 
 #endif // WOMBATFORENSICS_H
