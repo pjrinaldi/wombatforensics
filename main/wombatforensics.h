@@ -310,17 +310,155 @@ public:
     };
 };
 
+class TreeItem
+{
+public:
+    explicit TreeItem(const QList<QVariant> &data, TreeItem* parent = 0)
+    {
+        parentitem = parent;
+        itemdata = data;
+    };
+    ~TreeItem()
+    {
+        qDeleteAll(childitems);
+    };
+
+    void AppendChild(TreeItem* child)
+    {
+        childitems.append(child);
+    };
+
+    TreeItem* child(int row)
+    {
+        return childitems.value(row);
+    };
+    int childCount() const
+    {
+        return childitems.count();
+    };
+    int columnCount() const
+    {
+        return itemdata.count();
+    };
+    QVariant data(int column) const
+    {
+        return itemdata.count();
+    };
+    int row() const
+    {
+        if(parentitem)
+            return parentitem->childitems.indexOf(const_cast<TreeItem*>(this));
+
+        return 0;
+    };
+    TreeItem* parent()
+    {
+        return parentitem;
+    };
+
+private:
+    QList<TreeItem*> childitems;
+    QList<QVariant> itemdata;
+    TreeItem* parentitem;
+};
+
 class TreeViewSqlModel : public QAbstractItemModel
 {
     Q_OBJECT
 
 public:
-    TreeViewSqlModel(QObject* parent = 0) : QAbstractItemModel(parent) {};
-
+    explicit TreeViewSqlModel(const QString &data, QObject* parent = 0) : QAbstractItemModel(parent)
+    {
+        QList<QVariant> rootdata;
+        rootdata << "Title" << "Summary";
+        rootitem = new TreeItem(rootdata);
+        SetupModelData(data.split(QString("\n")), rootitem);
+    };
+    ~TreeViewSqlModel()
+    {
+        delete rootitem;
+    };
     QVariant data(const QModelIndex &index, int role) const
     {
+        if(!index.isValid())
+            return QVariant();
 
+        if(role != Qt::DisplayRole)
+            return QVariant();
+
+        TreeItem* item = static_cast<TreeItem*>(index.internalPointer());
+
+        return item->data(index.column());
     };
+    Qt::ItemFlags flags(const QModelIndex &index) const
+    {
+        if(!index.isValid())
+            return 0;
+        return QAbstractItemModel::flags(index);
+    };
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const
+    {
+        if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
+            return rootitem->data(section);
+
+        return QVariant();
+    };
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const
+    {
+        if(!hasIndex(row, column, parent))
+            return QModelIndex();
+
+        TreeItem *parentitem;
+        if(!parent.isValid())
+            parentitem = rootitem;
+        else
+            parentitem = static_cast<TreeItem*>(parent.internalPointer());
+
+        TreeItem* childitem = parentitem->child(row);
+        if(childitem)
+            return createIndex(row, column, childitem);
+        else
+            return QModelIndex();
+    };
+    QModelIndex parent(const QModelIndex &index) const
+    {
+        if(!index.isValid())
+            return QModelIndex();
+
+        TreeItem* childitem = static_cast<TreeItem*>(index.internalPointer());
+        TreeItem* parentitem = childitem->parent();
+
+        if(parentitem == rootitem)
+            return QModelIndex();
+
+        return createIndex(parentitem->row(), 0, parentitem);
+    };
+    int rowCount(const QModelIndex &parent = QModelIndex()) const
+    {
+        TreeItem* parentitem;
+        if(parent.column() > 0)
+            return 0;
+
+        if(!parent.isValid())
+            parentitem = rootitem;
+        else
+            parentitem = static_cast<TreeItem*>(parent.internalPointer());
+
+        return parentitem->childCount();
+    };
+    int columnCount(const QModelIndex &parent = QModelIndex()) const
+    {
+        if(parent.isValid())
+            return static_cast<TreeItem*>(parent.internalPointer())->columnCount();
+        else
+            return rootitem->columnCount();
+    };
+private:
+    void SetupModelData(const QStringList &lines, TreeItem* parent)
+    {
+    };
+
+    TreeItem* rootitem;
     // need to reimplement index(), parent(), rowCount(), columnCount(), hasChildren(), flags(), data(), headerdata()
     // from qabstractitemmodel. index.parent use createIndex() to genereate indexes for others to use/reference
     // fetchmore() can also be implemented to when a branch in the tree model is expanded. 
