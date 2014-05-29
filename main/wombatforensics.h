@@ -323,7 +323,7 @@ public:
         qDeleteAll(childitems);
     };
 
-    void AppendChild(TreeItem* child)
+    void appendChild(TreeItem* child)
     {
         childitems.append(child);
     };
@@ -475,22 +475,22 @@ private:
 
             QString linedata = lines[number].mid(position).trimmed();
 
-            if(!lineData.isEmpty())
+            if(!linedata.isEmpty())
             {
                 // read the columnm data from the rest of the line
-                QStringList columnStrings = lineData.split("\t", QString::SkipEmptyParts);
-                QList<QVariant> columnData;
+                QStringList columnStrings = linedata.split("\t", QString::SkipEmptyParts);
+                QList<QVariant> columndata;
                 for(int column = 0; column < columnStrings.count(); ++column)
-                    columdata << columnStrings[column];
+                    columndata << columnStrings[column];
 
                 if(position > indentations.last())
                 {
                     // the last child of the current parent is now the new parent
                     // unless the current parent has no children
-                    if(parents.last()->childCount > 0)
+                    if(parents.last()->childCount() > 0)
                     {
                         parents << parents.last()->child(parents.last()->childCount()-1);
-                        indentation << position;
+                        indentations << position;
                     }
 
                 }
@@ -504,7 +504,7 @@ private:
                 }
 
                 // append a new item to the current parent's list of children
-                parents.last()->appendChild(new TreeItem(columnData, parents.last()));
+                parents.last()->appendChild(new TreeItem(columndata, parents.last()));
             }
 
             ++number;
