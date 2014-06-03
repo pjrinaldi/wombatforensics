@@ -370,9 +370,20 @@ public:
     explicit TreeViewSqlModel(const QString &data, QObject* parent = 0) : QAbstractItemModel(parent)
     {
         QList<QVariant> rootdata;
+        //QList<QSqlRecord> dataset;
         rootdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
         rootitem = new TreeItem(rootdata);
-        SetupModelData(data.split(QString("\n")), rootitem);
+        //SetupModelData(data.split(QString("\n")), rootitem);
+        QSqlQuery treequery(fcasedb);
+        treequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data");
+        if(treequery.exec())
+        {
+            while(treequery.next())
+            {
+                dataset.append(treequery.record());
+            }
+        }
+        treequery.finish();
     };
     ~TreeViewSqlModel()
     {
@@ -405,6 +416,13 @@ public:
     };
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const
     {
+        if(parent.isValid())
+        {
+            return createIndex(row, column, address);
+        }
+        
+        return createIndex(row, column, address);
+        /*
         if(!hasIndex(row, column, parent))
             return QModelIndex();
 
@@ -412,16 +430,20 @@ public:
         if(!parent.isValid())
             parentitem = rootitem;
         else
-            parentitem = static_cast<TreeItem*>(parent.internalPointer());
+            parentitem = static_cast<TreeItem*>(parent.internalPointer()); // parent.internalId()
 
         TreeItem* childitem = parentitem->child(row);
         if(childitem)
             return createIndex(row, column, childitem);
         else
             return QModelIndex();
+        */
     };
     QModelIndex parent(const QModelIndex &index) const
     {
+        if(index.isValid)
+            return createIndex(index.sibling().row(), 0, index.sibling());
+        /*
         if(!index.isValid())
             return QModelIndex();
 
@@ -432,6 +454,7 @@ public:
             return QModelIndex();
 
         return createIndex(parentitem->row(), 0, parentitem);
+        */
     };
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
@@ -578,6 +601,7 @@ private:
     };
 
     TreeItem* rootitem;
+    QList<QSqlRecord> dataset;
     // need to reimplement index(), parent(), rowCount(), columnCount(), hasChildren(), flags(), data(), headerdata()
     // from qabstractitemmodel. index.parent use createIndex() to genereate indexes for others to use/reference
     // fetchmore() can also be implemented to when a branch in the tree model is expanded. 
