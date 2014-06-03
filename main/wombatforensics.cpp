@@ -239,6 +239,7 @@ void WombatForensics::InitializeQueryModel()
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
+        TreeViewSqlModel* testmodel = new TreeViewSqlModel();
         FileViewSqlModel* tmpmodel = new FileViewSqlModel();
         tmpmodel->setQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data", fcasedb);
         tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -261,7 +262,16 @@ void WombatForensics::InitializeQueryModel()
         //treeproxy->setSourceModel(tmpmodel);
         //checkableproxy->setSourceModel(treeproxy);
         //ui->dirTreeView->setModel(treeproxy);
-        checkableproxy->setSourceModel(tmpmodel);
+
+        // RUN TEST TREE ABSTRACT ITEM MODEL HERE
+
+
+        checkableproxy->setSourceModel(testmodel);
+        //checkableproxy->setSourceModel(tmpmodel);
+
+
+
+
         ui->dirTreeView->setModel(checkableproxy);
         connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));

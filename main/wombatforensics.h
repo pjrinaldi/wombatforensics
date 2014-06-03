@@ -367,7 +367,7 @@ class TreeViewSqlModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    explicit TreeViewSqlModel(const QString &data, QObject* parent = 0) : QAbstractItemModel(parent)
+    explicit TreeViewSqlModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         // get root address.
         /*
@@ -409,7 +409,17 @@ public:
         if(!index.isValid())
             return QVariant();
         QSqlQuery dataquery(fcasedb);
-        dataquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data WHERE address
+        dataquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data WHERE address = ?");
+        dataquery.addBindValue(index.internalId());
+        if(dataquery.exec())
+        {
+            dataquery.next();
+            qDebug() << "data query address|parent|rootinum: " << dataquery.value(5).toInt() << "|" << dataquery.value(11).toInt() << "|" << dataquery.value(12).toInt();
+        if(role != Qt::DisplayRole)
+            return QVariant();
+        return dataquery.value(index.column());
+        }
+        //dataquery.finish();
         //treequery.addBindValue(index.internalId());
         //treequery.exec
         // places data in each column from sql query. call above query to return columns where index/address is ?"
@@ -442,6 +452,14 @@ public:
     };
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const
     {
+        qDebug() << "index parent.internalid: " << parent.internalId();
+        if(parent.isValid()) // child
+        {
+            return createIndex(row, column, parent.internalId());
+        }
+        // root
+        return createIndex(row, column, rootinum);
+
         //treequery
         // simply calls sqlquery and uses address and parentid for it.
         // probably no need to validate stuff, since sql is valid.
@@ -473,11 +491,13 @@ public:
     };
     QModelIndex parent(const QModelIndex &index) const
     {
+        qDebug() << "parent index.internalid: " << index.internalId();
         // use sql to get parentid for a given index.
         // then createindex for it.
         if(index.isValid())
         {
         }
+        return createIndex(index.row(), 0, index.internalId());
             //return createIndex(index.sibling().row(), 0, index.sibling());
         /*
         if(!index.isValid())
@@ -496,11 +516,12 @@ public:
     {
         QSqlQuery rowquery(fcasedb);
         rowquery.prepare("SELECT count(objectid) AS childcount FROM data WHERE parentid = ?");
-        qDebug() << "Parent QModelIndex: " << parent << "Parent internalID: " << parent.internalId();
+        qDebug() << "ROWCOUNT " << "Parent QModelIndex: " << parent << "Parent internalID: " << parent.internalId();
         rowquery.addBindValue(parent.internalId());
         if(rowquery.exec())
         {
             rowquery.next();
+            qDebug() << "row count: " << rowquery.value(0).toInt();
             return rowquery.record().value("childcount").toInt();
         }
         else
@@ -575,9 +596,6 @@ private:
                     //treebranch
                     //parents << parents.last().appendChild(new TreeItem*(tmpdata, parents.last()));
                 }
-
-
-
             }
         }
         */
