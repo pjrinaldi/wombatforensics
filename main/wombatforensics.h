@@ -494,10 +494,20 @@ public:
         qDebug() << "parent index.internalid: " << index.internalId();
         // use sql to get parentid for a given index.
         // then createindex for it.
-        if(index.isValid())
+        if(index.isValid()) // child
         {
+            QSqlQuery parentquery(fcasedb);
+            parentquery.prepare("SELECT parentid FROM data where address = ?");
+            parentquery.addBindValue(index.internalId());
+            if(parentquery.exec())
+            {
+                parentquery.next();
+                return createIndex(index.row(), 0, parentquery.value(0).toInt());
+            }
+
+            return createIndex(index.row(), 0, rootinum);
         }
-        return createIndex(index.row(), 0, index.internalId());
+        //return createIndex(index.row(), 0, index.internalId());
             //return createIndex(index.sibling().row(), 0, index.sibling());
         /*
         if(!index.isValid())
@@ -581,7 +591,7 @@ private:
             {
                 //tmpdata.clear();
                 //tmpdata << modelquery.record().value("objectid").toInt() << modelquery.record().value("name").toString() << modelquery.record().value("fullpath").toString() << modelquery.record().value("size").toInt() << "" << "" << modelquery.record().value("crtime").toInt() << modelquery.record().value("atime").toInt() << modelquery.record().value("mtime").toInt() << modequery.record().value("ctime").toInt() << modelquery.record.value("md5").toString();
-                if(modelquery.value(4).toInt() < 5)
+                if(modelquery.value(4).toInt() == 4)
                 {
                     //parents << parents.last()->appendChild(new TreeItem*(tmpdata, parents.last()));
                     //if(modelquery.record().value("rootinum"))
