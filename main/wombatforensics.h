@@ -565,28 +565,32 @@ private:
         */
         /*
         QList<QVariant> tmpdata;
-        QList<QTreeItem*> parents;
-        QList<QTreeItem*> treebranch;
-        QHash<int, int> treehash; // address, TreeItem*.
-        int rootinum = -1;
-        tmpdata.clear();
-        parents << parent;
+        */
+        //QList<QTreeItem*> parents;
+        //QList<QTreeItem*> treebranch;
+        //QHash<int, int> treehash; // address, TreeItem*.
+        //int rootinum = -1;
+        //tmpdata.clear();
+        //parents << parent;
+        //*/
         QSqlQuery modelquery(fcasedb);
-        modequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data");
+        modelquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data");
         if(modelquery.exec())
         {
             while(modelquery.next())
             {
-                tmpdata.clear();
-                tmpdata << modelquery.record().value("objectid").toInt() << modelquery.record().value("name").toString() << modelquery.record().value("fullpath").toString() << modelquery.record().value("size").toInt() << "" << "" << modelquery.record().value("crtime").toInt() << modelquery.record().value("atime").toInt() << modelquery.record().value("mtime").toInt() << modequery.record().value("ctime").toInt() << modelquery.record.value("md5").toString();
-                if(modelquery.record().value("objecttype") < 5)
+                //tmpdata.clear();
+                //tmpdata << modelquery.record().value("objectid").toInt() << modelquery.record().value("name").toString() << modelquery.record().value("fullpath").toString() << modelquery.record().value("size").toInt() << "" << "" << modelquery.record().value("crtime").toInt() << modelquery.record().value("atime").toInt() << modelquery.record().value("mtime").toInt() << modequery.record().value("ctime").toInt() << modelquery.record.value("md5").toString();
+                if(modelquery.value(4).toInt() < 5)
                 {
-                    parents << parents.last()->appendChild(new TreeItem*(tmpdata, parents.last()));
-                    if(modelquery.record().value("rootinum"))
-                    {
-                        rootinum = modequery.record().value("rootinum");
+                    //parents << parents.last()->appendChild(new TreeItem*(tmpdata, parents.last()));
+                    //if(modelquery.record().value("rootinum"))
+                    //{
+                    rootinum = modelquery.value(12).toInt();
+                    createIndex(0, 0, rootinum);
+                    qDebug() << "root inum from setupmodeldata: " << rootinum;
                         //treehash.insert(modelquery.record.value("rootinum"), new TreeItem*(tmpdata, parents.last()));
-                    }
+                    //}
                 }
                 else // file/directory with hierarchy
                 {
@@ -598,7 +602,7 @@ private:
                 }
             }
         }
-        */
+        //*/
         // add images...
         /*
         modelquery.prepare("SELECT objectid, name, fullpath, size FROM data WHERE objecttype = 1");
