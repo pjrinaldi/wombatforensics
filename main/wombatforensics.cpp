@@ -266,13 +266,17 @@ void WombatForensics::InitializeQueryModel()
         // RUN TEST TREE ABSTRACT ITEM MODEL HERE
 
 
-        checkableproxy->setSourceModel(testmodel);
+        //checkableproxy->setSourceModel(testmodel);
         //checkableproxy->setSourceModel(tmpmodel);
 
 
 
+        ui->dirTreeView->setModel(testmodel);
+        ui->dirTreeView->setRootIndex(testmodel->index(0, 0, QModelIndex()));
+        //ui->dirTreeView->setModel(checkableproxy);
+        
 
-        ui->dirTreeView->setModel(checkableproxy);
+
         connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
