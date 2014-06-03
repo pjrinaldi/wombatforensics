@@ -455,10 +455,13 @@ public:
         qDebug() << "index parent.internalid: " << parent.internalId();
         if(parent.isValid()) // child
         {
-            return createIndex(row, column, parent.internalId());
+            //return createIndex(row, column, parent.internalId());
         }
+        QSqlQuery indexquery(fcasedb);
+        return parent;
+        //indexquery.prepare("SELECT addres");
         // root
-        return createIndex(row, column, rootinum);
+        //return createIndex(row, column, rootinum);
 
         //treequery
         // simply calls sqlquery and uses address and parentid for it.
@@ -502,10 +505,11 @@ public:
             if(parentquery.exec())
             {
                 parentquery.next();
-                return createIndex(index.row(), 0, parentquery.value(0).toInt());
+                return index.parent();
+                //return createIndex(index.row(), 0, parentquery.value(0).toInt());
             }
 
-            return createIndex(index.row(), 0, rootinum);
+            //return createIndex(index.row(), 0, rootinum);
         }
         //return createIndex(index.row(), 0, index.internalId());
             //return createIndex(index.sibling().row(), 0, index.sibling());
