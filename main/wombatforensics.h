@@ -391,6 +391,7 @@ public:
     };
     QVariant data(const QModelIndex &index, int role) const
     {
+        // places data in each column from sql query. call above query to return columns where index/address is ?"
         if(!index.isValid())
             return QVariant();
 
@@ -409,6 +410,7 @@ public:
     };
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const
     {
+        // headerdata simply calls headerdata[section].
         if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
             return rootitem->data(section);
 
@@ -416,6 +418,9 @@ public:
     };
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const
     {
+        // simply calls sqlquery and uses address and parentid for it.
+        // probably no need to validate stuff, since sql is valid.
+        // simply calls sqlquery and get's address from it for index.
         if(parent.isValid())
         {
             return createIndex(row, column, address);
@@ -441,6 +446,8 @@ public:
     };
     QModelIndex parent(const QModelIndex &index) const
     {
+        // use sql to get parentid for a given index.
+        // then createindex for it.
         if(index.isValid)
             return createIndex(index.sibling().row(), 0, index.sibling());
         /*
@@ -458,6 +465,7 @@ public:
     };
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
+        // get result count() for a given index/address
         TreeItem* parentitem;
         if(parent.column() > 0)
             return 0;
@@ -471,6 +479,7 @@ public:
     };
     int columnCount(const QModelIndex &parent = QModelIndex()) const
     {
+        // column count is always the same, length of the data..
         if(parent.isValid())
             return static_cast<TreeItem*>(parent.internalPointer())->columnCount();
         else
