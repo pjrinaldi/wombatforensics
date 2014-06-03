@@ -369,13 +369,27 @@ class TreeViewSqlModel : public QAbstractItemModel
 public:
     explicit TreeViewSqlModel(const QString &data, QObject* parent = 0) : QAbstractItemModel(parent)
     {
-        QList<QVariant> rootdata;
+        // get root address.
+        /*
+        QSqlQuery rootquery(fcasedb);
+        rootquery.prepare("SELECT rootinum from data where objecttype = 4");
+        if(rootquery.exec())
+        {
+            rootquery.next();
+            rootinum = rootquery.record().value("rootinum").toInt();
+        }
+        rootquery.finish();
+        */
+        //QList<QVariant> rootdata;
         //QList<QSqlRecord> dataset;
-        rootdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
-        rootitem = new TreeItem(rootdata);
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
+        SetupModelData();
+        //rootitem = new TreeItem(rootdata);
         //SetupModelData(data.split(QString("\n")), rootitem);
-        QSqlQuery treequery(fcasedb);
-        treequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data");
+        //treequery = QSqlQuery((fcasedb);
+        //treequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data");
+        //treequery = QSqlQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data where address = ?", fcasedb);
+        /*
         if(treequery.exec())
         {
             while(treequery.next())
@@ -384,14 +398,22 @@ public:
             }
         }
         treequery.finish();
+        */
     };
     ~TreeViewSqlModel()
     {
-        delete rootitem;
+        //delete rootitem;
     };
     QVariant data(const QModelIndex &index, int role) const
     {
+        if(!index.isValid())
+            return QVariant();
+        QSqlQuery dataquery(fcasedb);
+        dataquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data WHERE address
+        //treequery.addBindValue(index.internalId());
+        //treequery.exec
         // places data in each column from sql query. call above query to return columns where index/address is ?"
+        /*
         if(!index.isValid())
             return QVariant();
 
@@ -401,6 +423,7 @@ public:
         TreeItem* item = static_cast<TreeItem*>(index.internalPointer());
 
         return item->data(index.column());
+        */
     };
     Qt::ItemFlags flags(const QModelIndex &index) const
     {
@@ -412,21 +435,25 @@ public:
     {
         // headerdata simply calls headerdata[section].
         if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
-            return rootitem->data(section);
+            return headerdata[section];
+            //return rootitem->data(section);
 
         return QVariant();
     };
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const
     {
+        //treequery
         // simply calls sqlquery and uses address and parentid for it.
         // probably no need to validate stuff, since sql is valid.
         // simply calls sqlquery and get's address from it for index.
+        /*
         if(parent.isValid())
         {
-            return createIndex(row, column, address);
+            //return createIndex(row, column, address);
         }
         
-        return createIndex(row, column, address);
+        //return createIndex(row, column, address);
+        /*/
         /*
         if(!hasIndex(row, column, parent))
             return QModelIndex();
@@ -448,8 +475,10 @@ public:
     {
         // use sql to get parentid for a given index.
         // then createindex for it.
-        if(index.isValid)
-            return createIndex(index.sibling().row(), 0, index.sibling());
+        if(index.isValid())
+        {
+        }
+            //return createIndex(index.sibling().row(), 0, index.sibling());
         /*
         if(!index.isValid())
             return QModelIndex();
@@ -465,7 +494,19 @@ public:
     };
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
+        QSqlQuery rowquery(fcasedb);
+        rowquery.prepare("SELECT count(objectid) AS childcount FROM data WHERE parentid = ?");
+        qDebug() << "Parent QModelIndex: " << parent << "Parent internalID: " << parent.internalId();
+        rowquery.addBindValue(parent.internalId());
+        if(rowquery.exec())
+        {
+            rowquery.next();
+            return rowquery.record().value("childcount").toInt();
+        }
+        else
+            return 0;
         // get result count() for a given index/address
+        /*
         TreeItem* parentitem;
         if(parent.column() > 0)
             return 0;
@@ -474,20 +515,34 @@ public:
             parentitem = rootitem;
         else
             parentitem = static_cast<TreeItem*>(parent.internalPointer());
-
-        return parentitem->childCount();
+        */
+        //return parentitem->childCount();
     };
     int columnCount(const QModelIndex &parent = QModelIndex()) const
     {
+        return headerdata.count();
         // column count is always the same, length of the data..
+        /*
         if(parent.isValid())
             return static_cast<TreeItem*>(parent.internalPointer())->columnCount();
         else
             return rootitem->columnCount();
+        */
     };
 private:
-    void SetupModelData(const QStringList &lines, TreeItem* parent)
+    //void SetupModelData(const QStringList &lines, TreeItem* parent)
+    void SetupModelData()
     {
+        /*
+        treequery = QSqlQuery("SELECT objectid, name, fullpath, size, rootinum, parentid FROM data WHERE objecttype < 5", fcasedb);
+        if(treequery.exec())
+        {
+            while(treequery.next())
+            {
+            }
+        }
+        */
+        /*
         QList<QVariant> tmpdata;
         QList<QTreeItem*> parents;
         QList<QTreeItem*> treebranch;
@@ -525,6 +580,7 @@ private:
 
             }
         }
+        */
         // add images...
         /*
         modelquery.prepare("SELECT objectid, name, fullpath, size FROM data WHERE objecttype = 1");
@@ -609,8 +665,11 @@ private:
         */
     };
 
-    TreeItem* rootitem;
+    //TreeItem* rootitem;
+    QList<QVariant> headerdata;
     QList<QSqlRecord> dataset;
+    int rootinum = 0;
+    //QSqlQuery treequery(fcasedb);
     // need to reimplement index(), parent(), rowCount(), columnCount(), hasChildren(), flags(), data(), headerdata()
     // from qabstractitemmodel. index.parent use createIndex() to genereate indexes for others to use/reference
     // fetchmore() can also be implemented to when a branch in the tree model is expanded. 
