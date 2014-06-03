@@ -584,6 +584,8 @@ private:
         //parents << parent;
         //*/
         QSqlQuery modelquery(fcasedb);
+        QModelIndex imageindex;
+        QModelIndex fsindex;
         modelquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data");
         if(modelquery.exec())
         {
@@ -591,19 +593,25 @@ private:
             {
                 //tmpdata.clear();
                 //tmpdata << modelquery.record().value("objectid").toInt() << modelquery.record().value("name").toString() << modelquery.record().value("fullpath").toString() << modelquery.record().value("size").toInt() << "" << "" << modelquery.record().value("crtime").toInt() << modelquery.record().value("atime").toInt() << modelquery.record().value("mtime").toInt() << modequery.record().value("ctime").toInt() << modelquery.record.value("md5").toString();
-                if(modelquery.value(4).toInt() == 4)
+                if(modelquery.value(4).toInt() == 1)
+                {
+                    imageindex = createIndex(0, 0, (quintptr)0);
+                }
+                else if(modelquery.value(4).toInt() == 4)
                 {
                     //parents << parents.last()->appendChild(new TreeItem*(tmpdata, parents.last()));
                     //if(modelquery.record().value("rootinum"))
                     //{
+                    fsindex = createIndex(0, 0, imageindex.internalId());
                     rootinum = modelquery.value(12).toInt();
-                    createIndex(0, 0, rootinum);
+                    QModelIndex rootindex = createIndex(0, 0, fsindex.internalId());
                     qDebug() << "root inum from setupmodeldata: " << rootinum;
                         //treehash.insert(modelquery.record.value("rootinum"), new TreeItem*(tmpdata, parents.last()));
                     //}
                 }
                 else // file/directory with hierarchy
                 {
+                    createIndex(0, 0, modelquery.value(11).toInt());
                     //treehash.insert(rootinum, 
                     //treehash.insert(
                     //treebranch << parents.last();
