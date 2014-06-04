@@ -318,15 +318,15 @@ public:
     explicit TreeViewSqlModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
-        QSqlQuery setupquery(fcasedb);
-        setupquery.prepare("SELECT objectid, name, fullpath, size, address, crtime, atime, mtime, ctime, md5 FROM data");
-        if(setupquery.exec())
-        {
-            while(setupquery.next())
-            {
+        //QSqlQuery setupquery(fcasedb);
+        //setupquery.prepare("SELECT objectid, name, fullpath, size, address, crtime, atime, mtime, ctime, md5 FROM data");
+        //if(setupquery.exec())
+        //{
+        //    while(setupquery.next())
+        //    {
 
-            }
-        }
+        //    }
+        //}
     };
 
     ~TreeViewSqlModel()
@@ -335,37 +335,98 @@ public:
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
+        int paraddress = 0;
+        int imageindex = 0;
         // if parent.isValid() -> not root.
-        QSqlQuery rowquery(fcasedb);
-        rowquery.prepare("SELECT count(objectid) AS childcount FROM data");
-        //qDebug() << "ROWCOUNT " << "Parent QModelIndex: " << parent << "Parent internalID: " << parent.internalId();
-        rowquery.addBindValue(parent.internalId());
-        if(rowquery.exec())
+        if(parent.isValid())
         {
-            rowquery.next();
-            //qDebug() << "row count: " << rowquery.value(0).toInt();
-            return rowquery.record().value("childcount").toInt();
+            QSqlQuery rootquery(fcasedb);
+            rootquery.prepare("SELECT objecttype FROM data WHERE objectid = ?");
+            rootquery.addBindValue(parent.internalId());
+            if(rootquery.exec())
+            {
+                rootquery.next();
+                if(rootquery.value(0).toInt() == 1)
+                    imageindex = 1;
+            }
+            if(imageindex == 0)
+            {
+                QSqlQuery parquery(fcasedb);
+                parquery.prepare("SELECT address FROM data WHERE parentid = ?");
+                parquery.addBindValue(parent.internalId());
+                if(parquery.exec())
+                {
+                    parquery.next();
+                    paraddress = parquery.value(0).toInt();
+                }
+                QSqlQuery rowquery(fcasedb);
+                rowquery.prepare("SELECT count(objectid) AS childcount FROM data WHERE parentid = ?");
+                rowquery.addBindValue(paraddress);
+                if(rowquery.exec())
+                {
+                    rowquery.next();
+                    qDebug() << "row count: " << rowquery.value(0).toInt();
+                    return rowquery.value(0).toInt();
+                }
+            }
+            else // root element
+            {
+                // NEED TO GET ROOTINUM FROM QUERY WITH OBJECTTYPE == 4, FIND ALL CHILDREN WITH PARENTID = ROOTINUM
+                QSqlQuery inumquery(fcasedb);
+                inumquery.prepare("SELECT rootinum FROM data WHERE objecttype = 4");
+                if(inumquery.exec())
+                {
+                    inumquery.next();
+                    QSqlQuery rowquery(fcasedb);
+                    rowquery.prepare("SELECT count(objectid) AS childcount FROM data where parentid = ?");
+                    rowquery.addBindValue(inumquery.value(0).toInt());
+                    if(rowquery.exec())
+                    {
+                        rowquery.next();
+                        qDebug() << "root row count: " << rowquery.value(0).toInt();
+                        return rowquery.value(0).toInt();
+                    }
+                }
+                //qDebug() << "root row count: " << rowquery.value(0).toInt();
+                //qDebug() << "root row count: 1";
+                //return 1;
+            }
         }
-        else
-            return 0;
+        qDebug() << "neither option worked - indexroot count 1";
+        return 1;
     };
 
     QVariant data(const QModelIndex &index, int role) const
     {
-        if(!index.isValid())
-            return QVariant();
+        QList<QVariant> tmplist;
+        if(!index.isValid()) // root item...
+        {
+            tmplist.clear();
+            QSqlQuery rootquery(fcasedb);
+            rootquery.prepare("SELECT objectid, name, fullpath, size, address, crtime, atime, mtime, ctime, md5 FROM data WHERE objecttype = 1");
+            if(rootquery.exec())
+            {
+                rootquery.next();
+                tmplist << rootquery.value(0).toInt() << rootquery.value(1).toString() << rootquery.value(2).toString() << rootquery.value(3).toInt() << "" << "" << rootquery.value(5).toInt() << rootquery.value(6).toInt() << rootquery.value(7).toInt() << rootquery.value(8).toInt() << rootquery.value(9).toString();
+                qDebug() << tmplist[index.column()];
+                return tmplist[index.column()];
+            }
+        }
+            //return QVariant();
 
-        if(role == Qt::DisplayRole)
+        if(index.isValid() && role == Qt::DisplayRole)
         {
             QSqlQuery dataquery(fcasedb);
             dataquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data where objectid = ?");
-            dataquery.addBindValue(index.row());
+            dataquery.addBindValue(index.internalId());
             if(dataquery.exec())
             {
+                tmplist.clear();
                 dataquery.next();
-                QList<QVariant> tmplist;
+                //QList<QVariant> tmplist;
                 tmplist << dataquery.record().value("objectid").toInt() << dataquery.record().value("name").toString() << dataquery.record().value("fullpath").toString() << dataquery.record().value("size").toInt() << "" << "" << dataquery.record().value("crtime").toInt() << dataquery.record().value("atime").toInt() << dataquery.record().value("mtime").toInt() << dataquery.record().value("ctime").toInt() << dataquery.record().value("md5").toString();
-                return tmplist;
+                qDebug() << tmplist[index.column()];
+                return tmplist[index.column()];
             }
             return QVariant();
         }
@@ -388,13 +449,35 @@ public:
         if(!hasIndex(row, column, item))
             return QModelIndex();
         
-        if(!item.isValid()) // root item
+        /*if(!item.isValid()) // root item
         {
-            return QModelIndex();
+            QSqlQuery rootquery(fcasedb);
+            rootquery.prepare("SELECT objectid FROM data WHERE objecttype = 1");
+            if(rootquery.exec())
+            {
+                while(rootquery.next())
+                {
+                    return createIndex(0, 0, rootquery.value(0).toInt());
+                }
+            }
+            //return QModelIndex();
             //return createIndex(0, 0, 1);
+        }*/
+        if(!item.isValid()) // model root
+        {
+            //return createIndex(0, 0, QModelIndex().internalId());
+            return QModelIndex();
         }
 
-        //return createIndex(row, column, item.internalId());
+        QSqlQuery rootquery(fcasedb);
+        rootquery.prepare("SELECT objecttype FROM data WHERE objectid = ?");
+        rootquery.addBindValue(item.internalId());
+        if(rootquery.exec())
+        {
+            rootquery.next();
+            if(rootquery.value(0).toInt() == 1) // root item...
+                return createIndex(0, 0, item.internalId());
+        }
 
         QSqlQuery indexquery(fcasedb);
         indexquery.prepare("SELECT address FROM data WHERE objectid = ?");
@@ -419,14 +502,34 @@ public:
         if(!item.isValid())
             return QModelIndex();
 
+        QSqlQuery rootquery(fcasedb);
+        rootquery.prepare("SELECT objecttype FROM data WHERE objectid = ?");
+        rootquery.addBindValue(item.internalId());
+        if(rootquery.exec())
+        {
+            rootquery.next();
+            if(rootquery.value(0).toInt() == 1)
+            {
+                return QModelIndex();
+                //return createIndex(item.internalId(), 0, QModelIndex().internalId());
+            }
+        }
         // given item
         QSqlQuery parentquery(fcasedb);
-        parentquery.prepare("SELECT address, parentid FROM data WHERE objectid = ?");
+        parentquery.prepare("SELECT parentid FROM data WHERE objectid = ?");
         parentquery.addBindValue(item.internalId());
         if(parentquery.exec())
         {
             parentquery.next();
-            return createIndex(item.internalId(), 0, parentquery.value(1).toInt());
+            QSqlQuery idquery(fcasedb);
+            idquery.prepare("SELECT objectid FROM data WHERE address = ?");
+            idquery.addBindValue(parentquery.value(0).toInt());
+            if(idquery.exec())
+            {
+                idquery.next();
+                return createIndex(item.internalId(), 0, idquery.value(0).toInt());
+            }
+            //return createIndex(item.internalId(), 0, parentquery.value(1).toInt());
         }
         else
             return QModelIndex();

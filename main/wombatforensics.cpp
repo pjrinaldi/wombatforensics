@@ -272,6 +272,15 @@ void WombatForensics::InitializeQueryModel()
 
 
         ui->dirTreeView->setModel(testmodel);
+        /*
+        QSqlQuery rootquery(fcasedb);
+        rootquery.prepare("SELECT objectid FROM data WHERE objecttype = 1");
+        if(rootquery.exec())
+        {
+            rootquery.next();
+            //ui->dirTreeView->setRootIndex(testmodel->createIndex(0, 0, rootquery.value(0).toInt()));
+        }
+        */
         ui->dirTreeView->setRootIndex(testmodel->index(0, 0, QModelIndex()));
         //ui->dirTreeView->setModel(checkableproxy);
         
@@ -841,13 +850,14 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
-    for(int i=0; i < ((FileViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
-    {
+    //for(int i=0; i < ((FileViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
+    //for(int i=0; i < ((TreeViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
+    //{
         // may need to compare treeview->model() == currentmodel) to determine what to set it to.
         // depending on the design though, i may not need multiple layouts since the columns can be sorted.
         // have to see as i go. for now its good.
-        ui->dirTreeView->resizeColumnToContents(i);
-    }
+    //    ui->dirTreeView->resizeColumnToContents(i);
+    //}
 }
 
 void WombatForensics::SetupHexPage(void)
