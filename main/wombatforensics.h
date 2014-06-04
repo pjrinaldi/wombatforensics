@@ -381,7 +381,7 @@ public:
         
         if(!item.isValid()) // root item
         {
-            return QModelIndex();
+            return createIndex(0, 0, item.internalId());
         }
 
         return createIndex(row, column, item.internalId());
