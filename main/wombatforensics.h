@@ -317,6 +317,7 @@ class TreeViewSqlModel : public QAbstractItemModel
 public:
     explicit TreeViewSqlModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
     };
 
     ~TreeViewSqlModel()
@@ -364,30 +365,70 @@ public:
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const
     {
-        QList<QVariant> headerdata;
-        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
-
         if(role != Qt::DisplayRole)
             return QVariant();
 
         if(orientation == Qt::Horizontal)
-            return headerdata;
+            return headerdata[section];
+
+        return QVariant();
     };
 
     QModelIndex index(int row, int column, const QModelIndex &item = QModelIndex()) const
     {
+        if(!hasIndex(row, column, item))
+            return QModelIndex();
+        
+        if(!item.isValid()) // root item
+        {
+            return QModelIndex();
+        }
+
+        return createIndex(row, column, item.internalId());
+
+        //QSqlQuery indexquery(fcasedb);
+        //indexquery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data WHERE objectid = ?");
+        //indexquery.addBindValue(item.internalId());
+        //if(indexquery.exec())
+       // {
+            //indexquery.next();
+            //return createIndex(row, column, indexquery.
+        //}
     };
 
     QModelIndex parent(const QModelIndex &item) const
     {
+        if(!item.isValid())
+            return QModelIndex();
+
+        QSqlQuery parentquery(fcasedb);
+        parentquery.prepare("SELECT address, parentid FROM data WHERE objectid = ?");
+        parentquery.addBindValue(item.internalId());
+        if(parentquery.exec())
+        {
+            parentquery.next();
+            return createIndex(item.internalId(), 0, parentquery.value(1).toInt());
+        }
+        else
+            return QModelIndex();
     };
 
     int columnCount(const QModelIndex &item = QModelIndex()) const
     {
+        return headerdata.count();
+    };
+
+    Qt::ItemFlags flags(const QModelIndex &item) const
+    {
+        if(!item.isValid())
+            return 0;
+
+        return QAbstractItemModel::flags(item);
     };
 
 private:
     int rootinum;
+    QList<QVariant> headerdata;
 };
 
 /*

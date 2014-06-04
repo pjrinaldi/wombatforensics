@@ -272,7 +272,7 @@ void WombatForensics::InitializeQueryModel()
 
 
         ui->dirTreeView->setModel(testmodel);
-        //ui->dirTreeView->setRootIndex(testmodel->index(0, 0, QModelIndex()));
+        ui->dirTreeView->setRootIndex(testmodel->index(0, 0, QModelIndex()));
         //ui->dirTreeView->setModel(checkableproxy);
         
 
