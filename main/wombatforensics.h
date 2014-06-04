@@ -25,20 +25,37 @@ public:
     };
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const
     {
-        return index(sourceIndex.row(), sourceIndex.column());
+        //qDebug() << sourceIndex.internalId();
+        // ASSIGNS AN INTERNALID TO EACH INDEX.
+        return createIndex(sourceIndex.row(), sourceIndex.column(), sourceIndex.sibling(sourceIndex.row(), 0).data().toInt());
     };
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
     {
         return sourceModel()->data(mapToSource(index), role);
     };
+    
     QModelIndex index(int row, int col, const QModelIndex &index = QModelIndex()) const
     {
         //qDebug() << "current index objectid: " << sourceModel()->index(row, 0).data().toInt();
-        return createIndex(row, col, sourceModel()->index(row, 0).data().toInt()); // set internalId to the objectid...
+        // GIVEN A PARENT (INDEX) FIND THE CHILD ID WITH PARENT INDEX INTERNALID
+        //return createIndex(row, col, sourceModel()->index(row, 11).data().toInt());
+        //return createIndex(row, col, sourceModel()->index(row, 11).data().toInt());
+        //return sourceModel()->index(sourceModel()->index.row(), 0, sourceModel()->index.sibling(sourceModel()->index.row(), 11).data().toInt());
+        //return createIndex(row, col, sourceModel()->index(row, 0).data().toInt()); // set internalId to the objectid...
     }
-    QModelIndex parent(const QModelIndex&) const
+    QModelIndex parent(const QModelIndex &index) const
     {
-        return QModelIndex();
+        // PARENT() PROVIDES CHILD INDEX. GET CHILD INDEX PARENT ADDRESS AND THEN DETERMINE THAT ADDRESS' OBJECTID
+        //qDebug() << "parent() treeid|objectid|address|parentid: " << index.internalId() << index.sibling(index.row(), 0).data().toInt() << index.sibling(index.row(), 5).data().toInt() << index.sibling(index.row(), 11).data().toInt();
+        QSqlQuery parentquery(fcasedb);
+        parentquery.prepare("SELECT objectid FROM data WHERE address = ?");
+        parentquery.addBindValue(index.sibling(index.row(), 11).data().toInt());
+        if(parentquery.exec())
+        {
+            parentquery.next();
+            return createIndex(mapToSource(index).row(), 0, parentquery.value(0).toInt()); 
+        }
+        //return QModelIndex();
     }
     int rowCount(const QModelIndex &) const
     {

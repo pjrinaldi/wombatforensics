@@ -253,7 +253,7 @@ void WombatForensics::InitializeQueryModel()
         tmpmodel->setHeaderData(8, Qt::Horizontal, tr("Modified (UTC)"));
         tmpmodel->setHeaderData(9, Qt::Horizontal, tr("Status Changed (UTC)"));
         tmpmodel->setHeaderData(10, Qt::Horizontal, tr("MD5 Hash"));
-        tmpmodel->removeColumns(11, 1, QModelIndex());
+        //tmpmodel->removeColumns(11, 1, QModelIndex());
 
         //ui->dirTreeView->setModel(tmpmodel);
 
