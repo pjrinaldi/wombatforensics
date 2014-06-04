@@ -310,6 +310,87 @@ public:
     };
 };
 
+class TreeViewSqlModel : public QAbstractItemModel
+{
+    Q_OBJECT
+
+public:
+    explicit TreeViewSqlModel(QObject* parent = 0) : QAbstractItemModel(parent)
+    {
+    };
+
+    ~TreeViewSqlModel()
+    {
+    };
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const
+    {
+        // if parent.isValid() -> not root.
+        QSqlQuery rowquery(fcasedb);
+        rowquery.prepare("SELECT count(objectid) AS childcount FROM data");
+        //qDebug() << "ROWCOUNT " << "Parent QModelIndex: " << parent << "Parent internalID: " << parent.internalId();
+        rowquery.addBindValue(parent.internalId());
+        if(rowquery.exec())
+        {
+            rowquery.next();
+            //qDebug() << "row count: " << rowquery.value(0).toInt();
+            return rowquery.record().value("childcount").toInt();
+        }
+        else
+            return 0;
+    };
+
+    QVariant data(const QModelIndex &index, int role) const
+    {
+        if(!index.isValid())
+            return QVariant();
+
+        if(role == Qt::DisplayRole)
+        {
+            QSqlQuery dataquery(fcasedb);
+            dataquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data where objectid = ?");
+            dataquery.addBindValue(index.row());
+            if(dataquery.exec())
+            {
+                dataquery.next();
+                QList<QVariant> tmplist;
+                tmplist << dataquery.record().value("objectid").toInt() << dataquery.record().value("name").toString() << dataquery.record().value("fullpath").toString() << dataquery.record().value("size").toInt() << "" << "" << dataquery.record().value("crtime").toInt() << dataquery.record().value("atime").toInt() << dataquery.record().value("mtime").toInt() << dataquery.record().value("ctime").toInt() << dataquery.record().value("md5").toString();
+                return tmplist;
+            }
+            return QVariant();
+        }
+        return QVariant();
+    };
+
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const
+    {
+        QList<QVariant> headerdata;
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
+
+        if(role != Qt::DisplayRole)
+            return QVariant();
+
+        if(orientation == Qt::Horizontal)
+            return headerdata;
+    };
+
+    QModelIndex index(int row, int column, const QModelIndex &item = QModelIndex()) const
+    {
+    };
+
+    QModelIndex parent(const QModelIndex &item) const
+    {
+    };
+
+    int columnCount(const QModelIndex &item = QModelIndex()) const
+    {
+    };
+
+private:
+    int rootinum;
+};
+
+/*
 class TreeItem
 {
 public:
@@ -370,7 +451,6 @@ public:
     explicit TreeViewSqlModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         // get root address.
-        /*
         QSqlQuery rootquery(fcasedb);
         rootquery.prepare("SELECT rootinum from data where objecttype = 4");
         if(rootquery.exec())
@@ -379,7 +459,6 @@ public:
             rootinum = rootquery.record().value("rootinum").toInt();
         }
         rootquery.finish();
-        */
         //QList<QVariant> rootdata;
         //QList<QSqlRecord> dataset;
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
@@ -389,7 +468,6 @@ public:
         //treequery = QSqlQuery((fcasedb);
         //treequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data");
         //treequery = QSqlQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data where address = ?", fcasedb);
-        /*
         if(treequery.exec())
         {
             while(treequery.next())
@@ -398,7 +476,6 @@ public:
             }
         }
         treequery.finish();
-        */
     };
     ~TreeViewSqlModel()
     {
@@ -423,7 +500,6 @@ public:
         //treequery.addBindValue(index.internalId());
         //treequery.exec
         // places data in each column from sql query. call above query to return columns where index/address is ?"
-        /*
         if(!index.isValid())
             return QVariant();
 
@@ -433,7 +509,6 @@ public:
         TreeItem* item = static_cast<TreeItem*>(index.internalPointer());
 
         return item->data(index.column());
-        */
     };
     Qt::ItemFlags flags(const QModelIndex &index) const
     {
@@ -467,15 +542,12 @@ public:
         // simply calls sqlquery and uses address and parentid for it.
         // probably no need to validate stuff, since sql is valid.
         // simply calls sqlquery and get's address from it for index.
-        /*
         if(parent.isValid())
         {
             //return createIndex(row, column, address);
         }
         
         //return createIndex(row, column, address);
-        /*/
-        /*
         if(!hasIndex(row, column, parent))
             return QModelIndex();
 
@@ -490,7 +562,6 @@ public:
             return createIndex(row, column, childitem);
         else
             return QModelIndex();
-        */
     };
     QModelIndex parent(const QModelIndex &index) const
     {
@@ -513,7 +584,6 @@ public:
         }
         //return createIndex(index.row(), 0, index.internalId());
             //return createIndex(index.sibling().row(), 0, index.sibling());
-        /*
         if(!index.isValid())
             return QModelIndex();
 
@@ -524,7 +594,6 @@ public:
             return QModelIndex();
 
         return createIndex(parentitem->row(), 0, parentitem);
-        */
     };
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
@@ -541,7 +610,6 @@ public:
         else
             return 0;
         // get result count() for a given index/address
-        /*
         TreeItem* parentitem;
         if(parent.column() > 0)
             return 0;
@@ -550,25 +618,21 @@ public:
             parentitem = rootitem;
         else
             parentitem = static_cast<TreeItem*>(parent.internalPointer());
-        */
         //return parentitem->childCount();
     };
     int columnCount(const QModelIndex &parent = QModelIndex()) const
     {
         return headerdata.count();
         // column count is always the same, length of the data..
-        /*
         if(parent.isValid())
             return static_cast<TreeItem*>(parent.internalPointer())->columnCount();
         else
             return rootitem->columnCount();
-        */
     };
 private:
     //void SetupModelData(const QStringList &lines, TreeItem* parent)
     void SetupModelData()
     {
-        /*
         treequery = QSqlQuery("SELECT objectid, name, fullpath, size, rootinum, parentid FROM data WHERE objecttype < 5", fcasedb);
         if(treequery.exec())
         {
@@ -576,17 +640,13 @@ private:
             {
             }
         }
-        */
-        /*
         QList<QVariant> tmpdata;
-        */
         //QList<QTreeItem*> parents;
         //QList<QTreeItem*> treebranch;
         //QHash<int, int> treehash; // address, TreeItem*.
         //int rootinum = -1;
         //tmpdata.clear();
         //parents << parent;
-        //*/
         QSqlQuery modelquery(fcasedb);
         QModelIndex imageindex;
         QModelIndex fsindex;
@@ -624,9 +684,7 @@ private:
                 }
             }
         }
-        //*/
         // add images...
-        /*
         modelquery.prepare("SELECT objectid, name, fullpath, size FROM data WHERE objecttype = 1");
         if(modelquery.exec())
         {
@@ -651,9 +709,7 @@ private:
         {
         }
         modelquery.finish();
-        */
-        /*
-       QList<TreeItem*> parents;
+        QList<TreeItem*> parents;
         QList<int> indentations;
         parents << parent;
         indentations << 0;
@@ -706,7 +762,6 @@ private:
 
             ++number;
         }
-        */
     };
 
     //TreeItem* rootitem;
@@ -718,8 +773,7 @@ private:
     // from qabstractitemmodel. index.parent use createIndex() to genereate indexes for others to use/reference
     // fetchmore() can also be implemented to when a branch in the tree model is expanded. 
 };
-/*
- *        wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
+        wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
         FileViewSqlModel* tmpmodel = new FileViewSqlModel();
         tmpmodel->setQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data", fcasedb);
         tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -734,6 +788,5 @@ private:
         tmpmodel->setHeaderData(9, Qt::Horizontal, tr("Status Changed (UTC)"));
         tmpmodel->setHeaderData(10, Qt::Horizontal, tr("MD5 Hash"));
         tmpmodel->removeColumns(11, 1, QModelIndex());
- *
  */ 
 #endif // WOMBATFORENSICS_H
