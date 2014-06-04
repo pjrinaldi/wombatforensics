@@ -12,7 +12,6 @@
 #include "globals.h"
 #include "checkableproxymodel.h"
 
-/*
 class TreeProxy : public QSortFilterProxyModel
 {
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const
@@ -26,13 +25,26 @@ class TreeProxy : public QSortFilterProxyModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
     {
         //qDebug() << QSortFilterProxyModel::data(index, role); // object id
-        return QSortFilterProxyModel::data(index, role);
+        //return QSortFilterProxyModel::data(index, role);
+        return sourceModel()->data(mapToSource(index), role);
     };
-    bool setData(const QModelIndex &index, const QVariant &value, int role)
+    QModelIndex index(int row, int col, const QModelIndex &index = QModelIndex()) const
     {
-        return QSortFilterProxyModel::setData(index, value, role);
-    };
-};*/
+        return createIndex(row, col);
+    }
+    QModelIndex parent(const QModelIndex&) const
+    {
+        return QModelIndex();
+    }
+    int rowCount(const QModelIndex &) const
+    {
+        return sourceModel()->rowCount();
+    }
+    int columnCount(const QModelIndex &) const
+    {
+        return sourceModel()->columnCount();
+    }
+};
 /*
 class TreeProxy : public QAbstractProxyModel
 {
@@ -189,7 +201,7 @@ public:
     //ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
     CheckableProxyModel* checkableproxy;
-    //TreeProxy* treeproxy;
+    TreeProxy* treeproxy;
 
 signals:
     void LogVariable(WombatVariable* wombatVariable);
