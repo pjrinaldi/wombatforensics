@@ -29,12 +29,11 @@ public:
     };
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
     {
-        //qDebug() << QSortFilterProxyModel::data(index, role); // object id
-        //return QSortFilterProxyModel::data(index, role);
         return sourceModel()->data(mapToSource(index), role);
     };
     QModelIndex index(int row, int col, const QModelIndex &index = QModelIndex()) const
     {
+        qDebug() << "current index id: " << index.sibling(index.row(), 0).data().toString().toInt();
         return createIndex(row, col);
     }
     QModelIndex parent(const QModelIndex&) const
@@ -326,7 +325,7 @@ public:
         return value;
     };
 };
-
+/*
 class TreeViewSqlModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -364,6 +363,7 @@ public:
         }
 
         return 1;
+        */
         /*
         int paraddress = 0;
         int imageindex = 0;
@@ -425,7 +425,7 @@ public:
         qDebug() << "neither option worked - indexroot count 1";
         return 1;
         */
-    };
+/*    };
 
     QVariant data(const QModelIndex &index, int role) const
     {
@@ -440,6 +440,7 @@ public:
             return tmplist[index.column()];
         }
         return QVariant();
+        */
         /*
         if(!index.isValid()) // root item...
         {
@@ -474,7 +475,7 @@ public:
         }
         return QVariant();
         */
-    };
+/*    };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const
     {
@@ -493,7 +494,7 @@ public:
         if(!hasIndex(row, column, item))
             return QModelIndex();
    
-        createIndex(row, column);
+        createIndex(row, column);*/
         /*if(!item.isValid()) // root item
         {
             QSqlQuery rootquery(fcasedb);
@@ -542,7 +543,7 @@ public:
             //return createIndex(row, column, indexquery.
         }
         */
-    };
+   /* };
 
     // FOR TABLE ONLY, SIMPLY CALL PARENT() AND RETURN QMODELINDEX()
     QModelIndex parent(const QModelIndex &item) const
@@ -600,7 +601,7 @@ private:
     int rootinum;
     QList<QVariant> headerdata;
 };
-
+*/
 /*
 class TreeItem
 {
