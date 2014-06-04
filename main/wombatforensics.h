@@ -390,19 +390,28 @@ public:
         
         if(!item.isValid()) // root item
         {
-            return createIndex(0, 0, 1);
+            return QModelIndex();
+            //return createIndex(0, 0, 1);
         }
 
-        return createIndex(row, column, item.internalId());
+        //return createIndex(row, column, item.internalId());
 
-        //QSqlQuery indexquery(fcasedb);
-        //indexquery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, parentid, rootinum FROM data WHERE objectid = ?");
-        //indexquery.addBindValue(item.internalId());
-        //if(indexquery.exec())
-       // {
-            //indexquery.next();
+        QSqlQuery indexquery(fcasedb);
+        indexquery.prepare("SELECT address FROM data WHERE objectid = ?");
+        indexquery.addBindValue(item.internalId());
+        if(indexquery.exec())
+        {
+            indexquery.next();
+            QSqlQuery childquery(fcasedb);
+            childquery.prepare("SELECT objectid FROM data WHERE parentid = ?");
+            childquery.addBindValue(indexquery.value(0).toInt());
+            if(childquery.exec())
+            {
+                while(childquery.next())
+                    return createIndex(row, column, childquery.value(0).toInt());
+            }
             //return createIndex(row, column, indexquery.
-        //}
+        }
     };
 
     QModelIndex parent(const QModelIndex &item) const
