@@ -12,15 +12,20 @@
 #include "globals.h"
 #include "checkableproxymodel.h"
 
-class TreeProxy : public QSortFilterProxyModel
+class TreeProxy : public QAbstractProxyModel
 {
+public:
+
+    TreeProxy(QObject *p = 0) : QAbstractProxyModel(p)
+    {
+    };
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const
     {
-        return proxyIndex;
+        return sourceModel()->index(proxyIndex.row(), proxyIndex.column());
     };
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const
     {
-        return sourceIndex;
+        return index(sourceIndex.row(), sourceIndex.column());
     };
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
     {
