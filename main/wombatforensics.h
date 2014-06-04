@@ -335,6 +335,19 @@ public:
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
+        if(!parent.isValid())
+        {
+            QSqlQuery countquery(fcasedb);
+            countquery.prepare("SELECT count(objectid) FROM data");
+            if(countquery.exec())
+            {
+                countquery.next();
+                return countquery.value(0).toInt();
+            }
+        }
+
+        return 1;
+        /*
         int paraddress = 0;
         int imageindex = 0;
         // if parent.isValid() -> not root.
@@ -394,11 +407,23 @@ public:
         }
         qDebug() << "neither option worked - indexroot count 1";
         return 1;
+        */
     };
 
     QVariant data(const QModelIndex &index, int role) const
     {
         QList<QVariant> tmplist;
+        QSqlQuery filequery(fcasedb);
+        filequery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5 FROM data where objectid = ?");
+        filequery.addBindValue(index.row());
+        if(filequery.exec())
+        {
+            filequery.next();
+            tmplist << filequery.value(0).toInt() << filequery.value(1).toString() << filequery.value(2).toString() << filequery.value(3).toInt() << "" << "" << filequery.value(5).toInt() << filequery.value(6).toInt() << filequery.value(7).toInt() << filequery.value(8).toInt() << filequery.value(9).toString();
+            return tmplist[index.column()];
+        }
+        return QVariant();
+        /*
         if(!index.isValid()) // root item...
         {
             tmplist.clear();
@@ -431,6 +456,7 @@ public:
             return QVariant();
         }
         return QVariant();
+        */
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const
@@ -444,11 +470,13 @@ public:
         return QVariant();
     };
 
+    // FOR TABLE VIEW, SIMPLY CALL INDEX() WITH RETURN CREATEINDEX(ROW, COLUMN);
     QModelIndex index(int row, int column, const QModelIndex &item = QModelIndex()) const
     {
         if(!hasIndex(row, column, item))
             return QModelIndex();
-        
+   
+        createIndex(row, column);
         /*if(!item.isValid()) // root item
         {
             QSqlQuery rootquery(fcasedb);
@@ -463,6 +491,7 @@ public:
             //return QModelIndex();
             //return createIndex(0, 0, 1);
         }*/
+        /*
         if(!item.isValid()) // model root
         {
             //return createIndex(0, 0, QModelIndex().internalId());
@@ -495,8 +524,10 @@ public:
             }
             //return createIndex(row, column, indexquery.
         }
+        */
     };
 
+    // FOR TABLE ONLY, SIMPLY CALL PARENT() AND RETURN QMODELINDEX()
     QModelIndex parent(const QModelIndex &item) const
     {
         if(!item.isValid())
