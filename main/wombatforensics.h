@@ -33,8 +33,8 @@ public:
     };
     QModelIndex index(int row, int col, const QModelIndex &index = QModelIndex()) const
     {
-        qDebug() << "current index id: " << index.sibling(index.row(), 0).data().toString().toInt();
-        return createIndex(row, col);
+        //qDebug() << "current index objectid: " << sourceModel()->index(row, 0).data().toInt();
+        return createIndex(row, col, sourceModel()->index(row, 0).data().toInt()); // set internalId to the objectid...
     }
     QModelIndex parent(const QModelIndex&) const
     {
