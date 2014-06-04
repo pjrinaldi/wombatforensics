@@ -318,6 +318,15 @@ public:
     explicit TreeViewSqlModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
+        QSqlQuery setupquery(fcasedb);
+        setupquery.prepare("SELECT objectid, name, fullpath, size, address, crtime, atime, mtime, ctime, md5 FROM data");
+        if(setupquery.exec())
+        {
+            while(setupquery.next())
+            {
+
+            }
+        }
     };
 
     ~TreeViewSqlModel()
