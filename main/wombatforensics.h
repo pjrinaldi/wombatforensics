@@ -390,7 +390,7 @@ public:
         
         if(!item.isValid()) // root item
         {
-            return createIndex(0, 0, item.internalId());
+            return createIndex(0, 0, 1);
         }
 
         return createIndex(row, column, item.internalId());
@@ -410,6 +410,7 @@ public:
         if(!item.isValid())
             return QModelIndex();
 
+        // given item
         QSqlQuery parentquery(fcasedb);
         parentquery.prepare("SELECT address, parentid FROM data WHERE objectid = ?");
         parentquery.addBindValue(item.internalId());
