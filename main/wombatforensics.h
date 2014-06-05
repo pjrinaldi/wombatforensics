@@ -12,6 +12,7 @@
 #include "globals.h"
 #include "checkableproxymodel.h"
 
+/*
 class TreeProxy : public QAbstractProxyModel
 {
 public:
@@ -66,6 +67,7 @@ public:
         return sourceModel()->columnCount();
     }
 };
+*/
 /*
 class TreeProxy : public QAbstractProxyModel
 {
@@ -92,7 +94,6 @@ public:
     QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const
     {
         QVariant value = QAbstractProxyModel::data(proxyIndex, role);
-        /*
         QVariant value = QSqlQueryModel::data(index, role);
         if(value.isValid() && role == Qt::DisplayRole)
         {
@@ -222,7 +223,7 @@ public:
     //ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
     CheckableProxyModel* checkableproxy;
-    TreeProxy* treeproxy;
+    //TreeProxy* treeproxy;
 
 signals:
     void LogVariable(WombatVariable* wombatVariable);

@@ -257,17 +257,17 @@ void WombatForensics::InitializeQueryModel()
 
         //ui->dirTreeView->setModel(tmpmodel);
 
-        treeproxy = new TreeProxy();
+        //treeproxy = new TreeProxy();
         checkableproxy = new CheckableProxyModel(this);
-        treeproxy->setSourceModel(tmpmodel);
+        //treeproxy->setSourceModel(tmpmodel);
         //checkableproxy->setSourceModel(treeproxy);
-        ui->dirTreeView->setModel(treeproxy);
+        //ui->dirTreeView->setModel(treeproxy);
 
         // RUN TEST TREE ABSTRACT ITEM MODEL HERE
 
 
         //checkableproxy->setSourceModel(testmodel);
-        //checkableproxy->setSourceModel(tmpmodel);
+        checkableproxy->setSourceModel(tmpmodel);
 
 
 
@@ -282,7 +282,7 @@ void WombatForensics::InitializeQueryModel()
         }
         */
         //ui->dirTreeView->setRootIndex(testmodel->index(0, 0, QModelIndex()));
-        //ui->dirTreeView->setModel(checkableproxy);
+        ui->dirTreeView->setModel(checkableproxy);
         
 
 
@@ -850,14 +850,13 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
-    //for(int i=0; i < ((FileViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
-    //for(int i=0; i < ((TreeViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
-    //{
+    for(int i=0; i < ((FileViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
+    {
         // may need to compare treeview->model() == currentmodel) to determine what to set it to.
         // depending on the design though, i may not need multiple layouts since the columns can be sorted.
         // have to see as i go. for now its good.
-    //    ui->dirTreeView->resizeColumnToContents(i);
-    //}
+        ui->dirTreeView->resizeColumnToContents(i);
+    }
 }
 
 void WombatForensics::SetupHexPage(void)
