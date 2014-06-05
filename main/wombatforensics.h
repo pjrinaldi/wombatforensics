@@ -11,6 +11,7 @@
 #include "exportdialog.h"
 #include "globals.h"
 #include "checkableproxymodel.h"
+#include "tabletotreeproxymodel.h"
 
 /*
 class TreeProxy : public QAbstractProxyModel
@@ -224,6 +225,7 @@ public:
     ExportDialog* exportdialog;
     CheckableProxyModel* checkableproxy;
     //TreeProxy* treeproxy;
+    TableToTreeProxyModel* treeproxy;
 
 signals:
     void LogVariable(WombatVariable* wombatVariable);

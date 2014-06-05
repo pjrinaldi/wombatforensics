@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 */
 
-#include "TableToTreeProxyModel.h"
+#include "tabletotreeproxymodel.h"
 
 #include <QItemSelection>
 #include <QSqlQueryModel>
@@ -254,7 +254,7 @@ void TableToTreeProxyModel::reset()
     tableNodes.clear();
     delete rootNode;
 
-    QAbstractProxyModel::reset();
+    //QAbstractProxyModel::reset();
 
     rootNode = new TreeNode;
 
