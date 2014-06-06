@@ -34,7 +34,7 @@ class TableToTreeProxyModel : public QAbstractProxyModel
 {
     Q_OBJECT
 public:
-    explicit TableToTreeProxyModel(QObject *parent = 0);
+    explicit TableToTreeProxyModel(int rootaddress, QObject *parent = 0);
     ~TableToTreeProxyModel();
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
@@ -49,6 +49,7 @@ protected slots:
     void reset();
 private:
     TreeNode *rootNode;
+    int rootaddress;
     QList<QList<TreeNode*> > tableNodes;
 };
 
