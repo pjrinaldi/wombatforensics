@@ -45,7 +45,11 @@ public:
     int column;
     TreeNode *parent;
     QList<TreeNode*> children;
-    QString text;
+    int objid;
+    int addid;
+    int parid;
+    int typid;
+    //QString text;
 };
 
 TableToTreeProxyModel::TableToTreeProxyModel(QObject *parent)
@@ -68,8 +72,9 @@ QModelIndex TableToTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex)
     if (!node)
         return QModelIndex();
 
-    Q_ASSERT(false);
+    //Q_ASSERT(false);
     return index(sourceIndex.row(), 0);
+    //return index(sourceIndex.row(), sourceIndex.column());
 }
 
 QModelIndex TableToTreeProxyModel::mapToSource(const QModelIndex &proxyIndex) const
@@ -82,7 +87,8 @@ QModelIndex TableToTreeProxyModel::mapToSource(const QModelIndex &proxyIndex) co
     if (!node)
         return QModelIndex();
 
-    return sourceModel()->index(node->row, node->column);
+    //return sourceModel()->index(node->row, node->column);
+    return QModelIndex();
 }
 
 QVariant TableToTreeProxyModel::data(const QModelIndex &proxyIndex, int role) const
@@ -147,7 +153,8 @@ int TableToTreeProxyModel::rowCount(const QModelIndex &parent) const
 
 int TableToTreeProxyModel::columnCount(const QModelIndex &) const
 {
-    return 1;
+    return sourceModel()->columnCount();
+    //return 1;
 }
 
 bool TableToTreeProxyModel::hasChildren(const QModelIndex &parent) const
@@ -258,10 +265,67 @@ void TableToTreeProxyModel::reset()
 
     rootNode = new TreeNode;
 
-    for (int row=0; row < sourceModel()->rowCount(); ++row) {
+    for (int row=0; row < sourceModel()->rowCount(); ++row) { // for each row...
+        //qDebug() << sourceModel()->rowCount();
         QList<TreeNode*> rowNodes;
         TreeNode *previousNode = rootNode;
-        for (int column=0; column < sourceModel()->columnCount(); ++column) {
+        TreeNode* imagenode;
+        for(int col = 0; col < sourceModel()->columnCount(); ++col)
+        {
+            //qDebug() << "id|address|parent|type" << sourceModel()->data(sourceModel()->index(row, 0)).toString() << sourceModel()->data(sourceModel()->index(row, 5)).toString() << sourceModel()->data(sourceModel()->index(row, 11)).toString() << sourceModel()->data(sourceModel()->index(row, 4)).toString();
+            int objid = sourceModel()->data(sourceModel()->index(row, 0)).toInt(); // objectid
+            int addid = sourceModel()->data(sourceModel()->index(row, 5)).toInt(); // address
+            int parid = sourceModel()->data(sourceModel()->index(row, 11)).toInt(); // parentid
+            int typid = sourceModel()->data(sourceModel()->index(row, 4)).toInt(); // objecttype
+            if(typid < 5)
+            {
+                switch(typid)
+                {
+                    qDebug() << "typid: " << typid;
+                    // image node
+                    case 1:
+                        imagenode = new TreeNode(row, col, previousNode);
+                        rowNodes.insert(0, imagenode);
+                        previousNode = imagenode;
+                        break;
+                    // volume node
+                    case 2:
+                        //node = new TreeNode(row, column, previousNode);
+                        break;
+                    // partition node
+                    case 3:
+    
+                        break;
+                    // filesystem node
+                    case 4:
+                        break;
+                }
+            }
+            TreeNode* tmpnode = 0;
+            foreach(TreeNode* siblingnode, previousNode->children)
+            {
+                if(!siblingnode)
+                    continue;
+                if(siblingnode->addid == parid)
+                {
+                    qDebug() << "siblingnode->addid" << siblingnode->addid << " == parid " << parid;
+                    tmpnode = siblingnode;
+                    break;
+                }
+            }
+            if(!tmpnode)
+            {
+                tmpnode = new TreeNode(row, col, previousNode);
+                tmpnode->objid = objid;
+                tmpnode->addid = addid;
+                tmpnode->parid = parid;
+                tmpnode->typid = typid;
+            }
+            rowNodes.insert(col, tmpnode);
+            previousNode = tmpnode;
+        }
+        /*
+        for (int column=0; column < sourceModel()->columnCount(); ++column) { // for each column...
             const QString &nodeText = sourceModel()->data(sourceModel()->index(row, column)).toString();
             TreeNode *node = 0;
             foreach (TreeNode *siblingNode, previousNode->children) {
@@ -281,6 +345,7 @@ void TableToTreeProxyModel::reset()
             rowNodes.insert(column, node);
             previousNode = node;
         }
+        */
         tableNodes.insert(row, rowNodes);
     }
 

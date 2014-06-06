@@ -246,13 +246,14 @@ void WombatForensics::InitializeQueryModel()
         tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Name"));
         tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Full Path"));
         tmpmodel->setHeaderData(3, Qt::Horizontal, tr("Size (bytes)"));
-        tmpmodel->setHeaderData(4, Qt::Horizontal, tr("Signature"));
-        tmpmodel->setHeaderData(5, Qt::Horizontal, tr("Extension"));
+        tmpmodel->setHeaderData(4, Qt::Horizontal, tr("Object Type"));
+        tmpmodel->setHeaderData(5, Qt::Horizontal, tr("INUM Address"));
         tmpmodel->setHeaderData(6, Qt::Horizontal, tr("Created (UTC)"));
         tmpmodel->setHeaderData(7, Qt::Horizontal, tr("Accessed (UTC)"));
         tmpmodel->setHeaderData(8, Qt::Horizontal, tr("Modified (UTC)"));
         tmpmodel->setHeaderData(9, Qt::Horizontal, tr("Status Changed (UTC)"));
         tmpmodel->setHeaderData(10, Qt::Horizontal, tr("MD5 Hash"));
+        tmpmodel->setHeaderData(11, Qt::Horizontal, tr("Parent ID"));
         //tmpmodel->removeColumns(11, 1, QModelIndex());
 
         //ui->dirTreeView->setModel(tmpmodel);
@@ -260,6 +261,7 @@ void WombatForensics::InitializeQueryModel()
         //treeproxy = new TreeProxy();
         checkableproxy = new CheckableProxyModel(this);
         treeproxy = new TableToTreeProxyModel(this);
+        //treeproxy->index(0,0).parent().isValid();
         treeproxy->setSourceModel(tmpmodel);
         //treeproxy->setSourceModel(tmpmodel);
         //checkableproxy->setSourceModel(treeproxy);
@@ -292,7 +294,8 @@ void WombatForensics::InitializeQueryModel()
         connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
-        ResizeColumns();
+
+        //ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
 }
