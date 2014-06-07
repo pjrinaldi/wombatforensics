@@ -266,11 +266,11 @@ void TableToTreeProxyModel::reset()
     //QAbstractProxyModel::reset();
 
     rootNode = new TreeNode;
+    QList<TreeNode*> rowNodes;
+    TreeNode *previousNode = rootNode;
 
     for (int row=0; row < sourceModel()->rowCount(); ++row) { // for each row...
         //qDebug() << sourceModel()->rowCount();
-        QList<TreeNode*> rowNodes;
-        TreeNode *previousNode = rootNode;
         TreeNode* imagenode;
         int col = 0;
         //for(int col = 0; col < sourceModel()->columnCount(); ++col)
