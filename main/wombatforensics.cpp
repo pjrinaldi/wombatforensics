@@ -256,13 +256,13 @@ void WombatForensics::InitializeQueryModel()
         tmpmodel->setHeaderData(11, Qt::Horizontal, tr("Parent ID"));
         //tmpmodel->removeColumns(11, 1, QModelIndex());
 
-        //ui->dirTreeView->setModel(tmpmodel);
+        ui->dirTreeView->setModel(tmpmodel);
 
         //treeproxy = new TreeProxy();
         checkableproxy = new CheckableProxyModel(this);
         treeproxy = new TableToTreeProxyModel(5, this);
         //treeproxy->index(0,0).parent().isValid();
-        treeproxy->setSourceModel(tmpmodel);
+        //treeproxy->setSourceModel(tmpmodel);
         //treeproxy->setSourceModel(tmpmodel);
         //checkableproxy->setSourceModel(treeproxy);
         //ui->dirTreeView->setModel(treeproxy);
@@ -287,7 +287,7 @@ void WombatForensics::InitializeQueryModel()
         */
         //ui->dirTreeView->setRootIndex(testmodel->index(0, 0, QModelIndex()));
         //ui->dirTreeView->setModel(checkableproxy);
-        ui->dirTreeView->setModel(treeproxy);
+        //ui->dirTreeView->setModel(treeproxy);
         
 
 
