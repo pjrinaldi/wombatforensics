@@ -49,10 +49,12 @@ protected slots:
     void reset();
 private:
     TreeNode *rootNode;
+    TreeNode* rootnode;
     int rootaddress;
-    QList<QList<TreeNode*> > tableNodes;
-    QList<QVariant> colvalues;
-    QList<QList<QVariant> > rownodes;
+    QList<TreeNode*> treestructure;
+    //QList<QList<TreeNode*> > tableNodes;
+    //QList<QVariant> colvalues;
+    //QList<QList<QVariant> > rownodes;
 };
 
 #endif // SQLQUERYTREEPROXYMODEL_H
