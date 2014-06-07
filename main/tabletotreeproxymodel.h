@@ -51,6 +51,8 @@ private:
     TreeNode *rootNode;
     int rootaddress;
     QList<QList<TreeNode*> > tableNodes;
+    QList<QVariant> colvalues;
+    QList<QList<QVariant> > rownodes;
 };
 
 #endif // SQLQUERYTREEPROXYMODEL_H
