@@ -262,9 +262,13 @@ void WombatForensics::InitializeQueryModel()
                 qDebug() << "currentnode objid|addr|par" << currentnode->nodevalues.at(0) << currentnode->nodevalues.at(5) << currentnode->nodevalues.at(11);
                 if(dataquery.value(4).toInt() < 5)
                 {
-                    if(parentnode)
+                    if(dataquery.value(4).toInt() == 1)
+                        parentnode = currentnode;
+                    else
+                    {
                         parentnode->children.append(currentnode);
-                    else parentnode = currentnode;
+                        parentnode = currentnode;
+                    }
                 }
                 else
                 {

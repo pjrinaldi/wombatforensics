@@ -28,6 +28,8 @@ public:
         delete rootnode;
     };
 
+    //void SetRootAddress(int rootinum);
+
     void SetRootNode(Node* node)
     {
         delete rootnode;
