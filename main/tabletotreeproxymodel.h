@@ -49,7 +49,7 @@ public:
 protected slots:
     void reset();
 private:
-    TreeNode *rootNode;
+    //TreeNode *rootNode;
     TreeNode* rootnode;
     int rootaddress;
     QList<TreeNode*> treestructure;

@@ -54,11 +54,11 @@ public:
 };
 
 TableToTreeProxyModel::TableToTreeProxyModel(int rootaddress, QObject *parent)
-    : QAbstractProxyModel(parent), rootaddress(rootaddress), rootNode(0)
+    : QAbstractProxyModel(parent), rootaddress(rootaddress), rootnode(0)
 {
     //rootnode = new TreeNode(0,0,0);
     rootnode = new TreeNode;
-    rootNode = new TreeNode;
+    //rootNode = new TreeNode;
 }
 
 TableToTreeProxyModel::~TableToTreeProxyModel()
@@ -69,7 +69,7 @@ TableToTreeProxyModel::~TableToTreeProxyModel()
     tableNodes.clear();*/
     treestructure.clear();
     delete rootnode;
-    delete rootNode;
+    //delete rootNode;
 }
 
 QModelIndex TableToTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
