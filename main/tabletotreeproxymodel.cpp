@@ -56,7 +56,8 @@ public:
 TableToTreeProxyModel::TableToTreeProxyModel(int rootaddress, QObject *parent)
     : QAbstractProxyModel(parent), rootaddress(rootaddress), rootNode(0)
 {
-    rootnode = new TreeNode(0,0,0);
+    //rootnode = new TreeNode(0,0,0);
+    rootnode = new TreeNode;
     rootNode = new TreeNode;
 }
 
@@ -75,6 +76,7 @@ QModelIndex TableToTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex)
 {
     TreeNode* node = treestructure.at(sourceIndex.row());
     QVariant cell = node->cellvalues.at(sourceIndex.column());
+    qDebug() << "cell at 0: " << cell.toInt();
     //TreeNode *node = tableNodes.at(sourceIndex.column()).at(sourceIndex.row());
     //TreeNode* node = tableNodes.at(0).at(sourceIndex.row());
     // NEED TO FIGURE OUT WHAT THIS DOES/WORKS AND MODIFY/FIX....
@@ -101,7 +103,9 @@ QModelIndex TableToTreeProxyModel::mapToSource(const QModelIndex &proxyIndex) co
     if (!node)
         return QModelIndex();
 
-    return sourceModel()->index(node->row, node->column);
+    qDebug() << "map to source: ";
+    return index(proxyIndex.row(), proxyIndex.column());
+    //return sourceModel()->index(node->row, node->column);
     //return QModelIndex();
 }
 
@@ -116,24 +120,31 @@ QVariant TableToTreeProxyModel::data(const QModelIndex &proxyIndex, int role) co
         return QVariant();
 
     const TreeNode *node = static_cast<TreeNode*>(proxyIndex.internalPointer());
+    qDebug() << "data() cellvalues: " << node->cellvalues.at(proxyIndex.column());
+    return node->cellvalues.at(proxyIndex.column());
     Q_ASSERT(node);
     if (!node)
         return QVariant();
 
+    //qDebug() << "node row, col: " << node->row << node->column;
     const QModelIndex index = sourceModel()->index(node->row, node->column);
+    //return sourceModel()->data(sourceModel()->index(proxyIndex.row(), proxyIndex.column()));
+    //return node->cellvalues.at(proxyIndex.column());
     return sourceModel()->data(index, role);
+    //colvalues.append(sourceModel()->data(sourceModel()->index(row, col)));
 }
 
 QModelIndex TableToTreeProxyModel::index(int row, int column, const QModelIndex &parent) const
 {
+    //qDebug() << "row, col, index " << row << ", " << column << ", " << parent.internalPointer();
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
     const TreeNode *parentNode = static_cast<TreeNode*>(parent.internalPointer());
-    if(!parentNode)
-        return QModelIndex();
-    //if (!parentNode)
-        //parentNode = rootnode;
+    //if(!parentNode)
+        //return QModelIndex();
+    if (!parentNode)
+        parentNode = rootnode;
         //parentNode = rootNode;
 
     TreeNode *node = parentNode->children.at(row);
@@ -141,11 +152,13 @@ QModelIndex TableToTreeProxyModel::index(int row, int column, const QModelIndex 
     if (!node)
         return QModelIndex();
 
+    qDebug() << "index row col node: " << row << ", " << column << ", " << node->cellvalues.at(0);
     return createIndex(row, column, node);
 }
 
 QModelIndex TableToTreeProxyModel::parent(const QModelIndex &child) const
 {
+    qDebug() << "parent call";
     if (!child.isValid())
         return QModelIndex();
 
@@ -158,26 +171,30 @@ QModelIndex TableToTreeProxyModel::parent(const QModelIndex &child) const
     Q_ASSERT(parentNode);
     if (!parentNode)
         return QModelIndex();
-    //if(parentNode == rootnode)
+    if(parentNode == rootnode)
+        return QModelIndex();
     //if (parentNode == rootNode)
         //return QModelIndex();
 
+    qDebug() << "parent row col node: " << parentNode->row << ", " << parentNode->column << ", " << parentNode->cellvalues.at(0);
     return createIndex(parentNode->row, parentNode->column, parentNode);
 }
 
 int TableToTreeProxyModel::rowCount(const QModelIndex &parent) const
 {
     const TreeNode *node = static_cast<TreeNode*>(parent.internalPointer());
-    //if (!node)
+    if (!node)
         node = rootnode;
         //node = rootNode;
 
+    qDebug() << "row count: " << node->children.count();
     return node->children.count();
     //return node->children.size();
 }
 
 int TableToTreeProxyModel::columnCount(const QModelIndex &) const
 {
+    qDebug() << "column count: " << sourceModel()->columnCount();
     return sourceModel()->columnCount();
     //return 1;
 }
@@ -185,10 +202,11 @@ int TableToTreeProxyModel::columnCount(const QModelIndex &) const
 bool TableToTreeProxyModel::hasChildren(const QModelIndex &parent) const
 {
     const TreeNode *node = static_cast<TreeNode*>(parent.internalPointer());
-    //if (!node)
+    if (!node)
         node = rootnode;
         //node = rootNode;
 
+    qDebug() << "has children: " << node->children.count();
     return node->children.size() > 0;
 }
 
@@ -295,7 +313,8 @@ void TableToTreeProxyModel::reset()
     */
     //QAbstractProxyModel::reset();
 
-    rootnode = new TreeNode(0, 0, 0);
+    //rootnode = new TreeNode(0, 0, 0);
+    rootnode = new TreeNode;
     //rootNode = new TreeNode;
     //QList<TreeNode*> rowNodes;
     QList<QVariant> colvalues;
@@ -311,12 +330,13 @@ void TableToTreeProxyModel::reset()
         for(int col=0; col < sourceModel()->columnCount(); col++) // for each col
         {
             colvalues.append(sourceModel()->data(sourceModel()->index(row, col)));
-            //qDebug() << "(row, col, value): (" << row << ", " << col << ", " << sourceModel()->data(sourceModel()->index(row, col)).toString() << ")";
+            qDebug() << "(row, col, value): (" << row << ", " << col << ", " << sourceModel()->data(sourceModel()->index(row, col)).toString() << ")";
         }
         if(colvalues.at(4).toInt() < 5)
         {
             if(!parentnode)
-                currentnode = new TreeNode(row, 0, 0);
+                currentnode = rootnode;
+                //currentnode = new TreeNode(row, 0, 0);
             else
                 currentnode = new TreeNode(row, 0, parentnode);
             //currentnode->objid = colvalues.at(0).toInt();
@@ -358,6 +378,7 @@ void TableToTreeProxyModel::reset()
     }
     //qDebug() << "rownodes count: " << rownodes.count();
 
+    qDebug() << "reset called";
     endResetModel();
 }
         /*

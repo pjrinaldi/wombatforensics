@@ -261,7 +261,7 @@ void WombatForensics::InitializeQueryModel()
         //treeproxy = new TreeProxy();
         checkableproxy = new CheckableProxyModel(this);
         treeproxy = new TableToTreeProxyModel(5, this);
-        //treeproxy->index(0,0).parent().isValid();
+        treeproxy->index(0,0).parent().isValid();
         //treeproxy->setSourceModel(tmpmodel);
         treeproxy->setSourceModel(tmpmodel);
         //checkableproxy->setSourceModel(treeproxy);
