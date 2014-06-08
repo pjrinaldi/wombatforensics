@@ -13,6 +13,77 @@
 #include "checkableproxymodel.h"
 #include "tabletotreeproxymodel.h"
 
+class Node
+{
+public:
+    Node(QList<QVariant> celldata)
+    {
+        for(int i=0; i < celldata.count(); i++)
+            nodevalues.append(celldata.at(i));
+        parent = 0;
+    };
+
+    ~Node()
+    {
+        qDeleteAll(children);
+    };
+
+    QList<QVariant> nodevales;
+    Node* parent;
+    QList<Node*> children;
+};
+
+class TreeModel : public QAbstractItemModel
+{
+public:
+    TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
+    {
+        rootnode = 0;
+    };
+
+    ~TreeModel()
+    {
+        delete rootnode;
+    };
+
+    void SetRootNode(Node* node)
+    {
+        delete rootnode;
+        rootnode = node;
+        reset();
+    };
+
+    QModelIndex index(int row, int col, const QModelIndex &parent) const
+    {
+    };
+
+    QModelIndex parent(const QModelIndex &child) const
+    {
+    };
+
+    int rowCount(const QModelIndex &parent) const
+    {
+    };
+
+    int columnCount(const QModelIndex &parent) const
+    {
+    };
+
+    QVariant data(const QModelIndex &index, int role) const
+    {
+    };
+
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const
+    {
+    };
+
+private:
+    Node* NodeFromIndex(const QModelIndex &index) const
+    {
+    };
+
+    Node* rootnode;
+};
 /*
 class TreeProxy : public QAbstractProxyModel
 {
