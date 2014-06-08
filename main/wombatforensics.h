@@ -13,31 +13,13 @@
 #include "checkableproxymodel.h"
 #include "tabletotreeproxymodel.h"
 
-class Node
-{
-public:
-    Node(QList<QVariant> celldata)
-    {
-        for(int i=0; i < celldata.count(); i++)
-            nodevalues.append(celldata.at(i));
-        parent = 0;
-    };
-
-    ~Node()
-    {
-        qDeleteAll(children);
-    };
-
-    QList<QVariant> nodevales;
-    Node* parent;
-    QList<Node*> children;
-};
 
 class TreeModel : public QAbstractItemModel
 {
 public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID";
         rootnode = 0;
     };
 
@@ -50,39 +32,83 @@ public:
     {
         delete rootnode;
         rootnode = node;
-        reset();
+        beginResetModel();
+        endResetModel();
+        //QAbstractItemModel::reset();
     };
 
     QModelIndex index(int row, int col, const QModelIndex &parent) const
     {
+        if(!rootnode || row < 0 || col < 0)
+            return QModelIndex();
+        Node* parentnode = NodeFromIndex(parent);
+        Node* childnode = parentnode->children.value(row);
+        if(!childnode)
+            return QModelIndex();
+        return createIndex(row, col, childnode);
     };
 
     QModelIndex parent(const QModelIndex &child) const
     {
+        Node* node = NodeFromIndex(child);
+        if(!node)
+            return QModelIndex();
+        Node* parentnode = node->parent;
+        if(!parentnode)
+            return QModelIndex();
+        Node* grandparentnode = parentnode->parent;
+        if(!grandparentnode)
+            return QModelIndex();
+        int row = grandparentnode->children.indexOf(parentnode);
+        return createIndex(row, 0, parentnode);
     };
 
     int rowCount(const QModelIndex &parent) const
     {
+        if(parent.column() > 0)
+            return 0;
+        Node* parentnode = NodeFromIndex(parent);
+        if(!parentnode)
+            return 0;
+        return parentnode->children.count();
     };
 
     int columnCount(const QModelIndex &parent) const
     {
+        return headerdata.count();
     };
 
     QVariant data(const QModelIndex &index, int role) const
     {
+        if(role != Qt::DisplayRole)
+            return QVariant();
+        Node* node = NodeFromIndex(index);
+        if(!node)
+            return QVariant();
+        
+        return node->nodevalues.at(index.column());
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
     {
+        if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
+        {
+            return headerdata.at(section);
+        }
+        return QVariant();
     };
 
 private:
     Node* NodeFromIndex(const QModelIndex &index) const
     {
+        if(index.isValid())
+            return static_cast<Node*>(index.internalPointer());
+        else
+            return rootnode;
     };
 
     Node* rootnode;
+    QStringList headerdata;
 };
 /*
 class TreeProxy : public QAbstractProxyModel
@@ -297,6 +323,7 @@ public:
     CheckableProxyModel* checkableproxy;
     //TreeProxy* treeproxy;
     TableToTreeProxyModel* treeproxy;
+    TreeModel* treemodel;
 
 signals:
     void LogVariable(WombatVariable* wombatVariable);

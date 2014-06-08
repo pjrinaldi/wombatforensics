@@ -4,8 +4,29 @@
 #include "wombatinclude.h"
 #include "globals.h"
 
+class Node
+{
+public:
+    Node(QList<QVariant> celldata)
+    {
+        for(int i=0; i < celldata.count(); i++)
+            nodevalues.append(celldata.at(i));
+        parent = 0;
+    };
+
+    ~Node()
+    {
+        qDeleteAll(children);
+    };
+
+    QList<QVariant> nodevalues;
+    Node* parent;
+    QList<Node*> children;
+};
+
 std::string GetTime(void);
 char* TskTimeToStringUTC(time_t time, char buf[128]);
+bool ParentNodeExists(Node* curnode, Node* parentnode);
 bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
 void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints);

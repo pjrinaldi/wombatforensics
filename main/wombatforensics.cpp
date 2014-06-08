@@ -239,7 +239,47 @@ void WombatForensics::InitializeQueryModel()
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
+
+        Node* currentnode;
+        Node* parentnode = 0;
+        //Node* rootnode;
+        QList<QVariant> colvalues;
+
+        QSqlQuery dataquery(fcasedb);
+        dataquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data");
+        if(dataquery.exec())
+        {
+            while(dataquery.next())
+            {
+                QSqlRecord currentrecord = dataquery.record();
+
+                for(int i=0; i < currentrecord.count(); i++)
+                    colvalues.append(dataquery.value(i));
+
+                currentnode = new Node(colvalues);
+
+                if(dataquery.value(4).toInt() < 5)
+                {
+                    if(parentnode)
+                        parentnode->children.append(currentnode);
+                    else parentnode = currentnode;
+                }
+                else
+                {
+                    if(!ParentNodeExists(currentnode, parentnode))
+                    {
+                        parentnode->children.append(currentnode);
+                    }
+                }
+            }
+        }
+
+        TreeModel* treemodel = new TreeModel(this);
+        treemodel->SetRootNode(parentnode);
+        ui->dirTreeView->setModel(treemodel);
+
         //TreeViewSqlModel* testmodel = new TreeViewSqlModel();
+        /*
         FileViewSqlModel* tmpmodel = new FileViewSqlModel();
         tmpmodel->setQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data", fcasedb);
         tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -272,7 +312,7 @@ void WombatForensics::InitializeQueryModel()
 
         //checkableproxy->setSourceModel(testmodel);
         checkableproxy->setSourceModel(tmpmodel);
-
+        */
 
 
         //ui->dirTreeView->setModel(testmodel);
@@ -286,7 +326,7 @@ void WombatForensics::InitializeQueryModel()
         }
         */
         //ui->dirTreeView->setRootIndex(testmodel->index(0, 0, QModelIndex()));
-        ui->dirTreeView->setModel(checkableproxy);
+        //ui->dirTreeView->setModel(checkableproxy);
         //ui->dirTreeView->setModel(treeproxy);
         
 

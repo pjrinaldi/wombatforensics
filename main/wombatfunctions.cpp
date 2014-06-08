@@ -30,6 +30,28 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
+bool ParentNodeExists(Node* curnode, Node* parentnode)
+{
+    bool isparent = false;
+    foreach(Node* childnode, parentnode->children)
+    {
+        if(childnode->children.count() > 0)
+        {
+            foreach(Node* grandchildnode, childnode->children)
+                ParentNodeExists(childnode, grandchildnode);
+        }
+        else
+        {
+            if(curnode->nodevalues.at(11).toInt() == childnode->nodevalues.at(5).toInt())
+            {
+                isparent = true;
+                childnode->children.append(curnode);
+            }
+        }
+    }
+    return isparent;
+}
+
 bool FileExists(const std::string& filename)
 {
     struct stat buf;
