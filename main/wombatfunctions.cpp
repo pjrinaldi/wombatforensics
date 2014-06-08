@@ -38,7 +38,9 @@ bool ParentNodeExists(Node* curnode, Node* parentnode)
         if(childnode->children.count() > 0)
         {
             foreach(Node* grandchildnode, childnode->children)
-                ParentNodeExists(childnode, grandchildnode);
+            {
+                ParentNodeExists(curnode, grandchildnode);
+            }
         }
         else
         {

@@ -251,13 +251,14 @@ void WombatForensics::InitializeQueryModel()
         {
             while(dataquery.next())
             {
-                QSqlRecord currentrecord = dataquery.record();
-
-                for(int i=0; i < currentrecord.count(); i++)
+                //qDebug() << "# of cols: " << dataquery.record().count();
+                for(int i=0; i < dataquery.record().count(); i++)
+                {
                     colvalues.append(dataquery.value(i));
+                }
 
                 currentnode = new Node(colvalues);
-
+                qDebug() << "currentnode objid|addr|par" << currentnode->nodevalues.at(0) << currentnode->nodevalues.at(5) << currentnode->nodevalues.at(11);
                 if(dataquery.value(4).toInt() < 5)
                 {
                     if(parentnode)
