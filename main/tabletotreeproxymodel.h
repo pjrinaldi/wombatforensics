@@ -38,6 +38,7 @@ public:
     ~TableToTreeProxyModel();
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
     QModelIndex parent(const QModelIndex &child) const;

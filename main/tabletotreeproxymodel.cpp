@@ -56,7 +56,7 @@ public:
 TableToTreeProxyModel::TableToTreeProxyModel(int rootaddress, QObject *parent)
     : QAbstractProxyModel(parent), rootaddress(rootaddress), rootNode(0)
 {
-    rootnode = new TreeNode;
+    rootnode = new TreeNode(0,0,0);
     rootNode = new TreeNode;
 }
 
@@ -66,7 +66,7 @@ TableToTreeProxyModel::~TableToTreeProxyModel()
     foreach(QList<TreeNode*> rowNodes, tableNodes)
         rowNodes.clear();
     tableNodes.clear();*/
-    delete rootnode;
+    //delete rootnode;
     delete rootNode;
 }
 
@@ -101,6 +101,11 @@ QModelIndex TableToTreeProxyModel::mapToSource(const QModelIndex &proxyIndex) co
     //return QModelIndex();
 }
 
+QVariant TableToTreeProxyModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    return sourceModel()->headerData(section, orientation, role);
+}
+
 QVariant TableToTreeProxyModel::data(const QModelIndex &proxyIndex, int role) const
 {
     if (!proxyIndex.isValid())
@@ -121,8 +126,10 @@ QModelIndex TableToTreeProxyModel::index(int row, int column, const QModelIndex 
         return QModelIndex();
 
     const TreeNode *parentNode = static_cast<TreeNode*>(parent.internalPointer());
-    if (!parentNode)
-        parentNode = rootnode;
+    if(!parentNode)
+        return QModelIndex();
+    //if (!parentNode)
+        //parentNode = rootnode;
         //parentNode = rootNode;
 
     TreeNode *node = parentNode->children.at(row);
@@ -147,9 +154,9 @@ QModelIndex TableToTreeProxyModel::parent(const QModelIndex &child) const
     Q_ASSERT(parentNode);
     if (!parentNode)
         return QModelIndex();
-    if(parentNode == rootnode)
+    //if(parentNode == rootnode)
     //if (parentNode == rootNode)
-        return QModelIndex();
+        //return QModelIndex();
 
     return createIndex(parentNode->row, parentNode->column, parentNode);
 }
@@ -157,7 +164,7 @@ QModelIndex TableToTreeProxyModel::parent(const QModelIndex &child) const
 int TableToTreeProxyModel::rowCount(const QModelIndex &parent) const
 {
     const TreeNode *node = static_cast<TreeNode*>(parent.internalPointer());
-    if (!node)
+    //if (!node)
         node = rootnode;
         //node = rootNode;
 
@@ -174,7 +181,7 @@ int TableToTreeProxyModel::columnCount(const QModelIndex &) const
 bool TableToTreeProxyModel::hasChildren(const QModelIndex &parent) const
 {
     const TreeNode *node = static_cast<TreeNode*>(parent.internalPointer());
-    if (!node)
+    //if (!node)
         node = rootnode;
         //node = rootNode;
 
@@ -272,6 +279,7 @@ void TableToTreeProxyModel::reset()
     beginResetModel();
 
     treestructure.clear();
+    delete rootnode;
     //rownodes.clear();
     //colvalues.clear();
 
@@ -283,11 +291,12 @@ void TableToTreeProxyModel::reset()
     */
     //QAbstractProxyModel::reset();
 
+    rootnode = new TreeNode(0, 0, 0);
     //rootNode = new TreeNode;
     //QList<TreeNode*> rowNodes;
     QList<QVariant> colvalues;
     //TreeNode *previousNode = rootNode;
-    treestructure.append(rootnode);
+    //treestructure.append(rootnode);
     TreeNode* parentnode;
     TreeNode* currentnode;
     parentnode = rootnode;
@@ -302,13 +311,18 @@ void TableToTreeProxyModel::reset()
         }
         if(colvalues.at(4).toInt() < 5)
         {
-            currentnode = new TreeNode(row, 0, parentnode);
+            if(!parentnode)
+                currentnode = new TreeNode(row, 0, 0);
+            else
+                currentnode = new TreeNode(row, 0, parentnode);
+            //currentnode->objid = colvalues.at(0).toInt();
         }
         else
         {
             foreach(TreeNode* tmpnode, treestructure)
             {
-                qDebug() << " cell values.count() " << tmpnode->cellvalues.count();
+                //qDebug() << "tmpnode objid: " << tmpnode->objid;
+                qDebug() << " cell values.count() " << tmpnode->cellvalues.count(); //static_cast<QList>(tmpnode->cellvalues).count();
                 if(colvalues.at(11).toInt() == ((QVariant)tmpnode->cellvalues.at(5)).toInt())
                 {
                     parentnode = tmpnode;
@@ -318,6 +332,7 @@ void TableToTreeProxyModel::reset()
                 {
                     foreach(TreeNode* tmpchild, tmpnode->children)
                     {
+                        //qDebug() << "tmpchild objid: " << tmpchild->objid;
                         if(colvalues.at(11).toInt() == ((QVariant)tmpchild->cellvalues.at(5)).toInt())
                             parentnode = tmpnode;
                         break;
@@ -325,10 +340,16 @@ void TableToTreeProxyModel::reset()
                 }
             }
             currentnode = new TreeNode(row, 0, parentnode);
+            //currentnode->objid = colvalues.at(0).toInt();
+            //qDebug() << "currentnode objid: " << currentnode->objid;
             //if(colvalues.at(
         }
-        currentnode->cellvalues = colvalues;
+        for(int i=0; i < colvalues.count(); i++)
+            currentnode->cellvalues.append(colvalues.at(i));
+        qDebug() << "currentnode cellvalue count: " << currentnode->cellvalues.count();
+        //currentnode->cellvalues = colvalues;
         treestructure.append(currentnode);
+        parentnode = currentnode;
         //rownodes.append(colvalues);
     }
     //qDebug() << "rownodes count: " << rownodes.count();
