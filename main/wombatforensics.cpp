@@ -249,10 +249,9 @@ void WombatForensics::InitializeQueryModel()
         dataquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data");
         if(dataquery.exec())
         {
-            int a = 0;
             while(dataquery.next())
             {
-                a++;
+                colvalues.clear();
                 //qDebug() << "# of cols: " << dataquery.record().count();
                 for(int i=0; i < dataquery.record().count(); i++)
                 {
@@ -275,7 +274,6 @@ void WombatForensics::InitializeQueryModel()
                     }
                 }
             }
-            qDebug() << "# of rows: " << a;
         }
 
         TreeModel* treemodel = new TreeModel(this);
