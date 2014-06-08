@@ -66,12 +66,15 @@ TableToTreeProxyModel::~TableToTreeProxyModel()
     foreach(QList<TreeNode*> rowNodes, tableNodes)
         rowNodes.clear();
     tableNodes.clear();*/
-    //delete rootnode;
+    treestructure.clear();
+    delete rootnode;
     delete rootNode;
 }
 
 QModelIndex TableToTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
 {
+    TreeNode* node = treestructure.at(sourceIndex.row());
+    QVariant cell = node->cellvalues.at(sourceIndex.column());
     //TreeNode *node = tableNodes.at(sourceIndex.column()).at(sourceIndex.row());
     //TreeNode* node = tableNodes.at(0).at(sourceIndex.row());
     // NEED TO FIGURE OUT WHAT THIS DOES/WORKS AND MODIFY/FIX....
@@ -85,6 +88,7 @@ QModelIndex TableToTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex)
     //Q_ASSERT(false);
     //return index(sourceIndex.row(), 0);
     return index(sourceIndex.row(), sourceIndex.column());
+    //return index(
 }
 
 QModelIndex TableToTreeProxyModel::mapToSource(const QModelIndex &proxyIndex) const
@@ -322,7 +326,7 @@ void TableToTreeProxyModel::reset()
             foreach(TreeNode* tmpnode, treestructure)
             {
                 //qDebug() << "tmpnode objid: " << tmpnode->objid;
-                qDebug() << " cell values.count() " << tmpnode->cellvalues.count(); //static_cast<QList>(tmpnode->cellvalues).count();
+                //qDebug() << " cell values.count() " << tmpnode->cellvalues.count(); //static_cast<QList>(tmpnode->cellvalues).count();
                 if(colvalues.at(11).toInt() == ((QVariant)tmpnode->cellvalues.at(5)).toInt())
                 {
                     parentnode = tmpnode;
@@ -346,7 +350,7 @@ void TableToTreeProxyModel::reset()
         }
         for(int i=0; i < colvalues.count(); i++)
             currentnode->cellvalues.append(colvalues.at(i));
-        qDebug() << "currentnode cellvalue count: " << currentnode->cellvalues.count();
+        //qDebug() << "currentnode cellvalue count: " << currentnode->cellvalues.count();
         //currentnode->cellvalues = colvalues;
         treestructure.append(currentnode);
         parentnode = currentnode;
