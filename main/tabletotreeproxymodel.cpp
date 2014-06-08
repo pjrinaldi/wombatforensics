@@ -74,6 +74,8 @@ TableToTreeProxyModel::~TableToTreeProxyModel()
 
 QModelIndex TableToTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
 {
+    return index(sourceIndex.row(), sourceIndex.column());
+    /*
     TreeNode* node = treestructure.at(sourceIndex.row());
     QVariant cell = node->cellvalues.at(sourceIndex.column());
     qDebug() << "cell at 0: " << cell.toInt();
@@ -91,10 +93,13 @@ QModelIndex TableToTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex)
     //return index(sourceIndex.row(), 0);
     return index(sourceIndex.row(), sourceIndex.column());
     //return index(
+    */
 }
 
 QModelIndex TableToTreeProxyModel::mapToSource(const QModelIndex &proxyIndex) const
 {
+    return sourceModel()->index(proxyIndex.row(), proxyIndex.column());
+    /*
     if (!proxyIndex.isValid())
         return QModelIndex();
 
@@ -107,6 +112,7 @@ QModelIndex TableToTreeProxyModel::mapToSource(const QModelIndex &proxyIndex) co
     return index(proxyIndex.row(), proxyIndex.column());
     //return sourceModel()->index(node->row, node->column);
     //return QModelIndex();
+    */
 }
 
 QVariant TableToTreeProxyModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -116,6 +122,8 @@ QVariant TableToTreeProxyModel::headerData(int section, Qt::Orientation orientat
 
 QVariant TableToTreeProxyModel::data(const QModelIndex &proxyIndex, int role) const
 {
+    sourceModel()->data(mapToSource(proxyIndex), role);
+    /*
     if (!proxyIndex.isValid())
         return QVariant();
 
@@ -132,10 +140,13 @@ QVariant TableToTreeProxyModel::data(const QModelIndex &proxyIndex, int role) co
     //return node->cellvalues.at(proxyIndex.column());
     return sourceModel()->data(index, role);
     //colvalues.append(sourceModel()->data(sourceModel()->index(row, col)));
+    */
 }
 
 QModelIndex TableToTreeProxyModel::index(int row, int column, const QModelIndex &parent) const
 {
+    return createIndex(row, column); 
+    /*
     //qDebug() << "row, col, index " << row << ", " << column << ", " << parent.internalPointer();
     if (!hasIndex(row, column, parent))
         return QModelIndex();
@@ -154,10 +165,13 @@ QModelIndex TableToTreeProxyModel::index(int row, int column, const QModelIndex 
 
     qDebug() << "index row col node: " << row << ", " << column << ", " << node->cellvalues.at(0);
     return createIndex(row, column, node);
+    */
 }
 
 QModelIndex TableToTreeProxyModel::parent(const QModelIndex &child) const
 {
+    return QModelIndex();
+    /*
     qDebug() << "parent call";
     if (!child.isValid())
         return QModelIndex();
@@ -178,10 +192,13 @@ QModelIndex TableToTreeProxyModel::parent(const QModelIndex &child) const
 
     qDebug() << "parent row col node: " << parentNode->row << ", " << parentNode->column << ", " << parentNode->cellvalues.at(0);
     return createIndex(parentNode->row, parentNode->column, parentNode);
+    */
 }
 
 int TableToTreeProxyModel::rowCount(const QModelIndex &parent) const
 {
+    return sourceModel()->rowCount();
+    /*
     const TreeNode *node = static_cast<TreeNode*>(parent.internalPointer());
     if (!node)
         node = rootnode;
@@ -190,6 +207,7 @@ int TableToTreeProxyModel::rowCount(const QModelIndex &parent) const
     qDebug() << "row count: " << node->children.count();
     return node->children.count();
     //return node->children.size();
+    */
 }
 
 int TableToTreeProxyModel::columnCount(const QModelIndex &) const
@@ -201,6 +219,8 @@ int TableToTreeProxyModel::columnCount(const QModelIndex &) const
 
 bool TableToTreeProxyModel::hasChildren(const QModelIndex &parent) const
 {
+    return 0;
+    /*
     const TreeNode *node = static_cast<TreeNode*>(parent.internalPointer());
     if (!node)
         node = rootnode;
@@ -208,6 +228,7 @@ bool TableToTreeProxyModel::hasChildren(const QModelIndex &parent) const
 
     qDebug() << "has children: " << node->children.count();
     return node->children.size() > 0;
+    */
 }
 
 void TableToTreeProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
@@ -255,7 +276,7 @@ void TableToTreeProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
 
     QAbstractProxyModel::setSourceModel(sourceModel);
     reset();
-
+/*
     connect(this->sourceModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(reset()));
 
@@ -294,17 +315,19 @@ void TableToTreeProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
 
 //    connect(this->sourceModel(), SIGNAL(modelAboutToBeReset()), this, SLOT(_q_sourceAboutToBeReset()));
 //    connect(this->sourceModel(), SIGNAL(modelReset()), this, SLOT(_q_sourceReset()));
+*/
 }
 
 void TableToTreeProxyModel::reset()
 {
+    /*
     beginResetModel();
 
     treestructure.clear();
     delete rootnode;
     //rownodes.clear();
     //colvalues.clear();
-
+*/
     /*
     foreach(QList<TreeNode*> rowNodes, tableNodes)
         rowNodes.clear();
@@ -312,7 +335,7 @@ void TableToTreeProxyModel::reset()
     delete rootNode;
     */
     //QAbstractProxyModel::reset();
-
+/*
     //rootnode = new TreeNode(0, 0, 0);
     rootnode = new TreeNode;
     //rootNode = new TreeNode;
@@ -330,7 +353,7 @@ void TableToTreeProxyModel::reset()
         for(int col=0; col < sourceModel()->columnCount(); col++) // for each col
         {
             colvalues.append(sourceModel()->data(sourceModel()->index(row, col)));
-            qDebug() << "(row, col, value): (" << row << ", " << col << ", " << sourceModel()->data(sourceModel()->index(row, col)).toString() << ")";
+            //qDebug() << "(row, col, value): (" << row << ", " << col << ", " << sourceModel()->data(sourceModel()->index(row, col)).toString() << ")";
         }
         if(colvalues.at(4).toInt() < 5)
         {
@@ -380,6 +403,7 @@ void TableToTreeProxyModel::reset()
 
     qDebug() << "reset called";
     endResetModel();
+*/
 }
         /*
         qDebug() << "row count " << sourceModel()->rowCount() << "col count: " << sourceModel()->columnCount();

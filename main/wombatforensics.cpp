@@ -261,17 +261,17 @@ void WombatForensics::InitializeQueryModel()
         //treeproxy = new TreeProxy();
         checkableproxy = new CheckableProxyModel(this);
         treeproxy = new TableToTreeProxyModel(5, this);
-        treeproxy->index(0,0).parent().isValid();
+        //treeproxy->index(0,0).parent().isValid();
         //treeproxy->setSourceModel(tmpmodel);
-        treeproxy->setSourceModel(tmpmodel);
-        //checkableproxy->setSourceModel(treeproxy);
-        ui->dirTreeView->setModel(treeproxy);
+        checkableproxy->setSourceModel(treeproxy);
+        
+        //ui->dirTreeView->setModel(treeproxy);
 
         // RUN TEST TREE ABSTRACT ITEM MODEL HERE
 
 
         //checkableproxy->setSourceModel(testmodel);
-        //checkableproxy->setSourceModel(tmpmodel);
+        checkableproxy->setSourceModel(tmpmodel);
 
 
 
@@ -286,7 +286,7 @@ void WombatForensics::InitializeQueryModel()
         }
         */
         //ui->dirTreeView->setRootIndex(testmodel->index(0, 0, QModelIndex()));
-        //ui->dirTreeView->setModel(checkableproxy);
+        ui->dirTreeView->setModel(checkableproxy);
         //ui->dirTreeView->setModel(treeproxy);
         
 
