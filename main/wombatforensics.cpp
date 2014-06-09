@@ -239,10 +239,13 @@ void WombatForensics::InitializeQueryModel()
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
+        qDebug() << "currentfilesystemid: " << wombatvarptr->currentfilesystemid;
+        wombatdatabase->GetRootInum();
+        qDebug() << "currentrootinum: " << wombatvarptr->currentrootinum;
 
-        Node* currentnode;
+        Node* currentnode = 0;
         Node* parentnode = 0;
-        //Node* rootnode;
+        Node* rootnode = 0;
         QList<QVariant> colvalues;
 
         QSqlQuery dataquery(fcasedb);
@@ -251,37 +254,60 @@ void WombatForensics::InitializeQueryModel()
         {
             while(dataquery.next())
             {
+                currentnode = 0;
                 colvalues.clear();
-                //qDebug() << "# of cols: " << dataquery.record().count();
                 for(int i=0; i < dataquery.record().count(); i++)
                 {
                     colvalues.append(dataquery.value(i));
                 }
-
                 currentnode = new Node(colvalues);
-                qDebug() << "currentnode objid|addr|par" << currentnode->nodevalues.at(0) << currentnode->nodevalues.at(5) << currentnode->nodevalues.at(11);
                 if(dataquery.value(4).toInt() < 5)
                 {
                     if(dataquery.value(4).toInt() == 1)
+                    {
+                        qDebug() << "objtype = 1 objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode = currentnode;
+                        rootnode = currentnode;
+                    }
                     else
                     {
+                        qDebug() << "objtype < 5 objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode->children.append(currentnode);
                         parentnode = currentnode;
                     }
                 }
                 else
                 {
-                    if(!ParentNodeExists(currentnode, parentnode))
+                    if(dataquery.value(11).toInt() == wombatvarptr->currentrootinum)
                     {
+                        qDebug() << "rootinum objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode->children.append(currentnode);
                     }
+                    else
+                    {
+                        Node* missingnode = FindParentNode(currentnode, parentnode);
+                        if(missingnode)
+                        {
+                            qDebug() << "missingnode success objid: " << currentnode->nodevalues.at(0).toInt();
+                            missingnode->children.append(currentnode);
+                        }
+                        else
+                        {
+                            qDebug() << "missingnode fail objid: " << currentnode->nodevalues.at(0).toInt();
+                            parentnode->children.append(currentnode);
+                        }
+                    }
+                    //else if(!ParentNodeExists(currentnode, parentnode))
+                   //{
+                        //qDebug() << "no parent node:
+                        //parentnode->children.append(currentnode);
+                    //}
                 }
             }
         }
 
         TreeModel* treemodel = new TreeModel(this);
-        treemodel->SetRootNode(parentnode);
+        treemodel->SetRootNode(rootnode);
         ui->dirTreeView->setModel(treemodel);
 
         //TreeViewSqlModel* testmodel = new TreeViewSqlModel();

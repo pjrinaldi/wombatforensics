@@ -30,6 +30,41 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
+Node* FindParentNode(Node* curnode, Node* parentnode)
+{
+    int parentid = curnode->nodevalues.at(11).toInt();
+    //qDebug() << "curnode parid: " << parentid;
+    if(parentnode->nodevalues.at(5).toInt() == parentid)
+    {
+        qDebug() << "findparentnode-parent objid: " << curnode->nodevalues.at(0).toInt();
+        return parentnode;
+    }
+    else
+    {
+        foreach(Node* childnode, parentnode->children)
+        {
+            if(childnode->children.count() > 0)
+            {
+                qDebug() << "findparentnode-child child start objid: " << curnode->nodevalues.at(0).toInt();
+                FindParentNode(curnode, childnode);
+            }
+            else
+            {
+                if(childnode->nodevalues.at(5).toInt() == parentid)
+                {
+                    qDebug() << "findparentnode->childless child objid: " << curnode->nodevalues.at(0).toInt();
+                    return childnode;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+    }
+}
+
+/*
 bool ParentNodeExists(Node* curnode, Node* parentnode)
 {
     bool isparent = false;
@@ -52,7 +87,7 @@ bool ParentNodeExists(Node* curnode, Node* parentnode)
         }
     }
     return isparent;
-}
+}*/
 
 bool FileExists(const std::string& filename)
 {

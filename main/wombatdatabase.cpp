@@ -537,3 +537,12 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.address = wombatptr->sqlrecords[0].value(8).toInt();
     //qDebug() << "wombatptr->selectedobject.address (inum): " << wombatptr->selectedobject.address;
 }
+
+void WombatDatabase::GetRootInum()
+{
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->currentfilesystemid);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    wombatptr->currentrootinum = wombatptr->sqlrecords[0].value(0).toInt();
+}

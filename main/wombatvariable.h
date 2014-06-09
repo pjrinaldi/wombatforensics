@@ -196,6 +196,7 @@ struct WombatVariable
     int currentvolumeid;
     int currentpartitionid;
     int currentfilesystemid;
+    int currentrootinum;
     QString currentevidencename;
     QString currentvolumename;
     QString casespath;
