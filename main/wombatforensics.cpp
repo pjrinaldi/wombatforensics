@@ -246,6 +246,8 @@ void WombatForensics::InitializeQueryModel()
         Node* currentnode = 0;
         Node* parentnode = 0;
         Node* rootnode = 0;
+        Node* missingnode = 0;
+        int nodefound = 0;
         QList<QVariant> colvalues;
 
         QSqlQuery dataquery(fcasedb);
@@ -290,7 +292,17 @@ void WombatForensics::InitializeQueryModel()
                     */
                     //else // file/dir is part of another directory
                     //{
-                        Node* missingnode;
+                    nodefound = FindParentNode(currentnode, parentnode, wombatvarptr->currentrootinum);
+                    qDebug() << "Node found: " << nodefound;
+                    if(nodefound)
+                    {
+                        qDebug() << "node was found.";
+                    }
+                    else
+                    {
+                        qDebug() << "node wasn't found. check inum.";
+                        
+                    /*
                         missingnode = FindParentNode(currentnode, parentnode);
                         qDebug() << "missing node returned is: " << missingnode;
                         if(missingnode)
@@ -301,14 +313,15 @@ void WombatForensics::InitializeQueryModel()
                             currentnode->parent = missingnode;
                         }
                         else
+                        {*/
+                        /*
+                        if(currentnode->nodevalues.at(11).toInt() == wombatvarptr->currentrootinum)
                         {
-                            if(currentnode->nodevalues.at(11).toInt() == wombatvarptr->currentrootinum)
-                            {
-                                qDebug() << "currentnode parent == current root inum";
-                                parentnode->children.append(currentnode);
-                                currentnode->parent = parentnode;
-                            }
-                        }
+                            qDebug() << "currentnode parent == current root inum";
+                            parentnode->children.append(currentnode);
+                            currentnode->parent = parentnode;
+                        }*/
+                    }
                         /*
                         if(missingnode != 0)
                         {

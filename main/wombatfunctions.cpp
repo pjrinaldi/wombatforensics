@@ -30,22 +30,40 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
-Node* FindParentNode(Node* curnode, Node* parentnode)
+//Node* FindParentNode(Node* curnode, Node* parentnode)
+int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
 {
+    //int nodefound = 0;
+    if(curnode->nodevalues.at(11).toInt() == rootinum)
+    {
+        parentnode->children.append(curnode);
+        curnode->parent = parentnode;
+        qDebug() << "curnode parent id == rootinum";
+        return 1;
+    }
+    else
+    {
     if(parentnode->nodevalues.at(5).toInt() == curnode->nodevalues.at(11).toInt()) // parent address == cur parentid
     {
         qDebug() << "parent node with objid: " << parentnode->nodevalues.at(0).toInt() << "found for objid: " << curnode->nodevalues.at(0).toInt() << "!";
         qDebug() << "parent addr == cur parid" << parentnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
-        return parentnode;
+        parentnode->children.append(curnode);
+        curnode->parent = parentnode;
+        //nodefound = 1;
+        return 1;
+        //return parentnode;
     }
-    if(parentnode->HasChildren())
+    else if(parentnode->HasChildren())
     {
         for(int i=0; i < parentnode->children.count(); i++)
         {
             qDebug() << "re-iterate with new parent " << parentnode->children.at(i)->nodevalues.at(0).toInt();
-            FindParentNode(curnode, parentnode->children.at(i));
+            FindParentNode(curnode, parentnode->children.at(i), rootinum);
         }
     }
+    return 0;
+    }
+    //return nodefound;
     /*
     qDebug() << "parentnode objectid: " << parentnode->nodevalues.at(0).toInt();
     qDebug() << "parentnode address || currentnode parentid: " << parentnode->nodevalues.at(5).toInt() << " || " << curnode->nodevalues.at(11).toInt();

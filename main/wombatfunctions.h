@@ -35,7 +35,8 @@ public:
 
 std::string GetTime(void);
 char* TskTimeToStringUTC(time_t time, char buf[128]);
-Node* FindParentNode(Node* curnode, Node* parentnode);
+//Node* FindParentNode(Node* curnode, Node* parentnode);
+int FindParentNode(Node* curnode, Node* parentnode, int rootinum);
 //bool ParentNodeExists(Node* curnode, Node* parentnode);
 bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
