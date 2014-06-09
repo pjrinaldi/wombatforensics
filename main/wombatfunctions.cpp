@@ -32,6 +32,23 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
 
 Node* FindParentNode(Node* curnode, Node* parentnode)
 {
+    if(parentnode->nodevalues.at(5).toInt() == curnode->nodevalues.at(11).toInt()) // parent address == cur parentid
+    {
+        qDebug() << "parent node with objid: " << parentnode->nodevalues.at(0).toInt() << "found for objid: " << curnode->nodevalues.at(0).toInt() << "!";
+        qDebug() << "parent addr == cur parid" << parentnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
+        return parentnode;
+    }
+    if(parentnode->HasChildren())
+    {
+        for(int i=0; i < parentnode->children.count(); i++)
+        {
+            qDebug() << "re-iterate with new parent " << parentnode->children.at(i)->nodevalues.at(0).toInt();
+            FindParentNode(curnode, parentnode->children.at(i));
+        }
+    }
+    /*
+    qDebug() << "parentnode objectid: " << parentnode->nodevalues.at(0).toInt();
+    qDebug() << "parentnode address || currentnode parentid: " << parentnode->nodevalues.at(5).toInt() << " || " << curnode->nodevalues.at(11).toInt();
     int parentid = curnode->nodevalues.at(11).toInt();
     //qDebug() << "curnode parid: " << parentid;
     if(parentnode->nodevalues.at(5).toInt() == parentid)
@@ -43,26 +60,21 @@ Node* FindParentNode(Node* curnode, Node* parentnode)
     {
         foreach(Node* childnode, parentnode->children)
         {
-            if(childnode->children.count() > 0)
-            {
-                qDebug() << "findparentnode-child child start objid: " << curnode->nodevalues.at(0).toInt();
-                FindParentNode(curnode, childnode);
-            }
-            else
-            {
-                if(childnode->nodevalues.at(5).toInt() == parentid)
-                {
-                    qDebug() << "findparentnode->childless child objid: " << curnode->nodevalues.at(0).toInt();
-                    return childnode;
-                }
-                else
-                {
-                    qDebug() << "findparentnode-> failed";
-                    return 0;
-                }
-            }
+            //if(childnode->children.count() > 0)
+            //{
+            qDebug() << "findparentnode-child child start objid: " << curnode->nodevalues.at(0).toInt();
+            FindParentNode(curnode, childnode);
+           // }
+            //else
+            //{
+                //if(childnode->nodevalues.at(5).toInt() == parentid)
+                //{
+                    //qDebug() << "findparentnode->childless child objid: " << curnode->nodevalues.at(0).toInt();
+                    //return childnode;
+                //}
+            //}
         }
-    }
+    }*/
 }
 
 /*

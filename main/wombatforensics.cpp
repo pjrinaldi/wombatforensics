@@ -232,16 +232,16 @@ void WombatForensics::UpdateTree()
 void WombatForensics::InitializeQueryModel()
 {
     fcasedb.commit();
-    qDebug() << "temp db commit finished";
+    //qDebug() << "temp db commit finished";
     if(ProcessingComplete())
     {
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
-        qDebug() << "currentfilesystemid: " << wombatvarptr->currentfilesystemid;
+        //qDebug() << "currentfilesystemid: " << wombatvarptr->currentfilesystemid;
         wombatdatabase->GetRootInum();
-        qDebug() << "currentrootinum: " << wombatvarptr->currentrootinum;
+        //qDebug() << "currentrootinum: " << wombatvarptr->currentrootinum;
 
         Node* currentnode = 0;
         Node* parentnode = 0;
@@ -261,15 +261,15 @@ void WombatForensics::InitializeQueryModel()
                     colvalues.append(dataquery.value(i));
                 }
                 currentnode = new Node(colvalues);
-                if(dataquery.value(4).toInt() < 5)
+                if(dataquery.value(4).toInt() < 5) // not file or directory
                 {
-                    if(dataquery.value(4).toInt() == 1)
+                    if(dataquery.value(4).toInt() == 1) // image node
                     {
                         //qDebug() << "objtype = 1 objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode = currentnode;
                         rootnode = currentnode;
                     }
-                    else
+                    else // volume/partition/filesystem node
                     {
                         //qDebug() << "objtype < 5 objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode->children.append(currentnode);
@@ -277,18 +277,39 @@ void WombatForensics::InitializeQueryModel()
                         parentnode = currentnode;
                     }
                 }
-                else
+                else // file or directory nodes.
                 {
-                    if(dataquery.value(11).toInt() == wombatvarptr->currentrootinum)
+                    //qDebug() << "current root inum: " << wombatvarptr->currentrootinum;
+                    /*
+                    if(dataquery.value(11).toInt() == wombatvarptr->currentrootinum) // file/dir is in root directory
                     {
                         //qDebug() << "rootinum objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode->children.append(currentnode);
                         currentnode->parent = parentnode;
                     }
-                    else
-                    {
-                        Node* missingnode = 0;
+                    */
+                    //else // file/dir is part of another directory
+                    //{
+                        Node* missingnode;
                         missingnode = FindParentNode(currentnode, parentnode);
+                        qDebug() << "missing node returned is: " << missingnode;
+                        if(missingnode)
+                        {
+                            qDebug() << "missing node found";
+                            qDebug() << "missingnode objid:" << missingnode->nodevalues.at(0).toInt();
+                            missingnode->children.append(currentnode);
+                            currentnode->parent = missingnode;
+                        }
+                        else
+                        {
+                            if(currentnode->nodevalues.at(11).toInt() == wombatvarptr->currentrootinum)
+                            {
+                                qDebug() << "currentnode parent == current root inum";
+                                parentnode->children.append(currentnode);
+                                currentnode->parent = parentnode;
+                            }
+                        }
+                        /*
                         if(missingnode != 0)
                         {
                             qDebug() << "missingnode success objid: " << currentnode->nodevalues.at(0).toInt();
@@ -297,11 +318,12 @@ void WombatForensics::InitializeQueryModel()
                         }
                         else
                         {
-                            //qDebug() << "missingnode fail objid: " << currentnode->nodevalues.at(0).toInt();
+                            qDebug() << "missingnode fail objid: " << currentnode->nodevalues.at(0).toInt();
                             parentnode->children.append(currentnode);
                             currentnode->parent = parentnode;
                         }
-                    }
+                        */
+                    //}
                     //else if(!ParentNodeExists(currentnode, parentnode))
                    //{
                         //qDebug() << "no parent node:

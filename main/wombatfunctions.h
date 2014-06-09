@@ -25,6 +25,12 @@ public:
     QList<QVariant> nodevalues;
     Node* parent;
     QList<Node*> children;
+    bool HasChildren(void)
+    {
+        if(children.count() > 0)
+            return true;
+        return false;
+    };
 };
 
 std::string GetTime(void);
