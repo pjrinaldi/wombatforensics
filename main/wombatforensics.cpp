@@ -246,6 +246,7 @@ void WombatForensics::InitializeQueryModel()
         Node* currentnode = 0;
         Node* parentnode = 0;
         Node* rootnode = 0;
+        Node* dummynode = 0;
         Node* missingnode = 0;
         int nodefound = 0;
         QList<QVariant> colvalues;
@@ -267,9 +268,11 @@ void WombatForensics::InitializeQueryModel()
                 {
                     if(dataquery.value(4).toInt() == 1) // image node
                     {
+                        dummynode = new Node(colvalues);
+                        dummynode->children.append(currentnode);
+                        currentnode->parent = dummynode;
                         //qDebug() << "objtype = 1 objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode = currentnode;
-                        rootnode = currentnode;
                     }
                     else // volume/partition/filesystem node
                     {
@@ -297,7 +300,7 @@ void WombatForensics::InitializeQueryModel()
         }
 
         TreeModel* treemodel = new TreeModel(this);
-        treemodel->SetRootNode(rootnode);
+        treemodel->SetRootNode(dummynode);
 
         checkableproxy = new CheckableProxyModel(this);
         checkableproxy->setSourceModel(treemodel);
