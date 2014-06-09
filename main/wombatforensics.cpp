@@ -697,47 +697,16 @@ int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount
 
 void WombatForensics::ExportEvidence()
 {
-    // NEED TO FIX EITHER CHECKEDLEAF OR CHECKEDBRANCH TO ACCOUNT FOR ALL CHILDREN BEING CHECKED...
+    int listcount = 0;
     QModelIndexList checkedfiles;
-    QModelIndexList checkeddirs;
     QModelIndexList uncheckedfiles;
-    QModelIndexList uncheckeddirs;
     checkableproxy->checkedState()
         .checkedLeafSourceModelIndexes(checkedfiles)
-        .checkedBranchSourceModelIndexes(checkeddirs)
-        .uncheckedLeafSourceModelIndexes(uncheckedfiles)
-        .uncheckedBranchSourceModelIndexes(uncheckeddirs);
+        .uncheckedLeafSourceModelIndexes(uncheckedfiles);
 
-    qDebug() << "# checked files:" << checkedfiles.count() + checkeddirs.count(); 
-    
-    
-    
-    /*
-
-    int checkcount = 0;
-    int listcount = 0;
-
-    QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();
-    for(int i = 0; i < rootitem->rowCount(); i++)
-    {
-        QStandardItem* imagenode = rootitem->child(i,0);
-        for(int j = 0; j < imagenode->rowCount(); j++)
-        {
-            QStandardItem* volumenode = imagenode->child(j,0);
-            for(int k = 0; k < volumenode->rowCount(); k++)
-            {
-                QStandardItem* fsnode = volumenode->child(k,0);
-                for(int m = 0; m < fsnode->rowCount(); m++)
-                {
-                    QStandardItem* filenode = fsnode->child(m,0);
-                    checkcount = StandardItemCheckState(filenode, checkcount);
-                    listcount = StandardItemListCount(filenode, listcount);
-                }
-            }
-        }
-    }*/
-    exportdialog = new ExportDialog(this, checkedfiles.count() + checkeddirs.count());
-    //exportdialog = new ExportDialog(this, checkcount, listcount);
+    qDebug() << "# checked files:" << checkedfiles.count(); 
+    listcount = checkedfiles.count() + uncheckedfiles.count();
+    exportdialog = new ExportDialog(this, checkedfiles.count(), listcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
     exportdialog->show();
 }

@@ -575,12 +575,22 @@ CheckableProxyModelState CheckableProxyModel::checkedState()
 
         if (state == Qt::Checked) {
             if (sourceModel()->hasChildren(node)) {
+                for(int i=0; i < sourceModel()->rowCount(node); i++)
+                {
+                    QModelIndex childnode = sourceModel()->index(i, 0, node);
+                    scanQueue.enqueue(childnode);
+                }
                 checkedBNodes << node;
             } else {
                 checkedLNodes << node;
             }
         } else if (state == Qt::Unchecked) {
             if (sourceModel()->hasChildren(node)) {
+                for(int i=0; i < sourceModel()->rowCount(node); i++)
+                {
+                    QModelIndex childnode = sourceModel()->index(i, 0, node);
+                    scanQueue.enqueue(childnode);
+                }
                 uncheckedBNodes << node;
             } else {
                 uncheckedLNodes << node;
