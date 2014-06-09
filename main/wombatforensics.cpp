@@ -273,6 +273,7 @@ void WombatForensics::InitializeQueryModel()
                     {
                         qDebug() << "objtype < 5 objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode->children.append(currentnode);
+                        currentnode->parent = parentnode;
                         parentnode = currentnode;
                     }
                 }
@@ -282,6 +283,7 @@ void WombatForensics::InitializeQueryModel()
                     {
                         qDebug() << "rootinum objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode->children.append(currentnode);
+                        currentnode->parent = parentnode;
                     }
                     else
                     {
@@ -291,11 +293,13 @@ void WombatForensics::InitializeQueryModel()
                         {
                             qDebug() << "missingnode success objid: " << currentnode->nodevalues.at(0).toInt();
                             missingnode->children.append(currentnode);
+                            currentnode->parent = missingnode;
                         }
                         else
                         {
                             qDebug() << "missingnode fail objid: " << currentnode->nodevalues.at(0).toInt();
                             parentnode->children.append(currentnode);
+                            currentnode->parent = parentnode;
                         }
                     }
                     //else if(!ParentNodeExists(currentnode, parentnode))

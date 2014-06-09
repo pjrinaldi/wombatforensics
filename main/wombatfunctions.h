@@ -9,8 +9,11 @@ class Node
 public:
     Node(QList<QVariant> celldata)
     {
+        nodevalues.clear();
         for(int i=0; i < celldata.count(); i++)
+        {
             nodevalues.append(celldata.at(i));
+        }
         parent = 0;
     };
 

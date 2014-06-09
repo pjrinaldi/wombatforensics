@@ -32,16 +32,18 @@ public:
     {
         delete rootnode;
         rootnode = node;
-        beginResetModel();
-        endResetModel();
+        //beginResetModel();
+        //endResetModel();
         //QAbstractItemModel::reset();
     };
 
     QModelIndex index(int row, int col, const QModelIndex &parent) const
     {
+        //qDebug() << "(row, col) (" << row << ", " << col << ")";
         if(!rootnode || row < 0 || col < 0)
             return QModelIndex();
         Node* parentnode = NodeFromIndex(parent);
+        qDebug() << "parentid: " << parentnode->nodevalues.at(0).toInt();
         Node* childnode = parentnode->children.value(row);
         if(!childnode)
             return QModelIndex();
@@ -60,7 +62,10 @@ public:
         if(!grandparentnode)
             return QModelIndex();
         int row = grandparentnode->children.indexOf(parentnode);
-        return createIndex(row, 0, parentnode);
+        if(row > 0)
+            return createIndex(row, 0, parentnode);
+        else
+            return createIndex(0, 0, parentnode);
     };
 
     int rowCount(const QModelIndex &parent) const
@@ -70,6 +75,7 @@ public:
         Node* parentnode = NodeFromIndex(parent);
         if(!parentnode)
             return 0;
+        qDebug() << "return rowcount for parent." << parentnode->children.count();
         return parentnode->children.count();
     };
 
@@ -85,7 +91,7 @@ public:
         Node* node = NodeFromIndex(index);
         if(!node)
             return QVariant();
-        
+        qDebug() << "return data from nodevalues." << node->nodevalues.at(0).toInt();
         return node->nodevalues.at(index.column());
     };
 
