@@ -60,16 +60,16 @@ private:
 
 CheckableProxyModel::CheckableProxyModel(QObject *parent) :
     QSortFilterProxyModel(parent),
-    //m_cleanupTimer(new DelayedExecutionTimer(30000, 1000, this)),
+    m_cleanupTimer(new DelayedExecutionTimer(30000, 1000, this)),
     m_periodicalCleanupTimer(new QTimer(this))
 {
     m_baseState.defaultChildState = CheckableProxyModel::Unchecked;
     m_baseState.nodeState = CheckableProxyModel::Unchecked;
 
     setDynamicSortFilter(true);
-    //connect (m_cleanupTimer, SIGNAL(triggered()), SLOT(cleanupStorage()));
+    connect (m_cleanupTimer, SIGNAL(triggered()), SLOT(cleanupStorage()));
 
-    //connect (m_periodicalCleanupTimer, SIGNAL(timeout()), m_cleanupTimer, SLOT(trigger()));
+    connect (m_periodicalCleanupTimer, SIGNAL(timeout()), m_cleanupTimer, SLOT(trigger()));
     m_periodicalCleanupTimer->setInterval(5 * 60 * 1000); // 5 minutes
     m_periodicalCleanupTimer->start();
 }
@@ -84,10 +84,10 @@ Qt::ItemFlags CheckableProxyModel::flags(const QModelIndex &index) const
     Qt::ItemFlags flags = sourceIndex.flags();
     if (index.column() == 0) {
         flags |= Qt::ItemIsUserCheckable;
-        //if (sourceIndex.model()->hasChildren(sourceIndex)) {
-        //if(index.model()->hasChildren(index)) {
-        //    flags |= Qt::ItemIsTristate;
-        //}
+        if (sourceIndex.model()->hasChildren(sourceIndex)) {
+        if(index.model()->hasChildren(index))
+            flags |= Qt::ItemIsTristate;
+        }
     }
 
     return flags;
@@ -128,50 +128,6 @@ bool CheckableProxyModel::setData(const QModelIndex &index, const QVariant &valu
 
     return QSortFilterProxyModel::sourceModel()->setData(sourceIndex, value, role);
 }
-/*
-QModelIndex CheckableProxyModel::mapFromSource(const QModelIndex &sourceindex) const
-{
-    return QModelIndex();
-    //qDebug() << "should be source index id: " << sourceindex.sibling(sourceindex.row(), 0).data().toInt();
-    //QModelIndex *p = new QModelIndex(createIndex(sourceindex.sibling(sourceindex.row(), 5).data().toInt(), 0));
-    //return createIndex(sourceindex.row(), sourceindex.column(), sourceindex.sibling(sourceindex.row(), 5).data().toInt());
-    //if(sourceindex.sibling(sourceindex.row(), 11)
-    if()
-    {
-    }
-    else
-    {
-        return QModelIndex();
-    }
-        // which group did we put this row into?
-        QString group = whichGroup(sourceIndex.row());
-        int groupNo = groups.indexOf(group);
-
-        if (groupNo < 0) {
-            return QModelIndex();
-        } else {
-            QModelIndex *p = new QModelIndex(createIndex(groupNo, 0, NULL));
-            return createIndex(sourceRowToGroupRow[sourceIndex.row()], sourceIndex.column()+1, &p); // accomodate virtual column
-        }
-}
-
-QModelIndex CheckableProxyModel::mapToSource(const QModelIndex &proxyindex) const
-{
-    return QModelIndex();
-        if (proxyIndex.internalPointer() != NULL) {
-
-            int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
-            if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0) {
-                return QModelIndex();
-            }
-
-            return sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()),
-                                        proxyIndex.column()-1, // accomodate virtual column
-                                        QModelIndex());
-        } 
-        return QModelIndex();
-}
-*/
 
 Qt::CheckState CheckableProxyModel::resolveCheckStateRole(QModelIndex sourceIndex) const
 {
