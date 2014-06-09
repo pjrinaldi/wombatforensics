@@ -265,13 +265,13 @@ void WombatForensics::InitializeQueryModel()
                 {
                     if(dataquery.value(4).toInt() == 1)
                     {
-                        qDebug() << "objtype = 1 objid: " << currentnode->nodevalues.at(0).toInt();
+                        //qDebug() << "objtype = 1 objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode = currentnode;
                         rootnode = currentnode;
                     }
                     else
                     {
-                        qDebug() << "objtype < 5 objid: " << currentnode->nodevalues.at(0).toInt();
+                        //qDebug() << "objtype < 5 objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode->children.append(currentnode);
                         currentnode->parent = parentnode;
                         parentnode = currentnode;
@@ -281,7 +281,7 @@ void WombatForensics::InitializeQueryModel()
                 {
                     if(dataquery.value(11).toInt() == wombatvarptr->currentrootinum)
                     {
-                        qDebug() << "rootinum objid: " << currentnode->nodevalues.at(0).toInt();
+                        //qDebug() << "rootinum objid: " << currentnode->nodevalues.at(0).toInt();
                         parentnode->children.append(currentnode);
                         currentnode->parent = parentnode;
                     }
@@ -297,7 +297,7 @@ void WombatForensics::InitializeQueryModel()
                         }
                         else
                         {
-                            qDebug() << "missingnode fail objid: " << currentnode->nodevalues.at(0).toInt();
+                            //qDebug() << "missingnode fail objid: " << currentnode->nodevalues.at(0).toInt();
                             parentnode->children.append(currentnode);
                             currentnode->parent = parentnode;
                         }
@@ -1013,13 +1013,16 @@ WombatForensics::~WombatForensics()
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
+    /*
     if(ui->dirTreeView->model() != NULL)
     {
         if(checkableproxy->sourceModel() != NULL)
             //((FileViewSqlModel*)treeproxy->sourceModel())->clear(); // clear sql so db can be closed.
-            ((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
+            //((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
+            //((TreeModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
     }
     //((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
+    */
     //wombatprogresswindow->close();
     RemoveTmpFiles();
     // USE THIS FUNCTION AND PRINCIPLE TO BUILD THE PROGRESS WINDOW FUNCTIONALITY.

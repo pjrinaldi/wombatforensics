@@ -57,6 +57,7 @@ Node* FindParentNode(Node* curnode, Node* parentnode)
                 }
                 else
                 {
+                    qDebug() << "findparentnode-> failed";
                     return 0;
                 }
             }
