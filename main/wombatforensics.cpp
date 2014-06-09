@@ -303,8 +303,8 @@ void WombatForensics::InitializeQueryModel()
         checkableproxy->setSourceModel(treemodel);
         ui->dirTreeView->setModel(checkableproxy);
 
-        connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
-        //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+        //connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+        connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
 
         ResizeColumns();
@@ -314,14 +314,21 @@ void WombatForensics::InitializeQueryModel()
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
-    qDebug() << "selection stuff can happen now.";
+    QModelIndex srcindex = checkableproxy->mapToSource(curitem.indexes().at(0));
+    wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
+    wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
+    UpdateOmniValue();
+    UpdateViewer();
 }
 
+/*
+// FUNCTION GETS IMPLEMNTED WHEN YOU CLICK ON A CHECKBOX, BUT DO NOT SELECT THE ROW
 void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIndex &previndex)
 {
     qDebug() << "current index changed.";
     //dirTreeView_selectionChanged(curindex);
 }
+*/
 
 void WombatForensics::InitializeEvidenceStructure()
 {
@@ -1054,6 +1061,8 @@ void WombatForensics::UpdateOmniValue()
     }
 }
 
+/*
+// FUNCTION GETS IMPLEMNTED WHEN YOU CLICK ON A CHECKBOX, BUT DO NOT SELECT THE ROW
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     //qDebug() << "selection changed before mapping.";
@@ -1073,6 +1082,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     // GET THE RESPECTIVE VISIBLE VIEWER FROM THE VIEWER STACK.
     // LOAD THE DATA INTO THE RESPECTIVE VIEWER.
 }
+*/
 
 int WombatForensics::DetermineOmniView(QString currentSignature)
 {
