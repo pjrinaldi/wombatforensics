@@ -82,13 +82,40 @@ public:
 
     QVariant data(const QModelIndex &index, int role) const
     {
+        /*
+         *
+        QVariant value = QSqlQueryModel::data(index, role);
+        if(value.isValid() && role == Qt::DisplayRole)
+        {
+            if(index.column() >= 6 && index.column() <= 9)
+            {
+                char buf[128];
+                //QString tmpstr = QString(tsk_fs_time_to_str(value.toInt(), buf));
+                QString tmpstr = QString(TskTimeToStringUTC(value.toInt(), buf));
+
+                return tmpstr;
+            }
+        }
+
+        return value;
+
+         *
+         *
+         */ 
         if(role != Qt::DisplayRole)
             return QVariant();
         Node* node = NodeFromIndex(index);
         if(!node)
             return QVariant();
+        if(index.column() >= 6 && index.column() <= 9)
+        {
+            char buf[128];
+            QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
+            return tmpstr;
+        }
+        else
+            return node->nodevalues.at(index.column());
         //qDebug() << "return data from nodevalues." << node->nodevalues.at(0).toInt();
-        return node->nodevalues.at(index.column());
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
