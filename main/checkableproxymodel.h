@@ -26,7 +26,7 @@
 #include "delayedexecutiontimer.h"
 
 //disable to get rid of the debug output and checks
-#define CHECKABLEPROXYMODEL_DEBUG
+//#define CHECKABLEPROXYMODEL_DEBUG
 //note that the default debug output uses Qt::UserRole + 1. When using a QFileSystemModel, this is the full path
 
 
