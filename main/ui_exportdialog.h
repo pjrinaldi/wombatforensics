@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'exportdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.1.0
+** Created by: Qt User Interface Compiler version 5.3.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -186,7 +186,7 @@ public:
         groupBox_2->setTitle(QApplication::translate("ExportDialog", "Export File(s)", 0));
         selectedFileRadioButton->setText(QApplication::translate("ExportDialog", "Selected", 0));
         checkedFileRadioButton->setText(QApplication::translate("ExportDialog", "Checked (#)", 0));
-        listedFileRadioButton->setText(QApplication::translate("ExportDialog", "Listed (#)", 0));
+        listedFileRadioButton->setText(QApplication::translate("ExportDialog", "All (#)", 0));
         exportDirectoryLineEdit->setPlaceholderText(QApplication::translate("ExportDialog", "Export Directory", 0));
         browseButton->setText(QApplication::translate("ExportDialog", "Browse", 0));
         groupBox->setTitle(QApplication::translate("ExportDialog", "Path", 0));

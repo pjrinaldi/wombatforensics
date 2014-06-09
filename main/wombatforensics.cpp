@@ -696,7 +696,24 @@ int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount
 }
 
 void WombatForensics::ExportEvidence()
-{/*
+{
+    // NEED TO FIX EITHER CHECKEDLEAF OR CHECKEDBRANCH TO ACCOUNT FOR ALL CHILDREN BEING CHECKED...
+    QModelIndexList checkedfiles;
+    QModelIndexList checkeddirs;
+    QModelIndexList uncheckedfiles;
+    QModelIndexList uncheckeddirs;
+    checkableproxy->checkedState()
+        .checkedLeafSourceModelIndexes(checkedfiles)
+        .checkedBranchSourceModelIndexes(checkeddirs)
+        .uncheckedLeafSourceModelIndexes(uncheckedfiles)
+        .uncheckedBranchSourceModelIndexes(uncheckeddirs);
+
+    qDebug() << "# checked files:" << checkedfiles.count() + checkeddirs.count(); 
+    
+    
+    
+    /*
+
     int checkcount = 0;
     int listcount = 0;
 
@@ -718,14 +735,17 @@ void WombatForensics::ExportEvidence()
                 }
             }
         }
-    }
-    exportdialog = new ExportDialog(this, checkcount, listcount);
+    }*/
+    exportdialog = new ExportDialog(this, checkedfiles.count() + checkeddirs.count());
+    //exportdialog = new ExportDialog(this, checkcount, listcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
-    exportdialog->show();*/
+    exportdialog->show();
 }
 
 void WombatForensics::FileExport(FileExportData* exportdata)
-{/*
+{
+    qDebug() << "Need to implement the new file export method";
+    /*
     QVector<FileExportData> exportevidencelist;
     if(exportdata->filestatus == FileExportData::selected)
     {
