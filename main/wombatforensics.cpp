@@ -313,7 +313,11 @@ void WombatForensics::InitializeQueryModel()
 
         TreeModel* treemodel = new TreeModel(this);
         treemodel->SetRootNode(rootnode);
-        ui->dirTreeView->setModel(treemodel);
+
+        checkableproxy = new CheckableProxyModel(this);
+        checkableproxy->setSourceModel(treemodel);
+        ui->dirTreeView->setModel(checkableproxy);
+        //ui->dirTreeView->setModel(treemodel);
 
         //TreeViewSqlModel* testmodel = new TreeViewSqlModel();
         /*
@@ -336,8 +340,8 @@ void WombatForensics::InitializeQueryModel()
         //ui->dirTreeView->setModel(tmpmodel);
 
         //treeproxy = new TreeProxy();
-        checkableproxy = new CheckableProxyModel(this);
         treeproxy = new TableToTreeProxyModel(5, this);
+        checkableproxy = new CheckableProxyModel(this);
         //treeproxy->index(0,0).parent().isValid();
         //treeproxy->setSourceModel(tmpmodel);
         checkableproxy->setSourceModel(treeproxy);
@@ -372,7 +376,7 @@ void WombatForensics::InitializeQueryModel()
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
 
-        //ResizeColumns();
+        ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
 }
@@ -933,7 +937,8 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
-    for(int i=0; i < ((FileViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
+    //for(int i=0; i < ((FileViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
+    for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
     {
         // may need to compare treeview->model() == currentmodel) to determine what to set it to.
         // depending on the design though, i may not need multiple layouts since the columns can be sorted.
