@@ -285,7 +285,8 @@ void WombatForensics::InitializeQueryModel()
                     }
                     else
                     {
-                        Node* missingnode = FindParentNode(currentnode, parentnode);
+                        Node* missingnode = 0;
+                        missingnode = FindParentNode(currentnode, parentnode);
                         if(missingnode)
                         {
                             qDebug() << "missingnode success objid: " << currentnode->nodevalues.at(0).toInt();
