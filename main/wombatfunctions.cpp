@@ -30,95 +30,36 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
-//Node* FindParentNode(Node* curnode, Node* parentnode)
 int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
 {
-    //int nodefound = 0;
     if(curnode->nodevalues.at(11).toInt() == rootinum)
     {
         parentnode->children.append(curnode);
         curnode->parent = parentnode;
-        qDebug() << "curnode parent id == rootinum";
+        //qDebug() << "curnode parent id == rootinum";
         return 1;
     }
     else
     {
-    if(parentnode->nodevalues.at(5).toInt() == curnode->nodevalues.at(11).toInt()) // parent address == cur parentid
-    {
-        qDebug() << "parent node with objid: " << parentnode->nodevalues.at(0).toInt() << "found for objid: " << curnode->nodevalues.at(0).toInt() << "!";
-        qDebug() << "parent addr == cur parid" << parentnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
-        parentnode->children.append(curnode);
-        curnode->parent = parentnode;
-        //nodefound = 1;
-        return 1;
-        //return parentnode;
-    }
-    else if(parentnode->HasChildren())
-    {
-        for(int i=0; i < parentnode->children.count(); i++)
+        if(parentnode->nodevalues.at(5).toInt() == curnode->nodevalues.at(11).toInt()) // parent address == cur parentid
         {
-            qDebug() << "re-iterate with new parent " << parentnode->children.at(i)->nodevalues.at(0).toInt();
-            FindParentNode(curnode, parentnode->children.at(i), rootinum);
+            //qDebug() << "parent node with objid: " << parentnode->nodevalues.at(0).toInt() << "found for objid: " << curnode->nodevalues.at(0).toInt() << "!";
+            //qDebug() << "parent addr == cur parid" << parentnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
+            parentnode->children.append(curnode);
+            curnode->parent = parentnode;
+            return 1;
         }
-    }
-    return 0;
-    }
-    //return nodefound;
-    /*
-    qDebug() << "parentnode objectid: " << parentnode->nodevalues.at(0).toInt();
-    qDebug() << "parentnode address || currentnode parentid: " << parentnode->nodevalues.at(5).toInt() << " || " << curnode->nodevalues.at(11).toInt();
-    int parentid = curnode->nodevalues.at(11).toInt();
-    //qDebug() << "curnode parid: " << parentid;
-    if(parentnode->nodevalues.at(5).toInt() == parentid)
-    {
-        qDebug() << "findparentnode-parent objid: " << curnode->nodevalues.at(0).toInt();
-        return parentnode;
-    }
-    else
-    {
-        foreach(Node* childnode, parentnode->children)
+        else if(parentnode->HasChildren())
         {
-            //if(childnode->children.count() > 0)
-            //{
-            qDebug() << "findparentnode-child child start objid: " << curnode->nodevalues.at(0).toInt();
-            FindParentNode(curnode, childnode);
-           // }
-            //else
-            //{
-                //if(childnode->nodevalues.at(5).toInt() == parentid)
-                //{
-                    //qDebug() << "findparentnode->childless child objid: " << curnode->nodevalues.at(0).toInt();
-                    //return childnode;
-                //}
-            //}
+            for(int i=0; i < parentnode->children.count(); i++)
+            {
+                //qDebug() << "re-iterate with new parent " << parentnode->children.at(i)->nodevalues.at(0).toInt();
+                FindParentNode(curnode, parentnode->children.at(i), rootinum);
+            }
         }
-    }*/
+        return 0;
+    }
 }
-
-/*
-bool ParentNodeExists(Node* curnode, Node* parentnode)
-{
-    bool isparent = false;
-    foreach(Node* childnode, parentnode->children)
-    {
-        if(childnode->children.count() > 0)
-        {
-            foreach(Node* grandchildnode, childnode->children)
-            {
-                ParentNodeExists(curnode, grandchildnode);
-            }
-        }
-        else
-        {
-            if(curnode->nodevalues.at(11).toInt() == childnode->nodevalues.at(5).toInt())
-            {
-                isparent = true;
-                childnode->children.append(curnode);
-            }
-        }
-    }
-    return isparent;
-}*/
 
 bool FileExists(const std::string& filename)
 {

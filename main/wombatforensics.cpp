@@ -281,18 +281,8 @@ void WombatForensics::InitializeQueryModel()
                 }
                 else // file or directory nodes.
                 {
-                    //qDebug() << "current root inum: " << wombatvarptr->currentrootinum;
-                    /*
-                    if(dataquery.value(11).toInt() == wombatvarptr->currentrootinum) // file/dir is in root directory
-                    {
-                        //qDebug() << "rootinum objid: " << currentnode->nodevalues.at(0).toInt();
-                        parentnode->children.append(currentnode);
-                        currentnode->parent = parentnode;
-                    }
-                    */
-                    //else // file/dir is part of another directory
-                    //{
                     nodefound = FindParentNode(currentnode, parentnode, wombatvarptr->currentrootinum);
+                    /*
                     qDebug() << "Node found: " << nodefound;
                     if(nodefound)
                     {
@@ -301,47 +291,7 @@ void WombatForensics::InitializeQueryModel()
                     else
                     {
                         qDebug() << "node wasn't found. check inum.";
-                        
-                    /*
-                        missingnode = FindParentNode(currentnode, parentnode);
-                        qDebug() << "missing node returned is: " << missingnode;
-                        if(missingnode)
-                        {
-                            qDebug() << "missing node found";
-                            qDebug() << "missingnode objid:" << missingnode->nodevalues.at(0).toInt();
-                            missingnode->children.append(currentnode);
-                            currentnode->parent = missingnode;
-                        }
-                        else
-                        {*/
-                        /*
-                        if(currentnode->nodevalues.at(11).toInt() == wombatvarptr->currentrootinum)
-                        {
-                            qDebug() << "currentnode parent == current root inum";
-                            parentnode->children.append(currentnode);
-                            currentnode->parent = parentnode;
-                        }*/
-                    }
-                        /*
-                        if(missingnode != 0)
-                        {
-                            qDebug() << "missingnode success objid: " << currentnode->nodevalues.at(0).toInt();
-                            missingnode->children.append(currentnode);
-                            currentnode->parent = missingnode;
-                        }
-                        else
-                        {
-                            qDebug() << "missingnode fail objid: " << currentnode->nodevalues.at(0).toInt();
-                            parentnode->children.append(currentnode);
-                            currentnode->parent = parentnode;
-                        }
-                        */
-                    //}
-                    //else if(!ParentNodeExists(currentnode, parentnode))
-                   //{
-                        //qDebug() << "no parent node:
-                        //parentnode->children.append(currentnode);
-                    //}
+                    }*/  
                 }
             }
         }
@@ -352,60 +302,6 @@ void WombatForensics::InitializeQueryModel()
         checkableproxy = new CheckableProxyModel(this);
         checkableproxy->setSourceModel(treemodel);
         ui->dirTreeView->setModel(checkableproxy);
-        //ui->dirTreeView->setModel(treemodel);
-
-        //TreeViewSqlModel* testmodel = new TreeViewSqlModel();
-        /*
-        FileViewSqlModel* tmpmodel = new FileViewSqlModel();
-        tmpmodel->setQuery("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data", fcasedb);
-        tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
-        tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Name"));
-        tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Full Path"));
-        tmpmodel->setHeaderData(3, Qt::Horizontal, tr("Size (bytes)"));
-        tmpmodel->setHeaderData(4, Qt::Horizontal, tr("Object Type"));
-        tmpmodel->setHeaderData(5, Qt::Horizontal, tr("INUM Address"));
-        tmpmodel->setHeaderData(6, Qt::Horizontal, tr("Created (UTC)"));
-        tmpmodel->setHeaderData(7, Qt::Horizontal, tr("Accessed (UTC)"));
-        tmpmodel->setHeaderData(8, Qt::Horizontal, tr("Modified (UTC)"));
-        tmpmodel->setHeaderData(9, Qt::Horizontal, tr("Status Changed (UTC)"));
-        tmpmodel->setHeaderData(10, Qt::Horizontal, tr("MD5 Hash"));
-        tmpmodel->setHeaderData(11, Qt::Horizontal, tr("Parent ID"));
-        //tmpmodel->removeColumns(11, 1, QModelIndex());
-
-        //ui->dirTreeView->setModel(tmpmodel);
-
-        //treeproxy = new TreeProxy();
-        treeproxy = new TableToTreeProxyModel(5, this);
-        checkableproxy = new CheckableProxyModel(this);
-        //treeproxy->index(0,0).parent().isValid();
-        //treeproxy->setSourceModel(tmpmodel);
-        checkableproxy->setSourceModel(treeproxy);
-        
-        //ui->dirTreeView->setModel(treeproxy);
-
-        // RUN TEST TREE ABSTRACT ITEM MODEL HERE
-
-
-        //checkableproxy->setSourceModel(testmodel);
-        checkableproxy->setSourceModel(tmpmodel);
-        */
-
-
-        //ui->dirTreeView->setModel(testmodel);
-        /*
-        QSqlQuery rootquery(fcasedb);
-        rootquery.prepare("SELECT objectid FROM data WHERE objecttype = 1");
-        if(rootquery.exec())
-        {
-            rootquery.next();
-            //ui->dirTreeView->setRootIndex(testmodel->createIndex(0, 0, rootquery.value(0).toInt()));
-        }
-        */
-        //ui->dirTreeView->setRootIndex(testmodel->index(0, 0, QModelIndex()));
-        //ui->dirTreeView->setModel(checkableproxy);
-        //ui->dirTreeView->setModel(treeproxy);
-        
-
 
         connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
