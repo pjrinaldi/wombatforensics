@@ -159,7 +159,11 @@ private slots:
     void ResizeViewColumns(const QModelIndex &index)
     {
         ResizeColumns();
-    }
+    };
+    void ExpandCollapseResize(const QModelIndex &index)
+    {
+        ui->dirTreeView->resizeColumnToContents(index.column());
+    };
     void FileExport(FileExportData* exportdata);
     void setScrollBarRange(off_t low, off_t high);
     void setScrollBarValue(off_t pos);
