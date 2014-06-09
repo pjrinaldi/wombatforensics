@@ -16,6 +16,11 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+    Copyright (C) 2014 Pasquale Rinaldi <pjrinaldi@gmail.com>
+    modified checkstate to remove warning and to have it always check all
+    children when the parent is checked.
 */
 #include "checkableproxymodel.h"
 #include <QtDebug>
@@ -288,12 +293,12 @@ bool CheckableProxyModel::setCheckState(QModelIndex sourceIndex, Qt::CheckState 
     if (state == Qt::Unchecked) {
         treeState = CheckableProxyModel::Unchecked;
     } else if (state == Qt::PartiallyChecked) {
-        qWarning() << "Unexpected new tree state.";
-        return false;
+        treeState = CheckableProxyModel::Checked;
+        //qWarning() << "Unexpected new tree state.";
+        //return false;
     }
 
     CheckableProxyModel::TreeCheckState oldTreeState(CheckableProxyModel::DeterminedByParent);
-
     if (m_checkStates.contains(pIndex)) {
         oldTreeState = m_checkStates.value(pIndex).nodeState;
         if (oldTreeState == treeState)
