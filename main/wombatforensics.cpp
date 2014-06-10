@@ -312,8 +312,8 @@ void WombatForensics::InitializeQueryModel()
 
         connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
         connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
-        connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
-        //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+        //connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
+        connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
 
         ResizeColumns();
@@ -323,14 +323,21 @@ void WombatForensics::InitializeQueryModel()
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
-    qDebug() << "selection stuff can happen now.";
+    QModelIndex srcindex = checkableproxy->mapToSource(curitem.indexes().at(0));
+    wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
+    wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
+    UpdateOmniValue();
+    UpdateViewer();
 }
 
+/*
+// FUNCTION GETS IMPLEMNTED WHEN YOU CLICK ON A CHECKBOX, BUT DO NOT SELECT THE ROW
 void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIndex &previndex)
 {
     qDebug() << "current index changed.";
     //dirTreeView_selectionChanged(curindex);
 }
+*/
 
 void WombatForensics::InitializeEvidenceStructure()
 {
@@ -698,36 +705,25 @@ int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount
 }
 
 void WombatForensics::ExportEvidence()
-{/*
-    int checkcount = 0;
+{
     int listcount = 0;
+    QModelIndexList checkedfiles;
+    QModelIndexList uncheckedfiles;
+    checkableproxy->checkedState()
+        .checkedLeafSourceModelIndexes(checkedfiles)
+        .uncheckedLeafSourceModelIndexes(uncheckedfiles);
 
-    QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();
-    for(int i = 0; i < rootitem->rowCount(); i++)
-    {
-        QStandardItem* imagenode = rootitem->child(i,0);
-        for(int j = 0; j < imagenode->rowCount(); j++)
-        {
-            QStandardItem* volumenode = imagenode->child(j,0);
-            for(int k = 0; k < volumenode->rowCount(); k++)
-            {
-                QStandardItem* fsnode = volumenode->child(k,0);
-                for(int m = 0; m < fsnode->rowCount(); m++)
-                {
-                    QStandardItem* filenode = fsnode->child(m,0);
-                    checkcount = StandardItemCheckState(filenode, checkcount);
-                    listcount = StandardItemListCount(filenode, listcount);
-                }
-            }
-        }
-    }
-    exportdialog = new ExportDialog(this, checkcount, listcount);
+    qDebug() << "# checked files:" << checkedfiles.count(); 
+    listcount = checkedfiles.count() + uncheckedfiles.count();
+    exportdialog = new ExportDialog(this, checkedfiles.count(), listcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
-    exportdialog->show();*/
+    exportdialog->show();
 }
 
 void WombatForensics::FileExport(FileExportData* exportdata)
-{/*
+{
+    qDebug() << "Need to implement the new file export method";
+    /*
     QVector<FileExportData> exportevidencelist;
     if(exportdata->filestatus == FileExportData::selected)
     {
@@ -1063,6 +1059,8 @@ void WombatForensics::UpdateOmniValue()
     }
 }
 
+/*
+// FUNCTION GETS IMPLEMNTED WHEN YOU CLICK ON A CHECKBOX, BUT DO NOT SELECT THE ROW
 void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
 {
     //qDebug() << "selection changed before mapping.";
@@ -1082,6 +1080,7 @@ void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
     // GET THE RESPECTIVE VISIBLE VIEWER FROM THE VIEWER STACK.
     // LOAD THE DATA INTO THE RESPECTIVE VIEWER.
 }
+*/
 
 int WombatForensics::DetermineOmniView(QString currentSignature)
 {

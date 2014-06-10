@@ -10,7 +10,7 @@ ExportDialog::ExportDialog(QWidget *parent, int curcheckcount, int curlistcount)
     checkcount = curcheckcount;
     QString checktext = QString("Checked (") + QString::number(checkcount) + QString(")");
     listcount = curlistcount;
-    QString listtext = QString("Listed (") + QString::number(listcount) + QString(")");
+    QString listtext = QString("All (") + QString::number(listcount) + QString(")");
     ui->checkedFileRadioButton->setText(checktext);
     ui->listedFileRadioButton->setText(listtext);
     ui->exportButton->setEnabled(false);

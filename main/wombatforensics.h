@@ -174,8 +174,8 @@ private slots:
     void UpdateProgress(int count, int processcount);
     void UpdateMessageTable();
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
-    void CurrentChanged(const QModelIndex &selindex, const QModelIndex &previndex);
-    void dirTreeView_selectionChanged(const QModelIndex &index);
+    //void CurrentChanged(const QModelIndex &selindex, const QModelIndex &previndex);
+    //void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void PopulateProgressWindow(WombatVariable* wvariable);
