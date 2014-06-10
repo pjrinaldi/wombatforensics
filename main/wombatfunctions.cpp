@@ -116,10 +116,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-    //char buf[128];
     TSK_FS_HASH_RESULTS hashresults;
-    //qDebug() << "Accessed Time (readable): " << tsk_fs_time_to_str(tmpfile->meta->atime, buf); // need to call this function for
-    // dates and times when i get the variable and want to display it.
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     char sbuf[17];
     int sint = 0;
@@ -166,7 +163,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         fileints.append(0);
     }
 
-    //QFutureWatcher<void> tmpwatcher;
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints);
     filewatcher.setFuture(tmpfuture);
     threadvector.append(tmpfuture);
