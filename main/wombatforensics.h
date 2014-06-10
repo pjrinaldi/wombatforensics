@@ -33,7 +33,8 @@ public:
         delete rootnode;
         rootnode = node;
         beginResetModel();
-        currentrowcount = 0;
+        //currentrowcount = 0;
+        totalcount = node->children.count();
         //totalcount = sqlquery.count() // total record count returned from sql...
         endResetModel();
         //QAbstractItemModel::reset();
@@ -113,20 +114,44 @@ public:
 protected:
     bool canFetchMore(const QModelIndex &parent) const
     {
+        int rowcount = rowCount(parent);
+        if(rowcount > 0)
+            return true;
+        else
+            return false;
+        /*
         Node* parentnode = NodeFromIndex(parent);
-        if(parentnode->hasChildren())
+        if(parentnode->HasChildren())
         {
 
-            if(currentrowcount < parent->children.count())
+            if(currentrowcount < parentnode->children.count())
                 return true;
             else
                 return false;
         }
         else return false;
+        */
     };
 
     void fetchMore(const QModelIndex &parent) const
     {
+        int rowcount = rowCount(parent);
+        beginInsertRows(parent, 0, rowcount-1);
+        endInsertRows();
+        /*
+        Node* parentnode = NodeFromIndex(parent);
+        if(parentnode->HasChildren())
+        {
+            int remainder = parentnode->children.count() - currentrowcount;
+            int fetchcount = qMin(100, remainder);
+
+            beginInsertRows(parent, currentrowcount, currentrowcount+fetchcount-1);
+            currentrowcount += fetchcount;
+            QAbstractItemModel::endInsertRows();
+
+            //emit NumberPopulated(fetchcount); // used to update a log.
+        }
+        */
     };
 
 private:
