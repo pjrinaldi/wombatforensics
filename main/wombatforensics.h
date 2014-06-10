@@ -20,6 +20,7 @@ public:
     {
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID";
         rootnode = 0;
+        currentrowcount = 0;
     };
 
     ~TreeModel()
@@ -31,8 +32,10 @@ public:
     {
         delete rootnode;
         rootnode = node;
-        //beginResetModel();
-        //endResetModel();
+        beginResetModel();
+        currentrowcount = 0;
+        //totalcount = sqlquery.count() // total record count returned from sql...
+        endResetModel();
         //QAbstractItemModel::reset();
     };
 
@@ -82,26 +85,6 @@ public:
 
     QVariant data(const QModelIndex &index, int role) const
     {
-        /*
-         *
-        QVariant value = QSqlQueryModel::data(index, role);
-        if(value.isValid() && role == Qt::DisplayRole)
-        {
-            if(index.column() >= 6 && index.column() <= 9)
-            {
-                char buf[128];
-                //QString tmpstr = QString(tsk_fs_time_to_str(value.toInt(), buf));
-                QString tmpstr = QString(TskTimeToStringUTC(value.toInt(), buf));
-
-                return tmpstr;
-            }
-        }
-
-        return value;
-
-         *
-         *
-         */ 
         if(role != Qt::DisplayRole)
             return QVariant();
         Node* node = NodeFromIndex(index);
@@ -127,6 +110,25 @@ public:
         return QVariant();
     };
 
+protected:
+    bool canFetchMore(const QModelIndex &parent) const
+    {
+        Node* parentnode = NodeFromIndex(parent);
+        if(parentnode->hasChildren())
+        {
+
+            if(currentrowcount < parent->children.count())
+                return true;
+            else
+                return false;
+        }
+        else return false;
+    };
+
+    void fetchMore(const QModelIndex &parent) const
+    {
+    };
+
 private:
     Node* NodeFromIndex(const QModelIndex &index) const
     {
@@ -138,6 +140,8 @@ private:
 
     Node* rootnode;
     QStringList headerdata;
+    int currentrowcount;
+    int totalcount;
 };
 
 namespace Ui {

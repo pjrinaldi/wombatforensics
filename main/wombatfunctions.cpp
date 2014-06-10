@@ -19,7 +19,7 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
 {
     buf[0] = '\0';
     if (time <= 0) {
-        strncpy(buf, "0000-00-00 00:00:00", 128);
+        strncpy(buf, "", 128);
     }
     else {
         //struct tm *tmTime = localtime(&time);
@@ -36,15 +36,15 @@ int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
     {
         parentnode->children.append(curnode);
         curnode->parent = parentnode;
-        //qDebug() << "curnode parent id == rootinum";
+        qDebug() << "curnode parent id == rootinum";
         return 1;
     }
     else
     {
         if(parentnode->nodevalues.at(5).toInt() == curnode->nodevalues.at(11).toInt()) // parent address == cur parentid
         {
-            //qDebug() << "parent node with objid: " << parentnode->nodevalues.at(0).toInt() << "found for objid: " << curnode->nodevalues.at(0).toInt() << "!";
-            //qDebug() << "parent addr == cur parid" << parentnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
+            qDebug() << "parent node with objid: " << parentnode->nodevalues.at(0).toInt() << "found for objid: " << curnode->nodevalues.at(0).toInt() << "!";
+            qDebug() << "parent addr == cur parid" << parentnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
             parentnode->children.append(curnode);
             curnode->parent = parentnode;
             return 1;
