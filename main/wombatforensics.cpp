@@ -243,10 +243,6 @@ void WombatForensics::InitializeQueryModel()
         wombatdatabase->GetRootInum();
         wombatdatabase->GetRootNodes();
         // SETUPS THE ROOT NOTES, WHICH I CAN THEN MAKE VISIBLE IN THE MODEL...
-
-
-
-
         //Node* rootnode = 0;
         //Node* parentnode = 0;
         //Node* dummynode = 0;

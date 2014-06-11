@@ -33,6 +33,8 @@ public:
     {
         delete rootnode;
         rootnode = node;
+        beginResetModel();
+        endResetModel();
         //fetchMore(QModelIndex());
         //fetchMore(rootnode);
         //beginResetModel();
@@ -140,30 +142,115 @@ public:
         if(parent != QModelIndex())
         {
             Node* parentnode = NodeFromIndex(parent);
-            if(parentnode->children.count() > 0)
+            if(parentnode->haschildren && parentnode->children.count() <= 0)
                 return true;
-            return false;
         }
+
         return false;
     };
 
     void fetchMore(const QModelIndex &parent) const
     {
         Node* parentnode;
+        Node* currentchild;
+        QList<QSqlRecord> recordlist;
+        QList<QVariant> fetchvalues;
         qDebug() << "fetchmore called.";
         if(!parent.isValid())
         {
             parentnode = rootnode;
         }
-        parentnode = NodeFromIndex(parent);
-        if(parentnode->fetchedchildren)
-            return;
-        parentnode->fetchedchildren = true;
+        else
+            parentnode = NodeFromIndex(parent);
+        QSqlQuery fetchchildrenquery(fcasedb);
+        fetchchildrenquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype == 5 AND parentid = ?");
+        fetchchildrenquery.addBindValue(parentnode->nodevalues.at(5).toInt());
+        if(fetchchildrenquery.exec())
+        {
+            while(fetchchildrenquery.next())
+            {
+                recordlist.append(fetchchildrenquery.record());
+            }
+            for(int i=0; i < recordlist.count(); i++)
+            {
+                colvalues.clear();
+                for(int j=0; j < recordlist[i].count(); j++)
+                {
+                    colvalues.append(recordlist[i].value(j));
+                }
+                currentchild = new Node(colvalues);
+                parentnode->children.append(currentchild);
+                currentchild->parent = parentnode;
+                QSqlQuery childcountquery(fcasedb);
+                childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+                childcountquery.addBindValue(currentchild->nodevalues.at(5).toInt());
+                if(childcountquery.exec())
+                {
+                    childcountquery.next();
+                    currentchild->childcount = childcountquery.value(0).toInt();
+                    if(currentchild->childcount > 0)
+                        currentchild->haschildren = true;
+                }
+            }
+        }
+
+
+        //if(parentnode->fetchedchildren)
+        //    return;
+        //parentnode->fetchedchildren = true;
+       /*
+        *    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->currentrootinum);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        colvalues.clear();
+        for(int j=0; j < wombatptr->sqlrecords[i].count(); j++)
+        {
+            colvalues.append(wombatptr->sqlrecords[i].value(j));
+        }
+        currentnode = new Node(colvalues);
+        if(colvalues.at(4).toInt() < 5) // not file or directory
+        {
+            if(colvalues.at(4).toInt() == 1) // image node
+            {
+                dummynode = new Node(colvalues);
+                dummynode->children.append(currentnode);
+                currentnode->parent = dummynode;
+                parentnode = currentnode;
+            }
+            else // volume or partition or filesystem
+            {
+                parentnode->children.append(currentnode);
+                currentnode->parent = parentnode;
+                parentnode = currentnode;
+            }
+        }
+        else // its a file or directory at the rootinum level...
+        {
+            parentnode->children.append(currentnode);
+            currentnode->parent = parentnode;
+            QSqlQuery childcountquery(wombatptr->casedb);
+            childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+            childcountquery.addBindValue(currentnode->nodevalues.at(5).toInt());
+            if(childcountquery.exec())
+            {
+                childcountquery.next();
+                currentnode->childcount = childcountquery.value(0).toInt();
+                if(currentnode->childcount > 0)
+                    currentnode->haschildren = true;
+            }
+        }
+
+        *
+        */ 
+        
         // CALL SQL QUERY HERE...
         qDebug() << "get fetched children now...";
             
         //Node* parentnode = NodeFromIndex(parent);
-        rowCount(parent);
+        //rowCount(parent);
         //beginInsertRows(parent, 0, parentnode->children.count());
         /*
         //beginInsertRows(parent, 0, rowcount-1);
@@ -181,7 +268,7 @@ public:
             //emit NumberPopulated(fetchcount); // used to update a log.
         }*/
     };
-
+/*
     void Refresh(const QModelIndex &parent)
     {
         Node* parentnode;
@@ -194,7 +281,7 @@ public:
             fetchMore(parent);
         }
     };
-
+*/
 private:
     Node* NodeFromIndex(const QModelIndex &index) const
     {
@@ -280,9 +367,9 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
-        ((TreeModel*)index.model())->Refresh(index);
-        //if(((TreeModel*)index.model())->canFetchMore(index))
-            //((TreeModel*)index.model())->fetchMore(index);
+        //((TreeModel*)index.model())->Refresh(index);
+        if(((TreeModel*)index.model())->canFetchMore(index))
+            ((TreeModel*)index.model())->fetchMore(index);
         ui->dirTreeView->resizeColumnToContents(index.column());
     };
     void FileExport(FileExportData* exportdata);
