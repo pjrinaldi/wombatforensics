@@ -167,6 +167,7 @@ public:
         fetchchildrenquery.addBindValue(parentnode->nodevalues.at(5).toInt());
         if(fetchchildrenquery.exec())
         {
+            recordlist.clear();
             while(fetchchildrenquery.next())
             {
                 recordlist.append(fetchchildrenquery.record());

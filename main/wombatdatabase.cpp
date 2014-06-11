@@ -585,6 +585,7 @@ void WombatDatabase::GetRootNodes()
             childcountquery.addBindValue(currentnode->nodevalues.at(5).toInt());
             if(childcountquery.exec())
             {
+                childcountquery.next();
                 currentnode->childcount = childcountquery.value(0).toInt();
                 if(currentnode->childcount > 0)
                     currentnode->haschildren = true;
