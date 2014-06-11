@@ -15,6 +15,7 @@ public:
             nodevalues.append(celldata.at(i));
         }
         parent = 0;
+        fetchedchildren = false;
     };
 
     ~Node()
@@ -25,12 +26,14 @@ public:
     QList<QVariant> nodevalues;
     Node* parent;
     QList<Node*> children;
+    bool fetchedchildren;
+    /*
     bool HasChildren(void)
     {
         if(children.count() > 0)
             return true;
         return false;
-    };
+    };*/
 };
 
 std::string GetTime(void);

@@ -546,3 +546,14 @@ void WombatDatabase::GetRootInum()
     wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->currentrootinum = wombatptr->sqlrecords[0].value(0).toInt();
 }
+void WombatDatabase::GetRootNodes()
+{
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->currentrootinum);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
+    //for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    //{
+
+    //}
+}

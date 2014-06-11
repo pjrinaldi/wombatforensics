@@ -28,6 +28,7 @@ public:
     void GetFileSystemObjects(void);
     void GetObjectValues(void);
     void GetRootInum(void);
+    void GetRootNodes(void);
 
     ~WombatDatabase();
 

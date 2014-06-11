@@ -30,6 +30,7 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
+// MIGHT NOT NEED IF I GET THIS INFO FROM THE SQL QUERY...
 int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
 {
     if(curnode->nodevalues.at(11).toInt() == rootinum)
@@ -49,7 +50,7 @@ int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
             curnode->parent = parentnode;
             return 1;
         }
-        else if(parentnode->HasChildren())
+        else if(parentnode->fetchedchildren)
         {
             for(int i=0; i < parentnode->children.count(); i++)
             {

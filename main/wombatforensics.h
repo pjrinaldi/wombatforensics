@@ -11,6 +11,7 @@
 #include "exportdialog.h"
 #include "globals.h"
 #include "checkableproxymodel.h"
+#include "../modeltest/modeltest.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -32,11 +33,13 @@ public:
     {
         delete rootnode;
         rootnode = node;
-        beginResetModel();
+        //fetchMore(QModelIndex());
+        //fetchMore(rootnode);
+        //beginResetModel();
         //currentrowcount = 0;
-        totalcount = node->children.count();
+        //totalcount = node->children.count();
         //totalcount = sqlquery.count() // total record count returned from sql...
-        endResetModel();
+        //endResetModel();
         //QAbstractItemModel::reset();
     };
 
@@ -47,6 +50,10 @@ public:
             return QModelIndex();
         Node* parentnode = NodeFromIndex(parent);
         //qDebug() << "parentid: " << parentnode->nodevalues.at(0).toInt();
+        //if(parentnode == rootnode)
+        //{
+        //  call sql function here to get the data for root...
+        //}
         Node* childnode = parentnode->children.value(row);
         if(!childnode)
             return QModelIndex();
@@ -86,6 +93,8 @@ public:
 
     QVariant data(const QModelIndex &index, int role) const
     {
+        if(index == QModelIndex())
+            return QVariant();
         if(role != Qt::DisplayRole)
             return QVariant();
         Node* node = NodeFromIndex(index);
@@ -97,8 +106,7 @@ public:
             QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
             return tmpstr;
         }
-        else
-            return node->nodevalues.at(index.column());
+        return node->nodevalues.at(index.column());
         //qDebug() << "return data from nodevalues." << node->nodevalues.at(0).toInt();
     };
 
@@ -111,47 +119,80 @@ public:
         return QVariant();
     };
 
-protected:
+    bool hasChildren(const QModelIndex &parent = QModelIndex()) const
+    {
+        if(parent == QModelIndex())
+            return false;
+        Node* parentnode = NodeFromIndex(parent);
+        if(!parent.isValid())
+            return (parentnode->children.count() > 0);
+        return false;
+
+        //if(rowCount(parent) > 0)
+        //if(parentnode->children.count() > 0)
+            //return true;
+        //return false;
+    };
+
     bool canFetchMore(const QModelIndex &parent) const
     {
-        int rowcount = rowCount(parent);
-        if(rowcount > 0)
-            return true;
-        else
-            return false;
-        /*
-        Node* parentnode = NodeFromIndex(parent);
-        if(parentnode->HasChildren())
+        //qDebug() << "can fetch more called.";
+        if(parent != QModelIndex())
         {
-
-            if(currentrowcount < parentnode->children.count())
+            Node* parentnode = NodeFromIndex(parent);
+            if(parentnode->children.count() > 0)
                 return true;
-            else
-                return false;
+            return false;
         }
-        else return false;
-        */
+        return false;
     };
 
     void fetchMore(const QModelIndex &parent) const
     {
-        int rowcount = rowCount(parent);
-        beginInsertRows(parent, 0, rowcount-1);
-        endInsertRows();
+        Node* parentnode;
+        qDebug() << "fetchmore called.";
+        if(!parent.isValid())
+        {
+            parentnode = rootnode;
+        }
+        parentnode = NodeFromIndex(parent);
+        if(parentnode->fetchedchildren)
+            return;
+        parentnode->fetchedchildren = true;
+        // CALL SQL QUERY HERE...
+        qDebug() << "get fetched children now...";
+            
+        //Node* parentnode = NodeFromIndex(parent);
+        rowCount(parent);
+        //beginInsertRows(parent, 0, parentnode->children.count());
         /*
+        //beginInsertRows(parent, 0, rowcount-1);
+        //endInsertRows();
         Node* parentnode = NodeFromIndex(parent);
         if(parentnode->HasChildren())
         {
             int remainder = parentnode->children.count() - currentrowcount;
             int fetchcount = qMin(100, remainder);
 
-            beginInsertRows(parent, currentrowcount, currentrowcount+fetchcount-1);
-            currentrowcount += fetchcount;
-            QAbstractItemModel::endInsertRows();
+            //beginInsertRows(parent, currentrowcount, currentrowcount+fetchcount-1);
+            //currentrowcount += fetchcount;
+            //QAbstractItemModel::endInsertRows();
 
             //emit NumberPopulated(fetchcount); // used to update a log.
+        }*/
+    };
+
+    void Refresh(const QModelIndex &parent)
+    {
+        Node* parentnode;
+        if(!parent.isValid())
+            parentnode = rootnode;
+        parentnode = NodeFromIndex(parent);
+        if(parentnode->children.isEmpty())
+        {
+            parentnode->fetchedchildren = false;
+            fetchMore(parent);
         }
-        */
     };
 
 private:
@@ -161,6 +202,27 @@ private:
             return static_cast<Node*>(index.internalPointer());
         else
             return rootnode;
+    };
+
+    QModelIndex IndexFromNode(const Node* node, int col) const
+    {
+        int row = 0;
+        bool found = false;
+        Node* parentnode = node->parent;
+        if(!parentnode)
+            parentnode = rootnode;
+        for(int i=0; i < parentnode->children.count(); i++)
+        {
+            if(node == parentnode->children.at(i))
+            {
+                row = i;
+                found = true;
+            }
+        }
+        if(!found)
+            return QModelIndex();
+
+        return createIndex(row, col, parentnode->children.at(row));
     };
 
     Node* rootnode;
@@ -218,6 +280,9 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
+        ((TreeModel*)index.model())->Refresh(index);
+        //if(((TreeModel*)index.model())->canFetchMore(index))
+            //((TreeModel*)index.model())->fetchMore(index);
         ui->dirTreeView->resizeColumnToContents(index.column());
     };
     void FileExport(FileExportData* exportdata);

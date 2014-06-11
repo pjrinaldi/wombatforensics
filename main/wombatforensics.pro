@@ -8,12 +8,14 @@ INCLUDEPATH += ../sleuthkit/tsk/
 #INCLUDEPATH += ../vlc-qt/src/widgets/
 #INCLUDEPATH += ../vlc-qt/src/core/
 #INCLUDEPATH += ../vlc-qt/src/
+#INCLUDEPATH += ../modeltest/
 VPATH += ../sleuthkit/
 VPATH += ../sleuthkit/tsk/
+VPATH += ../modeltest/
 #VPATH += ../vlc-qt/src/widgets/
 #VPATH += ../vlc-qt/src/core/
 #VPATH += ../vlc-qt/src/
-HEADERS = wombatforensics.h wombatvariable.h wombatdatabase.h wombatframework.h wombatfunctions.h ui_wombatforensics.h progresswindow.h ui_progresswindow.h ui_exportdialog.h exportdialog.h hexEditor.hpp box.hpp cursor.hpp reader.hpp grid.hpp offsetConstraint.hpp translate.hpp libtsk.h tskvariable.h globals.h wombatinclude.h checkableproxymodel.h delayedexecutiontimer.h
+HEADERS = wombatforensics.h wombatvariable.h wombatdatabase.h wombatframework.h wombatfunctions.h ui_wombatforensics.h progresswindow.h ui_progresswindow.h ui_exportdialog.h exportdialog.h hexEditor.hpp box.hpp cursor.hpp reader.hpp grid.hpp offsetConstraint.hpp translate.hpp libtsk.h tskvariable.h globals.h wombatinclude.h checkableproxymodel.h delayedexecutiontimer.h 
 SOURCES = main.cpp wombatforensics.cpp wombatdatabase.cpp wombatframework.cpp wombatfunctions.cpp progresswindow.cpp exportdialog.cpp hexEditor.cpp cursor.cpp grid.cpp offsetConstraint.cpp reader.cpp translate.cpp globals.cpp checkableproxymodel.cpp delayedexecutiontimer.cpp
 RESOURCES += wombatforensics.qrc progresswindow.qrc
 DESTDIR = ./
@@ -33,3 +35,4 @@ win32:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)d
 #install
 target.path = ./
 INSTALLS += target
+include(../modeltest/modeltest.pro)

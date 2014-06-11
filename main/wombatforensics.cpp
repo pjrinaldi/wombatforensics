@@ -241,13 +241,21 @@ void WombatForensics::InitializeQueryModel()
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
         //qDebug() << "currentfilesystemid: " << wombatvarptr->currentfilesystemid;
         wombatdatabase->GetRootInum();
+        wombatdatabase->GetRootNodes();
+        Node* rootnode = 0;
+        Node* parentnode = 0;
+        Node* dummynode = 0;
+        Node* currentnode = 0;
+        for(int i=0; i < wombatvarptr->sqlrecords.count(); i++)
+        {
+        }
         //qDebug() << "currentrootinum: " << wombatvarptr->currentrootinum;
-
+        /*
         Node* currentnode = 0;
         Node* parentnode = 0;
         Node* rootnode = 0;
-        Node* dummynode = 0;
         Node* missingnode = 0;
+        Node* dummynode = 0;
         int nodefound = 0;
         QList<QVariant> colvalues;
 
@@ -284,7 +292,7 @@ void WombatForensics::InitializeQueryModel()
                 }
                 else // file or directory nodes.
                 {
-                    nodefound = FindParentNode(currentnode, parentnode, wombatvarptr->currentrootinum);
+                    nodefound = FindParentNode(currentnode, parentnode, wombatvarptr->currentrootinum);*/
                     /*
                     qDebug() << "Node found: " << nodefound;
                     if(nodefound)
@@ -294,12 +302,13 @@ void WombatForensics::InitializeQueryModel()
                     else
                     {
                         qDebug() << "node wasn't found. check inum.";
-                    }*/  
-                }
-            }
-        }
+                    }*/ 
+                //}
+            //}
+        //}
 
         TreeModel* treemodel = new TreeModel(this);
+        new ModelTest(treemodel, this);
         treemodel->SetRootNode(dummynode);
 
         checkableproxy = new CheckableProxyModel(this);
