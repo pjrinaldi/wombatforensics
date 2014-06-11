@@ -242,12 +242,17 @@ void WombatForensics::InitializeQueryModel()
         //qDebug() << "currentfilesystemid: " << wombatvarptr->currentfilesystemid;
         wombatdatabase->GetRootInum();
         wombatdatabase->GetRootNodes();
-        Node* rootnode = 0;
-        Node* parentnode = 0;
-        Node* dummynode = 0;
-        Node* currentnode = 0;
-        for(int i=0; i < wombatvarptr->sqlrecords.count(); i++)
-        {
+        // SETUPS THE ROOT NOTES, WHICH I CAN THEN MAKE VISIBLE IN THE MODEL...
+
+
+
+
+        //Node* rootnode = 0;
+        //Node* parentnode = 0;
+        //Node* dummynode = 0;
+        //Node* currentnode = 0;
+        //QList<QVariant> colvalues;
+
         }
         //qDebug() << "currentrootinum: " << wombatvarptr->currentrootinum;
         /*
@@ -327,7 +332,7 @@ void WombatForensics::InitializeQueryModel()
 
         ResizeColumns();
         wombatframework->CloseInfoStructures();
-    }
+    //}
 }
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)

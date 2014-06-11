@@ -552,8 +552,44 @@ void WombatDatabase::GetRootNodes()
     wombatptr->bindvalues.append(wombatptr->currentrootinum);
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
-    //for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-    //{
-
-    //}
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        colvalues.clear();
+        for(int j=0; j < wombatptr->sqlrecords[i].count(); j++)
+        {
+            colvalues.append(wombatptr->sqlrecords[i].value(j));
+        }
+        currentnode = new Node(colvalues);
+        if(colvalues.at(4).toInt() < 5) // not file or directory
+        {
+            if(colvalues.at(4).toInt() == 1) // image node
+            {
+                dummynode = new Node(colvalues);
+                dummynode->children.append(currentnode);
+                currentnode->parent = dummynode;
+                parentnode = currentnode;
+            }
+            else // volume or partition or filesystem
+            {
+                parentnode->children.append(currentnode);
+                currentnode->parent = parentnode;
+                parentnode = currentnode;
+            }
+        }
+        else // its a file or directory at the rootinum level...
+        {
+            parentnode->children.append(currentnode);
+            currentnode->parent = parentnode;
+            QSqlQuery childcountquery(wombatptr->casedb);
+            childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+            childcountquery.addBindValue(currentnode->nodevalues.at(5).toInt());
+            if(childcountquery.exec())
+            {
+                childcountquery.next();
+                currentnode->childcount = childcountquery.value(0).toInt();
+                if(currentnode->childcount > 0)
+                    currentnode->haschildren = true;
+            }
+        }
+    }
 }
