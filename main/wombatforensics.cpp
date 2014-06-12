@@ -311,6 +311,7 @@ void WombatForensics::InitializeQueryModel()
         TreeModel* treemodel = new TreeModel(this);
         new ModelTest(treemodel, this);
         treemodel->SetRootNode(dummynode);
+        //ExpandCollapseResize(QModelIndex());
 
         checkableproxy = new CheckableProxyModel(this);
         checkableproxy->setSourceModel(treemodel);
@@ -320,8 +321,8 @@ void WombatForensics::InitializeQueryModel()
         ui->dirTreeView->hideColumn(5);
         ui->dirTreeView->hideColumn(11);
 
-        connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
-        connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
+        connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+        connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
         //connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
         connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
         //connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));

@@ -34,7 +34,11 @@ public:
         delete rootnode;
         rootnode = node;
         beginResetModel();
+        fetchMore(index(0, 0, QModelIndex()));
+        //QModelIndex rootindex = IndexFromNode(node, 0);
+        //rowCount(QModelIndex());
         endResetModel();
+        //QAbstractItemModel::reset();
         //fetchMore(QModelIndex());
         //fetchMore(rootnode);
         //beginResetModel();
@@ -47,7 +51,6 @@ public:
 
     QModelIndex index(int row, int col, const QModelIndex &parent) const
     {
-        //qDebug() << "(row, col) (" << row << ", " << col << ")";
         if(!rootnode || row < 0 || col < 0)
             return QModelIndex();
         Node* parentnode = NodeFromIndex(parent);
@@ -57,6 +60,8 @@ public:
         //  call sql function here to get the data for root...
         //}
         Node* childnode = parentnode->children.value(row);
+        qDebug() << "index (" << row << ", " << col << ")";
+        //qDebug() << "index (" << row << ", " << col << ")" << childnode->nodevalues.at(0);
         if(!childnode)
             return QModelIndex();
         return createIndex(row, col, childnode);
@@ -74,6 +79,7 @@ public:
         if(!grandparentnode)
             return QModelIndex();
         int row = grandparentnode->children.indexOf(parentnode);
+        qDebug() << "parent (" << row << ", 0) " << parentnode->nodevalues.at(0);
         return createIndex(row, 0, parentnode);
     };
 
@@ -84,7 +90,7 @@ public:
         Node* parentnode = NodeFromIndex(parent);
         if(!parentnode)
             return 0;
-        //qDebug() << "return rowcount for parent." << parentnode->children.count();
+        qDebug() << "return rowcount for parent." << parentnode->children.count();
         return parentnode->children.count();
     };
 
@@ -108,8 +114,8 @@ public:
             QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
             return tmpstr;
         }
+        qDebug() << "return data from nodevalues." << node->nodevalues.at(0).toInt();
         return node->nodevalues.at(index.column());
-        //qDebug() << "return data from nodevalues." << node->nodevalues.at(0).toInt();
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -138,7 +144,7 @@ public:
 
     bool canFetchMore(const QModelIndex &parent) const
     {
-        //qDebug() << "can fetch more called.";
+        qDebug() << "can fetch more called.";
         if(parent != QModelIndex())
         {
             Node* parentnode = NodeFromIndex(parent);
@@ -151,12 +157,17 @@ public:
 
     void fetchMore(const QModelIndex &parent) const
     {
+        int parentid = 5; // if this works, i'll need to figure out how to get the rootinum in here.
+        //parentnode = rootnode;
+        if(parent != QModelIndex())
+            parentid = parentnode->nodevalues.at(5).toInt();
+
         Node* parentnode;
         Node* currentchild;
         QList<QSqlRecord> recordlist;
         QList<QVariant> fetchvalues;
         qDebug() << "fetchmore called.";
-        if(!parent.isValid())
+        if(parent == QModelIndex())
         {
             parentnode = rootnode;
         }
@@ -164,7 +175,7 @@ public:
             parentnode = NodeFromIndex(parent);
         QSqlQuery fetchchildrenquery(fcasedb);
         fetchchildrenquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype == 5 AND parentid = ?");
-        fetchchildrenquery.addBindValue(parentnode->nodevalues.at(5).toInt());
+        fetchchildrenquery.addBindValue(parentid);
         if(fetchchildrenquery.exec())
         {
             recordlist.clear();
@@ -269,7 +280,7 @@ public:
             //emit NumberPopulated(fetchcount); // used to update a log.
         }*/
     };
-/*
+
     void Refresh(const QModelIndex &parent)
     {
         Node* parentnode;
@@ -282,7 +293,7 @@ public:
             fetchMore(parent);
         }
     };
-*/
+
 private:
     Node* NodeFromIndex(const QModelIndex &index) const
     {
@@ -371,7 +382,8 @@ private slots:
         //((TreeModel*)index.model())->Refresh(index);
         if(((TreeModel*)index.model())->canFetchMore(index))
             ((TreeModel*)index.model())->fetchMore(index);
-        ui->dirTreeView->resizeColumnToContents(index.column());
+        //ui->dirTreeView->resizeColumnToContents(index.column());
+        ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
     void setScrollBarRange(off_t low, off_t high);
