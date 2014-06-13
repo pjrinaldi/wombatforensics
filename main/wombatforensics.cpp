@@ -314,9 +314,10 @@ void WombatForensics::InitializeQueryModel()
         //ExpandCollapseResize(QModelIndex());
 
         checkableproxy = new CheckableProxyModel(this);
-        checkableproxy->setSourceModel(treemodel);
+        //checkableproxy->setSourceModel(treemodel);
         ui->dirTreeView->setAllColumnsShowFocus(true);
-        ui->dirTreeView->setModel(checkableproxy);
+        //ui->dirTreeView->setModel(checkableproxy);
+        ui->dirTreeView->setModel(treemodel);
         ui->dirTreeView->hideColumn(4);
         ui->dirTreeView->hideColumn(5);
         ui->dirTreeView->hideColumn(11);

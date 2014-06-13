@@ -33,23 +33,23 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
 // MIGHT NOT NEED IF I GET THIS INFO FROM THE SQL QUERY...
 int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
 {
-    qDebug() << "rootinum is: " << rootinum;
+    //qDebug() << "rootinum is: " << rootinum;
     QSqlQuery childcountquery(fcasedb);
     childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
-    childcountquery.addBindValue(currentnode->nodevalues.at(5).toInt());
+    childcountquery.addBindValue(curnode->nodevalues.at(5).toInt());
     if(childcountquery.exec())
     {
         childcountquery.next();
-        currentnode->childcount = childcountquery.value(0).toInt();
-        //if(currentnode->childcount > 0)
-            //currentnode->haschildren = true;
+        curnode->childcount = childcountquery.value(0).toInt();
+        if(curnode->childcount > 0)
+            curnode->haschildren = true;
     }
     if(curnode->nodevalues.at(11).toInt() == rootinum)
     {
         parentnode->children.append(curnode);
         curnode->parent = parentnode;
-        if(currentnode->childcount > 0)
-            currentnode->haschildren = true;
+        if(curnode->childcount > 0)
+            parentnode->haschildren = true;
         qDebug() << "curnode parent id == rootinum";
         return 1;
     }
@@ -61,6 +61,7 @@ int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
             qDebug() << "parent addr == cur parid" << parentnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
             parentnode->children.append(curnode);
             curnode->parent = parentnode;
+            parentnode->haschildren = true;
             return 1;
         }
         else if(parentnode->haschildren == false)

@@ -63,14 +63,12 @@ public:
     int rowCount(const QModelIndex &parent) const
     {
         if(parent == QModelIndex())
-            return 0;
+            return 1;
         if(parent.column() > 0)
             return 0;
-        Node* parentnode = NodeFromIndex(parent);
-        if(parentnode == rootnode)
-            return 1;
-        if(!parentnode)
-            return 0;
+        Node* parentnode = rootnode; 
+        if(parent.isValid())
+            parentnode = NodeFromIndex(parent);
         qDebug() << "rowcount: childcount: " << parentnode->childcount;
         return parentnode->childcount;
         //return parentnode->children.count();
@@ -85,12 +83,11 @@ public:
     {
         if(index == QModelIndex())
             return QVariant();
-
         if(role != Qt::DisplayRole)
             return QVariant();
-        Node* node = NodeFromIndex(index);
-        if(!node)
-            return QVariant();
+        Node* node = rootnode; 
+        if(index.isValid())
+            node = NodeFromIndex(index);
         if(index.column() >= 6 && index.column() <= 9)
         {
             char buf[128];
@@ -109,27 +106,17 @@ public:
         }
         return QVariant();
     };
-/*
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const
     {
         if(parent == QModelIndex())
-        {
-            qDebug() << "parent was QModelIndex";
             return true;
-        }
-        Node* parentnode = NodeFromIndex(parent);
-        if(parentnode == rootnode)
+        Node* parentnode = rootnode;
+        if(parent.isValid())
+            parentnode = NodeFromIndex(parent);
+        if(rowCount(parent) > 0)
         {
-            qDebug() << "parent was rootnode";
+            qDebug() << "parent rowcount: " << rowCount(parent);
             return true;
-        }
-        else
-        {
-            if(rowCount(parent) > 0)
-            {
-                qDebug() << "parent rowcount: " << rowCount(parent);
-                return true;
-            }
         }
         return false;
     };

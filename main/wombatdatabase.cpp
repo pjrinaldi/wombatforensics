@@ -570,9 +570,12 @@ void WombatDatabase::GetRootNodes()
                 dummynode = new Node(colvalues);
                 dummynode->children.append(currentnode);
                 dummynode->nodevalues[5] = wombatptr->currentrootinum;
+                dummynode->parent = NULL;
                 dummynode->haschildren = true;
                 dummynode->childcount = 1;
                 currentnode->parent = dummynode;
+                currentnode->childcount = 1;
+                currentnode->haschildren = true;
                 parentnode = currentnode;
             }
             else // volume or partition or filesystem
