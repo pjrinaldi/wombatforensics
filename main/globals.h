@@ -40,7 +40,6 @@ public:
             nodevalues.append(celldata.at(i));
         }
         parent = 0;
-        fetchedchildren = false;
         haschildren = false;
     };
 
@@ -52,7 +51,6 @@ public:
     QList<QVariant> nodevalues;
     Node* parent;
     QList<Node*> children;
-    bool fetchedchildren;
     bool haschildren;
     int childcount;
 };

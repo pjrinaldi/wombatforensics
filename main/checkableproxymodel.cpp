@@ -85,6 +85,8 @@ Qt::ItemFlags CheckableProxyModel::flags(const QModelIndex &index) const
     if (!index.isValid())
         return Qt::NoItemFlags;
 
+    if(index == QModelIndex())
+        return Qt::NoItemFlags;
     QModelIndex sourceIndex = mapToSource(index);
     Qt::ItemFlags flags = sourceIndex.flags();
     if (index.column() == 0) {

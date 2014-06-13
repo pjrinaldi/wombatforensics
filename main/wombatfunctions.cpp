@@ -33,10 +33,23 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
 // MIGHT NOT NEED IF I GET THIS INFO FROM THE SQL QUERY...
 int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
 {
+    qDebug() << "rootinum is: " << rootinum;
+    QSqlQuery childcountquery(fcasedb);
+    childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+    childcountquery.addBindValue(currentnode->nodevalues.at(5).toInt());
+    if(childcountquery.exec())
+    {
+        childcountquery.next();
+        currentnode->childcount = childcountquery.value(0).toInt();
+        //if(currentnode->childcount > 0)
+            //currentnode->haschildren = true;
+    }
     if(curnode->nodevalues.at(11).toInt() == rootinum)
     {
         parentnode->children.append(curnode);
         curnode->parent = parentnode;
+        if(currentnode->childcount > 0)
+            currentnode->haschildren = true;
         qDebug() << "curnode parent id == rootinum";
         return 1;
     }
@@ -50,7 +63,7 @@ int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
             curnode->parent = parentnode;
             return 1;
         }
-        else if(parentnode->fetchedchildren)
+        else if(parentnode->haschildren == false)
         {
             for(int i=0; i < parentnode->children.count(); i++)
             {

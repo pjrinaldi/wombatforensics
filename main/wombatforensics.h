@@ -21,7 +21,6 @@ public:
     {
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID";
         rootnode = 0;
-        currentrowcount = 0;
     };
 
     ~TreeModel()
@@ -33,20 +32,6 @@ public:
     {
         delete rootnode;
         rootnode = node;
-        beginResetModel();
-        fetchMore(index(0, 0, QModelIndex()));
-        //QModelIndex rootindex = IndexFromNode(node, 0);
-        //rowCount(QModelIndex());
-        endResetModel();
-        //QAbstractItemModel::reset();
-        //fetchMore(QModelIndex());
-        //fetchMore(rootnode);
-        //beginResetModel();
-        //currentrowcount = 0;
-        //totalcount = node->children.count();
-        //totalcount = sqlquery.count() // total record count returned from sql...
-        //endResetModel();
-        //QAbstractItemModel::reset();
     };
 
     QModelIndex index(int row, int col, const QModelIndex &parent) const
@@ -54,14 +39,7 @@ public:
         if(!rootnode || row < 0 || col < 0)
             return QModelIndex();
         Node* parentnode = NodeFromIndex(parent);
-        //qDebug() << "parentid: " << parentnode->nodevalues.at(0).toInt();
-        //if(parentnode == rootnode)
-        //{
-        //  call sql function here to get the data for root...
-        //}
         Node* childnode = parentnode->children.value(row);
-        qDebug() << "index (" << row << ", " << col << ")";
-        //qDebug() << "index (" << row << ", " << col << ")" << childnode->nodevalues.at(0);
         if(!childnode)
             return QModelIndex();
         return createIndex(row, col, childnode);
@@ -79,19 +57,23 @@ public:
         if(!grandparentnode)
             return QModelIndex();
         int row = grandparentnode->children.indexOf(parentnode);
-        qDebug() << "parent (" << row << ", 0) " << parentnode->nodevalues.at(0);
         return createIndex(row, 0, parentnode);
     };
 
     int rowCount(const QModelIndex &parent) const
     {
+        if(parent == QModelIndex())
+            return 0;
         if(parent.column() > 0)
             return 0;
         Node* parentnode = NodeFromIndex(parent);
+        if(parentnode == rootnode)
+            return 1;
         if(!parentnode)
             return 0;
-        qDebug() << "return rowcount for parent." << parentnode->children.count();
-        return parentnode->children.count();
+        qDebug() << "rowcount: childcount: " << parentnode->childcount;
+        return parentnode->childcount;
+        //return parentnode->children.count();
     };
 
     int columnCount(const QModelIndex &parent) const
@@ -103,6 +85,7 @@ public:
     {
         if(index == QModelIndex())
             return QVariant();
+
         if(role != Qt::DisplayRole)
             return QVariant();
         Node* node = NodeFromIndex(index);
@@ -114,7 +97,6 @@ public:
             QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
             return tmpstr;
         }
-        qDebug() << "return data from nodevalues." << node->nodevalues.at(0).toInt();
         return node->nodevalues.at(index.column());
     };
 
@@ -122,11 +104,56 @@ public:
     {
         if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
         {
-            return headerdata.at(section);
+            if(section >= 0)
+                return headerdata.at(section);
         }
         return QVariant();
     };
+/*
+    bool hasChildren(const QModelIndex &parent = QModelIndex()) const
+    {
+        if(parent == QModelIndex())
+        {
+            qDebug() << "parent was QModelIndex";
+            return true;
+        }
+        Node* parentnode = NodeFromIndex(parent);
+        if(parentnode == rootnode)
+        {
+            qDebug() << "parent was rootnode";
+            return true;
+        }
+        else
+        {
+            if(rowCount(parent) > 0)
+            {
+                qDebug() << "parent rowcount: " << rowCount(parent);
+                return true;
+            }
+        }
+        return false;
+    };
+/*
+    bool canFetchMore(const QModelIndex &parent = QModelIndex()) const
+    {
+        /*
+        if(parent == QModelIndex())
+            return false;
+        Node* parentnode = NodeFromIndex(parent);
+        if(parentnode == rootnode)
+            return false;
+        else if(parentnode->childcount > 0 && parentnode->haschildren == false)
+            return true;
+        else
+            return false;
+        return false;
+    };
 
+    void fetchMore(const QModelIndex &parent) const
+    {
+        qDebug() << "fetch more called.";
+    };
+/*
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const
     {
         if(parent == QModelIndex())
@@ -210,8 +237,6 @@ public:
         //if(parentnode->fetchedchildren)
         //    return;
         //parentnode->fetchedchildren = true;
-       /*
-        *    wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->currentrootinum);
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
@@ -255,8 +280,6 @@ public:
             }
         }
 
-        *
-        */ 
         
         // CALL SQL QUERY HERE...
         qDebug() << "get fetched children now...";
@@ -264,7 +287,6 @@ public:
         //Node* parentnode = NodeFromIndex(parent);
         //rowCount(parent);
         //beginInsertRows(parent, 0, parentnode->children.count());
-        /*
         //beginInsertRows(parent, 0, rowcount-1);
         //endInsertRows();
         Node* parentnode = NodeFromIndex(parent);
@@ -278,9 +300,11 @@ public:
             //QAbstractItemModel::endInsertRows();
 
             //emit NumberPopulated(fetchcount); // used to update a log.
-        }*/
+        }
     };
+*/
 
+        /*
     void Refresh(const QModelIndex &parent)
     {
         Node* parentnode;
@@ -292,7 +316,7 @@ public:
             parentnode->fetchedchildren = false;
             fetchMore(parent);
         }
-    };
+    };*/
 
 private:
     Node* NodeFromIndex(const QModelIndex &index) const
@@ -303,7 +327,7 @@ private:
             return rootnode;
     };
 
-    QModelIndex IndexFromNode(const Node* node, int col) const
+    QModelIndex IndexFromNode(const Node* node) const
     {
         int row = 0;
         bool found = false;
@@ -321,13 +345,11 @@ private:
         if(!found)
             return QModelIndex();
 
-        return createIndex(row, col, parentnode->children.at(row));
+        return createIndex(row, 0, parentnode->children.at(row));
     };
 
     Node* rootnode;
     QStringList headerdata;
-    int currentrowcount;
-    int totalcount;
 };
 
 namespace Ui {
@@ -379,10 +401,8 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
-        //((TreeModel*)index.model())->Refresh(index);
-        if(((TreeModel*)index.model())->canFetchMore(index))
-            ((TreeModel*)index.model())->fetchMore(index);
-        //ui->dirTreeView->resizeColumnToContents(index.column());
+        //if(((TreeModel*)index.model())->canFetchMore(index))
+        //    ((TreeModel*)index.model())->fetchMore(index);
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
