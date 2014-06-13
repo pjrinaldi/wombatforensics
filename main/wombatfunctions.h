@@ -6,6 +6,7 @@
 
 std::string GetTime(void);
 char* TskTimeToStringUTC(time_t time, char buf[128]);
+int GetChildCount(int type, int address);
 int FindParentNode(Node* curnode, Node* parentnode, int rootinum);
 bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);

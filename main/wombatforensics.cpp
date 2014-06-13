@@ -241,15 +241,6 @@ void WombatForensics::InitializeQueryModel()
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
         //qDebug() << "currentfilesystemid: " << wombatvarptr->currentfilesystemid;
         wombatdatabase->GetRootInum();
-<<<<<<< HEAD
-        wombatdatabase->GetRootNodes(); // get non-files and non-directories as well as the files/directories in root directory
-        Node* rootnode = 0;
-        Node* parentnode = 0;
-        Node* dummynode = 0;
-        Node* currentnode = 0;
-        for(int i=0; i < wombatvarptr->sqlrecords.count(); i++)
-        {
-=======
         wombatdatabase->GetRootNodes();
         // SETUPS THE ROOT NOTES, WHICH I CAN THEN MAKE VISIBLE IN THE MODEL...
         //Node* rootnode = 0;
@@ -257,9 +248,6 @@ void WombatForensics::InitializeQueryModel()
         //Node* dummynode = 0;
         //Node* currentnode = 0;
         //QList<QVariant> colvalues;
-
->>>>>>> 976c11af2d24fa99d22fab12c8e95d7b6c741cfd
-        }
         //qDebug() << "currentrootinum: " << wombatvarptr->currentrootinum;
         /*
         Node* currentnode = 0;
@@ -321,13 +309,12 @@ void WombatForensics::InitializeQueryModel()
         TreeModel* treemodel = new TreeModel(this);
         new ModelTest(treemodel, this);
         treemodel->SetRootNode(dummynode);
-        //ExpandCollapseResize(QModelIndex());
 
         checkableproxy = new CheckableProxyModel(this);
-        //checkableproxy->setSourceModel(treemodel);
+        checkableproxy->setSourceModel(treemodel);
         ui->dirTreeView->setAllColumnsShowFocus(true);
-        //ui->dirTreeView->setModel(checkableproxy);
-        ui->dirTreeView->setModel(treemodel);
+        ui->dirTreeView->setModel(checkableproxy);
+        //ui->dirTreeView->setModel(treemodel);
         ui->dirTreeView->hideColumn(4);
         ui->dirTreeView->hideColumn(5);
         ui->dirTreeView->hideColumn(11);
@@ -340,7 +327,7 @@ void WombatForensics::InitializeQueryModel()
 
         ResizeColumns();
         wombatframework->CloseInfoStructures();
-    //}
+    }
 }
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)

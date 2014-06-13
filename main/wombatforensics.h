@@ -69,9 +69,8 @@ public:
         Node* parentnode = rootnode; 
         if(parent.isValid())
             parentnode = NodeFromIndex(parent);
-        qDebug() << "rowcount: childcount: " << parentnode->childcount;
+        //qDebug() << "rowcount: childcount: " << parentnode->childcount;
         return parentnode->childcount;
-        //return parentnode->children.count();
     };
 
     int columnCount(const QModelIndex &parent) const
@@ -106,6 +105,7 @@ public:
         }
         return QVariant();
     };
+
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const
     {
         if(parent == QModelIndex())
@@ -115,7 +115,8 @@ public:
             parentnode = NodeFromIndex(parent);
         if(rowCount(parent) > 0)
         {
-            qDebug() << "parent rowcount: " << rowCount(parent);
+            qDebug() << "has children called.";
+            //qDebug() << "parent rowcount: " << rowCount(parent);
             return true;
         }
         return false;
@@ -135,27 +136,7 @@ public:
             return false;
         return false;
     };
-
-    void fetchMore(const QModelIndex &parent) const
-    {
-        qDebug() << "fetch more called.";
-    };
 /*
-    bool hasChildren(const QModelIndex &parent = QModelIndex()) const
-    {
-        if(parent == QModelIndex())
-            return false;
-        Node* parentnode = NodeFromIndex(parent);
-        if(!parent.isValid())
-            return (parentnode->children.count() > 0);
-        return false;
-
-        //if(rowCount(parent) > 0)
-        //if(parentnode->children.count() > 0)
-            //return true;
-        //return false;
-    };
-
     bool canFetchMore(const QModelIndex &parent) const
     {
         qDebug() << "can fetch more called.";
@@ -291,20 +272,6 @@ public:
     };
 */
 
-        /*
-    void Refresh(const QModelIndex &parent)
-    {
-        Node* parentnode;
-        if(!parent.isValid())
-            parentnode = rootnode;
-        parentnode = NodeFromIndex(parent);
-        if(parentnode->children.isEmpty())
-        {
-            parentnode->fetchedchildren = false;
-            fetchMore(parent);
-        }
-    };*/
-
 private:
     Node* NodeFromIndex(const QModelIndex &index) const
     {
@@ -313,7 +280,7 @@ private:
         else
             return rootnode;
     };
-
+/*
     QModelIndex IndexFromNode(const Node* node) const
     {
         int row = 0;
@@ -333,7 +300,7 @@ private:
             return QModelIndex();
 
         return createIndex(row, 0, parentnode->children.at(row));
-    };
+    };*/
 
     Node* rootnode;
     QStringList headerdata;
@@ -388,8 +355,6 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
-        //if(((TreeModel*)index.model())->canFetchMore(index))
-        //    ((TreeModel*)index.model())->fetchMore(index);
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);

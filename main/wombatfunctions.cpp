@@ -30,46 +30,54 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
-// MIGHT NOT NEED IF I GET THIS INFO FROM THE SQL QUERY...
+int GetChildCount(int type, int address)
+{
+    QSqlQuery childquery(fcasedb);
+    QString querystring = "SELECT COUNT(objectid) FROM data WHERE parentid = ?";
+    if(type < 4)
+        querystring += " AND objecttype < 5";
+    childquery.prepare(querystring);
+    childquery.addBindValue(address);
+    if(childquery.exec())
+    {
+        childquery.next();
+        return childquery.value(0).toInt();
+    }
+}
+
 int FindParentNode(Node* curnode, Node* parnode, int rootinum)
 {
-    //qDebug() << "rootinum is: " << rootinum;
-    QSqlQuery childcountquery(fcasedb);
-    childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
-    childcountquery.addBindValue(curnode->nodevalues.at(5).toInt());
-    if(childcountquery.exec())
-    {
-        childcountquery.next();
-        curnode->childcount = childcountquery.value(0).toInt();
-        if(curnode->childcount > 0)
-            curnode->haschildren = true;
-    }
     if(curnode->nodevalues.at(11).toInt() == rootinum)
     {
         parnode->children.append(curnode);
         curnode->parent = parnode;
-        if(curnode->childcount > 0)
-            parnode->haschildren = true;
-        qDebug() << "curnode parent id == rootinum";
+        curnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
+        curnode->haschildren = curnode->HasChildren();
         return 1;
     }
     else
     {
         if(parnode->nodevalues.at(5).toInt() == curnode->nodevalues.at(11).toInt()) // parent address == cur parentid
         {
-            qDebug() << "parent node with objid: " << parnode->nodevalues.at(0).toInt() << "found for objid: " << curnode->nodevalues.at(0).toInt() << "!";
-            qDebug() << "parent addr == cur parid" << parnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
             parnode->children.append(curnode);
             curnode->parent = parnode;
-            parentnode->haschildren = true;
+            if(QString(".").compare(curnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(curnode->nodevalues.at(1).toString()) == 0)
+            {
+                curnode->childcount = 0;
+                curnode->haschildren = false;
+            }
+            else
+            {
+                curnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
+                curnode->haschildren = curnode->HasChildren();
+            }
             return 1;
         }
-        else if(parentnode->haschildren == false)
+        else
         {
-            for(int i=0; i < parentnode->children.count(); i++)
+            for(int i=0; i < parnode->children.count(); i++)
             {
-                //qDebug() << "re-iterate with new parent " << parentnode->children.at(i)->nodevalues.at(0).toInt();
-                FindParentNode(curnode, parentnode->children.at(i), rootinum);
+                FindParentNode(curnode, parnode->children.at(i), rootinum);
             }
         }
         return 0;

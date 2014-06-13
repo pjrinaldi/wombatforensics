@@ -53,6 +53,12 @@ public:
     QList<Node*> children;
     bool haschildren;
     int childcount;
+    bool HasChildren(void)
+    {
+        if(childcount > 0)
+            return true;
+        return false;
+    };
 };
 
 extern Node* rootnode;
