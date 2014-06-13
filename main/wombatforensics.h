@@ -115,8 +115,6 @@ public:
             parentnode = NodeFromIndex(parent);
         if(rowCount(parent) > 0)
         {
-            qDebug() << "has children called.";
-            //qDebug() << "parent rowcount: " << rowCount(parent);
             return true;
         }
         return false;
