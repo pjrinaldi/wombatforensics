@@ -21,7 +21,6 @@ public:
     {
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID";
         rootnode = 0;
-        currentrowcount = 0;
     };
 
     ~TreeModel()
@@ -33,27 +32,13 @@ public:
     {
         delete rootnode;
         rootnode = node;
-        //fetchMore(QModelIndex());
-        //fetchMore(rootnode);
-        //beginResetModel();
-        //currentrowcount = 0;
-        //totalcount = node->children.count();
-        //totalcount = sqlquery.count() // total record count returned from sql...
-        //endResetModel();
-        //QAbstractItemModel::reset();
     };
 
     QModelIndex index(int row, int col, const QModelIndex &parent) const
     {
-        //qDebug() << "(row, col) (" << row << ", " << col << ")";
         if(!rootnode || row < 0 || col < 0)
             return QModelIndex();
         Node* parentnode = NodeFromIndex(parent);
-        //qDebug() << "parentid: " << parentnode->nodevalues.at(0).toInt();
-        //if(parentnode == rootnode)
-        //{
-        //  call sql function here to get the data for root...
-        //}
         Node* childnode = parentnode->children.value(row);
         if(!childnode)
             return QModelIndex();
@@ -77,13 +62,16 @@ public:
 
     int rowCount(const QModelIndex &parent) const
     {
+        if(parent == QModelIndex())
+            return 1;
         if(parent.column() > 0)
             return 0;
-        Node* parentnode = NodeFromIndex(parent);
-        if(!parentnode)
-            return 0;
-        //qDebug() << "return rowcount for parent." << parentnode->children.count();
-        return parentnode->children.count();
+        Node* parentnode = rootnode; 
+        if(parent.isValid())
+            parentnode = NodeFromIndex(parent);
+        qDebug() << "rowcount: childcount: " << parentnode->childcount;
+        return parentnode->childcount;
+        //return parentnode->children.count();
     };
 
     int columnCount(const QModelIndex &parent) const
@@ -97,9 +85,9 @@ public:
             return QVariant();
         if(role != Qt::DisplayRole)
             return QVariant();
-        Node* node = NodeFromIndex(index);
-        if(!node)
-            return QVariant();
+        Node* node = rootnode; 
+        if(index.isValid())
+            node = NodeFromIndex(index);
         if(index.column() >= 6 && index.column() <= 9)
         {
             char buf[128];
@@ -107,18 +95,52 @@ public:
             return tmpstr;
         }
         return node->nodevalues.at(index.column());
-        //qDebug() << "return data from nodevalues." << node->nodevalues.at(0).toInt();
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
     {
         if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
         {
-            return headerdata.at(section);
+            if(section >= 0)
+                return headerdata.at(section);
         }
         return QVariant();
     };
+    bool hasChildren(const QModelIndex &parent = QModelIndex()) const
+    {
+        if(parent == QModelIndex())
+            return true;
+        Node* parentnode = rootnode;
+        if(parent.isValid())
+            parentnode = NodeFromIndex(parent);
+        if(rowCount(parent) > 0)
+        {
+            qDebug() << "parent rowcount: " << rowCount(parent);
+            return true;
+        }
+        return false;
+    };
+/*
+    bool canFetchMore(const QModelIndex &parent = QModelIndex()) const
+    {
+        /*
+        if(parent == QModelIndex())
+            return false;
+        Node* parentnode = NodeFromIndex(parent);
+        if(parentnode == rootnode)
+            return false;
+        else if(parentnode->childcount > 0 && parentnode->haschildren == false)
+            return true;
+        else
+            return false;
+        return false;
+    };
 
+    void fetchMore(const QModelIndex &parent) const
+    {
+        qDebug() << "fetch more called.";
+    };
+/*
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const
     {
         if(parent == QModelIndex())
@@ -136,36 +158,122 @@ public:
 
     bool canFetchMore(const QModelIndex &parent) const
     {
-        //qDebug() << "can fetch more called.";
+        qDebug() << "can fetch more called.";
         if(parent != QModelIndex())
         {
             Node* parentnode = NodeFromIndex(parent);
-            if(parentnode->children.count() > 0)
+            if(parentnode->haschildren && parentnode->children.count() <= 0)
                 return true;
-            return false;
         }
+
         return false;
     };
 
     void fetchMore(const QModelIndex &parent) const
     {
+        int parentid = 5; // if this works, i'll need to figure out how to get the rootinum in here.
+        //parentnode = rootnode;
+        if(parent != QModelIndex())
+            parentid = parentnode->nodevalues.at(5).toInt();
+
         Node* parentnode;
+        Node* currentchild;
+        QList<QSqlRecord> recordlist;
+        QList<QVariant> fetchvalues;
         qDebug() << "fetchmore called.";
-        if(!parent.isValid())
+        if(parent == QModelIndex())
         {
             parentnode = rootnode;
         }
-        parentnode = NodeFromIndex(parent);
-        if(parentnode->fetchedchildren)
-            return;
-        parentnode->fetchedchildren = true;
+        else
+            parentnode = NodeFromIndex(parent);
+        QSqlQuery fetchchildrenquery(fcasedb);
+        fetchchildrenquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype == 5 AND parentid = ?");
+        fetchchildrenquery.addBindValue(parentid);
+        if(fetchchildrenquery.exec())
+        {
+            recordlist.clear();
+            while(fetchchildrenquery.next())
+            {
+                recordlist.append(fetchchildrenquery.record());
+            }
+            for(int i=0; i < recordlist.count(); i++)
+            {
+                colvalues.clear();
+                for(int j=0; j < recordlist[i].count(); j++)
+                {
+                    colvalues.append(recordlist[i].value(j));
+                }
+                currentchild = new Node(colvalues);
+                parentnode->children.append(currentchild);
+                currentchild->parent = parentnode;
+                QSqlQuery childcountquery(fcasedb);
+                childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+                childcountquery.addBindValue(currentchild->nodevalues.at(5).toInt());
+                if(childcountquery.exec())
+                {
+                    childcountquery.next();
+                    currentchild->childcount = childcountquery.value(0).toInt();
+                    if(currentchild->childcount > 0)
+                        currentchild->haschildren = true;
+                }
+            }
+        }
+
+
+        //if(parentnode->fetchedchildren)
+        //    return;
+        //parentnode->fetchedchildren = true;
+    wombatptr->bindvalues.append(wombatptr->currentrootinum);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        colvalues.clear();
+        for(int j=0; j < wombatptr->sqlrecords[i].count(); j++)
+        {
+            colvalues.append(wombatptr->sqlrecords[i].value(j));
+        }
+        currentnode = new Node(colvalues);
+        if(colvalues.at(4).toInt() < 5) // not file or directory
+        {
+            if(colvalues.at(4).toInt() == 1) // image node
+            {
+                dummynode = new Node(colvalues);
+                dummynode->children.append(currentnode);
+                currentnode->parent = dummynode;
+                parentnode = currentnode;
+            }
+            else // volume or partition or filesystem
+            {
+                parentnode->children.append(currentnode);
+                currentnode->parent = parentnode;
+                parentnode = currentnode;
+            }
+        }
+        else // its a file or directory at the rootinum level...
+        {
+            parentnode->children.append(currentnode);
+            currentnode->parent = parentnode;
+            QSqlQuery childcountquery(wombatptr->casedb);
+            childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+            childcountquery.addBindValue(currentnode->nodevalues.at(5).toInt());
+            if(childcountquery.exec())
+            {
+                childcountquery.next();
+                currentnode->childcount = childcountquery.value(0).toInt();
+                if(currentnode->childcount > 0)
+                    currentnode->haschildren = true;
+            }
+        }
+
+        
         // CALL SQL QUERY HERE...
         qDebug() << "get fetched children now...";
             
         //Node* parentnode = NodeFromIndex(parent);
-        rowCount(parent);
+        //rowCount(parent);
         //beginInsertRows(parent, 0, parentnode->children.count());
-        /*
         //beginInsertRows(parent, 0, rowcount-1);
         //endInsertRows();
         Node* parentnode = NodeFromIndex(parent);
@@ -179,9 +287,11 @@ public:
             //QAbstractItemModel::endInsertRows();
 
             //emit NumberPopulated(fetchcount); // used to update a log.
-        }*/
+        }
     };
+*/
 
+        /*
     void Refresh(const QModelIndex &parent)
     {
         Node* parentnode;
@@ -193,7 +303,7 @@ public:
             parentnode->fetchedchildren = false;
             fetchMore(parent);
         }
-    };
+    };*/
 
 private:
     Node* NodeFromIndex(const QModelIndex &index) const
@@ -204,7 +314,7 @@ private:
             return rootnode;
     };
 
-    QModelIndex IndexFromNode(const Node* node, int col) const
+    QModelIndex IndexFromNode(const Node* node) const
     {
         int row = 0;
         bool found = false;
@@ -222,13 +332,11 @@ private:
         if(!found)
             return QModelIndex();
 
-        return createIndex(row, col, parentnode->children.at(row));
+        return createIndex(row, 0, parentnode->children.at(row));
     };
 
     Node* rootnode;
     QStringList headerdata;
-    int currentrowcount;
-    int totalcount;
 };
 
 namespace Ui {
@@ -280,10 +388,9 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
-        ((TreeModel*)index.model())->Refresh(index);
         //if(((TreeModel*)index.model())->canFetchMore(index))
-            //((TreeModel*)index.model())->fetchMore(index);
-        ui->dirTreeView->resizeColumnToContents(index.column());
+        //    ((TreeModel*)index.model())->fetchMore(index);
+        ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
     void setScrollBarRange(off_t low, off_t high);

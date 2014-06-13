@@ -545,15 +545,94 @@ void WombatDatabase::GetRootInum()
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->currentrootinum = wombatptr->sqlrecords[0].value(0).toInt();
+    qDebug() << "root inum: " << wombatptr->currentrootinum;
 }
 void WombatDatabase::GetRootNodes()
 {
     wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(wombatptr->currentrootinum);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
-    //for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-    //{
-
-    //}
+    //wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        currentnode = 0;
+        colvalues.clear();
+        for(int j=0; j < wombatptr->sqlrecords[i].count(); j++)
+        {
+            colvalues.append(wombatptr->sqlrecords[i].value(j));
+        }
+        currentnode = new Node(colvalues);
+        if(colvalues.at(4).toInt() < 5) // not file or directory
+        {
+            if(colvalues.at(4).toInt() == 1) // image node
+            {
+                currentnode->nodevalues[5] = wombatptr->currentrootinum;
+                dummynode = new Node(colvalues);
+                dummynode->children.append(currentnode);
+                dummynode->nodevalues[5] = wombatptr->currentrootinum;
+                dummynode->parent = NULL;
+                dummynode->haschildren = true;
+                dummynode->childcount = 1;
+                currentnode->parent = dummynode;
+                currentnode->childcount = 1;
+                currentnode->haschildren = true;
+                parentnode = currentnode;
+            }
+            else // volume or partition or filesystem
+            {
+                currentnode->nodevalues[5] = wombatptr->currentrootinum;
+                parentnode->children.append(currentnode);
+                currentnode->parent = parentnode;
+                currentnode->haschildren = true;
+                // need to do a proper sql query where i determine the # of type 2's for objectid 1, # of type 3's for objectid 2
+                // etc, make it scalable.
+                if(currentnode->nodevalues.at(4).toInt() == 4)
+                {
+                    QSqlQuery childcountquery(wombatptr->casedb);
+                    childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+                    childcountquery.addBindValue(currentnode->nodevalues.at(5).toInt());
+                    if(childcountquery.exec())
+                    {
+                        childcountquery.next();
+                        currentnode->childcount = childcountquery.value(0).toInt();
+                    }
+                }
+                else currentnode->childcount = 1;
+                parentnode = currentnode;
+            }
+        }
+        else // its a file or directory at the rootinum level...
+        {
+            /*
+            parentnode->children.append(currentnode);
+            currentnode->parent = parentnode;
+            QSqlQuery childcountquery(wombatptr->casedb);
+            childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+            childcountquery.addBindValue(currentnode->nodevalues.at(5).toInt());
+            if(childcountquery.exec())
+            {
+                childcountquery.next();
+                currentnode->childcount = childcountquery.value(0).toInt();
+                if(currentnode->childcount > 0)
+                    currentnode->haschildren = true;
+            }*/
+            bool nodefound = FindParentNode(currentnode, parentnode, wombatptr->currentrootinum);
+            qDebug() << "node found: " << nodefound;
+        }
+        /*else // file or directory nodes.
+        {
+            nodefound = FindParentNode(currentnode, parentnode, wombatvarptr->currentrootinum);
+            qDebug() << "Node found: " << nodefound;
+            if(nodefound)
+            {
+                qDebug() << "node was found.";
+            }
+            else
+            {
+                qDebug() << "node wasn't found. check inum.";
+            }
+        }
+        */
+    }
+    qDebug() << "get root nodes complete.";
 }

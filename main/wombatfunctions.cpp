@@ -31,26 +31,40 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
 }
 
 // MIGHT NOT NEED IF I GET THIS INFO FROM THE SQL QUERY...
-int FindParentNode(Node* curnode, Node* parentnode, int rootinum)
+int FindParentNode(Node* curnode, Node* parnode, int rootinum)
 {
+    //qDebug() << "rootinum is: " << rootinum;
+    QSqlQuery childcountquery(fcasedb);
+    childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+    childcountquery.addBindValue(curnode->nodevalues.at(5).toInt());
+    if(childcountquery.exec())
+    {
+        childcountquery.next();
+        curnode->childcount = childcountquery.value(0).toInt();
+        if(curnode->childcount > 0)
+            curnode->haschildren = true;
+    }
     if(curnode->nodevalues.at(11).toInt() == rootinum)
     {
-        parentnode->children.append(curnode);
-        curnode->parent = parentnode;
+        parnode->children.append(curnode);
+        curnode->parent = parnode;
+        if(curnode->childcount > 0)
+            parnode->haschildren = true;
         qDebug() << "curnode parent id == rootinum";
         return 1;
     }
     else
     {
-        if(parentnode->nodevalues.at(5).toInt() == curnode->nodevalues.at(11).toInt()) // parent address == cur parentid
+        if(parnode->nodevalues.at(5).toInt() == curnode->nodevalues.at(11).toInt()) // parent address == cur parentid
         {
-            qDebug() << "parent node with objid: " << parentnode->nodevalues.at(0).toInt() << "found for objid: " << curnode->nodevalues.at(0).toInt() << "!";
-            qDebug() << "parent addr == cur parid" << parentnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
-            parentnode->children.append(curnode);
-            curnode->parent = parentnode;
+            qDebug() << "parent node with objid: " << parnode->nodevalues.at(0).toInt() << "found for objid: " << curnode->nodevalues.at(0).toInt() << "!";
+            qDebug() << "parent addr == cur parid" << parnode->nodevalues.at(5).toInt() << " == " << curnode->nodevalues.at(11).toInt();
+            parnode->children.append(curnode);
+            curnode->parent = parnode;
+            parentnode->haschildren = true;
             return 1;
         }
-        else if(parentnode->fetchedchildren)
+        else if(parentnode->haschildren == false)
         {
             for(int i=0; i < parentnode->children.count(); i++)
             {

@@ -11,6 +11,7 @@ extern QFutureWatcher<void> filewatcher;
 extern int filesfound;
 extern int filesprocessed;
 extern int currentevidenceid;
+extern QList<QVariant> colvalues;
 
 class InterfaceSignals : public QObject
 {
@@ -27,5 +28,36 @@ signals:
 };
 
 extern InterfaceSignals* isignals;
+
+class Node
+{
+public:
+    Node(QList<QVariant> celldata)
+    {
+        nodevalues.clear();
+        for(int i=0; i < celldata.count(); i++)
+        {
+            nodevalues.append(celldata.at(i));
+        }
+        parent = 0;
+        haschildren = false;
+    };
+
+    ~Node()
+    {
+        qDeleteAll(children);
+    };
+
+    QList<QVariant> nodevalues;
+    Node* parent;
+    QList<Node*> children;
+    bool haschildren;
+    int childcount;
+};
+
+extern Node* rootnode;
+extern Node* dummynode;
+extern Node* parentnode;
+extern Node* currentnode;
 
 #endif
