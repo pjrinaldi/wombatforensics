@@ -241,7 +241,7 @@ void WombatForensics::InitializeQueryModel()
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
         //qDebug() << "currentfilesystemid: " << wombatvarptr->currentfilesystemid;
         wombatdatabase->GetRootInum();
-        wombatdatabase->GetRootNodes();
+        wombatdatabase->GetRootNodes(); // get non-files and non-directories as well as the files/directories in root directory
         Node* rootnode = 0;
         Node* parentnode = 0;
         Node* dummynode = 0;
