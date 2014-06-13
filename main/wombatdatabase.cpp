@@ -584,7 +584,20 @@ void WombatDatabase::GetRootNodes()
                 parentnode->children.append(currentnode);
                 currentnode->parent = parentnode;
                 currentnode->haschildren = true;
-                currentnode->childcount = 1;
+                // need to do a proper sql query where i determine the # of type 2's for objectid 1, # of type 3's for objectid 2
+                // etc, make it scalable.
+                if(currentnode->nodevalues.at(4).toInt() == 4)
+                {
+                    QSqlQuery childcountquery(wombatptr->casedb);
+                    childcountquery.prepare("SELECT COUNT(objectid) as children FROM data WHERE parentid = ?");
+                    childcountquery.addBindValue(currentnode->nodevalues.at(5).toInt());
+                    if(childcountquery.exec())
+                    {
+                        childcountquery.next();
+                        currentnode->childcount = childcountquery.value(0).toInt();
+                    }
+                }
+                else currentnode->childcount = 1;
                 parentnode = currentnode;
             }
         }
