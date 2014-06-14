@@ -119,36 +119,47 @@ public:
         }
         return false;
     };
-/*
+
+
     bool canFetchMore(const QModelIndex &parent = QModelIndex()) const
     {
-        /*
         if(parent == QModelIndex())
-            return false;
+            return true;
         Node* parentnode = NodeFromIndex(parent);
         if(parentnode == rootnode)
-            return false;
-        else if(parentnode->childcount > 0 && parentnode->haschildren == false)
             return true;
-        else
-            return false;
-        return false;
-    };
-/*
-    bool canFetchMore(const QModelIndex &parent) const
-    {
-        qDebug() << "can fetch more called.";
-        if(parent != QModelIndex())
-        {
-            Node* parentnode = NodeFromIndex(parent);
-            if(parentnode->haschildren && parentnode->children.count() <= 0)
-                return true;
-        }
-
+        if(parentnode->children.count() == parentnode->childcount && parentnode->haschildren == true)
+            return true;
         return false;
     };
 
     void fetchMore(const QModelIndex &parent) const
+    {
+        Node* parentnode = NodeFromIndex(parent);
+        QList<QVariant> fetchvalues;
+        fetchvalues.clear();
+        if(parentnode->haschildren == true)
+        {
+            QSqlQuery morequery(fcasedb);
+            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE parentid = ?");
+            morequery.addBindValue(parentnode->nodevalues.at(5).toInt());
+            if(morequery.exec())
+            {
+                while(morequery.next())
+                {
+                    for(int i=0; i < morequery.record().count(); i++)
+                        fetchvalues.append(morequery.value(i));
+                    Node* curchild = new Node(fetchvalues);
+                    curchild->parent = parentnode;
+                    curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toInt());
+                    curchild->haschildren = curchild->HasChildren();
+                    parentnode->children.append(curchild);
+                }
+            }
+        }
+    };
+
+    /*    void fetchMore(const QModelIndex &parent) const
     {
         int parentid = 5; // if this works, i'll need to figure out how to get the rootinum in here.
         //parentnode = rootnode;

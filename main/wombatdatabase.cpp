@@ -550,7 +550,8 @@ void WombatDatabase::GetRootNodes()
 {
     wombatptr->bindvalues.clear();
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data", wombatptr->bindvalues);
+    wombatptr->bindvalues.append(wombatptr->currentrootinum);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         currentnode = 0;
@@ -598,9 +599,13 @@ void WombatDatabase::GetRootNodes()
                 parentnode = currentnode;
             }
         }
-        else // its a file or directory at the rootinum level...
+        else // its a file or directory with rootinum for a parent
         {
-            bool nodefound = FindParentNode(currentnode, parentnode, wombatptr->currentrootinum);
+            currentnode->parent = parentnode;
+            parentnode->children.append(currentnode);
+            currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
+            currentnode->haschildren = currentnode->HasChildren();
         }
+            //bool nodefound = FindParentNode(currentnode, parentnode, wombatptr->currentrootinum);
     }
 }
