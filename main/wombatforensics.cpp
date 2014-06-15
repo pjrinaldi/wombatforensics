@@ -307,7 +307,7 @@ void WombatForensics::InitializeQueryModel()
         //}
 
         TreeModel* treemodel = new TreeModel(this);
-        new ModelTest(treemodel, this);
+        //new ModelTest(treemodel, this);
         treemodel->SetRootNode(dummynode);
 
         checkableproxy = new CheckableProxyModel(this);

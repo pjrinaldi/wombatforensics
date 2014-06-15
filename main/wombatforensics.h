@@ -69,7 +69,6 @@ public:
         Node* parentnode = rootnode; 
         if(parent.isValid())
             parentnode = NodeFromIndex(parent);
-        //qDebug() << "rowcount: childcount: " << parentnode->childcount;
         return parentnode->childcount;
     };
 
@@ -133,8 +132,9 @@ public:
         return false;
     };
 
-    void fetchMore(const QModelIndex &parent) const
+    void fetchMore(const QModelIndex &parent = QModelIndex()) const
     {
+        qDebug() << "fetchmore called";
         Node* parentnode = NodeFromIndex(parent);
         QList<QVariant> fetchvalues;
         fetchvalues.clear();
@@ -143,8 +143,8 @@ public:
             QSqlQuery morequery(fcasedb);
             morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE parentid = ?");
             morequery.addBindValue(parentnode->nodevalues.at(5).toInt());
-            if(morequery.exec())
-            {
+            //if(morequery.exec())
+            //{
                 while(morequery.next())
                 {
                     for(int i=0; i < morequery.record().count(); i++)
@@ -155,7 +155,7 @@ public:
                     curchild->haschildren = curchild->HasChildren();
                     parentnode->children.append(curchild);
                 }
-            }
+            //}
         }
     };
 
@@ -221,6 +221,9 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
+        qDebug() << ((TreeModel*)ui->dirTreeView->model())->canFetchMore(index);
+        if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
+            ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);

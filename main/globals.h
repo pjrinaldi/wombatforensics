@@ -55,6 +55,7 @@ public:
     int childcount;
     bool HasChildren(void)
     {
+        qDebug() << "HasChildren count: " << childcount;
         if(childcount > 0)
             return true;
         return false;

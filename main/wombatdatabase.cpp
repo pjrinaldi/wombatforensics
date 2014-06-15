@@ -604,6 +604,7 @@ void WombatDatabase::GetRootNodes()
             currentnode->parent = parentnode;
             parentnode->children.append(currentnode);
             currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
+            qDebug() << "SetRootNode: childcount" << currentnode->childcount;
             currentnode->haschildren = currentnode->HasChildren();
         }
             //bool nodefound = FindParentNode(currentnode, parentnode, wombatptr->currentrootinum);
