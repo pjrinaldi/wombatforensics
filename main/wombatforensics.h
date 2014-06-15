@@ -127,7 +127,7 @@ public:
         Node* parentnode = NodeFromIndex(parent);
         if(parentnode == rootnode)
             return true;
-        if(parentnode->children.count() == parentnode->childcount && parentnode->haschildren == true)
+        if(parentnode->children.count() < parentnode->childcount && parentnode->haschildren == true)
             return true;
         return false;
     };
