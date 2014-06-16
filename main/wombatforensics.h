@@ -16,6 +16,7 @@
 
 class TreeModel : public QAbstractItemModel
 {
+    Q_OBJECT
 public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
@@ -132,9 +133,8 @@ public:
         return false;
     };
 
-    void fetchMore(const QModelIndex &parent = QModelIndex()) const
+    void fetchMore(const QModelIndex &parent = QModelIndex())
     {
-        QAbstractItemModel::beginResetModel();
         qDebug() << "fetchmore called";
         Node* parentnode = NodeFromIndex(parent);
         QList<QVariant> fetchvalues;
@@ -146,6 +146,7 @@ public:
             morequery.addBindValue(parentnode->nodevalues.at(5).toInt());
             if(morequery.exec())
             {
+                beginInsertRows(parent, 0, morequery.record().count() - 1);
                 while(morequery.next())
                 {
                     for(int i=0; i < morequery.record().count(); i++)
@@ -156,9 +157,9 @@ public:
                     curchild->haschildren = curchild->HasChildren();
                     parentnode->children.append(curchild);
                 }
+                endInsertRows();
             }
         }
-        QAbstractItemModel::endResetModel();
     };
 
 private:
