@@ -106,6 +106,14 @@ public:
         return QVariant();
     };
 
+    Qt::ItemFlags flags(const QModelIndex &index) const
+    {
+        if(!index.isValid())
+            return 0;
+        
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    };
+
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const
     {
         if(parent == QModelIndex())
@@ -124,10 +132,10 @@ public:
     bool canFetchMore(const QModelIndex &parent = QModelIndex()) const
     {
         if(parent == QModelIndex())
-            return true;
+            return false;
         Node* parentnode = NodeFromIndex(parent);
         if(parentnode == rootnode)
-            return true;
+            return false;
         if(parentnode->children.count() < parentnode->childcount && parentnode->haschildren == true)
             return true;
         return false;
@@ -135,7 +143,6 @@ public:
 
     void fetchMore(const QModelIndex &parent = QModelIndex())
     {
-        qDebug() << "fetchmore called";
         Node* parentnode = NodeFromIndex(parent);
         QList<QVariant> fetchvalues;
         fetchvalues.clear();
@@ -146,15 +153,25 @@ public:
             morequery.addBindValue(parentnode->nodevalues.at(5).toInt());
             if(morequery.exec())
             {
-                beginInsertRows(parent, 0, morequery.record().count() - 1);
+                //qDebug() << "Parentnode childcount: " << parentnode->childcount;
+                beginInsertRows(parent, 0, parentnode->childcount - 1);
                 while(morequery.next())
                 {
+                    fetchvalues.clear();
                     for(int i=0; i < morequery.record().count(); i++)
                         fetchvalues.append(morequery.value(i));
                     Node* curchild = new Node(fetchvalues);
                     curchild->parent = parentnode;
-                    curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toInt());
-                    curchild->haschildren = curchild->HasChildren();
+                    if(QString(".").compare(curchild->nodevalues.at(1).toString()) == 0 || QString("..").compare(curchild->nodevalues.at(1).toString()) == 0)
+                    {
+                        curchild->childcount = 0;
+                        curchild->haschildren = false;
+                    }
+                    else
+                    {
+                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toInt());
+                        curchild->haschildren = curchild->HasChildren();
+                    }
                     parentnode->children.append(curchild);
                 }
                 endInsertRows();
@@ -224,12 +241,14 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
-        qDebug() << ((TreeModel*)ui->dirTreeView->model())->canFetchMore(index);
-        //((TreeModel*)ui->dirTreeView->model())->beginResetModel();
-        if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
-            ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
-        //((TreeModel*)ui->dirTreeView->model())->endResetModel();
-        ResizeViewColumns(index);
+        QModelIndex sourceindex = ((CheckableProxyModel*)ui->dirTreeView->model())->mapToSource(index);
+        if(((TreeModel*)((CheckableProxyModel*)ui->dirTreeView->model())->sourceModel())->canFetchMore(sourceindex))
+            ((TreeModel*)((CheckableProxyModel*)ui->dirTreeView->model())->sourceModel())->fetchMore(sourceindex);
+        //if(((TreeModel*)checkableproxy->sourceModel())->canFetchMore(index))
+            //((TreeModel*)checkableproxy->sourceModel())->fetchMore(index);
+        //if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
+            //((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
+        ResizeViewColumns(sourceindex);
     };
     void FileExport(FileExportData* exportdata);
     void setScrollBarRange(off_t low, off_t high);

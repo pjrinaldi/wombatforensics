@@ -242,69 +242,6 @@ void WombatForensics::InitializeQueryModel()
         //qDebug() << "currentfilesystemid: " << wombatvarptr->currentfilesystemid;
         wombatdatabase->GetRootInum();
         wombatdatabase->GetRootNodes();
-        // SETUPS THE ROOT NOTES, WHICH I CAN THEN MAKE VISIBLE IN THE MODEL...
-        //Node* rootnode = 0;
-        //Node* parentnode = 0;
-        //Node* dummynode = 0;
-        //Node* currentnode = 0;
-        //QList<QVariant> colvalues;
-        //qDebug() << "currentrootinum: " << wombatvarptr->currentrootinum;
-        /*
-        Node* currentnode = 0;
-        Node* parentnode = 0;
-        Node* rootnode = 0;
-        Node* missingnode = 0;
-        Node* dummynode = 0;
-        int nodefound = 0;
-        QList<QVariant> colvalues;
-
-        QSqlQuery dataquery(fcasedb);
-        dataquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data");
-        if(dataquery.exec())
-        {
-            while(dataquery.next())
-            {
-                currentnode = 0;
-                colvalues.clear();
-                for(int i=0; i < dataquery.record().count(); i++)
-                {
-                    colvalues.append(dataquery.value(i));
-                }
-                currentnode = new Node(colvalues);
-                if(dataquery.value(4).toInt() < 5) // not file or directory
-                {
-                    if(dataquery.value(4).toInt() == 1) // image node
-                    {
-                        dummynode = new Node(colvalues);
-                        dummynode->children.append(currentnode);
-                        currentnode->parent = dummynode;
-                        //qDebug() << "objtype = 1 objid: " << currentnode->nodevalues.at(0).toInt();
-                        parentnode = currentnode;
-                    }
-                    else // volume/partition/filesystem node
-                    {
-                        //qDebug() << "objtype < 5 objid: " << currentnode->nodevalues.at(0).toInt();
-                        parentnode->children.append(currentnode);
-                        currentnode->parent = parentnode;
-                        parentnode = currentnode;
-                    }
-                }
-                else // file or directory nodes.
-                {
-                    nodefound = FindParentNode(currentnode, parentnode, wombatvarptr->currentrootinum);*/
-                    /*
-                    qDebug() << "Node found: " << nodefound;
-                    if(nodefound)
-                    {
-                        qDebug() << "node was found.";
-                    }
-                    else
-                    {
-                        qDebug() << "node wasn't found. check inum.";
-                    }*/ 
-                //}
-            //}
-        //}
 
         TreeModel* treemodel = new TreeModel(this);
         //new ModelTest(treemodel, this);
@@ -313,11 +250,11 @@ void WombatForensics::InitializeQueryModel()
         checkableproxy = new CheckableProxyModel(this);
         checkableproxy->setSourceModel(treemodel);
         ui->dirTreeView->setAllColumnsShowFocus(true);
-        //ui->dirTreeView->setModel(checkableproxy);
-        ui->dirTreeView->setModel(treemodel);
-        ui->dirTreeView->hideColumn(4);
-        ui->dirTreeView->hideColumn(5);
-        ui->dirTreeView->hideColumn(11);
+        ui->dirTreeView->setModel(checkableproxy);
+        //ui->dirTreeView->setModel(treemodel);
+        //ui->dirTreeView->hideColumn(4);
+        //ui->dirTreeView->hideColumn(5);
+        //ui->dirTreeView->hideColumn(11);
 
         connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
         connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
@@ -882,12 +819,9 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
-    //for(int i=0; i < ((FileViewSqlModel*)ui->dirTreeView->model())->columnCount(); i++)
-    for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
+    //for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
+    for(int i=0; i < ((TreeModel*)checkableproxy->sourceModel())->columnCount(QModelIndex()); i++)
     {
-        // may need to compare treeview->model() == currentmodel) to determine what to set it to.
-        // depending on the design though, i may not need multiple layouts since the columns can be sorted.
-        // have to see as i go. for now its good.
         ui->dirTreeView->resizeColumnToContents(i);
     }
 }
@@ -958,16 +892,18 @@ WombatForensics::~WombatForensics()
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
-    /*
+    
     if(ui->dirTreeView->model() != NULL)
     {
         if(checkableproxy->sourceModel() != NULL)
+        {
+        }
             //((FileViewSqlModel*)treeproxy->sourceModel())->clear(); // clear sql so db can be closed.
             //((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
             //((TreeModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
     }
     //((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
-    */
+    
     //wombatprogresswindow->close();
     RemoveTmpFiles();
     // USE THIS FUNCTION AND PRINCIPLE TO BUILD THE PROGRESS WINDOW FUNCTIONALITY.

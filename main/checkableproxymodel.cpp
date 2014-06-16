@@ -91,10 +91,11 @@ Qt::ItemFlags CheckableProxyModel::flags(const QModelIndex &index) const
     Qt::ItemFlags flags = sourceIndex.flags();
     if (index.column() == 0) {
         flags |= Qt::ItemIsUserCheckable;
+        /*
         if (sourceIndex.model()->hasChildren(sourceIndex)) {
         if(index.model()->hasChildren(index))
             flags |= Qt::ItemIsTristate;
-        }
+        }*/
     }
 
     return flags;
