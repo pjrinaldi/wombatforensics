@@ -243,14 +243,11 @@ void WombatForensics::InitializeQueryModel()
         wombatdatabase->GetRootInum();
         wombatdatabase->GetRootNodes();
 
-        TreeModel* treemodel = new TreeModel(this);
+        //TreeModel* treemodel = new TreeModel(this);
         //new ModelTest(treemodel, this);
         treemodel->SetRootNode(dummynode);
 
-        //checkableproxy = new CheckableProxyModel(this);
-        //checkableproxy->setSourceModel(treemodel);
         ui->dirTreeView->setAllColumnsShowFocus(true);
-        //ui->dirTreeView->setModel(checkableproxy);
         ui->dirTreeView->setModel(treemodel);
         ui->dirTreeView->hideColumn(4);
         ui->dirTreeView->hideColumn(5);

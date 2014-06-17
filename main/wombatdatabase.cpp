@@ -615,8 +615,6 @@ void WombatDatabase::GetRootNodes()
                 currentnode->haschildren = currentnode->HasChildren();
             }
             parentnode->children.append(currentnode);
-            //currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
-            //currentnode->haschildren = currentnode->HasChildren();
         }
     }
 }
