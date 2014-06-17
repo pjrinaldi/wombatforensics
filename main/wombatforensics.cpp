@@ -247,14 +247,14 @@ void WombatForensics::InitializeQueryModel()
         //new ModelTest(treemodel, this);
         treemodel->SetRootNode(dummynode);
 
-        checkableproxy = new CheckableProxyModel(this);
-        checkableproxy->setSourceModel(treemodel);
+        //checkableproxy = new CheckableProxyModel(this);
+        //checkableproxy->setSourceModel(treemodel);
         ui->dirTreeView->setAllColumnsShowFocus(true);
-        ui->dirTreeView->setModel(checkableproxy);
-        //ui->dirTreeView->setModel(treemodel);
-        //ui->dirTreeView->hideColumn(4);
-        //ui->dirTreeView->hideColumn(5);
-        //ui->dirTreeView->hideColumn(11);
+        //ui->dirTreeView->setModel(checkableproxy);
+        ui->dirTreeView->setModel(treemodel);
+        ui->dirTreeView->hideColumn(4);
+        ui->dirTreeView->hideColumn(5);
+        ui->dirTreeView->hideColumn(11);
 
         connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
         connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
@@ -269,7 +269,9 @@ void WombatForensics::InitializeQueryModel()
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
-    QModelIndex srcindex = checkableproxy->mapToSource(curitem.indexes().at(0));
+    //QModelIndex srcindex = checkableproxy->mapToSource(curitem.indexes().at(0));
+    //wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
+    QModelIndex srcindex = curitem.indexes().at(0);
     wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
     wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
     UpdateOmniValue();
@@ -655,9 +657,9 @@ void WombatForensics::ExportEvidence()
     int listcount = 0;
     QModelIndexList checkedfiles;
     QModelIndexList uncheckedfiles;
-    checkableproxy->checkedState()
-        .checkedLeafSourceModelIndexes(checkedfiles)
-        .uncheckedLeafSourceModelIndexes(uncheckedfiles);
+    //checkableproxy->checkedState()
+    //    .checkedLeafSourceModelIndexes(checkedfiles)
+    //    .uncheckedLeafSourceModelIndexes(uncheckedfiles);
 
     qDebug() << "# checked files:" << checkedfiles.count(); 
     listcount = checkedfiles.count() + uncheckedfiles.count();
@@ -819,8 +821,8 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
-    //for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
-    for(int i=0; i < ((TreeModel*)checkableproxy->sourceModel())->columnCount(QModelIndex()); i++)
+    //for(int i=0; i < ((TreeModel*)checkableproxy->sourceModel())->columnCount(QModelIndex()); i++)
+    for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
     {
         ui->dirTreeView->resizeColumnToContents(i);
     }
@@ -895,9 +897,9 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     
     if(ui->dirTreeView->model() != NULL)
     {
-        if(checkableproxy->sourceModel() != NULL)
-        {
-        }
+        //if(checkableproxy->sourceModel() != NULL)
+        //{
+        //}
             //((FileViewSqlModel*)treeproxy->sourceModel())->clear(); // clear sql so db can be closed.
             //((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
             //((TreeModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.

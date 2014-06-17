@@ -10,7 +10,7 @@
 #include "progresswindow.h"
 #include "exportdialog.h"
 #include "globals.h"
-#include "checkableproxymodel.h"
+//#include "checkableproxymodel.h"
 #include "../modeltest/modeltest.h"
 
 
@@ -211,7 +211,7 @@ public:
     WombatFramework* wombatframework;
     //ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
-    CheckableProxyModel* checkableproxy;
+    //CheckableProxyModel* checkableproxy;
     TreeModel* treemodel;
 
 signals:
@@ -241,14 +241,14 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
-        QModelIndex sourceindex = ((CheckableProxyModel*)ui->dirTreeView->model())->mapToSource(index);
-        if(((TreeModel*)((CheckableProxyModel*)ui->dirTreeView->model())->sourceModel())->canFetchMore(sourceindex))
-            ((TreeModel*)((CheckableProxyModel*)ui->dirTreeView->model())->sourceModel())->fetchMore(sourceindex);
+        //QModelIndex sourceindex = ((CheckableProxyModel*)ui->dirTreeView->model())->mapToSource(index);
+        //if(((TreeModel*)((CheckableProxyModel*)ui->dirTreeView->model())->sourceModel())->canFetchMore(sourceindex))
+            //((TreeModel*)((CheckableProxyModel*)ui->dirTreeView->model())->sourceModel())->fetchMore(sourceindex);
         //if(((TreeModel*)checkableproxy->sourceModel())->canFetchMore(index))
             //((TreeModel*)checkableproxy->sourceModel())->fetchMore(index);
-        //if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
-            //((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
-        ResizeViewColumns(sourceindex);
+        if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
+            ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
+        ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
     void setScrollBarRange(off_t low, off_t high);
