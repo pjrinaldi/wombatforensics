@@ -91,11 +91,10 @@ Qt::ItemFlags CheckableProxyModel::flags(const QModelIndex &index) const
     Qt::ItemFlags flags = sourceIndex.flags();
     if (index.column() == 0) {
         flags |= Qt::ItemIsUserCheckable;
-        /*
-        if (sourceIndex.model()->hasChildren(sourceIndex)) {
+        //if (sourceIndex.model()->hasChildren(sourceIndex)) {
         if(index.model()->hasChildren(index))
             flags |= Qt::ItemIsTristate;
-        }*/
+        //}
     }
 
     return flags;
@@ -122,6 +121,24 @@ QVariant CheckableProxyModel::data(const QModelIndex &index, int role) const
     }
 
     return sourceIndex.data(role);
+}
+
+bool CheckableProxyModel::canFetchMore(const QModelIndex &parent) const
+{
+    QModelIndex sourceindex = mapToSource(parent);
+    return sourceModel()->canFetchMore(sourceindex);
+}
+
+void CheckableProxyModel::fetchMore(const QModelIndex &parent)
+{
+    QModelIndex sourceindex = mapToSource(parent);
+    sourceModel()->fetchMore(sourceindex);
+}
+
+bool CheckableProxyModel::hasChildren(const QModelIndex &parent = QModelIndex()) const
+{
+    QModelIndex sourceindex = mapToSource(parent);
+    return sourceModel()->hasChildren(sourceindex);
 }
 
 

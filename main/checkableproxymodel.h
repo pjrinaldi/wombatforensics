@@ -16,6 +16,10 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (C) 2014 Pasquale J. Rinaldi, Jr. <pjrinaldi@gmail.com>
+    adding hasChildren() fetchMore() and canFetchMore() to implement
+    sourcemodel equivalents.
 */
 #ifndef CHECKABLEPROXYMODEL_H
 #define CHECKABLEPROXYMODEL_H
@@ -44,6 +48,9 @@ public:
     virtual QVariant data(const QModelIndex &index, int role) const;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
     virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+    virtual bool canFetchMore(const QModelIndex &parent) const;
+    virtual void fetchMore(const QModelIndex &parent);
+    virtual bool hasChildren(const QModelIndex &parent) const;
 
     bool defaultCheckStateIsChecked() const;
 
