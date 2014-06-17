@@ -560,6 +560,7 @@ void WombatDatabase::GetRootNodes()
         {
             colvalues.append(wombatptr->sqlrecords[i].value(j));
         }
+        qDebug() << colvalues.at(0).toInt() << ": " << colvalues.at(1).toString();
         currentnode = new Node(colvalues);
         if(colvalues.at(4).toInt() < 5) // not file or directory
         {
@@ -601,8 +602,8 @@ void WombatDatabase::GetRootNodes()
         }
         else // its a file or directory with rootinum for a parent
         {
+            qDebug() << currentnode->nodevalues.at(0).toInt() << ": " << currentnode->nodevalues.at(1).toString();
             currentnode->parent = parentnode;
-            parentnode->children.append(currentnode);
             if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
             {
                 currentnode->childcount = 0;
@@ -613,6 +614,7 @@ void WombatDatabase::GetRootNodes()
                 currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
                 currentnode->haschildren = currentnode->HasChildren();
             }
+            parentnode->children.append(currentnode);
             //currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
             //currentnode->haschildren = currentnode->HasChildren();
         }
