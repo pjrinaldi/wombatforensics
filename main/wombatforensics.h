@@ -82,41 +82,28 @@ public:
     {
         if(index == QModelIndex())
             return QVariant();
-        //if(role != Qt::DisplayRole)
-            //return QVariant();
         Node* node = rootnode; 
         if(index.isValid())
             node = NodeFromIndex(index);
-        if(role == Qt::CheckStateRole || role == Qt::DisplayRole)
+        if(role == Qt::CheckStateRole)
         {
             if(index.column() == 0)
-            {
-                if(role == Qt::CheckStateRole)
-                    return QVariant(ResolveCheckStateRole(index));
-                //else
-                    //return QVariant();
-                if(role == Qt::DisplayRole)
-                    return node->nodevalues.at(index.column());
-            }
-        
+                return QVariant(ResolveCheckStateRole(index));
+            else
+                return QVariant();
+        }
+        if(role == Qt::DisplayRole)
+        {
             if(index.column() >= 6 && index.column() <= 9)
             {
-                if(role == Qt::CheckStateRole)
-                    return QVariant();
-                if(role == Qt::DisplayRole)
-                {
-                 char buf[128];
-                    QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
-                    return tmpstr;
-                }
+                char buf[128];
+                QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
+                return tmpstr;
             }
-            if(role == Qt::CheckStateRole)
-                return QVariant();
-            if(role == Qt::DisplayRole)
-                return node->nodevalues.at(index.column());
+            else return node->nodevalues.at(index.column());
         }
-        else
-            return QVariant();
+
+        return QVariant();
     };
 
     Qt::CheckState ResolveCheckStateRole(const QModelIndex &index) const
