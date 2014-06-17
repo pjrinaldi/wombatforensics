@@ -82,18 +82,46 @@ public:
     {
         if(index == QModelIndex())
             return QVariant();
-        if(role != Qt::DisplayRole)
-            return QVariant();
+        //if(role != Qt::DisplayRole)
+            //return QVariant();
         Node* node = rootnode; 
         if(index.isValid())
             node = NodeFromIndex(index);
-        if(index.column() >= 6 && index.column() <= 9)
+        if(role == Qt::CheckStateRole || role == Qt::DisplayRole)
         {
-            char buf[128];
-            QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
-            return tmpstr;
+            if(index.column() == 0)
+            {
+                if(role == Qt::CheckStateRole)
+                    return QVariant(ResolveCheckStateRole(index));
+                //else
+                    //return QVariant();
+                if(role == Qt::DisplayRole)
+                    return node->nodevalues.at(index.column());
+            }
+        
+            if(index.column() >= 6 && index.column() <= 9)
+            {
+                if(role == Qt::CheckStateRole)
+                    return QVariant();
+                if(role == Qt::DisplayRole)
+                {
+                 char buf[128];
+                    QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
+                    return tmpstr;
+                }
+            }
+            if(role == Qt::CheckStateRole)
+                return QVariant();
+            if(role == Qt::DisplayRole)
+                return node->nodevalues.at(index.column());
         }
-        return node->nodevalues.at(index.column());
+        else
+            return QVariant();
+    };
+
+    Qt::CheckState ResolveCheckStateRole(const QModelIndex &index) const
+    {
+        return Qt::Unchecked;
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -108,10 +136,20 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const
     {
+        Qt::ItemFlags flags = QAbstractItemModel::flags(index);
+
         if(!index.isValid())
-            return 0;
+            return Qt::NoItemFlags;
+        if(index == QModelIndex())
+            return Qt::NoItemFlags;
+        if(index.column() == 0)
+        {
+            flags |= Qt::ItemIsUserCheckable;
+            if(index.model()->hasChildren(index))
+                flags |= Qt::ItemIsTristate;
+        }
         
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+        return flags;
     };
 
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const
