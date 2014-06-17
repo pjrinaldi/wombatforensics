@@ -603,8 +603,18 @@ void WombatDatabase::GetRootNodes()
         {
             currentnode->parent = parentnode;
             parentnode->children.append(currentnode);
-            currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
-            currentnode->haschildren = currentnode->HasChildren();
+            if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
+            {
+                currentnode->childcount = 0;
+                currentnode->haschildren = false;
+            }
+            else
+            {
+                currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
+                currentnode->haschildren = currentnode->HasChildren();
+            }
+            //currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
+            //currentnode->haschildren = currentnode->HasChildren();
         }
     }
 }
