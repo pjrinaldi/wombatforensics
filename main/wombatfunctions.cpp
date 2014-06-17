@@ -36,6 +36,8 @@ int GetChildCount(int type, int address)
     QString querystring = "SELECT COUNT(objectid) FROM data WHERE parentid = ?";
     if(type < 4)
         querystring += " AND objecttype < 5";
+    else
+        querystring += " AND objecttype = 5";
     childquery.prepare(querystring);
     childquery.addBindValue(address);
     if(childquery.exec())
