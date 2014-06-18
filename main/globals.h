@@ -41,8 +41,8 @@ public:
         }
         parent = 0;
         haschildren = false;
-        checkstate = Qt::Unchecked;
-        nodecheckstate = Node::Unchecked;
+        //checkstate = Qt::Unchecked;
+        nodecheckstate = 3;
     };
 
     ~Node()
@@ -55,7 +55,7 @@ public:
     QList<Node*> children;
     bool haschildren;
     int childcount;
-    Qt::CheckState checkstate;
+    //Qt::CheckState checkstate;
     int nodecheckstate;
     bool HasChildren(void)
     {
@@ -63,14 +63,14 @@ public:
             return true;
         return false;
     };
-
+/*
     enum NodeCheckState
     {
         Parent = 0,
         Child = 1,
         Checked = 2,
         Unchecked = 3
-    };
+    };*/
 };
 
 extern Node* rootnode;

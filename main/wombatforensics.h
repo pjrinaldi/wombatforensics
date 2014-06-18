@@ -114,36 +114,6 @@ public:
         }
     };
 
-    Qt::CheckState ResolveCheckStateRole(const QModelIndex &index) const
-    {
-        // use this function to determine what value is set for the current node.
-        Node* currentnode = NodeFromIndex(index);
-
-        if(currentnode->nodecheckstate == Node::Parent)
-        {
-            return Qt::Checked;
-        }
-        else if(currentnode->nodecheckstate == Node::Child)
-        {
-            return Qt::Checked;
-        }
-        else if(currentnode->nodecheckstate == Node::Checked)
-        {
-            return Qt::Checked;
-        }
-        else if(currentnode->nodecheckstate == Node::Unchecked)
-        {
-            return Qt::Unchecked;
-        }
-
-        return Qt::Unchecked;
-    };
-
-    bool SetCheckState(const QModelIndex &index, Qt::CheckState state)
-    {
-        // use this function to set the new checkstate as well as parents or children where appropriate.
-    };
-
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
     {
         if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
@@ -244,8 +214,37 @@ private:
         else
             return rootnode;
     };
-    
-    Node* rootnode;
+
+    Qt::CheckState ResolveCheckStateRole(const QModelIndex &index) const
+    {
+        // use this function to determine what value is set for the current node.
+        Node* currentnode = NodeFromIndex(index);
+        if(currentnode->nodecheckstate == 0)
+        {
+            return Qt::Checked;
+        }
+        else if(currentnode->nodecheckstate == 1)
+        {
+            return Qt::Checked;
+        }
+        else if(currentnode->nodecheckstate == 2)
+        {
+            return Qt::Checked;
+        }
+        else if(currentnode->nodecheckstate == 3)
+        {
+            return Qt::Unchecked;
+        }
+
+        return Qt::Unchecked;
+    };
+
+    bool SetCheckState(const QModelIndex &index, Qt::CheckState state)
+    {
+        // use this function to set the new checkstate as well as parents or children where appropriate.
+    };
+   
+    //Node* rootnode;
     QStringList headerdata;
 };
 
@@ -268,7 +267,6 @@ public:
     WombatFramework* wombatframework;
     //ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
-    //CheckableProxyModel* checkableproxy;
     TreeModel* treemodel;
 
 signals:
