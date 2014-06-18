@@ -87,8 +87,7 @@ public:
         if(role == Qt::CheckStateRole)
         {
             if(index.column() == 0)
-                return node->checkstate;
-                //return QVariant(ResolveCheckStateRole(index));
+                return QVariant(GetCheckState(node));
             else
                 return QVariant();
         }
@@ -113,7 +112,6 @@ public:
         {
             Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
             return SetCheckState(index, state);
-            //return true;
         }
     };
 
@@ -217,33 +215,51 @@ private:
         else
             return rootnode;
     };
-/*
-    Qt::CheckState ResolveCheckStateRole(const QModelIndex &index) const
+
+    Qt::CheckState GetCheckState(Node* curnode) const
     {
-        // use this function to determine what value is set for the current node.
-        Node* currentnode = NodeFromIndex(index);
-        if(currentnode->checkstate == 0)
+        if(curnode->checkstate == 0) // determined by parent
         {
-            return Qt::Checked;
+            return GetCheckState(curnode->parent);
         }
-        else if(currentnode->checkstate == 1)
+        else if(curnode->checkstate == 1) // determined by child
         {
-            return Qt::Checked;
-        }
-        else if(currentnode->checkstate == 2)
-        {
-            return Qt::Checked;
-        }
-        else if(currentnode->checkstate == 3)
-        {
+            int checkcount = 0;
+            for(int i=0; i < curnode->children.count(); i++)
+            {
+                if(curnode->children.at(i)->checkstate == 2)
+                    checkcount++;
+            }
+            if(curnode->childcount < checkcount)
+                return Qt::PartiallyChecked;
+            else if(curnode->childcount == checkcount)
+                return Qt::Checked;
             return Qt::Unchecked;
         }
+        else if(curnode->checkstate == 2)
+            return Qt::Checked;
+        else if(curnode->checkstate == 3)
+            return Qt::Unchecked;
 
         return Qt::Unchecked;
     };
-*/
+
     bool SetCheckState(const QModelIndex &index, Qt::CheckState state)
     {
+        Node* curnode = NodeFromIndex(index);
+        int oldcheckstate = curnode->checkstate;
+        if(state == Qt::Unchecked)
+        {
+            if(oldcheckstate == 0) // determined by parent
+            {
+                curnode->checkstate = 3;
+            }
+            else if(oldcheckstate == 1) // determined by child
+            {
+                for(int i=0; i < curnode->children.count(); i++)
+                    curnode->children.at(i)->checkstate = 3;
+            }
+        }
         // use this function to set the new checkstate as well as parents or children where appropriate.
         return false;
     };
