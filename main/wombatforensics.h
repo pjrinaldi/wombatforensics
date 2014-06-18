@@ -10,7 +10,7 @@
 #include "progresswindow.h"
 #include "exportdialog.h"
 #include "globals.h"
-//#include "../modeltest/modeltest.h"
+#include "../modeltest/modeltest.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -100,21 +100,22 @@ public:
                 QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
                 return tmpstr;
             }
-            else return node->nodevalues.at(index.column());
+            else
+                return node->nodevalues.at(index.column());
         }
 
         return QVariant();
     };
-/*
+
     bool setData(const QModelIndex &index, const QVariant &value, int role)
     {
         if(index.column() == 0 && role == Qt::CheckStateRole)
         {
-            //Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
-            //return SetCheckState(index, state);
-            return true;
+            Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
+            return SetCheckState(index, state);
+            //return true;
         }
-    };*/
+    };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
     {
@@ -239,13 +240,13 @@ private:
         }
 
         return Qt::Unchecked;
-    };*/
-/*
+    };
+*/
     bool SetCheckState(const QModelIndex &index, Qt::CheckState state)
     {
         // use this function to set the new checkstate as well as parents or children where appropriate.
         return false;
-    };*/
+    };
    
     //Node* rootnode;
     QStringList headerdata;

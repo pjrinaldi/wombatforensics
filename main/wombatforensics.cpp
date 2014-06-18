@@ -243,7 +243,7 @@ void WombatForensics::InitializeQueryModel()
         wombatdatabase->GetRootInum();
         wombatdatabase->GetRootNodes();
 
-        //TreeModel* treemodel = new TreeModel(this);
+        TreeModel* treemodel = new TreeModel(this);
         //new ModelTest(treemodel, this);
         treemodel->SetRootNode(dummynode);
 
