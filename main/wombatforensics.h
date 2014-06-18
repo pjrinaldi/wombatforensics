@@ -10,8 +10,7 @@
 #include "progresswindow.h"
 #include "exportdialog.h"
 #include "globals.h"
-//#include "checkableproxymodel.h"
-#include "../modeltest/modeltest.h"
+//#include "../modeltest/modeltest.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -106,9 +105,18 @@ public:
         return QVariant();
     };
 
+    bool setData(const QModelIndex &index, const QVariant &value, int role)
+    {
+        if(index.column() == 0 && role == Qt::CheckStateRole)
+        {
+            Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
+            return SetCheckState(index, state);
+        }
+    };
+
     Qt::CheckState ResolveCheckStateRole(const QModelIndex &index) const
     {
-        // use this function to determine what value is set.
+        // use this function to determine what value is set for the current node.
         Node* currentnode = NodeFromIndex(index);
 
         if(currentnode->nodecheckstate == Node::Parent)
@@ -127,8 +135,13 @@ public:
         {
             return Qt::Unchecked;
         }
-        return Qt::Unchecked;
 
+        return Qt::Unchecked;
+    };
+
+    bool SetCheckState(const QModelIndex &index, Qt::CheckState state)
+    {
+        // use this function to set the new checkstate as well as parents or children where appropriate.
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -198,7 +211,6 @@ public:
             morequery.addBindValue(parentnode->nodevalues.at(5).toInt());
             if(morequery.exec())
             {
-                //qDebug() << "Parentnode childcount: " << parentnode->childcount;
                 beginInsertRows(parent, 0, parentnode->childcount - 1);
                 while(morequery.next())
                 {
@@ -286,11 +298,6 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
-        //QModelIndex sourceindex = ((CheckableProxyModel*)ui->dirTreeView->model())->mapToSource(index);
-        //if(((TreeModel*)((CheckableProxyModel*)ui->dirTreeView->model())->sourceModel())->canFetchMore(sourceindex))
-            //((TreeModel*)((CheckableProxyModel*)ui->dirTreeView->model())->sourceModel())->fetchMore(sourceindex);
-        //if(((TreeModel*)checkableproxy->sourceModel())->canFetchMore(index))
-            //((TreeModel*)checkableproxy->sourceModel())->fetchMore(index);
         if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
         ResizeViewColumns(index);
@@ -362,33 +369,5 @@ private:
     //QStandardItemModel* wombatdirmodel;
     //QStandardItemModel* wombattypmodel;
 };
-
-/*
-class FileViewSqlModel : public QSqlQueryModel
-{
-    Q_OBJECT
-
-public:
-    FileViewSqlModel(QObject* parent = 0) : QSqlQueryModel(parent) {};
-
-    QVariant data(const QModelIndex &index, int role) const
-    {
-        QVariant value = QSqlQueryModel::data(index, role);
-        if(value.isValid() && role == Qt::DisplayRole)
-        {
-            if(index.column() >= 6 && index.column() <= 9)
-            {
-                char buf[128];
-                //QString tmpstr = QString(tsk_fs_time_to_str(value.toInt(), buf));
-                QString tmpstr = QString(TskTimeToStringUTC(value.toInt(), buf));
-
-                return tmpstr;
-            }
-        }
-
-        return value;
-    };
-};
-*/
 
 #endif // WOMBATFORENSICS_H
