@@ -41,8 +41,7 @@ public:
         }
         parent = 0;
         haschildren = false;
-        //checkstate = Qt::Unchecked;
-        nodecheckstate = 3;
+        checkstate = 3;
     };
 
     ~Node()
@@ -56,7 +55,7 @@ public:
     bool haschildren;
     int childcount;
     //Qt::CheckState checkstate;
-    int nodecheckstate;
+    int checkstate;
     bool HasChildren(void)
     {
         if(childcount > 0)

@@ -87,7 +87,8 @@ public:
         if(role == Qt::CheckStateRole)
         {
             if(index.column() == 0)
-                return QVariant(ResolveCheckStateRole(index));
+                return node->checkstate;
+                //return QVariant(ResolveCheckStateRole(index));
             else
                 return QVariant();
         }
@@ -104,15 +105,16 @@ public:
 
         return QVariant();
     };
-
+/*
     bool setData(const QModelIndex &index, const QVariant &value, int role)
     {
         if(index.column() == 0 && role == Qt::CheckStateRole)
         {
-            Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
-            return SetCheckState(index, state);
+            //Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
+            //return SetCheckState(index, state);
+            return true;
         }
-    };
+    };*/
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
     {
@@ -214,35 +216,36 @@ private:
         else
             return rootnode;
     };
-
+/*
     Qt::CheckState ResolveCheckStateRole(const QModelIndex &index) const
     {
         // use this function to determine what value is set for the current node.
         Node* currentnode = NodeFromIndex(index);
-        if(currentnode->nodecheckstate == 0)
+        if(currentnode->checkstate == 0)
         {
             return Qt::Checked;
         }
-        else if(currentnode->nodecheckstate == 1)
+        else if(currentnode->checkstate == 1)
         {
             return Qt::Checked;
         }
-        else if(currentnode->nodecheckstate == 2)
+        else if(currentnode->checkstate == 2)
         {
             return Qt::Checked;
         }
-        else if(currentnode->nodecheckstate == 3)
+        else if(currentnode->checkstate == 3)
         {
             return Qt::Unchecked;
         }
 
         return Qt::Unchecked;
-    };
-
+    };*/
+/*
     bool SetCheckState(const QModelIndex &index, Qt::CheckState state)
     {
         // use this function to set the new checkstate as well as parents or children where appropriate.
-    };
+        return false;
+    };*/
    
     //Node* rootnode;
     QStringList headerdata;
