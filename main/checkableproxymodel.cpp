@@ -363,7 +363,7 @@ bool CheckableProxyModel::setCheckState(QModelIndex sourceIndex, Qt::CheckState 
         changedIndices << currentParent;
 
 #ifdef CHECKABLEPROXYMODEL_DEBUG
-        qDebug() << "updated node" << currentParent << currentParent.data(Qt::DisplayRole) << parentNodeState.nodeState << parentNodeState.defaultChildState;
+        qDebug() << "updated node" << currentParent << currentParent.data(Qt::DisplayRole) << parentNodeState.nodeState << parentfResolv.defaultChildState;
 #endif
 
         currentParent = currentParent.parent();

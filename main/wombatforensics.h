@@ -108,7 +108,27 @@ public:
 
     Qt::CheckState ResolveCheckStateRole(const QModelIndex &index) const
     {
+        // use this function to determine what value is set.
+        Node* currentnode = NodeFromIndex(index);
+
+        if(currentnode->nodecheckstate == Node::Parent)
+        {
+            return Qt::Checked;
+        }
+        else if(currentnode->nodecheckstate == Node::Child)
+        {
+            return Qt::Checked;
+        }
+        else if(currentnode->nodecheckstate == Node::Checked)
+        {
+            return Qt::Checked;
+        }
+        else if(currentnode->nodecheckstate == Node::Unchecked)
+        {
+            return Qt::Unchecked;
+        }
         return Qt::Unchecked;
+
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -212,7 +232,7 @@ private:
         else
             return rootnode;
     };
-
+    
     Node* rootnode;
     QStringList headerdata;
 };
