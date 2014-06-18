@@ -254,10 +254,29 @@ private:
             {
                 curnode->checkstate = 3;
             }
-            else if(oldcheckstate == 1) // determined by child
+            else if(oldcheckstate == 1) // determined by child partially checked
             {
+                curnode->checkstate = 3;
                 for(int i=0; i < curnode->children.count(); i++)
                     curnode->children.at(i)->checkstate = 3;
+            }
+            else if(oldcheckstate == 2 && curnode->haschildren == true) // checked and children are checked.
+            {
+                curnode->checkstate = 3;
+                for(int i=0; i < curnode->children.count(); i++)
+                    curnode->children.at(i)->checkstate = 3;
+            }
+            else if(oldcheckstate == 3) // unchecked already
+                return false;
+
+            return true;
+        }
+        else if(state == Qt::Checked)
+        {
+            if(oldcheckstate == 0) // determined by parent
+            {
+                curnode->checkstate = 2;
+                // figure out more
             }
         }
         // use this function to set the new checkstate as well as parents or children where appropriate.
