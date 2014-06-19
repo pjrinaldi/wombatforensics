@@ -54,7 +54,6 @@ public:
     QList<Node*> children;
     bool haschildren;
     int childcount;
-    //Qt::CheckState checkstate;
     int checkstate;
     bool HasChildren(void)
     {
@@ -62,11 +61,6 @@ public:
             return true;
         return false;
     };
-/*
-    Unchecked = 0,
-    Partial = 1,
-    Checked = 2,
-*/
 };
 
 extern Node* rootnode;

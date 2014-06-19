@@ -236,11 +236,12 @@ private:
         int checkcount = 0;
         for(int i=0; i < curnode->children.count(); i++)
         {
-            if(curnode->children[i]->checkstate == 2)
+            if(curnode->children[i]->checkstate == 2 || curnode->children[i]->checkstate == 1)
                 checkcount++;
+
         }
         qDebug() << curnode->nodevalues.at(0).toInt() << "child count:" << curnode->childcount << "check count:" << checkcount; 
-        if(curnode->childcount > checkcount)
+        if(curnode->childcount > checkcount && checkcount > 0)
             curnode->checkstate = 1;
         else if(curnode->childcount == checkcount)
             curnode->checkstate = 2;
@@ -262,6 +263,7 @@ private:
             if(curnode->children[i]->haschildren)
                 SetChildCheckState(index.child(i,0));
         }
+        //emit dataChanged(index, index);
         emit checkedNodesChanged();
     };
 
@@ -280,7 +282,8 @@ private:
         else if(state == Qt::Checked) // currentnode is now checked
         {
             curnode->checkstate = 2;
-            SetChildCheckState(index);
+            if(curnode->haschildren)
+                SetChildCheckState(index);
         }
         emit dataChanged(index, index);
         emit checkedNodesChanged();
