@@ -238,9 +238,7 @@ private:
         {
             if(curnode->children[i]->checkstate == 2 || curnode->children[i]->checkstate == 1)
                 checkcount++;
-
         }
-        qDebug() << curnode->nodevalues.at(0).toInt() << "child count:" << curnode->childcount << "check count:" << checkcount; 
         if(curnode->childcount > checkcount && checkcount > 0)
             curnode->checkstate = 1;
         else if(curnode->childcount == checkcount)
@@ -263,14 +261,12 @@ private:
             if(curnode->children[i]->haschildren)
                 SetChildCheckState(index.child(i,0));
         }
-        //emit dataChanged(index, index);
         emit checkedNodesChanged();
     };
 
     bool SetCheckState(const QModelIndex &index, Qt::CheckState state)
     {
         Node* curnode = NodeFromIndex(index);
-        qDebug() << "old nodestate is: " << curnode->checkstate << " and change checked state to: " << state;
         if(state == Qt::Unchecked) // curnode is now unchecked...
         {
             curnode->checkstate = 0;
