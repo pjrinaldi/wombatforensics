@@ -165,6 +165,8 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
     if(_offset+numbytes >= size())
     {
         _eof = true;
+        if(size() == 0)
+            v.erase(v.begin(), v.end()); // added to clear the previous values when a file is of size 0
         lastPageIdx = _data.size()-1;
         bytesread = size() - tell();
         numbytes = bytesread;
@@ -332,7 +334,6 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     _data[pageIdx] = new uchar[_pageSize];
     --nFreePages();
-
     //tsk img read from new offset...
     // possibly need to make it pageidx*_pagesize + tskptr->offset for the imageoffset.
     if(tskptr->objecttype < 5)
@@ -344,19 +345,20 @@ bool Reader::loadimagepage(off_t pageIdx)
     {
         retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     }
-    if(retval)
+    if(retval > 0)
     {
         if(pageIdx < _firstPage)
             _firstPage = pageIdx;
         if(pageIdx > _lastPage)
             _lastPage = pageIdx;
     }
+    else
+    {
+        fill( _data.begin(), _data.begin()+1, (uchar*)0 );
+        // try to set the page data to zero's here...
+    }
 
-    return retval;
-    /*if(retval > 0)
-        wombatptr->rawbyteintvector.resize(wombatptr->evidenceobject.imageinfo->sector_size);
-            wombatptr->rawbyteintvector[i] = bootbuffer[i];
-*/
+    return 1;
 }
 
 bool Reader::loadPage(off_t pageIdx)
