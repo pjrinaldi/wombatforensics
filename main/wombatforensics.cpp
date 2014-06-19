@@ -652,15 +652,16 @@ int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount
 void WombatForensics::ExportEvidence()
 {
     int listcount = 0;
-    QModelIndexList checkedfiles;
-    QModelIndexList uncheckedfiles;
+    int checkedcount = 0;
+    //QModelIndexList checkedfiles;
+    //QModelIndexList uncheckedfiles;
     //checkableproxy->checkedState()
     //    .checkedLeafSourceModelIndexes(checkedfiles)
     //    .uncheckedLeafSourceModelIndexes(uncheckedfiles);
 
-    qDebug() << "# checked files:" << checkedfiles.count(); 
-    listcount = checkedfiles.count() + uncheckedfiles.count();
-    exportdialog = new ExportDialog(this, checkedfiles.count(), listcount);
+    //qDebug() << "# checked files:" << checkedfiles.count(); 
+    //listcount = checkedfiles.count() + uncheckedfiles.count();
+    exportdialog = new ExportDialog(this, checkedcount, listcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
     exportdialog->show();
 }
