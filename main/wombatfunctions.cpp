@@ -46,46 +46,7 @@ int GetChildCount(int type, int address)
         return childquery.value(0).toInt();
     }
 }
-/*
-int FindParentNode(Node* curnode, Node* parnode, int rootinum)
-{
-    if(curnode->nodevalues.at(11).toInt() == rootinum)
-    {
-        parnode->children.append(curnode);
-        curnode->parent = parnode;
-        curnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
-        curnode->haschildren = curnode->HasChildren();
-        return 1;
-    }
-    else
-    {
-        if(parnode->nodevalues.at(5).toInt() == curnode->nodevalues.at(11).toInt()) // parent address == cur parentid
-        {
-            parnode->children.append(curnode);
-            curnode->parent = parnode;
-            if(QString(".").compare(curnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(curnode->nodevalues.at(1).toString()) == 0)
-            {
-                curnode->childcount = 0;
-                curnode->haschildren = false;
-            }
-            else
-            {
-                curnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
-                curnode->haschildren = curnode->HasChildren();
-            }
-            return 1;
-        }
-        else
-        {
-            for(int i=0; i < parnode->children.count(); i++)
-            {
-                FindParentNode(curnode, parnode->children.at(i), rootinum);
-            }
-        }
-        return 0;
-    }
-}
-*/
+
 bool FileExists(const std::string& filename)
 {
     struct stat buf;

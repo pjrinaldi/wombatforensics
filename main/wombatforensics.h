@@ -10,7 +10,6 @@
 #include "progresswindow.h"
 #include "exportdialog.h"
 #include "globals.h"
-#include "../modeltest/modeltest.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -341,8 +340,6 @@ private slots:
     void UpdateProgress(int count, int processcount);
     void UpdateMessageTable();
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
-    //void CurrentChanged(const QModelIndex &selindex, const QModelIndex &previndex);
-    //void dirTreeView_selectionChanged(const QModelIndex &index);
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void PopulateProgressWindow(WombatVariable* wvariable);
@@ -368,7 +365,6 @@ private slots:
     void ViewGroupTriggered(QAction* curaction);
     void LoadComplete(bool isok);
     void InitializeQueryModel(void);
-    void UpdateTree(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -382,7 +378,6 @@ private:
     void InitializeEvidenceStructure(void);
     void InitializeOpenCase(void);
     void InitializeWombatFramework(void);
-    void InitializeDirModel(void);
     void UpdateViewer(void);
     void UpdateOmniValue(void);
     void LoadHexContents(void);
@@ -393,8 +388,6 @@ private:
 
     void RemoveTmpFiles(void);
 
-    //QStandardItem* GetCurrentImageDirectoryTree(QObject *plugin, QString imageDbPath, QString imageName);
-    //QThreadPool* threadpool;
     int ReturnVisibleViewerID();
     int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
     int StandardItemListCount(QStandardItem* tmpitem, int listcount);
@@ -421,11 +414,6 @@ private:
     QLabel* selecteddouble;
     QProgressBar* mainprogress;
     QLabel* filecountlabel;
-
-    // NEED TO REMOVE THESE ONCE I GET MY FUNCTIONS DONE AND REMOVE THE OLD STRUCTURE
-    //QStandardItemModel* currenttreemodel;
-    //QStandardItemModel* wombatdirmodel;
-    //QStandardItemModel* wombattypmodel;
 };
 
 #endif // WOMBATFORENSICS_H

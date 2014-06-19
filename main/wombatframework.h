@@ -15,12 +15,10 @@ public:
     void BuildEvidenceModel(void);
     void OpenEvidenceImage(void);
     void OpenEvidenceImages(void); // might not need this functions, since re-opening a case can pull it's info from the db.
-    void AddEvidenceNodes(void);
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);
     void OpenPartitions(void);
     void OpenFiles(void);
-    void AddPartitionNodes(int increment);
     void CloseInfoStructures(void);
     void ProcessFile(uint64_t inodeaddress, TSK_FS_INFO* fsinfo);
 

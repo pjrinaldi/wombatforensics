@@ -324,7 +324,6 @@ void WombatDatabase::InsertFileSystemObjects()
     {
         for(uint32_t i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
         {
-            //wombatptr->filesystemobject.name = QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype));
             wombatptr->currentfilesystemid = 0;
             wombatptr->bindvalues.clear();
             wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype)).toUpper());
@@ -340,7 +339,6 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->last_inum);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
             wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blockcount, firstinum, lastinum, rootinum) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-            //wombatptr->filesystemobject.id = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blockcount, firstinum, lastinum, rootinum) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
         }
     }
 }
@@ -385,7 +383,6 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->bindvalues.append(wombatptr->currentevidencename);
     wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]));
     wombatptr->currentevidenceid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath, parimgid) VALUES(1, ?, ?, ?, ?, ?, NULL);", wombatptr->bindvalues);
-    //qDebug() << "item count 2: " << wombatptr->evidenceobject.itemcount;
     currentevidenceid = wombatptr->currentevidenceid;
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
@@ -428,7 +425,6 @@ void WombatDatabase::GetEvidenceObjects()
     wombatptr->bindvalues.clear();
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT objectid, objecttype, type, size, sectsize, name, fullpath FROM data WHERE objecttype = 1;", wombatptr->bindvalues);
-    //qDebug() << "evid sqlrecords count: " << wombatptr->sqlrecords.count();
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         wombatptr->evidenceobject.id = wombatptr->sqlrecords[i].value(0).toInt();
@@ -441,14 +437,12 @@ void WombatDatabase::GetEvidenceObjects()
         wombatptr->evidenceobject.parimgid = NULL;
         wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
     }
-    //qDebug() << "evidobjvec count: " << wombatptr->evidenceobjectvector.count();
     for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
     {
         wombatptr->bindvalues.clear();
         wombatptr->sqlrecords.clear();
         wombatptr->bindvalues.append(wombatptr->evidenceobjectvector[i].id);
         wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
-        //qDebug() << "fullpath sqlrecords count: " << wombatptr->sqlrecords.count();
         for(int j=0; j < wombatptr->sqlrecords.count(); j++)
             wombatptr->evidenceobjectvector[i].fullpathvector.push_back(wombatptr->sqlrecords[j].value(0).toString().toStdString());
     }
@@ -543,7 +537,6 @@ void WombatDatabase::GetRootInum()
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->currentrootinum = wombatptr->sqlrecords[0].value(0).toInt();
-    qDebug() << "root inum: " << wombatptr->currentrootinum;
 }
 
 void WombatDatabase::GetRootNodes()
@@ -560,7 +553,6 @@ void WombatDatabase::GetRootNodes()
         {
             colvalues.append(wombatptr->sqlrecords[i].value(j));
         }
-        //qDebug() << colvalues.at(0).toInt() << ": " << colvalues.at(1).toString();
         currentnode = new Node(colvalues);
         if(colvalues.at(4).toInt() < 5) // not file or directory
         {
@@ -602,7 +594,6 @@ void WombatDatabase::GetRootNodes()
         }
         else // its a file or directory with rootinum for a parent
         {
-            //qDebug() << currentnode->nodevalues.at(0).toInt() << ": " << currentnode->nodevalues.at(1).toString();
             currentnode->parent = parentnode;
             if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
             {

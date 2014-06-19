@@ -27,99 +27,6 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     free(images);
 }
 
-void WombatFramework::AddEvidenceNodes() // add evidence node to the dirmodel
-{
-    /*
-    wombatptr->dirmodel->clear();
-    QStringList headerList;
-    headerList << "Name" << "Unique ID" << "Full Path" << "Size (Bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
-    wombatptr->dirmodel->setHorizontalHeaderLabels(headerList);
-    for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
-    {
-        QList<QStandardItem*> tmplist;
-        QStandardItem* tmpnode = new QStandardItem(QString::number(wombatptr->evidenceobjectvector[i].id));
-        tmpnode->setCheckable(true);
-        tmpnode->setIcon(QIcon(":/basic/treeimage"));
-        tmplist << tmpnode << new QStandardItem(wombatptr->evidenceobjectvector[i].name);
-        wombatptr->dirmodel->invisibleRootItem()->appendRow(tmplist);
-        AddPartitionNodes(i);
-    }
-    */
-}
-
-void WombatFramework::AddPartitionNodes(int increment) // add partition/fs nodes to the image node
-{
-    /*
-    QList<QStandardItem*> evidnode = wombatptr->dirmodel->findItems(QString::number(wombatptr->evidenceobjectvector[increment].id), Qt::MatchExactly, 0);
-    QList<QStandardItem*> tmplist;
-    QStandardItem* tmpnode;
-    QString tmpstring = "";
-    for(int j=0; j < wombatptr->volumeobjectvector.count(); j++)
-    {
-        if(wombatptr->evidenceobjectvector[increment].id == wombatptr->volumeobjectvector[j].parentid)
-        {
-            if(wombatptr->volumeobjectvector[j].childcount > 0)
-            {
-                for(int i=0; i < wombatptr->partitionobjectvector.count(); i++)
-                {
-                    if(wombatptr->volumeobjectvector[j].id == wombatptr->partitionobjectvector[i].parentid)
-                    {
-                        tmplist.clear();
-                        tmpstring = "";
-                        tmpnode = NULL;
-                        tmpnode = new QStandardItem(QString::number(wombatptr->partitionobjectvector[i].id));
-                        tmpnode->setCheckable(true);
-                        tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
-                        int bytestart = wombatptr->partitionobjectvector[i].sectstart * wombatptr->partitionobjectvector[i].blocksize;
-                        int byteend = wombatptr->partitionobjectvector[i].blocksize * (wombatptr->partitionobjectvector[i].sectstart + wombatptr->partitionobjectvector[i].sectlength) - 1;
-                        QString tmpstring = wombatptr->partitionobjectvector[i].name + " [" + QString::number(bytestart) + "-" + QString::number(byteend) + "]";
-                        tmplist << tmpnode << new QStandardItem(tmpstring);
-                        evidnode[0]->appendRow(tmplist);
-                    }
-                }
-            }
-            else
-            {
-                for(int i=0; i < wombatptr->filesystemobjectvector.count(); i++)
-                {
-                    if(wombatptr->volumeobjectvector[j].id == wombatptr->filesystemobjectvector[i].parentid)
-                    {
-                        tmplist.clear();
-                        tmpstring = "";
-                        tmpnode = NULL;
-                        tmpnode = new QStandardItem(QString::number(wombatptr->filesystemobjectvector[i].id));
-                        tmpnode->setCheckable(true);
-                        tmpnode->setIcon(QIcon(":/basic/treefilemanager"));
-                        int byteend = wombatptr->filesystemobjectvector[i].blocksize * wombatptr->filesystemobjectvector[i].blockcount;
-                        QString tmpstring = wombatptr->filesystemobjectvector[i].name + " [" + QString::number(wombatptr->filesystemobjectvector[i].byteoffset) + "-" + QString::number(byteend) + "]";
-                        tmplist << tmpnode << new QStandardItem(tmpstring);
-                        evidnode[0]->appendRow(tmplist);
-                    }
-                    else
-                    {
-                        //qDebug() << "fs if failed";
-                    }
-                }
-            }
-        }
-    }*/
-}
-
-/*
- * LoadChildren(qstandarditem* item, selected.id)
- * if(selected.id.childcount > 0)
- * fileobjectvector<fileobject>, fileobject has the respective file data including childcount and parentid.
- * expand a parent, children need to looped so they'yre children can be loaded.
- * need to determine what fileobject will contain.
- * loop over the nodes where parentid = selected.id
- * add nodes
- *
-void WombatFramework::AddFileNodes(int curidx)
-{
-    QList<QStandardItem*>
-}
- */ 
-
 void WombatFramework::OpenVolumeSystem() // open current volume system
 {
     wombatptr->evidenceobject.volinfo = tsk_vs_open(wombatptr->evidenceobject.imageinfo, 0, TSK_VS_TYPE_DETECT);
@@ -163,27 +70,6 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
 
 void WombatFramework::OpenFiles() // open the files and add to file info vector
 {
-    /*
-    // MY OWN WALK FUNCTION... I THINK THE TSK DIR WALK WORKS BETTER
-    for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
-    {
-        if(fcasedb.transaction())
-        {
-            for(uint64_t j=0; j < wombatptr->evidenceobject.fsinfovector[i]->inum_count; j++)
-            {
-               // LAUNCH EACH INUM FILE IN ITS OWN THREAD, THIS FUNCTION WILL GET THE INFO AND STORE IT IN THE DB.
-               // THIS SHOULD BE ABLE TO COMBINE THE GET FILE, GET VALUES, STORE VALUES, CLOSE FILE
-                QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatFramework::ProcessFile, j, wombatptr->evidenceobject.fsinfovector[i]);
-                filewatcher.setFuture(tmpfuture);
-                threadvector.append(tmpfuture);
-            }
-        }
-
-        //qDebug() << "first inum: " << wombatptr->evidenceobject.fsinfovector[i]->first_inum;
-        //qDebug() << "last inum: " << wombatptr->evidenceobject.fsinfovector[i]->last_inum;
-        //qDebug() << "inum count: " << wombatptr->evidenceobject.fsinfovector[i]->inum_count;
-    }
-    */
     uint8_t walkreturn = 1;
     int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
     for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)

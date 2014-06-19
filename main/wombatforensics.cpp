@@ -39,7 +39,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    //InitializeDirModel();
     InitializeWombatFramework();
 }
 
@@ -197,38 +196,6 @@ void WombatForensics::InitializeWombatFramework()
     // MIGHT NOT NEED TO INITIALIZE ANYTHING HERE.
 }
 
-void WombatForensics::InitializeDirModel()
-{
-    // OLD MODEL, NOT USED NOW. REPLACED BY SQLTABLEMODEL AND SORTFILTERPROXYMODEL
-    /*
-    wombatvarptr->dirmodel = new QStandardItemModel();
-    QStringList headerList;
-    headerList << "Unique ID" << "Name" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
-    wombatvarptr->dirmodel->setHorizontalHeaderLabels(headerList);
-    ui->dirTreeView->setModel(wombatvarptr->dirmodel);
-    ResizeColumns();
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
-    connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
-    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
-*/
-}
-
-// CURRENTLY FUNCTION IS NOT USED.
-void WombatForensics::UpdateTree()
-{
-    /*
-    fcasedb.commit();
-    FileViewSqlModel* tmpmodel = new FileViewSqlModel();
-    tmpmodel->setQuery("SELECT objectid, objecttype, name FROM data", fcasedb);
-    tmpmodel->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    tmpmodel->setHeaderData(1, Qt::Horizontal, tr("Type"));
-    tmpmodel->setHeaderData(2, Qt::Horizontal, tr("Name"));
-
-    ui->dirTreeView->setModel(tmpmodel);
-    */
-}
-
 void WombatForensics::InitializeQueryModel()
 {
     fcasedb.commit();
@@ -244,7 +211,6 @@ void WombatForensics::InitializeQueryModel()
         wombatdatabase->GetRootNodes();
 
         TreeModel* treemodel = new TreeModel(this);
-        //new ModelTest(treemodel, this);
         treemodel->SetRootNode(dummynode);
 
         ui->dirTreeView->setAllColumnsShowFocus(true);
@@ -255,9 +221,7 @@ void WombatForensics::InitializeQueryModel()
 
         connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
         connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
-        //connect(ui->dirTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(dirTreeView_selectionChanged(QModelIndex)));
         connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
-        //connect(ui->dirTreeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(CurrentChanged(const QModelIndex &, const QModelIndex &)));
 
         //ResizeColumns();
         wombatframework->CloseInfoStructures();
@@ -266,8 +230,6 @@ void WombatForensics::InitializeQueryModel()
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
-    //QModelIndex srcindex = checkableproxy->mapToSource(curitem.indexes().at(0));
-    //wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
     QModelIndex srcindex = curitem.indexes().at(0);
     wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
     wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
@@ -304,7 +266,6 @@ void WombatForensics::InitializeEvidenceStructure()
     //wombatdatabase->GetPartitionObjects();
     //wombatdatabase->GetFileSystemObjects();
 
-    //wombatframework->AddEvidenceNodes(); // add evidence node to directory model
 }
 
 void WombatForensics::AddEvidence()
@@ -653,17 +614,7 @@ void WombatForensics::ExportEvidence()
 {
     totalcount = 0;
     totalchecked = 0;
-    //treemodel->GetModelCount(rootnode);
     ((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
-    qDebug() << "totalchecked: " << totalchecked << " totalcount: " << totalcount;
-    //QModelIndexList checkedfiles;
-    //QModelIndexList uncheckedfiles;
-    //checkableproxy->checkedState()
-    //    .checkedLeafSourceModelIndexes(checkedfiles)
-    //    .uncheckedLeafSourceModelIndexes(uncheckedfiles);
-
-    //qDebug() << "# checked files:" << checkedfiles.count(); 
-    //listcount = checkedfiles.count() + uncheckedfiles.count();
     exportdialog = new ExportDialog(this, totalchecked, totalcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
     exportdialog->show();
@@ -822,7 +773,6 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
-    //for(int i=0; i < ((TreeModel*)checkableproxy->sourceModel())->columnCount(QModelIndex()); i++)
     for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
     {
         ui->dirTreeView->resizeColumnToContents(i);
@@ -895,17 +845,10 @@ WombatForensics::~WombatForensics()
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
-    
+    // possibly will need to set dirtreeview model to nothing. or the treemodel to nothing to clear values so it'll close properly.
     if(ui->dirTreeView->model() != NULL)
     {
-        //if(checkableproxy->sourceModel() != NULL)
-        //{
-        //}
-            //((FileViewSqlModel*)treeproxy->sourceModel())->clear(); // clear sql so db can be closed.
-            //((FileViewSqlModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
-            //((TreeModel*)checkableproxy->sourceModel())->clear(); // clear sql so db can be closed.
     }
-    //((FileViewSqlModel*)ui->dirTreeView->model())->clear(); // clear sql so db can be closed.
     
     //wombatprogresswindow->close();
     RemoveTmpFiles();
@@ -1006,29 +949,6 @@ void WombatForensics::UpdateOmniValue()
     {
     }
 }
-
-/*
-// FUNCTION GETS IMPLEMNTED WHEN YOU CLICK ON A CHECKBOX, BUT DO NOT SELECT THE ROW
-void WombatForensics::dirTreeView_selectionChanged(const QModelIndex &index)
-{
-    //qDebug() << "selection changed before mapping.";
-    QModelIndex srcindex = checkableproxy->mapToSource(index);
-    //qDebug() << "selection changed id: " << srcindex.sibling(srcindex.row(), 0).data().toInt();
-    //qDebug() << "proxyid: " << index.sibling(index.row(), 0).data().toInt();
-    wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
-    wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
-    //qDebug() << "selected id: " << wombatvarptr->selectedobject.id << " type: " << wombatvarptr->selectedobject.type;
-    UpdateOmniValue();
-    UpdateViewer();
-    // NEED TO DETERMINE THE DATA TYPE TO CALL THE CORRECT DATA TO UPDATE.
-    //
-    //QString sigtext = "";
-    // I CAN EITHER GET THE SIGNATURE USING COMPARISON OR BY CALLING FILE AND MAGIC LIKE THE MODULE
-    /// SELECTING ITEM GETS IT'S ID VALUES AND SET'S RESPECTIVE WOMBATVARPTR->VALUES
-    // GET THE RESPECTIVE VISIBLE VIEWER FROM THE VIEWER STACK.
-    // LOAD THE DATA INTO THE RESPECTIVE VIEWER.
-}
-*/
 
 int WombatForensics::DetermineOmniView(QString currentSignature)
 {
