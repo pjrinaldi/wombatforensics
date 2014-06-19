@@ -207,6 +207,23 @@ public:
         }
     };
 
+    void GetModelCount(Node* curnode)
+    {
+        if(curnode->nodevalues.at(4).toInt() == 5)
+        {
+            totalcount++;
+            if(curnode->checkstate == 2)
+                totalchecked++;
+        }
+        if(curnode->haschildren)
+        {
+            for(int i=0; i < curnode->children.count(); i++)
+            {
+                GetModelCount(curnode->children[i]);
+            }
+        }
+    };
+
 signals:
     void checkedNodesChanged();
 
@@ -287,7 +304,7 @@ private:
             SetParentCheckState(index.parent());
         return true;
     };
-   
+
     QStringList headerdata;
 };
 

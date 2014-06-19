@@ -46,7 +46,7 @@ int GetChildCount(int type, int address)
         return childquery.value(0).toInt();
     }
 }
-
+/*
 int FindParentNode(Node* curnode, Node* parnode, int rootinum)
 {
     if(curnode->nodevalues.at(11).toInt() == rootinum)
@@ -85,7 +85,7 @@ int FindParentNode(Node* curnode, Node* parnode, int rootinum)
         return 0;
     }
 }
-
+*/
 bool FileExists(const std::string& filename)
 {
     struct stat buf;

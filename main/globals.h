@@ -10,6 +10,8 @@ extern QVector<QFuture<void> > threadvector;
 extern QFutureWatcher<void> filewatcher;
 extern int filesfound;
 extern int filesprocessed;
+extern int totalcount;
+extern int totalchecked;
 extern int currentevidenceid;
 extern QList<QVariant> colvalues;
 

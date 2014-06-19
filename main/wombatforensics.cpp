@@ -651,8 +651,11 @@ int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount
 
 void WombatForensics::ExportEvidence()
 {
-    int listcount = 0;
-    int checkedcount = 0;
+    totalcount = 0;
+    totalchecked = 0;
+    //treemodel->GetModelCount(rootnode);
+    ((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
+    qDebug() << "totalchecked: " << totalchecked << " totalcount: " << totalcount;
     //QModelIndexList checkedfiles;
     //QModelIndexList uncheckedfiles;
     //checkableproxy->checkedState()
@@ -661,7 +664,7 @@ void WombatForensics::ExportEvidence()
 
     //qDebug() << "# checked files:" << checkedfiles.count(); 
     //listcount = checkedfiles.count() + uncheckedfiles.count();
-    exportdialog = new ExportDialog(this, checkedcount, listcount);
+    exportdialog = new ExportDialog(this, totalchecked, totalcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
     exportdialog->show();
 }

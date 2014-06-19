@@ -7,6 +7,8 @@ QVector<QFuture<void> > threadvector;
 QFutureWatcher<void> filewatcher;
 int filesfound = 0;
 int filesprocessed = 0;
+int totalchecked = 0;
+int totalcount = 0;
 int currentevidenceid = 0;
 InterfaceSignals* isignals = new InterfaceSignals();
 Node* currentnode = 0;
