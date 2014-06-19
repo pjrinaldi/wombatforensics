@@ -83,7 +83,7 @@ QString HexEditor::filename() const
 
 bool HexEditor::openimage()
 {
-    qDebug() << "sector size: " << tskptr->readimginfo->sector_size;
+    //qDebug() << "sector size: " << tskptr->readimginfo->sector_size;
     if(!_reader.openimage(tskptr))
     {
         qDebug() << "error with reader openimage";

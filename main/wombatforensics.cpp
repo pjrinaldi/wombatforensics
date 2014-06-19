@@ -282,7 +282,7 @@ void WombatForensics::AddEvidence()
         //qDebug() << "tmplist count 2: " << tmplist.count();
         for(int i=0; i < tmplist.count(); i++)
         {
-            fprintf(stderr, "fullpathvector[%i]: %s\n", i, tmplist[i].toStdString().c_str());
+            //fprintf(stderr, "fullpathvector[%i]: %s\n", i, tmplist[i].toStdString().c_str());
             wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
         }
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
@@ -343,15 +343,17 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = wombatvarptr->selectedobject.size;
         //tskobjptr->length = wombatvarptr->evidenceobjectvector[curidx].size;
     }
-    else if(wombatvarptr->selectedobject.type == 3) // partition object
+    else if(wombatvarptr->selectedobject.type == 2) // volume object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         //OpenParentImage(wombatvarptr->partitionobjectvector[curidx].parimgid);
         //tskobjptr->offset = wombatvarptr->partitionobjectvector[curidx].sectstart * wombatvarptr->partitionobjectvector[curidx].blocksize;
         tskobjptr->objecttype = 3;
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.blocksize;
+        tskobjptr->length = wombatvarptr->selectedobject.size;
         //tskobjptr->length = wombatvarptr->partitionobjectvector[curidx].sectlength * wombatvarptr->partitionobjectvector[curidx].blocksize;
-        tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.blocksize;
+        // there is no sectlength for the volume objects...
+        //tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.blocksize; 
         // need to get the volume parent and then the image parent , so i can open the image from bytes...
         // need to do a self looping query, where i use the parentid and check if its null, if its not null, then run it again.
         // else return imageid and then loop over evidenceobjectvector for index. then loop over fullpathvector to get the
@@ -366,7 +368,8 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
         tskobjptr->objecttype = 4;
         //tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
-        tskobjptr->length = wombatvarptr->selectedobject.size * wombatvarptr->selectedobject.blockcount;
+        tskobjptr->length = wombatvarptr->selectedobject.size;
+        //tskobjptr->length = wombatvarptr->selectedobject.sectsize * wombatvarptr->selectedobject.blockcount;
         //tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
         //qDebug() << "File System Object";
     }
@@ -387,7 +390,7 @@ void WombatForensics::LoadHexContents()
         //tskobjptr->offset = 
         //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
     }
-    if(wombatvarptr->selectedobject.type != 2)
+    if(wombatvarptr->selectedobject.type != 3)
     {
         hexwidget->openimage();
         hexwidget->set2BPC();
