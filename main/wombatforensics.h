@@ -222,24 +222,9 @@ private:
     Qt::CheckState GetCheckState(Node* curnode) const
     {
         if(curnode->checkstate == 0) // unchecked
-        {
             return Qt::Unchecked;
-        }
         else if(curnode->checkstate == 1) // partially checked
-        {
-            int checkcount = 0;
-            for(int i=0; i < curnode->children.count(); i++)
-            {
-                if(curnode->children[i]->checkstate == 2)
-                    checkcount++;
-            }
-            if(curnode->childcount < checkcount)
-                return Qt::PartiallyChecked;
-            else if(curnode->childcount == checkcount)
-                return Qt::Checked;
-            
-            return Qt::Unchecked;
-        }
+            return Qt::PartiallyChecked;
         else if(curnode->checkstate == 2) // checked
             return Qt::Checked;
         return Qt::Unchecked;
@@ -254,11 +239,12 @@ private:
             if(curnode->children[i]->checkstate == 2)
                 checkcount++;
         }
-        if(curnode->childcount < checkcount)
+        qDebug() << curnode->nodevalues.at(0).toInt() << "child count:" << curnode->childcount << "check count:" << checkcount; 
+        if(curnode->childcount > checkcount)
             curnode->checkstate = 1;
         else if(curnode->childcount == checkcount)
             curnode->checkstate = 2;
-        else
+        else if(checkcount == 0)
             curnode->checkstate = 0;
         emit dataChanged(index, index);
         emit checkedNodesChanged();
@@ -286,7 +272,8 @@ private:
         if(state == Qt::Unchecked) // curnode is now unchecked...
         {
             curnode->checkstate = 0;
-            SetChildCheckState(index);
+            if(curnode->haschildren)
+                SetChildCheckState(index);
         }
         else if(state == Qt::PartiallyChecked) // curnode is now partially checked
             curnode->checkstate = 1;
@@ -295,10 +282,10 @@ private:
             curnode->checkstate = 2;
             SetChildCheckState(index);
         }
-        if(curnode->parent != 0)
-            SetParentCheckState(index);
         emit dataChanged(index, index);
         emit checkedNodesChanged();
+        if(curnode->parent != 0)
+            SetParentCheckState(index.parent());
         return true;
     };
    
