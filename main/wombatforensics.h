@@ -273,6 +273,8 @@ private:
         {
             curnode->children[i]->checkstate = curnode->checkstate;
             emit dataChanged(index.child(i, 0), index.child(i, 0));
+            if(curnode->children[i]->haschildren)
+                SetChildCheckState(index.child(i,0));
         }
         emit checkedNodesChanged();
     };
@@ -295,6 +297,7 @@ private:
         }
         if(curnode->parent != 0)
             SetParentCheckState(index);
+        emit dataChanged(index, index);
         emit checkedNodesChanged();
         return true;
     };
