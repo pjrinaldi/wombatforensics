@@ -41,7 +41,7 @@ public:
         }
         parent = 0;
         haschildren = false;
-        checkstate = 3;
+        checkstate = 0;
     };
 
     ~Node()
@@ -63,13 +63,10 @@ public:
         return false;
     };
 /*
-    enum NodeCheckState
-    {
-        Parent = 0,
-        Child = 1,
-        Checked = 2,
-        Unchecked = 3
-    };*/
+    Unchecked = 0,
+    Partial = 1,
+    Checked = 2,
+*/
 };
 
 extern Node* rootnode;
