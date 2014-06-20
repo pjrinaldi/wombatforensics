@@ -508,6 +508,7 @@ void WombatForensics::RemEvidence()
 {
 }
 
+/*
 int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
 {
     int curcount = checkcount;
@@ -526,7 +527,7 @@ int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcou
     }
     
     return curcount;
-}
+}*/
 
 QVector<FileExportData> WombatForensics::SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData> tmpexportlist)
 {
@@ -600,6 +601,8 @@ QVector<FileExportData> WombatForensics::SetListExportProperties(QStandardItem* 
 
     return tmpexportlist;
 }
+
+/*
 int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount)
 {
     int curcount = listcount;
@@ -614,6 +617,7 @@ int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount
 
     return curcount;
 }
+*/
 
 void WombatForensics::ExportEvidence()
 {

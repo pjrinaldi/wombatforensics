@@ -416,8 +416,8 @@ private:
     void RemoveTmpFiles(void);
 
     int ReturnVisibleViewerID();
-    int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
-    int StandardItemListCount(QStandardItem* tmpitem, int listcount);
+    //int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
+    //int StandardItemListCount(QStandardItem* tmpitem, int listcount);
     QVector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData>);
     QVector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData>);
     int DetermineOmniView(QString currentSignature);
