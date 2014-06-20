@@ -224,7 +224,7 @@ void WombatForensics::InitializeQueryModel()
         connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
         connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
 
-        //ResizeColumns();
+        ResizeColumns();
         wombatframework->CloseInfoStructures();
     }
 }
