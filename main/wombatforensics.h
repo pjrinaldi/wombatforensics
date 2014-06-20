@@ -421,7 +421,7 @@ private:
     QVector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData>);
     QVector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData>);
     int DetermineOmniView(QString currentSignature);
-    QModelIndex curselindex;
+    QModelIndex selectedindex;
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;

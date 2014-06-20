@@ -231,8 +231,9 @@ void WombatForensics::InitializeQueryModel()
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
-    QModelIndex srcindex = curitem.indexes().at(0);
-    wombatvarptr->selectedobject.id = srcindex.sibling(srcindex.row(), 0).data().toInt(); // object id
+    selectedindex = curitem.indexes().at(0);
+    wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
+    wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
     wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
     UpdateOmniValue();
     UpdateViewer();
@@ -627,29 +628,27 @@ void WombatForensics::ExportEvidence()
 void WombatForensics::FileExport(FileExportData* exportdata)
 {
     qDebug() << "Need to implement the new file export method";
-    /*
     QVector<FileExportData> exportevidencelist;
     if(exportdata->filestatus == FileExportData::selected)
     {
         exportdata->exportcount = 1;
-        exportdata->id = curselindex.sibling(curselindex.row(), 1).data().toString().toInt(); // unique objectid
-        //wombatvarptr->evidenceobject.id = wombatdatabase->ReturnObjectEvidenceID(exportdata->id); // evidence id
-        //QStringList currentevidencelist = wombatdatabase->ReturnEvidenceData(wombatvarptr->evidenceobject.id); // evidence data
-        exportdata->evidenceobject.fullpath = "";//currentevidencelist[0]; // evidence path
-        exportdata->evidenceobject.dbname = "";//currentevidencelist[1]; // evidence db name
-        exportdata->name = curselindex.sibling(curselindex.row(),0).data().toString().toStdString(); // file name
+        exportdata->id = wombatvarptr->selectedobject.id;
+        exportdata->name = wombatvarptr->selectedobject.name.toStdString();
+        exportdata->fullpath = exportdata->exportpath;
+        exportdata->fullpath += "/";
         if(exportdata->pathstatus == FileExportData::include)
-        {
-            exportdata->fullpath = exportdata->exportpath;
-            exportdata->fullpath += "/";
-            exportdata->fullpath += curselindex.sibling(curselindex.row(), 2).data().toString().toStdString(); // export path with original path
-        }
+            exportdata->fullpath += selectedindex.sibling(selectedindex.row(), 2).data().toString().toStdString();
         else if(exportdata->pathstatus == FileExportData::exclude)
-        {
-            exportdata->fullpath = exportdata->exportpath + "/" + exportdata->name; // export path without original path
-        }
+            exportdata->fullpath += exportdata->name;
         exportevidencelist.push_back(*exportdata);
     }
+    else if(exportdata->filestatus == FileExportData::checked)
+    {
+    }
+    else if(exportdata->filestatus == FileExportData::listed)
+    {
+    }
+    /*
     else if(exportdata->filestatus == FileExportData::checked)
     {
         QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();

@@ -152,7 +152,7 @@ struct SelectedObject
 {
     int id;
     int type;
-    int name;
+    QString name;
     int size;
     int parimgid;
     int sectstart;
