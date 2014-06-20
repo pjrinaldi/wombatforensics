@@ -653,6 +653,9 @@ void WombatForensics::FileExport(FileExportData* exportdata)
     {
     }
 
+    // NEED TO GET TSKPTR->OFFSET/LENGTH/READFILEINFO
+
+
     // REFERENCE TSK CALL TO GET THE DATA.
     //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
 
@@ -682,7 +685,9 @@ void SleuthKitPlugin::FinishExport(int processcount)
     wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, "File Export Finished");
     wombatdata->UpdateJobEnd(wombatvariable->jobid, wombatvariable->exportdatalist[0].exportcount, processcount);
     emit UpdateMessageTable();
-}void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
+}
+
+void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
 {
     int fileID = wombatdata->ReturnObjectFileID(objectID); // file id
     TskImageFileTsk currentimagefiletsk;
