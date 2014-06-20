@@ -239,7 +239,9 @@ public:
         {
             totalcount++;
             if(curnode->checkstate == 2)
+            {
                 totalchecked++;
+            }
         }
         if(curnode->haschildren)
         {

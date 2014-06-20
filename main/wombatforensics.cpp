@@ -652,6 +652,115 @@ void WombatForensics::FileExport(FileExportData* exportdata)
     else if(exportdata->filestatus == FileExportData::listed)
     {
     }
+
+    // REFERENCE TSK CALL TO GET THE DATA.
+    //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+
+    /*
+     *void SleuthKitPlugin::ExportFiles(WombatVariable* wombatVariable)
+{
+    wombatvariable = wombatVariable;
+    int processcount = 0;
+    for(int i = 0; i < wombatvariable->exportdatalist.size(); i++)
+    {
+        processcount++;
+        wombatvariable->evidencepath = QString::fromStdString(wombatvariable->exportdatalist[i].evidencepath);
+        wombatvariable->evidencedbname = QString::fromStdString(wombatvariable->exportdatalist[i].evidencedbname);
+        SetEvidenceDB(wombatvariable);
+        ExportFile(wombatvariable->exportdatalist[i].fullpath, wombatvariable->exportdatalist[i].id);
+        std::string tmpstring = wombatvariable->exportdatalist[i].fullpath + " Exported";
+        wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, tmpstring.c_str());
+        emit UpdateStatus(wombatvariable->exportdatalist[i].exportcount, processcount);
+        emit UpdateMessageTable();
+    }
+    FinishExport(processcount);
+}
+
+void SleuthKitPlugin::FinishExport(int processcount)
+{
+    LOGINFO("File Export Finished");
+    wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, "File Export Finished");
+    wombatdata->UpdateJobEnd(wombatvariable->jobid, wombatvariable->exportdatalist[0].exportcount, processcount);
+    emit UpdateMessageTable();
+}void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
+{
+    int fileID = wombatdata->ReturnObjectFileID(objectID); // file id
+    TskImageFileTsk currentimagefiletsk;
+    try
+    {
+        currentimagefiletsk.open(wombatvariable->evidencepath.toStdString());
+        TskServices::Instance().setImageFile(currentimagefiletsk);
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Error setfile: %s\n", ex.what());
+    }
+    int ihandle;
+    try
+    {
+        ihandle = TskServices::Instance().getImageFile().openFile(fileID);
+        //fprintf(stderr, "getimagefile works...");
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Error getFile: %s\n", ex.what());
+    }
+    TskFile* tfile;
+    try
+    {
+        tfile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
+        //fprintf(stderr, "get file from image works\n");
+    }
+    catch(TskException ex)
+    {
+        fprintf(stderr, "Get File Error: %s\n", ex.what());
+    }
+    if(tfile->isDirectory())
+    {
+        bool tmpdir = (new QDir())->mkpath(QString::fromStdString(exportpath));
+        if(!tmpdir)
+            fprintf(stderr, "%s creation failed.\n");
+        //fprintf(stderr, "need to make the directory here...\n");
+    }
+    else
+    {
+        try
+        {
+            if(!tfile->exists())
+            {
+                TskServices::Instance().getFileManager().saveFile(tfile);
+            }
+        }
+        catch(TskException ex)
+        {
+            fprintf(stderr, "read file/write to fail failed %s\n", ex.what());
+        }
+        catch(std::exception ex)
+        {
+            fprintf(stderr, "read file/write to fail %s\n", ex.what());
+        }
+        std::wstringstream ws;
+        ws << exportpath.c_str();
+        std::wstring wexportpath = ws.str();
+        try
+        {
+            TskServices::Instance().getFileManager().copyFile(tfile, wexportpath);
+        }
+        catch(TskException ex)
+        {
+            fprintf(stderr, "copy file to export location failed %s\n", ex.what());
+        }
+        catch(std::exception ex)
+        {
+            fprintf(stderr, "copy file to export location failed %s\n", ex.what());
+        }
+    }
+}
+     *
+     */
+
+
+
     /*
     else if(exportdata->filestatus == FileExportData::checked)
     {
