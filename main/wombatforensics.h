@@ -18,7 +18,7 @@ class TreeModel : public QAbstractItemModel
 public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
-        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID";
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type";
         rootnode = 0;
     };
 
@@ -101,6 +101,33 @@ public:
             else
                 return node->nodevalues.at(index.column());
         }
+        if(role == Qt::DecorationRole)
+        {
+            int nodetype = node->nodevalues.at(4).toInt();
+            if(index.column() == 0)
+            {
+                if(nodetype == 1)
+                    return QIcon(QPixmap(QString(":/basic/treeimg")));
+                else if(nodetype == 2)
+                    return QIcon(QPixmap(QString(":/basic/treevol")));
+                else if(nodetype == 3)
+                    return QIcon(QPixmap(QString(":/basic/treepart")));
+                else if(nodetype == 4)
+                    return QIcon(QPixmap(QString(":/basic/treefs")));
+                else if(nodetype == 5)
+                {
+                    int itemtype = node->nodevalues.at(12).toInt();
+                    if(itemtype == 5)
+                        return QIcon(QPixmap(QString(":/basic/treefile")));
+                    else if(itemtype == 3)
+                        return QIcon(QPixmap(QString(":/basic/treefolder")));
+                    return QIcon(QPixmap(QString(":/basic/treefile")));
+                }
+                return QVariant();
+            }
+            
+            return QVariant();
+        }
 
         return QVariant();
     };
@@ -177,7 +204,7 @@ public:
         if(parentnode->haschildren == true)
         {
             QSqlQuery morequery(fcasedb);
-            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid FROM data WHERE objecttype == 5 AND parentid = ?");
+            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE objecttype == 5 AND parentid = ?");
             morequery.addBindValue(parentnode->nodevalues.at(5).toInt());
             if(morequery.exec())
             {

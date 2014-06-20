@@ -218,6 +218,7 @@ void WombatForensics::InitializeQueryModel()
         ui->dirTreeView->hideColumn(4);
         ui->dirTreeView->hideColumn(5);
         ui->dirTreeView->hideColumn(11);
+        ui->dirTreeView->hideColumn(12);
 
         connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
         connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
