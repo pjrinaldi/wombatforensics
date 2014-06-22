@@ -237,9 +237,23 @@ public:
     {
         if(curnode->nodevalues.at(4).toInt() == 5)
         {
+            TskObject tmpobj;
+            tmpobj.address = curnode->nodevalues.at(5).toInt();
+            tmpobj.length = curnode->nodevalues.at(3).toInt();
+            tmpobj.type = curnode->nodevalues.at(12).toInt();
+            tmpobj.objecttype = 5;
+            tmpobj.offset = 0;
+            listedids.append(tmpobj);
             totalcount++;
             if(curnode->checkstate == 2)
             {
+                TskObject chkobj;
+                chkobj.address = curnode->nodevalues.at(5).toInt();
+                chkobj.length = curnode->nodevalues.at(3).toInt();
+                chkobj.type = curnode->nodevalues.at(12).toInt();
+                chkobj.objecttype = 5;
+                chkobj.offset = 0;
+                checkedids.append(chkobj);
                 totalchecked++;
             }
         }
@@ -394,6 +408,7 @@ private slots:
     void ViewGroupTriggered(QAction* curaction);
     void LoadComplete(bool isok);
     void InitializeQueryModel(void);
+    void FinishExport(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -414,6 +429,8 @@ private:
     void LoadWebContents(void);
     void LoadImgContents(void);
     void LoadVidContents(void);
+    void ExportFiles(FileExportData* exportdata);
+    void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
 
     void RemoveTmpFiles(void);
 
@@ -427,8 +444,8 @@ private:
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
-    //QFuture<void> openfuture;
-    //QFutureWatcher<void> openwatcher;
+    QFuture<void> exportfuture;
+    QFutureWatcher<void> exportwatcher;
 
     off_t offset() const;
     HexEditor* hexwidget;

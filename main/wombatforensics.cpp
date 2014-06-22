@@ -39,6 +39,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+    connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
     InitializeWombatFramework();
 }
 
@@ -199,7 +200,6 @@ void WombatForensics::InitializeWombatFramework()
 void WombatForensics::InitializeQueryModel()
 {
     fcasedb.commit();
-    //qDebug() << "temp db commit finished";
     if(ProcessingComplete())
     {
         qDebug() << "All threads have finished.";
@@ -631,8 +631,27 @@ void WombatForensics::ExportEvidence()
 
 void WombatForensics::FileExport(FileExportData* exportdata)
 {
-    qDebug() << "Need to implement the new file export method";
+    exportfuture = QtConcurrent::run(this, &WombatForensics::ExportFiles, exportdata);
+    exportwatcher.setFuture(exportfuture);
+}
+
+void WombatForensics::FinishExport()
+{
+    if(ProcessingComplete())
+    {
+        qDebug() << "export of files is complete.";
+    }
+    else
+    {
+        qDebug() << "still exporting files.";
+    }
+}
+
+void WombatForensics::ExportFiles(FileExportData* exportdata)
+{
+    threadvector.clear();
     QVector<FileExportData> exportevidencelist;
+    curlist.clear();
     if(exportdata->filestatus == FileExportData::selected)
     {
         exportdata->exportcount = 1;
@@ -645,172 +664,86 @@ void WombatForensics::FileExport(FileExportData* exportdata)
         else if(exportdata->pathstatus == FileExportData::exclude)
             exportdata->fullpath += exportdata->name;
         exportevidencelist.push_back(*exportdata);
+        TskObject tmpobj;
+        tmpobj.address = selectedindex.sibling(selectedindex.row(), 5).data().toInt();
+        tmpobj.offset = 0;
+        tmpobj.length = selectedindex.sibling(selectedindex.row(), 3).data().toInt();
+        tmpobj.type = selectedindex.sibling(selectedindex.row(), 12).data().toInt();
+        tmpobj.objecttype = 5;
+        curlist.append(tmpobj);
     }
     else if(exportdata->filestatus == FileExportData::checked)
     {
+        for(int i=0; i < checkedids.count(); i++)
+            curlist.append(checkedids.at(i));
     }
     else if(exportdata->filestatus == FileExportData::listed)
     {
+        for(int i=0; i < listedids.count(); i++)
+            curlist.append(listedids.at(i));
     }
-
-    // NEED TO GET TSKPTR->OFFSET/LENGTH/READFILEINFO
-
-
-    // REFERENCE TSK CALL TO GET THE DATA.
-    //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
-
-    /*
-     *void SleuthKitPlugin::ExportFiles(WombatVariable* wombatVariable)
-{
-    wombatvariable = wombatVariable;
-    int processcount = 0;
-    for(int i = 0; i < wombatvariable->exportdatalist.size(); i++)
+    for(int i=0; i < curlist.count(); i++)
     {
-        processcount++;
-        wombatvariable->evidencepath = QString::fromStdString(wombatvariable->exportdatalist[i].evidencepath);
-        wombatvariable->evidencedbname = QString::fromStdString(wombatvariable->exportdatalist[i].evidencedbname);
-        SetEvidenceDB(wombatvariable);
-        ExportFile(wombatvariable->exportdatalist[i].fullpath, wombatvariable->exportdatalist[i].id);
-        std::string tmpstring = wombatvariable->exportdatalist[i].fullpath + " Exported";
-        wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, tmpstring.c_str());
-        emit UpdateStatus(wombatvariable->exportdatalist[i].exportcount, processcount);
-        emit UpdateMessageTable();
+        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, curlist.at(i), exportdata->fullpath, exportdata->name);
+        threadvector.append(tmpfuture);
     }
-    FinishExport(processcount);
 }
 
-void SleuthKitPlugin::FinishExport(int processcount)
+void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std::string name)
 {
-    LOGINFO("File Export Finished");
-    wombatdata->InsertMsg(wombatvariable->caseid, wombatvariable->evidenceid, wombatvariable->jobid, 2, "File Export Finished");
-    wombatdata->UpdateJobEnd(wombatvariable->jobid, wombatvariable->exportdatalist[0].exportcount, processcount);
-    emit UpdateMessageTable();
-}
+    if(curobj.readimginfo != NULL)
+        tsk_img_close(curobj.readimginfo);
+    if(curobj.readfsinfo != NULL)
+        tsk_fs_close(curobj.readfsinfo);
+    if(curobj.readfileinfo != NULL)
+        tsk_fs_file_close(curobj.readfileinfo);
 
-void SleuthKitPlugin::ExportFile(std::string exportpath, int objectID)
-{
-    int fileID = wombatdata->ReturnObjectFileID(objectID); // file id
-    TskImageFileTsk currentimagefiletsk;
-    try
+    int curidx = 0;
+    for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
     {
-        currentimagefiletsk.open(wombatvariable->evidencepath.toStdString());
-        TskServices::Instance().setImageFile(currentimagefiletsk);
+        if(wombatvarptr->currentevidenceid == wombatvarptr->evidenceobjectvector[i].id)
+            curidx = i;
     }
-    catch(TskException ex)
+    curobj.imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
+    curobj.partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
+    for(int i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
     {
-        fprintf(stderr, "Error setfile: %s\n", ex.what());
+        curobj.imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
     }
-    int ihandle;
-    try
+    curobj.readimginfo = tsk_img_open(curobj.partcount, curobj.imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    if(curobj.readimginfo == NULL)
     {
-        ihandle = TskServices::Instance().getImageFile().openFile(fileID);
-        //fprintf(stderr, "getimagefile works...");
+        //qDebug() << "print image error here";
     }
-    catch(TskException ex)
+    free(curobj.imagepartspath);
+
+    curobj.readfsinfo = tsk_fs_open_img(curobj.readimginfo, 0, TSK_FS_TYPE_DETECT);
+    curobj.readfileinfo = tsk_fs_file_open_meta(curobj.readfsinfo, NULL, curobj.address);
+    if(curobj.type == 3) // directory
     {
-        fprintf(stderr, "Error getFile: %s\n", ex.what());
-    }
-    TskFile* tfile;
-    try
-    {
-        tfile = TskServices::Instance().getFileManager().getFile((uint64_t)fileID);
-        //fprintf(stderr, "get file from image works\n");
-    }
-    catch(TskException ex)
-    {
-        fprintf(stderr, "Get File Error: %s\n", ex.what());
-    }
-    if(tfile->isDirectory())
-    {
-        bool tmpdir = (new QDir())->mkpath(QString::fromStdString(exportpath));
+        bool tmpdir = (new QDir())->mkpath(QString::fromStdString(fullpath));
         if(!tmpdir)
-            fprintf(stderr, "%s creation failed.\n");
-        //fprintf(stderr, "need to make the directory here...\n");
+            qDebug() << "creation of export dirtree for file: " << QString::fromStdString(name) << "failed.";
     }
     else
     {
-        try
+        int retval = 0;
+        char* contentbuffer = new char[curobj.length];
+        retval = tsk_fs_file_read(curobj.readfileinfo, curobj.offset, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
+        if(retval > 0)
         {
-            if(!tfile->exists())
+            QFile tmpfile(QString::fromStdString(fullpath));
+            if(tmpfile.open(QIODevice::WriteOnly))
             {
-                TskServices::Instance().getFileManager().saveFile(tfile);
+                QDataStream outbuffer(&tmpfile);
+                outbuffer.writeRawData(contentbuffer, curobj.length);
             }
         }
-        catch(TskException ex)
-        {
-            fprintf(stderr, "read file/write to fail failed %s\n", ex.what());
-        }
-        catch(std::exception ex)
-        {
-            fprintf(stderr, "read file/write to fail %s\n", ex.what());
-        }
-        std::wstringstream ws;
-        ws << exportpath.c_str();
-        std::wstring wexportpath = ws.str();
-        try
-        {
-            TskServices::Instance().getFileManager().copyFile(tfile, wexportpath);
-        }
-        catch(TskException ex)
-        {
-            fprintf(stderr, "copy file to export location failed %s\n", ex.what());
-        }
-        catch(std::exception ex)
-        {
-            fprintf(stderr, "copy file to export location failed %s\n", ex.what());
-        }
     }
-}
-     *
-     */
 
-
+    // NEED TO IMPLEMENT FUNCTIONALITY TO UPDATE PROGRESS BAR/FILE COUNT FOR THE EXPORT.
 
     /*
-    else if(exportdata->filestatus == FileExportData::checked)
-    {
-        QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();
-        for(int i = 0; i < rootitem->rowCount(); i++) // loop over images
-        {
-            QStandardItem* imagenode = rootitem->child(i,0);
-            for(int j = 0; j < imagenode->rowCount(); j++) // loop over volume(s)
-            {
-                QStandardItem* volumenode = imagenode->child(j,0); // loop over partition(s)
-                for(int k = 0; k < volumenode->rowCount(); k++)
-                {
-                    QStandardItem* fsnode = volumenode->child(k,0); // file system node
-                    for(int m = 0; m < fsnode->rowCount(); m++)
-                    {
-                        QStandardItem* filenode = fsnode->child(m,0); // file system root node
-                        exportdata->exportcount = StandardItemCheckState(filenode, exportdata->exportcount);
-                        exportevidencelist = SetFileExportProperties(filenode, exportdata, exportevidencelist);
-                    }
-                }
-            }
-        }
-    }
-    else if(exportdata->filestatus == FileExportData::listed)
-    {
-        QStandardItem* rootitem = wombatdirmodel->invisibleRootItem();
-        for(int i = 0; i < rootitem->rowCount(); i++) // loop over images
-        {
-            QStandardItem* imagenode = rootitem->child(i,0);
-            for(int j = 0; j < imagenode->rowCount(); j++) // loop over volumes
-            {
-                QStandardItem* volumenode = imagenode->child(j,0); // loop over partitions
-                for(int k = 0; k < volumenode->rowCount(); k++)
-                {
-                    QStandardItem* fsnode = volumenode->child(k,0); // file system node
-                    for(int m = 0; m < fsnode->rowCount(); m++)
-                    {
-                        QStandardItem* filenode = fsnode->child(m,0); // file system root node
-                        exportdata->exportcount = StandardItemListCount(filenode, exportdata->exportcount);
-                        exportevidencelist = SetListExportProperties(filenode, exportdata, exportevidencelist);
-                    }
-                }
-            }
-        }
-    }
     wombatvarptr->exportdatavector = exportevidencelist;
     wombatprogresswindow->ClearTableWidget();
     wombatvarptr->jobtype = 3; // export files

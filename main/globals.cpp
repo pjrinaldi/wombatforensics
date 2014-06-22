@@ -16,5 +16,6 @@ Node* rootnode = 0;
 Node* dummynode = 0;
 Node* parentnode = 0;
 QList<QVariant> colvalues;
-QList<int> checkedids;
-QList<int> listedids;
+QList<TskObject> checkedids;
+QList<TskObject> listedids;
+QList<TskObject> curlist;

@@ -81,6 +81,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     }
 }
 
+/*
 void WombatFramework::ProcessFile(uint64_t inodeaddress, TSK_FS_INFO* fsinfo)
 {
     qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
@@ -138,6 +139,7 @@ void WombatFramework::ProcessFile(uint64_t inodeaddress, TSK_FS_INFO* fsinfo)
     {
     }
 }
+*/
 
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
 {

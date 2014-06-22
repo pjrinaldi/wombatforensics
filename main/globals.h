@@ -14,8 +14,9 @@ extern int totalcount;
 extern int totalchecked;
 extern int currentevidenceid;
 extern QList<QVariant> colvalues;
-extern QList<int> checkedids;
-extern QList<int> listedids;
+extern QList<TskObject> checkedids;
+extern QList<TskObject> listedids;
+extern QList<TskObject> curlist;
 
 class InterfaceSignals : public QObject
 {

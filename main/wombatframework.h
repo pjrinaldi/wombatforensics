@@ -20,7 +20,7 @@ public:
     void OpenPartitions(void);
     void OpenFiles(void);
     void CloseInfoStructures(void);
-    void ProcessFile(uint64_t inodeaddress, TSK_FS_INFO* fsinfo);
+    //void ProcessFile(uint64_t inodeaddress, TSK_FS_INFO* fsinfo);
 
     void GetBootCode(int idx);
     int DetermineVectorIndex(void);
