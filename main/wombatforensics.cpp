@@ -281,6 +281,7 @@ void WombatForensics::AddEvidence()
     if(tmplist.count())
     {
         wombatvarptr->currentevidencename = tmplist[0].split("/").last();
+        currentevidencename = wombatvarptr->currentevidencename;
         //qDebug() << "tmplist count 2: " << tmplist.count();
         for(int i=0; i < tmplist.count(); i++)
         {
@@ -650,7 +651,8 @@ void WombatForensics::FinishExport()
 void WombatForensics::ExportFiles(FileExportData* exportdata)
 {
     threadvector.clear();
-    QVector<FileExportData> exportevidencelist;
+    exportfilelist.clear();
+    //QVector<FileExportData> exportevidencelist;
     curlist.clear();
     if(exportdata->filestatus == FileExportData::selected)
     {
@@ -659,11 +661,14 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         exportdata->name = wombatvarptr->selectedobject.name.toStdString();
         exportdata->fullpath = exportdata->exportpath;
         exportdata->fullpath += "/";
+        exportdata->fullpath += currentevidencename.toStdString();
+        exportdata->fullpath += "/";
         if(exportdata->pathstatus == FileExportData::include)
             exportdata->fullpath += selectedindex.sibling(selectedindex.row(), 2).data().toString().toStdString();
-        else if(exportdata->pathstatus == FileExportData::exclude)
-            exportdata->fullpath += exportdata->name;
-        exportevidencelist.push_back(*exportdata);
+        exportdata->fullpath += "/";
+        //else if(exportdata->pathstatus == FileExportData::exclude)
+        exportfilelist.push_back(*exportdata);
+        //exportevidencelist.push_back(*exportdata);
         TskObject tmpobj;
         tmpobj.address = selectedindex.sibling(selectedindex.row(), 5).data().toInt();
         tmpobj.offset = 0;
@@ -675,16 +680,26 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         tmpobj.readfileinfo = NULL;
         curlist.append(tmpobj);
     }
-    else if(exportdata->filestatus == FileExportData::checked)
-    {
+    else
+        ((TreeModel*)ui->dirTreeView->model())->GetExportData(rootnode, exportdata);
+    //else if(exportdata->filestatus == FileExportData::checked)
+    //{
+        // need to store the exportdata functionality for each item...
+        /*
         for(int i=0; i < checkedids.count(); i++)
+        {
             curlist.append(checkedids.at(i));
-    }
-    else if(exportdata->filestatus == FileExportData::listed)
-    {
+        }*/
+    //}
+    //else if(exportdata->filestatus == FileExportData::listed)
+    //{
+        /*
         for(int i=0; i < listedids.count(); i++)
+        {
             curlist.append(listedids.at(i));
-    }
+        }
+        */
+    //}
 
     for(int i=0; i < curlist.count(); i++)
     {
@@ -741,7 +756,8 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         {
             bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
             // EXPORTING FULL PATH FAILS, SINCE THE DIRECTORIES HAVEN'T BEEN CREATED FOR IT.  NEED TO CALL MKPATH
-            QFile tmpfile(QString::fromStdString(fullpath));
+            std::string filepath = fullpath + "/" + name;
+            QFile tmpfile(QString::fromStdString(filepath));
             if(tmpfile.open(QIODevice::WriteOnly))
             {
                 QDataStream outbuffer(&tmpfile);

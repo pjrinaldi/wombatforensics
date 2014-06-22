@@ -233,35 +233,77 @@ public:
         }
     };
 
+    void GetExportData(Node* curnode, FileExportData* exportdata)
+    {
+        if(curnode->nodevalues.at(4).toInt() == 5)
+        {
+            QVariant tmpvariant;
+            if(exportdata->filestatus == FileExportData::checked)
+            {
+                if(curnode->checkstate == 2)
+                {
+                    TskObject tmpobj;
+                    tmpobj.address = curnode->nodevalues.at(5).toInt();
+                    tmpobj.length = curnode->nodevalues.at(3).toInt();
+                    tmpobj.type = curnode->nodevalues.at(12).toInt();
+                    tmpobj.objecttype = 5;
+                    tmpobj.offset = 0;
+                    tmpobj.readimginfo = NULL;
+                    tmpobj.readfsinfo = NULL;
+                    tmpobj.readfileinfo = NULL;
+                    checkedids.append(tmpobj);
+                    exportdata->exportcount = totalchecked;
+                    exportdata->id = curnode->nodevalues.at(0).toInt();
+                    exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
+                    exportdata->fullpath = exportdata->exportpath;
+                    exportdata->fullpath += "/";
+                    exportdata->fullpath += currentevidencename.toStdString();
+                    exportdata->fullpath += "/";
+                    if(exportdata->pathstatus == FileExportData::include)
+                        exportdata->fullpath += curnode->nodevalues.at(2).toString().toStdString();
+                    exportdata->fullpath += "/";
+                    exportfilelist.push_back(tmpvariant.setValue(*exportdata));
+                }
+            }
+            else
+            {
+                TskObject tmpobj;
+                tmpobj.address = curnode->nodevalues.at(5).toInt();
+                tmpobj.length = curnode->nodevalues.at(3).toInt();
+                tmpobj.type = curnode->nodevalues.at(12).toInt();
+                tmpobj.objecttype = 5;
+                tmpobj.offset = 0;
+                tmpobj.readimginfo = NULL;
+                tmpobj.readfsinfo = NULL;
+                tmpobj.readfileinfo = NULL;
+                listedids.append(tmpobj);
+                exportdata->exportcount = totalchecked;
+                exportdata->id = curnode->nodevalues.at(0).toInt();
+                exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
+                exportdata->fullpath = exportdata->exportpath;
+                exportdata->fullpath += "/";
+                exportdata->fullpath += currentevidencename.toStdString();
+                exportdata->fullpath += "/";
+                if(exportdata->pathstatus == FileExportData::include)
+                    exportdata->fullpath += curnode->nodevalues.at(2).toString().toStdString();
+                exportdata->fullpath += "/";
+                exportfilelist.push_back(tmpvariant.setValue(*exportdata));
+            }
+        }
+        if(curnode->haschildren)
+        {
+            for(int i=0; i < curnode->children.count(); i++)
+                GetExportData(curnode->children[i], exportdata);
+        }
+    };
+
     void GetModelCount(Node* curnode)
     {
         if(curnode->nodevalues.at(4).toInt() == 5)
         {
-            TskObject tmpobj;
-            tmpobj.address = curnode->nodevalues.at(5).toInt();
-            tmpobj.length = curnode->nodevalues.at(3).toInt();
-            tmpobj.type = curnode->nodevalues.at(12).toInt();
-            tmpobj.objecttype = 5;
-            tmpobj.offset = 0;
-            tmpobj.readimginfo = NULL;
-            tmpobj.readfsinfo = NULL;
-            tmpobj.readfileinfo = NULL;
-            listedids.append(tmpobj);
             totalcount++;
             if(curnode->checkstate == 2)
-            {
-                TskObject chkobj;
-                chkobj.address = curnode->nodevalues.at(5).toInt();
-                chkobj.length = curnode->nodevalues.at(3).toInt();
-                chkobj.type = curnode->nodevalues.at(12).toInt();
-                chkobj.objecttype = 5;
-                chkobj.offset = 0;
-                chkobj.readimginfo = NULL;
-                chkobj.readfsinfo = NULL;
-                chkobj.readfileinfo = NULL;
-                checkedids.append(chkobj);
                 totalchecked++;
-            }
         }
         if(curnode->haschildren)
         {

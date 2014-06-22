@@ -13,10 +13,12 @@ extern int filesprocessed;
 extern int totalcount;
 extern int totalchecked;
 extern int currentevidenceid;
+extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> checkedids;
 extern QList<TskObject> listedids;
 extern QList<TskObject> curlist;
+extern QVector<QVariant> exportfilelist; 
 
 class InterfaceSignals : public QObject
 {
