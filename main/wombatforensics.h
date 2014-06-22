@@ -243,6 +243,9 @@ public:
             tmpobj.type = curnode->nodevalues.at(12).toInt();
             tmpobj.objecttype = 5;
             tmpobj.offset = 0;
+            tmpobj.readimginfo = NULL;
+            tmpobj.readfsinfo = NULL;
+            tmpobj.readfileinfo = NULL;
             listedids.append(tmpobj);
             totalcount++;
             if(curnode->checkstate == 2)
@@ -253,6 +256,9 @@ public:
                 chkobj.type = curnode->nodevalues.at(12).toInt();
                 chkobj.objecttype = 5;
                 chkobj.offset = 0;
+                chkobj.readimginfo = NULL;
+                chkobj.readfsinfo = NULL;
+                chkobj.readfileinfo = NULL;
                 checkedids.append(chkobj);
                 totalchecked++;
             }

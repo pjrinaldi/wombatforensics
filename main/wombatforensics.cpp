@@ -670,6 +670,9 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         tmpobj.length = selectedindex.sibling(selectedindex.row(), 3).data().toInt();
         tmpobj.type = selectedindex.sibling(selectedindex.row(), 12).data().toInt();
         tmpobj.objecttype = 5;
+        tmpobj.readimginfo = NULL;
+        tmpobj.readfsinfo = NULL;
+        tmpobj.readfileinfo = NULL;
         curlist.append(tmpobj);
     }
     else if(exportdata->filestatus == FileExportData::checked)
