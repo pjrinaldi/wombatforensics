@@ -51,7 +51,8 @@ public:
 
     ~Node()
     {
-        qDeleteAll(children);
+        if(children.count() > 0)
+            qDeleteAll(children);
     };
 
     QList<QVariant> nodevalues;

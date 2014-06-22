@@ -685,9 +685,11 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         for(int i=0; i < listedids.count(); i++)
             curlist.append(listedids.at(i));
     }
+
     for(int i=0; i < curlist.count(); i++)
     {
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, curlist.at(i), exportdata->fullpath, exportdata->name);
+        exportwatcher.setFuture(tmpfuture);
         threadvector.append(tmpfuture);
     }
 }
@@ -720,11 +722,13 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     }
     free(curobj.imagepartspath);
 
+
     curobj.readfsinfo = tsk_fs_open_img(curobj.readimginfo, 0, TSK_FS_TYPE_DETECT);
     curobj.readfileinfo = tsk_fs_file_open_meta(curobj.readfsinfo, NULL, curobj.address);
     if(curobj.type == 3) // directory
     {
         bool tmpdir = (new QDir())->mkpath(QString::fromStdString(fullpath));
+        qDebug() << "full path: " << QString::fromStdString(fullpath);
         if(!tmpdir)
             qDebug() << "creation of export dirtree for file: " << QString::fromStdString(name) << "failed.";
     }
@@ -735,11 +739,14 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         retval = tsk_fs_file_read(curobj.readfileinfo, curobj.offset, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
         if(retval > 0)
         {
+            bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
+            // EXPORTING FULL PATH FAILS, SINCE THE DIRECTORIES HAVEN'T BEEN CREATED FOR IT.  NEED TO CALL MKPATH
             QFile tmpfile(QString::fromStdString(fullpath));
             if(tmpfile.open(QIODevice::WriteOnly))
             {
                 QDataStream outbuffer(&tmpfile);
                 outbuffer.writeRawData(contentbuffer, curobj.length);
+                tmpfile.close();
             }
         }
     }
