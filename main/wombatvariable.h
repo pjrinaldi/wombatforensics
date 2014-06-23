@@ -151,7 +151,7 @@ struct FileExportData
 struct SelectedObject
 {
     int id;
-    int type;
+    int objtype;
     QString name;
     int size;
     int parimgid;
@@ -161,6 +161,7 @@ struct SelectedObject
     int blockcount;
     int byteoffset;
     int address;
+    int type;
 };
 
 struct WombatVariable

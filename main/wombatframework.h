@@ -23,7 +23,7 @@ public:
     //void ProcessFile(uint64_t inodeaddress, TSK_FS_INFO* fsinfo);
 
     void GetBootCode(int idx);
-    int DetermineVectorIndex(void);
+    //int DetermineVectorIndex(void);
 
 private:
     WombatVariable* wombatptr;

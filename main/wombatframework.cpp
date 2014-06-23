@@ -203,13 +203,10 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
         wombatptr->htmlcontent += "<tr><td class='property'>block size</td><td class='pvalue'>";
         wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->volumeobjectvector[volidx].blocksize) + " bytes</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>endian ordering</td><td class='pvalue'>";
-        /*
         if(wombatptr->evidenceobject.volinfo->endian == TSK_LIT_ENDIAN)
             wombatptr->htmlcontent += "little endian";
         else
             wombatptr->htmlcontent += "big endian";
-        */
-    /*
         wombatptr->htmlcontent += "</td></tr>";
         wombatptr->htmlcontent += "<tr><td class='property'>partition count</td><td class='pvalue'>";
         wombatptr->htmlcontent += QLocale::system().toString((int)wombatptr->volumeobjectvector[volidx].childcount) + "</td></tr></table>";
@@ -229,9 +226,9 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
         // layout in the tree view
     }*/
 }
-
+/*
 int WombatFramework::DetermineVectorIndex()
-{
+{*/
     /*
     // the objectvectors and objects were replaced. i need to get it straight from the sql call...
     // so i shouldn't need this function or the currentidx since i can just get the sql call with the id.
@@ -274,5 +271,6 @@ int WombatFramework::DetermineVectorIndex()
 
     return curidx;
     */
+/*
     return 0;
-}
+}*/

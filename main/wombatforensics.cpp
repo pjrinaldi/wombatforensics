@@ -363,7 +363,7 @@ void WombatForensics::LoadHexContents()
         tsk_fs_file_close(tskobjptr->readfileinfo);
     // int curidx = wombatframework->DetermineVectorIndex(); // shouldn't need this, since i'm pulling from sql.
 
-    if(wombatvarptr->selectedobject.type == 1) // image file
+    if(wombatvarptr->selectedobject.objtype == 1) // image file
     {
         OpenParentImage(wombatvarptr->selectedobject.id);
         // OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id); 
@@ -372,7 +372,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = wombatvarptr->selectedobject.size;
         //tskobjptr->length = wombatvarptr->evidenceobjectvector[curidx].size;
     }
-    else if(wombatvarptr->selectedobject.type == 2) // volume object
+    else if(wombatvarptr->selectedobject.objtype == 2) // volume object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         //OpenParentImage(wombatvarptr->partitionobjectvector[curidx].parimgid);
@@ -389,7 +389,7 @@ void WombatForensics::LoadHexContents()
         // imagepartspath and open the respective image.
         // THEN I'LL HAVE TO GET THE OFFSET AND LENGTH FOR THE PARTITION...
     }
-    else if(wombatvarptr->selectedobject.type == 4) // fs object
+    else if(wombatvarptr->selectedobject.objtype == 4) // fs object
     {
         // set tskobjptr->offset and tskobjptr->length here prior to calling this...
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
@@ -402,7 +402,7 @@ void WombatForensics::LoadHexContents()
         //tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
         //qDebug() << "File System Object";
     }
-    else if(wombatvarptr->selectedobject.type == 5) // file object
+    else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         OpenParentFileSystem();
@@ -419,7 +419,7 @@ void WombatForensics::LoadHexContents()
         //tskobjptr->offset = 
         //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
     }
-    if(wombatvarptr->selectedobject.type != 3)
+    if(wombatvarptr->selectedobject.objtype != 3)
     {
         hexwidget->openimage();
         hexwidget->set2BPC();
@@ -433,7 +433,7 @@ void WombatForensics::LoadTxtContents()
 
 void WombatForensics::LoadWebContents()
 {
-    if(wombatvarptr->selectedobject.type == 1)
+    if(wombatvarptr->selectedobject.objtype == 1)
     {
         ui->webView->setUrl(QUrl("qrc:///html/infohtml"));
     }
@@ -450,20 +450,21 @@ void WombatForensics::LoadVidContents()
 void WombatForensics::LoadComplete(bool isok)
 {
     wombatvarptr->htmlcontent = "";
-    int curidx = wombatframework->DetermineVectorIndex();
+    int curidx = 0;
+    //int curidx = wombatframework->DetermineVectorIndex();
     if(isok && curidx > -1)
     {
-        if(wombatvarptr->selectedobject.type == 1) // image file
+        if(wombatvarptr->selectedobject.objtype == 1) // image file
         {
             wombatvarptr->htmlcontent += "<div id='infotitle'>image information</div><br/>";
             wombatvarptr->htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatvarptr->evidenceobjectvector[curidx].type)) + "</td></tr>";
+            wombatvarptr->htmlcontent += QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatvarptr->selectedobject.type)) + "</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>size:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->evidenceobjectvector[curidx].size) + " bytes</td></tr>";
+            wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->selectedobject.size) + " bytes</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>sector size:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->evidenceobjectvector[curidx].sectsize) + " bytes</td></tr>";
+            wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->selectedobject.sectlength) + " bytes</td></tr>";
             wombatvarptr->htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->evidenceobjectvector[curidx].size/(float)wombatvarptr->evidenceobjectvector[curidx].sectsize));
+            wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->selectedobject.size/(float)wombatvarptr->selectedobject.sectlength));
             wombatvarptr->htmlcontent += " sectors</td></tr>";
             // might not want to do the volume type one if there's no volume. have to think on it.
             //wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
@@ -480,13 +481,13 @@ void WombatForensics::LoadComplete(bool isok)
                 //tmpelement.appendInside("<br/><br/><div class='tabletitle'>boot sector</div>");
                 //tmpelement.appendInside("<br/><table><tr><th>byte offset</th><th>value</th><th>description</th></tr><tr class='odd'><td>0-2</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[0] + "</td><td class='desc'>Jump instruction to the boot code</td></tr><tr class='even'><td>3-10</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[1] + "</td><td class='desc'>OEM name string field. This field is ignored by Microsoft operating systems</td></tr><tr class='odd'><td>11-12</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[2] + " bytes</td><td class='desc'>Bytes per sector</td></tr><tr class='even'><td>13-13</td><td class='bvalue'>" + wombatvarptr->bootsectorlist[3] + " sectors</td><td class='desc'>Seectors per cluster</td></tr><tr class='odd'><td colspan='3' class='bot'></td></tr></table>");
         }
-        else if(wombatvarptr->selectedobject.type == 2) // volume file (it should never be a volume since i don't add it to the image tree)
+        else if(wombatvarptr->selectedobject.objtype == 2) // volume file (it should never be a volume since i don't add it to the image tree)
         {
         }
-        else if(wombatvarptr->selectedobject.type == 3) // partition file
+        else if(wombatvarptr->selectedobject.objtype == 3) // partition file
         {
         }
-        else if(wombatvarptr->selectedobject.type == 4) // file system file
+        else if(wombatvarptr->selectedobject.objtype == 4) // file system file
         {
         }
         else // implement for files, directories etc.. as i go.
@@ -985,7 +986,7 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked)
 
 void WombatForensics::UpdateOmniValue()
 {
-    if(wombatvarptr->selectedobject.type > 0 && wombatvarptr->selectedobject.type < 4)
+    if(wombatvarptr->selectedobject.objtype > 0 && wombatvarptr->selectedobject.objtype < 4)
     {
         wombatvarptr->omnivalue = 1;
     }
