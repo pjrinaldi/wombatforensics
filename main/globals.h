@@ -13,6 +13,7 @@ extern int filesprocessed;
 extern int totalcount;
 extern int totalchecked;
 extern int currentevidenceid;
+extern int exportcount;
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> checkedids;

@@ -7,19 +7,39 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvarptr = &wombatvariable;
     this->menuBar()->hide();
     this->statusBar()->setSizeGripEnabled(true);
-    mainprogress = new QProgressBar(this);
-    mainprogress->setMaximumHeight(15);
-    mainprogress->setStyleSheet("font-size: 10px");
-    int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
-    mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
-    this->statusBar()->setMaximumHeight(15);
-    this->statusBar()->addPermanentWidget(mainprogress, 0);
-    this->statusBar()->removeWidget(mainprogress);
+    //mainprogress = new QProgressBar(this);
+    //int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
+    //mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
+    //this->statusBar()->addWidget(mainprogress, 0);
+    //this->statusBar()->removeWidget(mainprogress);
+    selectedoffset = new QLabel(this);
+    selectedoffset->setText("Offset: 00");
+    selectedhex = new QLabel(this);
+    selectedhex->setText("Length: 0");
+    filtercountlabel = new QLabel(this);
+    filtercountlabel->setText("Filtered: 0");
     filecountlabel = new QLabel(this);
-    filecountlabel->setStyleSheet("font-size: 10px");
     filecountlabel->setText("Files: 0");
+    processcountlabel = new QLabel(this);
+    processcountlabel->setText("Processed: 0");
+    statuslabel = new QLabel(this);
+    statuslabel->setText("Current Status Area");
+    vline1 = new QFrame(this);
+    vline1->setFrameStyle(QFrame::VLine | QFrame::Raised);
+    vline1->setLineWidth(1);
+    vline1->setMidLineWidth(0);
+    vline2 = new QFrame(this);
+    vline2->setFrameStyle(QFrame::VLine | QFrame::Raised);
+    vline2->setLineWidth(1);
+    vline2->setMidLineWidth(0);
+    this->statusBar()->addWidget(selectedoffset, 0);
+    this->statusBar()->addWidget(selectedhex, 0);
+    this->statusBar()->addWidget(vline1, 0);
+    this->statusBar()->addWidget(filtercountlabel, 0);
     this->statusBar()->addWidget(filecountlabel, 0);
-    //this->statusBar()->removeWidget(filecountlabel);
+    this->statusBar()->addWidget(processcountlabel, 0);
+    this->statusBar()->addPermanentWidget(vline2, 0);
+    this->statusBar()->addPermanentWidget(statuslabel, 0);
     tskobjptr = &tskobject;
     tskobjptr->readimginfo = NULL;
     tskobjptr->readfsinfo = NULL;
@@ -96,6 +116,12 @@ void WombatForensics::InitializeAppStructure()
     {
         DisplayError("1.0", "Case Count", "Invalid Case Count returned.");
     }
+    ui->actionAdd_Evidence->setEnabled(false);
+    ui->actionRemove_Evidence->setEnabled(false);
+    ui->actionViewTxt->setEnabled(false);
+    ui->actionViewOmni->setEnabled(false);
+    ui->actionView_Progress->setEnabled(false);
+    ui->actionExport_Evidence->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -202,6 +228,7 @@ void WombatForensics::InitializeQueryModel()
     fcasedb.commit();
     if(ProcessingComplete())
     {
+        statuslabel->setText("Processing Complete");
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
@@ -290,11 +317,14 @@ void WombatForensics::AddEvidence()
         wombatvarptr->evidenceobject.itemcount = tmplist.count();
         //qDebug() << " ptr itemcount: " << wombatvarptr->evidenceobject.itemcount;
         // REPLACE WITH PROGRESSBAR/STATUSBAR
-        this->statusBar()->addPermanentWidget(mainprogress, 0);
-        this->mainprogress->show();
+        //this->statusBar()->addPermanentWidget(mainprogress, 0);
+        //this->mainprogress->show();
         int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
-        mainprogress->setValue(curprogress);
-        mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
+        processcountlabel->setText("Processed: " + QString::number(filesprocessed));
+        filecountlabel->setText("Files: " + QString::number(filesfound));
+        statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
+        //mainprogress->setValue(curprogress);
+        //mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
         //wombatprogresswindow->show();
         //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
         // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
@@ -306,17 +336,20 @@ void WombatForensics::AddEvidence()
 
 void WombatForensics::UpdateViewer()
 {
-    wombatvarptr->visibleviewer = ReturnVisibleViewerID();
-    if(wombatvarptr->visibleviewer == 0) // hex
-        LoadHexContents();
-    else if(wombatvarptr->visibleviewer == 1) // txt
-        LoadTxtContents();
-    else if(wombatvarptr->visibleviewer == 2) // web
-        LoadWebContents();
-    else if(wombatvarptr->visibleviewer == 3) // pic
-        LoadImgContents();
-    else if(wombatvarptr->visibleviewer == 4) // vid
-        LoadVidContents();
+    if(ui->dirTreeView->model() != NULL)
+    {
+        wombatvarptr->visibleviewer = ReturnVisibleViewerID();
+        if(wombatvarptr->visibleviewer == 0) // hex
+            LoadHexContents();
+        else if(wombatvarptr->visibleviewer == 1) // txt
+            LoadTxtContents();
+        else if(wombatvarptr->visibleviewer == 2) // web
+            LoadWebContents();
+        else if(wombatvarptr->visibleviewer == 3) // pic
+            LoadImgContents();
+        else if(wombatvarptr->visibleviewer == 4) // vid
+            LoadVidContents();
+    }
 }
 
 void WombatForensics::LoadHexContents()
@@ -566,6 +599,7 @@ void WombatForensics::ExportEvidence()
 {
     totalcount = 0;
     totalchecked = 0;
+    exportcount = 0;
     ((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
     exportdialog = new ExportDialog(this, totalchecked, totalcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
@@ -620,6 +654,8 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     }
     else
         GetExportData(rootnode, exportdata);
+    int curprogress = (int)((((float)exportcount)/(float)curlist.count())*100);
+    statuslabel->setText("Exported: " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
     for(int i=0; i < curlist.count(); i++)
     {
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, curlist.at(i), exportfilelist[i].fullpath, exportfilelist[i].name);
@@ -684,6 +720,9 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
             }
         }
     }
+    exportcount++;
+    int curprogress = (int)((((float)exportcount)/(float)curlist.count())*100);
+    StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%"));
 
     // NEED TO IMPLEMENT FUNCTIONALITY TO UPDATE PROGRESS BAR/FILE COUNT FOR THE EXPORT.
 
@@ -710,8 +749,11 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
 {
     //qDebug() << "Global Class Called This to AutoUpdate!!!";
     int curprogress = (int)((((float)processcount)/(float)filecount)*100);
-    mainprogress->setValue(curprogress);
-    mainprogress->setFormat("Processed " + QString::number(processcount) + " of " + QString::number(filecount) + " " + QString::number(curprogress) + "%");
+    processcountlabel->setText("Processed: " + QString::number(filesprocessed));
+    filecountlabel->setText("Files: " + QString::number(filesfound));
+    statuslabel->setText("Status: " + QString::number(curprogress) + "%"); // need to be able to set it to % processed or % exported
+    //mainprogress->setValue(curprogress);
+    //mainprogress->setFormat("Processed " + QString::number(processcount) + " of " + QString::number(filecount) + " " + QString::number(curprogress) + "%");
     //wombatprogresswindow->UpdateFilesFound(QString::number(filecount));
     //wombatprogresswindow->UpdateFilesProcessed(QString::number(processcount));
     //wombatprogresswindow->UpdateProgressBar(curprogress);
@@ -782,26 +824,26 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    hstatus = new QStatusBar(ui->hexPage);
-    hstatus->setSizeGripEnabled(false);
-    hstatus->setMaximumHeight(20);
-    selectedoffset = new QLabel(this);
-    selectedhex = new QLabel(this);
-    selectedoffset->setText("Offset: 00");
-    selectedoffset->setAlignment(Qt::AlignVCenter);
-    selectedhex->setText("Length: 0");
+    //hstatus = new QStatusBar(ui->hexPage);
+    //hstatus->setSizeGripEnabled(false);
+    //hstatus->setMaximumHeight(20);
+    //selectedoffset = new QLabel(this);
+    //selectedhex = new QLabel(this);
+    //selectedoffset->setText("Offset: 00");
+    //selectedoffset->setAlignment(Qt::AlignVCenter);
+    //selectedhex->setText("Length: 0");
     //selectedoffset = new QLabel("Offset: 00");
     //selectedhex = new QLabel("Length: 0");
-    selectedascii = new QLabel("Ascii: ");
-    selectedinteger = new QLabel("Integer: ");
-    selectedfloat = new QLabel("Float: ");
-    selecteddouble = new QLabel("Double: ");
-    hstatus->addWidget(selectedoffset);
-    hstatus->addWidget(selectedhex);
-    hstatus->addWidget(selectedascii);
-    hstatus->addWidget(selectedinteger);
-    hstatus->addWidget(selectedfloat);
-    hstatus->addWidget(selecteddouble);
+    //selectedascii = new QLabel("Ascii: ");
+    //selectedinteger = new QLabel("Integer: ");
+    //selectedfloat = new QLabel("Float: ");
+    //selecteddouble = new QLabel("Double: ");
+    //hstatus->addWidget(selectedoffset);
+    //hstatus->addWidget(selectedhex);
+    //hstatus->addWidget(selectedascii);
+    //hstatus->addWidget(selectedinteger);
+    //hstatus->addWidget(selectedfloat);
+    //hstatus->addWidget(selecteddouble);
     hexwidget = new HexEditor(ui->hexPage, tskobjptr);
     hexwidget->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
     hexwidget->setObjectName("bt-hexview");
@@ -811,7 +853,7 @@ void WombatForensics::SetupHexPage(void)
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
-    mainlayout->addWidget(hstatus);
+    //mainlayout->addWidget(hstatus);
 
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
@@ -994,7 +1036,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     QString ascii;
     Translate::ByteToChar(ascii, bytes);
     tmptext = "Ascii: " + ascii;
-    selectedascii->setText(tmptext);
+    //selectedascii->setText(tmptext);
     QString strvalue;
     uchar * ucharPtr;
     // update the int entry:
@@ -1004,7 +1046,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
     strvalue.setNum(intvalue);
     tmptext = "Int: " + strvalue;
-    selectedinteger->setText(tmptext);
+    //selectedinteger->setText(tmptext);
     // update float entry;
     float fvalue;
     ucharPtr = (uchar*)(&fvalue);
@@ -1028,7 +1070,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     }
     strvalue.setNum( fvalue );
     tmptext = "Float: " + strvalue;
-    selectedfloat->setText(tmptext);
+    //selectedfloat->setText(tmptext);
     // update double
     double dvalue;
     ucharPtr = (uchar*)&dvalue;
@@ -1052,7 +1094,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     }
     strvalue.setNum( dvalue );
     tmptext = "Double: " + strvalue;
-    selecteddouble->setText(tmptext);
+    //selecteddouble->setText(tmptext);
 }
 
 void WombatForensics::setOffsetLabel(off_t pos)

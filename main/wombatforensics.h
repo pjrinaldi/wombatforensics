@@ -356,7 +356,8 @@ public:
     TreeModel* treemodel;
 
 signals:
-    void LogVariable(WombatVariable* wombatVariable);
+    //void LogVariable(WombatVariable* wombatVariable);
+
 private slots:
     void AddEvidence();
     void RemEvidence();
@@ -393,6 +394,10 @@ private slots:
     void LoadComplete(bool isok);
     void InitializeQueryModel(void);
     void FinishExport(void);
+    void StatusUpdate(QString tmptext)
+    {
+        statuslabel->setText(tmptext);
+    };
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -432,15 +437,20 @@ private:
     HexEditor* hexwidget;
     QActionGroup* viewgroup;
     QScrollBar* hexvsb;
-    QStatusBar* hstatus;
+    //QStatusBar* hstatus;
     QLabel* selectedoffset;
     QLabel* selectedhex;
-    QLabel* selectedascii;
-    QLabel* selectedinteger;
-    QLabel* selectedfloat;
-    QLabel* selecteddouble;
-    QProgressBar* mainprogress;
+    //QLabel* selectedascii;
+    //QLabel* selectedinteger;
+    //QLabel* selectedfloat;
+    //QLabel* selecteddouble;
+    //QProgressBar* mainprogress;
     QLabel* filecountlabel;
+    QLabel* filtercountlabel;
+    QLabel* processcountlabel;
+    QLabel* statuslabel;
+    QFrame* vline1;
+    QFrame* vline2;
     QVector<FileExportData> exportfilelist;
 };
 
