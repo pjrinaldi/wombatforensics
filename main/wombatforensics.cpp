@@ -60,6 +60,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
+    treemodel = new TreeModel(this);
     InitializeWombatFramework();
 }
 
@@ -237,10 +238,9 @@ void WombatForensics::InitializeQueryModel()
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
-        wombatdatabase->GetRootInum();
-        wombatdatabase->GetRootNodes();
-
-        TreeModel* treemodel = new TreeModel(this);
+        wombatdatabase->GetRootInum(); // gets all the inums for each filesystem objecttype = 4 
+        wombatdatabase->GetRootNodes(); // gets all the root node assemblys for each evidence item
+        qDebug() << "dummy node count: " << dummynode->children.count();
         treemodel->SetRootNode(dummynode);
 
         ui->dirTreeView->setAllColumnsShowFocus(true);
@@ -254,7 +254,7 @@ void WombatForensics::InitializeQueryModel()
         connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
         connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
 
-        ResizeColumns();
+        //ResizeColumns();
         statuslabel->setText("");
         wombatframework->CloseInfoStructures();
     }
@@ -765,10 +765,10 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
-    if(curprogress == 100)
+    if(curprogress == 100 && ProcessingComplete())
     {
         statuslabel->setText("Processing Complete");
-        QThread::sleep(2);
+        //QThread::sleep(2);
         statuslabel->setText("");
     }
     //mainprogress->setValue(curprogress);

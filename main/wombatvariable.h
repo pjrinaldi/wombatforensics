@@ -208,6 +208,7 @@ struct WombatVariable
     QString wombatdbname;
     //QStandardItemModel* dirmodel;
     QList<int> objectidlist;
+    QList<int> rootinums;
     CaseObject caseobject;
     QStringList casenamelist;
     EvidenceObject evidenceobject;

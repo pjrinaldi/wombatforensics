@@ -377,7 +377,7 @@ private slots:
     void OpenFileSystemFile(void);
     void ResizeViewColumns(const QModelIndex &index)
     {
-        ResizeColumns();
+        //ResizeColumns();
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
