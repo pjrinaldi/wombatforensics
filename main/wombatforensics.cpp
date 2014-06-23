@@ -252,6 +252,7 @@ void WombatForensics::InitializeQueryModel()
 
         ResizeColumns();
         wombatframework->CloseInfoStructures();
+        statuslabel->setText("");
     }
 }
 
@@ -615,6 +616,9 @@ void WombatForensics::FinishExport()
 {
     if(ProcessingComplete())
     {
+        statuslabel->setText("Exporting completed");
+        QThread::sleep(2); // delay between the complete command and the clear status area command.
+        statuslabel->setText("");
         qDebug() << "export of files is complete.";
     }
     else
