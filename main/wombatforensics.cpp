@@ -23,7 +23,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     processcountlabel = new QLabel(this);
     processcountlabel->setText("Processed: 0");
     statuslabel = new QLabel(this);
-    statuslabel->setText("Current Status Area");
+    statuslabel->setText("");
     vline1 = new QFrame(this);
     vline1->setFrameStyle(QFrame::VLine | QFrame::Raised);
     vline1->setLineWidth(1);
@@ -170,6 +170,7 @@ void WombatForensics::InitializeCaseStructure()
         {
             ui->actionOpen_Case->setEnabled(true);
         }
+        ui->actionAdd_Evidence->setEnabled(true);
     }
 }
 
@@ -213,8 +214,11 @@ void WombatForensics::InitializeOpenCase()
                 DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
         fcasedb = wombatvarptr->casedb;
+        ui->actionAdd_Evidence->setEnabled(true);
         wombatdatabase->GetEvidenceObjects();
-        // NEED TO INITIALIZEEVIDENCEIMAGES() HERE
+        // need to initialize treeview model for existing evidence.
+        if(ui->dirTreeView->model() != NULL)
+            ui->actionRemove_Evidence->setEnabled(true);
     }
 
 }
@@ -251,14 +255,15 @@ void WombatForensics::InitializeQueryModel()
         connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
 
         ResizeColumns();
-        wombatframework->CloseInfoStructures();
         statuslabel->setText("");
+        wombatframework->CloseInfoStructures();
     }
 }
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
     selectedindex = curitem.indexes().at(0);
+    ui->actionExport_Evidence->setEnabled(true);
     wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
     wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
     wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
@@ -320,10 +325,13 @@ void WombatForensics::AddEvidence()
         // REPLACE WITH PROGRESSBAR/STATUSBAR
         //this->statusBar()->addPermanentWidget(mainprogress, 0);
         //this->mainprogress->show();
-        int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
-        processcountlabel->setText("Processed: " + QString::number(filesprocessed));
-        filecountlabel->setText("Files: " + QString::number(filesfound));
-        statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
+        //int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
+        //processcountlabel->setText("Processed: " + QString::number(filesprocessed));
+        //filecountlabel->setText("Files: " + QString::number(filesfound));
+        //statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
+        processcountlabel->setText("Processed: 0");
+        filecountlabel->setText("Files: 0");
+        statuslabel->setText("Processed 0%");
         //mainprogress->setValue(curprogress);
         //mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
         //wombatprogresswindow->show();
@@ -756,7 +764,13 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     int curprogress = (int)((((float)processcount)/(float)filecount)*100);
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    statuslabel->setText("Status: " + QString::number(curprogress) + "%"); // need to be able to set it to % processed or % exported
+    statuslabel->setText("Processed: " + QString::number(curprogress) + "%"); // need to be able to set it to % processed or % exported
+    if(curprogress == 100)
+    {
+        statuslabel->setText("Processing Complete");
+        QThread::sleep(2);
+        statuslabel->setText("");
+    }
     //mainprogress->setValue(curprogress);
     //mainprogress->setFormat("Processed " + QString::number(processcount) + " of " + QString::number(filecount) + " " + QString::number(curprogress) + "%");
     //wombatprogresswindow->UpdateFilesFound(QString::number(filecount));
