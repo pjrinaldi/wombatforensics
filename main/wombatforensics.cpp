@@ -60,7 +60,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
+    connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+
+
     treemodel = new TreeModel(this);
+    ui->dirTreeView->setModel(treemodel);
+    ui->dirTreeView->setAllColumnsShowFocus(true);
     InitializeWombatFramework();
 }
 
@@ -237,23 +244,20 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
+        /*
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
         wombatdatabase->GetRootInum(); // gets all the inums for each filesystem objecttype = 4 
         wombatdatabase->GetRootNodes(); // gets all the root node assemblys for each evidence item
-        qDebug() << "dummy node count: " << dummynode->children.count();
-        treemodel->SetRootNode(dummynode);
+        */
+        //qDebug() << "dummy node count: " << dummynode->children.count();
+        //treemodel->SetRootNode(dummynode);
 
-        ui->dirTreeView->setAllColumnsShowFocus(true);
-        ui->dirTreeView->setModel(treemodel);
-        ui->dirTreeView->hideColumn(4);
-        ui->dirTreeView->hideColumn(5);
-        ui->dirTreeView->hideColumn(11);
-        ui->dirTreeView->hideColumn(12);
-
-        connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
-        connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
-        connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
-
+        //ui->dirTreeView->setModel(treemodel);
+        //ui->dirTreeView->reset();
+        //ui->dirTreeView->hideColumn(4);
+        //ui->dirTreeView->hideColumn(5);
+        //ui->dirTreeView->hideColumn(11);
+        //ui->dirTreeView->hideColumn(12);
         //ResizeColumns();
         statuslabel->setText("");
         wombatframework->CloseInfoStructures();

@@ -19,7 +19,9 @@ public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type";
-        rootnode = 0;
+        QList<QVariant> emptyset;
+        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+        rootnode = new Node(emptyset);
     };
 
     ~TreeModel()
@@ -27,11 +29,11 @@ public:
         delete rootnode;
     };
 
-    void SetRootNode(Node* node)
+    /*void SetRootNode(Node* node)
     {
         delete rootnode;
         rootnode = node;
-    };
+    };*/
 
     QModelIndex index(int row, int col, const QModelIndex &parent) const
     {
@@ -248,6 +250,18 @@ public:
                 GetModelCount(curnode->children[i]);
             }
         }
+    };
+
+    void UpdateModel(Node* childnode)
+    {
+        beginResetModel();
+        rootnode->children.append(childnode);
+        childnode->parent = rootnode;
+        rootnode->haschildren = true;
+        rootnode->childcount = rootnode->childcount + 1;
+        endResetModel();
+        //beginInsertRows();
+        //endInsertRows();
     };
 
 signals:

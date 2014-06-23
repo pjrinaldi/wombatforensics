@@ -551,21 +551,17 @@ void WombatDatabase::GetRootInum()
 
 void WombatDatabase::GetRootNodes()
 {
-    QList<QVariant> emptyset;
-    emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
-    toplevelnode = 0;
-    toplevelnode = new Node(emptyset);
-    qDebug() << "rootinum count: " << wombatptr->rootinums.count();
-    dummynode = 0;
-    dummynode = new Node(emptyset);
-    toplevelnode->children.append(dummynode);
-    for(int k=0; k < wombatptr->rootinums.count(); k++)
-    {
+    //for(int k=0; k < wombatptr->rootinums.count(); k++)
+    //{
         wombatptr->bindvalues.clear();
         wombatptr->sqlrecords.clear();
-        wombatptr->bindvalues.append(wombatptr->rootinums.at(k));
+        rootnode->children.clear();
+        rootnode->childcount = 0;
+        //wombatptr->bindvalues.append(wombatptr->rootinums.at(k));
         //wombatptr->bindvalues.append(wombatptr->currentrootinum);
-        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
+        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE objecttype < 5 order by objecttype", wombatptr->bindvalues);
+        //wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
+        qDebug() << "sqlrecord count: " << wombatptr->sqlrecords.count();
         for(int i=0; i < wombatptr->sqlrecords.count(); i++)
         {
             currentnode = 0;
@@ -575,7 +571,19 @@ void WombatDatabase::GetRootNodes()
                 colvalues.append(wombatptr->sqlrecords[i].value(j));
             }
             currentnode = new Node(colvalues);
-            if(colvalues.at(4).toInt() < 5) // not file or directory
+            if(colvalues.at(4).toInt() == 1)
+            {
+                ((TreeModel*)ui->dirTreeView->model())->UpdateModel(currentnode);
+                //treemodel->
+                /*
+                rootnode->children.append(currentnode);
+                currentnode->parent = rootnode;
+                rootnode->haschildren = true;
+                rootnode->childcount = rootnode->childcount + 1;
+                */
+            }
+            //qDebug() << "root node child count: " << rootnode->childcount;
+           /*if(colvalues.at(4).toInt() < 5) // not file or directory
             {
                 if(colvalues.at(4).toInt() == 1) // image node
                 {
@@ -611,7 +619,8 @@ void WombatDatabase::GetRootNodes()
                     currentnode->haschildren = currentnode->HasChildren();
                     parentnode = currentnode;
                 }
-            }
+            }*/
+            /*
             else // its a file or directory with rootinum for a parent
             {
                 currentnode->parent = parentnode;
@@ -627,6 +636,7 @@ void WombatDatabase::GetRootNodes()
                 }
                 parentnode->children.append(currentnode);
             }
-        }
+            */
+        //}
     }
 }
