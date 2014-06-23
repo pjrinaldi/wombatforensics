@@ -551,7 +551,14 @@ void WombatDatabase::GetRootInum()
 
 void WombatDatabase::GetRootNodes()
 {
+    QList<QVariant> emptyset;
+    emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+    toplevelnode = 0;
+    toplevelnode = new Node(emptyset);
     qDebug() << "rootinum count: " << wombatptr->rootinums.count();
+    dummynode = 0;
+    dummynode = new Node(emptyset);
+    toplevelnode->children.append(dummynode);
     for(int k=0; k < wombatptr->rootinums.count(); k++)
     {
         wombatptr->bindvalues.clear();
@@ -572,8 +579,6 @@ void WombatDatabase::GetRootNodes()
             {
                 if(colvalues.at(4).toInt() == 1) // image node
                 {
-                    if(dummynode == 0)
-                        dummynode = new Node(colvalues);
                     dummynode->children.append(currentnode);
                     dummynode->childcount = GetChildCount(1, dummynode->nodevalues.at(0).toInt());
                     dummynode->haschildren = dummynode->HasChildren();

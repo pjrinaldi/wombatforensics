@@ -75,5 +75,6 @@ extern Node* rootnode;
 extern Node* dummynode;
 extern Node* parentnode;
 extern Node* currentnode;
+extern Node* toplevelnode;
 
 #endif
