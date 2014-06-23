@@ -764,7 +764,7 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     int curprogress = (int)((((float)processcount)/(float)filecount)*100);
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    statuslabel->setText("Processed: " + QString::number(curprogress) + "%"); // need to be able to set it to % processed or % exported
+    statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
     if(curprogress == 100)
     {
         statuslabel->setText("Processing Complete");
