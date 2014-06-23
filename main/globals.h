@@ -18,7 +18,6 @@ extern QList<QVariant> colvalues;
 extern QList<TskObject> checkedids;
 extern QList<TskObject> listedids;
 extern QList<TskObject> curlist;
-extern QVector<QVariant> exportfilelist; 
 
 class InterfaceSignals : public QObject
 {

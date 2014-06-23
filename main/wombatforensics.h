@@ -233,70 +233,6 @@ public:
         }
     };
 
-    void GetExportData(Node* curnode, FileExportData* exportdata)
-    {
-        if(curnode->nodevalues.at(4).toInt() == 5)
-        {
-            QVariant tmpvariant;
-            if(exportdata->filestatus == FileExportData::checked)
-            {
-                if(curnode->checkstate == 2)
-                {
-                    TskObject tmpobj;
-                    tmpobj.address = curnode->nodevalues.at(5).toInt();
-                    tmpobj.length = curnode->nodevalues.at(3).toInt();
-                    tmpobj.type = curnode->nodevalues.at(12).toInt();
-                    tmpobj.objecttype = 5;
-                    tmpobj.offset = 0;
-                    tmpobj.readimginfo = NULL;
-                    tmpobj.readfsinfo = NULL;
-                    tmpobj.readfileinfo = NULL;
-                    checkedids.append(tmpobj);
-                    exportdata->exportcount = totalchecked;
-                    exportdata->id = curnode->nodevalues.at(0).toInt();
-                    exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
-                    exportdata->fullpath = exportdata->exportpath;
-                    exportdata->fullpath += "/";
-                    exportdata->fullpath += currentevidencename.toStdString();
-                    exportdata->fullpath += "/";
-                    if(exportdata->pathstatus == FileExportData::include)
-                        exportdata->fullpath += curnode->nodevalues.at(2).toString().toStdString();
-                    exportdata->fullpath += "/";
-                    exportfilelist.push_back(tmpvariant.setValue(*exportdata));
-                }
-            }
-            else
-            {
-                TskObject tmpobj;
-                tmpobj.address = curnode->nodevalues.at(5).toInt();
-                tmpobj.length = curnode->nodevalues.at(3).toInt();
-                tmpobj.type = curnode->nodevalues.at(12).toInt();
-                tmpobj.objecttype = 5;
-                tmpobj.offset = 0;
-                tmpobj.readimginfo = NULL;
-                tmpobj.readfsinfo = NULL;
-                tmpobj.readfileinfo = NULL;
-                listedids.append(tmpobj);
-                exportdata->exportcount = totalchecked;
-                exportdata->id = curnode->nodevalues.at(0).toInt();
-                exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
-                exportdata->fullpath = exportdata->exportpath;
-                exportdata->fullpath += "/";
-                exportdata->fullpath += currentevidencename.toStdString();
-                exportdata->fullpath += "/";
-                if(exportdata->pathstatus == FileExportData::include)
-                    exportdata->fullpath += curnode->nodevalues.at(2).toString().toStdString();
-                exportdata->fullpath += "/";
-                exportfilelist.push_back(tmpvariant.setValue(*exportdata));
-            }
-        }
-        if(curnode->haschildren)
-        {
-            for(int i=0; i < curnode->children.count(); i++)
-                GetExportData(curnode->children[i], exportdata);
-        }
-    };
-
     void GetModelCount(Node* curnode)
     {
         if(curnode->nodevalues.at(4).toInt() == 5)
@@ -478,15 +414,12 @@ private:
     void LoadImgContents(void);
     void LoadVidContents(void);
     void ExportFiles(FileExportData* exportdata);
+    void GetExportData(Node* curnode, FileExportData* exportdata);
     void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
 
     void RemoveTmpFiles(void);
 
     int ReturnVisibleViewerID();
-    //int StandardItemCheckState(QStandardItem* tmpitem, int checkcount);
-    //int StandardItemListCount(QStandardItem* tmpitem, int listcount);
-    QVector<FileExportData> SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData>);
-    QVector<FileExportData> SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData>);
     int DetermineOmniView(QString currentSignature);
     QModelIndex selectedindex;
 
@@ -508,6 +441,7 @@ private:
     QLabel* selecteddouble;
     QProgressBar* mainprogress;
     QLabel* filecountlabel;
+    QVector<FileExportData> exportfilelist;
 };
 
 #endif // WOMBATFORENSICS_H

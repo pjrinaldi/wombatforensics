@@ -17,7 +17,4 @@ Node* rootnode = 0;
 Node* dummynode = 0;
 Node* parentnode = 0;
 QList<QVariant> colvalues;
-QList<TskObject> checkedids;
-QList<TskObject> listedids;
 QList<TskObject> curlist;
-QVector<QVariant> exportfilelist;

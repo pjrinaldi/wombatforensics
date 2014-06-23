@@ -206,7 +206,6 @@ void WombatForensics::InitializeQueryModel()
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
-        //qDebug() << "currentfilesystemid: " << wombatvarptr->currentfilesystemid;
         wombatdatabase->GetRootInum();
         wombatdatabase->GetRootNodes();
 
@@ -302,13 +301,6 @@ void WombatForensics::AddEvidence()
 
         sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
         sqlwatcher.setFuture(sqlfuture);
-
-        // SHOULD GO HERE, BUT IT NEEDS TO LAUNCH WHEN THE THREADS ARE DONE...
-        // FOR NOW I'LL PUT IT IN THE OFFSHOOT THREAD.
-        // if i call these in concurrent::runs-> then they shouldn't run until the end...?
-        //ResizeColumns();
-        // the below must be called when all threads are done and i don't need the variable anymore.
-        //wombatframework->CloseInfoStructures();
     }
 }
 
@@ -499,126 +491,76 @@ void WombatForensics::OpenParentFileSystem()
 
 void WombatForensics::OpenFileSystemFile()
 {
-    //qDebug() << "fs file inum: " << tskobjptr->address;
-    //qDebug() << "fs file length: " << tskobjptr->length;
     tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
-    //qDebug() << "file info inum: " << tskobjptr->readfileinfo->meta->addr;
 }
 
 void WombatForensics::RemEvidence()
 {
 }
 
-/*
-int WombatForensics::StandardItemCheckState(QStandardItem* tmpitem, int checkcount)
+void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
 {
-    int curcount = checkcount;
-    QModelIndex curindex = tmpitem->index();
-    if(tmpitem->hasChildren())
+    if(curnode->nodevalues.at(4).toInt() == 5)
     {
-        for(int i=0; i < tmpitem->rowCount(); i++)
+        QVariant tmpvariant;
+        if(exportdata->filestatus == FileExportData::checked)
         {
-            curcount = StandardItemCheckState(tmpitem->child(i,0), curcount);
-        }
-    }
-    if(curindex.sibling(curindex.row(),1).flags().testFlag(Qt::ItemIsUserCheckable))
-    {
-        if(tmpitem->parent()->child(curindex.row(), 1)->checkState())
-            curcount++;
-    }
-    
-    return curcount;
-}*/
-
-QVector<FileExportData> WombatForensics::SetFileExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData> tmpexportlist)
-{
-    QModelIndex curindex = tmpitem->index();
-    if(tmpitem->hasChildren())
-    {
-        for(int i=0; i < tmpitem->rowCount(); i++)
-        {
-            tmpexportlist = SetFileExportProperties(tmpitem->child(i,0), tmpexport, tmpexportlist);
-        }
-    }
-    if(curindex.sibling(curindex.row(), 1).flags().testFlag(Qt::ItemIsUserCheckable))
-    {
-        if(tmpitem->parent()->child(curindex.row(), 1)->checkState())
-        {
-            
-            // update evidence/file info for each item bit.
-            tmpexport->id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // unique object id
-            //wombatvarptr->evidenceobject.id = wombatdatabase->ReturnObjectEvidenceID(tmpexport->id); // evidence id
-            //QStringList currentevidencelist = wombatdatabase->ReturnEvidenceData(wombatvarptr->evidenceobject.id); // evidence data
-            //tmpexport->evidenceobject.fullpath = currentevidencelist[0]; // evidence path
-            //tmpexport->evidenceobject.dbname = currentevidencelist[1]; // evidence db name
-            tmpexport->evidenceobject.fullpath = "";
-            tmpexport->evidenceobject.dbname = "";
-            tmpexport->name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
-            if(tmpexport->pathstatus == FileExportData::include)
+            if(curnode->checkstate == 2)
             {
-                // export path with original path
-                tmpexport->fullpath = tmpexport->exportpath + "/" + curindex.sibling(curindex.row(), 2).data().toString().toStdString();
+                TskObject tmpobj;
+                tmpobj.address = curnode->nodevalues.at(5).toInt();
+                tmpobj.length = curnode->nodevalues.at(3).toInt();
+                tmpobj.type = curnode->nodevalues.at(12).toInt();
+                tmpobj.objecttype = 5;
+                tmpobj.offset = 0;
+                tmpobj.readimginfo = NULL;
+                tmpobj.readfsinfo = NULL;
+                tmpobj.readfileinfo = NULL;
+                curlist.append(tmpobj);
+                exportdata->exportcount = totalchecked;
+                exportdata->id = curnode->nodevalues.at(0).toInt();
+                exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
+                exportdata->fullpath = exportdata->exportpath;
+                exportdata->fullpath += "/";
+                exportdata->fullpath += currentevidencename.toStdString();
+                exportdata->fullpath += "/";
+                if(exportdata->pathstatus == FileExportData::include)
+                    exportdata->fullpath += curnode->nodevalues.at(2).toString().toStdString();
+                exportdata->fullpath += "/";
+                exportfilelist.push_back(*exportdata);
             }
-            else if(tmpexport->pathstatus == FileExportData::exclude)
-            {
-                tmpexport->fullpath = tmpexport->exportpath + "/" + tmpexport->name; // export path without original path
-            }
-            //fprintf(stderr, "export full path checked: %s\n", tmpexport.fullpath.c_str());
-    
-            tmpexportlist.push_back(*tmpexport);
         }
-    }
-
-    return tmpexportlist;
-}
-QVector<FileExportData> WombatForensics::SetListExportProperties(QStandardItem* tmpitem, FileExportData* tmpexport, QVector<FileExportData> tmpexportlist)
-{
-    QModelIndex curindex = tmpitem->index();
-    if(tmpitem->hasChildren())
-    {
-        for(int i = 0; i < tmpitem->rowCount(); i++)
+        else
         {
-            tmpexportlist = SetListExportProperties(tmpitem->child(i, 0), tmpexport, tmpexportlist);
+            TskObject tmpobj;
+            tmpobj.address = curnode->nodevalues.at(5).toInt();
+            tmpobj.length = curnode->nodevalues.at(3).toInt();
+            tmpobj.type = curnode->nodevalues.at(12).toInt();
+            tmpobj.objecttype = 5;
+            tmpobj.offset = 0;
+            tmpobj.readimginfo = NULL;
+            tmpobj.readfsinfo = NULL;
+            tmpobj.readfileinfo = NULL;
+            curlist.append(tmpobj);
+            exportdata->exportcount = totalchecked;
+            exportdata->id = curnode->nodevalues.at(0).toInt();
+            exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
+            exportdata->fullpath = exportdata->exportpath;
+            exportdata->fullpath += "/";
+            exportdata->fullpath += currentevidencename.toStdString();
+            exportdata->fullpath += "/";
+            if(exportdata->pathstatus == FileExportData::include)
+                exportdata->fullpath += curnode->nodevalues.at(2).toString().toStdString();
+            exportdata->fullpath += "/";
+            exportfilelist.push_back(*exportdata);
         }
     }
-    // get every item.
-    tmpexport->id = curindex.sibling(curindex.row(), 1).data().toString().toInt(); // unique object id
-    //wombatvarptr->evidenceobject.id = wombatdatabase->ReturnObjectEvidenceID(tmpexport->id); // evidence id
-    //QStringList currentevidencelist = wombatdatabase->ReturnEvidenceData(wombatvarptr->evidenceobject.id); // evidence data
-    tmpexport->evidenceobject.fullpath = ""; //currentevidencelist[0]; // evidence path
-    tmpexport->evidenceobject.dbname = ""; //currentevidencelist[1]; // evidence db name
-    tmpexport->name = curindex.sibling(curindex.row(), 0).data().toString().toStdString(); // file name
-    if(tmpexport->pathstatus == FileExportData::include)
+    if(curnode->haschildren)
     {
-        // export path with original path
-        tmpexport->fullpath = tmpexport->exportpath + "/" + curindex.sibling(curindex.row(), 2).data().toString().toStdString();
+        for(int i=0; i < curnode->children.count(); i++)
+            GetExportData(curnode->children[i], exportdata);
     }
-    else if(tmpexport->pathstatus == FileExportData::exclude)
-    {
-        tmpexport->fullpath = tmpexport->exportpath + "/" + tmpexport->name; // export path without original path
-    }
-    //fprintf(stderr, "export full path listed: %s\n", tmpexport.fullpath.c_str());
-    tmpexportlist.push_back(*tmpexport);
-
-    return tmpexportlist;
-}
-
-/*
-int WombatForensics::StandardItemListCount(QStandardItem* tmpitem, int listcount)
-{
-    int curcount = listcount;
-    if(tmpitem->hasChildren())
-    {
-        for(int i=0; i < tmpitem->rowCount(); i++)
-        {
-            curcount = StandardItemListCount(tmpitem->child(i,0), curcount);
-        }
-    }
-    curcount++;
-
-    return curcount;
-}
-*/
+};
 
 void WombatForensics::ExportEvidence()
 {
@@ -633,7 +575,6 @@ void WombatForensics::ExportEvidence()
 void WombatForensics::FileExport(FileExportData* exportdata)
 {
     exportfuture = QtConcurrent::run(this, &WombatForensics::ExportFiles, exportdata);
-    exportwatcher.setFuture(exportfuture);
 }
 
 void WombatForensics::FinishExport()
@@ -652,7 +593,6 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
 {
     threadvector.clear();
     exportfilelist.clear();
-    //QVector<FileExportData> exportevidencelist;
     curlist.clear();
     if(exportdata->filestatus == FileExportData::selected)
     {
@@ -666,9 +606,7 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         if(exportdata->pathstatus == FileExportData::include)
             exportdata->fullpath += selectedindex.sibling(selectedindex.row(), 2).data().toString().toStdString();
         exportdata->fullpath += "/";
-        //else if(exportdata->pathstatus == FileExportData::exclude)
         exportfilelist.push_back(*exportdata);
-        //exportevidencelist.push_back(*exportdata);
         TskObject tmpobj;
         tmpobj.address = selectedindex.sibling(selectedindex.row(), 5).data().toInt();
         tmpobj.offset = 0;
@@ -681,29 +619,10 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         curlist.append(tmpobj);
     }
     else
-        ((TreeModel*)ui->dirTreeView->model())->GetExportData(rootnode, exportdata);
-    //else if(exportdata->filestatus == FileExportData::checked)
-    //{
-        // need to store the exportdata functionality for each item...
-        /*
-        for(int i=0; i < checkedids.count(); i++)
-        {
-            curlist.append(checkedids.at(i));
-        }*/
-    //}
-    //else if(exportdata->filestatus == FileExportData::listed)
-    //{
-        /*
-        for(int i=0; i < listedids.count(); i++)
-        {
-            curlist.append(listedids.at(i));
-        }
-        */
-    //}
-
+        GetExportData(rootnode, exportdata);
     for(int i=0; i < curlist.count(); i++)
     {
-        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, curlist.at(i), exportdata->fullpath, exportdata->name);
+        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, curlist.at(i), exportfilelist[i].fullpath, exportfilelist[i].name);
         exportwatcher.setFuture(tmpfuture);
         threadvector.append(tmpfuture);
     }
@@ -743,7 +662,6 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     if(curobj.type == 3) // directory
     {
         bool tmpdir = (new QDir())->mkpath(QString::fromStdString(fullpath));
-        qDebug() << "full path: " << QString::fromStdString(fullpath);
         if(!tmpdir)
             qDebug() << "creation of export dirtree for file: " << QString::fromStdString(name) << "failed.";
     }
