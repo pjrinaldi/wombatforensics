@@ -33,13 +33,6 @@ public:
         delete rootnode;
     };
 
-    /*
-    void SetRootNode(Node* node)
-    {
-        delete rootnode;
-        rootnode = node;
-    };*/
-
     QModelIndex index(int row, int col, const QModelIndex &parent) const
     {
         if(!rootnode || row < 0 || col < 0)

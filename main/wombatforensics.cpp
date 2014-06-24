@@ -239,17 +239,6 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
-        /*
-        TreeModel* treemodel = new TreeModel(this);
-        ui->dirTreeView->setModel(treemodel);
-        ui->dirTreeView->hideColumn(4);
-        ui->dirTreeView->hideColumn(5);
-        ui->dirTreeView->hideColumn(11);
-        ui->dirTreeView->hideColumn(12);
-        connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
-        connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
-        connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
-        */
         wombatdatabase->GetRootInum();
         treemodel->AddEvidence(wombatvarptr->currentevidenceid, wombatvarptr->currentrootinum);
 
@@ -298,8 +287,6 @@ void WombatForensics::InitializeEvidenceStructure()
 void WombatForensics::AddEvidence()
 {
     int isnew = 1;
-    wombatvarptr->evidenceobject.Clear(); // clear values of current evidence object to add a new one.
-    wombatvarptr->evidenceobjectvector.clear();
     wombatdatabase->GetEvidenceObjects();
     //qDebug() << "fullpathvector count after clear: " << wombatvarptr->evidenceobject.fullpathvector.size();
     // might need to call these to a global tmp and then store it after initializeevidencestructure...
@@ -500,8 +487,9 @@ void WombatForensics::LoadComplete(bool isok)
 
 void WombatForensics::OpenParentImage(int imgid)
 {
+    wombatdatabase->GetEvidenceObjects();
     int curidx = 0;
-    //qDebug() << "evidobjvec.count: " << wombatvarptr->evidenceobjectvector.count();
+    qDebug() << "evidobjvec.count: " << wombatvarptr->evidenceobjectvector.count();
     for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
     {
         if(imgid == wombatvarptr->evidenceobjectvector[i].id)
@@ -762,14 +750,8 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     if(curprogress == 100 && ProcessingComplete())
     {
         statuslabel->setText("Processing Complete");
-        //QThread::sleep(2);
         statuslabel->setText("");
     }
-    //mainprogress->setValue(curprogress);
-    //mainprogress->setFormat("Processed " + QString::number(processcount) + " of " + QString::number(filecount) + " " + QString::number(curprogress) + "%");
-    //wombatprogresswindow->UpdateFilesFound(QString::number(filecount));
-    //wombatprogresswindow->UpdateFilesProcessed(QString::number(processcount));
-    //wombatprogresswindow->UpdateProgressBar(curprogress);
 }
 
 void WombatForensics::UpdateMessageTable()
@@ -837,26 +819,6 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    //hstatus = new QStatusBar(ui->hexPage);
-    //hstatus->setSizeGripEnabled(false);
-    //hstatus->setMaximumHeight(20);
-    //selectedoffset = new QLabel(this);
-    //selectedhex = new QLabel(this);
-    //selectedoffset->setText("Offset: 00");
-    //selectedoffset->setAlignment(Qt::AlignVCenter);
-    //selectedhex->setText("Length: 0");
-    //selectedoffset = new QLabel("Offset: 00");
-    //selectedhex = new QLabel("Length: 0");
-    //selectedascii = new QLabel("Ascii: ");
-    //selectedinteger = new QLabel("Integer: ");
-    //selectedfloat = new QLabel("Float: ");
-    //selecteddouble = new QLabel("Double: ");
-    //hstatus->addWidget(selectedoffset);
-    //hstatus->addWidget(selectedhex);
-    //hstatus->addWidget(selectedascii);
-    //hstatus->addWidget(selectedinteger);
-    //hstatus->addWidget(selectedfloat);
-    //hstatus->addWidget(selecteddouble);
     hexwidget = new HexEditor(ui->hexPage, tskobjptr);
     hexwidget->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
     hexwidget->setObjectName("bt-hexview");
@@ -866,7 +828,6 @@ void WombatForensics::SetupHexPage(void)
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
-    //mainlayout->addWidget(hstatus);
 
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));

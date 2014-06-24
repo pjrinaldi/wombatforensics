@@ -547,7 +547,7 @@ void WombatDatabase::GetRootInum()
     wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->currentrootinum = wombatptr->sqlrecords[0].value(0).toInt();
 }
-
+/*
 void WombatDatabase::GetRootNodes()
 {
     wombatptr->bindvalues.clear();
@@ -617,4 +617,4 @@ void WombatDatabase::GetRootNodes()
             parentnode->children.append(currentnode);
         }
     }
-}
+}*/
