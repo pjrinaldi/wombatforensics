@@ -276,6 +276,7 @@ public:
         addevidquery.addBindValue(currootinum);
         if(addevidquery.exec())
         {
+            beginInsertRows(QModelIndex(), rootnode->childcount - 1, 1);
             while(addevidquery.next())
             {
                 currentnode = 0;
@@ -330,6 +331,7 @@ public:
                     parentnode->children.append(currentnode);
                 }
             }
+            endInsertRows();
         }
     };
  
@@ -435,9 +437,8 @@ public:
     TskObject tskobject;
     TskObject* tskobjptr;
     WombatFramework* wombatframework;
-    //ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
-    //TreeModel* treemodel;
+    TreeModel* treemodel;
 
 signals:
     //void LogVariable(WombatVariable* wombatVariable);
@@ -521,14 +522,8 @@ private:
     HexEditor* hexwidget;
     QActionGroup* viewgroup;
     QScrollBar* hexvsb;
-    //QStatusBar* hstatus;
     QLabel* selectedoffset;
     QLabel* selectedhex;
-    //QLabel* selectedascii;
-    //QLabel* selectedinteger;
-    //QLabel* selectedfloat;
-    //QLabel* selecteddouble;
-    //QProgressBar* mainprogress;
     QLabel* filecountlabel;
     QLabel* filtercountlabel;
     QLabel* processcountlabel;

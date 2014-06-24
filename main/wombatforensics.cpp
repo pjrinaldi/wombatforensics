@@ -7,11 +7,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvarptr = &wombatvariable;
     this->menuBar()->hide();
     this->statusBar()->setSizeGripEnabled(true);
-    //mainprogress = new QProgressBar(this);
-    //int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
-    //mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
-    //this->statusBar()->addWidget(mainprogress, 0);
-    //this->statusBar()->removeWidget(mainprogress);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
     selectedhex = new QLabel(this);
@@ -46,28 +41,28 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tskobjptr->readfileinfo = NULL;
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
-    //wombatprogresswindow = new ProgressWindow(wombatdatabase);
     isignals = new InterfaceSignals();
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
-    //connect(wombatprogresswindow, SIGNAL(HideProgressWindow(bool)), this, SLOT(HideProgressWindow(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
     wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
-    //wombatprogresswindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
-    //connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
-    //connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
-    //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
 
-
-    //treemodel = new TreeModel(this);
-    //ui->dirTreeView->setModel(treemodel);
-    //ui->dirTreeView->setAllColumnsShowFocus(true);
+    treemodel = new TreeModel(this);
+    ui->dirTreeView->setModel(treemodel);
+    ui->dirTreeView->hideColumn(4);
+    ui->dirTreeView->hideColumn(5);
+    ui->dirTreeView->hideColumn(11);
+    ui->dirTreeView->hideColumn(12);
+    connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+ 
     InitializeWombatFramework();
 }
 
@@ -244,9 +239,8 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
+        /*
         TreeModel* treemodel = new TreeModel(this);
-        wombatdatabase->GetRootInum();
-        treemodel->AddEvidence(wombatvarptr->currentevidenceid, wombatvarptr->currentrootinum);
         ui->dirTreeView->setModel(treemodel);
         ui->dirTreeView->hideColumn(4);
         ui->dirTreeView->hideColumn(5);
@@ -255,6 +249,9 @@ void WombatForensics::InitializeQueryModel()
         connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
         connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
         connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+        */
+        wombatdatabase->GetRootInum();
+        treemodel->AddEvidence(wombatvarptr->currentevidenceid, wombatvarptr->currentrootinum);
 
         ResizeColumns();
         statuslabel->setText("");
@@ -295,12 +292,6 @@ void WombatForensics::InitializeEvidenceStructure()
     //  openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
     //  openwatcher.setFuture(openfuture);
     wombatframework->OpenFiles();
-    // OPEN FILES INCLUDES WALKING FILE TREE->ADDING TO DB->GETTING DB INFO->ADDING TO NODE TREE.
-    // MIGHT BE ABLE TO GET RID OF THE BELOW FUNCTIONS IF I CAN GET MY QUERYMODEL WORKING...
-    //wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
-    //wombatdatabase->GetVolumeObjects();
-    //wombatdatabase->GetPartitionObjects();
-    //wombatdatabase->GetFileSystemObjects();
 
 }
 
