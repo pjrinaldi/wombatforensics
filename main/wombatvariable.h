@@ -97,7 +97,8 @@ struct EvidenceObject
     //std::vector<TSK_VS_INFO*> volinfovector; // should use instead of volinfo, simply search for volumes and add them based on the size and offset to search for another one...
     TSK_VS_PART_INFO* partinfo; // may not need.
     std::vector<const TSK_VS_PART_INFO*> partinfovector;
-    std::vector<TSK_FS_INFO*> fsinfovector; 
+    std::vector<TSK_FS_INFO*> fsinfovector;
+    std::vector<int> fsidvector;
     TSK_FS_FILE* fileinfo; // may not need
     TSK_FS_DIR* dirinfo; // may not need
     std::vector<void*> dirfileinfovector; // may not need.
@@ -206,9 +207,9 @@ struct WombatVariable
     QString tmpfilepath;
     QString curerrmsg;
     QString wombatdbname;
+    QList<int> curevidlist; // may not need
     //QStandardItemModel* dirmodel;
-    QList<int> objectidlist;
-    QList<int> rootinums;
+    QList<int> rootinums; // shouldn't need this one.
     CaseObject caseobject;
     QStringList casenamelist;
     EvidenceObject evidenceobject;

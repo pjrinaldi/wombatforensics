@@ -74,7 +74,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         QSqlQuery fquery(fcasedb);
-        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
         fquery.addBindValue(tmpints[0]);
         fquery.addBindValue(tmpstrings[0]);
         fquery.addBindValue(tmpints[1]);
@@ -87,6 +87,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
         fquery.addBindValue(tmpints[7]);
         fquery.addBindValue(tmpstrings[2]);
         fquery.addBindValue(currentevidenceid);
+        fquery.addBindValue(tmpints[8]);
         
         fquery.exec();
         fquery.finish();
@@ -148,6 +149,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         fileints.append(0);
         fileints.append(0);
     }
+    fileints.append(currentfilesystemid);
 
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints);
     filewatcher.setFuture(tmpfuture);

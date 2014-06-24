@@ -20,9 +20,12 @@ public:
     {
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type";
         rootnode = 0;
-        //QList<QVariant> emptyset;
-        //emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
-        //rootnode = new Node(emptyset);
+        QList<QVariant> emptyset;
+        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+        rootnode = new Node(emptyset);
+        rootnode->parent = 0;
+        rootnode->childcount = 0;
+        rootinum = 0;
     };
 
     ~TreeModel()
@@ -30,11 +33,12 @@ public:
         delete rootnode;
     };
 
+    /*
     void SetRootNode(Node* node)
     {
         delete rootnode;
         rootnode = node;
-    };
+    };*/
 
     QModelIndex index(int row, int col, const QModelIndex &parent) const
     {
@@ -65,7 +69,7 @@ public:
     int rowCount(const QModelIndex &parent) const
     {
         if(parent == QModelIndex())
-            return 1;
+            return rootnode->childcount;
         if(parent.column() > 0)
             return 0;
         Node* parentnode = rootnode; 
@@ -235,7 +239,17 @@ public:
             }
         }
     };
+/*
+    bool insertRows(int row, int col, const QModelIndex &parent = QModelIndex())
+    {
+        QSqlQuery insertquery(fcasedb);
+        insertquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE parentid = ? and objectid > ");
+    };
 
+    bool removeRows(int row, int col, const QModelIndex &parent = QModelIndex())
+    {
+    };
+*/
     void GetModelCount(Node* curnode)
     {
         if(curnode->nodevalues.at(4).toInt() == 5)
@@ -253,6 +267,72 @@ public:
         }
     };
 
+    void AddEvidence(int curid, int currootinum)
+    {
+        rootinum = currootinum;
+        QSqlQuery addevidquery(fcasedb);
+        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parfsid FROM data WHERE objectid >= ? AND (objecttype < 5 OR (objecttype == 5 AND parentid = ?)) order by objecttype");
+        addevidquery.addBindValue(curid);
+        addevidquery.addBindValue(currootinum);
+        if(addevidquery.exec())
+        {
+            while(addevidquery.next())
+            {
+                currentnode = 0;
+                colvalues.clear();
+                for(int i=0; i < addevidquery.record().count() - 1; i++)
+                    colvalues.append(addevidquery.value(i));
+                currentnode = new Node(colvalues);
+                if(currentnode->nodevalues.at(4).toInt() == 1)
+                {
+                    rootnode->children.append(currentnode);
+                    rootnode->childcount++;
+                    rootnode->haschildren = rootnode->HasChildren();
+                    currentnode->parent = rootnode;
+                    currentnode->childcount = GetChildCount(1, currentnode->nodevalues.at(0).toInt());
+                    currentnode->haschildren = currentnode->HasChildren();
+                    parentnode = currentnode;
+                }
+                else if(currentnode->nodevalues.at(4).toInt() == 2)
+                {
+                    currentnode->parent = parentnode;
+                    parentnode->children.append(currentnode);
+                    currentnode->childcount = GetChildCount(2, currentnode->nodevalues.at(0).toInt());
+                    currentnode->haschildren = currentnode->HasChildren();
+                    parentnode = currentnode;
+                }
+                // THERE SHOULDN'T BE ANY PARTITION OBJECTS, OBJECTTYPE == 3, SINCE I INTEGRATED THEM INTO THE FILESYSTEM....
+                else if(currentnode->nodevalues.at(4).toInt() == 4)
+                {
+                    currentnode->parent = parentnode;
+                    parentnode->children.append(currentnode);
+                    currentnode->childcount = GetChildCount(4, currootinum);
+                    currentnode->haschildren = currentnode->HasChildren();
+                }
+                else if(currentnode->nodevalues.at(4).toInt() == 5)
+                {
+                    for(int i=0; i < parentnode->children.count(); i++)
+                    {
+                        if(addevidquery.value(13).toInt() == parentnode->children.at(i)->nodevalues.at(0).toInt()) // parfsid = fs node id
+                            parentnode = parentnode->children.at(i); // parentnode is now the proper file system.
+                    }
+                    currentnode->parent = parentnode;
+                    if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
+                    {
+                    currentnode->childcount = 0;
+                    currentnode->haschildren = false;
+                    }
+                    else
+                    {
+                        currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
+                        currentnode->haschildren = currentnode->HasChildren();
+                    }
+                    parentnode->children.append(currentnode);
+                }
+            }
+        }
+    };
+ 
 signals:
     void checkedNodesChanged();
 
@@ -264,7 +344,7 @@ private:
         else
             return rootnode;
     };
-
+    
     Qt::CheckState GetCheckState(Node* curnode) const
     {
         if(curnode->checkstate == 0) // unchecked
@@ -335,6 +415,7 @@ private:
     };
 
     QStringList headerdata;
+    int rootinum;
 };
 
 namespace Ui {
@@ -380,7 +461,7 @@ private slots:
     void OpenFileSystemFile(void);
     void ResizeViewColumns(const QModelIndex &index)
     {
-        //ResizeColumns();
+        ResizeColumns();
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {

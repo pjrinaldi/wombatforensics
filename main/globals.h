@@ -14,10 +14,9 @@ extern int totalcount;
 extern int totalchecked;
 extern int currentevidenceid;
 extern int exportcount;
+extern int currentfilesystemid;
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
-extern QList<TskObject> checkedids;
-extern QList<TskObject> listedids;
 extern QList<TskObject> curlist;
 
 class InterfaceSignals : public QObject
@@ -49,6 +48,7 @@ public:
         parent = 0;
         haschildren = false;
         checkstate = 0;
+        parentid = 0;
     };
 
     ~Node()
@@ -61,6 +61,7 @@ public:
     Node* parent;
     QList<Node*> children;
     bool haschildren;
+    int parentid;
     int childcount;
     int checkstate;
     bool HasChildren(void)

@@ -10,6 +10,7 @@ int filesprocessed = 0;
 int totalchecked = 0;
 int totalcount = 0;
 int currentevidenceid = 0;
+int currentfilesystemid = 0;
 int exportcount = 0;
 QString currentevidencename = "t.dd";
 InterfaceSignals* isignals = new InterfaceSignals();

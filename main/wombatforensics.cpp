@@ -237,7 +237,6 @@ void WombatForensics::InitializeWombatFramework()
 
 void WombatForensics::InitializeQueryModel()
 {
-    //ui->dirTreeView->setModel(NULL);
     fcasedb.commit();
     if(ProcessingComplete())
     {
@@ -245,13 +244,9 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
-        wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
-        wombatdatabase->GetRootInum(); // gets all the inums for each filesystem objecttype = 4 
-        wombatdatabase->GetRootNodes(); // gets all the root node assemblys for each evidence item
-
-
         TreeModel* treemodel = new TreeModel(this);
-        treemodel->SetRootNode(dummynode);
+        wombatdatabase->GetRootInum();
+        treemodel->AddEvidence(wombatvarptr->currentevidenceid, wombatvarptr->currentrootinum);
         ui->dirTreeView->setModel(treemodel);
         ui->dirTreeView->hideColumn(4);
         ui->dirTreeView->hideColumn(5);
@@ -311,7 +306,10 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::AddEvidence()
 {
+    int isnew = 1;
     wombatvarptr->evidenceobject.Clear(); // clear values of current evidence object to add a new one.
+    wombatvarptr->evidenceobjectvector.clear();
+    wombatdatabase->GetEvidenceObjects();
     //qDebug() << "fullpathvector count after clear: " << wombatvarptr->evidenceobject.fullpathvector.size();
     // might need to call these to a global tmp and then store it after initializeevidencestructure...
     // NEED TO CHECK WHAT GETEVIDENCEOBJECTS() RETURNS FOR A TEST IMAGE OPEN...
@@ -320,33 +318,31 @@ void WombatForensics::AddEvidence()
     if(tmplist.count())
     {
         wombatvarptr->currentevidencename = tmplist[0].split("/").last();
-        currentevidencename = wombatvarptr->currentevidencename;
-        //qDebug() << "tmplist count 2: " << tmplist.count();
-        for(int i=0; i < tmplist.count(); i++)
+        for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
         {
-            //fprintf(stderr, "fullpathvector[%i]: %s\n", i, tmplist[i].toStdString().c_str());
-            wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
+            if(wombatvarptr->evidenceobjectvector.at(i).fullpathvector[0].compare(tmplist[0].toStdString()) == 0)
+                isnew = 0;
         }
-        wombatvarptr->evidenceobject.itemcount = tmplist.count();
-        //qDebug() << " ptr itemcount: " << wombatvarptr->evidenceobject.itemcount;
-        // REPLACE WITH PROGRESSBAR/STATUSBAR
-        //this->statusBar()->addPermanentWidget(mainprogress, 0);
-        //this->mainprogress->show();
-        //int curprogress = (int)(((float)filesprocessed/(float)filesfound)*100);
-        //processcountlabel->setText("Processed: " + QString::number(filesprocessed));
-        //filecountlabel->setText("Files: " + QString::number(filesfound));
-        //statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
-        processcountlabel->setText("Processed: 0");
-        filecountlabel->setText("Files: 0");
-        statuslabel->setText("Processed 0%");
-        //mainprogress->setValue(curprogress);
-        //mainprogress->setFormat("Processed " + QString::number(filesprocessed) + " of " + QString::number(filesfound) + " " + QString::number(curprogress) + "%");
-        //wombatprogresswindow->show();
-        //wombatprogresswindow->ClearTableWidget(); // hiding these 2 for now since i'm not ready to populate progress yet and it gets in the way.
-        // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
+        if(isnew == 1)
+        {
+            currentevidencename = wombatvarptr->currentevidencename;
+            //qDebug() << "tmplist count 2: " << tmplist.count();
+            for(int i=0; i < tmplist.count(); i++)
+            {
+                //fprintf(stderr, "fullpathvector[%i]: %s\n", i, tmplist[i].toStdString().c_str());
+                wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
+            }
+            wombatvarptr->evidenceobject.itemcount = tmplist.count();
+            processcountlabel->setText("Processed: 0");
+            filecountlabel->setText("Files: 0");
+            statuslabel->setText("Processed 0%");
+            // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
 
-        sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
-        sqlwatcher.setFuture(sqlfuture);
+            sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
+            sqlwatcher.setFuture(sqlfuture);
+        }
+        else
+            DisplayError("1.8", "Evidence already exists in the case.", "Add Evidence cancelled");
     }
 }
 
@@ -830,7 +826,7 @@ void WombatForensics::PopulateProgressWindow(WombatVariable* wvariable)
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)
 {
     QString tmpString = errorNumber;
-    tmpString += ". SqlError: ";
+    tmpString += ". Error: ";
     tmpString += errorType;
     tmpString += " Returned ";
     tmpString += errorValue;
