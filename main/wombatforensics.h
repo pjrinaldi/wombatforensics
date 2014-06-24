@@ -19,9 +19,10 @@ public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type";
-        QList<QVariant> emptyset;
-        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
-        rootnode = new Node(emptyset);
+        rootnode = 0;
+        //QList<QVariant> emptyset;
+        //emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+        //rootnode = new Node(emptyset);
     };
 
     ~TreeModel()
@@ -29,11 +30,11 @@ public:
         delete rootnode;
     };
 
-    /*void SetRootNode(Node* node)
+    void SetRootNode(Node* node)
     {
         delete rootnode;
         rootnode = node;
-    };*/
+    };
 
     QModelIndex index(int row, int col, const QModelIndex &parent) const
     {
@@ -252,20 +253,6 @@ public:
         }
     };
 
-    void UpdateModel()
-    {
-        //emit dataChanged(index(0, 0, QModelIndex()), index(0, 0, QModelIndex()));
-        //beginResetModel();
-        //rootnode->children.append(childnode);
-        //childnode->parent = rootnode;
-        //rootnode->haschildren = true;
-        //rootnode->childcount = rootnode->childcount + 1;
-        //endResetModel();
-        //beginInsertRows(index(0, 0, QModelIndex()), 0, rootnode->childcount - 1);
-        //emit dataChanged(index(0, 0, QModelIndex()), index(0, 0, QModelIndex()));
-        //endInsertRows();
-    };
-
 signals:
     void checkedNodesChanged();
 
@@ -369,7 +356,7 @@ public:
     WombatFramework* wombatframework;
     //ProgressWindow* wombatprogresswindow;
     ExportDialog* exportdialog;
-    TreeModel* treemodel;
+    //TreeModel* treemodel;
 
 signals:
     //void LogVariable(WombatVariable* wombatVariable);

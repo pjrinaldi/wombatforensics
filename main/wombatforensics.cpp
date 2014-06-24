@@ -58,16 +58,16 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
-    connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
-    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+    //connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+    //connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
+    //connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+    //connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+    //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
 
 
-    treemodel = new TreeModel(this);
-    ui->dirTreeView->setModel(treemodel);
-    ui->dirTreeView->setAllColumnsShowFocus(true);
+    //treemodel = new TreeModel(this);
+    //ui->dirTreeView->setModel(treemodel);
+    //ui->dirTreeView->setAllColumnsShowFocus(true);
     InitializeWombatFramework();
 }
 
@@ -237,7 +237,7 @@ void WombatForensics::InitializeWombatFramework()
 
 void WombatForensics::InitializeQueryModel()
 {
-    ui->dirTreeView->setModel(NULL);
+    //ui->dirTreeView->setModel(NULL);
     fcasedb.commit();
     if(ProcessingComplete())
     {
@@ -249,18 +249,19 @@ void WombatForensics::InitializeQueryModel()
         wombatdatabase->GetRootInum(); // gets all the inums for each filesystem objecttype = 4 
         wombatdatabase->GetRootNodes(); // gets all the root node assemblys for each evidence item
 
-        //qDebug() << "dummy node count: " << dummynode->children.count();
-        //treemodel->SetRootNode(dummynode);
 
-        //ui->dirTreeView->setModel(treemodel);
-        emit ui->dirTreeView->model()->layoutChanged();
-        //emit ((TreeModel*)ui->dirTreeView->model())->LayoutChanged();
-        //ui->dirTreeView->reset();
-        //ui->dirTreeView->hideColumn(4);
-        //ui->dirTreeView->hideColumn(5);
-        //ui->dirTreeView->hideColumn(11);
-        //ui->dirTreeView->hideColumn(12);
-        //ResizeColumns();
+        TreeModel* treemodel = new TreeModel(this);
+        treemodel->SetRootNode(dummynode);
+        ui->dirTreeView->setModel(treemodel);
+        ui->dirTreeView->hideColumn(4);
+        ui->dirTreeView->hideColumn(5);
+        ui->dirTreeView->hideColumn(11);
+        ui->dirTreeView->hideColumn(12);
+        connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+        connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+        connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+
+        ResizeColumns();
         statuslabel->setText("");
         wombatframework->CloseInfoStructures();
     }
@@ -632,7 +633,7 @@ void WombatForensics::FinishExport()
     if(ProcessingComplete())
     {
         statuslabel->setText("Exporting completed");
-        QThread::sleep(2); // delay between the complete command and the clear status area command.
+        //QThread::sleep(2); // delay between the complete command and the clear status area command.
         statuslabel->setText("");
         qDebug() << "export of files is complete.";
     }

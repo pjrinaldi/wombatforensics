@@ -537,107 +537,84 @@ void WombatDatabase::GetObjectValues()
 void WombatDatabase::GetRootInum()
 {
     wombatptr->bindvalues.clear();
-    //wombatptr->bindvalues.append(wombatptr->currentfilesystemid);
+    wombatptr->bindvalues.append(wombatptr->currentfilesystemid);
     wombatptr->sqlrecords.clear();
     wombatptr->rootinums.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objecttype = 4", wombatptr->bindvalues);
-    qDebug() << "root inum sqlrecord count: " << wombatptr->sqlrecords.count();
-    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-    {
+    wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    //for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    //{
         wombatptr->currentrootinum = wombatptr->sqlrecords[0].value(0).toInt();
-        wombatptr->rootinums.append(wombatptr->sqlrecords[i].value(0).toInt());
-    }
+        //wombatptr->rootinums.append(wombatptr->sqlrecords[i].value(0).toInt());
+    //}
 }
 
 void WombatDatabase::GetRootNodes()
 {
-    //for(int k=0; k < wombatptr->rootinums.count(); k++)
-    //{
-        wombatptr->bindvalues.clear();
-        wombatptr->sqlrecords.clear();
-        rootnode->children.clear();
-        //rootnode = 0;
-        rootnode->childcount = 0;
-        //wombatptr->bindvalues.append(wombatptr->rootinums.at(k));
-        //wombatptr->bindvalues.append(wombatptr->currentrootinum);
-        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE objecttype < 5 order by objecttype", wombatptr->bindvalues);
-        //wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
-        qDebug() << "sqlrecord count: " << wombatptr->sqlrecords.count();
-        for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    wombatptr->bindvalues.clear();
+    wombatptr->sqlrecords.clear();
+    wombatptr->bindvalues.append(wombatptr->currentrootinum);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        currentnode = 0;
+        colvalues.clear();
+        for(int j=0; j < wombatptr->sqlrecords[i].count(); j++)
         {
-            currentnode = 0;
-            colvalues.clear();
-            for(int j=0; j < wombatptr->sqlrecords[i].count(); j++)
+            colvalues.append(wombatptr->sqlrecords[i].value(j));
+        }
+        currentnode = new Node(colvalues);
+        if(colvalues.at(4).toInt() < 5) // not file or directory
+        {
+            if(colvalues.at(4).toInt() == 1) // image node
             {
-                colvalues.append(wombatptr->sqlrecords[i].value(j));
-            }
-            currentnode = new Node(colvalues);
-            if(colvalues.at(4).toInt() == 1)
-            {
-                //((TreeModel*)ui->dirTreeView->model())->UpdateModel(currentnode);
-                //treemodel->
-                rootnode->children.append(currentnode);
-                currentnode->parent = rootnode;
+                dummynode = new Node(colvalues);
+                dummynode->children.append(currentnode);
+                dummynode->childcount = GetChildCount(1, dummynode->nodevalues.at(0).toInt());
+                dummynode->haschildren = dummynode->HasChildren();
+                currentnode->parent = dummynode;
                 currentnode->childcount = GetChildCount(1, currentnode->nodevalues.at(0).toInt());
                 currentnode->haschildren = currentnode->HasChildren();
-                rootnode->haschildren = true;
-                rootnode->childcount = rootnode->childcount + 1;
+                parentnode = currentnode;
             }
-            //qDebug() << "root node child count: " << rootnode->childcount;
-           /*if(colvalues.at(4).toInt() < 5) // not file or directory
+            else if(colvalues.at(4).toInt() == 2) // volume
             {
-                if(colvalues.at(4).toInt() == 1) // image node
-                {
-                    dummynode->children.append(currentnode);
-                    dummynode->childcount = GetChildCount(1, dummynode->nodevalues.at(0).toInt());
-                    dummynode->haschildren = dummynode->HasChildren();
-                    currentnode->parent = dummynode;
-                    currentnode->childcount = GetChildCount(1, currentnode->nodevalues.at(0).toInt());
-                    currentnode->haschildren = currentnode->HasChildren();
-                    parentnode = currentnode;
-                }
-                else if(colvalues.at(4).toInt() == 2) // volume
-                {
-                    parentnode->children.append(currentnode);
-                    currentnode->parent = parentnode;
-                    currentnode->childcount = GetChildCount(2, currentnode->nodevalues.at(0).toInt());
-                    currentnode->haschildren = currentnode->HasChildren();
-                    parentnode = currentnode;
-                }
-                else if(colvalues.at(4).toInt() == 3) // partition (should be none of these)
-                {
-                    parentnode->children.append(currentnode);
-                    currentnode->parent = parentnode;
-                    currentnode->childcount = GetChildCount(3, currentnode->nodevalues.at(0).toInt());
-                    currentnode->haschildren = currentnode->HasChildren();
-                    parentnode = currentnode;
-                }
-                else if(colvalues.at(4).toInt() == 4) // file system
-                {
-                    currentnode->parent = parentnode;
-                    parentnode->children.append(currentnode);
-                    currentnode->childcount = GetChildCount(4, wombatptr->currentrootinum); 
-                    currentnode->haschildren = currentnode->HasChildren();
-                    parentnode = currentnode;
-                }
-            }*/
-            /*
-            else // its a file or directory with rootinum for a parent
+                parentnode->children.append(currentnode);
+                currentnode->parent = parentnode;
+                currentnode->childcount = GetChildCount(2, currentnode->nodevalues.at(0).toInt());
+                currentnode->haschildren = currentnode->HasChildren();
+                parentnode = currentnode;
+            }
+            else if(colvalues.at(4).toInt() == 3) // partition (should be none of these)
+            {
+                parentnode->children.append(currentnode);
+                currentnode->parent = parentnode;
+                currentnode->childcount = GetChildCount(3, currentnode->nodevalues.at(0).toInt());
+                currentnode->haschildren = currentnode->HasChildren();
+                parentnode = currentnode;
+            }
+            else if(colvalues.at(4).toInt() == 4) // file system
             {
                 currentnode->parent = parentnode;
-                if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
-                {
-                    currentnode->childcount = 0;
-                    currentnode->haschildren = false;
-                }
-                else
-                {
-                    currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
-                    currentnode->haschildren = currentnode->HasChildren();
-                }
                 parentnode->children.append(currentnode);
+                currentnode->childcount = GetChildCount(4, wombatptr->currentrootinum); 
+                currentnode->haschildren = currentnode->HasChildren();
+                parentnode = currentnode;
             }
-            */
-        //}
+        }
+        else // its a file or directory with rootinum for a parent
+        {
+            currentnode->parent = parentnode;
+            if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
+            {
+                currentnode->childcount = 0;
+                currentnode->haschildren = false;
+            }
+            else
+            {
+                currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
+                currentnode->haschildren = currentnode->HasChildren();
+            }
+            parentnode->children.append(currentnode);
+        }
     }
 }
