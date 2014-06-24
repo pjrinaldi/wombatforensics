@@ -20,15 +20,10 @@ public:
     void GetEvidenceObject(void);
     void GetEvidenceObjects(void);
     void InsertVolumeObject(void);
-    void GetVolumeObjects(void);
     void InsertPartitionObjects(void);
-    void GetPartitionObjects(void);
     void InsertFileSystemObjects(void);
-    void InsertFileObjects(void);
-    void GetFileSystemObjects(void);
     void GetObjectValues(void);
     void GetRootInum(void);
-    void GetRootNodes(void);
 
     ~WombatDatabase();
 

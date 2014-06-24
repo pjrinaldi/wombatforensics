@@ -489,7 +489,6 @@ void WombatForensics::OpenParentImage(int imgid)
 {
     wombatdatabase->GetEvidenceObjects();
     int curidx = 0;
-    qDebug() << "evidobjvec.count: " << wombatvarptr->evidenceobjectvector.count();
     for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
     {
         if(imgid == wombatvarptr->evidenceobjectvector[i].id)
@@ -608,7 +607,6 @@ void WombatForensics::FinishExport()
     if(ProcessingComplete())
     {
         statuslabel->setText("Exporting completed");
-        //QThread::sleep(2); // delay between the complete command and the clear status area command.
         statuslabel->setText("");
         qDebug() << "export of files is complete.";
     }
@@ -704,7 +702,6 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         if(retval > 0)
         {
             bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
-            // EXPORTING FULL PATH FAILS, SINCE THE DIRECTORIES HAVEN'T BEEN CREATED FOR IT.  NEED TO CALL MKPATH
             std::string filepath = fullpath + "/" + name;
             QFile tmpfile(QString::fromStdString(filepath));
             if(tmpfile.open(QIODevice::WriteOnly))
@@ -718,26 +715,6 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     exportcount++;
     int curprogress = (int)((((float)exportcount)/(float)curlist.count())*100);
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%"));
-
-    // NEED TO IMPLEMENT FUNCTIONALITY TO UPDATE PROGRESS BAR/FILE COUNT FOR THE EXPORT.
-
-    /*
-    wombatvarptr->exportdatavector = exportevidencelist;
-    wombatprogresswindow->ClearTableWidget();
-    wombatvarptr->jobtype = 3; // export files
-    //wombatvarptr->jobid = wombatdatabase->InsertJob(wombatvarptr->jobtype, wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id);
-    emit LogVariable(wombatvarptr);
-    QString tmpString = "File Export - " + QString::fromStdString(GetTime());
-    QStringList tmpList;
-    tmpList << tmpString << QString::number(wombatvarptr->jobid);
-    wombatprogresswindow->UpdateAnalysisTree(1, new QTreeWidgetItem(tmpList));
-    wombatprogresswindow->UpdateFilesFound(QString::number(wombatvarptr->exportdata.exportcount));
-    wombatprogresswindow->UpdateFilesProcessed("0");
-    wombatprogresswindow->UpdateAnalysisState("Exporting Files");
-    //LOGINFO("File Export Started");
-    //wombatdatabase->InsertMsg(wombatvarptr->caseobject.id, wombatvarptr->evidenceobject.id, wombatvarptr->jobid, 2, "File Export Started");
-    //ThreadRunner* trun = new ThreadRunner(isleuthkit, "exportfiles", wombatvarptr);
-    //threadpool->start(trun);*/
 }
 
 void WombatForensics::UpdateProgress(int filecount, int processcount)
@@ -753,48 +730,6 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
         statuslabel->setText("");
     }
 }
-
-void WombatForensics::UpdateMessageTable()
-{
-    //wombatprogresswindow->ClearTableWidget();
-    //QStringList tmplist = wombatdatabase->ReturnMessageTableEntries(wombatvarptr->jobid);
-    //wombatprogresswindow->UpdateMessageTable(tmplist);
-}
-
-void WombatForensics::PopulateProgressWindow(WombatVariable* wvariable)
-{
-    int treebranch = 0;
-    QString tmpstring;
-    //QStringList joblist = wombatdatabase->ReturnJobDetails(wvariable->jobid);
-    if(wvariable->jobtype == 1 || wvariable->jobtype == 2)
-        tmpstring = wvariable->evidenceobject.dbname + " - " + "";//joblist[0];
-    else if(wvariable->jobtype == 3)
-        tmpstring = "File Export - ";// + "";//joblist[0];
-    else
-        tmpstring = wvariable->evidenceobject.dbname + " - " + "";//joblist[0];
-    QStringList tmplist;
-    tmplist << tmpstring << QString::number(wvariable->jobid);
-    if(wvariable->jobtype == 1) treebranch = 0;
-    else if(wvariable->jobtype == 2) treebranch = 2;
-    else treebranch = 1;
-    //wombatprogresswindow->UpdateAnalysisTree(treebranch,  new QTreeWidgetItem(tmplist));
-    if(wvariable->jobtype == 2)
-    {
-        //wombatprogresswindow->UpdateProgressBar(100);
-        //wombatprogresswindow->UpdateFilesFound("");
-        //wombatprogresswindow->UpdateFilesProcessed("");
-    }
-    else
-    {
-        //wombatprogresswindow->UpdateFilesFound(joblist[1]);
-        //wombatprogresswindow->UpdateFilesProcessed(joblist[2]);
-        //int finalprogress = (int)((((float)joblist[2].toInt())/(float)joblist[1].toInt())*100);
-        //wombatprogresswindow->UpdateProgressBar(finalprogress);
-    }
-    //wombatprogresswindow->UpdateAnalysisState(joblist[3]);
-    UpdateMessageTable();
-}
-
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)
 {
@@ -864,9 +799,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     {
     }
     
-    //wombatprogresswindow->close();
     RemoveTmpFiles();
-    // USE THIS FUNCTION AND PRINCIPLE TO BUILD THE PROGRESS WINDOW FUNCTIONALITY.
     if(ProcessingComplete())
     {
         qDebug() << "All threads are done";
@@ -944,7 +877,7 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
     UpdateViewer();
 }
 
-void WombatForensics::on_actionView_Progress_triggered(bool checked)
+void WombatForensics::on_actionView_Progress_triggered(bool checked) // modify this to be the logviewer.
 {/*
     if(!checked)
         wombatprogresswindow->hide();

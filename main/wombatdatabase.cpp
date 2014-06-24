@@ -246,29 +246,6 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, childcount, size, sectsize, byteoffset, parentid, parimgid, name) VALUES(2, 240, 0, ?, ?, 0, ?, ?, ?);", wombatptr->bindvalues);
     }
 }
-// may not need
-void WombatDatabase::GetVolumeObjects()
-{
-    /*
-    wombatptr->volumeobjectvector.clear();
-    for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
-    {
-        wombatptr->bindvalues.clear();
-        wombatptr->bindvalues.append(wombatptr->evidenceobjectvector[i].id);
-        wombatptr->sqlrecords.clear();
-        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, type, size, byteoffset, parentid, parimgid, childcount, name, objecttype FROM data WHERE parentid = ? and objecttype = 2", wombatptr->bindvalues);
-        wombatptr->volumeobject.id = wombatptr->sqlrecords[0].value(0).toInt();
-        wombatptr->volumeobject.type = wombatptr->sqlrecords[0].value(1).toInt();
-        wombatptr->volumeobject.blocksize = wombatptr->sqlrecords[0].value(2).toInt();
-        wombatptr->volumeobject.byteoffset = wombatptr->sqlrecords[0].value(3).toInt();
-        wombatptr->volumeobject.parentid = wombatptr->sqlrecords[0].value(4).toInt();
-        wombatptr->volumeobject.parimgid = wombatptr->sqlrecords[0].value(5).toInt();
-        wombatptr->volumeobject.childcount = wombatptr->sqlrecords[0].value(6).toInt();
-        wombatptr->volumeobject.name = wombatptr->sqlrecords[0].value(7).toString();
-        wombatptr->volumeobject.objecttype = wombatptr->sqlrecords[0].value(8).toInt();
-        wombatptr->volumeobjectvector.append(wombatptr->volumeobject);
-    }*/
-}
 
 void WombatDatabase::InsertPartitionObjects()
 {
@@ -288,36 +265,6 @@ void WombatDatabase::InsertPartitionObjects()
             wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, sectsize, parentid, parimgid) VALUES(3, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
         }
     }
-}
-// may not need
-void WombatDatabase::GetPartitionObjects()
-{
-    /*
-    wombatptr->partitionobjectvector.clear();
-    for(int j=0; j < wombatptr->volumeobjectvector.count(); j++)
-    {
-        wombatptr->bindvalues.clear();
-        wombatptr->bindvalues.append(wombatptr->volumeobjectvector[j].id);
-        wombatptr->sqlrecords.clear();
-        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, flags, sectstart, sectlength, name, size, parentid, parimgid, objecttype FROM data WHERE parentid = ? AND objecttype = 3 ORDER BY objectid", wombatptr->bindvalues);
-        for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-        {
-            wombatptr->partitionobject.id = wombatptr->sqlrecords[i].value(0).toInt();
-            wombatptr->partitionobject.flags = wombatptr->sqlrecords[i].value(1).toInt();
-            wombatptr->partitionobject.sectstart = wombatptr->sqlrecords[i].value(2).toInt();
-            wombatptr->partitionobject.sectlength = wombatptr->sqlrecords[i].value(3).toInt();
-            wombatptr->partitionobject.name = wombatptr->sqlrecords[i].value(4).toString();
-            wombatptr->partitionobject.blocksize = wombatptr->sqlrecords[i].value(5).toInt();
-            wombatptr->partitionobject.parentid = wombatptr->sqlrecords[i].value(6).toInt();
-            wombatptr->partitionobject.parimgid = wombatptr->sqlrecords[i].value(7).toInt();
-            wombatptr->partitionobject.objecttype = wombatptr->sqlrecords[i].value(8).toInt();
-            wombatptr->partitionobjectvector.append(wombatptr->partitionobject);
-        }
-    }*/
-}
-// may not need
-void WombatDatabase::InsertFileObjects() // loop over fileinfovector and add to db.
-{
 }
 
 void WombatDatabase::InsertFileSystemObjects()
@@ -347,35 +294,6 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
         }
     }
-}
-// may not need
-void WombatDatabase::GetFileSystemObjects()
-{
-    /*
-    wombatptr->filesystemobjectvector.clear();
-    for(int j=0; j < wombatptr->volumeobjectvector.count(); j++)
-    {
-        wombatptr->bindvalues.clear();
-        wombatptr->bindvalues.append(wombatptr->volumeobjectvector[j].id);
-        wombatptr->sqlrecords.clear();
-        wombatptr->sqlrecords = GetSqlResults("SELECT objectid, type, flags, byteoffset, parentid, parimgid, size, blockcount, firstinum, lastinum, rootinum, objecttype FROM data WHERE parentid = ? and objecttype = 4 ORDER BY objectid", wombatptr->bindvalues);
-        for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-        {
-            wombatptr->filesystemobject.id = wombatptr->sqlrecords[i].value(0).toInt(); 
-            wombatptr->filesystemobject.type = wombatptr->sqlrecords[i].value(1).toInt();
-            wombatptr->filesystemobject.flags = wombatptr->sqlrecords[i].value(2).toInt();
-            wombatptr->filesystemobject.byteoffset = wombatptr->sqlrecords[i].value(3).toInt();
-            wombatptr->filesystemobject.parentid = wombatptr->sqlrecords[i].value(4).toInt();
-            wombatptr->filesystemobject.parimgid = wombatptr->sqlrecords[i].value(5).toInt();
-            wombatptr->filesystemobject.blocksize = wombatptr->sqlrecords[i].value(6).toInt();
-            wombatptr->filesystemobject.blockcount = wombatptr->sqlrecords[i].value(7).toInt();
-            wombatptr->filesystemobject.firstinum = wombatptr->sqlrecords[i].value(8).toInt();
-            wombatptr->filesystemobject.lastinum = wombatptr->sqlrecords[i].value(9).toInt();
-            wombatptr->filesystemobject.rootinum = wombatptr->sqlrecords[i].value(10).toInt();
-            wombatptr->filesystemobject.objecttype = wombatptr->sqlrecords[i].value(10).toInt();
-            wombatptr->filesystemobjectvector.append(wombatptr->filesystemobject);
-        }
-    }*/
 }
 
 void WombatDatabase::InsertEvidenceObject()
@@ -547,74 +465,3 @@ void WombatDatabase::GetRootInum()
     wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->currentrootinum = wombatptr->sqlrecords[0].value(0).toInt();
 }
-/*
-void WombatDatabase::GetRootNodes()
-{
-    wombatptr->bindvalues.clear();
-    wombatptr->sqlrecords.clear();
-    wombatptr->bindvalues.append(wombatptr->currentrootinum);
-    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE objecttype < 5 OR (objecttype == 5 AND parentid = ?)", wombatptr->bindvalues);
-    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-    {
-        currentnode = 0;
-        colvalues.clear();
-        for(int j=0; j < wombatptr->sqlrecords[i].count(); j++)
-        {
-            colvalues.append(wombatptr->sqlrecords[i].value(j));
-        }
-        currentnode = new Node(colvalues);
-        if(colvalues.at(4).toInt() < 5) // not file or directory
-        {
-            if(colvalues.at(4).toInt() == 1) // image node
-            {
-                dummynode = new Node(colvalues);
-                dummynode->children.append(currentnode);
-                dummynode->childcount = GetChildCount(1, dummynode->nodevalues.at(0).toInt());
-                dummynode->haschildren = dummynode->HasChildren();
-                currentnode->parent = dummynode;
-                currentnode->childcount = GetChildCount(1, currentnode->nodevalues.at(0).toInt());
-                currentnode->haschildren = currentnode->HasChildren();
-                parentnode = currentnode;
-            }
-            else if(colvalues.at(4).toInt() == 2) // volume
-            {
-                parentnode->children.append(currentnode);
-                currentnode->parent = parentnode;
-                currentnode->childcount = GetChildCount(2, currentnode->nodevalues.at(0).toInt());
-                currentnode->haschildren = currentnode->HasChildren();
-                parentnode = currentnode;
-            }
-            else if(colvalues.at(4).toInt() == 3) // partition (should be none of these)
-            {
-                parentnode->children.append(currentnode);
-                currentnode->parent = parentnode;
-                currentnode->childcount = GetChildCount(3, currentnode->nodevalues.at(0).toInt());
-                currentnode->haschildren = currentnode->HasChildren();
-                parentnode = currentnode;
-            }
-            else if(colvalues.at(4).toInt() == 4) // file system
-            {
-                currentnode->parent = parentnode;
-                parentnode->children.append(currentnode);
-                currentnode->childcount = GetChildCount(4, wombatptr->currentrootinum); 
-                currentnode->haschildren = currentnode->HasChildren();
-                parentnode = currentnode;
-            }
-        }
-        else // its a file or directory with rootinum for a parent
-        {
-            currentnode->parent = parentnode;
-            if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
-            {
-                currentnode->childcount = 0;
-                currentnode->haschildren = false;
-            }
-            else
-            {
-                currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
-                currentnode->haschildren = currentnode->HasChildren();
-            }
-            parentnode->children.append(currentnode);
-        }
-    }
-}*/

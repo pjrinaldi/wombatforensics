@@ -434,11 +434,9 @@ private slots:
     void on_actionOpen_Case_triggered();
     void on_actionView_Progress_triggered(bool checked);
     void UpdateProgress(int count, int processcount);
-    void UpdateMessageTable();
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
-    void PopulateProgressWindow(WombatVariable* wvariable);
     void ResizeColumns(void);
     void OpenParentImage(int imgid);
     void OpenParentFileSystem(void);

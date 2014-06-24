@@ -82,66 +82,6 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     }
 }
 
-/*
-void WombatFramework::ProcessFile(uint64_t inodeaddress, TSK_FS_INFO* fsinfo)
-{
-    qDebug() << "Active Thread Count: " << threadpool->activeThreadCount();
-    TSK_FS_FILE* currentfile;
-    currentfile = tsk_fs_file_open_meta(fsinfo ,NULL, inodeaddress);
-    TSK_FS_HASH_RESULTS hashresults;
-    uint8_t retval = tsk_fs_file_hash_calc(currentfile, &hashresults, TSK_BASE_HASH_MD5);
-    char sbuf[17];
-    int sint = 0;
-    for(int i=0; i < 16; i++)
-    {
-        sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
-    }
-    QString tmpstring = QString(sbuf);
-    if(fcasedb.isValid() && fcasedb.isOpen())
-    {
-        QSqlQuery fquery(fcasedb);
-        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-        if(currentfile->name != NULL)
-        {
-            fquery.addBindValue((int)currentfile->name->type);
-            fquery.addBindValue(QString(currentfile->name->name));
-            fquery.addBindValue((int)currentfile->name->par_addr);
-        }
-        else
-        {
-            fquery.addBindValue(0);
-            fquery.addBindValue(QString("unknown.wbt"));
-            fquery.addBindValue(0);
-        }
-        fquery.addBindValue(QString("tmppath"));
-        if(currentfile->meta != NULL)
-        {
-            fquery.addBindValue((int)currentfile->meta->atime);
-            fquery.addBindValue((int)currentfile->meta->ctime);
-            fquery.addBindValue((int)currentfile->meta->crtime);
-            fquery.addBindValue((int)currentfile->meta->mtime);
-            fquery.addBindValue((int)currentfile->meta->size);
-            fquery.addBindValue((int)currentfile->meta->addr);
-        }
-        else
-        {
-            fquery.addBindValue(0);
-            fquery.addBindValue(0);
-            fquery.addBindValue(0);
-            fquery.addBindValue(0);
-            fquery.addBindValue(0);
-            fquery.addBindValue(0);
-        }
-        fquery.addBindValue(tmpstring);
-        fquery.exec();
-        fquery.finish();
-    }
-    else
-    {
-    }
-}
-*/
-
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
 {
     for(int j = 0; j < wombatptr->evidenceobjectvector.count(); j++)
