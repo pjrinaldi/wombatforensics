@@ -239,17 +239,7 @@ public:
             }
         }
     };
-/*
-    bool insertRows(int row, int col, const QModelIndex &parent = QModelIndex())
-    {
-        QSqlQuery insertquery(fcasedb);
-        insertquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE parentid = ? and objectid > ");
-    };
-
-    bool removeRows(int row, int col, const QModelIndex &parent = QModelIndex())
-    {
-    };
-*/
+    
     void GetModelCount(Node* curnode)
     {
         if(curnode->nodevalues.at(4).toInt() == 5)
@@ -276,7 +266,7 @@ public:
         addevidquery.addBindValue(currootinum);
         if(addevidquery.exec())
         {
-            beginInsertRows(QModelIndex(), rootnode->childcount - 1, 1);
+            beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
             while(addevidquery.next())
             {
                 currentnode = 0;
