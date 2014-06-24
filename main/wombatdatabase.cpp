@@ -556,6 +556,7 @@ void WombatDatabase::GetRootNodes()
         wombatptr->bindvalues.clear();
         wombatptr->sqlrecords.clear();
         rootnode->children.clear();
+        //rootnode = 0;
         rootnode->childcount = 0;
         //wombatptr->bindvalues.append(wombatptr->rootinums.at(k));
         //wombatptr->bindvalues.append(wombatptr->currentrootinum);
@@ -573,14 +574,14 @@ void WombatDatabase::GetRootNodes()
             currentnode = new Node(colvalues);
             if(colvalues.at(4).toInt() == 1)
             {
-                ((TreeModel*)ui->dirTreeView->model())->UpdateModel(currentnode);
+                //((TreeModel*)ui->dirTreeView->model())->UpdateModel(currentnode);
                 //treemodel->
-                /*
                 rootnode->children.append(currentnode);
                 currentnode->parent = rootnode;
+                currentnode->childcount = GetChildCount(1, currentnode->nodevalues.at(0).toInt());
+                currentnode->haschildren = currentnode->HasChildren();
                 rootnode->haschildren = true;
                 rootnode->childcount = rootnode->childcount + 1;
-                */
             }
             //qDebug() << "root node child count: " << rootnode->childcount;
            /*if(colvalues.at(4).toInt() < 5) // not file or directory

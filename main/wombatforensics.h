@@ -252,15 +252,17 @@ public:
         }
     };
 
-    void UpdateModel(Node* childnode)
+    void UpdateModel()
     {
-        beginResetModel();
-        rootnode->children.append(childnode);
-        childnode->parent = rootnode;
-        rootnode->haschildren = true;
-        rootnode->childcount = rootnode->childcount + 1;
-        endResetModel();
-        //beginInsertRows();
+        //emit dataChanged(index(0, 0, QModelIndex()), index(0, 0, QModelIndex()));
+        //beginResetModel();
+        //rootnode->children.append(childnode);
+        //childnode->parent = rootnode;
+        //rootnode->haschildren = true;
+        //rootnode->childcount = rootnode->childcount + 1;
+        //endResetModel();
+        //beginInsertRows(index(0, 0, QModelIndex()), 0, rootnode->childcount - 1);
+        //emit dataChanged(index(0, 0, QModelIndex()), index(0, 0, QModelIndex()));
         //endInsertRows();
     };
 

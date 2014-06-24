@@ -237,6 +237,7 @@ void WombatForensics::InitializeWombatFramework()
 
 void WombatForensics::InitializeQueryModel()
 {
+    ui->dirTreeView->setModel(NULL);
     fcasedb.commit();
     if(ProcessingComplete())
     {
@@ -244,15 +245,16 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
-        /*
         wombatdatabase->GetEvidenceObjects(); // get's all evidenceobjects from the db for the given case
         wombatdatabase->GetRootInum(); // gets all the inums for each filesystem objecttype = 4 
         wombatdatabase->GetRootNodes(); // gets all the root node assemblys for each evidence item
-        */
+
         //qDebug() << "dummy node count: " << dummynode->children.count();
         //treemodel->SetRootNode(dummynode);
 
         //ui->dirTreeView->setModel(treemodel);
+        emit ui->dirTreeView->model()->layoutChanged();
+        //emit ((TreeModel*)ui->dirTreeView->model())->LayoutChanged();
         //ui->dirTreeView->reset();
         //ui->dirTreeView->hideColumn(4);
         //ui->dirTreeView->hideColumn(5);
