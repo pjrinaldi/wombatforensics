@@ -18,10 +18,10 @@ class TreeModel : public QAbstractItemModel
 public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
-        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type";
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID";
         rootnode = 0;
         QList<QVariant> emptyset;
-        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
         rootnode = new Node(emptyset);
         rootnode->parent = 0;
         rootnode->childcount = 0;
@@ -204,8 +204,9 @@ public:
         if(parentnode->haschildren == true)
         {
             QSqlQuery morequery(fcasedb);
-            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type FROM data WHERE objecttype == 5 AND parentid = ?");
+            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid FROM data WHERE objecttype == 5 AND parentid = ? AND parimgid = ?");
             morequery.addBindValue(parentnode->nodevalues.at(5).toInt());
+            morequery.addBindValue(parentnode->nodevalues.at(13).toInt());
             if(morequery.exec())
             {
                 beginInsertRows(parent, 0, parentnode->childcount - 1);
@@ -223,7 +224,7 @@ public:
                     }
                     else
                     {
-                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toInt());
+                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toInt(), parentnode->nodevalues.at(13).toInt());
                         curchild->haschildren = curchild->HasChildren();
                     }
                     parentnode->children.append(curchild);
@@ -250,13 +251,26 @@ public:
         }
     };
 
+    void RemEvidence(int curid)
+    {
+        qDebug() << "original rootnode childcount " << rootnode->childcount;
+        int rownumber = rootnode->GetChildRow(curid);
+        beginRemoveRows(QModelIndex(), rownumber, rownumber);
+        rootnode->RemoveChild(rownumber);
+        rootnode->childcount--;
+        endRemoveRows();
+        qDebug() << "removed row number: " << rownumber << " and the new childcount is " << rootnode->childcount;
+    };
+
     void AddEvidence(int curid, int currootinum)
     {
         rootinum = currootinum;
         QSqlQuery addevidquery(fcasedb);
-        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parfsid FROM data WHERE objectid >= ? AND (objecttype < 5 OR (objecttype == 5 AND parentid = ?)) order by objecttype");
+        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?) OR (objecttype == 5 AND parentid = ? AND parimgid = ?)");
+        addevidquery.addBindValue(curid);
         addevidquery.addBindValue(curid);
         addevidquery.addBindValue(currootinum);
+        addevidquery.addBindValue(curid);
         if(addevidquery.exec())
         {
             beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
@@ -264,7 +278,7 @@ public:
             {
                 currentnode = 0;
                 colvalues.clear();
-                for(int i=0; i < addevidquery.record().count() - 1; i++)
+                for(int i=0; i < addevidquery.record().count(); i++)
                     colvalues.append(addevidquery.value(i));
                 currentnode = new Node(colvalues);
                 if(currentnode->nodevalues.at(4).toInt() == 1)
@@ -281,7 +295,7 @@ public:
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
-                    currentnode->childcount = GetChildCount(2, currentnode->nodevalues.at(0).toInt());
+                    currentnode->childcount = GetChildCount(2, currentnode->nodevalues.at(0).toInt(), curid);
                     currentnode->haschildren = currentnode->HasChildren();
                     parentnode = currentnode;
                 }
@@ -290,14 +304,14 @@ public:
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
-                    currentnode->childcount = GetChildCount(4, currootinum);
+                    currentnode->childcount = GetChildCount(4, currootinum, curid);
                     currentnode->haschildren = currentnode->HasChildren();
                 }
                 else if(currentnode->nodevalues.at(4).toInt() == 5)
                 {
                     for(int i=0; i < parentnode->children.count(); i++)
                     {
-                        if(addevidquery.value(13).toInt() == parentnode->children.at(i)->nodevalues.at(0).toInt()) // parfsid = fs node id
+                        if(addevidquery.value(14).toInt() == parentnode->children.at(i)->nodevalues.at(0).toInt()) // parfsid = fs node id
                             parentnode = parentnode->children.at(i); // parentnode is now the proper file system.
                     }
                     currentnode->parent = parentnode;
@@ -308,7 +322,7 @@ public:
                     }
                     else
                     {
-                        currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt());
+                        currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt(), curid);
                         currentnode->haschildren = currentnode->HasChildren();
                     }
                     parentnode->children.append(currentnode);

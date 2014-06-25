@@ -30,7 +30,7 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
-int GetChildCount(int type, int address)
+int GetChildCount(int type, int address, int parimgid)
 {
     QSqlQuery childquery(fcasedb);
     QString querystring = "SELECT COUNT(objectid) FROM data WHERE parentid = ?";
@@ -38,8 +38,12 @@ int GetChildCount(int type, int address)
         querystring += " AND objecttype < 5";
     else
         querystring += " AND objecttype = 5";
+    if(type != 1)
+        querystring += " AND parimgid = ?";
     childquery.prepare(querystring);
     childquery.addBindValue(address);
+    if(type != 1)
+        childquery.addBindValue(parimgid);
     if(childquery.exec())
     {
         childquery.next();

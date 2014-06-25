@@ -30,7 +30,9 @@ public:
     int ReturnCaseCount(void);
     void InsertCase();
     void ReturnCaseNameList(void);
+    void ReturnEvidenceNameList(void);
     void ReturnCaseID(void);
+    void RemoveEvidence(void);
 
     QList<QSqlRecord> GetSqlResults(QString query, QVariantList invalues);
     int InsertSqlGetID(QString query, QVariantList invalues);

@@ -207,11 +207,14 @@ struct WombatVariable
     QString tmpfilepath;
     QString curerrmsg;
     QString wombatdbname;
+    QString evidremovestring;
+    int evidremoveid;
     QList<int> curevidlist; // may not need
     //QStandardItemModel* dirmodel;
     QList<int> rootinums; // shouldn't need this one.
     CaseObject caseobject;
     QStringList casenamelist;
+    QStringList evidencenamelist;
     EvidenceObject evidenceobject;
     //VolumeObject volumeobject;
     QVector<EvidenceObject> evidenceobjectvector;

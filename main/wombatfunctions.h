@@ -6,7 +6,7 @@
 
 std::string GetTime(void);
 char* TskTimeToStringUTC(time_t time, char buf[128]);
-int GetChildCount(int type, int address);
+int GetChildCount(int type, int address, int parimgid = 0);
 bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
 void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints);

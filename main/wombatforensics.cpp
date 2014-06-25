@@ -59,6 +59,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->dirTreeView->hideColumn(5);
     ui->dirTreeView->hideColumn(11);
     ui->dirTreeView->hideColumn(12);
+    ui->dirTreeView->hideColumn(13);
+    ui->dirTreeView->hideColumn(14);
     connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
@@ -241,8 +243,8 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "DB Commit finished.";
         wombatdatabase->GetRootInum();
         treemodel->AddEvidence(wombatvarptr->currentevidenceid, wombatvarptr->currentrootinum);
-
         ResizeColumns();
+        ui->actionRemove_Evidence->setEnabled(true);
         statuslabel->setText("");
         wombatframework->CloseInfoStructures();
     }
@@ -520,6 +522,62 @@ void WombatForensics::OpenFileSystemFile()
 
 void WombatForensics::RemEvidence()
 {
+    wombatvarptr->evidencenamelist.clear();
+    wombatdatabase->ReturnEvidenceNameList();
+    bool ok;
+    wombatvarptr->evidremovestring = QInputDialog::getItem(this, tr("Remove Existing Evidence"), tr("Select the Evidence to Remove: "), wombatvarptr->evidencenamelist, 0, false, &ok);
+    if(ok && !wombatvarptr->evidremovestring.isEmpty()) // remove selected evidence
+    {
+        wombatvarptr->evidremoveid = wombatvarptr->evidremovestring.split(".").at(0).toInt();
+        if(wombatvarptr->evidremoveid > 0)
+        {
+            treemodel->RemEvidence(wombatvarptr->evidremoveid); // might need to multithread this
+            wombatdatabase->RemoveEvidence(); // might need to multithread this
+        }
+    }
+    /*
+    if(ok && !wombatvarptr->caseobject.name.isEmpty()) // open selected case
+    {
+        wombatdatabase->ReturnCaseID();
+        QString tmpTitle = "Wombat Forensics - ";
+        tmpTitle += wombatvarptr->caseobject.name;
+        this->setWindowTitle(tmpTitle);
+        QString casestring = QString::number(wombatvarptr->caseobject.id) + "-" + wombatvarptr->caseobject.name;
+        wombatvarptr->caseobject.dirpath = wombatvarptr->casespath + casestring + "/";
+        bool mkPath = (new QDir())->mkpath(wombatvarptr->caseobject.dirpath);
+        if(mkPath == false)
+        {
+            DisplayError("2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
+        }
+        // CREATE CASEID-CASENAME.DB RIGHT HERE.
+        wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
+        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
+        wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
+        bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
+        if(!caseFileExist)
+        {
+            wombatdatabase->CreateCaseDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.2", "Course DB Creation Error", wombatvarptr->curerrmsg);
+        }
+        else
+        {
+            wombatdatabase->OpenCaseDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
+        }
+        fcasedb = wombatvarptr->casedb;
+        ui->actionAdd_Evidence->setEnabled(true);
+        wombatdatabase->GetEvidenceObjects();
+        // need to initialize treeview model for existing evidence.
+        if(ui->dirTreeView->model() != NULL)
+            ui->actionRemove_Evidence->setEnabled(true);
+    }
+
+
+     *
+     *
+     */ 
 }
 
 void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)

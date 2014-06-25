@@ -70,6 +70,19 @@ public:
             return true;
         return false;
     };
+    void RemoveChild(int idx)
+    {
+        children.removeAt(idx);
+    };
+    int GetChildRow(int curid)
+    {
+        for(int i=0; i < children.count(); i++)
+        {
+            if(curid == children.at(i)->nodevalues.at(0).toInt())
+                return i;
+        }
+        return -1;
+    };
 };
 
 extern Node* rootnode;
