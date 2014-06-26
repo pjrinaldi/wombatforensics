@@ -221,7 +221,11 @@ void WombatForensics::InitializeOpenCase()
         }
         fcasedb = wombatvarptr->casedb;
         ui->actionAdd_Evidence->setEnabled(true);
-        wombatdatabase->GetEvidenceObjects();
+        // ALL I NEED TO DO IS ENSURE CURRENTVARIABLES ARE SET.
+        // THEN SIMPLY INITIALIZE THE TREEMODEL FOR EACH EVIDENCE OBJECT.
+        // GET EVIDENCEOBJECTS FROM THE BELOW DB CODE.
+        // ENSURE THIS IS MULTITHREADED.
+        //wombatdatabase->GetEvidenceObjects();
         // need to initialize treeview model for existing evidence.
         if(ui->dirTreeView->model() != NULL)
             ui->actionRemove_Evidence->setEnabled(true);

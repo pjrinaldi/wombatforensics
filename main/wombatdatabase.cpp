@@ -509,6 +509,7 @@ void WombatDatabase::RemoveEvidence()
     wombatptr->bindvalues.append(wombatptr->evidremoveid);
     wombatptr->bindvalues.append(wombatptr->evidremoveid);
     wombatptr->evidrowsremoved = ReturnSqlRowsAffected("DELETE FROM data WHERE objectid = ? or parimgid = ?", wombatptr->bindvalues);
-    //filesfound--, filesprocessed--
-    //isignals->ProgUpd();
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->evidremoveid);
+    InsertSql("DELETE FROM dataruns WHERE objectid = ?", wombatptr->bindvalues);
 }
