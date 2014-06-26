@@ -49,6 +49,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+    connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
@@ -245,7 +246,7 @@ void WombatForensics::InitializeQueryModel()
         treemodel->AddEvidence(wombatvarptr->currentevidenceid, wombatvarptr->currentrootinum);
         ResizeColumns();
         ui->actionRemove_Evidence->setEnabled(true);
-        statuslabel->setText("");
+        //statuslabel->setText("");
         wombatframework->CloseInfoStructures();
     }
 }
@@ -280,8 +281,6 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
-    //  openfuture = QtConcurrent::run(wombatframework, &WombatFramework::OpenFiles);
-    //  openwatcher.setFuture(openfuture);
     wombatframework->OpenFiles();
 
 }
@@ -289,6 +288,7 @@ void WombatForensics::InitializeEvidenceStructure()
 void WombatForensics::AddEvidence()
 {
     int isnew = 1;
+    threadvector.clear();
     wombatdatabase->GetEvidenceObjects();
     //qDebug() << "fullpathvector count after clear: " << wombatvarptr->evidenceobject.fullpathvector.size();
     // might need to call these to a global tmp and then store it after initializeevidencestructure...
@@ -320,6 +320,7 @@ void WombatForensics::AddEvidence()
 
             sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
             sqlwatcher.setFuture(sqlfuture);
+            threadvector.append(sqlfuture);
         }
         else
             DisplayError("1.8", "Evidence already exists in the case.", "Add Evidence cancelled");
@@ -522,6 +523,7 @@ void WombatForensics::OpenFileSystemFile()
 
 void WombatForensics::RemEvidence()
 {
+    threadvector.clear();
     wombatvarptr->evidencenamelist.clear();
     wombatdatabase->ReturnEvidenceNameList();
     bool ok;
@@ -531,53 +533,13 @@ void WombatForensics::RemEvidence()
         wombatvarptr->evidremoveid = wombatvarptr->evidremovestring.split(".").at(0).toInt();
         if(wombatvarptr->evidremoveid > 0)
         {
-            treemodel->RemEvidence(wombatvarptr->evidremoveid); // might need to multithread this
-            wombatdatabase->RemoveEvidence(); // might need to multithread this
+            treemodel->RemEvidence(wombatvarptr->evidremoveid);
+            remfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::RemoveEvidence);
+            remwatcher.setFuture(remfuture);
+            threadvector.append(remfuture);
+ 
         }
     }
-    /*
-    if(ok && !wombatvarptr->caseobject.name.isEmpty()) // open selected case
-    {
-        wombatdatabase->ReturnCaseID();
-        QString tmpTitle = "Wombat Forensics - ";
-        tmpTitle += wombatvarptr->caseobject.name;
-        this->setWindowTitle(tmpTitle);
-        QString casestring = QString::number(wombatvarptr->caseobject.id) + "-" + wombatvarptr->caseobject.name;
-        wombatvarptr->caseobject.dirpath = wombatvarptr->casespath + casestring + "/";
-        bool mkPath = (new QDir())->mkpath(wombatvarptr->caseobject.dirpath);
-        if(mkPath == false)
-        {
-            DisplayError("2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
-        }
-        // CREATE CASEID-CASENAME.DB RIGHT HERE.
-        wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
-        wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
-        bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
-        if(!caseFileExist)
-        {
-            wombatdatabase->CreateCaseDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.2", "Course DB Creation Error", wombatvarptr->curerrmsg);
-        }
-        else
-        {
-            wombatdatabase->OpenCaseDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
-        }
-        fcasedb = wombatvarptr->casedb;
-        ui->actionAdd_Evidence->setEnabled(true);
-        wombatdatabase->GetEvidenceObjects();
-        // need to initialize treeview model for existing evidence.
-        if(ui->dirTreeView->model() != NULL)
-            ui->actionRemove_Evidence->setEnabled(true);
-    }
-
-
-     *
-     *
-     */ 
 }
 
 void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
@@ -660,12 +622,31 @@ void WombatForensics::FileExport(FileExportData* exportdata)
     exportfuture = QtConcurrent::run(this, &WombatForensics::ExportFiles, exportdata);
 }
 
+void WombatForensics::FinishRemoval()
+{
+    if(ProcessingComplete())
+    {
+        filesprocessed = filesprocessed - wombatvarptr->evidrowsremoved;
+        filesfound = filesfound - wombatvarptr->evidrowsremoved;
+        processcountlabel->setText("Processed: " + QString::number(filesprocessed));
+        filecountlabel->setText("Files: " + QString::number(filesfound));
+        statuslabel->setText("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
+        //statuslabel->setText("");
+
+        qDebug() << "removal of files is complete.";
+    }
+    else
+    {
+        qDebug() << "still removing files.";
+    }
+}
+
 void WombatForensics::FinishExport()
 {
     if(ProcessingComplete())
     {
         statuslabel->setText("Exporting completed");
-        statuslabel->setText("");
+        //statuslabel->setText("");
         qDebug() << "export of files is complete.";
     }
     else
@@ -785,7 +766,7 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     if(curprogress == 100 && ProcessingComplete())
     {
         statuslabel->setText("Processing Complete");
-        statuslabel->setText("");
+        //statuslabel->setText("");
     }
 }
 

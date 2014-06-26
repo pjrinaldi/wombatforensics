@@ -38,6 +38,8 @@ public:
     int InsertSqlGetID(QString query, QVariantList invalues);
     void InsertSql(QString query, QVariantList invalues);
     void InsertSql(QString query);
+    int ReturnSqlRowsAffected(QString query, QVariantList invalues);
+
 
 signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);

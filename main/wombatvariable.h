@@ -209,6 +209,7 @@ struct WombatVariable
     QString wombatdbname;
     QString evidremovestring;
     int evidremoveid;
+    int evidrowsremoved;
     QList<int> curevidlist; // may not need
     //QStandardItemModel* dirmodel;
     QList<int> rootinums; // shouldn't need this one.

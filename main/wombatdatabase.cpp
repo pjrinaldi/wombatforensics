@@ -99,7 +99,7 @@ int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
        casequery.prepare(query);
        for(int i=0; i < invalues.count(); i++)
        {
-           casequery.addBindValue(invalues[i]);
+           casequery.addBindValue(invalues.at(i));
        }
        if(casequery.exec())
            tmpid = casequery.lastInsertId().toInt();
@@ -115,6 +115,28 @@ int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
    }
 
    return tmpid;
+}
+
+int WombatDatabase::ReturnSqlRowsAffected(QString query, QVariantList invalues)
+{
+    int tmpcount = 0;
+    if(wombatptr->casedb.isOpen())
+    {
+        QSqlQuery casequery(wombatptr->casedb);
+        casequery.prepare(query);
+        for(int i=0; i < invalues.count(); i++)
+            casequery.addBindValue(invalues.at(i));
+        if(casequery.exec())
+            tmpcount = casequery.numRowsAffected();
+        else
+        {
+        }
+        casequery.finish();
+    }
+    else
+    {
+    }
+    return tmpcount;
 }
 
 void WombatDatabase::CreateCaseDB(void)
@@ -143,7 +165,7 @@ void WombatDatabase::CreateCaseDB(void)
         wombatptr->casedb.transaction();
         for(int i=0; i < wombattableschema.count(); i++)
         {
-            casequery.exec(wombattableschema[i]);
+            casequery.exec(wombattableschema.at(i));
         }
         wombatptr->casedb.commit();
         casequery.finish();
@@ -245,6 +267,7 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->currentvolumename);
         wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, childcount, size, sectsize, byteoffset, parentid, parimgid, name) VALUES(2, 240, 0, ?, ?, 0, ?, ?, ?);", wombatptr->bindvalues);
     }
+    filesprocessed++;
 }
 
 void WombatDatabase::InsertPartitionObjects()
@@ -292,6 +315,7 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
             wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, sectsize, blockcount, firstinum, lastinum, rootinum, address) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
             wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
+            filesprocessed++;
         }
     }
 }
@@ -317,6 +341,7 @@ void WombatDatabase::InsertEvidenceObject()
         wombatptr->bindvalues.append(i+1);
         InsertSql("INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", wombatptr->bindvalues);
     }
+    filesprocessed++;
 }
 
 void WombatDatabase::GetEvidenceObject()
@@ -480,4 +505,10 @@ void WombatDatabase::GetRootInum()
 
 void WombatDatabase::RemoveEvidence()
 {
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->evidremoveid);
+    wombatptr->bindvalues.append(wombatptr->evidremoveid);
+    wombatptr->evidrowsremoved = ReturnSqlRowsAffected("DELETE FROM data WHERE objectid = ? or parimgid = ?", wombatptr->bindvalues);
+    //filesfound--, filesprocessed--
+    //isignals->ProgUpd();
 }

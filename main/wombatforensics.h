@@ -253,13 +253,13 @@ public:
 
     void RemEvidence(int curid)
     {
-        qDebug() << "original rootnode childcount " << rootnode->childcount;
+        //qDebug() << "original rootnode childcount " << rootnode->childcount;
         int rownumber = rootnode->GetChildRow(curid);
         beginRemoveRows(QModelIndex(), rownumber, rownumber);
         rootnode->RemoveChild(rownumber);
         rootnode->childcount--;
         endRemoveRows();
-        qDebug() << "removed row number: " << rownumber << " and the new childcount is " << rootnode->childcount;
+        //qDebug() << "removed row number: " << rownumber << " and the new childcount is " << rootnode->childcount;
     };
 
     void AddEvidence(int curid, int currootinum)
@@ -474,6 +474,7 @@ private slots:
     void LoadComplete(bool isok);
     void InitializeQueryModel(void);
     void FinishExport(void);
+    void FinishRemoval(void);
     void StatusUpdate(QString tmptext)
     {
         statuslabel->setText(tmptext);
@@ -512,6 +513,8 @@ private:
     QFutureWatcher<void> sqlwatcher;
     QFuture<void> exportfuture;
     QFutureWatcher<void> exportwatcher;
+    QFuture<void> remfuture;
+    QFutureWatcher<void> remwatcher;
 
     off_t offset() const;
     HexEditor* hexwidget;

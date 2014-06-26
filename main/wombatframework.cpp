@@ -24,12 +24,14 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     {
         //qDebug() << "print image error here";
     }
+    filesfound++;
     free(images);
 }
 
 void WombatFramework::OpenVolumeSystem() // open current volume system
 {
     wombatptr->evidenceobject.volinfo = tsk_vs_open(wombatptr->evidenceobject.imageinfo, 0, TSK_VS_TYPE_DETECT);
+    filesfound++;
 }
 
 void WombatFramework::GetVolumeSystemName() // get the volume system name
@@ -59,6 +61,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
                 if(tmpfsinfo != NULL)
                 {
                     wombatptr->evidenceobject.fsinfovector.push_back(tmpfsinfo);
+                    filesfound++;
                 }
                 else
                 {
