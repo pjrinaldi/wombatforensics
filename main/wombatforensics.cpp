@@ -223,18 +223,19 @@ void WombatForensics::InitializeOpenCase()
         processcountlabel->setText("Processed: 0");
         filecountlabel->setText("Files: 0");
         wombatdatabase->GetEvidenceObjects();
+
         for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
         {
             wombatvarptr->currentevidencename = QString::fromStdString(wombatvarptr->evidenceobjectvector.at(i).fullpathvector[0]).split("/").last(); 
             currentevidencename = wombatvarptr->currentevidencename;
-            // NEED TO FIGURE OUT WHERE I HAVE THE FILESYSTEM LOOP TO POPUPLATE TREE. THEN FIGURE OUT WHERE THE FSIDVECTOR IS FOR ROOT INUM...
             wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->evidenceobjectvector.at(i).id);
             wombatvarptr->currentevidenceid = wombatvarptr->evidenceobjectvector.at(i).id;
             wombatvarptr->evidenceobject = wombatvarptr->evidenceobjectvector.at(i);
             statuslabel->setText("Processed 0%");
-            sqlfuture = QtConcurrent::run(this, &WombatForensics::OpenEvidenceStructure);
-            sqlwatcher.setFuture(sqlfuture);
-            threadvector.append(sqlfuture);
+            OpenEvidenceStructure();
+            //sqlfuture = QtConcurrent::run(this, &WombatForensics::OpenEvidenceStructure);
+            //sqlwatcher.setFuture(sqlfuture);
+            //threadvector.append(sqlfuture);
             if(ui->dirTreeView->model() != NULL)
                 ui->actionRemove_Evidence->setEnabled(true);
         }
@@ -261,7 +262,8 @@ void WombatForensics::InitializeQueryModel()
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
-    oldselectedindex = previtem.indexes().at(0);
+    if(previtem.indexes().count() > 0)
+        oldselectedindex = previtem.indexes().at(0);
     selectedindex = curitem.indexes().at(0);
     ui->actionExport_Evidence->setEnabled(true);
     wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
@@ -296,12 +298,13 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::OpenEvidenceStructure()
 {
-    wombatframework->OpenEvidenceImage();
-    wombatframework->OpenVolumeSystem();
-    wombatframework->GetVolumeSystemName();
-    wombatframework->OpenPartitions();
-    //InitializeQueryModel();
-
+    //wombatframework->OpenEvidenceImage();
+    //wombatframework->OpenVolumeSystem();
+    //wombatframework->GetVolumeSystemName();
+    //wombatframework->OpenPartitions();
+    treemodel->AddEvidence(wombatvarptr->currentevidenceid);
+    // HAVE TO TEST WITH A LARGE DATASET AND DETERMINE IF I NEED TO RUN SOME OF THIS IN A SEPARATE THREAD
+    // NEED TO UPDATE THE FILES AND PROCESSED COUNTS WITH THE CORRECT NUMBER...
 }
 
 void WombatForensics::AddEvidence()
@@ -835,7 +838,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         //event->ignore();
     }
     
-    RemoveTmpFiles();
+    RemoveTmpFiles(); // can get rid of this function
     if(ProcessingComplete())
     {
         event->accept();

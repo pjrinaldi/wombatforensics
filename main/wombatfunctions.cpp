@@ -65,6 +65,8 @@ bool FileExists(const std::string& filename)
 bool ProcessingComplete()
 {
     bool processingcomplete = false;
+    if(threadvector.count() == 0)
+        return true;
     for(int i = 0; i < threadvector.count(); i++)
     {
         processingcomplete = threadvector[i].isFinished();
