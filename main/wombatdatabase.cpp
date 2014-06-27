@@ -366,6 +366,7 @@ void WombatDatabase::GetEvidenceObject()
     wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
         wombatptr->evidenceobject.fullpathvector.push_back(wombatptr->sqlrecords[i].value(0).toString().toStdString());
+    wombatptr->evidenceobject.itemcount = wombatptr->evidenceobject.fullpathvector.size();
 }
 
 void WombatDatabase::GetEvidenceObjects()
@@ -378,6 +379,7 @@ void WombatDatabase::GetEvidenceObjects()
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         wombatptr->evidenceobject.id = wombatptr->sqlrecords[i].value(0).toInt();
+        currentevidenceid = wombatptr->evidenceobject.id;
         wombatptr->evidenceobject.objecttype = wombatptr->sqlrecords[i].value(1).toInt();
         wombatptr->evidenceobject.type = wombatptr->sqlrecords[i].value(2).toInt();
         wombatptr->evidenceobject.size = wombatptr->sqlrecords[i].value(3).toInt();
@@ -473,6 +475,11 @@ void WombatDatabase::ReturnCaseID()
         //qDebug() << wombatptr->appdb.lastError().text();
     }
     appquery.finish();
+}
+void WombatDatabase::ReturnFileSystemIdList()
+{
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->currentevid
 }
 
 void WombatDatabase::GetObjectValues()

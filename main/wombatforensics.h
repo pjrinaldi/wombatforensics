@@ -254,13 +254,11 @@ public:
 
     void RemEvidence(int curid)
     {
-        //qDebug() << "original rootnode childcount " << rootnode->childcount;
         int rownumber = rootnode->GetChildRow(curid);
         beginRemoveRows(QModelIndex(), rownumber, rownumber);
         rootnode->RemoveChild(rownumber);
         rootnode->childcount--;
         endRemoveRows();
-        //qDebug() << "removed row number: " << rownumber << " and the new childcount is " << rootnode->childcount;
     };
 
     void AddEvidence(int curid, int currootinum)
@@ -493,7 +491,6 @@ private:
     void InitializeCaseStructure(void);
     void InitializeEvidenceStructure(void);
     void InitializeOpenCase(void);
-    void InitializeWombatFramework(void);
     void UpdateViewer(void);
     void UpdateOmniValue(void);
     void LoadHexContents(void);
@@ -501,6 +498,7 @@ private:
     void LoadWebContents(void);
     void LoadImgContents(void);
     void LoadVidContents(void);
+    void OpenEvidenceStructure(void);
     void ExportFiles(FileExportData* exportdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
     void ProcessExport(TskObject curobject, std::string fullpath, std::string name);

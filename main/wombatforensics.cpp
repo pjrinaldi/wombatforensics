@@ -50,9 +50,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
-    //connect(&openwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    //connect(&filewatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    //connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
 
     treemodel = new TreeModel(this);
     ui->dirTreeView->setModel(treemodel);
@@ -65,8 +62,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
- 
-    InitializeWombatFramework();
 }
 
 void WombatForensics::HideProgressWindow(bool checkedstate)
@@ -81,7 +76,7 @@ void WombatForensics::InitializeAppStructure()
     wombatvarptr->settingspath = homePath + "settings";
     wombatvarptr->datapath = homePath + "data/";
     wombatvarptr->casespath = homePath + "cases/";
-    wombatvarptr->tmpfilepath = homePath + "tmpfiles";
+    //wombatvarptr->tmpfilepath = homePath + "tmpfiles"; // currently not used if i continue to view objects in memory...
     bool mkPath = (new QDir())->mkpath(wombatvarptr->settingspath);
     if(mkPath == false)
         DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
@@ -91,9 +86,9 @@ void WombatForensics::InitializeAppStructure()
     mkPath = (new QDir())->mkpath(wombatvarptr->casespath);
     if(mkPath == false)
         DisplayError("2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvarptr->tmpfilepath);
-    if(mkPath == false)
-        DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
+    //mkPath = (new QDir())->mkpath(wombatvarptr->tmpfilepath);
+    //if(mkPath == false)
+    //    DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     wombatvarptr->wombatdbname = wombatvarptr->datapath + "WombatApp.db";
     wombatvarptr->appdb = QSqlDatabase::addDatabase("QSQLITE", "wombatapp");
     wombatvarptr->appdb.setDatabaseName(wombatvarptr->wombatdbname);
@@ -224,16 +219,25 @@ void WombatForensics::InitializeOpenCase()
         // THEN SIMPLY INITIALIZE THE TREEMODEL FOR EACH EVIDENCE OBJECT.
         // GET EVIDENCEOBJECTS FROM THE BELOW DB CODE.
         // ENSURE THIS IS MULTITHREADED.
-        //wombatdatabase->GetEvidenceObjects();
-        // need to initialize treeview model for existing evidence.
-        if(ui->dirTreeView->model() != NULL)
-            ui->actionRemove_Evidence->setEnabled(true);
+
+        processcountlabel->setText("Processed: 0");
+        filecountlabel->setText("Files: 0");
+        wombatdatabase->GetEvidenceObjects();
+        for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
+        {
+            wombatvarptr->currentevidencename = QString::fromStdString(wombatvarptr->evidenceobjectvector.at(i).fullpathvector[0]).split("/").last() 
+            currentevidencename = wombatvarptr->currentevidencename;
+            // NEED TO FIGURE OUT WHERE I HAVE THE FILESYSTEM LOOP TO POPUPLATE TREE. THEN FIGURE OUT WHERE THE FSIDVECTOR IS FOR ROOT INUM...
+            //QVector<int> fsidvector = wombatdatabase->ReturnFileSystemIdList(wombatvarptr->evidenceobjectvector.at(i).id);
+            statuslabel->setText("Processed 0%");
+            sqlfuture = QtConcurrent::run(this, &WombatForensics::OpenEvidenceStructure);
+            sqlwatcher.setFuture(sqlfuture);
+            threadvector.append(sqlfuture);
+            if(ui->dirTreeView->model() != NULL)
+                ui->actionRemove_Evidence->setEnabled(true);
+        }
     }
 
-}
-void WombatForensics::InitializeWombatFramework()
-{
-    // MIGHT NOT NEED TO INITIALIZE ANYTHING HERE.
 }
 
 void WombatForensics::InitializeQueryModel()
@@ -286,6 +290,15 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
     wombatframework->OpenFiles();
+}
+
+void WombatForensics::OpenEvidenceStructure()
+{
+    wombatframework->OpenEvidenceImage();
+    wombatframework->OpenVolumeSystem();
+    wombatframework->GetVolumeSystemName();
+    wombatframework->OpenPartitions();
+    InitializeQueryModel();
 
 }
 
@@ -357,46 +370,27 @@ void WombatForensics::LoadHexContents()
         tsk_fs_close(tskobjptr->readfsinfo);
     if(tskobjptr->readfileinfo != NULL)
         tsk_fs_file_close(tskobjptr->readfileinfo);
-    // int curidx = wombatframework->DetermineVectorIndex(); // shouldn't need this, since i'm pulling from sql.
 
     if(wombatvarptr->selectedobject.objtype == 1) // image file
     {
         OpenParentImage(wombatvarptr->selectedobject.id);
-        // OpenParentImage(wombatvarptr->evidenceobjectvector[curidx].id); 
         tskobjptr->offset = 0;
         tskobjptr->objecttype = 1;
         tskobjptr->length = wombatvarptr->selectedobject.size;
-        //tskobjptr->length = wombatvarptr->evidenceobjectvector[curidx].size;
     }
     else if(wombatvarptr->selectedobject.objtype == 2) // volume object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        //OpenParentImage(wombatvarptr->partitionobjectvector[curidx].parimgid);
-        //tskobjptr->offset = wombatvarptr->partitionobjectvector[curidx].sectstart * wombatvarptr->partitionobjectvector[curidx].blocksize;
         tskobjptr->objecttype = 3;
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.blocksize;
         tskobjptr->length = wombatvarptr->selectedobject.size;
-        //tskobjptr->length = wombatvarptr->partitionobjectvector[curidx].sectlength * wombatvarptr->partitionobjectvector[curidx].blocksize;
-        // there is no sectlength for the volume objects...
-        //tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.blocksize; 
-        // need to get the volume parent and then the image parent , so i can open the image from bytes...
-        // need to do a self looping query, where i use the parentid and check if its null, if its not null, then run it again.
-        // else return imageid and then loop over evidenceobjectvector for index. then loop over fullpathvector to get the
-        // imagepartspath and open the respective image.
-        // THEN I'LL HAVE TO GET THE OFFSET AND LENGTH FOR THE PARTITION...
     }
     else if(wombatvarptr->selectedobject.objtype == 4) // fs object
     {
-        // set tskobjptr->offset and tskobjptr->length here prior to calling this...
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        //OpenParentImage(wombatvarptr->filesystemobjectvector[curidx].parimgid);
         tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
         tskobjptr->objecttype = 4;
-        //tskobjptr->offset = wombatvarptr->filesystemobjectvector[curidx].byteoffset;
         tskobjptr->length = wombatvarptr->selectedobject.size;
-        //tskobjptr->length = wombatvarptr->selectedobject.sectsize * wombatvarptr->selectedobject.blockcount;
-        //tskobjptr->length = wombatvarptr->filesystemobjectvector[curidx].blocksize * wombatvarptr->filesystemobjectvector[curidx].blockcount;
-        //qDebug() << "File System Object";
     }
     else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
@@ -407,13 +401,6 @@ void WombatForensics::LoadHexContents()
         tskobjptr->address = wombatvarptr->selectedobject.address;
         tskobjptr->length = wombatvarptr->selectedobject.size;
         OpenFileSystemFile();
-        // OpenParentFileSystem(imgobject...) - calls tsk_fs_open_img()
-        // individual file store's address and size in the db right now.
-        // STORE IMG -> GET FILE SYSTEM -> FS_FILE_OPEN_META(FS, NULL, INUM)
-        // FILE gets address (inum) and size (filesize) from db.
-        //qDebug() << wombatvarptr->selectedobject.name << "(" << wombatvarptr->selectedobject.id << "): wombatvarptr->selectedobject.address (inum): " << wombatvarptr->selectedobject.address;
-        //tskobjptr->offset = 
-        //tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
     }
     if(wombatvarptr->selectedobject.objtype != 3)
     {
