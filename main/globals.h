@@ -18,6 +18,7 @@ extern int currentfilesystemid;
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;
+extern QList<FileSystemObject> fsobjectlist;
 
 class InterfaceSignals : public QObject
 {

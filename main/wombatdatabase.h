@@ -23,7 +23,7 @@ public:
     void InsertPartitionObjects(void);
     void InsertFileSystemObjects(void);
     void GetObjectValues(void);
-    void GetRootInum(void);
+    //void GetRootInum(void);
 
     ~WombatDatabase();
 
@@ -32,7 +32,7 @@ public:
     void ReturnCaseNameList(void);
     void ReturnEvidenceNameList(void);
     void ReturnCaseID(void);
-    void ReturnFileSystemIdList(void);
+    void ReturnFileSystemObjectList(int curid);
     void RemoveEvidence(void);
 
     QList<QSqlRecord> GetSqlResults(QString query, QVariantList invalues);

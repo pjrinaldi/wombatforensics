@@ -17,4 +17,11 @@ struct TskObject
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
 };
+
+struct FileSystemObject
+{
+    int id;
+    int rootinum;
+};
+
 #endif // TSKVARIABLE_H

@@ -397,6 +397,7 @@ void WombatDatabase::GetEvidenceObjects()
         wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
         for(int j=0; j < wombatptr->sqlrecords.count(); j++)
             wombatptr->evidenceobjectvector[i].fullpathvector.push_back(wombatptr->sqlrecords[j].value(0).toString().toStdString());
+        wombatptr->evidenceobjectvector[i].itemcount = wombatptr->evidenceobjectvector.at(i).fullpathvector.size();
     }
 }
 
@@ -476,10 +477,20 @@ void WombatDatabase::ReturnCaseID()
     }
     appquery.finish();
 }
-void WombatDatabase::ReturnFileSystemIdList()
+void WombatDatabase::ReturnFileSystemObjectList(int curevidenceid)
 {
+    fsobjectlist.clear();
+    FileSystemObject tmpobject;
     wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(wombatptr->currentevid
+    wombatptr->bindvalues.append(curevidenceid);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, rootinum FROM data WHERE objecttype = 4 and parimgid = ?", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        tmpobject.id = wombatptr->sqlrecords.at(i).value(0).toInt();
+        tmpobject.rootinum = wombatptr->sqlrecords.at(i).value(1).toInt();
+        fsobjectlist.append(tmpobject);
+    }
 }
 
 void WombatDatabase::GetObjectValues()
@@ -499,16 +510,16 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.address = wombatptr->sqlrecords[0].value(8).toInt();
     wombatptr->selectedobject.type = wombatptr->sqlrecords[0].value(9).toInt();
 }
-
+/*
 void WombatDatabase::GetRootInum()
 {
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->currentfilesystemid);
     wombatptr->sqlrecords.clear();
-    wombatptr->rootinums.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->currentrootinum = wombatptr->sqlrecords[0].value(0).toInt();
 }
+*/
 
 void WombatDatabase::RemoveEvidence()
 {

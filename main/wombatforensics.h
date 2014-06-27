@@ -25,7 +25,7 @@ public:
         rootnode = new Node(emptyset);
         rootnode->parent = 0;
         rootnode->childcount = 0;
-        rootinum = 0;
+        //rootinum = 0;
     };
 
     ~TreeModel()
@@ -261,15 +261,18 @@ public:
         endRemoveRows();
     };
 
-    void AddEvidence(int curid, int currootinum)
+    void AddEvidence(int curid)
     {
-        rootinum = currootinum;
+        int filesystemcount;
+        //rootinum = currootinum;
         QSqlQuery addevidquery(fcasedb);
-        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?) OR (objecttype == 5 AND parentid = ? AND parimgid = ?)");
+        // THIS IS WRONG. IT DOESN'T TAKE INTO ACCOUNT MULTIPLE FILESYSTEMS FOR AN IMAGE. TO ACCOMPLISH THAT, I WOULD NEED TO LOOP OVER THE FILES AND DIRECTORIES FOR EACH ROOTINUM OF THE RESPECTIVE FILESYSTEM. SO I SHOULD CALL THE SQL THEN DO ANOTHER SQL WHEN WE EQUAL 5 AND USE THE STUFF BELOW...
+        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
+        //addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?) OR (objecttype == 5 AND parentid = ? AND parimgid = ?)");
         addevidquery.addBindValue(curid);
         addevidquery.addBindValue(curid);
-        addevidquery.addBindValue(currootinum);
-        addevidquery.addBindValue(curid);
+        //addevidquery.addBindValue(currootinum);
+        //addevidquery.addBindValue(curid);
         if(addevidquery.exec())
         {
             beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
@@ -282,6 +285,7 @@ public:
                 currentnode = new Node(colvalues);
                 if(currentnode->nodevalues.at(4).toInt() == 1)
                 {
+                    filesystemcount = 0;
                     rootnode->children.append(currentnode);
                     rootnode->childcount++;
                     rootnode->haschildren = rootnode->HasChildren();
@@ -303,9 +307,47 @@ public:
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
-                    currentnode->childcount = GetChildCount(4, currootinum, curid);
+                    if(filesystemcount <= fsobjectlist.count())
+                    {
+                        currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid);
+                        filesystemcount++;
+                    }
                     currentnode->haschildren = currentnode->HasChildren();
                 }
+            }
+            QSqlQuery filequery(fcasedb);
+            Node* rootdirectory = 0;
+            for(int j=0; j < fsobjectlist.count(); j++)
+            {
+                filequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid FROM data WHERE objecttype = 5 AND parimgid = ? AND parentid = ?)");
+                filequery.addBindValue(curid);
+                filequery.addBindValue(fsobjectlist.at(j).rootinum);
+                if(filequery.exec())
+                {
+                    while(filequery.next())
+                    {
+                        for(int i=0; i < parentnode->children.count(); i++)
+                        {
+                            if(filequery.value(14).toInt() == parentnode->children.at(i)->nodevalues.at(0).toInt())
+                                rootdirectory = parentnode->children.at(i);
+                        }
+                        currentnode->parent = rootdirectory;
+                        if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
+                        {
+                            currentnode->childcount = 0;
+                            currentnode->haschildren = false;
+                        }
+                        else
+                        {
+                            currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt(), curid);
+                            currentnode->haschildren = currentnode->HasChildren();
+                        }
+                        rootdirectory->children.append(currentnode);
+                    }
+                }
+                filequery.finish();
+            }
+                /*
                 else if(currentnode->nodevalues.at(4).toInt() == 5)
                 {
                     for(int i=0; i < parentnode->children.count(); i++)
@@ -326,7 +368,7 @@ public:
                     }
                     parentnode->children.append(currentnode);
                 }
-            }
+            } */
             endInsertRows();
         }
     };
@@ -413,7 +455,7 @@ private:
     };
 
     QStringList headerdata;
-    int rootinum;
+    //int rootinum;
 };
 
 namespace Ui {

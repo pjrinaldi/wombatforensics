@@ -225,10 +225,12 @@ void WombatForensics::InitializeOpenCase()
         wombatdatabase->GetEvidenceObjects();
         for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
         {
-            wombatvarptr->currentevidencename = QString::fromStdString(wombatvarptr->evidenceobjectvector.at(i).fullpathvector[0]).split("/").last() 
+            wombatvarptr->currentevidencename = QString::fromStdString(wombatvarptr->evidenceobjectvector.at(i).fullpathvector[0]).split("/").last(); 
             currentevidencename = wombatvarptr->currentevidencename;
             // NEED TO FIGURE OUT WHERE I HAVE THE FILESYSTEM LOOP TO POPUPLATE TREE. THEN FIGURE OUT WHERE THE FSIDVECTOR IS FOR ROOT INUM...
-            //QVector<int> fsidvector = wombatdatabase->ReturnFileSystemIdList(wombatvarptr->evidenceobjectvector.at(i).id);
+            wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->evidenceobjectvector.at(i).id);
+            wombatvarptr->currentevidenceid = wombatvarptr->evidenceobjectvector.at(i).id;
+            wombatvarptr->evidenceobject = wombatvarptr->evidenceobjectvector.at(i);
             statuslabel->setText("Processed 0%");
             sqlfuture = QtConcurrent::run(this, &WombatForensics::OpenEvidenceStructure);
             sqlwatcher.setFuture(sqlfuture);
@@ -249,8 +251,7 @@ void WombatForensics::InitializeQueryModel()
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
-        wombatdatabase->GetRootInum();
-        treemodel->AddEvidence(wombatvarptr->currentevidenceid, wombatvarptr->currentrootinum);
+        treemodel->AddEvidence(wombatvarptr->currentevidenceid);
         ResizeColumns();
         ui->actionRemove_Evidence->setEnabled(true);
         //statuslabel->setText("");
@@ -289,6 +290,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->InsertFileSystemObjects();
+    wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
 }
 
@@ -298,7 +300,7 @@ void WombatForensics::OpenEvidenceStructure()
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
     wombatframework->OpenPartitions();
-    InitializeQueryModel();
+    //InitializeQueryModel();
 
 }
 
