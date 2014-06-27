@@ -384,7 +384,7 @@ void HexEditor::mousePressEvent( QMouseEvent* e )
 
   off_t byte_offset = localByteOffset();
   QRect bbox = byteBBox(byte_offset);
-  QRect abox = abyteBox(byte_offset);
+  //QRect abox = abyteBox(byte_offset);
   if( e->x() > bbox.right() ) {
     byte_offset++;
   }
@@ -397,7 +397,7 @@ void HexEditor::mouseMoveEvent( QMouseEvent* e )
 
   off_t byte_offset = localByteOffset();
   QRect bbox = byteBBox(byte_offset);
-  QRect abox = abyteBox(byte_offset);
+  //QRect abox = abyteBox(byte_offset);
   if(e->x() > bbox.right() ) {
     byte_offset++;
   }
@@ -411,7 +411,7 @@ void HexEditor::mouseReleaseEvent( QMouseEvent* e )
 
   off_t byte_offset = localByteOffset();
   QRect bbox = byteBBox(byte_offset);
-  QRect abox = abyteBox(byte_offset);
+  //QRect abox = abyteBox(byte_offset);
   if(e->x() > bbox.right() ) {
     byte_offset++;
   }
@@ -568,7 +568,7 @@ void HexEditor::paintLabels( QPainter* paintPtr)
   unsigned int i;
   off_t offset = _topLeft;
   uchar *ucptr;
-  uchar* offsetptr;
+  //uchar* offsetptr;
   QString label;
 
   // offset correction so the offset is showing the valid hex for the object loaded.

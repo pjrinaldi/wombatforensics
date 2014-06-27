@@ -13,7 +13,7 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     const TSK_TCHAR** images;
     //qDebug()  << "fullpathvector count: " << wombatptr->evidenceobject.fullpathvector.size();
     images = (const char**)malloc(wombatptr->evidenceobject.fullpathvector.size()*sizeof(char*));
-    for(int i=0; i < wombatptr->evidenceobject.fullpathvector.size(); i++)
+    for(uint i=0; i < wombatptr->evidenceobject.fullpathvector.size(); i++)
     {
         //qDebug() << "fullpathvector[" << i << "] = " << QString::fromStdString(wombatptr->evidenceobject.fullpathvector[i]);
         images[i] = wombatptr->evidenceobject.fullpathvector[i].c_str();
@@ -73,9 +73,9 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
 
 void WombatFramework::OpenFiles() // open the files and add to file info vector
 {
-    uint8_t walkreturn = 1;
+    uint8_t walkreturn;
     int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
-    for(int i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
+    for(uint i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
     {
         currentfilesystemid = wombatptr->evidenceobject.fsidvector[i];
         if(fcasedb.transaction())
@@ -83,6 +83,8 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
         }
     }
+    if(walkreturn == 1)
+        qDebug() << "issues with dir walk function.";
 }
 
 void WombatFramework::OpenEvidenceImages() // open all evidence images.
@@ -91,7 +93,7 @@ void WombatFramework::OpenEvidenceImages() // open all evidence images.
     {
         const TSK_TCHAR** images;
         images = (const char**)malloc(wombatptr->evidenceobjectvector[j].fullpathvector.size()*sizeof(char*));
-        for(int i=0; i < wombatptr->evidenceobjectvector[j].fullpathvector.size(); i++)
+        for(uint i=0; i < wombatptr->evidenceobjectvector[j].fullpathvector.size(); i++)
         {
             images[i] = wombatptr->evidenceobjectvector[j].fullpathvector[i].c_str();
         }
@@ -104,7 +106,7 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
 {
     for(int j=0; j < wombatptr->evidenceobjectvector.count(); j++)
     {
-        for(int i=0; i < wombatptr->evidenceobjectvector[j].fsinfovector.size(); i++)
+        for(uint i=0; i < wombatptr->evidenceobjectvector[j].fsinfovector.size(); i++)
         {
             if(wombatptr->evidenceobjectvector[j].fsinfovector[i] != NULL)
             {
@@ -113,7 +115,7 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
             }
         }
         wombatptr->evidenceobjectvector[j].fsinfovector.clear();
-        for(int i=0; i < wombatptr->evidenceobject.partinfovector.size(); i++)
+        for(uint i=0; i < wombatptr->evidenceobject.partinfovector.size(); i++)
         {
             wombatptr->evidenceobjectvector[j].partinfovector[i] = NULL;
         }
@@ -133,6 +135,7 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
 
 void WombatFramework::GetBootCode(int idx) // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
+    qDebug() << "Might not need " << idx;
     /*
     int volidx = -1;
     for(int i=0; i < wombatptr->volumeobjectvector.count(); i++)

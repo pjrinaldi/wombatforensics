@@ -73,7 +73,7 @@ public:
 
     int columnCount(const QModelIndex &parent) const
     {
-        return headerdata.count();
+        return NodeFromIndex(parent)->nodevalues.count();
     };
 
     QVariant data(const QModelIndex &index, int role) const
@@ -139,6 +139,7 @@ public:
             Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
             return SetCheckState(index, state);
         }
+        return false;
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -173,7 +174,7 @@ public:
     {
         if(parent == QModelIndex())
             return true;
-        Node* parentnode = rootnode;
+        parentnode = rootnode;
         if(parent.isValid())
             parentnode = NodeFromIndex(parent);
         if(rowCount(parent) > 0)
@@ -457,7 +458,8 @@ private slots:
     void OpenFileSystemFile(void);
     void ResizeViewColumns(const QModelIndex &index)
     {
-        ResizeColumns();
+        if(index.isValid())
+            ResizeColumns();
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
@@ -508,6 +510,7 @@ private:
     int ReturnVisibleViewerID();
     int DetermineOmniView(QString currentSignature);
     QModelIndex selectedindex;
+    QModelIndex oldselectedindex;
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;

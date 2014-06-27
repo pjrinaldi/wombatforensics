@@ -183,7 +183,6 @@ void WombatForensics::InitializeCaseStructure()
 void WombatForensics::InitializeOpenCase()
 {
     // open case here
-    wombatvarptr->casenamelist;
     wombatvarptr->casenamelist.clear();
     // populate case list here
     wombatdatabase->ReturnCaseNameList();
@@ -257,6 +256,7 @@ void WombatForensics::InitializeQueryModel()
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
+    oldselectedindex = previtem.indexes().at(0);
     selectedindex = curitem.indexes().at(0);
     ui->actionExport_Evidence->setEnabled(true);
     wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
@@ -503,7 +503,7 @@ void WombatForensics::OpenParentImage(int imgid)
     }
     tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
     tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
-    for(int i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
+    for(uint i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
     {
         tskobjptr->imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
     }
@@ -717,7 +717,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     }
     curobj.imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
     curobj.partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
-    for(int i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
+    for(uint i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
     {
         curobj.imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
     }
@@ -745,13 +745,16 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         if(retval > 0)
         {
             bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
-            std::string filepath = fullpath + "/" + name;
-            QFile tmpfile(QString::fromStdString(filepath));
-            if(tmpfile.open(QIODevice::WriteOnly))
+            if(tmpdir == true)
             {
-                QDataStream outbuffer(&tmpfile);
-                outbuffer.writeRawData(contentbuffer, curobj.length);
-                tmpfile.close();
+                std::string filepath = fullpath + "/" + name;
+                QFile tmpfile(QString::fromStdString(filepath));
+                if(tmpfile.open(QIODevice::WriteOnly))
+                {
+                    QDataStream outbuffer(&tmpfile);
+                    outbuffer.writeRawData(contentbuffer, curobj.length);
+                    tmpfile.close();
+                }
             }
         }
     }
@@ -840,15 +843,18 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     // possibly will need to set dirtreeview model to nothing. or the treemodel to nothing to clear values so it'll close properly.
     if(ui->dirTreeView->model() != NULL)
     {
+        //event->ignore();
     }
     
     RemoveTmpFiles();
     if(ProcessingComplete())
     {
+        event->accept();
         qDebug() << "All threads are done";
     }
     else
     {
+        event->ignore();
         qDebug() << "All threads aren't done yet.";
     }
     wombatdatabase->CloseCaseDB();
@@ -921,12 +927,11 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
 }
 
 void WombatForensics::on_actionView_Progress_triggered(bool checked) // modify this to be the logviewer.
-{/*
-    if(!checked)
-        wombatprogresswindow->hide();
-    else
-        wombatprogresswindow->show();
-    */
+{
+    if(!checked) // hide logviewer
+        qDebug() << "hide logviewer here.";
+    else// show logviewer
+        qDebug() << "show logviewer here.";
 }
 
 void WombatForensics::UpdateOmniValue()

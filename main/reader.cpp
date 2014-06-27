@@ -162,7 +162,7 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
     int lastPageIdx = 0;
     size_t bytesread;
     // MODIFY THIS TO WHERE IT'S NOT LOADING THE WHOLE IMAGE, BUT ONLY A PAGE'S WORTH..., IF ANYTHING AT ALL HERE
-    if(_offset+numbytes >= size())
+    if(_offset+(int)numbytes >= size())
     {
         _eof = true;
         if(size() == 0)
@@ -212,7 +212,7 @@ size_t Reader::read(vector<uchar>& v, size_t numBytes)
 
   // if we don't have enough bytes left... then set page_end to lastPageIdx
   // to the last page and set bytesRead to the remaining number of bytes
-  if( _offset+numBytes >= size() ) {
+  if( _offset+(int)numBytes >= size() ) {
     _eof = true;
     lastPageIdx = _data.size()-1;
     bytesRead = size()-tell();

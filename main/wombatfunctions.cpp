@@ -49,6 +49,7 @@ int GetChildCount(int type, int address, int parimgid)
         childquery.next();
         return childquery.value(0).toInt();
     }
+    return 0;
 }
 
 bool FileExists(const std::string& filename)
@@ -107,15 +108,24 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    if(tmpptr != NULL)
+        qDebug() << "Not sure how tmpptr got set.";
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
-    char sbuf[17];
-    int sint = 0;
-    for(int i=0; i < 16; i++)
+    QString tmpstring;
+    if(retval == 0)
     {
-        sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
+        char sbuf[17];
+        int sint = 0;
+        for(int i=0; i < 16; i++)
+        {
+            sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
+        }
+        if(sint > 0)
+            tmpstring = QString(sbuf);
     }
-    QString tmpstring = QString(sbuf);
+    else
+        tmpstring = QString("");
 
     QVector<QString> filestrings;
     if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
