@@ -773,7 +773,8 @@ void WombatForensics::SetupHexPage(void)
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
     hexwidget = new HexEditor(ui->hexPage, tskobjptr);
-    hexwidget->setStyleSheet(QStringLiteral("background-color: rgb(255, 255, 255);"));
+    setBackgroundRole(QPalette::Base);
+    setAutoFillBackground(true);
     hexwidget->setObjectName("bt-hexview");
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
