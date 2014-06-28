@@ -218,7 +218,6 @@ void WombatDatabase::CloseAppDB()
     {
         wombatptr->appdb.close();
         wombatptr->appdb = QSqlDatabase();
-        //delete wombatptr->appdb;
         QSqlDatabase::removeDatabase("wombatapp");
     }
 }
@@ -510,16 +509,6 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.address = wombatptr->sqlrecords[0].value(8).toInt();
     wombatptr->selectedobject.type = wombatptr->sqlrecords[0].value(9).toInt();
 }
-/*
-void WombatDatabase::GetRootInum()
-{
-    wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(wombatptr->currentfilesystemid);
-    wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT rootinum FROM data WHERE objectid = ?", wombatptr->bindvalues);
-    wombatptr->currentrootinum = wombatptr->sqlrecords[0].value(0).toInt();
-}
-*/
 
 void WombatDatabase::RemoveEvidence()
 {

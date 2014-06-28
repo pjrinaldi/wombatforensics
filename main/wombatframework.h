@@ -14,7 +14,6 @@ public:
 
     void BuildEvidenceModel(void);
     void OpenEvidenceImage(void);
-    void OpenEvidenceImages(void); // might not need this functions, since re-opening a case can pull it's info from the db.
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);
     void OpenPartitions(void);

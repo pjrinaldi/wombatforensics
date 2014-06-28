@@ -84,21 +84,6 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         qDebug() << "issues with dir walk function.";
 }
 
-void WombatFramework::OpenEvidenceImages() // open all evidence images.
-{
-    for(int j = 0; j < wombatptr->evidenceobjectvector.count(); j++)
-    {
-        const TSK_TCHAR** images;
-        images = (const char**)malloc(wombatptr->evidenceobjectvector[j].fullpathvector.size()*sizeof(char*));
-        for(uint i=0; i < wombatptr->evidenceobjectvector[j].fullpathvector.size(); i++)
-        {
-            images[i] = wombatptr->evidenceobjectvector[j].fullpathvector[i].c_str();
-        }
-        wombatptr->evidenceobjectvector[j].imageinfo = tsk_img_open(wombatptr->evidenceobjectvector[j].itemcount, images, TSK_IMG_TYPE_DETECT, 0);
-        free(images);
-    }
-}
-
 void WombatFramework::CloseInfoStructures() // close all open info structures
 {
     for(int j=0; j < wombatptr->evidenceobjectvector.count(); j++)

@@ -384,7 +384,6 @@ void HexEditor::mousePressEvent( QMouseEvent* e )
 
   off_t byte_offset = localByteOffset();
   QRect bbox = byteBBox(byte_offset);
-  //QRect abox = abyteBox(byte_offset);
   if( e->x() > bbox.right() ) {
     byte_offset++;
   }
@@ -397,7 +396,6 @@ void HexEditor::mouseMoveEvent( QMouseEvent* e )
 
   off_t byte_offset = localByteOffset();
   QRect bbox = byteBBox(byte_offset);
-  //QRect abox = abyteBox(byte_offset);
   if(e->x() > bbox.right() ) {
     byte_offset++;
   }
@@ -411,7 +409,6 @@ void HexEditor::mouseReleaseEvent( QMouseEvent* e )
 
   off_t byte_offset = localByteOffset();
   QRect bbox = byteBBox(byte_offset);
-  //QRect abox = abyteBox(byte_offset);
   if(e->x() > bbox.right() ) {
     byte_offset++;
   }

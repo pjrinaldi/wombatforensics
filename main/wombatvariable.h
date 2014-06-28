@@ -10,74 +10,7 @@ struct CaseObject
     QString dbname;
     QString dirpath;
 };
-/*
-struct VolumeObject
-{
-    int id;
-    int objecttype;
-    int type;
-    int blocksize;
-    int childcount;
-    int byteoffset;
-    int parentid;
-    int parimgid;
-    QString name;
-};
 
-struct PartitionObject
-{
-    int id;
-    int objecttype;
-    int flags;
-    int sectstart;
-    int sectlength;
-    int blocksize;
-    int parentid;
-    int parimgid;
-    QString name;
-};
-
-struct FileSystemObject
-{
-    int id;
-    int objecttype;
-    int type;
-    int flags;
-    int byteoffset;
-    int parentid;
-    int parimgid;
-    int blocksize;
-    int size;
-    int blockcount;
-    int firstinum;
-    int lastinum;
-    int rootinum;
-    QString name;
-};
-
-struct FileObject
-{
-    // "Name" << "Full Path" << "Size (Bytes)" << "Signature" << "Extension" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash";
-    int id;
-    int type;
-    int objecttype;
-    int nameflags;
-    QString name;
-    int metaaddress;
-    int paraddress;
-    QString shortname;
-    int address;
-    QString atime;
-    QString crtime;
-    QString ctime;
-    QString mtime;
-    int metaflags;
-    int size;
-    int parentid;
-    int parimgid;
-    // file and dir data stored here... metaVAR and/or nameVAR if they duplicate.
-};
-*/
 struct EvidenceObject
 {
     int id;
@@ -93,15 +26,10 @@ struct EvidenceObject
     QString fullpath; 
     std::vector<std::string> fullpathvector;
     TSK_IMG_INFO* imageinfo; // These may disappear when the image is closed, will have to test this concept
-    TSK_VS_INFO* volinfo; // may not need..
-    //std::vector<TSK_VS_INFO*> volinfovector; // should use instead of volinfo, simply search for volumes and add them based on the size and offset to search for another one...
-    TSK_VS_PART_INFO* partinfo; // may not need.
+    TSK_VS_INFO* volinfo;
     std::vector<const TSK_VS_PART_INFO*> partinfovector;
     std::vector<TSK_FS_INFO*> fsinfovector;
     std::vector<int> fsidvector;
-    TSK_FS_FILE* fileinfo; // may not need
-    TSK_FS_DIR* dirinfo; // may not need
-    std::vector<void*> dirfileinfovector; // may not need.
     QString dbname;
     void Clear()
     {
@@ -117,7 +45,6 @@ struct EvidenceObject
         fullpathvector.clear();
         imageinfo = NULL;
         volinfo = NULL;
-        partinfo = NULL;
         partinfovector.clear();
         fsinfovector.clear();
         dbname = "";
@@ -210,26 +137,14 @@ struct WombatVariable
     QString evidremovestring;
     int evidremoveid;
     int evidrowsremoved;
-    QList<int> curevidlist; // may not need
-    //QStandardItemModel* dirmodel;
-    QList<int> rootinums; // shouldn't need this one.
     CaseObject caseobject;
     QStringList casenamelist;
     QStringList evidencenamelist;
     EvidenceObject evidenceobject;
-    //VolumeObject volumeobject;
     QVector<EvidenceObject> evidenceobjectvector;
-    //QVector<VolumeObject> volumeobjectvector;
-    //PartitionObject partitionobject;
-    //QVector<PartitionObject> partitionobjectvector;
-    //FileSystemObject filesystemobject;
-    //QVector<FileSystemObject> filesystemobjectvector;
-    //QVector<FileObject> fileobjectvector;
     SelectedObject selectedobject;
     FileExportData exportdata;
     QVector<FileExportData> exportdatavector;
-    // QByteArray bootbytearray; // byte array of currently extracted rawdata -> clear() before each use [don't think i use this anymore]
-    std::vector<uchar> rawbyteintvector;
     QString htmlcontent;
     QSqlDatabase casedb;
     QSqlDatabase appdb;
@@ -241,10 +156,6 @@ Q_DECLARE_METATYPE(WombatVariable)
 Q_DECLARE_METATYPE(FileExportData)
 Q_DECLARE_METATYPE(CaseObject)
 Q_DECLARE_METATYPE(EvidenceObject)
-//Q_DECLARE_METATYPE(PartitionObject)
-//Q_DECLARE_METATYPE(VolumeObject)
-//Q_DECLARE_METATYPE(FileSystemObject)
-//Q_DECLARE_METATYPE(FileObject);
 Q_DECLARE_METATYPE(SelectedObject);
 
 #endif // WOMBATVARIABLE_H

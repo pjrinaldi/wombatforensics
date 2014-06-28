@@ -215,11 +215,6 @@ void WombatForensics::InitializeOpenCase()
         }
         fcasedb = wombatvarptr->casedb;
         ui->actionAdd_Evidence->setEnabled(true);
-        // ALL I NEED TO DO IS ENSURE CURRENTVARIABLES ARE SET.
-        // THEN SIMPLY INITIALIZE THE TREEMODEL FOR EACH EVIDENCE OBJECT.
-        // GET EVIDENCEOBJECTS FROM THE BELOW DB CODE.
-        // ENSURE THIS IS MULTITHREADED.
-
         processcountlabel->setText("Processed: 0");
         filecountlabel->setText("Files: 0");
         wombatdatabase->GetEvidenceObjects();
@@ -233,9 +228,6 @@ void WombatForensics::InitializeOpenCase()
             wombatvarptr->evidenceobject = wombatvarptr->evidenceobjectvector.at(i);
             statuslabel->setText("Processed 0%");
             OpenEvidenceStructure();
-            //sqlfuture = QtConcurrent::run(this, &WombatForensics::OpenEvidenceStructure);
-            //sqlwatcher.setFuture(sqlfuture);
-            //threadvector.append(sqlfuture);
             if(ui->dirTreeView->model() != NULL)
                 ui->actionRemove_Evidence->setEnabled(true);
         }
@@ -298,13 +290,7 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::OpenEvidenceStructure()
 {
-    //wombatframework->OpenEvidenceImage();
-    //wombatframework->OpenVolumeSystem();
-    //wombatframework->GetVolumeSystemName();
-    //wombatframework->OpenPartitions();
     treemodel->AddEvidence(wombatvarptr->currentevidenceid);
-    // HAVE TO TEST WITH A LARGE DATASET AND DETERMINE IF I NEED TO RUN SOME OF THIS IN A SEPARATE THREAD
-    // NEED TO UPDATE THE FILES AND PROCESSED COUNTS WITH THE CORRECT NUMBER...
 }
 
 void WombatForensics::AddEvidence()
@@ -312,11 +298,7 @@ void WombatForensics::AddEvidence()
     int isnew = 1;
     threadvector.clear();
     wombatdatabase->GetEvidenceObjects();
-    //qDebug() << "fullpathvector count after clear: " << wombatvarptr->evidenceobject.fullpathvector.size();
-    // might need to call these to a global tmp and then store it after initializeevidencestructure...
-    // NEED TO CHECK WHAT GETEVIDENCEOBJECTS() RETURNS FOR A TEST IMAGE OPEN...
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
-    //qDebug() << "tmplist count: " << tmplist.count();
     if(tmplist.count())
     {
         wombatvarptr->currentevidencename = tmplist[0].split("/").last();
@@ -328,10 +310,8 @@ void WombatForensics::AddEvidence()
         if(isnew == 1)
         {
             currentevidencename = wombatvarptr->currentevidencename;
-            //qDebug() << "tmplist count 2: " << tmplist.count();
             for(int i=0; i < tmplist.count(); i++)
             {
-                //fprintf(stderr, "fullpathvector[%i]: %s\n", i, tmplist[i].toStdString().c_str());
                 wombatvarptr->evidenceobject.fullpathvector.push_back(tmplist[i].toStdString());
             }
             wombatvarptr->evidenceobject.itemcount = tmplist.count();
@@ -838,7 +818,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         //event->ignore();
     }
     
-    RemoveTmpFiles(); // can get rid of this function
+    RemoveTmpFiles(); // can get rid of this function right now. I don't need to make temporary files to read.
     if(ProcessingComplete())
     {
         event->accept();

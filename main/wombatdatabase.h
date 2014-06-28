@@ -23,7 +23,6 @@ public:
     void InsertPartitionObjects(void);
     void InsertFileSystemObjects(void);
     void GetObjectValues(void);
-    //void GetRootInum(void);
 
     ~WombatDatabase();
 
