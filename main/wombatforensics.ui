@@ -230,7 +230,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -307,14 +307,15 @@
    <addaction name="actionViewTxt"/>
    <addaction name="actionViewOmni"/>
    <addaction name="separator"/>
+   <addaction name="actionView_Properties"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
    <addaction name="actionExport_Evidence"/>
   </widget>
-  <widget class="QStatusBar" name="mainStatusBar" />
+  <widget class="QStatusBar" name="mainStatusBar"/>
   <action name="actionNew_Case">
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/newcase</normaloff>:/newcase</iconset>
    </property>
    <property name="text">
@@ -323,7 +324,7 @@
   </action>
   <action name="actionOpen_Case">
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/opencase</normaloff>:/opencase</iconset>
    </property>
    <property name="text">
@@ -338,7 +339,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/bar/hexview</normaloff>:/bar/hexview</iconset>
    </property>
    <property name="text">
@@ -353,7 +354,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/bar/txtview</normaloff>:/bar/txtview</iconset>
    </property>
    <property name="text">
@@ -368,7 +369,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/bar/omniview</normaloff>:/bar/omniview</iconset>
    </property>
    <property name="text">
@@ -383,11 +384,14 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="progresswindow.qrc">
      <normaloff>:/progresswindow/window</normaloff>:/progresswindow/window</iconset>
    </property>
    <property name="text">
-    <string>View Progress...</string>
+    <string>View Log...</string>
+   </property>
+   <property name="toolTip">
+    <string>Log Viewer</string>
    </property>
   </action>
   <action name="actionExit">
@@ -397,7 +401,7 @@
   </action>
   <action name="actionAdd_Evidence">
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/basic/addevidence</normaloff>:/basic/addevidence</iconset>
    </property>
    <property name="text">
@@ -406,7 +410,7 @@
   </action>
   <action name="actionRemove_Evidence">
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/basic/remevidence</normaloff>:/basic/remevidence</iconset>
    </property>
    <property name="text">
@@ -415,7 +419,7 @@
   </action>
   <action name="actionExport_Evidence">
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/bar/export</normaloff>:/bar/export</iconset>
    </property>
    <property name="text">
@@ -427,6 +431,21 @@
     <string>Manage OmniViewer</string>
    </property>
   </action>
+  <action name="actionView_Properties">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/propview</normaloff>:/bar/propview</iconset>
+   </property>
+   <property name="text">
+    <string>View Properties</string>
+   </property>
+   <property name="toolTip">
+    <string>Properties Window</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -435,7 +454,10 @@
    <header>QtWebKitWidgets/QWebView</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="wombatforensics.qrc"/>
+  <include location="progresswindow.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionExit</sender>

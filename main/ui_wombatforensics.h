@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wombatforensics.ui'
 **
-** Created by: Qt User Interface Compiler version 5.1.0
+** Created by: Qt User Interface Compiler version 5.3.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -44,6 +44,7 @@ public:
     QAction *actionRemove_Evidence;
     QAction *actionExport_Evidence;
     QAction *actionManage_OmniViewer;
+    QAction *actionView_Properties;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -131,6 +132,12 @@ public:
         actionExport_Evidence->setIcon(icon8);
         actionManage_OmniViewer = new QAction(WombatForensics);
         actionManage_OmniViewer->setObjectName(QStringLiteral("actionManage_OmniViewer"));
+        actionView_Properties = new QAction(WombatForensics);
+        actionView_Properties->setObjectName(QStringLiteral("actionView_Properties"));
+        actionView_Properties->setCheckable(true);
+        QIcon icon9;
+        icon9.addFile(QStringLiteral(":/bar/propview"), QSize(), QIcon::Normal, QIcon::Off);
+        actionView_Properties->setIcon(icon9);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -232,7 +239,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QStringLiteral("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 800, 19));
+        mainMenubar->setGeometry(QRect(0, 0, 800, 21));
         mainMenubar->setAcceptDrops(true);
         menuFile = new QMenu(mainMenubar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
@@ -279,6 +286,7 @@ public:
         analysisToolBar->addAction(actionViewTxt);
         analysisToolBar->addAction(actionViewOmni);
         analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionView_Properties);
         analysisToolBar->addAction(actionView_Progress);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionExport_Evidence);
@@ -300,12 +308,19 @@ public:
         actionViewHex->setText(QApplication::translate("WombatForensics", "View Hex", 0));
         actionViewTxt->setText(QApplication::translate("WombatForensics", "View Text", 0));
         actionViewOmni->setText(QApplication::translate("WombatForensics", "View Omni", 0));
-        actionView_Progress->setText(QApplication::translate("WombatForensics", "View Progress...", 0));
+        actionView_Progress->setText(QApplication::translate("WombatForensics", "View Log...", 0));
+#ifndef QT_NO_TOOLTIP
+        actionView_Progress->setToolTip(QApplication::translate("WombatForensics", "Log Viewer", 0));
+#endif // QT_NO_TOOLTIP
         actionExit->setText(QApplication::translate("WombatForensics", "Exit", 0));
         actionAdd_Evidence->setText(QApplication::translate("WombatForensics", "Add Evidence", 0));
         actionRemove_Evidence->setText(QApplication::translate("WombatForensics", "Remove Evidence", 0));
         actionExport_Evidence->setText(QApplication::translate("WombatForensics", "Export Evidence", 0));
         actionManage_OmniViewer->setText(QApplication::translate("WombatForensics", "Manage OmniViewer", 0));
+        actionView_Properties->setText(QApplication::translate("WombatForensics", "View Properties", 0));
+#ifndef QT_NO_TOOLTIP
+        actionView_Properties->setToolTip(QApplication::translate("WombatForensics", "Properties Window", 0));
+#endif // QT_NO_TOOLTIP
         picViewer->setText(QString());
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));

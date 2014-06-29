@@ -18,6 +18,7 @@
         <file alias="hexview">../Resources/hexeditor.png</file>
         <file alias="txtview">../Resources/texteditor.png</file>
         <file alias="omniview">../Resources/omniviewer.png</file>
+        <file alias="propview">../Resources/iproperties.png</file>
 	<file alias="export">../Resources/format-indent-more.png</file>
     </qresource>
     <qresource prefix="/html">

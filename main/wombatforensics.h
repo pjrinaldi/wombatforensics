@@ -8,6 +8,7 @@
 #include "wombatfunctions.h"
 #include "ui_wombatforensics.h"
 #include "progresswindow.h"
+#include "propertieswindow.h"
 #include "exportdialog.h"
 #include "globals.h"
 
@@ -446,6 +447,7 @@ public:
     TskObject tskobject;
     TskObject* tskobjptr;
     WombatFramework* wombatframework;
+    PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
     TreeModel* treemodel;
 
@@ -458,10 +460,12 @@ private slots:
     void ExportEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
+    void on_actionView_Properties_triggered(bool checked);
     void on_actionView_Progress_triggered(bool checked);
     void UpdateProgress(int count, int processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);
+    void HidePropertyWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
     void OpenParentImage(int imgid);
@@ -505,6 +509,7 @@ private:
     void InitializeEvidenceStructure(void);
     void InitializeOpenCase(void);
     void UpdateViewer(void);
+    void UpdateProperties(void);
     void UpdateOmniValue(void);
     void LoadHexContents(void);
     void LoadTxtContents(void);

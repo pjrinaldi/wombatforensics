@@ -41,12 +41,16 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tskobjptr->readfileinfo = NULL;
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
+    propertywindow = new PropertiesWindow(wombatdatabase);
     isignals = new InterfaceSignals();
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
+    connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
+    connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
     wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
+    propertywindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
@@ -62,6 +66,12 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+}
+
+void WombatForensics::HidePropertyWindow(bool checkedstate)
+{
+    qDebug() << "set propertybutton to false";
+    ui->actionView_Properties->setChecked(checkedstate);
 }
 
 void WombatForensics::HideProgressWindow(bool checkedstate)
@@ -122,6 +132,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionViewTxt->setEnabled(false);
     ui->actionViewOmni->setEnabled(false);
     ui->actionView_Progress->setEnabled(false);
+    ui->actionView_Properties->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
@@ -257,12 +268,15 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     if(previtem.indexes().count() > 0)
         oldselectedindex = previtem.indexes().at(0);
     selectedindex = curitem.indexes().at(0);
+    ui->actionView_Properties->setEnabled(true);
     ui->actionExport_Evidence->setEnabled(true);
     wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
     wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
     wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
     UpdateOmniValue();
     UpdateViewer();
+    if(propertywindow->isVisible())
+        UpdateProperties();
 }
 
 /*
@@ -327,6 +341,11 @@ void WombatForensics::AddEvidence()
         else
             DisplayError("1.8", "Evidence already exists in the case.", "Add Evidence cancelled");
     }
+}
+
+void WombatForensics::UpdateProperties()
+{
+    qDebug() << "window is visible. properties get updated here.";
 }
 
 void WombatForensics::UpdateViewer()
@@ -819,6 +838,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         //event->ignore();
     }
     
+    propertywindow->close();
     RemoveTmpFiles(); // can get rid of this function right now. I don't need to make temporary files to read.
     if(ProcessingComplete())
     {
@@ -897,6 +917,18 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
         ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
     }
     UpdateViewer();
+}
+
+void WombatForensics::on_actionView_Properties_triggered(bool checked)
+{
+    if(!checked)
+        propertywindow->hide();
+    else
+    {
+        propertywindow->show();
+        if(ui->dirTreeView->selectionModel()->hasSelection())
+            UpdateProperties();
+    }
 }
 
 void WombatForensics::on_actionView_Progress_triggered(bool checked) // modify this to be the logviewer.
