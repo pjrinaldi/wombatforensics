@@ -14,17 +14,24 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QSplitter>
 #include <QtWidgets/QTableView>
-#include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
 
 class Ui_PropertiesWindow
 {
 public:
-    QVBoxLayout *verticalLayout;
+    QHBoxLayout *horizontalLayout;
+    QSplitter *splitter;
     QTableView *tableView;
+    QGroupBox *groupBox;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label;
 
     void setupUi(QDialog *PropertiesWindow)
     {
@@ -35,23 +42,53 @@ public:
         PropertiesWindow->setAutoFillBackground(false);
         PropertiesWindow->setSizeGripEnabled(false);
         PropertiesWindow->setModal(true);
-        verticalLayout = new QVBoxLayout(PropertiesWindow);
-        verticalLayout->setSpacing(0);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
-        tableView = new QTableView(PropertiesWindow);
+        horizontalLayout = new QHBoxLayout(PropertiesWindow);
+        horizontalLayout->setSpacing(0);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        splitter = new QSplitter(PropertiesWindow);
+        splitter->setObjectName(QStringLiteral("splitter"));
+        splitter->setOrientation(Qt::Vertical);
+        tableView = new QTableView(splitter);
         tableView->setObjectName(QStringLiteral("tableView"));
         tableView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
         tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
         tableView->setProperty("showDropIndicator", QVariant(false));
         tableView->setDragDropOverwriteMode(false);
         tableView->setAlternatingRowColors(true);
-        tableView->setSelectionMode(QAbstractItemView::NoSelection);
+        tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+        tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
         tableView->setShowGrid(true);
         tableView->setCornerButtonEnabled(false);
+        splitter->addWidget(tableView);
         tableView->verticalHeader()->setVisible(false);
+        tableView->verticalHeader()->setHighlightSections(false);
+        groupBox = new QGroupBox(splitter);
+        groupBox->setObjectName(QStringLiteral("groupBox"));
+        QFont font;
+        font.setPointSize(7);
+        groupBox->setFont(font);
+        groupBox->setAutoFillBackground(false);
+        groupBox->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+        groupBox->setFlat(false);
+        groupBox->setCheckable(false);
+        horizontalLayout_2 = new QHBoxLayout(groupBox);
+        horizontalLayout_2->setSpacing(0);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
+        label = new QLabel(groupBox);
+        label->setObjectName(QStringLiteral("label"));
+        label->setFont(font);
+        label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+        label->setWordWrap(true);
+        label->setMargin(1);
+        label->setTextInteractionFlags(Qt::NoTextInteraction);
 
-        verticalLayout->addWidget(tableView);
+        horizontalLayout_2->addWidget(label);
+
+        splitter->addWidget(groupBox);
+
+        horizontalLayout->addWidget(splitter);
 
 
         retranslateUi(PropertiesWindow);
@@ -62,6 +99,8 @@ public:
     void retranslateUi(QDialog *PropertiesWindow)
     {
         PropertiesWindow->setWindowTitle(QApplication::translate("PropertiesWindow", "Properties", 0));
+        groupBox->setTitle(QApplication::translate("PropertiesWindow", "Description", 0));
+        label->setText(QApplication::translate("PropertiesWindow", "Information on the selected object and its value.", 0));
     } // retranslateUi
 
 };
