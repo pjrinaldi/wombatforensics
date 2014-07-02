@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="newcase">./Resources/document-new.png</file>
+        <file alias="opencase">./Resources/document-open.png</file>
+	<file alias="appicon">./Resources/wombat_32.ico</file>
+    </qresource>
+    <qresource prefix="/basic">
+        <file alias="treefolder">./Resources/folder.png</file>
+        <file alias="addevidence">./Resources/list-add.png</file>
+        <file alias="treefile">./Resources/text-x-generic.png</file>
+        <file alias="remevidence">./Resources/list-remove.png</file>
+        <file alias="treeimg">./Resources/emblem-package-2.png</file>
+        <file alias="treevol">./Resources/drive-harddisk.png</file>
+        <file alias="treepart">./Resources/gparted.png</file>
+        <file alias="treefs">./Resources/foldersexplorer.png</file>
+    </qresource>
+    <qresource prefix="/bar">
+        <file alias="hexview">./Resources/hexeditor.png</file>
+        <file alias="txtview">./Resources/texteditor.png</file>
+        <file alias="omniview">./Resources/omniviewer.png</file>
+        <file alias="propview">./Resources/iproperties.png</file>
+	<file alias="export">./Resources/format-indent-more.png</file>
+        <file alias="window">./Resources/window-new.png</file>
+    </qresource>
+    <qresource prefix="/html">
+        <file alias="infohtml">./Resources/information.html</file>
+    </qresource>
+</RCC>

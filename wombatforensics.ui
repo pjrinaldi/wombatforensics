@@ -384,8 +384,8 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="progresswindow.qrc">
-     <normaloff>:/progresswindow/window</normaloff>:/progresswindow/window</iconset>
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/window</normaloff>:/bar/window</iconset>
    </property>
    <property name="text">
     <string>View Log...</string>
@@ -456,7 +456,6 @@
  </customwidgets>
  <resources>
   <include location="wombatforensics.qrc"/>
-  <include location="progresswindow.qrc"/>
  </resources>
  <connections>
   <connection>

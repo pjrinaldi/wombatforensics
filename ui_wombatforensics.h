@@ -111,7 +111,7 @@ public:
         actionView_Progress->setObjectName(QStringLiteral("actionView_Progress"));
         actionView_Progress->setCheckable(true);
         QIcon icon5;
-        icon5.addFile(QStringLiteral(":/progresswindow/window"), QSize(), QIcon::Normal, QIcon::Off);
+        icon5.addFile(QStringLiteral(":/bar/window"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_Progress->setIcon(icon5);
         actionExit = new QAction(WombatForensics);
         actionExit->setObjectName(QStringLiteral("actionExit"));
