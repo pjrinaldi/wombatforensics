@@ -19,6 +19,8 @@ extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;
 extern QList<FileSystemObject> fsobjectlist;
+//extern QList<QStringList> propertylist;
+extern QStringList propertylist;
 
 class InterfaceSignals : public QObject
 {

@@ -22,3 +22,5 @@ Node* toplevelnode = 0;
 QList<QVariant> colvalues;
 QList<TskObject> curlist;
 QList<FileSystemObject> fsobjectlist;
+//QList<QStringList> propertylist;
+QStringList propertylist;

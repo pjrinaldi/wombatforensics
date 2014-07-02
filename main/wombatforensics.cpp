@@ -345,6 +345,10 @@ void WombatForensics::AddEvidence()
 
 void WombatForensics::UpdateProperties()
 {
+    // get data here...
+    // wombatvarptr->selectedobject.
+    wombatdatabase->ReturnObjectPropertyList();
+    propertywindow->UpdateTableView();
     qDebug() << "window is visible. properties get updated here.";
 }
 

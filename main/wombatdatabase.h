@@ -32,6 +32,7 @@ public:
     void ReturnEvidenceNameList(void);
     void ReturnCaseID(void);
     void ReturnFileSystemObjectList(int curid);
+    void ReturnObjectPropertyList(void);
     void RemoveEvidence(void);
 
     QList<QSqlRecord> GetSqlResults(QString query, QVariantList invalues);

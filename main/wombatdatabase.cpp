@@ -510,6 +510,34 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.type = wombatptr->sqlrecords[0].value(9).toInt();
 }
 
+void WombatDatabase::ReturnObjectPropertyList()
+{
+    propertylist.clear();
+    if(wombatptr->selectedobject.objtype == 1) // image file
+    {
+        propertylist << QString("File Format") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatptr->selectedobject.type)) << QString("File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
+    }
+    //wombatptr->bindvalues.clear();
+    //wombatptr->sqlrecords.clear();
+    //wombatptr->sqlrecords = GetSqlResults("SELECT ");
+    /*
+     *        if(wombatvarptr->selectedobject.objtype == 1) // image file
+        {
+            wombatvarptr->htmlcontent += "<div id='infotitle'>image information</div><br/>";
+            wombatvarptr->htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
+            wombatvarptr->htmlcontent += QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatvarptr->selectedobject.type)) + "</td></tr>";
+            wombatvarptr->htmlcontent += "<tr><td class='property'>size:</td><td class='pvalue'>";
+            wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->selectedobject.size) + " bytes</td></tr>";
+            wombatvarptr->htmlcontent += "<tr><td class='property'>sector size:</td><td class='pvalue'>";
+            wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->selectedobject.sectlength) + " bytes</td></tr>";
+            wombatvarptr->htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
+            wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->selectedobject.size/(float)wombatvarptr->selectedobject.sectlength));
+            wombatvarptr->htmlcontent += " sectors</td></tr>";
+
+     *
+     */ 
+}
+
 void WombatDatabase::RemoveEvidence()
 {
     wombatptr->bindvalues.clear();
