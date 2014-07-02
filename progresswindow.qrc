@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/progresswindow">
-        <file alias="window">./Resources/window-new.png</file>
-    </qresource>
-</RCC>
