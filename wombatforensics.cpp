@@ -163,7 +163,9 @@ void WombatForensics::InitializeCaseStructure()
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
+        wombatvarptr->casedb = QSqlDatabase::database("casedb");
+        if(!wombatvarptr->casedb.isValid())
+            wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
         wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
         if(!FileExists(wombatvarptr->caseobject.dbname.toStdString()))
         {
@@ -209,8 +211,12 @@ void WombatForensics::InitializeOpenCase()
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-        wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
+        //wombatvarptr->casedb.close();
+        wombatvarptr->casedb = QSqlDatabase::database("casedb");
+        if(!wombatvarptr->casedb.isValid()) // casedb has not been added yet, so add now.
+            wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb");
         wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
+        qDebug() << wombatvarptr->casedb.databaseName();
         bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
         if(!caseFileExist)
         {
@@ -225,6 +231,7 @@ void WombatForensics::InitializeOpenCase()
                 DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
         fcasedb = wombatvarptr->casedb;
+        qDebug() << "fcasedb name: " << fcasedb.databaseName();
         ui->actionAdd_Evidence->setEnabled(true);
         processcountlabel->setText("Processed: 0");
         filecountlabel->setText("Files: 0");
@@ -266,16 +273,19 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
 {
     if(previtem.indexes().count() > 0)
         oldselectedindex = previtem.indexes().at(0);
-    selectedindex = curitem.indexes().at(0);
-    ui->actionView_Properties->setEnabled(true);
-    ui->actionExport_Evidence->setEnabled(true);
-    wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
-    wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
-    wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
-    UpdateOmniValue();
-    UpdateViewer();
-    if(propertywindow->isVisible())
-        UpdateProperties();
+    if(curitem.indexes().count() > 0)
+    {
+        selectedindex = curitem.indexes().at(0);
+        ui->actionView_Properties->setEnabled(true);
+        ui->actionExport_Evidence->setEnabled(true);
+        wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
+        wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
+        wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
+        UpdateOmniValue();
+        UpdateViewer();
+        if(propertywindow->isVisible())
+            UpdateProperties();
+    }
 }
 
 /*
@@ -522,6 +532,20 @@ void WombatForensics::OpenParentFileSystem()
 void WombatForensics::OpenFileSystemFile()
 {
     tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
+}
+
+void WombatForensics::CloseCurrentCase()
+{
+    wombatdatabase->GetEvidenceObjects();
+    for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
+    {
+        treemodel->RemEvidence(wombatvarptr->evidenceobjectvector.at(i).id);
+    }
+    filesprocessed = 0;
+    filesfound = 0;
+    processcountlabel->setText("Processed: " + QString::number(filesprocessed));
+    filecountlabel->setText("Files: " + QString::number(filesfound));
+    statuslabel->setText("Current Case was Closed Successfully"); 
 }
 
 void WombatForensics::RemEvidence()
@@ -876,30 +900,29 @@ void WombatForensics::RemoveTmpFiles()
 
 void WombatForensics::on_actionNew_Case_triggered()
 {
-    int ret = QMessageBox::Yes;
     // determine if a case is open
     if(wombatvarptr->caseobject.id > 0)
     {
-        ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
+        int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
+        if (ret == QMessageBox::Yes)
+            CloseCurrentCase();
     }
-    if (ret == QMessageBox::Yes)
-    {
-        InitializeCaseStructure();
-    }
+    InitializeCaseStructure();
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()
 {
-    int ret = QMessageBox::Yes;
     // determine if a case is open
     if(wombatvarptr->caseobject.id > 0)
     {
-        ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
+        int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
+        if (ret == QMessageBox::Yes)
+        {
+            statuslabel->setText("Closing Current Case...");
+            CloseCurrentCase();
+        }
     }
-    if (ret == QMessageBox::Yes)
-    {
-        InitializeOpenCase();
-    }
+    InitializeOpenCase();
 }
 
 void WombatForensics::ViewGroupTriggered(QAction* selaction)

@@ -508,6 +508,7 @@ private:
     void InitializeCaseStructure(void);
     void InitializeEvidenceStructure(void);
     void InitializeOpenCase(void);
+    void CloseCurrentCase(void);
     void UpdateViewer(void);
     void UpdateProperties(void);
     void UpdateOmniValue(void);
