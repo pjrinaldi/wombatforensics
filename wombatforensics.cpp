@@ -70,7 +70,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
 {
-    qDebug() << "set propertybutton to false";
     ui->actionView_Properties->setChecked(checkedstate);
 }
 
@@ -216,7 +215,6 @@ void WombatForensics::InitializeOpenCase()
         if(!wombatvarptr->casedb.isValid()) // casedb has not been added yet, so add now.
             wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb");
         wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
-        qDebug() << wombatvarptr->casedb.databaseName();
         bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
         if(!caseFileExist)
         {
@@ -231,7 +229,6 @@ void WombatForensics::InitializeOpenCase()
                 DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
         }
         fcasedb = wombatvarptr->casedb;
-        qDebug() << "fcasedb name: " << fcasedb.databaseName();
         ui->actionAdd_Evidence->setEnabled(true);
         processcountlabel->setText("Processed: 0");
         filecountlabel->setText("Files: 0");
@@ -546,6 +543,7 @@ void WombatForensics::CloseCurrentCase()
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     statuslabel->setText("Current Case was Closed Successfully"); 
+    wombatdatabase->CloseCaseDB();
 }
 
 void WombatForensics::RemEvidence()

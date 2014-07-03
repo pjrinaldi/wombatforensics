@@ -10,7 +10,6 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
     QList<QSqlRecord> tmplist;
     if(wombatptr->casedb.isOpen())
     {
-        qDebug() << "wombatdatabase: " << wombatptr->casedb.databaseName();
         QSqlQuery casequery(wombatptr->casedb);
         casequery.prepare(query);
         for(int i=0; i < invalues.count(); i++)
