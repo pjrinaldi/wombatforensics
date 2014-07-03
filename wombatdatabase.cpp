@@ -510,6 +510,16 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.type = wombatptr->sqlrecords[0].value(9).toInt();
 }
 
+int WombatDatabase::GetEvidenceFileCount()
+{
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+    wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(objectid) FROM data WHERE objectid = ? OR parimgid = ?", wombatptr->bindvalues);
+    return wombatptr->sqlrecords.at(0).value(0).toInt();
+}
+
 void WombatDatabase::ReturnObjectPropertyList()
 {
     propertylist.clear();

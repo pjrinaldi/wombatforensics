@@ -46,6 +46,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
     if(wombatptr->evidenceobject.volinfo == NULL)
     {
         wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_img(wombatptr->evidenceobject.imageinfo, 0, TSK_FS_TYPE_DETECT));
+        filesfound++;
     }
     else
     {

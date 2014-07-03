@@ -74,8 +74,7 @@ class PropertiesWindow : public QDialog
 
 public:
     PropertiesWindow(WombatDatabase* wdata, QWidget* parent = 0);
-    void UpdateTableView();
-    //void UpdateLabelText(void);
+    void UpdateTableView(void);
     ~PropertiesWindow();
 
 

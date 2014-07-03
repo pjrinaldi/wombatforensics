@@ -237,7 +237,7 @@ void WombatForensics::InitializeOpenCase()
             wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->evidenceobjectvector.at(i).id);
             wombatvarptr->currentevidenceid = wombatvarptr->evidenceobjectvector.at(i).id;
             wombatvarptr->evidenceobject = wombatvarptr->evidenceobjectvector.at(i);
-            statuslabel->setText("Processed 0%");
+            statuslabel->setText("Opening Case Evidence...");
             OpenEvidenceStructure();
             if(ui->dirTreeView->model() != NULL)
                 ui->actionRemove_Evidence->setEnabled(true);
@@ -258,7 +258,6 @@ void WombatForensics::InitializeQueryModel()
         treemodel->AddEvidence(wombatvarptr->currentevidenceid);
         ResizeColumns();
         ui->actionRemove_Evidence->setEnabled(true);
-        //statuslabel->setText("");
         wombatframework->CloseInfoStructures();
     }
 }
@@ -304,7 +303,12 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::OpenEvidenceStructure()
 {
+    filesfound = filesfound + wombatdatabase->GetEvidenceFileCount();
+    filesprocessed = filesfound;
+    processcountlabel->setText("Processed: " + QString::number(filesprocessed));
+    filecountlabel->setText("Files: " + QString::number(filesfound));
     treemodel->AddEvidence(wombatvarptr->currentevidenceid);
+    statuslabel->setText("Opening Case Evidence Completed");
 }
 
 void WombatForensics::AddEvidence()
