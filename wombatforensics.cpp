@@ -260,6 +260,7 @@ void WombatForensics::InitializeQueryModel()
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
         treemodel->AddEvidence(wombatvarptr->currentevidenceid);
+        ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
         ResizeColumns();
         ui->actionRemove_Evidence->setEnabled(true);
         wombatframework->CloseInfoStructures();
@@ -533,6 +534,7 @@ void WombatForensics::OpenFileSystemFile()
 
 void WombatForensics::CloseCurrentCase()
 {
+    setWindowTitle("WombatForensics");
     wombatdatabase->GetEvidenceObjects();
     for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
     {
@@ -543,6 +545,7 @@ void WombatForensics::CloseCurrentCase()
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     statuslabel->setText("Current Case was Closed Successfully"); 
+    // clear hex editor 
     wombatdatabase->CloseCaseDB();
 }
 
