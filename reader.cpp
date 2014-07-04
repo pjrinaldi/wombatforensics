@@ -37,8 +37,8 @@
 #include <assert.h>
 
 #include <stdexcept>
-#include "translate.hpp"
-#include "reader.hpp" // some systems #define to map fn's to thier 64 bit
+#include "translate.h"
+#include "reader.h" // some systems #define to map fn's to thier 64 bit
                       // equivalents. make sure the header gets processed the
                       // same as the .cc file
 

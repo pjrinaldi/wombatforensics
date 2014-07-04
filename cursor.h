@@ -22,7 +22,7 @@
 #include <sys/types.h>
 #include <limits.h>
 #include <stdexcept>
-#include "translate.hpp"
+#include "translate.h"
 
 #ifdef _LARGEFILE_SOURCE
 #define MAX_OFFSET LONG_LONG_MAX

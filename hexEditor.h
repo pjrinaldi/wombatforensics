@@ -40,9 +40,9 @@
 #include <sys/types.h>
 
 // Local headers
-#include "translate.hpp"
-#include "reader.hpp"
-#include "cursor.hpp"
+#include "translate.h"
+#include "reader.h"
+#include "cursor.h"
 
 class HexEditor : public QWidget {
   Q_OBJECT

@@ -51,8 +51,8 @@
 #include <sys/stat.h>
 
 #include "tskvariable.h"
-#include "translate.hpp"
-#include "hexEditor.hpp"
+#include "translate.h"
+#include "hexEditor.h"
 #include "img/tsk_img_i.h"
 #include "fs/tsk_fs_i.h"
 
