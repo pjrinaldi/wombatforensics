@@ -56,7 +56,7 @@ public:
   QString filename() const;
   Reader * reader();
   off_t offset() const;
-  
+  void ClearContent();  
 
   // returns the word (string representation) that the cursor is in
   //  QString currentWord() const;

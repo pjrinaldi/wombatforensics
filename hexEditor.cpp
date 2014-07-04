@@ -76,6 +76,15 @@ HexEditor::~HexEditor()
   _reader.close();
 }
 
+void HexEditor::ClearContent()
+{
+    _reader.Clear();
+    //_reader.seekimage(_topLeft);
+    //_reader.seek(_topLeft);
+    //_reader.readimage(_data,bytesPerPage());
+    //setTopLeft(0);
+}
+
 QString HexEditor::filename() const
 {
   return _reader.filename();

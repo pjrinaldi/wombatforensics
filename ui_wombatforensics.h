@@ -259,6 +259,8 @@ public:
         WombatForensics->addToolBar(Qt::TopToolBarArea, analysisToolBar);
         mainStatusBar = new QStatusBar(WombatForensics);
         mainStatusBar->setObjectName(QStringLiteral("mainStatusBar"));
+        mainStatusBar->setStyleSheet(QStringLiteral(""));
+        mainStatusBar->setSizeGripEnabled(true);
         WombatForensics->setStatusBar(mainStatusBar);
 
         mainMenubar->addAction(menuFile->menuAction());

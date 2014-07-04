@@ -316,6 +316,7 @@ void WombatForensics::OpenEvidenceStructure()
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     treemodel->AddEvidence(wombatvarptr->currentevidenceid);
+    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     statuslabel->setText("Opening Case Evidence Completed");
 }
 
@@ -545,6 +546,7 @@ void WombatForensics::CloseCurrentCase()
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     statuslabel->setText("Current Case was Closed Successfully"); 
+    hexwidget->ClearContent();
     // clear hex editor 
     wombatdatabase->CloseCaseDB();
 }
@@ -1108,7 +1110,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    (void)low;(void)high;
    // range must be contained in the space of an integer, just do 100
    // increments
-   hexvsb->setRange(0,100);
+   hexvsb->setRange(0,1000);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)
