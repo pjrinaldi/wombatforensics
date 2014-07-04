@@ -197,6 +197,7 @@ void HexEditor::setTopLeft( off_t offset )
 	_topLeft = offset;
      }
      // only let _topLeft be an integer multiple of the line length (round down)
+     _topLeft = _topLeft*bytesPerLine();
      //_topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //  setOffsetLabels(_topLeft);
