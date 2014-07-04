@@ -102,6 +102,7 @@ bool HexEditor::openimage()
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
     emit rangeChanged(0, _reader.size()/bytesPerLine());
+    emit StepValues(bytesPerLine(), bytesPerPage());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -196,7 +197,7 @@ void HexEditor::setTopLeft( off_t offset )
 	_topLeft = offset;
      }
      // only let _topLeft be an integer multiple of the line length (round down)
-     _topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
+     //_topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //  setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
@@ -318,7 +319,12 @@ QRect HexEditor::abyteBox(off_t byteIdx) const
 
 void HexEditor::setTopLeftToPercent( int percent )
 {
-   setTopLeft( (_reader.size()/100)*percent );
+    qDebug() << percent;
+    setTopLeft((_reader.size()/bytesPerLine())*percent);
+    //setTopLeft(_reader.size());
+    //nextPage();
+    //nextLine();
+   //setTopLeft( (_reader.size()/100)*percent );
 }
 
 // 
@@ -546,6 +552,7 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
   emit rangeChanged(0,_reader.size()/bytesPerLine());
+  emit StepValues(bytesPerLine(), bytesPerPage());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on

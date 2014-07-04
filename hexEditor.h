@@ -56,7 +56,7 @@ public:
   QString filename() const;
   Reader * reader();
   off_t offset() const;
-  void ClearContent();  
+  void ClearContent(); 
 
   // returns the word (string representation) that the cursor is in
   //  QString currentWord() const;
@@ -102,6 +102,7 @@ signals:
   void offsetChanged(off_t byte);
   void topLeftChanged(off_t offset);
   void selectionChanged(const QString& selection);
+  void StepValues(int singlestep, int pagestep);
 
 public slots:
   void setOffset(off_t offset);     // sets cursor offset

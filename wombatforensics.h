@@ -496,6 +496,7 @@ private slots:
     {
         statuslabel->setText(tmptext);
     };
+    void SetStepValues(int singlestep, int pagestep);
 
 protected:
     void closeEvent(QCloseEvent* event);

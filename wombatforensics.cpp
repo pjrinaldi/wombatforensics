@@ -838,6 +838,13 @@ void WombatForensics::SetupHexPage(void)
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
+    connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+}
+
+void WombatForensics::SetStepValues(int singlestep, int pagestep)
+{
+    hexvsb->setSingleStep(singlestep);
+    hexvsb->setPageStep(pagestep);
 }
 
 void WombatForensics::SetupToolbar(void)
@@ -1020,6 +1027,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     int sellength = txt.size()/2;
     QString tmptext = "Length: " + QString::number(sellength);
     selectedhex->setText(tmptext);
+    /*
     // get initial bytes value and then update ascii
     std::vector<uchar> bytes;
     Translate::HexToByte(bytes, txt);
@@ -1085,6 +1093,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     strvalue.setNum( dvalue );
     tmptext = "Double: " + strvalue;
     //selecteddouble->setText(tmptext);
+    */
 }
 
 void WombatForensics::setOffsetLabel(off_t pos)
@@ -1106,7 +1115,8 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    (void)low;(void)high;
    // range must be contained in the space of an integer, just do 100
    // increments
-   hexvsb->setRange(0,100);
+   //hexvsb->setRange(0,100);
+   hexvsb->setRange(low, high);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)
@@ -1115,5 +1125,6 @@ void WombatForensics::setScrollBarValue(off_t pos)
   // location of the last byte on the page
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
-  hexvsb->setValue(hexwidget->offsetToPercent(pos));
+  hexvsb->setValue(pos);
+  //hexvsb->setValue(hexwidget->offsetToPercent(pos));
 }
