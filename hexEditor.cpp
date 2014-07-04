@@ -101,8 +101,12 @@ bool HexEditor::openimage()
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
-    emit rangeChanged(0, _reader.size()/bytesPerLine());
-    emit StepValues(bytesPerLine(), bytesPerPage());
+    emit rangeChanged(0, _reader.NumberPages());
+    //emit rangeChanged(0, (_reader.size()/4096)+1);
+    //emit rangeChanged(0, _reader.size()/bytesPerLine());
+    //emit StepValues(bytesPerLine(), bytesPerPage());
+    //emit StepValues(_reader.PageIdx(), _reader.PageIdx()/5);
+    emit StepValues(1, _reader.NumberPages());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -321,7 +325,10 @@ QRect HexEditor::abyteBox(off_t byteIdx) const
 void HexEditor::setTopLeftToPercent( int percent )
 {
     qDebug() << percent;
-    setTopLeft((_reader.size()/bytesPerLine())*percent);
+    _reader.loadimagepage(percent);
+    //setTopLeft(_offset);
+    //loadimagepage(percent);
+    //setTopLeft((_reader.size()/bytesPerLine())*percent);
     //setTopLeft(_reader.size());
     //nextPage();
     //nextLine();

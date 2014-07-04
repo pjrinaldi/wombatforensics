@@ -844,7 +844,7 @@ void WombatForensics::SetupHexPage(void)
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
     hexvsb->setSingleStep(singlestep);
-    hexvsb->setPageStep(pagestep);
+    hexvsb->setPageStep(pagestep/5);
 }
 
 void WombatForensics::SetupToolbar(void)

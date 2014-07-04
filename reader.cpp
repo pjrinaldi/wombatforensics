@@ -305,6 +305,11 @@ off_t Reader::size() const
   return _size;
 }
 
+off_t Reader::NumberPages() const
+{
+    return _maxPages;
+}
+
 const char* Reader::lastError() const
 {
   return _error.c_str();
