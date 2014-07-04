@@ -210,7 +210,6 @@ void WombatForensics::InitializeOpenCase()
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-        //wombatvarptr->casedb.close();
         wombatvarptr->casedb = QSqlDatabase::database("casedb");
         if(!wombatvarptr->casedb.isValid()) // casedb has not been added yet, so add now.
             wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb");
@@ -661,7 +660,6 @@ void WombatForensics::FinishRemoval()
         processcountlabel->setText("Processed: " + QString::number(filesprocessed));
         filecountlabel->setText("Files: " + QString::number(filesfound));
         statuslabel->setText("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
-        //statuslabel->setText("");
 
         qDebug() << "removal of files is complete.";
     }
@@ -676,7 +674,6 @@ void WombatForensics::FinishExport()
     if(ProcessingComplete())
     {
         statuslabel->setText("Exporting completed");
-        //statuslabel->setText("");
         qDebug() << "export of files is complete.";
     }
     else
@@ -799,7 +796,6 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     if(curprogress == 100 && ProcessingComplete())
     {
         statuslabel->setText("Processing Complete");
-        //statuslabel->setText("");
     }
 }
 
@@ -1110,7 +1106,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    (void)low;(void)high;
    // range must be contained in the space of an integer, just do 100
    // increments
-   hexvsb->setRange(0,1000);
+   hexvsb->setRange(0,100);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)
