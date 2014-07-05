@@ -325,7 +325,8 @@ QRect HexEditor::abyteBox(off_t byteIdx) const
 void HexEditor::setTopLeftToPercent( int percent )
 {
     qDebug() << percent;
-    _reader.loadimagepage(percent);
+    //_reader.loadimagepage(percent);
+    setTopLeft(percent*4096);
     //setTopLeft(_offset);
     //loadimagepage(percent);
     //setTopLeft((_reader.size()/bytesPerLine())*percent);
