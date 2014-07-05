@@ -368,7 +368,7 @@ bool Reader::loadimagepage(off_t pageIdx)
 
 void Reader::Clear()
 {
-    _data.erase(_data.begin(), _data.end()); // added to clear the previous values when a file is of size 0
+    //_data.erase(_data.begin(), _data.end()); // added to clear the previous values when a file is of size 0
     //fill(_data.begin(), _data.begin()+1, (uchar*)0);
 }
 

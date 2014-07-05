@@ -52,7 +52,7 @@ HexEditor::HexEditor( QWidget * parent, TskObject* tskobjptr )
     : QWidget(parent)
 {
     tskptr = tskobjptr;
-  _cols   = 5;
+  _cols   = 6;
   _rows   = 10;
   _charsPerByte   = 2;
   _base           = 16;
@@ -78,7 +78,7 @@ HexEditor::~HexEditor()
 
 void HexEditor::ClearContent()
 {
-    _reader.Clear();
+    //_reader.Clear();
     //_reader.seekimage(_topLeft);
     //_reader.seek(_topLeft);
     //_reader.readimage(_data,bytesPerPage());
@@ -101,12 +101,13 @@ bool HexEditor::openimage()
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
-    emit rangeChanged(0, _reader.NumberPages());
+    //emit rangeChanged(0, _reader.NumberPages());
+    emit rangeChanged(0, _reader.size()/bytesPerLine());
     //emit rangeChanged(0, (_reader.size()/4096)+1);
     //emit rangeChanged(0, _reader.size()/bytesPerLine());
     //emit StepValues(bytesPerLine(), bytesPerPage());
     //emit StepValues(_reader.PageIdx(), _reader.PageIdx()/5);
-    emit StepValues(1, _reader.NumberPages());
+    //emit StepValues(1, _reader.NumberPages());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -201,10 +202,10 @@ void HexEditor::setTopLeft( off_t offset )
 	_topLeft = offset;
      }
      // only let _topLeft be an integer multiple of the line length (round down)
-     _topLeft = _topLeft*bytesPerLine();
-     //_topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
+     //_topLeft = _topLeft*bytesPerLine();
+     _topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
-     //  setOffsetLabels(_topLeft);
+     //setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
      //_reader.seek(_topLeft);
      _reader.readimage(_data,bytesPerPage());
@@ -326,14 +327,14 @@ void HexEditor::setTopLeftToPercent( int percent )
 {
     qDebug() << percent;
     //_reader.loadimagepage(percent);
-    setTopLeft(percent*4096);
+    //setTopLeft(percent*4096);
     //setTopLeft(_offset);
     //loadimagepage(percent);
     //setTopLeft((_reader.size()/bytesPerLine())*percent);
     //setTopLeft(_reader.size());
     //nextPage();
     //nextLine();
-   //setTopLeft( (_reader.size()/100)*percent );
+    setTopLeft( (_reader.size()/100)*percent );
 }
 
 // 
@@ -751,7 +752,8 @@ void HexEditor::cursorLeft()
 {
   off_t oldWordIdx = localWordOffset();
   // move the cursor
-  _cursor.decrByChar(1);
+  _cursor.decrByChar(2);
+  //_cursor.decrByChar(1);
   // make sure the user can see the cursor
   seeCursor();
   // redraw where the cursor used to be
@@ -762,7 +764,8 @@ void HexEditor::cursorLeft()
 void HexEditor::cursorRight()
 {
   off_t oldWordIdx = localWordOffset();
-  _cursor.incrByChar(1);
+  _cursor.incrByChar(2);
+  //_cursor.incrByChar(1);
   seeCursor();
   if( localWordOffset() != oldWordIdx ) 
     updateWord( oldWordIdx );

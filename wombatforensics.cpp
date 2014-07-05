@@ -843,8 +843,8 @@ void WombatForensics::SetupHexPage(void)
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
-    hexvsb->setSingleStep(singlestep);
-    hexvsb->setPageStep(pagestep/5);
+    //hexvsb->setSingleStep(singlestep);
+    //hexvsb->setPageStep(pagestep/5);
 }
 
 void WombatForensics::SetupToolbar(void)
@@ -1115,8 +1115,8 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    (void)low;(void)high;
    // range must be contained in the space of an integer, just do 100
    // increments
-   //hexvsb->setRange(0,100);
-   hexvsb->setRange(low, high);
+   hexvsb->setRange(0,100);
+   //hexvsb->setRange(low, high);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)
@@ -1125,6 +1125,6 @@ void WombatForensics::setScrollBarValue(off_t pos)
   // location of the last byte on the page
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
-  hexvsb->setValue(pos);
-  //hexvsb->setValue(hexwidget->offsetToPercent(pos));
+  //hexvsb->setValue(pos);
+  hexvsb->setValue(hexwidget->offsetToPercent(pos));
 }
