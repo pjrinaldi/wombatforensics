@@ -44,7 +44,7 @@
 #include <QResizeEvent>
 #include <QMouseEvent>
 
-#include "hexEditor.h"
+#include "hexeditor.h"
 
 extern int errno;
 

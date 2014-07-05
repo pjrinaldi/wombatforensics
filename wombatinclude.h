@@ -52,7 +52,7 @@
 
 #include "tskvariable.h"
 #include "translate.h"
-#include "hexEditor.h"
+#include "hexeditor.h"
 #include "img/tsk_img_i.h"
 #include "fs/tsk_fs_i.h"
 
