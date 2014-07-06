@@ -101,13 +101,7 @@ bool HexEditor::openimage()
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
-    //emit rangeChanged(0, _reader.NumberPages());
     emit rangeChanged(0, _reader.size()/bytesPerLine());
-    //emit rangeChanged(0, (_reader.size()/4096)+1);
-    //emit rangeChanged(0, _reader.size()/bytesPerLine());
-    //emit StepValues(bytesPerLine(), bytesPerPage());
-    //emit StepValues(_reader.PageIdx(), _reader.PageIdx()/5);
-    //emit StepValues(1, _reader.NumberPages());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -530,6 +524,7 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   // don't let _rows or _cols drop below 1
   _rows = max(1,(e->size().height() - _topMargin)/height);
   _cols = max(1,(e->size().width()/2 - _leftMargin)/totalWordWidth);
+  //_cols = max(1,(e->size().width() - _leftMargin)/totalWordWidth);
   
   // now update the line && word bbox vectors
   _lineBBox.reserve(_rows);
@@ -562,7 +557,7 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
   emit rangeChanged(0,_reader.size()/bytesPerLine());
-  emit StepValues(bytesPerLine(), bytesPerPage());
+  //emit StepValues(bytesPerLine(), bytesPerPage());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on
@@ -658,7 +653,8 @@ void HexEditor::paintEvent( QPaintEvent* e)
   int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );
   int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
   int row_stop  = min(_rows-1,e->rect().bottom() / lineSpacing());
-  int col_stop  = min(_cols-1,(e->rect().right()/2) / totalWordWidth);
+  int col_stop  = min(_cols-1,(e->rect().right()) / totalWordWidth);
+  //int col_stop  = min(_cols-1,(e->rect().right()/2) / totalWordWidth);
 
   // draw text in repaint event
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
