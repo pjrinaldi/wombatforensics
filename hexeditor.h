@@ -231,6 +231,7 @@ protected:
   int                 _width;
   Cursor              _cursor; 
 
+  int                 _previousstep;
   //
   // when refering to the offset of a word, I always mean the offset of the 
   // first byte of the word

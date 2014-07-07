@@ -60,6 +60,7 @@ HexEditor::HexEditor( QWidget * parent, TskObject* tskobjptr )
   _topMargin = _wordSpacing    = 6;
   _bytesPerWord   = 2;
   _lastValidWord  = -1;
+  _previousstep = 0;
   _selection[SelectionStart] = _selection[SelectionEnd] = -1;
 
   setFocusPolicy(Qt::StrongFocus);
@@ -102,6 +103,7 @@ bool HexEditor::openimage()
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
     emit rangeChanged(0, _reader.size()/bytesPerLine());
+    emit StepValues(bytesPerLine(), bytesPerPage());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -124,6 +126,7 @@ bool HexEditor::open( const QString & filename )
   setSelection(SelectionStart,-1);
   setSelection(SelectionEnd,-1);
   emit rangeChanged(0,_reader.size()/bytesPerLine());
+  emit StepValues(bytesPerLine(), bytesPerPage());
   calculateFontMetrics();     // update labels
   setTopLeft(0);              // reset the GUI
   return true;
@@ -319,16 +322,28 @@ QRect HexEditor::abyteBox(off_t byteIdx) const
 
 void HexEditor::setTopLeftToPercent( int percent )
 {
-    qDebug() << percent;
-    //_reader.loadimagepage(percent);
-    //setTopLeft(percent*4096);
-    //setTopLeft(_offset);
-    //loadimagepage(percent);
-    //setTopLeft((_reader.size()/bytesPerLine())*percent);
-    //setTopLeft(_reader.size());
-    //nextPage();
-    //nextLine();
-    setTopLeft( (_reader.size()/100)*percent );
+    qDebug() << "old value: " << _previousstep << "new value: " << percent;
+    if(_previousstep < percent)
+    {
+        int stepdiff = percent - _previousstep;
+        if(stepdiff == bytesPerLine())
+            nextLine();
+        else if(stepdiff == bytesPerPage())
+            nextPage();
+        else
+            setTopLeft(percent);
+    }
+    else if(_previousstep > percent)
+    {
+        int stepdiff = _previousstep - percent;
+        if(stepdiff == bytesPerLine())
+            prevLine();
+        else if(stepdiff == bytesPerPage())
+            prevPage();
+        else
+            setTopLeft(percent);
+    }
+    _previousstep = percent;
 }
 
 // 
@@ -524,7 +539,6 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   // don't let _rows or _cols drop below 1
   _rows = max(1,(e->size().height() - _topMargin)/height);
   _cols = max(1,(e->size().width()/2 - _leftMargin)/totalWordWidth);
-  //_cols = max(1,(e->size().width() - _leftMargin)/totalWordWidth);
   
   // now update the line && word bbox vectors
   _lineBBox.reserve(_rows);
@@ -557,7 +571,7 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
   emit rangeChanged(0,_reader.size()/bytesPerLine());
-  //emit StepValues(bytesPerLine(), bytesPerPage());
+  emit StepValues(bytesPerLine(), bytesPerPage());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on
@@ -654,7 +668,6 @@ void HexEditor::paintEvent( QPaintEvent* e)
   int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
   int row_stop  = min(_rows-1,e->rect().bottom() / lineSpacing());
   int col_stop  = min(_cols-1,(e->rect().right()) / totalWordWidth);
-  //int col_stop  = min(_cols-1,(e->rect().right()/2) / totalWordWidth);
 
   // draw text in repaint event
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
