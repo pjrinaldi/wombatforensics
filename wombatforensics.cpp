@@ -99,7 +99,7 @@ void WombatForensics::InitializeAppStructure()
     //if(mkPath == false)
     //    DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     wombatvarptr->wombatdbname = wombatvarptr->datapath + "WombatApp.db";
-    wombatvarptr->appdb = QSqlDatabase::addDatabase("QSQLITE", "wombatapp");
+    wombatvarptr->appdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
     wombatvarptr->appdb.setDatabaseName(wombatvarptr->wombatdbname);
     bool appFileExist = FileExists(wombatvarptr->wombatdbname.toStdString());
     if(!appFileExist)
@@ -157,10 +157,28 @@ void WombatForensics::InitializeCaseStructure()
         wombatvarptr->caseobject.dirpath = wombatvarptr->casespath + casestring + "/";
         bool mkPath = (new QDir())->mkpath(wombatvarptr->caseobject.dirpath);
         if(mkPath == false)
-        {
             DisplayError("2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
+        // CREATE CaseLog.DB HERE
+        logdb = QSqlDatabase::database("logdb");
+        if(!logdb.isValid())
+            logdb = QSqlDatabase::addDatabase("QSQLITE", "logdb");
+        logdb.setDatabaseName(wombatvarptr->caseobject.dirpath + "caselog.db");
+        if(!FileExists((wombatvarptr->caseobject.dirpath + "caselog.db").toStdString()))
+        {
+            wombatdatabase->CreateLogDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.1", "Course Log Creation Error", wombatvarptr->curerrmsg);
+        }
+        else
+        {
+            wombatdatabase->OpenLogDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.1", "SQL Error", wombatvarptr->curerrmsg);
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
+        errorcount = 0;
+        StartJob(0, wombatvarptr->caseobject.id, 0);
+        LogEntry(wombatvarptr->caseobject.id, 0, currentjobid, 1, "Started Creating Case Structure");
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
         wombatvarptr->casedb = QSqlDatabase::database("casedb");
         if(!wombatvarptr->casedb.isValid())
@@ -170,7 +188,11 @@ void WombatForensics::InitializeCaseStructure()
         {
             wombatdatabase->CreateCaseDB();
             if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.2", "Course DB Creation Error", wombatvarptr->curerrmsg);
+            {
+                LogEntry(wombatvarptr->caseobject.id, 0, currentjobid, 0, "Case DB Creation Error.");
+                errorcount++;
+                DisplayError("1.2", "Case DB Creation Error", wombatvarptr->curerrmsg);
+            }
         }
         else
         {
@@ -184,6 +206,8 @@ void WombatForensics::InitializeCaseStructure()
             ui->actionOpen_Case->setEnabled(true);
         }
         ui->actionAdd_Evidence->setEnabled(true);
+        EndJob(currentjobid, 1, 1, errorcount);
+        LogEntry(wombatvarptr->caseobject.id, 0, currentjobid, 1, "Case was created");
     }
 }
 
@@ -207,6 +231,23 @@ void WombatForensics::InitializeOpenCase()
         if(mkPath == false)
         {
             DisplayError("2.0", "Cases Folder Check Failed.", "Existing Case folder did not exist.");
+        }
+        // CREATE CaseLog.DB HERE
+        logdb = QSqlDatabase::database("logdb");
+        if(!logdb.isValid())
+            logdb = QSqlDatabase::addDatabase("QSQLITE", "logdb");
+        logdb.setDatabaseName(wombatvarptr->caseobject.dirpath + "caselog.db");
+        if(!FileExists((wombatvarptr->caseobject.dirpath + "caselog.db").toStdString()))
+        {
+            wombatdatabase->CreateLogDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.1", "Course Log Creation Error", wombatvarptr->curerrmsg);
+        }
+        else
+        {
+            wombatdatabase->OpenLogDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.1", "SQL Error", wombatvarptr->curerrmsg);
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
@@ -254,7 +295,8 @@ void WombatForensics::InitializeQueryModel()
     fcasedb.commit();
     if(ProcessingComplete())
     {
-        statuslabel->setText("Processing Complete");
+        EndJob(currentjobid, filesfound, filesprocessed, errorcount);
+        statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         qDebug() << "All threads have finished.";
         fcasedb.commit();
         qDebug() << "DB Commit finished.";
@@ -298,6 +340,9 @@ void WombatForensics::InitializeEvidenceStructure()
 {
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
+    errorcount = 0;
+    StartJob(1, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
+    LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Adding Evidence");
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
     wombatdatabase->InsertVolumeObject(); // add volume to data

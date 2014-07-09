@@ -19,7 +19,9 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
     if(wombatptr->evidenceobject.imageinfo == NULL)
     {
-        qDebug() << "print image error here";
+        LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Evidence Image Access Failed.");
+        errorcount++;
+        //qDebug() << "print image error here";
     }
     filesfound++;
     free(images);
@@ -63,6 +65,8 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
                 }
                 else
                 {
+                    LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Failed to Open Partition/FileSystem");
+                    errorcount++;
                 }
             }
         }
@@ -82,7 +86,11 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         }
     }
     if(walkreturn == 1)
-        qDebug() << "issues with dir walk function.";
+    {
+        LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Issues with Traversing the File Structure were encountered.");
+        errorcount++;
+        //qDebug() << "issues with dir walk function.";
+    }
 }
 
 void WombatFramework::CloseInfoStructures() // close all open info structures

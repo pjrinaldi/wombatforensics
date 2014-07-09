@@ -12,10 +12,13 @@ public:
     WombatDatabase(WombatVariable* wombatvarptr);
     void CreateAppDB(void);
     void CreateCaseDB(void);
+    void CreateLogDB(void);
     void OpenCaseDB(void);
     void OpenAppDB(void);
+    void OpenLogDB(void);
     void CloseAppDB(void);
     void CloseCaseDB(void);
+    void CloseLogDB(void);
     void InsertEvidenceObject(void);
     void GetEvidenceObject(void);
     void GetEvidenceObjects(void);

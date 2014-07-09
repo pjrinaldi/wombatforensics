@@ -177,6 +177,29 @@ void WombatDatabase::CreateCaseDB(void)
 
 }
 
+void WombatDatabase::CreateLogDB()
+{
+    QStringList loglist;
+    loglist.clear();
+    loglist << "CREATE TABLE job(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start INT, finish INT, errorcount INT)";
+    loglist << "CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, type INTEGER, datetime INT, logmsg TEXT)";
+    if(logdb.open())
+    {
+        QSqlQuery logquery(logdb);
+        logdb.transaction();
+        for(int i=0; i < loglist.count(); i++)
+        {
+            logquery.exec(loglist.at(i));
+        }
+        logdb.commit();
+        logquery.finish();
+    }
+    else
+    {
+        wombatptr->curerrmsg = logdb.lastError().text();
+    }
+}
+
 void WombatDatabase::CreateAppDB()
 {
     if(wombatptr->appdb.open())
@@ -201,6 +224,12 @@ void WombatDatabase::OpenAppDB()
         wombatptr->appdb.open();
 }
 
+void WombatDatabase::OpenLogDB()
+{
+    if(!logdb.isOpen())
+        logdb.open();
+}
+
 void WombatDatabase::OpenCaseDB()
 {
     if(wombatptr->casedb.isOpen())
@@ -218,7 +247,18 @@ void WombatDatabase::CloseAppDB()
     {
         wombatptr->appdb.close();
         wombatptr->appdb = QSqlDatabase();
-        QSqlDatabase::removeDatabase("wombatapp");
+        QSqlDatabase::removeDatabase("appdb");
+    }
+}
+
+void WombatDatabase::CloseLogDB()
+{
+    qDebug() << "LogDB closing";
+    if(logdb.isOpen())
+    {
+        logdb.close();
+        logdb = QSqlDatabase();
+        QSqlDatabase::removeDatabase("logdb");
     }
 }
 

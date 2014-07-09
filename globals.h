@@ -4,6 +4,7 @@
 #include "wombatinclude.h"
 
 extern QSqlDatabase fcasedb;
+extern QSqlDatabase logdb;
 extern QString fdbname;
 extern QThreadPool* threadpool;
 extern QVector<QFuture<void> > threadvector;
@@ -15,11 +16,12 @@ extern int totalchecked;
 extern int currentevidenceid;
 extern int exportcount;
 extern int currentfilesystemid;
+extern int errorcount;
+extern int currentjobid;
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;
 extern QList<FileSystemObject> fsobjectlist;
-//extern QList<QStringList> propertylist;
 extern QStringList propertylist;
 
 class InterfaceSignals : public QObject

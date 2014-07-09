@@ -11,5 +11,8 @@ bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
 void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints);
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
+void LogEntry(int caseid, int evidenceid, int jobid, int type, QString msg);
+void StartJob(int type, int caseid, int evidenceid);
+void EndJob(int jobid, int filecount, int processcount, int errorcount);
 
 #endif // wombatfunctions.h

@@ -15,6 +15,40 @@ std::string GetTime()
     return timeStr;
 }
 
+void LogEntry(int caseid, int evidenceid, int jobid, int type, QString msg)
+{
+    QSqlQuery logquery(logdb);
+    logquery.prepare("INSERT INTO msglog (caseid, evidenceid, jobid, type, datetime, logmsg) VALUES(?, ?, ?, ?, DATETIME('now', 'unixepoch'), ?)");
+    logquery.addBindValue(caseid);
+    logquery.addBindValue(evidenceid);
+    logquery.addBindValue(jobid);
+    logquery.addBindValue(type);
+    logquery.addBindValue(msg);
+    logquery.exec();
+}
+
+void StartJob(int type, int caseid, int evidenceid)
+{
+    QSqlQuery jobquery(logdb);
+    jobquery.prepare("INSERT INTO joblog (type, state, filecount, processcount, caseid, evidenceid, start, finish, errorcount) VALUES(?, 0, 0, 0, ?, ?, DATETIME('now', 'unixepoch'), 0, 0)");
+    jobquery.addBindValue(type);
+    jobquery.addBindValue(caseid);
+    jobquery.addBindValue(evidenceid);
+    if(jobquery.exec())
+        currentjobid = jobquery.lastInsertId().toInt();
+}
+
+void EndJob(int jobid, int filecount, int processcount, int errorcount)
+{
+    QSqlQuery jobquery(logdb);
+    jobquery.prepare("UPDATE joblog SET state = 1, filecount = ?, processcount = ?, finish = DATETIME('now', 'unixepoch'), errorcount = ? WHERE jobid = ?");
+    jobquery.addBindValue(filecount);
+    jobquery.addBindValue(processcount);
+    jobquery.addBindValue(errorcount);
+    jobquery.addBindValue(jobid);
+    jobquery.exec();
+}
+
 char* TskTimeToStringUTC(time_t time, char buf[128])
 {
     buf[0] = '\0';
@@ -104,13 +138,15 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
     }
     else
     {
-        //qDebug() << fcasedb.lastError().text();
+        LogEntry(0, currentevidenceid, currentjobid, 0, QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
+        errorcount++;
     }
 }
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     if(tmpptr != NULL)
+        LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
         qDebug() << "Not sure how tmpptr got set.";
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);

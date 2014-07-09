@@ -94,7 +94,7 @@ struct SelectedObject
 
 struct WombatVariable
 {
-
+    /*
     // ADD ENUMS FOR JOBSTATUS, JOBTYPE, ETC TO SIMPLIFY INTEGER ASSOCIATION AND READABILITY IN CODE
     enum JobStatus
     {
@@ -111,6 +111,7 @@ struct WombatVariable
         remedvidence = 2,
         exportfiles = 3
     };
+    */
 
     // id values
     int jobtype;
