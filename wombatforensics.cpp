@@ -296,6 +296,7 @@ void WombatForensics::InitializeQueryModel()
     if(ProcessingComplete())
     {
         EndJob(currentjobid, filesfound, filesprocessed, errorcount);
+        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Adding Evidence Finished");
         statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         qDebug() << "All threads have finished.";
         fcasedb.commit();
@@ -607,6 +608,9 @@ void WombatForensics::RemEvidence()
         wombatvarptr->evidremoveid = wombatvarptr->evidremovestring.split(".").at(0).toInt();
         if(wombatvarptr->evidremoveid > 0)
         {
+            StartJob(4, wombatvarptr->caseobject.id, wombatvarptr->evidremoveid);
+            errorcount = 0;
+            LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 1, "Evidence Removal Started"); 
             treemodel->RemEvidence(wombatvarptr->evidremoveid);
             remfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::RemoveEvidence);
             remwatcher.setFuture(remfuture);
@@ -704,9 +708,9 @@ void WombatForensics::FinishRemoval()
         filesfound = filesfound - wombatvarptr->evidrowsremoved;
         processcountlabel->setText("Processed: " + QString::number(filesprocessed));
         filecountlabel->setText("Files: " + QString::number(filesfound));
+        EndJob(currentjobid, wombatvarptr->evidrowsremoved, wombatvarptr->evidrowsremoved, errorcount);
+        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 1, "Evidence Removal Completed");
         statuslabel->setText("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
-
-        qDebug() << "removal of files is complete.";
     }
     else
     {
@@ -718,8 +722,10 @@ void WombatForensics::FinishExport()
 {
     if(ProcessingComplete())
     {
-        statuslabel->setText("Exporting completed");
-        qDebug() << "export of files is complete.";
+        EndJob(currentjobid, exportcount, exportcount, errorcount);
+        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Export Completed");
+        statuslabel->setText("Exporting completed with " + QString::number(errorcount) + "error(s)");
+        //qDebug() << "export of files is complete.";
     }
     else
     {
@@ -732,6 +738,9 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     threadvector.clear();
     exportfilelist.clear();
     curlist.clear();
+    errorcount = 0;
+    StartJob(3, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
+    LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Exporting EVidence");
     if(exportdata->filestatus == FileExportData::selected)
     {
         exportdata->exportcount = 1;
@@ -792,6 +801,8 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     curobj.readimginfo = tsk_img_open(curobj.partcount, curobj.imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     if(curobj.readimginfo == NULL)
     {
+        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 0, "Image was not loaded properly");
+        errorcount++;
         //qDebug() << "print image error here";
     }
     free(curobj.imagepartspath);
@@ -803,7 +814,10 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     {
         bool tmpdir = (new QDir())->mkpath(QString::fromStdString(fullpath));
         if(!tmpdir)
-            qDebug() << "creation of export dirtree for file: " << QString::fromStdString(name) << "failed.";
+        {
+            LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 0, "creation of export dirtree for file: " + QString::fromStdString(name) + "failed.");
+            errorcount++;
+        }
     }
     else
     {
