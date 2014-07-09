@@ -32,7 +32,6 @@ void ExportDialog::SelectDirectory()
     {
         ui->exportDirectoryLineEdit->setText(dirname);
         ui->exportButton->setEnabled(true);
-        fprintf(stderr, "Set Directory: %s\n", dirname.toStdString().c_str());
     }
 }
 

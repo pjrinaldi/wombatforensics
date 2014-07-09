@@ -95,9 +95,7 @@ bool HexEditor::openimage()
 {
     //qDebug() << "sector size: " << tskptr->readimginfo->sector_size;
     if(!_reader.openimage(tskptr))
-    {
-        qDebug() << "error with reader openimage";
-    }
+        QMessageBox::critical(this, "HexEdit", "Error opening image\n", QMessageBox::Ok, 0);
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
@@ -322,7 +320,6 @@ QRect HexEditor::abyteBox(off_t byteIdx) const
 
 void HexEditor::setTopLeftToPercent( int percent )
 {
-    qDebug() << "old value: " << _previousstep << "new value: " << percent;
     if(_previousstep < percent)
     {
         int stepdiff = percent - _previousstep;

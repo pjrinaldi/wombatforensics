@@ -189,7 +189,6 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
         }
         catch(bad_alloc)
         {
-            qDebug() << " out of memory.";
             return(_offset/_pageSize - page)*_pageSize;
         }
         int start = _offset%_pageSize;

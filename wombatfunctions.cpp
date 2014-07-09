@@ -147,7 +147,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 {
     if(tmpptr != NULL)
         LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
-        qDebug() << "Not sure how tmpptr got set.";
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     QString tmpstring;

@@ -298,9 +298,9 @@ void WombatForensics::InitializeQueryModel()
         EndJob(currentjobid, filesfound, filesprocessed, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Adding Evidence Finished");
         statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
-        qDebug() << "All threads have finished.";
+        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
         fcasedb.commit();
-        qDebug() << "DB Commit finished.";
+        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "DB Commit finished");
         treemodel->AddEvidence(wombatvarptr->currentevidenceid);
         ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
         ResizeColumns();
@@ -403,11 +403,8 @@ void WombatForensics::AddEvidence()
 
 void WombatForensics::UpdateProperties()
 {
-    // get data here...
-    // wombatvarptr->selectedobject.
     wombatdatabase->ReturnObjectPropertyList();
     propertywindow->UpdateTableView();
-    qDebug() << "window is visible. properties get updated here.";
 }
 
 void WombatForensics::UpdateViewer()
@@ -563,7 +560,7 @@ void WombatForensics::OpenParentImage(int imgid)
     tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     if(tskobjptr->readimginfo == NULL)
     {
-        //qDebug() << "print image error here";
+        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, 0, 0, "Image opening error");
     }
     free(tskobjptr->imagepartspath);
 }
@@ -713,9 +710,7 @@ void WombatForensics::FinishRemoval()
         statuslabel->setText("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
     }
     else
-    {
-        qDebug() << "still removing files.";
-    }
+        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 2, "Still Removing Files");
 }
 
 void WombatForensics::FinishExport()
@@ -725,12 +720,9 @@ void WombatForensics::FinishExport()
         EndJob(currentjobid, exportcount, exportcount, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Export Completed");
         statuslabel->setText("Exporting completed with " + QString::number(errorcount) + "error(s)");
-        //qDebug() << "export of files is complete.";
     }
     else
-    {
-        qDebug() << "still exporting files.";
-    }
+        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 2, "Still Removing Files");
 }
 
 void WombatForensics::ExportFiles(FileExportData* exportdata)
@@ -803,7 +795,6 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     {
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 0, "Image was not loaded properly");
         errorcount++;
-        //qDebug() << "print image error here";
     }
     free(curobj.imagepartspath);
 
@@ -847,7 +838,6 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
 
 void WombatForensics::UpdateProgress(int filecount, int processcount)
 {
-    //qDebug() << "Global Class Called This to AutoUpdate!!!";
     int curprogress = (int)((((float)processcount)/(float)filecount)*100);
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
@@ -940,12 +930,12 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     if(ProcessingComplete())
     {
         event->accept();
-        qDebug() << "All threads are done";
+        LogEntry(0, 0, 0, 1, "All threads are done. Exiting...");
     }
     else
     {
         event->ignore();
-        qDebug() << "All threads aren't done yet.";
+        LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
     }
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();

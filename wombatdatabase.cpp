@@ -25,13 +25,13 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
         }
         else
         {
-            //qDebug() << wombatptr->casedb.lastError().text();
+            LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
         }
         casequery.finish();
     }
     else
     {
-        //qDebug() << wombatptr->casedb.lastError().text();
+        LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
     }
 
     return tmplist;
@@ -56,15 +56,11 @@ void WombatDatabase::InsertSql(QString query, QVariantList invalues)
            }
        }
        else
-       {
-           //qDebug() << wombatptr->casedb.lastError().text();
-       }
+           LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
        casequery.finish();
    }
    else
-   {
-       //qDebug() << wombatptr->casedb.lastError().text();
-   }
+        LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
 }
 
 
@@ -79,15 +75,11 @@ void WombatDatabase::InsertSql(QString query)
            //qDebug() << "successful query";
        }
        else
-       {
-           //qDebug() << wombatptr->casedb.lastError().text();
-       }
+        LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
        casequery.finish();
    }
    else
-   {
-       //qDebug() << wombatptr->casedb.lastError().text();
-   }
+        LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
 }
 
 int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
@@ -104,15 +96,11 @@ int WombatDatabase::InsertSqlGetID(QString query, QVariantList invalues)
        if(casequery.exec())
            tmpid = casequery.lastInsertId().toInt();
        else
-       {
-           //qDebug() << wombatptr->casedb.lastError().text();
-       }
+        LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
        casequery.finish();
    }
    else
-   {
-       //qDebug() << wombatptr->casedb.lastError().text();
-   }
+        LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
 
    return tmpid;
 }
@@ -171,9 +159,7 @@ void WombatDatabase::CreateCaseDB(void)
         casequery.finish();
     }
     else
-    {
-        //qDebug() << wombatptr->casedb.lastError().text();
-    }
+        LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
 
 }
 
@@ -209,9 +195,7 @@ void WombatDatabase::CreateAppDB()
         appquery.finish();
     }
     else
-    {
-        //qDebug() << wombatptr->appdb.lastError().text();
-    }
+        LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
 }
 
 void WombatDatabase::OpenAppDB()
@@ -242,7 +226,6 @@ void WombatDatabase::OpenCaseDB()
 
 void WombatDatabase::CloseAppDB()
 {
-    qDebug() << "AppDB closing";
     if(wombatptr->appdb.isOpen())
     {
         wombatptr->appdb.close();
@@ -253,7 +236,6 @@ void WombatDatabase::CloseAppDB()
 
 void WombatDatabase::CloseLogDB()
 {
-    qDebug() << "LogDB closing";
     if(logdb.isOpen())
     {
         logdb.close();
@@ -264,7 +246,6 @@ void WombatDatabase::CloseLogDB()
 
 void WombatDatabase::CloseCaseDB()
 {
-    qDebug() << "CaseDB Closing";
     if(wombatptr->casedb.isOpen())
         wombatptr->casedb.close();
     if(fcasedb.isOpen())
@@ -447,9 +428,7 @@ int WombatDatabase::ReturnCaseCount() // from appdb
     if(appquery.first())
         retval = appquery.value(0).toInt();
     else
-    {
-        //qDebug() << wombatptr->appdb.lastError().text();
-    }
+        LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
     appquery.finish();
 
     return retval;
@@ -465,9 +444,7 @@ void WombatDatabase::InsertCase()
     if(appquery.exec())
         wombatptr->caseobject.id = appquery.lastInsertId().toInt();
     else
-    {
-        //qDebug() << "insert case failed: " << wombatptr->appdb.lastError().text();
-    }
+        LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
     appquery.finish();
 }
 
@@ -480,9 +457,7 @@ void WombatDatabase::ReturnCaseNameList()
             wombatptr->casenamelist << appquery.value(0).toString();
     }
     else
-    {
-        //qDebug() << wombatptr->appdb.lastError().text();
-    }
+        LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
     appquery.finish();
 }
 
@@ -507,13 +482,9 @@ void WombatDatabase::ReturnCaseID()
         if(appquery.first())
             wombatptr->caseobject.id = appquery.value(0).toInt();
         else
-        {
-            //qDebug() << wombatptr->appdb.lastError().text();
-        }
+            LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
     else
-    {
-        //qDebug() << wombatptr->appdb.lastError().text();
-    }
+        LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
     appquery.finish();
 }
 void WombatDatabase::ReturnFileSystemObjectList(int curevidenceid)
