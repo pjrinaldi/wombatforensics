@@ -230,7 +230,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -276,6 +276,9 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
    <property name="movable">
     <bool>false</bool>
    </property>
@@ -310,6 +313,7 @@
    <addaction name="actionView_Properties"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
+   <addaction name="actionBookmarkManager"/>
    <addaction name="actionExport_Evidence"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
@@ -328,6 +332,9 @@
    <property name="text">
     <string>New Case</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionOpen_Case">
    <property name="icon">
@@ -336,6 +343,9 @@
    </property>
    <property name="text">
     <string>Open Case</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionViewHex">
@@ -352,6 +362,9 @@
    <property name="text">
     <string>View Hex</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
    <property name="autoRepeat">
     <bool>false</bool>
    </property>
@@ -367,6 +380,9 @@
    <property name="text">
     <string>View Text</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
    <property name="autoRepeat">
     <bool>false</bool>
    </property>
@@ -381,6 +397,9 @@
    </property>
    <property name="text">
     <string>View Omni</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
    </property>
    <property name="autoRepeat">
     <bool>false</bool>
@@ -414,6 +433,9 @@
    <property name="text">
     <string>Add Evidence</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
   </action>
   <action name="actionRemove_Evidence">
    <property name="icon">
@@ -423,6 +445,9 @@
    <property name="text">
     <string>Remove Evidence</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
   </action>
   <action name="actionExport_Evidence">
    <property name="icon">
@@ -431,6 +456,9 @@
    </property>
    <property name="text">
     <string>Export Evidence</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="actionManage_OmniViewer">
@@ -451,6 +479,39 @@
    </property>
    <property name="toolTip">
     <string>Properties Window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionBookmarkManager">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/bookmarkmgr</normaloff>:/bar/bookmarkmgr</iconset>
+   </property>
+   <property name="text">
+    <string>Bookmark Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>Bookmark Manager</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionActionAbout">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/about</normaloff>:/bar/about</iconset>
+   </property>
+   <property name="text">
+    <string>actionAbout</string>
+   </property>
+   <property name="toolTip">
+    <string>About</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
  </widget>
