@@ -290,6 +290,10 @@
      <property name="title">
       <string>Add Selected File to...</string>
      </property>
+     <property name="icon">
+      <iconset resource="wombatforensics.qrc">
+       <normaloff>:/bar/addfileto</normaloff>:/bar/addfileto</iconset>
+     </property>
      <addaction name="actionNew_Bookmark"/>
      <addaction name="actionExisting_Bookmarks"/>
      <addaction name="separator"/>

@@ -22,6 +22,7 @@
 	<file alias="export">./Resources/format-indent-more.png</file>
         <file alias="window">./Resources/window-new.png</file>
         <file alias="bookmarkmgr">./Resources/bookmarks-organize.png</file>
+        <file alias="addfileto">./Resources/bookmark-new-4.png</file>
         <file alias="addtobkmrk">./Resources/bookmark.png</file>
         <file alias="addtonewbkmrk">./Resources/bookmark-new.png</file>
         <file alias="about">./Resources/about.png</file>

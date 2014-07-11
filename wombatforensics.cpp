@@ -36,6 +36,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addPermanentWidget(vline2, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
+    ui->analysisToolBar->addAction(ui->menuBookmark_Manager->menuAction());
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     //ui->analysisToolBar->addAction(ui->actionActionAbout);
@@ -138,6 +139,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionView_Progress->setEnabled(false);
     ui->actionView_Properties->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
+    ui->menuBookmark_Manager->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
