@@ -450,6 +450,7 @@ public:
     PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
     TreeModel* treemodel;
+    QMenu* treemenu;
 
 signals:
     //void LogVariable(WombatVariable* wombatVariable);
@@ -497,6 +498,7 @@ private slots:
         statuslabel->setText(tmptext);
     };
     void SetStepValues(int singlestep, int pagestep);
+    void TreeContextMenu(const QPoint &point);
 
 protected:
     void closeEvent(QCloseEvent* event);

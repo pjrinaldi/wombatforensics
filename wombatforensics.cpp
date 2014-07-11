@@ -39,7 +39,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addAction(ui->menuBookmark_Manager->menuAction());
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
-    //ui->analysisToolBar->addAction(ui->actionActionAbout);
     ui->analysisToolBar->addAction(ui->menuAbout->menuAction());
     tskobjptr = &tskobject;
     tskobjptr->readimginfo = NULL;
@@ -61,6 +60,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
 
+    treemenu = new QMenu(ui->dirTreeView);
+    treemenu->addAction(ui->menuBookmark_Manager->menuAction());
     treemodel = new TreeModel(this);
     ui->dirTreeView->setModel(treemodel);
     ui->dirTreeView->hideColumn(4);
@@ -69,9 +70,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->dirTreeView->hideColumn(12);
     ui->dirTreeView->hideColumn(13);
     ui->dirTreeView->hideColumn(14);
+    ui->dirTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+    connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
@@ -332,6 +335,15 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         UpdateViewer();
         if(propertywindow->isVisible())
             UpdateProperties();
+    }
+}
+
+void WombatForensics::TreeContextMenu(const QPoint &pt)
+{
+    QModelIndex index = ui->dirTreeView->indexAt(pt);
+    if(index.isValid())
+    {
+        treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
 }
 
