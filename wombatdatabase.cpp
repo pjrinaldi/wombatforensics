@@ -537,6 +537,7 @@ void WombatDatabase::ReturnObjectPropertyList()
     if(wombatptr->selectedobject.objtype == 1) // image file
     {
         propertylist << QString("File Format") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatptr->selectedobject.type)) << QString("File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
+        propertylist << QString("Sector Size") << QString(
     }
     //wombatptr->bindvalues.clear();
     //wombatptr->sqlrecords.clear();
