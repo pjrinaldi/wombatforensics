@@ -38,7 +38,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
-    ui->analysisToolBar->addAction(ui->actionActionAbout);
+    //ui->analysisToolBar->addAction(ui->actionActionAbout);
+    ui->analysisToolBar->addAction(ui->menuAbout->menuAction());
     tskobjptr = &tskobject;
     tskobjptr->readimginfo = NULL;
     tskobjptr->readfsinfo = NULL;

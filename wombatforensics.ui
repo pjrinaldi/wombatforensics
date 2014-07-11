@@ -230,7 +230,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -267,10 +267,41 @@
     </property>
     <addaction name="actionManage_OmniViewer"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <property name="icon">
+     <iconset resource="wombatforensics.qrc">
+      <normaloff>:/bar/about</normaloff>:/bar/about</iconset>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionHelp"/>
+   </widget>
+   <widget class="QMenu" name="menuBookmark_Manager">
+    <property name="title">
+     <string>Bookmark Manager</string>
+    </property>
+    <property name="icon">
+     <iconset resource="wombatforensics.qrc">
+      <normaloff>:/bar/bookmarkmgr</normaloff>:/bar/bookmarkmgr</iconset>
+    </property>
+    <widget class="QMenu" name="menuAdd_File_to">
+     <property name="title">
+      <string>Add Selected File to...</string>
+     </property>
+     <addaction name="actionNew_Bookmark"/>
+     <addaction name="actionExisting_Bookmarks"/>
+     <addaction name="separator"/>
+    </widget>
+    <addaction name="menuAdd_File_to"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEvidence"/>
    <addaction name="menuAction"/>
    <addaction name="menuSettings"/>
+   <addaction name="menuAbout"/>
+   <addaction name="menuBookmark_Manager"/>
   </widget>
   <widget class="QToolBar" name="analysisToolBar">
    <property name="windowTitle">
@@ -313,7 +344,6 @@
    <addaction name="actionView_Properties"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
-   <addaction name="actionBookmarkManager"/>
    <addaction name="actionExport_Evidence"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
@@ -484,21 +514,6 @@
     <string>Ctrl+P</string>
    </property>
   </action>
-  <action name="actionBookmarkManager">
-   <property name="icon">
-    <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/bookmarkmgr</normaloff>:/bar/bookmarkmgr</iconset>
-   </property>
-   <property name="text">
-    <string>Bookmark Manager</string>
-   </property>
-   <property name="toolTip">
-    <string>Bookmark Manager</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+B</string>
-   </property>
-  </action>
   <action name="actionActionAbout">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
@@ -512,6 +527,38 @@
    </property>
    <property name="shortcut">
     <string>F1</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/about</normaloff>:/bar/about</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="text">
+    <string>Help</string>
+   </property>
+  </action>
+  <action name="actionNew_Bookmark">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/addtonewbkmrk</normaloff>:/bar/addtonewbkmrk</iconset>
+   </property>
+   <property name="text">
+    <string>New Bookmark</string>
+   </property>
+  </action>
+  <action name="actionExisting_Bookmarks">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/addtobkmrk</normaloff>:/bar/addtobkmrk</iconset>
+   </property>
+   <property name="text">
+    <string>Existing Bookmarks</string>
    </property>
   </action>
  </widget>
