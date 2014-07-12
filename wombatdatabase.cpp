@@ -257,6 +257,7 @@ void WombatDatabase::CloseCaseDB()
 
 WombatDatabase::~WombatDatabase()
 {
+    CloseLogDB();
     CloseAppDB();
 }
 
@@ -537,27 +538,29 @@ void WombatDatabase::ReturnObjectPropertyList()
     if(wombatptr->selectedobject.objtype == 1) // image file
     {
         propertylist << QString("File Format") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatptr->selectedobject.type)) << QString("File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
-        propertylist << QString("Sector Size") << QString(
+        propertylist << QString("Sector Size") << QString(QString::number(wombatptr->selectedobject.blocksize) + " bytes") << QString("Sector size of the device. A Sector is a subdivision of a disk where data is stored. It is the smallest value used to divide the disk.");
+        propertylist << QString("Sector Count") << QString(QString::number((int)((float)wombatptr->selectedobject.size/(float)wombatptr->selectedobject.blocksize)) + " sectors") << QString("The number of sectors in the disk.");
     }
-    //wombatptr->bindvalues.clear();
-    //wombatptr->sqlrecords.clear();
-    //wombatptr->sqlrecords = GetSqlResults("SELECT ");
-    /*
-     *        if(wombatvarptr->selectedobject.objtype == 1) // image file
+    else if(wombatptr->selectedobject.objtype == 2) // volume information
+    {
+        if(wombatptr->selectedobject.type == 240) // dummy volume system
         {
-            wombatvarptr->htmlcontent += "<div id='infotitle'>image information</div><br/>";
-            wombatvarptr->htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatvarptr->selectedobject.type)) + "</td></tr>";
-            wombatvarptr->htmlcontent += "<tr><td class='property'>size:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QLocale::system().toString((int)wombatvarptr->selectedobject.size) + " bytes</td></tr>";
-            wombatvarptr->htmlcontent += "<tr><td class='property'>sector size:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QLocale::system().toString(wombatvarptr->selectedobject.sectlength) + " bytes</td></tr>";
-            wombatvarptr->htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
-            wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->selectedobject.size/(float)wombatvarptr->selectedobject.sectlength));
-            wombatvarptr->htmlcontent += " sectors</td></tr>";
-
-     *
-     */ 
+            // there is no relevant information for a dummy volume.
+        }
+        else // actual volume system
+        {
+            // get the partition table information, offset, block size, endian ordering, volume system type.
+        }
+    }
+    else if(wombatptr->selectedobject.objtype == 3) // partition information (shouldn't exist) its combined with fs
+    {
+    }
+    else if(wombatptr->selectedobject.objtype == 4) // file system information
+    {
+    }
+    else if(wombatptr->selectedobject.objtype == 5) // dir/file information
+    {
+    }
 }
 
 void WombatDatabase::RemoveEvidence()

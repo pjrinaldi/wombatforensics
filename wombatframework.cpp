@@ -124,7 +124,7 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
 
 void WombatFramework::GetBootCode(int idx) // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
-    qDebug() << "Might not need " << idx;
+    //qDebug() << "Might not need " << idx;
     /*
     int volidx = -1;
     for(int i=0; i < wombatptr->volumeobjectvector.count(); i++)

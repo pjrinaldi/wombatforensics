@@ -521,6 +521,7 @@ void WombatForensics::LoadComplete(bool isok)
     {
         if(wombatvarptr->selectedobject.objtype == 1) // image file
         {
+            /*
             wombatvarptr->htmlcontent += "<div id='infotitle'>image information</div><br/>";
             wombatvarptr->htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
             wombatvarptr->htmlcontent += QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatvarptr->selectedobject.type)) + "</td></tr>";
@@ -531,10 +532,11 @@ void WombatForensics::LoadComplete(bool isok)
             wombatvarptr->htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
             wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->selectedobject.size/(float)wombatvarptr->selectedobject.sectlength));
             wombatvarptr->htmlcontent += " sectors</td></tr>";
+            */
             // might not want to do the volume type one if there's no volume. have to think on it.
             //wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
             //wombatvarptr->htmlcontent += wombatvarptr->volumeobject.name + "</td></tr>";
-            wombatframework->GetBootCode(curidx); // determine boot type in this function and populate html string information into wombatvarptr value
+            //wombatframework->GetBootCode(curidx); // determine boot type in this function and populate html string information into wombatvarptr value
             QWebElement tmpelement = ui->webView->page()->currentFrame()->documentElement().lastChild();
             tmpelement.appendInside(wombatvarptr->htmlcontent);
 
@@ -956,6 +958,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         event->ignore();
         LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
     }
+    wombatdatabase->CloseLogDB();
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();
 }
