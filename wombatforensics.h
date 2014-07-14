@@ -305,7 +305,7 @@ public:
                         parentnode->children.append(currentnode); 
                     }
                 }
-                // THERE SHOULDN'T BE ANY PARTITION OBJECTS, OBJECTTYPE == 3, SINCE I INTEGRATED THEM INTO THE FILESYSTEM....
+                // THERE SHOULD ONLY BE PARTITION OBJECTS, OBJECTTYPE == 3, FOR UNALLOCATED SPACES....
                 else if(currentnode->nodevalues.at(4).toInt() == 4)
                 {
                     currentnode->parent = parentnode;

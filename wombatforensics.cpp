@@ -369,7 +369,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertVolumeObject(); // add volume to data
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
-    wombatdatabase->InsertFileSystemObjects();
+    //wombatdatabase->InsertFileSystemObjects(); // should be integrated into the partition set...
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
 }
@@ -464,9 +464,16 @@ void WombatForensics::LoadHexContents()
     else if(wombatvarptr->selectedobject.objtype == 2) // volume object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        tskobjptr->objecttype = 3;
+        tskobjptr->objecttype = 2;
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.blocksize;
         tskobjptr->length = wombatvarptr->selectedobject.size;
+    }
+    else if(wombatvarptr->selectedobject.objtype == 3) // unallocated partition
+    {
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.blocksize;
+        tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.blocksize;
+        tskobjptr->objecttype = 3;
     }
     else if(wombatvarptr->selectedobject.objtype == 4) // fs object
     {
@@ -485,7 +492,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = wombatvarptr->selectedobject.size;
         OpenFileSystemFile();
     }
-    if(wombatvarptr->selectedobject.objtype != 3)
+    if(wombatvarptr->selectedobject.objtype <= 5)
     {
         hexwidget->openimage();
         hexwidget->set2BPC();

@@ -55,8 +55,13 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
         {
             for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
             {
+                if(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->flags == 0x02) // if its an unallocated partition
+                {
+                    filesfound++;
+                }
                 wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
-                if(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->flags == 1) // contains an allocated file system.
+                /*
+                if(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->flags == 0x01) // contains an allocated file system.
                 {
                     TSK_FS_INFO* tmpfsinfo = tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT);
                     if(tmpfsinfo != NULL)
@@ -69,7 +74,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
                         LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Failed to Open Partition/FileSystem");
                         errorcount++;
                     }
-                }
+                }*/
             }
         }
     }

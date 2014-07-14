@@ -90,6 +90,7 @@ struct SelectedObject
     int byteoffset;
     int address;
     int type;
+    int flags;
 };
 
 struct WombatVariable

@@ -144,7 +144,7 @@ void WombatDatabase::CreateCaseDB(void)
     wombattableschema << "CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INTEGER);";
     wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
     wombattableschema << "CREATE TABLE artifacts(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
-    wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, flags INTEGER, childcount INTEGER, endian INTEGER, address INTEGER, size INTEGER, sectsize INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, inodenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);";
+    wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, flags INTEGER, childcount INTEGER, endian INTEGER, address INTEGER, size INTEGER, sectsize INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, inodenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blocksize INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);";
     if(wombatptr->casedb.open())
     {
         QSqlQuery casequery(wombatptr->casedb);
@@ -293,22 +293,62 @@ void WombatDatabase::InsertPartitionObjects()
 {
     if(wombatptr->evidenceobject.volinfo != NULL)
     {
-        for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
+        for(uint32_t i=0; i < wombatptr->evidenceobject.partinfovector.size(); i++)
         {
-            wombatptr->currentpartitionid = 0;
-            wombatptr->bindvalues.clear();
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->flags);
-            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->start);
-            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->len);
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
-            wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->block_size);
-            wombatptr->bindvalues.append(wombatptr->currentvolumeid);
-            wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-            wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, sectsize, parentid, parimgid) VALUES(3, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+            if(wombatptr->evidenceobject.partinfovector[i]->flags == 0x02) // unallocated partition
+            {
+                wombatptr->currentpartitionid = 0;
+                wombatptr->bindvalues.clear();
+                wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->flags);
+                wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->start);
+                wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->len);
+                wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
+                wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->block_size);
+                wombatptr->bindvalues.append(wombatptr->currentvolumeid);
+                wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+                wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, sectsize, parentid, parimgid) VALUES(3, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+                filesprocessed++;
+            }
+            else if(wombatptr->evidenceobject.partinfovector[i]->flags == 0x01) // allocated partition
+            {
+                TSK_FS_INFO* tmpfsinfo = tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT);
+                if(tmpfsinfo != NULL)
+                {
+                    wombatptr->evidenceobject.fsinfovector.push_back(tmpfsinfo);
+                    filesfound++;
+                }
+                else
+                {
+                    LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Failed to Open Partition/FileSystem");
+                    errorcount++;
+                }
+                wombatptr->currentfilesystemid = 0;
+                wombatptr->bindvalues.clear();
+                wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(tmpfsinfo->ftype)).toUpper());
+                wombatptr->bindvalues.append(QString("/"));
+                wombatptr->bindvalues.append(tmpfsinfo->ftype);
+                wombatptr->bindvalues.append(tmpfsinfo->flags);
+                wombatptr->bindvalues.append((int)tmpfsinfo->offset);
+                wombatptr->bindvalues.append(wombatptr->currentvolumeid);
+                wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+                wombatptr->bindvalues.append((int)tmpfsinfo->block_size * (int)tmpfsinfo->block_count);
+                wombatptr->bindvalues.append(tmpfsinfo->block_size);
+                wombatptr->bindvalues.append((int)tmpfsinfo->block_count);
+                wombatptr->bindvalues.append((int)tmpfsinfo->first_inum);
+                wombatptr->bindvalues.append((int)tmpfsinfo->last_inum);
+                wombatptr->bindvalues.append((int)tmpfsinfo->root_inum);
+                wombatptr->bindvalues.append((int)tmpfsinfo->root_inum);
+                wombatptr->bindvalues.append((int)wombatptr->evidenceobject.volinfo->block_size);
+                wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->start);
+                wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->len);
+                wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+                wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
+                filesprocessed++;
+            }
         }
     }
 }
-
+/*
 void WombatDatabase::InsertFileSystemObjects()
 {
     wombatptr->evidenceobject.fsidvector.clear();
@@ -332,13 +372,14 @@ void WombatDatabase::InsertFileSystemObjects()
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->last_inum);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
             wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
-            wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, sectsize, blockcount, firstinum, lastinum, rootinum, address) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+            wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->
+            wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
             wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
             filesprocessed++;
         }
     }
 }
-
+*/
 void WombatDatabase::InsertEvidenceObject()
 {
     wombatptr->currentevidenceid = 0;
@@ -507,7 +548,7 @@ void WombatDatabase::GetObjectValues()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type, flags FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->selectedobject.objtype = wombatptr->sqlrecords[0].value(0).toInt();
     wombatptr->selectedobject.size = wombatptr->sqlrecords[0].value(1).toInt();
     wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(2).toInt();
@@ -518,6 +559,7 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.byteoffset = wombatptr->sqlrecords[0].value(7).toInt();
     wombatptr->selectedobject.address = wombatptr->sqlrecords[0].value(8).toInt();
     wombatptr->selectedobject.type = wombatptr->sqlrecords[0].value(9).toInt();
+    wombatptr->selectedobject.flags = wombatptr->sqlrecords[0].value(10).toInt();
 }
 
 int WombatDatabase::GetEvidenceFileCount()
