@@ -19,10 +19,10 @@ class TreeModel : public QAbstractItemModel
 public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
-        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID";
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags";
         rootnode = 0;
         QList<QVariant> emptyset;
-        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
         rootnode = new Node(emptyset);
         rootnode->parent = 0;
         rootnode->childcount = 0;
@@ -265,7 +265,7 @@ public:
     {
         int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
-        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
+        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
         addevidquery.addBindValue(curid);
         addevidquery.addBindValue(curid);
         if(addevidquery.exec())
@@ -296,6 +296,14 @@ public:
                     currentnode->childcount = GetChildCount(2, currentnode->nodevalues.at(0).toInt(), curid);
                     currentnode->haschildren = currentnode->HasChildren();
                     parentnode = currentnode;
+                }
+                else if(currentnode->nodevalues.at(4).toInt() == 3) // determine if its an unallocated partition space
+                {
+                    if(currentnode->nodevalues.at(15).toInt() == 2) // unallocated partition, add to parent as a child.
+                    {
+                        currentnode->parent = parentnode;
+                        parentnode->children.append(currentnode); 
+                    }
                 }
                 // THERE SHOULDN'T BE ANY PARTITION OBJECTS, OBJECTTYPE == 3, SINCE I INTEGRATED THEM INTO THE FILESYSTEM....
                 else if(currentnode->nodevalues.at(4).toInt() == 4)

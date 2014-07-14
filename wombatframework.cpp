@@ -56,16 +56,19 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
             for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
             {
                 wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
-                TSK_FS_INFO* tmpfsinfo = tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT);
-                if(tmpfsinfo != NULL)
+                if(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->flags == 1) // contains an allocated file system.
                 {
-                    wombatptr->evidenceobject.fsinfovector.push_back(tmpfsinfo);
-                    filesfound++;
-                }
-                else
-                {
-                    LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Failed to Open Partition/FileSystem");
-                    errorcount++;
+                    TSK_FS_INFO* tmpfsinfo = tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT);
+                    if(tmpfsinfo != NULL)
+                    {
+                        wombatptr->evidenceobject.fsinfovector.push_back(tmpfsinfo);
+                        filesfound++;
+                    }
+                    else
+                    {
+                        LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Failed to Open Partition/FileSystem");
+                        errorcount++;
+                    }
                 }
             }
         }
@@ -121,11 +124,10 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
         }
     }
 }
-
+/*
 void WombatFramework::GetBootCode(int idx) // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
     //qDebug() << "Might not need " << idx;
-    /*
     int volidx = -1;
     for(int i=0; i < wombatptr->volumeobjectvector.count(); i++)
     {
@@ -161,7 +163,7 @@ void WombatFramework::GetBootCode(int idx) // deermine boot type and populate va
         // not sure if i want to include the minimal amount of sector info since there are so few and it'll be repetative with the possible partition
         // layout in the tree view
     }*/
-}
+//}
 /*
 int WombatFramework::DetermineVectorIndex()
 {*/

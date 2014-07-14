@@ -52,6 +52,7 @@ public:
         }
         parent = 0;
         haschildren = false;
+        childcount = 0;
         checkstate = 0;
         parentid = 0;
     };
