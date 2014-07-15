@@ -110,10 +110,9 @@ bool Reader::openimage(TskObject* tskpointer)
     if(is_open())
         close();
     _filename = "test.txt";
-    // NEED TO SET THE SIZE FROM _SIZE = TSKPTR->LENGTH;
-    //_size = tskptr->readimginfo->size;
     _size = tskptr->length;
     off_t npages = _size/_pageSize +1;
+    _numpages = npages;
     _data.resize(npages);
     fill(_data.begin(), _data.begin()+npages, (uchar*)0);
     _is_open = true;
@@ -306,7 +305,8 @@ off_t Reader::size() const
 
 off_t Reader::NumberPages() const
 {
-    return _maxPages;
+    return _numpages;
+    //return _maxPages;
 }
 
 const char* Reader::lastError() const
@@ -358,7 +358,7 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     else
     {
-        fill( _data.begin(), _data.begin()+1, (uchar*)0 );
+        //fill( _data.begin(), _data.begin()+1, (uchar*)0 );
         // try to set the page data to zero's here...
     }
 

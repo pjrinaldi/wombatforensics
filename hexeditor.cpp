@@ -52,7 +52,7 @@ HexEditor::HexEditor( QWidget * parent, TskObject* tskobjptr )
     : QWidget(parent)
 {
     tskptr = tskobjptr;
-  _cols   = 6;
+  _cols   = 8;
   _rows   = 10;
   _charsPerByte   = 2;
   _base           = 16;
@@ -100,8 +100,10 @@ bool HexEditor::openimage()
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
+    //qDebug() << "bytes per line: " << _reader.size()/bytesPerLine();
     emit rangeChanged(0, _reader.size()/bytesPerLine());
-    emit StepValues(bytesPerLine(), bytesPerPage());
+    //emit StepValues(bytesPerLine(), bytesPerPage());
+    emit StepValues(1, bytesPerPage()/bytesPerLine());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -124,7 +126,8 @@ bool HexEditor::open( const QString & filename )
   setSelection(SelectionStart,-1);
   setSelection(SelectionEnd,-1);
   emit rangeChanged(0,_reader.size()/bytesPerLine());
-  emit StepValues(bytesPerLine(), bytesPerPage());
+  emit StepValues(1, bytesPerPage()/bytesPerLine());
+  //emit StepValues(bytesPerLine(), bytesPerPage());
   calculateFontMetrics();     // update labels
   setTopLeft(0);              // reset the GUI
   return true;
@@ -197,8 +200,9 @@ void HexEditor::setTopLeft( off_t offset )
 	_topLeft = offset;
      }
      // only let _topLeft be an integer multiple of the line length (round down)
+     off_t linenum = _topLeft/bytesPerLine();
      //_topLeft = _topLeft*bytesPerLine();
-     _topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
+     //_topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
@@ -207,7 +211,8 @@ void HexEditor::setTopLeft( off_t offset )
      //_reader.read(_data,bytesPerPage());
      
      repaint();
-     emit topLeftChanged(_topLeft);
+     emit topLeftChanged(linenum);
+     //emit topLeftChanged(_topLeft);
   } catch( const exception &e ) {
      inTopLeft = false;
      throw e;
@@ -320,6 +325,7 @@ QRect HexEditor::abyteBox(off_t byteIdx) const
 
 void HexEditor::setTopLeftToPercent( int percent )
 {
+    percent = percent*bytesPerLine();
     if(_previousstep < percent)
     {
         int stepdiff = percent - _previousstep;
@@ -568,7 +574,8 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
   emit rangeChanged(0,_reader.size()/bytesPerLine());
-  emit StepValues(bytesPerLine(), bytesPerPage());
+  //emit StepValues(bytesPerLine(), bytesPerPage());
+  emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on
@@ -601,7 +608,7 @@ void HexEditor::paintLabels( QPainter* paintPtr)
   QString label;
 
   // offset correction so the offset is showing the valid hex for the object loaded.
-  offset = offset + tskptr->offset;
+  //offset = offset + tskptr->offset;
 
   for(int row = 0; row < _rows;++row) {
     label = "";

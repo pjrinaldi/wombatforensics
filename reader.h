@@ -94,6 +94,7 @@ class Reader {
   off_t         _firstPage;      // first currently loaded page
   off_t         _lastPage;       // last currently loaded page
   off_t         _maxPages;       // maximum number of pages which could be currently loaded
+  off_t         _numpages;      // total number of pages for a file size.
   off_t         _freePages;     // number of free pages
   vector< uchar *> _data;
   TskObject* tskptr;
