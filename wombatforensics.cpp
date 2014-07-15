@@ -494,7 +494,6 @@ void WombatForensics::LoadHexContents()
     }
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
-        qDebug() << "objtype:" << tskobjptr->objecttype << "address:" << tskobjptr->address << "(bytes) offset:" << tskobjptr->offset << "size:" << tskobjptr->length << "(bytes)";
         hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();

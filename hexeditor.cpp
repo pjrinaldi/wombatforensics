@@ -93,14 +93,12 @@ QString HexEditor::filename() const
 
 bool HexEditor::openimage()
 {
-    //qDebug() << "sector size: " << tskptr->readimginfo->sector_size;
     if(!_reader.openimage(tskptr))
         QMessageBox::critical(this, "HexEdit", "Error opening image\n", QMessageBox::Ok, 0);
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
-    //qDebug() << "bytes per line: " << _reader.size()/bytesPerLine();
     emit rangeChanged(0, _reader.size()/bytesPerLine());
     //emit StepValues(bytesPerLine(), bytesPerPage());
     emit StepValues(1, bytesPerPage()/bytesPerLine());
@@ -607,6 +605,7 @@ void HexEditor::paintLabels( QPainter* paintPtr)
   //uchar* offsetptr;
   QString label;
 
+  //qDebug() << "original offset:" << offset << "adjusted offset: " << offset + tskptr->offset;
   // offset correction so the offset is showing the valid hex for the object loaded.
   //offset = offset + tskptr->offset;
 
