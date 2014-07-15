@@ -83,6 +83,8 @@ struct SelectedObject
     QString name;
     int size;
     int parimgid;
+    int parfsid;
+    int sectsize;
     int sectstart;
     int sectlength;
     int blocksize;

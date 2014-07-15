@@ -465,14 +465,14 @@ void WombatForensics::LoadHexContents()
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         tskobjptr->objecttype = 2;
-        tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.blocksize;
+        tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
         tskobjptr->length = wombatvarptr->selectedobject.size;
     }
     else if(wombatvarptr->selectedobject.objtype == 3) // unallocated partition
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.blocksize;
-        tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.blocksize;
+        tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
+        tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.sectsize;
         tskobjptr->objecttype = 3;
     }
     else if(wombatvarptr->selectedobject.objtype == 4) // fs object
@@ -485,7 +485,7 @@ void WombatForensics::LoadHexContents()
     else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        OpenParentFileSystem();
+        OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
         tskobjptr->offset = 0; 
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;
@@ -594,9 +594,10 @@ void WombatForensics::OpenParentImage(int imgid)
     free(tskobjptr->imagepartspath);
 }
 
-void WombatForensics::OpenParentFileSystem()
+void WombatForensics::OpenParentFileSystem(int fsid)
 {
-    tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, 0, TSK_FS_TYPE_DETECT);
+    int fsoffset = wombatdatabase->ReturnFileSystemOffset(fsid);
+    tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
 }
 
 void WombatForensics::OpenFileSystemFile()

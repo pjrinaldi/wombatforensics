@@ -44,6 +44,7 @@ public:
     void InsertSql(QString query);
     int ReturnSqlRowsAffected(QString query, QVariantList invalues);
     int GetEvidenceFileCount(void);
+    int ReturnFileSystemOffset(int fsid);
 
 
 signals:

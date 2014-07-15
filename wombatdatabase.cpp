@@ -548,18 +548,20 @@ void WombatDatabase::GetObjectValues()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type, flags FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type, flags, blocksize, parfsid FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->selectedobject.objtype = wombatptr->sqlrecords[0].value(0).toInt();
     wombatptr->selectedobject.size = wombatptr->sqlrecords[0].value(1).toInt();
     wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(2).toInt();
     wombatptr->selectedobject.sectstart = wombatptr->sqlrecords[0].value(3).toInt();
     wombatptr->selectedobject.sectlength = wombatptr->sqlrecords[0].value(4).toInt();
-    wombatptr->selectedobject.blocksize = wombatptr->sqlrecords[0].value(5).toInt();
+    wombatptr->selectedobject.sectsize = wombatptr->sqlrecords[0].value(5).toInt();
     wombatptr->selectedobject.blockcount = wombatptr->sqlrecords[0].value(6).toInt();
     wombatptr->selectedobject.byteoffset = wombatptr->sqlrecords[0].value(7).toInt();
     wombatptr->selectedobject.address = wombatptr->sqlrecords[0].value(8).toInt();
     wombatptr->selectedobject.type = wombatptr->sqlrecords[0].value(9).toInt();
     wombatptr->selectedobject.flags = wombatptr->sqlrecords[0].value(10).toInt();
+    wombatptr->selectedobject.blocksize = wombatptr->sqlrecords[0].value(11).toInt();
+    wombatptr->selectedobject.parfsid = wombatptr->sqlrecords[0].value(12).toInt();
 }
 
 int WombatDatabase::GetEvidenceFileCount()
@@ -612,4 +614,12 @@ void WombatDatabase::RemoveEvidence()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidremoveid);
     InsertSql("DELETE FROM dataruns WHERE objectid = ?", wombatptr->bindvalues);
+}
+int WombatDatabase::ReturnFileSystemOffset(int fsid)
+{
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(fsid);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT byteoffset FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    return wombatptr->sqlrecords.at(0).value(0).toInt();
 }

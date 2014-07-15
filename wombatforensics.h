@@ -205,7 +205,7 @@ public:
         if(parentnode->haschildren == true)
         {
             QSqlQuery morequery(fcasedb);
-            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid FROM data WHERE objecttype == 5 AND parentid = ? AND parimgid = ?");
+            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags FROM data WHERE objecttype == 5 AND parentid = ? AND parimgid = ?");
             morequery.addBindValue(parentnode->nodevalues.at(5).toInt());
             morequery.addBindValue(parentnode->nodevalues.at(13).toInt());
             if(morequery.exec())
@@ -322,7 +322,7 @@ public:
             Node* rootdirectory = 0;
             for(int j=0; j < fsobjectlist.count(); j++)
             {
-                filequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid FROM data WHERE objecttype = 5 AND parimgid = ? AND parentid = ?)");
+                filequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags FROM data WHERE objecttype = 5 AND parimgid = ? AND parentid = ?)");
                 filequery.addBindValue(curid);
                 filequery.addBindValue(fsobjectlist.at(j).rootinum);
                 if(filequery.exec())
@@ -478,7 +478,7 @@ private slots:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
     void OpenParentImage(int imgid);
-    void OpenParentFileSystem(void);
+    void OpenParentFileSystem(int fsid);
     void OpenFileSystemFile(void);
     void ResizeViewColumns(const QModelIndex &index)
     {
