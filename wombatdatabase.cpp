@@ -306,7 +306,8 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->block_size);
                 wombatptr->bindvalues.append(wombatptr->currentvolumeid);
                 wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-                wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, sectsize, parentid, parimgid) VALUES(3, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+                wombatptr->bindvalues.append((int)(wombatptr->evidenceobject.partinfovector[i]->len * wombatptr->evidenceobject.volinfo->block_size));
+                wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, sectsize, parentid, parimgid, size) VALUES(3, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 filesprocessed++;
             }
             else if(wombatptr->evidenceobject.partinfovector[i]->flags == 0x01) // allocated partition
