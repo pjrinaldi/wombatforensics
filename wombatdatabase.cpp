@@ -323,6 +323,9 @@ void WombatDatabase::InsertPartitionObjects()
                     LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Failed to Open Partition/FileSystem");
                     errorcount++;
                 }
+                // BEGIN VOLUME NAME TEST
+
+                // END VOLUME NAME TEST
                 wombatptr->currentfilesystemid = 0;
                 wombatptr->bindvalues.clear();
                 wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(tmpfsinfo->ftype)).toUpper());
