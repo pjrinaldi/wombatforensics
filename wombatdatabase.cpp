@@ -324,7 +324,33 @@ void WombatDatabase::InsertPartitionObjects()
                     errorcount++;
                 }
                 // BEGIN VOLUME NAME TEST
-
+                TSK_FS_FILE* rootfileinfo = tsk_fs_file_open_meta(tmpfsinfo, NULL, tmpfsinfo->root_inum);
+                if(tsk_fs_file_attr_getsize(rootfileinfo) > 0)
+                {
+                    for(int i=0; i < tsk_fs_file_attr_getsize(rootfileinfo); i++)
+                    {
+                        TSK_FS_ATTR* tmpattr;
+                        if(i == 0)
+                            tmpattr = rootfileinfo->meta->attr->head;
+                        else
+                            tmpattr = rootfileinfo->meta->attr->head->next;
+                        if(tmpattr != NULL)
+                        {
+                            if(tmpattr->name != NULL)
+                                qDebug() << QString("Attribute ID|Name is: ") << QString::number(tmpattr->id) << "|" << QString(tmpattr->name);
+                            else
+                                qDebug() << "Attribute Name is null ID is: " << QString::number(tmpattr->id);
+                        }
+                        else
+                        {
+                            qDebug() << "attribute is null";
+                        }
+                    }
+                }
+                else
+                {
+                    qDebug() << "root inum has no attributes.";
+                }
                 // END VOLUME NAME TEST
                 wombatptr->currentfilesystemid = 0;
                 wombatptr->bindvalues.clear();
