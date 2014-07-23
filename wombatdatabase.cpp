@@ -324,6 +324,53 @@ void WombatDatabase::InsertPartitionObjects()
                     errorcount++;
                 }
                 // BEGIN VOLUME NAME TEST
+                TSK_FS_FILE* tmpfile;
+                const TSK_FS_ATTR* tmpattr;
+                char asc[512];
+                switch(tmpfsinfo->ftype)
+                {
+                    case TSK_FS_TYPE_NTFS:
+                        qDebug() << "NTFS";
+                        //NTFS_INFO* tmpinfo = (NTFS_INFO*)tmpfsinfo;
+                        if((tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, NTFS_MFT_VOL)) == NULL)
+                        {
+                            // log error here...
+                        }
+                        tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, TSK_FS_ATTR_TYPE_NTFS_VNAME);
+                        //tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, NTFS_ATYPE_VNAME);
+                        if(!tmpattr)
+                        {
+                            // log error here...
+                        }
+                        if((tmpattr->flags & TSK_FS_ATTR_RES) && (tmpattr->size))
+                        {
+                            UTF16* name16 = (UTF16*) tmpattr->rd.buf;
+                            UTF8* name8 = (UTF8*) asc;
+                            int retval;
+                            retval = tsk_UTF16toUTF8(tmpfsinfo->endian, (const UTF16**)&name16, (UTF16*) ((uintptr_t) name16 + (int) tmpattr->size), &name8, (UTF8*) ((uintptr_t)name8 + sizeof(asc)), TSKlenientConversion);
+                            if(retval != TSKconversionOK)
+                            {
+                                // log error here
+                                *name8 = '\0';
+                            }
+                            else if((uintptr_t) name8 >= (uintptr_t) asc + sizeof(asc))
+                                asc[sizeof(asc) - 1] = '\0';
+                            else
+                                *name8 = '\0';
+
+                        }
+                        qDebug() << "Volume Name:" << asc;
+                        break;
+                    case TSK_FS_TYPE_FAT12:
+                        qDebug() << "FAT12";
+                        break;
+                    default:
+                        qDebug() << "what to do for default???";
+                        break;
+                }
+                // END VOLUME NAME TEST
+                // BEGIN ATTRIBUTE LOOP TEST
+                /*
                 TSK_FS_FILE* rootfileinfo = tsk_fs_file_open_meta(tmpfsinfo, NULL, tmpfsinfo->root_inum);
                 if(tsk_fs_file_attr_getsize(rootfileinfo) > 0)
                 {
@@ -350,8 +397,8 @@ void WombatDatabase::InsertPartitionObjects()
                 else
                 {
                     qDebug() << "root inum has no attributes.";
-                }
-                // END VOLUME NAME TEST
+                }*/
+                // END ATTRIBUTE LOOP TEST
                 wombatptr->currentfilesystemid = 0;
                 wombatptr->bindvalues.clear();
                 wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(tmpfsinfo->ftype)).toUpper());
