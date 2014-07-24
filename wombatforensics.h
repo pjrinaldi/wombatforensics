@@ -92,7 +92,14 @@ public:
         }
         if(role == Qt::DisplayRole)
         {
-            if(index.column() >= 6 && index.column() <= 9)
+            if(index.column() == 2)
+            {
+                if(node->nodevalues.at(4).toInt() == 1)
+                    return QString("");
+                else
+                    return node->nodevalues.at(index.column());
+            }
+            else if(index.column() >= 6 && index.column() <= 9)
             {
                 char buf[128];
                 QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
