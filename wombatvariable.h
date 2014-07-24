@@ -81,6 +81,7 @@ struct SelectedObject
     int id;
     int objtype;
     QString name;
+    QString fullpath;
     int size;
     int parimgid;
     int parfsid;

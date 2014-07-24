@@ -549,7 +549,7 @@ void WombatDatabase::GetObjectValues()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type, flags, blocksize, parfsid FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type, flags, blocksize, parfsid, fullpath FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->selectedobject.objtype = wombatptr->sqlrecords[0].value(0).toInt();
     wombatptr->selectedobject.size = wombatptr->sqlrecords[0].value(1).toInt();
     wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(2).toInt();
@@ -563,6 +563,7 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.flags = wombatptr->sqlrecords[0].value(10).toInt();
     wombatptr->selectedobject.blocksize = wombatptr->sqlrecords[0].value(11).toInt();
     wombatptr->selectedobject.parfsid = wombatptr->sqlrecords[0].value(12).toInt();
+    wombatptr->selectedobject.fullpath = wombatptr->sqlrecords[0].value(13).toString();
 }
 
 int WombatDatabase::GetEvidenceFileCount()
@@ -583,6 +584,7 @@ void WombatDatabase::ReturnObjectPropertyList()
         propertylist << QString("File Format") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatptr->selectedobject.type)) << QString("File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
         propertylist << QString("Sector Size") << QString(QString::number(wombatptr->selectedobject.sectsize) + " bytes") << QString("Sector size of the device. A Sector is a subdivision of a disk where data is stored. It is the smallest value used to divide the disk.");
         propertylist << QString("Sector Count") << QString(QString::number((int)((float)wombatptr->selectedobject.size/(float)wombatptr->selectedobject.sectsize)) + " sectors") << QString("The number of sectors in the disk.");
+        propertylist << QString("Image Path") << QString(wombatptr->selectedobject.fullpath) << QString("Location where the evidence image is stored and read from.");
     }
     else if(wombatptr->selectedobject.objtype == 2) // volume information
     {
