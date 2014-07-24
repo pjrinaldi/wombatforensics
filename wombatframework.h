@@ -16,10 +16,11 @@ public:
     void OpenEvidenceImage(void);
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);
+    void GetFileSystemProperties(void);
     void OpenPartitions(void);
     void OpenFiles(void);
     void CloseInfoStructures(void);
-    void GetBootCode(int idx);
+    //void GetBootCode(int idx);
 
 private:
     WombatVariable* wombatptr;

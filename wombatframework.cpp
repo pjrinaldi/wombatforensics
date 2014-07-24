@@ -40,6 +40,109 @@ void WombatFramework::GetVolumeSystemName() // get the volume system name
         wombatptr->currentvolumename = QString::fromUtf8(tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype));
 }
 
+void WombatFramework::GetFileSystemProperties() // get the file system label, boot sector, etc...
+{
+    for(uint i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
+    {
+        TSK_FS_INFO* tmpfsinfo = wombatptr->evidenceobject.fsinfovector[i];
+        if(tmpfsinfo == NULL)
+        {
+            // log error here.
+        }
+        TSK_FS_FILE* tmpfile = NULL;
+        //TSK_FS_DIR* tmpdir = NULL;
+        FATFS_DENTRY* tmpfatdentry = NULL;
+        const TSK_FS_ATTR* tmpattr;
+        uint8_t rval;
+        char asc[512];
+        switch(tmpfsinfo->ftype)
+        {
+            case TSK_FS_TYPE_NTFS:
+                //NTFS_INFO* tmpinfo = (NTFS_INFO*)tmpfsinfo;
+                if((tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, NTFS_MFT_VOL)) == NULL)
+                {
+                    // log error here...
+                }
+                tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, TSK_FS_ATTR_TYPE_NTFS_VNAME);
+                //tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, NTFS_ATYPE_VNAME);
+                if(!tmpattr)
+                {
+                    // log error here...
+                }
+                if((tmpattr->flags & TSK_FS_ATTR_RES) && (tmpattr->size))
+                {
+                    UTF16* name16 = (UTF16*) tmpattr->rd.buf;
+                    UTF8* name8 = (UTF8*) asc;
+                    int retval;
+                    retval = tsk_UTF16toUTF8(tmpfsinfo->endian, (const UTF16**)&name16, (UTF16*) ((uintptr_t) name16 + (int) tmpattr->size), &name8, (UTF8*) ((uintptr_t)name8 + sizeof(asc)), TSKlenientConversion);
+                    if(retval != TSKconversionOK)
+                    {
+                        // log error here                                
+                        *name8 = '\0';
+                    }
+                    else if((uintptr_t) name8 >= (uintptr_t) asc + sizeof(asc))
+                        asc[sizeof(asc) - 1] = '\0';
+                    else
+                        *name8 = '\0';
+                }
+                qDebug() << "Volume Name:" << asc;
+                break;
+            case TSK_FS_TYPE_EXFAT:
+                //exfatfs_find_volume_label_dentry((FATFS_INFO*)tmpfsinfo, tmpfile);
+                //tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, 
+                rval = fatfs_dentry_load((FATFS_INFO*)tmpfsinfo, tmpfatdentry, 2);
+                tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, 2);
+                qDebug() << "Volume Name: " << tmpfile->meta->name2->name;
+                break;
+            case TSK_FS_TYPE_FAT12:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_FAT16:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_FAT32:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_FFS1:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_FFS1B:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_FFS2:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_EXT2:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_EXT3:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_EXT4:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_RAW:
+                qDebug() << "no file system. store 0, \"\", or message for respective variables";
+                break;
+            case TSK_FS_TYPE_ISO9660:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_HFS:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_YAFFS2:
+                qDebug() << "FAT12";
+                break;
+            case TSK_FS_TYPE_SWAP:
+                qDebug() << "no file system. store 0, \"\", or message for respective variables";
+                break;
+           default:
+                qDebug() << "what to do for default???";
+                break;
+        }
+    }
+}
+
 void WombatFramework::OpenPartitions() // open the partitions in the volume
 {
     wombatptr->evidenceobject.fsinfovector.clear();
@@ -129,6 +232,37 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
         }
     }
 }
+                // BEGIN ATTRIBUTE LOOP TEST
+                /*
+                TSK_FS_FILE* rootfileinfo = tsk_fs_file_open_meta(tmpfsinfo, NULL, tmpfsinfo->root_inum);
+                if(tsk_fs_file_attr_getsize(rootfileinfo) > 0)
+                {
+                    for(int i=0; i < tsk_fs_file_attr_getsize(rootfileinfo); i++)
+                    {
+                        TSK_FS_ATTR* tmpattr;
+                        if(i == 0)
+                            tmpattr = rootfileinfo->meta->attr->head;
+                        else
+                            tmpattr = rootfileinfo->meta->attr->head->next;
+                        if(tmpattr != NULL)
+                        {
+                            if(tmpattr->name != NULL)
+                                qDebug() << QString("Attribute ID|Name is: ") << QString::number(tmpattr->id) << "|" << QString(tmpattr->name);
+                            else
+                                qDebug() << "Attribute Name is null ID is: " << QString::number(tmpattr->id);
+                        }
+                        else
+                        {
+                            qDebug() << "attribute is null";
+                        }
+                    }
+                }
+                else
+                {
+                    qDebug() << "root inum has no attributes.";
+                }*/
+                // END ATTRIBUTE LOOP TEST
+
 /*
 void WombatFramework::GetBootCode(int idx) // deermine boot type and populate variable if exists otherwise populate wiht negative
 {
