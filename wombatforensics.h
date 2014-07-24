@@ -278,7 +278,7 @@ public:
                 for(int i=0; i < addevidquery.record().count(); i++)
                     colvalues.append(addevidquery.value(i));
                 currentnode = new Node(colvalues);
-                if(currentnode->nodevalues.at(4).toInt() == 1)
+                if(currentnode->nodevalues.at(4).toInt() == 1) // image file
                 {
                     filesystemcount = 0;
                     rootnode->children.append(currentnode);
@@ -289,7 +289,7 @@ public:
                     currentnode->haschildren = currentnode->HasChildren();
                     parentnode = currentnode;
                 }
-                else if(currentnode->nodevalues.at(4).toInt() == 2)
+                else if(currentnode->nodevalues.at(4).toInt() == 2) // volume
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
@@ -306,7 +306,7 @@ public:
                     }
                 }
                 // THERE SHOULD ONLY BE PARTITION OBJECTS, OBJECTTYPE == 3, FOR UNALLOCATED SPACES....
-                else if(currentnode->nodevalues.at(4).toInt() == 4)
+                else if(currentnode->nodevalues.at(4).toInt() == 4) // filesystem
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
