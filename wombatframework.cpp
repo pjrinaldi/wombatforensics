@@ -51,8 +51,14 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
         }
         TSK_FS_FILE* tmpfile = NULL;
         //TSK_FS_DIR* tmpdir = NULL;
-        FATFS_DENTRY* tmpfatdentry = NULL;
+        FATXXFS_SB* sb = NULL;
+        FATXXFS_DENTRY* tmpfatdentry = NULL;
+        FATXXFS_DENTRY* curentry = NULL;
+        FATFS_INFO* fatfs = NULL;
         const TSK_FS_ATTR* tmpattr;
+        char* databuffer;
+        ssize_t cnt;
+        int a;
         uint8_t rval;
         char asc[512];
         switch(tmpfsinfo->ftype)
@@ -90,48 +96,98 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
             case TSK_FS_TYPE_EXFAT:
                 //exfatfs_find_volume_label_dentry((FATFS_INFO*)tmpfsinfo, tmpfile);
                 //tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, 
-                rval = fatfs_dentry_load((FATFS_INFO*)tmpfsinfo, tmpfatdentry, 2);
-                tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, 2);
-                qDebug() << "Volume Name: " << tmpfile->meta->name2->name;
+                //rval = fatfs_dentry_load((FATFS_INFO*)tmpfsinfo, tmpfatdentry, 2);
+                //tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, 2);
+                qDebug() << "EXFAT Volume Name: " << tmpfile->meta->name2->name;
                 break;
             case TSK_FS_TYPE_FAT12:
+                fatfs = (FATFS_INFO*)tmpfsinfo;
+                if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
+                {
+                    // log error here
+                }
+                cnt = tsk_fs_read_block(tmpfsinfo, fatfs->rootsect, databuffer, tmpfsinfo->block_size);
+                if(cnt != tmpfsinfo->block_size)
+                {
+                    // log error here
+                }
+                tmpfatdentry = NULL;
+                if(fatfs->ssize <= tmpfsinfo->block_size)
+                {
+                    curentry = (FATXXFS_DENTRY*)databuffer;
+                    for(int i=0; i < fatfs->ssize; i += sizeof(*curentry))
+                    {
+                        if(curentry->attrib == FATFS_ATTR_VOLUME)
+                        {
+                            tmpfatdentry = curentry;
+                            break;
+                        }
+                        curentry++;
+                    }
+                }
+                qDebug() << "FAT12 Volume Label: " << tmpfatdentry->name;
                 qDebug() << "FAT12";
                 break;
             case TSK_FS_TYPE_FAT16:
-                qDebug() << "FAT12";
+                fatfs = (FATFS_INFO*)tmpfsinfo;
+                if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
+                {
+                    // log error here
+                }
+                cnt = tsk_fs_read_block(tmpfsinfo, fatfs->rootsect, databuffer, tmpfsinfo->block_size);
+                if(cnt != tmpfsinfo->block_size)
+                {
+                    // log error here
+                }
+                tmpfatdentry = NULL;
+                if(fatfs->ssize <= tmpfsinfo->block_size)
+                {
+                    curentry = (FATXXFS_DENTRY*)databuffer;
+                    for(int i=0; i < fatfs->ssize; i += sizeof(*curentry))
+                    {
+                        if(curentry->attrib == FATFS_ATTR_VOLUME)
+                        {
+                            tmpfatdentry = curentry;
+                            break;
+                        }
+                        curentry++;
+                    }
+                }
+                qDebug() << "FAT16 Volume Label: " << tmpfatdentry->name;
+                //qDebug() << "FAT16";
                 break;
             case TSK_FS_TYPE_FAT32:
-                qDebug() << "FAT12";
+                qDebug() << "FAT32";
                 break;
             case TSK_FS_TYPE_FFS1:
-                qDebug() << "FAT12";
+                qDebug() << "FFS1";
                 break;
             case TSK_FS_TYPE_FFS1B:
-                qDebug() << "FAT12";
+                qDebug() << "FFS1B";
                 break;
             case TSK_FS_TYPE_FFS2:
-                qDebug() << "FAT12";
+                qDebug() << "FFS2";
                 break;
             case TSK_FS_TYPE_EXT2:
-                qDebug() << "FAT12";
+                qDebug() << "EXT2";
                 break;
             case TSK_FS_TYPE_EXT3:
-                qDebug() << "FAT12";
+                qDebug() << "EXT3";
                 break;
             case TSK_FS_TYPE_EXT4:
-                qDebug() << "FAT12";
+                qDebug() << "EXT4";
                 break;
             case TSK_FS_TYPE_RAW:
                 qDebug() << "no file system. store 0, \"\", or message for respective variables";
                 break;
             case TSK_FS_TYPE_ISO9660:
-                qDebug() << "FAT12";
+                qDebug() << "ISO9660";
                 break;
             case TSK_FS_TYPE_HFS:
-                qDebug() << "FAT12";
+                qDebug() << "HFS";
                 break;
             case TSK_FS_TYPE_YAFFS2:
-                qDebug() << "FAT12";
+                qDebug() << "YAFFS2";
                 break;
             case TSK_FS_TYPE_SWAP:
                 qDebug() << "no file system. store 0, \"\", or message for respective variables";

@@ -371,6 +371,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     //wombatdatabase->InsertFileSystemObjects(); // should be integrated into the partition set...
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
+    wombatframework->GetFileSystemProperties();
     wombatframework->OpenFiles();
 }
 
