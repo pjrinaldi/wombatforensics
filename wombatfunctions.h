@@ -14,5 +14,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 void LogEntry(int caseid, int evidenceid, int jobid, int type, QString msg);
 void StartJob(int type, int caseid, int evidenceid);
 void EndJob(int jobid, int filecount, int processcount, int errorcount);
+void cnid_to_array(uint32_t cnid, uint8_t array[4]);
 
 #endif // wombatfunctions.h

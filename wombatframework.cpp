@@ -69,6 +69,14 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
         ISO_INFO* iso = NULL;
         iso9660_pvd_node* p = NULL;
         iso9660_svd_node* s = NULL;
+        HFS_INFO* hfs = NULL;
+        hfs_plus_vh* hsb = NULL;
+        char fn[HFS_MAXNAMLEN + 1];
+        HFS_ENTRY* hfsentry = NULL;
+        hfs_btree_key_cat key;
+        hfs_thread thread;
+        hfs_file_folder record;
+        TSK_OFF_T off;
         char* databuffer = NULL;
         ssize_t cnt;
         ssize_t bytesread = 0;
@@ -290,10 +298,70 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                 qDebug() << "ISO9660";
                 break;
             case TSK_FS_TYPE_HFS:
-                qDebug() << "HFS";
+                hfs = (HFS_INFO*)tmpfsinfo;
+                hsb = hfs->fs;
+                memset((char*)&key, 0, sizeof(hfs_btree_key_cat));
+                cnid_to_array((uint32_t)HFS_ROOT_INUM, key.parent_cnid);
+                /*
+                off = hfs_cat_get_record_offset(hfs, &key);
+                if(off == 0)
+                {
+                    // log error here
+                }
+                if(hfs_cat_read_thread_record(hfs, off, &thread))
+                {
+                    // log error here
+                }
+
+                memset((char*)&key, 0, sizeof(hfs_btree_key_cat));
+                memcpy((char*)key.parent_cnid, (char*)thread.parent_cnid, sizeof(key.parent_cnid));
+                memcpy((char*)&key.name, (char*)&thread.name, sizeof(key.name));
+                off = hfs_cat_get_record_offset(hfs, &key);
+                if(off = 0)
+                {
+                    // log error here
+                }
+                if(hfs_cat_read_file_folder_record(hfs, off, &record))
+                {
+                    // log error here
+                }
+                //if(tsk_getU16(tmpfsinfo->endian, record.file.std.rec_type) == HFS_FOLDER_RECORD)
+                memcpy((char*)&entry->thread, (char*)&thread, sizeof(hfs_thread));
+                entry->flags = TSK_FS_META_FLAG_ALLOC | TSK_FS_META_FLAG_USED;
+                entry->inum = HFS_ROOT_INUM;
+                if(follow_hard_link)
+                {
+                    unsigned char is_err;
+                    TSK_INUM_T target_cnid = hfs_follow_hard_link(hfs, &(entry->cat), &is_err);
+                    if(is_err > 1)
+                    {
+                        // log error here
+                    }*/
+                    /*
+                    if(target_cnid != HFS_ROOT_INUM)
+                    {
+                        uint8_t res = hfs_cat_file_lookup(hfs, target_cnid, entry, FALSE);
+                        if(res != 0)
+                        {
+                            // log error here
+                        }
+                    }*/
+                //}
+                // NEED TO EXPAND THE HFS_CAT_FILE_LOOKUP() FUNCTION AND THE 
+                /*
+                if(hfs_cat_file_lookup(hfs, HFS_ROOT_INUM, &hfsentry, FALSE))
+                {
+                    // log error here
+                }
+                if(hfs_UTF16toUTF8(tmpfsinfo, hfsentry.thread.name.unicode, tsk_getu16(tmpfsinfo->endian, hfsentry.thread.name.length), fn, HFS_MAXNAMLEN + 1, HFS_U16U8_FLAG_REPLACE_SLASH))
+                {
+                    // log error here.
+                }*/
+                qDebug() << "HFS Volume Name: " << fn;
+                free(fn);
                 break;
             case TSK_FS_TYPE_YAFFS2:
-                qDebug() << "YAFFS2";
+                qDebug() << "YAFFS2 no volume name, might want other properties though";
                 break;
             case TSK_FS_TYPE_SWAP:
                 qDebug() << "no file system. store 0, \"\", or message for respective variables";
