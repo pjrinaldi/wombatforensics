@@ -60,4 +60,6 @@
 #include "fs/tsk_exfatfs.h"
 #include "fs/tsk_fatfs.h"
 #include "fs/tsk_fatxxfs.h"
+#include "fs/tsk_ffs.h"
+#include "fs/tsk_ext2fs.h"
 #endif // WOMBATINCLUDE_H

@@ -50,6 +50,9 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
             // log error here.
         }
         TSK_FS_FILE* tmpfile = NULL;
+        FFS_INFO* ffs = NULL;
+        ffs_sb1* sb1 = NULL;
+        ffs_sb2* sb2 = NULL;
         //TSK_FS_DIR* tmpdir = NULL;
         //FATXXFS_SB* sb = NULL;
         FATXXFS_DENTRY* tmpfatdentry = NULL;
@@ -61,6 +64,8 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
         int8_t isallocsec = 0;
         TSK_INUM_T curinum = 0;
         FATFS_DENTRY* dentry = NULL;
+        EXT2FS_INFO* ext2fs = NULL;
+        ext2fs_sb* sb = NULL;
         char* databuffer = NULL;
         ssize_t cnt;
         ssize_t bytesread = 0;
@@ -98,6 +103,7 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                         *name8 = '\0';
                 }
                 qDebug() << "Volume Name:" << asc;
+                tsk_fs_file_close(tmpfile);
                 break;
             case TSK_FS_TYPE_EXFAT:
                 fatfs = (FATFS_INFO*)tmpfsinfo;
@@ -146,6 +152,8 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                         }
                     }
                 }
+                tsk_fs_file_close(tmpfile);
+                free(databuffer);
                 break;
             case TSK_FS_TYPE_FAT12:
                 fatfs = (FATFS_INFO*)tmpfsinfo;
@@ -173,7 +181,7 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                     }
                 }
                 qDebug() << "FAT12 Volume Label: " << tmpfatdentry->name;
-                qDebug() << "FAT12";
+                free(databuffer);
                 break;
             case TSK_FS_TYPE_FAT16:
                 fatfs = (FATFS_INFO*)tmpfsinfo;
@@ -201,7 +209,7 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                     }
                 }
                 qDebug() << "FAT16 Volume Label: " << tmpfatdentry->name;
-                //qDebug() << "FAT16";
+                free(databuffer);
                 break;
             case TSK_FS_TYPE_FAT32:
                 fatfs = (FATFS_INFO*)tmpfsinfo;
@@ -229,7 +237,7 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                     }
                 }
                 qDebug() << "FAT32 Volume Label: " << tmpfatdentry->name;
-                //qDebug() << "FAT32";
+                free(databuffer);
                 break;
             case TSK_FS_TYPE_FFS1:
                 qDebug() << "FFS1";
@@ -238,16 +246,25 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                 qDebug() << "FFS1B";
                 break;
             case TSK_FS_TYPE_FFS2:
-                qDebug() << "FFS2";
+                ffs = (FFS_INFO*)tmpfsinfo;
+                sb1 = ffs->fs.sb1;
+                sb2 = ffs->fs.sb2;
+                qDebug() << "FFS2 Volume label: " << sb2->volname;
                 break;
             case TSK_FS_TYPE_EXT2:
-                qDebug() << "EXT2";
+                ext2fs = (EXT2FS_INFO*)tmpfsinfo;
+                sb = ext2fs->fs;
+                qDebug() << "EXT2 Volume name: " << sb->s_volume_name;
                 break;
             case TSK_FS_TYPE_EXT3:
-                qDebug() << "EXT3";
+                ext2fs = (EXT2FS_INFO*)tmpfsinfo;
+                sb = ext2fs->fs;
+                qDebug() << "EXT3 Volume name: " << sb->s_volume_name;
                 break;
             case TSK_FS_TYPE_EXT4:
-                qDebug() << "EXT4";
+                ext2fs = (EXT2FS_INFO*)tmpfsinfo;
+                sb = ext2fs->fs;
+                qDebug() << "EXT4 Volume name: " << sb->s_volume_name;
                 break;
             case TSK_FS_TYPE_RAW:
                 qDebug() << "no file system. store 0, \"\", or message for respective variables";
