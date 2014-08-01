@@ -113,7 +113,7 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                     else
                         *name8 = '\0';
                 }
-                qDebug() << "Volume Name:" << asc;
+                qDebug() << "NTFS Volume Name:" << asc;
                 tsk_fs_file_close(tmpfile);
                 break;
             case TSK_FS_TYPE_EXFAT:
