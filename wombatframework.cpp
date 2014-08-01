@@ -66,10 +66,13 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
         FATFS_DENTRY* dentry = NULL;
         EXT2FS_INFO* ext2fs = NULL;
         ext2fs_sb* sb = NULL;
+        ISO_INFO* iso = NULL;
+        iso9660_pvd_node* p = NULL;
+        iso9660_svd_node* s = NULL;
         char* databuffer = NULL;
         ssize_t cnt;
         ssize_t bytesread = 0;
-        //int a;
+        int a;
         //uint8_t rval;
         char asc[512];
         switch(tmpfsinfo->ftype)
@@ -270,6 +273,20 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                 qDebug() << "no file system. store 0, \"\", or message for respective variables";
                 break;
             case TSK_FS_TYPE_ISO9660:
+                a = 0;
+                iso = (ISO_INFO*)tmpfsinfo;
+                p = iso->pvd;
+                for(p = iso->pvd; p!= NULL; p = p->next)
+                {
+                    a++;
+                    qDebug() << "ISO9660 vol name: " << p->pvd.vol_id;
+                }
+                a = 0;
+                for(s = iso->svd; s!= NULL; s = s->next)
+                {
+                    a++;
+                    qDebug() << "ISO9660 vol name: " << s->svd.vol_id;
+                }
                 qDebug() << "ISO9660";
                 break;
             case TSK_FS_TYPE_HFS:

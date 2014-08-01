@@ -62,4 +62,7 @@
 #include "fs/tsk_fatxxfs.h"
 #include "fs/tsk_ffs.h"
 #include "fs/tsk_ext2fs.h"
+#include "fs/tsk_iso9660.h"
+#include "fs/tsk_hfs.h"
+#include "fs/tsk_yaffs.h"
 #endif // WOMBATINCLUDE_H
