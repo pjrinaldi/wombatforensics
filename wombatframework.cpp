@@ -58,6 +58,7 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
         FATXXFS_DENTRY* tmpfatdentry = NULL;
         FATXXFS_DENTRY* curentry = NULL;
         FATFS_INFO* fatfs = NULL;
+        FATXXFS_SB* fatsb = NULL;
         const TSK_FS_ATTR* tmpattr;
         TSK_DADDR_T cursector = 0;
         TSK_DADDR_T endsector = 0;
@@ -168,6 +169,9 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                 break;
             case TSK_FS_TYPE_FAT12:
                 fatfs = (FATFS_INFO*)tmpfsinfo;
+                fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
+                qDebug() << fatsb->a.f16.vol_lab;
+                printf("Volume Label (Boot Sector): %c%c%c%c%c%c%c%c%c%c%c\n", fatsb->a.f16.vol_lab[0], fatsb->a.f16.vol_lab[1], fatsb->a.f16.vol_lab[2], fatsb->a.f16.vol_lab[3], fatsb->a.f16.vol_lab[4], fatsb->a.f16.vol_lab[5], fatsb->a.f16.vol_lab[6], fatsb->a.f16.vol_lab[7], fatsb->a.f16.vol_lab[8], fatsb->a.f16.vol_lab[9], fatsb->a.f16.vol_lab[10]);
                 if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
                 {
                     // log error here
@@ -196,6 +200,9 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                 break;
             case TSK_FS_TYPE_FAT16:
                 fatfs = (FATFS_INFO*)tmpfsinfo;
+                fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
+                qDebug() << fatsb->a.f16.vol_lab;
+                printf("Volume Label (Boot Sector): %c%c%c%c%c%c%c%c%c%c%c\n", fatsb->a.f16.vol_lab[0], fatsb->a.f16.vol_lab[1], fatsb->a.f16.vol_lab[2], fatsb->a.f16.vol_lab[3], fatsb->a.f16.vol_lab[4], fatsb->a.f16.vol_lab[5], fatsb->a.f16.vol_lab[6], fatsb->a.f16.vol_lab[7], fatsb->a.f16.vol_lab[8], fatsb->a.f16.vol_lab[9], fatsb->a.f16.vol_lab[10]);
                 if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
                 {
                     // log error here
@@ -224,6 +231,9 @@ void WombatFramework::GetFileSystemProperties() // get the file system label, bo
                 break;
             case TSK_FS_TYPE_FAT32:
                 fatfs = (FATFS_INFO*)tmpfsinfo;
+                fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
+                qDebug() << fatsb->a.f32.vol_lab;
+                printf("Volume Label (Boot Sector): %c%c%c%c%c%c%c%c%c%c%c\n", fatsb->a.f32.vol_lab[0], fatsb->a.f32.vol_lab[1], fatsb->a.f32.vol_lab[2], fatsb->a.f32.vol_lab[3], fatsb->a.f32.vol_lab[4], fatsb->a.f32.vol_lab[5], fatsb->a.f32.vol_lab[6], fatsb->a.f32.vol_lab[7], fatsb->a.f32.vol_lab[8], fatsb->a.f32.vol_lab[9], fatsb->a.f32.vol_lab[10]);
                 if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
                 {
                     // log error here
