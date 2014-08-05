@@ -43,8 +43,17 @@
    </property>
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>1</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
+     </property>
+     <property name="opaqueResize">
+      <bool>false</bool>
      </property>
      <property name="childrenCollapsible">
       <bool>false</bool>
@@ -53,16 +62,28 @@
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
-        <verstretch>1</verstretch>
+        <verstretch>2</verstretch>
        </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>200</height>
+       </size>
       </property>
       <property name="font">
        <font>
         <pointsize>7</pointsize>
        </font>
       </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="autoScroll">
+       <bool>false</bool>
       </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
@@ -82,6 +103,9 @@
       <property name="selectionBehavior">
        <enum>QAbstractItemView::SelectRows</enum>
       </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideRight</enum>
+      </property>
       <property name="horizontalScrollMode">
        <enum>QAbstractItemView::ScrollPerItem</enum>
       </property>
@@ -89,7 +113,7 @@
        <bool>true</bool>
       </property>
       <property name="wordWrap">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="cornerButtonEnabled">
        <bool>false</bool>
@@ -113,8 +137,8 @@
      <widget class="QGroupBox" name="groupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
        </sizepolicy>
       </property>
       <property name="minimumSize">
@@ -161,6 +185,18 @@
        </property>
        <item>
         <widget class="QLabel" name="label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <pointsize>7</pointsize>
@@ -168,6 +204,12 @@
          </property>
          <property name="text">
           <string>Information on the selected object and its value.</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
