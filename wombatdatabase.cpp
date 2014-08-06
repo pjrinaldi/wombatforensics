@@ -383,6 +383,7 @@ void WombatDatabase::InsertPartitionObjects()
 }
 void WombatDatabase::InsertEvidenceObject()
 {
+    IMG_AFF_INFO* affinfo = NULL;
     wombatptr->currentevidenceid = 0;
     currentevidenceid = 0;
     wombatptr->bindvalues.clear();
@@ -398,6 +399,9 @@ void WombatDatabase::InsertEvidenceObject()
     if(TSK_IMG_TYPE_ISAFF(wombatptr->evidenceobject.imageinfo->itype)) // its AFF
     {
         // look at aff.c:111-210 for attributes to store...
+        //affimginfo = aff_open(
+        affinfo = (IMG_AFF_INFO*)wombatptr->evidenceobject.imageinfo;
+        qDebug() << affinfo->type;
     }
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {

@@ -50,6 +50,7 @@ signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:
     WombatVariable* wombatptr;
+    TSK_IMG_INFO* affimginfo = NULL;
 };
 
 #endif // WOMBATDATABASE_H

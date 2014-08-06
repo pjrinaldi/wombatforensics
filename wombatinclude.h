@@ -56,6 +56,8 @@
 
 #include "tsk/libtsk.h"
 #include "img/aff.h"
+#include "afflib.h"
+//#include "afflib_i.h"
 #include "fs/tsk_ntfs.h"
 #include "fs/tsk_exfatfs.h"
 #include "fs/tsk_fatfs.h"

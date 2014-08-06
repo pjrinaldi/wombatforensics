@@ -15,14 +15,14 @@ VPATH += ../AFFLIBv3/lib/
 #VPATH += ../vlc-qt/src/widgets/
 #VPATH += ../vlc-qt/src/core/
 #VPATH += ../vlc-qt/src/
-HEADERS = wombatforensics.h wombatvariable.h wombatdatabase.h wombatframework.h wombatfunctions.h ui_wombatforensics.h progresswindow.h ui_progresswindow.h ui_exportdialog.h exportdialog.h hexeditor.h cursor.h reader.h translate.h libtsk.h tskvariable.h globals.h wombatinclude.h propertieswindow.h ui_propertieswindow.h afflib.h
+HEADERS = wombatforensics.h wombatvariable.h wombatdatabase.h wombatframework.h wombatfunctions.h ui_wombatforensics.h progresswindow.h ui_progresswindow.h ui_exportdialog.h exportdialog.h hexeditor.h cursor.h reader.h translate.h libtsk.h tskvariable.h globals.h wombatinclude.h propertieswindow.h ui_propertieswindow.h 
 SOURCES = main.cpp wombatforensics.cpp wombatdatabase.cpp wombatframework.cpp wombatfunctions.cpp progresswindow.cpp exportdialog.cpp hexeditor.cpp cursor.cpp reader.cpp translate.cpp globals.cpp propertieswindow.cpp
 RESOURCES += wombatforensics.qrc
 DESTDIR = ./
 mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk 
 #mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk 
 #mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk -L/opt/Qt5.3.1/5.3/gcc_64/plugins/sqldrivers -lqsqlite
-linux:LIBS = -lewf -ltsk -lafflib
+linux:LIBS = -lewf -lafflib -ltsk
 #linux:LIBS = -lsqlite3 -lewf -ltsk 
 #linux:LIBS = -lsqlite3 -lewf -ltsk -lqsqlite 
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
