@@ -55,7 +55,7 @@
 #include "hexeditor.h"
 
 #include "tsk/libtsk.h"
-//#include "img/tsk_img_i.h"
+#include "img/aff.h"
 #include "fs/tsk_ntfs.h"
 #include "fs/tsk_exfatfs.h"
 #include "fs/tsk_fatfs.h"
