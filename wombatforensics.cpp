@@ -369,9 +369,9 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertVolumeObject(); // add volume to data
     wombatframework->OpenPartitions();
     wombatdatabase->InsertPartitionObjects();
-    //wombatdatabase->InsertFileSystemObjects(); // should be integrated into the partition set...
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
-    wombatframework->GetFileSystemProperties();
+    //wombatframework->GetFileSystemProperties();
+    // the above function needs to be integrated into the respective InsertObject calls to store the respective values in the db.
     wombatframework->OpenFiles();
 }
 
