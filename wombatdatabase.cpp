@@ -381,11 +381,19 @@ void WombatDatabase::InsertPartitionObjects()
         }
     }
 }
+
 void WombatDatabase::InsertEvidenceObject()
 {
     IMG_AFF_INFO* affinfo = NULL;
     unsigned char buf[512];
     size_t buf_len = 512;
+    //const char* hexit;
+    //QString outstring;
+    //char* str = malloc(sizeof(char)*(16+1));
+    std::stringstream stm;
+    std::string s;
+    //s.resize(
+    //char* strbuffer;
     wombatptr->currentevidenceid = 0;
     currentevidenceid = 0;
     wombatptr->bindvalues.clear();
@@ -405,10 +413,23 @@ void WombatDatabase::InsertEvidenceObject()
         affinfo = (IMG_AFF_INFO*)wombatptr->evidenceobject.imageinfo;
         if(af_get_seg(affinfo->affile, AF_MD5, NULL, buf, &buf_len) == 0)
         {
+            unsigned char* bytebuf = buf;
+            stm << std::hex << std::setfill('0');
+            //Translate::ByteToChar(outstring, buf);
+            //s.assign(buf, buf + buf_len);
+            //qDebug() << QString::fromStdString(s);
             printf("MD5: ");
             for(int i=0; i < 16; i++)
+            {
+                stm << std::setw(2) << static_cast<int>(bytebuf[i]);
+                //hexit[i] = Translate::ByteToHex(buf[i]);
+                //stm << 
                 printf("%x", buf[i]);
+            }
             printf("\n");
+            s = stm.str();
+            //printf("STR: %s\n", s);
+            qDebug() << QString::fromStdString(s);
         }
         //qDebug() << affinfo->type;
     }
