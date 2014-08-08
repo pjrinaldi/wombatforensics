@@ -144,6 +144,7 @@ void WombatDatabase::CreateCaseDB(void)
     wombattableschema << "CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INTEGER);";
     wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
     wombattableschema << "CREATE TABLE attributes(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
+    wombattableschema << "CREATE TABLE properties(id INTEGER PRIMARY KEY, objectid INTEGER, name TEXT, description TEXT, valuetype INTEGER, value BLOB);";
     wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, flags INTEGER, childcount INTEGER, endian INTEGER, address INTEGER, size INTEGER, sectsize INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, inodenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blocksize INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);";
     if(wombatptr->casedb.open())
     {
@@ -385,15 +386,10 @@ void WombatDatabase::InsertPartitionObjects()
 void WombatDatabase::InsertEvidenceObject()
 {
     IMG_AFF_INFO* affinfo = NULL;
-    unsigned char buf[512];
-    size_t buf_len = 512;
-    //const char* hexit;
-    //QString outstring;
-    //char* str = malloc(sizeof(char)*(16+1));
-    std::stringstream stm;
-    std::string s;
-    //s.resize(
-    //char* strbuffer;
+    //unsigned char buf[512];
+    //size_t buf_len = 512;
+    //std::stringstream stm;
+    //std::string s;
     wombatptr->currentevidenceid = 0;
     currentevidenceid = 0;
     wombatptr->bindvalues.clear();
@@ -405,33 +401,29 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->currentevidenceid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath, parimgid) VALUES(1, ?, ?, ?, ?, ?, NULL);", wombatptr->bindvalues);
     wombatptr->evidenceobject.id = wombatptr->currentevidenceid;
     currentevidenceid = wombatptr->currentevidenceid;
-    // place the insert into attributes call here... if...else if...if for the image types
     if(TSK_IMG_TYPE_ISAFF(wombatptr->evidenceobject.imageinfo->itype)) // its AFF
     {
         // look at aff.c:111-210 for attributes to store...
-        //affimginfo = aff_open(
         affinfo = (IMG_AFF_INFO*)wombatptr->evidenceobject.imageinfo;
+        std::string md5str = GetSegmentValue(affinfo, AF_MD5);
+        qDebug() << "MD5: " << QString::fromStdString(md5str);
+        /*
         if(af_get_seg(affinfo->affile, AF_MD5, NULL, buf, &buf_len) == 0)
         {
             unsigned char* bytebuf = buf;
             stm << std::hex << std::setfill('0');
-            //Translate::ByteToChar(outstring, buf);
-            //s.assign(buf, buf + buf_len);
-            //qDebug() << QString::fromStdString(s);
             printf("MD5: ");
             for(int i=0; i < 16; i++)
             {
                 stm << std::setw(2) << static_cast<int>(bytebuf[i]);
-                //hexit[i] = Translate::ByteToHex(buf[i]);
-                //stm << 
                 printf("%x", buf[i]);
             }
             printf("\n");
             s = stm.str();
-            //printf("STR: %s\n", s);
             qDebug() << QString::fromStdString(s);
         }
-        //qDebug() << affinfo->type;
+        */
+        //qDebug() << affinfo->type; // affinfo->type == 1 (AFF-aff file) 2 (AFD-directory of aff files) 6 (AFM-raw file with metadata)
     }
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {

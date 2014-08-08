@@ -2,6 +2,7 @@
 #define WOMBATFUNCTIONS_H
 
 #include "wombatinclude.h"
+#include "wombatvariable.h"
 #include "globals.h"
 
 std::string GetTime(void);
@@ -15,5 +16,5 @@ void LogEntry(int caseid, int evidenceid, int jobid, int type, QString msg);
 void StartJob(int type, int caseid, int evidenceid);
 void EndJob(int jobid, int filecount, int processcount, int errorcount);
 void cnid_to_array(uint32_t cnid, uint8_t array[4]);
-
+std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname);
 #endif // wombatfunctions.h

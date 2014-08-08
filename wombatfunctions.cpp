@@ -217,3 +217,31 @@ void cnid_to_array(uint32_t cnid, uint8_t array[4])
     array[1] = (cnid >> 16) & 0xff;
     array[0] = (cnid >> 24) & 0xff;
 }
+
+
+std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname)
+{
+    unsigned char buf[512];
+    size_t buflen = 512;
+    std::stringstream stm;
+    std::string s;
+    int ilimit = 0;
+    if(af_get_seg(curaffinfo->affile, segname, NULL, buf, &buflen) == 0)
+    {
+        if(strcmp(segname, AF_MD5) == 0 || strcmp(segname,AF_SHA1) == 0)
+        {
+            if(strcmp(segname,AF_MD5) == 0)
+                ilimit = 16;
+            else
+                ilimit = 20;
+            unsigned char* bytebuf = buf;
+            stm << std::hex << std::setfill('0');
+            for(int i=0; i < ilimit; i++)
+            {
+                stm << std::setw(2) << static_cast<int>(bytebuf[i]);
+            }
+            s = stm.str();
+        }
+    }
+    return s;
+}
