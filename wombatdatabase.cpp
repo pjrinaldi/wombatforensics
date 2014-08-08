@@ -384,6 +384,8 @@ void WombatDatabase::InsertPartitionObjects()
 void WombatDatabase::InsertEvidenceObject()
 {
     IMG_AFF_INFO* affinfo = NULL;
+    unsigned char buf[512];
+    size_t buf_len = 512;
     wombatptr->currentevidenceid = 0;
     currentevidenceid = 0;
     wombatptr->bindvalues.clear();
@@ -401,7 +403,14 @@ void WombatDatabase::InsertEvidenceObject()
         // look at aff.c:111-210 for attributes to store...
         //affimginfo = aff_open(
         affinfo = (IMG_AFF_INFO*)wombatptr->evidenceobject.imageinfo;
-        qDebug() << affinfo->type;
+        if(af_get_seg(affinfo->affile, AF_MD5, NULL, buf, &buf_len) == 0)
+        {
+            printf("MD5: ");
+            for(int i=0; i < 16; i++)
+                printf("%x", buf[i]);
+            printf("\n");
+        }
+        //qDebug() << affinfo->type;
     }
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {
