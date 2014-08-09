@@ -386,10 +386,6 @@ void WombatDatabase::InsertPartitionObjects()
 void WombatDatabase::InsertEvidenceObject()
 {
     IMG_AFF_INFO* affinfo = NULL;
-    //unsigned char buf[512];
-    //size_t buf_len = 512;
-    //std::stringstream stm;
-    //std::string s;
     wombatptr->currentevidenceid = 0;
     currentevidenceid = 0;
     wombatptr->bindvalues.clear();
@@ -403,27 +399,13 @@ void WombatDatabase::InsertEvidenceObject()
     currentevidenceid = wombatptr->currentevidenceid;
     if(TSK_IMG_TYPE_ISAFF(wombatptr->evidenceobject.imageinfo->itype)) // its AFF
     {
-        // look at aff.c:111-210 for attributes to store...
         affinfo = (IMG_AFF_INFO*)wombatptr->evidenceobject.imageinfo;
         std::string md5str = GetSegmentValue(affinfo, AF_MD5);
         qDebug() << "MD5: " << QString::fromStdString(md5str);
-        /*
-        if(af_get_seg(affinfo->affile, AF_MD5, NULL, buf, &buf_len) == 0)
-        {
-            unsigned char* bytebuf = buf;
-            stm << std::hex << std::setfill('0');
-            printf("MD5: ");
-            for(int i=0; i < 16; i++)
-            {
-                stm << std::setw(2) << static_cast<int>(bytebuf[i]);
-                printf("%x", buf[i]);
-            }
-            printf("\n");
-            s = stm.str();
-            qDebug() << QString::fromStdString(s);
-        }
-        */
-        //qDebug() << affinfo->type; // affinfo->type == 1 (AFF-aff file) 2 (AFD-directory of aff files) 6 (AFM-raw file with metadata)
+        std::string gidstr = GetSegmentValue(affinfo, AF_IMAGE_GID);
+        qDebug() << "IMAGE_GID: " << QString::fromStdString(gidstr);
+        std::string creatorstr = GetSegmentValue(affinfo, AF_DEVICE_MODEL);
+        qDebug() << "DeviceModel: " << QString::fromStdString(creatorstr);
     }
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {

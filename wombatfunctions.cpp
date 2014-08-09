@@ -228,18 +228,26 @@ std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname)
     int ilimit = 0;
     if(af_get_seg(curaffinfo->affile, segname, NULL, buf, &buflen) == 0)
     {
-        if(strcmp(segname, AF_MD5) == 0 || strcmp(segname,AF_SHA1) == 0)
+        if(strcmp(segname, AF_MD5) == 0 || strcmp(segname,AF_SHA1) == 0 || strcmp(segname, AF_IMAGE_GID) == 0)
         {
             if(strcmp(segname,AF_MD5) == 0)
                 ilimit = 16;
-            else
+            else if(strcmp(segname, AF_SHA1) == 0)
                 ilimit = 20;
+            else
+                ilimit = buflen;
             unsigned char* bytebuf = buf;
             stm << std::hex << std::setfill('0');
             for(int i=0; i < ilimit; i++)
             {
                 stm << std::setw(2) << static_cast<int>(bytebuf[i]);
             }
+            s = stm.str();
+        }
+        else
+        {
+            buf[buflen] = '\0';
+            stm << buf;
             s = stm.str();
         }
     }
