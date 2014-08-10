@@ -165,11 +165,24 @@ typedef struct
     uint16_t type;
 } IMG_AFF_INFO;
 
+typedef struct
+{
+    TSK_IMG_INFO imginfo;
+    libewf_handle_t *handle;
+    char md5hash[33];
+    int md5hashisset;
+    TSK_TCHAR** images;
+    int numimgs;
+    uint8_t usedewfglob;
+    tsk_lock_t readlock;
+} IMG_EWF_INFO;
+
 Q_DECLARE_METATYPE(WombatVariable)
 Q_DECLARE_METATYPE(FileExportData)
 Q_DECLARE_METATYPE(CaseObject)
 Q_DECLARE_METATYPE(EvidenceObject)
 Q_DECLARE_METATYPE(SelectedObject);
 Q_DECLARE_METATYPE(IMG_AFF_INFO);
+Q_DECLARE_METATYPE(IMG_EWF_INFO);
 
 #endif // WOMBATVARIABLE_H

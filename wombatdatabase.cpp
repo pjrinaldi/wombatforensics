@@ -386,6 +386,7 @@ void WombatDatabase::InsertPartitionObjects()
 void WombatDatabase::InsertEvidenceObject()
 {
     IMG_AFF_INFO* affinfo = NULL;
+    IMG_EWF_INFO* ewfinfo = NULL;
     QStringList evidpropertylist;
     wombatptr->currentevidenceid = 0;
     evidpropertylist.clear();
@@ -421,6 +422,14 @@ void WombatDatabase::InsertEvidenceObject()
     }
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {
+        ewfinfo = (IMG_EWF_INFO*)wombatptr->evidenceobject.imageinfo;
+        std::stringstream stm;
+        if(ewfinfo->md5hashisset == 1)
+        {
+            ewfinfo->md5hash[33] = '\0';
+            stm << ewfinfo->md5hash;
+            evidpropertylist << "MD5" << QString::fromStdString(stm.str()) << "";
+        }
     }
     else if(TSK_IMG_TYPE_ISRAW(wombatptr->evidenceobject.imageinfo->itype)) // is raw
     {
