@@ -433,6 +433,7 @@ void WombatDatabase::InsertEvidenceObject()
     }
     else if(TSK_IMG_TYPE_ISRAW(wombatptr->evidenceobject.imageinfo->itype)) // is raw
     {
+        // nothing i want to add for raw right now.
     }
     else // not supported...
     {
