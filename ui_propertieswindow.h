@@ -69,14 +69,15 @@ public:
         tableView->setFont(font);
         tableView->setAutoFillBackground(false);
         tableView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        tableView->setAutoScroll(false);
+        tableView->setAutoScroll(true);
         tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
         tableView->setProperty("showDropIndicator", QVariant(false));
         tableView->setDragDropOverwriteMode(false);
         tableView->setAlternatingRowColors(true);
         tableView->setSelectionMode(QAbstractItemView::SingleSelection);
         tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-        tableView->setTextElideMode(Qt::ElideNone);
+        tableView->setTextElideMode(Qt::ElideRight);
+        tableView->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
         tableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
         tableView->setShowGrid(true);
         tableView->setWordWrap(true);
