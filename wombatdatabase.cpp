@@ -144,7 +144,7 @@ void WombatDatabase::CreateCaseDB(void)
     wombattableschema << "CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INTEGER);";
     wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
     wombattableschema << "CREATE TABLE attributes(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
-    wombattableschema << "CREATE TABLE properties(id INTEGER PRIMARY KEY, objectid INTEGER, name TEXT, description TEXT, valuetype INTEGER, value BLOB);";
+    wombattableschema << "CREATE TABLE properties(id INTEGER PRIMARY KEY, objectid INTEGER, name TEXT, description TEXT, value BLOB);";
     wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, flags INTEGER, childcount INTEGER, endian INTEGER, address INTEGER, size INTEGER, sectsize INTEGER, sectstart INTEGER, sectlength INTEGER, dirtype INTEGER, metattype INTEGER, dirflags INTEGER, metaflags INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, mode INTEGER, uid INTEGER, gid INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, known INTEGER, inodenumber INTEGER, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blocksize INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT);";
     if(wombatptr->casedb.open())
     {
@@ -386,6 +386,7 @@ void WombatDatabase::InsertPartitionObjects()
 void WombatDatabase::InsertEvidenceObject()
 {
     IMG_AFF_INFO* affinfo = NULL;
+    QStringList evidpropertylist;
     wombatptr->currentevidenceid = 0;
     currentevidenceid = 0;
     wombatptr->bindvalues.clear();
@@ -399,13 +400,20 @@ void WombatDatabase::InsertEvidenceObject()
     currentevidenceid = wombatptr->currentevidenceid;
     if(TSK_IMG_TYPE_ISAFF(wombatptr->evidenceobject.imageinfo->itype)) // its AFF
     {
+        evidpropertylist.clear();
         affinfo = (IMG_AFF_INFO*)wombatptr->evidenceobject.imageinfo;
-        std::string md5str = GetSegmentValue(affinfo, AF_MD5);
-        qDebug() << "MD5: " << QString::fromStdString(md5str);
-        std::string gidstr = GetSegmentValue(affinfo, AF_IMAGE_GID);
-        qDebug() << "IMAGE_GID: " << QString::fromStdString(gidstr);
-        std::string creatorstr = GetSegmentValue(affinfo, AF_DEVICE_MODEL);
-        qDebug() << "DeviceModel: " << QString::fromStdString(creatorstr);
+        evidpropertylist << "MD5" << QString::fromStdString(GetSegmentValue(affinfo, AF_MD5)) << "";
+        evidpropertylist << "Image GID" << QString::fromStdString(GetSegmentValue(affinfo, AF_IMAGE_GID)) << "";
+        evidpropertylist << "Device Model" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_MODEL)) << "";
+        evidpropertylist << "Creator" << QString::fromStdString(GetSegmentValue(affinfo, AF_CREATOR)) << "";
+        evidpropertylist << "Case Number" << QString::fromStdString(GetSegmentValue(affinfo, AF_CASE_NUM)) << "";
+        evidpropertylist << "SHA1" << QString::fromStdString(GetSegmentValue(affinfo, AF_SHA1)) << "";
+        evidpropertylist << "Acquisition Date" << QString::fromStdString(GetSegmentValue(affinfo, AF_ACQUISITION_DATE)) << "";
+        evidpropertylist << "Acquisition Notes" << QString::fromStdString(GetSegmentValue(affinfo, AF_ACQUISITION_NOTES)) << "";
+        evidpropertylist << "Acquisition Device" << QString::fromStdString(GetSegmentValue(affinfo, AF_ACQUISITION_DEVICE)) << "";
+        evidpropertylist << "AFFLib Version" << QString::fromStdString(GetSegmentValue(affinfo, AF_AFFLIB_VERSION)) << "";
+        evidpropertylist << "Device Manufacturer" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_MANUFACTURER)) << "";
+        evidpropertylist << "Device Serial Number" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_SN)) << "";
     }
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {
@@ -416,6 +424,15 @@ void WombatDatabase::InsertEvidenceObject()
     else // not supported...
     {
         // log error about unsupported image type.
+    }
+    for(int i=0; i < evidpropertylist.count()/3; i++)
+    {
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+        wombatptr->bindvalues.append(evidpropertylist.at(3*i));
+        wombatptr->bindvalues.append(evidpropertylist.at(3*i+1));
+        wombatptr->bindvalues.append(evidpropertylist.at(3*i+2));
+        InsertSql("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);", wombatptr->bindvalues);
     }
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
@@ -604,6 +621,7 @@ void WombatDatabase::ReturnObjectPropertyList()
     propertylist.clear();
     if(wombatptr->selectedobject.objtype == 1) // image file
     {
+        // NEED TO MAKE THIS PULL DATA FROM THE SQL QUERY... IMPLEMENT THIS AFTER I LOOK AT HOW THE INPUT WENT
         propertylist << QString("File Format") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatptr->selectedobject.type)) << QString("File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
         propertylist << QString("Sector Size") << QString(QString::number(wombatptr->selectedobject.sectsize) + " bytes") << QString("Sector size of the device. A Sector is a subdivision of a disk where data is stored. It is the smallest value used to divide the disk.");
         propertylist << QString("Sector Count") << QString(QString::number((int)((float)wombatptr->selectedobject.size/(float)wombatptr->selectedobject.sectsize)) + " sectors") << QString("The number of sectors in the disk.");
