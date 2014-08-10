@@ -643,13 +643,6 @@ void WombatDatabase::ReturnObjectPropertyList()
         {
             propertylist << wombatptr->sqlrecords.at(i).value(0).toString() << wombatptr->sqlrecords.at(i).value(1).toString() << wombatptr->sqlrecords.at(i).value(2).toString();
         }
-        /*
-        // NEED TO MAKE THIS PULL DATA FROM THE SQL QUERY... IMPLEMENT THIS AFTER I LOOK AT HOW THE INPUT WENT
-        propertylist << QString("File Format") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatptr->selectedobject.type)) << QString("File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
-        propertylist << QString("Sector Size") << QString(QString::number(wombatptr->selectedobject.sectsize) + " bytes") << QString("Sector size of the device. A Sector is a subdivision of a disk where data is stored. It is the smallest value used to divide the disk.");
-        propertylist << QString("Sector Count") << QString(QString::number((int)((float)wombatptr->selectedobject.size/(float)wombatptr->selectedobject.sectsize)) + " sectors") << QString("The number of sectors in the disk.");
-        propertylist << QString("Image Path") << QString(wombatptr->selectedobject.fullpath) << QString("Location where the evidence image is stored and read from.");
-        */
     }
     else if(wombatptr->selectedobject.objtype == 2) // volume information
     {

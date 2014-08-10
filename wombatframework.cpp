@@ -39,7 +39,7 @@ void WombatFramework::GetVolumeSystemName() // get the volume system name
     else
         wombatptr->currentvolumename = QString::fromUtf8(tsk_vs_type_todesc(wombatptr->evidenceobject.volinfo->vstype));
 }
-
+// NEED TO DELETE THIS ONCE I GET THE RESPECTIVE INFORMATION FOR THE FILE SYSTEMS
 void WombatFramework::GetFileSystemProperties() // get the file system label, boot sector, etc...
 {
     for(uint i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
