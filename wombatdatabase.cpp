@@ -387,6 +387,10 @@ void WombatDatabase::InsertEvidenceObject()
 {
     IMG_AFF_INFO* affinfo = NULL;
     IMG_EWF_INFO* ewfinfo = NULL;
+    uint8_t* ewfvalue;
+    size_t ewfvaluesize;
+    libewf_error_t* ewferror = NULL;
+    int ewfreturnvalue = 0;
     QStringList evidpropertylist;
     wombatptr->currentevidenceid = 0;
     evidpropertylist.clear();
@@ -423,6 +427,9 @@ void WombatDatabase::InsertEvidenceObject()
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {
         ewfinfo = (IMG_EWF_INFO*)wombatptr->evidenceobject.imageinfo;
+        ewfreturnvalue = libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror);
+        char* valuechar = reinterpret_cast<char*>(ewfvalue);
+        qDebug() << QString::fromUtf8(valuechar);
         std::stringstream stm;
         if(ewfinfo->md5hashisset == 1)
         {
