@@ -168,7 +168,7 @@ typedef struct
 typedef struct
 {
     TSK_IMG_INFO imginfo;
-    libewf_handle_t *handle;
+    libewf_handle_t* handle;
     char md5hash[33];
     int md5hashisset;
     TSK_TCHAR** images;

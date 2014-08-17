@@ -388,9 +388,9 @@ void WombatDatabase::InsertEvidenceObject()
     IMG_AFF_INFO* affinfo = NULL;
     IMG_EWF_INFO* ewfinfo = NULL;
     uint8_t* ewfvalue = NULL;
-    size_t ewfvaluesize;
+    //size_t ewfvaluesize;
     libewf_error_t* ewferror = NULL;
-    //int ewfreturnvalue = 0;
+    int ewfreturnvalue = 0;
     QStringList evidpropertylist;
     wombatptr->currentevidenceid = 0;
     evidpropertylist.clear();
@@ -427,11 +427,10 @@ void WombatDatabase::InsertEvidenceObject()
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {
         ewfinfo = (IMG_EWF_INFO*)wombatptr->evidenceobject.imageinfo;
-        libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 11, &ewferror);
-        char* valuechar = reinterpret_cast<char*>(ewfvalue);
-        qDebug() << QString::fromUtf8(valuechar);
         if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Case Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_description(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Description" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         if(libewf_handle_get_utf8_header_value_examiner_name(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
