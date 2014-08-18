@@ -387,7 +387,7 @@ void WombatDatabase::InsertEvidenceObject()
 {
     IMG_AFF_INFO* affinfo = NULL;
     IMG_EWF_INFO* ewfinfo = NULL;
-    uint8_t* ewfvalue = NULL;
+    uint8_t* ewfvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
     //size_t ewfvaluesize;
     libewf_error_t* ewferror = NULL;
     int ewfreturnvalue = 0;
@@ -454,6 +454,7 @@ void WombatDatabase::InsertEvidenceObject()
             stm << ewfinfo->md5hash;
             evidpropertylist << "MD5" << QString::fromStdString(stm.str()) << "";
         }
+        free(ewfvalue);
     }
     else if(TSK_IMG_TYPE_ISRAW(wombatptr->evidenceobject.imageinfo->itype)) // is raw
     {
