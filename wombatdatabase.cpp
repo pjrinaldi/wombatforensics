@@ -388,9 +388,11 @@ void WombatDatabase::InsertEvidenceObject()
     IMG_AFF_INFO* affinfo = NULL;
     IMG_EWF_INFO* ewfinfo = NULL;
     uint8_t* ewfvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
+    char* charvalue = NULL;
+    uint32_t* int32value = (uint32_t*)malloc(sizeof(uint32_t)*64);
     //size_t ewfvaluesize;
     libewf_error_t* ewferror = NULL;
-    int ewfreturnvalue = 0;
+    //int ewfreturnvalue = 0;
     QStringList evidpropertylist;
     wombatptr->currentevidenceid = 0;
     evidpropertylist.clear();
@@ -427,10 +429,10 @@ void WombatDatabase::InsertEvidenceObject()
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {
         ewfinfo = (IMG_EWF_INFO*)wombatptr->evidenceobject.imageinfo;
-        ewfreturnvalue = libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror);
-        qDebug() << "return value" << ewfreturnvalue;
-        char* valuechar = reinterpret_cast<char*>(ewfvalue);
-        qDebug() << QString::fromUtf8(valuechar);
+        //ewfreturnvalue = libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror);
+        //qDebug() << "return value" << ewfreturnvalue;
+        //char* valuechar = reinterpret_cast<char*>(ewfvalue);
+        //qDebug() << QString::fromUtf8(valuechar);
         if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             qDebug() << "case number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue));
         if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
@@ -439,14 +441,60 @@ void WombatDatabase::InsertEvidenceObject()
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_description(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Description" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_examiner_name(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Examiner Name" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_evidence_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Evidence Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_notes(ewfinfo->handle, ewfvalue, 255, &ewferror) == 1)
             evidpropertylist << "Notes" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_acquiry_date(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Acquisition Date" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_utf8_header_value_system_date(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            evidpropertylist << "System Date" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_utf8_header_value_acquiry_operating_system(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            evidpropertylist << "Aquisition OS" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_utf8_header_value_password(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            evidpropertylist << "Password" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_utf8_header_value_compression_level(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            evidpropertylist << "Compression Level" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_utf8_header_value_model(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            evidpropertylist << "Model" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_utf8_header_value_serial_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            evidpropertylist << "Serial Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_segment_filename(ewfinfo->handle, charvalue, 64, &ewferror) == 1)
+        {
+            evidpropertylist << "Segment File Name" << QString::fromUtf8(charvalue) << "";
+            qDebug() << "segment file name" << QString::fromUtf8(charvalue);
+        }
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_sectors_per_chunk(ewfinfo->handle, int32value, &ewferror) == 1)
+        {
+            //evidpropertylist << "Segments per Chunk" << 
+            qDebug() << "segments per chunk" << int32value;
+        }
         std::stringstream stm;
         if(ewfinfo->md5hashisset == 1)
         {
@@ -455,6 +503,7 @@ void WombatDatabase::InsertEvidenceObject()
             evidpropertylist << "MD5" << QString::fromStdString(stm.str()) << "";
         }
         free(ewfvalue);
+        free(int32value);
     }
     else if(TSK_IMG_TYPE_ISRAW(wombatptr->evidenceobject.imageinfo->itype)) // is raw
     {
