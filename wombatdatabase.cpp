@@ -490,10 +490,10 @@ void WombatDatabase::InsertEvidenceObject()
         }
         else
             libewf_error_fprint(ewferror, stdout);
-        if(libewf_handle_get_sectors_per_chunk(ewfinfo->handle, int32value, &ewferror) == 1)
+        if(libewf_handle_get_format(ewfinfo->handle, ewfvalue, &ewferror) == 1)
         {
             //evidpropertylist << "Segments per Chunk" << 
-            qDebug() << "segments per chunk" << int32value;
+            qDebug() << "format" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue));
         }
         std::stringstream stm;
         if(ewfinfo->md5hashisset == 1)
