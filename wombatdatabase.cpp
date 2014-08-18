@@ -428,8 +428,11 @@ void WombatDatabase::InsertEvidenceObject()
     {
         ewfinfo = (IMG_EWF_INFO*)wombatptr->evidenceobject.imageinfo;
         ewfreturnvalue = libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror);
+        qDebug() << "return value" << ewfreturnvalue;
         char* valuechar = reinterpret_cast<char*>(ewfvalue);
         qDebug() << QString::fromUtf8(valuechar);
+        if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            qDebug() << "case number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue));
         std::stringstream stm;
         if(ewfinfo->md5hashisset == 1)
         {
