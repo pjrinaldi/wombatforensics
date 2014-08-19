@@ -430,10 +430,6 @@ void WombatDatabase::InsertEvidenceObject()
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {
         ewfinfo = (IMG_EWF_INFO*)wombatptr->evidenceobject.imageinfo;
-        //ewfreturnvalue = libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror);
-        //qDebug() << "return value" << ewfreturnvalue;
-        //char* valuechar = reinterpret_cast<char*>(ewfvalue);
-        //qDebug() << QString::fromUtf8(valuechar);
         if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             qDebug() << "case number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue));
         if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
@@ -466,6 +462,10 @@ void WombatDatabase::InsertEvidenceObject()
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_acquiry_operating_system(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Aquisition OS" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_utf8_header_value_acquiry_software_version(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            evidpropertylist << "Software Version Used" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_password(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
@@ -549,6 +549,7 @@ void WombatDatabase::InsertEvidenceObject()
             evidpropertylist << QString("Error Granularity") << QString::number(value32bit) << "";
         else
             libewf_error_fprint(ewferror, stdout);
+        evidpropertylist << "Compression Method" << "Deflate" << "";
         if(libewf_handle_get_compression_values(ewfinfo->handle, &value8bit, 0, &ewferror) == 1)
         {
             evidpropertylist << "Compression Level";
@@ -610,13 +611,22 @@ void WombatDatabase::InsertEvidenceObject()
             evidpropertylist << "Media Size" << QString::number(size64bit) << "";
         else
             libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_utf8_hash_value_md5(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            evidpropertylist << "MD5" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        /*
         std::stringstream stm;
         if(ewfinfo->md5hashisset == 1)
         {
             ewfinfo->md5hash[33] = '\0';
             stm << ewfinfo->md5hash;
             evidpropertylist << "MD5" << QString::fromStdString(stm.str()) << "";
-        }
+        }*/
+        if(libewf_handle_get_utf8_hash_value_sha1(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
+            evidpropertylist << "SHA1" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
         free(ewfvalue);
         //free(int32value);
     }
