@@ -388,13 +388,10 @@ void WombatDatabase::InsertEvidenceObject()
     IMG_AFF_INFO* affinfo = NULL;
     IMG_EWF_INFO* ewfinfo = NULL;
     uint8_t* ewfvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
-    char* charvalue = NULL;
     uint8_t ewfformat = 0;
-    //uint32_t* int32value = (uint32_t*)malloc(sizeof(uint32_t)*64);
-    //uint32_t* int32value = NULL;
-    //size_t ewfvaluesize;
+    uint32_t value32bit = 0;
+    uint64_t value64bit = 0;
     libewf_error_t* ewferror = NULL;
-    //int ewfreturnvalue = 0;
     QStringList evidpropertylist;
     wombatptr->currentevidenceid = 0;
     evidpropertylist.clear();
@@ -485,18 +482,67 @@ void WombatDatabase::InsertEvidenceObject()
             evidpropertylist << "Serial Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
             libewf_error_fprint(ewferror, stdout);
-        if(libewf_handle_get_segment_filename(ewfinfo->handle, charvalue, 64, &ewferror) == 1)
+        if(libewf_handle_get_sectors_per_chunk(ewfinfo->handle, &value32bit, &ewferror) == 1)
         {
-            evidpropertylist << "Segment File Name" << QString::fromUtf8(charvalue) << "";
-            qDebug() << "segment file name" << QString::fromUtf8(charvalue);
+            evidpropertylist << QString("Sectors Per Chunk") << QString::number(value32bit) << "";
+            qDebug() << "Sectors Per Chunk" << QString::number(value32bit);
         }
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_format(ewfinfo->handle, &ewfformat, &ewferror) == 1)
         {
-            if(ewfformat == LIBEWF_FORMAT_ENCASE5)
-                qDebug() << "format" << QString("EnCase 5");
+            evidpropertylist << QString("File Format");
+            switch(ewfformat)
+            {
+                case LIBEWF_FORMAT_EWF:
+                    evidpropertylist << QString("Original EWF") << "";
+                    break;
+                case LIBEWF_FORMAT_SMART:
+                    evidpropertylist << QString("SMART") << "";
+                    break;
+                case LIBEWF_FORMAT_FTK:
+                    evidpropertylist << QString("FTK Imager") << "";
+                    break;
+                case LIBEWF_FORMAT_ENCASE1:
+                    evidpropertylist << QString("EnCase 1") << "";
+                    break;
+                case LIBEWF_FORMAT_ENCASE2:
+                    evidpropertylist << QString("EnCase 2") << "";
+                    break;
+                case LIBEWF_FORMAT_ENCASE3:
+                    evidpropertylist << QString("EnCase 3") << "";
+                    break;
+                case LIBEWF_FORMAT_ENCASE4:
+                    evidpropertylist << QString("EnCase 4") << "";
+                    break;
+                case LIBEWF_FORMAT_ENCASE5:
+                    evidpropertylist << QString("EnCase 5") << "";
+                    break;
+                case LIBEWF_FORMAT_ENCASE6:
+                    evidpropertylist << QString("EnCase 6") << "";
+                    break;
+                case LIBEWF_FORMAT_LINEN5:
+                    evidpropertylist << QString("Linen 5") << "";
+                    break;
+                case LIBEWF_FORMAT_LINEN6:
+                    evidpropertylist << QString("Linen 6") << "";
+                    break;
+                case LIBEWF_FORMAT_EWFX:
+                    evidpropertylist << QString("EWFX (extended ewf)") << QString("Extended EWF");
+                    break;
+                case LIBEWF_FORMAT_LOGICAL_ENCASE5:
+                    evidpropertylist << QString("LEF EnCase 5") << QString("Logical Evidence File EnCase 5");
+                    break;
+                case LIBEWF_FORMAT_LOGICAL_ENCASE6:
+                    evidpropertylist << QString("LEF EnCase 6") << QString("Logical Evidence File EnCase 6");
+                    break;
+                case LIBEWF_FORMAT_UNKNOWN:
+                    evidpropertylist << QString("Unknown Format") << "";
+                    break;
+            }
         }
+        else
+            libewf_error_fprint(ewferror, stdout);
         std::stringstream stm;
         if(ewfinfo->md5hashisset == 1)
         {

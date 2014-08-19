@@ -59,7 +59,6 @@
 #include "afflib.h"
 #include "img/ewf.h"
 #include "libewf.h"
-//#include "libewf/definitions.h"
 #include "fs/tsk_ntfs.h"
 #include "fs/tsk_exfatfs.h"
 #include "fs/tsk_fatfs.h"
