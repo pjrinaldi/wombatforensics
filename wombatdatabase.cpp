@@ -472,10 +472,12 @@ void WombatDatabase::InsertEvidenceObject()
             evidpropertylist << "Password" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
             libewf_error_fprint(ewferror, stdout);
+        /*
         if(libewf_handle_get_utf8_header_value_compression_level(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Compression Level" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
             libewf_error_fprint(ewferror, stdout);
+        */
         if(libewf_handle_get_utf8_header_value_model(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Model" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
@@ -550,7 +552,7 @@ void WombatDatabase::InsertEvidenceObject()
         else
             libewf_error_fprint(ewferror, stdout);
         evidpropertylist << "Compression Method" << "Deflate" << "";
-        if(libewf_handle_get_compression_values(ewfinfo->handle, &value8bit, 0, &ewferror) == 1)
+        if(libewf_handle_get_compression_values(ewfinfo->handle, &value8bit, &uvalue8bit, &ewferror) == 1)
         {
             evidpropertylist << "Compression Level";
             if(value8bit == LIBEWF_COMPRESSION_NONE)
@@ -615,20 +617,11 @@ void WombatDatabase::InsertEvidenceObject()
             evidpropertylist << "MD5" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
             libewf_error_fprint(ewferror, stdout);
-        /*
-        std::stringstream stm;
-        if(ewfinfo->md5hashisset == 1)
-        {
-            ewfinfo->md5hash[33] = '\0';
-            stm << ewfinfo->md5hash;
-            evidpropertylist << "MD5" << QString::fromStdString(stm.str()) << "";
-        }*/
         if(libewf_handle_get_utf8_hash_value_sha1(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "SHA1" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
             libewf_error_fprint(ewferror, stdout);
         free(ewfvalue);
-        //free(int32value);
     }
     else if(TSK_IMG_TYPE_ISRAW(wombatptr->evidenceobject.imageinfo->itype)) // is raw
     {
