@@ -431,8 +431,6 @@ void WombatDatabase::InsertEvidenceObject()
     {
         ewfinfo = (IMG_EWF_INFO*)wombatptr->evidenceobject.imageinfo;
         if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            qDebug() << "case number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue));
-        if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Case Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
             libewf_error_fprint(ewferror, stdout);
@@ -472,12 +470,6 @@ void WombatDatabase::InsertEvidenceObject()
             evidpropertylist << "Password" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
             libewf_error_fprint(ewferror, stdout);
-        /*
-        if(libewf_handle_get_utf8_header_value_compression_level(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Compression Level" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
-        else
-            libewf_error_fprint(ewferror, stdout);
-        */
         if(libewf_handle_get_utf8_header_value_model(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
             evidpropertylist << "Model" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
         else
@@ -487,10 +479,7 @@ void WombatDatabase::InsertEvidenceObject()
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_sectors_per_chunk(ewfinfo->handle, &value32bit, &ewferror) == 1)
-        {
             evidpropertylist << QString("Sectors Per Chunk") << QString::number(value32bit) << "";
-            qDebug() << "Sectors Per Chunk" << QString::number(value32bit);
-        }
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_format(ewfinfo->handle, &uvalue8bit, &ewferror) == 1)
