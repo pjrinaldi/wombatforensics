@@ -388,9 +388,11 @@ void WombatDatabase::InsertEvidenceObject()
     IMG_AFF_INFO* affinfo = NULL;
     IMG_EWF_INFO* ewfinfo = NULL;
     uint8_t* ewfvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
-    uint8_t ewfformat = 0;
+    uint8_t uvalue8bit = 0;
+    int8_t value8bit = 0;
     uint32_t value32bit = 0;
     uint64_t value64bit = 0;
+    size64_t size64bit = 0;
     libewf_error_t* ewferror = NULL;
     QStringList evidpropertylist;
     wombatptr->currentevidenceid = 0;
@@ -489,10 +491,10 @@ void WombatDatabase::InsertEvidenceObject()
         }
         else
             libewf_error_fprint(ewferror, stdout);
-        if(libewf_handle_get_format(ewfinfo->handle, &ewfformat, &ewferror) == 1)
+        if(libewf_handle_get_format(ewfinfo->handle, &uvalue8bit, &ewferror) == 1)
         {
             evidpropertylist << QString("File Format");
-            switch(ewfformat)
+            switch(uvalue8bit)
             {
                 case LIBEWF_FORMAT_EWF:
                     evidpropertylist << QString("Original EWF") << "";
@@ -541,6 +543,71 @@ void WombatDatabase::InsertEvidenceObject()
                     break;
             }
         }
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_error_granularity(ewfinfo->handle, &value32bit, &ewferror) == 1)
+            evidpropertylist << QString("Error Granularity") << QString::number(value32bit) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_compression_values(ewfinfo->handle, &value8bit, 0, &ewferror) == 1)
+        {
+            evidpropertylist << "Compression Level";
+            if(value8bit == LIBEWF_COMPRESSION_NONE)
+                evidpropertylist << "No Compression";
+            else if(value8bit == LIBEWF_COMPRESSION_FAST)
+                evidpropertylist << "Good (Fast) Compression";
+            else if(value8bit == LIBEWF_COMPRESSION_BEST)
+                evidpropertylist << "Best Compression";
+            else
+                evidpropertylist << "Unknown Compression";
+            evidpropertylist << "";
+        }
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_media_type(ewfinfo->handle, &uvalue8bit, &ewferror) == 1)
+        {
+            evidpropertylist << "Media Type";
+            if(uvalue8bit == LIBEWF_MEDIA_TYPE_REMOVABLE)
+                evidpropertylist << "Removable Disk";
+            else if(uvalue8bit == LIBEWF_MEDIA_TYPE_FIXED)
+                evidpropertylist << "Fixed Disk";
+            else if(uvalue8bit == LIBEWF_MEDIA_TYPE_SINGLE_FILES)
+                evidpropertylist << "Single Files";
+            else if(uvalue8bit == LIBEWF_MEDIA_TYPE_OPTICAL)
+                evidpropertylist << "Optical Disk (CD/DVD/BD)";
+            else if(uvalue8bit == LIBEWF_MEDIA_TYPE_MEMORY)
+                evidpropertylist << "Memory (RAM)";
+            else
+                evidpropertylist << "Unknown";
+            evidpropertylist << "";
+        }
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_media_flags(ewfinfo->handle, &uvalue8bit, &ewferror) == 1)
+        {
+            if(uvalue8bit == LIBEWF_MEDIA_FLAG_PHYSICAL)
+                evidpropertylist << "Media Flag" << "Physical" << "";
+            if(uvalue8bit == LIBEWF_MEDIA_FLAG_FASTBLOC)
+                evidpropertylist << "Media Flag" << "Fastbloc Write Blocked" << "";
+            if(uvalue8bit == LIBEWF_MEDIA_FLAG_TABLEAU)
+                evidpropertylist << "Media Flag" << "Tableau Write Blocked" << "";
+        }
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_bytes_per_sector(ewfinfo->handle, &value32bit, &ewferror) == 1)
+            evidpropertylist << "Bytes Per Sector" << QString::number(value32bit) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_number_of_sectors(ewfinfo->handle, &value64bit, &ewferror) == 1)
+            evidpropertylist << "Number of Sectors" << QString::number(value64bit) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_chunk_size(ewfinfo->handle, &value32bit, &ewferror) == 1)
+            evidpropertylist << "Chunk Size" << QString::number(value32bit) << "";
+        else
+            libewf_error_fprint(ewferror, stdout);
+        if(libewf_handle_get_media_size(ewfinfo->handle, &size64bit, &ewferror) == 1)
+            evidpropertylist << "Media Size" << QString::number(size64bit) << "";
         else
             libewf_error_fprint(ewferror, stdout);
         std::stringstream stm;
