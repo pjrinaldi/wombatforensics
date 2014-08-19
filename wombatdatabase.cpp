@@ -389,7 +389,9 @@ void WombatDatabase::InsertEvidenceObject()
     IMG_EWF_INFO* ewfinfo = NULL;
     uint8_t* ewfvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
     char* charvalue = NULL;
-    uint32_t* int32value = (uint32_t*)malloc(sizeof(uint32_t)*64);
+    uint8_t ewfformat = 0;
+    //uint32_t* int32value = (uint32_t*)malloc(sizeof(uint32_t)*64);
+    //uint32_t* int32value = NULL;
     //size_t ewfvaluesize;
     libewf_error_t* ewferror = NULL;
     //int ewfreturnvalue = 0;
@@ -490,10 +492,10 @@ void WombatDatabase::InsertEvidenceObject()
         }
         else
             libewf_error_fprint(ewferror, stdout);
-        if(libewf_handle_get_format(ewfinfo->handle, ewfvalue, &ewferror) == 1)
+        if(libewf_handle_get_format(ewfinfo->handle, &ewfformat, &ewferror) == 1)
         {
-            //evidpropertylist << "Segments per Chunk" << 
-            qDebug() << "format" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue));
+            if(ewfformat == LIBEWF_FORMAT_ENCASE5)
+                qDebug() << "format" << QString("EnCase 5");
         }
         std::stringstream stm;
         if(ewfinfo->md5hashisset == 1)
@@ -503,7 +505,7 @@ void WombatDatabase::InsertEvidenceObject()
             evidpropertylist << "MD5" << QString::fromStdString(stm.str()) << "";
         }
         free(ewfvalue);
-        free(int32value);
+        //free(int32value);
     }
     else if(TSK_IMG_TYPE_ISRAW(wombatptr->evidenceobject.imageinfo->itype)) // is raw
     {
