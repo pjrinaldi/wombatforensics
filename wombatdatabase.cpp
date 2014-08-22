@@ -540,7 +540,7 @@ void WombatDatabase::InsertEvidenceObject()
             evidpropertylist << QString("Error Granularity") << QString::number(value32bit) << "Error block size";
         else
             libewf_error_fprint(ewferror, stdout);
-        evidpropertylist << "Compression Method" << "Deflate" << "";
+        evidpropertylist << "Compression Method" << "Deflate" << "Method used to compress the image";
         if(libewf_handle_get_compression_values(ewfinfo->handle, &value8bit, &uvalue8bit, &ewferror) == 1)
         {
             evidpropertylist << "Compression Level";
@@ -552,7 +552,7 @@ void WombatDatabase::InsertEvidenceObject()
                 evidpropertylist << "Best Compression";
             else
                 evidpropertylist << "Unknown Compression";
-            evidpropertylist << "";
+            evidpropertylist << "The more compression, the slower the acquisition but the smaller the file size";
         }
         else
             libewf_error_fprint(ewferror, stdout);
@@ -571,43 +571,43 @@ void WombatDatabase::InsertEvidenceObject()
                 evidpropertylist << "Memory (RAM)";
             else
                 evidpropertylist << "Unknown";
-            evidpropertylist << "";
+            evidpropertylist << "Media type of the original evidence";
         }
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_media_flags(ewfinfo->handle, &uvalue8bit, &ewferror) == 1)
         {
             if(uvalue8bit == LIBEWF_MEDIA_FLAG_PHYSICAL)
-                evidpropertylist << "Media Flag" << "Physical" << "";
+                evidpropertylist << "Media Flag" << "Physical" << "Directly connected disk";
             if(uvalue8bit == LIBEWF_MEDIA_FLAG_FASTBLOC)
-                evidpropertylist << "Media Flag" << "Fastbloc Write Blocked" << "";
+                evidpropertylist << "Media Flag" << "Fastbloc Write Blocked" << "Write blocked disk using Fastbloc";
             if(uvalue8bit == LIBEWF_MEDIA_FLAG_TABLEAU)
-                evidpropertylist << "Media Flag" << "Tableau Write Blocked" << "";
+                evidpropertylist << "Media Flag" << "Tableau Write Blocked" << "Write blocked disk using Tableau";
         }
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_bytes_per_sector(ewfinfo->handle, &value32bit, &ewferror) == 1)
-            evidpropertylist << "Bytes Per Sector" << QString::number(value32bit) << "";
+            evidpropertylist << "Bytes Per Sector" << QString::number(value32bit) << "Number of bytes in a sector";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_number_of_sectors(ewfinfo->handle, &value64bit, &ewferror) == 1)
-            evidpropertylist << "Number of Sectors" << QString::number(value64bit) << "";
+            evidpropertylist << "Number of Sectors" << QString::number(value64bit) << "Number of total sectors in the original media";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_chunk_size(ewfinfo->handle, &value32bit, &ewferror) == 1)
-            evidpropertylist << "Chunk Size" << QString::number(value32bit) << "";
+            evidpropertylist << "Chunk Size" << QString::number(value32bit) << "The size of an image chunk";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_media_size(ewfinfo->handle, &size64bit, &ewferror) == 1)
-            evidpropertylist << "Media Size" << QString::number(size64bit) << "";
+            evidpropertylist << "Media Size" << QString::number(size64bit) << "The size of the media";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_hash_value_md5(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "MD5" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "MD5" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "The MD5 hash algorithm of the uncompressed image stored as a 128-bit value";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_hash_value_sha1(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "SHA1" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "SHA1" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "The SHA1 hash algorithm of the uncompressed image stored as a 160-bit value";
         else
             libewf_error_fprint(ewferror, stdout);
         free(ewfvalue);
