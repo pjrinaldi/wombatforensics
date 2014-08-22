@@ -414,72 +414,72 @@ void WombatDatabase::InsertEvidenceObject()
     if(TSK_IMG_TYPE_ISAFF(wombatptr->evidenceobject.imageinfo->itype)) // its AFF
     {
         affinfo = (IMG_AFF_INFO*)wombatptr->evidenceobject.imageinfo;
-        evidpropertylist << "MD5" << QString::fromStdString(GetSegmentValue(affinfo, AF_MD5)) << "";
-        evidpropertylist << "Image GID" << QString::fromStdString(GetSegmentValue(affinfo, AF_IMAGE_GID)) << "";
-        evidpropertylist << "Device Model" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_MODEL)) << "";
-        evidpropertylist << "Creator" << QString::fromStdString(GetSegmentValue(affinfo, AF_CREATOR)) << "";
-        evidpropertylist << "Case Number" << QString::fromStdString(GetSegmentValue(affinfo, AF_CASE_NUM)) << "";
-        evidpropertylist << "SHA1" << QString::fromStdString(GetSegmentValue(affinfo, AF_SHA1)) << "";
-        evidpropertylist << "Acquisition Date" << QString::fromStdString(GetSegmentValue(affinfo, AF_ACQUISITION_DATE)) << "";
-        evidpropertylist << "Acquisition Notes" << QString::fromStdString(GetSegmentValue(affinfo, AF_ACQUISITION_NOTES)) << "";
-        evidpropertylist << "Acquisition Device" << QString::fromStdString(GetSegmentValue(affinfo, AF_ACQUISITION_DEVICE)) << "";
-        evidpropertylist << "AFFLib Version" << QString::fromStdString(GetSegmentValue(affinfo, AF_AFFLIB_VERSION)) << "";
-        evidpropertylist << "Device Manufacturer" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_MANUFACTURER)) << "";
-        evidpropertylist << "Device Serial Number" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_SN)) << "";
+        evidpropertylist << "MD5" << QString::fromStdString(GetSegmentValue(affinfo, AF_MD5)) << "The MD5 hash algorithm of the uncompressed image file, stored as a 128-bit value";
+        evidpropertylist << "Image GID" << QString::fromStdString(GetSegmentValue(affinfo, AF_IMAGE_GID)) << "A unique global identifier for the image";
+        evidpropertylist << "Device Model" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_MODEL)) << "Acquired Drive Model number";
+        evidpropertylist << "Creator" << QString::fromStdString(GetSegmentValue(affinfo, AF_CREATOR)) << "Examiner who initiated the image acquisition";
+        evidpropertylist << "Case Number" << QString::fromStdString(GetSegmentValue(affinfo, AF_CASE_NUM)) << "The case number that the image is associated with";
+        evidpropertylist << "SHA1" << QString::fromStdString(GetSegmentValue(affinfo, AF_SHA1)) << "The SHA1 hash algorithm of the uncompressed image file, stored as a 160-bit value";
+        evidpropertylist << "Acquisition Date" << QString::fromStdString(GetSegmentValue(affinfo, AF_ACQUISITION_DATE)) << "The date the acquisition was made";
+        evidpropertylist << "Acquisition Notes" << QString::fromStdString(GetSegmentValue(affinfo, AF_ACQUISITION_NOTES)) << "Notes regading the acquisition";
+        evidpropertylist << "Acquisition Device" << QString::fromStdString(GetSegmentValue(affinfo, AF_ACQUISITION_DEVICE)) << "The device used to acquire the information";
+        evidpropertylist << "AFFLib Version" << QString::fromStdString(GetSegmentValue(affinfo, AF_AFFLIB_VERSION)) << "Verion of the AFFLib Library used";
+        evidpropertylist << "Device Manufacturer" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_MANUFACTURER)) << "Maker of the drive";
+        evidpropertylist << "Device Serial Number" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_SN)) << "Serial number of the drive";
     }
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {
         ewfinfo = (IMG_EWF_INFO*)wombatptr->evidenceobject.imageinfo;
         if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Case Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Case Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "The case number the image is associated";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_description(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Description" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Description" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Description of the acquisition and or evidence item";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_examiner_name(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Examiner Name" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Examiner Name" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Name of the examiner who acquired the image";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_evidence_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Evidence Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Evidence Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Unique number identifying the evidence item";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_notes(ewfinfo->handle, ewfvalue, 255, &ewferror) == 1)
-            evidpropertylist << "Notes" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Notes" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Any notes related to the acquisition";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_acquiry_date(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Acquisition Date" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Acquisition Date" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Date the acquisition was made";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_system_date(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "System Date" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "System Date" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Date for the system acquiring the image";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_acquiry_operating_system(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Aquisition OS" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Aquisition OS" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Operating System acquiring the image";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_acquiry_software_version(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Software Version Used" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Software Version Used" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Version of the software used to acquire the image";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_password(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Password" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Password" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Password to protect the image";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_model(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Model" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Model" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Model of the drive acquired";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_serial_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            evidpropertylist << "Serial Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "";
+            evidpropertylist << "Serial Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Serial number of the drive acquired";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_sectors_per_chunk(ewfinfo->handle, &value32bit, &ewferror) == 1)
-            evidpropertylist << QString("Sectors Per Chunk") << QString::number(value32bit) << "";
+            evidpropertylist << QString("Sectors Per Chunk") << QString::number(value32bit) << "Number of sectors in a image evidence chunk";
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_format(ewfinfo->handle, &uvalue8bit, &ewferror) == 1)
@@ -488,56 +488,56 @@ void WombatDatabase::InsertEvidenceObject()
             switch(uvalue8bit)
             {
                 case LIBEWF_FORMAT_EWF:
-                    evidpropertylist << QString("Original EWF") << "";
+                    evidpropertylist << QString("Original EWF") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_SMART:
-                    evidpropertylist << QString("SMART") << "";
+                    evidpropertylist << QString("SMART") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_FTK:
-                    evidpropertylist << QString("FTK Imager") << "";
+                    evidpropertylist << QString("FTK Imager") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_ENCASE1:
-                    evidpropertylist << QString("EnCase 1") << "";
+                    evidpropertylist << QString("EnCase 1") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_ENCASE2:
-                    evidpropertylist << QString("EnCase 2") << "";
+                    evidpropertylist << QString("EnCase 2") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_ENCASE3:
-                    evidpropertylist << QString("EnCase 3") << "";
+                    evidpropertylist << QString("EnCase 3") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_ENCASE4:
-                    evidpropertylist << QString("EnCase 4") << "";
+                    evidpropertylist << QString("EnCase 4") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_ENCASE5:
-                    evidpropertylist << QString("EnCase 5") << "";
+                    evidpropertylist << QString("EnCase 5") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_ENCASE6:
-                    evidpropertylist << QString("EnCase 6") << "";
+                    evidpropertylist << QString("EnCase 6") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_LINEN5:
-                    evidpropertylist << QString("Linen 5") << "";
+                    evidpropertylist << QString("Linen 5") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_LINEN6:
-                    evidpropertylist << QString("Linen 6") << "";
+                    evidpropertylist << QString("Linen 6") << "Format used to store the evidence image";
                     break;
                 case LIBEWF_FORMAT_EWFX:
-                    evidpropertylist << QString("EWFX (extended ewf)") << QString("Extended EWF");
+                    evidpropertylist << QString("EWFX (extended ewf)") << QString("Extended EWF Format used to store the evidence image");
                     break;
                 case LIBEWF_FORMAT_LOGICAL_ENCASE5:
-                    evidpropertylist << QString("LEF EnCase 5") << QString("Logical Evidence File EnCase 5");
+                    evidpropertylist << QString("LEF EnCase 5") << QString("Logical Evidence File EnCase 5 Format used to store the evidence image");
                     break;
                 case LIBEWF_FORMAT_LOGICAL_ENCASE6:
-                    evidpropertylist << QString("LEF EnCase 6") << QString("Logical Evidence File EnCase 6");
+                    evidpropertylist << QString("LEF EnCase 6") << QString("Logical Evidence File EnCase 6 Format used to store the evidence image");
                     break;
                 case LIBEWF_FORMAT_UNKNOWN:
-                    evidpropertylist << QString("Unknown Format") << "";
+                    evidpropertylist << QString("Unknown Format") << "Format used to store the evidence image";
                     break;
             }
         }
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_error_granularity(ewfinfo->handle, &value32bit, &ewferror) == 1)
-            evidpropertylist << QString("Error Granularity") << QString::number(value32bit) << "";
+            evidpropertylist << QString("Error Granularity") << QString::number(value32bit) << "Error block size";
         else
             libewf_error_fprint(ewferror, stdout);
         evidpropertylist << "Compression Method" << "Deflate" << "";
