@@ -1197,6 +1197,7 @@ void WombatDatabase::InsertFileSystemProperties()
                 {
                     // log error here.
                 }*/
+                /* continuance
                 qDebug() << "HFS Volume Name: " << fn;
                 free(fn);
                 break;
