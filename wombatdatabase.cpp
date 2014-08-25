@@ -345,6 +345,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->len);
                 wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
+                InsertFileSystemProperties();
                 filesprocessed++;
             }
         }
@@ -377,6 +378,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->block_count);
                 wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
+                InsertFileSystemProperties();
                 filesprocessed++;
             }
         }
@@ -864,4 +866,352 @@ int WombatDatabase::ReturnFileSystemOffset(int fsid)
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT byteoffset FROM data WHERE objectid = ?", wombatptr->bindvalues);
     return wombatptr->sqlrecords.at(0).value(0).toInt();
+}
+
+void WombatDatabase::InsertFileSystemProperties()
+{
+    /*
+     *
+    for(uint i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
+    {
+        TSK_FS_INFO* tmpfsinfo = wombatptr->evidenceobject.fsinfovector[i];
+        if(tmpfsinfo == NULL)
+        {
+            // log error here.
+        }
+        TSK_FS_FILE* tmpfile = NULL;
+        FFS_INFO* ffs = NULL;
+        ffs_sb1* sb1 = NULL;
+        ffs_sb2* sb2 = NULL;
+        //TSK_FS_DIR* tmpdir = NULL;
+        //FATXXFS_SB* sb = NULL;
+        FATXXFS_DENTRY* tmpfatdentry = NULL;
+        FATXXFS_DENTRY* curentry = NULL;
+        FATFS_INFO* fatfs = NULL;
+        FATXXFS_SB* fatsb = NULL;
+        const TSK_FS_ATTR* tmpattr;
+        TSK_DADDR_T cursector = 0;
+        TSK_DADDR_T endsector = 0;
+        int8_t isallocsec = 0;
+        TSK_INUM_T curinum = 0;
+        FATFS_DENTRY* dentry = NULL;
+        EXT2FS_INFO* ext2fs = NULL;
+        ext2fs_sb* sb = NULL;
+        ISO_INFO* iso = NULL;
+        iso9660_pvd_node* p = NULL;
+        iso9660_svd_node* s = NULL;
+        HFS_INFO* hfs = NULL;
+        hfs_plus_vh* hsb = NULL;
+        char fn[HFS_MAXNAMLEN + 1];
+        HFS_ENTRY* hfsentry = NULL;
+        hfs_btree_key_cat key;
+        hfs_thread thread;
+        hfs_file_folder record;
+        TSK_OFF_T off;
+        char* databuffer = NULL;
+        ssize_t cnt;
+        ssize_t bytesread = 0;
+        int a;
+        //uint8_t rval;
+        char asc[512];
+        switch(tmpfsinfo->ftype)
+        {
+            case TSK_FS_TYPE_NTFS:
+                //NTFS_INFO* tmpinfo = (NTFS_INFO*)tmpfsinfo;
+                if((tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, NTFS_MFT_VOL)) == NULL)
+                {
+                    // log error here...
+                }
+                tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, TSK_FS_ATTR_TYPE_NTFS_VNAME);
+                //tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, NTFS_ATYPE_VNAME);
+                if(!tmpattr)
+                {
+                    // log error here...
+                }
+                if((tmpattr->flags & TSK_FS_ATTR_RES) && (tmpattr->size))
+                {
+                    UTF16* name16 = (UTF16*) tmpattr->rd.buf;
+                    UTF8* name8 = (UTF8*) asc;
+                    int retval;
+                    retval = tsk_UTF16toUTF8(tmpfsinfo->endian, (const UTF16**)&name16, (UTF16*) ((uintptr_t) name16 + (int) tmpattr->size), &name8, (UTF8*) ((uintptr_t)name8 + sizeof(asc)), TSKlenientConversion);
+                    if(retval != TSKconversionOK)
+                    {
+                        // log error here                                
+                        *name8 = '\0';
+                    }
+                    else if((uintptr_t) name8 >= (uintptr_t) asc + sizeof(asc))
+                        asc[sizeof(asc) - 1] = '\0';
+                    else
+                        *name8 = '\0';
+                }
+                qDebug() << "NTFS Volume Name:" << asc;
+                tsk_fs_file_close(tmpfile);
+                break;
+            case TSK_FS_TYPE_EXFAT:
+                fatfs = (FATFS_INFO*)tmpfsinfo;
+                if((tmpfile = tsk_fs_file_alloc(tmpfsinfo)) == NULL)
+                {
+                    // log error here
+                }
+                if((tmpfile->meta = tsk_fs_meta_alloc(FATFS_FILE_CONTENT_LEN)) == NULL)
+                {
+                    // log error here
+                }
+                if((databuffer = (char*)tsk_malloc(fatfs->ssize)) == NULL)
+                {
+                    // log error here
+                }
+                cursector = fatfs->rootsect;
+                endsector = fatfs->firstdatasect + (fatfs->clustcnt * fatfs->csize) - 1;
+                while(cursector < endsector)
+                {
+
+                }
+                bytesread = tsk_fs_read_block(tmpfsinfo, cursector, databuffer, fatfs->ssize);
+                if(bytesread != fatfs->ssize)
+                {
+                    // log error here
+                }
+                isallocsec = fatfs_is_sectalloc(fatfs, cursector);
+                if(isallocsec == -1)
+                {
+                    // log error here
+                }
+                curinum = FATFS_SECT_2_INODE(fatfs, cursector);
+                for(i = 0; i < fatfs->ssize; i+= sizeof(FATFS_DENTRY))
+                {
+                    dentry = (FATFS_DENTRY*)&(databuffer[i]);
+                    if(exfatfs_get_enum_from_type(dentry->data[0]) == EXFATFS_DIR_ENTRY_TYPE_VOLUME_LABEL)
+                    {
+                        if(exfatfs_dinode_copy(fatfs, curinum, dentry, isallocsec, tmpfile) == TSK_OK)
+                        {
+                            qDebug() << "EXFAT Volume Name: " << tmpfile->meta->name2->name;
+                            break;
+                        }
+                        else
+                        {
+                            // log error here
+                        }
+                    }
+                }
+                tsk_fs_file_close(tmpfile);
+                free(databuffer);
+                break;
+            case TSK_FS_TYPE_FAT12:
+                fatfs = (FATFS_INFO*)tmpfsinfo;
+                fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
+                qDebug() << fatsb->a.f16.vol_lab;
+                printf("Volume Label (Boot Sector): %c%c%c%c%c%c%c%c%c%c%c\n", fatsb->a.f16.vol_lab[0], fatsb->a.f16.vol_lab[1], fatsb->a.f16.vol_lab[2], fatsb->a.f16.vol_lab[3], fatsb->a.f16.vol_lab[4], fatsb->a.f16.vol_lab[5], fatsb->a.f16.vol_lab[6], fatsb->a.f16.vol_lab[7], fatsb->a.f16.vol_lab[8], fatsb->a.f16.vol_lab[9], fatsb->a.f16.vol_lab[10]);
+                if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
+                {
+                    // log error here
+                }
+                cnt = tsk_fs_read_block(tmpfsinfo, fatfs->rootsect, databuffer, tmpfsinfo->block_size);
+                if(cnt != tmpfsinfo->block_size)
+                {
+                    // log error here
+                }
+                tmpfatdentry = NULL;
+                if(fatfs->ssize <= tmpfsinfo->block_size)
+                {
+                    curentry = (FATXXFS_DENTRY*)databuffer;
+                    for(int i=0; i < fatfs->ssize; i += sizeof(*curentry))
+                    {
+                        if(curentry->attrib == FATFS_ATTR_VOLUME)
+                        {
+                            tmpfatdentry = curentry;
+                            break;
+                        }
+                        curentry++;
+                    }
+                }
+                qDebug() << "FAT12 Volume Label: " << tmpfatdentry->name;
+                free(databuffer);
+                break;
+            case TSK_FS_TYPE_FAT16:
+                fatfs = (FATFS_INFO*)tmpfsinfo;
+                fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
+                qDebug() << fatsb->a.f16.vol_lab;
+                printf("Volume Label (Boot Sector): %c%c%c%c%c%c%c%c%c%c%c\n", fatsb->a.f16.vol_lab[0], fatsb->a.f16.vol_lab[1], fatsb->a.f16.vol_lab[2], fatsb->a.f16.vol_lab[3], fatsb->a.f16.vol_lab[4], fatsb->a.f16.vol_lab[5], fatsb->a.f16.vol_lab[6], fatsb->a.f16.vol_lab[7], fatsb->a.f16.vol_lab[8], fatsb->a.f16.vol_lab[9], fatsb->a.f16.vol_lab[10]);
+                if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
+                {
+                    // log error here
+                }
+                cnt = tsk_fs_read_block(tmpfsinfo, fatfs->rootsect, databuffer, tmpfsinfo->block_size);
+                if(cnt != tmpfsinfo->block_size)
+                {
+                    // log error here
+                }
+                tmpfatdentry = NULL;
+                if(fatfs->ssize <= tmpfsinfo->block_size)
+                {
+                    curentry = (FATXXFS_DENTRY*)databuffer;
+                    for(int i=0; i < fatfs->ssize; i += sizeof(*curentry))
+                    {
+                        if(curentry->attrib == FATFS_ATTR_VOLUME)
+                        {
+                            tmpfatdentry = curentry;
+                            break;
+                        }
+                        curentry++;
+                    }
+                }
+                qDebug() << "FAT16 Volume Label: " << tmpfatdentry->name;
+                free(databuffer);
+                break;
+            case TSK_FS_TYPE_FAT32:
+                fatfs = (FATFS_INFO*)tmpfsinfo;
+                fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
+                qDebug() << fatsb->a.f32.vol_lab;
+                printf("Volume Label (Boot Sector): %c%c%c%c%c%c%c%c%c%c%c\n", fatsb->a.f32.vol_lab[0], fatsb->a.f32.vol_lab[1], fatsb->a.f32.vol_lab[2], fatsb->a.f32.vol_lab[3], fatsb->a.f32.vol_lab[4], fatsb->a.f32.vol_lab[5], fatsb->a.f32.vol_lab[6], fatsb->a.f32.vol_lab[7], fatsb->a.f32.vol_lab[8], fatsb->a.f32.vol_lab[9], fatsb->a.f32.vol_lab[10]);
+                if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
+                {
+                    // log error here
+                }
+                cnt = tsk_fs_read_block(tmpfsinfo, fatfs->rootsect, databuffer, tmpfsinfo->block_size);
+                if(cnt != tmpfsinfo->block_size)
+                {
+                    // log error here
+                }
+                tmpfatdentry = NULL;
+                if(fatfs->ssize <= tmpfsinfo->block_size)
+                {
+                    curentry = (FATXXFS_DENTRY*)databuffer;
+                    for(int i=0; i < fatfs->ssize; i += sizeof(*curentry))
+                    {
+                        if(curentry->attrib == FATFS_ATTR_VOLUME)
+                        {
+                            tmpfatdentry = curentry;
+                            break;
+                        }
+                        curentry++;
+                    }
+                }
+                qDebug() << "FAT32 Volume Label: " << tmpfatdentry->name;
+                free(databuffer);
+                break;
+            case TSK_FS_TYPE_FFS1:
+                qDebug() << "FFS1";
+                break;
+            case TSK_FS_TYPE_FFS1B:
+                qDebug() << "FFS1B";
+                break;
+            case TSK_FS_TYPE_FFS2:
+                ffs = (FFS_INFO*)tmpfsinfo;
+                sb1 = ffs->fs.sb1;
+                sb2 = ffs->fs.sb2;
+                qDebug() << "FFS2 Volume label: " << sb2->volname;
+                break;
+            case TSK_FS_TYPE_EXT2:
+                ext2fs = (EXT2FS_INFO*)tmpfsinfo;
+                sb = ext2fs->fs;
+                qDebug() << "EXT2 Volume name: " << sb->s_volume_name;
+                break;
+            case TSK_FS_TYPE_EXT3:
+                ext2fs = (EXT2FS_INFO*)tmpfsinfo;
+                sb = ext2fs->fs;
+                qDebug() << "EXT3 Volume name: " << sb->s_volume_name;
+                break;
+            case TSK_FS_TYPE_EXT4:
+                ext2fs = (EXT2FS_INFO*)tmpfsinfo;
+                sb = ext2fs->fs;
+                qDebug() << "EXT4 Volume name: " << sb->s_volume_name;
+                break;
+            case TSK_FS_TYPE_RAW:
+                qDebug() << "no file system. store 0, \"\", or message for respective variables";
+                break;
+            case TSK_FS_TYPE_ISO9660:
+                a = 0;
+                iso = (ISO_INFO*)tmpfsinfo;
+                p = iso->pvd;
+                for(p = iso->pvd; p!= NULL; p = p->next)
+                {
+                    a++;
+                    qDebug() << "ISO9660 vol name: " << p->pvd.vol_id;
+                }
+                a = 0;
+                for(s = iso->svd; s!= NULL; s = s->next)
+                {
+                    a++;
+                    qDebug() << "ISO9660 vol name: " << s->svd.vol_id;
+                }
+                qDebug() << "ISO9660";
+                break;
+            case TSK_FS_TYPE_HFS:
+                hfs = (HFS_INFO*)tmpfsinfo;
+                hsb = hfs->fs;
+                memset((char*)&key, 0, sizeof(hfs_btree_key_cat));
+                cnid_to_array((uint32_t)HFS_ROOT_INUM, key.parent_cnid);
+                /*
+                off = hfs_cat_get_record_offset(hfs, &key);
+                if(off == 0)
+                {
+                    // log error here
+                }
+                if(hfs_cat_read_thread_record(hfs, off, &thread))
+                {
+                    // log error here
+                }
+
+                memset((char*)&key, 0, sizeof(hfs_btree_key_cat));
+                memcpy((char*)key.parent_cnid, (char*)thread.parent_cnid, sizeof(key.parent_cnid));
+                memcpy((char*)&key.name, (char*)&thread.name, sizeof(key.name));
+                off = hfs_cat_get_record_offset(hfs, &key);
+                if(off = 0)
+                {
+                    // log error here
+                }
+                if(hfs_cat_read_file_folder_record(hfs, off, &record))
+                {
+                    // log error here
+                }
+                //if(tsk_getU16(tmpfsinfo->endian, record.file.std.rec_type) == HFS_FOLDER_RECORD)
+                memcpy((char*)&entry->thread, (char*)&thread, sizeof(hfs_thread));
+                entry->flags = TSK_FS_META_FLAG_ALLOC | TSK_FS_META_FLAG_USED;
+                entry->inum = HFS_ROOT_INUM;
+                if(follow_hard_link)
+                {
+                    unsigned char is_err;
+                    TSK_INUM_T target_cnid = hfs_follow_hard_link(hfs, &(entry->cat), &is_err);
+                    if(is_err > 1)
+                    {
+                        // log error here
+                    }*/
+                    /*
+                    if(target_cnid != HFS_ROOT_INUM)
+                    {
+                        uint8_t res = hfs_cat_file_lookup(hfs, target_cnid, entry, FALSE);
+                        if(res != 0)
+                        {
+                            // log error here
+                        }
+                    }*/
+                //}
+                // NEED TO EXPAND THE HFS_CAT_FILE_LOOKUP() FUNCTION AND THE 
+                /*
+                if(hfs_cat_file_lookup(hfs, HFS_ROOT_INUM, &hfsentry, FALSE))
+                {
+                    // log error here
+                }
+                if(hfs_UTF16toUTF8(tmpfsinfo, hfsentry.thread.name.unicode, tsk_getu16(tmpfsinfo->endian, hfsentry.thread.name.length), fn, HFS_MAXNAMLEN + 1, HFS_U16U8_FLAG_REPLACE_SLASH))
+                {
+                    // log error here.
+                }*/
+                qDebug() << "HFS Volume Name: " << fn;
+                free(fn);
+                break;
+            case TSK_FS_TYPE_YAFFS2:
+                qDebug() << "YAFFS2 no volume name, might want other properties though";
+                break;
+            case TSK_FS_TYPE_SWAP:
+                qDebug() << "no file system. store 0, \"\", or message for respective variables";
+                break;
+           default:
+                qDebug() << "what to do for default???";
+                break;
+        }
+    }
+
+     *
+     */ 
 }

@@ -24,6 +24,7 @@ public:
     void GetEvidenceObjects(void);
     void InsertVolumeObject(void);
     void InsertPartitionObjects(void);
+    void InsertFileSystemProperties(void);
     void GetObjectValues(void);
 
     ~WombatDatabase();
