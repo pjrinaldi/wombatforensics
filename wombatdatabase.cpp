@@ -920,10 +920,15 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
     char asc[512];
     QStringList fsproplist;
     fsproplist.clear();
+    //uint8_t*  fsvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
     if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4)
     {
         ext2fs = (EXT2FS_INFO*)curfsinfo;
-        fsproplist << "Inode Count" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_inodes_count))) << "Number of Inodes in the file system. Found in the superblock at bytes 0 - 3";
+        //fsvalue = ext2fs->fs->s_inodes_count;
+        qDebug() << "qdebug inode count" << tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_count) + 1;
+        //qDebug() << "qdebug inode count" << ext2fs->fs->s_inodes_count;
+        //fsproplist << "Inode Count" << QString::fromUtf8(reinterpret_cast<char*>(fsvalue)) << "Number of Inodes in the file system. Found in the superblock at bytes 0 - 3";
+        //fsproplist << "Inode Count" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_inodes_count))) << "Number of Inodes in the file system. Found in the superblock at bytes 0 - 3";
         fsproplist << "Block Count" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_blocks_count))) << "Number of Blocks in the file system. Found in the superblock at bytes 4-7";
         fsproplist << "Reserved Blocks" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_r_blocks_count))) << "Number of blocks reserved to prevent the file system from filling up. Found in the superblock at bytes 8-11";
         fsproplist << "Unallocated Blocks" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_free_blocks_count))) << "Number of unallocated blocks. Found in the superblock at bytes 12-15";
