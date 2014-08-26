@@ -816,7 +816,17 @@ int WombatDatabase::GetEvidenceFileCount()
 void WombatDatabase::ReturnObjectPropertyList()
 {
     propertylist.clear();
-    if(wombatptr->selectedobject.objtype == 1) // image file
+    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->selectedobject.id);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT name, value, description FROM properties WHERE objectid = ?", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        propertylist << wombatptr->sqlrecords.at(i).value(0).toString() << wombatptr->sqlrecords.at(i).value(1).toString() << wombatptr->sqlrecords.at(i).value(2).toString();
+    }
+    // PROBABLY DON'T NEED TO DIFFERENTIATE, SINCE I'M PULLING THE DATA FROM THE DB, WHICH DOES THE DIFFERENTIATING BY OBJECTID
+    /*
+    if(wombatptr->selectedobject.objtype == 1 || wombatptr->selectedobject.) // image file
     {
         wombatptr->bindvalues.clear();
         wombatptr->bindvalues.append(wombatptr->selectedobject.id);
@@ -846,7 +856,7 @@ void WombatDatabase::ReturnObjectPropertyList()
     }
     else if(wombatptr->selectedobject.objtype == 5) // dir/file information
     {
-    }
+    }*/
 }
 
 void WombatDatabase::RemoveEvidence()
@@ -890,7 +900,7 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
     TSK_INUM_T curinum = 0;
     FATFS_DENTRY* dentry = NULL;
     EXT2FS_INFO* ext2fs = NULL;
-    ext2fs_sb* sb = NULL;
+    //ext2fs_sb* sb = NULL;
     ISO_INFO* iso = NULL;
     iso9660_pvd_node* p = NULL;
     iso9660_svd_node* s = NULL;
@@ -908,6 +918,22 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
     int a;
     uint len = 0;
     char asc[512];
+    QStringList fsproplist;
+    fsproplist.clear();
+    if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4)
+    {
+        ext2fs = (EXT2FS_INFO*)curfsinfo;
+        fsproplist << "Inode Count" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_inodes_count))) << "Number of Inodes in the file system. Found in the superblock at bytes 0 - 3";
+        fsproplist << "Block Count" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_blocks_count))) << "Number of Blocks in the file system. Found in the superblock at bytes 4-7";
+        fsproplist << "Reserved Blocks" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_r_blocks_count))) << "Number of blocks reserved to prevent the file system from filling up. Found in the superblock at bytes 8-11";
+        fsproplist << "Unallocated Blocks" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_free_blocks_count))) << "Number of unallocated blocks. Found in the superblock at bytes 12-15";
+        fsproplist << "Unallocated Inodes" << QString::fromUtf8(reinterpret_cast<char*>(&(ext2fs->fs->s_free_inode_count))) << "Number of unnalocated inodes";
+        //fsproplist << "Volume Name" << QString(sb->s_volume_name) << "
+        //sb = ext2fs->fs;
+        //qDebug() << "EXT2 Volume name: " << sb->s_volume_name;
+ 
+    }
+    /*
     switch(curfsinfo->ftype)
     {
         case TSK_FS_TYPE_NTFS:
@@ -919,7 +945,7 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         case TSK_FS_TYPE_EXFAT:
 
 
-    }
+    }*/
     /*
      *
             case TSK_FS_TYPE_NTFS:
@@ -1221,4 +1247,13 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
 
      *
      */ 
+    for(int i=0; i < fsproplist.count()/3; i++)
+    {
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append(curfsid);
+        wombatptr->bindvalues.append(fsproplist.at(3*i));
+        wombatptr->bindvalues.append(fsproplist.at(3*i+1));
+        wombatptr->bindvalues.append(fsproplist.at(3*i+2));
+        InsertSql("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);", wombatptr->bindvalues);
+    }
 }
