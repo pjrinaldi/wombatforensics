@@ -24,7 +24,7 @@ public:
     void GetEvidenceObjects(void);
     void InsertVolumeObject(void);
     void InsertPartitionObjects(void);
-    void InsertFileSystemProperties(void);
+    void InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsinfo);
     void GetObjectValues(void);
 
     ~WombatDatabase();

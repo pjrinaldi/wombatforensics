@@ -345,7 +345,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->len);
                 wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
-                InsertFileSystemProperties();
+                InsertFileSystemProperties(wombatptr->currentfilesystemid, tmpfsinfo);
                 filesprocessed++;
             }
         }
@@ -378,7 +378,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->block_count);
                 wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
-                InsertFileSystemProperties();
+                InsertFileSystemProperties(wombatptr->currentfilesystemid, wombatptr->evidenceobject.fsinfovector[i]);
                 filesprocessed++;
             }
         }
@@ -868,54 +868,60 @@ int WombatDatabase::ReturnFileSystemOffset(int fsid)
     return wombatptr->sqlrecords.at(0).value(0).toInt();
 }
 
-void WombatDatabase::InsertFileSystemProperties()
+void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsinfo)
 {
+    if(curfsinfo == NULL)
+    {
+        // log error here
+    }
+    TSK_FS_FILE* tmpfile = NULL;
+    ntfs_sb* ntfssb = NULL;
+    FFS_INFO* ffs = NULL;
+    ffs_sb1* sb1 = NULL;
+    ffs_sb2* sb2 = NULL;
+    FATXXFS_DENTRY* tmpfatdentry = NULL;
+    FATXXFS_DENTRY* curentry = NULL;
+    FATFS_INFO* fatfs = NULL;
+    FATXXFS_SB* fatsb = NULL;
+    const TSK_FS_ATTR*tmpattr;
+    TSK_DADDR_T cursector = 0;
+    TSK_DADDR_T endsector = 0;
+    int8_t isallocsec = 0;
+    TSK_INUM_T curinum = 0;
+    FATFS_DENTRY* dentry = NULL;
+    EXT2FS_INFO* ext2fs = NULL;
+    ext2fs_sb* sb = NULL;
+    ISO_INFO* iso = NULL;
+    iso9660_pvd_node* p = NULL;
+    iso9660_svd_node* s = NULL;
+    HFS_INFO* hfs = NULL;
+    hfs_plus_vh* hsb = NULL;
+    char fn[HFS_MAXNAMLEN + 1];
+    HFS_ENTRY* hfsentry = NULL;
+    hfs_btree_key_cat key;
+    hfs_thread thread;
+    hfs_file_folder record;
+    TSK_OFF_T off;
+    char* databuffer = NULL;
+    ssize_t cnt;
+    ssize_t bytesread = 0;
+    int a;
+    uint len = 0;
+    char asc[512];
+    switch(curfsinfo->ftype)
+    {
+        case TSK_FS_TYPE_NTFS:
+            len = roundup(sizeof(ntfs_sb), curfsinfo->img_info->sector_size);
+            ntfssb = tsk_malloc(len);
+            cnt = tsk_fs_read(curfsinfo, (TSK_OFF_T) 0, (char*) ntfssb, len);
+            // will come back to NTFS.
+            break;
+        case TSK_FS_TYPE_EXFAT:
+
+
+    }
     /*
      *
-    for(uint i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
-    {
-        TSK_FS_INFO* tmpfsinfo = wombatptr->evidenceobject.fsinfovector[i];
-        if(tmpfsinfo == NULL)
-        {
-            // log error here.
-        }
-        TSK_FS_FILE* tmpfile = NULL;
-        FFS_INFO* ffs = NULL;
-        ffs_sb1* sb1 = NULL;
-        ffs_sb2* sb2 = NULL;
-        //TSK_FS_DIR* tmpdir = NULL;
-        //FATXXFS_SB* sb = NULL;
-        FATXXFS_DENTRY* tmpfatdentry = NULL;
-        FATXXFS_DENTRY* curentry = NULL;
-        FATFS_INFO* fatfs = NULL;
-        FATXXFS_SB* fatsb = NULL;
-        const TSK_FS_ATTR* tmpattr;
-        TSK_DADDR_T cursector = 0;
-        TSK_DADDR_T endsector = 0;
-        int8_t isallocsec = 0;
-        TSK_INUM_T curinum = 0;
-        FATFS_DENTRY* dentry = NULL;
-        EXT2FS_INFO* ext2fs = NULL;
-        ext2fs_sb* sb = NULL;
-        ISO_INFO* iso = NULL;
-        iso9660_pvd_node* p = NULL;
-        iso9660_svd_node* s = NULL;
-        HFS_INFO* hfs = NULL;
-        hfs_plus_vh* hsb = NULL;
-        char fn[HFS_MAXNAMLEN + 1];
-        HFS_ENTRY* hfsentry = NULL;
-        hfs_btree_key_cat key;
-        hfs_thread thread;
-        hfs_file_folder record;
-        TSK_OFF_T off;
-        char* databuffer = NULL;
-        ssize_t cnt;
-        ssize_t bytesread = 0;
-        int a;
-        //uint8_t rval;
-        char asc[512];
-        switch(tmpfsinfo->ftype)
-        {
             case TSK_FS_TYPE_NTFS:
                 //NTFS_INFO* tmpinfo = (NTFS_INFO*)tmpfsinfo;
                 if((tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, NTFS_MFT_VOL)) == NULL)
