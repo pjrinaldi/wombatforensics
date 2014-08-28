@@ -967,6 +967,14 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         fsproplist << "Current Mount Count" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_mnt_count)) << "Number of times the file system has been mounted (52-53)";
         fsproplist << "Maximum Mount Count" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_max_mnt_count)) << "Maximum number of times the file system can be mounted (54-55)";
         fsproplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_magic)) << "File system signature value should be 0xef53 (56-57)";
+        fsproplist << "File System State";
+        if(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_state) & EXT2FS_STATE_VALID)
+            fsproplist << "Unmounted properly";
+        else if(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_state) & EXT2FS_STATE_ERROR)
+            fsproplist << "Errors Detected";
+        else
+            fsproplist << "Orphan inodes were being recovered";
+        fsproplist << "State of the file system when it was last shut down (58-59)";
 
         fsproplist << "File System Label" << QString::fromStdString(string(ext2fs->fs->s_volume_name)) << ""; 
         sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[8]), tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[0]));
