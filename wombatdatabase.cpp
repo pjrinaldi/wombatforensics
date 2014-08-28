@@ -975,6 +975,14 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         else
             fsproplist << "Orphan inodes were being recovered";
         fsproplist << "State of the file system when it was last shut down (58-59)";
+        fsproplist << "Error Handling Method";
+        if(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_errors) == 1)
+            fsproplist << "Continue";
+        else if(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_errors) == 2)
+            fsproplist << "Remount as Read-Only";
+        else
+            fsproplist << "Panic";
+        fsproplist << "Identifies what the OS should do when it encounters a file system error (60-61)";
 
         fsproplist << "File System Label" << QString::fromStdString(string(ext2fs->fs->s_volume_name)) << ""; 
         sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[8]), tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[0]));
