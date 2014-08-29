@@ -983,6 +983,40 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         else
             fsproplist << "Panic";
         fsproplist << "Identifies what the OS should do when it encounters a file system error (60-61)";
+        fsproplist << "Minor Version" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_minor_rev_level)) << "Minor Revision Level (62-63)";
+        sprintf(asc, "%s", (tsk_getu32(curfsinfo->endian, ext2fs->fs->s_lastcheck) > 0) ? tsk_fs_time_to_str(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_lastcheck), timebuf) : "empty");
+        fsproplist << "Last Checked" << QString::fromStdString(string(asc)) << "Last time the consistency of the file system was checked (64-67)";
+        fsproplist << "Interval b/w Checks" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_checkinterval)) << "Interval between forced consistency checks (68-71)";
+        fsproplist << "Creator OS";
+        switch(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_creator_os))
+        {
+            case EXT2FS_OS_LINUX:
+                fsproplist << "Linux";
+                break;
+            case EXT2FS_OS_HURD:
+                fsproplist << "HURD";
+                break;
+            case EXT2FS_OS_MASIX:
+                fsproplist << "MASIX";
+                break;
+            case EXT2FS_OS_FREEBSD:
+                fsproplist << "FreeBSD";
+                break;
+            case EXT2FS_OS_LITES:
+                fsproplist << "LITES";
+                break;
+            default:
+                fsproplist << "Unknown";
+                break;
+        }
+        fsproplist << "OS that might have created the file system (72-75)";
+        fsproplist << "Major Version";
+        if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_rev_level) == EXT2FS_REV_ORIG)
+            fsproplist << "Static Structure";
+        else
+            fsproplist << "Dynamic Structure";
+        fsproplist << "If the version is not set to dynamic, the values from bytes 84 and up might not be accurate (76-79)";
+
 
         fsproplist << "File System Label" << QString::fromStdString(string(ext2fs->fs->s_volume_name)) << ""; 
         sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[8]), tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[0]));
