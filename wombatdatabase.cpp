@@ -1016,6 +1016,23 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         else
             fsproplist << "Dynamic Structure";
         fsproplist << "If the version is not set to dynamic, the values from bytes 84 and up might not be accurate (76-79)";
+        fsproplist << "UID to Use Reserved Blocks" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_def_resuid)) << "User ID that can use reserved blocks (80-81)";
+        fsproplist << "GID to Use Reserved Blocks" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_def_resgid)) << "Group ID that can use reserved blocks (82-83)";
+        fsproplist << "First Non-Reserved Inode" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_first_ino)) << "First non-reserved inode in the file system (84-87)";
+        fsproplist << "Inode Structure Size" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_inode_size)) << "Size of each inode structure (88-89)";
+        fsproplist << "Block Group for SuperBlock" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_block_group_nr)) << "Superblock is part of the block group (if backup copy) (90-91)";
+        if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_DIR_PREALLOC)
+            fsproplist << "Compatible Feature" << "Directory Pre-allocation" << "Pre-allocate directory blocks to reduce fragmentation (92-95)";
+        if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_IMAGIC_INODES)
+            fsproplist << "Compatible Feature" << "IMagic Inodes" << "AFS server inodes exist (92-95)";
+        if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_HAS_JOURNAL)
+            fsproplist << "Compatible Feature" << "Journal" << "File System has a journal (92-95)";
+        if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_EXT_ATTR)
+            fsproplist << "Compatible Feature" << "Extended Attributes" << "Inodes have extended attributes (92-95)";
+        if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_RESIZE_INO)
+            fsproplist << "Compatible Feature" << "Resizable File System" << "File system can resize itself for larger aptitions (92-95)";
+        if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_DIR_INDEX)
+            fsproplist << "Compatible Feature" << "Directory Index" << "Directories use hash index (92-95)";
 
 
         fsproplist << "File System Label" << QString::fromStdString(string(ext2fs->fs->s_volume_name)) << ""; 
