@@ -1073,7 +1073,7 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         fsproplist << "Blocks Preallocated for Files" << QString::number(ext2fs->fs->s_prealloc_blocks) << "Number of blocks to preallocate for files (204-204)";
         fsproplist << "Blocks Preallocated for Directories" << QString::number(ext2fs->fs->s_prealloc_dir_blocks) << "Number of blocks to preallocate for directories (205-205)";
         fsproplist << "Unused" << "Unused" << "Unused bytes (206-207)";
-        sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(curfsinfo->endian, ext2fs->fs->s_journal_uuid[8]), tsk_getu64(curfsinfo->endian, ext2fs->fs->s_journal_uuid[0]));
+        sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_journal_uuid[8]), tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_journal_uuid[0]));
         fsproplist << "Journal ID" << QString::fromStdString(string(asc)) << "Journal ID (208-223)";
         fsproplist << "Journal Inode" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_journal_inum)) << "Journal Inode (224-227)";
         fsproplist << "Journal Device" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_journal_dev)) << "Journal device (228-231)";
