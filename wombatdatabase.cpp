@@ -914,7 +914,6 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
     TSK_INUM_T curinum = 0;
     FATFS_DENTRY* dentry = NULL;
     EXT2FS_INFO* ext2fs = NULL;
-    //ext2fs_sb* sb = NULL;
     ISO_INFO* iso = NULL;
     iso9660_pvd_node* p = NULL;
     iso9660_svd_node* s = NULL;
@@ -932,9 +931,10 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
     int a;
     uint len = 0;
     char asc[512];
+    char timebuf[128];
     QStringList fsproplist;
     fsproplist.clear();
-    if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4)
+    if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || TSK_FS_TYPE_EXT_DETECT)
     {
         ext2fs = (EXT2FS_INFO*)curfsinfo;
         fsproplist << "File System Type";
@@ -945,9 +945,6 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         else if(curfsinfo->ftype == TSK_FS_TYPE_EXT4)
             fsproplist << "ext4";
         fsproplist << "";
-        //fsproplist << "File System Label" << QString::fromStdString(string(ext2fs->fs->s_volume_name)) << ""; 
-        //sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[8]), tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[0]));
-        //fsproplist << "File System ID:" << QString::fromStdString(string(asc)) << "File system ID. Found in the superblock at bytes 104-119";
         fsproplist << "Inode Count" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_count)) << "Number of Inodes in the file system (0-3)";
         fsproplist << "Block Count" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_count)) << "Number of Blocks in the file system (4-7)";
         fsproplist << "Reserved Blocks" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_r_blocks_count)) << "Number of blocks reserved to prevent the file system from filling up (8-11)";
@@ -959,7 +956,6 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         fsproplist << "Blocks per Group" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_blocks_per_group)) << "Number of blocks in each block group (32-35)";
         fsproplist << "Fragments per Group" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_frags_per_group)) << "Number of fragments in each block group (36-39)";
         fsproplist << "Inodes per Group" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_per_group)) << "Number of inodes in each block group (40-43)";
-        char timebuf[128];
         sprintf(asc, "%s", (tsk_getu32(curfsinfo->endian, ext2fs->fs->s_mtime) > 0) ? tsk_fs_time_to_str(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_mtime), timebuf) : "empty");
         fsproplist << "Last Mount Time" << QString::fromStdString(string(asc)) << "Last time the file system was mounted (44-47)";
         sprintf(asc, "%s", (tsk_getu32(curfsinfo->endian, ext2fs->fs->s_wtime) > 0) ? tsk_fs_time_to_str(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_wtime), timebuf) : "empty");
@@ -1079,6 +1075,21 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         fsproplist << "Journal Device" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_journal_dev)) << "Journal device (228-231)";
         fsproplist << "Head of Oprhan Inode List" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_last_orphan)) << "Head of orphan inode list. (232-235)";
         fsproplist << "Unused" << "Unused" << "Unused (236-1023)";
+    }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B || curfsinfo->ftype == TSK_FS_TYPE_FFS2 || TSK_FS_TYPE_FFS_DETECT)
+    {
+        ffs = (FFS_INFO*)curfsinfo;
+        sb1 = ffs->fs.sb1;
+        sb2 = ffs->fs.sb2;
+        fsproplist << "File System Type";
+        if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B)
+            fsproplist << "UFS 1";
+        else
+            fsproplist << "UFS 2";
+        fsproplist << "";
+        fsproplist << "Unused" << "Unused" << "Unused (0-7)";
+        fsproplist << "Backup Superblock Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->sb_off)) << "Offset to backup superblock in cylinder group relative to a \"base\" (8-11)";
+        fsproplist << "Group Descriptor Offset" << QString::number(tsk_gets32(curfinfo->endian, sb1->gd_off)) << "Offset to group descriptor in cylinder group relative to a \"base\" (12-15)";
     }
     /*
     switch(curfsinfo->ftype)
