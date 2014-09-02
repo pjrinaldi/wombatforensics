@@ -1102,6 +1102,13 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         fsproplist << "Block Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_b)) << "Size of a block in bytes (48-51)";
         fsproplist << "Fragment Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fsize_b)) << "Size of a fragment in bytes (52-55)";
         fsproplist << "Block Framgent Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_frag)) << "Size of a block in fragments (56-59)";
+        fsproplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (60-95)";
+        fsproplist << "Number of Bits Convert Block to Fragment" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_fragshift)) << "Number of bits to convert between a block address and a fragment address (96-99)";
+        fsproplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (100-119)";
+        fsproplist << "Inodes Per Block" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_inopb)) << "Number of inodes per block in the inode table (120-123)";
+        fsproplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (124-143)";
+        sprintf(asc, "%" PRIx32 "%" PRIx32 "", tsk_getu32(curfsinfo->endian, &sb1>fs_id[4]), tsk_getu32(curfsinfo->endian, &sb1->fs_id[0]));
+        fsproplist << "File System ID" << QString::fromStdString(string(asc)) << "File system ID (144-151)";
     }
     /*
     switch(curfsinfo->ftype)
