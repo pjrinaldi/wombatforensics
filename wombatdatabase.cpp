@@ -1107,7 +1107,7 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         fsproplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (100-119)";
         fsproplist << "Inodes Per Block" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_inopb)) << "Number of inodes per block in the inode table (120-123)";
         fsproplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (124-143)";
-        sprintf(asc, "%" PRIx32 "%" PRIx32 "", tsk_getu32(curfsinfo->endian, &sb1>fs_id[4]), tsk_getu32(curfsinfo->endian, &sb1->fs_id[0]));
+        sprintf(asc, "%" PRIx32 "%" PRIx32 "", tsk_getu32(curfsinfo->endian, &sb1->fs_id[4]), tsk_getu32(curfsinfo->endian, &sb1->fs_id[0]));
         fsproplist << "File System ID" << QString::fromStdString(string(asc)) << "File system ID (144-151)";
     }
     /*
