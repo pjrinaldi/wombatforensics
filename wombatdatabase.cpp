@@ -326,10 +326,10 @@ void WombatDatabase::InsertPartitionObjects()
                 }
                 wombatptr->currentfilesystemid = 0;
                 wombatptr->bindvalues.clear();
-                wombatptr->bindvalues.append(GetFileSystemLabel(wombatptr->evidenceobject.fsinfovector[i]));
+                //wombatptr->bindvalues.append(GetFileSystemLabel(wombatptr->evidenceobject.fsinfovector[i]));
                 // ONLY TAKES CARE OF AN EXT2FS, I NEED TO MAKE A FUNCTION THAT WILL IF OUT THE VARIOUS FILESYSTEMS AND GET THE RESPECTIVE VALUES AND THEN RETURN THE QSTRING FOR IT
                 //wombatptr->bindvalues.append(QString::fromStdString(string(((EXT2FS_INFO*)tmpfsinfo)->fs->s_volume_name)));
-                //wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(tmpfsinfo->ftype)).toUpper());
+                wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(tmpfsinfo->ftype)).toUpper());
                 wombatptr->bindvalues.append(QString("/"));
                 wombatptr->bindvalues.append(tmpfsinfo->ftype);
                 wombatptr->bindvalues.append(tmpfsinfo->flags);
@@ -362,10 +362,10 @@ void WombatDatabase::InsertPartitionObjects()
             {
                 wombatptr->currentfilesystemid = 0;
                 wombatptr->bindvalues.clear();
-                wombatptr->bindvalues.append(GetFileSystemLabel(wombatptr->evidenceobject.fsinfovector[i]));
+                //wombatptr->bindvalues.append(GetFileSystemLabel(wombatptr->evidenceobject.fsinfovector[i]));
                 // ONLY TAKES CARE OF AN EXT2FS, I NEED TO MAKE A FUNCTION THAT WILL IF OUT THE VARIOUS FILESYSTEMS AND GET THE RESPECTIVE VALUES AND THEN RETURN THE QSTRING FOR IT
                 //wombatptr->bindvalues.append(QString::fromStdString(string(((EXT2FS_INFO*)wombatptr->evidenceobject.fsinfovector[i])->fs->s_volume_name)));
-                //wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype)).toUpper());
+                wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype)).toUpper());
                 wombatptr->bindvalues.append(QString("/"));
                 wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->ftype);
                 wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->flags);
@@ -934,7 +934,7 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
     char timebuf[128];
     QStringList fsproplist;
     fsproplist.clear();
-    if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || TSK_FS_TYPE_EXT_DETECT)
+    if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || curfsinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
     {
         ext2fs = (EXT2FS_INFO*)curfsinfo;
         fsproplist << "File System Type";
@@ -944,6 +944,8 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
             fsproplist << "ext3";
         else if(curfsinfo->ftype == TSK_FS_TYPE_EXT4)
             fsproplist << "ext4";
+        else
+            fsproplist << "ext2";
         fsproplist << "";
         fsproplist << "Inode Count" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_count)) << "Number of Inodes in the file system (0-3)";
         fsproplist << "Block Count" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_count)) << "Number of Blocks in the file system (4-7)";
@@ -1086,7 +1088,7 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
             fsproplist << "UFS 1";
         else
             fsproplist << "UFS 2";
-        if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FSTYPE_FFS1B)
+        if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B)
         {
             fsproplist << "";
             fsproplist << "Unused" << "Unused" << "Unused (0-7)";
@@ -1121,7 +1123,7 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
             fsproplist << "Fragments per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_frag_num)) << "Number of fragments in a cylinder group (188-191)";
             fsproplist << "Number of Directories" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.dir_num)) << "Number of directories (192-195)";
             fsproplist << "Number of Free Blocks" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.blk_free)) << "Number of free blocks (196-199)";
-            fsproplist << "Number of Free Inodes" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.ino_free)) <<< "Number of free inodes (200-203)";
+            fsproplist << "Number of Free Inodes" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.ino_free)) << "Number of free inodes (200-203)";
             fsproplist << "Number of Free Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.frag_free)) << "Number of free fragments (204-207)";
             fsproplist << "Super Block Modified Flag" << QString::number(sb1->fs_fmod) << "Super Block Modified Flag (208-208)";
             fsproplist << "Clean File System Flag" << QString::number(sb1->fs_clean) << "File system was clean when it was mounted (209-209)";
@@ -1140,7 +1142,7 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
                 fsproplist << "General Flags" << "TrustedBSD MAC Multi-Label" << "TrustedBSD Mandatory Access Control multi-labels are being used (211-211)";
             if(sb1->fs_flags & FFS_SB_FLAG_UPDATED)
                 fsproplist << "General Flags" << "Updated Flag Location" << "Flags have been moved (211-211)";
-            fsproplist << "Last Mount Point" << QString::fromStdString(string(sb1->last_mnt)) << "Last mount point (212-723)";
+            fsproplist << "Last Mount Point" << QString::fromStdString(string(reinterpret_cast<char*>(sb1->last_mnt))) << "Last mount point (212-723)";
             fsproplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (724-1371)";
             fsproplist << "Signature" << QString::number(tsk_gets32(curfsinfo->endian, sb1->magic)) << "File System signature value should be 0x011954 (1372-1375)";
         }
