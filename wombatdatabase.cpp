@@ -3,6 +3,7 @@
 WombatDatabase::WombatDatabase(WombatVariable* wombatvarptr)
 {
     wombatptr = wombatvarptr;
+    wombatprop = new WombatProperties(wombatptr);
 }
 
 QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList invalues)
@@ -415,6 +416,11 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->currentevidenceid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath, parimgid) VALUES(1, ?, ?, ?, ?, ?, NULL);", wombatptr->bindvalues);
     wombatptr->evidenceobject.id = wombatptr->currentevidenceid;
     currentevidenceid = wombatptr->currentevidenceid;
+
+    // Might need to make a global variable so it will be easier to abstract the thread call.
+    evidpropertlist = wombatprop->PopulateEvidenceImageProperties();
+
+    /*
     evidpropertylist << QString("File Format") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatptr->evidenceobject.imageinfo->itype)) << QString("File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
     evidpropertylist << QString("Sector Size") << QString(QString::number(wombatptr->evidenceobject.imageinfo->sector_size) + " bytes") << QString("Sector size of the device. A Sector is a subdivision of a disk where data is stored. It is the smallest value used to divide the disk.");
     evidpropertylist << QString("Sector Count") << QString(QString::number((int)((float)wombatptr->evidenceobject.imageinfo->size/(float)wombatptr->evidenceobject.imageinfo->sector_size)) + " sectors") << QString("The number of sectors in the disk.");
@@ -628,6 +634,8 @@ void WombatDatabase::InsertEvidenceObject()
     {
         // log error about unsupported image type.
     }
+    */
+
     for(int i=0; i < evidpropertylist.count()/3; i++)
     {
         wombatptr->bindvalues.clear();

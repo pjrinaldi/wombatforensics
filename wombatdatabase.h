@@ -3,6 +3,7 @@
 
 #include "wombatinclude.h"
 #include "wombatvariable.h"
+#include "wombatproperties.h"
 #include "wombatfunctions.h"
 
 class WombatDatabase : public QObject
@@ -47,12 +48,12 @@ public:
     int GetEvidenceFileCount(void);
     int ReturnFileSystemOffset(int fsid);
 
+    WombatProperties* wombatprop;
 
 signals:
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:
     WombatVariable* wombatptr;
-    //TSK_IMG_INFO* affimginfo = NULL;
 };
 
 #endif // WOMBATDATABASE_H

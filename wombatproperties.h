@@ -15,3 +15,7 @@ public:
     QStringList PopulatePartitionProperties(void);
     QStringList PopulateFileSystemProperties(void);
     QStringList PopulateFileProperties(void);
+
+private:
+    WombatVariable* wombatptr;
+    QStringList propertylist;
