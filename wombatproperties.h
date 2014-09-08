@@ -19,3 +19,6 @@ public:
 private:
     WombatVariable* wombatptr;
     QStringList propertylist;
+};
+
+#endif // WOMBATPROPERTIES_H

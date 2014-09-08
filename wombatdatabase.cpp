@@ -418,7 +418,7 @@ void WombatDatabase::InsertEvidenceObject()
     currentevidenceid = wombatptr->currentevidenceid;
 
     // Might need to make a global variable so it will be easier to abstract the thread call.
-    evidpropertlist = wombatprop->PopulateEvidenceImageProperties();
+    evidpropertylist = wombatprop->PopulateEvidenceImageProperties();
 
     /*
     evidpropertylist << QString("File Format") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatptr->evidenceobject.imageinfo->itype)) << QString("File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
