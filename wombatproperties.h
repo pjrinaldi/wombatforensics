@@ -19,6 +19,15 @@ public:
 private:
     WombatVariable* wombatptr;
     QStringList propertylist;
+    IMG_AFF_INFO* affinfo;
+    IMG_EWF_INFO* ewfinfo;
+    uint8_t* ewfvalue;
+    uint8_t uvalue8bit;
+    int8_t value8bit;
+    uint32_t value32bit;
+    uint64_t value64bit;
+    size64_t size64bit;
+    libewf_error_t* ewferror;
 };
 
 #endif // WOMBATPROPERTIES_H

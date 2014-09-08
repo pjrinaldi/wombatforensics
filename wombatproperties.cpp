@@ -2,6 +2,16 @@
 
 WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
 {
+    wombatptr = wombatvarptr;
+    affinfo = NULL;
+    ewfinfo = NULL;
+    ewfvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
+    uvalue8bit = 0;
+    value8bit = 0;
+    value32bit = 0;
+    value64bit = 0;
+    size64bit = 0;
+    ewferror = NULL;
 }
 
 QString WombatProperties::GetFileSystemLabel()

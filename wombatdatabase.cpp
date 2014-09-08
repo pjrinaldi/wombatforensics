@@ -394,6 +394,8 @@ void WombatDatabase::InsertPartitionObjects()
 
 void WombatDatabase::InsertEvidenceObject()
 {
+    // NEED TO MOVE THESE VARIABLES OVER TO THE PROPER LOCATION
+    /*
     IMG_AFF_INFO* affinfo = NULL;
     IMG_EWF_INFO* ewfinfo = NULL;
     uint8_t* ewfvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
@@ -402,7 +404,7 @@ void WombatDatabase::InsertEvidenceObject()
     uint32_t value32bit = 0;
     uint64_t value64bit = 0;
     size64_t size64bit = 0;
-    libewf_error_t* ewferror = NULL;
+    libewf_error_t* ewferror = NULL; */
     QStringList evidpropertylist;
     wombatptr->currentevidenceid = 0;
     evidpropertylist.clear();
