@@ -18,7 +18,7 @@ public:
 
 private:
     WombatVariable* wombatptr;
-    QStringList propertylist;
+    QStringList proplist;
     IMG_AFF_INFO* affinfo;
     IMG_EWF_INFO* ewfinfo;
     uint8_t* ewfvalue;
