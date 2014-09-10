@@ -31,9 +31,11 @@ private:
     /*
     TSK_FS_FILE* tmpfile = NULL;
     ntfs_sb* ntfssb = NULL;
-    FFS_INFO* ffs = NULL;
-    ffs_sb1* sb1 = NULL;
-    ffs_sb2* sb2 = NULL;
+    */
+    FFS_INFO* ffs;
+    ffs_sb1* sb1;
+    ffs_sb2* sb2;
+    /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
     FATFS_INFO* fatfs = NULL;
@@ -45,7 +47,7 @@ private:
     TSK_INUM_T curinum = 0;
     */
     //FATFS_DENTRY* dentry = NULL;
-    EXT2FS_INFO* ext2fs = NULL;
+    EXT2FS_INFO* ext2fs;
     /*
     ISO_INFO* iso = NULL;
     iso9660_pvd_node* p = NULL;
@@ -63,9 +65,9 @@ private:
     ssize_t bytesread = 0;
     int a;
     uint len = 0;
+    */
     char asc[512];
     char timebuf[128];
-    */
 
 };
 
