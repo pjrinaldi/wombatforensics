@@ -364,10 +364,11 @@ void WombatDatabase::InsertPartitionObjects()
             {
                 wombatptr->currentfilesystemid = 0;
                 wombatptr->bindvalues.clear();
+                wombatptr->bindvalues.append(wombatprop->GetFileSystemLabel(wombatptr->evidenceobject.fsinfovector[i]));
                 //wombatptr->bindvalues.append(GetFileSystemLabel(wombatptr->evidenceobject.fsinfovector[i]));
                 // ONLY TAKES CARE OF AN EXT2FS, I NEED TO MAKE A FUNCTION THAT WILL IF OUT THE VARIOUS FILESYSTEMS AND GET THE RESPECTIVE VALUES AND THEN RETURN THE QSTRING FOR IT
                 //wombatptr->bindvalues.append(QString::fromStdString(string(((EXT2FS_INFO*)wombatptr->evidenceobject.fsinfovector[i])->fs->s_volume_name)));
-                wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype)).toUpper());
+                //wombatptr->bindvalues.append(QString::fromUtf8(tsk_fs_type_toname(wombatptr->evidenceobject.fsinfovector[i]->ftype)).toUpper());
                 wombatptr->bindvalues.append(QString("/"));
                 wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->ftype);
                 wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->flags);
@@ -601,7 +602,7 @@ int WombatDatabase::GetEvidenceFileCount()
     wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(objectid) FROM data WHERE objectid = ? OR parimgid = ?", wombatptr->bindvalues);
     return wombatptr->sqlrecords.at(0).value(0).toInt();
 }
-
+/*
 QString WombatDatabase::GetFileSystemLabel(TSK_FS_INFO* curfsinfo)
 {
     if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4)
@@ -609,7 +610,7 @@ QString WombatDatabase::GetFileSystemLabel(TSK_FS_INFO* curfsinfo)
     //else if(curfsinfo->ftype == TSK_FS_TYPE_UFS1)...
     return "";
 }
-
+*/
 void WombatDatabase::ReturnObjectPropertyList()
 {
     propertylist.clear();

@@ -51,6 +51,7 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
 
 QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curfsinfo)
 {
+    //wombatptr->bindvalues.append(QString::fromStdString(string(((EXT2FS_INFO*)tmpfsinfo)->fs->s_volume_name)));
     return "";
 }
 

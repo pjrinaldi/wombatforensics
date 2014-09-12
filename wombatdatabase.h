@@ -27,7 +27,7 @@ public:
     void InsertPartitionObjects(void);
     void InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsinfo);
     void GetObjectValues(void);
-    QString GetFileSystemLabel(TSK_FS_INFO* curfsinfo);
+    //QString GetFileSystemLabel(TSK_FS_INFO* curfsinfo);
 
     ~WombatDatabase();
 

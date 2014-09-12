@@ -368,9 +368,13 @@ void WombatForensics::InitializeEvidenceStructure()
     LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Adding Evidence");
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
-    wombatdatabase->InsertVolumeObject(); // add volume to data
+    tmpfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::InsertVolumeObject);
+    threadvector.append(tmpfuture);
+    //wombatdatabase->InsertVolumeObject(); // add volume to data
     wombatframework->OpenPartitions();
-    wombatdatabase->InsertPartitionObjects();
+    tmpfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::InsertPartitionObjects);
+    threadvector.append(tmpfuture);
+    //wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     //wombatframework->GetFileSystemProperties();
     // the above function needs to be integrated into the respective InsertObject calls to store the respective values in the db.
