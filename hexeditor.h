@@ -176,9 +176,8 @@ protected:
     void drawCursor( QPainter& p );
     void drawSelection( QPainter& p );
     void drawAsciiRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop);
-    void drawTextRegion( QPainter& p, const QString& text,
-			 int row_start, int row_end,
-			 int col_start, int col_end );
+    void drawTextRegion( QPainter& p, const QString& text, int row_start, int row_end, int col_start, int col_end );
+    void DrawCurrentObject(QPainter& p);
   // event handlers
 protected:
   void resizeEvent      ( QResizeEvent *e );

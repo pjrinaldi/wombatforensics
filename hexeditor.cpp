@@ -100,7 +100,6 @@ bool HexEditor::openimage()
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
     emit rangeChanged(0, _reader.size()/bytesPerLine());
-    //emit StepValues(bytesPerLine(), bytesPerPage());
     emit StepValues(1, bytesPerPage()/bytesPerLine());
     calculateFontMetrics();
     setTopLeft(0);
@@ -125,7 +124,6 @@ bool HexEditor::open( const QString & filename )
   setSelection(SelectionEnd,-1);
   emit rangeChanged(0,_reader.size()/bytesPerLine());
   emit StepValues(1, bytesPerPage()/bytesPerLine());
-  //emit StepValues(bytesPerLine(), bytesPerPage());
   calculateFontMetrics();     // update labels
   setTopLeft(0);              // reset the GUI
   return true;
@@ -931,7 +929,8 @@ void HexEditor::drawSelection( QPainter& paint )
   if( start < bytesPerPage() ) {
     off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
     paint.setPen(Qt::NoPen);
-    paint.setBrush( qApp->palette().highlight() );
+    //paint.setBrush( qApp->palette().highlight() );
+    paint.setBrush(QColor(0, 0, 255, 15));
     // foreach line with selection
     stop--;
     while( start <= stop ) {
@@ -947,6 +946,14 @@ void HexEditor::drawSelection( QPainter& paint )
       start = linestop+1;
     }
   }
+  DrawCurrentObject(paint);
+}
+
+void HexEditor::DrawCurrentObject(QPainter& paint)
+{
+    paint.setPen(Qt::NoPen);
+    paint.setBrush(QColor(255, 0, 0, 15));
+    paint.drawRect(0, 0, 10, 10);
 }
 
 void HexEditor::drawCursor( QPainter& paint )
