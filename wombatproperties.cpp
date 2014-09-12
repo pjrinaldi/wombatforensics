@@ -49,7 +49,7 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
 
 }
 
-QString WombatProperties::GetFileSystemLabel()
+QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curfsinfo)
 {
     return "";
 }

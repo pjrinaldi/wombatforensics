@@ -360,7 +360,9 @@ void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIn
 void WombatForensics::InitializeEvidenceStructure()
 {
     wombatframework->OpenEvidenceImage();
-    wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
+    QFuture<void> tmpfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::InsertEvidenceObject);
+    threadvector.append(tmpfuture);
+    //wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     errorcount = 0;
     StartJob(1, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
     LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Adding Evidence");
