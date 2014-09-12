@@ -360,21 +360,21 @@ void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIn
 void WombatForensics::InitializeEvidenceStructure()
 {
     wombatframework->OpenEvidenceImage();
-    QFuture<void> tmpfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::InsertEvidenceObject);
-    threadvector.append(tmpfuture);
-    //wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
+    //QFuture<void> tmpfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::InsertEvidenceObject);
+    //threadvector.append(tmpfuture);
+    wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     errorcount = 0;
     StartJob(1, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
     LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Adding Evidence");
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
-    tmpfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::InsertVolumeObject);
-    threadvector.append(tmpfuture);
-    //wombatdatabase->InsertVolumeObject(); // add volume to data
+    //tmpfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::InsertVolumeObject);
+    //threadvector.append(tmpfuture);
+    wombatdatabase->InsertVolumeObject(); // add volume to data
     wombatframework->OpenPartitions();
-    tmpfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::InsertPartitionObjects);
-    threadvector.append(tmpfuture);
-    //wombatdatabase->InsertPartitionObjects();
+    //tmpfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::InsertPartitionObjects);
+    //threadvector.append(tmpfuture);
+    wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     //wombatframework->GetFileSystemProperties();
     // the above function needs to be integrated into the respective InsertObject calls to store the respective values in the db.

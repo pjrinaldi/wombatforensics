@@ -52,6 +52,18 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
 QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curfsinfo)
 {
     //wombatptr->bindvalues.append(QString::fromStdString(string(((EXT2FS_INFO*)tmpfsinfo)->fs->s_volume_name)));
+    if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || curfsinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
+    {
+        return QString::fromStdString(string(((EXT2FS_INFO*)curfsinfo)->fs->s_volume_name));
+    }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B)
+    {
+        return "ufs1";
+    }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_FFS2 || TSK_FS_TYPE_FFS_DETECT)
+    {
+        return "ufs2";
+    }
     return "";
 }
 
