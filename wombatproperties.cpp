@@ -62,6 +62,7 @@ QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curfsinfo)
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_FFS2 || TSK_FS_TYPE_FFS_DETECT)
     {
+        qDebug() << "ffs2 volname: " << ((FFS_INFO*)curfsinfo)->fs.sb2->volname;
         return "ufs2";
     }
     return "";
