@@ -10,7 +10,7 @@ class WombatProperties : public QObject
     Q_OBJECT
 public:
     WombatProperties(WombatVariable* wombatvarptr);
-    QString GetFileSystemLabel(TSK_FS_INFO* curfsinfo);
+    QString GetFileSystemLabel(TSK_FS_INFO* curinfo);
     QStringList PopulateEvidenceImageProperties(void);
     QStringList PopulatePartitionProperties(void);
     QStringList PopulateFileSystemProperties(TSK_FS_INFO* curfsinfo);

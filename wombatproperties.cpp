@@ -49,21 +49,21 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
 
 }
 
-QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curfsinfo)
+QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curinfo)
 {
     //wombatptr->bindvalues.append(QString::fromStdString(string(((EXT2FS_INFO*)tmpfsinfo)->fs->s_volume_name)));
-    if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || curfsinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
+    if(curinfo->ftype == TSK_FS_TYPE_EXT2 || curinfo->ftype == TSK_FS_TYPE_EXT3 || curinfo->ftype == TSK_FS_TYPE_EXT4 || curinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
     {
-        return QString::fromStdString(string(((EXT2FS_INFO*)curfsinfo)->fs->s_volume_name));
+        return QString::fromStdString(string(((EXT2FS_INFO*)curinfo)->fs->s_volume_name));
     }
-    else if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B)
+    else if(curinfo->ftype == TSK_FS_TYPE_FFS1 || curinfo->ftype == TSK_FS_TYPE_FFS1B)
     {
         return "ufs1";
     }
-    else if(curfsinfo->ftype == TSK_FS_TYPE_FFS2 || TSK_FS_TYPE_FFS_DETECT)
+    else if(curinfo->ftype == TSK_FS_TYPE_FFS2 || curinfo->ftype == TSK_FS_TYPE_FFS_DETECT)
     {
-        qDebug() << "ffs2 volname: " << ((FFS_INFO*)curfsinfo)->fs.sb2->volname;
-        return "ufs2";
+        qDebug() << "ffs2 volname: " << ((FFS_INFO*)curinfo)->fs.sb2->volname;
+        return ((FFS_INFO*)curinfo)->fs.sb2->volname;
     }
     return "";
 }
@@ -438,7 +438,7 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Head of Oprhan Inode List" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_last_orphan)) << "Head of orphan inode list. (232-235)";
         proplist << "Unused" << "Unused" << "Unused (236-1023)";
     }
-    else if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B || curfsinfo->ftype == TSK_FS_TYPE_FFS2 || TSK_FS_TYPE_FFS_DETECT)
+    else if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B || curfsinfo->ftype == TSK_FS_TYPE_FFS2 || curfsinfo->ftype == TSK_FS_TYPE_FFS_DETECT)
     {
         ffs = (FFS_INFO*)curfsinfo;
         sb1 = ffs->fs.sb1;

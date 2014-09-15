@@ -327,7 +327,7 @@ void WombatDatabase::InsertPartitionObjects()
                 }
                 wombatptr->currentfilesystemid = 0;
                 wombatptr->bindvalues.clear();
-                wombatptr->bindvalues.append(wombatprop->GetFileSystemLabel(wombatptr->evidenceobject.fsinfovector[i]));
+                wombatptr->bindvalues.append(wombatprop->GetFileSystemLabel(tmpfsinfo));
                 //wombatptr->bindvalues.append(GetFileSystemLabel(wombatptr->evidenceobject.fsinfovector[i]));
                 // ONLY TAKES CARE OF AN EXT2FS, I NEED TO MAKE A FUNCTION THAT WILL IF OUT THE VARIOUS FILESYSTEMS AND GET THE RESPECTIVE VALUES AND THEN RETURN THE QSTRING FOR IT
                 //wombatptr->bindvalues.append(QString::fromStdString(string(((EXT2FS_INFO*)tmpfsinfo)->fs->s_volume_name)));
