@@ -510,7 +510,8 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         {
             proplist << "Unused" << "Unused" << "Unused (0x00-0x07)";
             proplist << "Backup Superblock Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb2->sb_off)) << "Offset to backup superblock in cylinder group relative to a \"base\" (0x08-0x0B)";
-            proplist << "Group Descriptor Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb2->gd_off)) << "Offset to group descriptor in cylinder group relative to a \"base\" (0x0C-0x10)";
+            proplist << "Group Descriptor Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb2->gd_off)) << "Offset to group descriptor in cylinder group relative to a \"base\" (0x0C-0x0F)";
+            proplist << "Inode Table Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb2->ino_off)) << "Offset to inode table in cylinder group relative to a \"base\" (0x10-0x13)";
         }
     }
     return proplist;
