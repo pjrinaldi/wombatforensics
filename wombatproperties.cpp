@@ -451,60 +451,60 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B)
         {
             proplist << "";
-            proplist << "Unused" << "Unused" << "Unused (0-7)";
-            proplist << "Backup Superblock Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->sb_off)) << "Offset to backup superblock in cylinder group relative to a \"base\" (8-11)";
-            proplist << "Group Descriptor Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->gd_off)) << "Offset to group descriptor in cylinder group relative to a \"base\" (12-15)";
-            proplist << "Inode Table Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->ino_off)) << "Offset to inode table in cylinder group relative to a \"base\" (16-19)";
-            proplist << "Data Block Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->dat_off)) << "Offset to data blocks in cylinder group relative to a \"base\" (20-23)";
-            proplist << "Delta Value for Staggering Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_delta)) << "Delta value for caluclating the staggering offset in cylinder group (24-27)";
-            proplist << "Mask for Staggering Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_cyc_mask)) << "Mask for calculating the staggering offset (cycle value) in cylinder group (28-31)";
+            proplist << "Unused" << "Unused" << "Unused (0x00-0x07)";
+            proplist << "Backup Superblock Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->sb_off)) << "Offset to backup superblock in cylinder group relative to a \"base\" (0x08-0x0B)";
+            proplist << "Group Descriptor Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->gd_off)) << "Offset to group descriptor in cylinder group relative to a \"base\" (0x0C-0x0F)";
+            proplist << "Inode Table Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->ino_off)) << "Offset to inode table in cylinder group relative to a \"base\" (0x10-0x13)";
+            proplist << "Data Block Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->dat_off)) << "Offset to data blocks in cylinder group relative to a \"base\" (0x14-0x17)";
+            proplist << "Delta Value for Staggering Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_delta)) << "Delta value for caluclating the staggering offset in cylinder group (0x18-0x1B)";
+            proplist << "Mask for Staggering Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_cyc_mask)) << "Mask for calculating the staggering offset (cycle value) in cylinder group (0x1C-0x1F)";
             sprintf(asc, "%s", (tsk_getu32(curfsinfo->endian, sb1->wtime) > 0) ? tsk_fs_time_to_str(tsk_getu32(curfsinfo->endian, sb1->wtime), timebuf) : "empty");
-            proplist << "Last Written Time" << QString::fromStdString(string(asc)) << "Last time data was written to the file system (32-35)";
-            proplist << "Number of Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->frag_num)) << "Number of fragments in the file system (36-39)";
-            proplist << "Number of Data Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->data_frag_num)) << "Number of fragments in the file system that can store file data (40-43)";
-            proplist << "Number of Cylinder Groups" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_num)) << "Number of cylinder groups in the file system (44-47)";
-            proplist << "Block Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_b)) << "Size of a block in bytes (48-51)";
-            proplist << "Fragment Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fsize_b)) << "Size of a fragment in bytes (52-55)";
-            proplist << "Block Framgent Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_frag)) << "Size of a block in fragments (56-59)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (60-95)";
-            proplist << "Number of Bits Convert Block to Fragment" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_fragshift)) << "Number of bits to convert between a block address and a fragment address (96-99)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (100-119)";
-            proplist << "Inodes Per Block" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_inopb)) << "Number of inodes per block in the inode table (120-123)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (124-143)";
+            proplist << "Last Written Time" << QString::fromStdString(string(asc)) << "Last time data was written to the file system (0x20-0x23)";
+            proplist << "Number of Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->frag_num)) << "Number of fragments in the file system (0x24-0x27)";
+            proplist << "Number of Data Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->data_frag_num)) << "Number of fragments in the file system that can store file data (0x28-0x2B)";
+            proplist << "Number of Cylinder Groups" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_num)) << "Number of cylinder groups in the file system (0x2C-0x2F)";
+            proplist << "Block Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_b)) << "Size of a block in bytes (0x30-0x33)";
+            proplist << "Fragment Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fsize_b)) << "Size of a fragment in bytes (0x34-0x37)";
+            proplist << "Block Framgent Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_frag)) << "Size of a block in fragments (0x38-0x3B)";
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x3C-0x5F)";
+            proplist << "Number of Bits Convert Block to Fragment" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_fragshift)) << "Number of bits to convert between a block address and a fragment address (0x60-0x63)";
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x64-0x77)";
+            proplist << "Inodes Per Block" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_inopb)) << "Number of inodes per block in the inode table (0x78-0x7B)";
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x7C-0x8F)";
             sprintf(asc, "%" PRIx32 "%" PRIx32 "", tsk_getu32(curfsinfo->endian, &sb1->fs_id[4]), tsk_getu32(curfsinfo->endian, &sb1->fs_id[0]));
-            proplist << "File System ID" << QString::fromStdString(string(asc)) << "File system ID (144-151)";
-            proplist << "Cylinder Group Fragment Address" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_saddr)) << "Fragment address of the cylinder group summary area (152-155)";
-            proplist << "Cylinder Group Summary Area Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_ssize_b)) << "Size of the cylinder group summary area in bytes (156-159)";
-            proplist << "Cylinder Group Descriptor Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_cgsize)) << "Size of the cylinder group descriptor in bytes (160-163)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (164-175)";
-            proplist << "Cylinders in File System" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_ncyl)) << "Number of cylinders in the file system (176-179)";
-            proplist << "Cylinders per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_cpg)) << "Number of cylinders in a cylinder group (180-183)";
-            proplist << "Inodes per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_inode_num)) << "Number of inodes in a cylinder group (184-187)";
-            proplist << "Fragments per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_frag_num)) << "Number of fragments in a cylinder group (188-191)";
-            proplist << "Number of Directories" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.dir_num)) << "Number of directories (192-195)";
-            proplist << "Number of Free Blocks" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.blk_free)) << "Number of free blocks (196-199)";
-            proplist << "Number of Free Inodes" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.ino_free)) << "Number of free inodes (200-203)";
-            proplist << "Number of Free Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.frag_free)) << "Number of free fragments (204-207)";
-            proplist << "Super Block Modified Flag" << QString::number(sb1->fs_fmod) << "Super Block Modified Flag (208-208)";
-            proplist << "Clean File System Flag" << QString::number(sb1->fs_clean) << "File system was clean when it was mounted (209-209)";
-            proplist << "Read Only File System Flag" << QString::number(sb1->fs_ronly) << "File system was mounted read only (210-210)";
+            proplist << "File System ID" << QString::fromStdString(string(asc)) << "File system ID (0x90-0x97)";
+            proplist << "Cylinder Group Fragment Address" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_saddr)) << "Fragment address of the cylinder group summary area (0x98-0x9B)";
+            proplist << "Cylinder Group Summary Area Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_ssize_b)) << "Size of the cylinder group summary area in bytes (0x9C-0x9F)";
+            proplist << "Cylinder Group Descriptor Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_cgsize)) << "Size of the cylinder group descriptor in bytes (0xA0-0xA3)";
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0xA4-0xA5)";
+            proplist << "Cylinders in File System" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_ncyl)) << "Number of cylinders in the file system (0xA6-0xB3)";
+            proplist << "Cylinders per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_cpg)) << "Number of cylinders in a cylinder group (0xB4-0xB7)";
+            proplist << "Inodes per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_inode_num)) << "Number of inodes in a cylinder group (0xB8-0xBB)";
+            proplist << "Fragments per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_frag_num)) << "Number of fragments in a cylinder group (0xBC-0xBF)";
+            proplist << "Number of Directories" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.dir_num)) << "Number of directories (0xC0-0xC3)";
+            proplist << "Number of Free Blocks" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.blk_free)) << "Number of free blocks (0xC4-0xC7)";
+            proplist << "Number of Free Inodes" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.ino_free)) << "Number of free inodes (0xC8-0xCB)";
+            proplist << "Number of Free Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.frag_free)) << "Number of free fragments (0xCC-0xCF)";
+            proplist << "Super Block Modified Flag" << QString::number(sb1->fs_fmod) << "Super Block Modified Flag (0xD0-0xD0)";
+            proplist << "Clean File System Flag" << QString::number(sb1->fs_clean) << "File system was clean when it was mounted (0xD1-0xD1)";
+            proplist << "Read Only File System Flag" << QString::number(sb1->fs_ronly) << "File system was mounted read only (0xD2-0xD2)";
             if(sb1->fs_flags & FFS_SB_FLAG_UNCLEAN)
-                proplist << "General Flags" << "Unclean" << "Set when the file system is mounted (211-211)";
+                proplist << "General Flags" << "Unclean" << "Set when the file system is mounted (0xD3-0xD3)";
             if(sb1->fs_flags & FFS_SB_FLAG_SOFTDEP)
-                proplist << "General Flags" << "Soft Dependencies" << "Soft dependencies are being used (211-211)";
+                proplist << "General Flags" << "Soft Dependencies" << "Soft dependencies are being used (0xD3-0xD3)";
             if(sb1->fs_flags & FFS_SB_FLAG_NEEDFSCK)
-                proplist << "General Flags" << "Needs Check" << "Needs consistency check next time the file system is mounted (211-211)";
+                proplist << "General Flags" << "Needs Check" << "Needs consistency check next time the file system is mounted (0xD3-0xD3)";
             if(sb1->fs_flags & FFS_SB_FLAG_INDEXDIR)
-                proplist << "General Flags" << "Index Directories" << "Directories are indexed using a hashtree or B-Tree (211-211)";
+                proplist << "General Flags" << "Index Directories" << "Directories are indexed using a hashtree or B-Tree (0xD3-0xD3)";
             if(sb1->fs_flags & FFS_SB_FLAG_ACL)
-                proplist << "General Flags" << "Access Control Lists" << "Access control lists are being used (211-211)";
+                proplist << "General Flags" << "Access Control Lists" << "Access control lists are being used (0xD3-0xD3)";
             if(sb1->fs_flags & FFS_SB_FLAG_MULTILABEL)
-                proplist << "General Flags" << "TrustedBSD MAC Multi-Label" << "TrustedBSD Mandatory Access Control multi-labels are being used (211-211)";
+                proplist << "General Flags" << "TrustedBSD MAC Multi-Label" << "TrustedBSD Mandatory Access Control multi-labels are being used (0xD3-0xD3)";
             if(sb1->fs_flags & FFS_SB_FLAG_UPDATED)
-                proplist << "General Flags" << "Updated Flag Location" << "Flags have been moved (211-211)";
-            proplist << "Last Mount Point" << QString::fromStdString(string(reinterpret_cast<char*>(sb1->last_mnt))) << "Last mount point (212-723)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (724-1371)";
-            proplist << "Signature" << QString::number(tsk_gets32(curfsinfo->endian, sb1->magic)) << "File System signature value should be 0x011954 (1372-1375)";
+                proplist << "General Flags" << "Updated Flag Location" << "Flags have been moved (0xD3-0xD3)";
+            proplist << "Last Mount Point" << QString::fromStdString(string(reinterpret_cast<char*>(sb1->last_mnt))) << "Last mount point (0xD4-0x02D3)";
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x02D4-0x055B)";
+            proplist << "Signature" << QString::number(tsk_gets32(curfsinfo->endian, sb1->magic)) << "File System signature value should be 0x011954 (0x055C-0x055F)";
         }
         else // FFS2
         {
