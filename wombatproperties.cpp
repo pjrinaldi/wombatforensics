@@ -292,8 +292,45 @@ QStringList WombatProperties::PopulatePartitionProperties()
     return QStringList("");
 }
 
+QStringList WombatProperties::PopulateVolumeProperties()
+{
+    proplist.clear();
+    if(wombatptr->evidenceobject.volinfo != NULL) // valid volume object
+    {
+        if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_DOS)
+            proplist << "Signature" << "0xAA55" << "Signature Value should be 0xAA55 (0x1FE-0x1FF)";
+        else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_BSD)
+        {
+            char* sect_buf;
+            bsd_disklabel* dlabel;
+            uint32_t idx = 0;
+            ssize_t cnt;
+            char* table_str;
+            if((sect_buf = tsk_malloc(wombatptr->evidenceobject.volinfo->block_size)) != NULL)
+            {
+                dlabel = (bsd_disklabel*) sect_buf;
+            }
+            proplist << "Signature" << QString::number(tsk_getu32(wombatptr->evidenceobject.volinfo->endian, dlabel->magic)) << "Signature value should be 0x82564557 (0x00-0x03)";
+            proplist << "Drive Type" << QString::number(tsk_getu16(wombatptr->evidenceobject.volinfo->endian, dlabel->type)) << "Drive type (0x04-0x05)";
+            proplist << "Drive Subtype" << QString::number(tsk_getu16(wombatptr->evidenceobject.volinfo->endian, dlabel->sub_type)) << "Drive subtype (0x06-0x07)";
+            //proplist << "Drive Type Name" << QString::fromUtf8(reinterpret_cast<char*>(
+        }
+        else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_SUN)
+        {
+        }
+        else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_MAC)
+        {
+        }
+        else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_GPT)
+        {
+        }
+    }
+    return proplist;
+}
+
 QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinfo)
 {
+    proplist.clear();
     if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || curfsinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
     {
         ext2fs = (EXT2FS_INFO*)curfsinfo;
@@ -573,6 +610,7 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
 
 QStringList WombatProperties::PopulateFileProperties()
 {
+    proplist.clear();
     return QStringList("");
 }
 // REFERENCE INFORMATION

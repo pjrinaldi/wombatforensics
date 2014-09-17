@@ -277,6 +277,7 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->currentevidenceid);
         wombatptr->bindvalues.append(wombatptr->currentvolumename);
         wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, childcount, byteoffset, parentid, parimgid, name) VALUES(2, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+        wombatprop->PopulateVolumeProperties();
     }
     else
     {
