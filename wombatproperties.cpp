@@ -63,7 +63,7 @@ QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curinfo)
     else if(curinfo->ftype == TSK_FS_TYPE_FFS2 || curinfo->ftype == TSK_FS_TYPE_FFS_DETECT)
     {
         qDebug() << "ffs2 volname: " << ((FFS_INFO*)curinfo)->fs.sb2->volname;
-        return ((FFS_INFO*)curinfo)->fs.sb2->volname;
+        return QString::fromUtf8(reinterpret_cast<char*>(((FFS_INFO*)curinfo)->fs.sb2->volname));
     }
     return "";
 }
@@ -512,6 +512,41 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Backup Superblock Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb2->sb_off)) << "Offset to backup superblock in cylinder group relative to a \"base\" (0x08-0x0B)";
             proplist << "Group Descriptor Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb2->gd_off)) << "Offset to group descriptor in cylinder group relative to a \"base\" (0x0C-0x0F)";
             proplist << "Inode Table Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb2->ino_off)) << "Offset to inode table in cylinder group relative to a \"base\" (0x10-0x13)";
+            proplist << "First Data Block Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb2->dat_off)) << "Offset to the first data block in the cylinder group relative to a \"base\" (0x14-0x17)";
+            proplist << "Unused" << "Unused" << "Unused (0x18-0x2B)";
+            proplist << "Number of Cylinder Groups" << QString::number(tsk_gets32(curfsinfo->endian, sb2->cg_num)) << "The Number of cylinder groups in the file system (0x2C-0x2F)";
+            proplist << "Block Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb2->bsize_b)) << "Size of a block in bytes (0x30-0x33)";
+            proplist << "Fragment Size" << QString::number(tsk_gets32(curfsinfo->endian, sb2->fsize_b)) << "Size of a fragment in bytes (0x34-0x37)";
+            proplist << "Block Fragment Size" << QString::number(tsk_gets32(curfsinfo->endian, sb2->bsize_frag)) << "Size of a block in fragments (0x38-0x3B)";
+            proplist << "Unused" << "Unused" << "Unused (0x3C-0x5F)";
+            proplist << "File System Fragment Shift" << QString::number(tsk_gets32(curfsinfo->endian, sb2->fs_fragshift)) << "Number of bits to convert between a block address and a fragment address (0x60-0x63)";
+            proplist << "Unused" << "Unused" << "Unused (0x64-0x77)";
+            proplist << "Inodes Per Block" << QString::number(tsk_gets32(curfsinfo->endian, sb2->fs_inopb)) << "Number of inodes per block in inode table (0x78-0x7B)";
+            proplist << "Unused" << "Unused" << "Unused (0x7C-0x9B)";
+            proplist << "Cylinder Group Summary Size" << QString::number(tsk_gets32(curfsinfo->endian, sb2->cg_ssize_b)) << "Size of cylinder group summary area in bytes (0x9C-0x9F)";
+            proplist << "Cylinder Group Descriptor Size" << QString::number(tsk_gets32(curfsinfo->endian, sb2->fs_cgsize)) << "Size of cylinder group descriptor in bytes (0xA0-0xA3)";
+            proplist << "Unused" << "Unused" << "Unused (0xA4-0xB7)";
+            proplist << "Cylinder Group Inodes" << QString::number(tsk_gets32(curfsinfo->endian, sb2->cg_inode_num)) << "Inodes per cylinder group (0xB8-0xBB)";
+            proplist << "Cylinder Group Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb2->cg_frag_num)) << "Fragments per cylinder group (0xBC-0xBF)";
+            proplist << "Unused" << "Unused" << "Unused (0xC0-0xCF)";
+            proplist << "Super Block Modified Flag" << QString::number(sb2->fs_fmod) << "Super block modified flag (0xD0-0xD0)";
+            proplist << "Clean File System" << QString::number(sb2->fs_clean) << "File system was clean when it was mounted (0xD1-0xD1)";
+            proplist << "Read Only Flag" << QString::number(sb2->fs_ronly) << "File system was mounted read only (0xD2-0xD2)";
+            proplist << "Unused" << "Unused" << "Unused (0xD3-0xD3)";
+            proplist << "Last Mount Point" << QString::fromUtf8(reinterpret_cast<char*>(sb2->last_mnt)) << "Last mount point (0xD4-0x02A7)";
+            proplist << "Volume Name" << QString::fromUtf8(reinterpret_cast<char*>(sb2->volname)) << "Volume name (0x02A8-0x02C7)";
+            proplist << "System UID" << QString::fromUtf8(reinterpret_cast<char*>(sb2->swuid)) << "System UID (0x02C8-0x02CF)";
+            proplist << "Unused" << "Unused" << "Unused (0x02D0-0x03EF)";
+            proplist << "Number of Directories" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.dir_num)) << "Number of directories (0x03F0-0x03F7)";
+            proplist << "Number of Free Blocks" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.blk_free)) << "Number of free blocks (0x03F8-0x03FF)";
+            proplist << "Number of Free Inodes" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.ino_free)) << "Number of free inodes (0x0400-0x0407)";
+            proplist << "Number of Free Fragments" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.frag_free)) << "Number of free fragments (0x0408-0x040F)";
+            proplist << "Number of Free Clusters" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.clust_free)) << "Number of free clusters (0x0410-0x0417)";
+            proplist << "Unused" << "Unused" << "Unused (0x0418-0x042F)";
+            sprintf(asc, "%s", (tsk_getu64(curfsinfo->endian, sb1->wtime) > 0) ? tsk_fs_time_to_str(tsk_getu64(curfsinfo->endian, sb1->wtime), timebuf) : "empty");
+            proplist << "Last Written Time" << QString::fromStdString(string(asc)) << "Last time data was written to the file system (0x0430-0x0437)";
+            proplist << "Fragment Numbers" << QString::number(tsk_gets64(curfsinfo->endian, sb2->frag_num)) << "Number of fragments in the file system (0x0438-0x043F)";
+            proplist << "" << "" << "";
         }
     }
     return proplist;
