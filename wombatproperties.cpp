@@ -547,21 +547,22 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Last Written Time" << QString::fromStdString(string(asc)) << "Last time data was written to the file system (0x0430-0x0437)";
             proplist << "Fragment Numbers" << QString::number(tsk_gets64(curfsinfo->endian, sb2->frag_num)) << "Number of fragments in the file system (0x0438-0x043F)";
             proplist << "Usable Fragment Numbers" << QString::number(tsk_gets64(curfsinfo->endian, sb2->blk_num)) << "Number of fragments that can store file data (0x0440-0x0447)";
-            proplist << "Cylinder Group Fragment Address" << QString::number(tsk_get264(curfsinfo->endian, sb2->cg_saddr)) << "Fragment address of cylinder group summary area (0x0448-0x044F)";
+            proplist << "Cylinder Group Fragment Address" << QString::number(tsk_gets64(curfsinfo->endian, sb2->cg_saddr)) << "Fragment address of cylinder group summary area (0x0448-0x044F)";
             proplist << "Unused" << "Unused" << "Unused (0x0450-0x051F)";
-            if(sb2->fs_flags & FFS_SB_FLAG_UNCLEAN)
+            int flags = tsk_getu32(curfsinfo->endian, sb2->fs_flags);
+            if(flags & FFS_SB_FLAG_UNCLEAN)
                 proplist << "General Flags" << "Unclean" << "Set when the file system is mounted (0x0520-0x0523)";
-            if(sb2->fs_flags & FFS_SB_FLAG_SOFTDEP)
+            if(flags & FFS_SB_FLAG_SOFTDEP)
                 proplist << "General Flags" << "Soft Dependencies" << "Soft dependencies are being used (0x0520-0x0523)";
-            if(sb2->fs_flags & FFS_SB_FLAG_NEEDFSCK)
+            if(flags & FFS_SB_FLAG_NEEDFSCK)
                 proplist << "General Flags" << "Needs Check" << "Needs consistency check next time the file system is mounted (0x0520-0x0523)";
-            if(sb2->fs_flags & FFS_SB_FLAG_INDEXDIR)
+            if(flags & FFS_SB_FLAG_INDEXDIR)
                 proplist << "General Flags" << "Index Directories" << "Directories are indexed using a hashtree or B-Tree (0x0520-0x0523)";
-            if(sb2->fs_flags & FFS_SB_FLAG_ACL)
+            if(flags & FFS_SB_FLAG_ACL)
                 proplist << "General Flags" << "Access Control Lists" << "Access control lists are being used (0x0520-0x0523)";
-            if(sb2->fs_flags & FFS_SB_FLAG_MULTILABEL)
+            if(flags & FFS_SB_FLAG_MULTILABEL)
                 proplist << "General Flags" << "TrustedBSD MAC Multi-Label" << "TrustedBSD Mandatory Access Control multi-labels are being used (0x0520-0x0523)";
-            if(sb2->fs_flags & FFS_SB_FLAG_UPDATED)
+            if(flags & FFS_SB_FLAG_UPDATED)
                 proplist << "General Flags" << "Updated Flag Location" << "Flags have been moved (0x0520-0x0523)";
             proplist << "Unused" << "Unused" << "Unused (0x0524-0x055B)";
             proplist << "Signature" << QString::number(tsk_gets32(curfsinfo->endian, sb2->magic)) << "File system signature value should be 0x19540119 (0x055C-0x055F)";
