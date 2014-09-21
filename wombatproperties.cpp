@@ -301,6 +301,7 @@ QStringList WombatProperties::PopulateVolumeProperties()
             proplist << "Signature" << "0xAA55" << "Signature Value should be 0xAA55 (0x1FE-0x1FF)";
         else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_BSD)
         {
+            /*
             char* sect_buf;
             bsd_disklabel* dlabel;
             uint32_t idx = 0;
@@ -314,6 +315,7 @@ QStringList WombatProperties::PopulateVolumeProperties()
             proplist << "Drive Type" << QString::number(tsk_getu16(wombatptr->evidenceobject.volinfo->endian, dlabel->type)) << "Drive type (0x04-0x05)";
             proplist << "Drive Subtype" << QString::number(tsk_getu16(wombatptr->evidenceobject.volinfo->endian, dlabel->sub_type)) << "Drive subtype (0x06-0x07)";
             //proplist << "Drive Type Name" << QString::fromUtf8(reinterpret_cast<char*>(
+            */
         }
         else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_SUN)
         {
