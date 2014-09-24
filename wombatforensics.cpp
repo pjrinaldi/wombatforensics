@@ -454,6 +454,9 @@ void WombatForensics::UpdateViewer()
 
 void WombatForensics::LoadHexContents()
 {
+    // here is where i would call the highlight functionality using the data obtained from the tsk functions
+    // which would show what should be highlighted for each object type, such as the volume, partition/file system, unallocated
+    // or an actual file and/or directory.
     if(tskobjptr->readimginfo != NULL)
         tsk_img_close(tskobjptr->readimginfo);
     if(tskobjptr->readfsinfo != NULL)
