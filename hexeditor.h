@@ -139,6 +139,7 @@ protected:
   QRect  charBBox( off_t charIdx ) const;
   QRect  byteBBox( off_t byteIdx ) const;
   QRect abyteBox(off_t byteIdx) const;
+  QRect highlightBox(off_t byteIdx) const;
   // translate widget coord to word index
   int pointToWord(const QPoint& pt);
   QChar& pointToChar(const QPoint& pt);
@@ -177,7 +178,7 @@ protected:
     void drawSelection( QPainter& p );
     void drawAsciiRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop);
     void drawTextRegion( QPainter& p, const QString& text, int row_start, int row_end, int col_start, int col_end );
-    void DrawCurrentObject(QPainter& p);
+    void DrawCurrentObject(QPainter& p, int row_start, int row_end, int col_start, int col_end);
   // event handlers
 protected:
   void resizeEvent      ( QResizeEvent *e );
@@ -218,6 +219,7 @@ protected:
   QRect               _labelBBox;
   vector<QRect>       _asciiBBox;
   vector<QRect>       _alineBBox;
+  vector<QRect>       _highlightBBox;
 
   int                 _linspacing;
   int                 _fontMaxWidth;

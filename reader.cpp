@@ -340,6 +340,7 @@ bool Reader::loadimagepage(off_t pageIdx)
     --nFreePages();
     //tsk img read from new offset...
     // possibly need to make it pageidx*_pagesize + tskptr->offset for the imageoffset.
+    // HERE IS WHERE I WOULD WANT TO HIGHLIGHT THE IMG INFO TO READ.
     if(tskptr->objecttype < 5)
     {
         retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
@@ -347,6 +348,9 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     else
     {
+        // I NEED TO CALL THE IMAGE LOADING THE SAME AS ABOVE, BUT IN HEXEDITOR, NEED TO CALL THE HIGHLIGHT FUNCTION
+        // WITH THE FILE VARIABLES
+        //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     }
     if(retval > 0)

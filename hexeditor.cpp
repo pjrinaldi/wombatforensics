@@ -670,6 +670,9 @@ void HexEditor::paintEvent( QPaintEvent* e)
   int row_stop  = min(_rows-1,e->rect().bottom() / lineSpacing());
   int col_stop  = min(_cols-1,(e->rect().right()) / totalWordWidth);
 
+  // draw highlight over the correct text region. need to switch text values to using offset and size
+  // for now i'll use the row/col values for testing the highlighting
+  DrawCurrentObject(paint, row_start, row_stop, col_start, col_stop);
   // draw text in repaint event
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
@@ -946,14 +949,22 @@ void HexEditor::drawSelection( QPainter& paint )
       start = linestop+1;
     }
   }
-  DrawCurrentObject(paint);
+  //DrawCurrentObject(paint);
 }
 
-void HexEditor::DrawCurrentObject(QPainter& paint)
+void HexEditor::DrawCurrentObject(QPainter& paint, int row_start, int row_stop, int col_start, int col_stop)
 {
+    // THAT SORT OF WORKS... A GOOD START TO GO FROM.
     paint.setPen(Qt::NoPen);
     paint.setBrush(QColor(255, 0, 0, 15));
-    paint.drawRect(0, 0, 10, 10);
+    for(int r = row_start; r <= row_stop; r++)
+    {
+        for(int c = col_start; c <= col_stop; c++)
+        {
+            int widx = r*_cols+c;
+            paint.drawRect(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].top(), _wordBBox[widx].right(), _wordBBox[widx].bottom());
+        }
+    }
 }
 
 void HexEditor::drawCursor( QPainter& paint )
