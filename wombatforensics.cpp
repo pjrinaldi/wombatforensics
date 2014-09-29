@@ -506,6 +506,9 @@ void WombatForensics::LoadHexContents()
     {
         // here is where i need to print out the file byte offset, byte length, block information to figure out
         // how to highlight the relevant information for a selected object.
+        // based on the file address, i can call functions such as istat to determine the blocks it occupies, then i would
+        // need to highlight those blocks up to the file size and then highlight the rest as file slack...
+        // based on comparison of block size and file size.
         hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
