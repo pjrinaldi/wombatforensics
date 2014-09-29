@@ -504,6 +504,8 @@ void WombatForensics::LoadHexContents()
     }
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
+        // here is where i need to print out the file byte offset, byte length, block information to figure out
+        // how to highlight the relevant information for a selected object.
         hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
