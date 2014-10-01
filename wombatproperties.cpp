@@ -365,6 +365,15 @@ QStringList WombatProperties::PopulateVolumeProperties()
             {
                 if(tsk_getu32(endian, sunsparcpart->sanity) == SUN_SANITY) // populate sparc
                 {
+                    proplist << "ASCII Label" << QString::fromUtf8(reinterpret_cast<char*>(sunsparcpart->asciilabel)) << "ASCII label (0x00-0x7F)";
+                    proplist << "Version" << QString::number(tsk_getu32(endian, sunsparcpart->version)) << "Version (0x80-0x83)";
+                    proplist << "Volume Name" << QString::fromUtf8(reinterpret_cast<char*>(sunsparcpart->vol_name)) << "Volume Name (0x84-0x8C)";
+                    proplist << "Number of Partitions" << QString::number(tsk_getu16(endian, sunsparcpart->num_parts)) << "Number of partitions (0x8D-0x8E)";
+                    proplist << "Signature Sanity" << QString::number(tsk_getu32(endian, sunsparcpart->sanity)) << "Signature Value Sanity should be 0x600DDEEE (0xBC-0xBF)";
+                    proplist << "Writing Sectors to Skip" << QString::number(tsk_getu16(endian, sunsparcpart->write_reinstruct)) << "Sectors to skip, writing (0x0106-0x0107)";
+                    proplist << "Reading Sectors to Skip" << QString::number(tsk_getu16(endian, sunsparcpart->read_reinstruct)) << "Sectors to skip, reading (0x0108-0x0109)";
+                    proplist << "Reserved" << "Reserved" << "Reserved (0x010A-0x01A3)";
+                    proplist << "Disk Speed" << QString::number(tsk_getu16(endian, sunsparcpart->rpm)) << "Disk Speed (0x01A4-0x01A5)";
                 }
                 else if(tsk_getu32(endian, sunx86part->sanity) == SUN_SANITY) // populate i386
                 {
