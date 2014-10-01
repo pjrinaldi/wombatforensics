@@ -393,7 +393,7 @@ QStringList WombatProperties::PopulateVolumeProperties()
                     proplist << "Volume Name" << QString::fromUtf8(reinterpret_cast<char*>(sunx86part->vol_name)) << "Volume Name (0x14-0x1B)";
                     proplist << "Sector Size" << QString::number(tsk_getu16(endian, sunx86part->sec_size)) << "Sector sie (0x1C-0x1D)";
                     proplist << "Number of Partitions" << QString::number(tsk_getu16(endian, sunx86part->num_parts)) << "Number of partitions (0x1E-0x1F)";
-                    proplist << "Volume Label" << QString::fromUtf8(sunx86part->asciilabel)) << "Volume label (0x0148-0x01C7)";
+                    proplist << "Volume Label" << QString::fromUtf8(reinterpret_cast<char*>(sunx86part->asciilabel)) << "Volume label (0x0148-0x01C7)";
                     proplist << "Physical Cylinder Count" << QString::number(tsk_getu16(endian, sunx86part->num_ph_cyl)) << "Number of physical cylinders (0x01C8-0x01CB)";
                     proplist << "Data Cylinder Count" << QString::number(tsk_getu16(endian, sunx86part->num_cyl)) << "Number of data cylinders (0x01CC-0x01CD)";
                     proplist << "Alternates per Cylinder" << QString::number(tsk_getu16(endian, sunx86part->alt_per_cyl)) << "Alternates per cylinder (0x01CE-0x01CF)";
