@@ -374,9 +374,26 @@ QStringList WombatProperties::PopulateVolumeProperties()
                     proplist << "Reading Sectors to Skip" << QString::number(tsk_getu16(endian, sunsparcpart->read_reinstruct)) << "Sectors to skip, reading (0x0108-0x0109)";
                     proplist << "Reserved" << "Reserved" << "Reserved (0x010A-0x01A3)";
                     proplist << "Disk Speed" << QString::number(tsk_getu16(endian, sunsparcpart->rpm)) << "Disk Speed (0x01A4-0x01A5)";
+                    proplist << "Physical Cylinder Count" << QString::number(tsk_getu16(endian, sunsparcpart->num_ph_cyl)) << "Number of physical cylinders (0x01A6-0x01A7)";
+                    proplist << "Alternates per Cylinder" << QString::number(tsk_getu16(endian, sunsparcpart->alt_per_cyl)) << "Alternates per cylinder (0x01A8-0x01A9)";
+                    proplist << "Reserved" << "Reserved" << "Reserved (0x01AA-0x01AD)";
+                    proplist << "Interleave" << QString::number(tsk_getu16(endian, sunsparcpart->interleave)) << "Interleave (0x01AE-0x01AF)";
+                    proplist << "Data Cylinder Count" << QString::number(tsk_getu16(endian, sunsparcpart->num_cyl)) << "Number of data cylinders (0x01B0-0x01B1)";
+                    proplist << "Alternate Cylinder Count" << QString::number(tsk_getu16(endian, sunsparcpart->num_alt_cyl)) << "Number of alternate cylinders (0x01B2-0x01B3)";
+                    proplist << "Number of Heads" << QString::number(tsk_getu16(endian, sunsparcpart->num_head)) << "Number of heads (0x01B4-0x01B5)";
+                    proplist << "Sectors per Track Count" << QString::number(tsk_getu16(endian, sunsparcpart->sec_per_tr)) << "Number of sectors per track (0x01B6-0x01B7)";
+                    proplist << "Reserved" << "Reserved" << "Reserved (0x01B8-0x01BB)";
+                    proplist << "Signature" << QString::number(tsk_getu16(endian, sunsparcpart->magic)) << "Signature value should be 0xDABE (0x01FC-0x01FD)";
+                    proplist << "Checksum" << QString::number(tsk_getu16(endian, sunsparcpart->checksum)) << "Checksum (0x01FE-0x01FF)";
                 }
                 else if(tsk_getu32(endian, sunx86part->sanity) == SUN_SANITY) // populate i386
                 {
+                    proplist << "Signature Sanity" << QString::number(tsk_getu32(endian, sunx86part->sanity)) << "Signature Value Sanity should be 0x600DDEEE (0x1C-0x1F)";
+                    proplist << "Version" << QString::number(tsk_getu32(endian, sunx86part->version)) << "Version (0x10-0x13)";
+                    proplist << "Volume Name" << QString::fromUtf8(reinterpret_cast<char*>(sunx86part->vol_name)) << "Volume Name (0x14-0x1B)";
+                    proplist << "Sector Size" << QString::number(tsk_getu16(endian, sunx86part->sec_size)) << "Sector sie (0x1C-0x1D)";
+                    proplist << "Number of Partitions" << QString::number(tsk_getu16(endian, sunx86part->num_parts)) << "Number of partitions (0x1E-0x1F)";
+                    proplist << "Volume Label" << QString::fromUtf8(sunx86part->asciilabel)) << "Volume label (0x0148-0x01C7)";
                 }
                 free(buf);
             }
