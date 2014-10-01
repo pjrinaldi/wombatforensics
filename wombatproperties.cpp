@@ -388,18 +388,28 @@ QStringList WombatProperties::PopulateVolumeProperties()
                 }
                 else if(tsk_getu32(endian, sunx86part->sanity) == SUN_SANITY) // populate i386
                 {
-                    proplist << "Signature Sanity" << QString::number(tsk_getu32(endian, sunx86part->sanity)) << "Signature Value Sanity should be 0x600DDEEE (0x1C-0x1F)";
+                    proplist << "Signature Sanity" << QString::number(tsk_getu32(endian, sunx86part->sanity)) << "Signature Value Sanity should be 0x600DDEEE (0x0C-0x0F)";
                     proplist << "Version" << QString::number(tsk_getu32(endian, sunx86part->version)) << "Version (0x10-0x13)";
                     proplist << "Volume Name" << QString::fromUtf8(reinterpret_cast<char*>(sunx86part->vol_name)) << "Volume Name (0x14-0x1B)";
                     proplist << "Sector Size" << QString::number(tsk_getu16(endian, sunx86part->sec_size)) << "Sector sie (0x1C-0x1D)";
                     proplist << "Number of Partitions" << QString::number(tsk_getu16(endian, sunx86part->num_parts)) << "Number of partitions (0x1E-0x1F)";
                     proplist << "Volume Label" << QString::fromUtf8(reinterpret_cast<char*>(sunx86part->asciilabel)) << "Volume label (0x0148-0x01C7)";
-                    proplist << "Physical Cylinder Count" << QString::number(tsk_getu16(endian, sunx86part->num_ph_cyl)) << "Number of physical cylinders (0x01C8-0x01CB)";
-                    proplist << "Data Cylinder Count" << QString::number(tsk_getu16(endian, sunx86part->num_cyl)) << "Number of data cylinders (0x01CC-0x01CD)";
-                    proplist << "Alternates per Cylinder" << QString::number(tsk_getu16(endian, sunx86part->alt_per_cyl)) << "Alternates per cylinder (0x01CE-0x01CF)";
-                    proplist << "Cylinder offset" << QString::number(tsk_getu16(endian, sunx86part->cyl_offset)) << "Cylinder offset (0x01D0-0x01D1)";
-                    proplist << "Number of Heads" << QString::number(tsk_getu32(endian, sunx86part->num_head)) << "Number of heads (0x01D2-0x01D5)";
-                    proplist << "Sectors per Track Count" << QString::number(tsk_getu32(endian, sunx86part->sec_per_tr)) << "Number of sectors per track (0x01D6-0x01D9)";
+                    proplist << "Physical Cylinder Count" << QString::number(tsk_getu32(endian, sunx86part->num_ph_cyl)) << "Number of physical cylinders (0x01C8-0x01CB)";
+                    proplist << "Data Cylinder Count" << QString::number(tsk_getu32(endian, sunx86part->num_cyl)) << "Number of data cylinders (0x01CC-0x01CF)";
+                    proplist << "Alternate Cylinder Count" << QString::number(tsk_getu16(endian, sunx86part->num_alt_cyl)) << "Number of alternate cylinders (0x01D0-0x01D1)";
+                    proplist << "Cylinder offset" << QString::number(tsk_getu16(endian, sunx86part->cyl_offset)) << "Cylinder offset (0x01D2-0x01D3)";
+                    proplist << "Number of Heads" << QString::number(tsk_getu32(endian, sunx86part->num_head)) << "Number of heads (0x01D4-0x01D7)";
+                    proplist << "Sectors per Track Count" << QString::number(tsk_getu32(endian, sunx86part->sec_per_tr)) << "Number of sectors per track (0x01D8-0x01DB)";
+                    proplist << "Interleave" << QString::number(tsk_getu16(endian, sunx86part->interleave)) << "Interleave (0x01DC-0x01DD)";
+                    proplist << "Skew" << QString::number(tsk_getu16(endian, sunx86part->skew)) << "Skew (0x01DE-0x01DF)";
+                    proplist << "Alternates per Cylinder" << QString::number(tsk_getu16(endian, sunx86part->alt_per_cyl)) << "Number of alternates per cylinder (0x01E0-0x01E1)";
+                    proplist << "Disk Speed" << QString::number(tsk_getu16(endian, sunx86part->rpm)) << "Disk Speed (0x01E2-0x01E3)";
+                    proplist << "Writing Sectors to Skip" << QString::number(tsk_getu16(endian, sunx86part->write_reinstruct)) << "Sectors to skip, writing (0x01E4-0x01E5)";
+                    proplist << "Reading Sectors to Skip" << QString::number(tsk_getu16(endian, sunx86part->read_reinstruct)) << "Sectors to skip, reading (0x01E6-0x01E7)";
+                    proplist << "Reserved" << "Reserved" << "Reserved (0x01E8-0x01EF)";
+                    proplist << "Reserved" << "Reserved" << "Reserved (0x01F0-0x0x01FB)";
+                    proplist << "Signature" << QString::number(tsk_getu16(endian, sunx86part->magic)) << "Signature value should be 0xDABE (0x01FC-0x01FD)";
+                    proplist << "Checksum" << QString::number(tsk_getu16(endian, sunx86part->checksum)) << "Checksum (0x01FE-0x01FF)";
                 }
                 free(buf);
             }
