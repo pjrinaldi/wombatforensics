@@ -60,6 +60,7 @@
 #include "img/ewf.h"
 #include "libewf.h"
 #include "vs/tsk_bsd.h"
+#include "vs/tsk_mac.h"
 #include "fs/tsk_ntfs.h"
 #include "fs/tsk_exfatfs.h"
 #include "fs/tsk_fatfs.h"

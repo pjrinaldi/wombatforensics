@@ -36,6 +36,8 @@ private:
     FFS_INFO* ffs;
     ffs_sb1* sb1;
     ffs_sb2* sb2;
+    mac_part* macpart;
+    bsd_disklabel* bsdpart;
     /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;

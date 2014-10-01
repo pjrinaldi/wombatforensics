@@ -16,6 +16,8 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     sb1 = NULL;
     sb2 = NULL;
     ext2fs = NULL;
+    macpart = NULL;
+    //bsdpart = NULL;
     /*
     TSK_FS_FILE* tmpfile = NULL;
     ntfs_sb* ntfssb = NULL;
@@ -301,27 +303,59 @@ QStringList WombatProperties::PopulateVolumeProperties()
             proplist << "Signature" << "0xAA55" << "Signature Value should be 0xAA55 (0x1FE-0x1FF)";
         else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_BSD)
         {
-            /*
             char* sect_buf;
-            bsd_disklabel* dlabel;
-            uint32_t idx = 0;
+            //uint32_t idx = 0;
             ssize_t cnt;
-            char* table_str;
-            if((sect_buf = tsk_malloc(wombatptr->evidenceobject.volinfo->block_size)) != NULL)
+            //char* table_str;
+            TSK_ENDIAN_ENUM endian = wombatptr->evidenceobject.volinfo->endian;
+            sect_buf = (char*)tsk_malloc(wombatptr->evidenceobject.volinfo->block_size);
+            bsdpart = (bsd_disklabel*) sect_buf;
+            cnt = tsk_vs_read_block(wombatptr->evidenceobject.volinfo, BSD_PART_SOFFSET, sect_buf, wombatptr->evidenceobject.volinfo->block_size);
+            if(cnt != wombatptr->evidenceobject.volinfo->block_size)
             {
-                dlabel = (bsd_disklabel*) sect_buf;
+                // print error here
             }
-            proplist << "Signature" << QString::number(tsk_getu32(wombatptr->evidenceobject.volinfo->endian, dlabel->magic)) << "Signature value should be 0x82564557 (0x00-0x03)";
-            proplist << "Drive Type" << QString::number(tsk_getu16(wombatptr->evidenceobject.volinfo->endian, dlabel->type)) << "Drive type (0x04-0x05)";
-            proplist << "Drive Subtype" << QString::number(tsk_getu16(wombatptr->evidenceobject.volinfo->endian, dlabel->sub_type)) << "Drive subtype (0x06-0x07)";
-            //proplist << "Drive Type Name" << QString::fromUtf8(reinterpret_cast<char*>(
-            */
+            free(sect_buf);
+            proplist << "Signature" << QString::number(tsk_getu32(endian, bsdpart->magic)) << "Signature value should be 0x82564557 (0x00-0x03)";
+            proplist << "Drive Type" << QString::number(tsk_getu16(endian, bsdpart->type)) << "Drive type (0x04-0x05)";
+            proplist << "Drive Subtype" << QString::number(tsk_getu16(endian, bsdpart->sub_type)) << "Drive subtype (0x06-0x07)";
+            proplist << "Drive Type Name" << QString::fromUtf8(reinterpret_cast<char*>(bsdpart->type_name)) << "The Drive type name (0x08-0x17)";
+            proplist << "Pack Identifier Name" << QString::fromUtf8(reinterpret_cast<char*>(bsdpart->packname)) << "The Pack identifier name (0x18-0x27)";
+            proplist << "Sector Size (bytes)" << QString::number(tsk_getu32(endian, bsdpart->sec_size)) << "Size of a sector in bytes (0x28-0x2B)";
+            proplist << "Sectors per Track" << QString::number(tsk_getu32(endian, bsdpart->sec_per_tr)) << "Number of Sectors per track (0x2C-0x2F)";
+            proplist << "Tracks per Cylinder" << QString::number(tsk_getu32(endian, bsdpart->tr_per_cyl)) << "Number of tracks per cylinder (0x30-0x33)";
+            proplist << "Cylinders per Unit" << QString::number(tsk_getu32(endian, bsdpart->cyl_per_unit)) << "Number of cylinders per unit (0x34-0x37)";
+            proplist << "Sectors per Cylinder" << QString::number(tsk_getu32(endian, bsdpart->sec_per_cyl)) << "Number of sectors per cylinder (0x38-0x3B)";
+            proplist << "Sectors per Unit" << QString::number(tsk_getu32(endian, bsdpart->sec_per_unit)) << "Number of sectors per unit (0x3C-0x3F)";
+            proplist << "Spare Sectors per Track" << QString::number(tsk_getu16(endian, bsdpart->spare_per_tr)) << "Number of spare sectors per track (0x40-0x41)";
+            proplist << "Spare Sectors per Cylinder" << QString::number(tsk_getu16(endian, bsdpart->spare_per_cyl)) << "Number of spare sectors per cylinder (0x42-0x43)";
+            proplist << "Alternate Cylinders Per Unit" << QString::number(tsk_getu32(endian, bsdpart->alt_per_unit)) << "Number of alternate cylinders per unit (0x44-0x47)";
+            proplist << "Rotational Disk Speed" << QString::number(tsk_getu16(endian, bsdpart->rpm)) << "Rotational Speed of Disk (0x48-0x49)";
+            proplist << "Hardware Sector Interleave" << QString::number(tsk_getu16(endian, bsdpart->interleave)) << "Hardware sector interleave (0x4A-0x4B)";
+            proplist << "Track Skew" << QString::number(tsk_getu16(endian, bsdpart->trackskew)) << "Track skew (0x4C-0x4D)";
+            proplist << "Cylinder Skew" << QString::number(tsk_getu16(endian, bsdpart->cylskew)) << "Cylinder skew (0x4E-0x4F)";
+            proplist << "Head Switch Time" << QString::number(tsk_getu32(endian, bsdpart->headswitch)) << "Head switch time in microseconds (0x50-0x53)";
+            proplist << "Track-to-Track Seek Time" << QString::number(tsk_getu32(endian, bsdpart->track_seek)) << "Track-to-Track seek time in microseconds (0x54-0x57)";
+            proplist << "Flags" << QString::number(tsk_getu32(endian, bsdpart->flags)) << "Flags (0x58-0x5B)";
+            proplist << "Drive Specific Data" << QString::fromUtf8(reinterpret_cast<char*>(bsdpart->drivedata)) << "Drive Specific Data (0x5C-0x6F)";
+            proplist << "Reserved" << "Reserved" << "Reserved (0x70-0x83)";
+            proplist << "Signature" << QString::number(tsk_getu32(endian, bsdpart->magic2)) << "Signature value should be 0x82564557 (0x84-0x87)";
+            proplist << "Checksum" << QString::number(tsk_getu16(endian, bsdpart->checksum)) << "Checksum (0x88-0x89)";
+            proplist << "Number of Partitions" << QString::number(tsk_getu16(endian, bsdpart->num_parts)) << "Number of partitions (0x8A-0x8B)";
+            proplist << "Boot Area Size" << QString::number(tsk_getu32(endian, bsdpart->bootarea_size)) << "Size of boot area (0x8C-0x8F)";
+            proplist << "Super Block Maximum Size" << QString::number(tsk_getu32(endian, bsdpart->sb_size)) << "Maximum size of the file system boot super block (0x90-0x93)";
+            proplist << "Unused" << "Unused" << "Unused (0x0194-0x01FF)";
         }
         else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_SUN)
         {
         }
         else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_MAC)
         {
+            TSK_ENDIAN_ENUM endian = wombatptr->evidenceobject.volinfo->endian;
+            macpart = (mac_part*)wombatptr->evidenceobject.volinfo;
+            proplist << "Signature" << "0x504D" << "Signature Value should be 0x504D (0x00-0x01)";
+            proplist << "Reserved" << "Reserved" << "Reserved (0x02-0x03)";
+            proplist << "Number of Partitions" << QString::number(tsk_getu32(endian, macpart->pmap_size)) << "Total Number of Partitions (0x08-0x0B)";
         }
         else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_GPT)
         {
