@@ -17,7 +17,9 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     sb2 = NULL;
     ext2fs = NULL;
     macpart = NULL;
-    //bsdpart = NULL;
+    bsdpart = NULL;
+    sunsparcpart = NULL;
+    sunx86part = NULL;
     /*
     TSK_FS_FILE* tmpfile = NULL;
     ntfs_sb* ntfssb = NULL;
@@ -348,6 +350,27 @@ QStringList WombatProperties::PopulateVolumeProperties()
         }
         else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_SUN)
         {
+            char* buf;
+            ssize_t cnt;
+            TSK_ENDIAN_ENUM endian = wombatptr->evidenceobject.volinfo->endian;
+            buf = (char*)tsk_malloc(wombatptr->evidenceobject.volinfo->block_size);
+            cnt = tsk_vs_read_block(wombatptr->evidenceobject.volinfo, SUN_SPARC_PART_SOFFSET, buf, wombatptr->evidenceobject.volinfo->block_size);
+            if(cnt != wombatptr->evidenceobject.volinfo->block_size)
+            {
+                // print error here.
+            }
+            sunsparcpart = (sun_dlabel_sparc*)buf;
+            sunx86part = (sun_dlabel_i386*)buf;
+            if(tsk_vs_guessu16(wombatptr->evidenceobject.volinfo, sunsparcpart->magic, SUN_MAGIC) == 0)
+            {
+                if(tsk_getu32(endian, sunsparcpart->sanity) == SUN_SANITY) // populate sparc
+                {
+                }
+                else if(tsk_getu32(endian, sunx86part->sanity) == SUN_SANITY) // populate i386
+                {
+                }
+                free(buf);
+            }
         }
         else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_MAC)
         {

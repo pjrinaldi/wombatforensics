@@ -38,6 +38,8 @@ private:
     ffs_sb2* sb2;
     mac_part* macpart;
     bsd_disklabel* bsdpart;
+    sun_dlabel_sparc* sunsparcpart;
+    sun_dlabel_i386* sunx86part;
     /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
