@@ -24,9 +24,8 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     fatfs = NULL;
     fatsb = NULL;
     ntfsinfo = NULL;
-    //ntfssb = NULL;
+    exfatsb = NULL;
     /*
-    TSK_FS_FILE* tmpfile = NULL;
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
     const TSK_FS_ATTR*tmpattr;
@@ -849,6 +848,25 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
                 proplist << "Newer than Windows XP";
             proplist << "Version Information";
         }
+    }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_EXFAT)
+    {
+        fatfs = (FATFS_INFO*)curfsinfo;
+        exfatsb = (EXFATFS_MASTER_BOOT_REC*)&(fatfs->boot_sector_buffer);
+        proplist << "Jump Boot" << "Jump Boot" << "Jump boot should be 0xEB7690 (0x00-0x02)";
+        proplist << "File System Name" << QString::fromUtf8(reinterpret_cast<char*>(exfatsb->fs_name)) << "File system name should be \"EXFAT \" (0x03-0x0A)";
+        proplist << "Unused" << "Unused" << "Unused, must be zeros (0x0B-0x3F)";
+        proplist << "Partition Offset" << QString::number(tsk_getu64(curfsinfo->endian, exfatsb->partition_offset)) << "Sector address for partition start (0x40-0x47)";
+        proplist << "Volume Length (sectors)" << QString::number(tsk_getu64(curfsinfo->endian, exfatsb->vol_len_in_sectors)) << "Size of exFAT volume in sectors (0x48-0x4F)";
+        proplist << "FAT Offset" << QString::number(tsk_getu32(curfsinfo->endian, exfatsb->fat_offset)) << "FAT offset in sectors (0x50-0x53)";
+        proplist << "FAT Length" << QString::number(tsk_getu32(curfsinfo->endian, exfatsb->fat_len_in_sectors)) << "FAT length in sectors. May exceed the required space in order to align the second FAT (0x54-0x57)";
+        proplist << "Cluster Heap Offset" << QString::number(tsk_getu32(curfsinfo->endian, exfatsb->cluster_heap_offset)) << "Sector address of the data region (0x58-0x5B)";
+        proplist << "Cluster Count" << QString::number(tsk_getu32(curfsinfo->endian, exfatsb->cluster_cnt)) << "Number of clusters in the cluster heap (0x5C-0x5F)";
+        proplist << "Root Directory Cluster" << QString::number(tsk_getu32(curfsinfo->endian, exfatsb->root_dir_cluster)) << "Cluster address of the root directory (0x60-0x63)";
+        proplist << "Volume Serial Number" << QString::fromUtf8(reinterpret_cast<char*>(exfatsb->vol_serial_no)) << "Volume serial number (0x64-0x67)";
+        proplist << "File System Revision" << QString::number(exfatsb->fs_revision[1]) + "." + QString::number(exfatsb->fs_revision[0]) << "File system revision as Major.Minor (0x68-0x69)";
+        proplist << "Volume Flags" << QString::number(tsk_getu16(curfsinfo->endian, exfatsb->vol_flags)) << "Volume Flags (0x6A-0x6B)";
+        proplist << "Bytes Per Sector" << QString::number(exfatsb->bytes_per_sector) << "Bytes per sector as a power of 2. Minimum 9 (512 bytes per sector), maximum 12 (4096 bytes per sector (0x6C-0x6C)";
     }
     // EXFAT, HFS, YAFFS2
     return proplist;
