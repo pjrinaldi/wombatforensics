@@ -733,6 +733,10 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Signature" << QString::number(tsk_gets32(curfsinfo->endian, sb2->magic)) << "File system signature value should be 0x19540119 (0x055C-0x055F)";
         }
     }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_FAT12 || curfsinfo->ftype == TSK_FS_TYPE_FAT16 || curfsinfo->ftype == TSK_FS_TYPE_FAT32)
+    {
+
+    }
     return proplist;
 }
 
