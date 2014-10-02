@@ -31,7 +31,6 @@ private:
     libewf_error_t* ewferror;
     /*
     TSK_FS_FILE* tmpfile = NULL;
-    ntfs_sb* ntfssb = NULL;
     */
     FFS_INFO* ffs;
     ffs_sb1* sb1;
@@ -43,6 +42,8 @@ private:
     gpt_head* gptpart;
     FATFS_INFO* fatfs;
     FATXXFS_SB* fatsb;
+    NTFS_INFO* ntfsinfo;
+    ntfs_sb* ntfssb;
     /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;

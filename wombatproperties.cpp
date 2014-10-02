@@ -23,9 +23,10 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     gptpart = NULL;
     fatfs = NULL;
     fatsb = NULL;
+    ntfsinfo = NULL;
+    ntfssb = NULL;
     /*
     TSK_FS_FILE* tmpfile = NULL;
-    ntfs_sb* ntfssb = NULL;
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
     const TSK_FS_ATTR*tmpattr;
@@ -769,8 +770,37 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Size of FAT" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->sectperfat16)) << "16-bit size in sectors of each FAT for FAT12 and FAT16. For FAT32, this field is 0 (0x14-0x15)";
         proplist << "Reserved" << "Reserved" << "Reserved (0x16-0x1B)";
         proplist << "Number of Sectors Before Partition Start" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->prevsect)) << "Number of sectors before the start of the file system partition (0x1C-0x1F)";
-        // proplist ->32-bit value of number of fs sectors->tsk_fatxxfs.h->line 94
+        proplist << "Number of Sectors in File System" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->sectors32)) << "32-bit value of number of sectors in the file system. Either this value or the 16-bit value above must be 0 (0x20-0x23)";
+        if(curfsinfo->ftype == TSK_FS_TYPE_FAT32)
+        {
+            proplist << "Size of FAT" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->a.f32.sectperfat32)) << "32-bit size in sectors of one FAT (0x24-0x27)";
+            proplist << "Defines FAT is Written" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->a.f32.ext_flag)) << "Defines how multiple FAT structures are written to. If bit 7 is 1, only one of the FAT structures is active and its index is described in bits 0-3. Otherwise all FAT structures are mirrors of each other (0x28-0x29)";
+            proplist << "Major and Minor Version" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->a.f32.fs_ver)) << "The major and minor version number (0x2A-0x2B)";
+            proplist << "Root Directory Cluster" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->a.f32.rootclust)) << "Cluster where the root directory can be found (0x2C-0x2F)";
+            proplist << "FSINFO Structure Sector" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->a.f32.fsinfo)) << "Sector where FSINFO structure can be found (0x30-0x31)";
+            proplist << "Boot Sector Backup Copy" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->a.f32.bs_backup)) << "Sector where the backup copy of the boot sector is located, default is 6 (0x32-0x33)";
+            proplist << "Reserved" << "Reserved" << "Reserved (0x34-0x3F)";
+            proplist << "BIOS Drive Number" << QString::number(fatsb->a.f32.drvnum) << "BIOS INT32h drive number (0x40-0x40)";
+            proplist << "Not used" << "Not used" << "Not used (0x41-0x42)";
+            proplist << "Volume Serial Number" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->a.f32.vol_id)) << "Volume serial number, which some versions of Windows will calculate based on the creation date and time (0x43-0x46)";
+            proplist << "Volume Label" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f32.vol_lab)) << "Volume label in ASCII. The user chooses this value when creating the file system (0x47-0x51)";
+            proplist << "File System Type" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f32.fs_type)) << "File system type label in ASCII. Standard values include \"FAT32\", but nothing is required (0x52-0x59)";
+            proplist << "Not Used" << "Not Used" << "Not Used (0x005A-0x01FD)";
+        }
+        else
+        {
+            proplist << "Reserved" << "Reserved" << "Reserved (0x24-0x26)";
+            proplist << "Volume Serial Number" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->a.f16.vol_id)) << "Volume serial number, which some versions of Windows will calculate based on the creation date and time (0x27-0x2A)";
+            proplist << "Volume Label" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f16.vol_lab)) << "Volume label in ASCII. The user chooses this value when creating the file system (0x2B-0x35)";
+            proplist << "File System Type" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f16.fs_type)) << "File system type in ASCII. Standard values include \"FAT\", \"FAT12\", \"FAT16\", but nothing is required (0x36->0x3D)";
+            proplist << "Reserved" << "Reserved" << "Reserved (0x3E-0x01FD)";
+        }
+        proplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->magic)) << "Signature value should be 0xAA55 (0x01FE-0x01FF)";
     }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_NTFS)
+    {
+    }
+    // EXFAT, HFS, YAFFS2
     return proplist;
 }
 
@@ -873,126 +903,6 @@ QStringList WombatProperties::PopulateFileProperties()
                 }
                 tsk_fs_file_close(tmpfile);
                 free(databuffer);
-                break;
-            case TSK_FS_TYPE_FAT12:
-                fatfs = (FATFS_INFO*)tmpfsinfo;
-                fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
-                qDebug() << fatsb->a.f16.vol_lab;
-                printf("Volume Label (Boot Sector): %c%c%c%c%c%c%c%c%c%c%c\n", fatsb->a.f16.vol_lab[0], fatsb->a.f16.vol_lab[1], fatsb->a.f16.vol_lab[2], fatsb->a.f16.vol_lab[3], fatsb->a.f16.vol_lab[4], fatsb->a.f16.vol_lab[5], fatsb->a.f16.vol_lab[6], fatsb->a.f16.vol_lab[7], fatsb->a.f16.vol_lab[8], fatsb->a.f16.vol_lab[9], fatsb->a.f16.vol_lab[10]);
-                if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
-                {
-                    // log error here
-                }
-                cnt = tsk_fs_read_block(tmpfsinfo, fatfs->rootsect, databuffer, tmpfsinfo->block_size);
-                if(cnt != tmpfsinfo->block_size)
-                {
-                    // log error here
-                }
-                tmpfatdentry = NULL;
-                if(fatfs->ssize <= tmpfsinfo->block_size)
-                {
-                    curentry = (FATXXFS_DENTRY*)databuffer;
-                    for(int i=0; i < fatfs->ssize; i += sizeof(*curentry))
-                    {
-                        if(curentry->attrib == FATFS_ATTR_VOLUME)
-                        {
-                            tmpfatdentry = curentry;
-                            break;
-                        }
-                        curentry++;
-                    }
-                }
-                qDebug() << "FAT12 Volume Label: " << tmpfatdentry->name;
-                free(databuffer);
-                break;
-            case TSK_FS_TYPE_FAT16:
-                fatfs = (FATFS_INFO*)tmpfsinfo;
-                fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
-                qDebug() << fatsb->a.f16.vol_lab;
-                printf("Volume Label (Boot Sector): %c%c%c%c%c%c%c%c%c%c%c\n", fatsb->a.f16.vol_lab[0], fatsb->a.f16.vol_lab[1], fatsb->a.f16.vol_lab[2], fatsb->a.f16.vol_lab[3], fatsb->a.f16.vol_lab[4], fatsb->a.f16.vol_lab[5], fatsb->a.f16.vol_lab[6], fatsb->a.f16.vol_lab[7], fatsb->a.f16.vol_lab[8], fatsb->a.f16.vol_lab[9], fatsb->a.f16.vol_lab[10]);
-                if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
-                {
-                    // log error here
-                }
-                cnt = tsk_fs_read_block(tmpfsinfo, fatfs->rootsect, databuffer, tmpfsinfo->block_size);
-                if(cnt != tmpfsinfo->block_size)
-                {
-                    // log error here
-                }
-                tmpfatdentry = NULL;
-                if(fatfs->ssize <= tmpfsinfo->block_size)
-                {
-                    curentry = (FATXXFS_DENTRY*)databuffer;
-                    for(int i=0; i < fatfs->ssize; i += sizeof(*curentry))
-                    {
-                        if(curentry->attrib == FATFS_ATTR_VOLUME)
-                        {
-                            tmpfatdentry = curentry;
-                            break;
-                        }
-                        curentry++;
-                    }
-                }
-                qDebug() << "FAT16 Volume Label: " << tmpfatdentry->name;
-                free(databuffer);
-                break;
-            case TSK_FS_TYPE_FAT32:
-                fatfs = (FATFS_INFO*)tmpfsinfo;
-                fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
-                qDebug() << fatsb->a.f32.vol_lab;
-                printf("Volume Label (Boot Sector): %c%c%c%c%c%c%c%c%c%c%c\n", fatsb->a.f32.vol_lab[0], fatsb->a.f32.vol_lab[1], fatsb->a.f32.vol_lab[2], fatsb->a.f32.vol_lab[3], fatsb->a.f32.vol_lab[4], fatsb->a.f32.vol_lab[5], fatsb->a.f32.vol_lab[6], fatsb->a.f32.vol_lab[7], fatsb->a.f32.vol_lab[8], fatsb->a.f32.vol_lab[9], fatsb->a.f32.vol_lab[10]);
-                if((databuffer = (char*) tsk_malloc(tmpfsinfo->block_size)) == NULL)
-                {
-                    // log error here
-                }
-                cnt = tsk_fs_read_block(tmpfsinfo, fatfs->rootsect, databuffer, tmpfsinfo->block_size);
-                if(cnt != tmpfsinfo->block_size)
-                {
-                    // log error here
-                }
-                tmpfatdentry = NULL;
-                if(fatfs->ssize <= tmpfsinfo->block_size)
-                {
-                    curentry = (FATXXFS_DENTRY*)databuffer;
-                    for(int i=0; i < fatfs->ssize; i += sizeof(*curentry))
-                    {
-                        if(curentry->attrib == FATFS_ATTR_VOLUME)
-                        {
-                            tmpfatdentry = curentry;
-                            break;
-                        }
-                        curentry++;
-                    }
-                }
-                qDebug() << "FAT32 Volume Label: " << tmpfatdentry->name;
-                free(databuffer);
-                break;
-            case TSK_FS_TYPE_FFS1:
-                qDebug() << "FFS1";
-                break;
-            case TSK_FS_TYPE_FFS1B:
-                qDebug() << "FFS1B";
-                break;
-            case TSK_FS_TYPE_FFS2:
-                ffs = (FFS_INFO*)tmpfsinfo;
-                sb1 = ffs->fs.sb1;
-                sb2 = ffs->fs.sb2;
-                qDebug() << "FFS2 Volume label: " << sb2->volname;
-                break;
-            case TSK_FS_TYPE_EXT2:
-                ext2fs = (EXT2FS_INFO*)tmpfsinfo;
-                sb = ext2fs->fs;
-                qDebug() << "EXT2 Volume name: " << sb->s_volume_name;
-                break;
-            case TSK_FS_TYPE_EXT3:
-                ext2fs = (EXT2FS_INFO*)tmpfsinfo;
-                sb = ext2fs->fs;
-                qDebug() << "EXT3 Volume name: " << sb->s_volume_name;
-                break;
-            case TSK_FS_TYPE_EXT4:
-                ext2fs = (EXT2FS_INFO*)tmpfsinfo;
-                sb = ext2fs->fs;
-                qDebug() << "EXT4 Volume name: " << sb->s_volume_name;
                 break;
             case TSK_FS_TYPE_RAW:
                 qDebug() << "no file system. store 0, \"\", or message for respective variables";
