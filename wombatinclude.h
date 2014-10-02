@@ -62,6 +62,7 @@
 #include "vs/tsk_bsd.h"
 #include "vs/tsk_mac.h"
 #include "vs/tsk_sun.h"
+#include "vs/tsk_gpt.h"
 #include "fs/tsk_ntfs.h"
 #include "fs/tsk_exfatfs.h"
 #include "fs/tsk_fatfs.h"

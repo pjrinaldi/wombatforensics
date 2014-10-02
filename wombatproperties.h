@@ -40,6 +40,7 @@ private:
     bsd_disklabel* bsdpart;
     sun_dlabel_sparc* sunsparcpart;
     sun_dlabel_i386* sunx86part;
+    gpt_head* gptpart;
     /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;

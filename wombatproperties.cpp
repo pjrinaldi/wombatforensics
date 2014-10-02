@@ -20,6 +20,7 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     bsdpart = NULL;
     sunsparcpart = NULL;
     sunx86part = NULL;
+    gptpart = NULL;
     /*
     TSK_FS_FILE* tmpfile = NULL;
     ntfs_sb* ntfssb = NULL;
@@ -424,6 +425,32 @@ QStringList WombatProperties::PopulateVolumeProperties()
         }
         else if(wombatptr->evidenceobject.volinfo->vstype == TSK_VS_TYPE_GPT)
         {
+            char* sect_buf;
+            ssize_t cnt;
+            TSK_ENDIAN_ENUM endian = wombatptr->evidenceobject.volinfo->endian;
+            sect_buf = (char*)tsk_malloc(wombatptr->evidenceobject.volinfo->block_size);
+            cnt = tsk_vs_read_block(wombatptr->evidenceobject.volinfo, GPT_PART_SOFFSET + 1, sect_buf, wombatptr->evidenceobject.volinfo->block_size);
+            if(cnt != wombatptr->evidenceobject.volinfo->block_size)
+            {
+                // print error here
+            }
+            free(sect_buf);
+            proplist << "Signature" << QString::number(tsk_getu64(endian, gptpart->signature)) << "Signature Value should ve EFI PART (0x00-0x07)";
+            proplist << "Version" << QString::number(tsk_getu32(endian, gptpart->version)) << "Version (0x08-0x0B)";
+            proplist << "GPT Header Size (bytes)" << QString::number(tsk_getu32(endian, gptpart->head_size_b)) << "Size of GPT header in bytes (0x0C-0x0F)";
+            proplist << "GPT Header Checksum" << QString::number(tsk_getu32(endian, gptpart->head_crc)) << "CRC32 checksum of GPT header (0x10-0x13)";
+            proplist << "Reserved" << "Reserved" << "Reserved (0x14-0x17)";
+            proplist << "Current GPT Header LBA" << QString::number(tsk_getu64(endian, gptpart->head_lba)) << "Logical Block Address of the current GPT header structure (0x18-0x1F)";
+            proplist << "Other GPT Header LBA" << QString::number(tsk_getu64(endian, gptpart->head2_lba)) << "Logical Block Address of the other GPT header structure (0x20-0x27)";
+            proplist << "Partition Area Start LBA" << QString::number(tsk_getu64(endian, gptpart->partarea_start)) << "Logical Block Address of the start of the partition area (0x28-0x2F)";
+            proplist << "Partition End Area LBA" << QString::number(tsk_getu64(endian, gptpart->partarea_end)) << "Logical Block Address of the end of the partition area (0x30-0x37)";
+            sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(endian, &(gptpart->guid[8])), tsk_getu64(endian, &(gptpart->guid[0])));
+            proplist << "Disk GUID" << QString::fromStdString(string(asc)) << "Disk GUID (0x38-0x47)";
+            proplist << "LBA of Start of the Partition Table" << QString::number(tsk_getu64(endian, gptpart->tab_start_lba)) << "Logical Block Address of the start of the partition table (0x48-0x4F)";
+            proplist << "Number of Partition Table Entries" << QString::number(tsk_getu32(endian, gptpart->tab_num_ent)) << "Number of entries in the partition table (0x50-0x53)";
+            proplist << "Partition Table Entry Size" << QString::number(tsk_getu32(endian, gptpart->tab_size_b)) << "Size of each entry in the partition table (0x54-0x57)";
+            proplist << "Partition Table Checksum" << QString::number(tsk_getu32(endian, gptpart->tab_crc)) << "CRC32 checksum of the partition table (0x58-0x5B)";
+            proplist << "Reserved" << "Reserved" << "Reserved (0x5C-0x01FF)";
         }
     }
     return proplist;
