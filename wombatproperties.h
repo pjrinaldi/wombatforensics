@@ -43,7 +43,7 @@ private:
     FATFS_INFO* fatfs;
     FATXXFS_SB* fatsb;
     NTFS_INFO* ntfsinfo;
-    ntfs_sb* ntfssb;
+    //ntfs_sb* ntfssb;
     /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;

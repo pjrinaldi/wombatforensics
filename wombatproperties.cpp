@@ -24,7 +24,7 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     fatfs = NULL;
     fatsb = NULL;
     ntfsinfo = NULL;
-    ntfssb = NULL;
+    //ntfssb = NULL;
     /*
     TSK_FS_FILE* tmpfile = NULL;
     FATXXFS_DENTRY* tmpfatdentry = NULL;
@@ -799,6 +799,56 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_NTFS)
     {
+        ntfsinfo = (NTFS_INFO*)curfsinfo;
+        proplist << "Assembly Boot Code" << "Assembly Boot Code" << "Assembly instruction to jump to boot code (0x00-0x02)";
+        proplist << "OEM Name" << QString::fromUtf8(ntfsinfo->fs->oemname) << "OEM Name (0x03-0x0A)";
+        proplist << "Bytes per Sector" << QString::number(tsk_getu16(curfsinfo->endian, ntfsinfo->fs->ssize)) << "Bytes per sector (0x0B-0x0C)";
+        proplist << "Sectors per Cluster" << QString::number(ntfsinfo->fs->csize) << "Sectors per cluster (0x0D-0x0D)";
+        proplist << "Reserved Sectors" << "Reserved Sectors" << "Reserved and Unused Sectors (0x0E-0x27)";
+        proplist << "Volume Size (sectors)" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->vol_size_s)) << "Total Sectors in the file system (0x28-0x2F)";
+        proplist << "MFT Starting Cluster Address" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->mft_clust)) << "Starting cluster address of the Master File Table (MFT) (0x30-0x37)";
+        proplist << "MFT Mirror Starting Cluster Address" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->mftm_clust)) << "Starting cluster address of the MFT Mirror (0x38-0x3F)";
+        proplist << "MFT Record Size (clusters)" << QString::number(ntfsinfo->fs->mft_rsize_c) << "Size of file record (MFT Entry) (0x40-0x40)";
+        proplist << "Unused" << "Unused" << "Unused (0x41-0x43)";
+        proplist << "Size of Index Record" << QString::number(ntfsinfo->fs->idx_rsize_c) << "Number of clusters per index record (0x44-0x44)";
+        proplist << "Unused" << "Unused" << "Unused (0x45-0x47)";
+        proplist << "Serial Number" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->serial)) << "Serial Number (0x48-0x4F)";
+        proplist << "Boot Code" << "Boot Code" << "Boot Code (0x0050-0x00FD)";
+        proplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, ntfsinfo->fs->magic)) << "Signature value should be 0xAA55 (0x00FE-0x00FF)";
+        TSK_FS_FILE* tmpfile = NULL;
+        const TSK_FS_ATTR* tmpattr;
+        if((tmpfile = tsk_fs_file_open_meta(curfsinfo, NULL, NTFS_MFT_VOL)) == NULL)
+        {
+            // log error here
+        }
+        tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, TSK_FS_ATTR_TYPE_NTFS_VNAME);
+        if((tmpattr->flags & TSK_FS_ATTR_RES) && (tmpattr->size))
+        {
+            UTF16* name16 = (UTF16*) tmpattr->rd.buf;
+            UTF8* name8 = (UTF8*) asc;
+            int retval;
+            retval = tsk_UTF16toUTF8(curfsinfo->endian, (const UTF16**)&name16, (UTF16*) ((uintptr_t)name16 + (int) tmpattr->size), &name8, (UTF8*) ((uintptr_t)name8 + sizeof(asc)), TSKlenientConversion);
+            if(retval != TSKconversionOK)
+            {
+                // log error here
+                *name8 = '\0';
+            }
+            else if((uintptr_t)name8 >= (uintptr_t)asc + sizeof(asc))
+                asc[sizeof(asc)-1] = '\0';
+            else
+                *name8 = '\0';
+            proplist << "Volume Name" << QString::fromStdString(string(asc)) << "Volume Name from $VOLUME_NAME attribute";
+            proplist << "Version";
+            if(ntfsinfo->ver == NTFS_VINFO_NT)
+                proplist << "Windows NT";
+            else if(ntfsinfo->ver == NTFS_VINFO_2K)
+                proplist << "Windows 2000";
+            else if(ntfsinfo->ver == NTFS_VINFO_XP)
+                proplist << "Windows XP";
+            else
+                proplist << "Newer than Windows XP";
+            proplist << "Version Information";
+        }
     }
     // EXFAT, HFS, YAFFS2
     return proplist;
@@ -813,16 +863,6 @@ QStringList WombatProperties::PopulateFileProperties()
     /*
     switch(curfsinfo->ftype)
     {
-        case TSK_FS_TYPE_NTFS:
-            len = roundup(sizeof(ntfs_sb), curfsinfo->img_info->sector_size);
-            ntfssb = tsk_malloc(len);
-            cnt = tsk_fs_read(curfsinfo, (TSK_OFF_T) 0, (char*) ntfssb, len);
-            // will come back to NTFS.
-            break;
-        case TSK_FS_TYPE_EXFAT:
-
-
-    }
         case TSK_FS_TYPE_NTFS:
                 //NTFS_INFO* tmpinfo = (NTFS_INFO*)tmpfsinfo;
                 if((tmpfile = tsk_fs_file_open_meta(tmpfsinfo, NULL, NTFS_MFT_VOL)) == NULL)
