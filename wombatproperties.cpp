@@ -21,13 +21,13 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     sunsparcpart = NULL;
     sunx86part = NULL;
     gptpart = NULL;
+    fatfs = NULL;
+    fatsb = NULL;
     /*
     TSK_FS_FILE* tmpfile = NULL;
     ntfs_sb* ntfssb = NULL;
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
-    FATFS_INFO* fatfs = NULL;
-    FATXXFS_SB* fatsb = NULL;
     const TSK_FS_ATTR*tmpattr;
     TSK_DADDR_T cursector = 0;
     TSK_DADDR_T endsector = 0;
@@ -735,7 +735,38 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_FAT12 || curfsinfo->ftype == TSK_FS_TYPE_FAT16 || curfsinfo->ftype == TSK_FS_TYPE_FAT32)
     {
-
+        fatfs = (FATFS_INFO*)curfsinfo;
+        fatsb = (FATXXFS_SB*)fatfs->boot_sector_buffer;
+        char* data_buf;
+        ssize_t cnt;
+        if((data_buf = (char*)tsk_malloc(curfsinfo->block_size)) != NULL)
+        {
+            // print error
+        }
+        cnt = tsk_fs_read_block(curfsinfo, fatfs->rootsect, data_buf, curfsinfo->block_size);
+        if(cnt != curfsinfo->block_size)
+        {
+            // print error
+        }
+        free(data_buf);
+        proplist << "File System Type";
+        if(curfsinfo->ftype == TSK_FS_TYPE_FAT12)
+            proplist << "FAT12";
+        else if(curfsinfo->ftype == TSK_FS_TYPE_FAT16)
+            proplist << "FAT16";
+        else if(curfsinfo->ftype == TSK_FS_TYPE_FAT32)
+            proplist << "FAT32";
+        proplist << "File System Type";
+        proplist << "Reserved" << "Jump Code" << "Assembly instructions to jump to boot code (0x00-0x02)";
+        proplist << "OEM Name" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->oemname)) << "OEM name in ASCII (0x03-0x0A)";
+        proplist << "Bytes per Sector" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->ssize)) << "Sector size in bytes. Allowed values include 512, 1024, 2048, and 4096 (0x0B-0x0C)";
+        proplist << "Sectors per Cluster" << QString::number(fatsb->csize) << "Cluster size in sectors. Allowed values are powers of 2, but the cluster size must be 32KB or smaller (0x0D-0x0D)";
+        proplist << "Reserved Area Size" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->reserved)) << "Number of reserved sectors for boot sectors (0x0E-0x0F)";
+        proplist << "Number of FATs" << QString::number(fatsb->numfat) << "Number of File Allocation Tables (FATs). Typically two for redundancy (0x10-0x10)";
+        proplist << "Number of Root Directory Entries" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->numroot)) << "Maximum number of files in the root directory for FAT12 and FAT16. This is 0 for FAT32 and typically 512 for FAT16 (0x11-0x12)";
+        proplist << "Number of Sectors in File System" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->sectors16)) << "Maximum number of sectors in the file system. If the number of sectors is larger than can be represented in this 2-byte value, a 4-byte value exists later in the data structure and this should be 0 (0x13-0x14)";
+        proplist << "Media Type" << QString::number(fatsb->f2) << "Media type. Should be 0xF8 for fixed disks and 0xF0 for removable disks (0x13-0x13)";
+        proplist << "Size of FAT" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->sectperfat16)) << "16-bit size in sectors of each FAT for FAT12 and FAT16. For FAT32, this field is 0 (0x14-0x15)";
     }
     return proplist;
 }

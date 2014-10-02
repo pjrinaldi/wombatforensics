@@ -41,11 +41,11 @@ private:
     sun_dlabel_sparc* sunsparcpart;
     sun_dlabel_i386* sunx86part;
     gpt_head* gptpart;
+    FATFS_INFO* fatfs;
+    FATXXFS_SB* fatsb;
     /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
-    FATFS_INFO* fatfs = NULL;
-    FATXXFS_SB* fatsb = NULL;
     const TSK_FS_ATTR*tmpattr;
     TSK_DADDR_T cursector = 0;
     TSK_DADDR_T endsector = 0;
