@@ -765,7 +765,7 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Number of FATs" << QString::number(fatsb->numfat) << "Number of File Allocation Tables (FATs). Typically two for redundancy (0x10-0x10)";
         proplist << "Number of Root Directory Entries" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->numroot)) << "Maximum number of files in the root directory for FAT12 and FAT16. This is 0 for FAT32 and typically 512 for FAT16 (0x11-0x12)";
         proplist << "Number of Sectors in File System" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->sectors16)) << "Maximum number of sectors in the file system. If the number of sectors is larger than can be represented in this 2-byte value, a 4-byte value exists later in the data structure and this should be 0 (0x13-0x14)";
-        proplist << "Media Type" << QString::number(fatsb->f2) << "Media type. Should be 0xF8 for fixed disks and 0xF0 for removable disks (0x13-0x13)";
+        proplist << "Media Type" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->f2)) << "Media type. Should be 0xF8 for fixed disks and 0xF0 for removable disks (0x13-0x13)";
         proplist << "Size of FAT" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->sectperfat16)) << "16-bit size in sectors of each FAT for FAT12 and FAT16. For FAT32, this field is 0 (0x14-0x15)";
         proplist << "Reserved" << "Reserved" << "Reserved (0x16-0x1B)";
         proplist << "Number of Sectors Before Partition Start" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->prevsect)) << "Number of sectors before the start of the file system partition (0x1C-0x1F)";
