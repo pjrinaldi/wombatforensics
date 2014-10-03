@@ -25,6 +25,7 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     fatsb = NULL;
     ntfsinfo = NULL;
     exfatsb = NULL;
+    hfs = NULL;
     /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
@@ -866,7 +867,18 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Volume Serial Number" << QString::fromUtf8(reinterpret_cast<char*>(exfatsb->vol_serial_no)) << "Volume serial number (0x64-0x67)";
         proplist << "File System Revision" << QString::number(exfatsb->fs_revision[1]) + "." + QString::number(exfatsb->fs_revision[0]) << "File system revision as Major.Minor (0x68-0x69)";
         proplist << "Volume Flags" << QString::number(tsk_getu16(curfsinfo->endian, exfatsb->vol_flags)) << "Volume Flags (0x6A-0x6B)";
-        proplist << "Bytes Per Sector" << QString::number(exfatsb->bytes_per_sector) << "Bytes per sector as a power of 2. Minimum 9 (512 bytes per sector), maximum 12 (4096 bytes per sector (0x6C-0x6C)";
+        proplist << "Bytes Per Sector" << QString::number(exfatsb->bytes_per_sector) << "Bytes per sector as a power of 2. Minimum 9 (512 bytes per sector), maximum 12 (4096 bytes per sector) (0x6C-0x6C)";
+        proplist << "Sectors Per Cluster" << QString::number(exfatsb->sectors_per_cluster) << "Sectors per cluster as a power of 2. Minimum 0 (1 sector per cluster) up to a maximum 25 (0x6D-0x6D)";
+        proplist << "Number of FATs" << QString::QString::number(exfatsb->num_fats) << "Number of FATs: 1 or 2, 2 is for TexFAT only) (0x6E-0x6E)";
+        proplist << "Drive Select" << QString::number(exfatsb->drive_select) << "Used by INT 13h, typically 0x80 (0x6F-0x6F)";
+        proplist << "Percent of the Heap in Use" << QString::number(exfatsb->percent_of_cluster_heap_in_use) << "0-100, percentage of allocated clusters rounded down to the integer; 0xFF, percentage is not available (0x70-0x70)";
+        proplist << "Reserved" << "Reserved" << "Reserved (0x71-0x77)";
+        proplist << "Boot Code" << "Boot Code" << "Boot Code (0x78-0x01FD)";
+        proplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, exfatsb->signature)) << "Signature value should be 0xAA55 (0x01FE-0x01FF)";
+    }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_HFS)
+    {
+        hfs = (HFS_INFO*)curfsinfo;
     }
     // EXFAT, HFS, YAFFS2
     return proplist;

@@ -41,7 +41,9 @@ private:
     FATXXFS_SB* fatsb;
     NTFS_INFO* ntfsinfo;
     EXFATFS_MASTER_BOOT_REC* exfatsb;
-    /*
+    HFS_INFO* hfs;
+    //hfs_plus_vh* hsb;
+   /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
     const TSK_FS_ATTR*tmpattr;
