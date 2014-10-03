@@ -42,7 +42,10 @@ private:
     NTFS_INFO* ntfsinfo;
     EXFATFS_MASTER_BOOT_REC* exfatsb;
     HFS_INFO* hfs;
-    //hfs_plus_vh* hsb;
+    ISO_INFO* iso;
+    iso9660_pvd_node* p;
+    iso9660_svd_node* s;
+   //hfs_plus_vh* hsb;
    /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;

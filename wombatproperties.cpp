@@ -26,6 +26,9 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     ntfsinfo = NULL;
     exfatsb = NULL;
     hfs = NULL;
+    iso = NULL;
+    p = NULL;
+    s = NULL;
     /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
@@ -35,10 +38,8 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     int8_t isallocsec = 0;
     TSK_INUM_T curinum = 0;
     FATFS_DENTRY* dentry = NULL;
-    ISO_INFO* iso = NULL;
     iso9660_pvd_node* p = NULL;
     iso9660_svd_node* s = NULL;
-    HFS_INFO* hfs = NULL;
     hfs_plus_vh* hsb = NULL;
     char fn[HFS_MAXNAMLEN + 1];
     HFS_ENTRY* hfsentry = NULL;
@@ -880,7 +881,22 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
     {
         hfs = (HFS_INFO*)curfsinfo;
     }
-    // EXFAT, HFS, YAFFS2
+    else if(curfsinfo->ftype == TSK_FS_TYPE_ISO9660)
+    {
+        //int a = 0;
+        iso = (ISO_INFO*)curfsinfo;
+        for(p = iso->pvd; p!= NULL; p = p->next)
+        {
+            //a++;
+            //qDebug() << "ISO9660 vol name: " << p->pvd.vol_id;
+        }
+        //a = 0;
+        for(s = iso->svd; s!= NULL; s = s->next)
+        {
+            //a++;
+            //qDebug() << "ISO9660 vol name: " << s->svd.vol_id;
+        }
+    }
     return proplist;
 }
 
