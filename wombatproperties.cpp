@@ -881,12 +881,18 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
     {
         hfs = (HFS_INFO*)curfsinfo;
     }
-    else if(curfsinfo->ftype == TSK_FS_TYPE_ISO9660)
+    else if(curfsinfo->ftype == TSK_FS_TYPE_ISO9660) // Byte offset's aren't working out too well right now.
     {
         //int a = 0;
         iso = (ISO_INFO*)curfsinfo;
         for(p = iso->pvd; p!= NULL; p = p->next)
         {
+            proplist << "Unused" << "Unused" << "Unused (0x00-0x07)";
+            proplist << "System Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.sys_id)) << "System Identifier (0x08-0x27)";
+            proplist << "Volume Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_id)) << "Volume Identifier (0x28-0x47)";
+            proplist << "Unused" << "Unused" << "Unused should be all zeros (0x48-0x49)";
+            proplist << "Volume Space Size (LE)" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.vs_sz_l)) << "Volume Space Size in blocks (0x4A-0x4D)";
+            proplist << "Volume Space Size (BE)" << QString::number(tsk_getu32(cursfinfo->endian, p->pvd.vs_sz_m)) << "Volume Space Size in blocks (0x4E-0x51)";
             //a++;
             //qDebug() << "ISO9660 vol name: " << p->pvd.vol_id;
         }
