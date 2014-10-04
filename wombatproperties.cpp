@@ -890,13 +890,29 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Volume Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_id)) << "Volume Identifier (0x28-0x47)";
             proplist << "Unused" << "Unused" << "Unused should be all zeros (0x48-0x4F)";
             proplist << "Volume Space Size (LE)" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.vs_sz_l)) << "Volume Space Size in blocks (0x50-0x53)";
-            proplist << "Volume Space Size (BE)" << QString::number(tsk_getu32(cursfinfo->endian, p->pvd.vs_sz_m)) << "Volume Space Size in blocks (0x54-0x57)";
+            proplist << "Volume Space Size (BE)" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.vs_sz_m)) << "Volume Space Size in blocks (0x54-0x57)";
             proplist << "Unused" << "Unused" << "Unused. All zeros (0x58-0x77)";
             proplist << "Volume Set Size (LE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.vol_set_l)) << "The size of the set in this logical volume (0x78-0x79)";
             proplist << "Volume Set Size (BE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.vol_set_m)) << "The size of the set in this logical volume (0x7A-0x7B)";
             proplist << "Volume Sequence Number (LE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.vol_seq_l)) << "The number of this disk in the volume set (0x7C-0x7D)";
             proplist << "Volume Sequence Number (BE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.vol_seq_m)) << "The number of this disk in the volume set (0x7E-0x7F)";
-            //proplist << 
+            proplist << "Logical Block Size (LE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.blk_sz_l)) << "The size in bytes of a logical block (0x80-0x81)";
+            proplist << "Logical Block Size (BE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.blk_sz_m)) << "The size in bytes of a logical block (0x82-0x83)";
+            proplist << "Path Table Size (LE)" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.pt_size_l)) << "The size in bytes of the path table (0x84-0x87)";
+            proplist << "Path Table Size (BE)" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.pt_size_m)) << "The size in bytes of the path table (0x88-0x8B)";
+            proplist << "Logical Block Address of Type-L Path Table" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.pt_loc_l)) << "LBA location of the path table (0x8C-0x8F)";
+            proplist << "Logical Block Address of Optional Type-L Path Table" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.pt_opt_loc_l)) << "LBA location of the optional path table (0x90-0x93)";
+            proplist << "Logical Block Address of the Type-M Path Table" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.pt_loc_m)) << "LBA location of the path table (0x94-0x97)";
+            proplist << "Logical Block Address of the Optional Type-M Path Table" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.pt_opt_loc_m)) << "LBA location of the optional path table (0x98-0x9B)";
+            proplist << "Directory Entry for Root Directory" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.dir_rec.name)) << "Directory Entry for Root Directory (0xB6-0xBD)";
+            proplist << "Volume Set Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_setid)) << "Identifier of the volume set of which this volume is a member (0x00BE-0x013D)";
+            proplist << "Publisher Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.pub_id)) << "Volume publisher (0x013E-0x01BD)";
+            proplist << "Data Preparer Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.prep_id)) << "Identifier of the person(s) who prepared the data for this volume (0x01BE-0x023D)";
+            proplist << "Application Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.app_id)) << "Identifies how the data are recorded on this volume (0x023E-0x02BD)";
+            proplist << "Copyright File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.copy_id)) << "Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)";
+            proplist << "Abstract File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.abs_id)) << "Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)";
+            proplist << "Bibliographic File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.bib_id)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
+            proplist << "Volume Creation Date and Time" << "Figure out how to convert the date/time" << "The date and time when the volume was created (0x032D-0x033D)";
         }
         //a = 0;
         for(s = iso->svd; s!= NULL; s = s->next)
