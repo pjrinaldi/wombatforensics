@@ -38,8 +38,6 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     int8_t isallocsec = 0;
     TSK_INUM_T curinum = 0;
     FATFS_DENTRY* dentry = NULL;
-    iso9660_pvd_node* p = NULL;
-    iso9660_svd_node* s = NULL;
     hfs_plus_vh* hsb = NULL;
     char fn[HFS_MAXNAMLEN + 1];
     HFS_ENTRY* hfsentry = NULL;
@@ -890,11 +888,15 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Unused" << "Unused" << "Unused (0x00-0x07)";
             proplist << "System Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.sys_id)) << "System Identifier (0x08-0x27)";
             proplist << "Volume Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_id)) << "Volume Identifier (0x28-0x47)";
-            proplist << "Unused" << "Unused" << "Unused should be all zeros (0x48-0x49)";
-            proplist << "Volume Space Size (LE)" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.vs_sz_l)) << "Volume Space Size in blocks (0x4A-0x4D)";
-            proplist << "Volume Space Size (BE)" << QString::number(tsk_getu32(cursfinfo->endian, p->pvd.vs_sz_m)) << "Volume Space Size in blocks (0x4E-0x51)";
-            //a++;
-            //qDebug() << "ISO9660 vol name: " << p->pvd.vol_id;
+            proplist << "Unused" << "Unused" << "Unused should be all zeros (0x48-0x4F)";
+            proplist << "Volume Space Size (LE)" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.vs_sz_l)) << "Volume Space Size in blocks (0x50-0x53)";
+            proplist << "Volume Space Size (BE)" << QString::number(tsk_getu32(cursfinfo->endian, p->pvd.vs_sz_m)) << "Volume Space Size in blocks (0x54-0x57)";
+            proplist << "Unused" << "Unused" << "Unused. All zeros (0x58-0x77)";
+            proplist << "Volume Set Size (LE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.vol_set_l)) << "The size of the set in this logical volume (0x78-0x79)";
+            proplist << "Volume Set Size (BE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.vol_set_m)) << "The size of the set in this logical volume (0x7A-0x7B)";
+            proplist << "Volume Sequence Number (LE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.vol_seq_l)) << "The number of this disk in the volume set (0x7C-0x7D)";
+            proplist << "Volume Sequence Number (BE)" << QString::number(tsk_getu16(curfsinfo->endian, p->pvd.vol_seq_m)) << "The number of this disk in the volume set (0x7E-0x7F)";
+            //proplist << 
         }
         //a = 0;
         for(s = iso->svd; s!= NULL; s = s->next)
