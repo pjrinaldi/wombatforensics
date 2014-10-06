@@ -912,7 +912,8 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Copyright File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.copy_id)) << "Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)";
             proplist << "Abstract File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.abs_id)) << "Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)";
             proplist << "Bibliographic File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.bib_id)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
-            proplist << "Volume Creation Date and Time" << "Figure out how to convert the date/time" << "The date and time when the volume was created (0x032D-0x033D)";
+            QString datestring = QString::fromUtf8(reinterpret_cast<char*>(p->pvd.make_date.month)) + "/" + QString::fromUtf8(reinterpret_cast<char*>(p->pvd.make_date.day)) + "/" + QString::fromUtf8(reinterpret_cast<char*>(p->pvd.make_date.year)) + " " + QString::fromUtf8(reinterpret_cast<char*>(p->pvd.make_date.hour)) + ":" + QString::fromUtf8(reinterpret_cast<char*>(p->pvd.make_date.min)) + ":" + QString::fromUtf8(reinterpret_cast<char*>(p->pvd.make_date.sec)) + " GMT " + QString::number(p->pvd.make_date.gmt_off);
+            proplist << "Volume Creation Date and Time" << datestring << "The date and time when the volume was created (0x032D-0x033D)";
         }
         //a = 0;
         for(s = iso->svd; s!= NULL; s = s->next)
