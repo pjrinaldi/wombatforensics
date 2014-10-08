@@ -886,7 +886,7 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         for(p = iso->pvd; p!= NULL; p = p->next)
         {
             proplist << "Unused" << "Unused" << "Unused (0x00-0x07)";
-            proplist << "System Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.sys_id)) << "System Identifier (0x08-0x27)";
+            proplist << "System Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.sys_id), 32) << "System Identifier (0x08-0x27)";
             proplist << "Volume Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_id)) << "Volume Identifier (0x28-0x47)";
             proplist << "Unused" << "Unused" << "Unused should be all zeros (0x48-0x4F)";
             proplist << "Volume Space Size (LE)" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.vs_sz_l)) << "Volume Space Size in blocks (0x50-0x53)";
@@ -905,13 +905,27 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Logical Block Address of the Type-M Path Table" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.pt_loc_m)) << "LBA location of the path table (0x94-0x97)";
             proplist << "Logical Block Address of the Optional Type-M Path Table" << QString::number(tsk_getu32(curfsinfo->endian, p->pvd.pt_opt_loc_m)) << "LBA location of the optional path table (0x98-0x9B)";
             proplist << "Directory Entry for Root Directory" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.dir_rec.name)) << "Directory Entry for Root Directory (0xB6-0xBD)";
-            proplist << "Volume Set Identifier" << QString::fromLatin1(reinterpret_cast<char*>(p->pvd.vol_setid)) << "Identifier of the volume set of which this volume is a member (0x00BE-0x013D)";
-            proplist << "Publisher Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.pub_id)) << "Volume publisher (0x013E-0x01BD)";
-            proplist << "Data Preparer Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.prep_id)) << "Identifier of the person(s) who prepared the data for this volume (0x01BE-0x023D)";
-            proplist << "Application Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.app_id)) << "Identifies how the data are recorded on this volume (0x023E-0x02BD)";
-            proplist << "Copyright File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.copy_id)) << "Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)";
-            proplist << "Abstract File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.abs_id)) << "Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)";
-            proplist << "Bibliographic File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.bib_id)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
+            snprintf(asc128, 128, "%s", p->pvd.vol_setid);
+            proplist << "Volume Set Identifier" << QString::fromStdString(string(asc128)) << "Identifier of the volume set of which this volume is a member (0x00BE-0x013D)";
+            //proplist << "Volume Set Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_setid)) << "Identifier of the volume set of which this volume is a member (0x00BE-0x013D)";
+            snprintf(asc128, 128, "%s", p->pvd.pub_id);
+            proplist << "Publisher Identifier" << QString::fromStdString(string(asc128)) << "Volume publisher (0x013E-0x01BD)";
+            //proplist << "Publisher Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.pub_id)) << "Volume publisher (0x013E-0x01BD)";
+            snprintf(asc128, 128, "%s", p->pvd.prep_id);
+            proplist << "Data Preparer Identifier" << QString::fromStdString(string(asc128)) << "Identifier of the person(s) who prepared the data for this volume (0x01BE-0x023D)";
+            //proplist << "Data Preparer Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.prep_id)) << "Identifier of the person(s) who prepared the data for this volume (0x01BE-0x023D)";
+            snprintf(asc128, 128, "%s", p->pvd.app_id);
+            proplist << "Application Identifier" << QString::fromStdString(string(asc128)) << "Identifies how the data are recorded on this volume (0x023E-0x02BD)";
+            //proplist << "Application Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.app_id)) << "Identifies how the data are recorded on this volume (0x023E-0x02BD)";
+            snprintf(asc128, 38, "%s", p->pvd.copy_id);
+            proplist << "Copyright File Identifier" << QString::fromStdString(string(asc128)) << "Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)";
+            //proplist << "Copyright File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.copy_id)) << "Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)";
+            snprintf(asc128, 36, "%s", p->pvd.abs_id);
+            proplist << "Abstract File Identifier" << QString::fromStdString(string(asc128)) << "Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)";
+            //proplist << "Abstract File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.abs_id)) << "Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)";
+            snprintf(asc128, 37, "%s", p->pvd.bib_id);
+            proplist << "Bibliographic File Identifier" << QString::fromStdString(string(asc128)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
+            //proplist << "Bibliographic File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.bib_id)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
             sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c GMT %d", ((char)(p->pvd.make_date.month[0])), (char)p->pvd.make_date.month[1], (char)p->pvd.make_date.day[0], (char)p->pvd.make_date.day[1], (char)p->pvd.make_date.year[0], (char)p->pvd.make_date.year[1], (char)p->pvd.make_date.year[2], (char)p->pvd.make_date.year[3], (char)p->pvd.make_date.hour[0], (char)p->pvd.make_date.hour[1], (char)p->pvd.make_date.min[0], (char)p->pvd.make_date.min[1], (char)p->pvd.make_date.sec[0], (char)p->pvd.make_date.sec[1], p->pvd.make_date.gmt_off);  
             proplist << "Volume Creation Date and Time" << QString::fromStdString(string(asc)) << "The date and time when the volume was created (0x032D-0x033D)";
         }

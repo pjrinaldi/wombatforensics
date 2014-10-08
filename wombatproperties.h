@@ -76,6 +76,7 @@ private:
     uint len = 0;
     */
     char asc[512];
+    char asc128[129];
     char timebuf[128];
 
 };
