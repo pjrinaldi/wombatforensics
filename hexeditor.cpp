@@ -672,7 +672,7 @@ void HexEditor::paintEvent( QPaintEvent* e)
 
   // draw highlight over the correct text region. need to switch text values to using offset and size
   // for now i'll use the row/col values for testing the highlighting
-  DrawCurrentObject(paint, row_start, row_stop, col_start, col_stop);
+  //DrawCurrentObject(paint, row_start, row_stop, col_start, col_stop);
   // draw text in repaint event
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
