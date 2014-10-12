@@ -16,6 +16,7 @@ public:
     QStringList PopulatePartitionProperties(void);
     QStringList PopulateFileSystemProperties(TSK_FS_INFO* curfsinfo);
     QStringList PopulateFileProperties(void);
+    QString ConvertGmtHours(int gmtvar);
 
 private:
     WombatVariable* wombatptr;

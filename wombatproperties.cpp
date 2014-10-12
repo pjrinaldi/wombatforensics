@@ -919,10 +919,10 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Abstract File Identifier" << QString::fromStdString(string(asc128)) << "Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)";
             snprintf(asc128, 37, "%s", p->pvd.bib_id);
             proplist << "Bibliographic File Identifier" << QString::fromStdString(string(asc128)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
-            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c GMT %d", ((char)(p->pvd.make_date.month[0])), (char)p->pvd.make_date.month[1], (char)p->pvd.make_date.day[0], (char)p->pvd.make_date.day[1], (char)p->pvd.make_date.year[0], (char)p->pvd.make_date.year[1], (char)p->pvd.make_date.year[2], (char)p->pvd.make_date.year[3], (char)p->pvd.make_date.hour[0], (char)p->pvd.make_date.hour[1], (char)p->pvd.make_date.min[0], (char)p->pvd.make_date.min[1], (char)p->pvd.make_date.sec[0], (char)p->pvd.make_date.sec[1], p->pvd.make_date.gmt_off);  
-            proplist << "Volume Creation Date and Time" << QString::fromStdString(string(asc)) << "The date and time when the volume was created (0x032D-0x033D)";
-            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c GMT %d", (char)p->pvd.mod_date.month[0], (char)p->pvd.mod_date.month[1], (char)p->pvd.mod_date.day[0], (char)p->pvd.mod_date.day[1], (char)p->pvd.mod_date.year[0], (char)p->pvd.mod_date.year[1], (char)p->pvd.mod_date.year[2], (char)p->pvd.mod_date.year[3], (char)p->pvd.mod_date.hour[0], (char)p->pvd.mod_date.hour[1], (char)p->pvd.mod_date.min[0], (char)p->pvd.mod_date.min[1], (char)p->pvd.mod_date.sec[0], (char)p->pvd.mod_date.sec[1], p->pvd.mod_date.gmt_off);
-            proplist << "Volume Modification Date and Time" << QString::fromStdString(string(asc)) << "The date and time when the volume was modified (0x033E-0x034E)";
+            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", ((char)(p->pvd.make_date.month[0])), (char)p->pvd.make_date.month[1], (char)p->pvd.make_date.day[0], (char)p->pvd.make_date.day[1], (char)p->pvd.make_date.year[0], (char)p->pvd.make_date.year[1], (char)p->pvd.make_date.year[2], (char)p->pvd.make_date.year[3], (char)p->pvd.make_date.hour[0], (char)p->pvd.make_date.hour[1], (char)p->pvd.make_date.min[0], (char)p->pvd.make_date.min[1], (char)p->pvd.make_date.sec[0], (char)p->pvd.make_date.sec[1]);
+            proplist << "Volume Creation Date and Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(p->pvd.make_date.gmt_off) << "The date and time when the volume was created (0x032D-0x033D)";
+            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", (char)p->pvd.mod_date.month[0], (char)p->pvd.mod_date.month[1], (char)p->pvd.mod_date.day[0], (char)p->pvd.mod_date.day[1], (char)p->pvd.mod_date.year[0], (char)p->pvd.mod_date.year[1], (char)p->pvd.mod_date.year[2], (char)p->pvd.mod_date.year[3], (char)p->pvd.mod_date.hour[0], (char)p->pvd.mod_date.hour[1], (char)p->pvd.mod_date.min[0], (char)p->pvd.mod_date.min[1], (char)p->pvd.mod_date.sec[0], (char)p->pvd.mod_date.sec[1]);
+            proplist << "Volume Modification Date and Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(p->pvd.mod_date.gmt_off) << "The date and time when the volume was modified (0x033E-0x034E)";
         }
         //a = 0;
         for(s = iso->svd; s!= NULL; s = s->next)
@@ -934,6 +934,22 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
     return proplist;
 }
 
+QString WombatProperties::ConvertGmtHours(int gmtvar)
+{
+    int tmpmin = gmtvar - 48;
+    int gmthr = tmpmin / 4;
+    int gmtmin = (tmpmin % 4)*15;
+    QString tmpstring = " GMT ";
+    qDebug() << "tmpmin = " << tmpmin << " gmthr = " << gmthr << " gmtmin = " << gmtmin;
+    if(abs(gmthr) < 10)
+        tmpstring += "0";
+    tmpstring += QString::number(gmthr) + QString::number(gmtmin);
+    if(gmtmin == 0)
+        tmpstring += "0";
+
+    return tmpstring;
+
+}
 QStringList WombatProperties::PopulateFileProperties()
 {
     proplist.clear();
