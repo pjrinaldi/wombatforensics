@@ -881,7 +881,6 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_ISO9660) // Byte offset's aren't working out too well right now.
     {
-        //int a = 0;
         iso = (ISO_INFO*)curfsinfo;
         for(p = iso->pvd; p!= NULL; p = p->next)
         {
@@ -920,11 +919,19 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             snprintf(asc128, 37, "%s", p->pvd.bib_id);
             proplist << "Bibliographic File Identifier" << QString::fromStdString(string(asc128)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
             sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", ((char)(p->pvd.make_date.month[0])), (char)p->pvd.make_date.month[1], (char)p->pvd.make_date.day[0], (char)p->pvd.make_date.day[1], (char)p->pvd.make_date.year[0], (char)p->pvd.make_date.year[1], (char)p->pvd.make_date.year[2], (char)p->pvd.make_date.year[3], (char)p->pvd.make_date.hour[0], (char)p->pvd.make_date.hour[1], (char)p->pvd.make_date.min[0], (char)p->pvd.make_date.min[1], (char)p->pvd.make_date.sec[0], (char)p->pvd.make_date.sec[1]);
-            proplist << "Volume Creation Date and Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(p->pvd.make_date.gmt_off) << "The date and time when the volume was created (0x032D-0x033D)";
+            proplist << "Volume Creation Date/Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(p->pvd.make_date.gmt_off) << "The date and time when the volume was created (0x032D-0x033D)";
             sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", (char)p->pvd.mod_date.month[0], (char)p->pvd.mod_date.month[1], (char)p->pvd.mod_date.day[0], (char)p->pvd.mod_date.day[1], (char)p->pvd.mod_date.year[0], (char)p->pvd.mod_date.year[1], (char)p->pvd.mod_date.year[2], (char)p->pvd.mod_date.year[3], (char)p->pvd.mod_date.hour[0], (char)p->pvd.mod_date.hour[1], (char)p->pvd.mod_date.min[0], (char)p->pvd.mod_date.min[1], (char)p->pvd.mod_date.sec[0], (char)p->pvd.mod_date.sec[1]);
-            proplist << "Volume Modification Date and Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(p->pvd.mod_date.gmt_off) << "The date and time when the volume was modified (0x033E-0x034E)";
+            proplist << "Volume Modification Date/Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(p->pvd.mod_date.gmt_off) << "The date and time when the volume was modified (0x033E-0x034E)";
+            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", (char)p->pvd.exp_date.month[0], (char)p->pvd.exp_date.month[1], (char)p->pvd.exp_date.day[0], (char)p->pvd.exp_date.day[1], (char)p->pvd.exp_date.year[0], (char)p->pvd.exp_date.year[1], (char)p->pvd.exp_date.year[2], (char)p->pvd.exp_date.year[3], (char)p->pvd.exp_date.hour[0], (char)p->pvd.exp_date.hour[1], (char)p->pvd.exp_date.min[0], (char)p->pvd.exp_date.min[1], (char)p->pvd.exp_date.sec[0], (char)p->pvd.exp_date.sec[1]);
+            proplist << "Volume Expiration Date/Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(p->pvd.exp_date.gmt_off) << "The date and time after which the volume is considered to be obsolete. If not specified, then the volume is never considered to be obsolete (0x034F-0x035F)";
+            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", (char)p->pvd.ef_date.month[0], (char)p->pvd.ef_date.month[1], (char)p->pvd.ef_date.day[0], (char)p->pvd.ef_date.day[1], (char)p->pvd.ef_date.year[0], (char)p->pvd.ef_date.year[1], (char)p->pvd.ef_date.year[2], (char)p->pvd.ef_date.year[3], (char)p->pvd.ef_date.hour[0], (char)p->pvd.ef_date.hour[1], (char)p->pvd.ef_date.min[0], (char)p->pvd.ef_date.min[1], (char)p->pvd.ef_date.sec[0], (char)p->pvd.ef_date.sec[1]);
+            proplist << "Volume Effective Date/Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(p->pvd.ef_date.gmt_off) << "The date and time after which the volume may be used. If not specified, then the volume may be used immediately (0x0360-0x0370)";
+            proplist << "File Structure Version" << QString::number(p->pvd.fs_ver) << "The directory records and path table version, always 0x01 (0x0371-0x0371)";
+            proplist << "Unused" << "Unused" << "Unused, always 0x00 (0x0372-0x0372)";
+            snprintf(asc, 512, "%s", p->pvd.app_use);
+            proplist << "Application Used" << QString::fromStdString(string(asc)) << "Application Used. Contents not defined by ISO9660 (0x0373-0x0572)";
+            proplist << "Reserved by ISO" << "Reserved" << "Reserved by ISO (0x0573-0x07FF)";
         }
-        //a = 0;
         for(s = iso->svd; s!= NULL; s = s->next)
         {
             //a++;
@@ -940,7 +947,6 @@ QString WombatProperties::ConvertGmtHours(int gmtvar)
     int gmthr = tmpmin / 4;
     int gmtmin = (tmpmin % 4)*15;
     QString tmpstring = " GMT ";
-    qDebug() << "tmpmin = " << tmpmin << " gmthr = " << gmthr << " gmtmin = " << gmtmin;
     if(abs(gmthr) < 10)
         tmpstring += "0";
     tmpstring += QString::number(gmthr) + QString::number(gmtmin);
