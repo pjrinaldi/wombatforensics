@@ -58,9 +58,6 @@ private:
     //FATFS_DENTRY* dentry = NULL;
     EXT2FS_INFO* ext2fs;
     /*
-    ISO_INFO* iso = NULL;
-    iso9660_pvd_node* p = NULL;
-    iso9660_svd_node* s = NULL;
     HFS_INFO* hfs = NULL;
     hfs_plus_vh* hsb = NULL;
     char fn[HFS_MAXNAMLEN + 1];

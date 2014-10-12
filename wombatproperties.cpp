@@ -907,27 +907,22 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Directory Entry for Root Directory" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.dir_rec.name)) << "Directory Entry for Root Directory (0xB6-0xBD)";
             snprintf(asc128, 128, "%s", p->pvd.vol_setid);
             proplist << "Volume Set Identifier" << QString::fromStdString(string(asc128)) << "Identifier of the volume set of which this volume is a member (0x00BE-0x013D)";
-            //proplist << "Volume Set Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_setid)) << "Identifier of the volume set of which this volume is a member (0x00BE-0x013D)";
             snprintf(asc128, 128, "%s", p->pvd.pub_id);
             proplist << "Publisher Identifier" << QString::fromStdString(string(asc128)) << "Volume publisher (0x013E-0x01BD)";
-            //proplist << "Publisher Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.pub_id)) << "Volume publisher (0x013E-0x01BD)";
             snprintf(asc128, 128, "%s", p->pvd.prep_id);
             proplist << "Data Preparer Identifier" << QString::fromStdString(string(asc128)) << "Identifier of the person(s) who prepared the data for this volume (0x01BE-0x023D)";
-            //proplist << "Data Preparer Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.prep_id)) << "Identifier of the person(s) who prepared the data for this volume (0x01BE-0x023D)";
             snprintf(asc128, 128, "%s", p->pvd.app_id);
             proplist << "Application Identifier" << QString::fromStdString(string(asc128)) << "Identifies how the data are recorded on this volume (0x023E-0x02BD)";
-            //proplist << "Application Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.app_id)) << "Identifies how the data are recorded on this volume (0x023E-0x02BD)";
             snprintf(asc128, 38, "%s", p->pvd.copy_id);
             proplist << "Copyright File Identifier" << QString::fromStdString(string(asc128)) << "Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)";
-            //proplist << "Copyright File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.copy_id)) << "Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)";
             snprintf(asc128, 36, "%s", p->pvd.abs_id);
             proplist << "Abstract File Identifier" << QString::fromStdString(string(asc128)) << "Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)";
-            //proplist << "Abstract File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.abs_id)) << "Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)";
             snprintf(asc128, 37, "%s", p->pvd.bib_id);
             proplist << "Bibliographic File Identifier" << QString::fromStdString(string(asc128)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
-            //proplist << "Bibliographic File Identifier" << QString::fromUtf8(reinterpret_cast<char*>(p->pvd.bib_id)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
             sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c GMT %d", ((char)(p->pvd.make_date.month[0])), (char)p->pvd.make_date.month[1], (char)p->pvd.make_date.day[0], (char)p->pvd.make_date.day[1], (char)p->pvd.make_date.year[0], (char)p->pvd.make_date.year[1], (char)p->pvd.make_date.year[2], (char)p->pvd.make_date.year[3], (char)p->pvd.make_date.hour[0], (char)p->pvd.make_date.hour[1], (char)p->pvd.make_date.min[0], (char)p->pvd.make_date.min[1], (char)p->pvd.make_date.sec[0], (char)p->pvd.make_date.sec[1], p->pvd.make_date.gmt_off);  
             proplist << "Volume Creation Date and Time" << QString::fromStdString(string(asc)) << "The date and time when the volume was created (0x032D-0x033D)";
+            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c GMT %d", (char)p->pvd.mod_date.month[0], (char)p->pvd.mod_date.month[1], (char)p->pvd.mod_date.day[0], (char)p->pvd.mod_date.day[1], (char)p->pvd.mod_date.year[0], (char)p->pvd.mod_date.year[1], (char)p->pvd.mod_date.year[2], (char)p->pvd.mod_date.year[3], (char)p->pvd.mod_date.hour[0], (char)p->pvd.mod_date.hour[1], (char)p->pvd.mod_date.min[0], (char)p->pvd.mod_date.min[1], (char)p->pvd.mod_date.sec[0], (char)p->pvd.mod_date.sec[1], p->pvd.mod_date.gmt_off);
+            proplist << "Volume Modification Date and Time" << QString::fromStdString(string(asc)) << "The date and time when the volume was modified (0x033E-0x034E)";
         }
         //a = 0;
         for(s = iso->svd; s!= NULL; s = s->next)
