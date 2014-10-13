@@ -934,8 +934,53 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         }
         for(s = iso->svd; s!= NULL; s = s->next)
         {
-            //a++;
-            //qDebug() << "ISO9660 vol name: " << s->svd.vol_id;
+            proplist << "Volume Flags" << QString::number(tsk_getu32(curfsinfo->endian, s->svd.flags)) << "Unused (0x00-0x07)";
+            proplist << "System Identifier" << QString::fromUtf8(reinterpret_cast<char*>(s->svd.sys_id), 32) << "System Identifier (0x08-0x27)";
+            proplist << "Volume Identifier" << QString::fromUtf8(reinterpret_cast<char*>(s->svd.vol_id)) << "Volume Identifier (0x28-0x47)";
+            proplist << "Unused" << "Unused" << "Unused should be all zeros (0x48-0x4F)";
+            proplist << "Volume Space Size (LE)" << QString::number(tsk_getu32(curfsinfo->endian, s->svd.vs_sz_l)) << "Volume Space Size in blocks (0x50-0x53)";
+            proplist << "Volume Space Size (BE)" << QString::number(tsk_getu32(curfsinfo->endian, s->svd.vs_sz_m)) << "Volume Space Size in blocks (0x54-0x57)";
+            proplist << "Unused" << "Unused" << "Unused. All zeros (0x58-0x77)";
+            proplist << "Volume Set Size (LE)" << QString::number(tsk_getu16(curfsinfo->endian, s->svd.vol_set_l)) << "The size of the set in this logical volume (0x78-0x79)";
+            proplist << "Volume Set Size (BE)" << QString::number(tsk_getu16(curfsinfo->endian, s->svd.vol_set_m)) << "The size of the set in this logical volume (0x7A-0x7B)";
+            proplist << "Volume Sequence Number (LE)" << QString::number(tsk_getu16(curfsinfo->endian, s->svd.vol_seq_l)) << "The number of this disk in the volume set (0x7C-0x7D)";
+            proplist << "Volume Sequence Number (BE)" << QString::number(tsk_getu16(curfsinfo->endian, s->svd.vol_seq_m)) << "The number of this disk in the volume set (0x7E-0x7F)";
+            proplist << "Logical Block Size (LE)" << QString::number(tsk_getu16(curfsinfo->endian, s->svd.blk_sz_l)) << "The size in bytes of a logical block (0x80-0x81)";
+            proplist << "Logical Block Size (BE)" << QString::number(tsk_getu16(curfsinfo->endian, s->svd.blk_sz_m)) << "The size in bytes of a logical block (0x82-0x83)";
+            proplist << "Path Table Size (LE)" << QString::number(tsk_getu32(curfsinfo->endian, s->svd.pt_size_l)) << "The size in bytes of the path table (0x84-0x87)";
+            proplist << "Path Table Size (BE)" << QString::number(tsk_getu32(curfsinfo->endian, s->svd.pt_size_m)) << "The size in bytes of the path table (0x88-0x8B)";
+            proplist << "Logical Block Address of Type-L Path Table" << QString::number(tsk_getu32(curfsinfo->endian, s->svd.pt_loc_l)) << "LBA location of the path table (0x8C-0x8F)";
+            proplist << "Logical Block Address of Optional Type-L Path Table" << QString::number(tsk_getu32(curfsinfo->endian, s->svd.pt_opt_loc_l)) << "LBA location of the optional path table (0x90-0x93)";
+            proplist << "Logical Block Address of the Type-M Path Table" << QString::number(tsk_getu32(curfsinfo->endian, s->svd.pt_loc_m)) << "LBA location of the path table (0x94-0x97)";
+            proplist << "Logical Block Address of the Optional Type-M Path Table" << QString::number(tsk_getu32(curfsinfo->endian, s->svd.pt_opt_loc_m)) << "LBA location of the optional path table (0x98-0x9B)";
+            proplist << "Directory Entry for Root Directory" << QString::fromUtf8(reinterpret_cast<char*>(s->svd.dir_rec.name)) << "Directory Entry for Root Directory (0xB6-0xBD)";
+            snprintf(asc128, 128, "%s", s->svd.vol_setid);
+            proplist << "Volume Set Identifier" << QString::fromStdString(string(asc128)) << "Identifier of the volume set of which this volume is a member (0x00BE-0x013D)";
+            snprintf(asc128, 128, "%s", s->svd.pub_id);
+            proplist << "Publisher Identifier" << QString::fromStdString(string(asc128)) << "Volume publisher (0x013E-0x01BD)";
+            snprintf(asc128, 128, "%s", s->svd.prep_id);
+            proplist << "Data Preparer Identifier" << QString::fromStdString(string(asc128)) << "Identifier of the person(s) who prepared the data for this volume (0x01BE-0x023D)";
+            snprintf(asc128, 128, "%s", s->svd.app_id);
+            proplist << "Application Identifier" << QString::fromStdString(string(asc128)) << "Identifies how the data are recorded on this volume (0x023E-0x02BD)";
+            snprintf(asc128, 38, "%s", s->svd.copy_id);
+            proplist << "Copyright File Identifier" << QString::fromStdString(string(asc128)) << "Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)";
+            snprintf(asc128, 36, "%s", s->svd.abs_id);
+            proplist << "Abstract File Identifier" << QString::fromStdString(string(asc128)) << "Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)";
+            snprintf(asc128, 37, "%s", s->svd.bib_id);
+            proplist << "Bibliographic File Identifier" << QString::fromStdString(string(asc128)) << "Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)";
+            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", ((char)(s->svd.make_date.month[0])), (char)s->svd.make_date.month[1], (char)s->svd.make_date.day[0], (char)s->svd.make_date.day[1], (char)s->svd.make_date.year[0], (char)s->svd.make_date.year[1], (char)s->svd.make_date.year[2], (char)s->svd.make_date.year[3], (char)s->svd.make_date.hour[0], (char)s->svd.make_date.hour[1], (char)s->svd.make_date.min[0], (char)s->svd.make_date.min[1], (char)s->svd.make_date.sec[0], (char)s->svd.make_date.sec[1]);
+            proplist << "Volume Creation Date/Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(s->svd.make_date.gmt_off) << "The date and time when the volume was created (0x032D-0x033D)";
+            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", (char)s->svd.mod_date.month[0], (char)s->svd.mod_date.month[1], (char)s->svd.mod_date.day[0], (char)s->svd.mod_date.day[1], (char)s->svd.mod_date.year[0], (char)s->svd.mod_date.year[1], (char)s->svd.mod_date.year[2], (char)s->svd.mod_date.year[3], (char)s->svd.mod_date.hour[0], (char)s->svd.mod_date.hour[1], (char)s->svd.mod_date.min[0], (char)s->svd.mod_date.min[1], (char)s->svd.mod_date.sec[0], (char)s->svd.mod_date.sec[1]);
+            proplist << "Volume Modification Date/Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(s->svd.mod_date.gmt_off) << "The date and time when the volume was modified (0x033E-0x034E)";
+            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", (char)s->svd.exp_date.month[0], (char)s->svd.exp_date.month[1], (char)s->svd.exp_date.day[0], (char)s->svd.exp_date.day[1], (char)s->svd.exp_date.year[0], (char)s->svd.exp_date.year[1], (char)s->svd.exp_date.year[2], (char)s->svd.exp_date.year[3], (char)s->svd.exp_date.hour[0], (char)s->svd.exp_date.hour[1], (char)s->svd.exp_date.min[0], (char)s->svd.exp_date.min[1], (char)s->svd.exp_date.sec[0], (char)s->svd.exp_date.sec[1]);
+            proplist << "Volume Expiration Date/Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(s->svd.exp_date.gmt_off) << "The date and time after which the volume is considered to be obsolete. If not specified, then the volume is never considered to be obsolete (0x034F-0x035F)";
+            sprintf(asc, "%c%c/%c%c/%c%c%c%c %c%c:%c%c:%c%c", (char)s->svd.ef_date.month[0], (char)s->svd.ef_date.month[1], (char)s->svd.ef_date.day[0], (char)s->svd.ef_date.day[1], (char)s->svd.ef_date.year[0], (char)s->svd.ef_date.year[1], (char)s->svd.ef_date.year[2], (char)s->svd.ef_date.year[3], (char)s->svd.ef_date.hour[0], (char)s->svd.ef_date.hour[1], (char)s->svd.ef_date.min[0], (char)s->svd.ef_date.min[1], (char)s->svd.ef_date.sec[0], (char)s->svd.ef_date.sec[1]);
+            proplist << "Volume Effective Date/Time" << QString::fromStdString(string(asc)) + ConvertGmtHours(s->svd.ef_date.gmt_off) << "The date and time after which the volume may be used. If not specified, then the volume may be used immediately (0x0360-0x0370)";
+            proplist << "File Structure Version" << QString::fromUtf8(reinterpret_cast<char*>(s->svd.fs_ver)) << "The directory records and path table version, always 0x01 (0x0371-0x0371)";
+            proplist << "Unused" << "Unused" << "Unused, always 0x00 (0x0372-0x0372)";
+            snprintf(asc, 512, "%s", s->svd.app_use);
+            proplist << "Application Used" << QString::fromStdString(string(asc)) << "Application Used. Contents not defined by ISO9660 (0x0373-0x0572)";
+            proplist << "Reserved by ISO" << "Reserved" << "Reserved by ISO (0x0573-0x07FF)";
         }
     }
     return proplist;
