@@ -29,6 +29,7 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     iso = NULL;
     p = NULL;
     s = NULL;
+    yfs = NULL;
     /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
@@ -983,6 +984,23 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Reserved by ISO" << "Reserved" << "Reserved by ISO (0x0573-0x07FF)";
         }
     }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_YAFFS2) // YAFFS2 file system info
+    {
+        yfs = (YAFFSFS_INFO*)curfsinfo;
+        unsigned int objcnt;
+        uint32_t objfirst, objlast, vercnt, verfirst, verlast;
+        proplist << "Page Size" << QString::number(yfs->page_size) << "Page Size";
+        proplist << "Spare Size" << QString::number(yfs->spare_size) << "Spare Size";
+        proplist << "Spare Offset Sequence Number" << QString::number(yfs->spare_seq_offset) << "Spare Offset Sequence Number";
+        proplist << "Spare Offset Object ID" << QString::number(yfs->spare_obj_id_offset) << "Spare offset object id";
+        proplist << "Spare Offset Chunk ID" << QString::number(yfs->spare_chunk_id_offset) << "Spare offset chunk id";
+        proplist << "Spare Offset Number of Bytes" << QString::number(yfs->spare_nbytes_offset) << "Spare offset number of bytes";
+        yaffscache_objects_stats(yfs, &objcnt, &objfirst, &objlast, &vercnt, &verfirst, &verlast);
+        proplist << "Number of Allocated Objects" << QString::number(objcnt) << "Number of Allocated Objects";
+        proplist << "Object ID Range" << QString::number(objfirst) + " - " + QString::number(objlast) << "Object id range";
+        proplist << "Number of Total Object Versions" << QString::number(vercnt) << "Number of total object versions";
+        proplist << "Object Version Range" << QString::number(verfirst) + " - " + QString::number(verlast) << "Object version range";
+    }
     return proplist;
 }
 
@@ -1001,6 +1019,36 @@ QString WombatProperties::ConvertGmtHours(int gmtvar)
     return tmpstring;
 
 }
+void WombatProperties::yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t* objfirst, uint32_t* objlast, uint32_t* vercnt, uint32_t* verfirst, uint32_t* verlast)
+{
+    YaffsCacheObject* obj;
+    YaffsCacheVersion* ver;
+
+    *objcnt = 2;
+    *objfirst = 0xffffffff;
+    *objlast = 0;
+    *vercnt = 0;
+    *verfirst = 0xffffffff;
+    *verlast = 0;
+
+    for(obj = yfs->cache_objects; obj != NULL; obj = obj->yco_next)
+    {
+        objcnt += 1;
+        if(obj->yco_obj_id < *objfirst)
+            *objfirst = obj->yco_obj_id;
+        if(obj->yco_obj_id > *objlast)
+            *objlast = obj->yco_obj_id;
+        for(ver = obj->yco_latest; ver != NULL; ver = ver->ycv_prior)
+        {
+            vercnt += 1;
+            if(ver->ycv_seq_number < *verfirst)
+                *verfirst = ver->ycv_seq_number;
+            if(ver->ycv_seq_number > *verlast)
+                *verlast = ver->ycv_seq_number;
+        }
+    }
+}
+
 QStringList WombatProperties::PopulateFileProperties()
 {
     proplist.clear();

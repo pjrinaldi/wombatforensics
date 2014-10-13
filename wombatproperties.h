@@ -17,6 +17,7 @@ public:
     QStringList PopulateFileSystemProperties(TSK_FS_INFO* curfsinfo);
     QStringList PopulateFileProperties(void);
     QString ConvertGmtHours(int gmtvar);
+    void yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t* objfirst, uint32_t* objlast, uint32_t* vercnt, uint32_t* verfirst, uint32_t* verlast);
 
 private:
     WombatVariable* wombatptr;
@@ -46,6 +47,7 @@ private:
     ISO_INFO* iso;
     iso9660_pvd_node* p;
     iso9660_svd_node* s;
+    YAFFSFS_INFO* yfs;
    //hfs_plus_vh* hsb;
    /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
