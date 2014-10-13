@@ -44,11 +44,11 @@ private:
     NTFS_INFO* ntfsinfo;
     EXFATFS_MASTER_BOOT_REC* exfatsb;
     HFS_INFO* hfs;
+    hfs_plus_vh* hsb;
     ISO_INFO* iso;
     iso9660_pvd_node* p;
     iso9660_svd_node* s;
     YAFFSFS_INFO* yfs;
-   //hfs_plus_vh* hsb;
    /*
     FATXXFS_DENTRY* tmpfatdentry = NULL;
     FATXXFS_DENTRY* curentry = NULL;
@@ -61,8 +61,6 @@ private:
     //FATFS_DENTRY* dentry = NULL;
     EXT2FS_INFO* ext2fs;
     /*
-    HFS_INFO* hfs = NULL;
-    hfs_plus_vh* hsb = NULL;
     char fn[HFS_MAXNAMLEN + 1];
     HFS_ENTRY* hfsentry = NULL;
     hfs_btree_key_cat key;

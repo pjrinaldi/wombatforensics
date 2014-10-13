@@ -26,6 +26,7 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     ntfsinfo = NULL;
     exfatsb = NULL;
     hfs = NULL;
+    hsb = NULL;
     iso = NULL;
     p = NULL;
     s = NULL;
@@ -876,10 +877,6 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Boot Code" << "Boot Code" << "Boot Code (0x78-0x01FD)";
         proplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, exfatsb->signature)) << "Signature value should be 0xAA55 (0x01FE-0x01FF)";
     }
-    else if(curfsinfo->ftype == TSK_FS_TYPE_HFS)
-    {
-        hfs = (HFS_INFO*)curfsinfo;
-    }
     else if(curfsinfo->ftype == TSK_FS_TYPE_ISO9660) // Byte offset's aren't working out too well right now.
     {
         iso = (ISO_INFO*)curfsinfo;
@@ -1000,6 +997,11 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Object ID Range" << QString::number(objfirst) + " - " + QString::number(objlast) << "Object id range";
         proplist << "Number of Total Object Versions" << QString::number(vercnt) << "Number of total object versions";
         proplist << "Object Version Range" << QString::number(verfirst) + " - " + QString::number(verlast) << "Object version range";
+    }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_HFS) // hfs file system info (last of the tsk defined ones)
+    {
+        hfs = (HFS_INFO*)curfsinfo;
+        hsb = hfs->fs;
     }
     return proplist;
 }
