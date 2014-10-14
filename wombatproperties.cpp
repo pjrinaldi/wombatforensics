@@ -1002,6 +1002,7 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
     {
         hfs = (HFS_INFO*)curfsinfo;
         hsb = hfs->fs;
+        proplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, hsb->signature)) << "Signature value 0x4244 for \"BD\", 0x482B for \"H+\" and 0x4858 for \"HX\" (0x00-0x01)";
     }
     return proplist;
 }
