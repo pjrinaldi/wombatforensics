@@ -1012,7 +1012,7 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
             proplist << "Volume was Unmounted Improperly";
         proplist << "Attribute values, bits 0-7,14,16-31 are reserved. Bit 8 determines if the volume was unmounted properly (0x04-0x07)";
         proplist << "Volume Attributes";
-        if(tsk_getu32(cursfinfo->endian, hsb->attr) & HFS_VH_ATTR_BADBlOCKS)
+        if(tsk_getu32(curfsinfo->endian, hsb->attr) & HFS_VH_ATTR_BADBLOCKS)
             proplist << "Volume has Bad Blocks";
         else
             proplist << "Volume does not have Bad Blocks";
@@ -1047,6 +1047,9 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         else
             proplist << "Volume is not Write-Protected in Software";
         proplist << "Attribute values, bits 0-7,14,16-31 are reserved. Bit 15 determines if the volume should be write-protected (0x04-0x07)";
+        sprintf(asc, "0x%X%X%X%X %c%c%c%c", hsb->last_mnt_ver[0], hsb->last_mnt_ver[1], hsb->last_mnt_ver[2], hsb->last_mnt_ver[3], hsb->last_mnt_ver[0], hsb->last_mnt_ver[1], hsb->last_mnt_ver[2], hsb->last_mnt_ver[3]);
+        proplist << "Last Mounted By" << QString::fromStdString(string(asc)) << "\"10.0\" for Mac OS X, \"HFSJ\" for journaled HFS+ on Mac OS X, \"FSK!\" for failed journal replay, \"fsck\" for fsck_hfs and \"8.10\" for Mac OS 8.1-9.2.2 (0x08-0x0B)";
+        proplist << "Journal Info Block" << QString::number(tsk_getu32(curfsinfo->endian, hsb->jinfo_blk)) << "Journal information block (0x0C-0x0F)";
 
     }
     return proplist;
