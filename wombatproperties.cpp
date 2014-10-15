@@ -1054,6 +1054,9 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         mactime = hfs_convert_2_unix_time(tsk_getu32(curfsinfo->endian, hsb->cr_date));
         sprintf(asc, "%s", tsk_fs_time_to_str(mktime(gmtime(&mactime)), timebuf));
         proplist << "Volume Creation TimeStamp" << QString::fromStdString(string(asc)) << "MACTIME32 converted to UTC from Local Time (0x10-0x13)";
+        sprintf(asc, "%s", tsk_fs_time_to_str(hfs_convert_2_unix_time(tsk_getu32(curfsinfo->endian, hsb->m_date)), timebuf));
+        proplist << "Volume Last Modified TimeStamp" << QString::fromStdString(string(asc)) << "MACTIME32 converted to UTC (0x14-0x17)";
+
     }
     return proplist;
 }
