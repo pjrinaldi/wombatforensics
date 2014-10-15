@@ -1005,8 +1005,49 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         sprintf(asc, "0x%X%X %c%c", hsb->signature[0], hsb->signature[1], hsb->signature[0], hsb->signature[1]);
         proplist << "Signature" << QString::fromStdString(string(asc)) << "Signature value 0x4244 for \"BD\", 0x482B for \"H+\" and 0x4858 for \"HX\" (0x00-0x01)";
         proplist << "Version" << QString::number(tsk_getu16(curfsinfo->endian, hsb->version)) << "Version number. 4 for HFS+, 5 for HFSX (0x02-0x03)";
+        proplist << "Volume Attributes";
         if(tsk_getu32(curfsinfo->endian, hsb->attr) & HFS_VH_ATTR_UNMOUNTED)
-            proplist << "Volume Attributes" << "" << "";
+            proplist << "Volume was Unmounted Properly";
+        else
+            proplist << "Volume was Unmounted Improperly";
+        proplist << "Attribute values, bits 0-7,14,16-31 are reserved. Bit 8 determines if the volume was unmounted properly (0x04-0x07)";
+        proplist << "Volume Attributes";
+        if(tsk_getu32(cursfinfo->endian, hsb->attr) & HFS_VH_ATTR_BADBlOCKS)
+            proplist << "Volume has Bad Blocks";
+        else
+            proplist << "Volume does not have Bad Blocks";
+        proplist << "Attribute values, bits 0-7,14,16-31 are reserved. Bit 9 determines if there are bad blocks for the volume (0x04-0x07)";
+        proplist << "Volume Attributes";
+        if(tsk_getu32(curfsinfo->endian, hsb->attr) & HFS_VH_ATTR_NOCACHE)
+            proplist << "Volume is not Cached";
+        else
+            proplist << "Volume is Cached";
+        proplist << "Attribute values, bits 0-7,14,16-31 are reserved. Bit 10 determines if the volume should not be cached (0x04-0x07)";
+        proplist << "Volume Attributes";
+        if(tsk_getu32(curfsinfo->endian, hsb->attr) & HFS_VH_ATTR_INCONSISTENT)
+            proplist << "Volume is Inconsistent";
+        else
+            proplist << "Volume is Consistent";
+        proplist << "Attribute values, bits 0-7,14,16-31 are reserved. Bit 11 determines if the volume was unmounted properly (0x04-0x07)";
+        proplist << "Volume Attributes";
+        if(tsk_getu32(curfsinfo->endian, hsb->attr) & HFS_VH_ATTR_CNIDS_REUSED)
+            proplist << "CNIDs are Being Reused";
+        else
+            proplist << "CNIDs are not Being Reused";
+        proplist << "Attribute values, bits 0-7,14,16-31 are reserved. Bit 12 determines if the CNIDs have wrapped around past the maximum value and are being reused (0x04-0x07)";
+        proplist << "Volume Attributes";
+        if(tsk_getu32(curfsinfo->endian, hsb->attr) & HFS_VH_ATTR_JOURNALED)
+            proplist << "Journaling Enabled";
+        else
+            proplist << "Journaling Disabled";
+        proplist << "Attribute values, bits 0-7,14,16-31 are reserved. Bit 13 determines if journaling is enabled for the volume (0x04-0x07)";
+        proplist << "Volume Attributes";
+        if(tsk_getu32(curfsinfo->endian, hsb->attr) & HFS_VH_ATTR_SOFTWARE_LOCK)
+            proplist << "Volume should be Write-Protected in Software";
+        else
+            proplist << "Volume is not Write-Protected in Software";
+        proplist << "Attribute values, bits 0-7,14,16-31 are reserved. Bit 15 determines if the volume should be write-protected (0x04-0x07)";
+
     }
     return proplist;
 }
