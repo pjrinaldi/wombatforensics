@@ -1002,6 +1002,7 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
     {
         hfs = (HFS_INFO*)curfsinfo;
         hsb = hfs->fs;
+        time_t mactime;
         sprintf(asc, "0x%X%X %c%c", hsb->signature[0], hsb->signature[1], hsb->signature[0], hsb->signature[1]);
         proplist << "Signature" << QString::fromStdString(string(asc)) << "Signature value 0x4244 for \"BD\", 0x482B for \"H+\" and 0x4858 for \"HX\" (0x00-0x01)";
         proplist << "Version" << QString::number(tsk_getu16(curfsinfo->endian, hsb->version)) << "Version number. 4 for HFS+, 5 for HFSX (0x02-0x03)";
@@ -1050,7 +1051,9 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         sprintf(asc, "0x%X%X%X%X %c%c%c%c", hsb->last_mnt_ver[0], hsb->last_mnt_ver[1], hsb->last_mnt_ver[2], hsb->last_mnt_ver[3], hsb->last_mnt_ver[0], hsb->last_mnt_ver[1], hsb->last_mnt_ver[2], hsb->last_mnt_ver[3]);
         proplist << "Last Mounted By" << QString::fromStdString(string(asc)) << "\"10.0\" for Mac OS X, \"HFSJ\" for journaled HFS+ on Mac OS X, \"FSK!\" for failed journal replay, \"fsck\" for fsck_hfs and \"8.10\" for Mac OS 8.1-9.2.2 (0x08-0x0B)";
         proplist << "Journal Info Block" << QString::number(tsk_getu32(curfsinfo->endian, hsb->jinfo_blk)) << "Journal information block (0x0C-0x0F)";
-
+        mactime = hfs_convert_2_unix_time(tsk_getu32(curfsinfo->endian, hsb->cr_date));
+        sprintf(asc, "%s", tsk_fs_time_to_str(mktime(gmtime(&mactime)), timebuf));
+        proplist << "Volume Creation TimeStamp" << QString::fromStdString(string(asc)) << "MACTIME32 converted to UTC from Local Time (0x10-0x13)";
     }
     return proplist;
 }
@@ -1070,6 +1073,7 @@ QString WombatProperties::ConvertGmtHours(int gmtvar)
     return tmpstring;
 
 }
+
 void WombatProperties::yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t* objfirst, uint32_t* objlast, uint32_t* vercnt, uint32_t* verfirst, uint32_t* verlast)
 {
     YaffsCacheObject* obj;
@@ -1098,6 +1102,13 @@ void WombatProperties::yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int*
                 *verlast = ver->ycv_seq_number;
         }
     }
+}
+
+uint32_t WombatProperties::hfs_convert_2_unix_time(uint32_t hfsdate)
+{
+    if(hfsdate < NSEC_BTWN_1904_1970)
+        return 0;
+    return (uint32_t)(hfsdate - NSEC_BTWN_1904_1970);
 }
 
 QStringList WombatProperties::PopulateFileProperties()
