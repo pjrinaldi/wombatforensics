@@ -124,6 +124,38 @@ QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curinfo)
             }
         }
     }
+    else if(curinfo->ftype == TSK_FS_TYPE_ISO9660)
+    {
+        for(p = ((ISO_INFO*)curinfo)->pvd; p != NULL; p = p->next)
+        {
+            return QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_id));
+        }
+    }
+    else if(curinfo->ftype == TSK_FS_TYPE_YAFFS2)
+    {
+        return "YAFFS2";
+    }
+    else if(curinfo->ftype == TSK_FS_TYPE_SWAP)
+    {
+        return "SWAP";
+    }
+    else if(curinfo->ftype == TSK_FS_TYPE_HFS)
+    {
+        hfs = (HFS_INFO*)curinfo;
+        char fn[HFS_MAXNAMLEN + 1];
+        HFS_ENTRY entry;
+        if(hfs_cat_file_lookup(hfs, HFS_ROOT_INUM, &entry, FALSE))
+        {
+            // log error here
+        }
+        if(hfs_UTF16toUTF8(curinfo, entry.thread.name.unicode, tsk_getu16(curinfo->endian, entry.thread.name.length), fn, HFS_MAXNAMLEN + 1, HFS_U16U8_FLAG_REPLACE_SLASH))
+        {
+            // log error here
+        }
+        sprintf(asc, "%s", fn);
+        return QString::fromStdString(string(asc));
+        // print_inode_name(((HFS_INFO*)fs), HFS_ROOT_INUM);
+    }
     return "";
 }
 
