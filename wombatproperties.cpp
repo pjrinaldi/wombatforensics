@@ -42,12 +42,87 @@ QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curinfo)
     }
     else if(curinfo->ftype == TSK_FS_TYPE_FFS1 || curinfo->ftype == TSK_FS_TYPE_FFS1B)
     {
-        return "ufs1";
+        return "UFS1";
     }
     else if(curinfo->ftype == TSK_FS_TYPE_FFS2 || curinfo->ftype == TSK_FS_TYPE_FFS_DETECT)
     {
-        qDebug() << "ffs2 volname: " << ((FFS_INFO*)curinfo)->fs.sb2->volname;
         return QString::fromUtf8(reinterpret_cast<char*>(((FFS_INFO*)curinfo)->fs.sb2->volname));
+    }
+    else if(curinfo->ftype == TSK_FS_TYPE_FAT12 || curinfo->ftype == TSK_FS_TYPE_FAT16)
+    {
+        return QString::fromUtf8(reinterpret_cast<char*>(((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab));
+    }
+    else if(curinfo->ftype == TSK_FS_TYPE_FAT32)
+    {
+        return QString::fromUtf8(reinterpret_cast<char*>(((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab));
+    }
+    else if(curinfo->ftype == TSK_FS_TYPE_NTFS)
+    {
+        TSK_FS_FILE* tmpfile = NULL;
+        const TSK_FS_ATTR* tmpattr;
+        if((tmpfile = tsk_fs_file_open_meta(curinfo, NULL, NTFS_MFT_VOL)) != NULL)
+        {
+            tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, TSK_FS_ATTR_TYPE_NTFS_VNAME);
+            if((tmpattr->flags & TSK_FS_ATTR_RES) && (tmpattr->size))
+            {
+                UTF16* name16 = (UTF16*) tmpattr->rd.buf;
+                UTF8* name8 = (UTF8*) asc;
+                int retval;
+                retval = tsk_UTF16toUTF8(curinfo->endian, (const UTF16**)&name16, (UTF16*) ((uintptr_t)name16 + (int) tmpattr->size), &name8, (UTF8*) ((uintptr_t)name8 + sizeof(asc)), TSKlenientConversion);
+                if(retval != TSKconversionOK)
+                    *name8 = '\0';
+                else if((uintptr_t)name8 >= (uintptr_t)asc + sizeof(asc))
+                    asc[sizeof(asc)-1] = '\0';
+                else
+                    *name8 = '\0';
+                return QString::fromStdString(string(asc));
+            }
+        }
+    }
+    else if(curinfo->ftype == TSK_FS_TYPE_EXFAT)
+    {
+        char* databuffer = NULL;
+        TSK_DADDR_T cursector = 0;
+        TSK_DADDR_T endsector = 0;
+        int8_t isallocsec = 0;
+        TSK_INUM_T curinum = 0;
+        FATFS_DENTRY* dentry = NULL;
+        TSK_FS_FILE* tmpfile = NULL;
+        ssize_t bytesread = 0;
+        if((tmpfile = tsk_fs_file_alloc(curinfo)) != NULL)
+        {
+            if((tmpfile->meta = tsk_fs_meta_alloc(FATFS_FILE_CONTENT_LEN)) != NULL)
+            {
+                if((databuffer = (char*)tsk_malloc(((FATFS_INFO*)curinfo)->ssize)) != NULL)
+                {
+                    cursector = ((FATFS_INFO*)curinfo)->rootsect;
+                    endsector = (((FATFS_INFO*)curinfo)->firstdatasect + ((FATFS_INFO*)curinfo)->clustcnt * ((FATFS_INFO*)curinfo)->csize) - 1;
+                    while(cursector < endsector)
+                    {
+                    }
+                    bytesread = tsk_fs_read_block(curinfo, cursector, databuffer, ((FATFS_INFO*)curinfo)->ssize);
+                    if(bytesread == ((FATFS_INFO*)curinfo)->ssize)
+                    {
+                        isallocsec = fatfs_is_sectalloc(((FATFS_INFO*)curinfo), cursector);
+                        if(isallocsec != -1)
+                        {
+                            curinum = FATFS_SECT_2_INODE(((FATFS_INFO*)curinfo), cursector);
+                            for(int i = 0; i < ((FATFS_INFO*)curinfo)->ssize; i+= sizeof(FATFS_DENTRY))
+                            {
+                                dentry = (FATFS_DENTRY*)&(databuffer[i]);
+                                if(exfatfs_get_enum_from_type(dentry->data[0]) == EXFATFS_DIR_ENTRY_TYPE_VOLUME_LABEL)
+                                {
+                                    if(exfatfs_dinode_copy(((FATFS_INFO*)curinfo), curinum, dentry, isallocsec, tmpfile) == TSK_OK)
+                                        return QString::fromStdString(tmpfile->meta->name2->name);
+                                }
+                            }
+                        }
+                    }
+                }
+                tsk_fs_file_close(tmpfile);
+                free(databuffer);
+            }
+        }
     }
     return "";
 }
