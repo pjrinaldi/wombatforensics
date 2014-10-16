@@ -1056,6 +1056,11 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Mac OS X Blessed System Folder ID" << QString::number(tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_BOOTX])) << "Mac OS X blessed system folder id (0x64-0x67)";
         sprintf(asc, "%08" PRIx32 "%08" PRIx32, tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID1]), tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID2]));
         proplist << "Volume Identifier" << QString::fromStdString(string(asc)) << "Volume identifier (0x068-0x6F)";
+        proplist << "Fork Data Allocation File" << "" << "Location and size of allocation bitmap files (0x70-0xBF)";
+        proplist << "Fork Data Extents File" << "" << "Location and size of extents file (0x00C0-0x010F)";
+        proplist << "Fork Data Catalog File" << "" << "Location and size of catalog file (0x0110-0x015F)";
+        proplist << "Fork Data Attributes File" << "" << "Location and size of attributes file (0x0160-0x01AF)";
+        proplist << "Fork Data Startup File" << "" << "Location and size of startup file (0x01B0-0x01FF)";
     }
     return proplist;
 }
