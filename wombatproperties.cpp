@@ -31,29 +31,6 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     p = NULL;
     s = NULL;
     yfs = NULL;
-    /*
-    FATXXFS_DENTRY* tmpfatdentry = NULL;
-    FATXXFS_DENTRY* curentry = NULL;
-    const TSK_FS_ATTR*tmpattr;
-    TSK_DADDR_T cursector = 0;
-    TSK_DADDR_T endsector = 0;
-    int8_t isallocsec = 0;
-    TSK_INUM_T curinum = 0;
-    FATFS_DENTRY* dentry = NULL;
-    hfs_plus_vh* hsb = NULL;
-    char fn[HFS_MAXNAMLEN + 1];
-    HFS_ENTRY* hfsentry = NULL;
-    hfs_btree_key_cat key;
-    hfs_thread thread;
-    hfs_file_folder record;
-    TSK_OFF_T off;
-    char* databuffer = NULL;
-    ssize_t cnt;
-    ssize_t bytesread = 0;
-    int a;
-    uint len = 0;
-    */
-
 }
 
 QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curinfo)
@@ -1056,7 +1033,29 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Volume Creation TimeStamp" << QString::fromStdString(string(asc)) << "MACTIME32 converted to UTC from Local Time (0x10-0x13)";
         sprintf(asc, "%s", tsk_fs_time_to_str(hfs_convert_2_unix_time(tsk_getu32(curfsinfo->endian, hsb->m_date)), timebuf));
         proplist << "Volume Last Modified TimeStamp" << QString::fromStdString(string(asc)) << "MACTIME32 converted to UTC (0x14-0x17)";
-
+        sprintf(asc, "%s", tsk_fs_time_to_str(hfs_convert_2_unix_time(tsk_getu32(curfsinfo->endian, hsb->bkup_date)), timebuf));
+        proplist << "Volume Backup TimeStamp" << QString::fromStdString(string(asc)) << "MACTIME32 converted to UTC (0x18-0x1B)";
+        sprintf(asc, "%s", tsk_fs_time_to_str(hfs_convert_2_unix_time(tsk_getu32(curfsinfo->endian, hsb->chk_date)), timebuf));
+        proplist << "Volume Checked TimeStamp" << QString::fromStdString(string(asc)) << "MACTIME32 converted to UTC (0x1C-0x1F)";
+        proplist << "File Count" << QString::number(tsk_getu32(curfsinfo->endian, hsb->file_cnt)) << "Number of files on volume, not including special files (0x20-0x23)";
+        proplist << "Folder Count" << QString::number(tsk_getu32(curfsinfo->endian, hsb->fldr_cnt)) << "Number of folders on volume, not including the root directory (0x24-0x27)";
+        proplist << "Allocation Block Size" << QString::number(tsk_getu32(curfsinfo->endian, hsb->blk_sz)) << "Allocation block size in bytes (0x28-0x2B)";
+        proplist << "Allocation Block Total" << QString::number(tsk_getu32(curfsinfo->endian, hsb->blk_cnt)) << "Number of blocks on disk (0x2C-0x2F)";
+        proplist << "Allocation Block Free" << QString::number(tsk_getu32(curfsinfo->endian, hsb->free_blks)) << "Unused block count (0x30-0x33)";
+        proplist << "Next Allocation" << QString::number(tsk_getu32(curfsinfo->endian, hsb->next_alloc)) << "Block address to start the allocation search (0x34-0x37)";
+        proplist << "Resource Clump Size" << QString::number(tsk_getu32(curfsinfo->endian, hsb->rsrc_clmp_sz)) << "Default clump size for resource forks in bytes (0x38-0x3B)";
+        proplist << "Data Clump Size" << QString::number(tsk_getu32(curfsinfo->endian, hsb->data_clmp_sz)) << "Default clump size for data forks in bytes (0x3C-0x3F)";
+        proplist << "Next Catalog ID" << QString::number(tsk_getu32(curfsinfo->endian, hsb->next_cat_id)) << "Next catalog node id for allocation (0x40-0x43)";
+        proplist << "Write Count" << QString::number(tsk_getu32(curfsinfo->endian, hsb->write_cnt)) << "Write count incremented each time it is mounted and modified (0x44-0x47)";
+        proplist << "Encoding Bitmap" << QString::number(tsk_getu64(curfsinfo->endian, hsb->enc_bmp)) << "Encoding bitmap identifies which encodings were used in the file system (0x48-0x4F)";
+        proplist << "Bootable Folder ID" << QString::number(tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_BOOT])) << "Bootable folder id (0x50-0x53)";
+        proplist << "Startup App ID" << QString::number(tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_START])) << "Startup app id (0x54-0x57)";
+        proplist << "Startup Open Folder ID" << QString::number(tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_OPEN])) << "Startup open folder id (0x58-0x5B)";
+        proplist << "Mac OS 8/9 Blessed System Folder ID" << QString::number(tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_BOOT9])) << "Mac OS 8/9 blessed system folder id (0x5C-0x5F)";
+        proplist << "Reserved" << "Reserved" << "Reserved (0x60-0x63)";
+        proplist << "Mac OS X Blessed System Folder ID" << QString::number(tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_BOOTX])) << "Mac OS X blessed system folder id (0x64-0x67)";
+        sprintf(asc, "%08" PRIx32 "%08" PRIx32, tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID1]), tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID2]));
+        proplist << "Volume Identifier" << QString::fromStdString(string(asc)) << "Volume identifier (0x068-0x6F)";
     }
     return proplist;
 }

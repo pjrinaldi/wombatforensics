@@ -50,30 +50,7 @@ private:
     iso9660_pvd_node* p;
     iso9660_svd_node* s;
     YAFFSFS_INFO* yfs;
-   /*
-    FATXXFS_DENTRY* tmpfatdentry = NULL;
-    FATXXFS_DENTRY* curentry = NULL;
-    const TSK_FS_ATTR*tmpattr;
-    TSK_DADDR_T cursector = 0;
-    TSK_DADDR_T endsector = 0;
-    int8_t isallocsec = 0;
-    TSK_INUM_T curinum = 0;
-    */
-    //FATFS_DENTRY* dentry = NULL;
     EXT2FS_INFO* ext2fs;
-    /*
-    char fn[HFS_MAXNAMLEN + 1];
-    HFS_ENTRY* hfsentry = NULL;
-    hfs_btree_key_cat key;
-    hfs_thread thread;
-    hfs_file_folder record;
-    TSK_OFF_T off;
-    char* databuffer = NULL;
-    ssize_t cnt;
-    ssize_t bytesread = 0;
-    int a;
-    uint len = 0;
-    */
     char asc[512];
     char asc128[129];
     char timebuf[128];
