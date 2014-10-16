@@ -26,6 +26,8 @@ public:
     void InsertVolumeObject(void);
     void InsertPartitionObjects(void);
     void InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsinfo);
+    void InsertEvidenceProperties(void);
+    void InsertVolumeProperties(void);
     void GetObjectValues(void);
     //QString GetFileSystemLabel(TSK_FS_INFO* curfsinfo);
 

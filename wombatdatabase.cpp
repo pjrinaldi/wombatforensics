@@ -277,7 +277,9 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->currentevidenceid);
         wombatptr->bindvalues.append(wombatptr->currentvolumename);
         wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, childcount, byteoffset, parentid, parimgid, name) VALUES(2, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-        wombatprop->PopulateVolumeProperties();
+        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertVolumeProperties);
+        threadvector.append(tmpfuture);
+        //wombatprop->PopulateVolumeProperties();
     }
     else
     {
@@ -412,18 +414,8 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->currentevidenceid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, name, fullpath, parimgid) VALUES(1, ?, ?, ?, ?, ?, NULL);", wombatptr->bindvalues);
     wombatptr->evidenceobject.id = wombatptr->currentevidenceid;
     currentevidenceid = wombatptr->currentevidenceid;
-    // Might need to make a global variable so it will be easier to abstract the thread call.
-    evidpropertylist = wombatprop->PopulateEvidenceImageProperties();
-
-    for(int i=0; i < evidpropertylist.count()/3; i++)
-    {
-        wombatptr->bindvalues.clear();
-        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-        wombatptr->bindvalues.append(evidpropertylist.at(3*i));
-        wombatptr->bindvalues.append(evidpropertylist.at(3*i+1));
-        wombatptr->bindvalues.append(evidpropertylist.at(3*i+2));
-        InsertSql("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);", wombatptr->bindvalues);
-    }
+    QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertEvidenceProperties);
+    threadvector.append(tmpfuture);
     for(int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
         wombatptr->bindvalues.clear();
@@ -694,6 +686,37 @@ void WombatDatabase::InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsi
         wombatptr->bindvalues.append(fsproplist.at(3*i));
         wombatptr->bindvalues.append(fsproplist.at(3*i+1));
         wombatptr->bindvalues.append(fsproplist.at(3*i+2));
+        InsertSql("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);", wombatptr->bindvalues);
+    }
+}
+void WombatDatabase::InsertEvidenceProperties()
+{
+    QStringList evidpropertylist;
+    evidpropertylist.clear();
+    evidpropertylist = wombatprop->PopulateEvidenceImageProperties();
+
+    for(int i=0; i < evidpropertylist.count()/3; i++)
+    {
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+        wombatptr->bindvalues.append(evidpropertylist.at(3*i));
+        wombatptr->bindvalues.append(evidpropertylist.at(3*i+1));
+        wombatptr->bindvalues.append(evidpropertylist.at(3*i+2));
+        InsertSql("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);", wombatptr->bindvalues);
+    }
+}
+void WombatDatabase::InsertVolumeProperties()
+{
+    QStringList evidpropertylist;
+    evidpropertylist.clear();
+    evidpropertylist = wombatprop->PopulateVolumeProperties();
+    for(int i=0; i < evidpropertylist.count()/3; i++)
+    {
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append(wombatptr->currentvolumeid);
+        wombatptr->bindvalues.append(evidpropertylist.at(3*i));
+        wombatptr->bindvalues.append(evidpropertylist.at(3*i+1));
+        wombatptr->bindvalues.append(evidpropertylist.at(3*i+2));
         InsertSql("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);", wombatptr->bindvalues);
     }
 }

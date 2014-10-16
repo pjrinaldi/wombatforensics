@@ -54,7 +54,6 @@ private:
     char asc[512];
     char asc128[129];
     char timebuf[128];
-
 };
 
 #endif // WOMBATPROPERTIES_H
