@@ -190,7 +190,15 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     // THE FUNCTION IS SLIGHTLY DIFFERENT FOR EACH FILE SYSTEM. I NEED A SWITCH HERE FOR ISO OR ALL ELSE
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
-        qDebug() << "ISO or HFS hasn't been done yet.";
+        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
+        {
+        }
+        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
+        {
+        }
+        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+        {
+        }
     }
     else
         tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
