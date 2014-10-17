@@ -147,13 +147,35 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
 {
     // WILL HAVE TO CREATE A SWITCH TO ACCOUNT FOR THE DIFFERENT FILE SYSTEMS
     TSK_FS_INFO* fs = tmpfile->fs_info;
-    if(flags & TSK_FS_BLOCK_FLAG_CONT)
+    if(fs->ftype == TSK_FS_TYPE_HFS_DETECT)
     {
-        int i, s;
-        for(i = 0, s = (int) size; s > 0; s -= fs->block_size, i++)
+        qDebug() << "HFS addresses will go here..";
+        //if(addr == 
+    }
+    else if(fs->ftype == TSK_FS_TYPE_ISO9660_DETECT)
+    {
+    }
+    else if(fs->ftype == TSK_FS_TYPE_FAT_DETECT || fs->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    {
+        qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
+    }
+    else if(fs->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
+    {
+        if(flags & TSK_FS_BLOCK_FLAG_CONT)
         {
-            if(addr)
-                qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
+            qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
+        }
+    }
+    else
+    {
+        if(flags & TSK_FS_BLOCK_FLAG_CONT)
+        {
+            int i, s;
+            for(i = 0, s = (int) size; s > 0; s -= fs->block_size, i++)
+            {
+                if(addr)
+                    qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
+            }
         }
     }
     return TSK_WALK_CONT;
@@ -188,16 +210,35 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
     // BEGIN TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE (EXT2FS)
     // THE FUNCTION IS SLIGHTLY DIFFERENT FOR EACH FILE SYSTEM. I NEED A SWITCH HERE FOR ISO OR ALL ELSE
-    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
     {
         if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
         {
+            tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
         {
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
+            if(tmpfile->meta->attr)
+            {
+                int cnt, i;
+                cnt = tsk_fs_file_attr_getsize(tmpfile);
+                for(i = 0; i < cnt; i++)
+                {
+                    char type[512];
+                    const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                    if(tmpattr->flags & TSK_FS_ATTR_NONRES)
+                    {
+                        tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+                    }
+                }
+            }
+        }
+        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
+        {
+            tsk_fs_file_walk(tmpfile, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
         }
     }
     else
