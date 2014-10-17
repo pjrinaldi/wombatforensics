@@ -149,11 +149,12 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     TSK_FS_INFO* fs = tmpfile->fs_info;
     if(fs->ftype == TSK_FS_TYPE_HFS_DETECT)
     {
-        qDebug() << "HFS addresses will go here..";
-        //if(addr == 
+        // NEED TO FIGURE OUT HOW TO GET EACH BLOCK SO I CAN STORE THE RESPECTIVE VALUES
+        qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << addr;
     }
     else if(fs->ftype == TSK_FS_TYPE_ISO9660_DETECT)
     {
+        // iso is already done in the previous function
     }
     else if(fs->ftype == TSK_FS_TYPE_FAT_DETECT || fs->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
@@ -218,6 +219,16 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
         {
+            iso9660_inode* dinode;
+            dinode = (iso9660_inode*)tsk_malloc(sizeof(iso9660_inode));
+            iso9660_dinode_load(((ISO_INFO*)tmpfile->fs_info), tmpfile->meta->addr, dinode);
+            int block = tsk_getu32(tmpfile->fs_info->endian, dinode->dr.ext_loc_m);
+            TSK_OFF_T size = tmpfile->meta->size;
+            while((int64_t)size > 0)
+            {
+                qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << block++;
+                size -= tmpfile->fs_info->block_size;
+            }
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
