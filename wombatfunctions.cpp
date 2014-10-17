@@ -143,6 +143,21 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
     }
 }
 
+TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
+{
+    TSK_FS_INFO* fs = tmpfile->fs_info;
+    if(flags & TSK_FS_BLOCK_FLAG_CONT)
+    {
+        int i, s;
+        for(i = 0, s = (int) size; s > 0; s -= fs->block_size, i++)
+        {
+            if(addr)
+                qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
+        }
+    }
+    return TSK_WALK_CONT;
+}
+
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     if(tmpptr != NULL)
@@ -169,6 +184,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     else filestrings.append(QString("unknown.wbt"));
     filestrings.append(QString("/") + QString(tmppath));
     filestrings.append(tmpstring);
+
+    // BEGIN TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE (EXT2FS)
+    tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
+    // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE (EXT2FS)
 
     QVector<int> fileints;
 
