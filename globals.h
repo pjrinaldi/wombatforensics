@@ -23,6 +23,7 @@ extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;
 extern QList<FileSystemObject> fsobjectlist;
 extern QStringList propertylist;
+extern QString blockstring;
 
 class InterfaceSignals : public QObject
 {

@@ -129,6 +129,10 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
         fquery.addBindValue(tmpstrings[2]);
         fquery.addBindValue(currentevidenceid);
         fquery.addBindValue(tmpints[8]);
+
+        qDebug() << "Start Full Block Addresses";
+        qDebug() << blockstring;
+        qDebug() << "End Full Block Addresses";
         
         fquery.exec();
         fquery.finish();
@@ -149,6 +153,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     TSK_FS_INFO* fs = tmpfile->fs_info;
     if(fs->ftype == TSK_FS_TYPE_HFS_DETECT)
     {
+        blockstring += QString::number(addr) + "|";
         // NEED TO FIGURE OUT HOW TO GET EACH BLOCK SO I CAN STORE THE RESPECTIVE VALUES
         qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << addr;
     }
@@ -158,12 +163,14 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     }
     else if(fs->ftype == TSK_FS_TYPE_FAT_DETECT || fs->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
+        blockstring += QString::number(addr) + "|";
         qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
     }
     else if(fs->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
     {
         if(flags & TSK_FS_BLOCK_FLAG_CONT)
         {
+            blockstring += QString::number(addr) + "|";
             qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
         }
     }
@@ -175,7 +182,10 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
             for(i = 0, s = (int) size; s > 0; s -= fs->block_size, i++)
             {
                 if(addr)
+                {
+                    blockstring += QString::number(addr + i) + "|";
                     qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
+                }
             }
         }
     }
@@ -209,8 +219,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     filestrings.append(QString("/") + QString(tmppath));
     filestrings.append(tmpstring);
 
-    // BEGIN TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE (EXT2FS)
-    // THE FUNCTION IS SLIGHTLY DIFFERENT FOR EACH FILE SYSTEM. I NEED A SWITCH HERE FOR ISO OR ALL ELSE
+    // BEGIN TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
+    blockstring = "";
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
     {
         if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
@@ -221,11 +231,18 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         {
             iso9660_inode* dinode;
             dinode = (iso9660_inode*)tsk_malloc(sizeof(iso9660_inode));
-            iso9660_dinode_load(((ISO_INFO*)tmpfile->fs_info), tmpfile->meta->addr, dinode);
+            iso9660_inode_node* n;
+            n = ((ISO_INFO*)tmpfile->fs_info)->in_list;
+            while(n && (n->inum != tmpfile->meta->addr))
+                n = n->next;
+            if(n)
+                memcpy(dinode, &n->inode, sizeof(iso9660_inode));
+            //iso9660_dinode_load(((ISO_INFO*)tmpfile->fs_info), tmpfile->meta->addr, dinode);
             int block = tsk_getu32(tmpfile->fs_info->endian, dinode->dr.ext_loc_m);
             TSK_OFF_T size = tmpfile->meta->size;
             while((int64_t)size > 0)
             {
+                blockstring += QString::number(block++) + "|";
                 qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << block++;
                 size -= tmpfile->fs_info->block_size;
             }
@@ -254,7 +271,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     else
         tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
-    // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE (EXT2FS)
+    // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
 
     QVector<int> fileints;
 

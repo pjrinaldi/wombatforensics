@@ -432,6 +432,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         currentfilesystemid = wombatptr->evidenceobject.fsidvector[i];
         if(fcasedb.transaction())
         {
+            blockstring = "";
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
         }
     }

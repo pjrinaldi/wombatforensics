@@ -26,3 +26,4 @@ QList<QVariant> colvalues;
 QList<TskObject> curlist;
 QList<FileSystemObject> fsobjectlist;
 QStringList propertylist;
+QString blockstring = "";
