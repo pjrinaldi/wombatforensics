@@ -145,6 +145,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
 
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
 {
+    // WILL HAVE TO CREATE A SWITCH TO ACCOUNT FOR THE DIFFERENT FILE SYSTEMS
     TSK_FS_INFO* fs = tmpfile->fs_info;
     if(flags & TSK_FS_BLOCK_FLAG_CONT)
     {
@@ -186,7 +187,13 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     filestrings.append(tmpstring);
 
     // BEGIN TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE (EXT2FS)
-    tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
+    // THE FUNCTION IS SLIGHTLY DIFFERENT FOR EACH FILE SYSTEM. I NEED A SWITCH HERE FOR ISO OR ALL ELSE
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    {
+        qDebug() << "ISO or HFS hasn't been done yet.";
+    }
+    else
+        tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
     // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE (EXT2FS)
 
     QVector<int> fileints;
