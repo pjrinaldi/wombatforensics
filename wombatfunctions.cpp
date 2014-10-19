@@ -115,7 +115,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         QSqlQuery fquery(fcasedb);
-        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid, blockaddress) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);");
         fquery.addBindValue(tmpints[0]);
         fquery.addBindValue(tmpstrings[0]);
         fquery.addBindValue(tmpints[1]);
@@ -129,12 +129,14 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
         fquery.addBindValue(tmpstrings[2]);
         fquery.addBindValue(currentevidenceid);
         fquery.addBindValue(tmpints[8]);
+        fquery.addBindValue(blockstring);
 
-        qDebug() << "Start Full Block Addresses";
-        qDebug() << blockstring;
-        qDebug() << "End Full Block Addresses";
+        //qDebug() << "Start Full Block Addresses";
+        qDebug() << tmpstrings[0] << blockstring;
+        //qDebug() << "End Full Block Addresses";
         
         fquery.exec();
+        //int tmpid = casequery.lastInsertId().toInt();
         fquery.finish();
         filesprocessed++;
         isignals->ProgUpd();
@@ -149,13 +151,25 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
 
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
 {
+    if(off < 0)
+    {
+        // remove warning
+    }
+    if(buf)
+    {
+        // remove warning
+    }
+    if(ptr)
+    {
+        // remove warning
+    }
     // WILL HAVE TO CREATE A SWITCH TO ACCOUNT FOR THE DIFFERENT FILE SYSTEMS
     TSK_FS_INFO* fs = tmpfile->fs_info;
     if(fs->ftype == TSK_FS_TYPE_HFS_DETECT)
     {
         blockstring += QString::number(addr) + "|";
         // NEED TO FIGURE OUT HOW TO GET EACH BLOCK SO I CAN STORE THE RESPECTIVE VALUES
-        qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << addr;
+        //qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << addr;
     }
     else if(fs->ftype == TSK_FS_TYPE_ISO9660_DETECT)
     {
@@ -164,14 +178,14 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     else if(fs->ftype == TSK_FS_TYPE_FAT_DETECT || fs->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
         blockstring += QString::number(addr) + "|";
-        qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
+        //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
     }
     else if(fs->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
     {
         if(flags & TSK_FS_BLOCK_FLAG_CONT)
         {
             blockstring += QString::number(addr) + "|";
-            qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
+            //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
         }
     }
     else
@@ -184,7 +198,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
                 if(addr)
                 {
                     blockstring += QString::number(addr + i) + "|";
-                    qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
+                    //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
                 }
             }
         }
@@ -243,7 +257,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             while((int64_t)size > 0)
             {
                 blockstring += QString::number(block++) + "|";
-                qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << block++;
+                //qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << block++;
                 size -= tmpfile->fs_info->block_size;
             }
         }
@@ -255,7 +269,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 cnt = tsk_fs_file_attr_getsize(tmpfile);
                 for(i = 0; i < cnt; i++)
                 {
-                    char type[512];
+                    //char type[512];
                     const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
                     if(tmpattr->flags & TSK_FS_ATTR_NONRES)
                     {
