@@ -129,14 +129,11 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
         fquery.addBindValue(tmpstrings[2]);
         fquery.addBindValue(currentevidenceid);
         fquery.addBindValue(tmpints[8]);
-        fquery.addBindValue(blockstring);
+        fquery.addBindValue(tmpstrings[3]);
 
-        //qDebug() << "Start Full Block Addresses";
-        qDebug() << tmpstrings[0] << blockstring;
-        //qDebug() << "End Full Block Addresses";
+        //qDebug() << tmpstrings[0] << tmpstrings[3];
         
         fquery.exec();
-        //int tmpid = casequery.lastInsertId().toInt();
         fquery.finish();
         filesprocessed++;
         isignals->ProgUpd();
@@ -197,7 +194,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
                 if(addr)
                 {
                     blockstring += QString::number(addr + i) + "|";
-                    qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
+                    //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
                 }
             }
         }
@@ -284,6 +281,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     else
         tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
     // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
+
+    filestrings.append(blockstring);
 
     QVector<int> fileints;
 
