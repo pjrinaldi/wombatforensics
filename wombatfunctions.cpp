@@ -153,34 +153,33 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
 {
     if(off < 0)
     {
-        // remove warning
+        // remove compile warning
     }
     if(buf)
     {
-        // remove warning
+        // remove compile warning
     }
     if(ptr)
     {
-        // remove warning
+        // remove compile warning
     }
     // WILL HAVE TO CREATE A SWITCH TO ACCOUNT FOR THE DIFFERENT FILE SYSTEMS
-    TSK_FS_INFO* fs = tmpfile->fs_info;
-    if(fs->ftype == TSK_FS_TYPE_HFS_DETECT)
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
     {
         blockstring += QString::number(addr) + "|";
         // NEED TO FIGURE OUT HOW TO GET EACH BLOCK SO I CAN STORE THE RESPECTIVE VALUES
         //qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << addr;
     }
-    else if(fs->ftype == TSK_FS_TYPE_ISO9660_DETECT)
+    else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
     {
         // iso is already done in the previous function
     }
-    else if(fs->ftype == TSK_FS_TYPE_FAT_DETECT || fs->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
         blockstring += QString::number(addr) + "|";
         //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
     }
-    else if(fs->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
+    else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
     {
         if(flags & TSK_FS_BLOCK_FLAG_CONT)
         {
@@ -193,12 +192,12 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
         if(flags & TSK_FS_BLOCK_FLAG_CONT)
         {
             int i, s;
-            for(i = 0, s = (int) size; s > 0; s -= fs->block_size, i++)
+            for(i = 0, s = (int) size; s > 0; s -= tmpfile->fs_info->block_size, i++)
             {
                 if(addr)
                 {
                     blockstring += QString::number(addr + i) + "|";
-                    //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
+                    qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
                 }
             }
         }
@@ -251,7 +250,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 n = n->next;
             if(n)
                 memcpy(dinode, &n->inode, sizeof(iso9660_inode));
-            //iso9660_dinode_load(((ISO_INFO*)tmpfile->fs_info), tmpfile->meta->addr, dinode);
             int block = tsk_getu32(tmpfile->fs_info->endian, dinode->dr.ext_loc_m);
             TSK_OFF_T size = tmpfile->meta->size;
             while((int64_t)size > 0)
