@@ -563,7 +563,7 @@ void WombatDatabase::GetObjectValues()
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type, flags, blocksize, parfsid, fullpath FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type, flags, blocksize, parfsid, fullpath, blockaddress FROM data WHERE objectid = ?", wombatptr->bindvalues);
     wombatptr->selectedobject.objtype = wombatptr->sqlrecords[0].value(0).toInt();
     wombatptr->selectedobject.size = wombatptr->sqlrecords[0].value(1).toInt();
     wombatptr->selectedobject.parimgid = wombatptr->sqlrecords[0].value(2).toInt();
@@ -578,6 +578,7 @@ void WombatDatabase::GetObjectValues()
     wombatptr->selectedobject.blocksize = wombatptr->sqlrecords[0].value(11).toInt();
     wombatptr->selectedobject.parfsid = wombatptr->sqlrecords[0].value(12).toInt();
     wombatptr->selectedobject.fullpath = wombatptr->sqlrecords[0].value(13).toString();
+    wombatptr->selectedobject.blockaddress = wombatptr->sqlrecords[0].value(14).toString();
 }
 
 int WombatDatabase::GetEvidenceFileCount()
