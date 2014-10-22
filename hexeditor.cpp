@@ -901,12 +901,14 @@ void HexEditor::showMatch( off_t pos, int len )
 void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
     paint.setPen(qApp->palette().foreground().color());
+    paint.setBrush(QColor(0, 255, 0, 15));
     for(int r = row_start; r <= row_stop; r++)
     {
         for(int c = col_start; c <= col_stop; c++)
         {
             int widx = r*_cols+c;
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
+            paint.drawRect(_asciiBBox[widx].left(), _asciiBBox[widx].top(), _asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom());
         }
     }
 }
