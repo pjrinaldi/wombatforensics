@@ -160,7 +160,7 @@ void HexEditor::calculateFontMetrics()
   if( _reader.size() ) {
      double width = log(static_cast<float>(_reader.size()))/log(16.0)+2;
      _offsetLabelBytes = static_cast<int>( width );
-  } else {
+
      _offsetLabelBytes = 0;
   }
   _leftMargin = _topMargin + _fontMaxWidth*(_offsetLabelBytes + 2);
@@ -673,6 +673,7 @@ void HexEditor::paintEvent( QPaintEvent* e)
   // draw highlight over the correct text region. need to switch text values to using offset and size
   // for now i'll use the row/col values for testing the highlighting
   //DrawCurrentObject(paint, row_start, row_stop, col_start, col_stop);
+  DrawCurrentObject(paint, e->rect().left(), topMargin(), e->rect().right()/2, height()-topMargin());
   // draw text in repaint event
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
@@ -952,6 +953,8 @@ void HexEditor::drawSelection( QPainter& paint )
   //DrawCurrentObject(paint);
 }
 
+// THIS DRAWS ON TOP OF THE TEXT. I MIGHT NEED TO ADD A BRUSH TO WHERE I DRAW TEXT AND THEN DRAW THE TEXT WITH THE HIGHLIGHTING
+// IF ITS PART OF THE FILE BYTE OFFSET DATA...
 void HexEditor::DrawCurrentObject(QPainter& paint, int row_start, int row_stop, int col_start, int col_stop)
 {
     // THAT SORT OF WORKS... A GOOD START TO GO FROM.
@@ -962,9 +965,10 @@ void HexEditor::DrawCurrentObject(QPainter& paint, int row_start, int row_stop, 
         for(int c = col_start; c <= col_stop; c++)
         {
             int widx = r*_cols+c;
-            paint.drawRect(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].top(), _wordBBox[widx].right(), _wordBBox[widx].bottom());
+            //paint.drawRect(_wordBBox[widx].left() + wordSpacing(), _wordBBox[widx].top(), _wordBBox[widx].right()/2, _wordBBox[widx].bottom());
         }
     }
+    paint.drawRect(row_start, row_stop, col_start, col_stop);
 }
 
 void HexEditor::drawCursor( QPainter& paint )
