@@ -69,7 +69,6 @@ HexEditor::HexEditor( QWidget * parent, TskObject* tskobjptr )
   font.setStyleHint(QFont::TypeWriter);
   font.setFixedPitch(1);
   setFont( font );
-  //_reader = new Reader();
 }
 
 HexEditor::~HexEditor() 
@@ -913,9 +912,7 @@ void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
     }
 }
 
-void HexEditor::drawTextRegion( QPainter& paint, const QString& text,
-				int row_start, int row_stop,
-				int col_start, int col_stop )
+void HexEditor::drawTextRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
   paint.setPen(qApp->palette().foreground().color());
   for(int r = row_start; r <= row_stop; r++) {

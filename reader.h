@@ -54,7 +54,6 @@ class Reader {
   bool open(const string& filename);
   bool openimage(TskObject* tskobject);
   bool close();
-  void Clear(void);
   bool eof();
   bool is_open() const;
   

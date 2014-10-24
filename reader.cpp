@@ -360,19 +360,8 @@ bool Reader::loadimagepage(off_t pageIdx)
         if(pageIdx > _lastPage)
             _lastPage = pageIdx;
     }
-    else
-    {
-        //fill( _data.begin(), _data.begin()+1, (uchar*)0 );
-        // try to set the page data to zero's here...
-    }
 
     return 1;
-}
-
-void Reader::Clear()
-{
-    //_data.erase(_data.begin(), _data.end()); // added to clear the previous values when a file is of size 0
-    //fill(_data.begin(), _data.begin()+1, (uchar*)0);
 }
 
 bool Reader::loadPage(off_t pageIdx)

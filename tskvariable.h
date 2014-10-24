@@ -13,6 +13,7 @@ struct TskObject
     int address;
     int objecttype;
     int type;
+    int blocksize;
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
