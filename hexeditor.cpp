@@ -289,8 +289,6 @@ int HexEditor::offsetToPercent(
 // public slots:
 
 QRect HexEditor::charBBox( off_t charIdx ) const {
-  //  byteIdx =  charIdx/charsPerByte
-  //  wordIdx =  byteIdx/bytesPerWord
   int wordIdx = (charIdx/charsPerByte())/bytesPerWord();
   int localCharIdx = charIdx % charsPerWord();
   return QRect( _wordBBox[wordIdx].left() + localCharIdx*fontMaxWidth() +
@@ -301,7 +299,6 @@ QRect HexEditor::charBBox( off_t charIdx ) const {
 }
 
 QRect HexEditor::byteBBox( off_t byteIdx ) const {
-  //  wordIdx =  byteIdx/bytesPerWord
   int wordIdx = byteIdx/bytesPerWord();
   int localByteIdx = byteIdx % bytesPerWord();
   return QRect( _wordBBox[wordIdx].left() + localByteIdx*2*fontMaxWidth() +
@@ -918,9 +915,8 @@ void HexEditor::drawTextRegion(QPainter& paint, const QString& text, int row_sta
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
         int widx = r*_cols+c;
-        paint.drawText( _wordBBox[widx].left() + wordSpacing()/2,
-			_wordBBox[widx].bottom(),
-			text.mid(widx*charsPerWord(),charsPerWord()) );
+        paint.fillRect(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), widx*charsPerWord(), _wordBBox[widx].top(), QColor(0, 255, 0, 15));
+        paint.drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()) );
     }
   }
 }
