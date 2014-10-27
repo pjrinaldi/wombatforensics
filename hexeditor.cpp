@@ -159,7 +159,9 @@ void HexEditor::calculateFontMetrics()
   if( _reader.size() ) {
      double width = log(static_cast<float>(_reader.size()))/log(16.0)+2;
      _offsetLabelBytes = static_cast<int>( width );
-
+  }
+  else
+  {
      _offsetLabelBytes = 0;
   }
   _leftMargin = _topMargin + _fontMaxWidth*(_offsetLabelBytes + 2);
