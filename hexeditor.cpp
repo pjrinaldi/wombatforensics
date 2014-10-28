@@ -673,6 +673,7 @@ void HexEditor::paintEvent( QPaintEvent* e)
   //DrawCurrentObject(paint, row_start, row_stop, col_start, col_stop);
   //DrawCurrentObject(paint, e->rect().left(), topMargin(), e->rect().right()/2, height()-topMargin());
   // draw text in repaint event
+  DrawCharacterFill(paint);
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
   // draw dividing line
@@ -917,7 +918,7 @@ void HexEditor::drawTextRegion(QPainter& paint, const QString& text, int row_sta
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
         int widx = r*_cols+c;
-        paint.fillRect(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), widx*charsPerWord(), _wordBBox[widx].top(), QColor(0, 255, 0, 15));
+        //paint.fillRect(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), widx*charsPerWord(), _wordBBox[widx].top(), QColor(0, 255, 0, 15));
         paint.drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()) );
     }
   }
@@ -930,8 +931,8 @@ void HexEditor::drawSelection( QPainter& paint )
   if( start < bytesPerPage() ) {
     off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
     paint.setPen(Qt::NoPen);
-    //paint.setBrush( qApp->palette().highlight() );
-    paint.setBrush(QColor(0, 0, 255, 15));
+    paint.setBrush( qApp->palette().highlight() );
+    //paint.setBrush(QColor(0, 0, 255, 15));
     // foreach line with selection
     stop--;
     while( start <= stop ) {
@@ -966,6 +967,13 @@ void HexEditor::DrawCurrentObject(QPainter& paint, int row_start, int row_stop, 
         }
     }
     paint.drawRect(row_start, row_stop, col_start, col_stop);
+}
+
+void HexEditor::DrawCharacterFill(QPainter& paint)
+{
+    //paint.setPen(Qt::NoPen);
+    //paint.setBrush(QColor(255, 0, 0, 15));
+    paint.fillRect(10, 10, 100, 100, QColor(255, 0, 0, 15));
 }
 
 void HexEditor::drawCursor( QPainter& paint )
