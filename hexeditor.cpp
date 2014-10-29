@@ -967,6 +967,30 @@ void HexEditor::DrawCurrentObject(QPainter& paint, int row_start, int row_stop, 
         }
     }
     paint.drawRect(row_start, row_stop, col_start, col_stop);
+    /*
+     *  // draw selection
+  off_t start = max( (off_t)0, selectionStart() - _topLeft);
+  if( start < bytesPerPage() ) {
+    off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
+    paint.setPen(Qt::NoPen);
+    paint.setBrush( qApp->palette().highlight() );
+    //paint.setBrush(QColor(0, 0, 255, 15));
+    // foreach line with selection
+    stop--;
+    while( start <= stop ) {
+      // linestop = min(stop,endofline)
+      off_t linestop = 
+	min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
+      QRect bbox = byteBBox(start);
+      QRect abox = abyteBox(start);
+      bbox.setRight( byteBBox(linestop).right() );
+      abox.setRight(abyteBox(linestop).right());
+      paint.drawRect( bbox );
+      paint.drawRect(abox);
+      start = linestop+1;
+    }
+
+     */ 
 }
 
 void HexEditor::DrawCharacterFill(QPainter& paint)
