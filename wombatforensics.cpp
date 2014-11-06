@@ -492,14 +492,18 @@ void WombatForensics::LoadHexContents()
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
-        tskobjptr->offset = 0;
+        //tskobjptr->offset = 0;
+        tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize;
+        qDebug() << "file object offset:" << tskobjptr->offset;
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         //OpenFileSystemFile();
     }
-    if(wombatvarptr->selectedobject.objtype <= 5)
+    // MODIFYING FOR HIGHLIGHTING TEST...
+    //if(wombatvarptr->selectedobject.objtype <= 5)
+    if(wombatvarptr->selectedobject.objtype < 5)
     {
         // here is where i need to print out the file byte offset, byte length, block information to figure out
         // how to highlight the relevant information for a selected object.
@@ -510,6 +514,11 @@ void WombatForensics::LoadHexContents()
         hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
+    }
+    else
+    {
+        //((int)tskobjptr->blockaddress.split("|", QString::SKipEntryParts).at(0))*tskobjptr->;
+        hexwidget->SetTopLeft(tskobjptr->offset);
     }
 }
 

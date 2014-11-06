@@ -85,6 +85,11 @@ void HexEditor::ClearContent()
     //setTopLeft(0);
 }
 
+void HexEditor::SetTopLeft(off_t offset)
+{
+    setTopLeft(offset);
+}
+
 QString HexEditor::filename() const
 {
   return _reader.filename();
