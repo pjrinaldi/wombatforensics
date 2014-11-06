@@ -356,7 +356,11 @@ bool Reader::loadimagepage(off_t pageIdx)
         QStringList blocklist = tskptr->blockaddress.split("|", QString::SkipEmptyParts);
         for(int i=0; i < blocklist.count(); i++)
         {
-            qDebug() << blocklist.at(i);
+            if(pageIdx == blocklist.at(i).toInt())
+            {
+                qDebug() << blocklist.at(i);
+                break;
+            }
         }
         // END HIGHLIGHTING TEST SEQUENCE
 
