@@ -348,10 +348,18 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     else
     {
+        // BEGIN HIGHLIGHTING TEST SEQUENCE
+        QStringList blocklist = tskptr->blockaddress.split("|", QString::SkipEmptyParts);
+        for(int i=0; i < blocklist.count(); i++)
+        {
+            qDebug() << blocklist.at(i);
+        }
+        // END HIGHLIGHTING TEST SEQUENCE
+
         // I NEED TO CALL THE IMAGE LOADING THE SAME AS ABOVE, BUT IN HEXEDITOR, NEED TO CALL THE HIGHLIGHT FUNCTION
         // WITH THE FILE VARIABLES
         //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
-        retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+        //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     }
     if(retval > 0)
     {

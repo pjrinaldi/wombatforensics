@@ -14,6 +14,8 @@ struct TskObject
     int objecttype;
     int type;
     int blocksize;
+    int sectsize;
+    QString blockaddress;
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;

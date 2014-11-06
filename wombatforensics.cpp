@@ -462,6 +462,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = 0;
         tskobjptr->objecttype = 1;
         tskobjptr->length = wombatvarptr->selectedobject.size;
+        tskobjptr->blocksize = wombatvarptr->selectedobject.sectsize;
     }
     else if(wombatvarptr->selectedobject.objtype == 2) // volume object
     {
@@ -469,6 +470,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->objecttype = 2;
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
         tskobjptr->length = wombatvarptr->selectedobject.size;
+        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
     }
     else if(wombatvarptr->selectedobject.objtype == 3) // unallocated partition
     {
@@ -476,6 +478,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
         tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.sectsize;
         tskobjptr->objecttype = 3;
+        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
     }
     else if(wombatvarptr->selectedobject.objtype == 4) // fs object
     {
@@ -483,6 +486,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
         tskobjptr->objecttype = 4;
         tskobjptr->length = wombatvarptr->selectedobject.size;
+        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
     }
     else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
@@ -492,6 +496,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;
         tskobjptr->length = wombatvarptr->selectedobject.size;
+        tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         OpenFileSystemFile();
     }
     if(wombatvarptr->selectedobject.objtype <= 5)
