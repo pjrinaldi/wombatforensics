@@ -110,7 +110,7 @@ bool Reader::openimage(TskObject* tskpointer)
     if(is_open())
         close();
     _filename = "test.txt";
-    _size = tskptr->length; // length in bytes for selected file
+    _size = tskptr->imglength; // length in bytes for selected file
     _pageSize = tskptr->blocksize;
     //off_t npages = _size/_pageSize +1;
     // don't need the +1 since the _pageSize is blocksize and should always have no remainder

@@ -10,6 +10,7 @@ struct TskObject
     int partcount;
     int offset;
     int length;
+    int imglength;
     int address;
     int objecttype;
     int type;
