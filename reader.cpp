@@ -355,6 +355,7 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     else
     {
+        retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         /*
         // BEGIN HIGHLIGHTING TEST SEQUENCE
         QStringList blocklist = tskptr->blockaddress.split("|", QString::SkipEmptyParts);

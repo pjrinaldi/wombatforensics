@@ -498,7 +498,7 @@ void WombatForensics::LoadHexContents()
         qDebug() << "file object offset:" << tskobjptr->offset;
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;
-        tskobjptr->length = wombatvarptr->selectedobject.size;
+        //tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         //OpenFileSystemFile();
     }
