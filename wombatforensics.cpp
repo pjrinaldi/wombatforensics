@@ -500,7 +500,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->address = wombatvarptr->selectedobject.address;
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
-        OpenFileSystemFile();
+        //OpenFileSystemFile();
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)

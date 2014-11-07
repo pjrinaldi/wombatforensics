@@ -346,8 +346,8 @@ bool Reader::loadimagepage(off_t pageIdx)
     // possibly need to make it pageidx*_pagesize + tskptr->offset for the imageoffset.
     // HERE IS WHERE I WOULD WANT TO HIGHLIGHT THE IMG INFO TO READ.
     qDebug() << "page index:" << pageIdx;
-    qDebug() << "page size:" << _pageSize;
-    qDebug() << "tskptr offset:" << tskptr->offset;
+    //qDebug() << "page size:" << _pageSize;
+    //qDebug() << "tskptr offset:" << tskptr->offset;
     if(tskptr->objecttype < 5)
     {
         retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
