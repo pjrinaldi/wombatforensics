@@ -110,11 +110,13 @@ bool Reader::openimage(TskObject* tskpointer)
     if(is_open())
         close();
     _filename = "test.txt";
+    //_size = tskptr->length;
     _size = tskptr->imglength; // length in bytes for selected file
+    qDebug() << "image length:" << tskptr->imglength;
     _pageSize = tskptr->blocksize;
-    //off_t npages = _size/_pageSize +1;
+    off_t npages = _size/_pageSize +1;
     // don't need the +1 since the _pageSize is blocksize and should always have no remainder
-    off_t npages = _size/_pageSize;
+    //off_t npages = _size/_pageSize;
     qDebug() << "block size:" << _pageSize << "num of pages:" << npages;
     _numpages = npages;
     _data.resize(npages);
@@ -355,7 +357,7 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     else
     {
-        retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+        //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         /*
         // BEGIN HIGHLIGHTING TEST SEQUENCE
         QStringList blocklist = tskptr->blockaddress.split("|", QString::SkipEmptyParts);
@@ -371,6 +373,7 @@ bool Reader::loadimagepage(off_t pageIdx)
         */
         // I NEED TO CALL THE IMAGE LOADING THE SAME AS ABOVE, BUT IN HEXEDITOR, NEED TO CALL THE HIGHLIGHT FUNCTION
         // WITH THE FILE VARIABLES
+        retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     }

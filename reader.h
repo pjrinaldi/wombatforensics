@@ -48,7 +48,7 @@ ostream& operator<< (ostream&out,const ReadBuffer& buff);
 class Reader {
  public:
   // default is only 50*4k = 200k memory image.
-  Reader(const string& filename = "",off_t npages = 50, off_t pageSize = 4096);
+  Reader(const string& filename = "",off_t npages = 500, off_t pageSize = 4096);
   ~Reader();
 
   bool open(const string& filename);

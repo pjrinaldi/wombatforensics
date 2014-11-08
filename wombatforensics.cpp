@@ -495,12 +495,12 @@ void WombatForensics::LoadHexContents()
         OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
         //tskobjptr->offset = 0;
         tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize;
-        qDebug() << "file object offset:" << tskobjptr->offset;
+        //qDebug() << "file object offset:" << tskobjptr->offset;
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;
         //tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
-        //OpenFileSystemFile();
+        OpenFileSystemFile();
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)
@@ -520,8 +520,8 @@ void WombatForensics::LoadHexContents()
     else
     {
         //((int)tskobjptr->blockaddress.split("|", QString::SKipEntryParts).at(0))*tskobjptr->;
-        //hexwidget->openimage();
-        //hexwidget->SetTopLeft(tskobjptr->offset);
+        hexwidget->openimage();
+        hexwidget->SetTopLeft(tskobjptr->offset);
     }
 }
 
