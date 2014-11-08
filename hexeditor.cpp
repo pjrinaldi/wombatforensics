@@ -678,7 +678,13 @@ void HexEditor::paintEvent( QPaintEvent* e)
   //DrawCurrentObject(paint, row_start, row_stop, col_start, col_stop);
   //DrawCurrentObject(paint, e->rect().left(), topMargin(), e->rect().right()/2, height()-topMargin());
   // draw text in repaint event
+
+
+  // foreach blockaddress in blockaddress
+  // if reader.pageidx == blockaddress
+  // {
   DrawCharacterFill(paint);
+  // }
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
   // draw dividing line
