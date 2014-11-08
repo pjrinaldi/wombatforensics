@@ -500,6 +500,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->address = wombatvarptr->selectedobject.address;
         //tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
+        tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         OpenFileSystemFile();
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
@@ -519,7 +520,6 @@ void WombatForensics::LoadHexContents()
     }
     else
     {
-        //((int)tskobjptr->blockaddress.split("|", QString::SKipEntryParts).at(0))*tskobjptr->;
         hexwidget->openimage();
         hexwidget->SetTopLeft(tskobjptr->offset);
     }

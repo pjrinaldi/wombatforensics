@@ -104,6 +104,11 @@ bool Reader::open( const string& filename )
   return loadPage(0);
 }
 
+off_t Reader::CurrentPage()
+{
+    return _offset/_pageSize;
+}
+
 bool Reader::openimage(TskObject* tskpointer)
 {
     tskptr = tskpointer;

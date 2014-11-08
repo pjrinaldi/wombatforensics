@@ -683,7 +683,19 @@ void HexEditor::paintEvent( QPaintEvent* e)
   // foreach blockaddress in blockaddress
   // if reader.pageidx == blockaddress
   // {
-  DrawCharacterFill(paint);
+  for(int i=0; i < tskptr->blkaddrlist.count(); i++)
+  {
+      int pageid = _reader.CurrentPage();
+      qDebug() << "pageid:" << pageid;
+      qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
+      if(pageid == tskptr->blkaddrlist.at(i).toInt())
+      {
+          qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
+          paint.fillRect(row_start, col_start, row_start+row_stop, col_start+col_stop, QColor(255, 0, 0, 15));
+          //DrawCharacterFill(paint, tskptr->blkaddrlist.at(i).toInt());
+          //DrawCharacterFill(paint);
+      }
+  }
   // }
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
@@ -1004,11 +1016,20 @@ void HexEditor::DrawCurrentObject(QPainter& paint, int row_start, int row_stop, 
      */ 
 }
 
-void HexEditor::DrawCharacterFill(QPainter& paint)
+void HexEditor::DrawCharacterFill(QPainter& paint, int pageid)
 {
-    //paint.setPen(Qt::NoPen);
-    //paint.setBrush(QColor(255, 0, 0, 15));
-    paint.fillRect(10, 10, 100, 100, QColor(255, 0, 0, 15));
+    int curoffset = pageid*tskptr->blocksize;
+    //`
+    // paint.fillRect(offset (x,y), pagesize width, pagesize height, QColor()
+    //
+    /*
+    int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );
+    int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
+    int row_stop  = min(_rows-1,e->rect().bottom() / lineSpacing());
+    int col_stop  = min(_cols-1,(e->rect().right()) / totalWordWidth);
+
+    paint.fillRect(row_start, col_start, row_start+row_stop, col_start+col_stop, QColor(255, 0, 0, 15));
+    */
 }
 
 void HexEditor::drawCursor( QPainter& paint )

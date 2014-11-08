@@ -180,7 +180,7 @@ protected:
     void drawAsciiRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop);
     void drawTextRegion( QPainter& p, const QString& text, int row_start, int row_end, int col_start, int col_end );
     void DrawCurrentObject(QPainter& p, int row_start, int row_end, int col_start, int col_end);
-    void DrawCharacterFill(QPainter& p);
+    void DrawCharacterFill(QPainter& p, int pageid);
   // event handlers
 protected:
   void resizeEvent      ( QResizeEvent *e );
