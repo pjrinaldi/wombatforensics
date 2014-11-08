@@ -690,8 +690,49 @@ void HexEditor::paintEvent( QPaintEvent* e)
       qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
       if(pageid == tskptr->blkaddrlist.at(i).toInt())
       {
-          qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
-          paint.fillRect(row_start, col_start, row_start+row_stop, col_start+col_stop, QColor(255, 0, 0, 15));
+          off_t start = _topLeft;
+          off_t stop = (off_t)bytesPerPage();
+          stop--;
+          while(start <= stop)
+          {
+              off_t linestop = min(stop, start+bytesPerLine()-1-(start % bytesPerLine()));
+              QRect bbox = byteBBox(start);
+              bbox.setRight(byteBBox(linestop).right());
+              paint.fillRect(bbox, QColor(255, 0, 0, 15));
+              start = linestop+1;
+          }
+          /*  // draw selection
+  off_t start = max( (off_t)0, selectionStart() - _topLeft);
+  if( start < bytesPerPage() ) {
+    off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
+    paint.setPen(Qt::NoPen);
+    paint.setBrush( qApp->palette().highlight() );
+    //paint.setBrush(QColor(0, 0, 255, 15));
+    // foreach line with selection
+    stop--;
+    while( start <= stop ) {
+      // linestop = min(stop,endofline)
+      off_t linestop = 
+	min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
+      QRect bbox = byteBBox(start);
+      QRect abox = abyteBox(start);
+      bbox.setRight( byteBBox(linestop).right() );
+      abox.setRight(abyteBox(linestop).right());
+      paint.drawRect( bbox );
+      paint.drawRect(abox);
+      start = linestop+1;
+
+          for(int r=row_start; r < row_stop; r++)
+          {
+              for(int c=col_start; c < col_stop; c++)
+              {
+                  paint.fillRect(r, c, totalWordWidth, lineSpacing(), QColor(255, 0, 0, 15));
+              }
+          }
+          */
+          //qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
+          //paint.fillRect(row_start, col_start, row_stop, col_start+col_stop, QColor(255, 0, 0, 15));
+          //paint.fillRect((e->rect().top()-topMargin())/lineSpacing(), (e->rect().left()-leftMargin())/totalWordWidth, e->rect().bottom()/lineSpacing(), e->rect().right()/totalWordWidth, QColor(255, 0, 0, 15));
           //DrawCharacterFill(paint, tskptr->blkaddrlist.at(i).toInt());
           //DrawCharacterFill(paint);
       }
@@ -937,6 +978,7 @@ void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
 
 void HexEditor::drawTextRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
+  paint.setBrush(QColor(255, 0, 0, 15));
   paint.setPen(qApp->palette().foreground().color());
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
