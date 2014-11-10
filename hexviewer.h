@@ -1,7 +1,6 @@
 #ifndef HEXVIEWER_H
 #define HEXVIEWER_H
 
-#include <QtCore>
 #include "xbytearray.h"
 
 class HexViewer : public QScrollArea
