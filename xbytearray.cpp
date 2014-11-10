@@ -3,43 +3,43 @@
 XByteArray::XByteArray()
 {
     //_oldSize = -99;
-    _addressNumbers = 4;
-    _addressOffset = 0;
+    addressnumbers = 4;
+    addressoffset = 0;
 
 }
 
-int XByteArray::addressOffset()
+int XByteArray::AddressOffset()
 {
-    return _addressOffset;
+    return addressoffset;
 }
 
-void XByteArray::setAddressOffset(int offset)
+void XByteArray::SetAddressOffset(int offset)
 {
-    _addressOffset = offset;
+    addressoffset = offset;
 }
 
-int XByteArray::addressWidth()
+int XByteArray::AddressWidth()
 {
-    return _addressNumbers;
+    return addressnumbers;
 }
 
-void XByteArray::setAddressWidth(int width)
+void XByteArray::SetAddressWidth(int width)
 {
     if ((width >= 0) and (width<=6))
     {
-        _addressNumbers = width;
+        addressnumbers = width;
     }
 }
 
 QByteArray & XByteArray::data()
 {
-    return _data;
+    return data;
 }
 
-void XByteArray::setData(QByteArray data)
+void XByteArray::SetData(QByteArray d)
 {
-    _data = data;
-    _changedData = QByteArray(data.length(), char(0));
+    data = d;
+    //_changedData = QByteArray(data.length(), char(0));
 }
 /*
 bool XByteArray::dataChanged(int i)
@@ -68,21 +68,17 @@ void XByteArray::setDataChanged(int i, const QByteArray & state)
     _changedData.replace(i, len, state);
 }
 */
-int XByteArray::realAddressNumbers()
+int XByteArray::RealAddressNumbers()
 {
-    if (_oldSize != _data.size())
-    {
-        // is addressNumbers wide enought?
-        QString test = QString("%1")
-                      .arg(_data.size() + _addressOffset, _addressNumbers, 16, QChar('0'));
-        _realAddressNumbers = test.size();
-    }
-    return _realAddressNumbers;
+    // is addressNumbers wide enought?
+    QString test = QString("%1").arg(data.size() + addressoffset, addressnumbers, 16, QChar('0'));
+    realaddressnumbers = test.size();
+    return realaddressnumbers;
 }
 
 int XByteArray::size()
 {
-    return _data.size();
+    return data.size();
 }
 /*
 QByteArray & XByteArray::insert(int i, char ch)
@@ -131,26 +127,26 @@ QByteArray & XByteArray::replace(int index, int length, const QByteArray & ba)
     return _data;
 }
 */
-QChar XByteArray::asciiChar(int index)
+QChar XByteArray::AsciiChar(int index)
 {
-    char ch = _data[index];
+    char ch = data[index];
     if ((ch < 0x20) or (ch > 0x7e))
             ch = '.';
     return QChar(ch);
 }
 
-QString XByteArray::toRedableString(int start, int end)
+QString XByteArray::ToReadableString(int start, int end)
 {
-    int adrWidth = realAddressNumbers();
-    if (_addressNumbers > adrWidth)
-        adrWidth = _addressNumbers;
+    int adrWidth = RealAddressNumbers();
+    if (addressnumbers > adrWidth)
+        adrWidth = addressnumbers;
     if (end < 0)
-        end = _data.size();
+        end = data.size();
 
     QString result;
     for (int i=start; i < end; i += 16)
     {
-        QString adrStr = QString("%1").arg(_addressOffset + i, adrWidth, 16, QChar('0'));
+        QString adrStr = QString("%1").arg(addressoffset + i, adrWidth, 16, QChar('0'));
         QString hexStr;
         QString ascStr;
         for (int j=0; j<16; j++)

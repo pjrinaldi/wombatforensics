@@ -36,6 +36,7 @@ protected:
     void mousePressEvent(QMouseEvent* event);
     void paintEvent(QPaintEvent* event);
     int CursorPosition(QPoint pos);
+    int CursorPosition(void);
     void ResetSelection(int pos);
     void ResetSelection(void);
     void SetSelection(int pos);
@@ -46,6 +47,9 @@ private slots:
 private:
     QByteArray bytedata;
     XByteArray xdata;
+    QColor addressareacolor;
+    QColor highlightcolor;
+    QColor selectioncolor;
     int addressnumbers;
     int addressoffset;
     int realaddressnumbers;
@@ -60,6 +64,7 @@ private:
     int selectioninitial;
 
     void EnsureVisible(void);
+    void Adjust(void);
 
 };
 

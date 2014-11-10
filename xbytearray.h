@@ -19,14 +19,14 @@ class XByteArray
 public:
     explicit XByteArray();
 
-    int addressOffset();
-    void setAddressOffset(int offset);
+    int AddressOffset();
+    void SetAddressOffset(int offset);
 
-    int addressWidth();
-    void setAddressWidth(int width);
+    int AddressWidth();
+    void SetAddressWidth(int width);
 
-    QByteArray & data();
-    void setData(QByteArray data);
+    QByteArray& data();
+    void SetData(QByteArray data);
 
     /*
     bool dataChanged(int i);
@@ -34,7 +34,7 @@ public:
     void setDataChanged(int i, bool state);
     void setDataChanged(int i, const QByteArray & state);
     */
-    int realAddressNumbers();
+    int RealAddressNumbers();
     int size();
 
     /*
@@ -47,20 +47,20 @@ public:
     QByteArray & replace(int index, const QByteArray & ba);
     QByteArray & replace(int index, int length, const QByteArray & ba);
 */
-    QChar asciiChar(int index);
-    QString toRedableString(int start=0, int end=-1);
+    QChar AsciiChar(int index);
+    QString ToReadableString(int start=0, int end=-1);
 
 signals:
 
 public slots:
 
 private:
-    QByteArray _data;
+    QByteArray data;
     //QByteArray _changedData;
 
-    int _addressNumbers;                    // wanted width of address area
-    int _addressOffset;                     // will be added to the real addres inside bytearray
-    int _realAddressNumbers;                // real width of address area (can be greater then wanted width)
+    int addressnumbers;                    // wanted width of address area
+    int addressoffset;                     // will be added to the real addres inside bytearray
+    int realaddressnumbers;                // real width of address area (can be greater then wanted width)
     //int _oldSize;                           // size of data
 };
 

@@ -7,6 +7,15 @@ const int BYTES_PER_LINE = 16;
 
 HexViewer::HexViewer(QWidget* parent) : QScrollArea(parent)
 {
+    SetAddressWidth(4);
+    SetAddressOffset(0);
+    addressareacolor = QColor(0xd4, 0xd4, 0xd4, 0xff);
+    highlightColor = QColor(0xff, 0xff, 0x99, 0xff);
+    selectioncolor = QColor(0x6d, 0x93, 0xff, 0xff);
+    setFont(QFont("Courier", 10));
+
+    size = 0;
+    ResetSelection(0);
 }
 
 XByteArray& HexViewer::XData(void)
@@ -184,8 +193,177 @@ void HexViewer::paintEvent(QPaintEvent* e)
     }
 
     // PAINT HEX AREA
+    QByteArray hexba(xdata.data().mid(firstlineindex, lastlineindex - firstlineindex + 1).toHex());
+    QBrush highlighted = QBrush(highlightcolor);
+    QPen colhighlighted = QPen(this->palette().color(QPalette::WindowText));
+    QBrush selected = QBrush(selectioncolor);
+    QPen colselected = QPen(Qt::white);
+    QPen colstandard = QPen(this->palette().color(QPalette::WindowText));
+    painter.setBackgroundMode(Qt::TransparentMode);
+
+    for(int lineindex = firstlineindex, ypos = yposstart; lineindex < lastlineindex; lineindex += BYTES_PER_LINE, ypos += charheight)
+    {
+        QByteArray hex;
+        int xpos = hexposition;
+        for(int colindex = 0; ((lineindex + colindex) < xdata.size() and (colindex < BYTES_PER_LINE)); colindex++)
+        {
+            int posba = lineindex + colindex;
+            if((GetSelectionBegin() <= posba) && (GetSelectionEnd() > posba))
+            {
+                painter.setBackground(selected);
+                painter.setBackgroundMode(Qt::OpaqueMode);
+                painter.setPen(colselected);
+            }
+            else
+            {
+                // if highlighting (which i might use for the highlighting of specific file blocks
+                painter.setBackground(highlighted);
+                /*
+                if(xdata.dataChanged(posba))
+                {
+                    painter.setPen(colhighlighted);
+                    painter.setBackgroundMode(Qt::OpaqueMode);
+                }
+                else
+                {
+                    painter.setPen(colstandard);
+                    painter.setBackgroundMode(Qt::TransparentMode);
+                }
+                */
+            }
+            if(colindex == 0)
+            {
+                hex = hexba.mid((lineindex - firstlineindex)*2, 2);
+                painter.drawText(xpos, ypos, hex);
+                xpos += 2 * charwidth;
+            }
+            else
+            {
+                hex = hexba.mid((lineindex + colindex - firstlineindex)*2, 2).prepend(" ");
+                painter.drawText(xpos, ypos, hex);
+                xpos += 3 * charwidth;
+            }
+        }
+    }
+    painter.setBackgroundMode(Qt::TransparentMode);
+    painter.setPen(this->palette().color(QPalette::WindowText));
 
     // PAINT ASCII AREA
-
+    for(int lineindex = firstlineindex, ypos = yposstart; lineindex < lastlineindex; lineindex += BYTES_PER_LINE, ypos += charheight)
+    {
+        int asciipos = asciiposition;
+        for(int colindex = 0; ((lineindex + colindex) < xdata.size() and (colindex < BYTES_PER_LINE)); colindex++)
+        {
+            painter.drawText(asciipos, ypos, xdata.asciiChar(lineindex + colindex));
+            asciipos += charwidth;
+        }
+    }
     // PAINT CURSOR
+    painter.fillRect(cursorx, cursory, 2, charheight, this->palette().color(QPalette::WindowText));
+}
+
+void HexViewer::SetCursorPosition(int position)
+{
+    update();
+    if(position > xdata.size() * 2)
+        position = xdata.size() * 2;
+    if(position < 0)
+        position = 0;
+
+    cursorposition = position;
+    cursory = (position / (2 * BYTES_PER_LINE)) * charheight + 4;
+    int x = (position % (2 * BYTES_PER_LINE));
+    cursorx = (((x/2) * 3) + (x % 2)) * charwidth + hexposition;
+
+    update();
+    emit CurrentAddressChanged(cursorposition/2);
+}
+
+int HexViewer::CursorPosition(QPoint pos)
+{
+    int result = -1;
+    if((pos.x() >= hexposition) and (pos.x() < (hexposition + HEXCHARS_IN_LINE * charwidth)))
+    {
+        int x = (pos.x() - hexposition) / charwidth;
+        if((x % 3) == 0)
+            x = (x / 3) * 2;
+        else
+            x = ((x / 3) * 2) + 1;
+        int y = ((pos.y() - 3) / charheight) * 2 * BYTES_PER_LINE;
+        result = x + y;
+    }
+    return result;
+}
+
+int HexViewer::CursorPosition(void)
+{
+    return cursorposition;
+}
+
+void HexViewer::ResetSelection(void)
+{
+    selectionbegin = selectioninit;
+    selectionend = selectioninit;
+}
+
+void HexViewer::ResetSelection(int pos)
+{
+    if(pos < 0)
+        pos = 0;
+    pos = pos / 2;
+    selectioninit = pos;
+    selectionbegin = pos;
+    selectionend = pos;
+}
+
+void HexViewer::SetSelection(int pos)
+{
+    if(pos < 0)
+        pos = 0;
+    pos = pos / 2;
+    if(pos >= selectioninit)
+    {
+        selectionend = pos;
+        selectionbegin = selectioninit;
+    }
+    else
+    {
+        selectionbegin = pos;
+        selectionend = selectioninit;
+    }
+}
+
+int HexViewer::GetSelectionBegin()
+{
+    return selectionbegin;
+}
+
+int HexViewer::GetSelectionEnd()
+{
+    return selectionend;
+}
+
+void HexViewer::UpdateCursor()
+{
+    update(cursorx, cursory, charwidth, charheight);
+}
+
+void HexViewer::Adjust(void)
+{
+    charwidth = fontMetrics().width(QLatin1Char('9'));
+    charheight = fontMetrics().height();
+
+    labelposition = 0;
+    hexposition = xdata.realAddressNumbers() * charwidth + GAP_ADR_HEX;
+    asciiposition = hexposition + HEXCHARS_IN_LINE * charwidth + GAP_HEX_ASCII;
+
+    setMinimumHeight(((xdata.size()/16 + 1) * charheight) + 5);
+    setMinimumWidth(asciiposition + (BYTES_PER_LINE * charwidth));
+
+    update();
+}
+
+void HexViewer::EnsureVisible()
+{
+    scrollarea->ensureVisible(cursorx, cursory + charheight/2, 3, charheight/2 + 2);
 }
