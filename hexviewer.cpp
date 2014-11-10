@@ -216,7 +216,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
     {
         QString address = QString("%1").arg(lineindex + xdata.AddressOffset(), xdata.RealAddressNumbers(), 16, QChar('0'));
         qDebug() << "byte address:" << address;
-        painter.drawText(lineposition, ypos, address);
+        painter.drawText(labelposition, ypos, address);
     }
 
     // PAINT HEX AREA
