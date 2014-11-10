@@ -942,7 +942,6 @@ void WombatForensics::SetupHexPage(void)
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
     scrollarea->setWidget(hexviewer);
-    //scrollarea->setLayout(hexLayout);
     //hexLayout->addWidget(hexviewer);
     hexLayout->addWidget(scrollarea);
     //hexvsb = new QScrollBar(hexwidget);

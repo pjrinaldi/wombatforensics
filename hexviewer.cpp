@@ -12,7 +12,7 @@ HexViewer::HexViewer(QWidget* parent) : QWidget(parent)
     addressareacolor = QColor(255, 0, 0, 100);
     highlightcolor = QColor(0, 255, 0, 100);
     selectioncolor = QColor(0, 0, 255, 100);
-    setFont(QFont("Courier", 10));
+    setFont(QFont("fixed", 10));
 
     size = 0;
     ResetSelection(0);
@@ -196,7 +196,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
     painter.drawLine(lineposition, e->rect().top(), lineposition, height());
 
     //painter.setPen(this->palette().color(QPalette::WindowText));
-    painter.setPen(Qt::black);
+    painter.setPen(qApp->palette().foreground().color());
 
     int firstlineindex = ((e->rect().top()/charheight) - charheight) * BYTES_PER_LINE;
     if(firstlineindex < 0)
