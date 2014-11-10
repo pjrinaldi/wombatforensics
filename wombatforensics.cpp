@@ -939,7 +939,12 @@ void WombatForensics::SetupHexPage(void)
     //hexwidget->setObjectName("bt-hexview");
     //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     //hexLayout->addWidget(hexwidget);
-    hexLayout->addWidget(hexviewer);
+    scrollarea = new QScrollArea();
+    scrollarea->setBackgroundRole(QPalette::Dark);
+    scrollarea->setWidget(hexviewer);
+    //scrollarea->setLayout(hexLayout);
+    //hexLayout->addWidget(hexviewer);
+    hexLayout->addWidget(scrollarea);
     //hexvsb = new QScrollBar(hexwidget);
     //hexLayout->addWidget(hexvsb);
     //hexvsb->setRange(0, 0);
