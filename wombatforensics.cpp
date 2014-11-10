@@ -930,23 +930,31 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    hexwidget = new HexEditor(ui->hexPage, tskobjptr);
+    //hexwidget = new HexEditor(ui->hexPage, tskobjptr);
+    hexviewer = new HexViewer();
+    hexviewer->setObjectName("bt-hexviewer");
+    hexviewer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
-    hexwidget->setObjectName("bt-hexview");
-    hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    hexLayout->addWidget(hexwidget);
-    hexvsb = new QScrollBar(hexwidget);
-    hexLayout->addWidget(hexvsb);
-    hexvsb->setRange(0, 0);
+    //hexwidget->setObjectName("bt-hexview");
+    //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //hexLayout->addWidget(hexwidget);
+    hexLayout->addWidget(hexviewer);
+    //hexvsb = new QScrollBar(hexwidget);
+    //hexLayout->addWidget(hexvsb);
+    //hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
-
+    QFile file("./reader.h");
+    file.open(QFile::ReadOnly);
+    hexviewer->SetData(file.readAll());
+/*
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+*/
 }
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)

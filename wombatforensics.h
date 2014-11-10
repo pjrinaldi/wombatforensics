@@ -466,8 +466,6 @@ public:
     ExportDialog* exportdialog;
     TreeModel* treemodel;
     QMenu* treemenu;
-    void SetAddressWidth(int addresswidth);
-    void SetAddressOffset(int offset);
 
 
 signals:

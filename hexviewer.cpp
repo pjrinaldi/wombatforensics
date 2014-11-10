@@ -35,6 +35,13 @@ void HexViewer::SetAddressOffset(int addressoffset)
     Adjust();
 }
 
+void HexViewer::SetData(const QByteArray data)
+{
+    xdata.SetData(data);
+    Adjust();
+    SetCursorPosition(0);
+}
+
 void HexViewer::keyPressEvent(QKeyEvent* e)
 {
     //int charx = (cursorx - hexposition)/charwidth;
