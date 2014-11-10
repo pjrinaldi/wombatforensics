@@ -466,6 +466,9 @@ public:
     ExportDialog* exportdialog;
     TreeModel* treemodel;
     QMenu* treemenu;
+    void SetAddressWidth(int addresswidth);
+    void SetAddressOffset(int offset);
+
 
 signals:
     //void LogVariable(WombatVariable* wombatVariable);
@@ -556,6 +559,7 @@ private:
 
     off_t offset() const;
     HexEditor* hexwidget;
+    HexViewer* hexviewer;
     QActionGroup* viewgroup;
     QScrollBar* hexvsb;
     QLabel* selectedoffset;

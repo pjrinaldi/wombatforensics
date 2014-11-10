@@ -33,12 +33,12 @@ void XByteArray::SetAddressWidth(int width)
 
 QByteArray & XByteArray::data()
 {
-    return data;
+    return _data;
 }
 
 void XByteArray::SetData(QByteArray d)
 {
-    data = d;
+    _data = d;
     //_changedData = QByteArray(data.length(), char(0));
 }
 /*
@@ -71,14 +71,14 @@ void XByteArray::setDataChanged(int i, const QByteArray & state)
 int XByteArray::RealAddressNumbers()
 {
     // is addressNumbers wide enought?
-    QString test = QString("%1").arg(data.size() + addressoffset, addressnumbers, 16, QChar('0'));
+    QString test = QString("%1").arg(_data.size() + addressoffset, addressnumbers, 16, QChar('0'));
     realaddressnumbers = test.size();
     return realaddressnumbers;
 }
 
 int XByteArray::size()
 {
-    return data.size();
+    return _data.size();
 }
 /*
 QByteArray & XByteArray::insert(int i, char ch)
@@ -129,7 +129,7 @@ QByteArray & XByteArray::replace(int index, int length, const QByteArray & ba)
 */
 QChar XByteArray::AsciiChar(int index)
 {
-    char ch = data[index];
+    char ch = _data[index];
     if ((ch < 0x20) or (ch > 0x7e))
             ch = '.';
     return QChar(ch);
@@ -141,7 +141,7 @@ QString XByteArray::ToReadableString(int start, int end)
     if (addressnumbers > adrWidth)
         adrWidth = addressnumbers;
     if (end < 0)
-        end = data.size();
+        end = _data.size();
 
     QString result;
     for (int i=start; i < end; i += 16)
@@ -154,7 +154,7 @@ QString XByteArray::ToReadableString(int start, int end)
             if ((i + j) < _data.size())
             {
                 hexStr.append(" ").append(_data.mid(i+j, 1).toHex());
-                ascStr.append(asciiChar(i+j));
+                ascStr.append(AsciiChar(i+j));
             }
         }
         result += adrStr + " " + QString("%1").arg(hexStr, -48) + "  " + QString("%1").arg(ascStr, -17) + "\n";

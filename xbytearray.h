@@ -55,7 +55,7 @@ signals:
 public slots:
 
 private:
-    QByteArray data;
+    QByteArray _data;
     //QByteArray _changedData;
 
     int addressnumbers;                    // wanted width of address area

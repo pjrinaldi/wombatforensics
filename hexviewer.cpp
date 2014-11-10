@@ -5,12 +5,12 @@ const int GAP_ADR_HEX = 10;
 const int GAP_HEX_ASCII = 16;
 const int BYTES_PER_LINE = 16;
 
-HexViewer::HexViewer(QWidget* parent) : QScrollArea(parent)
+HexViewer::HexViewer() : QScrollArea()
 {
     SetAddressWidth(4);
     SetAddressOffset(0);
     addressareacolor = QColor(0xd4, 0xd4, 0xd4, 0xff);
-    highlightColor = QColor(0xff, 0xff, 0x99, 0xff);
+    highlightcolor = QColor(0xff, 0xff, 0x99, 0xff);
     selectioncolor = QColor(0x6d, 0x93, 0xff, 0xff);
     setFont(QFont("Courier", 10));
 
@@ -22,11 +22,24 @@ XByteArray& HexViewer::XData(void)
 {
     return xdata;
 }
+
+void HexViewer::SetAddressWidth(int addresswidth)
+{
+    xdata.SetAddressWidth(addresswidth);
+    SetCursorPosition(cursorposition);
+}
+
+void HexViewer::SetAddressOffset(int addressoffset)
+{
+    xdata.SetAddressOffset(addressoffset);
+    Adjust();
+}
+
 void HexViewer::keyPressEvent(QKeyEvent* e)
 {
-    int charx = (cursorx - hexposition)/charwidth;
-    int posx = (charx/3)*2 + (charx % 3);
-    int posba = (cursory/charheight) * BYTES_PER_LINE + posx/2;
+    //int charx = (cursorx - hexposition)/charwidth;
+    //int posx = (charx/3)*2 + (charx % 3);
+    //int posba = (cursory/charheight) * BYTES_PER_LINE + posx/2;
 
     // CURSOR MOVEMENTS
     if(e->matches(QKeySequence::MoveToNextChar))
@@ -125,14 +138,14 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
     if (e->matches(QKeySequence::SelectNextPage))
     {
         int pos = cursorposition + (((scrollarea->viewport()->height() / charheight) - 1) * 2 * BYTES_PER_LINE);
-        setCursorPos(pos);
-        setSelection(pos);
+        SetCursorPosition(pos);
+        SetSelection(pos);
     }
     if (e->matches(QKeySequence::SelectPreviousPage))
     {
         int pos = cursorposition - (((scrollarea->viewport()->height() / charheight) - 1) * 2 * BYTES_PER_LINE);
-        setCursorPos(pos);
-        setSelection(pos);
+        SetCursorPosition(pos);
+        SetSelection(pos);
     }
     if (e->matches(QKeySequence::SelectEndOfDocument))
     {
@@ -175,21 +188,21 @@ void HexViewer::paintEvent(QPaintEvent* e)
     painter.setPen(Qt::gray);
     painter.drawLine(lineposition, e->rect().top(), lineposition, height());
 
-    painter.setPen(this->palette.color(QPalette::WindowText));
+    painter.setPen(this->palette().color(QPalette::WindowText));
 
     int firstlineindex = ((e->rect().top()/charheight) - charheight) * BYTES_PER_LINE;
     if(firstlineindex < 0)
         firstlineindex = 0;
-    int lastlineindex = ((e->rect().botto()/charheight) + charheight) * BYTES_PER_LINE;
+    int lastlineindex = ((e->rect().bottom()/charheight) + charheight) * BYTES_PER_LINE;
     if(lastlineindex > bytedata.size())
         lastlineindex = bytedata.size();
     int yposstart = ((firstlineindex)/BYTES_PER_LINE) * charheight + charheight;
 
     // PAINT ADDRESS AREA
-    for(int lineindex = firstlineindex, ypos = yposstart; lineindex < lastlineindex; lindeindex += BYTES_PER_LINE, ypos += charheight)
+    for(int lineindex = firstlineindex, ypos = yposstart; lineindex < lastlineindex; lineindex += BYTES_PER_LINE, ypos += charheight)
     {
-        QString address = QString("%1").arg(lineindex + xdata.addressOffset(), xdata.realAddressNumbers(), 16, QChar('0'));
-        painter.drawText(xposaddr, ypos, address);
+        QString address = QString("%1").arg(lineindex + xdata.AddressOffset(), xdata.RealAddressNumbers(), 16, QChar('0'));
+        painter.drawText(lineposition, ypos, address);
     }
 
     // PAINT HEX AREA
@@ -254,7 +267,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
         int asciipos = asciiposition;
         for(int colindex = 0; ((lineindex + colindex) < xdata.size() and (colindex < BYTES_PER_LINE)); colindex++)
         {
-            painter.drawText(asciipos, ypos, xdata.asciiChar(lineindex + colindex));
+            painter.drawText(asciiposition, ypos, xdata.AsciiChar(lineindex + colindex));
             asciipos += charwidth;
         }
     }
@@ -302,7 +315,7 @@ int HexViewer::CursorPosition(void)
 
 void HexViewer::ResetSelection(void)
 {
-    selectionbegin = selectioninit;
+    selectionstart = selectioninit;
     selectionend = selectioninit;
 }
 
@@ -312,7 +325,7 @@ void HexViewer::ResetSelection(int pos)
         pos = 0;
     pos = pos / 2;
     selectioninit = pos;
-    selectionbegin = pos;
+    selectionstart = pos;
     selectionend = pos;
 }
 
@@ -324,18 +337,18 @@ void HexViewer::SetSelection(int pos)
     if(pos >= selectioninit)
     {
         selectionend = pos;
-        selectionbegin = selectioninit;
+        selectionstart = selectioninit;
     }
     else
     {
-        selectionbegin = pos;
+        selectionstart = pos;
         selectionend = selectioninit;
     }
 }
 
 int HexViewer::GetSelectionBegin()
 {
-    return selectionbegin;
+    return selectionstart;
 }
 
 int HexViewer::GetSelectionEnd()
@@ -354,7 +367,7 @@ void HexViewer::Adjust(void)
     charheight = fontMetrics().height();
 
     labelposition = 0;
-    hexposition = xdata.realAddressNumbers() * charwidth + GAP_ADR_HEX;
+    hexposition = xdata.RealAddressNumbers() * charwidth + GAP_ADR_HEX;
     asciiposition = hexposition + HEXCHARS_IN_LINE * charwidth + GAP_HEX_ASCII;
 
     setMinimumHeight(((xdata.size()/16 + 1) * charheight) + 5);

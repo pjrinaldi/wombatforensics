@@ -54,6 +54,8 @@
 #include "translate.h"
 #include "hexeditor.h"
 
+#include "hexviewer.h"
+
 #include "tsk/libtsk.h"
 #include "img/aff.h"
 #include "afflib.h"

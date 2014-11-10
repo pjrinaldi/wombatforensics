@@ -2,12 +2,15 @@
 #define HEXVIEWER_H
 
 #include "xbytearray.h"
+#include <QtGui>
+#include <QtWidgets>
 
 class HexViewer : public QScrollArea
 {
-    QOBJECT
+    Q_OBJECT
 
 public:
+    HexViewer(void);
     int AddressOffset(void);
     void SetAddressOffset(int offset);
 
@@ -61,7 +64,8 @@ private:
     int labelposition, hexposition, asciiposition;
     int selectionstart;
     int selectionend;
-    int selectioninitial;
+    int selectioninit;
+    int size;
 
     void EnsureVisible(void);
     void Adjust(void);
