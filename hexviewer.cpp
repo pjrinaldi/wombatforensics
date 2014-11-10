@@ -5,13 +5,13 @@ const int GAP_ADR_HEX = 10;
 const int GAP_HEX_ASCII = 16;
 const int BYTES_PER_LINE = 16;
 
-HexViewer::HexViewer() : QScrollArea()
+HexViewer::HexViewer(QWidget* parent) : QWidget(parent)
 {
     SetAddressWidth(4);
     SetAddressOffset(0);
-    addressareacolor = QColor(0xd4, 0xd4, 0xd4, 0xff);
-    highlightcolor = QColor(0xff, 0xff, 0x99, 0xff);
-    selectioncolor = QColor(0x6d, 0x93, 0xff, 0xff);
+    addressareacolor = QColor(255, 0, 0, 100);
+    highlightcolor = QColor(0, 255, 0, 100);
+    selectioncolor = QColor(0, 0, 255, 100);
     setFont(QFont("Courier", 10));
 
     size = 0;
@@ -195,7 +195,8 @@ void HexViewer::paintEvent(QPaintEvent* e)
     painter.setPen(Qt::gray);
     painter.drawLine(lineposition, e->rect().top(), lineposition, height());
 
-    painter.setPen(this->palette().color(QPalette::WindowText));
+    //painter.setPen(this->palette().color(QPalette::WindowText));
+    painter.setPen(Qt::black);
 
     int firstlineindex = ((e->rect().top()/charheight) - charheight) * BYTES_PER_LINE;
     if(firstlineindex < 0)
@@ -215,10 +216,12 @@ void HexViewer::paintEvent(QPaintEvent* e)
     // PAINT HEX AREA
     QByteArray hexba(xdata.data().mid(firstlineindex, lastlineindex - firstlineindex + 1).toHex());
     QBrush highlighted = QBrush(highlightcolor);
-    QPen colhighlighted = QPen(this->palette().color(QPalette::WindowText));
+    //QPen colhighlighted = QPen(this->palette().color(QPalette::WindowText));
+    QPen colhighlighted = QPen(Qt::black);
     QBrush selected = QBrush(selectioncolor);
-    QPen colselected = QPen(Qt::white);
-    QPen colstandard = QPen(this->palette().color(QPalette::WindowText));
+    QPen colselected = QPen(Qt::black);
+    //QPen colstandard = QPen(this->palette().color(QPalette::WindowText));
+    QPen colstandard = QPen(Qt::black);
     painter.setBackgroundMode(Qt::TransparentMode);
 
     for(int lineindex = firstlineindex, ypos = yposstart; lineindex < lastlineindex; lineindex += BYTES_PER_LINE, ypos += charheight)

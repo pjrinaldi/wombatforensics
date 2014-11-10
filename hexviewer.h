@@ -5,12 +5,12 @@
 #include <QtGui>
 #include <QtWidgets>
 
-class HexViewer : public QScrollArea
+class HexViewer : public QWidget 
 {
     Q_OBJECT
 
 public:
-    HexViewer(void);
+    HexViewer(QWidget* parent = 0);
     int AddressOffset(void);
     void SetAddressOffset(int offset);
 
