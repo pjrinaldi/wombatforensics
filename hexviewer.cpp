@@ -35,11 +35,16 @@ void HexViewer::SetAddressOffset(int addressoffset)
     Adjust();
 }
 
-void HexViewer::SetData(const QByteArray data)
+void HexViewer::SetData(const QByteArray &data)
 {
     xdata.SetData(data);
     Adjust();
     SetCursorPosition(0);
+}
+
+QByteArray HexViewer::Data()
+{
+    return xdata.data();
 }
 
 void HexViewer::keyPressEvent(QKeyEvent* e)
@@ -91,7 +96,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
     }
     if(e->matches(QKeySequence::MoveToEndOfDocument))
     {
-        SetCursorPosition(bytedata.size() * 2);
+        SetCursorPosition(xdata.size() * 2);
         ResetSelection(cursorposition);
     }
     if(e->matches(QKeySequence::MoveToStartOfDocument))
@@ -103,7 +108,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
     if (e->matches(QKeySequence::SelectAll))
     {
         ResetSelection(0);
-        SetSelection(2*bytedata.size() + 1);
+        SetSelection(2*xdata.size() + 1);
     }
     if (e->matches(QKeySequence::SelectNextChar))
     {
@@ -156,7 +161,7 @@ void HexViewer::keyPressEvent(QKeyEvent* e)
     }
     if (e->matches(QKeySequence::SelectEndOfDocument))
     {
-        int pos = bytedata.size() * 2;
+        int pos = xdata.size() * 2;
         SetCursorPosition(pos);
         SetSelection(pos);
     }
@@ -202,14 +207,15 @@ void HexViewer::paintEvent(QPaintEvent* e)
     if(firstlineindex < 0)
         firstlineindex = 0;
     int lastlineindex = ((e->rect().bottom()/charheight) + charheight) * BYTES_PER_LINE;
-    if(lastlineindex > bytedata.size())
-        lastlineindex = bytedata.size();
+    if(lastlineindex > xdata.size())
+        lastlineindex = xdata.size();
     int yposstart = ((firstlineindex)/BYTES_PER_LINE) * charheight + charheight;
 
     // PAINT ADDRESS AREA
     for(int lineindex = firstlineindex, ypos = yposstart; lineindex < lastlineindex; lineindex += BYTES_PER_LINE, ypos += charheight)
     {
         QString address = QString("%1").arg(lineindex + xdata.AddressOffset(), xdata.RealAddressNumbers(), 16, QChar('0'));
+        qDebug() << "byte address:" << address;
         painter.drawText(lineposition, ypos, address);
     }
 
@@ -278,6 +284,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
         for(int colindex = 0; ((lineindex + colindex) < xdata.size() and (colindex < BYTES_PER_LINE)); colindex++)
         {
             painter.drawText(asciiposition, ypos, xdata.AsciiChar(lineindex + colindex));
+            qDebug() << "ascii text:" << xdata.AsciiChar(lineindex + colindex);
             asciipos += charwidth;
         }
     }

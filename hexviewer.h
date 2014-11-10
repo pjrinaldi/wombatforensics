@@ -17,8 +17,8 @@ public:
     int AddressWidth(void);
     void SetAddressWidth(int width);
 
-    QByteArray& Data(void);
-    void SetData(QByteArray data);
+    QByteArray Data(void);
+    void SetData(QByteArray const &data);
 
     int RealAddressNumbers(void);
     int Size(void);
@@ -48,7 +48,7 @@ protected:
 private slots:
     void UpdateCursor(void);
 private:
-    QByteArray bytedata;
+    //QByteArray bytedata;
     XByteArray xdata;
     QColor addressareacolor;
     QColor highlightcolor;

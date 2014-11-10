@@ -25,7 +25,7 @@ public:
     int AddressWidth();
     void SetAddressWidth(int width);
 
-    QByteArray& data();
+    QByteArray & data();
     void SetData(QByteArray data);
 
     /*
