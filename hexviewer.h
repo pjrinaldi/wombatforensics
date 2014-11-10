@@ -25,6 +25,8 @@ public:
     void SetCursorPosition(int position);
     int GetCursorPosition(void);
 
+    XByteArray& XData(void);
+
 signals:
     void CurrentAddressChanged(int address);
     void DataChanged(void);

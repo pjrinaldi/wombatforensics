@@ -28,14 +28,16 @@ public:
     QByteArray & data();
     void setData(QByteArray data);
 
+    /*
     bool dataChanged(int i);
     QByteArray dataChanged(int i, int len);
     void setDataChanged(int i, bool state);
     void setDataChanged(int i, const QByteArray & state);
-
+    */
     int realAddressNumbers();
     int size();
 
+    /*
     QByteArray & insert(int i, char ch);
     QByteArray & insert(int i, const QByteArray & ba);
 
@@ -44,7 +46,7 @@ public:
     QByteArray & replace(int index, char ch);
     QByteArray & replace(int index, const QByteArray & ba);
     QByteArray & replace(int index, int length, const QByteArray & ba);
-
+*/
     QChar asciiChar(int index);
     QString toRedableString(int start=0, int end=-1);
 
@@ -54,12 +56,12 @@ public slots:
 
 private:
     QByteArray _data;
-    QByteArray _changedData;
+    //QByteArray _changedData;
 
     int _addressNumbers;                    // wanted width of address area
     int _addressOffset;                     // will be added to the real addres inside bytearray
     int _realAddressNumbers;                // real width of address area (can be greater then wanted width)
-    int _oldSize;                           // size of data
+    //int _oldSize;                           // size of data
 };
 
 /** \endcond docNever */

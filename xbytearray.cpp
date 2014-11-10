@@ -2,7 +2,7 @@
 
 XByteArray::XByteArray()
 {
-    _oldSize = -99;
+    //_oldSize = -99;
     _addressNumbers = 4;
     _addressOffset = 0;
 
@@ -41,7 +41,7 @@ void XByteArray::setData(QByteArray data)
     _data = data;
     _changedData = QByteArray(data.length(), char(0));
 }
-
+/*
 bool XByteArray::dataChanged(int i)
 {
     return bool(_changedData[i]);
@@ -67,7 +67,7 @@ void XByteArray::setDataChanged(int i, const QByteArray & state)
         len = length;
     _changedData.replace(i, len, state);
 }
-
+*/
 int XByteArray::realAddressNumbers()
 {
     if (_oldSize != _data.size())
@@ -84,7 +84,7 @@ int XByteArray::size()
 {
     return _data.size();
 }
-
+/*
 QByteArray & XByteArray::insert(int i, char ch)
 {
     _data.insert(i, ch);
@@ -130,7 +130,7 @@ QByteArray & XByteArray::replace(int index, int length, const QByteArray & ba)
     _changedData.replace(index, len, QByteArray(len, char(1)));
     return _data;
 }
-
+*/
 QChar XByteArray::asciiChar(int index)
 {
     char ch = _data[index];

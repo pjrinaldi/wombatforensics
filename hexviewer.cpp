@@ -9,6 +9,10 @@ HexViewer::HexViewer(QWidget* parent) : QScrollArea(parent)
 {
 }
 
+XByteArray& HexViewer::XData(void)
+{
+    return xdata;
+}
 void HexViewer::keyPressEvent(QKeyEvent* e)
 {
     int charx = (cursorx - hexposition)/charwidth;
