@@ -215,7 +215,6 @@ void HexViewer::paintEvent(QPaintEvent* e)
     for(int lineindex = firstlineindex, ypos = yposstart; lineindex < lastlineindex; lineindex += BYTES_PER_LINE, ypos += charheight)
     {
         QString address = QString("%1").arg(lineindex + xdata.AddressOffset(), xdata.RealAddressNumbers(), 16, QChar('0'));
-        qDebug() << "byte address:" << address;
         painter.drawText(labelposition, ypos, address);
     }
 
@@ -275,7 +274,8 @@ void HexViewer::paintEvent(QPaintEvent* e)
         }
     }
     painter.setBackgroundMode(Qt::TransparentMode);
-    painter.setPen(this->palette().color(QPalette::WindowText));
+    //painter.setPen(this->palette().color(QPalette::WindowText));
+    painter.setPen(qApp->palette().foreground().color());
 
     // PAINT ASCII AREA
     for(int lineindex = firstlineindex, ypos = yposstart; lineindex < lastlineindex; lineindex += BYTES_PER_LINE, ypos += charheight)
@@ -283,8 +283,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
         int asciipos = asciiposition;
         for(int colindex = 0; ((lineindex + colindex) < xdata.size() and (colindex < BYTES_PER_LINE)); colindex++)
         {
-            painter.drawText(asciiposition, ypos, xdata.AsciiChar(lineindex + colindex));
-            qDebug() << "ascii text:" << xdata.AsciiChar(lineindex + colindex);
+            painter.drawText(asciipos, ypos, xdata.AsciiChar(lineindex + colindex));
             asciipos += charwidth;
         }
     }
