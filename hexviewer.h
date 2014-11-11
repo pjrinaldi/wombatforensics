@@ -30,6 +30,12 @@ public:
 
     XByteArray& XData(void);
 
+    bool OpenImage();
+    bool CloseImage();
+    size_t ReadImage(size_t numbytes); // here is where i need to map the QFileDevice (as in # of pages)
+    bool LoadImagePage(off_t pageindex);
+    off_t SeekImage(off_t offset);
+
 signals:
     void CurrentAddressChanged(int address);
     void DataChanged(void);
@@ -69,6 +75,11 @@ private:
 
     void EnsureVisible(void);
     void Adjust(void);
+
+    int pagesize;
+    int imagesize;
+    int pagecount;
+    int currentpageindex;
 
 };
 
