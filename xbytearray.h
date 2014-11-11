@@ -4,6 +4,7 @@
 /** \cond docNever */
 
 #include <QtCore>
+#include "tskvariable.h"
 
 /*! XByteArray represents the content of QHexEcit.
 XByteArray comprehend the data itself and informations to store if it was

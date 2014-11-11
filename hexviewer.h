@@ -10,7 +10,8 @@ class HexViewer : public QWidget
     Q_OBJECT
 
 public:
-    HexViewer(QWidget* parent = 0);
+    HexViewer(QWidget* parent = 0, TskObject* tskobject = NULL);
+    ~HexViewer();
     int AddressOffset(void);
     void SetAddressOffset(int offset);
 
@@ -51,6 +52,9 @@ protected:
     void SetSelection(int pos);
     int GetSelectionBegin(void);
     int GetSelectionEnd(void);
+
+    TskObject* tskptr;
+
 private slots:
     void UpdateCursor(void);
 private:

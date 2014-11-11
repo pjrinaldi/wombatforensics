@@ -5,8 +5,9 @@ const int GAP_ADR_HEX = 10;
 const int GAP_HEX_ASCII = 16;
 const int BYTES_PER_LINE = 16;
 
-HexViewer::HexViewer(QWidget* parent) : QWidget(parent)
+HexViewer::HexViewer(QWidget* parent, TskObject* tskobjptr) : QWidget(parent)
 {
+    tskptr = tskobjptr;
     SetAddressWidth(4);
     SetAddressOffset(0);
     addressareacolor = QColor(255, 0, 0, 100);
@@ -395,4 +396,14 @@ void HexViewer::Adjust(void)
 void HexViewer::EnsureVisible()
 {
     scrollarea->ensureVisible(cursorx, cursory + charheight/2, 3, charheight/2 + 2);
+}
+
+bool HexViewer::OpenImage()
+{
+    //if(!xdata.OpenImage(
+    return true;
+}
+
+HexViewer::~HexViewer()
+{
 }

@@ -511,6 +511,7 @@ void WombatForensics::LoadHexContents()
     //if(wombatvarptr->selectedobject.objtype <= 5)
     if(wombatvarptr->selectedobject.objtype < 5)
     {
+        hexviewer->OpenImage();
         // here is where i need to print out the file byte offset, byte length, block information to figure out
         // how to highlight the relevant information for a selected object.
         // based on the file address, i can call functions such as istat to determine the blocks it occupies, then i would
@@ -931,7 +932,7 @@ void WombatForensics::SetupHexPage(void)
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
     //hexwidget = new HexEditor(ui->hexPage, tskobjptr);
-    hexviewer = new HexViewer(this);
+    hexviewer = new HexViewer(this, tskobjptr);
     hexviewer->setObjectName("bt-hexviewer");
     hexviewer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setBackgroundRole(QPalette::Base);
