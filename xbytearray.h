@@ -25,6 +25,7 @@ public:
 
     int AddressWidth();
     void SetAddressWidth(int width);
+    int LinesPerPage(void);
 
     QByteArray & data();
     void SetData(QByteArray data);
@@ -55,6 +56,7 @@ public:
 */
     QChar AsciiChar(int index);
     //QString ToReadableString(int start=0, int end=-1);
+    int bytesperline;
 
 signals:
 
@@ -69,11 +71,12 @@ private:
     int realaddressnumbers;                // real width of address area (can be greater then wanted width)
     //int _oldSize;                           // size of data
     TskObject* tskptr;
-    off_t pagesize;
-    off_t imagesize;
-    off_t pagecount;
+    off_t pagesize; // bytes per page
+    off_t imagesize; // bytes per image
+    off_t pagecount; // number of pages
     off_t currentpageindex;
     off_t firstpage, lastpage;
+    off_t linesperpage; // number of lines per page
 };
 
 /** \endcond docNever */

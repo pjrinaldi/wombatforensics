@@ -26,6 +26,7 @@ XByteArray& HexViewer::XData(void)
 
 void HexViewer::SetAddressWidth(int addresswidth)
 {
+    xdata.bytesperline = BYTES_PER_LINE;
     xdata.SetAddressWidth(addresswidth);
     SetCursorPosition(cursorposition);
 }
@@ -402,6 +403,7 @@ bool HexViewer::OpenImage()
 {
     if(!xdata.OpenImage(tskptr))
         QMessageBox::critical(this, "HexViewer", "Error Opening Image\n", QMessageBox::Ok, 0);
+    emit StepValues(charheight, xdata.LinesPerPage());
     /*
      * SET CURSOR RANGE
      * SET SELECTION TO NOTHING

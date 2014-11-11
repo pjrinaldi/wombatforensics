@@ -40,6 +40,7 @@ public:
 signals:
     void CurrentAddressChanged(int address);
     void DataChanged(void);
+    void StepValues(int singlestep, int pagestep);
 protected:
     void keyPressEvent(QKeyEvent* event);
     void mouseMoveEvent(QMouseEvent* event);

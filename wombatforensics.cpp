@@ -949,12 +949,11 @@ void WombatForensics::SetupHexPage(void)
     //hexLayout->addWidget(hexvsb);
     //hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
-    /*
-     * how we load the data into a qbytearray...
-    QFile file("./reader.h");
-    file.open(QFile::ReadOnly);
-    hexviewer->SetData(file.readAll());
-    */
+    connect(hexviewer, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+     // how we load the data into a qbytearray...
+    //QFile file("./reader.h");
+    //file.open(QFile::ReadOnly);
+    //hexviewer->SetData(file.readAll());
 /*
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
@@ -967,6 +966,9 @@ void WombatForensics::SetupHexPage(void)
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
+    //scrollarea->verticalScrollBar()->setSingleStep(fontMetrics().height());
+    //scrollarea->verticalScrollbar()->setPageStep(
+
     hexvsb->setSingleStep(singlestep);
     hexvsb->setPageStep(pagestep);
 }

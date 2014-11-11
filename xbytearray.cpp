@@ -162,12 +162,19 @@ QString XByteArray::ToReadableString(int start, int end)
     return result;
 }
 */
+
+int XByteArray::LinesPerPage(void)
+{
+    return linesperpage;
+}
 bool XByteArray::OpenImage(TskObject* tskpointer)
 {
     tskptr = tskpointer;
     pagesize = tskptr->blocksize;
     imagesize = tskptr->imglength;
     pagecount = imagesize / pagesize;
+    linesperpage = pagesize / bytesperline;
+    
     //_data.resize(pagecount);
     //_data.fill('0');
     // IN HEXEDITOR/READER PARADIGM, DATA IS A VECTOR OF UCHAR*'S OF 512 BYTES.
