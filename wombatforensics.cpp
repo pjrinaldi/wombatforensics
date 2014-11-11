@@ -950,6 +950,7 @@ void WombatForensics::SetupHexPage(void)
     //hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
     connect(hexviewer, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+    connect(hexviewer, SIGNAL(SetRange(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
      // how we load the data into a qbytearray...
     //QFile file("./reader.h");
     //file.open(QFile::ReadOnly);
@@ -1243,7 +1244,8 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // range must be contained in the space of an integer, just do 100
    // increments
    //hexvsb->setRange(0,100);
-   hexvsb->setRange(low, high);
+   scrollarea->verticalScrollBar()->setRange(low, high);
+   //hexvsb->setRange(low, high);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)

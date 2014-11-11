@@ -41,6 +41,7 @@ signals:
     void CurrentAddressChanged(int address);
     void DataChanged(void);
     void StepValues(int singlestep, int pagestep);
+    void SetRange(off_t low, off_t high);
 protected:
     void keyPressEvent(QKeyEvent* event);
     void mouseMoveEvent(QMouseEvent* event);

@@ -167,6 +167,10 @@ int XByteArray::LinesPerPage(void)
 {
     return linesperpage;
 }
+int XByteArray::LineCount(void)
+{
+    return linecount;
+}
 bool XByteArray::OpenImage(TskObject* tskpointer)
 {
     tskptr = tskpointer;
@@ -174,7 +178,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     imagesize = tskptr->imglength;
     pagecount = imagesize / pagesize;
     linesperpage = pagesize / bytesperline;
-    
+    linecount = imagesize / bytesperline;
     //_data.resize(pagecount);
     //_data.fill('0');
     // IN HEXEDITOR/READER PARADIGM, DATA IS A VECTOR OF UCHAR*'S OF 512 BYTES.
@@ -187,7 +191,18 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
 bool XByteArray::LoadImagePage(off_t pageindex)
 {
     off_t retval = 0;
-    //if(_data[pageindex] != 0)
-        return true;
-
+    // freepages...
+    retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageindex*pagesize, NULL, pagesize);
+    if(tskptr->objecttype > 1)
+    {
+        // do highlighting here or set it up.
+    }
+    if(retval > 0)
+    {
+        if(pageindex < firstpage)
+            firstpage = pageindex;
+        if(pageindex > lastpage)
+            lastpage = pageindex;
+    }
+    return true;
 }

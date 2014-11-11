@@ -26,6 +26,7 @@ public:
     int AddressWidth();
     void SetAddressWidth(int width);
     int LinesPerPage(void);
+    int LineCount(void);
 
     QByteArray & data();
     void SetData(QByteArray data);
@@ -74,6 +75,7 @@ private:
     off_t pagesize; // bytes per page
     off_t imagesize; // bytes per image
     off_t pagecount; // number of pages
+    off_t linecount; // number of lines
     off_t currentpageindex;
     off_t firstpage, lastpage;
     off_t linesperpage; // number of lines per page
