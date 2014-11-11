@@ -517,15 +517,15 @@ void WombatForensics::LoadHexContents()
         // JUST NEED TO CALL MY HIGHLIGHT FUNCTION FOR EACH BLOCK ADDRESS.
         // need to highlight those blocks up to the file size and then highlight the rest as file slack...
         // based on comparison of block size and file size.
-        hexwidget->openimage();
-        hexwidget->set2BPC();
-        hexwidget->setBaseHex();
+        //hexwidget->openimage();
+        //hexwidget->set2BPC();
+        //hexwidget->setBaseHex();
         //hexwidget->SetTopLeft(tskobjptr->offset);
     }
     else
     {
-        hexwidget->openimage();
-        hexwidget->SetTopLeft(tskobjptr->offset);
+        //hexwidget->openimage();
+        //hexwidget->SetTopLeft(tskobjptr->offset);
     }
 }
 
@@ -647,7 +647,7 @@ void WombatForensics::CloseCurrentCase()
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     statuslabel->setText("Current Case was Closed Successfully"); 
-    hexwidget->ClearContent();
+    //hexwidget->ClearContent();
     // clear hex editor 
     wombatdatabase->CloseCaseDB();
 }
@@ -948,9 +948,12 @@ void WombatForensics::SetupHexPage(void)
     //hexLayout->addWidget(hexvsb);
     //hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
+    /*
+     * how we load the data into a qbytearray...
     QFile file("./reader.h");
     file.open(QFile::ReadOnly);
     hexviewer->SetData(file.readAll());
+    */
 /*
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
