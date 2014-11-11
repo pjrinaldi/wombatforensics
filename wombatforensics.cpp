@@ -492,7 +492,7 @@ void WombatForensics::LoadHexContents()
     else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
+        //OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
         tskobjptr->offset = 0;
         //qDebug() << "blockaddress failure:" << wombatvarptr->selectedobject.blockaddress;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
@@ -505,7 +505,7 @@ void WombatForensics::LoadHexContents()
         //tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
-        OpenFileSystemFile();
+        //OpenFileSystemFile();
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)

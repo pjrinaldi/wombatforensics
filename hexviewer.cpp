@@ -400,7 +400,17 @@ void HexViewer::EnsureVisible()
 
 bool HexViewer::OpenImage()
 {
+    if(!xdata.OpenImage(tskptr))
+        QMessageBox::critical(this, "HexViewer", "Error Opening Image\n", QMessageBox::Ok, 0);
+    /*
+     * SET CURSOR RANGE
+     * SET SELECTION TO NOTHING
+     * SET NEW SCROLLBAR RANGE
+     * CALCULATEFONTMETRICS
+     * SETTOPLEFT
     //if(!xdata.OpenImage(
+    return true;
+    */
     return true;
 }
 

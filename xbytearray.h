@@ -28,6 +28,11 @@ public:
 
     QByteArray & data();
     void SetData(QByteArray data);
+    bool OpenImage(TskObject* tskobject);
+    bool CloseImage();
+    size_t ReadImage(size_t numbytes); // here is where i need to map the QFileDevice (as in # of pages)
+    bool LoadImagePage(off_t pageindex);
+    off_t SeekImage(off_t offset);
 
     /*
     bool dataChanged(int i);
@@ -49,7 +54,7 @@ public:
     QByteArray & replace(int index, int length, const QByteArray & ba);
 */
     QChar AsciiChar(int index);
-    QString ToReadableString(int start=0, int end=-1);
+    //QString ToReadableString(int start=0, int end=-1);
 
 signals:
 
@@ -63,6 +68,12 @@ private:
     int addressoffset;                     // will be added to the real addres inside bytearray
     int realaddressnumbers;                // real width of address area (can be greater then wanted width)
     //int _oldSize;                           // size of data
+    TskObject* tskptr;
+    off_t pagesize;
+    off_t imagesize;
+    off_t pagecount;
+    off_t currentpageindex;
+    off_t firstpage, lastpage;
 };
 
 /** \endcond docNever */

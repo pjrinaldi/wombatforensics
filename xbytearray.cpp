@@ -134,7 +134,7 @@ QChar XByteArray::AsciiChar(int index)
             ch = '.';
     return QChar(ch);
 }
-
+/*
 QString XByteArray::ToReadableString(int start, int end)
 {
     int adrWidth = RealAddressNumbers();
@@ -160,4 +160,27 @@ QString XByteArray::ToReadableString(int start, int end)
         result += adrStr + " " + QString("%1").arg(hexStr, -48) + "  " + QString("%1").arg(ascStr, -17) + "\n";
     }
     return result;
+}
+*/
+bool XByteArray::OpenImage(TskObject* tskpointer)
+{
+    tskptr = tskpointer;
+    pagesize = tskptr->blocksize;
+    imagesize = tskptr->imglength;
+    pagecount = imagesize / pagesize;
+    //_data.resize(pagecount);
+    //_data.fill('0');
+    // IN HEXEDITOR/READER PARADIGM, DATA IS A VECTOR OF UCHAR*'S OF 512 BYTES.
+    // IN HEXVIEWER/XBYTEARRAY PARADIGM, DATA IS THE FULL BYTEARRAY OF THE IMAGE.
+    firstpage = lastpage = 0;
+
+    return LoadImagePage(0);
+}
+
+bool XByteArray::LoadImagePage(off_t pageindex)
+{
+    off_t retval = 0;
+    //if(_data[pageindex] != 0)
+        return true;
+
 }
