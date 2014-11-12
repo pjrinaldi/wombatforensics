@@ -82,8 +82,10 @@ private:
     off_t lastloadedoffset;
     off_t currentlineindex;
     off_t loadedlinecount;
+    off_t blocklinecount;
     off_t firstline, lastline;
     off_t firstloadedline, lastloadedline;
+    off_t loadedsize;
     //off_t pagecount;
     //off_t currentpageindex;
     //off_t firstpage, lastpage;

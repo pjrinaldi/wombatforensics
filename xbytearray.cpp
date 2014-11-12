@@ -5,6 +5,7 @@ XByteArray::XByteArray()
     //_oldSize = -99;
     addressnumbers = 4;
     addressoffset = 0;
+    loadedsize = 81920; // default loaded size 1600*512 (linecount * bytes)
 
 }
 
@@ -172,19 +173,28 @@ int XByteArray::LineCount(void)
 {
     return linecount;
 }
-    //pagecount = imagesize / pagesize;
-    //linesperpage = pagesize / bytesperline;
+
+int XByteArray::BlockLineCount(void)
+{
+    return blocklinecount;
+}
 
 bool XByteArray::OpenImage(TskObject* tskpointer)
 {
     tskptr = tskpointer;
     blocksize = tskptr->blocksize;
     imagesize = tskptr->imglength;
-
-    //pagecount = imagesize / pagesize;
+    // determine if loadedsize is > imagesize and adjust accordingly
+    if(loadedsize >= imagesize)
+        loadedsize = imagesize;
+    loadedlinecount = loadedsize / bytesperline;
     linecount = imagesize / bytesperline;
+    blocklinecount = blocksize / bytesperline;
     firstline = 0;
     lastline = linecount - 1;
+    firstloadedline = 0;
+    lastloadedline = loadedlinecount;
+    
     //_data.resize(pagecount);
     //_data.fill('0');
     // IN HEXEDITOR/READER PARADIGM, DATA IS A VECTOR OF UCHAR*'S OF 512 BYTES.
