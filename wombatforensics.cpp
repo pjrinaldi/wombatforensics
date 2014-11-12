@@ -456,9 +456,11 @@ void WombatForensics::LoadHexContents()
     if(tskobjptr->readfileinfo != NULL)
         tsk_fs_file_close(tskobjptr->readfileinfo);
 
+    OpenParentImage(wombatvarptr->selectedobject.id);
+
     if(wombatvarptr->selectedobject.objtype == 1) // image file
     {
-        OpenParentImage(wombatvarptr->selectedobject.id);
+        //OpenParentImage(wombatvarptr->selectedobject.id);
         tskobjptr->offset = 0;
         tskobjptr->objecttype = 1;
         tskobjptr->length = wombatvarptr->selectedobject.size;
@@ -467,7 +469,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.objtype == 2) // volume object
     {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        //OpenParentImage(wombatvarptr->selectedobject.parimgid);
         tskobjptr->objecttype = 2;
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
         tskobjptr->length = wombatvarptr->selectedobject.size;
@@ -475,7 +477,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.objtype == 3) // unallocated partition
     {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        //OpenParentImage(wombatvarptr->selectedobject.parimgid);
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
         tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.sectsize;
         tskobjptr->objecttype = 3;
@@ -483,7 +485,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.objtype == 4) // fs object
     {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        //OpenParentImage(wombatvarptr->selectedobject.parimgid);
         tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
         tskobjptr->objecttype = 4;
         tskobjptr->length = wombatvarptr->selectedobject.size;
@@ -491,7 +493,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        //OpenParentImage(wombatvarptr->selectedobject.parimgid);
         //OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
         tskobjptr->offset = 0;
         //qDebug() << "blockaddress failure:" << wombatvarptr->selectedobject.blockaddress;

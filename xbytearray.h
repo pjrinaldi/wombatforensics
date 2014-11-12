@@ -66,7 +66,6 @@ private:
     //QList<QByteArray> slicelist;
     QByteArray _data;
     //QByteArray _changedData;
-    char* tmpbuf;
 
     int addressnumbers;                    // wanted width of address area
     int addressoffset;                     // will be added to the real addres inside bytearray

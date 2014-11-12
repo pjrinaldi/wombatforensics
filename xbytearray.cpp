@@ -190,7 +190,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     }
     else
     {
-        sliceend = 2*slicesize - 1;
+        sliceend = 3*slicesize - 1;
     }
     lastoffset = imagesize - 1;
     currentoffset = 0;
@@ -206,11 +206,14 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
 bool XByteArray::LoadSlice(off_t soffset, off_t sindex)
 {
     off_t retval = 0;
-    retval = tsk_img_read(tskptr->readimginfo, soffset + sindex*slicesize, tmpbuf, slicesize);
+    char tmpbuf[slicesize];
+    retval = tsk_img_read(tskptr->readimginfo, sindex*slicesize, tmpbuf, slicesize);
+    qDebug() << "retval" << retval;
     if(retval > 0)
     {
         //slicelist.append(QByteArray(tmpbuf, retval));
         _data.append(QByteArray(tmpbuf, retval));
+        qDebug() << "_data size" << _data.size();
     }
     return true;
     /*

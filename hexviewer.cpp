@@ -399,8 +399,11 @@ bool HexViewer::OpenImage()
 {
     if(!xdata.OpenImage(tskptr))
         QMessageBox::critical(this, "HexViewer", "Error Opening Image\n", QMessageBox::Ok, 0);
-    emit SetRange(0, xdata.LineCount()*charheight);
-    emit StepValues(charheight, xdata.BlockLineCount()*charheight);
+
+    Adjust();
+    SetCursorPosition(0);
+    //emit SetRange(0, xdata.LineCount()*charheight);
+    //emit StepValues(charheight, xdata.BlockLineCount()*charheight);
     /*
      * SET CURSOR RANGE
      * SET SELECTION TO NOTHING
