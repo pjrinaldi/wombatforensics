@@ -176,6 +176,7 @@ int XByteArray::BlockLineCount(void)
 
 bool XByteArray::OpenImage(TskObject* tskpointer)
 {
+    // initialize the line variables and the loadedline variables
     tskptr = tskpointer;
     blocksize = tskptr->blocksize;
     imagesize = tskptr->imglength;
@@ -188,7 +189,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     firstline = 0;
     lastline = linecount - 1;
     firstloadedline = 0;
-    lastloadedline = loadedlinecount;
+    lastloadedline = loadedlinecount - 1;
     
     //_data.resize(pagecount);
     //_data.fill('0');

@@ -25,7 +25,7 @@ public:
 
     int AddressWidth();
     void SetAddressWidth(int width);
-    int LinesPerPage(void);
+    int BlockLineCount(void);
     int LineCount(void);
 
     QByteArray & data();
