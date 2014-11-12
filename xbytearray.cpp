@@ -163,12 +163,7 @@ QString XByteArray::ToReadableString(int start, int end)
     return result;
 }
 */
-/*
-int XByteArray::LinesPerPage(void)
-{
-    return linesperpage;
-}
-*/
+
 int XByteArray::LineCount(void)
 {
     return linecount;

@@ -74,21 +74,18 @@ private:
     TskObject* tskptr;
     off_t imagesize; // bytes per image
     off_t linecount; // number of lines
-    off_t blocksize;
-    off_t currentoffset;
-    off_t firstoffset;
-    off_t lastoffset;
-    off_t firstloadedoffset;
-    off_t lastloadedoffset;
-    off_t currentlineindex;
-    off_t loadedlinecount;
-    off_t blocklinecount;
-    off_t firstline, lastline;
-    off_t firstloadedline, lastloadedline;
-    off_t loadedsize;
-    //off_t pagecount;
-    //off_t currentpageindex;
-    //off_t firstpage, lastpage;
+    off_t blocksize; // bytes per image block
+    off_t currentoffset; // current cursor offset
+    off_t firstoffset; // first offset for image
+    off_t lastoffset; // last offset for image
+    off_t firstloadedoffset; // first loaded offset
+    off_t lastloadedoffset; // last loaded offset
+    off_t currentlineindex; // current line
+    off_t loadedlinecount; // number of lines loaded
+    off_t blocklinecount; // number of lines per block
+    off_t firstline, lastline; // first line and last line for image
+    off_t firstloadedline, lastloadedline; // first line and last line for loaded portion of the image
+    off_t loadedsize; // size of loaded portion of the image
 };
 
 /** \endcond docNever */
