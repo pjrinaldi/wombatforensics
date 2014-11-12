@@ -162,6 +162,7 @@ QString XByteArray::ToReadableString(int start, int end)
     return result;
 }
 */
+<<<<<<< Updated upstream
 
 int XByteArray::LinesPerPage(void)
 {
@@ -179,11 +180,24 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     pagecount = imagesize / pagesize;
     linesperpage = pagesize / bytesperline;
     linecount = imagesize / bytesperline;
+=======
+bool XByteArray::OpenImage(TskObject* tskpointer)
+{
+    tskptr = tskpointer;
+    blocksize = tskptr->blocksize;
+    imagesize = tskptr->imglength;
+
+    //pagecount = imagesize / pagesize;
+>>>>>>> Stashed changes
     //_data.resize(pagecount);
     //_data.fill('0');
     // IN HEXEDITOR/READER PARADIGM, DATA IS A VECTOR OF UCHAR*'S OF 512 BYTES.
     // IN HEXVIEWER/XBYTEARRAY PARADIGM, DATA IS THE FULL BYTEARRAY OF THE IMAGE.
+<<<<<<< Updated upstream
     firstpage = lastpage = 0;
+=======
+    //firstpage = lastpage = 0;
+>>>>>>> Stashed changes
 
     return LoadImagePage(0);
 }
@@ -191,6 +205,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
 bool XByteArray::LoadImagePage(off_t pageindex)
 {
     off_t retval = 0;
+<<<<<<< Updated upstream
     // freepages...
     retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageindex*pagesize, NULL, pagesize);
     if(tskptr->objecttype > 1)
@@ -205,4 +220,9 @@ bool XByteArray::LoadImagePage(off_t pageindex)
             lastpage = pageindex;
     }
     return true;
+=======
+    //if(_data[pageindex] != 0)
+        return true;
+
+>>>>>>> Stashed changes
 }

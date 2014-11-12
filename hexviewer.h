@@ -82,10 +82,21 @@ private:
     void EnsureVisible(void);
     void Adjust(void);
 
+    int currentoffset;
+    int firstoffset;
+    int lastoffset;
+    int firstloadedoffset;
+    int lastloadedoffset;
+    int currentline;
+    int linecount;
+    int loadedlinecount;
+
+    /*
     int pagesize;
     int imagesize;
     int pagecount;
     int currentpageindex;
+    */
 
 };
 
