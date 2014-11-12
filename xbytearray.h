@@ -32,10 +32,8 @@ public:
     void SetData(QByteArray data);
     bool OpenImage(TskObject* tskobject);
     bool CloseImage();
-    size_t ReadImage(); // here is where i need to map the QFileDevice (as in # of pages)
     bool LoadSlice();
     void FreeSlice();
-    off_t SeekImage();
 
     /*
     bool dataChanged(int i);

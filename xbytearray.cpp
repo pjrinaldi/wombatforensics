@@ -5,8 +5,7 @@ XByteArray::XByteArray()
     //_oldSize = -99;
     addressnumbers = 4;
     addressoffset = 0;
-    slicesize = 81920; // default loaded size 1600*512 (linecount * bytes)
-
+    slicesize = 245760; // default loaded size is three slices 3*(1600*512)
 }
 
 int XByteArray::AddressOffset()
@@ -180,22 +179,24 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     tskptr = tskpointer;
     blocksize = tskptr->blocksize;
     imagesize = tskptr->imglength;
+    sliceindex = 1;
     // determine if slicesize is > imagesize and adjust accordingly
-    if(slicesize >= imagesize)
+    if(slicesize*3 >= imagesize)
         slicesize = imagesize;
     firstoffset = 0;
-    slicestart = 0 + 512;
-    sliceend = slicesize - 513;
+    slicestart = sliceindex*slicesize;
+    sliceend = (sliceindex+1)*slicesize - 1;
     lastoffset = imagesize - 1;
     currentoffset = 0;
     blocklinecount = blocksize / bytesperline;
     linecount = imagesize / bytesperline;
+    // load the 1st three slices here...
 
-    return LoadSlice();
 }
 
 bool XByteArray::LoadSlice()
 {
+    /*
     off_t retval = 0;
     off_t sliceoffset = 0;
     FreeSlice();
@@ -222,16 +223,19 @@ bool XByteArray::LoadSlice()
         if(pageindex > lastpage)
             lastpage = pageindex;
         */
-    }
+    /*}
     return true;
+    */
 }
 
 void XByteArray::FreeSlice()
 {
+    /*
     if(currentoffset == slicestart)
     {
         // free the 
     }
+    */
     // NEED TO FIGURE OUT HOW TO TELL WHERE THE CURRENT OFFSET IS AT
     // IF ITS == SLICE START THEN LOAD SLICEINDEX - 1
     // IF ITS == SLICE END THEN LOAD SLICEINDEX + 1
