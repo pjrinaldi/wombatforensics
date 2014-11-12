@@ -190,6 +190,10 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     lastline = linecount - 1;
     firstloadedline = 0;
     lastloadedline = loadedlinecount - 1;
+    currentoffset = 0;
+    currentloadedoffset = 0;
+    currentloadedlineindex = 0;
+    currentlineindex = 0;
     
     //_data.resize(pagecount);
     //_data.fill('0');
