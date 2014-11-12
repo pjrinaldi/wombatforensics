@@ -57,10 +57,7 @@ public:
 */
     QChar AsciiChar(int index);
     //QString ToReadableString(int start=0, int end=-1);
-<<<<<<< Updated upstream
     int bytesperline;
-=======
->>>>>>> Stashed changes
 
 signals:
 
@@ -75,32 +72,21 @@ private:
     int realaddressnumbers;                // real width of address area (can be greater then wanted width)
     //int _oldSize;                           // size of data
     TskObject* tskptr;
-<<<<<<< Updated upstream
-    off_t pagesize; // bytes per page
     off_t imagesize; // bytes per image
-    off_t pagecount; // number of pages
     off_t linecount; // number of lines
-    off_t currentpageindex;
-    off_t firstpage, lastpage;
-    off_t linesperpage; // number of lines per page
-=======
-    //off_t pagesize;
     off_t blocksize;
-    off_t imagesize;
     off_t currentoffset;
     off_t firstoffset;
     off_t lastoffset;
     off_t firstloadedoffset;
     off_t lastloadedoffset;
-    off_t currentline;
-    off_t linecount;
+    off_t currentlineindex;
     off_t loadedlinecount;
     off_t firstline, lastline;
     off_t firstloadedline, lastloadedline;
     //off_t pagecount;
     //off_t currentpageindex;
     //off_t firstpage, lastpage;
->>>>>>> Stashed changes
 };
 
 /** \endcond docNever */

@@ -162,25 +162,19 @@ QString XByteArray::ToReadableString(int start, int end)
     return result;
 }
 */
-<<<<<<< Updated upstream
-
+/*
 int XByteArray::LinesPerPage(void)
 {
     return linesperpage;
 }
+*/
 int XByteArray::LineCount(void)
 {
     return linecount;
 }
-bool XByteArray::OpenImage(TskObject* tskpointer)
-{
-    tskptr = tskpointer;
-    pagesize = tskptr->blocksize;
-    imagesize = tskptr->imglength;
-    pagecount = imagesize / pagesize;
-    linesperpage = pagesize / bytesperline;
-    linecount = imagesize / bytesperline;
-=======
+    //pagecount = imagesize / pagesize;
+    //linesperpage = pagesize / bytesperline;
+
 bool XByteArray::OpenImage(TskObject* tskpointer)
 {
     tskptr = tskpointer;
@@ -188,16 +182,14 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     imagesize = tskptr->imglength;
 
     //pagecount = imagesize / pagesize;
->>>>>>> Stashed changes
+    linecount = imagesize / bytesperline;
+    firstline = 0;
+    lastline = linecount - 1;
     //_data.resize(pagecount);
     //_data.fill('0');
     // IN HEXEDITOR/READER PARADIGM, DATA IS A VECTOR OF UCHAR*'S OF 512 BYTES.
     // IN HEXVIEWER/XBYTEARRAY PARADIGM, DATA IS THE FULL BYTEARRAY OF THE IMAGE.
-<<<<<<< Updated upstream
-    firstpage = lastpage = 0;
-=======
     //firstpage = lastpage = 0;
->>>>>>> Stashed changes
 
     return LoadImagePage(0);
 }
@@ -205,24 +197,20 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
 bool XByteArray::LoadImagePage(off_t pageindex)
 {
     off_t retval = 0;
-<<<<<<< Updated upstream
     // freepages...
-    retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageindex*pagesize, NULL, pagesize);
+    //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageindex*pagesize, NULL, pagesize);
     if(tskptr->objecttype > 1)
     {
         // do highlighting here or set it up.
     }
     if(retval > 0)
     {
+        /*
         if(pageindex < firstpage)
             firstpage = pageindex;
         if(pageindex > lastpage)
             lastpage = pageindex;
+        */
     }
     return true;
-=======
-    //if(_data[pageindex] != 0)
-        return true;
-
->>>>>>> Stashed changes
 }
