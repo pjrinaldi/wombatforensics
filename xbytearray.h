@@ -73,21 +73,15 @@ private:
     //int _oldSize;                           // size of data
     TskObject* tskptr;
     off_t imagesize; // bytes per image
-    off_t linecount; // number of lines
     off_t blocksize; // bytes per image block
     off_t currentoffset; // current cursor offset
-    off_t currentloadedoffset; // current loaded offset
     off_t firstoffset; // first offset for image
     off_t lastoffset; // last offset for image
-    off_t firstloadedoffset; // first loaded offset
-    off_t lastloadedoffset; // last loaded offset
-    off_t currentlineindex; // current line
-    off_t currentloadedlineindex;
-    off_t loadedlinecount; // number of lines loaded
-    off_t blocklinecount; // number of lines per block
-    off_t firstline, lastline; // first line and last line for image
-    off_t firstloadedline, lastloadedline; // first line and last line for loaded portion of the image
-    off_t loadedsize; // size of loaded portion of the image
+    off_t firstsliceoffset; // first loaded offset
+    off_t lastsliceoffset; // last loaded offset
+    off_t slicesize; // size of loaded portion of the image
+    off_t linecount;
+    off_t blocklinecount;
 };
 
 /** \endcond docNever */

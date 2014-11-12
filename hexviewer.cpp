@@ -51,10 +51,6 @@ QByteArray HexViewer::Data()
 
 void HexViewer::keyPressEvent(QKeyEvent* e)
 {
-    //int charx = (cursorx - hexposition)/charwidth;
-    //int posx = (charx/3)*2 + (charx % 3);
-    //int posba = (cursory/charheight) * BYTES_PER_LINE + posx/2;
-
     // CURSOR MOVEMENTS
     if(e->matches(QKeySequence::MoveToNextChar))
     {

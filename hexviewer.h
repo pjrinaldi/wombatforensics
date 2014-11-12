@@ -60,7 +60,6 @@ protected:
 private slots:
     void UpdateCursor(void);
 private:
-    //QByteArray bytedata;
     XByteArray xdata;
     QColor addressareacolor;
     QColor highlightcolor;
@@ -85,19 +84,6 @@ private:
     int currentoffset;
     int firstoffset;
     int lastoffset;
-    int firstloadedoffset;
-    int lastloadedoffset;
-    int currentline;
-    int linecount;
-    int loadedlinecount;
-
-    /*
-    int pagesize;
-    int imagesize;
-    int pagecount;
-    int currentpageindex;
-    */
-
 };
 
 #endif // HEXVIEWER_H
