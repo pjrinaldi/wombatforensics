@@ -184,21 +184,32 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     if(slicesize >= imagesize)
         slicesize = imagesize;
     firstoffset = 0;
-    firstsliceoffset = 0 + 512;
-    lastsliceoffset = slicesize - 513;
+    slicestart = 0 + 512;
+    sliceend = slicesize - 513;
     lastoffset = imagesize - 1;
     currentoffset = 0;
     blocklinecount = blocksize / bytesperline;
     linecount = imagesize / bytesperline;
 
-    return LoadImagePage(0);
+    return LoadSlice();
 }
 
-bool XByteArray::LoadImagePage(off_t pageindex)
+bool XByteArray::LoadSlice()
 {
     off_t retval = 0;
-    // freepages...
-    //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageindex*pagesize, NULL, pagesize);
+    off_t sliceoffset = 0;
+    FreeSlice();
+    if(currentoffset == slicestart)
+    {
+        // free sliceindex
+        // load sliceindex - 1
+    }
+    if(currentoffset == sliceend)
+    {
+        // free sliceindex
+        // load sliceindex + 1
+    }
+    //retval = tsk_img_read(tskptr->readimginfo, sliceoffset + sliceindex*slicesize, NULL, slicesize);
     if(tskptr->objecttype > 1)
     {
         // do highlighting here or set it up.
@@ -213,4 +224,15 @@ bool XByteArray::LoadImagePage(off_t pageindex)
         */
     }
     return true;
+}
+
+void XByteArray::FreeSlice()
+{
+    if(currentoffset == slicestart)
+    {
+        // free the 
+    }
+    // NEED TO FIGURE OUT HOW TO TELL WHERE THE CURRENT OFFSET IS AT
+    // IF ITS == SLICE START THEN LOAD SLICEINDEX - 1
+    // IF ITS == SLICE END THEN LOAD SLICEINDEX + 1
 }

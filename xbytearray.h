@@ -32,9 +32,10 @@ public:
     void SetData(QByteArray data);
     bool OpenImage(TskObject* tskobject);
     bool CloseImage();
-    size_t ReadImage(size_t numbytes); // here is where i need to map the QFileDevice (as in # of pages)
-    bool LoadImagePage(off_t pageindex);
-    off_t SeekImage(off_t offset);
+    size_t ReadImage(); // here is where i need to map the QFileDevice (as in # of pages)
+    bool LoadSlice();
+    void FreeSlice();
+    off_t SeekImage();
 
     /*
     bool dataChanged(int i);
@@ -77,9 +78,10 @@ private:
     off_t currentoffset; // current cursor offset
     off_t firstoffset; // first offset for image
     off_t lastoffset; // last offset for image
-    off_t firstsliceoffset; // first loaded offset
-    off_t lastsliceoffset; // last loaded offset
+    off_t slicestart; // first loaded offset
+    off_t sliceend; // last loaded offset
     off_t slicesize; // size of loaded portion of the image
+    off_t sliceindex; // which slice is currently loaded.
     off_t linecount;
     off_t blocklinecount;
 };
