@@ -32,8 +32,8 @@ public:
     void SetData(QByteArray data);
     bool OpenImage(TskObject* tskobject);
     bool CloseImage();
-    bool LoadSlice();
-    void FreeSlice();
+    bool LoadSlice(off_t sliceoffset, off_t sliceindex);
+    void FreeSlice(off_t sliceindex);
 
     /*
     bool dataChanged(int i);
@@ -63,8 +63,10 @@ signals:
 public slots:
 
 private:
+    //QList<QByteArray> slicelist;
     QByteArray _data;
     //QByteArray _changedData;
+    char* tmpbuf;
 
     int addressnumbers;                    // wanted width of address area
     int addressoffset;                     // will be added to the real addres inside bytearray

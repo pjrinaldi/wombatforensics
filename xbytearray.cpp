@@ -5,7 +5,7 @@ XByteArray::XByteArray()
     //_oldSize = -99;
     addressnumbers = 4;
     addressoffset = 0;
-    slicesize = 245760; // default loaded size is three slices 3*(1600*512)
+    slicesize = 819200; // default loaded size is three slices (1600*512)
 }
 
 int XByteArray::AddressOffset()
@@ -180,55 +180,52 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     blocksize = tskptr->blocksize;
     imagesize = tskptr->imglength;
     sliceindex = 1;
+    firstoffset = 0;
+    slicestart = slicesize;
     // determine if slicesize is > imagesize and adjust accordingly
     if(slicesize*3 >= imagesize)
+    {
         slicesize = imagesize;
-    firstoffset = 0;
-    slicestart = sliceindex*slicesize;
-    sliceend = (sliceindex+1)*slicesize - 1;
+        sliceend = slicesize - 1;
+    }
+    else
+    {
+        sliceend = 2*slicesize - 1;
+    }
     lastoffset = imagesize - 1;
     currentoffset = 0;
     blocklinecount = blocksize / bytesperline;
     linecount = imagesize / bytesperline;
     // load the 1st three slices here...
-
+    int retval = 0;
+    LoadSlice(firstoffset, 0);
+    LoadSlice(slicesize, 1);
+    LoadSlice(2*slicesize, 2);
 }
 
-bool XByteArray::LoadSlice()
+bool XByteArray::LoadSlice(off_t soffset, off_t sindex)
 {
-    /*
     off_t retval = 0;
-    off_t sliceoffset = 0;
-    FreeSlice();
-    if(currentoffset == slicestart)
-    {
-        // free sliceindex
-        // load sliceindex - 1
-    }
-    if(currentoffset == sliceend)
-    {
-        // free sliceindex
-        // load sliceindex + 1
-    }
-    //retval = tsk_img_read(tskptr->readimginfo, sliceoffset + sliceindex*slicesize, NULL, slicesize);
-    if(tskptr->objecttype > 1)
-    {
-        // do highlighting here or set it up.
-    }
+    retval = tsk_img_read(tskptr->readimginfo, soffset + sindex*slicesize, tmpbuf, slicesize);
     if(retval > 0)
     {
-        /*
+        //slicelist.append(QByteArray(tmpbuf, retval));
+        _data.append(QByteArray(tmpbuf, retval));
+    }
+    return true;
+    /*
+    //retval = tsk_img_read(tskptr->readimginfo, sliceoffset + sliceindex*slicesize, NULL, slicesize);
+    if(retval > 0)
+    {
         if(pageindex < firstpage)
             firstpage = pageindex;
         if(pageindex > lastpage)
             lastpage = pageindex;
-        */
-    /*}
-    return true;
+    }
     */
 }
 
-void XByteArray::FreeSlice()
+void XByteArray::FreeSlice(off_t sliceindex)
 {
     /*
     if(currentoffset == slicestart)
