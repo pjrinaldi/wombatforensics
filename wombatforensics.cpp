@@ -969,8 +969,8 @@ void WombatForensics::SetupHexPage(void)
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
-    //scrollarea->verticalScrollBar()->setSingleStep(fontMetrics().height());
-    //scrollarea->verticalScrollbar()->setPageStep(
+    scrollarea->verticalScrollBar()->setSingleStep(singlestep);
+    scrollarea->verticalScrollBar()->setPageStep(pagestep);
 
     //hexvsb->setSingleStep(singlestep);
     //hexvsb->setPageStep(pagestep);
