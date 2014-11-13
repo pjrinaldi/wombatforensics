@@ -26,7 +26,6 @@ XByteArray& HexViewer::XData(void)
 
 void HexViewer::SetAddressWidth(int addresswidth)
 {
-    xdata.bytesperline = BYTES_PER_LINE;
     xdata.SetAddressWidth(addresswidth);
     SetCursorPosition(cursorposition);
 }
