@@ -230,6 +230,7 @@ bool XByteArray::LoadSlice(off_t soffset, off_t sindex)
 
 void XByteArray::FreeSlice(off_t sliceindex)
 {
+    _data.remove((sliceindex*slicesize - slicesize), slicesize);
     /*
     if(currentoffset == slicestart)
     {
@@ -239,4 +240,26 @@ void XByteArray::FreeSlice(off_t sliceindex)
     // NEED TO FIGURE OUT HOW TO TELL WHERE THE CURRENT OFFSET IS AT
     // IF ITS == SLICE START THEN LOAD SLICEINDEX - 1
     // IF ITS == SLICE END THEN LOAD SLICEINDEX + 1
+}
+void XByteArray::AdjustData(int offset, int charheight)
+{
+    int curoff = (offset/charheight)*bytesperline;
+    //qDebug() << "scroll bar value changed:" << (offset/charheight)*bytesperline; // 1st byteoffset for each line
+    if(curoff <= slicestart && sliceindex > 1)
+    {
+        qDebug() << "need to remove the end slice and load the new begin slice";
+        // set sliceindex = sliceindex - 1;
+        // set the new slicestart, sliceend
+        // need to free the endslice and load the beginslice
+    }
+    if(curoff >= sliceend && sliceindex < (imagesize/slicesize + 1))
+    {
+        qDebug() << "need to remove the begin slice and load the new end slice";
+        FreeSlice(sliceindex - 1);
+        sliceindex++;
+        LoadSlice(0, (sliceindex + 1));
+        // set sliceindex = sliceindex + 1
+        // set the new slicestart, sliceend
+        // need to free the beginslice and load the end slice
+    }
 }

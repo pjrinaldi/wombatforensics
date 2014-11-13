@@ -421,20 +421,5 @@ HexViewer::~HexViewer()
 
 void HexViewer::AdjustData(int offset)
 {
-    int curoff = (offset/charheight)*BYTES_PER_LINE;
-    qDebug() << "scroll bar value changed:" << (offset/charheight)*BYTES_PER_LINE; // 1st byteoffset for each line
-    if(curoff <= slicestart && sliceindex > 1)
-    {
-        qDebug() << "need to remove the end slice and load the new begin slice";
-        // set sliceindex = sliceindex - 1;
-        // set the new slicestart, sliceend
-        // need to free the endslice and load the beginslice
-    }
-    if(curoff >= sliceend && sliceindex < (imagesize/slicesize + 1))
-    {
-        qDebug() << "need to remove the begin slice and load the new end slice";
-        // set sliceindex = sliceindex + 1
-        // set the new slicestart, sliceend
-        // need to free the beginslice and load the end slice
-    }
+    xdata.AdjustData(offset, charheight);
 }
