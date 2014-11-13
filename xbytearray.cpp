@@ -182,6 +182,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     sliceindex = 1;
     firstoffset = 0;
     slicestart = slicesize - 1;
+    addressoffset = 0;
     // determine if slicesize is > imagesize and adjust accordingly
     if(slicesize*3 >= imagesize)
     {
@@ -256,6 +257,7 @@ void XByteArray::AdjustData(int offset, int charheight)
     {
         qDebug() << "need to remove the begin slice and load the new end slice";
         FreeSlice(sliceindex - 1);
+        addressoffset = addressoffset + slicesize;
         sliceindex++;
         LoadSlice(0, (sliceindex + 1));
         // set sliceindex = sliceindex + 1
