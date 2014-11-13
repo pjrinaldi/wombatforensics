@@ -181,7 +181,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     imagesize = tskptr->imglength;
     sliceindex = 1;
     firstoffset = 0;
-    slicestart = slicesize;
+    slicestart = slicesize - 1;
     // determine if slicesize is > imagesize and adjust accordingly
     if(slicesize*3 >= imagesize)
     {
@@ -190,7 +190,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     }
     else
     {
-        sliceend = 3*slicesize - 1;
+        sliceend = 2*slicesize - 1;
     }
     lastoffset = imagesize - 1;
     currentoffset = 0;

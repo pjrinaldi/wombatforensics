@@ -421,6 +421,6 @@ HexViewer::~HexViewer()
 
 void HexViewer::AdjustData(int offset)
 {
-    qDebug() << "scroll bar value changed:" << offset/charheight;
+    qDebug() << "scroll bar value changed:" << (offset/charheight)*BYTES_PER_LINE; // 1st byteoffset for each line
 }
 
