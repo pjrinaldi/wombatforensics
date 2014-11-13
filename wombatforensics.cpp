@@ -511,7 +511,7 @@ void WombatForensics::LoadHexContents()
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)
-    if(wombatvarptr->selectedobject.objtype < 5)
+    if(wombatvarptr->selectedobject.objtype == 1)
     {
         hexviewer->OpenImage();
         // here is where i need to print out the file byte offset, byte length, block information to figure out
@@ -945,8 +945,11 @@ void WombatForensics::SetupHexPage(void)
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
     scrollarea->setWidget(hexviewer);
+    scrollarea->setContentsMargins(0, 0, 0, 0);
     //hexLayout->addWidget(hexviewer);
     hexLayout->addWidget(scrollarea);
+    hexLayout->setContentsMargins(0, 0, 0, 0);
+    mainlayout->setContentsMargins(0, 0, 0, 0);
     //hexvsb = new QScrollBar(hexwidget);
     //hexLayout->addWidget(hexvsb);
     //hexvsb->setRange(0, 0);
