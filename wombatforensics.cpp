@@ -956,17 +956,18 @@ void WombatForensics::SetupHexPage(void)
     mainlayout->addLayout(hexLayout);
     connect(hexviewer, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
     connect(hexviewer, SIGNAL(SetRange(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
+    connect(hexviewer, SIGNAL(CurrentAddressChanged(int)), this, SLOT(SetOffsetLabel(int)));
      // how we load the data into a qbytearray...
     //QFile file("./reader.h");
     //file.open(QFile::ReadOnly);
     //hexviewer->SetData(file.readAll());
 /*
-    connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
+    //connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
-    connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
+    //connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
-    connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+    //connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
 */
 }
 
@@ -1229,8 +1230,10 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     */
 }
 
-void WombatForensics::setOffsetLabel(off_t pos)
+void WombatForensics::SetOffsetLabel(int pos)
 {
+    selectedoffset->setText(QString("0x%1").arg(pos, 1, 16));
+    /*
   QString label;
   label = "Offset: ";
   char    buffer[64];
@@ -1241,6 +1244,7 @@ void WombatForensics::setOffsetLabel(off_t pos)
 #endif
   label += buffer;
   selectedoffset->setText(label);
+  */
 }
 
 void WombatForensics::setScrollBarRange(off_t low, off_t high)

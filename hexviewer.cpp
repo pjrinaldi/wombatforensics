@@ -393,7 +393,6 @@ void HexViewer::Adjust(void)
 void HexViewer::EnsureVisible()
 {
     scrollarea->ensureVisible(cursorx, cursory + charheight/2, 3, charheight/2 + 2);
-    //scrollarea->ensureVisible(cursorx, cursory + charheight/2, 0, 0);
 }
 
 bool HexViewer::OpenImage()

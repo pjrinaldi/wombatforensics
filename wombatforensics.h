@@ -502,7 +502,7 @@ private slots:
     void FileExport(FileExportData* exportdata);
     void setScrollBarRange(off_t low, off_t high);
     void setScrollBarValue(off_t pos);
-    void setOffsetLabel(off_t pos);
+    void SetOffsetLabel(int pos);
     void UpdateSelectValue(const QString &txt);
     void ViewGroupTriggered(QAction* curaction);
     void LoadComplete(bool isok);
