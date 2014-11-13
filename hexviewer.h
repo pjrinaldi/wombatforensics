@@ -59,6 +59,7 @@ protected:
 
 private slots:
     void UpdateCursor(void);
+    void AdjustData(int offset);
 private:
     XByteArray xdata;
     QColor addressareacolor;

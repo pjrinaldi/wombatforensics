@@ -511,7 +511,7 @@ void WombatForensics::LoadHexContents()
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)
-    if(wombatvarptr->selectedobject.objtype == 1)
+    if(wombatvarptr->selectedobject.objtype <= 5)
     {
         hexviewer->OpenImage();
         // here is where i need to print out the file byte offset, byte length, block information to figure out
@@ -957,6 +957,7 @@ void WombatForensics::SetupHexPage(void)
     connect(hexviewer, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
     connect(hexviewer, SIGNAL(SetRange(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
     connect(hexviewer, SIGNAL(CurrentAddressChanged(int)), this, SLOT(SetOffsetLabel(int)));
+    connect(scrollarea->verticalScrollBar(), SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
      // how we load the data into a qbytearray...
     //QFile file("./reader.h");
     //file.open(QFile::ReadOnly);
@@ -1232,7 +1233,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
 
 void WombatForensics::SetOffsetLabel(int pos)
 {
-    selectedoffset->setText(QString("0x%1").arg(pos, 1, 16));
+    selectedoffset->setText(QString("Offset: 0x%1").arg(pos, 1, 16));
     /*
   QString label;
   label = "Offset: ";

@@ -14,7 +14,7 @@ HexViewer::HexViewer(QWidget* parent, TskObject* tskobjptr) : QWidget(parent)
     highlightcolor = QColor(0, 255, 0, 100);
     selectioncolor = QColor(0, 0, 255, 100);
     setFont(QFont("fixed", 10));
-
+    xdata.bytesperline = BYTES_PER_LINE;
     size = 0;
     ResetSelection(0);
 }
@@ -197,7 +197,7 @@ void HexViewer::paintEvent(QPaintEvent* e)
     painter.setPen(Qt::gray);
     painter.drawLine(lineposition, e->rect().top(), lineposition, height());
 
-    //painter.setPen(this->palette().color(QPalette::WindowText));
+    //painter.setPen(this->palette().color(QPalette::WindowText);
     painter.setPen(qApp->palette().foreground().color());
 
     int firstlineindex = ((e->rect().top()/charheight) - charheight) * BYTES_PER_LINE;
@@ -418,3 +418,9 @@ bool HexViewer::OpenImage()
 HexViewer::~HexViewer()
 {
 }
+
+void HexViewer::AdjustData(int offset)
+{
+    qDebug() << "scroll bar value changed:" << offset/charheight;
+}
+
