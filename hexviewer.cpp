@@ -389,7 +389,7 @@ void HexViewer::Adjust(void)
     hexposition = xdata.RealAddressNumbers() * charwidth + GAP_ADR_HEX;
     asciiposition = hexposition + HEXCHARS_IN_LINE * charwidth + GAP_HEX_ASCII;
 
-    setMinimumHeight(((xdata.size()/16 + 1) * charheight) + 5);
+    //setMinimumHeight(((xdata.size()/16 + 1) * charheight) + 5);
     setMinimumWidth(asciiposition + (BYTES_PER_LINE * charwidth));
 
     update();

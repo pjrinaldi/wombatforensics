@@ -1263,7 +1263,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // range must be contained in the space of an integer, just do 100
    // increments
    //hexvsb->setRange(0,100);
-   //hexscroll->setRange(low, high);
+   hexscroll->setRange(low, high);
    //scrollarea->verticalScrollBar()->setRange(low, high);
    //hexvsb->setRange(low, high);
 }
