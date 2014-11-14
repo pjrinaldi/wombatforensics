@@ -7,6 +7,7 @@ const int BYTES_PER_LINE = 16;
 
 HexViewer::HexViewer(QWidget* parent, TskObject* tskobjptr) : QWidget(parent)
 {
+    scrollarea = (QScrollArea*)parent;
     tskptr = tskobjptr;
     SetAddressWidth(4);
     SetAddressOffset(0);
