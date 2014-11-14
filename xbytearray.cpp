@@ -242,7 +242,7 @@ void XByteArray::AdjustData(int offset, int charheight)
     if(curoff <= slicestart && sliceindex > 1)
     {
         qDebug() << "need to remove the end slice and load the new begin slice";
-        //addressoffset = addressoffset - slicesize;
+        addressoffset = addressoffset - slicesize;
         sliceindex--;
         slicestart = sliceindex*slicesize;
         sliceend = slicestart + slicesize;
@@ -255,7 +255,7 @@ void XByteArray::AdjustData(int offset, int charheight)
     if(curoff >= sliceend && sliceindex < (imagesize/slicesize + 1))
     {
         qDebug() << "need to remove the begin slice and load the new end slice";
-        //addressoffset = addressoffset + slicesize;
+        addressoffset = addressoffset + slicesize;
         sliceindex++;
         slicestart = sliceindex*slicesize;
         sliceend = slicestart + slicesize;
