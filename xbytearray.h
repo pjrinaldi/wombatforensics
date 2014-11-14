@@ -33,7 +33,7 @@ public:
     bool OpenImage(TskObject* tskobject);
     bool CloseImage();
     bool LoadSlice(off_t sliceoffset, off_t sliceindex);
-    void FreeSlice(off_t sliceindex);
+    void FreeSlice(int prepost, off_t sliceindex);
     void AdjustData(int offset, int charheight);
 
     /*

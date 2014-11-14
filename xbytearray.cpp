@@ -212,26 +212,18 @@ bool XByteArray::LoadSlice(off_t soffset, off_t sindex)
     //qDebug() << "retval" << retval;
     if(retval > 0)
     {
+        _data.insert(sindex*slicesize, QByteArray(tmpbuf, retval));
         //slicelist.append(QByteArray(tmpbuf, retval));
-        _data.append(QByteArray(tmpbuf, retval));
+        //_data.append(QByteArray(tmpbuf, retval));
         //qDebug() << "_data size" << _data.size();
     }
+
     return true;
-    /*
-    //retval = tsk_img_read(tskptr->readimginfo, sliceoffset + sliceindex*slicesize, NULL, slicesize);
-    if(retval > 0)
-    {
-        if(pageindex < firstpage)
-            firstpage = pageindex;
-        if(pageindex > lastpage)
-            lastpage = pageindex;
-    }
-    */
 }
 
-void XByteArray::FreeSlice(off_t sliceindex)
+void XByteArray::FreeSlice(int prepost, off_t sliceindex)
 {
-    _data.remove((sliceindex*slicesize - slicesize), slicesize);
+    _data.remove((sliceindex*slicesize - (prepost*slicesize)), slicesize);
     /*
     if(currentoffset == slicestart)
     {
@@ -254,8 +246,8 @@ void XByteArray::AdjustData(int offset, int charheight)
         sliceindex--;
         slicestart = sliceindex*slicesize;
         sliceend = slicestart + slicesize;
-        //LoadSlice(0, (sliceindex - 1));
-        //FreeSlice(sliceindex + 2);
+        LoadSlice(0, (sliceindex - 1));
+        FreeSlice(1, sliceindex + 2);
         // set sliceindex = sliceindex - 1;
         // set the new slicestart, sliceend
         // need to free the endslice and load the beginslice
@@ -268,7 +260,7 @@ void XByteArray::AdjustData(int offset, int charheight)
         slicestart = sliceindex*slicesize;
         sliceend = slicestart + slicesize;
         LoadSlice(0, (sliceindex + 1));
-        //FreeSlice(sliceindex - 2);
+        FreeSlice(-1, sliceindex - 2);
         // set sliceindex = sliceindex + 1
         // set the new slicestart, sliceend
         // need to free the beginslice and load the end slice
