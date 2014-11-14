@@ -296,9 +296,12 @@ void HexViewer::SetCursorPosition(int position)
     if(position < 0)
         position = 0;
 
-    cursorposition = position;
-    qDebug() << "cursor position:" << position;
-    //qDebug() << "cursor position:" << position << "adjusted offset cursor position:" << xdata.sliceindex*xdata.slicesize + position;
+    if(xdata.sliceindex == 1)
+        cursorposition = position;
+    else
+        cursorposition = xdata.sliceindex*xdata.slicesize + position;
+    //qDebug() << "cursor position:" << position;
+    qDebug() << "cursor position:" << position/2 << "adjusted offset cursor position:" << (xdata.sliceindex*xdata.slicesize + position)/2;
     cursory = (position / (2 * BYTES_PER_LINE)) * charheight + 4;
     int x = (position % (2 * BYTES_PER_LINE));
     cursorx = (((x/2) * 3) + (x % 2)) * charwidth + hexposition;
@@ -319,6 +322,7 @@ int HexViewer::CursorPosition(QPoint pos)
             x = ((x / 3) * 2) + 1;
         int y = ((pos.y() - 3) / charheight) * 2 * BYTES_PER_LINE;
         result = x + y;
+        //result = x + y + xdata.AddressOffset();
     }
     return result;
 }
