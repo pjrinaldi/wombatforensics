@@ -428,7 +428,29 @@ HexViewer::~HexViewer()
 
 void HexViewer::AdjustData(int offset)
 {
+    if(offset > oldoffset)
+    {
+        SetCursorPosition(offset - (2 * BYTES_PER_LINE));
+        ResetSelection(offset);
+    }
+    else
+    {
+        SetCursorPosition(offset + (2*BYTES_PER_LINE));
+        ResetSelection(offset);
+    }
     qDebug() << "scroll offset:" << offset;
+    //SetCursorPosition(offset);
     xdata.AdjustData(offset, charheight);
     update();
+
+    /*
+     *        SetCursorPosition(cursorposition - (2 * BYTES_PER_LINE));
+        ResetSelection(cursorposition);
+    }
+    if(e->matches(QKeySequence::MoveToNextLine))
+    {
+        SetCursorPosition(cursorposition + (2 * BYTES_PER_LINE));
+        ResetSelection(cursorposition);
+
+     */ 
 }

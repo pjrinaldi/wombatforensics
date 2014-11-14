@@ -1243,6 +1243,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
 void WombatForensics::SetOffsetLabel(int pos)
 {
     selectedoffset->setText(QString("Offset: 0x%1").arg(pos, 1, 16));
+    hexviewer->oldoffset = hexscroll->value();
     /*
   QString label;
   label = "Offset: ";

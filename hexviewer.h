@@ -37,6 +37,8 @@ public:
     bool LoadImagePage(off_t pageindex);
     off_t SeekImage(off_t offset);
 
+    int oldoffset;
+
 signals:
     void CurrentAddressChanged(int address);
     void DataChanged(void);
