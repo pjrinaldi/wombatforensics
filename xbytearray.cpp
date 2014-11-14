@@ -210,7 +210,7 @@ bool XByteArray::LoadSlice(off_t soffset, off_t sindex)
     off_t retval = 0;
     char tmpbuf[slicesize];
     retval = tsk_img_read(tskptr->readimginfo, sindex*slicesize, tmpbuf, slicesize);
-    //qDebug() << "retval" << retval;
+    qDebug() << "retval" << retval;
     if(retval > 0)
     {
         _data.insert(sindex*slicesize, QByteArray(tmpbuf, retval));
