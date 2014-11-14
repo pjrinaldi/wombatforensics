@@ -196,6 +196,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     lastoffset = imagesize - 1;
     currentoffset = 0;
     blocklinecount = blocksize / bytesperline;
+    //blocklinecount = slicesize / bytesperline;
     linecount = imagesize / bytesperline;
     // load the 1st three slices here...
     int retval = 0;
@@ -238,14 +239,16 @@ void XByteArray::AdjustData(int offset, int charheight)
 {
     //int curoff = (sliceindex-1)*slicesize + (offset/charheight)*bytesperline;
     int curoff = (offset/charheight)*bytesperline;
+    qDebug() << "curoff:" << curoff;
     //qDebug() << "scroll bar value changed:" << (offset/charheight)*bytesperline; // 1st byteoffset for each line
     if(curoff <= slicestart && sliceindex > 1)
     {
-        qDebug() << "need to remove the end slice and load the new begin slice";
+        //qDebug() << "need to remove the end slice and load the new begin slice:" << sliceindex;
         addressoffset = addressoffset - slicesize;
         sliceindex--;
         slicestart = sliceindex*slicesize;
-        sliceend = slicestart + slicesize;
+        sliceend = slicestart + slicesize - blocksize;
+        qDebug() << "sidx:" << sliceindex << "ssrt:" << slicestart << "send" << sliceend << "curoff:" << curoff;
         LoadSlice(0, (sliceindex - 1));
         FreeSlice(1, sliceindex + 2);
         // set sliceindex = sliceindex - 1;
@@ -254,11 +257,12 @@ void XByteArray::AdjustData(int offset, int charheight)
     }
     if(curoff >= sliceend && sliceindex < (imagesize/slicesize + 1))
     {
-        qDebug() << "need to remove the begin slice and load the new end slice";
+        qDebug() << "need to remove the begin slice and load the new end slice:" << sliceindex;
         addressoffset = addressoffset + slicesize;
         sliceindex++;
         slicestart = sliceindex*slicesize;
-        sliceend = slicestart + slicesize;
+        sliceend = slicestart + slicesize - blocksize;
+        qDebug() << "sidx:" << sliceindex << "ssrt:" << slicestart << "send" << sliceend << "curoff:" << curoff;
         LoadSlice(0, (sliceindex + 1));
         FreeSlice(-1, sliceindex - 2);
         // set sliceindex = sliceindex + 1

@@ -427,5 +427,7 @@ HexViewer::~HexViewer()
 
 void HexViewer::AdjustData(int offset)
 {
+    qDebug() << "scroll offset:" << offset;
     xdata.AdjustData(offset, charheight);
+    update();
 }
