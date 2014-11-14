@@ -942,14 +942,20 @@ void WombatForensics::SetupHexPage(void)
     //hexwidget->setObjectName("bt-hexview");
     //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     //hexLayout->addWidget(hexwidget);
+    /*
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
     scrollarea->setWidget(hexviewer);
     scrollarea->setContentsMargins(0, 0, 0, 0);
+    */
+    hexLayout->addWidget(hexviewer);
     //hexLayout->addWidget(hexviewer);
-    hexLayout->addWidget(scrollarea);
-    hexLayout->setContentsMargins(0, 0, 0, 0);
-    mainlayout->setContentsMargins(0, 0, 0, 0);
+    //hexLayout->addWidget(scrollarea);
+    //hexLayout->setContentsMargins(0, 0, 0, 0);
+    //mainlayout->setContentsMargins(0, 0, 0, 0);
+    hexscroll = new QScrollBar(hexviewer);
+    hexLayout->addWidget(hexscroll);
+    hexscroll->setRange(0, 0);
     //hexvsb = new QScrollBar(hexwidget);
     //hexLayout->addWidget(hexvsb);
     //hexvsb->setRange(0, 0);
@@ -957,7 +963,8 @@ void WombatForensics::SetupHexPage(void)
     connect(hexviewer, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
     connect(hexviewer, SIGNAL(SetRange(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
     connect(hexviewer, SIGNAL(CurrentAddressChanged(int)), this, SLOT(SetOffsetLabel(int)));
-    connect(scrollarea->verticalScrollBar(), SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
+    connect(hexscroll, SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
+    //connect(scrollarea->verticalScrollBar(), SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
      // how we load the data into a qbytearray...
     //QFile file("./reader.h");
     //file.open(QFile::ReadOnly);
@@ -974,8 +981,10 @@ void WombatForensics::SetupHexPage(void)
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
-    scrollarea->verticalScrollBar()->setSingleStep(singlestep);
-    scrollarea->verticalScrollBar()->setPageStep(pagestep);
+    hexscroll->setSingleStep(singlestep);
+    hexscroll->setPageStep(pagestep);
+    //scrollarea->verticalScrollBar()->setSingleStep(singlestep);
+    //scrollarea->verticalScrollBar()->setPageStep(pagestep);
 
     //hexvsb->setSingleStep(singlestep);
     //hexvsb->setPageStep(pagestep);
@@ -1254,14 +1263,15 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // range must be contained in the space of an integer, just do 100
    // increments
    //hexvsb->setRange(0,100);
-   scrollarea->verticalScrollBar()->setRange(low, high);
+   hexscroll->setRange(low, high);
+   //scrollarea->verticalScrollBar()->setRange(low, high);
    //hexvsb->setRange(low, high);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)
 {
     // THIS IS THE LINE # THAT THE OFFSET FALLS UNDER
-    hexvsb->setValue(pos);
+    //hexvsb->setValue(pos);
   // pos is the topLeft pos, set the scrollbar to the
   // location of the last byte on the page
   // Note: offsetToPercent now rounds up, so we don't

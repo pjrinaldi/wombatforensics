@@ -559,6 +559,7 @@ private:
     HexEditor* hexwidget;
     HexViewer* hexviewer;
     QScrollArea* scrollarea;
+    QScrollBar* hexscroll;
     QActionGroup* viewgroup;
     QScrollBar* hexvsb;
     QLabel* selectedoffset;
