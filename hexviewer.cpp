@@ -409,7 +409,8 @@ bool HexViewer::OpenImage()
 
     Adjust();
     SetCursorPosition(0);
-    emit SetRange(0, xdata.LineCount()*charheight);
+    emit SetRange(0, xdata.size());
+    //emit SetRange(0, xdata.LineCount()*charheight);
     emit StepValues(charheight, xdata.BlockLineCount()*charheight);
     /*
      * SET CURSOR RANGE
