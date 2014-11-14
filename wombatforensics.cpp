@@ -934,7 +934,7 @@ void WombatForensics::SetupHexPage(void)
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
     //hexwidget = new HexEditor(ui->hexPage, tskobjptr);
-    hexviewer = new HexViewer(this, tskobjptr);
+    hexviewer = new HexViewer(ui->hexPage, tskobjptr);
     hexviewer->setObjectName("bt-hexviewer");
     hexviewer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setBackgroundRole(QPalette::Base);
@@ -1263,7 +1263,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // range must be contained in the space of an integer, just do 100
    // increments
    //hexvsb->setRange(0,100);
-   hexscroll->setRange(low, high);
+   //hexscroll->setRange(low, high);
    //scrollarea->verticalScrollBar()->setRange(low, high);
    //hexvsb->setRange(low, high);
 }
