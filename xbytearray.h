@@ -57,6 +57,8 @@ public:
 */
     QChar AsciiChar(int index);
     //QString ToReadableString(int start=0, int end=-1);
+    off_t slicesize; // size of loaded portion of the image
+    off_t sliceindex; // which slice is currently loaded.
     int bytesperline;
 
 signals:
@@ -80,8 +82,8 @@ private:
     off_t lastoffset; // last offset for image
     off_t slicestart; // first loaded offset
     off_t sliceend; // last loaded offset
-    off_t slicesize; // size of loaded portion of the image
-    off_t sliceindex; // which slice is currently loaded.
+    //off_t slicesize; // size of loaded portion of the image
+    //off_t sliceindex; // which slice is currently loaded.
     off_t linecount;
     off_t blocklinecount;
 };

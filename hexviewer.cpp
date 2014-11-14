@@ -297,6 +297,8 @@ void HexViewer::SetCursorPosition(int position)
         position = 0;
 
     cursorposition = position;
+    qDebug() << "cursor position:" << position;
+    //qDebug() << "cursor position:" << position << "adjusted offset cursor position:" << xdata.sliceindex*xdata.slicesize + position;
     cursory = (position / (2 * BYTES_PER_LINE)) * charheight + 4;
     int x = (position % (2 * BYTES_PER_LINE));
     cursorx = (((x/2) * 3) + (x % 2)) * charwidth + hexposition;
