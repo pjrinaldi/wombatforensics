@@ -958,6 +958,7 @@ void WombatForensics::SetupHexPage(void)
     //mainlayout->setContentsMargins(0, 0, 0, 0);
     hexscroll = new QScrollBar(hexviewer);
     hexLayout->addWidget(hexscroll);
+    scrollarea->setVerticalScrollBar(hexscroll);
     hexscroll->setRange(0, 0);
     //hexvsb = new QScrollBar(hexwidget);
     //hexLayout->addWidget(hexvsb);
@@ -967,7 +968,7 @@ void WombatForensics::SetupHexPage(void)
     connect(hexviewer, SIGNAL(SetRange(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
     connect(hexviewer, SIGNAL(CurrentAddressChanged(int)), this, SLOT(SetOffsetLabel(int)));
     connect(hexscroll, SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
-    connect(scrollarea->verticalScrollBar(), SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
+    //connect(scrollarea->verticalScrollBar(), SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
      // how we load the data into a qbytearray...
     //QFile file("./reader.h");
     //file.open(QFile::ReadOnly);
@@ -986,8 +987,8 @@ void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
     hexscroll->setSingleStep(singlestep);
     hexscroll->setPageStep(pagestep);
-    scrollarea->verticalScrollBar()->setSingleStep(singlestep);
-    scrollarea->verticalScrollBar()->setPageStep(pagestep);
+    //scrollarea->verticalScrollBar()->setSingleStep(singlestep);
+    //scrollarea->verticalScrollBar()->setPageStep(pagestep);
 
     //hexvsb->setSingleStep(singlestep);
     //hexvsb->setPageStep(pagestep);
@@ -1268,7 +1269,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // increments
    //hexvsb->setRange(0,100);
    hexscroll->setRange(low, high);
-   scrollarea->verticalScrollBar()->setRange(low, high);
+   //scrollarea->verticalScrollBar()->setRange(low, high);
    //hexvsb->setRange(low, high);
 }
 

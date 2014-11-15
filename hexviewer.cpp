@@ -390,8 +390,8 @@ void HexViewer::Adjust(void)
     hexposition = xdata.RealAddressNumbers() * charwidth + GAP_ADR_HEX;
     asciiposition = hexposition + HEXCHARS_IN_LINE * charwidth + GAP_HEX_ASCII;
 
-    setMinimumHeight(20*charheight);
-    //setMinimumHeight(((xdata.size()/16 + 1) * charheight) + 5);
+    //setMinimumHeight(20*charheight);
+    setMinimumHeight(((xdata.size()/16 + 1) * charheight) + 5);
     setMinimumWidth(asciiposition + (BYTES_PER_LINE * charwidth));
 
     update();
@@ -409,8 +409,8 @@ bool HexViewer::OpenImage()
 
     Adjust();
     SetCursorPosition(0);
-    emit SetRange(0, xdata.size());
-    //emit SetRange(0, xdata.LineCount()*charheight);
+    //emit SetRange(0, xdata.size());
+    emit SetRange(0, xdata.LineCount()*charheight);
     emit StepValues(charheight, xdata.BlockLineCount()*charheight);
     /*
      * SET CURSOR RANGE
@@ -430,6 +430,7 @@ HexViewer::~HexViewer()
 
 void HexViewer::AdjustData(int offset)
 {
+    /*
     if(offset > oldoffset)
     {
         SetCursorPosition(offset - (2 * BYTES_PER_LINE));
@@ -440,6 +441,9 @@ void HexViewer::AdjustData(int offset)
         SetCursorPosition(offset + (2*BYTES_PER_LINE));
         ResetSelection(offset);
     }
+    */
+    //scrollarea
+    //scrollarea->verticalScrollBar()->setValue(offset);
     qDebug() << "scroll offset:" << offset;
     //SetCursorPosition(offset);
     xdata.AdjustData(offset, charheight);
