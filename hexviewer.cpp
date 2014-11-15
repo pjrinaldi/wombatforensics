@@ -444,7 +444,7 @@ void HexViewer::AdjustData(int offset)
     */
     //scrollarea
     //scrollarea->verticalScrollBar()->setValue(offset);
-    qDebug() << "scroll offset:" << offset;
+    //qDebug() << "scroll offset:" << offset;
     //SetCursorPosition(offset);
     xdata.AdjustData(offset, charheight);
     update();

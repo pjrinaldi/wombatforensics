@@ -187,11 +187,11 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     if(slicesize*3 >= imagesize)
     {
         slicesize = imagesize;
-        sliceend = slicesize/2;
+        sliceend = slicesize;
     }
     else
     {
-        sliceend = 2*slicesize - 1;
+        sliceend = 2*slicesize;
     }
     lastoffset = imagesize - 1;
     currentoffset = 0;
@@ -237,17 +237,35 @@ void XByteArray::FreeSlice(int prepost, off_t sliceindex)
 }
 void XByteArray::AdjustData(int offset, int charheight)
 {
+    int curoff = (offset/charheight)*bytesperline;
+    if(curoff <= slicestart && sliceindex > 1)
+    {
+        addressoffset = addressoffset - slicesize;
+        sliceindex--;
+        slicestart = sliceindex*slicesize - 5120;
+        LoadSlice(0, sliceindex - 1);
+        FreeSlice(1, sliceindex + 2);
+    }
+    if(curoff >= sliceend && sliceindex < (imagesize/slicesize))
+    {
+        addressoffset = addressoffset + slicesize;
+        sliceindex++;
+        sliceend = sliceindex*slicesize - 5120;
+        LoadSlice(0, sliceindex + 1);
+        FreeSlice(-1, sliceindex - 2);
+    }
+    /*
     //int curoff = (sliceindex-1)*slicesize + (offset/charheight)*bytesperline;
     int curoff = (offset/charheight)*bytesperline;
-    qDebug() << "curoff:" << curoff;
+    //qDebug() << "curoff:" << curoff;
     //qDebug() << "scroll bar value changed:" << (offset/charheight)*bytesperline; // 1st byteoffset for each line
     if(curoff <= slicestart && sliceindex > 1)
     {
         //qDebug() << "need to remove the end slice and load the new begin slice:" << sliceindex;
         addressoffset = addressoffset - slicesize;
         sliceindex--;
-        slicestart = slicestart + slicesize/2;
-        sliceend = sliceend + slicesize/2;
+        //slicestart = slicestart + slicesize/2;
+        //sliceend = sliceend + slicesize/2;
         //slicestart = sliceindex*slicesize - 10*blocksize;
         //sliceend = slicestart + slicesize/2;
         qDebug() << "sidx:" << sliceindex << "ssrt:" << slicestart << "send" << sliceend << "curoff:" << curoff;
@@ -263,8 +281,9 @@ void XByteArray::AdjustData(int offset, int charheight)
         addressoffset = addressoffset + slicesize;
         qDebug() << (imagesize/slicesize);
         sliceindex++;
-        slicestart = sliceindex*slicesize - 10*blocksize;
-        sliceend = slicestart + slicesize - 10*blocksize;
+        //slicestart = sliceindex*slicesize - 10*blocksize;
+        //sliceend = slicestart + slicesize - 10*blocksize;
+        sliceend = sliceend + slicesize;
         qDebug() << "sidx:" << sliceindex << "ssrt:" << slicestart << "send" << sliceend << "curoff:" << curoff;
         LoadSlice(0, (sliceindex + 1));
         FreeSlice(-1, sliceindex - 2);
@@ -272,4 +291,5 @@ void XByteArray::AdjustData(int offset, int charheight)
         // set the new slicestart, sliceend
         // need to free the beginslice and load the end slice
     }
+    */
 }

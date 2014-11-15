@@ -446,6 +446,8 @@ void WombatForensics::UpdateViewer()
 
 void WombatForensics::LoadHexContents()
 {
+    if(hexviewer->isVisible() == false)
+        hexviewer->setVisible(true);
     // here is where i would call the highlight functionality using the data obtained from the tsk functions
     // which would show what should be highlighted for each object type, such as the volume, partition/file system, unallocated
     // or an actual file and/or directory.
@@ -959,6 +961,7 @@ void WombatForensics::SetupHexPage(void)
     hexscroll = new QScrollBar(hexviewer);
     hexLayout->addWidget(hexscroll);
     scrollarea->setVerticalScrollBar(hexscroll);
+    hexviewer->setVisible(false);
     hexscroll->setRange(0, 0);
     //hexvsb = new QScrollBar(hexwidget);
     //hexLayout->addWidget(hexvsb);
