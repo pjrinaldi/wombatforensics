@@ -181,13 +181,13 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     imagesize = tskptr->imglength;
     sliceindex = 1;
     firstoffset = 0;
-    slicestart = slicesize - 1;
+    slicestart = slicesize;
     addressoffset = 0;
     // determine if slicesize is > imagesize and adjust accordingly
     if(slicesize*3 >= imagesize)
     {
         slicesize = imagesize;
-        sliceend = slicesize - 1;
+        sliceend = slicesize/2;
     }
     else
     {
@@ -195,8 +195,8 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     }
     lastoffset = imagesize - 1;
     currentoffset = 0;
-    blocklinecount = blocksize / bytesperline;
-    //blocklinecount = slicesize / bytesperline;
+    //blocklinecount = blocksize / bytesperline;
+    blocklinecount = slicesize / bytesperline;
     linecount = imagesize / bytesperline;
     // load the 1st three slices here...
     int retval = 0;
@@ -246,8 +246,10 @@ void XByteArray::AdjustData(int offset, int charheight)
         //qDebug() << "need to remove the end slice and load the new begin slice:" << sliceindex;
         addressoffset = addressoffset - slicesize;
         sliceindex--;
-        slicestart = sliceindex*slicesize;
-        sliceend = slicestart + slicesize - blocksize;
+        slicestart = slicestart + slicesize/2;
+        sliceend = sliceend + slicesize/2;
+        //slicestart = sliceindex*slicesize - 10*blocksize;
+        //sliceend = slicestart + slicesize/2;
         qDebug() << "sidx:" << sliceindex << "ssrt:" << slicestart << "send" << sliceend << "curoff:" << curoff;
         LoadSlice(0, (sliceindex - 1));
         FreeSlice(1, sliceindex + 2);
@@ -259,9 +261,10 @@ void XByteArray::AdjustData(int offset, int charheight)
     {
         qDebug() << "need to remove the begin slice and load the new end slice:" << sliceindex;
         addressoffset = addressoffset + slicesize;
+        qDebug() << (imagesize/slicesize);
         sliceindex++;
-        slicestart = sliceindex*slicesize;
-        sliceend = slicestart + slicesize - blocksize;
+        slicestart = sliceindex*slicesize - 10*blocksize;
+        sliceend = slicestart + slicesize - 10*blocksize;
         qDebug() << "sidx:" << sliceindex << "ssrt:" << slicestart << "send" << sliceend << "curoff:" << curoff;
         LoadSlice(0, (sliceindex + 1));
         FreeSlice(-1, sliceindex - 2);
