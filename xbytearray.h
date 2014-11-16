@@ -86,6 +86,7 @@ private:
     //off_t sliceindex; // which slice is currently loaded.
     off_t linecount;
     off_t blocklinecount;
+    off_t slicecount; // total slices
 };
 
 /** \endcond docNever */

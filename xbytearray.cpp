@@ -179,7 +179,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     tskptr = tskpointer;
     blocksize = tskptr->blocksize;
     imagesize = tskptr->imglength;
-    sliceindex = 1;
+    sliceindex = 3;
     firstoffset = 0;
     slicestart = slicesize;
     addressoffset = 0;
@@ -188,6 +188,7 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     {
         slicesize = imagesize;
         sliceend = slicesize;
+        slicestart = 0;
     }
     else
     {
@@ -198,6 +199,9 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     //blocklinecount = blocksize / bytesperline;
     blocklinecount = slicesize / bytesperline;
     linecount = imagesize / bytesperline;
+    slicecount = imagesize / slicesize;
+    if(imagesize % slicesize != 0)
+        slicecount++;
     // load the 1st three slices here...
     int retval = 0;
     LoadSlice(firstoffset, 0);
@@ -237,6 +241,23 @@ void XByteArray::FreeSlice(int prepost, off_t sliceindex)
 }
 void XByteArray::AdjustData(int offset, int charheight)
 {
+    if(sliceindex <= slicecount && sliceindex >= (sliceindex-1)*slicesize)
+    {
+        LoadSlice(0, sliceindex);
+        FreeSlice(1, (sliceindex - 3));
+        slicestart = (sliceindex - 1)*slicesize;
+        sliceend = sliceindex*slicesize;
+        sliceindex++;
+    }
+    if(sliceindex > 3 && sliceindex <= (sliceindex-2)*slicesize)
+    {
+        sliceindex--;
+        LoadSlice(0, sliceindex - 3);
+        FreeSlice(-1, sliceindex);
+        slicestart = (sliceindex - 2)*slicesize;
+        sliceend = (sliceindex - 1)*slicesize;
+    }
+    /*
     int curoff = (offset/charheight)*bytesperline;
     if(curoff <= slicestart && sliceindex > 1)
     {
@@ -253,7 +274,7 @@ void XByteArray::AdjustData(int offset, int charheight)
         sliceend = sliceindex*slicesize - 5120;
         LoadSlice(0, sliceindex + 1);
         FreeSlice(-1, sliceindex - 2);
-    }
+    }*/
     /*
     //int curoff = (sliceindex-1)*slicesize + (offset/charheight)*bytesperline;
     int curoff = (offset/charheight)*bytesperline;
