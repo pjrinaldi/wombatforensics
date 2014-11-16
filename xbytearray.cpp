@@ -241,8 +241,11 @@ void XByteArray::FreeSlice(int prepost, off_t sliceindex)
 }
 void XByteArray::AdjustData(int offset, int charheight)
 {
+    int curoff = (offset/charheight)*bytesperline;
+    qDebug() << "sidx:" << sliceindex << "ssrt:" << slicestart << "send" << sliceend << "curoff:" << curoff;
     if(sliceindex <= slicecount && sliceindex >= (sliceindex-1)*slicesize)
     {
+        qDebug() << "need to remove the end slice and load the new begin slice:" << sliceindex;
         LoadSlice(0, sliceindex);
         FreeSlice(1, (sliceindex - 3));
         slicestart = (sliceindex - 1)*slicesize;
@@ -251,6 +254,7 @@ void XByteArray::AdjustData(int offset, int charheight)
     }
     if(sliceindex > 3 && sliceindex <= (sliceindex-2)*slicesize)
     {
+        qDebug() << "need to remove the begin slice and load the new end slice:" << sliceindex;
         sliceindex--;
         LoadSlice(0, sliceindex - 3);
         FreeSlice(-1, sliceindex);
