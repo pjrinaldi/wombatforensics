@@ -515,6 +515,7 @@ private slots:
     };
     void SetStepValues(int singlestep, int pagestep);
     void TreeContextMenu(const QPoint &point);
+    void SetNewMax(int slicerange); 
 
 protected:
     void closeEvent(QCloseEvent* event);

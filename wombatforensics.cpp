@@ -971,6 +971,7 @@ void WombatForensics::SetupHexPage(void)
     connect(hexviewer, SIGNAL(SetRange(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
     connect(hexviewer, SIGNAL(CurrentAddressChanged(int)), this, SLOT(SetOffsetLabel(int)));
     connect(hexscroll, SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
+    connect(hexviewer, SIGNAL(AddRange(int)), this, SLOT(SetNewMax(int)));
     //connect(scrollarea->verticalScrollBar(), SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
      // how we load the data into a qbytearray...
     //QFile file("./reader.h");
@@ -984,6 +985,11 @@ void WombatForensics::SetupHexPage(void)
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     //connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
 */
+}
+
+void WombatForensics::SetNewMax(int slicerange)
+{
+    hexscroll->setMaximum(hexscroll->maximum() + slicerange);
 }
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)

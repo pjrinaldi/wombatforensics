@@ -297,7 +297,7 @@ void HexViewer::SetCursorPosition(int position)
     if(position < 0)
         position = 0;
 
-    if(xdata.sliceindex == 1)
+    if(xdata.sliceindex == 3)
         cursorposition = position;
     else
         cursorposition = xdata.sliceindex*xdata.slicesize + position;
@@ -408,9 +408,13 @@ bool HexViewer::OpenImage()
         QMessageBox::critical(this, "HexViewer", "Error Opening Image\n", QMessageBox::Ok, 0);
 
     Adjust();
+    qDebug() << "charheight:" << charheight;
     SetCursorPosition(0);
     //emit SetRange(0, xdata.size());
-    emit SetRange(0, xdata.LineCount()*charheight);
+    qDebug() << "line count:" << xdata.LineCount();
+    emit SetRange(charheight, xdata.LineCount()*charheight);
+    //emit SetRange(0, tskptr->imglength*charheight);
+    //emit StepValues(charheight, xdata.BlockLineCount()*charheight);
     emit StepValues(charheight, xdata.BlockLineCount()*charheight);
     /*
      * SET CURSOR RANGE
@@ -446,6 +450,7 @@ void HexViewer::AdjustData(int offset)
     //scrollarea->verticalScrollBar()->setValue(offset);
     //qDebug() << "scroll offset:" << offset;
     //SetCursorPosition(offset);
+    //emit AddRange((BYTES_PER_LINE));
     xdata.AdjustData(offset, charheight);
     update();
 
