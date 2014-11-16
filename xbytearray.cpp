@@ -203,7 +203,6 @@ bool XByteArray::OpenImage(TskObject* tskpointer)
     if(imagesize % slicesize != 0)
         slicecount++;
     // load the 1st three slices here...
-    int retval = 0;
     LoadSlice(firstoffset, 0);
     LoadSlice(slicesize, 1);
     LoadSlice(2*slicesize, 2);
@@ -241,20 +240,22 @@ void XByteArray::FreeSlice(int prepost, off_t sliceindex)
 }
 void XByteArray::AdjustData(int offset, int charheight)
 {
+    // it appears the currentoffset isn't adjusting accordingly on the page increase, so it won't reach the next start or end slice
+    // i need to adjust the offset position as well as figure out how to adjust the scrollbar size and gap.
     int curoff = (offset/charheight)*bytesperline;
     qDebug() << "sidx:" << sliceindex << "ssrt:" << slicestart << "send" << sliceend << "curoff:" << curoff;
-    if(sliceindex <= slicecount && sliceindex >= (sliceindex-1)*slicesize)
+    if(sliceindex < slicecount && curoff >= (sliceindex-1)*slicesize)
     {
-        qDebug() << "need to remove the end slice and load the new begin slice:" << sliceindex;
+        qDebug() << "need to remove the begin slice and load the new end slice:" << sliceindex;
         LoadSlice(0, sliceindex);
         FreeSlice(1, (sliceindex - 3));
         slicestart = (sliceindex - 1)*slicesize;
         sliceend = sliceindex*slicesize;
         sliceindex++;
     }
-    if(sliceindex > 3 && sliceindex <= (sliceindex-2)*slicesize)
+    if(sliceindex > 3 && curoff <= (sliceindex-2)*slicesize)
     {
-        qDebug() << "need to remove the begin slice and load the new end slice:" << sliceindex;
+        qDebug() << "need to remove the end slice and load the new begin slice:" << sliceindex;
         sliceindex--;
         LoadSlice(0, sliceindex - 3);
         FreeSlice(-1, sliceindex);
