@@ -1294,5 +1294,5 @@ void WombatForensics::setScrollBarValue(off_t pos)
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
   //hexvsb->setValue(hexwidget->offsetToPercent(pos));
-  hexscroll->setValue(pos);
+  //hexscroll->setValue(pos);
 }

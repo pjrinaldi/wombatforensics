@@ -6,6 +6,7 @@ XByteArray::XByteArray()
     addressnumbers = 4;
     addressoffset = 0;
     slicesize = 819200; // default loaded size is three slices (1600*512)
+    sliceindex = 3;
 }
 
 int XByteArray::AddressOffset()
@@ -244,9 +245,14 @@ void XByteArray::AdjustData(int offset, int charheight)
 {
     // it appears the currentoffset isn't adjusting accordingly on the page increase, so it won't reach the next start or end slice
     // i need to adjust the offset position as well as figure out how to adjust the scrollbar size and gap.
-    int curoff = (offset/charheight)*bytesperline;
+    int curoff = 0;
+    if(sliceindex == 3)
+        curoff = (offset/charheight)*bytesperline;
+    else
+        curoff = (offset/charheight)*bytesperline + (sliceindex-3)*slicesize;
+    //int curoff = (sliceindex*slicesize) + (offset/charheight)*bytesperline;
     qDebug() << "sidx:" << sliceindex << "ssrt:" << slicestart << "send" << sliceend << "curoff:" << curoff;
-    if(sliceindex < slicecount && curoff >= (sliceindex-1)*slicesize - 512)
+    if(sliceindex <= slicecount && curoff >= (sliceindex-1)*slicesize - 512)
     {
         qDebug() << "need to remove the begin slice and load the new end slice:" << sliceindex;
         addressoffset = addressoffset + slicesize;
@@ -256,8 +262,7 @@ void XByteArray::AdjustData(int offset, int charheight)
         sliceend = sliceindex*slicesize;
         sliceindex++;
         //emit AddRange((slicesize/charheight)*bytesperline)
-    }
-    /*
+    } 
     if(sliceindex > 3 && curoff <= ((sliceindex-2)*slicesize + 512))
     {
         qDebug() << "need to remove the end slice and load the new begin slice:" << sliceindex;
@@ -267,7 +272,7 @@ void XByteArray::AdjustData(int offset, int charheight)
         FreeSlice(-1, sliceindex-1);
         slicestart = (sliceindex - 2)*slicesize;
         sliceend = (sliceindex - 1)*slicesize;
-    }*/
+    }
     /*
     int curoff = (offset/charheight)*bytesperline;
     if(curoff <= slicestart && sliceindex > 1)

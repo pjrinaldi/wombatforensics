@@ -411,7 +411,7 @@ bool HexViewer::OpenImage()
     qDebug() << "charheight:" << charheight;
     SetCursorPosition(0);
     //emit SetRange(0, xdata.size());
-    qDebug() << "line count:" << xdata.LineCount();
+    qDebug() << "line count:" << xdata.LineCount()*charheight;
     emit SetRange(0, xdata.LineCount()*charheight);
     //emit SetRange(0, tskptr->imglength*charheight);
     //emit StepValues(charheight, xdata.BlockLineCount()*charheight);
@@ -453,7 +453,7 @@ void HexViewer::AdjustData(int offset)
     //emit AddRange((BYTES_PER_LINE));
     xdata.AdjustData(offset, charheight);
     update();
-    emit TopLeftChanged(offset);
+    //emit TopLeftChanged(offset);
 
     /*
      *        SetCursorPosition(cursorposition - (2 * BYTES_PER_LINE));
