@@ -45,6 +45,7 @@ signals:
     void StepValues(int singlestep, int pagestep);
     void SetRange(off_t low, off_t high);
     void AddRange(int newslice);
+    void TopLeftChanged(off_t newoffset);
 protected:
     void keyPressEvent(QKeyEvent* event);
     void mouseMoveEvent(QMouseEvent* event);

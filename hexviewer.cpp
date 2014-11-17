@@ -300,7 +300,7 @@ void HexViewer::SetCursorPosition(int position)
     if(xdata.sliceindex == 3)
         cursorposition = position;
     else
-        cursorposition = xdata.sliceindex*xdata.slicesize + position;
+        cursorposition = (xdata.sliceindex-1)*xdata.slicesize + position;
     //qDebug() << "cursor position:" << position;
     qDebug() << "cursor position:" << position/2 << "adjusted offset cursor position:" << (xdata.sliceindex*xdata.slicesize + position)/2;
     cursory = (position / (2 * BYTES_PER_LINE)) * charheight + 4;
@@ -412,7 +412,7 @@ bool HexViewer::OpenImage()
     SetCursorPosition(0);
     //emit SetRange(0, xdata.size());
     qDebug() << "line count:" << xdata.LineCount();
-    emit SetRange(charheight, xdata.LineCount()*charheight);
+    emit SetRange(0, xdata.LineCount()*charheight);
     //emit SetRange(0, tskptr->imglength*charheight);
     //emit StepValues(charheight, xdata.BlockLineCount()*charheight);
     emit StepValues(charheight, xdata.BlockLineCount()*charheight);
@@ -453,6 +453,7 @@ void HexViewer::AdjustData(int offset)
     //emit AddRange((BYTES_PER_LINE));
     xdata.AdjustData(offset, charheight);
     update();
+    emit TopLeftChanged(offset);
 
     /*
      *        SetCursorPosition(cursorposition - (2 * BYTES_PER_LINE));

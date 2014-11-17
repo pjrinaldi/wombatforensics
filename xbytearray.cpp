@@ -249,22 +249,25 @@ void XByteArray::AdjustData(int offset, int charheight)
     if(sliceindex < slicecount && curoff >= (sliceindex-1)*slicesize - 512)
     {
         qDebug() << "need to remove the begin slice and load the new end slice:" << sliceindex;
+        addressoffset = addressoffset + slicesize;
         LoadSlice(0, sliceindex);
-        FreeSlice(1, (sliceindex - 3));
+        FreeSlice(1, (sliceindex - 2));
         slicestart = (sliceindex - 1)*slicesize;
         sliceend = sliceindex*slicesize;
         sliceindex++;
         //emit AddRange((slicesize/charheight)*bytesperline)
     }
-    if(sliceindex > 3 && curoff <= (sliceindex-2)*slicesize + 512)
+    /*
+    if(sliceindex > 3 && curoff <= ((sliceindex-2)*slicesize + 512))
     {
         qDebug() << "need to remove the end slice and load the new begin slice:" << sliceindex;
+        addressoffset = addressoffset - slicesize;
         sliceindex--;
         LoadSlice(0, sliceindex - 3);
-        FreeSlice(-1, sliceindex);
+        FreeSlice(-1, sliceindex-1);
         slicestart = (sliceindex - 2)*slicesize;
         sliceend = (sliceindex - 1)*slicesize;
-    }
+    }*/
     /*
     int curoff = (offset/charheight)*bytesperline;
     if(curoff <= slicestart && sliceindex > 1)

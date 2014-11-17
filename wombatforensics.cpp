@@ -956,8 +956,10 @@ void WombatForensics::SetupHexPage(void)
     //hexLayout->addWidget(hexviewer);
     //hexLayout->addWidget(hexviewer);
     hexLayout->addWidget(scrollarea);
-    //hexLayout->setContentsMargins(0, 0, 0, 0);
-    //mainlayout->setContentsMargins(0, 0, 0, 0);
+    hexLayout->setContentsMargins(0, 0, 0, 0);
+    hexLayout->setSpacing(0);
+    mainlayout->setContentsMargins(0, 0, 0, 0);
+    mainlayout->setSpacing(0);
     hexscroll = new QScrollBar(hexviewer);
     hexLayout->addWidget(hexscroll);
     scrollarea->setVerticalScrollBar(hexscroll);
@@ -972,6 +974,7 @@ void WombatForensics::SetupHexPage(void)
     connect(hexviewer, SIGNAL(CurrentAddressChanged(int)), this, SLOT(SetOffsetLabel(int)));
     connect(hexscroll, SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
     connect(hexviewer, SIGNAL(AddRange(int)), this, SLOT(SetNewMax(int)));
+    connect(hexviewer, SIGNAL(TopLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     //connect(scrollarea->verticalScrollBar(), SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
      // how we load the data into a qbytearray...
     //QFile file("./reader.h");
@@ -1291,4 +1294,5 @@ void WombatForensics::setScrollBarValue(off_t pos)
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
   //hexvsb->setValue(hexwidget->offsetToPercent(pos));
+  hexscroll->setValue(pos);
 }
