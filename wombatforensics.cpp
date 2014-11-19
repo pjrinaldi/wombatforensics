@@ -527,7 +527,7 @@ void WombatForensics::LoadHexContents()
         {
             testdata.insert(0, QByteArray(tmpbuf, retval));
         }
-        hexview->setPlainText(QString(testdata));
+        hexview->setPlainText(QString(testdata.toHex()));
  
         //hexviewer->OpenImage();
         // here is where i need to print out the file byte offset, byte length, block information to figure out
