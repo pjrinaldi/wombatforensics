@@ -517,7 +517,7 @@ void WombatForensics::LoadHexContents()
     //if(wombatvarptr->selectedobject.objtype <= 5)
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
-        int slicesize = 819200;
+        int slicesize = 512;
         QByteArray testdata;
         off_t retval = 0;
         char tmpbuf[slicesize];
@@ -527,6 +527,12 @@ void WombatForensics::LoadHexContents()
         {
             testdata.insert(0, QByteArray(tmpbuf, retval));
         }
+        /*
+        for(int i = 0; i < testdata.size(); i++)
+        {
+            hexview->appendPlainText(QString(testdata.toHex().at(i)));
+        }
+        */
         hexview->setPlainText(QString(testdata.toHex()));
  
         //hexviewer->OpenImage();
