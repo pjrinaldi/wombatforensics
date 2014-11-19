@@ -446,8 +446,10 @@ void WombatForensics::UpdateViewer()
 
 void WombatForensics::LoadHexContents()
 {
+    /*
     if(hexviewer->isVisible() == false)
         hexviewer->setVisible(true);
+    */
     // here is where i would call the highlight functionality using the data obtained from the tsk functions
     // which would show what should be highlighted for each object type, such as the volume, partition/file system, unallocated
     // or an actual file and/or directory.
@@ -515,7 +517,19 @@ void WombatForensics::LoadHexContents()
     //if(wombatvarptr->selectedobject.objtype <= 5)
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
-        hexviewer->OpenImage();
+        int slicesize = 819200;
+        QByteArray testdata;
+        off_t retval = 0;
+        char tmpbuf[slicesize];
+        retval = tsk_img_read(tskobjptr->readimginfo, 0, tmpbuf, slicesize);
+        qDebug() << "retval" << retval;
+        if(retval > 0)
+        {
+            testdata.insert(0, QByteArray(tmpbuf, retval));
+        }
+        hexview->setPlainText(QString(testdata));
+ 
+        //hexviewer->OpenImage();
         // here is where i need to print out the file byte offset, byte length, block information to figure out
         // how to highlight the relevant information for a selected object.
         // based on the file address, i can call functions such as istat to determine the blocks it occupies, then i would
@@ -935,6 +949,9 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
+    hexview = new HexView(ui->hexPage);
+    hexLayout->addWidget(hexview);
+    /*
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
     //hexwidget = new HexEditor(ui->hexPage, tskobjptr);
@@ -947,34 +964,41 @@ void WombatForensics::SetupHexPage(void)
     //hexwidget->setObjectName("bt-hexview");
     //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     //hexLayout->addWidget(hexwidget);
+    */
     ///*
+    /*
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
     scrollarea->setWidget(hexviewer);
     scrollarea->setContentsMargins(0, 0, 0, 0);
+    */
     //*/
     //hexLayout->addWidget(hexviewer);
     //hexLayout->addWidget(hexviewer);
+    /*
     hexLayout->addWidget(scrollarea);
     hexLayout->setContentsMargins(0, 0, 0, 0);
     hexLayout->setSpacing(0);
     mainlayout->setContentsMargins(0, 0, 0, 0);
     mainlayout->setSpacing(0);
-    hexscroll = new QScrollBar(hexviewer);
-    hexLayout->addWidget(hexscroll);
-    scrollarea->setVerticalScrollBar(hexscroll);
-    hexviewer->setVisible(false);
-    hexscroll->setRange(0, 0);
+    */
+    //hexscroll = new QScrollBar(hexviewer);
+    //hexLayout->addWidget(hexscroll);
+    //scrollarea->setVerticalScrollBar(hexscroll);
+    //hexviewer->setVisible(false);
+    //hexscroll->setRange(0, 0);
     //hexvsb = new QScrollBar(hexwidget);
     //hexLayout->addWidget(hexvsb);
     //hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
+    /*
     connect(hexviewer, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
     connect(hexviewer, SIGNAL(SetRange(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
     connect(hexviewer, SIGNAL(CurrentAddressChanged(int)), this, SLOT(SetOffsetLabel(int)));
     connect(hexscroll, SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
     connect(hexviewer, SIGNAL(AddRange(int)), this, SLOT(SetNewMax(int)));
     connect(hexviewer, SIGNAL(TopLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
+    */
     //connect(scrollarea->verticalScrollBar(), SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
      // how we load the data into a qbytearray...
     //QFile file("./reader.h");
