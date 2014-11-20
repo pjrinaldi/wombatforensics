@@ -13,6 +13,7 @@ HexView::HexView(QWidget *parent) : QPlainTextEdit(parent)
 
     UpdateAddressAreaWidth(0);
     highlightCurrentLine();
+    setFont(QFont("fixed"));
 }
 
 
