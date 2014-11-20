@@ -5,13 +5,17 @@
 
 HexView::HexView(QWidget *parent) : QPlainTextEdit(parent)
 {
-    addressarea = new AddressArea(this);
+    /*
+    if(showaddressarea)
+    {
+        addressarea = new AddressArea(this);
 
-    connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(UpdateAddressAreaWidth(int)));
-    connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(UpdateAddressArea(QRect,int)));
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
-
-    UpdateAddressAreaWidth(0);
+        connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(UpdateAddressAreaWidth(int)));
+        connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(UpdateAddressArea(QRect,int)));
+        connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    
+        UpdateAddressAreaWidth(5);
+    }*/
     highlightCurrentLine();
     setFont(QFont("fixed"));
 }
@@ -20,15 +24,18 @@ HexView::HexView(QWidget *parent) : QPlainTextEdit(parent)
 
 int HexView::AddressAreaWidth()
 {
-    int digits = 1;
+    int space = 0;
+    if(showaddressarea)
+    {
+    int digits = 5;
     int max = qMax(1, blockCount());
     while (max >= 10) {
         max /= 10;
         ++digits;
     }
 
-    int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
-
+    space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+    }
     return space;
 }
 
@@ -36,7 +43,10 @@ int HexView::AddressAreaWidth()
 
 void HexView::UpdateAddressAreaWidth(int /* newBlockCount */)
 {
-    setViewportMargins(AddressAreaWidth(), 0, 0, 0);
+    if(showaddressarea)
+        setViewportMargins(AddressAreaWidth(), 0, 0, 0);
+    else
+        setViewportMargins(0, 0, 0, 0);
 }
 
 
@@ -59,7 +69,10 @@ void HexView::resizeEvent(QResizeEvent *e)
     QPlainTextEdit::resizeEvent(e);
 
     QRect cr = contentsRect();
-    addressarea->setGeometry(QRect(cr.left(), cr.top(), AddressAreaWidth(), cr.height()));
+    /*
+    if(showaddressarea)
+        addressarea->setGeometry(QRect(cr.left(), cr.top(), AddressAreaWidth(), cr.height()));
+        */
 }
 
 

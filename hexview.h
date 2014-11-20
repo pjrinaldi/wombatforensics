@@ -21,6 +21,7 @@ public:
 
     void AddressAreaPaintEvent(QPaintEvent *event);
     int AddressAreaWidth();
+    bool showaddressarea;
 
 protected:
     void resizeEvent(QResizeEvent *event);

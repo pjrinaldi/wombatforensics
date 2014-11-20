@@ -517,16 +517,17 @@ void WombatForensics::LoadHexContents()
     //if(wombatvarptr->selectedobject.objtype <= 5)
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
+        off_t imageoffset = 0;
         char bytetocharmap[256] = {'.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.',' ','!','"','#','.','%','&','\'','(',')','*','+',',','-','.','/','0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','[','\\',']','^','_','`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','{','|','}','~','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.',};
         int slicesize = 512;
         QByteArray testdata;
         off_t retval = 0;
         char tmpbuf[slicesize];
-        retval = tsk_img_read(tskobjptr->readimginfo, 0, tmpbuf, slicesize);
-        qDebug() << "retval" << retval;
-        if(retval > 0)
+        imageoffset += tsk_img_read(tskobjptr->readimginfo, 0, tmpbuf, slicesize);
+        qDebug() << "retval" << imageoffset;
+        if(imageoffset > 0)
         {
-            testdata.insert(0, QByteArray(tmpbuf, retval));
+            testdata.insert(0, QByteArray(tmpbuf, imageoffset));
         }
         QString tmpstring = QString(testdata.toHex()).toUpper();
         QString txtstring = "";
@@ -986,9 +987,12 @@ void WombatForensics::SetupHexPage(void)
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
     hexview = new HexView(ui->hexPage);
+    hexview->showaddressarea = true;
     asciiview = new HexView(ui->hexPage);
+    asciiview->showaddressarea = false;
     hexLayout->addWidget(hexview);
     hexLayout->addWidget(asciiview);
+    asciiview->setVerticalScrollBar(hexview->verticalScrollBar());
     /*
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
