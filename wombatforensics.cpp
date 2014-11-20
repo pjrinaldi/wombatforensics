@@ -525,6 +525,8 @@ void WombatForensics::LoadHexContents()
         char tmpbuf[slicesize];
         imageoffset += tsk_img_read(tskobjptr->readimginfo, 0, tmpbuf, slicesize);
         qDebug() << "retval" << imageoffset;
+        qDebug() << "letter width" << hexview->fontMetrics().width(QLatin1Char('9')) << "viewport width:" << hexview->viewport()->width();
+        qDebug() << "letters per line" << hexview->viewport()->width()/((hexview->fontMetrics().width(QLatin1Char('9')))*3) - 1;
         if(imageoffset > 0)
         {
             testdata.insert(0, QByteArray(tmpbuf, imageoffset));
