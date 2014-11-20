@@ -559,6 +559,7 @@ private:
     off_t offset() const;
     HexEditor* hexwidget;
     HexViewer* hexviewer;
+    HexView* asciiview;
     HexView* hexview;
     QScrollArea* scrollarea;
     QScrollBar* hexscroll;

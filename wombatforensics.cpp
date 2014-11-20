@@ -529,10 +529,13 @@ void WombatForensics::LoadHexContents()
         }
         QString tmpstring = QString(testdata.toHex()).toUpper();
         QString formattedstring = "";
+        QString asciistring = "";
         for(int i=0; i < tmpstring.size()/2; i++)
         {
             formattedstring += QString(tmpstring.at(i)) + QString(tmpstring.at(i+1));
             formattedstring += " ";
+            asciistring += QString("%1").arg(tmpstring.mid(i, 2), 0, 16);
+            asciistring += " ";
         }
         /*
         for(int i = 0; i < testdata.size(); i++)
@@ -542,6 +545,8 @@ void WombatForensics::LoadHexContents()
         */
         //hexview->setPlainText(tmpstring);
         hexview->setPlainText(formattedstring);
+        asciiview->setPlainText(testdata.data());
+        //asciiview->setPlainText(QString::fromUtf8(tmpstring), tmpstring.size());
         //hexview->setPlainText(QString(testdata.toHex()).toUpper());
  
         //hexviewer->OpenImage();
@@ -965,7 +970,9 @@ void WombatForensics::SetupHexPage(void)
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
     hexview = new HexView(ui->hexPage);
+    asciiview = new HexView(ui->hexPage);
     hexLayout->addWidget(hexview);
+    hexLayout->addWidget(asciiview);
     /*
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
@@ -1031,13 +1038,13 @@ void WombatForensics::SetupHexPage(void)
 
 void WombatForensics::SetNewMax(int slicerange)
 {
-    hexscroll->setMaximum(hexscroll->maximum() + slicerange);
+    //hexscroll->setMaximum(hexscroll->maximum() + slicerange);
 }
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
-    hexscroll->setSingleStep(singlestep);
-    hexscroll->setPageStep(pagestep);
+    //hexscroll->setSingleStep(singlestep);
+    //hexscroll->setPageStep(pagestep);
     //scrollarea->verticalScrollBar()->setSingleStep(singlestep);
     //scrollarea->verticalScrollBar()->setPageStep(pagestep);
 
@@ -1298,7 +1305,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
 void WombatForensics::SetOffsetLabel(int pos)
 {
     selectedoffset->setText(QString("Offset: 0x%1").arg(pos, 1, 16));
-    hexviewer->oldoffset = hexscroll->value();
+    //hexviewer->oldoffset = hexscroll->value();
     /*
   QString label;
   label = "Offset: ";
@@ -1319,7 +1326,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // range must be contained in the space of an integer, just do 100
    // increments
    //hexvsb->setRange(0,100);
-   hexscroll->setRange(low, high);
+   //hexscroll->setRange(low, high);
    //scrollarea->verticalScrollBar()->setRange(low, high);
    //hexvsb->setRange(low, high);
 }
