@@ -535,7 +535,10 @@ void WombatForensics::LoadHexContents()
         QString txtstring = "";
         for(int i=0; i < testdata.size(); i++)
         {
-            txtstring += bytetocharmap[testdata[i]];
+            if(isprint(testdata[i]) && testdata[i] != '\n')
+                txtstring += bytetocharmap[testdata[i]];
+            else
+                txtstring += ".";
             txtstring += "  ";
             //txtstring += QString(bytetocharmap[testdata.mid(i, 1)]);
         }
