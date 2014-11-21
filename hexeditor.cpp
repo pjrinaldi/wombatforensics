@@ -213,8 +213,8 @@ void HexEditor::setTopLeft( off_t offset )
      //_reader.read(_data,bytesPerPage());
      
      repaint();
-     //emit topLeftChanged(linenum);
-     emit topLeftChanged(_topLeft);
+     emit topLeftChanged(linenum);
+     //emit topLeftChanged(_topLeft);
   } catch( const exception &e ) {
      inTopLeft = false;
      throw e;

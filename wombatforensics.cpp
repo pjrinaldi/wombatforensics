@@ -1372,11 +1372,11 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
 void WombatForensics::setScrollBarValue(off_t pos)
 {
     // THIS IS THE LINE # THAT THE OFFSET FALLS UNDER
-    //hexvsb->setValue(pos);
+    hexvsb->setValue(pos);
   // pos is the topLeft pos, set the scrollbar to the
   // location of the last byte on the page
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
-  hexvsb->setValue(hexwidget->offsetToPercent(pos));
+  //hexvsb->setValue(hexwidget->offsetToPercent(pos));
   //hexscroll->setValue(pos);
 }
