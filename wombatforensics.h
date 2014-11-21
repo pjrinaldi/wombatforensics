@@ -561,6 +561,7 @@ private:
     HexViewer* hexviewer;
     HexView* asciiview;
     HexView* hexview;
+    HexView* offsetview;
     QScrollArea* scrollarea;
     QScrollBar* hexscroll;
     QActionGroup* viewgroup;

@@ -975,14 +975,25 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
+    offsetview = new HexView(ui->hexPage);
+    offsetview->showaddressarea = false;
     hexview = new HexView(ui->hexPage);
     hexview->showaddressarea = true;
     asciiview = new HexView(ui->hexPage);
     asciiview->showaddressarea = false;
+    hexLayout->addWidget(offsetview);
     hexLayout->addWidget(hexview);
     hexLayout->addWidget(asciiview);
+    hexLayout->setContentsMargins(0, 0, 0, 0);
+    offsetview->setVerticalScrollBar(hexview->verticalScrollBar());
+    offsetview->resize(5, hexview->height());
+    offsetview->setMaximumWidth(50);
     asciiview->setVerticalScrollBar(hexview->verticalScrollBar());
     asciiview->resize(hexview->width(), hexview->height());
+    offsetview->setReadOnly(true);
+    hexview->setReadOnly(true);
+    asciiview->setReadOnly(true);
+    mainlayout->setContentsMargins(0, 0, 0, 0);
     /*
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
