@@ -515,8 +515,9 @@ void WombatForensics::LoadHexContents()
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)
-    if(wombatvarptr->selectedobject.objtype <= 5)
+    if(wombatvarptr->selectedobject.objtype < 5)
     {
+        /*
         off_t imageoffset = 0;
         char bytetocharmap[256] = {'.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.',' ','!','"','#','.','%','&','\'','(',')','*','+',',','-','.','/','0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','[','\\',']','^','_','`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','{','|','}','~','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.',};
         int slicesize = 512;
@@ -565,7 +566,7 @@ void WombatForensics::LoadHexContents()
         offsetview->setPlainText(offsetstring);
         hexview->setPlainText(formattedstring);
         asciiview->setPlainText(txtstring);
- 
+ */
         //hexviewer->OpenImage();
         // here is where i need to print out the file byte offset, byte length, block information to figure out
         // how to highlight the relevant information for a selected object.
@@ -573,15 +574,15 @@ void WombatForensics::LoadHexContents()
         // JUST NEED TO CALL MY HIGHLIGHT FUNCTION FOR EACH BLOCK ADDRESS.
         // need to highlight those blocks up to the file size and then highlight the rest as file slack...
         // based on comparison of block size and file size.
-        //hexwidget->openimage();
-        //hexwidget->set2BPC();
-        //hexwidget->setBaseHex();
-        //hexwidget->SetTopLeft(tskobjptr->offset);
+        hexwidget->openimage();
+        hexwidget->set2BPC();
+        hexwidget->setBaseHex();
+        hexwidget->SetTopLeft(tskobjptr->offset);
     }
     else
     {
-        //hexwidget->openimage();
-        //hexwidget->SetTopLeft(tskobjptr->offset);
+        hexwidget->openimage();
+        hexwidget->SetTopLeft(tskobjptr->offset);
     }
 }
 
@@ -986,6 +987,7 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
+    /*
     offsetview = new HexView(ui->hexPage);
     //offsetview->showaddressarea = false;
     hexview = new HexView(ui->hexPage);
@@ -1005,20 +1007,23 @@ void WombatForensics::SetupHexPage(void)
     hexview->setReadOnly(true);
     asciiview->setReadOnly(true);
     mainlayout->setContentsMargins(0, 0, 0, 0);
+    */
     /*
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
-    //hexwidget = new HexEditor(ui->hexPage, tskobjptr);
+    */
+    hexwidget = new HexEditor(ui->hexPage, tskobjptr);
     //hexviewer = new HexViewer(ui->hexPage, tskobjptr);
+    /*
     hexviewer = new HexViewer(scrollarea, tskobjptr);
     hexviewer->setObjectName("bt-hexviewer");
     hexviewer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
-    //hexwidget->setObjectName("bt-hexview");
-    //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    //hexLayout->addWidget(hexwidget);
     */
+    hexwidget->setObjectName("bt-hexview");
+    hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    hexLayout->addWidget(hexwidget);
     ///*
     /*
     scrollarea = new QScrollArea();
@@ -1041,9 +1046,9 @@ void WombatForensics::SetupHexPage(void)
     //scrollarea->setVerticalScrollBar(hexscroll);
     //hexviewer->setVisible(false);
     //hexscroll->setRange(0, 0);
-    //hexvsb = new QScrollBar(hexwidget);
-    //hexLayout->addWidget(hexvsb);
-    //hexvsb->setRange(0, 0);
+    hexvsb = new QScrollBar(hexwidget);
+    hexLayout->addWidget(hexvsb);
+    hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
     
     /*
@@ -1059,14 +1064,12 @@ void WombatForensics::SetupHexPage(void)
     //QFile file("./reader.h");
     //file.open(QFile::ReadOnly);
     //hexviewer->SetData(file.readAll());
-/*
-    //connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
+    connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
-    //connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(setOffsetLabel(off_t)));
+    connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
-    //connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
-*/
+    connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
 }
 
 void WombatForensics::SetNewMax(int slicerange)
@@ -1081,8 +1084,8 @@ void WombatForensics::SetStepValues(int singlestep, int pagestep)
     //scrollarea->verticalScrollBar()->setSingleStep(singlestep);
     //scrollarea->verticalScrollBar()->setPageStep(pagestep);
 
-    //hexvsb->setSingleStep(singlestep);
-    //hexvsb->setPageStep(pagestep);
+    hexvsb->setSingleStep(singlestep);
+    hexvsb->setPageStep(pagestep);
 }
 
 void WombatForensics::SetupToolbar(void)
@@ -1337,20 +1340,18 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
 
 void WombatForensics::SetOffsetLabel(int pos)
 {
-    selectedoffset->setText(QString("Offset: 0x%1").arg(pos, 1, 16));
+    //selectedoffset->setText(QString("Offset: 0x%1").arg(pos, 1, 16));
     //hexviewer->oldoffset = hexscroll->value();
-    /*
-  QString label;
-  label = "Offset: ";
-  char    buffer[64];
-#if _LARGEFILE_SOURCE
-  sprintf(buffer,"0x%lx",pos);
-#else
-  sprintf(buffer,"0x%x",pos);
-#endif
-  label += buffer;
-  selectedoffset->setText(label);
-  */
+    QString label;
+    label = "Offset: ";
+    char    buffer[64];
+    #if _LARGEFILE_SOURCE
+    sprintf(buffer,"0x%lx",pos);
+    #else
+    sprintf(buffer,"0x%x",pos);
+    #endif
+    label += buffer;
+    selectedoffset->setText(label);
 }
 
 void WombatForensics::setScrollBarRange(off_t low, off_t high)
@@ -1361,7 +1362,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    //hexvsb->setRange(0,100);
    //hexscroll->setRange(low, high);
    //scrollarea->verticalScrollBar()->setRange(low, high);
-   //hexvsb->setRange(low, high);
+   hexvsb->setRange(low, high);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)
@@ -1372,6 +1373,6 @@ void WombatForensics::setScrollBarValue(off_t pos)
   // location of the last byte on the page
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
-  //hexvsb->setValue(hexwidget->offsetToPercent(pos));
+  hexvsb->setValue(hexwidget->offsetToPercent(pos));
   //hexscroll->setValue(pos);
 }

@@ -683,6 +683,7 @@ void HexEditor::paintEvent( QPaintEvent* e)
   // foreach blockaddress in blockaddress
   // if reader.pageidx == blockaddress
   // {
+  /*
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
@@ -698,9 +699,10 @@ void HexEditor::paintEvent( QPaintEvent* e)
               off_t linestop = min(stop, start+bytesPerLine()-1-(start % bytesPerLine()));
               QRect bbox = byteBBox(start);
               bbox.setRight(byteBBox(linestop).right());
-              paint.fillRect(bbox, QColor(255, 0, 0, 15));
+              //paint.fillRect(bbox, QColor(255, 0, 0, 15));
               start = linestop+1;
           }
+          */
           /*  // draw selection
   off_t start = max( (off_t)0, selectionStart() - _topLeft);
   if( start < bytesPerPage() ) {
@@ -735,8 +737,8 @@ void HexEditor::paintEvent( QPaintEvent* e)
           //paint.fillRect((e->rect().top()-topMargin())/lineSpacing(), (e->rect().left()-leftMargin())/totalWordWidth, e->rect().bottom()/lineSpacing(), e->rect().right()/totalWordWidth, QColor(255, 0, 0, 15));
           //DrawCharacterFill(paint, tskptr->blkaddrlist.at(i).toInt());
           //DrawCharacterFill(paint);
-      }
-  }
+      //}
+  //}
   // }
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
@@ -964,7 +966,7 @@ void HexEditor::showMatch( off_t pos, int len )
 void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
     paint.setPen(qApp->palette().foreground().color());
-    paint.setBrush(QColor(0, 255, 0, 15));
+    //paint.setBrush(QColor(0, 255, 0, 15));
     for(int r = row_start; r <= row_stop; r++)
     {
         for(int c = col_start; c <= col_stop; c++)
@@ -978,7 +980,7 @@ void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
 
 void HexEditor::drawTextRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
-  paint.setBrush(QColor(255, 0, 0, 15));
+  //paint.setBrush(QColor(255, 0, 0, 15));
   paint.setPen(qApp->palette().foreground().color());
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
