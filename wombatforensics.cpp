@@ -1070,7 +1070,7 @@ void WombatForensics::SetupHexPage(void)
     //hexviewer->SetData(file.readAll());
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
-    //connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
+    connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
@@ -1342,7 +1342,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     */
 }
 
-void WombatForensics::SetOffsetLabel(int pos)
+void WombatForensics::SetOffsetLabel(off_t pos)
 {
     //selectedoffset->setText(QString("Offset: 0x%1").arg(pos, 1, 16));
     //hexviewer->oldoffset = hexscroll->value();
