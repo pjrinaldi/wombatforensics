@@ -14,12 +14,12 @@ HexView::HexView(QWidget *parent) : QPlainTextEdit(parent)
     
         UpdateAddressAreaWidth(5);
     */
-    highlightCurrentLine();
+    //highlightCurrentLine();
     setFont(QFont("fixed"));
 }
 
 
-
+/*
 int HexView::AddressAreaWidth()
 {
     int space = 0;
@@ -36,19 +36,19 @@ int HexView::AddressAreaWidth()
     }
     return space;
 }
+*/
 
-
-
-void HexView::UpdateAddressAreaWidth(int /* newBlockCount */)
+/*
+void HexView::UpdateAddressAreaWidth(int newBlockCount)
 {
     if(showaddressarea)
         setViewportMargins(AddressAreaWidth(), 0, 0, 0);
     else
         setViewportMargins(0, 0, 0, 0);
 }
+*/
 
-
-
+/*
 void HexView::UpdateAddressArea(const QRect &rect, int dy)
 {
     if (dy)
@@ -59,22 +59,23 @@ void HexView::UpdateAddressArea(const QRect &rect, int dy)
     if (rect.contains(viewport()->rect()))
         UpdateAddressAreaWidth(0);
 }
+*/
 
 
 
 void HexView::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
-
+/*
     QRect cr = contentsRect();
-    /*
+    
     if(showaddressarea)
         addressarea->setGeometry(QRect(cr.left(), cr.top(), AddressAreaWidth(), cr.height()));
         */
 }
 
 
-
+/*
 void HexView::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
@@ -93,13 +94,13 @@ void HexView::highlightCurrentLine()
 
     setExtraSelections(extraSelections);
 }
-
+*/
 
 
 void HexView::AddressAreaPaintEvent(QPaintEvent *event)
 {
-    QPainter painter(addressarea);
-    painter.fillRect(event->rect(), Qt::lightGray);
+    //QPainter painter(addressarea);
+    //painter.fillRect(event->rect(), Qt::lightGray);
 
 
     /*

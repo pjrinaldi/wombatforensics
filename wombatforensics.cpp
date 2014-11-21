@@ -525,8 +525,10 @@ void WombatForensics::LoadHexContents()
         char tmpbuf[slicesize];
         imageoffset += tsk_img_read(tskobjptr->readimginfo, 0, tmpbuf, slicesize);
         qDebug() << "retval" << imageoffset;
-        //int bytesperline = hexview->viewport()->width()/((hexview->fontMetrics().width(QLatin1Char('9')))*3) - 1;
-        //int offsetaddresswidth = tskobjptr->imglength/bytesperline;
+        int bytesperline = hexview->viewport()->width()/((hexview->fontMetrics().width(QLatin1Char('9')))*3) - 1;
+        int offsetaddresswidth = tskobjptr->imglength/bytesperline;
+        int offsetviewwidth = offsetaddresswidth*hexview->fontMetrics().width(QLatin1Char('9'));
+        offsetview->resize(offsetviewwidth, hexview->height());
         qDebug() << "letter width" << hexview->fontMetrics().width(QLatin1Char('9')) << "viewport width:" << hexview->viewport()->width();
         qDebug() << "letters per line" << hexview->viewport()->width()/((hexview->fontMetrics().width(QLatin1Char('9')))*3) - 1;
         if(imageoffset > 0)
@@ -976,11 +978,11 @@ void WombatForensics::SetupHexPage(void)
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
     offsetview = new HexView(ui->hexPage);
-    offsetview->showaddressarea = false;
+    //offsetview->showaddressarea = false;
     hexview = new HexView(ui->hexPage);
-    hexview->showaddressarea = true;
+    //hexview->showaddressarea = true;
     asciiview = new HexView(ui->hexPage);
-    asciiview->showaddressarea = false;
+    //asciiview->showaddressarea = false;
     hexLayout->addWidget(offsetview);
     hexLayout->addWidget(hexview);
     hexLayout->addWidget(asciiview);

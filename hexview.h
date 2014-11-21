@@ -9,7 +9,7 @@ class QResizeEvent;
 class QSize;
 class QWidget;
 
-class AddressArea;
+//class AddressArea;
 
 
 class HexView : public QPlainTextEdit
@@ -20,22 +20,22 @@ public:
     HexView(QWidget *parent = 0);
 
     void AddressAreaPaintEvent(QPaintEvent *event);
-    int AddressAreaWidth();
-    bool showaddressarea;
+    //int AddressAreaWidth();
+    //bool showaddressarea;
 
 protected:
     void resizeEvent(QResizeEvent *event);
 
 private slots:
-    void UpdateAddressAreaWidth(int newBlockCount);
-    void highlightCurrentLine();
-    void UpdateAddressArea(const QRect &, int);
+    //void UpdateAddressAreaWidth(int newBlockCount);
+    //void highlightCurrentLine();
+    //void UpdateAddressArea(const QRect &, int);
 
 private:
-    QWidget *addressarea;
+    //QWidget *addressarea;
 };
 
-
+/*
 class AddressArea : public QWidget
 {
 public:
@@ -55,5 +55,5 @@ protected:
 private:
     HexView *hexview;
 };
-
+*/
 #endif
