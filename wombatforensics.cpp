@@ -525,6 +525,8 @@ void WombatForensics::LoadHexContents()
         char tmpbuf[slicesize];
         imageoffset += tsk_img_read(tskobjptr->readimginfo, 0, tmpbuf, slicesize);
         qDebug() << "retval" << imageoffset;
+        //int bytesperline = hexview->viewport()->width()/((hexview->fontMetrics().width(QLatin1Char('9')))*3) - 1;
+        //int offsetaddresswidth = tskobjptr->imglength/bytesperline;
         qDebug() << "letter width" << hexview->fontMetrics().width(QLatin1Char('9')) << "viewport width:" << hexview->viewport()->width();
         qDebug() << "letters per line" << hexview->viewport()->width()/((hexview->fontMetrics().width(QLatin1Char('9')))*3) - 1;
         if(imageoffset > 0)
@@ -540,17 +542,9 @@ void WombatForensics::LoadHexContents()
             else
                 txtstring += ".";
             txtstring += "  ";
-            //txtstring += QString(bytetocharmap[testdata.mid(i, 1)]);
         }
         QString formattedstring = "";
         QString asciistring = "";
-        /*
-         *  dst = "";
-  for(unsigned int i = 0; i < src.size(); i++) {
-    dst += TranslationTables::byteToCharMap[src[i]];
-  }
-
-         */ 
         for(int i=0; i < tmpstring.size()/2; i++)
         {
             formattedstring += QString(tmpstring.at(i)) + QString(tmpstring.at(i+1));
@@ -558,18 +552,8 @@ void WombatForensics::LoadHexContents()
             asciistring += QString("%1").arg(tmpstring.mid(i, 2), 0, 16);
             asciistring += " ";
         }
-        /*
-        for(int i = 0; i < testdata.size(); i++)
-        {
-            hexview->appendPlainText(QString(testdata.toHex().at(i)));
-        }
-        */
-        //hexview->setPlainText(tmpstring);
         hexview->setPlainText(formattedstring);
         asciiview->setPlainText(txtstring);
-        //asciiview->setPlainText(testdata.data());
-        //asciiview->setPlainText(QString::fromUtf8(tmpstring), tmpstring.size());
-        //hexview->setPlainText(QString(testdata.toHex()).toUpper());
  
         //hexviewer->OpenImage();
         // here is where i need to print out the file byte offset, byte length, block information to figure out
@@ -998,6 +982,7 @@ void WombatForensics::SetupHexPage(void)
     hexLayout->addWidget(hexview);
     hexLayout->addWidget(asciiview);
     asciiview->setVerticalScrollBar(hexview->verticalScrollBar());
+    asciiview->resize(hexview->width(), hexview->height());
     /*
     scrollarea = new QScrollArea();
     scrollarea->setBackgroundRole(QPalette::Dark);
@@ -1038,6 +1023,7 @@ void WombatForensics::SetupHexPage(void)
     //hexLayout->addWidget(hexvsb);
     //hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
+    
     /*
     connect(hexviewer, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
     connect(hexviewer, SIGNAL(SetRange(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));

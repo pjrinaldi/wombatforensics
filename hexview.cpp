@@ -6,8 +6,6 @@
 HexView::HexView(QWidget *parent) : QPlainTextEdit(parent)
 {
     /*
-    if(showaddressarea)
-    {
         addressarea = new AddressArea(this);
 
         connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(UpdateAddressAreaWidth(int)));
@@ -15,7 +13,7 @@ HexView::HexView(QWidget *parent) : QPlainTextEdit(parent)
         connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     
         UpdateAddressAreaWidth(5);
-    }*/
+    */
     highlightCurrentLine();
     setFont(QFont("fixed"));
 }
@@ -104,6 +102,7 @@ void HexView::AddressAreaPaintEvent(QPaintEvent *event)
     painter.fillRect(event->rect(), Qt::lightGray);
 
 
+    /*
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
     int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();
@@ -122,4 +121,5 @@ void HexView::AddressAreaPaintEvent(QPaintEvent *event)
         bottom = top + (int) blockBoundingRect(block).height();
         ++blockNumber;
     }
+    */
 }
