@@ -464,7 +464,7 @@ void WombatForensics::LoadHexContents()
 
     if(wombatvarptr->selectedobject.objtype == 1) // image file
     {
-        //OpenParentImage(wombatvarptr->selectedobject.id);
+        OpenParentImage(wombatvarptr->selectedobject.id);
         tskobjptr->offset = 0;
         tskobjptr->objecttype = 1;
         tskobjptr->length = wombatvarptr->selectedobject.size;
@@ -473,7 +473,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.objtype == 2) // volume object
     {
-        //OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
         tskobjptr->objecttype = 2;
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
         tskobjptr->length = wombatvarptr->selectedobject.size;
@@ -481,7 +481,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.objtype == 3) // unallocated partition
     {
-        //OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
         tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.sectsize;
         tskobjptr->objecttype = 3;
@@ -489,7 +489,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.objtype == 4) // fs object
     {
-        //OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
         tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
         tskobjptr->objecttype = 4;
         tskobjptr->length = wombatvarptr->selectedobject.size;
@@ -497,25 +497,27 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
-        //OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        //OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
+        OpenFileSystemFile();
         tskobjptr->offset = 0;
+        /*
         //qDebug() << "blockaddress failure:" << wombatvarptr->selectedobject.blockaddress;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
             tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize;
         else
             tskobjptr->offset = 0;
+            */
         //qDebug() << "file object offset:" << tskobjptr->offset;
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;
-        //tskobjptr->length = wombatvarptr->selectedobject.size;
+        tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
-        //OpenFileSystemFile();
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)
-    if(wombatvarptr->selectedobject.objtype < 5)
+    if(wombatvarptr->selectedobject.objtype <= 5)
     {
         /*
         off_t imageoffset = 0;
@@ -1013,6 +1015,8 @@ void WombatForensics::SetupHexPage(void)
     scrollarea->setBackgroundRole(QPalette::Dark);
     */
     hexwidget = new HexEditor(ui->hexPage, tskobjptr);
+    setBackgroundRole(QPalette::Base);
+    setAutoFillBackground(true);
     //hexviewer = new HexViewer(ui->hexPage, tskobjptr);
     /*
     hexviewer = new HexViewer(scrollarea, tskobjptr);
@@ -1066,7 +1070,7 @@ void WombatForensics::SetupHexPage(void)
     //hexviewer->SetData(file.readAll());
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
-    connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
+    //connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));

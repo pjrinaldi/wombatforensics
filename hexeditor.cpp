@@ -204,7 +204,7 @@ void HexEditor::setTopLeft( off_t offset )
      // only let _topLeft be an integer multiple of the line length (round down)
      off_t linenum = _topLeft/bytesPerLine();
      //_topLeft = _topLeft*bytesPerLine();
-     //_topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
+     _topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
@@ -213,8 +213,8 @@ void HexEditor::setTopLeft( off_t offset )
      //_reader.read(_data,bytesPerPage());
      
      repaint();
-     emit topLeftChanged(linenum);
-     //emit topLeftChanged(_topLeft);
+     //emit topLeftChanged(linenum);
+     emit topLeftChanged(_topLeft);
   } catch( const exception &e ) {
      inTopLeft = false;
      throw e;
@@ -324,6 +324,8 @@ QRect HexEditor::abyteBox(off_t byteIdx) const
 
 void HexEditor::setTopLeftToPercent( int percent )
 {
+    setTopLeft((_reader.size()/100)*percent);
+    /*
     percent = percent*bytesPerLine();
     if(_previousstep < percent)
     {
@@ -346,6 +348,7 @@ void HexEditor::setTopLeftToPercent( int percent )
             setTopLeft(percent);
     }
     _previousstep = percent;
+    */
 }
 
 // 
@@ -574,7 +577,7 @@ void HexEditor::resizeEvent( QResizeEvent * e )
   setTopLeft(_topLeft);
   emit rangeChanged(0,_reader.size()/bytesPerLine());
   //emit StepValues(bytesPerLine(), bytesPerPage());
-  emit StepValues(1, bytesPerPage()/bytesPerLine());
+  //emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on
