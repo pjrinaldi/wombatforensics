@@ -342,6 +342,7 @@ bool Reader::loadimagepage(off_t pageIdx)
         return true;
     if(!nFreePages())
     {
+        // need to debug freePage where it crashes. it appears _firstPage++ isn't set correctly...
         if(abs(_firstPage - pageIdx) > abs(_lastPage - pageIdx))
             while(!freePage(_firstPage++));
         else
