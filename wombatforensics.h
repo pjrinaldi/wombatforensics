@@ -558,12 +558,6 @@ private:
 
     off_t offset() const;
     HexEditor* hexwidget;
-    HexViewer* hexviewer;
-    HexView* asciiview;
-    HexView* hexview;
-    HexView* offsetview;
-    QScrollArea* scrollarea;
-    QScrollBar* hexscroll;
     QActionGroup* viewgroup;
     QScrollBar* hexvsb;
     QLabel* selectedoffset;

@@ -989,85 +989,16 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    /*
-    offsetview = new HexView(ui->hexPage);
-    //offsetview->showaddressarea = false;
-    hexview = new HexView(ui->hexPage);
-    //hexview->showaddressarea = true;
-    asciiview = new HexView(ui->hexPage);
-    //asciiview->showaddressarea = false;
-    hexLayout->addWidget(offsetview);
-    hexLayout->addWidget(hexview);
-    hexLayout->addWidget(asciiview);
-    hexLayout->setContentsMargins(0, 0, 0, 0);
-    offsetview->setVerticalScrollBar(hexview->verticalScrollBar());
-    offsetview->resize(5, hexview->height());
-    offsetview->setMaximumWidth(50);
-    asciiview->setVerticalScrollBar(hexview->verticalScrollBar());
-    asciiview->resize(hexview->width(), hexview->height());
-    offsetview->setReadOnly(true);
-    hexview->setReadOnly(true);
-    asciiview->setReadOnly(true);
-    mainlayout->setContentsMargins(0, 0, 0, 0);
-    */
-    /*
-    scrollarea = new QScrollArea();
-    scrollarea->setBackgroundRole(QPalette::Dark);
-    */
     hexwidget = new HexEditor(ui->hexPage, tskobjptr);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
-    //hexviewer = new HexViewer(ui->hexPage, tskobjptr);
-    /*
-    hexviewer = new HexViewer(scrollarea, tskobjptr);
-    hexviewer->setObjectName("bt-hexviewer");
-    hexviewer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    setBackgroundRole(QPalette::Base);
-    setAutoFillBackground(true);
-    */
     hexwidget->setObjectName("bt-hexview");
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexLayout->addWidget(hexwidget);
-    ///*
-    /*
-    scrollarea = new QScrollArea();
-    scrollarea->setBackgroundRole(QPalette::Dark);
-    scrollarea->setWidget(hexviewer);
-    scrollarea->setContentsMargins(0, 0, 0, 0);
-    */
-    //*/
-    //hexLayout->addWidget(hexviewer);
-    //hexLayout->addWidget(hexviewer);
-    /*
-    hexLayout->addWidget(scrollarea);
-    hexLayout->setContentsMargins(0, 0, 0, 0);
-    hexLayout->setSpacing(0);
-    mainlayout->setContentsMargins(0, 0, 0, 0);
-    mainlayout->setSpacing(0);
-    */
-    //hexscroll = new QScrollBar(hexviewer);
-    //hexLayout->addWidget(hexscroll);
-    //scrollarea->setVerticalScrollBar(hexscroll);
-    //hexviewer->setVisible(false);
-    //hexscroll->setRange(0, 0);
     hexvsb = new QScrollBar(hexwidget);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);
-    
-    /*
-    connect(hexviewer, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
-    connect(hexviewer, SIGNAL(SetRange(off_t, off_t)), this, SLOT(setScrollBarRange(off_t, off_t)));
-    connect(hexviewer, SIGNAL(CurrentAddressChanged(int)), this, SLOT(SetOffsetLabel(int)));
-    connect(hexscroll, SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
-    connect(hexviewer, SIGNAL(AddRange(int)), this, SLOT(SetNewMax(int)));
-    connect(hexviewer, SIGNAL(TopLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
-    */
-    //connect(scrollarea->verticalScrollBar(), SIGNAL(valueChanged(int)), hexviewer, SLOT(AdjustData(int)));
-     // how we load the data into a qbytearray...
-    //QFile file("./reader.h");
-    //file.open(QFile::ReadOnly);
-    //hexviewer->SetData(file.readAll());
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
@@ -1083,11 +1014,6 @@ void WombatForensics::SetNewMax(int slicerange)
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
-    //hexscroll->setSingleStep(singlestep);
-    //hexscroll->setPageStep(pagestep);
-    //scrollarea->verticalScrollBar()->setSingleStep(singlestep);
-    //scrollarea->verticalScrollBar()->setPageStep(pagestep);
-
     hexvsb->setSingleStep(singlestep);
     hexvsb->setPageStep(pagestep);
 }
@@ -1344,8 +1270,6 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
 
 void WombatForensics::SetOffsetLabel(off_t pos)
 {
-    //selectedoffset->setText(QString("Offset: 0x%1").arg(pos, 1, 16));
-    //hexviewer->oldoffset = hexscroll->value();
     QString label;
     label = "Offset: ";
     char    buffer[64];
@@ -1363,9 +1287,6 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    (void)low;(void)high;
    // range must be contained in the space of an integer, just do 100
    // increments
-   //hexvsb->setRange(0,100);
-   //hexscroll->setRange(low, high);
-   //scrollarea->verticalScrollBar()->setRange(low, high);
    hexvsb->setRange(low, high);
 }
 
@@ -1378,5 +1299,4 @@ void WombatForensics::setScrollBarValue(off_t pos)
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
   //hexvsb->setValue(hexwidget->offsetToPercent(pos));
-  //hexscroll->setValue(pos);
 }

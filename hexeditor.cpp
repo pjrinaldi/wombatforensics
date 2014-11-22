@@ -684,7 +684,6 @@ void HexEditor::paintEvent( QPaintEvent* e)
   // foreach blockaddress in blockaddress
   // if reader.pageidx == blockaddress
   // {
-  /*
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
@@ -703,44 +702,9 @@ void HexEditor::paintEvent( QPaintEvent* e)
               //paint.fillRect(bbox, QColor(255, 0, 0, 15));
               start = linestop+1;
           }
-          */
-          /*  // draw selection
-  off_t start = max( (off_t)0, selectionStart() - _topLeft);
-  if( start < bytesPerPage() ) {
-    off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
-    paint.setPen(Qt::NoPen);
-    paint.setBrush( qApp->palette().highlight() );
-    //paint.setBrush(QColor(0, 0, 255, 15));
-    // foreach line with selection
-    stop--;
-    while( start <= stop ) {
-      // linestop = min(stop,endofline)
-      off_t linestop = 
-	min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
-      QRect bbox = byteBBox(start);
-      QRect abox = abyteBox(start);
-      bbox.setRight( byteBBox(linestop).right() );
-      abox.setRight(abyteBox(linestop).right());
-      paint.drawRect( bbox );
-      paint.drawRect(abox);
-      start = linestop+1;
-
-          for(int r=row_start; r < row_stop; r++)
-          {
-              for(int c=col_start; c < col_stop; c++)
-              {
-                  paint.fillRect(r, c, totalWordWidth, lineSpacing(), QColor(255, 0, 0, 15));
-              }
-          }
-          */
           //qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
-          //paint.fillRect(row_start, col_start, row_stop, col_start+col_stop, QColor(255, 0, 0, 15));
-          //paint.fillRect((e->rect().top()-topMargin())/lineSpacing(), (e->rect().left()-leftMargin())/totalWordWidth, e->rect().bottom()/lineSpacing(), e->rect().right()/totalWordWidth, QColor(255, 0, 0, 15));
-          //DrawCharacterFill(paint, tskptr->blkaddrlist.at(i).toInt());
-          //DrawCharacterFill(paint);
-      //}
-  //}
-  // }
+      }
+  }
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
   // draw dividing line
@@ -967,26 +931,22 @@ void HexEditor::showMatch( off_t pos, int len )
 void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
     paint.setPen(qApp->palette().foreground().color());
-    //paint.setBrush(QColor(0, 255, 0, 15));
     for(int r = row_start; r <= row_stop; r++)
     {
         for(int c = col_start; c <= col_stop; c++)
         {
             int widx = r*_cols+c;
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
-            //paint.drawRect(_asciiBBox[widx].left(), _asciiBBox[widx].top(), _asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom());
         }
     }
 }
 
 void HexEditor::drawTextRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
-  //paint.setBrush(QColor(255, 0, 0, 15));
   paint.setPen(qApp->palette().foreground().color());
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
         int widx = r*_cols+c;
-        //paint.fillRect(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), widx*charsPerWord(), _wordBBox[widx].top(), QColor(0, 255, 0, 15));
         paint.drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()) );
     }
   }
@@ -1000,8 +960,6 @@ void HexEditor::drawSelection( QPainter& paint )
     off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
     paint.setPen(Qt::NoPen);
     paint.setBrush( qApp->palette().highlight() );
-    //paint.setBrush(QColor(0, 0, 255, 15));
-    // foreach line with selection
     stop--;
     while( start <= stop ) {
       // linestop = min(stop,endofline)
@@ -1016,65 +974,6 @@ void HexEditor::drawSelection( QPainter& paint )
       start = linestop+1;
     }
   }
-  //DrawCurrentObject(paint);
-}
-
-// THIS DRAWS ON TOP OF THE TEXT. I MIGHT NEED TO ADD A BRUSH TO WHERE I DRAW TEXT AND THEN DRAW THE TEXT WITH THE HIGHLIGHTING
-// IF ITS PART OF THE FILE BYTE OFFSET DATA...
-void HexEditor::DrawCurrentObject(QPainter& paint, int row_start, int row_stop, int col_start, int col_stop)
-{
-    // THAT SORT OF WORKS... A GOOD START TO GO FROM.
-    paint.setPen(Qt::NoPen);
-    paint.setBrush(QColor(255, 0, 0, 15));
-    for(int r = row_start; r <= row_stop; r++)
-    {
-        for(int c = col_start; c <= col_stop; c++)
-        {
-            int widx = r*_cols+c;
-            //paint.drawRect(_wordBBox[widx].left() + wordSpacing(), _wordBBox[widx].top(), _wordBBox[widx].right()/2, _wordBBox[widx].bottom());
-        }
-    }
-    paint.drawRect(row_start, row_stop, col_start, col_stop);
-    /*
-     *  // draw selection
-  off_t start = max( (off_t)0, selectionStart() - _topLeft);
-  if( start < bytesPerPage() ) {
-    off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
-    paint.setPen(Qt::NoPen);
-    paint.setBrush( qApp->palette().highlight() );
-    //paint.setBrush(QColor(0, 0, 255, 15));
-    // foreach line with selection
-    stop--;
-    while( start <= stop ) {
-      // linestop = min(stop,endofline)
-      off_t linestop = 
-	min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
-      QRect bbox = byteBBox(start);
-      QRect abox = abyteBox(start);
-      bbox.setRight( byteBBox(linestop).right() );
-      abox.setRight(abyteBox(linestop).right());
-      paint.drawRect( bbox );
-      paint.drawRect(abox);
-      start = linestop+1;
-    }
-
-     */ 
-}
-
-void HexEditor::DrawCharacterFill(QPainter& paint, int pageid)
-{
-    int curoffset = pageid*tskptr->blocksize;
-    //`
-    // paint.fillRect(offset (x,y), pagesize width, pagesize height, QColor()
-    //
-    /*
-    int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );
-    int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
-    int row_stop  = min(_rows-1,e->rect().bottom() / lineSpacing());
-    int col_stop  = min(_cols-1,(e->rect().right()) / totalWordWidth);
-
-    paint.fillRect(row_start, col_start, row_start+row_stop, col_start+col_stop, QColor(255, 0, 0, 15));
-    */
 }
 
 void HexEditor::drawCursor( QPainter& paint )
