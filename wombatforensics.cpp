@@ -500,14 +500,12 @@ void WombatForensics::LoadHexContents()
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
         tskobjptr->offset = 0;
-        /*
         //qDebug() << "blockaddress failure:" << wombatvarptr->selectedobject.blockaddress;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
             tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize;
         else
             tskobjptr->offset = 0;
-            */
-        //qDebug() << "file object offset:" << tskobjptr->offset;
+        qDebug() << "file object offset:" << tskobjptr->offset;
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;
         tskobjptr->length = wombatvarptr->selectedobject.size;

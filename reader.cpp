@@ -116,14 +116,14 @@ bool Reader::openimage(TskObject* tskpointer)
         close();
     _filename = "test.txt";
     _size = tskptr->length;
-    //_size = tskptr->imglength; // length in bytes for selected file
+    _size = tskptr->imglength; // length in bytes for selected file
     qDebug() << "image length:" << tskptr->imglength;
-    //_pageSize = tskptr->blocksize;
+    _pageSize = tskptr->blocksize;
     off_t npages = _size/_pageSize +1;
     // don't need the +1 since the _pageSize is blocksize and should always have no remainder
-    //off_t npages = _size/_pageSize;
+    npages = _size/_pageSize;
     qDebug() << "block size:" << _pageSize << "num of pages:" << npages;
-    //_numpages = npages;
+    _numpages = npages;
     _data.resize(npages);
     fill(_data.begin(), _data.begin()+npages, (uchar*)0);
     _is_open = true;

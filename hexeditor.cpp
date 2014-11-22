@@ -684,13 +684,16 @@ void HexEditor::paintEvent( QPaintEvent* e)
   // foreach blockaddress in blockaddress
   // if reader.pageidx == blockaddress
   // {
+  paint.setPen(QColor(0, 0, 0, 255));
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
-      qDebug() << "pageid:" << pageid;
-      qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
+      //qDebug() << "pageid:" << pageid;
+      //qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
       if(pageid == tskptr->blkaddrlist.at(i).toInt())
       {
+          paint.setPen(QColor(255, 0, 0, 255));
+          /*
           off_t start = _topLeft;
           off_t stop = (off_t)bytesPerPage();
           stop--;
@@ -702,7 +705,9 @@ void HexEditor::paintEvent( QPaintEvent* e)
               //paint.fillRect(bbox, QColor(255, 0, 0, 15));
               start = linestop+1;
           }
-          //qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
+          */
+          qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
+          break;
       }
   }
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
@@ -943,7 +948,7 @@ void HexEditor::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
 
 void HexEditor::drawTextRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
-  paint.setPen(qApp->palette().foreground().color());
+  //paint.setPen(qApp->palette().foreground().color());
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
         int widx = r*_cols+c;
