@@ -6,6 +6,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
     this->menuBar()->hide();
+    ui->actionViewHex->setVisible(false);
+    ui->actionViewTxt->setVisible(false);
+    ui->actionViewOmni->setVisible(false);
     this->statusBar()->setSizeGripEnabled(true);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
