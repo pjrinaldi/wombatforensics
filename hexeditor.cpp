@@ -688,31 +688,18 @@ void HexEditor::paintEvent( QPaintEvent* e)
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
-      //qDebug() << "pageid:" << pageid;
       //qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
       if(pageid == tskptr->blkaddrlist.at(i).toInt())
       {
           paint.setPen(QColor(255, 0, 0, 255));
-          /*
-          off_t start = _topLeft;
-          off_t stop = (off_t)bytesPerPage();
-          stop--;
-          while(start <= stop)
-          {
-              off_t linestop = min(stop, start+bytesPerLine()-1-(start % bytesPerLine()));
-              QRect bbox = byteBBox(start);
-              bbox.setRight(byteBBox(linestop).right());
-              //paint.fillRect(bbox, QColor(255, 0, 0, 15));
-              start = linestop+1;
-          }
-          */
-          qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
+          //qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
           break;
       }
   }
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
   // draw dividing line
+  paint.setPen(QColor(0, 0, 0, 255));
   paint.drawLine(e->rect().right()/2, topMargin(), e->rect().right()/2, height()-topMargin());
   QString ascii;
   getDisplayAscii(ascii);
@@ -722,8 +709,17 @@ void HexEditor::paintEvent( QPaintEvent* e)
   col_start = max(0, (e->rect().left() - leftMargin() - e->rect().right()/2)/totalWordWidth);
   row_stop = min(_rows-1, e->rect().bottom()/lineSpacing());
   col_stop = min(_cols-1, e->rect().right()/totalWordWidth);
-
+  for(int i=0; i < tskptr->blkaddrlist.count(); i++)
+  {
+      int pageid = _reader.CurrentPage();
+      if(pageid == tskptr->blkaddrlist.at(i).toInt())
+      {
+          paint.setPen(QColor(255, 0, 0, 255));
+          break;
+      }
+  }
   drawAsciiRegion(paint, ascii, row_start, row_stop, col_start, col_stop);
+  paint.setPen(QColor(0, 0, 0, 255));
 }
 
 bool HexEditor::getDisplayText( QString& text )
