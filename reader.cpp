@@ -115,13 +115,13 @@ bool Reader::openimage(TskObject* tskpointer)
     if(is_open())
         close();
     _filename = "test.txt";
-    _size = tskptr->length;
+    //_size = tskptr->length;
     _size = tskptr->imglength; // length in bytes for selected file
     qDebug() << "image length:" << tskptr->imglength;
     _pageSize = tskptr->blocksize;
-    off_t npages = _size/_pageSize +1;
+    off_t npages = _size/_pageSize;
+    //off_t npages = _size/_pageSize +1;
     // don't need the +1 since the _pageSize is blocksize and should always have no remainder
-    npages = _size/_pageSize;
     qDebug() << "block size:" << _pageSize << "num of pages:" << npages;
     _numpages = npages;
     _data.resize(npages);
@@ -346,7 +346,7 @@ bool Reader::loadimagepage(off_t pageIdx)
         if(abs(_firstPage - pageIdx) > abs(_lastPage - pageIdx))
             while(!freePage(_firstPage++));
         else
-            while(!freePage(_firstPage++));
+            while(!freePage(_lastPage--));
     }
     _data[pageIdx] = new uchar[_pageSize];
     --nFreePages();
@@ -356,7 +356,7 @@ bool Reader::loadimagepage(off_t pageIdx)
     //qDebug() << "page index:" << pageIdx;
     //qDebug() << "page size:" << _pageSize;
     //qDebug() << "tskptr offset:" << tskptr->offset;
-    if(tskptr->objecttype < 5)
+    if(tskptr->objecttype <= 5)
     {
         //retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
@@ -381,7 +381,7 @@ bool Reader::loadimagepage(off_t pageIdx)
         // WITH THE FILE VARIABLES
         //retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
-        retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+        //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     }
     if(retval > 0)
     {

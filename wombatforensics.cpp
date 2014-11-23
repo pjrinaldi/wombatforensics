@@ -517,63 +517,6 @@ void WombatForensics::LoadHexContents()
     //if(wombatvarptr->selectedobject.objtype <= 5)
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
-        /*
-        off_t imageoffset = 0;
-        char bytetocharmap[256] = {'.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.',' ','!','"','#','.','%','&','\'','(',')','*','+',',','-','.','/','0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','[','\\',']','^','_','`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','{','|','}','~','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.',};
-        int slicesize = 512;
-        QByteArray testdata;
-        off_t retval = 0;
-        char tmpbuf[slicesize];
-        imageoffset += tsk_img_read(tskobjptr->readimginfo, 0, tmpbuf, slicesize);
-        qDebug() << "retval" << imageoffset;
-        int bytesperline = hexview->viewport()->width()/((hexview->fontMetrics().width(QLatin1Char('9')))*3) - 1;
-        //int offsetaddresswidth = tskobjptr->imglength/bytesperline;
-        int lastoffset = tskobjptr->imglength - bytesperline;
-        int offsetaddresswidth = QString::number(lastoffset, 16).length();
-        int linecount = tskobjptr->imglength/bytesperline;
-        int offsetviewwidth = offsetaddresswidth*hexview->fontMetrics().width(QLatin1Char('9'));
-        offsetview->resize(offsetviewwidth, hexview->height());
-        qDebug() << "letter width" << hexview->fontMetrics().width(QLatin1Char('9')) << "viewport width:" << hexview->viewport()->width();
-        qDebug() << "letters per line" << hexview->viewport()->width()/((hexview->fontMetrics().width(QLatin1Char('9')))*3) - 1;
-        if(imageoffset > 0)
-        {
-            testdata.insert(0, QByteArray(tmpbuf, imageoffset));
-        }
-        QString tmpstring = QString(testdata.toHex()).toUpper();
-        QString txtstring = "";
-        for(int i=0; i < testdata.size(); i++)
-        {
-            if(isprint(testdata[i]) && testdata[i] != '\n')
-                txtstring += bytetocharmap[testdata[i]];
-            else
-                txtstring += ".";
-            txtstring += "  ";
-        }
-        QString formattedstring = "";
-        QString asciistring = "";
-        for(int i=0; i < tmpstring.size()/2; i++)
-        {
-            formattedstring += QString(tmpstring.at(i)) + QString(tmpstring.at(i+1));
-            formattedstring += " ";
-            asciistring += QString("%1").arg(tmpstring.mid(i, 2), 0, 16);
-            asciistring += " ";
-        }
-        QString offsetstring = QString("%1").arg("0", offsetaddresswidth, QLatin1Char('0'));
-        for(int i=0; i < linecount; i++)
-        {
-            offsetstring += QString("%1").arg(QString::number((imageoffset + linecount*bytesperline), 16), offsetaddresswidth, QLatin1Char('0'));
-        }
-        offsetview->setPlainText(offsetstring);
-        hexview->setPlainText(formattedstring);
-        asciiview->setPlainText(txtstring);
- */
-        //hexviewer->OpenImage();
-        // here is where i need to print out the file byte offset, byte length, block information to figure out
-        // how to highlight the relevant information for a selected object.
-        // based on the file address, i can call functions such as istat to determine the blocks it occupies, then i would
-        // JUST NEED TO CALL MY HIGHLIGHT FUNCTION FOR EACH BLOCK ADDRESS.
-        // need to highlight those blocks up to the file size and then highlight the rest as file slack...
-        // based on comparison of block size and file size.
         hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
