@@ -12,9 +12,9 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     selectedhex->setText("Length: 0");
     this->statusBar()->addWidget(selectedoffset, 0);
     this->statusBar()->addWidget(selectedhex, 0);
-    tskptr->readimginfo = NULL;
-    tskptr->readfsinfo = NULL;
-    tskptr->readfileinfo = NULL;
+    //tskptr->readimginfo = NULL;
+    //tskptr->readfsinfo = NULL;
+    //tskptr->readfileinfo = NULL;
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);

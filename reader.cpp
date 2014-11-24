@@ -134,24 +134,6 @@ bool Reader::openimage(TskObject* tskpointer)
     return loadimagepage(0);
 }
 
-bool Reader::openfile(TskObject* tskpointer)
-{
-    tskptr = tskpointer;
-    if(is_open())
-        close();
-    _filename = "test.txt";
-    _size = tskptr->length;
-    _pageSize = tskptr->blocksize;
-    off_t npages = _size/_pageSize;
-    _numpages = npages;
-    _data.resize(npages);
-    fill(_data.begin(), _data.begin()+npages, (uchar*)0);
-    _is_open = true;
-    _firstPage = _lastPage = 0;
-
-    return loadfilepage(0);
-}
-
 bool Reader::close()
 {
     if(!is_open())
@@ -231,49 +213,6 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
         _offset  += stop-start;
     }
 
-    return bytesread;
-}
-
-size_t Reader::readfile(vector<uchar>& v, size_t numbytes)
-{
-    int lastPageIdx = 0;
-    size_t bytesread;
-    if(_offset+(int)numbytes >= size())
-    {
-        _eof = true;
-        if(size() == 0)
-            v.erase(v.begin(), v.end());
-        lastPageIdx = _data.size()-1;
-        bytesread = size() - tell();
-        numbytes = bytesread;
-    }
-    else
-    {
-        lastPageIdx = (_offset+numbytes)/_pageSize;
-        bytesread = numbytes;
-    }
-
-    if(!numbytes)
-        return numbytes;
-    v.erase(v.begin(), v.end());
-    v.reserve(v.size()+numbytes);
-    for(int page = _offset/_pageSize; page <= lastPageIdx; page++)
-    {
-        try
-        {
-            loadfilepage(page);
-        }
-        catch(bad_alloc)
-            return (_offset/_pageSize - page)*_pageSize;
-        int start = _offset%_pageSize;
-        int stop = (page == lastPageIdx) ? start + numbytes : _pageSize;
-        for(int i = start; i < stop; i++)
-        {
-            v.push_back(_data[page][i]);
-        }
-        numbytes -= stop - start;
-        _offset += stop - start;
-    }
     return bytesread;
 }
 

@@ -15,6 +15,7 @@ class FileViewer : public QMainWindow
 public:
     FileViewer(QWidget* parent = 0, TskObject* tskobject = NULL);
     ~FileViewer();
+    HexEditor* filehexview;
 
 private slots:
     void SetScrollBarRange(off_t low, off_t high);
@@ -26,7 +27,6 @@ private slots:
 private:
     Ui::FileViewer* ui;
 
-    HexEditor* filehexview;
     QActionGroup* viewgroup;
     QLabel* selectedoffset;
     QLabel* selectedhex;

@@ -985,7 +985,7 @@ void HexEditor::drawCursor( QPainter& paint )
   }
 }
 
-bool HexEditor::SetIsFile(bool state)
+void HexEditor::SetIsFile(bool state)
 {
     _reader.isfile = state;
 }
