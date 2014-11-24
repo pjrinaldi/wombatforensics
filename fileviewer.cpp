@@ -12,12 +12,10 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     selectedhex->setText("Length: 0");
     this->statusBar()->addWidget(selectedoffset, 0);
     this->statusBar()->addWidget(selectedhex, 0);
-    //tskptr->readimginfo = NULL;
-    //tskptr->readfsinfo = NULL;
-    //tskptr->readfileinfo = NULL;
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
+    /*
     filehexview = new HexEditor(ui->hexpage, tskptr);
     filehexview->setObjectName("filehexview");
     filehexview->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -31,6 +29,7 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     connect(filehexvsb, SIGNAL(valueChanged(int)), filehexview, SLOT(setTopLeftToPercent(int)));
     connect(filehexview, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(filehexview, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+    */
 }
 
 FileViewer::~FileViewer()
@@ -38,14 +37,26 @@ FileViewer::~FileViewer()
     this->close();
 }
 
+void FileViewer::HideClicked()
+{
+    this->hide();
+    emit HideFileViewer(false);
+}
+
+void FileViewer::closeEvent(QCloseEvent* event)
+{
+    emit HideFileViewer(false);
+    event->accept();
+}
+
 void FileViewer::SetScrollBarRange(off_t low, off_t high)
 {
-   filehexvsb->setRange(low, high);
+   //filehexvsb->setRange(low, high);
 }
 
 void FileViewer::setScrollBarValue(off_t pos)
 {
-    filehexvsb->setValue(pos);
+    //filehexvsb->setValue(pos);
 }
 
 void FileViewer::SetOffsetLabel(off_t pos)
@@ -139,6 +150,6 @@ void FileViewer::UpdateSelectValue(const QString &txt)
 
 void FileViewer::SetStepValues(int singlestep, int pagestep)
 {
-    filehexvsb->setSingleStep(singlestep);
-    filehexvsb->setPageStep(pagestep);
+    //filehexvsb->setSingleStep(singlestep);
+    //filehexvsb->setPageStep(pagestep);
 }

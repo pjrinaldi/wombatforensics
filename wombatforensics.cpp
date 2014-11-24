@@ -54,7 +54,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     isignals = new InterfaceSignals();
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
+    connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
+    connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
     wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
@@ -85,6 +87,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
 {
     ui->actionView_Properties->setChecked(checkedstate);
+}
+
+void WombatForensics::HideFileViewer(bool checkedstate)
+{
+    ui->actionView_File->setChecked(checkedstate);
 }
 
 void WombatForensics::HideProgressWindow(bool checkedstate)
@@ -146,6 +153,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionViewOmni->setEnabled(false);
     ui->actionView_Progress->setEnabled(false);
     ui->actionView_Properties->setEnabled(false);
+    ui->actionView_File->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     ui->menuBookmark_Manager->setEnabled(false);
     QList<int> sizelist;
@@ -332,6 +340,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     {
         selectedindex = curitem.indexes().at(0);
         ui->actionView_Properties->setEnabled(true);
+        ui->actionView_File->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
         wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
         wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
@@ -1075,13 +1084,23 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
     if(!checked)
     {
         propertywindow->hide();
-        fileviewer->hide();
     }
     else
     {
         propertywindow->show();
         if(ui->dirTreeView->selectionModel()->hasSelection())
             UpdateProperties();
+    }
+}
+
+void WombatForensics::on_actionView_File_triggered(bool checked)
+{
+    if(!checked)
+    {
+        fileviewer->hide();
+    }
+    else
+    {
         fileviewer->show();
     }
 }

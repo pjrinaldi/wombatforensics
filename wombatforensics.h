@@ -481,10 +481,12 @@ private slots:
     void on_actionOpen_Case_triggered();
     void on_actionView_Properties_triggered(bool checked);
     void on_actionView_Progress_triggered(bool checked);
+    void on_actionView_File_triggered(bool checked);
     void UpdateProgress(int count, int processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);
     void HidePropertyWindow(bool checkstate);
+    void HideFileViewer(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
     void OpenParentImage(int imgid);

@@ -230,7 +230,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -346,6 +346,7 @@
    <addaction name="actionViewOmni"/>
    <addaction name="separator"/>
    <addaction name="actionView_Properties"/>
+   <addaction name="actionView_File"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
    <addaction name="actionExport_Evidence"/>
@@ -563,6 +564,18 @@
    </property>
    <property name="text">
     <string>Existing Bookmarks</string>
+   </property>
+  </action>
+  <action name="actionView_File">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/fileview</normaloff>:/bar/fileview</iconset>
+   </property>
+   <property name="text">
+    <string>View File</string>
    </property>
   </action>
  </widget>

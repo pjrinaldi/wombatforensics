@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wombatforensics.ui'
 **
-** Created by: Qt User Interface Compiler version 5.3.1
+** Created by: Qt User Interface Compiler version 5.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -50,6 +50,7 @@ public:
     QAction *actionHelp;
     QAction *actionNew_Bookmark;
     QAction *actionExisting_Bookmarks;
+    QAction *actionView_File;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -166,6 +167,12 @@ public:
         QIcon icon12;
         icon12.addFile(QStringLiteral(":/bar/addtobkmrk"), QSize(), QIcon::Normal, QIcon::Off);
         actionExisting_Bookmarks->setIcon(icon12);
+        actionView_File = new QAction(WombatForensics);
+        actionView_File->setObjectName(QStringLiteral("actionView_File"));
+        actionView_File->setCheckable(true);
+        QIcon icon13;
+        icon13.addFile(QStringLiteral(":/bar/fileview"), QSize(), QIcon::Normal, QIcon::Off);
+        actionView_File->setIcon(icon13);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -267,7 +274,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QStringLiteral("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 800, 21));
+        mainMenubar->setGeometry(QRect(0, 0, 800, 22));
         mainMenubar->setAcceptDrops(true);
         menuFile = new QMenu(mainMenubar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
@@ -282,14 +289,14 @@ public:
         menuAbout->setIcon(icon10);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon13;
-        icon13.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon13);
+        QIcon icon14;
+        icon14.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon14);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon14;
-        icon14.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon14);
+        QIcon icon15;
+        icon15.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon15);
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
         analysisToolBar->setObjectName(QStringLiteral("analysisToolBar"));
@@ -339,6 +346,7 @@ public:
         analysisToolBar->addAction(actionViewOmni);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionView_Properties);
+        analysisToolBar->addAction(actionView_File);
         analysisToolBar->addAction(actionView_Progress);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionExport_Evidence);
@@ -391,6 +399,7 @@ public:
         actionHelp->setText(QApplication::translate("WombatForensics", "Help", 0));
         actionNew_Bookmark->setText(QApplication::translate("WombatForensics", "New Bookmark", 0));
         actionExisting_Bookmarks->setText(QApplication::translate("WombatForensics", "Existing Bookmarks", 0));
+        actionView_File->setText(QApplication::translate("WombatForensics", "View File", 0));
         picViewer->setText(QString());
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
