@@ -68,6 +68,7 @@
    <addaction name="actionText"/>
    <addaction name="actionOmni"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionHex">
    <property name="text">
     <string>Hex</string>

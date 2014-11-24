@@ -60,7 +60,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     propertywindow->setModal(false);
-    //fileviewer->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
@@ -518,6 +517,11 @@ void WombatForensics::LoadHexContents()
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
         hexwidget->SetTopLeft(tskobjptr->offset);
+        //emit
+        // need to load a new function which will load the file in the fileviewer
+        // and not load the image with the offset. this would require duplicating loadimagepage with a modified
+        // setup which will load the respective object based on the objecttype
+        //fileviewer->filehexview->openimage();
     }
     /*
     else

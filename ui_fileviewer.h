@@ -17,6 +17,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
@@ -35,6 +36,7 @@ public:
     QWidget *textpage;
     QWidget *omnipage;
     QToolBar *toolBar;
+    QStatusBar *statusBar;
 
     void setupUi(QMainWindow *FileViewer)
     {
@@ -75,6 +77,9 @@ public:
         toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         toolBar->setFloatable(false);
         FileViewer->addToolBar(Qt::TopToolBarArea, toolBar);
+        statusBar = new QStatusBar(FileViewer);
+        statusBar->setObjectName(QStringLiteral("statusBar"));
+        FileViewer->setStatusBar(statusBar);
 
         toolBar->addAction(actionHex);
         toolBar->addAction(actionText);
