@@ -72,6 +72,7 @@ public:
   int  wordWidth() const;
   int  wordSpacing() const;
   void setCursorFromXY(int x,int y);
+  void SetIsFile(bool state);
 
 public:
   enum SelectionPos_e {

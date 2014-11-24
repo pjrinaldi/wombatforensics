@@ -98,7 +98,7 @@ QString HexEditor::filename() const
 bool HexEditor::openimage()
 {
     if(!_reader.openimage(tskptr))
-        QMessageBox::critical(this, "HexEdit", "Error opening image\n", QMessageBox::Ok, 0);
+        QMessageBox::critical(this, "HexView", "Error opening image\n", QMessageBox::Ok, 0);
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
@@ -983,4 +983,9 @@ void HexEditor::drawCursor( QPainter& paint )
     QRect box = charBBox( localCharOffset() );
     paint.drawRect( box );
   }
+}
+
+bool HexEditor::SetIsFile(bool state)
+{
+    _reader.isfile = state;
 }

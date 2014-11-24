@@ -75,6 +75,9 @@ class Reader {
 		   off_t stop );
   off_t rFindIndex( off_t start, const vector<uchar>& data,
 		    off_t stop );
+
+  bool isfile;
+
  protected:
   bool dataIsAtOffset( const vector<uchar>& data, off_t pos );
   bool loadPage(off_t pageIdx);

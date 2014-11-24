@@ -53,6 +53,7 @@ Reader::Reader( const string& filename, off_t npages, off_t pageSize )
   _size    = 0;
   _firstPage = -1;
   _lastPage  = -1;
+  isfile = false;
 
   //if( !filename.empty() )
     //open(filename);
@@ -115,8 +116,9 @@ bool Reader::openimage(TskObject* tskpointer)
     if(is_open())
         close();
     _filename = "test.txt";
-    //_size = tskptr->length;
     _size = tskptr->imglength; // length in bytes for selected file
+    if(isfile)
+        _size = tskptr->length;
     qDebug() << "image length:" << tskptr->imglength;
     _pageSize = tskptr->blocksize;
     off_t npages = _size/_pageSize;
@@ -130,6 +132,24 @@ bool Reader::openimage(TskObject* tskpointer)
     _firstPage = _lastPage = 0;
 
     return loadimagepage(0);
+}
+
+bool Reader::openfile(TskObject* tskpointer)
+{
+    tskptr = tskpointer;
+    if(is_open())
+        close();
+    _filename = "test.txt";
+    _size = tskptr->length;
+    _pageSize = tskptr->blocksize;
+    off_t npages = _size/_pageSize;
+    _numpages = npages;
+    _data.resize(npages);
+    fill(_data.begin(), _data.begin()+npages, (uchar*)0);
+    _is_open = true;
+    _firstPage = _lastPage = 0;
+
+    return loadfilepage(0);
 }
 
 bool Reader::close()
@@ -211,6 +231,49 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
         _offset  += stop-start;
     }
 
+    return bytesread;
+}
+
+size_t Reader::readfile(vector<uchar>& v, size_t numbytes)
+{
+    int lastPageIdx = 0;
+    size_t bytesread;
+    if(_offset+(int)numbytes >= size())
+    {
+        _eof = true;
+        if(size() == 0)
+            v.erase(v.begin(), v.end());
+        lastPageIdx = _data.size()-1;
+        bytesread = size() - tell();
+        numbytes = bytesread;
+    }
+    else
+    {
+        lastPageIdx = (_offset+numbytes)/_pageSize;
+        bytesread = numbytes;
+    }
+
+    if(!numbytes)
+        return numbytes;
+    v.erase(v.begin(), v.end());
+    v.reserve(v.size()+numbytes);
+    for(int page = _offset/_pageSize; page <= lastPageIdx; page++)
+    {
+        try
+        {
+            loadfilepage(page);
+        }
+        catch(bad_alloc)
+            return (_offset/_pageSize - page)*_pageSize;
+        int start = _offset%_pageSize;
+        int stop = (page == lastPageIdx) ? start + numbytes : _pageSize;
+        for(int i = start; i < stop; i++)
+        {
+            v.push_back(_data[page][i]);
+        }
+        numbytes -= stop - start;
+        _offset += stop - start;
+    }
     return bytesread;
 }
 
@@ -349,14 +412,16 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     _data[pageIdx] = new uchar[_pageSize];
     --nFreePages();
-    if(tskptr->objecttype <= 5)
+    if(tskptr->objecttype < 5)
     {
         retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     }
     else
     {
-        //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
-        //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+        if(isfile)
+            retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+        else
+            retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     }
     if(retval > 0)
     {

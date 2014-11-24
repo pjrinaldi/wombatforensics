@@ -517,6 +517,10 @@ void WombatForensics::LoadHexContents()
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
         hexwidget->SetTopLeft(tskobjptr->offset);
+        fileviewer->filehexview->openimage();
+        fileviewer->set2BPC();
+        fileviewer->setBaseHex();
+        fileviewer->setTopLeft(0);
         //emit
         // need to load a new function which will load the file in the fileviewer
         // and not load the image with the offset. this would require duplicating loadimagepage with a modified
