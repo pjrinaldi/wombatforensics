@@ -50,6 +50,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
     propertywindow = new PropertiesWindow(wombatdatabase);
+    fileviewer = new FileViewer();
     isignals = new InterfaceSignals();
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
@@ -59,6 +60,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     propertywindow->setModal(false);
+    //fileviewer->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
@@ -449,13 +451,6 @@ void WombatForensics::UpdateViewer()
 
 void WombatForensics::LoadHexContents()
 {
-    /*
-    if(hexviewer->isVisible() == false)
-        hexviewer->setVisible(true);
-    */
-    // here is where i would call the highlight functionality using the data obtained from the tsk functions
-    // which would show what should be highlighted for each object type, such as the volume, partition/file system, unallocated
-    // or an actual file and/or directory.
     if(tskobjptr->readimginfo != NULL)
         tsk_img_close(tskobjptr->readimginfo);
     if(tskobjptr->readfsinfo != NULL)
@@ -503,7 +498,6 @@ void WombatForensics::LoadHexContents()
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
         tskobjptr->offset = 0;
-        //qDebug() << "blockaddress failure:" << wombatvarptr->selectedobject.blockaddress;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
             tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize;
         else
@@ -525,11 +519,13 @@ void WombatForensics::LoadHexContents()
         hexwidget->setBaseHex();
         hexwidget->SetTopLeft(tskobjptr->offset);
     }
+    /*
     else
     {
         hexwidget->openimage();
         hexwidget->SetTopLeft(tskobjptr->offset);
     }
+    */
 }
 
 void WombatForensics::LoadTxtContents()
@@ -951,11 +947,6 @@ void WombatForensics::SetupHexPage(void)
     connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
 }
 
-void WombatForensics::SetNewMax(int slicerange)
-{
-    //hexscroll->setMaximum(hexscroll->maximum() + slicerange);
-}
-
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
     hexvsb->setSingleStep(singlestep);
@@ -992,6 +983,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     }
     
     propertywindow->close();
+    fileviewer->close();
     RemoveTmpFiles(); // can get rid of this function right now. I don't need to make temporary files to read.
     if(ProcessingComplete())
     {
@@ -1075,12 +1067,16 @@ void WombatForensics::ViewGroupTriggered(QAction* selaction)
 void WombatForensics::on_actionView_Properties_triggered(bool checked)
 {
     if(!checked)
+    {
         propertywindow->hide();
+        fileviewer->hide();
+    }
     else
     {
         propertywindow->show();
         if(ui->dirTreeView->selectionModel()->hasSelection())
             UpdateProperties();
+        fileviewer->show();
     }
 }
 

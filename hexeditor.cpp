@@ -674,16 +674,6 @@ void HexEditor::paintEvent( QPaintEvent* e)
   int row_stop  = min(_rows-1,e->rect().bottom() / lineSpacing());
   int col_stop  = min(_cols-1,(e->rect().right()) / totalWordWidth);
 
-  // draw highlight over the correct text region. need to switch text values to using offset and size
-  // for now i'll use the row/col values for testing the highlighting
-  //DrawCurrentObject(paint, row_start, row_stop, col_start, col_stop);
-  //DrawCurrentObject(paint, e->rect().left(), topMargin(), e->rect().right()/2, height()-topMargin());
-  // draw text in repaint event
-
-
-  // foreach blockaddress in blockaddress
-  // if reader.pageidx == blockaddress
-  // {
   paint.setPen(QColor(0, 0, 0, 255));
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {

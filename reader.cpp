@@ -342,7 +342,6 @@ bool Reader::loadimagepage(off_t pageIdx)
         return true;
     if(!nFreePages())
     {
-        // need to debug freePage where it crashes. it appears _firstPage++ isn't set correctly...
         if(abs(_firstPage - pageIdx) > abs(_lastPage - pageIdx))
             while(!freePage(_firstPage++));
         else
@@ -350,36 +349,12 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     _data[pageIdx] = new uchar[_pageSize];
     --nFreePages();
-    //tsk img read from new offset...
-    // possibly need to make it pageidx*_pagesize + tskptr->offset for the imageoffset.
-    // HERE IS WHERE I WOULD WANT TO HIGHLIGHT THE IMG INFO TO READ.
-    //qDebug() << "page index:" << pageIdx;
-    //qDebug() << "page size:" << _pageSize;
-    //qDebug() << "tskptr offset:" << tskptr->offset;
     if(tskptr->objecttype <= 5)
     {
-        //retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
-        //off_t retval = tsk_img_read(imageinfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     }
     else
     {
-        /*
-        // BEGIN HIGHLIGHTING TEST SEQUENCE
-        QStringList blocklist = tskptr->blockaddress.split("|", QString::SkipEmptyParts);
-        for(int i=0; i < blocklist.count(); i++)
-        {
-            if(pageIdx == blocklist.at(i).toInt())
-            {
-                qDebug() << blocklist.at(i);
-                break;
-            }
-        }
-        // END HIGHLIGHTING TEST SEQUENCE
-        */
-        // I NEED TO CALL THE IMAGE LOADING THE SAME AS ABOVE, BUT IN HEXEDITOR, NEED TO CALL THE HIGHLIGHT FUNCTION
-        // WITH THE FILE VARIABLES
-        //retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     }

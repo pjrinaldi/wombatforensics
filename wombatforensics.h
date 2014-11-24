@@ -10,6 +10,7 @@
 #include "progresswindow.h"
 #include "propertieswindow.h"
 #include "exportdialog.h"
+#include "fileviewer.h"
 #include "globals.h"
 
 
@@ -464,6 +465,7 @@ public:
     WombatFramework* wombatframework;
     PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
+    FileViewer* fileviewer;
     TreeModel* treemodel;
     QMenu* treemenu;
 
@@ -515,7 +517,6 @@ private slots:
     };
     void SetStepValues(int singlestep, int pagestep);
     void TreeContextMenu(const QPoint &point);
-    void SetNewMax(int slicerange); 
 
 protected:
     void closeEvent(QCloseEvent* event);
