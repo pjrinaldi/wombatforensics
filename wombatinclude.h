@@ -52,6 +52,7 @@
 
 #include "tskvariable.h"
 #include "translate.h"
+#include "hexviewer.h"
 #include "hexeditor.h"
 
 #include "tsk/libtsk.h"

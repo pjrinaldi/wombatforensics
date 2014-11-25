@@ -944,7 +944,7 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    hexwidget = new HexEditor(ui->hexPage, tskobjptr);
+    hexwidget = new HexViewer(ui->hexPage, tskobjptr);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     hexwidget->setObjectName("bt-hexview");

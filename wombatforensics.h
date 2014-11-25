@@ -560,7 +560,7 @@ private:
     QFutureWatcher<void> remwatcher;
 
     off_t offset() const;
-    HexEditor* hexwidget;
+    HexViewer* hexwidget;
     QActionGroup* viewgroup;
     QScrollBar* hexvsb;
     QLabel* selectedoffset;
