@@ -675,17 +675,13 @@ void HexEditor::paintEvent( QPaintEvent* e)
   int col_stop  = min(_cols-1,(e->rect().right()) / totalWordWidth);
 
   paint.setPen(QColor(0, 0, 0, 255));
-  paint.setBrush(Qt::NoBrush);
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
       //qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
       if(pageid == tskptr->blkaddrlist.at(i).toInt())
       {
-          //paint.setPen(QColor(255, 0, 0, 255));
-          paint.setPen(QColor(37, 96, 214, 255));
-          paint.setPen(QColor(155, 125, 75, 255));
-          //paint.setBrush(QColor(155, 125, 75, 255));
+          paint.setPen(QColor(255, 0, 0, 255));
           //qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
           break;
       }
