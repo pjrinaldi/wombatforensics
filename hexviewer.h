@@ -26,23 +26,9 @@
 #ifndef _HEX_VIEWER
 #define _HEX_VIEWER
 
-#include <QMouseEvent>
-#include <QFocusEvent>
-#include <QResizeEvent>
-#include <QKeyEvent>
-#include <QPaintEvent>
-#include <QWidget>
-
-// STL headers
-#include <vector>
-
-// System headers
-#include <sys/types.h>
-
-// Local headers
+#include "wombatinclude.h"
 #include "translate.h"
 #include "reader.h"
-#include "cursor.h"
 
 class HexViewer : public QWidget {
   Q_OBJECT
@@ -50,11 +36,12 @@ public:
   HexViewer( QWidget * parent =0, TskObject* tskobject = NULL );
   ~HexViewer();
 
-  bool open(const QString& filename);
   bool openimage();
+  // CUSTOM ABSTRACTION FUNCTIONS
+  //void SetReader(Reader* tmpreader);
+  // END CUSTOM ABSTRACTION FUNCTIONS
   //bool bigopen(startbyte, bytelen);
-  QString filename() const;
-  Reader * reader();
+  Reader* reader();
   off_t offset() const;
   void ClearContent(); 
   void SetTopLeft(off_t offset);

@@ -12,6 +12,8 @@
 #include "exportdialog.h"
 #include "fileviewer.h"
 #include "globals.h"
+#include "reader.h"
+#include "hexviewer.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -561,6 +563,8 @@ private:
 
     off_t offset() const;
     HexViewer* hexwidget;
+    Reader* imagereader; 
+    Reader* filereader;
     QActionGroup* viewgroup;
     QScrollBar* hexvsb;
     QLabel* selectedoffset;

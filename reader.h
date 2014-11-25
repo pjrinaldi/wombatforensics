@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#ifndef _READER_H_
-#define _READER_H_
+#ifndef _READER_H
+#define _READER_H
 
 //
 // Interface for Reader object.
@@ -30,14 +30,7 @@
 // off_t seek( off_t offset );     -> move file pointer to offset offset.
 //
 
-#include <sys/types.h>
-#include <stdio.h>
-
-#include <vector>
-#include <string>
-#include <iostream>
-
-#include "tskvariable.h"
+#include "wombatinclude.h"
 
 typedef vector<uchar> ReadBuffer;
 
@@ -48,26 +41,27 @@ ostream& operator<< (ostream&out,const ReadBuffer& buff);
 class Reader {
  public:
   // default is only 50*4k = 200k memory image.
-  Reader(const string& filename = "",off_t npages = 50, off_t pageSize = 4096);
+  Reader(off_t npages = 50, off_t pageSize = 4096);
   ~Reader();
 
-  bool open(const string& filename);
+
+  // CUSTOM ABSTRACTION FUNCTIONS
+  void SetData();
+  // END CUSTOM FUNCTIONS
+
   bool openimage(TskObject* tskobject);
   bool close();
   bool eof();
   bool is_open() const;
   
-  size_t read( ReadBuffer& v, size_t numBytes );
   size_t readimage(ReadBuffer& v, size_t numbytes);
   off_t seekimage(off_t offset);
   bool loadimagepage(off_t pageIdx);
   off_t CurrentPage(void);
-  off_t  seek( off_t offset );
   off_t tell() const; // returns the current offset or -1 if !open
   off_t size() const;
   off_t NumberPages() const;
   const char* lastError() const;
-  const char* filename() const;
 
   uchar operator[] (off_t offset); // cannot be const because it does change
                                    // data by loading/swapping pages
@@ -90,7 +84,6 @@ class Reader {
   FILE*         _fptr;
   bool          _is_open;
   bool          _eof;
-  string        _filename;
   off_t         _offset;         // current offset
   off_t         _size;           // file size from fstat
   off_t         _pageSize;       // number of bytes in a page

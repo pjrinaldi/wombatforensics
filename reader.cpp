@@ -20,31 +20,22 @@
  * Updates to enable editor to open a forensic image.
  * Copyright (C) 2014 Pasquale J. Rinaldi, Jr. <pjrinaldi@gmail.com>
  */ 
-
 #include <stdexcept>
 #include <algorithm>
 #include <new>
-
-// for stat:
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-// for strerror and errno:
 #include <string.h>
 #include <errno.h>
-
 #include <assert.h>
 
-#include <stdexcept>
-#include "translate.h"
-#include "reader.h" // some systems #define to map fn's to thier 64 bit
+#include "reader.h"
+// some systems #define to map fn's to thier 64 bit
                       // equivalents. make sure the header gets processed the
                       // same as the .cc file
 
-Reader::Reader( const string& filename, off_t npages, off_t pageSize )
-  : _filename(filename),
-    _pageSize(pageSize)
+Reader::Reader(off_t npages, off_t pageSize) : _pageSize(pageSize)
 {
   _maxPages = _freePages = (npages < 10) ? 10: npages;
   _error   = "";
@@ -54,9 +45,6 @@ Reader::Reader( const string& filename, off_t npages, off_t pageSize )
   _firstPage = -1;
   _lastPage  = -1;
   isfile = false;
-
-  //if( !filename.empty() )
-    //open(filename);
 }
 
 Reader::~Reader()
@@ -68,43 +56,6 @@ Reader::~Reader()
 //
 // public methods
 //
-bool Reader::open( const string& filename )
-{
-  // clear old data
-  if( is_open() ) {
-    this->close();
-    if( is_open() ) // only occurs if close somehow fails. 
-      return false;
-  } else {
-    _is_open = false;
-  }
-
-  if( 0 == (_fptr = fopen( filename.c_str() , "r" )) ) {
-    _error = "Failed to open \"" + filename + "\"";
-    return false;
-  }
-
-  // get filesize
-  struct stat statBuf;
-  if( -1 == stat(filename.c_str(), &statBuf) ) {
-    _error = "Could not stat \"" + filename + "\"";
-    return false;
-  }
-
-  off_t filesize = statBuf.st_size;
-  _size = filesize;
-  // calculate necessary number of pages
-  off_t npages   = filesize/_pageSize +1;
-  // initialize page pointers
-  _data.resize(npages);
-  fill( _data.begin(), _data.begin()+npages, (uchar*)0 );
-  
-  _filename = filename;
-  _is_open = true;
-  _firstPage = _lastPage = 0;
-  return loadPage(0);
-}
-
 off_t Reader::CurrentPage()
 {
     return _offset/_pageSize;
@@ -115,7 +66,6 @@ bool Reader::openimage(TskObject* tskpointer)
     tskptr = tskpointer;
     if(is_open())
         close();
-    _filename = "test.txt";
     _size = tskptr->imglength; // length in bytes for selected file
     if(isfile)
         _size = tskptr->length;
@@ -145,7 +95,6 @@ bool Reader::close()
   }
   */
 
-    _filename = "";
     _error = "";
   /*
   if( EOF == fclose(_fptr) ) {
@@ -216,56 +165,6 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
     return bytesread;
 }
 
-size_t Reader::read(vector<uchar>& v, size_t numBytes)
-{
-  int lastPageIdx = 0;
-  size_t bytesRead;
-
-  // if we don't have enough bytes left... then set page_end to lastPageIdx
-  // to the last page and set bytesRead to the remaining number of bytes
-  if( _offset+(int)numBytes >= size() ) {
-    _eof = true;
-    lastPageIdx = _data.size()-1;
-    bytesRead = size()-tell();
-    // we use numBytes as a counter for the number of operations to make
-    // so limit numBytes to the actual the max number of bytes left
-    numBytes  = bytesRead;
-  } else {
-    lastPageIdx = (_offset+numBytes)/_pageSize;
-    bytesRead = numBytes;
-  }
-  
-  if( !numBytes ) 
-    return numBytes;
-
-  // only do one realloc if necessary
-  v.erase(v.begin(),v.end());
-  v.reserve(v.size()+numBytes);
-
-  //  int byte_end; // == lastByteIndex+1  
-  // copy the data a page at a time
-  for(int page = _offset/_pageSize; page <= lastPageIdx; page++) {
-    // ensure the page is loaded.
-    try {
-      loadPage( page );
-    } 
-    catch (bad_alloc){
-      // out of memory
-      _error = "Out of memory.";
-      // return the number of bytes read
-      return (_offset/_pageSize - page)*_pageSize;
-    }
-
-    int start = _offset%_pageSize;
-    int stop  = (page == lastPageIdx)? start+numBytes: _pageSize;
-    for(int i = start; i < stop; i++) {
-      v.push_back(_data[page][i]);
-    }
-    numBytes -= stop-start;
-    _offset  += stop-start;
-  }
-  return bytesRead;
-}
 bool Reader::eof()
 {
   return (is_open())? _eof : 0;
@@ -281,27 +180,6 @@ off_t Reader::seekimage(off_t offset)
 
     return _offset;
     //_offset = tsk_img_read(tskptr->readimginfo, _offset, 
-}
-
-off_t Reader::seek(off_t offset)
-{
-  if( !is_open() )
-    return -1;
-  
-  // seek resets eof... even if the seek is past eof
-  _eof = false;
-
-  _offset = max( min( offset, size()-1 ), (off_t)0);
-  /*
-  if( fseek(_fptr, _offset, SEEK_SET) ) {
-    _error = "Seek to offset:";
-    _error += _offset;
-    _error += " failed.";
-    return -1;
-  }*/
-
-  assert(_offset == ftell(_fptr));
-  return _offset;
 }
 
 off_t Reader::tell() const
@@ -325,10 +203,6 @@ off_t Reader::NumberPages() const
 const char* Reader::lastError() const
 {
   return _error.c_str();
-}
-const char* Reader::filename() const
-{
-  return _filename.c_str();
 }
 
 //
@@ -490,6 +364,10 @@ Reader::rFindIndex( off_t start, const vector<uchar>& data, off_t stop )
 	--pos;
     }
     return size();
+}
+
+void Reader::SetData()
+{
 }
 
 //

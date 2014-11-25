@@ -44,16 +44,36 @@
 #include <QtPlugin>
 #include <QtWebKitWidgets>
 #include <QtWidgets>
+#include <QMouseEvent>
+#include <QFocusEvent>
+#include <QResizeEvent>
+#include <QKeyEvent>
+#include <QPaintEvent>
+#include <QWidget>
+#include <QPainter>
+#include <QPixmap>
+
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <stdexcept>
+#include <vector>
+
+#include <math.h>
+#include <assert.h>
+#include <errno.h>
+#include <ctype.h>
+#include <algorithm>
+#include <new>
+#include <unistd.h>
+#include <string.h>
 
 #include "tskvariable.h"
-#include "translate.h"
-#include "hexviewer.h"
-#include "hexeditor.h"
+#include "cursor.h"
+#include "mappings.h"
 
 #include "tsk/libtsk.h"
 #include "img/aff.h"

@@ -25,25 +25,6 @@
  *
  */ 
 
-#include <math.h>
-#include <assert.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <ctype.h>
-#include <algorithm>
-#include <iostream>
-
-#include <QApplication>
-#include <QMessageBox>
-#include <QPainter>
-#include <QPixmap>
-#include <QFocusEvent>
-#include <QPaintEvent>
-#include <QKeyEvent>
-#include <QResizeEvent>
-#include <QMouseEvent>
-
 #include "hexviewer.h"
 
 extern int errno;
@@ -90,11 +71,6 @@ void HexViewer::SetTopLeft(off_t offset)
     setTopLeft(offset);
 }
 
-QString HexViewer::filename() const
-{
-  return _reader.filename();
-}
-
 bool HexViewer::openimage()
 {
     if(!_reader.openimage(tskptr))
@@ -109,28 +85,6 @@ bool HexViewer::openimage()
     setTopLeft(0);
 
     return true;
-}
-
-bool HexViewer::open( const QString & filename )
-{
-  if(!_reader.open(C_STR(filename))) {
-    QMessageBox::critical( this, "HexEdit", 
-			   "Error loading \"" + filename + "\"\n" +
-			  _reader.lastError(),
-			   QMessageBox::Ok,0);
-    return false;
-  }
-
-  // set the new range for the scrollbar
-  _cursor.setRange(0,_reader.size());
-  _cursor.setCharsPerByte(_charsPerByte);
-  setSelection(SelectionStart,-1);
-  setSelection(SelectionEnd,-1);
-  emit rangeChanged(0,_reader.size()/bytesPerLine());
-  emit StepValues(1, bytesPerPage()/bytesPerLine());
-  calculateFontMetrics();     // update labels
-  setTopLeft(0);              // reset the GUI
-  return true;
 }
 
 void HexViewer::setBytesPerWord( int nbytes )
@@ -832,8 +786,9 @@ void HexViewer::cursorDown()
 void HexViewer::search( const QString& hexText, bool forwards )
 {
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
-  //if( !hexText.length() || _reader.filename() == "" )
-  if(!hexText.length() || QString(_reader.filename()).compare("") == 0)
+  if(!hexText.length())
+
+
     return;
 
   vector<uchar> data;
@@ -912,7 +867,7 @@ off_t HexViewer::offset() const
   return _cursor.byteOffset();
 }
 
-Reader * HexViewer::reader()
+Reader* HexViewer::reader()
 {
   return &_reader;
 }
@@ -988,8 +943,13 @@ void HexViewer::drawCursor( QPainter& paint )
     paint.drawRect( box );
   }
 }
-
+/*
 void HexViewer::SetIsFile(bool state)
 {
     _reader.isfile = state;
-}
+}*/
+/*
+void HexViewer::SetReader(Reader* tmpreader)
+{
+    _reader = tmpreader;
+}*/
