@@ -73,7 +73,7 @@
 
 #include "tskvariable.h"
 #include "cursor.h"
-#include "mappings.h"
+//#include "mappings.h"
 
 #include "tsk/libtsk.h"
 #include "img/aff.h"
