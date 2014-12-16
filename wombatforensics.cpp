@@ -541,6 +541,9 @@ void WombatForensics::LoadHexContents()
         hexwidget->SetTopLeft(tskobjptr->offset);
     }
     */
+    // BEGIN ABSTRACTION CHANGE
+    //
+    // END ABSTRACTION CHANGE
 }
 
 void WombatForensics::LoadTxtContents()

@@ -45,6 +45,7 @@ public:
   off_t offset() const;
   void ClearContent(); 
   void SetTopLeft(off_t offset);
+  void SetReader(Reader* tmpreader);
 
   // returns the word (string representation) that the cursor is in
   //  QString currentWord() const;

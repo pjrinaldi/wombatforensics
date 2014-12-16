@@ -948,8 +948,8 @@ void HexViewer::SetIsFile(bool state)
 {
     _reader.isfile = state;
 }*/
-/*
+
 void HexViewer::SetReader(Reader* tmpreader)
 {
-    _reader = tmpreader;
-}*/
+    _reader = *tmpreader;
+}
