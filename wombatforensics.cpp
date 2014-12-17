@@ -522,11 +522,19 @@ void WombatForensics::LoadHexContents()
     //if(wombatvarptr->selectedobject.objtype <= 5)
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
+        // SetData(imagereader->data, ...) -> which calls tsk_img_read and what is necessary
+        // tsk_img_read(..., imagereader->data, ...);
+        // hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
         hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
         hexwidget->SetTopLeft(tskobjptr->offset);
         /*
+        // fileviewer->SetReader(filereader);
+        //
+        //
+        //
+        //
         fileviewer->filehexview->SetIsFile(true);
         fileviewer->filehexview->openimage();
         fileviewer->filehexview->set2BPC();
@@ -948,6 +956,8 @@ void WombatForensics::SetupHexPage(void)
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
     hexwidget = new HexViewer(ui->hexPage, tskobjptr);
+    // imagereader = new Reader();
+    // filereader = new Reader();
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     hexwidget->setObjectName("bt-hexview");
