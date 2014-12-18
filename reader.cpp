@@ -366,8 +366,9 @@ Reader::rFindIndex( off_t start, const vector<uchar>& data, off_t stop )
     return size();
 }
 
-void Reader::SetData()
+void Reader::SetData(vector<uchar*> tmpdata)
 {
+    _data = tmpdata;
 }
 
 //

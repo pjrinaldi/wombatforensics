@@ -524,7 +524,7 @@ void WombatForensics::LoadHexContents()
     {
         // SetData(imagereader->data, ...) -> which calls tsk_img_read and what is necessary
         // tsk_img_read(..., imagereader->data, ...);
-        // hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
+        hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
         hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();

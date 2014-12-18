@@ -565,6 +565,8 @@ private:
     HexViewer* hexwidget;
     Reader* imagereader; 
     Reader* filereader;
+    vector<uchar*> imagedata;
+    vector<uchar*> filedata;
     QActionGroup* viewgroup;
     QScrollBar* hexvsb;
     QLabel* selectedoffset;

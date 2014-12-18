@@ -46,7 +46,8 @@ class Reader {
 
 
   // CUSTOM ABSTRACTION FUNCTIONS
-  void SetData();
+  void SetData(vector<uchar*> tmpdata);
+  void LoadPage();
   // END CUSTOM FUNCTIONS
 
   bool openimage(TskObject* tskobject);
