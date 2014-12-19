@@ -522,6 +522,8 @@ void WombatForensics::LoadHexContents()
     //if(wombatvarptr->selectedobject.objtype <= 5)
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
+        imagereader->_pageSize = tskobjptr->blocksize;
+        imagereader->SetData(imagedata);
         // SetData(imagereader->data, ...) -> which calls tsk_img_read and what is necessary
         // tsk_img_read(..., imagereader->data, ...);
         hexwidget->SetReader(imagereader); // which should replace the openimage functionality.

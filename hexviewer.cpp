@@ -73,8 +73,10 @@ void HexViewer::SetTopLeft(off_t offset)
 
 bool HexViewer::openimage()
 {
+    /*
     if(!_reader.openimage(tskptr))
         QMessageBox::critical(this, "HexView", "Error opening image\n", QMessageBox::Ok, 0);
+    */
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
