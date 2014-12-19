@@ -83,8 +83,8 @@ bool HexViewer::openimage()
     setSelection(SelectionEnd, -1);
     emit rangeChanged(0, _reader.size()/bytesPerLine());
     emit StepValues(1, bytesPerPage()/bytesPerLine());
-    calculateFontMetrics();
-    setTopLeft(0);
+    //calculateFontMetrics();
+    //setTopLeft(0);
 
     return true;
 }
