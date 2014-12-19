@@ -523,6 +523,12 @@ void WombatForensics::LoadHexContents()
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
         imagereader->_pageSize = tskobjptr->blocksize;
+        imagereader->_size = tskobjptr->imglength;
+        imagereader->_numpages = imagereader->_size / imagereader->_pageSize;
+        imagedata.resize(imagereader->_numpages);
+        fill(imagedata.begin(), imagedata.begin()+imagereader->_numpages, (uchar*)0);
+        imagereader->_firstPage = imagereader->_lastPage = 0;
+        LoadPage(0);
         imagereader->SetData(imagedata);
         // SetData(imagereader->data, ...) -> which calls tsk_img_read and what is necessary
         // tsk_img_read(..., imagereader->data, ...);
@@ -554,6 +560,13 @@ void WombatForensics::LoadHexContents()
     // BEGIN ABSTRACTION CHANGE
     //
     // END ABSTRACTION CHANGE
+}
+
+void WombatForensics::LoadPage(off_t pageindex)
+{
+    imagedata[pageindex] = new uchar[imagereader->_pageSize];
+    off_t retval = 0;
+    retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
 }
 
 void WombatForensics::LoadTxtContents()
