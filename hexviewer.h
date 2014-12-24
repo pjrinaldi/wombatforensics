@@ -121,6 +121,7 @@ public slots:
 
 
   int bytesPerPage() const;
+  void SetData(vector<uchar*> v);
 
 protected:
   //  void setOffsetLabels( off_t topLeft );
