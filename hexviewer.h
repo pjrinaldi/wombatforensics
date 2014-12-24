@@ -119,6 +119,9 @@ public slots:
   void setBaseBinary();
   void setBaseASCII();
 
+
+  int bytesPerPage() const;
+
 protected:
   //  void setOffsetLabels( off_t topLeft );
   void setTopLeft( off_t offset );
@@ -139,7 +142,7 @@ protected:
   int charsPerByte() const;
   int charsPerWord() const;
   int charsPerLine() const;
-  int bytesPerPage() const;
+  //int bytesPerPage() const;
   int bytesPerWord() const;
   int bytesPerLine() const;
   int wordsPerLine() const;

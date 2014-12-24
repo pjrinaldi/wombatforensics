@@ -572,6 +572,37 @@ void WombatForensics::LoadPage(off_t pageindex)
 
 void WombatForensics::AdjustData(int topleft)
 {
+    int lastpageindex = 0;
+    size_t bytesread;
+    int numbytes = (int)hexwidget->bytesPerPage();
+    if(imagereader->_offset + numbytes >= (int)imagereader->size())
+    {
+        imagereader->_eof = true;
+        if(imagereader->size() == 0)
+            imagedata.erase(imagedata.begin(), imagedata.end());
+        lastpageindex = imagedata.size() - 1;
+        bytesread = imagereader->size() - imagereader->tell();
+        numbytes = bytesread;
+    }
+    else
+    {
+        lastpageindex = (imagereader->_offset + numbytes)/imagereader->_pageSize;
+        bytesread = numbytes;
+    }
+    imagedata.erase(imagedata.begin(), imagedata.end());
+    imagedata.reserve(imagedata.size() + numbytes);
+    for(int page = imagereader->_offset/imagereader->_pageSize; page <= lastpageindex; page++)
+    {
+        LoadPage(page);
+        /* MIGHT NOT NEED
+        int start = imagereader->offset%imagereader->_pageSize;
+        int stop = (page == lastpageindex) ? start + numbytes : imagereader->_pageSize;
+        for(int i = start; i < stop; i++)
+        {
+            //imagedata.push_back(
+        }
+        */
+    }
     // implement the functionality of reader.readimage here and then pass on to setTopLeftToPercent
     hexwidget->setTopLeftToPercent(topleft);
     /*

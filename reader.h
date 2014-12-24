@@ -77,6 +77,8 @@ class Reader {
   off_t _size;
   off_t _firstPage;
   off_t _lastPage;
+  off_t _offset;
+  bool _eof;
 
  protected:
   bool dataIsAtOffset( const vector<uchar>& data, off_t pos );
@@ -89,8 +91,8 @@ class Reader {
   string        _error;
   FILE*         _fptr;
   bool          _is_open;
-  bool          _eof;
-  off_t         _offset;         // current offset
+  //bool          _eof;
+  //off_t         _offset;         // current offset
   //off_t         _size;           // file size from fstat
   //off_t         _pageSize;       // number of bytes in a page
   //off_t         _firstPage;      // first currently loaded page
