@@ -525,13 +525,12 @@ void WombatForensics::LoadHexContents()
         imagereader->_pageSize = tskobjptr->blocksize;
         imagereader->_size = tskobjptr->imglength;
         imagereader->_numpages = imagereader->_size / imagereader->_pageSize;
+        qDebug() << "imagereader size:" << imagereader->_size << "numpages" << imagereader->_numpages;
         imagedata.resize(imagereader->_numpages);
         fill(imagedata.begin(), imagedata.begin()+imagereader->_numpages, (uchar*)0);
         imagereader->_firstPage = imagereader->_lastPage = 0;
         LoadPage(0);
         imagereader->SetData(imagedata);
-        // SetData(imagereader->data, ...) -> which calls tsk_img_read and what is necessary
-        // tsk_img_read(..., imagereader->data, ...);
         hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
         hexwidget->openimage();
         hexwidget->set2BPC();
@@ -572,6 +571,18 @@ void WombatForensics::LoadPage(off_t pageindex)
 void WombatForensics::AdjustData(int topleft)
 {
     int lastpageindex = 0;
+    imagereader->_eof = false;
+    imagereader->_offset = max(min((off_t)topleft, imagereader->size()-1), (off_t)0);
+
+    // seek image code should go here
+    /*
+     *    _eof = false;
+    _offset = max(min(offset, size()-1), (off_t)0);
+
+    return _offset;
+
+     */ 
+    // end seek image code
     size_t bytesread;
     int numbytes = (int)hexwidget->bytesPerPage();
     if(imagereader->_offset + numbytes >= (int)imagereader->size())
@@ -588,21 +599,25 @@ void WombatForensics::AdjustData(int topleft)
         lastpageindex = (imagereader->_offset + numbytes)/imagereader->_pageSize;
         bytesread = numbytes;
     }
-    imagedata.erase(imagedata.begin(), imagedata.end());
-    imagedata.reserve(imagedata.size() + numbytes);
+    //imagedata.erase(imagedata.begin(), imagedata.end());
+    //imagedata.reserve(imagedata.size() + numbytes);
     for(int page = imagereader->_offset/imagereader->_pageSize; page <= lastpageindex; page++)
     {
         LoadPage(page);
         /* MIGHT NOT NEED
-        int start = imagereader->offset%imagereader->_pageSize;
+         */ 
+        int start = imagereader->_offset%imagereader->_pageSize;
         int stop = (page == lastpageindex) ? start + numbytes : imagereader->_pageSize;
         for(int i = start; i < stop; i++)
         {
             //imagedata.push_back(
         }
-        */
+        numbytes -= stop - start;
+        imagereader->_offset += stop - start;
+        /**/
     }
     // implement the functionality of reader.readimage here and then pass on to setTopLeftToPercent
+    imagereader->SetData(imagedata);
     hexwidget->setTopLeftToPercent(topleft);
     /*
      *

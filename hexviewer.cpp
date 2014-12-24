@@ -77,6 +77,7 @@ bool HexViewer::openimage()
     if(!_reader.openimage(tskptr))
         QMessageBox::critical(this, "HexView", "Error opening image\n", QMessageBox::Ok, 0);
     */
+    qDebug() << "reader size: " << _reader.size();
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
@@ -163,7 +164,7 @@ void HexViewer::setTopLeft( off_t offset )
      _topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //setOffsetLabels(_topLeft);
-     _reader.seekimage(_topLeft);
+     //_reader.seekimage(_topLeft);
      //_reader.seek(_topLeft);
      //_reader.readimage(_data,bytesPerPage()); // replaced with AdjustData()
      //_reader.read(_data,bytesPerPage());
