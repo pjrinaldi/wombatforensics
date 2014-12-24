@@ -521,6 +521,7 @@ private slots:
     };
     void SetStepValues(int singlestep, int pagestep);
     void TreeContextMenu(const QPoint &point);
+    void AdjustData(int topleft);
 
 protected:
     void closeEvent(QCloseEvent* event);

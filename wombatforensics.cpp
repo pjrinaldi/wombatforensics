@@ -570,6 +570,60 @@ void WombatForensics::LoadPage(off_t pageindex)
     retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
 }
 
+void WombatForensics::AdjustData(int topleft)
+{
+    // implement the functionality of reader.readimage here and then pass on to setTopLeftToPercent
+    hexwidget->setTopLeftToPercent(topleft);
+    /*
+     *
+    int lastPageIdx = 0;
+    size_t bytesread;
+    // MODIFY THIS TO WHERE IT'S NOT LOADING THE WHOLE IMAGE, BUT ONLY A PAGE'S WORTH..., IF ANYTHING AT ALL HERE
+    if(_offset+(int)numbytes >= size())
+    {
+        _eof = true;
+        if(size() == 0)
+            v.erase(v.begin(), v.end()); // added to clear the previous values when a file is of size 0
+        lastPageIdx = _data.size()-1;
+        bytesread = size() - tell();
+        numbytes = bytesread;
+    }
+    else
+    {
+        lastPageIdx = (_offset+numbytes)/_pageSize;
+        bytesread = numbytes;
+    }
+
+    if(!numbytes)
+        return numbytes;
+    v.erase(v.begin(), v.end());
+    v.reserve(v.size() + numbytes);
+    for(int page = _offset/_pageSize; page <= lastPageIdx; page++)
+    {
+        try
+        {
+            loadimagepage(page);
+        }
+        catch(bad_alloc)
+        {
+            return(_offset/_pageSize - page)*_pageSize;
+        }
+        int start = _offset%_pageSize;
+        int stop  = (page == lastPageIdx)? start+numbytes: _pageSize;
+        for(int i = start; i < stop; i++)
+        {
+            v.push_back(_data[page][i]);
+        }
+        numbytes -= stop-start;
+        _offset  += stop-start;
+    }
+
+    return bytesread;
+
+     *
+     */ 
+}
+
 void WombatForensics::LoadTxtContents()
 {
 }
@@ -986,7 +1040,8 @@ void WombatForensics::SetupHexPage(void)
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    connect(hexvsb, SIGNAL(valueChanged(int)), this, SLOT(AdjustData(int)));
+    //connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
 }

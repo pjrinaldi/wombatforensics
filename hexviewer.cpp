@@ -165,7 +165,7 @@ void HexViewer::setTopLeft( off_t offset )
      //setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
      //_reader.seek(_topLeft);
-     _reader.readimage(_data,bytesPerPage());
+     //_reader.readimage(_data,bytesPerPage()); // replaced with AdjustData()
      //_reader.read(_data,bytesPerPage());
      
      repaint();
