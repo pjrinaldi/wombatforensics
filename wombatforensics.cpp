@@ -584,12 +584,14 @@ void WombatForensics::AdjustData(int topleft)
      */ 
     // end seek image code
     size_t bytesread;
+    vector<uchar>& v = hexwidget->_data;
     int numbytes = (int)hexwidget->bytesPerPage();
     if(imagereader->_offset + numbytes >= (int)imagereader->size())
     {
         imagereader->_eof = true;
         if(imagereader->size() == 0)
-            imagedata.erase(imagedata.begin(), imagedata.end());
+            v.erase(v.begin(), v.end());
+            //imagedata.erase(imagedata.begin(), imagedata.end());
         lastpageindex = imagedata.size() - 1;
         bytesread = imagereader->size() - imagereader->tell();
         numbytes = bytesread;
@@ -599,6 +601,8 @@ void WombatForensics::AdjustData(int topleft)
         lastpageindex = (imagereader->_offset + numbytes)/imagereader->_pageSize;
         bytesread = numbytes;
     }
+    v.erase(v.begin(), v.end());
+    v.reserve(v.size() + numbytes);
     //imagedata.erase(imagedata.begin(), imagedata.end());
     //imagedata.reserve(imagedata.size() + numbytes);
     for(int page = imagereader->_offset/imagereader->_pageSize; page <= lastpageindex; page++)
@@ -610,6 +614,7 @@ void WombatForensics::AdjustData(int topleft)
         int stop = (page == lastpageindex) ? start + numbytes : imagereader->_pageSize;
         for(int i = start; i < stop; i++)
         {
+            v.push_back(imagedata[page][i]);
             //imagedata.push_back(imagedata[page][i]);
         }
         numbytes -= stop - start;
@@ -618,7 +623,6 @@ void WombatForensics::AdjustData(int topleft)
     }
     // implement the functionality of reader.readimage here and then pass on to setTopLeftToPercent
     //imagereader->SetData(imagedata);
-    hexwidget->SetData(imagedata);
     hexwidget->setTopLeftToPercent(topleft);
     /*
      *

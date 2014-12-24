@@ -71,11 +71,6 @@ void HexViewer::SetTopLeft(off_t offset)
     setTopLeft(offset);
 }
 
-void HexViewer::SetData(vector<uchar*> v)
-{
-    _data = v;
-}
-
 bool HexViewer::openimage()
 {
     /*

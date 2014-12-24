@@ -76,6 +76,10 @@ public:
   int   offsetToPercent( off_t offset );
 
   off_t localByteOffsetAtXY( off_t x, off_t y );
+
+
+  vector<uchar> _data;
+
 protected:
   // accessors for local offset's
   // note: returned offset's are not necessarily visible
@@ -121,7 +125,7 @@ public slots:
 
 
   int bytesPerPage() const;
-  void SetData(vector<uchar*> v);
+
 
 protected:
   //  void setOffsetLabels( off_t topLeft );
@@ -203,7 +207,7 @@ protected:
   //
   // current screen data info              
   //
-  vector<uchar>       _data;
+  //vector<uchar>       _data;
   int                 _base; // either 2 8 or 16
 
   off_t               _lastValidWord;
