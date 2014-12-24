@@ -610,6 +610,7 @@ void WombatForensics::AdjustData(int topleft)
         int stop = (page == lastpageindex) ? start + numbytes : imagereader->_pageSize;
         for(int i = start; i < stop; i++)
         {
+            imagedata.push_back(imagedata[page][i]);
             //imagedata.push_back(
         }
         numbytes -= stop - start;
