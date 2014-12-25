@@ -529,7 +529,8 @@ void WombatForensics::LoadHexContents()
         imagedata.resize(imagereader->_numpages);
         fill(imagedata.begin(), imagedata.begin()+imagereader->_numpages, (uchar*)0);
         imagereader->_firstPage = imagereader->_lastPage = 0;
-        LoadPage(0);
+        //LoadPage(0);
+        AdjustData(0);
         imagereader->SetData(imagedata);
         hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
         hexwidget->openimage();
