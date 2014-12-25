@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'fileviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.3.2
+** Created by: Qt User Interface Compiler version 5.4.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -16,9 +16,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
-#include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -31,11 +29,6 @@ public:
     QAction *actionOmni;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
-    QStackedWidget *stackedWidget;
-    QWidget *hexpage;
-    QWidget *textpage;
-    QWidget *omnipage;
-    QToolBar *toolBar;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *FileViewer)
@@ -55,40 +48,12 @@ public:
         horizontalLayout = new QHBoxLayout(centralwidget);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        stackedWidget = new QStackedWidget(centralwidget);
-        stackedWidget->setObjectName(QStringLiteral("stackedWidget"));
-        stackedWidget->setFrameShadow(QFrame::Sunken);
-        hexpage = new QWidget();
-        hexpage->setObjectName(QStringLiteral("hexpage"));
-        stackedWidget->addWidget(hexpage);
-        textpage = new QWidget();
-        textpage->setObjectName(QStringLiteral("textpage"));
-        stackedWidget->addWidget(textpage);
-        omnipage = new QWidget();
-        omnipage->setObjectName(QStringLiteral("omnipage"));
-        stackedWidget->addWidget(omnipage);
-
-        horizontalLayout->addWidget(stackedWidget);
-
         FileViewer->setCentralWidget(centralwidget);
-        toolBar = new QToolBar(FileViewer);
-        toolBar->setObjectName(QStringLiteral("toolBar"));
-        toolBar->setAllowedAreas(Qt::TopToolBarArea);
-        toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        toolBar->setFloatable(false);
-        FileViewer->addToolBar(Qt::TopToolBarArea, toolBar);
         statusBar = new QStatusBar(FileViewer);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         FileViewer->setStatusBar(statusBar);
 
-        toolBar->addAction(actionHex);
-        toolBar->addAction(actionText);
-        toolBar->addAction(actionOmni);
-
         retranslateUi(FileViewer);
-
-        stackedWidget->setCurrentIndex(0);
-
 
         QMetaObject::connectSlotsByName(FileViewer);
     } // setupUi
@@ -99,7 +64,6 @@ public:
         actionHex->setText(QApplication::translate("FileViewer", "Hex", 0));
         actionText->setText(QApplication::translate("FileViewer", "Text", 0));
         actionOmni->setText(QApplication::translate("FileViewer", "Omni", 0));
-        toolBar->setWindowTitle(QApplication::translate("FileViewer", "toolBar", 0));
     } // retranslateUi
 
 };

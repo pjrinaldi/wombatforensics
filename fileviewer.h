@@ -2,6 +2,7 @@
 #define FILEVIEWER_H
 
 #include "wombatinclude.h"
+#include "hexviewer.h"
 #include "ui_fileviewer.h"
 
 namespace Ui {
@@ -15,7 +16,7 @@ class FileViewer : public QMainWindow
 public:
     FileViewer(QWidget* parent = 0, TskObject* tskobject = NULL);
     ~FileViewer();
-    //HexEditor* filehexview;
+    HexViewer* filehexview;
 
 private slots:
     void SetScrollBarRange(off_t low, off_t high);
@@ -36,7 +37,7 @@ private:
     QActionGroup* viewgroup;
     QLabel* selectedoffset;
     QLabel* selectedhex;
-    //QScrollBar* filehexvsb;
+    QScrollBar* filehexvsb;
     TskObject* tskptr;
 };
 

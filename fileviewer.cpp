@@ -16,7 +16,7 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     /*
-    filehexview = new HexEditor(ui->hexpage, tskptr);
+    filehexview = new HexEditor(ui->centralwidget, tskptr);
     filehexview->setObjectName("filehexview");
     filehexview->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexlayout->addWidget(filehexview);
