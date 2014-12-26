@@ -4,7 +4,7 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
 {
     tskptr = tskobjptr;
     ui->setupUi(this);
-    QHBoxLayout* hexlayout = new QHBoxLayout();
+    QHBoxLayout* hexlayout = new QHBoxLayout(ui->centralwidget);
     this->statusBar()->setSizeGripEnabled(true);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
@@ -156,6 +156,7 @@ void FileViewer::SetStepValues(int singlestep, int pagestep)
 
 void FileViewer::LoadPage(off_t pageindex)
 {
+    qDebug() << "tskptr" << tskptr->offset;
     filedata[pageindex] = new uchar[filereader->_pageSize];
     off_t retval = 0;
     retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);

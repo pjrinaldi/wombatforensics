@@ -23,6 +23,7 @@ public:
 
 public slots:
     void AdjustData(int topleft);
+
 private slots:
     void SetScrollBarRange(off_t low, off_t high);
     void setScrollBarValue(off_t pos);

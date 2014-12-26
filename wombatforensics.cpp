@@ -50,7 +50,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatdatabase = new WombatDatabase(wombatvarptr);
     wombatframework = new WombatFramework(wombatvarptr);
     propertywindow = new PropertiesWindow(wombatdatabase);
-    fileviewer = new FileViewer();
+    fileviewer = new FileViewer(this, tskobjptr);
     isignals = new InterfaceSignals();
     connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
