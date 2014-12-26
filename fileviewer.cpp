@@ -18,10 +18,13 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     filehexview = new HexViewer(ui->centralwidget, tskptr);
     filehexview->setObjectName("filehexview");
     filehexview->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    hexlayout->addWidget(filehexview);
+    ui->horizontalLayout->addWidget(filehexview);
+    //hexlayout->addWidget(filehexview);
     filehexvsb = new QScrollBar(filehexview);
     filehexvsb->setRange(0, 0);
-    hexlayout->addWidget(filehexvsb);
+    //hexlayout->addWidget(filehexvsb);
+    ui->horizontalLayout->addWidget(filehexvsb);
+    //ui->centralwidget->setLayout(hexlayout);
     connect(filehexview, SIGNAL(rangeChanged(off_t, off_t)), this, SLOT(SetScrollBarRange(off_t, off_t)));
     connect(filehexview, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(filehexview, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));

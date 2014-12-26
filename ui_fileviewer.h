@@ -45,7 +45,13 @@ public:
         actionOmni->setObjectName(QStringLiteral("actionOmni"));
         centralwidget = new QWidget(FileViewer);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(centralwidget->sizePolicy().hasHeightForWidth());
+        centralwidget->setSizePolicy(sizePolicy);
         horizontalLayout = new QHBoxLayout(centralwidget);
+        horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         FileViewer->setCentralWidget(centralwidget);
