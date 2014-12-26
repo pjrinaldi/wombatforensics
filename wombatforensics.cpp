@@ -525,7 +525,7 @@ void WombatForensics::LoadHexContents()
         imagereader->_pageSize = tskobjptr->blocksize;
         imagereader->_size = tskobjptr->imglength;
         imagereader->_numpages = imagereader->_size / imagereader->_pageSize;
-        qDebug() << "imagereader size:" << imagereader->_size << "numpages" << imagereader->_numpages;
+        //qDebug() << "imagereader size:" << imagereader->_size << "numpages" << imagereader->_numpages;
         imagedata.resize(imagereader->_numpages);
         fill(imagedata.begin(), imagedata.begin()+imagereader->_numpages, (uchar*)0);
         imagereader->_firstPage = imagereader->_lastPage = 0;
@@ -537,6 +537,20 @@ void WombatForensics::LoadHexContents()
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
         hexwidget->SetTopLeft(tskobjptr->offset);
+        fileviewer->filereader->_pageSize = tskobjptr->blocksize;
+        fileviewer->filereader->_size = tskobjptr->length;
+        fileviewer->filereader->_numpages = fileviewer->filereader->_size / fileviewer->filereader->_pageSize;
+        fileviewer->filedata.resize(fileviewer->filereader->_numpages);
+        fill(fileviewer->filedata.begin(), fileviewer->filedata.begin()+fileviewer->filereader->_numpages, (uchar*)0);
+        fileviewer->filereader->_firstPage = fileviewer->filereader->_lastPage = 0;
+        fileviewer->AdjustData(0);
+        fileviewer->filereader->SetData(fileviewer->filedata);
+        fileviewer->filehexview->SetReader(fileviewer->filereader);
+        fileviewer->filehexview->openimage();
+        fileviewer->filehexview->set2BPC();
+        fileviewer->filehexview->setBaseHex();
+        fileviewer->filehexview->SetTopLeft(tskobjptr->offset);
+
         /*
         // fileviewer->SetReader(filereader);
         //
@@ -1078,7 +1092,7 @@ void WombatForensics::SetupHexPage(void)
     QHBoxLayout* hexLayout = new QHBoxLayout();
     hexwidget = new HexViewer(ui->hexPage, tskobjptr);
     imagereader = new Reader();
-    filereader = new Reader();
+    fileviewer->filereader = new Reader();
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     hexwidget->setObjectName("bt-hexview");

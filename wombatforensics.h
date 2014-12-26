@@ -565,9 +565,9 @@ private:
     off_t offset() const;
     HexViewer* hexwidget;
     Reader* imagereader; 
-    Reader* filereader;
+    //Reader* filereader;
     vector<uchar*> imagedata;
-    vector<uchar*> filedata;
+    //vector<uchar*> filedata;
     void LoadPage(off_t pageindex);
     QActionGroup* viewgroup;
     QScrollBar* hexvsb;
