@@ -79,13 +79,19 @@ class Reader {
   off_t _lastPage;
   off_t _offset;
   bool _eof;
+  off_t _freePages;
+  off_t _maxPages;
+
+  bool freePage(off_t pageIdx);
+  off_t nFreePages() const;
+  off_t& nFreePages();
 
  protected:
   bool dataIsAtOffset( const vector<uchar>& data, off_t pos );
   bool loadPage(off_t pageIdx);
-  bool freePage(off_t pageIdx);
-  off_t nFreePages() const;
-  off_t& nFreePages();
+  //bool freePage(off_t pageIdx);
+  //off_t nFreePages() const;
+  //off_t& nFreePages();
 
  protected:
   string        _error;
@@ -97,9 +103,9 @@ class Reader {
   //off_t         _pageSize;       // number of bytes in a page
   //off_t         _firstPage;      // first currently loaded page
   //off_t         _lastPage;       // last currently loaded page
-  off_t         _maxPages;       // maximum number of pages which could be currently loaded
+  //off_t         _maxPages;       // maximum number of pages which could be currently loaded
   //off_t         _numpages;      // total number of pages for a file size.
-  off_t         _freePages;     // number of free pages
+  //off_t         _freePages;     // number of free pages
   vector< uchar *> _data;
   TskObject* tskptr;
 };

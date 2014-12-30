@@ -525,11 +525,9 @@ void WombatForensics::LoadHexContents()
         imagereader->_pageSize = tskobjptr->blocksize;
         imagereader->_size = tskobjptr->imglength;
         imagereader->_numpages = imagereader->_size / imagereader->_pageSize;
-        //qDebug() << "imagereader size:" << imagereader->_size << "numpages" << imagereader->_numpages;
         imagedata.resize(imagereader->_numpages);
         fill(imagedata.begin(), imagedata.begin()+imagereader->_numpages, (uchar*)0);
         imagereader->_firstPage = imagereader->_lastPage = 0;
-        //LoadPage(0);
         AdjustData(0);
         imagereader->SetData(imagedata);
         hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
@@ -565,26 +563,36 @@ void WombatForensics::LoadHexContents()
 
 void WombatForensics::LoadPage(off_t pageindex)
 {
-    imagedata[pageindex] = new uchar[imagereader->_pageSize];
     off_t retval = 0;
+
+    if(!imagereader->nFreePages())
+    {
+        if(abs(imagereader->_firstPage - pageindex) > abs(imagereader->_lastPage - pageindex))
+            while(!imagereader->freePage(imagereader->_firstPage++));
+        else
+            while(!imagereader->freePage(imagereader->_lastPage--));
+    }
+    imagedata[pageindex] = new uchar[imagereader->_pageSize];
+    --imagereader->nFreePages();
+
     retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
+    if(retval > 0)
+    {
+        if(pageindex < imagereader->_firstPage)
+            imagereader->_firstPage = pageindex;
+        if(pageindex > imagereader->_lastPage)
+            imagereader->_lastPage = pageindex;
+    }
 }
 
 void WombatForensics::AdjustData(int topleft)
 {
+    // seek image code should go here
     int lastpageindex = 0;
     imagereader->_eof = false;
     imagereader->_offset = max(min((off_t)topleft, imagereader->size()-1), (off_t)0);
-
-    // seek image code should go here
-    /*
-     *    _eof = false;
-    _offset = max(min(offset, size()-1), (off_t)0);
-
-    return _offset;
-
-     */ 
     // end seek image code
+
     size_t bytesread;
     vector<uchar>& v = hexwidget->_data;
     int numbytes = (int)hexwidget->bytesPerPage();
@@ -593,7 +601,6 @@ void WombatForensics::AdjustData(int topleft)
         imagereader->_eof = true;
         if(imagereader->size() == 0)
             v.erase(v.begin(), v.end());
-            //imagedata.erase(imagedata.begin(), imagedata.end());
         lastpageindex = imagedata.size() - 1;
         bytesread = imagereader->size() - imagereader->tell();
         numbytes = bytesread;
@@ -605,75 +612,21 @@ void WombatForensics::AdjustData(int topleft)
     }
     v.erase(v.begin(), v.end());
     v.reserve(v.size() + numbytes);
-    //imagedata.erase(imagedata.begin(), imagedata.end());
-    //imagedata.reserve(imagedata.size() + numbytes);
     for(int page = imagereader->_offset/imagereader->_pageSize; page <= lastpageindex; page++)
     {
         LoadPage(page);
-        /* MIGHT NOT NEED
-         */ 
         int start = imagereader->_offset%imagereader->_pageSize;
         int stop = (page == lastpageindex) ? start + numbytes : imagereader->_pageSize;
         for(int i = start; i < stop; i++)
         {
             v.push_back(imagedata[page][i]);
-            //imagedata.push_back(imagedata[page][i]);
         }
         numbytes -= stop - start;
         imagereader->_offset += stop - start;
-        /**/
     }
     // implement the functionality of reader.readimage here and then pass on to setTopLeftToPercent
     //imagereader->SetData(imagedata);
     hexwidget->setTopLeftToPercent(topleft);
-    /*
-     *
-    int lastPageIdx = 0;
-    size_t bytesread;
-    // MODIFY THIS TO WHERE IT'S NOT LOADING THE WHOLE IMAGE, BUT ONLY A PAGE'S WORTH..., IF ANYTHING AT ALL HERE
-    if(_offset+(int)numbytes >= size())
-    {
-        _eof = true;
-        if(size() == 0)
-            v.erase(v.begin(), v.end()); // added to clear the previous values when a file is of size 0
-        lastPageIdx = _data.size()-1;
-        bytesread = size() - tell();
-        numbytes = bytesread;
-    }
-    else
-    {
-        lastPageIdx = (_offset+numbytes)/_pageSize;
-        bytesread = numbytes;
-    }
-
-    if(!numbytes)
-        return numbytes;
-    v.erase(v.begin(), v.end());
-    v.reserve(v.size() + numbytes);
-    for(int page = _offset/_pageSize; page <= lastPageIdx; page++)
-    {
-        try
-        {
-            loadimagepage(page);
-        }
-        catch(bad_alloc)
-        {
-            return(_offset/_pageSize - page)*_pageSize;
-        }
-        int start = _offset%_pageSize;
-        int stop  = (page == lastPageIdx)? start+numbytes: _pageSize;
-        for(int i = start; i < stop; i++)
-        {
-            v.push_back(_data[page][i]);
-        }
-        numbytes -= stop-start;
-        _offset  += stop-start;
-    }
-
-    return bytesread;
-
-     *
-     */ 
 }
 
 void WombatForensics::LoadTxtContents()

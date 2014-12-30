@@ -160,9 +160,25 @@ void FileViewer::SetStepValues(int singlestep, int pagestep)
 void FileViewer::LoadPage(off_t pageindex)
 {
     qDebug() << "tskptr" << tskptr->offset;
-    filedata[pageindex] = new uchar[filereader->_pageSize];
     off_t retval = 0;
+
+    if(!filereader->nFreePages())
+    {
+        if(abs(filereader->_firstPage - pageindex) > abs(filereader->_lastPage - pageindex))
+            while(!filereader->freePage(filereader->_firstPage++));
+        else
+            while(!filereader->freePage(filereader->_lastPage--));
+    }
+    filedata[pageindex] = new uchar[filereader->_pageSize];
+    --filereader->nFreePages();
     retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+    if(retval > 0)
+    {
+        if(pageindex < filereader->_firstPage)
+            filereader->_firstPage = pageindex;
+        if(pageindex > filereader->_lastPage)
+            filereader->_lastPage = pageindex;
+    }
 }
 
 void FileViewer::AdjustData(int topleft)
