@@ -4,7 +4,7 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
 {
     tskptr = tskobjptr;
     ui->setupUi(this);
-    QHBoxLayout* hexlayout = new QHBoxLayout(ui->centralwidget);
+    //QHBoxLayout* hexlayout = new QHBoxLayout(ui->centralwidget);
     this->statusBar()->setSizeGripEnabled(true);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");

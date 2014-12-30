@@ -35,7 +35,7 @@ public:
     {
         if (FileViewer->objectName().isEmpty())
             FileViewer->setObjectName(QStringLiteral("FileViewer"));
-        FileViewer->setWindowModality(Qt::WindowModal);
+        FileViewer->setWindowModality(Qt::NonModal);
         FileViewer->resize(640, 480);
         actionHex = new QAction(FileViewer);
         actionHex->setObjectName(QStringLiteral("actionHex"));

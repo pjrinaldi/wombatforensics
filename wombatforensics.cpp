@@ -550,19 +550,6 @@ void WombatForensics::LoadHexContents()
         fileviewer->filehexview->set2BPC();
         fileviewer->filehexview->setBaseHex();
         fileviewer->filehexview->SetTopLeft(tskobjptr->offset);
-
-        /*
-        // fileviewer->SetReader(filereader);
-        //
-        //
-        //
-        //
-        fileviewer->filehexview->SetIsFile(true);
-        fileviewer->filehexview->openimage();
-        fileviewer->filehexview->set2BPC();
-        fileviewer->filehexview->setBaseHex();
-        fileviewer->filehexview->SetTopLeft(0);
-        */
     }
     /*
     else
