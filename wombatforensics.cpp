@@ -1031,8 +1031,8 @@ void WombatForensics::SetupHexPage(void)
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
     hexwidget = new HexViewer(ui->hexPage, tskobjptr);
-    imagereader = new Reader();
-    fileviewer->filereader = new Reader();
+    imagereader = new Reader(50, 4096);
+    fileviewer->filereader = new Reader(50, 4096);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     hexwidget->setObjectName("bt-hexview");
