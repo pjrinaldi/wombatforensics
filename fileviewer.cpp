@@ -32,21 +32,6 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     connect(filehexvsb, SIGNAL(valueChanged(int)), this, SLOT(AdjustData(int)));
     connect(filehexview, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(filehexview, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
-    //filehexview->openimage();
-
-
-    //qDebug() << "reader size: " << _reader.size();
-    //_cursor.setRange(0, _reader.size());
-    //_cursor.setCharsPerByte(_charsPerByte);
-    //setSelection(SelectionStart, -1);
-    //setSelection(SelectionEnd, -1);
-    //emit rangeChanged(0, _reader.size()/bytesPerLine());
-    //emit StepValues(bytesPerLine(), bytesPerPage());
-    //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-    //emit StepValues(1, bytesPerPage()/bytesPerLine());
-    //calculateFontMetrics();
-    //setTopLeft(0);
-
 }
 
 FileViewer::~FileViewer()
@@ -239,4 +224,5 @@ void FileViewer::AdjustData(int topleft)
         numbytes -= stop - start;
         filereader->_offset += stop - start;
     }
+    filehexview->setTopLeftToPercent(topleft);
 }
