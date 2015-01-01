@@ -161,7 +161,7 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
     SetupHexPage();
-    SetupToolbar();
+    //SetupToolbar();
 }
 
 void WombatForensics::InitializeCaseStructure()
@@ -523,6 +523,7 @@ void WombatForensics::LoadHexContents()
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
         imagereader->_pageSize = tskobjptr->blocksize;
+        //imagereader->_pageSize = 4096*500;
         imagereader->_size = tskobjptr->imglength;
         imagereader->_numpages = imagereader->_size / imagereader->_pageSize;
         imagedata.resize(imagereader->_numpages);
@@ -565,17 +566,23 @@ void WombatForensics::LoadPage(off_t pageindex)
 {
     off_t retval = 0;
 
-    if(!imagereader->nFreePages())
+    /*
+    if(!(imagereader->nFreePages()))
     {
         if(abs(imagereader->_firstPage - pageindex) > abs(imagereader->_lastPage - pageindex))
-            while(!imagereader->freePage(imagereader->_firstPage++));
+            while(!(imagereader->freePage((imagereader->_firstPage)++)));
         else
-            while(!imagereader->freePage(imagereader->_lastPage--));
+            while(!(imagereader->freePage((imagereader->_lastPage)--)));
     }
+    */
     imagedata[pageindex] = new uchar[imagereader->_pageSize];
-    --imagereader->nFreePages();
+    /*
+    --(imagereader->nFreePages());
+    */
 
     retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
+    qDebug() << "retval" << retval;
+    /*
     if(retval > 0)
     {
         if(pageindex < imagereader->_firstPage)
@@ -583,6 +590,7 @@ void WombatForensics::LoadPage(off_t pageindex)
         if(pageindex > imagereader->_lastPage)
             imagereader->_lastPage = pageindex;
     }
+    */
 }
 
 void WombatForensics::AdjustData(int topleft)

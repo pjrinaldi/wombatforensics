@@ -81,7 +81,8 @@ bool Reader::openimage(TskObject* tskpointer)
     _is_open = true;
     _firstPage = _lastPage = 0;
 
-    return loadimagepage(0);
+    return true;
+    //return loadimagepage(0);
 }
 
 bool Reader::close()
@@ -146,7 +147,7 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
     {
         try
         {
-            loadimagepage(page);
+            //loadimagepage(page);
         }
         catch(bad_alloc)
         {
@@ -313,6 +314,7 @@ uchar Reader::operator[] (off_t offset)
 off_t
 Reader::nFreePages() const
 {
+    //qDebug() << "Free Pages" << _freePages;
    return _freePages;
 }
 
