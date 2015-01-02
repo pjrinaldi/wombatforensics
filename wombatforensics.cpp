@@ -579,7 +579,7 @@ void WombatForensics::LoadPage(off_t pageindex)
     /*
     --(imagereader->nFreePages());
     */
-
+    qDebug() << "tsk offset:" << tskobjptr->offset << "pageindex:" << pageindex << "new offset:" << tskobjptr->offset + pageindex*imagereader->_pageSize;
     retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
     qDebug() << "retval" << retval;
     /*
@@ -604,6 +604,7 @@ void WombatForensics::AdjustData(int topleft)
     size_t bytesread;
     vector<uchar>& v = hexwidget->_data;
     int numbytes = (int)hexwidget->bytesPerPage();
+    qDebug() << "imagereader offset:" << imagereader->_offset;
     if(imagereader->_offset + numbytes >= (int)imagereader->size())
     {
         imagereader->_eof = true;

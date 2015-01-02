@@ -639,7 +639,8 @@ void HexViewer::paintEvent( QPaintEvent* e)
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
-      //qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
+      qDebug() << "cur block addr:" << tskptr->blkaddrlist.at(i);
+      qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
       if(pageid == tskptr->blkaddrlist.at(i).toInt())
       {
           //paint.setPen(QColor(255, 0, 0, 255));
