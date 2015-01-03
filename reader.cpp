@@ -44,7 +44,6 @@ Reader::Reader(off_t npages, off_t pageSize) : _pageSize(pageSize)
   _size    = 0;
   _firstPage = -1;
   _lastPage  = -1;
-  isfile = false;
 }
 
 Reader::~Reader()
@@ -67,8 +66,6 @@ bool Reader::openimage(TskObject* tskpointer)
     if(is_open())
         close();
     _size = tskptr->imglength; // length in bytes for selected file
-    if(isfile)
-        _size = tskptr->length;
     qDebug() << "image length:" << tskptr->imglength;
     _pageSize = tskptr->blocksize;
     off_t npages = _size/_pageSize;
@@ -226,16 +223,9 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     _data[pageIdx] = new uchar[_pageSize];
     --nFreePages();
-    if(tskptr->objecttype < 5)
+    if(tskptr->objecttype <= 5)
     {
         retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
-    }
-    else
-    {
-        if(isfile)
-            retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
-        else
-            retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     }
     if(retval > 0)
     {

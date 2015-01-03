@@ -636,6 +636,7 @@ void HexViewer::paintEvent( QPaintEvent* e)
 
   paint.setPen(QColor(0, 0, 0, 255));
   paint.setBrush(Qt::NoBrush);
+  /*
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
@@ -651,6 +652,7 @@ void HexViewer::paintEvent( QPaintEvent* e)
           break;
       }
   }
+  */
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
   // draw dividing line
@@ -664,6 +666,7 @@ void HexViewer::paintEvent( QPaintEvent* e)
   col_start = max(0, (e->rect().left() - leftMargin() - e->rect().right()/2)/totalWordWidth);
   row_stop = min(_rows-1, e->rect().bottom()/lineSpacing());
   col_stop = min(_cols-1, e->rect().right()/totalWordWidth);
+  /*
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
@@ -673,6 +676,7 @@ void HexViewer::paintEvent( QPaintEvent* e)
           break;
       }
   }
+  */
   drawAsciiRegion(paint, ascii, row_start, row_stop, col_start, col_stop);
   paint.setPen(QColor(0, 0, 0, 255));
 }
@@ -950,11 +954,6 @@ void HexViewer::drawCursor( QPainter& paint )
     paint.drawRect( box );
   }
 }
-/*
-void HexViewer::SetIsFile(bool state)
-{
-    _reader.isfile = state;
-}*/
 
 void HexViewer::SetReader(Reader* tmpreader)
 {
