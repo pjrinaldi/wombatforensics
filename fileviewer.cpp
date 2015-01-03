@@ -172,6 +172,7 @@ void FileViewer::LoadPage(off_t pageindex)
     --filereader->nFreePages();
     */
     retval = tsk_fs_file_read(tskptr->readfileinfo, pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+    qDebug() << "tsk fs file read bytecount:" << retval;
     //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     /*
     if(retval > 0)
