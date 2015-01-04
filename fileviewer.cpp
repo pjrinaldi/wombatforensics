@@ -172,9 +172,10 @@ void FileViewer::LoadPage(off_t pageindex)
     */
     if(tskptr->objecttype == 5)
     {
+        qDebug() << "blkaddrlist count:" << tskptr->blkaddrlist.count();
         if(pageindex < tskptr->blkaddrlist.count())
         {
-        qDebug() << "pageindex:" << pageindex << "blk id:" << tskptr->blkaddrlist.at(pageindex);
+        //qDebug() << "pageindex:" << pageindex << "blk id:" << tskptr->blkaddrlist.at(pageindex);
         //qDebug() << "sector offset:" << tskptr->blkaddrlist.at(pageindex).toInt()*512;
         retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageindex).toInt(), (char*)filedata[pageindex], filereader->_pageSize);
         //retval = tsk_fs_read_block(tskptr->readfsinfo, (tskptr->blkaddrlist.at(pageindex).toInt()-1)*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize);
@@ -202,23 +203,27 @@ void FileViewer::AdjustData(int topleft)
     size_t bytesread;
     vector<uchar>& v = filehexview->_data;
     int numbytes = (int)filehexview->bytesPerPage();
-    if(!filereader->_offset + numbytes >= (int)filereader->size())
+    if(filereader->_offset + numbytes >= (int)filereader->size() - 1)
     {
         filereader->_eof = true;
         if(filereader->size() == 0)
             v.erase(v.begin(), v.end());
-        lastpageindex = filedata.size() - 1;
-        bytesread = filereader->size() - filereader->tell();
+        //lastpageindex = filedata.size();
+        lastpageindex = tskptr->blkaddrlist.count() - 1;
+        bytesread = filereader->size() - 1 - filereader->tell();
         numbytes = bytesread;
+        qDebug() << "lastpageindex:" << lastpageindex;
     }
     else
     {
         lastpageindex = (filereader->_offset + numbytes)/filereader->_pageSize;
+        qDebug() << "normal lastpageindex:" << lastpageindex;
         bytesread = numbytes;
     }
     v.erase(v.begin(), v.end());
     v.reserve(v.size() + numbytes);
     qDebug() << "initial page:" << filereader->_offset/filereader->_pageSize;
+    // for loop might want to simply be page = 0; page count
     for(int page = filereader->_offset/filereader->_pageSize; page <= lastpageindex; page++)
     {
         LoadPage(page);
