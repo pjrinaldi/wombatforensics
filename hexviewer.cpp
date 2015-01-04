@@ -322,8 +322,6 @@ void HexViewer::setOffset( off_t offset )
   emit offsetChanged( _cursor.byteOffset() );
 }
 
-// LOOK INTO THIS
-// issue might be here or it might be in the definition of wordsPerPage or bytesPerPage
 void HexViewer::nextLine()
 {
   setTopLeft(_topLeft+bytesPerLine());

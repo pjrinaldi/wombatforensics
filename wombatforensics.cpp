@@ -522,7 +522,7 @@ void WombatForensics::LoadHexContents()
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)
-    if(wombatvarptr->selectedobject.objtype <= 5)
+    if(wombatvarptr->selectedobject.objtype == 1)
     {
         imagereader->_pageSize = tskobjptr->blocksize;
         imagereader->_size = tskobjptr->imglength;
@@ -535,7 +535,8 @@ void WombatForensics::LoadHexContents()
         imagedata.resize(imagereader->_numpages);
         fill(imagedata.begin(), imagedata.begin()+imagereader->_numpages, (uchar*)0);
         imagereader->_firstPage = imagereader->_lastPage = 0;
-        AdjustData(tskobjptr->offset);
+        //AdjustData(tskobjptr->offset);
+        AdjustData(0);
         imagereader->SetData(imagedata);
         hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
         hexwidget->openimage();
@@ -543,8 +544,13 @@ void WombatForensics::LoadHexContents()
         hexwidget->setBaseHex();
         qDebug() << "should be the file block offset:" << tskobjptr->offset;
         //hexwidget->SetTopLeft(tskobjptr->offset);
+    }
+    else
+    {
+        qDebug() << "should be the file block offset:" << tskobjptr->offset;
         if(wombatvarptr->selectedobject.objtype == 5)
         {
+            AdjustData(tskobjptr->offset);
             fileviewer->filereader->_pageSize = tskobjptr->blocksize;
             // should be equal to the size of the blocks that contain the file...
             fileviewer->filereader->_size = tskobjptr->blocksize*tskobjptr->blkaddrlist.count();
@@ -563,6 +569,7 @@ void WombatForensics::LoadHexContents()
             fileviewer->filehexview->set2BPC();
             fileviewer->filehexview->setBaseHex();
             fileviewer->filehexview->SetTopLeft(0);
+            //hexwidget->setTopLeftToPercent(tskobjptr->offset);
         }
     }
     /*
