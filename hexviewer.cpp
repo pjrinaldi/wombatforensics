@@ -84,10 +84,10 @@ bool HexViewer::openimage()
     setSelection(SelectionEnd, -1);
     //emit rangeChanged(0, _reader.size());
     emit rangeChanged(0, _reader.size()/bytesPerLine());
-    emit StepValues(bytesPerLine(), _reader._pageSize);
+    //emit StepValues(bytesPerLine(), _reader._pageSize);
     //emit StepValues(bytesPerLine(), bytesPerPage());
     //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-    //emit StepValues(1, bytesPerPage()/bytesPerLine());
+    emit StepValues(1, bytesPerPage()/bytesPerLine());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -538,10 +538,10 @@ void HexViewer::resizeEvent( QResizeEvent * e )
   setTopLeft(_topLeft);
   //emit rangeChanged(0, _reader.size());
   emit rangeChanged(0,_reader.size()/bytesPerLine());
-  emit StepValues(bytesPerLine(), _reader._pageSize);
+  //emit StepValues(bytesPerLine(), _reader._pageSize);
   //emit StepValues(bytesPerLine(), bytesPerPage());
   //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-  //emit StepValues(1, bytesPerPage()/bytesPerLine());
+  emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on
@@ -560,8 +560,7 @@ void HexViewer::focusOutEvent( QFocusEvent* )
 void HexViewer::updateWord( off_t wordIdx )
 {
   if( wordIdx > -1 && wordIdx < _rows*_cols ) 
-      repaint();
-    //repaint(_wordBBox[wordIdx]);
+    repaint(_wordBBox[wordIdx]);
 }
 
 void HexViewer::paintLabels( QPainter* paintPtr) 
@@ -570,7 +569,6 @@ void HexViewer::paintLabels( QPainter* paintPtr)
   int y = _wordBBox[0].bottom();
   unsigned int i;
   off_t offset = _topLeft;
-  //off_t offset = _topLeft/bytesPerLine();
   uchar *ucptr;
   //uchar* offsetptr;
   QString label;
@@ -766,8 +764,8 @@ void HexViewer::seeCursor()
       }
       else
       {
-          qDebug() << "topleft:" << _topLeft << "bytes per line:" << bytesPerLine();
-          qDebug() << "topleft + bytesperline:" << _topLeft + bytesPerLine();
+          //qDebug() << "topleft:" << _topLeft << "bytes per line:" << bytesPerLine();
+          //qDebug() << "topleft + bytesperline:" << _topLeft + bytesPerLine();
           setTopLeft(_topLeft + bytesPerLine());
           //setTopLeft(_cursor.byteOffset() + bytesPerLine()-1);
       }
