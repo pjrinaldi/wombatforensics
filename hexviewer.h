@@ -125,7 +125,7 @@ public slots:
 
 
   int bytesPerPage() const;
-
+  int bytesPerLine() const;
 
 protected:
   //  void setOffsetLabels( off_t topLeft );
@@ -149,7 +149,7 @@ protected:
   int charsPerLine() const;
   //int bytesPerPage() const;
   int bytesPerWord() const;
-  int bytesPerLine() const;
+  //int bytesPerLine() const;
   int wordsPerLine() const;
   int wordsPerPage() const;
   int linesPerPage() const;

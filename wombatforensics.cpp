@@ -608,7 +608,7 @@ void WombatForensics::AdjustData(int topleft)
     // seek image code should go here
     int lastpageindex = 0;
     imagereader->_eof = false;
-    imagereader->_offset = max(min((off_t)topleft, imagereader->size()-1), (off_t)0);
+    imagereader->_offset = max(min((off_t)topleft*hexwidget->bytesPerLine(), imagereader->size()-1), (off_t)0);
     // end seek image code
 
     size_t bytesread;

@@ -198,7 +198,7 @@ void FileViewer::AdjustData(int topleft)
 {
     int lastpageindex = 0;
     filereader->_eof = false;
-    filereader->_offset = max(min((off_t)topleft, filereader->size()-1), (off_t)0);
+    filereader->_offset = max(min((off_t)topleft*filehexview->bytesPerLine(), filereader->size()-1), (off_t)0);
     size_t bytesread;
     vector<uchar>& v = filehexview->_data;
     int numbytes = (int)filehexview->bytesPerPage();

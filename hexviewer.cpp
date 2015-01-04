@@ -569,8 +569,8 @@ void HexViewer::paintLabels( QPainter* paintPtr)
   // ignore redraw range for first aproximation:
   int y = _wordBBox[0].bottom();
   unsigned int i;
-  //off_t offset = _topLeft;
-  off_t offset = _topLeft/bytesPerLine();
+  off_t offset = _topLeft;
+  //off_t offset = _topLeft/bytesPerLine();
   uchar *ucptr;
   //uchar* offsetptr;
   QString label;
@@ -594,10 +594,10 @@ void HexViewer::paintLabels( QPainter* paintPtr)
 #endif
     label = label.mid(sizeof(off_t)*2-_offsetLabelBytes);
     paintPtr->drawText( 5, y, label  );
-    qDebug() << "original offset:" << offset;
-    qDebug() << "bytes per line:" << bytesPerLine();
+    //qDebug() << "original offset:" << offset;
+    //qDebug() << "bytes per line:" << bytesPerLine();
     offset+=bytesPerLine();
-    qDebug() << "new offset:" << offset;
+    //qDebug() << "new offset:" << offset;
     y+=lineSpacing();
   }
   // draw dividing line between offset labels and data
@@ -760,11 +760,15 @@ void HexViewer::seeCursor()
   } else {
       if(_cursor.byteOffset() < _topLeft)
       {
+          setTopLeft(_topLeft - bytesPerLine());
           // just need to replace setTopLeft with however we move the cursor, i think with updateWord...
           //setTopLeft(_cursor.byteOffset() - bytesPerLine()-1);
       }
       else
       {
+          qDebug() << "topleft:" << _topLeft << "bytes per line:" << bytesPerLine();
+          qDebug() << "topleft + bytesperline:" << _topLeft + bytesPerLine();
+          setTopLeft(_topLeft + bytesPerLine());
           //setTopLeft(_cursor.byteOffset() + bytesPerLine()-1);
       }
     // setTopLeft so cursor is in middle line of screen
