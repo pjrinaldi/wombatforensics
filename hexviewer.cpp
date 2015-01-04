@@ -157,8 +157,8 @@ void HexViewer::setTopLeft( off_t offset )
   try {
      if( offset < 0 ) {
 	_topLeft = 0;
-     } else if( offset > _reader.size() ) {
-	_topLeft = _reader.size();
+     } else if( offset > _reader.size() - 1 ) {
+	_topLeft = _reader.size() - 1;
      } else {
 	_topLeft = offset;
      }
@@ -769,6 +769,7 @@ void HexViewer::seeCursor()
           setTopLeft(_topLeft + bytesPerLine());
           //setTopLeft(_cursor.byteOffset() + bytesPerLine()-1);
       }
+      repaint();
     // setTopLeft so cursor is in middle line of screen
     //setTopLeft( max(_cursor.byteOffset() - bytesPerPage()/2, (off_t)0) );
   }
