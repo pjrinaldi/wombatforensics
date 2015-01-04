@@ -536,9 +536,13 @@ void WombatForensics::LoadHexContents()
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
         hexwidget->SetTopLeft(tskobjptr->offset);
+        if(wombatvarptr->selectedobject.objtype == 5)
+        {
         fileviewer->filereader->_pageSize = tskobjptr->blocksize;
         fileviewer->filereader->_size = tskobjptr->length;
         fileviewer->filereader->_numpages = fileviewer->filereader->_size / fileviewer->filereader->_pageSize;
+        if(fileviewer->filereader->_size % fileviewer->filereader->_pageSize != 0)
+            fileviewer->filereader->_numpages++;
         fileviewer->filedata.resize(fileviewer->filereader->_numpages);
         fill(fileviewer->filedata.begin(), fileviewer->filedata.begin()+fileviewer->filereader->_numpages, (uchar*)0);
         fileviewer->filereader->_firstPage = fileviewer->filereader->_lastPage = 0;
@@ -549,6 +553,7 @@ void WombatForensics::LoadHexContents()
         fileviewer->filehexview->set2BPC();
         fileviewer->filehexview->setBaseHex();
         fileviewer->filehexview->SetTopLeft(0);
+        }
     }
     /*
     else
