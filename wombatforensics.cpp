@@ -525,7 +525,6 @@ void WombatForensics::LoadHexContents()
     if(wombatvarptr->selectedobject.objtype <= 5)
     {
         imagereader->_pageSize = tskobjptr->blocksize;
-        //imagereader->_pageSize = 4096*500;
         imagereader->_size = tskobjptr->imglength;
         imagereader->_numpages = imagereader->_size / imagereader->_pageSize;
         imagedata.resize(imagereader->_numpages);
@@ -540,24 +539,24 @@ void WombatForensics::LoadHexContents()
         hexwidget->SetTopLeft(tskobjptr->offset);
         if(wombatvarptr->selectedobject.objtype == 5)
         {
-        fileviewer->filereader->_pageSize = tskobjptr->blocksize;
-        // should be equal to the size of the blocks that contain the file...
-        fileviewer->filereader->_size = tskobjptr->blocksize*tskobjptr->blkaddrlist.count();
-        qDebug() << "file reader size (multiple of blocks):" << fileviewer->filereader->_size;
-        //fileviewer->filereader->_size = tskobjptr->length;
-        fileviewer->filereader->_numpages = fileviewer->filereader->_size / fileviewer->filereader->_pageSize;
-        if(fileviewer->filereader->_size % fileviewer->filereader->_pageSize != 0)
-            fileviewer->filereader->_numpages++;
-        fileviewer->filedata.resize(fileviewer->filereader->_numpages);
-        fill(fileviewer->filedata.begin(), fileviewer->filedata.begin()+fileviewer->filereader->_numpages, (uchar*)0);
-        fileviewer->filereader->_firstPage = fileviewer->filereader->_lastPage = 0;
-        fileviewer->AdjustData(0);
-        fileviewer->filereader->SetData(fileviewer->filedata);
-        fileviewer->filehexview->SetReader(fileviewer->filereader);
-        fileviewer->filehexview->openimage();
-        fileviewer->filehexview->set2BPC();
-        fileviewer->filehexview->setBaseHex();
-        fileviewer->filehexview->SetTopLeft(0);
+            fileviewer->filereader->_pageSize = tskobjptr->blocksize;
+            // should be equal to the size of the blocks that contain the file...
+            fileviewer->filereader->_size = tskobjptr->blocksize*tskobjptr->blkaddrlist.count();
+            qDebug() << "file reader size (multiple of blocks):" << fileviewer->filereader->_size;
+            //fileviewer->filereader->_size = tskobjptr->length;
+            fileviewer->filereader->_numpages = fileviewer->filereader->_size / fileviewer->filereader->_pageSize;
+            if(fileviewer->filereader->_size % fileviewer->filereader->_pageSize != 0)
+                fileviewer->filereader->_numpages++;
+            fileviewer->filedata.resize(fileviewer->filereader->_numpages);
+            fill(fileviewer->filedata.begin(), fileviewer->filedata.begin()+fileviewer->filereader->_numpages, (uchar*)0);
+            fileviewer->filereader->_firstPage = fileviewer->filereader->_lastPage = 0;
+            fileviewer->AdjustData(0);
+            fileviewer->filereader->SetData(fileviewer->filedata);
+            fileviewer->filehexview->SetReader(fileviewer->filereader);
+            fileviewer->filehexview->openimage();
+            fileviewer->filehexview->set2BPC();
+            fileviewer->filehexview->setBaseHex();
+            fileviewer->filehexview->SetTopLeft(0);
         }
     }
     /*
@@ -589,9 +588,9 @@ void WombatForensics::LoadPage(off_t pageindex)
     /*
     --(imagereader->nFreePages());
     */
-    qDebug() << "tsk offset:" << tskobjptr->offset << "pageindex:" << pageindex << "new offset:" << tskobjptr->offset + pageindex*imagereader->_pageSize;
+    //qDebug() << "tsk offset:" << tskobjptr->offset << "pageindex:" << pageindex << "new offset:" << tskobjptr->offset + pageindex*imagereader->_pageSize;
     retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
-    qDebug() << "retval" << retval;
+    //qDebug() << "retval" << retval;
     /*
     if(retval > 0)
     {
@@ -608,25 +607,27 @@ void WombatForensics::AdjustData(int topleft)
     // seek image code should go here
     int lastpageindex = 0;
     imagereader->_eof = false;
-    imagereader->_offset = max(min((off_t)topleft*hexwidget->bytesPerLine(), imagereader->size()-1), (off_t)0);
+    imagereader->_offset = max(min((off_t)topleft*hexwidget->bytesPerLine(), imagereader->size()), (off_t)0);
     // end seek image code
 
     size_t bytesread;
     vector<uchar>& v = hexwidget->_data;
     int numbytes = (int)hexwidget->bytesPerPage();
-    qDebug() << "imagereader offset:" << imagereader->_offset;
-    if(imagereader->_offset + numbytes >= (int)imagereader->size())
+    //qDebug() << "imagereader offset:" << imagereader->_offset;
+    if(imagereader->_offset + numbytes >= (int)imagereader->size() - 1)
     {
         imagereader->_eof = true;
         if(imagereader->size() == 0)
             v.erase(v.begin(), v.end());
-        lastpageindex = imagedata.size() - 1;
-        bytesread = imagereader->size() - imagereader->tell();
+        lastpageindex = imagedata.size() - 1 - 1;
+        qDebug() << "lastpageindex:" << lastpageindex; 
+        bytesread = imagereader->size() - 1 - imagereader->tell();
         numbytes = bytesread;
     }
     else
     {
         lastpageindex = (imagereader->_offset + numbytes)/imagereader->_pageSize;
+        qDebug() << "normal lastpageindex:" << lastpageindex;
         bytesread = numbytes;
     }
     v.erase(v.begin(), v.end());
