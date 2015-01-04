@@ -564,7 +564,7 @@ void HexViewer::paintLabels( QPainter* paintPtr)
   // ignore redraw range for first aproximation:
   int y = _wordBBox[0].bottom();
   unsigned int i;
-  off_t offset = _topLeft;
+  off_t offset = _topLeft/bytesPerLine();
   uchar *ucptr;
   //uchar* offsetptr;
   QString label;
