@@ -156,20 +156,7 @@ void FileViewer::SetStepValues(int singlestep, int pagestep)
 void FileViewer::LoadPage(off_t pageindex)
 {
     off_t retval = 0;
-
-    /*
-    if(!filereader->nFreePages())
-    {
-        if(abs(filereader->_firstPage - pageindex) > abs(filereader->_lastPage - pageindex))
-            while(!filereader->freePage(filereader->_firstPage++));
-        else
-            while(!filereader->freePage(filereader->_lastPage--));
-    }
-    */
     filedata[pageindex] = new uchar[filereader->_pageSize];
-    /*
-    --filereader->nFreePages();
-    */
     if(tskptr->objecttype == 5)
     {
         //qDebug() << "blkaddrlist count:" << tskptr->blkaddrlist.count();
@@ -179,20 +166,10 @@ void FileViewer::LoadPage(off_t pageindex)
         //qDebug() << "sector offset:" << tskptr->blkaddrlist.at(pageindex).toInt()*512;
         retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageindex).toInt(), (char*)filedata[pageindex], filereader->_pageSize);
         //retval = tsk_fs_read_block(tskptr->readfsinfo, (tskptr->blkaddrlist.at(pageindex).toInt()-1)*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize);
-    //retval = tsk_fs_file_read(tskptr->readfileinfo, pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     //qDebug() << "tsk fs file read bytecount:" << retval;
         }
     }
     //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
-    /*
-    if(retval > 0)
-    {
-        if(pageindex < filereader->_firstPage)
-            filereader->_firstPage = pageindex;
-        if(pageindex > filereader->_lastPage)
-            filereader->_lastPage = pageindex;
-    }
-    */
 }
 
 void FileViewer::AdjustData(int topleft)
@@ -223,12 +200,12 @@ void FileViewer::AdjustData(int topleft)
     v.erase(v.begin(), v.end());
     v.reserve(v.size() + numbytes);
     //qDebug() << "initial page:" << filereader->_offset/filereader->_pageSize;
-    // for loop might want to simply be page = 0; page count
     for(int page = filereader->_offset/filereader->_pageSize; page <= lastpageindex; page++)
     {
         LoadPage(page);
         int start = filereader->_offset%filereader->_pageSize;
-        int stop = (page == lastpageindex) ? start + numbytes : filereader->_pageSize;
+        int stop = filereader->_pageSize;
+        //int stop = (page == lastpageindex) ? start + numbytes : filereader->_pageSize;
         for(int i = start; i < stop; i++)
         {
             v.push_back(filedata[page][i]);
