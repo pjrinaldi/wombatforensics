@@ -518,7 +518,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
-        OpenFileSystemFile();
+        //OpenFileSystemFile();
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)
@@ -526,27 +526,29 @@ void WombatForensics::LoadHexContents()
     {
         imagereader->_pageSize = tskobjptr->blocksize;
         imagereader->_size = tskobjptr->imglength;
+        qDebug() << "reader.size():" << imagereader->_size;
         imagereader->_numpages = (imagereader->_size-1) / imagereader->_pageSize;
-        qDebug() << "numpages before modulus:" << imagereader->_numpages;
+        //qDebug() << "numpages before modulus:" << imagereader->_numpages;
         if((imagereader->_size-1) % imagereader->_pageSize != 0)
             imagereader->_numpages++;
         qDebug() << "numpages after modulus:" << imagereader->_numpages;
         imagedata.resize(imagereader->_numpages);
         fill(imagedata.begin(), imagedata.begin()+imagereader->_numpages, (uchar*)0);
         imagereader->_firstPage = imagereader->_lastPage = 0;
-        AdjustData(0);
+        AdjustData(tskobjptr->offset);
         imagereader->SetData(imagedata);
         hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
         hexwidget->openimage();
         hexwidget->set2BPC();
         hexwidget->setBaseHex();
-        hexwidget->SetTopLeft(tskobjptr->offset);
+        qDebug() << "should be the file block offset:" << tskobjptr->offset;
+        //hexwidget->SetTopLeft(tskobjptr->offset);
         if(wombatvarptr->selectedobject.objtype == 5)
         {
             fileviewer->filereader->_pageSize = tskobjptr->blocksize;
             // should be equal to the size of the blocks that contain the file...
             fileviewer->filereader->_size = tskobjptr->blocksize*tskobjptr->blkaddrlist.count();
-            qDebug() << "file reader size (multiple of blocks):" << fileviewer->filereader->_size;
+            //qDebug() << "file reader size (multiple of blocks):" << fileviewer->filereader->_size;
             //fileviewer->filereader->_size = tskobjptr->length;
             fileviewer->filereader->_numpages = (fileviewer->filereader->_size-1) / fileviewer->filereader->_pageSize;
             if((fileviewer->filereader->_size-1) % fileviewer->filereader->_pageSize != 0)
@@ -606,14 +608,14 @@ void WombatForensics::AdjustData(int topleft)
             v.erase(v.begin(), v.end());
         lastpageindex = imagereader->_numpages - 1;
         //lastpageindex = imagedata.size() - 1 - 1;
-        qDebug() << "lastpageindex:" << lastpageindex; 
+        //qDebug() << "lastpageindex:" << lastpageindex; 
         bytesread = imagereader->size() - 1 - imagereader->tell();
         numbytes = bytesread;
     }
     else
     {
         lastpageindex = (imagereader->_offset + numbytes)/imagereader->_pageSize;
-        qDebug() << "normal lastpageindex:" << lastpageindex;
+        //qDebug() << "normal lastpageindex:" << lastpageindex;
         bytesread = numbytes;
     }
     v.erase(v.begin(), v.end());

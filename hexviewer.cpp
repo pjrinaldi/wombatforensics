@@ -77,7 +77,7 @@ bool HexViewer::openimage()
     if(!_reader.openimage(tskptr))
         QMessageBox::critical(this, "HexView", "Error opening image\n", QMessageBox::Ok, 0);
     */
-    qDebug() << "reader size: " << _reader.size();
+    //qDebug() << "reader size: " << _reader.size();
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
