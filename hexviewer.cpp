@@ -82,11 +82,11 @@ bool HexViewer::openimage()
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
-    emit rangeChanged(0, _reader.size());
-    //emit rangeChanged(0, _reader.size()/bytesPerLine());
-    emit StepValues(bytesPerLine(), bytesPerPage());
+    //emit rangeChanged(0, _reader.size());
+    emit rangeChanged(0, _reader.size()/bytesPerLine());
+    //emit StepValues(bytesPerLine(), bytesPerPage());
     //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-    //emit StepValues(1, bytesPerPage()/bytesPerLine());
+    emit StepValues(1, bytesPerPage()/bytesPerLine());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -533,11 +533,11 @@ void HexViewer::resizeEvent( QResizeEvent * e )
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
-  emit rangeChanged(0, _reader.size());
-  //emit rangeChanged(0,_reader.size()/bytesPerLine());
-  emit StepValues(bytesPerLine(), bytesPerPage());
+  //emit rangeChanged(0, _reader.size());
+  emit rangeChanged(0,_reader.size()/bytesPerLine());
+  //emit StepValues(bytesPerLine(), bytesPerPage());
   //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-  //emit StepValues(1, bytesPerPage()/bytesPerLine());
+  emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on

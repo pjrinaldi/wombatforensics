@@ -539,7 +539,10 @@ void WombatForensics::LoadHexContents()
         if(wombatvarptr->selectedobject.objtype == 5)
         {
         fileviewer->filereader->_pageSize = tskobjptr->blocksize;
-        fileviewer->filereader->_size = tskobjptr->length;
+        // should be equal to the size of the blocks that contain the file...
+        fileviewer->filereader->_size = tskobjptr->blocksize*tskobjptr->blkaddrlist.count();
+        qDebug() << "file reader size (multiple of blocks):" << fileviewer->filereader->_size;
+        //fileviewer->filereader->_size = tskobjptr->length;
         fileviewer->filereader->_numpages = fileviewer->filereader->_size / fileviewer->filereader->_pageSize;
         if(fileviewer->filereader->_size % fileviewer->filereader->_pageSize != 0)
             fileviewer->filereader->_numpages++;

@@ -155,7 +155,6 @@ void FileViewer::SetStepValues(int singlestep, int pagestep)
 
 void FileViewer::LoadPage(off_t pageindex)
 {
-    qDebug() << "tskptr" << tskptr->offset;
     off_t retval = 0;
 
     /*
@@ -216,6 +215,7 @@ void FileViewer::AdjustData(int topleft)
     }
     v.erase(v.begin(), v.end());
     v.reserve(v.size() + numbytes);
+    qDebug() << "initial page:" << filereader->_offset/filereader->_pageSize;
     for(int page = filereader->_offset/filereader->_pageSize; page <= lastpageindex; page++)
     {
         LoadPage(page);
