@@ -84,7 +84,8 @@ bool HexViewer::openimage()
     setSelection(SelectionEnd, -1);
     //emit rangeChanged(0, _reader.size());
     emit rangeChanged(0, _reader.size()/bytesPerLine());
-    emit StepValues(bytesPerLine(), bytesPerPage());
+    emit StepValues(bytesPerLine(), _reader._pageSize);
+    //emit StepValues(bytesPerLine(), bytesPerPage());
     //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
     //emit StepValues(1, bytesPerPage()/bytesPerLine());
     calculateFontMetrics();
@@ -537,7 +538,8 @@ void HexViewer::resizeEvent( QResizeEvent * e )
   setTopLeft(_topLeft);
   //emit rangeChanged(0, _reader.size());
   emit rangeChanged(0,_reader.size()/bytesPerLine());
-  emit StepValues(bytesPerLine(), bytesPerPage());
+  emit StepValues(bytesPerLine(), _reader._pageSize);
+  //emit StepValues(bytesPerLine(), bytesPerPage());
   //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
   //emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
@@ -558,7 +560,8 @@ void HexViewer::focusOutEvent( QFocusEvent* )
 void HexViewer::updateWord( off_t wordIdx )
 {
   if( wordIdx > -1 && wordIdx < _rows*_cols ) 
-    repaint(_wordBBox[wordIdx]);
+      repaint();
+    //repaint(_wordBBox[wordIdx]);
 }
 
 void HexViewer::paintLabels( QPainter* paintPtr) 
@@ -755,8 +758,17 @@ void HexViewer::seeCursor()
     updateWord( localWordOffset() );
     return;
   } else {
+      if(_cursor.byteOffset() < _topLeft)
+      {
+          // just need to replace setTopLeft with however we move the cursor, i think with updateWord...
+          //setTopLeft(_cursor.byteOffset() - bytesPerLine()-1);
+      }
+      else
+      {
+          //setTopLeft(_cursor.byteOffset() + bytesPerLine()-1);
+      }
     // setTopLeft so cursor is in middle line of screen
-    setTopLeft( max(_cursor.byteOffset() - bytesPerPage()/2, (off_t)0) );
+    //setTopLeft( max(_cursor.byteOffset() - bytesPerPage()/2, (off_t)0) );
   }
 }
 
