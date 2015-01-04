@@ -84,9 +84,9 @@ bool HexViewer::openimage()
     setSelection(SelectionEnd, -1);
     //emit rangeChanged(0, _reader.size());
     emit rangeChanged(0, _reader.size()/bytesPerLine());
-    //emit StepValues(bytesPerLine(), bytesPerPage());
+    emit StepValues(bytesPerLine(), bytesPerPage());
     //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-    emit StepValues(1, bytesPerPage()/bytesPerLine());
+    //emit StepValues(1, bytesPerPage()/bytesPerLine());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -535,9 +535,9 @@ void HexViewer::resizeEvent( QResizeEvent * e )
   setTopLeft(_topLeft);
   //emit rangeChanged(0, _reader.size());
   emit rangeChanged(0,_reader.size()/bytesPerLine());
-  //emit StepValues(bytesPerLine(), bytesPerPage());
+  emit StepValues(bytesPerLine(), bytesPerPage());
   //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-  emit StepValues(1, bytesPerPage()/bytesPerLine());
+  //emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on
@@ -588,7 +588,10 @@ void HexViewer::paintLabels( QPainter* paintPtr)
 #endif
     label = label.mid(sizeof(off_t)*2-_offsetLabelBytes);
     paintPtr->drawText( 5, y, label  );
+    qDebug() << "original offset:" << offset;
+    qDebug() << "bytes per line:" << bytesPerLine();
     offset+=bytesPerLine();
+    qDebug() << "new offset:" << offset;
     y+=lineSpacing();
   }
   // draw dividing line between offset labels and data
