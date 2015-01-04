@@ -172,7 +172,7 @@ void FileViewer::LoadPage(off_t pageindex)
     */
     if(tskptr->objecttype == 5)
     {
-        qDebug() << "blkaddrlist count:" << tskptr->blkaddrlist.count();
+        //qDebug() << "blkaddrlist count:" << tskptr->blkaddrlist.count();
         if(pageindex < tskptr->blkaddrlist.count())
         {
         //qDebug() << "pageindex:" << pageindex << "blk id:" << tskptr->blkaddrlist.at(pageindex);
@@ -180,7 +180,7 @@ void FileViewer::LoadPage(off_t pageindex)
         retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageindex).toInt(), (char*)filedata[pageindex], filereader->_pageSize);
         //retval = tsk_fs_read_block(tskptr->readfsinfo, (tskptr->blkaddrlist.at(pageindex).toInt()-1)*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize);
     //retval = tsk_fs_file_read(tskptr->readfileinfo, pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
-    qDebug() << "tsk fs file read bytecount:" << retval;
+    //qDebug() << "tsk fs file read bytecount:" << retval;
         }
     }
     //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
@@ -222,7 +222,7 @@ void FileViewer::AdjustData(int topleft)
     }
     v.erase(v.begin(), v.end());
     v.reserve(v.size() + numbytes);
-    qDebug() << "initial page:" << filereader->_offset/filereader->_pageSize;
+    //qDebug() << "initial page:" << filereader->_offset/filereader->_pageSize;
     // for loop might want to simply be page = 0; page count
     for(int page = filereader->_offset/filereader->_pageSize; page <= lastpageindex; page++)
     {

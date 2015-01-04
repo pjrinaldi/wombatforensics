@@ -526,7 +526,11 @@ void WombatForensics::LoadHexContents()
     {
         imagereader->_pageSize = tskobjptr->blocksize;
         imagereader->_size = tskobjptr->imglength;
-        imagereader->_numpages = imagereader->_size / imagereader->_pageSize;
+        imagereader->_numpages = (imagereader->_size-1) / imagereader->_pageSize;
+        qDebug() << "numpages before modulus:" << imagereader->_numpages;
+        if((imagereader->_size-1) % imagereader->_pageSize != 0)
+            imagereader->_numpages++;
+        qDebug() << "numpages after modulus:" << imagereader->_numpages;
         imagedata.resize(imagereader->_numpages);
         fill(imagedata.begin(), imagedata.begin()+imagereader->_numpages, (uchar*)0);
         imagereader->_firstPage = imagereader->_lastPage = 0;
@@ -544,8 +548,8 @@ void WombatForensics::LoadHexContents()
             fileviewer->filereader->_size = tskobjptr->blocksize*tskobjptr->blkaddrlist.count();
             qDebug() << "file reader size (multiple of blocks):" << fileviewer->filereader->_size;
             //fileviewer->filereader->_size = tskobjptr->length;
-            fileviewer->filereader->_numpages = fileviewer->filereader->_size / fileviewer->filereader->_pageSize;
-            if(fileviewer->filereader->_size % fileviewer->filereader->_pageSize != 0)
+            fileviewer->filereader->_numpages = (fileviewer->filereader->_size-1) / fileviewer->filereader->_pageSize;
+            if((fileviewer->filereader->_size-1) % fileviewer->filereader->_pageSize != 0)
                 fileviewer->filereader->_numpages++;
             fileviewer->filedata.resize(fileviewer->filereader->_numpages);
             fill(fileviewer->filedata.begin(), fileviewer->filedata.begin()+fileviewer->filereader->_numpages, (uchar*)0);
@@ -575,31 +579,12 @@ void WombatForensics::LoadPage(off_t pageindex)
 {
     off_t retval = 0;
 
-    /*
-    if(!(imagereader->nFreePages()))
-    {
-        if(abs(imagereader->_firstPage - pageindex) > abs(imagereader->_lastPage - pageindex))
-            while(!(imagereader->freePage((imagereader->_firstPage)++)));
-        else
-            while(!(imagereader->freePage((imagereader->_lastPage)--)));
-    }
-    */
     imagedata[pageindex] = new uchar[imagereader->_pageSize];
-    /*
-    --(imagereader->nFreePages());
-    */
     //qDebug() << "tsk offset:" << tskobjptr->offset << "pageindex:" << pageindex << "new offset:" << tskobjptr->offset + pageindex*imagereader->_pageSize;
-    retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
-    //qDebug() << "retval" << retval;
-    /*
-    if(retval > 0)
+    if(tskobjptr->offset + pageindex*imagereader->_pageSize <= tskobjptr->imglength - 1)
     {
-        if(pageindex < imagereader->_firstPage)
-            imagereader->_firstPage = pageindex;
-        if(pageindex > imagereader->_lastPage)
-            imagereader->_lastPage = pageindex;
+        retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
     }
-    */
 }
 
 void WombatForensics::AdjustData(int topleft)
@@ -607,7 +592,7 @@ void WombatForensics::AdjustData(int topleft)
     // seek image code should go here
     int lastpageindex = 0;
     imagereader->_eof = false;
-    imagereader->_offset = max(min((off_t)topleft*hexwidget->bytesPerLine(), imagereader->size()), (off_t)0);
+    imagereader->_offset = max(min((off_t)topleft*hexwidget->bytesPerLine(), imagereader->size()-1), (off_t)0);
     // end seek image code
 
     size_t bytesread;
@@ -619,7 +604,8 @@ void WombatForensics::AdjustData(int topleft)
         imagereader->_eof = true;
         if(imagereader->size() == 0)
             v.erase(v.begin(), v.end());
-        lastpageindex = imagedata.size() - 1 - 1;
+        lastpageindex = imagereader->_numpages - 1;
+        //lastpageindex = imagedata.size() - 1 - 1;
         qDebug() << "lastpageindex:" << lastpageindex; 
         bytesread = imagereader->size() - 1 - imagereader->tell();
         numbytes = bytesread;
