@@ -521,7 +521,7 @@ void HexViewer::resizeEvent( QResizeEvent * e )
       _asciiBBox[r*_cols+c] = QRect(aleft, top, totalWordWidth, height);
     }
     _lineBBox[r] = QRect(_leftMargin,top,linewidth,height);
-    _alineBBox[r] = QRect(_leftMargin + linewidth , top, e->size().width() - _leftMargin, height);
+    _alineBBox[r] = QRect(_leftMargin + linewidth , top, e->size().width()/2 - _leftMargin, height);
   }
   // calculate offset label bounding box
   _labelBBox.setRect(0,                        // x
@@ -564,8 +564,8 @@ void HexViewer::paintLabels( QPainter* paintPtr)
   // ignore redraw range for first aproximation:
   int y = _wordBBox[0].bottom();
   unsigned int i;
-  off_t offset = _topLeft;
-  //off_t offset = _topLeft/bytesPerLine();
+  //off_t offset = _topLeft;
+  off_t offset = _topLeft/bytesPerLine();
   uchar *ucptr;
   //uchar* offsetptr;
   QString label;

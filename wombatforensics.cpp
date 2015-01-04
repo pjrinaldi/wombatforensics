@@ -405,6 +405,8 @@ void WombatForensics::AddEvidence()
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
     {
+        // need to figure out how to force the damn action to be untoggled.
+        //ui->actionAdd_Evidence->setEnabled(false);
         wombatvarptr->currentevidencename = tmplist[0].split("/").last();
         for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
         {
