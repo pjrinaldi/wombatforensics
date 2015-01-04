@@ -564,7 +564,8 @@ void HexViewer::paintLabels( QPainter* paintPtr)
   // ignore redraw range for first aproximation:
   int y = _wordBBox[0].bottom();
   unsigned int i;
-  off_t offset = _topLeft/bytesPerLine();
+  off_t offset = _topLeft;
+  //off_t offset = _topLeft/bytesPerLine();
   uchar *ucptr;
   //uchar* offsetptr;
   QString label;
@@ -909,7 +910,6 @@ void HexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
 
 void HexViewer::drawTextRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
-  //paint.setPen(qApp->palette().foreground().color());
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
         int widx = r*_cols+c;

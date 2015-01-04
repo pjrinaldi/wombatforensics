@@ -172,12 +172,15 @@ void FileViewer::LoadPage(off_t pageindex)
     */
     if(tskptr->objecttype == 5)
     {
+        if(pageindex < tskptr->blkaddrlist.count())
+        {
         qDebug() << "pageindex:" << pageindex << "blk id:" << tskptr->blkaddrlist.at(pageindex);
         //qDebug() << "sector offset:" << tskptr->blkaddrlist.at(pageindex).toInt()*512;
         retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageindex).toInt(), (char*)filedata[pageindex], filereader->_pageSize);
         //retval = tsk_fs_read_block(tskptr->readfsinfo, (tskptr->blkaddrlist.at(pageindex).toInt()-1)*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize);
     //retval = tsk_fs_file_read(tskptr->readfileinfo, pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     qDebug() << "tsk fs file read bytecount:" << retval;
+        }
     }
     //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
     /*
