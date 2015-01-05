@@ -550,7 +550,7 @@ void WombatForensics::LoadHexContents()
         qDebug() << "should be the file block offset:" << tskobjptr->offset;
         if(wombatvarptr->selectedobject.objtype == 5)
         {
-            AdjustData(tskobjptr->offset);
+            //AdjustData(tskobjptr->offset/hexwidget->bytesPerLine());
             fileviewer->filereader->_pageSize = tskobjptr->blocksize;
             // should be equal to the size of the blocks that contain the file...
             fileviewer->filereader->_size = tskobjptr->blocksize*tskobjptr->blkaddrlist.count();
@@ -569,7 +569,10 @@ void WombatForensics::LoadHexContents()
             fileviewer->filehexview->set2BPC();
             fileviewer->filehexview->setBaseHex();
             fileviewer->filehexview->SetTopLeft(0);
-            //hexwidget->setTopLeftToPercent(tskobjptr->offset);
+            hexwidget->openimage(); // newly added line
+            hexwidget->setOffset(tskobjptr->offset);
+            //hexwidget->seeCursor();
+            hexwidget->setTopLeftToFloat((float)((float)tskobjptr->offset/(float)hexwidget->bytesPerLine()));
         }
     }
     /*

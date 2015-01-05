@@ -101,6 +101,7 @@ signals:
 public slots:
   void setOffset(off_t offset);     // sets cursor offset
   void setTopLeftToPercent( int percent ); // for setting pos from scroll
+  void setTopLeftToFloat(float offset);
   //
   // slots for setting the number of bytes per column
   // I really should change all references of "bytesPerWord" to "bytesPerCol"

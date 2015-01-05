@@ -310,6 +310,33 @@ void HexViewer::setTopLeftToPercent( int percent )
     _previousstep = percent;
 }
 
+void HexViewer::setTopLeftToFloat( float offset )
+{
+    //setTopLeft((_reader.size()/100)*percent);
+    float percent = offset*bytesPerLine();
+    if(_previousstep < (int)percent)
+    {
+        int stepdiff = (int)percent - _previousstep;
+        if(stepdiff == bytesPerLine())
+            nextLine();
+        else if(stepdiff == bytesPerPage())
+            nextPage();
+        else
+            setTopLeft((int)percent);
+    }
+    else if(_previousstep > (int)percent)
+    {
+        int stepdiff = _previousstep - (int)percent;
+        if(stepdiff == bytesPerLine())
+            prevLine();
+        else if(stepdiff == bytesPerPage())
+            prevPage();
+        else
+            setTopLeft((int)percent);
+    }
+    _previousstep = (int)percent;
+}
+
 // 
 // slot for setting cursor offset.
 //
