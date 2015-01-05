@@ -569,10 +569,11 @@ void WombatForensics::LoadHexContents()
             fileviewer->filehexview->set2BPC();
             fileviewer->filehexview->setBaseHex();
             fileviewer->filehexview->SetTopLeft(0);
+            // THIS KIND OF WORKS, THEN ONCE IT LOOSES FOCUS, IT DOESN'T WORK. NOT SURE WHY...
             hexwidget->openimage(); // newly added line
             hexwidget->setOffset(tskobjptr->offset);
             //hexwidget->seeCursor();
-            hexwidget->setTopLeftToFloat((float)((float)tskobjptr->offset/(float)hexwidget->bytesPerLine()));
+            //hexwidget->setTopLeftToFloat((float)((float)tskobjptr->offset/(float)hexwidget->bytesPerLine()));
         }
     }
     /*
