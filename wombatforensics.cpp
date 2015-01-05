@@ -529,7 +529,6 @@ void WombatForensics::LoadHexContents()
     }
     else
     {
-        //hexwidget->openimage();
         hexwidget->SetTopLeft(tskobjptr->offset);
     }
     // MODIFYING FOR HIGHLIGHTING TEST...

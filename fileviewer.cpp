@@ -15,6 +15,7 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
+    /*
     filehexview = new HexViewer(ui->centralwidget, tskptr);
     filehexview->setObjectName("filehexview");
     filehexview->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -22,12 +23,15 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     filehexvsb = new QScrollBar(filehexview);
     filehexvsb->setRange(0, 0);
     ui->horizontalLayout->addWidget(filehexvsb);
+    */
+    /*
     connect(filehexview, SIGNAL(rangeChanged(off_t, off_t)), this, SLOT(SetScrollBarRange(off_t, off_t)));
     connect(filehexview, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(filehexview, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
     connect(filehexvsb, SIGNAL(valueChanged(int)), this, SLOT(AdjustData(int)));
     connect(filehexview, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(filehexview, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+    */
 }
 
 FileViewer::~FileViewer()
@@ -157,6 +161,7 @@ void FileViewer::LoadPage(off_t pageindex)
 {
     off_t retval = 0;
     filedata[pageindex] = new uchar[filereader->_pageSize];
+    /*
     if(tskptr->objecttype == 5)
     {
         //qDebug() << "blkaddrlist count:" << tskptr->blkaddrlist.count();
@@ -169,11 +174,13 @@ void FileViewer::LoadPage(off_t pageindex)
     //qDebug() << "tsk fs file read bytecount:" << retval;
         }
     }
+    */
     //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
 }
 
 void FileViewer::AdjustData(int topleft)
 {
+    /*
     int lastpageindex = 0;
     filereader->_eof = false;
     filereader->_offset = max(min((off_t)topleft*filehexview->bytesPerLine(), filereader->size()-1), (off_t)0);
@@ -214,4 +221,5 @@ void FileViewer::AdjustData(int topleft)
         filereader->_offset += stop - start;
     }
     filehexview->setTopLeftToPercent(topleft);
+    */
 }

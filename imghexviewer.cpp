@@ -81,12 +81,12 @@ bool ImageHexViewer::openimage()
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
-    //emit rangeChanged(0, _reader.size());
-    emit rangeChanged(0, _reader.size()/bytesPerLine());
+    emit rangeChanged(0, _reader.size());
+    //emit rangeChanged(0, _reader.size()/bytesPerLine());
     //emit StepValues(bytesPerLine(), _reader._pageSize);
-    //emit StepValues(bytesPerLine(), bytesPerPage());
+    emit StepValues(bytesPerLine(), bytesPerPage());
     //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-    emit StepValues(1, bytesPerPage()/bytesPerLine());
+    //emit StepValues(1, bytesPerPage()/bytesPerLine());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -162,9 +162,9 @@ void ImageHexViewer::setTopLeft( off_t offset )
 	_topLeft = offset;
      }
      // only let _topLeft be an integer multiple of the line length (round down)
-     off_t linenum = _topLeft/bytesPerLine();
+     //off_t linenum = _topLeft/bytesPerLine();
      //_topLeft = _topLeft*bytesPerLine();
-     _topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
+     //_topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
@@ -173,8 +173,8 @@ void ImageHexViewer::setTopLeft( off_t offset )
      //_reader.read(_data,bytesPerPage());
      
      repaint();
-     emit topLeftChanged(linenum);
-     //emit topLeftChanged(_topLeft);
+     //emit topLeftChanged(linenum);
+     emit topLeftChanged(_topLeft);
   } catch( const exception &e ) {
      inTopLeft = false;
      throw e;
@@ -559,12 +559,12 @@ void ImageHexViewer::resizeEvent( QResizeEvent * e )
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
-  //emit rangeChanged(0, _reader.size());
-  emit rangeChanged(0,_reader.size()/bytesPerLine());
+  emit rangeChanged(0, _reader.size());
+  //emit rangeChanged(0,_reader.size()/bytesPerLine());
   //emit StepValues(bytesPerLine(), _reader._pageSize);
-  //emit StepValues(bytesPerLine(), bytesPerPage());
+  emit StepValues(bytesPerLine(), bytesPerPage());
   //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-  emit StepValues(1, bytesPerPage()/bytesPerLine());
+  //emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on
