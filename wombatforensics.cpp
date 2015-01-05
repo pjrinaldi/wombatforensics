@@ -540,7 +540,7 @@ void WombatForensics::LoadHexContents()
         imagereader->SetData(imagedata);
         hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
         hexwidget->openimage();
-        hexwidget->set2BPC();
+        hexwidget->set1BPC();
         hexwidget->setBaseHex();
         qDebug() << "should be the file block offset:" << tskobjptr->offset;
         //hexwidget->SetTopLeft(tskobjptr->offset);
@@ -566,7 +566,7 @@ void WombatForensics::LoadHexContents()
             fileviewer->filereader->SetData(fileviewer->filedata);
             fileviewer->filehexview->SetReader(fileviewer->filereader);
             fileviewer->filehexview->openimage();
-            fileviewer->filehexview->set2BPC();
+            fileviewer->filehexview->set1BPC();
             fileviewer->filehexview->setBaseHex();
             fileviewer->filehexview->SetTopLeft(0);
             // THIS KIND OF WORKS, THEN ONCE IT LOOSES FOCUS, IT DOESN'T WORK. NOT SURE WHY...

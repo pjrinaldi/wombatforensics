@@ -673,8 +673,8 @@ void HexViewer::paintEvent( QPaintEvent* e)
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
-      qDebug() << "cur block addr:" << tskptr->blkaddrlist.at(i);
-      qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
+      //qDebug() << "cur block addr:" << tskptr->blkaddrlist.at(i);
+      //qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
       if(pageid == tskptr->blkaddrlist.at(i).toInt())
       {
           paint.setPen(QColor(0, 0, 255, 255));
@@ -942,8 +942,9 @@ void HexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
         {
             int widx = r*_cols+c;
             /* REPRESENTS THE FILE SLACK */
-            if(globalOffset(2*widx) < tskptr->length)
-                paint.setPen(QColor(0, 0, 0, 255));
+            //if(globalOffset(2*widx) < tskptr->length)
+            if(globalOffset(widx) > tskptr->length - 1)
+                paint.setPen(QColor(255, 0, 0, 255));
             //else
             //    paint.setPen(QColor(255, 0, 0, 255));
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
@@ -956,9 +957,10 @@ void HexViewer::drawTextRegion(QPainter& paint, const QString& text, int row_sta
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
         int widx = r*_cols+c;
+        //qDebug() << "c:" << c << "widx:" << widx << "global offset:" << globalOffset(widx);
         /* REPRESENTS THE FILE SLACK */
-        if(globalOffset(2*widx) < tskptr->length)
-            paint.setPen(QColor(0, 0, 0, 255));
+        if(globalOffset(widx) > tskptr->length - 1)
+            paint.setPen(QColor(255, 0, 0, 255));
         //else
         //    paint.setPen(QColor(255, 0, 0, 255));
         paint.drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()) );
