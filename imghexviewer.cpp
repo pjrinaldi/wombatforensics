@@ -81,12 +81,12 @@ bool ImageHexViewer::openimage()
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
-    emit rangeChanged(0, _reader.size());
-    //emit rangeChanged(0, _reader.size()/bytesPerLine());
+    //emit rangeChanged(0, _reader.size());
+    emit rangeChanged(0, _reader.size()/bytesPerLine());
     //emit StepValues(bytesPerLine(), _reader._pageSize);
-    emit StepValues(bytesPerLine(), bytesPerPage());
+    //emit StepValues(bytesPerLine(), bytesPerPage());
     //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-    //emit StepValues(1, bytesPerPage()/bytesPerLine());
+    emit StepValues(1, bytesPerPage()/bytesPerLine());
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -147,6 +147,7 @@ void ImageHexViewer::setFont(const QFont& font )
 // set the top left editor to offset in reader
 void ImageHexViewer::setTopLeft( off_t offset )
 {
+    qDebug() << "new topleft:" << offset;
   static bool inTopLeft;
   if( inTopLeft ) {
      // don't nest
@@ -174,7 +175,7 @@ void ImageHexViewer::setTopLeft( off_t offset )
      
      repaint();
      //emit topLeftChanged(linenum);
-     emit topLeftChanged(_topLeft);
+     emit topLeftChanged(_topLeft/bytesPerLine());
   } catch( const exception &e ) {
      inTopLeft = false;
      throw e;
@@ -559,12 +560,12 @@ void ImageHexViewer::resizeEvent( QResizeEvent * e )
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
-  emit rangeChanged(0, _reader.size());
-  //emit rangeChanged(0,_reader.size()/bytesPerLine());
+  //emit rangeChanged(0, _reader.size());
+  emit rangeChanged(0,_reader.size()/bytesPerLine());
   //emit StepValues(bytesPerLine(), _reader._pageSize);
-  emit StepValues(bytesPerLine(), bytesPerPage());
+  //emit StepValues(bytesPerLine(), bytesPerPage());
   //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
-  //emit StepValues(1, bytesPerPage()/bytesPerLine());
+  emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on
