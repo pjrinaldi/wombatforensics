@@ -83,7 +83,6 @@ bool ImageHexViewer::openimage()
     setSelection(SelectionEnd, -1);
     //emit rangeChanged(0, _reader.size());
     emit rangeChanged(0, _reader.size()/bytesPerLine());
-    //emit StepValues(bytesPerLine(), _reader._pageSize);
     //emit StepValues(bytesPerLine(), bytesPerPage());
     //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
     emit StepValues(1, bytesPerPage()/bytesPerLine());
@@ -562,7 +561,6 @@ void ImageHexViewer::resizeEvent( QResizeEvent * e )
   setTopLeft(_topLeft);
   //emit rangeChanged(0, _reader.size());
   emit rangeChanged(0,_reader.size()/bytesPerLine());
-  //emit StepValues(bytesPerLine(), _reader._pageSize);
   //emit StepValues(bytesPerLine(), bytesPerPage());
   //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
   emit StepValues(1, bytesPerPage()/bytesPerLine());
