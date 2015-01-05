@@ -542,14 +542,14 @@ void WombatForensics::LoadHexContents()
         hexwidget->openimage();
         hexwidget->set1BPC();
         hexwidget->setBaseHex();
-        qDebug() << "should be the file block offset:" << tskobjptr->offset;
+        //qDebug() << "should be the file block offset:" << tskobjptr->offset;
         //hexwidget->SetTopLeft(tskobjptr->offset);
     }
     else
     {
-        qDebug() << "should be the file block offset:" << tskobjptr->offset;
         if(wombatvarptr->selectedobject.objtype == 5)
         {
+            qDebug() << "should be the file block offset:" << tskobjptr->offset;
             //AdjustData(tskobjptr->offset/hexwidget->bytesPerLine());
             fileviewer->filereader->_pageSize = tskobjptr->blocksize;
             // should be equal to the size of the blocks that contain the file...
@@ -569,11 +569,11 @@ void WombatForensics::LoadHexContents()
             fileviewer->filehexview->set1BPC();
             fileviewer->filehexview->setBaseHex();
             fileviewer->filehexview->SetTopLeft(0);
-            // THIS KIND OF WORKS, THEN ONCE IT LOOSES FOCUS, IT DOESN'T WORK. NOT SURE WHY...
-            hexwidget->openimage(); // newly added line
-            hexwidget->setOffset(tskobjptr->offset);
+            AdjustData(tskobjptr->offset);
+            //hexwidget->setOffset(tskobjptr->offset);
             //hexwidget->seeCursor();
-            //hexwidget->setTopLeftToFloat((float)((float)tskobjptr->offset/(float)hexwidget->bytesPerLine()));
+            hexwidget->setTopLeftToFloat((float)((float)tskobjptr->offset/(float)hexwidget->bytesPerLine()));
+            //AdjustData(tskobjptr->offset);
         }
     }
     /*
@@ -1066,8 +1066,8 @@ void WombatForensics::SetupHexPage(void)
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    connect(hexvsb, SIGNAL(valueChanged(int)), this, SLOT(AdjustData(int)));
-    //connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    //connect(hexvsb, SIGNAL(valueChanged(int)), this, SLOT(AdjustData(int)));
+    connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
 }
