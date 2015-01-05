@@ -211,8 +211,10 @@ bool ImageReader::loadimagepage(off_t pageIdx)
     off_t retval = 0;
     if(!is_open())
         return false;
+    /*
     if(_data[pageIdx] != 0)
         return true;
+    */
     if(!nFreePages())
     {
         if(abs(_firstPage - pageIdx) > abs(_lastPage - pageIdx))
@@ -224,7 +226,8 @@ bool ImageReader::loadimagepage(off_t pageIdx)
     --nFreePages();
     if(tskptr->objecttype <= 5)
     {
-        retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+        //retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+        retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     }
     if(retval > 0)
     {
