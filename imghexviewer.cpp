@@ -937,33 +937,17 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
             int widx = r*_cols+c;
             for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
             {
-                if((globalOffset(widx) > tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) && (globalOffset(widx) < tskptr->blkaddrlist.at(i).toInt() + tskptr->blocksize - 1))
+                if((globalOffset(widx) >= tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) && (globalOffset(widx) < tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize + tskptr->blocksize - 1))
                 {
                     if(i == (tskptr->blkaddrlist.count() - 1))
                     {
-                        if(((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) > (tskptr->length - 1)) && ((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize) < (tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize + tskptr->blocksize - 1)))
+                        if(((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) > (tskptr->length - 1 - tskptr->blocksize)) && ((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize) < (tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize + tskptr->blocksize - 1)))
                             paint.setPen(QColor(255, 0, 0, 255));
                     }
                     else
                         paint.setPen(QColor(0, 0, 255, 255));
                 }
             }
-            /* REPRESENTS THE FILE SLACK */
-            /*
-            // this needs to be the (curoffset - fileoffset) > tskptr->length - 1; and then (curoffset - fileoffset) < blkct*blksz - 1;
-            if(((globalOffset(widx) - tskptr->offset) > (tskptr->length - 1)) && ((globalOffset(widx) - tskptr->offset) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1)))
-            {
-                qDebug() << "fileoff:" << tskptr->offset;
-                qDebug() << "curoff - fileoff:" << globalOffset(widx) - tskptr->offset;
-                paint.setPen(QColor(255, 0, 0, 255));
-            }
-            else if(((globalOffset(widx) - tskptr->offset) < (tskptr->length - 1)) && ((globalOffset(widx) - tskptr->offset) > 0))
-            {
-                paint.setPen(QColor(0, 0, 255, 255));
-            }
-            else
-                paint.setPen(QColor(0, 0, 0, 255));
-            */
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
         }
     }
@@ -977,16 +961,16 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
         //qDebug() << globalOffset(widx);
         for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
         {
-            if((globalOffset(widx) > tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize) && (globalOffset(widx) < tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize + tskptr->blocksize))
+            if((globalOffset(widx) >= tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) && (globalOffset(widx) < tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize + tskptr->blocksize - 1))
             {
                 paint.setPen(QColor(0, 0, 255, 255));
                 if(i == (tskptr->blkaddrlist.count() - 1))
                 {
-                    if(((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize) > (tskptr->length - 1)) && ((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize) < (tskptr->blkaddrlist.count()*tskptr->blocksize)))
+                    if(((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) > (tskptr->length - 1 - tskptr->blocksize)) && ((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1)))
                         paint.setPen(QColor(255, 0, 0, 255));
                     }
                 }
-            }
+        }
 
         /* REPRESENTS THE FILE SLACK */
         // this needs to be the (curoffset - fileoffset) > tskptr->length - 1; and then (curoffset - fileoffset) < blkct*blksz - 1;
