@@ -667,6 +667,7 @@ void ImageHexViewer::paintEvent( QPaintEvent* e)
 
   paint.setPen(QColor(0, 0, 0, 255));
   paint.setBrush(Qt::NoBrush);
+  /*
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
@@ -682,6 +683,7 @@ void ImageHexViewer::paintEvent( QPaintEvent* e)
           break;
       }
   }
+  */
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
   // draw dividing line
@@ -695,6 +697,7 @@ void ImageHexViewer::paintEvent( QPaintEvent* e)
   col_start = max(0, (e->rect().left() - leftMargin() - e->rect().right()/2)/totalWordWidth);
   row_stop = min(_rows-1, e->rect().bottom()/lineSpacing());
   col_stop = min(_cols-1, e->rect().right()/totalWordWidth);
+  /*
   for(int i=0; i < tskptr->blkaddrlist.count(); i++)
   {
       int pageid = _reader.CurrentPage();
@@ -704,6 +707,7 @@ void ImageHexViewer::paintEvent( QPaintEvent* e)
           break;
       }
   }
+  */
   drawAsciiRegion(paint, ascii, row_start, row_stop, col_start, col_stop);
   paint.setPen(QColor(0, 0, 0, 255));
 }
@@ -940,10 +944,18 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
             int widx = r*_cols+c;
             /* REPRESENTS THE FILE SLACK */
             // this needs to be the (curoffset - fileoffset) > tskptr->length - 1; and then (curoffset - fileoffset) < blkct*blksz - 1;
-            if(globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
+            if(((globalOffset(widx) - tskptr->offset) > (tskptr->length - 1)) && ((globalOffset(widx) - tskptr->offset) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1)))
+            {
+                qDebug() << "fileoff:" << tskptr->offset;
+                qDebug() << "curoff - fileoff:" << globalOffset(widx) - tskptr->offset;
                 paint.setPen(QColor(255, 0, 0, 255));
-            //else
-            //    paint.setPen(QColor(255, 0, 0, 255));
+            }
+            else if(((globalOffset(widx) - tskptr->offset) < (tskptr->length - 1)) && ((globalOffset(widx) - tskptr->offset) > 0))
+            {
+                paint.setPen(QColor(0, 0, 255, 255));
+            }
+            else
+                paint.setPen(QColor(0, 0, 0, 255));
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
         }
     }
@@ -956,10 +968,14 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
         int widx = r*_cols+c;
         /* REPRESENTS THE FILE SLACK */
         // this needs to be the (curoffset - fileoffset) > tskptr->length - 1; and then (curoffset - fileoffset) < blkct*blksz - 1;
-        if(globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
+        if((globalOffset(widx) - tskptr->offset) > tskptr->length - 1 && (globalOffset(widx) - tskptr->offset) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
             paint.setPen(QColor(255, 0, 0, 255));
-        //else
-        //    paint.setPen(QColor(255, 0, 0, 255));
+        else if(((globalOffset(widx) - tskptr->offset) < (tskptr->length - 1)) && ((globalOffset(widx) - tskptr->offset) > 0))
+        {
+            paint.setPen(QColor(0, 0, 255, 255));
+        }
+        else
+            paint.setPen(QColor(0, 0, 0, 255));
         paint.drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()) );
     }
   }
