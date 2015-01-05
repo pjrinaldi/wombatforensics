@@ -917,8 +917,8 @@ void HexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
             /* REPRESENTS THE FILE SLACK */
             if(globalOffset(2*widx) < tskptr->length)
                 paint.setPen(QColor(0, 0, 0, 255));
-            else
-                paint.setPen(QColor(255, 0, 0, 255));
+            //else
+            //    paint.setPen(QColor(255, 0, 0, 255));
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
         }
     }
@@ -932,8 +932,8 @@ void HexViewer::drawTextRegion(QPainter& paint, const QString& text, int row_sta
         /* REPRESENTS THE FILE SLACK */
         if(globalOffset(2*widx) < tskptr->length)
             paint.setPen(QColor(0, 0, 0, 255));
-        else
-            paint.setPen(QColor(255, 0, 0, 255));
+        //else
+        //    paint.setPen(QColor(255, 0, 0, 255));
         paint.drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()) );
     }
   }
