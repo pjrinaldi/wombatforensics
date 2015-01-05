@@ -942,8 +942,7 @@ void HexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
         {
             int widx = r*_cols+c;
             /* REPRESENTS THE FILE SLACK */
-            //if(globalOffset(2*widx) < tskptr->length)
-            if(globalOffset(widx) > tskptr->length - 1)
+            if(globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
                 paint.setPen(QColor(255, 0, 0, 255));
             //else
             //    paint.setPen(QColor(255, 0, 0, 255));
@@ -957,9 +956,8 @@ void HexViewer::drawTextRegion(QPainter& paint, const QString& text, int row_sta
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
         int widx = r*_cols+c;
-        //qDebug() << "c:" << c << "widx:" << widx << "global offset:" << globalOffset(widx);
         /* REPRESENTS THE FILE SLACK */
-        if(globalOffset(widx) > tskptr->length - 1)
+        if(globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
             paint.setPen(QColor(255, 0, 0, 255));
         //else
         //    paint.setPen(QColor(255, 0, 0, 255));
