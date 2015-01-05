@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#ifndef _READER_H
-#define _READER_H
+#ifndef IMG_READER_H
+#define IMG_READER_H
 
 //
-// Interface for Reader object.
+// Interface for ImageReader object.
 //
-// Reader object supports:
+// ImageReader object supports:
 // open(const QString& filename ); -> open a file for reading
 // bool is_open();                 -> see if file is open
 // close();                        -> free resources for open file.
@@ -38,11 +38,11 @@ typedef vector<uchar> ReadBuffer;
 ostream& operator<< (ostream&out,const ReadBuffer& buff);
 #endif
 
-class Reader {
+class ImageReader {
  public:
   // default is only 50*4k = 200k memory image.
-  Reader(off_t npages = 50, off_t pageSize = 4096);
-  ~Reader();
+  ImageReader(off_t npages = 50, off_t pageSize = 4096);
+  ~ImageReader();
 
 
   // CUSTOM ABSTRACTION FUNCTIONS
@@ -71,41 +71,26 @@ class Reader {
   off_t rFindIndex( off_t start, const vector<uchar>& data,
 		    off_t stop );
 
-  bool isfile;
-  off_t _pageSize;
-  off_t _numpages;
-  off_t _size;
-  off_t _firstPage;
-  off_t _lastPage;
-  off_t _offset;
-  bool _eof;
-  off_t _freePages;
-  off_t _maxPages;
-
+ protected:
+  bool dataIsAtOffset( const vector<uchar>& data, off_t pos );
+  bool loadPage(off_t pageIdx);
   bool freePage(off_t pageIdx);
   off_t nFreePages() const;
   off_t& nFreePages();
 
  protected:
-  bool dataIsAtOffset( const vector<uchar>& data, off_t pos );
-  bool loadPage(off_t pageIdx);
-  //bool freePage(off_t pageIdx);
-  //off_t nFreePages() const;
-  //off_t& nFreePages();
-
- protected:
   string        _error;
   FILE*         _fptr;
   bool          _is_open;
-  //bool          _eof;
-  //off_t         _offset;         // current offset
-  //off_t         _size;           // file size from fstat
-  //off_t         _pageSize;       // number of bytes in a page
-  //off_t         _firstPage;      // first currently loaded page
-  //off_t         _lastPage;       // last currently loaded page
-  //off_t         _maxPages;       // maximum number of pages which could be currently loaded
-  //off_t         _numpages;      // total number of pages for a file size.
-  //off_t         _freePages;     // number of free pages
+  bool          _eof;
+  off_t         _offset;         // current offset
+  off_t         _size;           // file size from fstat
+  off_t         _pageSize;       // number of bytes in a page
+  off_t         _firstPage;      // first currently loaded page
+  off_t         _lastPage;       // last currently loaded page
+  off_t         _maxPages;       // maximum number of pages which could be currently loaded
+  off_t         _numpages;      // total number of pages for a file size.
+  off_t         _freePages;     // number of free pages
   vector< uchar *> _data;
   TskObject* tskptr;
 };

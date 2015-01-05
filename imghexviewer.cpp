@@ -25,11 +25,11 @@
  *
  */ 
 
-#include "hexviewer.h"
+#include "imghexviewer.h"
 
 extern int errno;
 
-HexViewer::HexViewer( QWidget * parent, TskObject* tskobjptr )
+ImageHexViewer::ImageHexViewer( QWidget * parent, TskObject* tskobjptr )
     : QWidget(parent)
 {
     tskptr = tskobjptr;
@@ -52,12 +52,12 @@ HexViewer::HexViewer( QWidget * parent, TskObject* tskobjptr )
   setFont( font );
 }
 
-HexViewer::~HexViewer() 
+ImageHexViewer::~ImageHexViewer() 
 {
   _reader.close();
 }
-
-void HexViewer::ClearContent()
+/*
+void ImageHexViewer::ClearContent()
 {
     //_reader.Clear();
     //_reader.seekimage(_topLeft);
@@ -65,18 +65,17 @@ void HexViewer::ClearContent()
     //_reader.readimage(_data,bytesPerPage());
     //setTopLeft(0);
 }
+*/
 
-void HexViewer::SetTopLeft(off_t offset)
+void ImageHexViewer::SetTopLeft(off_t offset)
 {
     setTopLeft(offset);
 }
 
-bool HexViewer::openimage()
+bool ImageHexViewer::openimage()
 {
-    /*
     if(!_reader.openimage(tskptr))
         QMessageBox::critical(this, "HexView", "Error opening image\n", QMessageBox::Ok, 0);
-    */
     //qDebug() << "reader size: " << _reader.size();
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
@@ -94,7 +93,7 @@ bool HexViewer::openimage()
     return true;
 }
 
-void HexViewer::setBytesPerWord( int nbytes )
+void ImageHexViewer::setBytesPerWord( int nbytes )
 {
   _bytesPerWord = nbytes;
   calculateFontMetrics();
@@ -102,19 +101,19 @@ void HexViewer::setBytesPerWord( int nbytes )
   resizeEvent(re);
   delete re;
 }
-int HexViewer::fontHeight() const
+int ImageHexViewer::fontHeight() const
 {
     return _fontHeight;
 }
-int HexViewer::lineSpacing() const
+int ImageHexViewer::lineSpacing() const
 {
   return _lineSpacing;
 }
-int HexViewer::fontMaxWidth() const
+int ImageHexViewer::fontMaxWidth() const
 {
   return _fontMaxWidth;
 }
-void HexViewer::calculateFontMetrics()
+void ImageHexViewer::calculateFontMetrics()
 {
   _lineSpacing = fontMetrics().lineSpacing();
   _fontMaxWidth = fontMetrics().maxWidth();
@@ -136,7 +135,7 @@ void HexViewer::calculateFontMetrics()
   resizeEvent(re);
   delete re;
 }
-void HexViewer::setFont(const QFont& font )
+void ImageHexViewer::setFont(const QFont& font )
 { 
   if( !font.fixedPitch() ) {
     cerr << "setFont() failed, font was not fixedPitch()." << endl;
@@ -146,7 +145,7 @@ void HexViewer::setFont(const QFont& font )
   calculateFontMetrics();
 }
 // set the top left editor to offset in reader
-void HexViewer::setTopLeft( off_t offset )
+void ImageHexViewer::setTopLeft( off_t offset )
 {
   static bool inTopLeft;
   if( inTopLeft ) {
@@ -183,70 +182,70 @@ void HexViewer::setTopLeft( off_t offset )
   inTopLeft = false;
 }
 
-//void HexViewer::setOffsetLabels( off_t topLeft )
+//void ImageHexViewer::setOffsetLabels( off_t topLeft )
 //{
   // need to impliment manually printing labels
 //}
 
-int HexViewer::topMargin() const
+int ImageHexViewer::topMargin() const
 {
   return _topMargin;
 }
-int HexViewer::leftMargin() const
+int ImageHexViewer::leftMargin() const
 {
   return _leftMargin;
 }
 //
 // access fn's for offset manip
 //
-int HexViewer::bytesPerPage() const
+int ImageHexViewer::bytesPerPage() const
 {
   return _rows*_cols*bytesPerWord();
 }
-int HexViewer::bytesPerWord() const
+int ImageHexViewer::bytesPerWord() const
 {
   return _bytesPerWord;
 }
-int HexViewer::bytesPerLine() const
+int ImageHexViewer::bytesPerLine() const
 {
   return bytesPerWord()*wordsPerLine();
 }
-int HexViewer::wordsPerLine() const
+int ImageHexViewer::wordsPerLine() const
 {
   return _cols;
 }
-int HexViewer::linesPerPage() const
+int ImageHexViewer::linesPerPage() const
 {
   return _rows;
 }
-int HexViewer::wordsPerPage() const
+int ImageHexViewer::wordsPerPage() const
 {
   return _rows*_cols;
 }
-int HexViewer::charsPerByte() const
+int ImageHexViewer::charsPerByte() const
 {
   return _charsPerByte;
 }
-int HexViewer::charsPerWord() const
+int ImageHexViewer::charsPerWord() const
 {
   return _charsPerByte*bytesPerWord();
 }
-int HexViewer::charsPerLine() const
+int ImageHexViewer::charsPerLine() const
 {
   return _charsPerByte*(bytesPerLine());
 }
 // translate local byte offsets to global byte offsets
-off_t HexViewer::globalOffset( off_t local ) const
+off_t ImageHexViewer::globalOffset( off_t local ) const
 {
   return local+_topLeft;
 }
 // translate global byte offsets to viewport byte offsets
-off_t HexViewer::localOffset( off_t global ) const
+off_t ImageHexViewer::localOffset( off_t global ) const
 {
   return global-_topLeft;
 }
 
-int HexViewer::offsetToPercent(
+int ImageHexViewer::offsetToPercent(
    off_t offset
    )
 {
@@ -256,7 +255,7 @@ int HexViewer::offsetToPercent(
 
 // public slots:
 
-QRect HexViewer::charBBox( off_t charIdx ) const {
+QRect ImageHexViewer::charBBox( off_t charIdx ) const {
   int wordIdx = (charIdx/charsPerByte())/bytesPerWord();
   int localCharIdx = charIdx % charsPerWord();
   return QRect( _wordBBox[wordIdx].left() + localCharIdx*fontMaxWidth() +
@@ -266,7 +265,7 @@ QRect HexViewer::charBBox( off_t charIdx ) const {
 		fontHeight() );
 }
 
-QRect HexViewer::byteBBox( off_t byteIdx ) const {
+QRect ImageHexViewer::byteBBox( off_t byteIdx ) const {
   int wordIdx = byteIdx/bytesPerWord();
   int localByteIdx = byteIdx % bytesPerWord();
   return QRect( _wordBBox[wordIdx].left() + localByteIdx*2*fontMaxWidth() +
@@ -276,14 +275,14 @@ QRect HexViewer::byteBBox( off_t byteIdx ) const {
 		lineSpacing() );
 }
 
-QRect HexViewer::abyteBox(off_t byteIdx) const
+QRect ImageHexViewer::abyteBox(off_t byteIdx) const
 {
     int wordIdx = byteIdx/bytesPerWord();
     int localByteIdx = byteIdx % bytesPerWord();
     return QRect(_asciiBBox[wordIdx].left() + localByteIdx*fontMaxWidth() + wordSpacing(), _asciiBBox[wordIdx].top(), fontMaxWidth(), lineSpacing());
 }
 
-void HexViewer::setTopLeftToPercent( int percent )
+void ImageHexViewer::setTopLeftToPercent( int percent )
 {
     //setTopLeft((_reader.size()/100)*percent);
     percent = percent*bytesPerLine();
@@ -310,9 +309,8 @@ void HexViewer::setTopLeftToPercent( int percent )
     _previousstep = percent;
 }
 
-void HexViewer::setTopLeftToFloat( float offset )
+void ImageHexViewer::setTopLeftToFloat( float offset )
 {
-    //setTopLeft((_reader.size()/100)*percent);
     float percent = offset*bytesPerLine();
     if(_previousstep < (int)percent)
     {
@@ -340,7 +338,7 @@ void HexViewer::setTopLeftToFloat( float offset )
 // 
 // slot for setting cursor offset.
 //
-void HexViewer::setOffset( off_t offset )
+void ImageHexViewer::setOffset( off_t offset )
 {
   off_t oldWordOffset = localWordOffset();
   _cursor.setOffset( offset, 0 );
@@ -349,24 +347,24 @@ void HexViewer::setOffset( off_t offset )
   emit offsetChanged( _cursor.byteOffset() );
 }
 
-void HexViewer::nextLine()
+void ImageHexViewer::nextLine()
 {
   setTopLeft(_topLeft+bytesPerLine());
 }
-void HexViewer::prevLine()
+void ImageHexViewer::prevLine()
 {
   setTopLeft(_topLeft-bytesPerLine());
 }
-void HexViewer::nextPage()
+void ImageHexViewer::nextPage()
 {
   setTopLeft(_topLeft+bytesPerPage());
 }
-void HexViewer::prevPage()
+void ImageHexViewer::prevPage()
 {
   setTopLeft(_topLeft-bytesPerPage());
 }
 
-off_t HexViewer::localByteOffsetAtXY(off_t x, off_t y) 
+off_t ImageHexViewer::localByteOffsetAtXY(off_t x, off_t y) 
 {
   off_t wordIdx;
   off_t wordLength = wordSpacing()+wordWidth();
@@ -389,7 +387,7 @@ off_t HexViewer::localByteOffsetAtXY(off_t x, off_t y)
 //
 // event handler implimentation:
 //
-void HexViewer::setCursorFromXY(int x,int y)
+void ImageHexViewer::setCursorFromXY(int x,int y)
 {
   off_t oldWordIdx = localWordOffset();
 
@@ -403,7 +401,7 @@ void HexViewer::setCursorFromXY(int x,int y)
   emit offsetChanged(_cursor.byteOffset());
 }
 
-void HexViewer::mousePressEvent( QMouseEvent* e )
+void ImageHexViewer::mousePressEvent( QMouseEvent* e )
 {
   setCursorFromXY(e->x(),e->y());
 
@@ -415,7 +413,7 @@ void HexViewer::mousePressEvent( QMouseEvent* e )
   setSelection( SelectionStart, globalOffset( byte_offset ));
 }
 
-void HexViewer::mouseMoveEvent( QMouseEvent* e )
+void ImageHexViewer::mouseMoveEvent( QMouseEvent* e )
 {
   setCursorFromXY(e->x(),e->y());
 
@@ -428,7 +426,7 @@ void HexViewer::mouseMoveEvent( QMouseEvent* e )
   setSelection( SelectionEnd, globalOffset( byte_offset ));
 }
 
-void HexViewer::mouseReleaseEvent( QMouseEvent* e )
+void ImageHexViewer::mouseReleaseEvent( QMouseEvent* e )
 {
   setCursorFromXY(e->x(),e->y());
 
@@ -441,7 +439,7 @@ void HexViewer::mouseReleaseEvent( QMouseEvent* e )
   setSelection( SelectionEnd, globalOffset( byte_offset ));
 }
 
-off_t HexViewer::selectionStart() const
+off_t ImageHexViewer::selectionStart() const
 {
   if( _selection[SelectionStart] == -1 || _selection[SelectionEnd] == -1 )
     return -1;
@@ -449,14 +447,14 @@ off_t HexViewer::selectionStart() const
 }
 // note: end is open. range is: [start,end)
 
-off_t HexViewer::selectionEnd() const
+off_t ImageHexViewer::selectionEnd() const
 {
   if( _selection[SelectionStart] == -1 || _selection[SelectionEnd] == -1 )
     return -1;
   return max(_selection[SelectionStart],_selection[SelectionEnd]);
 }
 
-void HexViewer::setSelection(SelectionPos_e pos, off_t offset)
+void ImageHexViewer::setSelection(SelectionPos_e pos, off_t offset)
 {
   if( !_reader.is_open() ) {
     return;
@@ -488,7 +486,7 @@ void HexViewer::setSelection(SelectionPos_e pos, off_t offset)
 //
 // Editor implimentation
 //
-void HexViewer::keyPressEvent( QKeyEvent *e )
+void ImageHexViewer::keyPressEvent( QKeyEvent *e )
 {
   switch ( e->key() ) {
   case Qt::Key_Left:
@@ -521,7 +519,7 @@ void HexViewer::keyPressEvent( QKeyEvent *e )
   }
 }
 
-void HexViewer::resizeEvent( QResizeEvent * e )
+void ImageHexViewer::resizeEvent( QResizeEvent * e )
 {
   int height= lineSpacing();
   int totalWordWidth = wordWidth() + wordSpacing();
@@ -572,23 +570,23 @@ void HexViewer::resizeEvent( QResizeEvent * e )
 // Reimplimented to be more efficient then repainting the whole screen on
 // focus events.
 //
-void HexViewer::focusInEvent( QFocusEvent* ) 
+void ImageHexViewer::focusInEvent( QFocusEvent* ) 
 {
   updateWord( localWordOffset() );
 }
-void HexViewer::focusOutEvent( QFocusEvent* ) 
+void ImageHexViewer::focusOutEvent( QFocusEvent* ) 
 {
   updateWord( localWordOffset() );
 }
 // generate's paint events for wordIdx (global wordIdx)
 // is safe to call with any wordIdx
-void HexViewer::updateWord( off_t wordIdx )
+void ImageHexViewer::updateWord( off_t wordIdx )
 {
   if( wordIdx > -1 && wordIdx < _rows*_cols ) 
     repaint(_wordBBox[wordIdx]);
 }
 
-void HexViewer::paintLabels( QPainter* paintPtr) 
+void ImageHexViewer::paintLabels( QPainter* paintPtr) 
 {
   // ignore redraw range for first aproximation:
   int y = _wordBBox[0].bottom();
@@ -634,7 +632,7 @@ void HexViewer::paintLabels( QPainter* paintPtr)
 // This data can then be retrieved with wordBBox()
 // We can then test intersections to see which words need to be redrawn
 //
-void HexViewer::paintEvent( QPaintEvent* e)
+void ImageHexViewer::paintEvent( QPaintEvent* e)
 {
 /*  QPixmap      pixmap(this->width(),this->height());
     pixmap.fill(backgroundRole());*/
@@ -711,7 +709,7 @@ void HexViewer::paintEvent( QPaintEvent* e)
   paint.setPen(QColor(0, 0, 0, 255));
 }
 
-bool HexViewer::getDisplayText( QString& text )
+bool ImageHexViewer::getDisplayText( QString& text )
 {
   // get data to draw
   switch (_base) {
@@ -734,42 +732,42 @@ bool HexViewer::getDisplayText( QString& text )
   return true;
 }
 
-void HexViewer::getDisplayAscii(QString& txt)
+void ImageHexViewer::getDisplayAscii(QString& txt)
 {
     Translate::ByteToChar(txt, _data);
 }
 //
 // accessors for local offsets
 //
-off_t HexViewer::localByteOffset()  const
+off_t ImageHexViewer::localByteOffset()  const
 {
   return _cursor.byteOffset() - _topLeft;
 }
-off_t HexViewer::localWordOffset() const
+off_t ImageHexViewer::localWordOffset() const
 {
   return localByteOffset()/bytesPerWord();
 }
 // in offset relative to _data[0]
-off_t HexViewer::localCharOffset() const
+off_t ImageHexViewer::localCharOffset() const
 {
   return localByteOffset()*charsPerByte() + _cursor.charOffset();
 }
-off_t HexViewer::localLineOffset() const
+off_t ImageHexViewer::localLineOffset() const
 {
   return localWordOffset()/wordsPerLine();
 }
-int HexViewer::wordWidth() const 
+int ImageHexViewer::wordWidth() const 
 {
   return _fontMaxWidth*charsPerWord();
 }
-int HexViewer::wordSpacing() const
+int ImageHexViewer::wordSpacing() const
 {
   return _wordSpacing;
 }
 //
 // cursor movement members
 //
-void HexViewer::seeCursor()
+void ImageHexViewer::seeCursor()
 {
   // see if it is already visible
   if ( _cursor.byteOffset() >= _topLeft && 
@@ -796,7 +794,7 @@ void HexViewer::seeCursor()
   }
 }
 
-void HexViewer::cursorLeft()
+void ImageHexViewer::cursorLeft()
 {
   off_t oldWordIdx = localWordOffset();
   // move the cursor
@@ -809,7 +807,7 @@ void HexViewer::cursorLeft()
     updateWord( oldWordIdx );
   emit offsetChanged( _cursor.byteOffset() );
 }
-void HexViewer::cursorRight()
+void ImageHexViewer::cursorRight()
 {
   off_t oldWordIdx = localWordOffset();
   _cursor.incrByChar(2);
@@ -819,7 +817,7 @@ void HexViewer::cursorRight()
     updateWord( oldWordIdx );
   emit offsetChanged( _cursor.byteOffset() );
 }
-void HexViewer::cursorUp()
+void ImageHexViewer::cursorUp()
 {
   off_t oldWordIdx = localWordOffset();
   _cursor.decrByByte( bytesPerLine() );
@@ -828,7 +826,7 @@ void HexViewer::cursorUp()
     updateWord( oldWordIdx );
   emit offsetChanged( _cursor.byteOffset() );
 }
-void HexViewer::cursorDown()
+void ImageHexViewer::cursorDown()
 {
   off_t oldWordIdx = localWordOffset();
   _cursor.incrByByte( bytesPerLine() );
@@ -838,7 +836,7 @@ void HexViewer::cursorDown()
   emit offsetChanged( _cursor.byteOffset() );
 }
 
-void HexViewer::search( const QString& hexText, bool forwards )
+void ImageHexViewer::search( const QString& hexText, bool forwards )
 {
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
   if(!hexText.length())
@@ -864,22 +862,22 @@ void HexViewer::search( const QString& hexText, bool forwards )
   }
   QApplication::restoreOverrideCursor();
 }
-void HexViewer::setBaseASCII() {
+void ImageHexViewer::setBaseASCII() {
   setBase(-1);
 }
-void HexViewer::setBaseHex()
+void ImageHexViewer::setBaseHex()
 {
   setBase(16);
 }
-void HexViewer::setBaseOctal()
+void ImageHexViewer::setBaseOctal()
 {
   setBase(8);
 }
-void HexViewer::setBaseBinary()
+void ImageHexViewer::setBaseBinary()
 {
   setBase(2);
 }
-void HexViewer::setBase(int base)
+void ImageHexViewer::setBase(int base)
 {
   switch(base) {
   case -1:
@@ -917,23 +915,23 @@ void HexViewer::setBase(int base)
   seeCursor();
 }
 
-off_t HexViewer::offset() const
+off_t ImageHexViewer::offset() const
 {
   return _cursor.byteOffset();
 }
 
-Reader* HexViewer::reader()
+ImageReader* ImageHexViewer::reader()
 {
   return &_reader;
 }
 
-void HexViewer::showMatch( off_t pos, int len )
+void ImageHexViewer::showMatch( off_t pos, int len )
 {
     setSelection( SelectionStart, pos );
     setSelection( SelectionEnd, pos + len );
 }
 
-void HexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
+void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
     paint.setPen(qApp->palette().foreground().color());
     for(int r = row_start; r <= row_stop; r++)
@@ -952,7 +950,7 @@ void HexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int row_st
     }
 }
 
-void HexViewer::drawTextRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
+void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
   for(int r = row_start; r <= row_stop; r++) {
     for(int c = col_start; c <= col_stop; c++) {
@@ -968,7 +966,7 @@ void HexViewer::drawTextRegion(QPainter& paint, const QString& text, int row_sta
   }
 }
 
-void HexViewer::drawSelection( QPainter& paint )
+void ImageHexViewer::drawSelection( QPainter& paint )
 {
   // draw selection
   off_t start = max( (off_t)0, selectionStart() - _topLeft);
@@ -992,7 +990,7 @@ void HexViewer::drawSelection( QPainter& paint )
   }
 }
 
-void HexViewer::drawCursor( QPainter& paint )
+void ImageHexViewer::drawCursor( QPainter& paint )
 {
   QBrush b = qApp->palette().mid();
   if( localWordOffset() > -1 && localWordOffset() < wordsPerPage() ) {
@@ -1009,8 +1007,9 @@ void HexViewer::drawCursor( QPainter& paint )
     paint.drawRect( box );
   }
 }
-
-void HexViewer::SetReader(Reader* tmpreader)
+/*
+void ImageHexViewer::SetReader(Reader* tmpreader)
 {
     _reader = *tmpreader;
 }
+*/

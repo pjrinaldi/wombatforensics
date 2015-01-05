@@ -23,29 +23,29 @@
  *
  */ 
 
-#ifndef _HEX_VIEWER
-#define _HEX_VIEWER
+#ifndef IMG_HEX_VIEWER
+#define IMG_HEX_VIEWER
 
 #include "wombatinclude.h"
 #include "translate.h"
-#include "reader.h"
+#include "imgreader.h"
 
-class HexViewer : public QWidget {
+class ImageHexViewer : public QWidget {
   Q_OBJECT
 public:
-  HexViewer( QWidget * parent =0, TskObject* tskobject = NULL );
-  ~HexViewer();
+  ImageHexViewer( QWidget * parent =0, TskObject* tskobject = NULL );
+  ~ImageHexViewer();
 
   bool openimage();
   // CUSTOM ABSTRACTION FUNCTIONS
   //void SetReader(Reader* tmpreader);
   // END CUSTOM ABSTRACTION FUNCTIONS
   //bool bigopen(startbyte, bytelen);
-  Reader* reader();
+  ImageReader* reader();
   off_t offset() const;
-  void ClearContent(); 
+  //void ClearContent(); 
   void SetTopLeft(off_t offset);
-  void SetReader(Reader* tmpreader);
+  //void SetReader(Reader* tmpreader);
 
   // returns the word (string representation) that the cursor is in
   //  QString currentWord() const;
@@ -60,7 +60,6 @@ public:
   int  wordWidth() const;
   int  wordSpacing() const;
   void setCursorFromXY(int x,int y);
-  void SetIsFile(bool state);
 
 public:
   enum SelectionPos_e {
@@ -76,9 +75,6 @@ public:
   int   offsetToPercent( off_t offset );
 
   off_t localByteOffsetAtXY( off_t x, off_t y );
-
-
-  vector<uchar> _data;
 
 protected:
   // accessors for local offset's
@@ -125,9 +121,6 @@ public slots:
   void setBaseASCII();
 
 
-  int bytesPerPage() const;
-  int bytesPerLine() const;
-
 protected:
   //  void setOffsetLabels( off_t topLeft );
   void setTopLeft( off_t offset );
@@ -148,9 +141,9 @@ protected:
   int charsPerByte() const;
   int charsPerWord() const;
   int charsPerLine() const;
-  //int bytesPerPage() const;
+  int bytesPerPage() const;
   int bytesPerWord() const;
-  //int bytesPerLine() const;
+  int bytesPerLine() const;
   int wordsPerLine() const;
   int wordsPerPage() const;
   int linesPerPage() const;
@@ -195,8 +188,8 @@ protected:
   void mouseMoveEvent   ( QMouseEvent *e );
 
 protected:
-  Reader              _reader;
-  TSK_IMG_INFO*       tskimg;
+  ImageReader              _reader;
+  //TSK_IMG_INFO*       tskimg;
   int                 _wordSpacing;
   int                 _wordWidth;
   int                 _lineSpacing;
@@ -208,7 +201,7 @@ protected:
   //
   // current screen data info              
   //
-  //vector<uchar>       _data;
+  vector<uchar>       _data;
   int                 _base; // either 2 8 or 16
 
   off_t               _lastValidWord;

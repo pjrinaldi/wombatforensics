@@ -14,6 +14,8 @@
 #include "globals.h"
 #include "reader.h"
 #include "hexviewer.h"
+#include "imgreader.h"
+#include "imghexviewer.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -563,8 +565,9 @@ private:
     QFutureWatcher<void> remwatcher;
 
     off_t offset() const;
-    HexViewer* hexwidget;
-    Reader* imagereader; 
+    //HexViewer* hexwidget;
+    ImageHexViewer* hexwidget;
+    //Reader* imagereader; 
     //Reader* filereader;
     vector<uchar*> imagedata;
     //vector<uchar*> filedata;

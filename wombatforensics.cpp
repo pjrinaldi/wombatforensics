@@ -520,8 +520,16 @@ void WombatForensics::LoadHexContents()
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         //OpenFileSystemFile();
     }
+    if(wombatvarptr->selectedobject.objtype <= 5)
+    {
+        hexwidget->openimage();
+        hexwidget->set1BPC();
+        hexwidget->setBaseHex();
+        hexwidget->SetTopLeft(tskobjptr->offset);
+    }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)
+    /*
     if(wombatvarptr->selectedobject.objtype == 1)
     {
         imagereader->_pageSize = tskobjptr->blocksize;
@@ -575,7 +583,7 @@ void WombatForensics::LoadHexContents()
             hexwidget->setTopLeftToFloat((float)((float)tskobjptr->offset/(float)hexwidget->bytesPerLine()));
             //AdjustData(tskobjptr->offset);
         }
-    }
+    }*/
     /*
     else
     {
@@ -590,6 +598,7 @@ void WombatForensics::LoadHexContents()
 
 void WombatForensics::LoadPage(off_t pageindex)
 {
+    /*
     off_t retval = 0;
 
     imagedata[pageindex] = new uchar[imagereader->_pageSize];
@@ -597,11 +606,12 @@ void WombatForensics::LoadPage(off_t pageindex)
     if(tskobjptr->offset + pageindex*imagereader->_pageSize <= tskobjptr->imglength - 1)
     {
         retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
-    }
+    }*/
 }
 
 void WombatForensics::AdjustData(int topleft)
 {
+    /*
     // seek image code should go here
     int lastpageindex = 0;
     imagereader->_eof = false;
@@ -648,6 +658,7 @@ void WombatForensics::AdjustData(int topleft)
     // implement the functionality of reader.readimage here and then pass on to setTopLeftToPercent
     //imagereader->SetData(imagedata);
     hexwidget->setTopLeftToPercent(topleft);
+    */
 }
 
 void WombatForensics::LoadTxtContents()
@@ -1051,8 +1062,9 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    hexwidget = new HexViewer(ui->hexPage, tskobjptr);
-    imagereader = new Reader(50, 4096);
+    //hexwidget = new HexViewer(ui->hexPage, tskobjptr);
+    hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
+    //imagereader = new Reader(50, 4096);
     fileviewer->filereader = new Reader(50, 4096);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
