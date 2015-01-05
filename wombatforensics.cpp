@@ -520,11 +520,16 @@ void WombatForensics::LoadHexContents()
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         //OpenFileSystemFile();
     }
-    if(wombatvarptr->selectedobject.objtype <= 5)
+    if(wombatvarptr->selectedobject.objtype == 1)
     {
         hexwidget->openimage();
         hexwidget->set1BPC();
         hexwidget->setBaseHex();
+        hexwidget->SetTopLeft(0);
+    }
+    else
+    {
+        //hexwidget->openimage();
         hexwidget->SetTopLeft(tskobjptr->offset);
     }
     // MODIFYING FOR HIGHLIGHTING TEST...

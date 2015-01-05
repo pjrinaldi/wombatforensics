@@ -167,9 +167,9 @@ void ImageHexViewer::setTopLeft( off_t offset )
      _topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //setOffsetLabels(_topLeft);
-     //_reader.seekimage(_topLeft);
+     _reader.seekimage(_topLeft);
      //_reader.seek(_topLeft);
-     //_reader.readimage(_data,bytesPerPage()); // replaced with AdjustData()
+     _reader.readimage(_data,bytesPerPage()); // replaced with AdjustData()
      //_reader.read(_data,bytesPerPage());
      
      repaint();
