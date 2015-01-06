@@ -338,13 +338,13 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append(wombatptr->currentvolumeid);
                 wombatptr->bindvalues.append(wombatptr->currentevidenceid);
                 wombatptr->bindvalues.append((int)tmpfsinfo->block_size * (int)tmpfsinfo->block_count);
-                wombatptr->bindvalues.append(tmpfsinfo->block_size);
+                wombatptr->bindvalues.append((int)wombatptr->evidenceobject.volinfo->block_size);
                 wombatptr->bindvalues.append((int)tmpfsinfo->block_count);
                 wombatptr->bindvalues.append((int)tmpfsinfo->first_inum);
                 wombatptr->bindvalues.append((int)tmpfsinfo->last_inum);
                 wombatptr->bindvalues.append((int)tmpfsinfo->root_inum);
                 wombatptr->bindvalues.append((int)tmpfsinfo->root_inum);
-                wombatptr->bindvalues.append((int)wombatptr->evidenceobject.volinfo->block_size);
+                wombatptr->bindvalues.append(tmpfsinfo->block_size);
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->start);
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.partinfovector[i]->len);
                 wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
@@ -381,7 +381,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.imageinfo->sector_size);
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->offset);
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->block_count);
-                wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+                wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, sectsize, blockcount, firstinum, lastinum, rootinum, address, blocksize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
                 QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, wombatptr->evidenceobject.fsinfovector[i]);
                 threadvector.append(tmpfuture);

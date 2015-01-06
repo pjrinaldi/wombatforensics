@@ -452,6 +452,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->imglength = wombatvarptr->selectedobject.size;
         tskobjptr->blocksize = wombatvarptr->selectedobject.sectsize;
+        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
     }
     else if(wombatvarptr->selectedobject.objtype == 2) // volume object
     {
@@ -483,7 +484,7 @@ void WombatForensics::LoadHexContents()
         OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
         tskobjptr->offset = 0;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
-            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize;
+            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*wombatvarptr->selectedobject.sectsize;
         else
             tskobjptr->offset = 0;
         qDebug() << "file object offset:" << tskobjptr->offset;

@@ -65,8 +65,8 @@ bool FileReader::openimage(TskObject* tskpointer)
     tskptr = tskpointer;
     if(is_open())
         close();
-    _size = tskptr->blocksize*tskptr->blkaddrlist.count();
-    _pageSize = tskptr->blocksize;
+    _size = tskptr->sectsize*tskptr->blkaddrlist.count();
+    _pageSize = tskptr->sectsize;
     off_t npages = _size/_pageSize;
     if((_size - 1) % _pageSize != 0)
         npages++;
