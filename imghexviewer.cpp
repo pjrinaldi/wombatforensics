@@ -956,23 +956,6 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
                     }
                 }
             }
-
-            /*
-            for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
-            {
-                if((globalOffset(widx) >= tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) && (globalOffset(widx) < tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize + tskptr->blocksize - 1))
-                {
-                    if(i == (tskptr->blkaddrlist.count() - 1))
-                    {
-                        if(((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) > (tskptr->length - 1 - tskptr->blocksize)) && ((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize) < (tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize + tskptr->blocksize - 1)))
-                            paint.setPen(QColor(255, 0, 0, 255));
-                    }
-                    else
-                        paint.setPen(QColor(0, 0, 255, 255));
-                }
-            }
-	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
-            */
         }
     }
 }
