@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wombatforensics.ui'
 **
-** Created by: Qt User Interface Compiler version 5.3.2
+** Created by: Qt User Interface Compiler version 5.4.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,17 +10,14 @@
 #define UI_WOMBATFORENSICS_H
 
 #include <QtCore/QVariant>
-#include <QtWebKitWidgets/QWebView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
@@ -35,9 +32,6 @@ class Ui_WombatForensics
 public:
     QAction *actionNew_Case;
     QAction *actionOpen_Case;
-    QAction *actionViewHex;
-    QAction *actionViewTxt;
-    QAction *actionViewOmni;
     QAction *actionView_Progress;
     QAction *actionExit;
     QAction *actionAdd_Evidence;
@@ -56,17 +50,6 @@ public:
     QSplitter *splitter;
     QStackedWidget *viewerstack;
     QWidget *hexPage;
-    QWidget *textPage;
-    QWidget *webpage;
-    QHBoxLayout *horizontalLayout_3;
-    QWebView *webView;
-    QWidget *picpage;
-    QHBoxLayout *horizontalLayout_4;
-    QScrollArea *scrollArea;
-    QWidget *scrollAreaWidgetContents;
-    QHBoxLayout *horizontalLayout_5;
-    QLabel *picViewer;
-    QWidget *vidpage;
     QTreeView *dirTreeView;
     QMenuBar *mainMenubar;
     QMenu *menuFile;
@@ -94,85 +77,63 @@ public:
         QIcon icon1;
         icon1.addFile(QStringLiteral(":/opencase"), QSize(), QIcon::Normal, QIcon::Off);
         actionOpen_Case->setIcon(icon1);
-        actionViewHex = new QAction(WombatForensics);
-        actionViewHex->setObjectName(QStringLiteral("actionViewHex"));
-        actionViewHex->setCheckable(true);
-        actionViewHex->setChecked(true);
-        QIcon icon2;
-        icon2.addFile(QStringLiteral(":/bar/hexview"), QSize(), QIcon::Normal, QIcon::Off);
-        actionViewHex->setIcon(icon2);
-        actionViewHex->setAutoRepeat(false);
-        actionViewTxt = new QAction(WombatForensics);
-        actionViewTxt->setObjectName(QStringLiteral("actionViewTxt"));
-        actionViewTxt->setCheckable(true);
-        QIcon icon3;
-        icon3.addFile(QStringLiteral(":/bar/txtview"), QSize(), QIcon::Normal, QIcon::Off);
-        actionViewTxt->setIcon(icon3);
-        actionViewTxt->setAutoRepeat(false);
-        actionViewOmni = new QAction(WombatForensics);
-        actionViewOmni->setObjectName(QStringLiteral("actionViewOmni"));
-        actionViewOmni->setCheckable(true);
-        QIcon icon4;
-        icon4.addFile(QStringLiteral(":/bar/omniview"), QSize(), QIcon::Normal, QIcon::Off);
-        actionViewOmni->setIcon(icon4);
-        actionViewOmni->setAutoRepeat(false);
         actionView_Progress = new QAction(WombatForensics);
         actionView_Progress->setObjectName(QStringLiteral("actionView_Progress"));
         actionView_Progress->setCheckable(true);
-        QIcon icon5;
-        icon5.addFile(QStringLiteral(":/bar/window"), QSize(), QIcon::Normal, QIcon::Off);
-        actionView_Progress->setIcon(icon5);
+        QIcon icon2;
+        icon2.addFile(QStringLiteral(":/bar/window"), QSize(), QIcon::Normal, QIcon::Off);
+        actionView_Progress->setIcon(icon2);
         actionExit = new QAction(WombatForensics);
         actionExit->setObjectName(QStringLiteral("actionExit"));
         actionAdd_Evidence = new QAction(WombatForensics);
         actionAdd_Evidence->setObjectName(QStringLiteral("actionAdd_Evidence"));
-        QIcon icon6;
-        icon6.addFile(QStringLiteral(":/basic/addevidence"), QSize(), QIcon::Normal, QIcon::Off);
-        actionAdd_Evidence->setIcon(icon6);
+        QIcon icon3;
+        icon3.addFile(QStringLiteral(":/basic/addevidence"), QSize(), QIcon::Normal, QIcon::Off);
+        actionAdd_Evidence->setIcon(icon3);
         actionRemove_Evidence = new QAction(WombatForensics);
         actionRemove_Evidence->setObjectName(QStringLiteral("actionRemove_Evidence"));
-        QIcon icon7;
-        icon7.addFile(QStringLiteral(":/basic/remevidence"), QSize(), QIcon::Normal, QIcon::Off);
-        actionRemove_Evidence->setIcon(icon7);
+        QIcon icon4;
+        icon4.addFile(QStringLiteral(":/basic/remevidence"), QSize(), QIcon::Normal, QIcon::Off);
+        actionRemove_Evidence->setIcon(icon4);
         actionExport_Evidence = new QAction(WombatForensics);
         actionExport_Evidence->setObjectName(QStringLiteral("actionExport_Evidence"));
-        QIcon icon8;
-        icon8.addFile(QStringLiteral(":/bar/export"), QSize(), QIcon::Normal, QIcon::Off);
-        actionExport_Evidence->setIcon(icon8);
+        QIcon icon5;
+        icon5.addFile(QStringLiteral(":/bar/export"), QSize(), QIcon::Normal, QIcon::Off);
+        actionExport_Evidence->setIcon(icon5);
         actionManage_OmniViewer = new QAction(WombatForensics);
         actionManage_OmniViewer->setObjectName(QStringLiteral("actionManage_OmniViewer"));
         actionView_Properties = new QAction(WombatForensics);
         actionView_Properties->setObjectName(QStringLiteral("actionView_Properties"));
         actionView_Properties->setCheckable(true);
-        QIcon icon9;
-        icon9.addFile(QStringLiteral(":/bar/propview"), QSize(), QIcon::Normal, QIcon::Off);
-        actionView_Properties->setIcon(icon9);
+        QIcon icon6;
+        icon6.addFile(QStringLiteral(":/bar/propview"), QSize(), QIcon::Normal, QIcon::Off);
+        actionView_Properties->setIcon(icon6);
         actionActionAbout = new QAction(WombatForensics);
         actionActionAbout->setObjectName(QStringLiteral("actionActionAbout"));
-        QIcon icon10;
-        icon10.addFile(QStringLiteral(":/bar/about"), QSize(), QIcon::Normal, QIcon::Off);
-        actionActionAbout->setIcon(icon10);
+        QIcon icon7;
+        icon7.addFile(QStringLiteral(":/bar/about"), QSize(), QIcon::Normal, QIcon::Off);
+        actionActionAbout->setIcon(icon7);
         actionAbout = new QAction(WombatForensics);
         actionAbout->setObjectName(QStringLiteral("actionAbout"));
-        actionAbout->setIcon(icon10);
+        actionAbout->setIcon(icon7);
         actionHelp = new QAction(WombatForensics);
         actionHelp->setObjectName(QStringLiteral("actionHelp"));
         actionNew_Bookmark = new QAction(WombatForensics);
         actionNew_Bookmark->setObjectName(QStringLiteral("actionNew_Bookmark"));
-        QIcon icon11;
-        icon11.addFile(QStringLiteral(":/bar/addtonewbkmrk"), QSize(), QIcon::Normal, QIcon::Off);
-        actionNew_Bookmark->setIcon(icon11);
+        QIcon icon8;
+        icon8.addFile(QStringLiteral(":/bar/addtonewbkmrk"), QSize(), QIcon::Normal, QIcon::Off);
+        actionNew_Bookmark->setIcon(icon8);
         actionExisting_Bookmarks = new QAction(WombatForensics);
         actionExisting_Bookmarks->setObjectName(QStringLiteral("actionExisting_Bookmarks"));
-        QIcon icon12;
-        icon12.addFile(QStringLiteral(":/bar/addtobkmrk"), QSize(), QIcon::Normal, QIcon::Off);
-        actionExisting_Bookmarks->setIcon(icon12);
+        QIcon icon9;
+        icon9.addFile(QStringLiteral(":/bar/addtobkmrk"), QSize(), QIcon::Normal, QIcon::Off);
+        actionExisting_Bookmarks->setIcon(icon9);
         actionView_File = new QAction(WombatForensics);
         actionView_File->setObjectName(QStringLiteral("actionView_File"));
         actionView_File->setCheckable(true);
-        QIcon icon13;
-        icon13.addFile(QStringLiteral(":/bar/fileview"), QSize(), QIcon::Normal, QIcon::Off);
-        actionView_File->setIcon(icon13);
+        QIcon icon10;
+        icon10.addFile(QStringLiteral(":/bar/fileview"), QSize(), QIcon::Normal, QIcon::Off);
+        actionView_File->setIcon(icon10);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -199,67 +160,6 @@ public:
         sizePolicy.setHeightForWidth(hexPage->sizePolicy().hasHeightForWidth());
         hexPage->setSizePolicy(sizePolicy);
         viewerstack->addWidget(hexPage);
-        textPage = new QWidget();
-        textPage->setObjectName(QStringLiteral("textPage"));
-        sizePolicy.setHeightForWidth(textPage->sizePolicy().hasHeightForWidth());
-        textPage->setSizePolicy(sizePolicy);
-        viewerstack->addWidget(textPage);
-        webpage = new QWidget();
-        webpage->setObjectName(QStringLiteral("webpage"));
-        horizontalLayout_3 = new QHBoxLayout(webpage);
-        horizontalLayout_3->setSpacing(0);
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
-        webView = new QWebView(webpage);
-        webView->setObjectName(QStringLiteral("webView"));
-        sizePolicy.setHeightForWidth(webView->sizePolicy().hasHeightForWidth());
-        webView->setSizePolicy(sizePolicy);
-        webView->setAcceptDrops(false);
-        webView->setUrl(QUrl(QStringLiteral("about:blank")));
-
-        horizontalLayout_3->addWidget(webView);
-
-        viewerstack->addWidget(webpage);
-        picpage = new QWidget();
-        picpage->setObjectName(QStringLiteral("picpage"));
-        sizePolicy.setHeightForWidth(picpage->sizePolicy().hasHeightForWidth());
-        picpage->setSizePolicy(sizePolicy);
-        horizontalLayout_4 = new QHBoxLayout(picpage);
-        horizontalLayout_4->setSpacing(0);
-        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
-        horizontalLayout_4->setContentsMargins(0, 0, 0, 0);
-        scrollArea = new QScrollArea(picpage);
-        scrollArea->setObjectName(QStringLiteral("scrollArea"));
-        scrollArea->setFrameShape(QFrame::NoFrame);
-        scrollArea->setWidgetResizable(true);
-        scrollArea->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
-        scrollAreaWidgetContents = new QWidget();
-        scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 100, 30));
-        sizePolicy.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
-        scrollAreaWidgetContents->setSizePolicy(sizePolicy);
-        horizontalLayout_5 = new QHBoxLayout(scrollAreaWidgetContents);
-        horizontalLayout_5->setSpacing(0);
-        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
-        horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
-        picViewer = new QLabel(scrollAreaWidgetContents);
-        picViewer->setObjectName(QStringLiteral("picViewer"));
-        sizePolicy.setHeightForWidth(picViewer->sizePolicy().hasHeightForWidth());
-        picViewer->setSizePolicy(sizePolicy);
-        picViewer->setTextFormat(Qt::PlainText);
-
-        horizontalLayout_5->addWidget(picViewer);
-
-        scrollArea->setWidget(scrollAreaWidgetContents);
-
-        horizontalLayout_4->addWidget(scrollArea);
-
-        viewerstack->addWidget(picpage);
-        vidpage = new QWidget();
-        vidpage->setObjectName(QStringLiteral("vidpage"));
-        sizePolicy.setHeightForWidth(vidpage->sizePolicy().hasHeightForWidth());
-        vidpage->setSizePolicy(sizePolicy);
-        viewerstack->addWidget(vidpage);
         splitter->addWidget(viewerstack);
         dirTreeView = new QTreeView(splitter);
         dirTreeView->setObjectName(QStringLiteral("dirTreeView"));
@@ -286,17 +186,17 @@ public:
         menuSettings->setObjectName(QStringLiteral("menuSettings"));
         menuAbout = new QMenu(mainMenubar);
         menuAbout->setObjectName(QStringLiteral("menuAbout"));
-        menuAbout->setIcon(icon10);
+        menuAbout->setIcon(icon7);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon14;
-        icon14.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon14);
+        QIcon icon11;
+        icon11.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon11);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon15;
-        icon15.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon15);
+        QIcon icon12;
+        icon12.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon12);
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
         analysisToolBar->setObjectName(QStringLiteral("analysisToolBar"));
@@ -341,10 +241,6 @@ public:
         analysisToolBar->addAction(actionAdd_Evidence);
         analysisToolBar->addAction(actionRemove_Evidence);
         analysisToolBar->addSeparator();
-        analysisToolBar->addAction(actionViewHex);
-        analysisToolBar->addAction(actionViewTxt);
-        analysisToolBar->addAction(actionViewOmni);
-        analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionView_Properties);
         analysisToolBar->addAction(actionView_File);
         analysisToolBar->addAction(actionView_Progress);
@@ -367,12 +263,6 @@ public:
         actionNew_Case->setShortcut(QApplication::translate("WombatForensics", "Ctrl+N", 0));
         actionOpen_Case->setText(QApplication::translate("WombatForensics", "Open Case", 0));
         actionOpen_Case->setShortcut(QApplication::translate("WombatForensics", "Ctrl+O", 0));
-        actionViewHex->setText(QApplication::translate("WombatForensics", "View Hex", 0));
-        actionViewHex->setShortcut(QApplication::translate("WombatForensics", "Ctrl+1", 0));
-        actionViewTxt->setText(QApplication::translate("WombatForensics", "View Text", 0));
-        actionViewTxt->setShortcut(QApplication::translate("WombatForensics", "Ctrl+2", 0));
-        actionViewOmni->setText(QApplication::translate("WombatForensics", "View Omni", 0));
-        actionViewOmni->setShortcut(QApplication::translate("WombatForensics", "Ctrl+3", 0));
         actionView_Progress->setText(QApplication::translate("WombatForensics", "View Log...", 0));
 #ifndef QT_NO_TOOLTIP
         actionView_Progress->setToolTip(QApplication::translate("WombatForensics", "Log Viewer", 0));
@@ -400,7 +290,6 @@ public:
         actionNew_Bookmark->setText(QApplication::translate("WombatForensics", "New Bookmark", 0));
         actionExisting_Bookmarks->setText(QApplication::translate("WombatForensics", "Existing Bookmarks", 0));
         actionView_File->setText(QApplication::translate("WombatForensics", "View File", 0));
-        picViewer->setText(QString());
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));

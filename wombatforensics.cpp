@@ -6,9 +6,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
     this->menuBar()->hide();
-    ui->actionViewHex->setVisible(false);
-    ui->actionViewTxt->setVisible(false);
-    ui->actionViewOmni->setVisible(false);
     this->statusBar()->setSizeGripEnabled(true);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
@@ -52,14 +49,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     propertywindow = new PropertiesWindow(wombatdatabase);
     fileviewer = new FileViewer(this, tskobjptr);
     isignals = new InterfaceSignals();
-    connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
+    //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
-    wombatvarptr->omnivalue = 1; // web view is default omniviewer view to display
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     propertywindow->setModal(false);
     InitializeAppStructure();
@@ -149,8 +145,6 @@ void WombatForensics::InitializeAppStructure()
     }
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
-    ui->actionViewTxt->setEnabled(false);
-    ui->actionViewOmni->setEnabled(false);
     ui->actionView_Progress->setEnabled(false);
     ui->actionView_Properties->setEnabled(false);
     ui->actionView_File->setEnabled(false);
@@ -161,7 +155,6 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
     SetupHexPage();
-    //SetupToolbar();
 }
 
 void WombatForensics::InitializeCaseStructure()
@@ -345,8 +338,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
         wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
         wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
-        UpdateOmniValue();
-        UpdateViewer();
+        LoadHexContents();
         if(propertywindow->isVisible())
             UpdateProperties();
     }
@@ -441,24 +433,6 @@ void WombatForensics::UpdateProperties()
     propertywindow->UpdateTableView();
 }
 
-void WombatForensics::UpdateViewer()
-{
-    if(ui->dirTreeView->model() != NULL)
-    {
-        wombatvarptr->visibleviewer = ReturnVisibleViewerID();
-        if(wombatvarptr->visibleviewer == 0) // hex
-            LoadHexContents();
-        else if(wombatvarptr->visibleviewer == 1) // txt
-            LoadTxtContents();
-        else if(wombatvarptr->visibleviewer == 2) // web
-            LoadWebContents();
-        else if(wombatvarptr->visibleviewer == 3) // pic
-            LoadImgContents();
-        else if(wombatvarptr->visibleviewer == 4) // vid
-            LoadVidContents();
-    }
-}
-
 void WombatForensics::LoadHexContents()
 {
     if(tskobjptr->readimginfo != NULL)
@@ -538,140 +512,10 @@ void WombatForensics::LoadHexContents()
             fileviewer->filehexview->SetTopLeft(0);
         }
     }
-    // MODIFYING FOR HIGHLIGHTING TEST...
-    //if(wombatvarptr->selectedobject.objtype <= 5)
-    /*
-    if(wombatvarptr->selectedobject.objtype == 1)
-    {
-        imagereader->_pageSize = tskobjptr->blocksize;
-        imagereader->_size = tskobjptr->imglength;
-        qDebug() << "reader.size():" << imagereader->_size;
-        imagereader->_numpages = (imagereader->_size-1) / imagereader->_pageSize;
-        //qDebug() << "numpages before modulus:" << imagereader->_numpages;
-        if((imagereader->_size-1) % imagereader->_pageSize != 0)
-            imagereader->_numpages++;
-        qDebug() << "numpages after modulus:" << imagereader->_numpages;
-        imagedata.resize(imagereader->_numpages);
-        fill(imagedata.begin(), imagedata.begin()+imagereader->_numpages, (uchar*)0);
-        imagereader->_firstPage = imagereader->_lastPage = 0;
-        //AdjustData(tskobjptr->offset);
-        AdjustData(0);
-        imagereader->SetData(imagedata);
-        hexwidget->SetReader(imagereader); // which should replace the openimage functionality.
-        hexwidget->openimage();
-        hexwidget->set1BPC();
-        hexwidget->setBaseHex();
-        //qDebug() << "should be the file block offset:" << tskobjptr->offset;
-        //hexwidget->SetTopLeft(tskobjptr->offset);
-    }
-    else
-    {
-        if(wombatvarptr->selectedobject.objtype == 5)
-        {
-            qDebug() << "should be the file block offset:" << tskobjptr->offset;
-            //AdjustData(tskobjptr->offset/hexwidget->bytesPerLine());
-            fileviewer->filereader->_pageSize = tskobjptr->blocksize;
-            // should be equal to the size of the blocks that contain the file...
-            fileviewer->filereader->_size = tskobjptr->blocksize*tskobjptr->blkaddrlist.count();
-            //qDebug() << "file reader size (multiple of blocks):" << fileviewer->filereader->_size;
-            //fileviewer->filereader->_size = tskobjptr->length;
-            fileviewer->filereader->_numpages = (fileviewer->filereader->_size-1) / fileviewer->filereader->_pageSize;
-            if((fileviewer->filereader->_size-1) % fileviewer->filereader->_pageSize != 0)
-                fileviewer->filereader->_numpages++;
-            fileviewer->filedata.resize(fileviewer->filereader->_numpages);
-            fill(fileviewer->filedata.begin(), fileviewer->filedata.begin()+fileviewer->filereader->_numpages, (uchar*)0);
-            fileviewer->filereader->_firstPage = fileviewer->filereader->_lastPage = 0;
-            fileviewer->AdjustData(0);
-            fileviewer->filereader->SetData(fileviewer->filedata);
-            fileviewer->filehexview->SetReader(fileviewer->filereader);
-            fileviewer->filehexview->openimage();
-            fileviewer->filehexview->set1BPC();
-            fileviewer->filehexview->setBaseHex();
-            fileviewer->filehexview->SetTopLeft(0);
-            AdjustData(tskobjptr->offset);
-            //hexwidget->setOffset(tskobjptr->offset);
-            //hexwidget->seeCursor();
-            hexwidget->setTopLeftToFloat((float)((float)tskobjptr->offset/(float)hexwidget->bytesPerLine()));
-            //AdjustData(tskobjptr->offset);
-        }
-    }*/
-    /*
-    else
-    {
-        hexwidget->openimage();
-        hexwidget->SetTopLeft(tskobjptr->offset);
-    }
-    */
-    // BEGIN ABSTRACTION CHANGE
-    //
-    // END ABSTRACTION CHANGE
 }
 
-void WombatForensics::LoadPage(off_t pageindex)
-{
-    /*
-    off_t retval = 0;
 
-    imagedata[pageindex] = new uchar[imagereader->_pageSize];
-    //qDebug() << "tsk offset:" << tskobjptr->offset << "pageindex:" << pageindex << "new offset:" << tskobjptr->offset + pageindex*imagereader->_pageSize;
-    if(tskobjptr->offset + pageindex*imagereader->_pageSize <= tskobjptr->imglength - 1)
-    {
-        retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset + pageindex*imagereader->_pageSize, (char*)imagedata[pageindex], imagereader->_pageSize);
-    }*/
-}
-
-void WombatForensics::AdjustData(int topleft)
-{
-    /*
-    // seek image code should go here
-    int lastpageindex = 0;
-    imagereader->_eof = false;
-    imagereader->_offset = max(min((off_t)topleft*hexwidget->bytesPerLine(), imagereader->size()-1), (off_t)0);
-    // end seek image code
-
-    size_t bytesread;
-    vector<uchar>& v = hexwidget->_data;
-    int numbytes = (int)hexwidget->bytesPerPage();
-    //qDebug() << "imagereader offset:" << imagereader->_offset;
-    if(imagereader->_offset + numbytes >= (int)imagereader->size() - 1)
-    {
-        imagereader->_eof = true;
-        if(imagereader->size() == 0)
-            v.erase(v.begin(), v.end());
-        lastpageindex = imagereader->_numpages - 1;
-        //lastpageindex = imagedata.size() - 1 - 1;
-        //qDebug() << "lastpageindex:" << lastpageindex; 
-        bytesread = imagereader->size() - 1 - imagereader->tell();
-        numbytes = bytesread;
-    }
-    else
-    {
-        lastpageindex = (imagereader->_offset + numbytes)/imagereader->_pageSize;
-        //qDebug() << "normal lastpageindex:" << lastpageindex;
-        bytesread = numbytes;
-    }
-    v.erase(v.begin(), v.end());
-    v.reserve(v.size() + numbytes);
-    for(int page = imagereader->_offset/imagereader->_pageSize; page <= lastpageindex; page++)
-    {
-        LoadPage(page);
-        int start = imagereader->_offset%imagereader->_pageSize;
-        int stop = imagereader->_pageSize;
-        //int stop = start + numbytes;
-        //int stop = (page == lastpageindex) ? start + numbytes : imagereader->_pageSize;
-        for(int i = start; i < stop; i++)
-        {
-            v.push_back(imagedata[page][i]);
-        }
-        numbytes -= stop - start;
-        imagereader->_offset += stop - start;
-    }
-    // implement the functionality of reader.readimage here and then pass on to setTopLeftToPercent
-    //imagereader->SetData(imagedata);
-    hexwidget->setTopLeftToPercent(topleft);
-    */
-}
-
+/*
 void WombatForensics::LoadTxtContents()
 {
 }
@@ -691,7 +535,9 @@ void WombatForensics::LoadImgContents()
 void WombatForensics::LoadVidContents()
 {
 }
+*/
 
+/*
 void WombatForensics::LoadComplete(bool isok)
 {
     wombatvarptr->htmlcontent = "";
@@ -701,7 +547,6 @@ void WombatForensics::LoadComplete(bool isok)
     {
         if(wombatvarptr->selectedobject.objtype == 1) // image file
         {
-            /*
             wombatvarptr->htmlcontent += "<div id='infotitle'>image information</div><br/>";
             wombatvarptr->htmlcontent += "<table><tr><td class='property'>imagetype:</td><td class='pvalue'>";
             wombatvarptr->htmlcontent += QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatvarptr->selectedobject.type)) + "</td></tr>";
@@ -712,7 +557,6 @@ void WombatForensics::LoadComplete(bool isok)
             wombatvarptr->htmlcontent += "<tr><td class='property'>sector count:</td><td class='pvalue'>";
             wombatvarptr->htmlcontent += QLocale::system().toString((int)((float)wombatvarptr->selectedobject.size/(float)wombatvarptr->selectedobject.sectlength));
             wombatvarptr->htmlcontent += " sectors</td></tr>";
-            */
             // might not want to do the volume type one if there's no volume. have to think on it.
             //wombatvarptr->htmlcontent += " sectors</td></tr><tr><td class='property'>volume type</td><td class='pvalue'>";
             //wombatvarptr->htmlcontent += wombatvarptr->volumeobject.name + "</td></tr>";
@@ -742,6 +586,7 @@ void WombatForensics::LoadComplete(bool isok)
         }
     }
 }
+*/
 
 void WombatForensics::OpenParentImage(int imgid)
 {
@@ -790,8 +635,6 @@ void WombatForensics::CloseCurrentCase()
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     statuslabel->setText("Current Case was Closed Successfully"); 
-    //hexwidget->ClearContent();
-    // clear hex editor 
     wombatdatabase->CloseCaseDB();
 }
 
@@ -1073,10 +916,7 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    //hexwidget = new HexViewer(ui->hexPage, tskobjptr);
     hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
-    //imagereader = new Reader(50, 4096);
-    //fileviewer->filereader = new Reader(50, 4096);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     hexwidget->setObjectName("bt-hexview");
@@ -1089,7 +929,6 @@ void WombatForensics::SetupHexPage(void)
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    //connect(hexvsb, SIGNAL(valueChanged(int)), this, SLOT(AdjustData(int)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
@@ -1099,22 +938,6 @@ void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
     hexvsb->setSingleStep(singlestep);
     hexvsb->setPageStep(pagestep);
-}
-
-void WombatForensics::SetupToolbar(void)
-{
-    // setup actiongroups and initial settings here.
-    viewgroup = new QActionGroup(this);
-    viewgroup->addAction(ui->actionViewHex);
-    viewgroup->addAction(ui->actionViewTxt);
-    viewgroup->addAction(ui->actionViewOmni);
-    ui->actionViewHex->setChecked(true);
-    connect(viewgroup, SIGNAL(triggered(QAction*)), this, SLOT(ViewGroupTriggered(QAction*)));
-}
-
-int WombatForensics::ReturnVisibleViewerID(void)
-{
-    return ui->viewerstack->currentIndex();
 }
 
 WombatForensics::~WombatForensics()
@@ -1187,31 +1010,6 @@ void WombatForensics::on_actionOpen_Case_triggered()
     InitializeOpenCase();
 }
 
-void WombatForensics::ViewGroupTriggered(QAction* selaction)
-{
-    wombatvarptr->visibleviewer = ReturnVisibleViewerID();
-    if(wombatvarptr->visibleviewer > 1) // if an omniviewer is visible, set the current omnivalue.
-        wombatvarptr->omnivalue = wombatvarptr->visibleviewer - 1; // may not need this since i can simply -1 it.
-
-    // READ RESPECTIVE SIGNATURE HERE TO SET OMNIVALUE
-    // GET CURRENTLY SELECTED FILE AND IF IT'S A VALUE, THEN LOAD THE RESPECTIVE CONTENT.
-    // wombatvarptr->omnivalue = 1;
-    if(selaction == ui->actionViewHex)
-    {
-        ui->viewerstack->setCurrentIndex(0); // hex
-        // show the correct viewer page from stacked widget
-    }
-    else if(selaction == ui->actionViewTxt)
-    {
-        ui->viewerstack->setCurrentIndex(1); // txt
-    }
-    else if(selaction == ui->actionViewOmni) // omni 3,4,5
-    {
-        ui->viewerstack->setCurrentIndex(wombatvarptr->omnivalue + 1);
-    }
-    UpdateViewer();
-}
-
 void WombatForensics::on_actionView_Properties_triggered(bool checked)
 {
     if(!checked)
@@ -1244,51 +1042,6 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked) // modify t
         qDebug() << "hide logviewer here.";
     else// show logviewer
         qDebug() << "show logviewer here.";
-}
-
-void WombatForensics::UpdateOmniValue()
-{
-    if(wombatvarptr->selectedobject.objtype > 0 && wombatvarptr->selectedobject.objtype < 4)
-    {
-        wombatvarptr->omnivalue = 1;
-    }
-    else // if image - omnivalue = 2, video - omnivalue = 3.
-    {
-    }
-}
-
-int WombatForensics::DetermineOmniView(QString currentSignature)
-{
-    int retvalue = 0;
-    QString tmppath = wombatvarptr->settingspath;
-    tmppath += "/tsk-magicview.xml";
-    QFile magicfile(tmppath);
-    if(magicfile.exists()) // if the xml exists, read it.
-    {
-        if(magicfile.open(QFile::ReadOnly | QFile::Text))
-        {
-            QXmlStreamReader reader(&magicfile);
-            while(!reader.atEnd())
-            {
-                reader.readNext();
-                if(reader.isStartElement() && reader.name() == "signature")
-                {
-                    if(currentSignature.toLower().compare(reader.readElementText().toLower()) == 0)
-                    {
-                        retvalue = reader.attributes().value("viewer").toString().toInt();
-                    }
-                }
-            }
-            if(reader.hasError())
-                fprintf(stderr, "Reader Error: %s\n", reader.errorString().toStdString().c_str());
-            magicfile.close();
-        }
-        else
-            fprintf(stderr, "Couldn't Read the omni file\n");
-    }
-    else
-        fprintf(stderr, "Couldn't find the omni file\n");
-    return retvalue;
 }
 
 void WombatForensics::UpdateSelectValue(const QString &txt)

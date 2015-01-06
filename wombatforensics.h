@@ -12,8 +12,6 @@
 #include "exportdialog.h"
 #include "fileviewer.h"
 #include "globals.h"
-//#include "reader.h"
-//#include "hexviewer.h"
 #include "imgreader.h"
 #include "imghexviewer.h"
 
@@ -512,8 +510,7 @@ private slots:
     void setScrollBarValue(off_t pos);
     void SetOffsetLabel(off_t pos);
     void UpdateSelectValue(const QString &txt);
-    void ViewGroupTriggered(QAction* curaction);
-    void LoadComplete(bool isok);
+    //void LoadComplete(bool isok);
     void InitializeQueryModel(void);
     void FinishExport(void);
     void FinishRemoval(void);
@@ -523,7 +520,6 @@ private slots:
     };
     void SetStepValues(int singlestep, int pagestep);
     void TreeContextMenu(const QPoint &point);
-    void AdjustData(int topleft);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -531,20 +527,17 @@ private:
     Ui::WombatForensics *ui;
 
     void SetupHexPage(void);
-    void SetupToolbar(void);
     void InitializeAppStructure(void);
     void InitializeCaseStructure(void);
     void InitializeEvidenceStructure(void);
     void InitializeOpenCase(void);
     void CloseCurrentCase(void);
-    void UpdateViewer(void);
     void UpdateProperties(void);
-    void UpdateOmniValue(void);
     void LoadHexContents(void);
-    void LoadTxtContents(void);
-    void LoadWebContents(void);
-    void LoadImgContents(void);
-    void LoadVidContents(void);
+    //void LoadTxtContents(void);
+    //void LoadWebContents(void);
+    //void LoadImgContents(void);
+    //void LoadVidContents(void);
     void OpenEvidenceStructure(void);
     void ExportFiles(FileExportData* exportdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
@@ -552,8 +545,6 @@ private:
 
     void RemoveTmpFiles(void);
 
-    int ReturnVisibleViewerID();
-    int DetermineOmniView(QString currentSignature);
     QModelIndex selectedindex;
     QModelIndex oldselectedindex;
 
@@ -565,14 +556,7 @@ private:
     QFutureWatcher<void> remwatcher;
 
     off_t offset() const;
-    //HexViewer* hexwidget;
     ImageHexViewer* hexwidget;
-    //Reader* imagereader; 
-    //Reader* filereader;
-    //vector<uchar*> imagedata;
-    //vector<uchar*> filedata;
-    void LoadPage(off_t pageindex);
-    QActionGroup* viewgroup;
     QScrollBar* hexvsb;
     QLabel* selectedoffset;
     QLabel* selectedhex;

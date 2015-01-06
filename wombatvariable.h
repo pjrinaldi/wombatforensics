@@ -125,8 +125,6 @@ struct WombatVariable
     int volid;
     int filecount;
     int processcount;
-    int omnivalue;
-    int visibleviewer;
     int currentevidenceid;
     int currentvolumeid;
     int currentpartitionid;
