@@ -17,12 +17,10 @@ public:
     FileViewer(QWidget* parent = 0, TskObject* tskobject = NULL);
     ~FileViewer();
     FileHexViewer* filehexview;
-    void LoadPage(off_t pageindex);
     FileReader* filereader;
     vector<uchar*> filedata;
 
 public slots:
-    void AdjustData(int topleft);
 
 private slots:
     void SetScrollBarRange(off_t low, off_t high);

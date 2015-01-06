@@ -24,7 +24,6 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     connect(filehexview, SIGNAL(rangeChanged(off_t, off_t)), this, SLOT(SetScrollBarRange(off_t, off_t)));
     connect(filehexview, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(filehexview, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    //connect(filehexvsb, SIGNAL(valueChanged(int)), this, SLOT(AdjustData(int)));
     connect(filehexvsb, SIGNAL(valueChanged(int)), filehexview, SLOT(setTopLeftToPercent(int)));
     connect(filehexview, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(filehexview, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
@@ -151,71 +150,4 @@ void FileViewer::SetStepValues(int singlestep, int pagestep)
 {
     filehexvsb->setSingleStep(singlestep);
     filehexvsb->setPageStep(pagestep);
-}
-
-void FileViewer::LoadPage(off_t pageindex)
-{
-    /*
-    off_t retval = 0;
-    filedata[pageindex] = new uchar[filereader->_pageSize];
-    if(tskptr->objecttype == 5)
-    {
-        //qDebug() << "blkaddrlist count:" << tskptr->blkaddrlist.count();
-        if(pageindex < tskptr->blkaddrlist.count())
-        {
-        //qDebug() << "pageindex:" << pageindex << "blk id:" << tskptr->blkaddrlist.at(pageindex);
-        //qDebug() << "sector offset:" << tskptr->blkaddrlist.at(pageindex).toInt()*512;
-        retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageindex).toInt(), (char*)filedata[pageindex], filereader->_pageSize);
-        //retval = tsk_fs_read_block(tskptr->readfsinfo, (tskptr->blkaddrlist.at(pageindex).toInt()-1)*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize);
-    //qDebug() << "tsk fs file read bytecount:" << retval;
-        }
-    }
-    */
-    //retval = tsk_fs_file_read(tskptr->readfileinfo, tskptr->offset + pageindex*filereader->_pageSize, (char*)filedata[pageindex], filereader->_pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
-}
-
-void FileViewer::AdjustData(int topleft)
-{
-    /*
-    int lastpageindex = 0;
-    filereader->_eof = false;
-    filereader->_offset = max(min((off_t)topleft*filehexview->bytesPerLine(), filereader->size()-1), (off_t)0);
-    size_t bytesread;
-    vector<uchar>& v = filehexview->_data;
-    int numbytes = (int)filehexview->bytesPerPage();
-    if(filereader->_offset + numbytes >= (int)filereader->size() - 1)
-    {
-        filereader->_eof = true;
-        if(filereader->size() == 0)
-            v.erase(v.begin(), v.end());
-        //lastpageindex = filedata.size();
-        lastpageindex = tskptr->blkaddrlist.count() - 1;
-        bytesread = filereader->size() - 1 - filereader->tell();
-        numbytes = bytesread;
-        qDebug() << "lastpageindex:" << lastpageindex;
-    }
-    else
-    {
-        lastpageindex = (filereader->_offset + numbytes)/filereader->_pageSize;
-        qDebug() << "normal lastpageindex:" << lastpageindex;
-        bytesread = numbytes;
-    }
-    v.erase(v.begin(), v.end());
-    v.reserve(v.size() + numbytes);
-    //qDebug() << "initial page:" << filereader->_offset/filereader->_pageSize;
-    for(int page = filereader->_offset/filereader->_pageSize; page <= lastpageindex; page++)
-    {
-        LoadPage(page);
-        int start = filereader->_offset%filereader->_pageSize;
-        int stop = filereader->_pageSize;
-        //int stop = (page == lastpageindex) ? start + numbytes : filereader->_pageSize;
-        for(int i = start; i < stop; i++)
-        {
-            v.push_back(filedata[page][i]);
-        }
-        numbytes -= stop - start;
-        filereader->_offset += stop - start;
-    }
-    filehexview->setTopLeftToPercent(topleft);
-    */
 }
