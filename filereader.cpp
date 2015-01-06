@@ -30,12 +30,12 @@
 #include <errno.h>
 #include <assert.h>
 
-#include "reader.h"
+#include "filereader.h"
 // some systems #define to map fn's to thier 64 bit
                       // equivalents. make sure the header gets processed the
                       // same as the .cc file
 
-Reader::Reader(off_t npages, off_t pageSize) : _pageSize(pageSize)
+FileReader::FileReader(off_t npages, off_t pageSize) : _pageSize(pageSize)
 {
   _maxPages = _freePages = (npages < 10) ? 10: npages;
   _error   = "";
@@ -46,7 +46,7 @@ Reader::Reader(off_t npages, off_t pageSize) : _pageSize(pageSize)
   _lastPage  = -1;
 }
 
-Reader::~Reader()
+FileReader::~FileReader()
 {
   if( _is_open )
     close();
@@ -55,23 +55,23 @@ Reader::~Reader()
 //
 // public methods
 //
-off_t Reader::CurrentPage()
+off_t FileReader::CurrentPage()
 {
     return _offset/_pageSize;
 }
 
-bool Reader::openimage(TskObject* tskpointer)
+bool FileReader::openimage(TskObject* tskpointer)
 {
     tskptr = tskpointer;
     if(is_open())
         close();
     _size = tskptr->imglength; // length in bytes for selected file
-    qDebug() << "image length:" << tskptr->imglength;
+    //qDebug() << "image length:" << tskptr->imglength;
     _pageSize = tskptr->blocksize;
     off_t npages = _size/_pageSize;
-    //off_t npages = _size/_pageSize +1;
-    // don't need the +1 since the _pageSize is blocksize and should always have no remainder
-    qDebug() << "block size:" << _pageSize << "num of pages:" << npages;
+    if((_size - 1) % _pageSize != 0)
+        npages++;
+    //qDebug() << "block size:" << _pageSize << "num of pages:" << npages;
     _numpages = npages;
     _data.resize(npages);
     fill(_data.begin(), _data.begin()+npages, (uchar*)0);
@@ -82,7 +82,7 @@ bool Reader::openimage(TskObject* tskpointer)
     //return loadimagepage(0);
 }
 
-bool Reader::close()
+bool FileReader::close()
 {
     if(!is_open())
         return false;
@@ -111,12 +111,12 @@ bool Reader::close()
     return true;
 }
 
-bool Reader::is_open() const
+bool FileReader::is_open() const
 {
   return _is_open;
 }
 
-size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
+size_t FileReader::readimage(vector<uchar>& v, size_t numbytes)
 {
     int lastPageIdx = 0;
     size_t bytesread;
@@ -144,7 +144,7 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
     {
         try
         {
-            //loadimagepage(page);
+            loadimagepage(page);
         }
         catch(bad_alloc)
         {
@@ -163,12 +163,12 @@ size_t Reader::readimage(vector<uchar>& v, size_t numbytes)
     return bytesread;
 }
 
-bool Reader::eof()
+bool FileReader::eof()
 {
   return (is_open())? _eof : 0;
 }
 
-off_t Reader::seekimage(off_t offset)
+off_t FileReader::seekimage(off_t offset)
 {
     if(!is_open())
         return -1;
@@ -177,28 +177,27 @@ off_t Reader::seekimage(off_t offset)
     _offset = max(min(offset, size()-1), (off_t)0);
 
     return _offset;
-    //_offset = tsk_img_read(tskptr->readimginfo, _offset, 
 }
 
-off_t Reader::tell() const
+off_t FileReader::tell() const
 {
   if(!is_open())
     return -1;
   return _offset;
 }
 
-off_t Reader::size() const
+off_t FileReader::size() const
 {
   return _size;
 }
 
-off_t Reader::NumberPages() const
+off_t FileReader::NumberPages() const
 {
     return _numpages;
     //return _maxPages;
 }
 
-const char* Reader::lastError() const
+const char* FileReader::lastError() const
 {
   return _error.c_str();
 }
@@ -207,7 +206,7 @@ const char* Reader::lastError() const
 // Protected member fn's
 //
 
-bool Reader::loadimagepage(off_t pageIdx)
+bool FileReader::loadimagepage(off_t pageIdx)
 {
     off_t retval = 0;
     if(!is_open())
@@ -223,9 +222,12 @@ bool Reader::loadimagepage(off_t pageIdx)
     }
     _data[pageIdx] = new uchar[_pageSize];
     --nFreePages();
-    if(tskptr->objecttype <= 5)
+    if(tskptr->objecttype == 5)
     {
-        retval = tsk_img_read(tskptr->readimginfo, tskptr->offset + pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+        if(pageIdx < tskptr->blkaddrlist.count())
+        {
+            retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageIdx).toInt(), (char*)_data[pageIdx], _pageSize);
+        }
     }
     if(retval > 0)
     {
@@ -238,7 +240,7 @@ bool Reader::loadimagepage(off_t pageIdx)
     return 1;
 }
 
-bool Reader::loadPage(off_t pageIdx)
+bool FileReader::loadPage(off_t pageIdx)
 {
   if( !is_open() )
     return false;
@@ -272,7 +274,7 @@ bool Reader::loadPage(off_t pageIdx)
   return retval;
 }
 
-bool Reader::freePage(off_t pageIdx)
+bool FileReader::freePage(off_t pageIdx)
 {
   // check range
   if( pageIdx < 0 || (unsigned)pageIdx >= _data.size() || !_data[pageIdx] )
@@ -284,15 +286,15 @@ bool Reader::freePage(off_t pageIdx)
   return true;
 }
 
-uchar Reader::operator[] (off_t offset)
+uchar FileReader::operator[] (off_t offset)
 {
   if( !is_open() )
-    throw logic_error("Reader::operator[] - attempt to access non-open file.");
+    throw logic_error("FileReader::operator[] - attempt to access non-open file.");
   if( offset < 0 )
-    throw out_of_range("Reader::operator[] - "
+    throw out_of_range("FileReader::operator[] - "
 		       "attempt to access negative offset.");
   if( offset >= size() ) 
-    throw out_of_range("Reader::operator[] - "
+    throw out_of_range("FileReader::operator[] - "
 		       "attempt to access past end of file");
 
   off_t page_idx = offset/_pageSize;
@@ -302,20 +304,20 @@ uchar Reader::operator[] (off_t offset)
 }
 
 off_t
-Reader::nFreePages() const
+FileReader::nFreePages() const
 {
     //qDebug() << "Free Pages" << _freePages;
    return _freePages;
 }
 
 off_t&
-Reader::nFreePages()
+FileReader::nFreePages()
 {
    return _freePages;
 }
 
 bool
-Reader::dataIsAtOffset( const vector<uchar>& data, off_t pos )
+FileReader::dataIsAtOffset( const vector<uchar>& data, off_t pos )
 {
     size_t i = 0;
     while( i < data.size() ) {
@@ -329,7 +331,7 @@ Reader::dataIsAtOffset( const vector<uchar>& data, off_t pos )
 
 
 off_t
-Reader::findIndex( off_t start, const vector<uchar>& data, off_t stop )
+FileReader::findIndex( off_t start, const vector<uchar>& data, off_t stop )
 {
     off_t pos = start;
     while( pos <= stop ) {
@@ -344,7 +346,7 @@ Reader::findIndex( off_t start, const vector<uchar>& data, off_t stop )
 }
 
 off_t
-Reader::rFindIndex( off_t start, const vector<uchar>& data, off_t stop )
+FileReader::rFindIndex( off_t start, const vector<uchar>& data, off_t stop )
 {
     off_t pos = start;
     while( pos >= stop ) {
@@ -358,7 +360,7 @@ Reader::rFindIndex( off_t start, const vector<uchar>& data, off_t stop )
     return size();
 }
 
-void Reader::SetData(vector<uchar*> tmpdata)
+void FileReader::SetData(vector<uchar*> tmpdata)
 {
     _data = tmpdata;
 }

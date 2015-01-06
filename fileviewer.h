@@ -18,7 +18,7 @@ public:
     ~FileViewer();
     HexViewer* filehexview;
     void LoadPage(off_t pageindex);
-    Reader* filereader;
+    FileReader* filereader;
     vector<uchar*> filedata;
 
 public slots:
@@ -31,7 +31,6 @@ private slots:
     void UpdateSelectValue(const QString &txt);
     void SetStepValues(int singlestep, int pagestep);
     void HideClicked();
-    //void AdjustData(int topleft);
 
 signals:
     void HideFileViewer(bool checkstate);
