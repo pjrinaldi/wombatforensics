@@ -158,18 +158,12 @@ void ImageHexViewer::setTopLeft( off_t offset )
 	_topLeft = offset;
      }
      // only let _topLeft be an integer multiple of the line length (round down)
-     //off_t linenum = _topLeft/bytesPerLine();
-     //_topLeft = _topLeft*bytesPerLine();
-     //_topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
-     //_reader.seek(_topLeft);
      _reader.readimage(_data,bytesPerPage()); // replaced with AdjustData()
-     //_reader.read(_data,bytesPerPage());
      
      repaint();
-     //emit topLeftChanged(linenum);
      emit topLeftChanged(_topLeft/bytesPerLine());
   } catch( const exception &e ) {
      inTopLeft = false;
@@ -588,10 +582,6 @@ void ImageHexViewer::paintLabels( QPainter* paintPtr)
   //uchar* offsetptr;
   QString label;
 
-  //qDebug() << "original offset:" << offset << "adjusted offset: " << offset + tskptr->offset;
-  // offset correction so the offset is showing the valid hex for the object loaded.
-  //offset = offset + tskptr->offset;
-
   for(int row = 0; row < _rows;++row) {
     label = "";
 #ifdef WORDS_BIGENDIAN
@@ -607,10 +597,7 @@ void ImageHexViewer::paintLabels( QPainter* paintPtr)
 #endif
     label = label.mid(sizeof(off_t)*2-_offsetLabelBytes);
     paintPtr->drawText( 5, y, label  );
-    //qDebug() << "original offset:" << offset;
-    //qDebug() << "bytes per line:" << bytesPerLine();
     offset+=bytesPerLine();
-    //qDebug() << "new offset:" << offset;
     y+=lineSpacing();
   }
   // draw dividing line between offset labels and data
@@ -660,23 +647,6 @@ void ImageHexViewer::paintEvent( QPaintEvent* e)
 
   paint.setPen(QColor(0, 0, 0, 255));
   paint.setBrush(Qt::NoBrush);
-  /*
-  for(int i=0; i < tskptr->blkaddrlist.count(); i++)
-  {
-      int pageid = _reader.CurrentPage();
-      //qDebug() << "cur block addr:" << tskptr->blkaddrlist.at(i);
-      //qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
-      if(pageid == tskptr->blkaddrlist.at(i).toInt())
-      {
-          paint.setPen(QColor(0, 0, 255, 255));
-          //paint.setPen(QColor(37, 96, 214, 255));
-          //paint.setPen(QColor(155, 125, 75, 255));
-          //paint.setBrush(QColor(155, 125, 75, 255));
-          //qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
-          break;
-      }
-  }
-  */
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
   // draw dividing line
@@ -690,17 +660,6 @@ void ImageHexViewer::paintEvent( QPaintEvent* e)
   col_start = max(0, (e->rect().left() - leftMargin() - e->rect().right()/2)/totalWordWidth);
   row_stop = min(_rows-1, e->rect().bottom()/lineSpacing());
   col_stop = min(_cols-1, e->rect().right()/totalWordWidth);
-  /*
-  for(int i=0; i < tskptr->blkaddrlist.count(); i++)
-  {
-      int pageid = _reader.CurrentPage();
-      if(pageid == tskptr->blkaddrlist.at(i).toInt())
-      {
-          paint.setPen(QColor(0, 0, 255, 255));
-          break;
-      }
-  }
-  */
   drawAsciiRegion(paint, ascii, row_start, row_stop, col_start, col_stop);
   paint.setPen(QColor(0, 0, 0, 255));
 }
@@ -1003,8 +962,7 @@ void ImageHexViewer::drawSelection( QPainter& paint )
     stop--;
     while( start <= stop ) {
       // linestop = min(stop,endofline)
-      off_t linestop = 
-	min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
+      off_t linestop = min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
       QRect bbox = byteBBox(start);
       QRect abox = abyteBox(start);
       bbox.setRight( byteBBox(linestop).right() );
@@ -1033,9 +991,3 @@ void ImageHexViewer::drawCursor( QPainter& paint )
     paint.drawRect( box );
   }
 }
-/*
-void ImageHexViewer::SetReader(Reader* tmpreader)
-{
-    _reader = *tmpreader;
-}
-*/

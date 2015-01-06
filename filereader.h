@@ -72,7 +72,6 @@ class FileReader {
 		    off_t stop );
  protected:
   bool dataIsAtOffset( const vector<uchar>& data, off_t pos );
-  bool loadPage(off_t pageIdx);
   bool freePage(off_t pageIdx);
   off_t nFreePages() const;
   off_t& nFreePages();

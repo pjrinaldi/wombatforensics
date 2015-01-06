@@ -65,42 +65,26 @@ bool FileReader::openimage(TskObject* tskpointer)
     tskptr = tskpointer;
     if(is_open())
         close();
-    //_size = tskptr->length;
     _size = tskptr->blocksize*tskptr->blkaddrlist.count();
-    //qDebug() << "image length:" << tskptr->imglength;
     _pageSize = tskptr->blocksize;
     off_t npages = _size/_pageSize;
     if((_size - 1) % _pageSize != 0)
         npages++;
-    //qDebug() << "block size:" << _pageSize << "num of pages:" << npages;
     _numpages = npages;
     _data.resize(npages);
     fill(_data.begin(), _data.begin()+npages, (uchar*)0);
     _is_open = true;
     _firstPage = _lastPage = 0;
 
-    return true;
-    //return loadimagepage(0);
+    return loadimagepage(0);
 }
 
 bool FileReader::close()
 {
     if(!is_open())
         return false;
- /*
-  if( !is_open() ) {
-    _error = "attempted to close non-open reader.";
-    return false;
-  }
-  */
 
     _error = "";
-  /*
-  if( EOF == fclose(_fptr) ) {
-    _error = strerror(errno);
-    return false;
-  }
-  */
   // free data pages
     vector<uchar*>::iterator itr;
     for( itr = _data.begin(); itr != _data.end(); ++itr )
@@ -241,40 +225,6 @@ bool FileReader::loadimagepage(off_t pageIdx)
     return 1;
 }
 
-bool FileReader::loadPage(off_t pageIdx)
-{
-  if( !is_open() )
-    return false;
-  if(_data[pageIdx] != 0)
-    return true;
-
-  if( !nFreePages() ) {
-    // free the page which is the furthest away from the page we are loading
-
-    // this could be trouble if off_t is unsigned!
-    if( abs(_firstPage - pageIdx) > abs(_lastPage - pageIdx) ) 
-      while(!freePage(_firstPage++));
-    else
-      while(!freePage(_lastPage--));
-  }
-  _data[pageIdx] = new uchar [_pageSize];
-  // page added, subtract from num available
-  --nFreePages();
-
-  fseek(_fptr,pageIdx*_pageSize, SEEK_SET);
-
-  off_t retval = fread(_data[pageIdx], sizeof(uchar), _pageSize, _fptr);
-
-  if( retval ) {
-    if( pageIdx < _firstPage )
-      _firstPage = pageIdx;
-
-    if( pageIdx > _lastPage ) 
-      _lastPage = pageIdx;
-  }
-  return retval;
-}
-
 bool FileReader::freePage(off_t pageIdx)
 {
   // check range
@@ -299,8 +249,6 @@ uchar FileReader::operator[] (off_t offset)
 		       "attempt to access past end of file");
 
   off_t page_idx = offset/_pageSize;
-  bool loaded = loadPage( page_idx );
-  assert( loaded );
   return _data[page_idx][ offset%_pageSize ];
 }
 
@@ -359,11 +307,6 @@ FileReader::rFindIndex( off_t start, const vector<uchar>& data, off_t stop )
 	--pos;
     }
     return size();
-}
-
-void FileReader::SetData(vector<uchar*> tmpdata)
-{
-    _data = tmpdata;
 }
 
 //

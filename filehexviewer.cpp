@@ -75,16 +75,11 @@ bool FileHexViewer::openimage()
 {
     if(!_reader.openimage(tskptr))
         QMessageBox::critical(this, "HexView", "Error opening image\n", QMessageBox::Ok, 0);
-    //qDebug() << "reader size: " << _reader.size();
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
-    //emit rangeChanged(0, _reader.size());
     emit rangeChanged(0, _reader.size()/bytesPerLine());
-    //emit StepValues(bytesPerLine(), _reader._pageSize);
-    //emit StepValues(bytesPerLine(), bytesPerPage());
-    //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
     emit StepValues(1, bytesPerPage()/bytesPerLine());
     calculateFontMetrics();
     setTopLeft(0);
@@ -161,18 +156,12 @@ void FileHexViewer::setTopLeft( off_t offset )
 	_topLeft = offset;
      }
      // only let _topLeft be an integer multiple of the line length (round down)
-     //off_t linenum = _topLeft/bytesPerLine();
-     //_topLeft = _topLeft*bytesPerLine();
-     //_topLeft = (_topLeft/bytesPerLine()) * bytesPerLine();
      // update the labels
      //setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
-     //_reader.seek(_topLeft);
      _reader.readimage(_data,bytesPerPage()); // replaced with AdjustData()
-     //_reader.read(_data,bytesPerPage());
      
      repaint();
-     //emit topLeftChanged(linenum);
      emit topLeftChanged(_topLeft/bytesPerLine());
   } catch( const exception &e ) {
      inTopLeft = false;
@@ -310,7 +299,6 @@ void FileHexViewer::setTopLeftToPercent( int percent )
 
 void FileHexViewer::setTopLeftToFloat( float offset )
 {
-    //setTopLeft((_reader.size()/100)*percent);
     float percent = offset*bytesPerLine();
     if(_previousstep < (int)percent)
     {
@@ -559,11 +547,7 @@ void FileHexViewer::resizeEvent( QResizeEvent * e )
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
-  //emit rangeChanged(0, _reader.size());
   emit rangeChanged(0,_reader.size()/bytesPerLine());
-  //emit StepValues(bytesPerLine(), _reader._pageSize);
-  //emit StepValues(bytesPerLine(), bytesPerPage());
-  //emit StepValues(bytesPerLine(), bytesPerPage()/bytesPerLine());
   emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
 //
@@ -596,9 +580,6 @@ void FileHexViewer::paintLabels( QPainter* paintPtr)
   //uchar* offsetptr;
   QString label;
 
-  //qDebug() << "original offset:" << offset << "adjusted offset: " << offset + tskptr->offset;
-  // offset correction so the offset is showing the valid hex for the object loaded.
-  //offset = offset + tskptr->offset;
 
   for(int row = 0; row < _rows;++row) {
     label = "";
@@ -615,10 +596,7 @@ void FileHexViewer::paintLabels( QPainter* paintPtr)
 #endif
     label = label.mid(sizeof(off_t)*2-_offsetLabelBytes);
     paintPtr->drawText( 5, y, label  );
-    //qDebug() << "original offset:" << offset;
-    //qDebug() << "bytes per line:" << bytesPerLine();
     offset+=bytesPerLine();
-    //qDebug() << "new offset:" << offset;
     y+=lineSpacing();
   }
   // draw dividing line between offset labels and data
@@ -668,23 +646,6 @@ void FileHexViewer::paintEvent( QPaintEvent* e)
 
   paint.setPen(QColor(0, 0, 0, 255));
   paint.setBrush(Qt::NoBrush);
-  /*
-  for(int i=0; i < tskptr->blkaddrlist.count(); i++)
-  {
-      int pageid = _reader.CurrentPage();
-      //qDebug() << "cur block addr:" << tskptr->blkaddrlist.at(i);
-      //qDebug() << "cur offset:" << _reader.CurrentPage()*tskptr->blocksize;
-      if(pageid == tskptr->blkaddrlist.at(i).toInt())
-      {
-          paint.setPen(QColor(0, 0, 255, 255));
-          //paint.setPen(QColor(37, 96, 214, 255));
-          //paint.setPen(QColor(155, 125, 75, 255));
-          //paint.setBrush(QColor(155, 125, 75, 255));
-          //qDebug() << "block address:" << tskptr->blkaddrlist.at(i);
-          break;
-      }
-  }
-  */
   drawTextRegion( paint, text, row_start, row_stop, col_start, col_stop );
   // draw ascii text in repaint event
   // draw dividing line
@@ -698,17 +659,6 @@ void FileHexViewer::paintEvent( QPaintEvent* e)
   col_start = max(0, (e->rect().left() - leftMargin() - e->rect().right()/2)/totalWordWidth);
   row_stop = min(_rows-1, e->rect().bottom()/lineSpacing());
   col_stop = min(_cols-1, e->rect().right()/totalWordWidth);
-  /*
-  for(int i=0; i < tskptr->blkaddrlist.count(); i++)
-  {
-      int pageid = _reader.CurrentPage();
-      if(pageid == tskptr->blkaddrlist.at(i).toInt())
-      {
-          paint.setPen(QColor(0, 0, 255, 255));
-          break;
-      }
-  }
-  */
   drawAsciiRegion(paint, ascii, row_start, row_stop, col_start, col_stop);
   paint.setPen(QColor(0, 0, 0, 255));
 }
@@ -944,7 +894,6 @@ void FileHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int ro
         {
             int widx = r*_cols+c;
             /* REPRESENTS THE FILE SLACK */
-            // this needs to be the (curoffset - fileoffset) > tskptr->length - 1; and then (curoffset - fileoffset) < blkct*blksz - 1;
             if(globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
                 paint.setPen(QColor(255, 0, 0, 255));
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
@@ -958,7 +907,6 @@ void FileHexViewer::drawTextRegion(QPainter& paint, const QString& text, int row
     for(int c = col_start; c <= col_stop; c++) {
         int widx = r*_cols+c;
         /* REPRESENTS THE FILE SLACK */
-        // this needs to be the (curoffset - fileoffset) > tskptr->length - 1; and then (curoffset - fileoffset) < blkct*blksz - 1;
         if(globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
             paint.setPen(QColor(255, 0, 0, 255));
         paint.drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()) );
@@ -976,9 +924,7 @@ void FileHexViewer::drawSelection( QPainter& paint )
     paint.setBrush( qApp->palette().highlight() );
     stop--;
     while( start <= stop ) {
-      // linestop = min(stop,endofline)
-      off_t linestop = 
-	min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
+      off_t linestop = min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
       QRect bbox = byteBBox(start);
       QRect abox = abyteBox(start);
       bbox.setRight( byteBBox(linestop).right() );
@@ -1007,9 +953,3 @@ void FileHexViewer::drawCursor( QPainter& paint )
     paint.drawRect( box );
   }
 }
-/*
-void FileHexViewer::SetReader(Reader* tmpreader)
-{
-    _reader = *tmpreader;
-}
-*/

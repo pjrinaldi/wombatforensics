@@ -45,11 +45,6 @@ class ImageReader {
   ~ImageReader();
 
 
-  // CUSTOM ABSTRACTION FUNCTIONS
-  void SetData(vector<uchar*> tmpdata);
-  void LoadPage();
-  // END CUSTOM FUNCTIONS
-
   bool openimage(TskObject* tskobject);
   bool close();
   bool eof();
@@ -73,7 +68,6 @@ class ImageReader {
 
  protected:
   bool dataIsAtOffset( const vector<uchar>& data, off_t pos );
-  bool loadPage(off_t pageIdx);
   bool freePage(off_t pageIdx);
   off_t nFreePages() const;
   off_t& nFreePages();

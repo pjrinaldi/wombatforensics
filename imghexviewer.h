@@ -37,15 +37,11 @@ public:
   ~ImageHexViewer();
 
   bool openimage();
-  // CUSTOM ABSTRACTION FUNCTIONS
-  //void SetReader(Reader* tmpreader);
-  // END CUSTOM ABSTRACTION FUNCTIONS
   //bool bigopen(startbyte, bytelen);
   ImageReader* reader();
   off_t offset() const;
   //void ClearContent(); 
   void SetTopLeft(off_t offset);
-  //void SetReader(Reader* tmpreader);
 
   // returns the word (string representation) that the cursor is in
   //  QString currentWord() const;
@@ -189,7 +185,6 @@ protected:
 
 protected:
   ImageReader              _reader;
-  //TSK_IMG_INFO*       tskimg;
   int                 _wordSpacing;
   int                 _wordWidth;
   int                 _lineSpacing;
