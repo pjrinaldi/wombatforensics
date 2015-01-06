@@ -935,6 +935,29 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
         for(int c = col_start; c <= col_stop; c++)
         {
             int widx = r*_cols+c;
+            int curoffset = globalOffset(widx);
+            paint.setPen(QColor(0, 0, 0, 255)); // BLACK
+            paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+            for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
+            {
+                int curblkstart = tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1;
+                int curblkend = curblkstart + tskptr->blocksize;
+                if(curoffset > curblkstart && curoffset <= curblkend)
+                {
+                    paint.setPen(QColor(0, 0, 255, 255)); // BLUE
+                    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                    if(i == (tskptr->blkaddrlist.count() - 1))
+                    {
+                        if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize)) && curoffset <= curblkend)
+                        {
+                            paint.setPen(QColor(255, 0, 0, 255)); // RED
+                            paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                        }
+                    }
+                }
+            }
+
+            /*
             for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
             {
                 if((globalOffset(widx) >= tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) && (globalOffset(widx) < tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize + tskptr->blocksize - 1))
@@ -949,44 +972,41 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
                 }
             }
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
+            */
         }
     }
 }
 
 void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int row_start, int row_stop, int col_start, int col_stop)
 {
-  for(int r = row_start; r <= row_stop; r++) {
-    for(int c = col_start; c <= col_stop; c++) {
-        int widx = r*_cols+c;
-        //qDebug() << globalOffset(widx);
-        for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
+    for(int r = row_start; r <= row_stop; r++)
+    {
+        for(int c = col_start; c <= col_stop; c++)
         {
-            if((globalOffset(widx) >= tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) && (globalOffset(widx) < tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize + tskptr->blocksize - 1))
+            int widx = r*_cols+c;
+            int curoffset = globalOffset(widx);
+            paint.setPen(QColor(0, 0, 0, 255)); // BLACK
+            paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
+            for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
             {
-                paint.setPen(QColor(0, 0, 255, 255));
-                if(i == (tskptr->blkaddrlist.count() - 1))
+                int curblkstart = tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1;
+                int curblkend = curblkstart + tskptr->blocksize;
+                if(curoffset > curblkstart && curoffset <= curblkend)
                 {
-                    if(((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) > (tskptr->length - 1 - tskptr->blocksize)) && ((globalOffset(widx) - tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1)))
-                        paint.setPen(QColor(255, 0, 0, 255));
+                    paint.setPen(QColor(0, 0, 255, 255)); // BLUE
+                    paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
+                    if(i == (tskptr->blkaddrlist.count() - 1))
+                    {
+                        if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize)) && curoffset <= curblkend)
+                        {
+                            paint.setPen(QColor(255, 0, 0, 255)); // RED
+                            paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
+                        }
                     }
                 }
+            }
         }
-
-        /* REPRESENTS THE FILE SLACK */
-        // this needs to be the (curoffset - fileoffset) > tskptr->length - 1; and then (curoffset - fileoffset) < blkct*blksz - 1;
-        /*
-        if((globalOffset(widx) - tskptr->offset) > tskptr->length - 1 && (globalOffset(widx) - tskptr->offset) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
-            paint.setPen(QColor(255, 0, 0, 255));
-        else if(((globalOffset(widx) - tskptr->offset) < (tskptr->length - 1)) && ((globalOffset(widx) - tskptr->offset) > 0))
-        {
-            paint.setPen(QColor(0, 0, 255, 255));
-        }
-        else
-            paint.setPen(QColor(0, 0, 0, 255));
-        */
-        paint.drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()) );
     }
-  }
 }
 
 void ImageHexViewer::drawSelection( QPainter& paint )
