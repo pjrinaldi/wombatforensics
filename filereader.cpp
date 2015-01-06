@@ -65,7 +65,8 @@ bool FileReader::openimage(TskObject* tskpointer)
     tskptr = tskpointer;
     if(is_open())
         close();
-    _size = tskptr->imglength; // length in bytes for selected file
+    //_size = tskptr->length;
+    _size = tskptr->blocksize*tskptr->blkaddrlist.count();
     //qDebug() << "image length:" << tskptr->imglength;
     _pageSize = tskptr->blocksize;
     off_t npages = _size/_pageSize;
