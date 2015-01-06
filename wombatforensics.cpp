@@ -530,6 +530,13 @@ void WombatForensics::LoadHexContents()
     else
     {
         hexwidget->SetTopLeft(tskobjptr->offset);
+        if(wombatvarptr->selectedobject.objtype == 5)
+        {
+            fileviewer->filehexview->openimage();
+            fileviewer->filehexview->set1BPC();
+            fileviewer->filehexview->setBaseHex();
+            fileviewer->filehexview->SetTopLeft(0);
+        }
     }
     // MODIFYING FOR HIGHLIGHTING TEST...
     //if(wombatvarptr->selectedobject.objtype <= 5)
@@ -1069,7 +1076,7 @@ void WombatForensics::SetupHexPage(void)
     //hexwidget = new HexViewer(ui->hexPage, tskobjptr);
     hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
     //imagereader = new Reader(50, 4096);
-    fileviewer->filereader = new Reader(50, 4096);
+    //fileviewer->filereader = new Reader(50, 4096);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     hexwidget->setObjectName("bt-hexview");

@@ -2,7 +2,7 @@
 #define FILEVIEWER_H
 
 #include "wombatinclude.h"
-#include "hexviewer.h"
+#include "filehexviewer.h"
 #include "ui_fileviewer.h"
 
 namespace Ui {
@@ -16,7 +16,7 @@ class FileViewer : public QMainWindow
 public:
     FileViewer(QWidget* parent = 0, TskObject* tskobject = NULL);
     ~FileViewer();
-    HexViewer* filehexview;
+    FileHexViewer* filehexview;
     void LoadPage(off_t pageindex);
     FileReader* filereader;
     vector<uchar*> filedata;

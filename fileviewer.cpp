@@ -4,7 +4,6 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
 {
     tskptr = tskobjptr;
     ui->setupUi(this);
-    //QHBoxLayout* hexlayout = new QHBoxLayout(ui->centralwidget);
     this->statusBar()->setSizeGripEnabled(true);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
@@ -15,23 +14,20 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
-    /*
-    filehexview = new HexViewer(ui->centralwidget, tskptr);
+    filehexview = new FileHexViewer(ui->centralwidget, tskptr);
     filehexview->setObjectName("filehexview");
     filehexview->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     ui->horizontalLayout->addWidget(filehexview);
     filehexvsb = new QScrollBar(filehexview);
     filehexvsb->setRange(0, 0);
     ui->horizontalLayout->addWidget(filehexvsb);
-    */
-    /*
     connect(filehexview, SIGNAL(rangeChanged(off_t, off_t)), this, SLOT(SetScrollBarRange(off_t, off_t)));
     connect(filehexview, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(filehexview, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    connect(filehexvsb, SIGNAL(valueChanged(int)), this, SLOT(AdjustData(int)));
+    //connect(filehexvsb, SIGNAL(valueChanged(int)), this, SLOT(AdjustData(int)));
+    connect(filehexvsb, SIGNAL(valueChanged(int)), filehexview, SLOT(setTopLeftToPercent(int)));
     connect(filehexview, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(filehexview, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
-    */
 }
 
 FileViewer::~FileViewer()
@@ -159,9 +155,9 @@ void FileViewer::SetStepValues(int singlestep, int pagestep)
 
 void FileViewer::LoadPage(off_t pageindex)
 {
+    /*
     off_t retval = 0;
     filedata[pageindex] = new uchar[filereader->_pageSize];
-    /*
     if(tskptr->objecttype == 5)
     {
         //qDebug() << "blkaddrlist count:" << tskptr->blkaddrlist.count();

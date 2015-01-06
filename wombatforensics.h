@@ -12,8 +12,8 @@
 #include "exportdialog.h"
 #include "fileviewer.h"
 #include "globals.h"
-#include "reader.h"
-#include "hexviewer.h"
+//#include "reader.h"
+//#include "hexviewer.h"
 #include "imgreader.h"
 #include "imghexviewer.h"
 
@@ -569,7 +569,7 @@ private:
     ImageHexViewer* hexwidget;
     //Reader* imagereader; 
     //Reader* filereader;
-    vector<uchar*> imagedata;
+    //vector<uchar*> imagedata;
     //vector<uchar*> filedata;
     void LoadPage(off_t pageindex);
     QActionGroup* viewgroup;
