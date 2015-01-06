@@ -66,7 +66,7 @@ bool ImageReader::openimage(TskObject* tskpointer)
     if(is_open())
         close();
     _size = tskptr->imglength; // length in bytes for selected file
-    _pageSize = tskptr->sectsize;
+    _pageSize = tskptr->blocksize;
     off_t npages = _size/_pageSize;
     if((_size - 1) % _pageSize != 0)
         npages++;

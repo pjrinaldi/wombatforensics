@@ -452,7 +452,6 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->imglength = wombatvarptr->selectedobject.size;
         tskobjptr->blocksize = wombatvarptr->selectedobject.sectsize;
-        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
     }
     else if(wombatvarptr->selectedobject.objtype == 2) // volume object
     {
