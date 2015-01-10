@@ -399,6 +399,7 @@ void WombatForensics::AddEvidence()
     {
         // need to figure out how to force the damn action to be untoggled.
         //ui->actionAdd_Evidence->setEnabled(false);
+        // maybe set focus for something else when it's done. 
         wombatvarptr->currentevidencename = tmplist[0].split("/").last();
         for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
         {
@@ -451,6 +452,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->objecttype = 1;
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->imglength = wombatvarptr->selectedobject.size;
+        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
         tskobjptr->blocksize = wombatvarptr->selectedobject.sectsize;
     }
     else if(wombatvarptr->selectedobject.objtype == 2) // volume object
@@ -460,6 +462,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
+        tskobjptr->blocksize = wombatvarptr->selectedobject.sectsize;
     }
     else if(wombatvarptr->selectedobject.objtype == 3) // unallocated partition
     {
@@ -468,6 +471,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.sectsize;
         tskobjptr->objecttype = 3;
         tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
+        tskobjptr->blocksize = wombatvarptr->selectedobject.sectsize;
     }
     else if(wombatvarptr->selectedobject.objtype == 4) // fs object
     {
@@ -476,14 +480,17 @@ void WombatForensics::LoadHexContents()
         tskobjptr->objecttype = 4;
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
+        tskobjptr->blocksize = wombatvarptr->selectedobject.blocksize;
     }
     else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
+        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
         tskobjptr->offset = 0;
+        qDebug() << "tskobjptr->blocksize:" << tskobjptr->blocksize;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
-            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*wombatvarptr->selectedobject.sectsize;
+            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize;
         else
             tskobjptr->offset = 0;
         qDebug() << "file object offset:" << tskobjptr->offset;
