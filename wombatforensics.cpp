@@ -154,6 +154,10 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
+    //magicptr = magic_open(MAGIC_CONTINUE|MAGIC_ERROR|MAGIC_MIME|MAGIC_CHECK);
+    magicptr = magic_open(MAGIC_CONTINUE|MAGIC_ERROR|MAGIC_MIME);
+    // NEED TO ABSTRACT THE PATH TO THE APPLICATION INSTALLATION PATH.
+    magic_load(magicptr, "/home/pasquale/Projects/wombatforensics/Resources/magic.mgc");
     SetupHexPage();
 }
 
@@ -973,6 +977,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         event->ignore();
         LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
     }
+    magic_close(magicptr);
     wombatdatabase->CloseLogDB();
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();

@@ -284,6 +284,25 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
     filestrings.append(blockstring);
 
+    // BEGIN TEST AREA FOR GETTING THE FILE SIGNATURE STRING
+    // NEED TO DO THE OPEN/LOADING BEFORE I DO ANYTHING FOR EACH FILE
+    //magic_load(magic, "/home/pasquale/Projects/wombatforensics/Resources/magic.mgc");
+    //magic_t magichandle = NULL;
+    //struct magic_set *magic = magic_open(MAGIC_MIME|MAGIC_CHECK);
+    //magichandle = magic_open(MAGIC_MIME|MAGIC_CHECK);
+    //magic_load(magic, "/home/pasquale/Projects/wombatforensics/Resources/magic.mgc");
+    //magichandle = magic_open(MAGIC_CONTINUE|MAGIC_ERROR/*|MAGIC_DEBUG*/|MAGIC_MIME);
+    //magic_load(magichandle, ":/magicfile");
+    char magicbuffer[1024];
+    ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+    if(readlen > 0)
+    {
+        const char* sigtype = magic_buffer(magicptr, magicbuffer, readlen);
+        qDebug() << "sigtype:" << sigtype;
+    }
+    // NEED TO WRITE THE MIME TYPE TO THE DATABASE INSTEAD OF DEBUG OUTPUT
+    // END TEST AREA FOR GETTING THE FILE SIGNATURE STRING
+
     QVector<int> fileints;
 
     if(tmpfile->name != NULL)

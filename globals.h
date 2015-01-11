@@ -24,6 +24,7 @@ extern QList<TskObject> curlist;
 extern QList<FileSystemObject> fsobjectlist;
 extern QStringList propertylist;
 extern QString blockstring;
+extern struct magic_set* magicptr;
 
 class InterfaceSignals : public QObject
 {

@@ -27,3 +27,4 @@ QList<TskObject> curlist;
 QList<FileSystemObject> fsobjectlist;
 QStringList propertylist;
 QString blockstring = "";
+struct magic_set* magicptr = NULL;

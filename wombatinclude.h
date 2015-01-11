@@ -92,4 +92,6 @@
 #include "fs/tsk_iso9660.h"
 #include "fs/tsk_hfs.h"
 #include "fs/tsk_yaffs.h"
+#include "magic.h"
+
 #endif // WOMBATINCLUDE_H
