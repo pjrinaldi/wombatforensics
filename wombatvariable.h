@@ -83,6 +83,7 @@ struct SelectedObject
     QString name;
     QString fullpath;
     QString blockaddress;
+    QString filesignature;
     int size;
     int parimgid;
     int parfsid;
