@@ -115,7 +115,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         QSqlQuery fquery(fcasedb);
-        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid, blockaddress) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);");
+        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid, blockaddress, filesignature) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);");
         fquery.addBindValue(tmpints[0]);
         fquery.addBindValue(tmpstrings[0]);
         fquery.addBindValue(tmpints[1]);
@@ -130,6 +130,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
         fquery.addBindValue(currentevidenceid);
         fquery.addBindValue(tmpints[8]);
         fquery.addBindValue(tmpstrings[3]);
+        fquery.addBindValue(tmpstrings[4]);
 
         //qDebug() << tmpstrings[0] << tmpstrings[3];
         
@@ -291,7 +292,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     {
         const char* sigtype = magic_buffer(magicptr, magicbuffer, readlen);
         char* sigp1 = strtok((char*)sigtype, ";");
-        qDebug() << "sigtype:" << sigp1;
+        filestrings.append(QString::fromStdString(string(sigp1)));
+        //qDebug() << "sigtype:" << QString::fromStdString(string(sigp1));
     }
     // NEED TO WRITE THE MIME TYPE TO THE DATABASE INSTEAD OF DEBUG OUTPUT
     // END TEST AREA FOR GETTING THE FILE SIGNATURE STRING
