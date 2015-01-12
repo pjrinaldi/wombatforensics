@@ -290,7 +290,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     if(readlen > 0)
     {
         const char* sigtype = magic_buffer(magicptr, magicbuffer, readlen);
-        qDebug() << "sigtype:" << sigtype;
+        char* sigp1 = strtok((char*)sigtype, ";");
+        qDebug() << "sigtype:" << sigp1;
     }
     // NEED TO WRITE THE MIME TYPE TO THE DATABASE INSTEAD OF DEBUG OUTPUT
     // END TEST AREA FOR GETTING THE FILE SIGNATURE STRING
