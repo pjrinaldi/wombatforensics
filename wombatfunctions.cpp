@@ -295,7 +295,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         filestrings.append(QString::fromStdString(string(sigp1)));
         //qDebug() << "sigtype:" << QString::fromStdString(string(sigp1));
     }
-    // NEED TO WRITE THE MIME TYPE TO THE DATABASE INSTEAD OF DEBUG OUTPUT
+    else
+        filestrings.append(QString("Zero File"));
     // END TEST AREA FOR GETTING THE FILE SIGNATURE STRING
 
     QVector<int> fileints;
