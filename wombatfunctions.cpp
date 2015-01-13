@@ -264,24 +264,27 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     // NEED TO WORK ON THE DESCRIPTIONS FOR THE FILE PROPERTIES A LITTLE
     QStringList proplist;
     proplist.clear();
-    proplist << "Short Name" << tmpfile->name->shrt_name << "Short name for a file";
-    proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbpv]|rw[sSx]|rw[sSx]|rw[tTx]";
-    proplist << "User ID" << QString::number(tmpfile->meta->uid) << "User ID";
-    proplist << "Group ID" << QString::number(tmpfile->meta->gid) << "Group ID";
-    proplist << "Allocation Status";
-    if(tmpfile->meta->flags == TSK_FS_META_FLAG_ALLOC)
-        proplist << "Currently Allocated";
-    else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNALLOC)
-        proplist << "Currently Unallocated";
-    else if(tmpfile->meta->flags == TSK_FS_META_FLAG_USED)
-        proplist << "Allocated at least once";
-    else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNUSED)
-        proplist << "Never allocated";
-    else if(tmpfile->meta->flags == TSK_FS_META_FLAG_COMP)
-        proplist << "Contents are compressed";
-    else
-        proplist << "Unspecified";
-    proplist << "allocation status for the file.";
+    if(tmpfile->name != NULL) proplist << "Short Name" << tmpfile->name->shrt_name << "Short name for a file";
+    if(tmpfile->meta != NULL)
+    {
+        proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbpv]|rw[sSx]|rw[sSx]|rw[tTx]";
+        proplist << "User ID" << QString::number(tmpfile->meta->uid) << "User ID";
+        proplist << "Group ID" << QString::number(tmpfile->meta->gid) << "Group ID";
+        proplist << "Allocation Status";
+        if(tmpfile->meta->flags == TSK_FS_META_FLAG_ALLOC)
+            proplist << "Currently Allocated";
+        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNALLOC)
+            proplist << "Currently Unallocated";
+        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_USED)
+            proplist << "Allocated at least once";
+        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNUSED)
+            proplist << "Never allocated";
+        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_COMP)
+            proplist << "Contents are compressed";
+        else
+            proplist << "Unspecified";
+        proplist << "allocation status for the file.";
+    }
     if(tmpptr != NULL)
         LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
     TSK_FS_HASH_RESULTS hashresults;
