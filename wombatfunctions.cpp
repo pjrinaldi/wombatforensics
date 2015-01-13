@@ -265,7 +265,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     QStringList proplist;
     proplist.clear();
     proplist << "Short Name" << tmpfile->name->shrt_name << "Short name for a file";
-    proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. f - file, d - directory, r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [fd]|rw[sSx]|rw[sSx]|rw[tTx]";
+    proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbp]|rw[sSx]|rw[sSx]|rw[tTx]";
     proplist << "User ID" << QString::number(tmpfile->meta->uid) << "User ID";
     proplist << "Group ID" << QString::number(tmpfile->meta->gid) << "Group ID";
     proplist << "Allocation Status";
