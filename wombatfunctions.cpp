@@ -135,8 +135,8 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList 
         //qDebug() << tmpstrings[0] << tmpstrings[3];
         
         fquery.exec();
-        fquery.finish();
         int tmpid = fquery.lastInsertId().toInt();
+        fquery.finish();
         for(int i=0; i < tmplist.count()/3; i++)
         {
             fquery.prepare("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);");
