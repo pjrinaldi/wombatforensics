@@ -378,10 +378,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     // END TEST AREA FOR GETTING THE FILE SIGNATURE STRING
 
     QVector<int> fileints;
-    qDebug() << "file name:" << tmpfile->name->name;
     if(tmpfile->name != NULL)
     {
-        qDebug() << "name type:" << tmpfile->name->type;
         fileints.append((int)tmpfile->name->type);
         fileints.append((int)tmpfile->name->par_addr);
     }
@@ -392,7 +390,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     if(tmpfile->meta != NULL)
     {
-        qDebug() << "meta type:" << tmpfile->meta->type;
         fileints.append((int)tmpfile->meta->atime);
         fileints.append((int)tmpfile->meta->ctime);
         fileints.append((int)tmpfile->meta->crtime);
