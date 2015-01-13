@@ -109,7 +109,7 @@ bool ProcessingComplete()
     return processingcomplete;
 }
 
-void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
+void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList tmplist)
 {
 
     if(fcasedb.isValid() && fcasedb.isOpen())
@@ -136,9 +136,19 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints)
         
         fquery.exec();
         fquery.finish();
+        int tmpid = fquery.lastInsertId().toInt();
+        for(int i=0; i < tmplist.count()/3; i++)
+        {
+            fquery.prepare("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);");
+            fquery.addBindValue(tmpid);
+            fquery.addBindValue(tmplist.at(3*i));
+            fquery.addBindValue(tmplist.at(3*i+1));
+            fquery.addBindValue(tmplist.at(3*i+2));
+            fquery.exec();
+            fquery.finish();
+        }
         filesprocessed++;
         isignals->ProgUpd();
-        
     }
     else
     {
@@ -256,6 +266,22 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     proplist.clear();
     proplist << "Short Name" << tmpfile->name->shrt_name << "Short name for a file";
     proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. f - file, d - directory, r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [fd]|rw[sSx]|rw[sSx]|rw[tTx]";
+    proplist << "User ID" << QString::number(tmpfile->meta->uid) << "User ID";
+    proplist << "Group ID" << QString::number(tmpfile->meta->gid) << "Group ID";
+    proplist << "Allocation Status";
+    if(tmpfile->meta->flags == TSK_FS_META_FLAG_ALLOC)
+        proplist << "Currently Allocated";
+    else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNALLOC)
+        proplist << "Currently Unallocated";
+    else if(tmpfile->meta->flags == TSK_FS_META_FLAG_USED)
+        proplist << "Allocated at least once";
+    else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNUSED)
+        proplist << "Never allocated";
+    else if(tmpfile->meta->flags == TSK_FS_META_FLAG_COMP)
+        proplist << "Contents are compressed";
+    else
+        proplist << "Unspecified";
+    proplist << "allocation status for the file.";
     if(tmpptr != NULL)
         LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
     TSK_FS_HASH_RESULTS hashresults;
@@ -335,6 +361,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
 
     filestrings.append(blockstring);
+    proplist << "Block Address" << blockstring << "List of block addresses which contain the contents of the file";
 
     // BEGIN TEST AREA FOR GETTING THE FILE SIGNATURE STRING
     char magicbuffer[1024];
@@ -382,7 +409,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     fileints.append(currentfilesystemid);
 
-    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints);
+    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, proplist);
     filewatcher.setFuture(tmpfuture);
     threadvector.append(tmpfuture);
     filesfound++;
