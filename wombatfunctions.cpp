@@ -203,8 +203,59 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     return TSK_WALK_CONT;
 }
 
+QString GetFilePermissions(TSK_FS_META* tmpmeta)
+{
+    QString tmpstring = "----------";
+    tmpstring.replace(0, 1, tsk_fs_meta_type_str[tmpmeta->type][0]);
+    if(tmpmeta->mode & TSK_FS_META_MODE_IRUSR)
+        tmpstring.replace(1, 1, "r");
+    if(tmpmeta->mode & TSK_FS_META_MODE_IWUSR)
+        tmpstring.replace(2, 1, "w");
+    if(tmpmeta->mode & TSK_FS_META_MODE_ISUID)
+    {
+        if(tmpmeta->mode & TSK_FS_META_MODE_IXUSR)
+            tmpstring.replace(3, 1, "s");
+        else
+            tmpstring.replace(3, 1, "S");
+    }
+    else if(tmpmeta->mode & TSK_FS_META_MODE_IXUSR)
+        tmpstring.replace(3, 1, "x");
+    if(tmpmeta->mode & TSK_FS_META_MODE_IRGRP)
+        tmpstring.replace(4, 1, "r");
+    if(tmpmeta->mode & TSK_FS_META_MODE_IWGRP)
+        tmpstring.replace(5, 1, "w");
+    if(tmpmeta->mode && TSK_FS_META_MODE_ISGID)
+    {
+        if(tmpmeta->mode & TSK_FS_META_MODE_IXGRP)
+            tmpstring.replace(6, 1, "s");
+        else
+            tmpstring.replace(6, 1, "S");
+    }
+    else if(tmpmeta->mode & TSK_FS_META_MODE_IXGRP)
+        tmpstring.replace(6, 1, "x");
+    if(tmpmeta->mode & TSK_FS_META_MODE_IROTH)
+        tmpstring.replace(7, 1, "r");
+    if(tmpmeta->mode & TSK_FS_META_MODE_IWOTH)
+        tmpstring.replace(8, 1, "w");
+    if(tmpmeta->mode & TSK_FS_META_MODE_ISVTX) // sticky bit
+    {
+        if(tmpmeta->mode & TSK_FS_META_MODE_IXOTH)
+            tmpstring.replace(9, 1, "t");
+        else
+            tmpstring.replace(9, 1, "T");
+    }
+    else if(tmpmeta->mode & TSK_FS_META_MODE_IXOTH)
+        tmpstring.replace(9, 1, "x");
+    return tmpstring;
+}
+
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    // NEED TO WORK ON THE DESCRIPTIONS FOR THE FILE PROPERTIES A LITTLE
+    QStringList proplist;
+    proplist.clear();
+    proplist << "Short Name" << tmpfile->name->shrt_name << "Short name for a file";
+    proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. f - file, d - directory, r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [fd]|rw[sSx]|rw[sSx]|rw[tTx]";
     if(tmpptr != NULL)
         LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
     TSK_FS_HASH_RESULTS hashresults;
