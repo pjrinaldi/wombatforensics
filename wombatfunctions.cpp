@@ -265,7 +265,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     QStringList proplist;
     proplist.clear();
     proplist << "Short Name" << tmpfile->name->shrt_name << "Short name for a file";
-    proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbp]|rw[sSx]|rw[sSx]|rw[tTx]";
+    proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbpv]|rw[sSx]|rw[sSx]|rw[tTx]";
     proplist << "User ID" << QString::number(tmpfile->meta->uid) << "User ID";
     proplist << "Group ID" << QString::number(tmpfile->meta->gid) << "Group ID";
     proplist << "Allocation Status";
@@ -378,9 +378,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     // END TEST AREA FOR GETTING THE FILE SIGNATURE STRING
 
     QVector<int> fileints;
-
+    qDebug() << "file name:" << tmpfile->name->name;
     if(tmpfile->name != NULL)
     {
+        qDebug() << "name type:" << tmpfile->name->type;
         fileints.append((int)tmpfile->name->type);
         fileints.append((int)tmpfile->name->par_addr);
     }
@@ -391,6 +392,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     if(tmpfile->meta != NULL)
     {
+        qDebug() << "meta type:" << tmpfile->meta->type;
         fileints.append((int)tmpfile->meta->atime);
         fileints.append((int)tmpfile->meta->ctime);
         fileints.append((int)tmpfile->meta->crtime);
