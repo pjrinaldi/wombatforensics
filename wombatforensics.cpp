@@ -1048,6 +1048,7 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
     {
         fileviewer->show();
         sfwindow->show();
+        sfwindow->ShowQuery();
     }
 }
 

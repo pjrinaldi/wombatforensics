@@ -16,7 +16,7 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QListView>
+#include <QtWidgets/QTableView>
 
 QT_BEGIN_NAMESPACE
 
@@ -24,7 +24,7 @@ class Ui_sortfilter
 {
 public:
     QHBoxLayout *horizontalLayout;
-    QListView *listView;
+    QTableView *tableView;
 
     void setupUi(QDialog *sortfilter)
     {
@@ -37,10 +37,23 @@ public:
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        listView = new QListView(sortfilter);
-        listView->setObjectName(QStringLiteral("listView"));
+        tableView = new QTableView(sortfilter);
+        tableView->setObjectName(QStringLiteral("tableView"));
+        QFont font;
+        font.setPointSize(8);
+        tableView->setFont(font);
+        tableView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        tableView->setTabKeyNavigation(false);
+        tableView->setProperty("showDropIndicator", QVariant(false));
+        tableView->setDragDropOverwriteMode(false);
+        tableView->setAlternatingRowColors(true);
+        tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+        tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+        tableView->setShowGrid(false);
+        tableView->verticalHeader()->setVisible(false);
 
-        horizontalLayout->addWidget(listView);
+        horizontalLayout->addWidget(tableView);
 
 
         retranslateUi(sortfilter);

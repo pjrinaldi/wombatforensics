@@ -94,9 +94,9 @@ public:
             else
                 return QVariant();
         }
-        if(role == Qt::ForegroundRole)
+        if(role == Qt::TextColorRole)
         {
-            return QVariant(QColor(15, 15, 15, 255));
+            return QVariant::fromValue((QColor(15, 15, 15, 255)));
         }
         if(role == Qt::DisplayRole)
         {
