@@ -48,6 +48,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatframework = new WombatFramework(wombatvarptr);
     propertywindow = new PropertiesWindow(wombatdatabase);
     fileviewer = new FileViewer(this, tskobjptr);
+    sfwindow = new SortFilterWindow(this);
     isignals = new InterfaceSignals();
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
@@ -1046,6 +1047,7 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
     else
     {
         fileviewer->show();
+        sfwindow->show();
     }
 }
 

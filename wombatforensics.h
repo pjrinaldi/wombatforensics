@@ -11,6 +11,7 @@
 #include "propertieswindow.h"
 #include "exportdialog.h"
 #include "fileviewer.h"
+#include "sortfilterwindow.h"
 #include "globals.h"
 #include "imgreader.h"
 #include "imghexviewer.h"
@@ -482,6 +483,7 @@ public:
     PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
     FileViewer* fileviewer;
+    SortFilterWindow* sfwindow;
     TreeModel* treemodel;
     QMenu* treemenu;
 
