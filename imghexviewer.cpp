@@ -907,7 +907,7 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
                     paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                     if(i == (tskptr->blkaddrlist.count() - 1))
                     {
-                        if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize)) && curoffset <= curblkend)
+                        if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize*i)) && curoffset <= curblkend)
                         {
                             paint.setPen(QColor(255, 0, 0, 255)); // RED
                             paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
@@ -939,7 +939,7 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
                     paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
                     if(i == (tskptr->blkaddrlist.count() - 1))
                     {
-                        if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize)) && curoffset <= curblkend)
+                        if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize*i)) && curoffset <= curblkend)
                         {
                             paint.setPen(QColor(255, 0, 0, 255)); // RED
                             paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));

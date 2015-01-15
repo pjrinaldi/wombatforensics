@@ -93,6 +93,10 @@ public:
             else
                 return QVariant();
         }
+        if(role == Qt::ForegroundRole)
+        {
+            return QVariant(QColor(15, 15, 15, 255));
+        }
         if(role == Qt::DisplayRole)
         {
             if(index.column() == 2)
@@ -131,6 +135,8 @@ public:
                         return QIcon(QPixmap(QString(":/basic/treefile")));
                     else if(itemtype == 3)
                         return QIcon(QPixmap(QString(":/basic/treefolder")));
+                    else if(itemtype == 10)
+                        return QIcon(QPixmap(QString(":/basic/virtualfile")));
                     return QIcon(QPixmap(QString(":/basic/treefile")));
                 }
                 return QVariant();
