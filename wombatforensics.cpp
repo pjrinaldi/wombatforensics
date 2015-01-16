@@ -80,6 +80,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
+    connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
@@ -1166,4 +1167,9 @@ void WombatForensics::setScrollBarValue(off_t pos)
   // Note: offsetToPercent now rounds up, so we don't
   // have to worry about if this is the topLeft or bottom right
   //hexvsb->setValue(hexwidget->offsetToPercent(pos));
+}
+
+void WombatForensics::SetFilter(int headercolumn)
+{
+    qDebug() << "header clicked: " << headercolumn;
 }
