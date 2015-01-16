@@ -1172,5 +1172,8 @@ void WombatForensics::setScrollBarValue(off_t pos)
 
 void WombatForensics::SetFilter(int headercolumn)
 {
+    // if header column, show respective filter widget.
+    // then we need to activate that filter and relay that info
+    // back to the treemodel and redraw it accordingly.
     qDebug() << "header clicked: " << headercolumn;
 }

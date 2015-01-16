@@ -252,14 +252,15 @@ public:
             }
         }
     };
-
+/*
     void sort(int col, Qt::SortOrder order = Qt::AscendingOrder)
     {
+        // i won't be using sorting, so i can probably delete this.
         if(col == 3) // file size sort
         {
             qDebug() << "sorting would work now if i could figure it out.";
         }
-    };
+    };*/
     
     void GetModelCount(Node* curnode)
     {
