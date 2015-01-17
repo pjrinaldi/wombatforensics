@@ -21,52 +21,52 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_idfilter
+class Ui_pathfilter
 {
 public:
     QGridLayout *gridLayout;
     QCheckBox *checkBox;
     QLineEdit *lineEdit;
 
-    void setupUi(QWidget *idfilter)
+    void setupUi(QWidget *pathfilter)
     {
-        if (idfilter->objectName().isEmpty())
-            idfilter->setObjectName(QStringLiteral("idfilter"));
-        idfilter->setWindowModality(Qt::ApplicationModal);
-        idfilter->resize(339, 42);
+        if (pathfilter->objectName().isEmpty())
+            pathfilter->setObjectName(QStringLiteral("pathfilter"));
+        pathfilter->setWindowModality(Qt::ApplicationModal);
+        pathfilter->resize(339, 42);
         QFont font;
         font.setPointSize(8);
-        idfilter->setFont(font);
-        gridLayout = new QGridLayout(idfilter);
+        pathfilter->setFont(font);
+        gridLayout = new QGridLayout(pathfilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        checkBox = new QCheckBox(idfilter);
+        checkBox = new QCheckBox(pathfilter);
         checkBox->setObjectName(QStringLiteral("checkBox"));
 
         gridLayout->addWidget(checkBox, 0, 0, 1, 1);
 
-        lineEdit = new QLineEdit(idfilter);
+        lineEdit = new QLineEdit(pathfilter);
         lineEdit->setObjectName(QStringLiteral("lineEdit"));
 
         gridLayout->addWidget(lineEdit, 0, 1, 1, 1);
 
 
-        retranslateUi(idfilter);
+        retranslateUi(pathfilter);
         QObject::connect(checkBox, SIGNAL(toggled(bool)), lineEdit, SLOT(setEnabled(bool)));
 
-        QMetaObject::connectSlotsByName(idfilter);
+        QMetaObject::connectSlotsByName(pathfilter);
     } // setupUi
 
-    void retranslateUi(QWidget *idfilter)
+    void retranslateUi(QWidget *pathfilter)
     {
-        idfilter->setWindowTitle(QApplication::translate("idfilter", "Filter", 0));
-        checkBox->setText(QApplication::translate("idfilter", "Show Items where path contains", 0));
+        pathfilter->setWindowTitle(QApplication::translate("pathfilter", "Filter", 0));
+        checkBox->setText(QApplication::translate("pathfilter", "Show Items where path contains", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class idfilter: public Ui_idfilter {};
+    class pathfilter: public Ui_pathfilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

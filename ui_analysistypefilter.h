@@ -21,54 +21,54 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_idfilter
+class Ui_analysistypefilter
 {
 public:
     QGridLayout *gridLayout;
     QCheckBox *checkBox;
     QComboBox *comboBox;
 
-    void setupUi(QWidget *idfilter)
+    void setupUi(QWidget *analysistypefilter)
     {
-        if (idfilter->objectName().isEmpty())
-            idfilter->setObjectName(QStringLiteral("idfilter"));
-        idfilter->setWindowModality(Qt::ApplicationModal);
-        idfilter->resize(442, 42);
+        if (analysistypefilter->objectName().isEmpty())
+            analysistypefilter->setObjectName(QStringLiteral("analysistypefilter"));
+        analysistypefilter->setWindowModality(Qt::ApplicationModal);
+        analysistypefilter->resize(442, 42);
         QFont font;
         font.setPointSize(8);
-        idfilter->setFont(font);
-        gridLayout = new QGridLayout(idfilter);
+        analysistypefilter->setFont(font);
+        gridLayout = new QGridLayout(analysistypefilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        checkBox = new QCheckBox(idfilter);
+        checkBox = new QCheckBox(analysistypefilter);
         checkBox->setObjectName(QStringLiteral("checkBox"));
 
         gridLayout->addWidget(checkBox, 0, 0, 1, 1);
 
-        comboBox = new QComboBox(idfilter);
+        comboBox = new QComboBox(analysistypefilter);
         comboBox->setObjectName(QStringLiteral("comboBox"));
         comboBox->setEditable(false);
 
         gridLayout->addWidget(comboBox, 0, 1, 1, 1);
 
 
-        retranslateUi(idfilter);
+        retranslateUi(analysistypefilter);
         QObject::connect(checkBox, SIGNAL(toggled(bool)), comboBox, SLOT(setEnabled(bool)));
 
-        QMetaObject::connectSlotsByName(idfilter);
+        QMetaObject::connectSlotsByName(analysistypefilter);
     } // setupUi
 
-    void retranslateUi(QWidget *idfilter)
+    void retranslateUi(QWidget *analysistypefilter)
     {
-        idfilter->setWindowTitle(QApplication::translate("idfilter", "Filter", 0));
-        checkBox->setText(QApplication::translate("idfilter", "Show Items where analysis type matches", 0));
+        analysistypefilter->setWindowTitle(QApplication::translate("analysistypefilter", "Filter", 0));
+        checkBox->setText(QApplication::translate("analysistypefilter", "Show Items where analysis type matches", 0));
         comboBox->setCurrentText(QString());
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class idfilter: public Ui_idfilter {};
+    class analysistypefilter: public Ui_analysistypefilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

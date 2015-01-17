@@ -21,54 +21,54 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_idfilter
+class Ui_hashcategoryfilter
 {
 public:
     QGridLayout *gridLayout;
     QCheckBox *checkBox;
     QComboBox *comboBox;
 
-    void setupUi(QWidget *idfilter)
+    void setupUi(QWidget *hashcategoryfilter)
     {
-        if (idfilter->objectName().isEmpty())
-            idfilter->setObjectName(QStringLiteral("idfilter"));
-        idfilter->setWindowModality(Qt::ApplicationModal);
-        idfilter->resize(383, 42);
+        if (hashcategoryfilter->objectName().isEmpty())
+            hashcategoryfilter->setObjectName(QStringLiteral("hashcategoryfilter"));
+        hashcategoryfilter->setWindowModality(Qt::ApplicationModal);
+        hashcategoryfilter->resize(383, 42);
         QFont font;
         font.setPointSize(8);
-        idfilter->setFont(font);
-        gridLayout = new QGridLayout(idfilter);
+        hashcategoryfilter->setFont(font);
+        gridLayout = new QGridLayout(hashcategoryfilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        checkBox = new QCheckBox(idfilter);
+        checkBox = new QCheckBox(hashcategoryfilter);
         checkBox->setObjectName(QStringLiteral("checkBox"));
 
         gridLayout->addWidget(checkBox, 0, 0, 1, 1);
 
-        comboBox = new QComboBox(idfilter);
+        comboBox = new QComboBox(hashcategoryfilter);
         comboBox->setObjectName(QStringLiteral("comboBox"));
         comboBox->setEditable(false);
 
         gridLayout->addWidget(comboBox, 0, 1, 1, 1);
 
 
-        retranslateUi(idfilter);
+        retranslateUi(hashcategoryfilter);
         QObject::connect(checkBox, SIGNAL(toggled(bool)), comboBox, SLOT(setEnabled(bool)));
 
-        QMetaObject::connectSlotsByName(idfilter);
+        QMetaObject::connectSlotsByName(hashcategoryfilter);
     } // setupUi
 
-    void retranslateUi(QWidget *idfilter)
+    void retranslateUi(QWidget *hashcategoryfilter)
     {
-        idfilter->setWindowTitle(QApplication::translate("idfilter", "Filter", 0));
-        checkBox->setText(QApplication::translate("idfilter", "Show Items where hash matches", 0));
+        hashcategoryfilter->setWindowTitle(QApplication::translate("hashcategoryfilter", "Filter", 0));
+        checkBox->setText(QApplication::translate("hashcategoryfilter", "Show Items where hash matches", 0));
         comboBox->setCurrentText(QString());
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class idfilter: public Ui_idfilter {};
+    class hashcategoryfilter: public Ui_hashcategoryfilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

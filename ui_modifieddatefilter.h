@@ -21,7 +21,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_idfilter
+class Ui_modifieddatefilter
 {
 public:
     QGridLayout *gridLayout;
@@ -30,57 +30,57 @@ public:
     QDateTimeEdit *moredateTimeEdit;
     QDateTimeEdit *lessdateTimeEdit;
 
-    void setupUi(QWidget *idfilter)
+    void setupUi(QWidget *modifieddatefilter)
     {
-        if (idfilter->objectName().isEmpty())
-            idfilter->setObjectName(QStringLiteral("idfilter"));
-        idfilter->setWindowModality(Qt::ApplicationModal);
-        idfilter->resize(311, 72);
+        if (modifieddatefilter->objectName().isEmpty())
+            modifieddatefilter->setObjectName(QStringLiteral("modifieddatefilter"));
+        modifieddatefilter->setWindowModality(Qt::ApplicationModal);
+        modifieddatefilter->resize(311, 72);
         QFont font;
         font.setPointSize(8);
-        idfilter->setFont(font);
-        gridLayout = new QGridLayout(idfilter);
+        modifieddatefilter->setFont(font);
+        gridLayout = new QGridLayout(modifieddatefilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        morecheckBox = new QCheckBox(idfilter);
+        morecheckBox = new QCheckBox(modifieddatefilter);
         morecheckBox->setObjectName(QStringLiteral("morecheckBox"));
 
         gridLayout->addWidget(morecheckBox, 0, 0, 1, 1);
 
-        lesscheckBox = new QCheckBox(idfilter);
+        lesscheckBox = new QCheckBox(modifieddatefilter);
         lesscheckBox->setObjectName(QStringLiteral("lesscheckBox"));
 
         gridLayout->addWidget(lesscheckBox, 2, 0, 1, 1);
 
-        moredateTimeEdit = new QDateTimeEdit(idfilter);
+        moredateTimeEdit = new QDateTimeEdit(modifieddatefilter);
         moredateTimeEdit->setObjectName(QStringLiteral("moredateTimeEdit"));
 
         gridLayout->addWidget(moredateTimeEdit, 0, 1, 1, 1);
 
-        lessdateTimeEdit = new QDateTimeEdit(idfilter);
+        lessdateTimeEdit = new QDateTimeEdit(modifieddatefilter);
         lessdateTimeEdit->setObjectName(QStringLiteral("lessdateTimeEdit"));
 
         gridLayout->addWidget(lessdateTimeEdit, 2, 1, 1, 1);
 
 
-        retranslateUi(idfilter);
+        retranslateUi(modifieddatefilter);
         QObject::connect(lesscheckBox, SIGNAL(toggled(bool)), lessdateTimeEdit, SLOT(setEnabled(bool)));
         QObject::connect(morecheckBox, SIGNAL(toggled(bool)), moredateTimeEdit, SLOT(setEnabled(bool)));
 
-        QMetaObject::connectSlotsByName(idfilter);
+        QMetaObject::connectSlotsByName(modifieddatefilter);
     } // setupUi
 
-    void retranslateUi(QWidget *idfilter)
+    void retranslateUi(QWidget *modifieddatefilter)
     {
-        idfilter->setWindowTitle(QApplication::translate("idfilter", "Filter", 0));
-        morecheckBox->setText(QApplication::translate("idfilter", "Show Items with date >", 0));
-        lesscheckBox->setText(QApplication::translate("idfilter", "Show Items with date <", 0));
+        modifieddatefilter->setWindowTitle(QApplication::translate("modifieddatefilter", "Filter", 0));
+        morecheckBox->setText(QApplication::translate("modifieddatefilter", "Show Items with date >", 0));
+        lesscheckBox->setText(QApplication::translate("modifieddatefilter", "Show Items with date <", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class idfilter: public Ui_idfilter {};
+    class modifieddatefilter: public Ui_modifieddatefilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

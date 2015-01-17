@@ -20,45 +20,45 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_idfilter
+class Ui_hashfilter
 {
 public:
     QGridLayout *gridLayout;
     QCheckBox *checkBox;
 
-    void setupUi(QWidget *idfilter)
+    void setupUi(QWidget *hashfilter)
     {
-        if (idfilter->objectName().isEmpty())
-            idfilter->setObjectName(QStringLiteral("idfilter"));
-        idfilter->setWindowModality(Qt::ApplicationModal);
-        idfilter->resize(181, 36);
+        if (hashfilter->objectName().isEmpty())
+            hashfilter->setObjectName(QStringLiteral("hashfilter"));
+        hashfilter->setWindowModality(Qt::ApplicationModal);
+        hashfilter->resize(181, 36);
         QFont font;
         font.setPointSize(8);
-        idfilter->setFont(font);
-        gridLayout = new QGridLayout(idfilter);
+        hashfilter->setFont(font);
+        gridLayout = new QGridLayout(hashfilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        checkBox = new QCheckBox(idfilter);
+        checkBox = new QCheckBox(hashfilter);
         checkBox->setObjectName(QStringLiteral("checkBox"));
 
         gridLayout->addWidget(checkBox, 0, 0, 1, 1);
 
 
-        retranslateUi(idfilter);
+        retranslateUi(hashfilter);
 
-        QMetaObject::connectSlotsByName(idfilter);
+        QMetaObject::connectSlotsByName(hashfilter);
     } // setupUi
 
-    void retranslateUi(QWidget *idfilter)
+    void retranslateUi(QWidget *hashfilter)
     {
-        idfilter->setWindowTitle(QApplication::translate("idfilter", "Filter", 0));
-        checkBox->setText(QApplication::translate("idfilter", "Filter out duplicate items", 0));
+        hashfilter->setWindowTitle(QApplication::translate("hashfilter", "Filter", 0));
+        checkBox->setText(QApplication::translate("hashfilter", "Filter out duplicate items", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class idfilter: public Ui_idfilter {};
+    class hashfilter: public Ui_hashfilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

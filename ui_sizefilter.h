@@ -21,7 +21,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_idfilter
+class Ui_sizefilter
 {
 public:
     QGridLayout *gridLayout;
@@ -30,57 +30,57 @@ public:
     QSpinBox *morespinBox;
     QSpinBox *lessspinBox;
 
-    void setupUi(QWidget *idfilter)
+    void setupUi(QWidget *sizefilter)
     {
-        if (idfilter->objectName().isEmpty())
-            idfilter->setObjectName(QStringLiteral("idfilter"));
-        idfilter->setWindowModality(Qt::ApplicationModal);
-        idfilter->resize(221, 72);
+        if (sizefilter->objectName().isEmpty())
+            sizefilter->setObjectName(QStringLiteral("sizefilter"));
+        sizefilter->setWindowModality(Qt::ApplicationModal);
+        sizefilter->resize(221, 72);
         QFont font;
         font.setPointSize(8);
-        idfilter->setFont(font);
-        gridLayout = new QGridLayout(idfilter);
+        sizefilter->setFont(font);
+        gridLayout = new QGridLayout(sizefilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        morecheckBox = new QCheckBox(idfilter);
+        morecheckBox = new QCheckBox(sizefilter);
         morecheckBox->setObjectName(QStringLiteral("morecheckBox"));
 
         gridLayout->addWidget(morecheckBox, 0, 0, 1, 1);
 
-        lesscheckBox = new QCheckBox(idfilter);
+        lesscheckBox = new QCheckBox(sizefilter);
         lesscheckBox->setObjectName(QStringLiteral("lesscheckBox"));
 
         gridLayout->addWidget(lesscheckBox, 2, 0, 1, 1);
 
-        morespinBox = new QSpinBox(idfilter);
+        morespinBox = new QSpinBox(sizefilter);
         morespinBox->setObjectName(QStringLiteral("morespinBox"));
 
         gridLayout->addWidget(morespinBox, 0, 1, 1, 1);
 
-        lessspinBox = new QSpinBox(idfilter);
+        lessspinBox = new QSpinBox(sizefilter);
         lessspinBox->setObjectName(QStringLiteral("lessspinBox"));
 
         gridLayout->addWidget(lessspinBox, 2, 1, 1, 1);
 
 
-        retranslateUi(idfilter);
+        retranslateUi(sizefilter);
         QObject::connect(lesscheckBox, SIGNAL(toggled(bool)), lessspinBox, SLOT(setEnabled(bool)));
         QObject::connect(morecheckBox, SIGNAL(toggled(bool)), morespinBox, SLOT(setEnabled(bool)));
 
-        QMetaObject::connectSlotsByName(idfilter);
+        QMetaObject::connectSlotsByName(sizefilter);
     } // setupUi
 
-    void retranslateUi(QWidget *idfilter)
+    void retranslateUi(QWidget *sizefilter)
     {
-        idfilter->setWindowTitle(QApplication::translate("idfilter", "Filter", 0));
-        morecheckBox->setText(QApplication::translate("idfilter", "Show Items with size >", 0));
-        lesscheckBox->setText(QApplication::translate("idfilter", "Show Items with size < ", 0));
+        sizefilter->setWindowTitle(QApplication::translate("sizefilter", "Filter", 0));
+        morecheckBox->setText(QApplication::translate("sizefilter", "Show Items with size >", 0));
+        lesscheckBox->setText(QApplication::translate("sizefilter", "Show Items with size < ", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class idfilter: public Ui_idfilter {};
+    class sizefilter: public Ui_sizefilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

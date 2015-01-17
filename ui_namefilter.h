@@ -21,52 +21,52 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_idfilter
+class Ui_namefilter
 {
 public:
     QGridLayout *gridLayout;
     QCheckBox *checkBox;
     QLineEdit *lineEdit;
 
-    void setupUi(QWidget *idfilter)
+    void setupUi(QWidget *namefilter)
     {
-        if (idfilter->objectName().isEmpty())
-            idfilter->setObjectName(QStringLiteral("idfilter"));
-        idfilter->setWindowModality(Qt::ApplicationModal);
-        idfilter->resize(346, 42);
+        if (namefilter->objectName().isEmpty())
+            namefilter->setObjectName(QStringLiteral("namefilter"));
+        namefilter->setWindowModality(Qt::ApplicationModal);
+        namefilter->resize(346, 42);
         QFont font;
         font.setPointSize(8);
-        idfilter->setFont(font);
-        gridLayout = new QGridLayout(idfilter);
+        namefilter->setFont(font);
+        gridLayout = new QGridLayout(namefilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        checkBox = new QCheckBox(idfilter);
+        checkBox = new QCheckBox(namefilter);
         checkBox->setObjectName(QStringLiteral("checkBox"));
 
         gridLayout->addWidget(checkBox, 0, 0, 1, 1);
 
-        lineEdit = new QLineEdit(idfilter);
+        lineEdit = new QLineEdit(namefilter);
         lineEdit->setObjectName(QStringLiteral("lineEdit"));
 
         gridLayout->addWidget(lineEdit, 0, 1, 1, 1);
 
 
-        retranslateUi(idfilter);
+        retranslateUi(namefilter);
         QObject::connect(checkBox, SIGNAL(toggled(bool)), lineEdit, SLOT(setEnabled(bool)));
 
-        QMetaObject::connectSlotsByName(idfilter);
+        QMetaObject::connectSlotsByName(namefilter);
     } // setupUi
 
-    void retranslateUi(QWidget *idfilter)
+    void retranslateUi(QWidget *namefilter)
     {
-        idfilter->setWindowTitle(QApplication::translate("idfilter", "Filter", 0));
-        checkBox->setText(QApplication::translate("idfilter", "Show Items where name contains", 0));
+        namefilter->setWindowTitle(QApplication::translate("namefilter", "Filter", 0));
+        checkBox->setText(QApplication::translate("namefilter", "Show Items where name contains", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class idfilter: public Ui_idfilter {};
+    class namefilter: public Ui_namefilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

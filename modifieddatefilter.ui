@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>idfilter</class>
- <widget class="QWidget" name="idfilter">
+ <class>modifieddatefilter</class>
+ <widget class="QWidget" name="modifieddatefilter">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
