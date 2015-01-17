@@ -15,7 +15,18 @@
 #include "ui_sizefilter.h"
 
 namespace Ui {
-    class FilterViews;
+    class accessdatefilter;
+    class analysistypefilter;
+    class changedatefilter;
+    class createdatefilter;
+    class filetypefilter;
+    class hashcategoryfilter;
+    class hashfilter;
+    class idfilter;
+    class modifieddatefilter;
+    class namefilter;
+    class pathfilter;
+    class sizefilter;
 }
 
 class FilterViews : public QWidget
@@ -27,7 +38,18 @@ public:
     ~FilterViews();
 
 private:
-    Ui::FilterViews *ui;
+    Ui::accessdatefilter* uiadate;
+    Ui::analysistypefilter* uiatype;
+    Ui::changedatefilter* uichdate;
+    Ui::createdatefilter* uicrdate;
+    Ui::filetypefilter* uiftype;
+    Ui::hashcategoryfilter* uihashc;
+    Ui::hashfilter* uihash;
+    Ui::idfilter* uiid;
+    Ui::modifieddatefilter* uimdate;
+    Ui::namefilter* uiname;
+    Ui::pathfilter* uipath;
+    Ui::sizefilter* uisize;
 };
 
 Q_DECLARE_METATYPE(FilterViews*);
