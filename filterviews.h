@@ -6,6 +6,7 @@
 #include "ui_analysistypefilter.h"
 #include "ui_changeddatefilter.h"
 #include "ui_createdatefilter.h"
+#include "ui_filetypefilter.h"
 #include "ui_hashcategoryfilter.h"
 #include "ui_hashfilter.h"
 #include "ui_idfilter.h"
