@@ -97,8 +97,23 @@ public:
         }
         if(role == Qt::ForegroundRole)
         {
-            if(node->nodevalues.at(3).toInt() <= 512)
-                return QColor(Qt::lightGray);
+            if(filtervalues.maxidbool && filtervalues.minidbool == false)
+            {
+                if(node->nodevalues.at(0).toInt() <= filtervalues.maxid)
+                    return QColor(Qt::lightGray);
+            }
+            if(filtervalues.minidbool && filtervalues.maxidbool == false)
+            {
+                if(node->nodevalues.at(0).toInt() >= filtervalues.minid)
+                    return QColor(Qt::lightGray);
+            }
+            if(filtervalues.maxidbool && filtervalues.minidbool)
+            {
+                if(node->nodevalues.at(0).toInt() >= filtervalues.minid && node->nodevalues.at(0).toInt() <= filtervalues.maxid)
+                    return QColor(Qt::lightGray);
+            }
+            //if(node->nodevalues.at(3).toInt() <= 512)
+                //return QColor(Qt::lightGray);
         }
         if(role == Qt::DisplayRole)
         {

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>167</width>
-    <height>74</height>
+    <width>207</width>
+    <height>107</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,22 +93,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>IdFilter</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>121</x>
-     <y>56</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>83</x>
-     <y>36</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

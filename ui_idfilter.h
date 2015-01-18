@@ -37,7 +37,7 @@ public:
         if (IdFilter->objectName().isEmpty())
             IdFilter->setObjectName(QStringLiteral("IdFilter"));
         IdFilter->setWindowModality(Qt::WindowModal);
-        IdFilter->resize(167, 74);
+        IdFilter->resize(207, 107);
         IdFilter->setAutoFillBackground(true);
         IdFilter->setFrameShape(QFrame::StyledPanel);
         IdFilter->setFrameShadow(QFrame::Raised);
@@ -83,7 +83,6 @@ public:
 
 
         retranslateUi(IdFilter);
-        QObject::connect(pushButton, SIGNAL(clicked()), IdFilter, SLOT(hide()));
 
         QMetaObject::connectSlotsByName(IdFilter);
     } // setupUi

@@ -2,6 +2,7 @@
 #define FILTERVIEWS_H
 
 #include "wombatinclude.h"
+#include "globals.h"
 #include "ui_accesseddatefilter.h"
 #include "ui_analysistypefilter.h"
 #include "ui_changeddatefilter.h"
@@ -41,6 +42,9 @@ public:
     IdFilter(QWidget* parent = 0);
     ~IdFilter();
     void DisplayFilter(void);
+
+private slots:
+    void HideClicked();
 
 private:
     Ui::IdFilter* ui;

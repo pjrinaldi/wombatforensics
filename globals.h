@@ -26,6 +26,16 @@ extern QStringList propertylist;
 extern QString blockstring;
 extern struct magic_set* magicptr;
 
+struct FilterValues
+{
+    bool maxidbool;
+    bool minidbool;
+    int maxid;
+    int minid;
+};
+
+extern FilterValues filtervalues;
+
 class InterfaceSignals : public QObject
 {
     Q_OBJECT
