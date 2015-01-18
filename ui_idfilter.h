@@ -17,6 +17,7 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
 
 QT_BEGIN_NAMESPACE
@@ -29,6 +30,7 @@ public:
     QSpinBox *morespinBox;
     QCheckBox *lesscheckBox;
     QSpinBox *lessspinBox;
+    QPushButton *pushButton;
 
     void setupUi(QFrame *IdFilter)
     {
@@ -68,8 +70,20 @@ public:
 
         gridLayout->addWidget(lessspinBox, 1, 1, 1, 1);
 
+        pushButton = new QPushButton(IdFilter);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        QFont font1;
+        font1.setPointSize(8);
+        font1.setStrikeOut(false);
+        pushButton->setFont(font1);
+        pushButton->setCursor(QCursor(Qt::ArrowCursor));
+        pushButton->setFlat(true);
+
+        gridLayout->addWidget(pushButton, 2, 1, 1, 1);
+
 
         retranslateUi(IdFilter);
+        QObject::connect(pushButton, SIGNAL(clicked()), IdFilter, SLOT(hide()));
 
         QMetaObject::connectSlotsByName(IdFilter);
     } // setupUi
@@ -79,6 +93,7 @@ public:
         IdFilter->setWindowTitle(QApplication::translate("IdFilter", "Frame", 0));
         morecheckBox->setText(QApplication::translate("IdFilter", "Show ID's >", 0));
         lesscheckBox->setText(QApplication::translate("IdFilter", "Show ID's < ", 0));
+        pushButton->setText(QApplication::translate("IdFilter", "Apply", 0));
     } // retranslateUi
 
 };
