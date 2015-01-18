@@ -34,6 +34,8 @@ struct FilterValues
     int minid;
     bool namebool;
     QString namefilter;
+    bool pathbool;
+    QString pathfilter;
 };
 
 extern FilterValues filtervalues;

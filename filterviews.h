@@ -28,6 +28,7 @@ namespace Ui {
     */
     class IdFilter;
     class NameFilter;
+    class PathFilter;
     /*
     class modifieddatefilter;
     class pathfilter;
@@ -66,7 +67,24 @@ private:
     Ui::NameFilter* ui;
 };
 
+class PathFilter : public QWidget
+{
+    Q_OBJECT
+
+public:
+    PathFilter(QWidget* parent = 0);
+    ~PathFilter();
+    void DisplayFilter(void);
+
+private slots:
+    void HideClicked();
+
+private:
+    Ui::PathFilter* ui;
+};
+
 Q_DECLARE_METATYPE(IdFilter*);
 Q_DECLARE_METATYPE(NameFilter*);
+Q_DECLARE_METATYPE(PathFilter*);
 
 #endif

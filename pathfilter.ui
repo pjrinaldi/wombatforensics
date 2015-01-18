@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>pathfilter</class>
- <widget class="QWidget" name="pathfilter">
+ <class>PathFilter</class>
+ <widget class="QWidget" name="PathFilter">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>339</width>
-    <height>42</height>
+    <height>75</height>
    </rect>
   </property>
   <property name="font">
@@ -20,6 +20,9 @@
   </property>
   <property name="windowTitle">
    <string>Filter</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="horizontalSpacing">
@@ -35,25 +38,24 @@
    <item row="0" column="1">
     <widget class="QLineEdit" name="lineEdit"/>
    </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="pushButton">
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Apply</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>checkBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lineEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>116</x>
-     <y>119</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>267</x>
-     <y>119</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

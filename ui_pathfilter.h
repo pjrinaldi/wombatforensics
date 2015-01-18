@@ -17,56 +17,67 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
-class Ui_pathfilter
+class Ui_PathFilter
 {
 public:
     QGridLayout *gridLayout;
     QCheckBox *checkBox;
     QLineEdit *lineEdit;
+    QPushButton *pushButton;
 
-    void setupUi(QWidget *pathfilter)
+    void setupUi(QWidget *PathFilter)
     {
-        if (pathfilter->objectName().isEmpty())
-            pathfilter->setObjectName(QStringLiteral("pathfilter"));
-        pathfilter->setWindowModality(Qt::ApplicationModal);
-        pathfilter->resize(339, 42);
+        if (PathFilter->objectName().isEmpty())
+            PathFilter->setObjectName(QStringLiteral("PathFilter"));
+        PathFilter->setWindowModality(Qt::ApplicationModal);
+        PathFilter->resize(339, 75);
         QFont font;
         font.setPointSize(8);
-        pathfilter->setFont(font);
-        gridLayout = new QGridLayout(pathfilter);
+        PathFilter->setFont(font);
+        PathFilter->setAutoFillBackground(true);
+        gridLayout = new QGridLayout(PathFilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        checkBox = new QCheckBox(pathfilter);
+        checkBox = new QCheckBox(PathFilter);
         checkBox->setObjectName(QStringLiteral("checkBox"));
 
         gridLayout->addWidget(checkBox, 0, 0, 1, 1);
 
-        lineEdit = new QLineEdit(pathfilter);
+        lineEdit = new QLineEdit(PathFilter);
         lineEdit->setObjectName(QStringLiteral("lineEdit"));
 
         gridLayout->addWidget(lineEdit, 0, 1, 1, 1);
 
+        pushButton = new QPushButton(PathFilter);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setAutoFillBackground(false);
+        pushButton->setDefault(true);
+        pushButton->setFlat(true);
 
-        retranslateUi(pathfilter);
-        QObject::connect(checkBox, SIGNAL(toggled(bool)), lineEdit, SLOT(setEnabled(bool)));
+        gridLayout->addWidget(pushButton, 1, 1, 1, 1);
 
-        QMetaObject::connectSlotsByName(pathfilter);
+
+        retranslateUi(PathFilter);
+
+        QMetaObject::connectSlotsByName(PathFilter);
     } // setupUi
 
-    void retranslateUi(QWidget *pathfilter)
+    void retranslateUi(QWidget *PathFilter)
     {
-        pathfilter->setWindowTitle(QApplication::translate("pathfilter", "Filter", 0));
-        checkBox->setText(QApplication::translate("pathfilter", "Show Items where path contains", 0));
+        PathFilter->setWindowTitle(QApplication::translate("PathFilter", "Filter", 0));
+        checkBox->setText(QApplication::translate("PathFilter", "Show Items where path contains", 0));
+        pushButton->setText(QApplication::translate("PathFilter", "Apply", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class pathfilter: public Ui_pathfilter {};
+    class PathFilter: public Ui_PathFilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

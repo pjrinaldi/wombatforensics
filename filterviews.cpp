@@ -63,3 +63,29 @@ void NameFilter::HideClicked()
         filtervalues.namefilter = ui->lineEdit->text();
     this->hide();
 }
+
+PathFilter::PathFilter(QWidget* parent) : QWidget(parent), ui(new Ui::PathFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+PathFilter::~PathFilter()
+{
+}
+
+void PathFilter::DisplayFilter()
+{
+    if(this->pos().x() == 0)
+        this->move(this->mapFromGlobal(QCursor::pos()));
+    this->show();
+}
+
+void PathFilter::HideClicked()
+{
+    filtervalues.pathbool = ui->checkBox->isChecked();
+    if(filtervalues.pathbool)
+        filtervalues.pathfilter = ui->lineEdit->text();
+    this->hide();
+}

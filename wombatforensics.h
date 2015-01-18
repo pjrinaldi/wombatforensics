@@ -117,6 +117,11 @@ public:
                 if(node->nodevalues.at(1).toString().contains(filtervalues.namefilter) == false)
                     return QColor(Qt::lightGray);
             }
+            if(filtervalues.pathbool)
+            {
+                if(node->nodevalues.at(2).toString().contains(filtervalues.pathfilter) == false)
+                    return QColor(Qt::lightGray);
+            }
         }
         if(role == Qt::DisplayRole)
         {
@@ -202,6 +207,8 @@ public:
             if(section == 0 && (filtervalues.maxidbool || filtervalues.minidbool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 1 && filtervalues.namebool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 2 && filtervalues.pathbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -527,6 +534,7 @@ public:
     QMenu* treemenu;
     IdFilter* idfilterview;
     NameFilter* namefilterview;
+    PathFilter* pathfilterview;
 
 
 signals:
