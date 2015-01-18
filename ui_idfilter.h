@@ -77,6 +77,7 @@ public:
         font1.setStrikeOut(false);
         pushButton->setFont(font1);
         pushButton->setCursor(QCursor(Qt::ArrowCursor));
+        pushButton->setDefault(true);
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 2, 1, 1, 1);

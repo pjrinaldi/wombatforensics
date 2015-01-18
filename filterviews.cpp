@@ -37,3 +37,23 @@ void IdFilter::HideClicked()
         filtervalues.minid = ui->lessspinBox->value();
     this->hide();
 }
+
+NameFilter::NameFilter(QWidget* parent) : QWidget(parent), ui(new Ui::NameFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+NameFilter::~NameFilter()
+{
+}
+
+void NameFilter::DisplayFilter()
+{
+}
+
+void NameFilter::HideClicked()
+{
+    this->hide();
+}

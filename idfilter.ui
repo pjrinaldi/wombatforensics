@@ -85,6 +85,9 @@
      <property name="text">
       <string>Apply</string>
      </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
      <property name="flat">
       <bool>true</bool>
      </property>
