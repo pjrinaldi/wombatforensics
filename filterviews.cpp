@@ -12,7 +12,9 @@ IdFilter::~IdFilter()
 
 void IdFilter::DisplayFilter()
 {
-    this->move(this->mapFromParent(QCursor::pos()));
-    //this->move(this->mapFromGlobal(QCursor::pos()));
+    //qDebug() << "cur pos:" << this->pos();
+    //this->move(this->mapFromParent(QCursor::pos()));
+    if(this->pos().x() == 0)
+        this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
 }
