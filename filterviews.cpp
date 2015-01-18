@@ -13,8 +13,15 @@ IdFilter::~IdFilter()
 
 void IdFilter::DisplayFilter()
 {
-    //qDebug() << "cur pos:" << this->pos();
-    //this->move(this->mapFromParent(QCursor::pos()));
+    QSqlQuery idquery(fcasedb);
+    idquery.prepare("SELECT COUNT(objectid) FROM data;");
+    idquery.exec();
+    idquery.next();
+    ui->morespinBox->setMaximum(idquery.value(0).toInt());
+    ui->morespinBox->setMinimum(1);
+    ui->lessspinBox->setMaximum(idquery.value(0).toInt());
+    ui->lessspinBox->setMinimum(1);
+    idquery.finish();
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
