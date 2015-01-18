@@ -109,11 +109,14 @@ public:
             }
             if(filtervalues.maxidbool && filtervalues.minidbool)
             {
-                if(node->nodevalues.at(0).toInt() >= filtervalues.minid && node->nodevalues.at(0).toInt() <= filtervalues.maxid)
+                if(node->nodevalues.at(0).toInt() >= filtervalues.minid || node->nodevalues.at(0).toInt() <= filtervalues.maxid)
                     return QColor(Qt::lightGray);
             }
-            //if(node->nodevalues.at(3).toInt() <= 512)
-                //return QColor(Qt::lightGray);
+            if(filtervalues.namebool)
+            {
+                if(node->nodevalues.at(1).toString().contains(filtervalues.namefilter) == false)
+                    return QColor(Qt::lightGray);
+            }
         }
         if(role == Qt::DisplayRole)
         {
@@ -197,7 +200,9 @@ public:
         if(role == Qt::DecorationRole)
         {
             if(section == 0 && (filtervalues.maxidbool || filtervalues.minidbool))
-                return QIcon(QPixmap(QString(":/basic/treefile")));
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 1 && filtervalues.namebool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
     };
@@ -521,6 +526,7 @@ public:
     TreeModel* treemodel;
     QMenu* treemenu;
     IdFilter* idfilterview;
+    NameFilter* namefilterview;
 
 
 signals:

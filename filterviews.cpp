@@ -51,9 +51,15 @@ NameFilter::~NameFilter()
 
 void NameFilter::DisplayFilter()
 {
+    if(this->pos().x() == 0)
+        this->move(this->mapFromGlobal(QCursor::pos()));
+    this->show();
 }
 
 void NameFilter::HideClicked()
 {
+    filtervalues.namebool = ui->checkBox->isChecked();
+    if(filtervalues.namebool)
+        filtervalues.namefilter = ui->lineEdit->text();
     this->hide();
 }

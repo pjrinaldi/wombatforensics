@@ -39,6 +39,7 @@ public:
         QFont font;
         font.setPointSize(8);
         NameFilter->setFont(font);
+        NameFilter->setAutoFillBackground(true);
         gridLayout = new QGridLayout(NameFilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);

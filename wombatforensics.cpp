@@ -51,6 +51,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     sfwindow = new SortFilterWindow(this);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
+    namefilterview = new NameFilter(this);
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
@@ -1178,7 +1179,9 @@ void WombatForensics::SetFilter(int headercolumn)
     // back to the treemodel and redraw it accordingly.
     if(headercolumn == 0)
         idfilterview->DisplayFilter();
-    ui->dirTreeView->viewport()->update();
+    if(headercolumn == 1)
+        namefilterview->DisplayFilter();
+    //ui->dirTreeView->viewport()->update();
     //ui->dirTreeView->update();
     //ui->dirTreeView->resizeColumnToContents(0);
     //qDebug() << "header clicked: " << headercolumn;

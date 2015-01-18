@@ -21,6 +21,9 @@
   <property name="windowTitle">
    <string>Filter</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="horizontalSpacing">
     <number>0</number>
