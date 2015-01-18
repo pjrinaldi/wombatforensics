@@ -14,6 +14,7 @@
         <file alias="treepart">./Resources/gparted.png</file>
         <file alias="treefs">./Resources/foldersexplorer.png</file>
         <file alias="virtualfile">./Resources/virtualfile.png</file>
+        <file alias="virtualfolder">./Resources/virtualfolder.png</file>
     </qresource>
     <qresource prefix="/bar">
         <file alias="hexview">./Resources/hexeditor.png</file>
