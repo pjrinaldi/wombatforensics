@@ -183,6 +183,11 @@ public:
             if(section >= 0)
                 return headerdata.at(section);
         }
+        if(role == Qt::DecorationRole)
+        {
+            if(section == 0 && (filtervalues.maxidbool || filtervalues.minidbool))
+                return QIcon(QPixmap(QString(":/basic/treefile")));
+        }
         return QVariant();
     };
 

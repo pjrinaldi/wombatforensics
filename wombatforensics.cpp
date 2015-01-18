@@ -1178,5 +1178,6 @@ void WombatForensics::SetFilter(int headercolumn)
     // back to the treemodel and redraw it accordingly.
     if(headercolumn == 0)
         idfilterview->DisplayFilter();
+    ui->dirTreeView->header()->reset();
     //qDebug() << "header clicked: " << headercolumn;
 }
