@@ -50,6 +50,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     fileviewer = new FileViewer(this, tskobjptr);
     sfwindow = new SortFilterWindow(this);
     isignals = new InterfaceSignals();
+    idfilterview = new IdFilter(this);
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
@@ -1175,5 +1176,7 @@ void WombatForensics::SetFilter(int headercolumn)
     // if header column, show respective filter widget.
     // then we need to activate that filter and relay that info
     // back to the treemodel and redraw it accordingly.
-    qDebug() << "header clicked: " << headercolumn;
+    if(headercolumn == 0)
+        idfilterview->DisplayFilter();
+    //qDebug() << "header clicked: " << headercolumn;
 }

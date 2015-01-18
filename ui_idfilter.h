@@ -14,73 +14,77 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QSpinBox>
-#include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
-class Ui_idfilter
+class Ui_IdFilter
 {
 public:
     QGridLayout *gridLayout;
     QCheckBox *morecheckBox;
-    QCheckBox *lesscheckBox;
     QSpinBox *morespinBox;
+    QCheckBox *lesscheckBox;
     QSpinBox *lessspinBox;
 
-    void setupUi(QWidget *idfilter)
+    void setupUi(QFrame *IdFilter)
     {
-        if (idfilter->objectName().isEmpty())
-            idfilter->setObjectName(QStringLiteral("idfilter"));
-        idfilter->setWindowModality(Qt::ApplicationModal);
-        idfilter->resize(159, 72);
+        if (IdFilter->objectName().isEmpty())
+            IdFilter->setObjectName(QStringLiteral("IdFilter"));
+        IdFilter->setWindowModality(Qt::WindowModal);
+        IdFilter->resize(167, 74);
+        IdFilter->setAutoFillBackground(true);
+        IdFilter->setFrameShape(QFrame::StyledPanel);
+        IdFilter->setFrameShadow(QFrame::Raised);
+        gridLayout = new QGridLayout(IdFilter);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setSizeConstraint(QLayout::SetFixedSize);
+        morecheckBox = new QCheckBox(IdFilter);
+        morecheckBox->setObjectName(QStringLiteral("morecheckBox"));
         QFont font;
         font.setPointSize(8);
-        idfilter->setFont(font);
-        gridLayout = new QGridLayout(idfilter);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        gridLayout->setHorizontalSpacing(0);
-        morecheckBox = new QCheckBox(idfilter);
-        morecheckBox->setObjectName(QStringLiteral("morecheckBox"));
+        morecheckBox->setFont(font);
 
         gridLayout->addWidget(morecheckBox, 0, 0, 1, 1);
 
-        lesscheckBox = new QCheckBox(idfilter);
-        lesscheckBox->setObjectName(QStringLiteral("lesscheckBox"));
-
-        gridLayout->addWidget(lesscheckBox, 2, 0, 1, 1);
-
-        morespinBox = new QSpinBox(idfilter);
+        morespinBox = new QSpinBox(IdFilter);
         morespinBox->setObjectName(QStringLiteral("morespinBox"));
+        morespinBox->setFont(font);
 
         gridLayout->addWidget(morespinBox, 0, 1, 1, 1);
 
-        lessspinBox = new QSpinBox(idfilter);
+        lesscheckBox = new QCheckBox(IdFilter);
+        lesscheckBox->setObjectName(QStringLiteral("lesscheckBox"));
+        lesscheckBox->setFont(font);
+
+        gridLayout->addWidget(lesscheckBox, 1, 0, 1, 1);
+
+        lessspinBox = new QSpinBox(IdFilter);
         lessspinBox->setObjectName(QStringLiteral("lessspinBox"));
+        lessspinBox->setFont(font);
 
-        gridLayout->addWidget(lessspinBox, 2, 1, 1, 1);
+        gridLayout->addWidget(lessspinBox, 1, 1, 1, 1);
 
 
-        retranslateUi(idfilter);
-        QObject::connect(lesscheckBox, SIGNAL(toggled(bool)), lessspinBox, SLOT(setEnabled(bool)));
-        QObject::connect(morecheckBox, SIGNAL(toggled(bool)), morespinBox, SLOT(setEnabled(bool)));
+        retranslateUi(IdFilter);
 
-        QMetaObject::connectSlotsByName(idfilter);
+        QMetaObject::connectSlotsByName(IdFilter);
     } // setupUi
 
-    void retranslateUi(QWidget *idfilter)
+    void retranslateUi(QFrame *IdFilter)
     {
-        idfilter->setWindowTitle(QApplication::translate("idfilter", "Filter", 0));
-        morecheckBox->setText(QApplication::translate("idfilter", "Show ID's >", 0));
-        lesscheckBox->setText(QApplication::translate("idfilter", "Show ID's < ", 0));
+        IdFilter->setWindowTitle(QApplication::translate("IdFilter", "Frame", 0));
+        morecheckBox->setText(QApplication::translate("IdFilter", "Show ID's >", 0));
+        lesscheckBox->setText(QApplication::translate("IdFilter", "Show ID's < ", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class idfilter: public Ui_idfilter {};
+    class IdFilter: public Ui_IdFilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

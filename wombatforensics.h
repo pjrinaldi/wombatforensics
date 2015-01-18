@@ -15,6 +15,7 @@
 #include "globals.h"
 #include "imgreader.h"
 #include "imghexviewer.h"
+#include "filterviews.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -488,6 +489,7 @@ public:
     SortFilterWindow* sfwindow;
     TreeModel* treemodel;
     QMenu* treemenu;
+    IdFilter* idfilterview;
 
 
 signals:
