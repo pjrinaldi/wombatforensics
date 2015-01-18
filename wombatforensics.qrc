@@ -13,7 +13,7 @@
         <file alias="treevol">./Resources/drive-harddisk.png</file>
         <file alias="treepart">./Resources/gparted.png</file>
         <file alias="treefs">./Resources/foldersexplorer.png</file>
-        <file alias="virtualfile">./Resources/wombat_49.png</file>
+        <file alias="virtualfile">./Resources/virtualfile.png</file>
     </qresource>
     <qresource prefix="/bar">
         <file alias="hexview">./Resources/hexeditor.png</file>
