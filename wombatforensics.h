@@ -233,7 +233,6 @@ public:
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 3 && (filtervalues.maxsizebool || filtervalues.minsizebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            return QIcon(QPixmap(QString(":/basic/nofilter")));
         }
         return QVariant();
     };
