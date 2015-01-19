@@ -139,8 +139,10 @@ CreatedDateFilter::~CreatedDateFilter()
 
 void CreatedDateFilter::DisplayFilter()
 {
-    //if(this->pos().x() == 0)
-        //this->move(this->mapFromGlobal(QCursor::pos()));
+    ui->moredateTimeEdit->setDateTime(QDateTime::currentDateTimeUtc());
+    ui->lessdateTimeEdit->setDateTime(QDateTime::currentDateTimeUtc());
+    if(this->pos().x() == 0)
+        this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
 }
 

@@ -140,6 +140,7 @@ public:
             if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
             {
                 char buf[128];
+                qDebug() << filtervalues.maxcreate;
                 if(QDateTime::fromString(QString(TskTimeToStringUTC(node->nodevalues.at(6).toInt(), buf))) <= filtervalues.maxcreate)
                     return QColor(Qt::lightGray);
             }
