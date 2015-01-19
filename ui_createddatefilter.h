@@ -88,6 +88,8 @@ public:
         CreatedDateFilter->setWindowTitle(QApplication::translate("CreatedDateFilter", "Filter", 0));
         morecheckBox->setText(QApplication::translate("CreatedDateFilter", "Show Items with date >", 0));
         lesscheckBox->setText(QApplication::translate("CreatedDateFilter", "Show Items with date <", 0));
+        moredateTimeEdit->setDisplayFormat(QApplication::translate("CreatedDateFilter", "M/d/yy HH:mm:ss", 0));
+        lessdateTimeEdit->setDisplayFormat(QApplication::translate("CreatedDateFilter", "M/d/yy HH:mm:ss", 0));
         pushButton->setText(QApplication::translate("CreatedDateFilter", "Apply", 0));
     } // retranslateUi
 
