@@ -18,7 +18,6 @@
 
 namespace Ui {
     /*
-    class accessdatefilter;
     class analysistypefilter;
     class changedatefilter;
     class filetypefilter;
@@ -30,6 +29,7 @@ namespace Ui {
     class PathFilter;
     class SizeFilter;
     class CreatedDateFilter;
+    class AccessedDateFilter;
     /*
     class modifieddatefilter;
     */
@@ -112,10 +112,24 @@ private:
     Ui::CreatedDateFilter* ui;
 };
 
+class AccessedDateFilter : public QWidget
+{
+    Q_OBJECT
+public:
+    AccessedDateFilter(QWidget* parent = 0);
+    ~AccessedDateFilter();
+    void DisplayFilter();
+private slots:
+    void HideClicked();
+private:
+    Ui::AccessedDateFilter* ui;
+};
+
 Q_DECLARE_METATYPE(IdFilter*);
 Q_DECLARE_METATYPE(NameFilter*);
 Q_DECLARE_METATYPE(PathFilter*);
 Q_DECLARE_METATYPE(SizeFilter*);
 Q_DECLARE_METATYPE(CreatedDateFilter*);
+Q_DECLARE_METATYPE(AccessedDateFilter*);
 
 #endif

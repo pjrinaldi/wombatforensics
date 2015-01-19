@@ -55,8 +55,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     pathfilterview = new PathFilter(this);
     sizefilterview = new SizeFilter(this);
     createfilterview = new CreatedDateFilter(this);
+    accessfilterview = new AccessedDateFilter(this);
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
+    filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
+    filtervalues.minaccess = QDateTime::currentDateTimeUtc().toTime_t();
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
@@ -1189,4 +1192,6 @@ void WombatForensics::SetFilter(int headercolumn)
         sizefilterview->DisplayFilter();
     if(headercolumn == 6)
         createfilterview->DisplayFilter();
+    if(headercolumn == 7)
+        accessfilterview->DisplayFilter();
 }

@@ -156,3 +156,34 @@ void CreatedDateFilter::HideClicked()
         filtervalues.mincreate = ui->lessdateTimeEdit->dateTime().toTime_t();
     this->hide();
 }
+
+AccessedDateFilter::AccessedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::AccessedDateFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+AccessedDateFilter::~AccessedDateFilter()
+{
+}
+
+void AccessedDateFilter::DisplayFilter()
+{
+    ui->moredateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.maxaccess, Qt::OffsetFromUTC, 0));
+    ui->lessdateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.minaccess, Qt::OffsetFromUTC, 0));
+    if(this->pos().x() == 0)
+        this->move(this->mapFromGlobal(QCursor::pos()));
+    this->show();
+}
+
+void AccessedDateFilter::HideClicked()
+{
+    filtervalues.maxaccessbool = ui->morecheckBox->isChecked();
+    if(filtervalues.maxaccessbool)
+        filtervalues.maxaccess = ui->moredateTimeEdit->dateTime().toTime_t();
+    filtervalues.minaccessbool = ui->lesscheckBox->isChecked();
+    if(filtervalues.minaccessbool)
+        filtervalues.minaccess = ui->lessdateTimeEdit->dateTime().toTime_t();
+    this->hide();
+}

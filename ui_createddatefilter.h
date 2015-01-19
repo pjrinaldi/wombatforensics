@@ -37,7 +37,7 @@ public:
         if (CreatedDateFilter->objectName().isEmpty())
             CreatedDateFilter->setObjectName(QStringLiteral("CreatedDateFilter"));
         CreatedDateFilter->setWindowModality(Qt::ApplicationModal);
-        CreatedDateFilter->resize(311, 105);
+        CreatedDateFilter->resize(346, 105);
         QFont font;
         font.setPointSize(8);
         CreatedDateFilter->setFont(font);
@@ -88,8 +88,8 @@ public:
         CreatedDateFilter->setWindowTitle(QApplication::translate("CreatedDateFilter", "Filter", 0));
         morecheckBox->setText(QApplication::translate("CreatedDateFilter", "Show Items with date >", 0));
         lesscheckBox->setText(QApplication::translate("CreatedDateFilter", "Show Items with date <", 0));
-        moredateTimeEdit->setDisplayFormat(QApplication::translate("CreatedDateFilter", "M/d/yy HH:mm:ss", 0));
-        lessdateTimeEdit->setDisplayFormat(QApplication::translate("CreatedDateFilter", "M/d/yy HH:mm:ss", 0));
+        moredateTimeEdit->setDisplayFormat(QApplication::translate("CreatedDateFilter", "MM/dd/yyyy HH:mm:ss", 0));
+        lessdateTimeEdit->setDisplayFormat(QApplication::translate("CreatedDateFilter", "MM/dd/yyyy HH:mm:ss", 0));
         pushButton->setText(QApplication::translate("CreatedDateFilter", "Apply", 0));
     } // retranslateUi
 

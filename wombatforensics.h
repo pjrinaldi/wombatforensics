@@ -137,20 +137,38 @@ public:
                 if(node->nodevalues.at(3).toInt() >= filtervalues.minsize || node->nodevalues.at(3).toInt() <= filtervalues.maxsize)
                     return QColor(Qt::lightGray);
             }
-            if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
+            if(node->nodevalues.at(4).toInt() == 5)
             {
-                if(node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
-                    return QColor(Qt::lightGray);
-            }
-            if(filtervalues.maxcreatebool == false && filtervalues.mincreatebool)
-            {
-                if(node->nodevalues.at(6).toInt() >= filtervalues.mincreate)
-                    return QColor(Qt::lightGray);
-            }
-            if(filtervalues.maxcreatebool && filtervalues.mincreatebool)
-            {
-                if(node->nodevalues.at(6).toInt() >= filtervalues.mincreate || node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
-                    return QColor(Qt::lightGray);
+                if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
+                {
+                    if(node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxcreatebool == false && filtervalues.mincreatebool)
+                {
+                    if(node->nodevalues.at(6).toInt() >= filtervalues.mincreate)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxcreatebool && filtervalues.mincreatebool)
+                {
+                    if(node->nodevalues.at(6).toInt() >= filtervalues.mincreate || node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxaccessbool && filtervalues.minaccessbool == false)
+                {
+                    if(node->nodevalues.at(7).toInt() <= filtervalues.maxaccess)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxaccessbool == false && filtervalues.minaccessbool)
+                {
+                    if(node->nodevalues.at(7).toInt() >= filtervalues.minaccess)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxaccessbool && filtervalues.minaccessbool)
+                {
+                    if(node->nodevalues.at(7).toInt() >= filtervalues.minaccess || node->nodevalues.at(7).toInt() <= filtervalues.maxaccess)
+                        return QColor(Qt::lightGray);
+                }
             }
         }
         if(role == Qt::DisplayRole)
@@ -249,6 +267,8 @@ public:
             if(section == 3 && (filtervalues.maxsizebool || filtervalues.minsizebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 6 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 7 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -577,6 +597,7 @@ public:
     PathFilter* pathfilterview;
     SizeFilter* sizefilterview;
     CreatedDateFilter* createfilterview;
+    AccessedDateFilter* accessfilterview;
 
 
 signals:
