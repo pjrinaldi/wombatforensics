@@ -16,71 +16,80 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
-class Ui_sizefilter
+class Ui_SizeFilter
 {
 public:
     QGridLayout *gridLayout;
-    QCheckBox *morecheckBox;
-    QCheckBox *lesscheckBox;
-    QSpinBox *morespinBox;
     QSpinBox *lessspinBox;
+    QCheckBox *morecheckBox;
+    QSpinBox *morespinBox;
+    QCheckBox *lesscheckBox;
+    QPushButton *pushButton;
 
-    void setupUi(QWidget *sizefilter)
+    void setupUi(QWidget *SizeFilter)
     {
-        if (sizefilter->objectName().isEmpty())
-            sizefilter->setObjectName(QStringLiteral("sizefilter"));
-        sizefilter->setWindowModality(Qt::ApplicationModal);
-        sizefilter->resize(221, 72);
+        if (SizeFilter->objectName().isEmpty())
+            SizeFilter->setObjectName(QStringLiteral("SizeFilter"));
+        SizeFilter->setWindowModality(Qt::ApplicationModal);
+        SizeFilter->resize(261, 105);
         QFont font;
         font.setPointSize(8);
-        sizefilter->setFont(font);
-        gridLayout = new QGridLayout(sizefilter);
+        SizeFilter->setFont(font);
+        SizeFilter->setAutoFillBackground(true);
+        gridLayout = new QGridLayout(SizeFilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        morecheckBox = new QCheckBox(sizefilter);
-        morecheckBox->setObjectName(QStringLiteral("morecheckBox"));
-
-        gridLayout->addWidget(morecheckBox, 0, 0, 1, 1);
-
-        lesscheckBox = new QCheckBox(sizefilter);
-        lesscheckBox->setObjectName(QStringLiteral("lesscheckBox"));
-
-        gridLayout->addWidget(lesscheckBox, 2, 0, 1, 1);
-
-        morespinBox = new QSpinBox(sizefilter);
-        morespinBox->setObjectName(QStringLiteral("morespinBox"));
-
-        gridLayout->addWidget(morespinBox, 0, 1, 1, 1);
-
-        lessspinBox = new QSpinBox(sizefilter);
+        lessspinBox = new QSpinBox(SizeFilter);
         lessspinBox->setObjectName(QStringLiteral("lessspinBox"));
 
         gridLayout->addWidget(lessspinBox, 2, 1, 1, 1);
 
+        morecheckBox = new QCheckBox(SizeFilter);
+        morecheckBox->setObjectName(QStringLiteral("morecheckBox"));
 
-        retranslateUi(sizefilter);
-        QObject::connect(lesscheckBox, SIGNAL(toggled(bool)), lessspinBox, SLOT(setEnabled(bool)));
-        QObject::connect(morecheckBox, SIGNAL(toggled(bool)), morespinBox, SLOT(setEnabled(bool)));
+        gridLayout->addWidget(morecheckBox, 0, 0, 1, 1);
 
-        QMetaObject::connectSlotsByName(sizefilter);
+        morespinBox = new QSpinBox(SizeFilter);
+        morespinBox->setObjectName(QStringLiteral("morespinBox"));
+
+        gridLayout->addWidget(morespinBox, 0, 1, 1, 1);
+
+        lesscheckBox = new QCheckBox(SizeFilter);
+        lesscheckBox->setObjectName(QStringLiteral("lesscheckBox"));
+
+        gridLayout->addWidget(lesscheckBox, 2, 0, 1, 1);
+
+        pushButton = new QPushButton(SizeFilter);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setDefault(true);
+        pushButton->setFlat(true);
+
+        gridLayout->addWidget(pushButton, 3, 1, 1, 1);
+
+
+        retranslateUi(SizeFilter);
+
+        QMetaObject::connectSlotsByName(SizeFilter);
     } // setupUi
 
-    void retranslateUi(QWidget *sizefilter)
+    void retranslateUi(QWidget *SizeFilter)
     {
-        sizefilter->setWindowTitle(QApplication::translate("sizefilter", "Filter", 0));
-        morecheckBox->setText(QApplication::translate("sizefilter", "Show Items with size >", 0));
-        lesscheckBox->setText(QApplication::translate("sizefilter", "Show Items with size < ", 0));
+        SizeFilter->setWindowTitle(QApplication::translate("SizeFilter", "Filter", 0));
+        morecheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size >", 0));
+        lesscheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size < ", 0));
+        pushButton->setText(QApplication::translate("SizeFilter", "Apply", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class sizefilter: public Ui_sizefilter {};
+    class SizeFilter: public Ui_SizeFilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

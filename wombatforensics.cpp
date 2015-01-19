@@ -53,6 +53,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     idfilterview = new IdFilter(this);
     namefilterview = new NameFilter(this);
     pathfilterview = new PathFilter(this);
+    sizefilterview = new SizeFilter(this);
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
@@ -1184,6 +1185,9 @@ void WombatForensics::SetFilter(int headercolumn)
         namefilterview->DisplayFilter();
     if(headercolumn == 2)
         pathfilterview->DisplayFilter();
+    if(headercolumn == 3)
+        sizefilterview->DisplayFilter();
+    //ui->dirTreeView->header()->resizeSections(QHeaderView::ResizeToContents);
     //ui->dirTreeView->viewport()->update();
     //ui->dirTreeView->update();
     //ui->dirTreeView->resizeColumnToContents(0);

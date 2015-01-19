@@ -89,3 +89,39 @@ void PathFilter::HideClicked()
         filtervalues.pathfilter = ui->lineEdit->text();
     this->hide();
 }
+
+SizeFilter::SizeFilter(QWidget* parent) : QWidget(parent), ui(new Ui::SizeFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+SizeFilter::~SizeFilter()
+{
+}
+
+void SizeFilter::DisplayFilter()
+{
+    QSqlQuery sizequery(fcasedb);
+    sizequery.prepare("SELECT MAX(size) FROM data;");
+    sizequery.exec();
+    sizequery.next();
+    ui->morespinBox->setMaximum(sizequery.value(0).toInt());
+    ui->lessspinBox->setMaximum(sizequery.value(0).toInt());
+    sizequery.finish();
+    if(this->pos().x() == 0)
+        this->move(this->mapFromGlobal(QCursor::pos()));
+    this->show();
+}
+
+void SizeFilter::HideClicked()
+{
+    filtervalues.maxsizebool = ui->morecheckBox->isChecked();
+    if(filtervalues.maxsizebool)
+        filtervalues.maxsize = ui->morespinBox->value();
+    filtervalues.minsizebool = ui->lesscheckBox->isChecked();
+    if(filtervalues.minsizebool)
+        filtervalues.minsize = ui->lessspinBox->value();
+    this->hide();
+}

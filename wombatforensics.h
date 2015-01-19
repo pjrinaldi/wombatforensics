@@ -122,6 +122,21 @@ public:
                 if(node->nodevalues.at(2).toString().contains(filtervalues.pathfilter) == false)
                     return QColor(Qt::lightGray);
             }
+            if(filtervalues.maxsizebool && filtervalues.minsizebool == false)
+            {
+                if(node->nodevalues.at(3).toInt() <= filtervalues.maxsize)
+                    return QColor(Qt::lightGray);
+            }
+            if(filtervalues.minsizebool && filtervalues.maxsizebool == false)
+            {
+                if(node->nodevalues.at(3).toInt() >= filtervalues.minsize)
+                    return QColor(Qt::lightGray);
+            }
+            if(filtervalues.maxsizebool && filtervalues.minsizebool)
+            {
+                if(node->nodevalues.at(3).toInt() >= filtervalues.minsize || node->nodevalues.at(3).toInt() <= filtervalues.maxsize)
+                    return QColor(Qt::lightGray);
+            }
         }
         if(role == Qt::DisplayRole)
         {
@@ -209,6 +224,8 @@ public:
             if(section == 1 && filtervalues.namebool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 2 && filtervalues.pathbool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 3 && (filtervalues.maxsizebool || filtervalues.minsizebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -535,6 +552,7 @@ public:
     IdFilter* idfilterview;
     NameFilter* namefilterview;
     PathFilter* pathfilterview;
+    SizeFilter* sizefilterview;
 
 
 signals:

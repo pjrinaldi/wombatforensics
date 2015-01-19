@@ -36,6 +36,10 @@ struct FilterValues
     QString namefilter;
     bool pathbool;
     QString pathfilter;
+    bool maxsizebool;
+    bool minsizebool;
+    int maxsize;
+    int minsize;
 };
 
 extern FilterValues filtervalues;

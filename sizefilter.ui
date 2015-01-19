@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>sizefilter</class>
- <widget class="QWidget" name="sizefilter">
+ <class>SizeFilter</class>
+ <widget class="QWidget" name="SizeFilter">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>221</width>
-    <height>72</height>
+    <width>261</width>
+    <height>105</height>
    </rect>
   </property>
   <property name="font">
@@ -21,16 +21,25 @@
   <property name="windowTitle">
    <string>Filter</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="horizontalSpacing">
     <number>0</number>
    </property>
+   <item row="2" column="1">
+    <widget class="QSpinBox" name="lessspinBox"/>
+   </item>
    <item row="0" column="0">
     <widget class="QCheckBox" name="morecheckBox">
      <property name="text">
       <string>Show Items with size &gt;</string>
      </property>
     </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QSpinBox" name="morespinBox"/>
    </item>
    <item row="2" column="0">
     <widget class="QCheckBox" name="lesscheckBox">
@@ -39,47 +48,21 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QSpinBox" name="morespinBox"/>
-   </item>
-   <item row="2" column="1">
-    <widget class="QSpinBox" name="lessspinBox"/>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Apply</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>lesscheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lessspinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>56</x>
-     <y>50</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>127</x>
-     <y>50</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>morecheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>morespinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>56</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>127</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
