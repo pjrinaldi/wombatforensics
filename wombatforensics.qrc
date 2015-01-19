@@ -16,6 +16,7 @@
         <file alias="virtualfile">./Resources/virtualfile.png</file>
         <file alias="virtualfolder">./Resources/virtualfolder.png</file>
         <file alias="filterimg">./Resources/filterlist.png</file>
+        <file alias="nofilter">./Resources/nofilter.png</file>
     </qresource>
     <qresource prefix="/bar">
         <file alias="hexview">./Resources/hexeditor.png</file>

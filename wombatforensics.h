@@ -212,12 +212,8 @@ public:
 
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
     {
-        if(role == Qt::DecorationRole)
-        {
-            emit headerDataChanged(orientation, section, section);
-            return true;
-        }
-        return false;
+        emit headerDataChanged(orientation, section, section);
+        return true;
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -237,6 +233,7 @@ public:
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 3 && (filtervalues.maxsizebool || filtervalues.minsizebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
+            return QIcon(QPixmap(QString(":/basic/nofilter")));
         }
         return QVariant();
     };

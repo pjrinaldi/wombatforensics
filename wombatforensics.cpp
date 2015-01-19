@@ -1176,9 +1176,6 @@ void WombatForensics::setScrollBarValue(off_t pos)
 
 void WombatForensics::SetFilter(int headercolumn)
 {
-    // if header column, show respective filter widget.
-    // then we need to activate that filter and relay that info
-    // back to the treemodel and redraw it accordingly.
     if(headercolumn == 0)
         idfilterview->DisplayFilter();
     if(headercolumn == 1)
@@ -1187,9 +1184,4 @@ void WombatForensics::SetFilter(int headercolumn)
         pathfilterview->DisplayFilter();
     if(headercolumn == 3)
         sizefilterview->DisplayFilter();
-    //ui->dirTreeView->header()->resizeSections(QHeaderView::ResizeToContents);
-    //ui->dirTreeView->viewport()->update();
-    //ui->dirTreeView->update();
-    //ui->dirTreeView->resizeColumnToContents(0);
-    //qDebug() << "header clicked: " << headercolumn;
 }
