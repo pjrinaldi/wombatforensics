@@ -139,8 +139,8 @@ CreatedDateFilter::~CreatedDateFilter()
 
 void CreatedDateFilter::DisplayFilter()
 {
-    ui->moredateTimeEdit->setDateTime(QDateTime::currentDateTimeUtc());
-    ui->lessdateTimeEdit->setDateTime(QDateTime::currentDateTimeUtc());
+    ui->moredateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.maxcreate, Qt::OffsetFromUTC, 0));
+    ui->lessdateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.mincreate, Qt::OffsetFromUTC, 0));
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
@@ -150,9 +150,9 @@ void CreatedDateFilter::HideClicked()
 {
     filtervalues.maxcreatebool = ui->morecheckBox->isChecked();
     if(filtervalues.maxcreatebool)
-        filtervalues.maxcreate = ui->moredateTimeEdit->dateTime();
+        filtervalues.maxcreate = ui->moredateTimeEdit->dateTime().toTime_t();
     filtervalues.mincreatebool = ui->lesscheckBox->isChecked();
     if(filtervalues.mincreatebool)
-        filtervalues.mincreate = ui->lessdateTimeEdit->dateTime();
+        filtervalues.mincreate = ui->lessdateTimeEdit->dateTime().toTime_t();
     this->hide();
 }

@@ -139,21 +139,17 @@ public:
             }
             if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
             {
-                char buf[128];
-                qDebug() << filtervalues.maxcreate;
-                if(QDateTime::fromString(QString(TskTimeToStringUTC(node->nodevalues.at(6).toInt(), buf))) <= filtervalues.maxcreate)
+                if(node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
                     return QColor(Qt::lightGray);
             }
             if(filtervalues.maxcreatebool == false && filtervalues.mincreatebool)
             {
-                char buf[128];
-                if(QDateTime::fromString(QString(TskTimeToStringUTC(node->nodevalues.at(6).toInt(), buf))) >= filtervalues.mincreate)
+                if(node->nodevalues.at(6).toInt() >= filtervalues.mincreate)
                     return QColor(Qt::lightGray);
             }
             if(filtervalues.maxcreatebool && filtervalues.mincreatebool)
             {
-                char buf[128];
-                if(QDateTime::fromString(QString(TskTimeToStringUTC(node->nodevalues.at(6).toInt(), buf))) >= filtervalues.mincreate || QDateTime::fromString(QString(TskTimeToStringUTC(node->nodevalues.at(6).toInt(), buf))) <= filtervalues.maxcreate)
+                if(node->nodevalues.at(6).toInt() >= filtervalues.mincreate || node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
                     return QColor(Qt::lightGray);
             }
         }
