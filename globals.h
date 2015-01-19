@@ -40,6 +40,10 @@ struct FilterValues
     bool minsizebool;
     int maxsize;
     int minsize;
+    bool maxcreatebool;
+    bool mincreatebool;
+    QDateTime maxcreate;
+    QDateTime mincreate;
 };
 
 extern FilterValues filtervalues;

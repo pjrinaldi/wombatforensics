@@ -1184,4 +1184,6 @@ void WombatForensics::SetFilter(int headercolumn)
         pathfilterview->DisplayFilter();
     if(headercolumn == 3)
         sizefilterview->DisplayFilter();
+    if(headercolumn == 6)
+        createfilterview->DisplayFilter();
 }

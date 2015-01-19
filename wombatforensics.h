@@ -137,6 +137,24 @@ public:
                 if(node->nodevalues.at(3).toInt() >= filtervalues.minsize || node->nodevalues.at(3).toInt() <= filtervalues.maxsize)
                     return QColor(Qt::lightGray);
             }
+            if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
+            {
+                char buf[128];
+                if(QDateTime::fromString(QString(TskTimeToStringUTC(node->nodevalues.at(6).toInt(), buf))) <= filtervalues.maxcreate)
+                    return QColor(Qt::lightGray);
+            }
+            if(filtervalues.maxcreatebool == false && filtervalues.mincreatebool)
+            {
+                char buf[128];
+                if(QDateTime::fromString(QString(TskTimeToStringUTC(node->nodevalues.at(6).toInt(), buf))) >= filtervalues.mincreate)
+                    return QColor(Qt::lightGray);
+            }
+            if(filtervalues.maxcreatebool && filtervalues.mincreatebool)
+            {
+                char buf[128];
+                if(QDateTime::fromString(QString(TskTimeToStringUTC(node->nodevalues.at(6).toInt(), buf))) >= filtervalues.mincreate || QDateTime::fromString(QString(TskTimeToStringUTC(node->nodevalues.at(6).toInt(), buf))) <= filtervalues.maxcreate)
+                    return QColor(Qt::lightGray);
+            }
         }
         if(role == Qt::DisplayRole)
         {
@@ -232,6 +250,8 @@ public:
             if(section == 2 && filtervalues.pathbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 3 && (filtervalues.maxsizebool || filtervalues.minsizebool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 6 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -559,6 +579,7 @@ public:
     NameFilter* namefilterview;
     PathFilter* pathfilterview;
     SizeFilter* sizefilterview;
+    CreatedDateFilter* createfilterview;
 
 
 signals:

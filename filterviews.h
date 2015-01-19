@@ -6,7 +6,7 @@
 #include "ui_accesseddatefilter.h"
 #include "ui_analysistypefilter.h"
 #include "ui_changeddatefilter.h"
-#include "ui_createdatefilter.h"
+#include "ui_createddatefilter.h"
 #include "ui_filetypefilter.h"
 #include "ui_hashcategoryfilter.h"
 #include "ui_hashfilter.h"
@@ -21,7 +21,6 @@ namespace Ui {
     class accessdatefilter;
     class analysistypefilter;
     class changedatefilter;
-    class createdatefilter;
     class filetypefilter;
     class hashcategoryfilter;
     class hashfilter;
@@ -30,6 +29,7 @@ namespace Ui {
     class NameFilter;
     class PathFilter;
     class SizeFilter;
+    class CreatedDateFilter;
     /*
     class modifieddatefilter;
     */
@@ -97,9 +97,25 @@ private:
     Ui::SizeFilter* ui;
 };
 
+class CreatedDateFilter : public QWidget
+{
+    Q_OBJECT
+public:
+    CreatedDateFilter(QWidget* parent = 0);
+    ~CreatedDateFilter();
+    void DisplayFilter();
+
+private slots:
+    void HideClicked();
+
+private:
+    Ui::CreatedDateFilter* ui;
+};
+
 Q_DECLARE_METATYPE(IdFilter*);
 Q_DECLARE_METATYPE(NameFilter*);
 Q_DECLARE_METATYPE(PathFilter*);
 Q_DECLARE_METATYPE(SizeFilter*);
+Q_DECLARE_METATYPE(CreatedDateFilter*);
 
 #endif

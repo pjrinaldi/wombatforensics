@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>createdatefilter</class>
- <widget class="QWidget" name="createdatefilter">
+ <class>CreatedDateFilter</class>
+ <widget class="QWidget" name="CreatedDateFilter">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>311</width>
-    <height>72</height>
+    <height>105</height>
    </rect>
   </property>
   <property name="font">
@@ -21,7 +21,13 @@
   <property name="windowTitle">
    <string>Filter</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
+   </property>
    <property name="horizontalSpacing">
     <number>0</number>
    </property>
@@ -40,46 +46,40 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QDateTimeEdit" name="moredateTimeEdit"/>
+    <widget class="QDateTimeEdit" name="moredateTimeEdit">
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+     <property name="timeSpec">
+      <enum>Qt::UTC</enum>
+     </property>
+    </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QDateTimeEdit" name="lessdateTimeEdit"/>
+    <widget class="QDateTimeEdit" name="lessdateTimeEdit">
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+     <property name="timeSpec">
+      <enum>Qt::UTC</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Apply</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>lesscheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lessdateTimeEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>87</x>
-     <y>162</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>238</x>
-     <y>162</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>morecheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>moredateTimeEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>87</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>238</x>
-     <y>76</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

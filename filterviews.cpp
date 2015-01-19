@@ -125,3 +125,32 @@ void SizeFilter::HideClicked()
         filtervalues.minsize = ui->lessspinBox->value();
     this->hide();
 }
+
+CreatedDateFilter::CreatedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::CreatedDateFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+CreatedDateFilter::~CreatedDateFilter()
+{
+}
+
+void CreatedDateFilter::DisplayFilter()
+{
+    //if(this->pos().x() == 0)
+        //this->move(this->mapFromGlobal(QCursor::pos()));
+    this->show();
+}
+
+void CreatedDateFilter::HideClicked()
+{
+    filtervalues.maxcreatebool = ui->morecheckBox->isChecked();
+    if(filtervalues.maxcreatebool)
+        filtervalues.maxcreate = ui->moredateTimeEdit->dateTime();
+    filtervalues.mincreatebool = ui->lesscheckBox->isChecked();
+    if(filtervalues.mincreatebool)
+        filtervalues.mincreate = ui->lessdateTimeEdit->dateTime();
+    this->hide();
+}
