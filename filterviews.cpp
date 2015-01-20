@@ -21,6 +21,8 @@ void IdFilter::DisplayFilter()
     ui->morespinBox->setMinimum(1);
     ui->lessspinBox->setMaximum(idquery.value(0).toInt());
     ui->lessspinBox->setMinimum(1);
+    ui->morespinBox->setValue(filtervalues.maxid);
+    ui->lessspinBox->setValue(filtervalues.minid);
     idquery.finish();
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
@@ -51,6 +53,7 @@ NameFilter::~NameFilter()
 
 void NameFilter::DisplayFilter()
 {
+    ui->lineEdit->setText(filtervalues.namefilter);
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
@@ -77,6 +80,7 @@ PathFilter::~PathFilter()
 
 void PathFilter::DisplayFilter()
 {
+    ui->lineEdit->setText(filtervalues.pathfilter);
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
@@ -109,6 +113,8 @@ void SizeFilter::DisplayFilter()
     sizequery.next();
     ui->morespinBox->setMaximum(sizequery.value(0).toInt());
     ui->lessspinBox->setMaximum(sizequery.value(0).toInt());
+    ui->morespinBox->setValue(filtervalues.maxsize);
+    ui->lessspinBox->setValue(filtervalues.minsize);
     sizequery.finish();
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
@@ -288,6 +294,10 @@ void FileTypeFilter::DisplayFilter()
         ui->categorycomboBox->addItem(tmpcategory.at(i));
     for(int i=0; i < tmptype.count(); i++)
         ui->typecomboBox->addItem(tmptype.at(i));
+    if(filtervalues.filecategory.compare("") != 0)
+        ui->categorycomboBox->setCurrentText(filtervalues.filecategory);
+    if(filtervalues.filetype.compare("") != 0)
+        ui->typecomboBox->setCurrentText(filtervalues.filetype);
     QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
     QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
     if(this->pos().x() == 0)

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>181</width>
-    <height>36</height>
+    <width>266</width>
+    <height>45</height>
    </rect>
   </property>
   <property name="font">
@@ -21,6 +21,9 @@
   <property name="windowTitle">
    <string>Filter</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="horizontalSpacing">
     <number>0</number>
@@ -29,6 +32,19 @@
     <widget class="QCheckBox" name="checkBox">
      <property name="text">
       <string>Filter out duplicate items</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Apply</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
