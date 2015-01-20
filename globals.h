@@ -52,6 +52,14 @@ struct FilterValues
     bool minmodifybool;
     int maxmodify;
     int minmodify;
+    bool maxchangebool;
+    bool minchangebool;
+    int maxchange;
+    int minchange;
+    bool filecategorybool;
+    bool filetypebool;
+    QString filecategory;
+    QString filetype;
 };
 
 extern FilterValues filtervalues;

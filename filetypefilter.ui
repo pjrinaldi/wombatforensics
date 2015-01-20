@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>filetypefilter</class>
- <widget class="QWidget" name="filetypefilter">
+ <class>FileTypeFilter</class>
+ <widget class="QWidget" name="FileTypeFilter">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>429</width>
-    <height>72</height>
+    <height>105</height>
    </rect>
   </property>
   <property name="font">
@@ -21,17 +21,13 @@
   <property name="windowTitle">
    <string>Filter</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="horizontalSpacing">
     <number>0</number>
    </property>
-   <item row="0" column="0">
-    <widget class="QCheckBox" name="categorycheckBox">
-     <property name="text">
-      <string>Show Items where category matches</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="1">
     <widget class="QComboBox" name="categorycomboBox">
      <property name="editable">
@@ -39,6 +35,23 @@
      </property>
      <property name="currentText">
       <string/>
+     </property>
+     <property name="insertPolicy">
+      <enum>QComboBox::NoInsert</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="typecomboBox">
+     <property name="insertPolicy">
+      <enum>QComboBox::NoInsert</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QCheckBox" name="categorycheckBox">
+     <property name="text">
+      <string>Show Items where category matches</string>
      </property>
     </widget>
    </item>
@@ -49,8 +62,18 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="typecomboBox"/>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Apply</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

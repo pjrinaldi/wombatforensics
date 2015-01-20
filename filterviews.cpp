@@ -218,3 +218,81 @@ void ModifiedDateFilter::HideClicked()
         filtervalues.minmodify = ui->lessdateTimeEdit->dateTime().toTime_t();
     this->hide();
 }
+
+ChangedDateFilter::ChangedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::ChangedDateFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+ChangedDateFilter::~ChangedDateFilter()
+{
+}
+
+void ChangedDateFilter::DisplayFilter()
+{
+    ui->moredateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.maxchange, Qt::OffsetFromUTC, 0));
+    ui->lessdateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.minchange, Qt::OffsetFromUTC, 0));
+    if(this->pos().x() == 0)
+        this->move(this->mapFromGlobal(QCursor::pos()));
+    this->show();
+}
+
+void ChangedDateFilter::HideClicked()
+{
+    filtervalues.maxchangebool = ui->morecheckBox->isChecked();
+    if(filtervalues.maxchangebool)
+        filtervalues.maxchange = ui->moredateTimeEdit->dateTime().toTime_t();
+    filtervalues.minchangebool = ui->lesscheckBox->isChecked();
+    if(filtervalues.minchangebool)
+        filtervalues.minchange = ui->lessdateTimeEdit->dateTime().toTime_t();
+    this->hide();
+}
+
+FileTypeFilter::FileTypeFilter(QWidget* parent) : QWidget(parent), ui(new Ui::FileTypeFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+FileTypeFilter::~FileTypeFilter()
+{
+}
+
+void FileTypeFilter::DisplayFilter()
+{
+    QStringList tmplist, tmpcategory, tmptype;
+    tmplist.clear();
+    QSqlQuery typequery(fcasedb);
+    typequery.prepare("SELECT DISTINCT filesignature FROM data WHERE objecttype = 5;");
+    if(typequery.exec())
+    {
+        while(typequery.next())
+        {
+            tmpcategory.append(typequery.value(0).toString().split("/", QString::SkipEmptyParts).at(0));
+            if(typequery.value(0).toString().split("/", QString::SkipEmptyParts).count() == 2)
+                tmptype.append(typequery.value(0).toString().split("/", QString::SkipEmptyParts).at(1));
+            //tmplist.append(typequery.value(0).toString());
+        }
+    }
+    else
+        qDebug() << fcasedb.lastError().text();
+    typequery.finish();
+    qDebug() << "category:" << tmpcategory;
+    qDebug() << "type:" << tmptype;
+    qDebug() << "list:" << tmplist;
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
+    if(this->pos().x() == 0)
+        this->move(newpos);
+    this->show();
+}
+
+void FileTypeFilter::HideClicked()
+{
+    filtervalues.filecategorybool = ui->categorycheckBox->isChecked();
+    filtervalues.filetypebool = ui->typecheckBox->isChecked();
+    this->hide();
+}

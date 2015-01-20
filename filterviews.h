@@ -19,8 +19,6 @@
 namespace Ui {
     /*
     class analysistypefilter;
-    class changedatefilter;
-    class filetypefilter;
     class hashcategoryfilter;
     class hashfilter;
     */
@@ -31,6 +29,8 @@ namespace Ui {
     class CreatedDateFilter;
     class AccessedDateFilter;
     class ModifiedDateFilter;
+    class ChangedDateFilter;
+    class FileTypeFilter;
 }
 
 class IdFilter : public QFrame
@@ -136,6 +136,32 @@ private:
     Ui::ModifiedDateFilter* ui;
 };
 
+class ChangedDateFilter : public QWidget
+{
+    Q_OBJECT
+public:
+    ChangedDateFilter(QWidget* parent = 0);
+    ~ChangedDateFilter();
+    void DisplayFilter();
+private slots:
+    void HideClicked();
+private:
+    Ui::ChangedDateFilter* ui;
+};
+
+class FileTypeFilter : public QWidget
+{
+    Q_OBJECT
+public:
+    FileTypeFilter(QWidget* parent = 0);
+    ~FileTypeFilter();
+    void DisplayFilter();
+private slots:
+    void HideClicked();
+private:
+    Ui::FileTypeFilter* ui;
+};
+
 Q_DECLARE_METATYPE(IdFilter*);
 Q_DECLARE_METATYPE(NameFilter*);
 Q_DECLARE_METATYPE(PathFilter*);
@@ -143,5 +169,7 @@ Q_DECLARE_METATYPE(SizeFilter*);
 Q_DECLARE_METATYPE(CreatedDateFilter*);
 Q_DECLARE_METATYPE(AccessedDateFilter*);
 Q_DECLARE_METATYPE(ModifiedDateFilter*);
+Q_DECLARE_METATYPE(ChangedDateFilter*);
+Q_DECLARE_METATYPE(FileTypeFilter*);
 
 #endif

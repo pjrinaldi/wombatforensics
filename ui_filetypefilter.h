@@ -17,72 +17,85 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
-class Ui_filetypefilter
+class Ui_FileTypeFilter
 {
 public:
     QGridLayout *gridLayout;
-    QCheckBox *categorycheckBox;
     QComboBox *categorycomboBox;
-    QCheckBox *typecheckBox;
     QComboBox *typecomboBox;
+    QCheckBox *categorycheckBox;
+    QCheckBox *typecheckBox;
+    QPushButton *pushButton;
 
-    void setupUi(QWidget *filetypefilter)
+    void setupUi(QWidget *FileTypeFilter)
     {
-        if (filetypefilter->objectName().isEmpty())
-            filetypefilter->setObjectName(QStringLiteral("filetypefilter"));
-        filetypefilter->setWindowModality(Qt::ApplicationModal);
-        filetypefilter->resize(429, 72);
+        if (FileTypeFilter->objectName().isEmpty())
+            FileTypeFilter->setObjectName(QStringLiteral("FileTypeFilter"));
+        FileTypeFilter->setWindowModality(Qt::ApplicationModal);
+        FileTypeFilter->resize(429, 105);
         QFont font;
         font.setPointSize(8);
-        filetypefilter->setFont(font);
-        gridLayout = new QGridLayout(filetypefilter);
+        FileTypeFilter->setFont(font);
+        FileTypeFilter->setAutoFillBackground(true);
+        gridLayout = new QGridLayout(FileTypeFilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
-        categorycheckBox = new QCheckBox(filetypefilter);
+        categorycomboBox = new QComboBox(FileTypeFilter);
+        categorycomboBox->setObjectName(QStringLiteral("categorycomboBox"));
+        categorycomboBox->setEditable(false);
+        categorycomboBox->setInsertPolicy(QComboBox::NoInsert);
+
+        gridLayout->addWidget(categorycomboBox, 0, 1, 1, 1);
+
+        typecomboBox = new QComboBox(FileTypeFilter);
+        typecomboBox->setObjectName(QStringLiteral("typecomboBox"));
+        typecomboBox->setInsertPolicy(QComboBox::NoInsert);
+
+        gridLayout->addWidget(typecomboBox, 1, 1, 1, 1);
+
+        categorycheckBox = new QCheckBox(FileTypeFilter);
         categorycheckBox->setObjectName(QStringLiteral("categorycheckBox"));
 
         gridLayout->addWidget(categorycheckBox, 0, 0, 1, 1);
 
-        categorycomboBox = new QComboBox(filetypefilter);
-        categorycomboBox->setObjectName(QStringLiteral("categorycomboBox"));
-        categorycomboBox->setEditable(false);
-
-        gridLayout->addWidget(categorycomboBox, 0, 1, 1, 1);
-
-        typecheckBox = new QCheckBox(filetypefilter);
+        typecheckBox = new QCheckBox(FileTypeFilter);
         typecheckBox->setObjectName(QStringLiteral("typecheckBox"));
 
         gridLayout->addWidget(typecheckBox, 1, 0, 1, 1);
 
-        typecomboBox = new QComboBox(filetypefilter);
-        typecomboBox->setObjectName(QStringLiteral("typecomboBox"));
+        pushButton = new QPushButton(FileTypeFilter);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setDefault(true);
+        pushButton->setFlat(true);
 
-        gridLayout->addWidget(typecomboBox, 1, 1, 1, 1);
+        gridLayout->addWidget(pushButton, 2, 1, 1, 1);
 
 
-        retranslateUi(filetypefilter);
+        retranslateUi(FileTypeFilter);
         QObject::connect(categorycheckBox, SIGNAL(toggled(bool)), categorycomboBox, SLOT(setEnabled(bool)));
         QObject::connect(typecheckBox, SIGNAL(toggled(bool)), typecomboBox, SLOT(setEnabled(bool)));
 
-        QMetaObject::connectSlotsByName(filetypefilter);
+        QMetaObject::connectSlotsByName(FileTypeFilter);
     } // setupUi
 
-    void retranslateUi(QWidget *filetypefilter)
+    void retranslateUi(QWidget *FileTypeFilter)
     {
-        filetypefilter->setWindowTitle(QApplication::translate("filetypefilter", "Filter", 0));
-        categorycheckBox->setText(QApplication::translate("filetypefilter", "Show Items where category matches", 0));
+        FileTypeFilter->setWindowTitle(QApplication::translate("FileTypeFilter", "Filter", 0));
         categorycomboBox->setCurrentText(QString());
-        typecheckBox->setText(QApplication::translate("filetypefilter", "Show Items where type matches", 0));
+        categorycheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where category matches", 0));
+        typecheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where type matches", 0));
+        pushButton->setText(QApplication::translate("FileTypeFilter", "Apply", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class filetypefilter: public Ui_filetypefilter {};
+    class FileTypeFilter: public Ui_FileTypeFilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

@@ -184,6 +184,21 @@ public:
                     if(node->nodevalues.at(8).toInt() >= filtervalues.minmodify || node->nodevalues.at(8).toInt() <= filtervalues.maxmodify)
                         return QColor(Qt::lightGray);
                 }
+                if(filtervalues.maxchangebool && filtervalues.minchangebool == false)
+                {
+                    if(node->nodevalues.at(9).toInt() <= filtervalues.maxchange)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxchangebool == false && filtervalues.minchangebool)
+                {
+                    if(node->nodevalues.at(9).toInt() >= filtervalues.minchange)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxchangebool && filtervalues.minchangebool)
+                {
+                    if(node->nodevalues.at(9).toInt() >= filtervalues.minchange || node->nodevalues.at(9).toInt() <= filtervalues.maxchange)
+                        return QColor(Qt::lightGray);
+                }
             }
         }
         if(role == Qt::DisplayRole)
@@ -286,6 +301,10 @@ public:
             if(section == 7 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 8 && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 9 && (filtervalues.maxchangebool || filtervalues.minchangebool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 16 && (filtervalues.filecategorybool || filtervalues.filetypebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -616,6 +635,8 @@ public:
     CreatedDateFilter* createfilterview;
     AccessedDateFilter* accessfilterview;
     ModifiedDateFilter* modifyfilterview;
+    ChangedDateFilter* changefilterview;
+    FileTypeFilter* filetypefilterview;
 
 
 signals:
