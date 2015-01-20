@@ -280,9 +280,15 @@ void FileTypeFilter::DisplayFilter()
     else
         qDebug() << fcasedb.lastError().text();
     typequery.finish();
-    qDebug() << "category:" << tmpcategory;
-    qDebug() << "type:" << tmptype;
-    qDebug() << "list:" << tmplist;
+    //qDebug() << "category:" << tmpcategory;
+    //qDebug() << "type:" << tmptype;
+    //qDebug() << "list:" << tmplist;
+    tmpcategory.removeDuplicates();
+    tmptype.removeDuplicates();
+    for(int i=0; i < tmpcategory.count(); i++)
+        ui->categorycomboBox->addItem(tmpcategory.at(i));
+    for(int i=0; i < tmptype.count(); i++)
+        ui->typecomboBox->addItem(tmptype.at(i));
     QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
     QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
     if(this->pos().x() == 0)
