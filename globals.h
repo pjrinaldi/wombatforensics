@@ -48,6 +48,10 @@ struct FilterValues
     bool minaccessbool;
     int maxaccess;
     int minaccess;
+    bool maxmodifybool;
+    bool minmodifybool;
+    int maxmodify;
+    int minmodify;
 };
 
 extern FilterValues filtervalues;

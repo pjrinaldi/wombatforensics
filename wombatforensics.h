@@ -169,6 +169,21 @@ public:
                     if(node->nodevalues.at(7).toInt() >= filtervalues.minaccess || node->nodevalues.at(7).toInt() <= filtervalues.maxaccess)
                         return QColor(Qt::lightGray);
                 }
+                if(filtervalues.maxmodifybool && filtervalues.minmodifybool == false)
+                {
+                    if(node->nodevalues.at(8).toInt() <= filtervalues.maxmodify)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxmodifybool == false && filtervalues.minmodifybool)
+                {
+                    if(node->nodevalues.at(8).toInt() >= filtervalues.minmodify)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxmodifybool && filtervalues.minmodifybool)
+                {
+                    if(node->nodevalues.at(8).toInt() >= filtervalues.minmodify || node->nodevalues.at(8).toInt() <= filtervalues.maxmodify)
+                        return QColor(Qt::lightGray);
+                }
             }
         }
         if(role == Qt::DisplayRole)
@@ -269,6 +284,8 @@ public:
             if(section == 6 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 7 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 8 && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -598,6 +615,7 @@ public:
     SizeFilter* sizefilterview;
     CreatedDateFilter* createfilterview;
     AccessedDateFilter* accessfilterview;
+    ModifiedDateFilter* modifyfilterview;
 
 
 signals:
