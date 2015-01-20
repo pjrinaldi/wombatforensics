@@ -77,8 +77,6 @@ public:
 
 
         retranslateUi(FileTypeFilter);
-        QObject::connect(categorycheckBox, SIGNAL(toggled(bool)), categorycomboBox, SLOT(setEnabled(bool)));
-        QObject::connect(typecheckBox, SIGNAL(toggled(bool)), typecomboBox, SLOT(setEnabled(bool)));
 
         QMetaObject::connectSlotsByName(FileTypeFilter);
     } // setupUi

@@ -263,8 +263,11 @@ FileTypeFilter::~FileTypeFilter()
 
 void FileTypeFilter::DisplayFilter()
 {
-    QStringList tmplist, tmpcategory, tmptype;
-    tmplist.clear();
+    QStringList tmpcategory, tmptype;
+    tmpcategory.clear();
+    tmptype.clear();
+    ui->categorycomboBox->clear();
+    ui->typecomboBox->clear();
     QSqlQuery typequery(fcasedb);
     typequery.prepare("SELECT DISTINCT filesignature FROM data WHERE objecttype = 5;");
     if(typequery.exec())
@@ -274,15 +277,11 @@ void FileTypeFilter::DisplayFilter()
             tmpcategory.append(typequery.value(0).toString().split("/", QString::SkipEmptyParts).at(0));
             if(typequery.value(0).toString().split("/", QString::SkipEmptyParts).count() == 2)
                 tmptype.append(typequery.value(0).toString().split("/", QString::SkipEmptyParts).at(1));
-            //tmplist.append(typequery.value(0).toString());
         }
     }
     else
         qDebug() << fcasedb.lastError().text();
     typequery.finish();
-    //qDebug() << "category:" << tmpcategory;
-    //qDebug() << "type:" << tmptype;
-    //qDebug() << "list:" << tmplist;
     tmpcategory.removeDuplicates();
     tmptype.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)
@@ -299,6 +298,10 @@ void FileTypeFilter::DisplayFilter()
 void FileTypeFilter::HideClicked()
 {
     filtervalues.filecategorybool = ui->categorycheckBox->isChecked();
+    if(filtervalues.filecategorybool)
+        filtervalues.filecategory = ui->categorycomboBox->currentText();
     filtervalues.filetypebool = ui->typecheckBox->isChecked();
+    if(filtervalues.filetypebool)
+        filtervalues.filetype = ui->typecomboBox->currentText();
     this->hide();
 }

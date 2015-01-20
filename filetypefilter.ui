@@ -78,38 +78,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>categorycheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>categorycomboBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>125</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>331</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>typecheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>typecomboBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>125</x>
-     <y>50</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>331</x>
-     <y>50</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

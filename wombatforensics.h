@@ -199,6 +199,21 @@ public:
                     if(node->nodevalues.at(9).toInt() >= filtervalues.minchange || node->nodevalues.at(9).toInt() <= filtervalues.maxchange)
                         return QColor(Qt::lightGray);
                 }
+                if(filtervalues.filecategorybool && filtervalues.filetypebool == false)
+                {
+                    if(node->nodevalues.at(16).toString().contains(filtervalues.filecategory) == false)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.filecategorybool == false && filtervalues.filetypebool)
+                {
+                    if(node->nodevalues.at(16).toString().contains(filtervalues.filetype) == false)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.filecategorybool && filtervalues.filetypebool)
+                {
+                    if(node->nodevalues.at(16).toString().contains(filtervalues.filecategory) == false || node->nodevalues.at(16).toString().contains(filtervalues.filetype) == false)
+                        return QColor(Qt::lightGray);
+                }
             }
         }
         if(role == Qt::DisplayRole)
@@ -272,13 +287,13 @@ public:
         }
         return false;
     };
-
+/*
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
     {
         emit headerDataChanged(orientation, section, section);
         return true;
     };
-
+*/
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
     {
         if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
