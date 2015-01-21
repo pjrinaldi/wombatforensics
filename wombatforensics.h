@@ -551,11 +551,7 @@ public:
            endInsertRows();
         }
     };
- 
-signals:
-    void checkedNodesChanged();
 
-private:
     Node* NodeFromIndex(const QModelIndex &index) const
     {
         if(index.isValid())
@@ -563,7 +559,11 @@ private:
         else
             return rootnode;
     };
-    
+ 
+signals:
+    void checkedNodesChanged();
+
+private:
     Qt::CheckState GetCheckState(Node* curnode) const
     {
         if(curnode->checkstate == 0) // unchecked
@@ -724,6 +724,8 @@ private slots:
         //qDebug() << "still doesn't work";
         emit ui->dirTreeView->header()->geometriesChanged();
     };
+    void NextItem();
+    void PreviousItem();
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -771,6 +773,8 @@ private:
     QFrame* vline1;
     QFrame* vline2;
     QVector<FileExportData> exportfilelist;
+    QShortcut* jumpforward;
+    QShortcut* jumpbackward;
 };
 
 #endif // WOMBATFORENSICS_H

@@ -111,6 +111,12 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(changefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(filetypefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(hashfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    jumpforward = new QShortcut(ui->dirTreeView);
+    jumpbackward = new QShortcut(ui->dirTreeView);
+    jumpforward->setKey(Qt::CTRL + Qt::Key_J);
+    jumpbackward->setKey(Qt::CTRL + Qt::SHIFT + Qt::Key_J);
+    connect(jumpforward, SIGNAL(activated()), this, SLOT(NextItem()));
+    connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
@@ -1220,4 +1226,20 @@ void WombatForensics::SetFilter(int headercolumn)
     if(headercolumn == 10)
         hashfilterview->DisplayFilter();
     ResizeColumns();
+}
+
+void WombatForensics::NextItem()
+{
+    QModelIndex curindex = ui->dirTreeView->currentIndex();
+    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(curindex, Qt::ForegroundRole, QVariant(), 2, Qt::MatchExactly);
+    if(tmplist.count() == 2)
+        ui->dirTreeView->setCurrentIndex(tmplist.at(1));
+}
+
+void WombatForensics::PreviousItem()
+{
+    QModelIndex curindex = ui->dirTreeView->currentIndex();
+    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(curindex, Qt::ForegroundRole, QVariant(), -1, Qt::MatchExactly | Qt::MatchWrap);
+    if(tmplist.count() > 0)
+        ui->dirTreeView->setCurrentIndex(tmplist.last());
 }
