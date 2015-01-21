@@ -101,8 +101,17 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
-    connect(ui->dirTreeView->model(), SIGNAL(headerDataChanged(Qt::Orientation, int, int)), ui->dirTreeView->header(), SLOT(headerDataChanged(Qt::Orientation, int, int)));
+    //connect(ui->dirTreeView->model(), SIGNAL(headerDataChanged(Qt::Orientation, int, int)), ui->dirTreeView->header(), SLOT(headerDataChanged(Qt::Orientation, int, int)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(namefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(pathfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(sizefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(createfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(accessfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(modifyfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(changefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(filetypefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(hashfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)

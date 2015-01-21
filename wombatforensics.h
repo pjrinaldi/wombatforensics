@@ -723,8 +723,8 @@ private slots:
     void SetFilter(int headercolumn);
     void FilterApplied()
     {
-        qDebug() << "still doesn't work";
-        ResizeColumns();
+        //qDebug() << "still doesn't work";
+        emit ui->dirTreeView->header()->geometriesChanged();
     };
 
 protected:

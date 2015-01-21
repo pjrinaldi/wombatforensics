@@ -61,6 +61,9 @@ public:
     ~NameFilter();
     void DisplayFilter(void);
 
+signals:
+    void HeaderChanged();
+
 private slots:
     void HideClicked();
 
@@ -77,6 +80,9 @@ public:
     ~PathFilter();
     void DisplayFilter(void);
 
+signals:
+    void HeaderChanged();
+
 private slots:
     void HideClicked();
 
@@ -91,6 +97,9 @@ public:
     SizeFilter(QWidget* parent = 0);
     ~SizeFilter();
     void DisplayFilter(void);
+
+signals:
+    void HeaderChanged();
 
 private slots:
     void HideClicked();
@@ -107,6 +116,9 @@ public:
     ~CreatedDateFilter();
     void DisplayFilter();
 
+signals:
+    void HeaderChanged();
+
 private slots:
     void HideClicked();
 
@@ -121,6 +133,10 @@ public:
     AccessedDateFilter(QWidget* parent = 0);
     ~AccessedDateFilter();
     void DisplayFilter();
+
+signals:
+    void HeaderChanged();
+
 private slots:
     void HideClicked();
 private:
@@ -134,6 +150,10 @@ public:
     ModifiedDateFilter(QWidget* parent = 0);
     ~ModifiedDateFilter();
     void DisplayFilter();
+
+signals:
+    void HeaderChanged();
+
 private slots:
     void HideClicked();
 private:
@@ -147,6 +167,10 @@ public:
     ChangedDateFilter(QWidget* parent = 0);
     ~ChangedDateFilter();
     void DisplayFilter();
+
+signals:
+    void HeaderChanged();
+
 private slots:
     void HideClicked();
 private:
@@ -160,6 +184,10 @@ public:
     FileTypeFilter(QWidget* parent = 0);
     ~FileTypeFilter();
     void DisplayFilter();
+
+signals:
+    void HeaderChanged();
+
 private slots:
     void HideClicked();
 private:
@@ -173,6 +201,10 @@ public:
     HashFilter(QWidget* parent = 0);
     ~HashFilter();
     void DisplayFilter();
+
+signals:
+    void HeaderChanged();
+
 private slots:
     void HideClicked();
 private:

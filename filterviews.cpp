@@ -66,6 +66,7 @@ void NameFilter::HideClicked()
     if(filtervalues.namebool)
         filtervalues.namefilter = ui->lineEdit->text();
     this->hide();
+    emit HeaderChanged();
 }
 
 PathFilter::PathFilter(QWidget* parent) : QWidget(parent), ui(new Ui::PathFilter)
@@ -93,6 +94,7 @@ void PathFilter::HideClicked()
     if(filtervalues.pathbool)
         filtervalues.pathfilter = ui->lineEdit->text();
     this->hide();
+    emit HeaderChanged();
 }
 
 SizeFilter::SizeFilter(QWidget* parent) : QWidget(parent), ui(new Ui::SizeFilter)
@@ -131,6 +133,7 @@ void SizeFilter::HideClicked()
     if(filtervalues.minsizebool)
         filtervalues.minsize = ui->lessspinBox->value();
     this->hide();
+    emit HeaderChanged();
 }
 
 CreatedDateFilter::CreatedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::CreatedDateFilter)
@@ -148,8 +151,10 @@ void CreatedDateFilter::DisplayFilter()
 {
     ui->moredateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.maxcreate, Qt::OffsetFromUTC, 0));
     ui->lessdateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.mincreate, Qt::OffsetFromUTC, 0));
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
     if(this->pos().x() == 0)
-        this->move(this->mapFromGlobal(QCursor::pos()));
+        this->move(newpos);
     this->show();
 }
 
@@ -162,6 +167,7 @@ void CreatedDateFilter::HideClicked()
     if(filtervalues.mincreatebool)
         filtervalues.mincreate = ui->lessdateTimeEdit->dateTime().toTime_t();
     this->hide();
+    emit HeaderChanged();
 }
 
 AccessedDateFilter::AccessedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::AccessedDateFilter)
@@ -179,8 +185,10 @@ void AccessedDateFilter::DisplayFilter()
 {
     ui->moredateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.maxaccess, Qt::OffsetFromUTC, 0));
     ui->lessdateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.minaccess, Qt::OffsetFromUTC, 0));
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
     if(this->pos().x() == 0)
-        this->move(this->mapFromGlobal(QCursor::pos()));
+        this->move(newpos);
     this->show();
 }
 
@@ -193,6 +201,7 @@ void AccessedDateFilter::HideClicked()
     if(filtervalues.minaccessbool)
         filtervalues.minaccess = ui->lessdateTimeEdit->dateTime().toTime_t();
     this->hide();
+    emit HeaderChanged();
 }
 
 ModifiedDateFilter::ModifiedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::ModifiedDateFilter)
@@ -210,8 +219,10 @@ void ModifiedDateFilter::DisplayFilter()
 {
     ui->moredateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.maxmodify, Qt::OffsetFromUTC, 0));
     ui->lessdateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.minmodify, Qt::OffsetFromUTC, 0));
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
     if(this->pos().x() == 0)
-        this->move(this->mapFromGlobal(QCursor::pos()));
+        this->move(newpos);
     this->show();
 }
 
@@ -224,6 +235,7 @@ void ModifiedDateFilter::HideClicked()
     if(filtervalues.minmodifybool)
         filtervalues.minmodify = ui->lessdateTimeEdit->dateTime().toTime_t();
     this->hide();
+    emit HeaderChanged();
 }
 
 ChangedDateFilter::ChangedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::ChangedDateFilter)
@@ -241,8 +253,10 @@ void ChangedDateFilter::DisplayFilter()
 {
     ui->moredateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.maxchange, Qt::OffsetFromUTC, 0));
     ui->lessdateTimeEdit->setDateTime(QDateTime::fromTime_t(filtervalues.minchange, Qt::OffsetFromUTC, 0));
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
     if(this->pos().x() == 0)
-        this->move(this->mapFromGlobal(QCursor::pos()));
+        this->move(newpos);
     this->show();
 }
 
@@ -255,6 +269,7 @@ void ChangedDateFilter::HideClicked()
     if(filtervalues.minchangebool)
         filtervalues.minchange = ui->lessdateTimeEdit->dateTime().toTime_t();
     this->hide();
+    emit HeaderChanged();
 }
 
 FileTypeFilter::FileTypeFilter(QWidget* parent) : QWidget(parent), ui(new Ui::FileTypeFilter)
@@ -315,6 +330,7 @@ void FileTypeFilter::HideClicked()
     if(filtervalues.filetypebool)
         filtervalues.filetype = ui->typecomboBox->currentText();
     this->hide();
+    emit HeaderChanged();
 }
 
 HashFilter::HashFilter(QWidget* parent) : QWidget(parent), ui(new Ui::HashFilter)
@@ -375,4 +391,5 @@ void HashFilter::HideClicked()
         hashquery.finish();
     }
     this->hide();
+    emit HeaderChanged();
 }
