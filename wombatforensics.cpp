@@ -101,6 +101,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
+    connect(ui->dirTreeView->model(), SIGNAL(headerDataChanged(Qt::Orientation, int, int)), ui->dirTreeView->header(), SLOT(headerDataChanged(Qt::Orientation, int, int)));
+    connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
@@ -1211,4 +1213,5 @@ void WombatForensics::SetFilter(int headercolumn)
         filetypefilterview->DisplayFilter();
     if(headercolumn == 10)
         hashfilterview->DisplayFilter();
+    ResizeColumns();
 }

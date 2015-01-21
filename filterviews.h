@@ -42,6 +42,9 @@ public:
     ~IdFilter();
     void DisplayFilter(void);
 
+signals:
+    void HeaderChanged();
+
 private slots:
     void HideClicked();
 

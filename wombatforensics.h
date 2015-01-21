@@ -221,21 +221,6 @@ public:
                         if(node->nodevalues.at(0).toInt() == filtervalues.hashidlist.at(i))
                             return QColor(Qt::lightGray);
                     }
-                    /*
-                    for(int i=0; i < filtervalues.hashlist.count(); i++)
-                    {
-                        if(node->nodevalues.at(10).toString().compare(filtervalues.hashlist.at(i)) == 0)
-                        {
-                            if(filtervalues.hashcount.at(i) > 1)
-                                return QColor(Qt::lightGray);
-                            else
-                            {
-                                filtervalues.hashcount[i]++;
-                                break;
-                            }
-                        }
-                    }
-                    */
                 }
             }
         }
@@ -311,11 +296,13 @@ public:
         return false;
     };
 
+    /*
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
     {
         emit headerDataChanged(orientation, section, section);
         return true;
     };
+    */
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
     {
@@ -327,9 +314,14 @@ public:
         if(role == Qt::DecorationRole)
         {
             if(section == 0 && (filtervalues.maxidbool || filtervalues.minidbool))
+            {
+                //emit headerDataChanged(orientation, section, section);
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
+            }
             if(section == 1 && filtervalues.namebool)
+            {
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
+            }
             if(section == 2 && filtervalues.pathbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 3 && (filtervalues.maxsizebool || filtervalues.minsizebool))
@@ -729,6 +721,11 @@ private slots:
     void SetStepValues(int singlestep, int pagestep);
     void TreeContextMenu(const QPoint &point);
     void SetFilter(int headercolumn);
+    void FilterApplied()
+    {
+        qDebug() << "still doesn't work";
+        ResizeColumns();
+    };
 
 protected:
     void closeEvent(QCloseEvent* event);

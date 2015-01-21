@@ -38,6 +38,7 @@ void IdFilter::HideClicked()
     if(filtervalues.minidbool)
         filtervalues.minid = ui->lessspinBox->value();
     this->hide();
+    emit HeaderChanged();
 }
 
 NameFilter::NameFilter(QWidget* parent) : QWidget(parent), ui(new Ui::NameFilter)
