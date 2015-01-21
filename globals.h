@@ -60,6 +60,10 @@ struct FilterValues
     bool filetypebool;
     QString filecategory;
     QString filetype;
+    bool hashbool;
+    QStringList hashlist;
+    QVector<int> hashcount;
+    QVector<int> hashidlist;
 };
 
 extern FilterValues filtervalues;

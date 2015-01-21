@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>hashfilter</class>
- <widget class="QWidget" name="hashfilter">
+ <class>HashFilter</class>
+ <widget class="QWidget" name="HashFilter">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -25,6 +25,9 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
+   </property>
    <property name="horizontalSpacing">
     <number>0</number>
    </property>

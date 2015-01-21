@@ -59,13 +59,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     modifyfilterview = new ModifiedDateFilter(this);
     changefilterview = new ChangedDateFilter(this);
     filetypefilterview = new FileTypeFilter(this);
+    hashfilterview = new HashFilter(this);
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
-    filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
+    filtervalues.minaccess = QDateTime::currentDateTimeUtc().toTime_t();
+    filtervalues.maxmodify = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minmodify = QDateTime::currentDateTimeUtc().toTime_t();
-    filtervalues.minmodify = QDateTime::currentDateTimeUtc().toTime_t();
-    filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
+    filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
@@ -1207,4 +1208,6 @@ void WombatForensics::SetFilter(int headercolumn)
         changefilterview->DisplayFilter();
     if(headercolumn == 16)
         filetypefilterview->DisplayFilter();
+    if(headercolumn == 10)
+        hashfilterview->DisplayFilter();
 }

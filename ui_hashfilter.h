@@ -21,32 +21,33 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_hashfilter
+class Ui_HashFilter
 {
 public:
     QGridLayout *gridLayout;
     QCheckBox *checkBox;
     QPushButton *pushButton;
 
-    void setupUi(QWidget *hashfilter)
+    void setupUi(QWidget *HashFilter)
     {
-        if (hashfilter->objectName().isEmpty())
-            hashfilter->setObjectName(QStringLiteral("hashfilter"));
-        hashfilter->setWindowModality(Qt::ApplicationModal);
-        hashfilter->resize(266, 45);
+        if (HashFilter->objectName().isEmpty())
+            HashFilter->setObjectName(QStringLiteral("HashFilter"));
+        HashFilter->setWindowModality(Qt::ApplicationModal);
+        HashFilter->resize(266, 45);
         QFont font;
         font.setPointSize(8);
-        hashfilter->setFont(font);
-        hashfilter->setAutoFillBackground(true);
-        gridLayout = new QGridLayout(hashfilter);
+        HashFilter->setFont(font);
+        HashFilter->setAutoFillBackground(true);
+        gridLayout = new QGridLayout(HashFilter);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setSizeConstraint(QLayout::SetFixedSize);
         gridLayout->setHorizontalSpacing(0);
-        checkBox = new QCheckBox(hashfilter);
+        checkBox = new QCheckBox(HashFilter);
         checkBox->setObjectName(QStringLiteral("checkBox"));
 
         gridLayout->addWidget(checkBox, 0, 0, 1, 1);
 
-        pushButton = new QPushButton(hashfilter);
+        pushButton = new QPushButton(HashFilter);
         pushButton->setObjectName(QStringLiteral("pushButton"));
         pushButton->setDefault(true);
         pushButton->setFlat(true);
@@ -54,22 +55,22 @@ public:
         gridLayout->addWidget(pushButton, 0, 1, 1, 1);
 
 
-        retranslateUi(hashfilter);
+        retranslateUi(HashFilter);
 
-        QMetaObject::connectSlotsByName(hashfilter);
+        QMetaObject::connectSlotsByName(HashFilter);
     } // setupUi
 
-    void retranslateUi(QWidget *hashfilter)
+    void retranslateUi(QWidget *HashFilter)
     {
-        hashfilter->setWindowTitle(QApplication::translate("hashfilter", "Filter", 0));
-        checkBox->setText(QApplication::translate("hashfilter", "Filter out duplicate items", 0));
-        pushButton->setText(QApplication::translate("hashfilter", "Apply", 0));
+        HashFilter->setWindowTitle(QApplication::translate("HashFilter", "Filter", 0));
+        checkBox->setText(QApplication::translate("HashFilter", "Filter out duplicate items", 0));
+        pushButton->setText(QApplication::translate("HashFilter", "Apply", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class hashfilter: public Ui_hashfilter {};
+    class HashFilter: public Ui_HashFilter {};
 } // namespace Ui
 
 QT_END_NAMESPACE

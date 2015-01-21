@@ -315,3 +315,63 @@ void FileTypeFilter::HideClicked()
         filtervalues.filetype = ui->typecomboBox->currentText();
     this->hide();
 }
+
+HashFilter::HashFilter(QWidget* parent) : QWidget(parent), ui(new Ui::HashFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+HashFilter::~HashFilter()
+{
+}
+
+void HashFilter::DisplayFilter()
+{
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
+    if(this->pos().x() == 0)
+        this->move(newpos);
+    this->show();
+}
+
+void HashFilter::HideClicked()
+{
+    filtervalues.hashbool = ui->checkBox->isChecked();
+    if(filtervalues.hashbool)
+    {
+        filtervalues.hashlist.clear();
+        filtervalues.hashcount.clear();
+        filtervalues.hashidlist.clear();
+        QSqlQuery hashquery(fcasedb);
+        hashquery.prepare("SELECT md5, COUNT(md5) FROM data GROUP BY md5 HAVING COUNT(md5) > 1 AND md5 != '';");
+        if(hashquery.exec())
+        {
+            while(hashquery.next())
+            {
+                filtervalues.hashlist.append(hashquery.value(0).toString());
+                filtervalues.hashcount.append(hashquery.value(1).toInt());
+            }
+        }
+        else
+            qDebug() << fcasedb.lastError().text();
+        for(int i=0; i < filtervalues.hashlist.count(); i++)
+        {
+            hashquery.prepare("SELECT objectid FROM data WHERE md5 = ? ORDER BY objectid DESC limit ?;");
+            hashquery.addBindValue(filtervalues.hashlist.at(i));
+            hashquery.addBindValue(filtervalues.hashcount.at(i) - 1);
+            if(hashquery.exec())
+            {
+                while(hashquery.next())
+                {
+                    filtervalues.hashidlist.append(hashquery.value(0).toInt());
+                }
+            }
+            else
+                qDebug() << fcasedb.lastError().text();
+        }
+        hashquery.finish();
+    }
+    this->hide();
+}

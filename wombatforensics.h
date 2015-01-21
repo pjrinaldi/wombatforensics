@@ -214,6 +214,29 @@ public:
                     if(node->nodevalues.at(16).toString().contains(filtervalues.filecategory) == false || node->nodevalues.at(16).toString().contains(filtervalues.filetype) == false)
                         return QColor(Qt::lightGray);
                 }
+                if(filtervalues.hashbool)
+                {
+                    for(int i=0; i < filtervalues.hashidlist.count(); i++)
+                    {
+                        if(node->nodevalues.at(0).toInt() == filtervalues.hashidlist.at(i))
+                            return QColor(Qt::lightGray);
+                    }
+                    /*
+                    for(int i=0; i < filtervalues.hashlist.count(); i++)
+                    {
+                        if(node->nodevalues.at(10).toString().compare(filtervalues.hashlist.at(i)) == 0)
+                        {
+                            if(filtervalues.hashcount.at(i) > 1)
+                                return QColor(Qt::lightGray);
+                            else
+                            {
+                                filtervalues.hashcount[i]++;
+                                break;
+                            }
+                        }
+                    }
+                    */
+                }
             }
         }
         if(role == Qt::DisplayRole)
@@ -320,6 +343,8 @@ public:
             if(section == 9 && (filtervalues.maxchangebool || filtervalues.minchangebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 16 && (filtervalues.filecategorybool || filtervalues.filetypebool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 10 && filtervalues.hashbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -652,6 +677,7 @@ public:
     ModifiedDateFilter* modifyfilterview;
     ChangedDateFilter* changefilterview;
     FileTypeFilter* filetypefilterview;
+    HashFilter* hashfilterview;
 
 
 signals:
