@@ -48,7 +48,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     wombatframework = new WombatFramework(wombatvarptr);
     propertywindow = new PropertiesWindow(wombatdatabase);
     fileviewer = new FileViewer(this, tskobjptr);
-    sfwindow = new SortFilterWindow(this);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
     namefilterview = new NameFilter(this);
@@ -1079,8 +1078,6 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
     else
     {
         fileviewer->show();
-        sfwindow->show();
-        sfwindow->ShowQuery();
     }
 }
 
