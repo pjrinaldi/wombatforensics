@@ -1231,13 +1231,14 @@ void WombatForensics::SetFilter(int headercolumn)
 void WombatForensics::NextItem()
 {
     QModelIndex curindex = ui->dirTreeView->currentIndex();
-    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(curindex, Qt::ForegroundRole, QVariant(), -1, (Qt::MatchRecursive));
+    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(curindex, Qt::ForegroundRole, QVariant(), 15, (Qt::MatchRecursive));
     if(tmplist.isEmpty() == false)
     {
         for(int i=0; i < tmplist.count(); i++)
         {
-            if(tmplist.at(i) == curindex)
+            if(tmplist.at(i) == curindex && i < tmplist.count() - 1)
             ui->dirTreeView->setCurrentIndex(tmplist.at(i+1));
+            break;
         }
     }
 }
