@@ -310,13 +310,13 @@ public:
         }
         return false;
     };
-/*
+
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
     {
         emit headerDataChanged(orientation, section, section);
         return true;
     };
-*/
+
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
     {
         if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
