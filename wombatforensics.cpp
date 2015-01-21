@@ -1231,15 +1231,21 @@ void WombatForensics::SetFilter(int headercolumn)
 void WombatForensics::NextItem()
 {
     QModelIndex curindex = ui->dirTreeView->currentIndex();
-    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(curindex, Qt::ForegroundRole, QVariant(), 2, Qt::MatchExactly);
-    if(tmplist.count() == 2)
-        ui->dirTreeView->setCurrentIndex(tmplist.at(1));
+    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(curindex, Qt::ForegroundRole, QVariant(), -1, (Qt::MatchRecursive));
+    if(tmplist.isEmpty() == false)
+    {
+        for(int i=0; i < tmplist.count(); i++)
+        {
+            if(tmplist.at(i) == curindex)
+            ui->dirTreeView->setCurrentIndex(tmplist.at(i+1));
+        }
+    }
 }
 
 void WombatForensics::PreviousItem()
 {
     QModelIndex curindex = ui->dirTreeView->currentIndex();
-    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(curindex, Qt::ForegroundRole, QVariant(), -1, Qt::MatchExactly | Qt::MatchWrap);
+    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(curindex, Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     if(tmplist.count() > 0)
         ui->dirTreeView->setCurrentIndex(tmplist.last());
 }
