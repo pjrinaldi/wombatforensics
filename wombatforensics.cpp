@@ -190,14 +190,45 @@ void WombatForensics::InitializeAppStructure()
     ui->actionView_File->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     ui->menuBookmark_Manager->setEnabled(false);
+    ui->actionView_Image_Gallery->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
-    //magicptr = magic_open(MAGIC_CONTINUE|MAGIC_ERROR|MAGIC_MIME|MAGIC_CHECK);
+    QFile magfile(":/magic/magicfile");
+    QString magicpath = wombatvarptr->datapath + "magic.mgc";
+    QFile installmagfile(magicpath);
+    if(magfile.open(QIODevice::ReadOnly))
+    {
+        if(installmagfile.open(QIODevice::WriteOnly))
+        {
+            QByteArray tmparray = magfile.readAll();
+            installmagfile.write(tmparray);
+            installmagfile.close();
+            magfile.close();
+        }
+    }
+    /*
+     *        char* contentbuffer = new char[curobj.length];
+        retval = tsk_fs_file_read(curobj.readfileinfo, curobj.offset, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
+        if(retval > 0)
+        {
+            bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
+            if(tmpdir == true)
+            {
+                std::string filepath = fullpath + "/" + name;
+                QFile tmpfile(QString::fromStdString(filepath));
+                if(tmpfile.open(QIODevice::WriteOnly))
+                {
+                    QDataStream outbuffer(&tmpfile);
+                    outbuffer.writeRawData(contentbuffer, curobj.length);
+                    tmpfile.close();
+ 
+     *
+     */ 
     magicptr = magic_open(MAGIC_CONTINUE|MAGIC_ERROR|MAGIC_MIME);
     // NEED TO ABSTRACT THE PATH TO THE APPLICATION INSTALLATION PATH.
-    magic_load(magicptr, "/home/pasquale/Projects/wombatforensics/Resources/magic.mgc");
+    magic_load(magicptr, magicpath);
     SetupHexPage();
 }
 

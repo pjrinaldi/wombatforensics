@@ -374,7 +374,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         const char* sigtype = magic_buffer(magicptr, magicbuffer, readlen);
         char* sigp1 = strtok((char*)sigtype, ";");
         filestrings.append(QString::fromStdString(string(sigp1)));
-        //qDebug() << "sigtype:" << QString::fromStdString(string(sigp1));
+        qDebug() << "sigtype:" << QString::fromStdString(string(sigp1));
     }
     else
         filestrings.append(QString("Zero File"));
