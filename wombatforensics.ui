@@ -203,6 +203,7 @@
    <addaction name="separator"/>
    <addaction name="actionView_Properties"/>
    <addaction name="actionView_File"/>
+   <addaction name="actionView_Image_Gallery"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
    <addaction name="actionExport_Evidence"/>
@@ -218,7 +219,7 @@
   <action name="actionNew_Case">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/newcase</normaloff>:/newcase</iconset>
+     <normaloff>:/bar/newcase</normaloff>:/bar/newcase</iconset>
    </property>
    <property name="text">
     <string>New Case</string>
@@ -230,7 +231,7 @@
   <action name="actionOpen_Case">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/opencase</normaloff>:/opencase</iconset>
+     <normaloff>:/bar/opencase</normaloff>:/bar/opencase</iconset>
    </property>
    <property name="text">
     <string>Open Case</string>
@@ -262,7 +263,7 @@
   <action name="actionAdd_Evidence">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/basic/addevidence</normaloff>:/basic/addevidence</iconset>
+     <normaloff>:/bar/bwadd</normaloff>:/bar/bwadd</iconset>
    </property>
    <property name="text">
     <string>Add Evidence</string>
@@ -274,7 +275,7 @@
   <action name="actionRemove_Evidence">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/basic/remevidence</normaloff>:/basic/remevidence</iconset>
+     <normaloff>:/bar/bwrem</normaloff>:/bar/bwrem</iconset>
    </property>
    <property name="text">
     <string>Remove Evidence</string>
@@ -375,6 +376,21 @@
    </property>
    <property name="text">
     <string>View File</string>
+   </property>
+  </action>
+  <action name="actionView_Image_Gallery">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/bwimageview</normaloff>:/bar/bwimageview</iconset>
+   </property>
+   <property name="text">
+    <string>View Image Gallery</string>
+   </property>
+   <property name="toolTip">
+    <string>View Image Gallery</string>
    </property>
   </action>
  </widget>

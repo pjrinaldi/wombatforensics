@@ -45,6 +45,7 @@ public:
     QAction *actionNew_Bookmark;
     QAction *actionExisting_Bookmarks;
     QAction *actionView_File;
+    QAction *actionView_Image_Gallery;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -70,12 +71,12 @@ public:
         actionNew_Case = new QAction(WombatForensics);
         actionNew_Case->setObjectName(QStringLiteral("actionNew_Case"));
         QIcon icon;
-        icon.addFile(QStringLiteral(":/newcase"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QStringLiteral(":/bar/newcase"), QSize(), QIcon::Normal, QIcon::Off);
         actionNew_Case->setIcon(icon);
         actionOpen_Case = new QAction(WombatForensics);
         actionOpen_Case->setObjectName(QStringLiteral("actionOpen_Case"));
         QIcon icon1;
-        icon1.addFile(QStringLiteral(":/opencase"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QStringLiteral(":/bar/opencase"), QSize(), QIcon::Normal, QIcon::Off);
         actionOpen_Case->setIcon(icon1);
         actionView_Progress = new QAction(WombatForensics);
         actionView_Progress->setObjectName(QStringLiteral("actionView_Progress"));
@@ -88,12 +89,12 @@ public:
         actionAdd_Evidence = new QAction(WombatForensics);
         actionAdd_Evidence->setObjectName(QStringLiteral("actionAdd_Evidence"));
         QIcon icon3;
-        icon3.addFile(QStringLiteral(":/basic/addevidence"), QSize(), QIcon::Normal, QIcon::Off);
+        icon3.addFile(QStringLiteral(":/bar/bwadd"), QSize(), QIcon::Normal, QIcon::Off);
         actionAdd_Evidence->setIcon(icon3);
         actionRemove_Evidence = new QAction(WombatForensics);
         actionRemove_Evidence->setObjectName(QStringLiteral("actionRemove_Evidence"));
         QIcon icon4;
-        icon4.addFile(QStringLiteral(":/basic/remevidence"), QSize(), QIcon::Normal, QIcon::Off);
+        icon4.addFile(QStringLiteral(":/bar/bwrem"), QSize(), QIcon::Normal, QIcon::Off);
         actionRemove_Evidence->setIcon(icon4);
         actionExport_Evidence = new QAction(WombatForensics);
         actionExport_Evidence->setObjectName(QStringLiteral("actionExport_Evidence"));
@@ -134,6 +135,12 @@ public:
         QIcon icon10;
         icon10.addFile(QStringLiteral(":/bar/fileview"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_File->setIcon(icon10);
+        actionView_Image_Gallery = new QAction(WombatForensics);
+        actionView_Image_Gallery->setObjectName(QStringLiteral("actionView_Image_Gallery"));
+        actionView_Image_Gallery->setCheckable(true);
+        QIcon icon11;
+        icon11.addFile(QStringLiteral(":/bar/bwimageview"), QSize(), QIcon::Normal, QIcon::Off);
+        actionView_Image_Gallery->setIcon(icon11);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -189,14 +196,14 @@ public:
         menuAbout->setIcon(icon7);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon11;
-        icon11.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon11);
+        QIcon icon12;
+        icon12.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon12);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon12;
-        icon12.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon12);
+        QIcon icon13;
+        icon13.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon13);
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
         analysisToolBar->setObjectName(QStringLiteral("analysisToolBar"));
@@ -243,6 +250,7 @@ public:
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionView_Properties);
         analysisToolBar->addAction(actionView_File);
+        analysisToolBar->addAction(actionView_Image_Gallery);
         analysisToolBar->addAction(actionView_Progress);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionExport_Evidence);
@@ -290,6 +298,10 @@ public:
         actionNew_Bookmark->setText(QApplication::translate("WombatForensics", "New Bookmark", 0));
         actionExisting_Bookmarks->setText(QApplication::translate("WombatForensics", "Existing Bookmarks", 0));
         actionView_File->setText(QApplication::translate("WombatForensics", "View File", 0));
+        actionView_Image_Gallery->setText(QApplication::translate("WombatForensics", "View Image Gallery", 0));
+#ifndef QT_NO_TOOLTIP
+        actionView_Image_Gallery->setToolTip(QApplication::translate("WombatForensics", "View Image Gallery", 0));
+#endif // QT_NO_TOOLTIP
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));

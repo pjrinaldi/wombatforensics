@@ -30,6 +30,11 @@
         <file alias="addtonewbkmrk">./Resources/bookmark-new.png</file>
         <file alias="about">./Resources/about.png</file>
         <file alias="fileview">./Resources/fileviewer.png</file>
+        <file alias="bwimageview">./Resources/imageviewer.png</file>
+        <file alias="bwadd">./Resources/add.png</file>
+        <file alias="bwrem">./Resources/remove.png</file>
+        <file alias="newcase">./Resources/new-document.png</file>
+        <file alias="opencase">./Resources/open-document.png</file>
     </qresource>
     <qresource prefix="/html">
         <file alias="infohtml">./Resources/information.html</file>
