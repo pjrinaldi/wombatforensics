@@ -15,6 +15,7 @@
 #include "imgreader.h"
 #include "imghexviewer.h"
 #include "filterviews.h"
+#include "imageviewer.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -668,6 +669,7 @@ public:
     ChangedDateFilter* changefilterview;
     FileTypeFilter* filetypefilterview;
     HashFilter* hashfilterview;
+    ImageViewer* imagewindow;
 
 
 signals:

@@ -18,6 +18,7 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QGridLayout>
+#include <QImage>
 #include <QInputDialog>
 #include <QList>
 #include <QMainWindow>

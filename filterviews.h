@@ -20,7 +20,6 @@ namespace Ui {
     /*
     class analysistypefilter;
     class hashcategoryfilter;
-    class hashfilter;
     */
     class IdFilter;
     class NameFilter;
