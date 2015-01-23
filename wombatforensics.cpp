@@ -93,6 +93,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->dirTreeView->hideColumn(13);
     ui->dirTreeView->hideColumn(14);
     ui->dirTreeView->hideColumn(15);
+    ui->dirTreeView->hideColumn(17);
     ui->dirTreeView->setSortingEnabled(true); // enables the sorting arrow, but doesn't sort anything.
     ui->dirTreeView->header()->setSortIndicatorShown(false);
     ui->dirTreeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -445,6 +446,7 @@ void WombatForensics::OpenEvidenceStructure()
 {
     filesfound = filesfound + wombatdatabase->GetEvidenceFileCount();
     filesprocessed = filesfound;
+    filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     treemodel->AddEvidence(wombatvarptr->currentevidenceid);
@@ -702,6 +704,7 @@ void WombatForensics::CloseCurrentCase()
     }
     filesprocessed = 0;
     filesfound = 0;
+    filtercountlabel->setText("Filtered: 0");
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     statuslabel->setText("Current Case was Closed Successfully"); 
@@ -820,6 +823,7 @@ void WombatForensics::FinishRemoval()
         filesfound = filesfound - wombatvarptr->evidrowsremoved;
         processcountlabel->setText("Processed: " + QString::number(filesprocessed));
         filecountlabel->setText("Files: " + QString::number(filesfound));
+        filtercountlabel->setText("Filtered: " + QString::number(filesfound));
         EndJob(currentjobid, wombatvarptr->evidrowsremoved, wombatvarptr->evidrowsremoved, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 1, "Evidence Removal Completed");
         statuslabel->setText("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
@@ -959,6 +963,7 @@ void WombatForensics::UpdateProgress(int filecount, int processcount)
     statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
     if(curprogress == 100 && ProcessingComplete())
     {
+        filtercountlabel->setText("Filtered: " + QString::number(filesfound));
         statuslabel->setText("Processing Complete");
     }
 }
