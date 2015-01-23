@@ -173,6 +173,8 @@ public:
         dirTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
         dirTreeView->setProperty("showDropIndicator", QVariant(false));
         dirTreeView->setAlternatingRowColors(true);
+        dirTreeView->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+        dirTreeView->setUniformRowHeights(true);
         dirTreeView->setExpandsOnDoubleClick(false);
         splitter->addWidget(dirTreeView);
 

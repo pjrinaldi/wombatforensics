@@ -76,6 +76,12 @@
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>
+       <property name="horizontalScrollMode">
+        <enum>QAbstractItemView::ScrollPerItem</enum>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
+       </property>
        <property name="expandsOnDoubleClick">
         <bool>false</bool>
        </property>
