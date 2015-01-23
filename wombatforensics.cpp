@@ -197,38 +197,24 @@ void WombatForensics::InitializeAppStructure()
     ui->splitter->setSizes(sizelist);
     QFile magfile(":/magic/magicfile");
     QString magicpath = wombatvarptr->datapath + "magic.mgc";
-    QFile installmagfile(magicpath);
-    if(magfile.open(QIODevice::ReadOnly))
+    if(!FileExists(magicpath.toStdString()))
     {
-        if(installmagfile.open(QIODevice::WriteOnly))
+        QFile installmagfile(magicpath);
+        if(magfile.open(QIODevice::ReadOnly))
         {
-            QByteArray tmparray = magfile.readAll();
-            installmagfile.write(tmparray);
-            installmagfile.close();
-            magfile.close();
+            if(installmagfile.open(QIODevice::WriteOnly))
+            {
+                QByteArray tmparray = magfile.readAll();
+                installmagfile.write(tmparray);
+                installmagfile.close();
+                magfile.close();
+           }
         }
     }
-    /*
-     *        char* contentbuffer = new char[curobj.length];
-        retval = tsk_fs_file_read(curobj.readfileinfo, curobj.offset, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
-        if(retval > 0)
-        {
-            bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
-            if(tmpdir == true)
-            {
-                std::string filepath = fullpath + "/" + name;
-                QFile tmpfile(QString::fromStdString(filepath));
-                if(tmpfile.open(QIODevice::WriteOnly))
-                {
-                    QDataStream outbuffer(&tmpfile);
-                    outbuffer.writeRawData(contentbuffer, curobj.length);
-                    tmpfile.close();
- 
-     *
-     */ 
-    magicptr = magic_open(MAGIC_CONTINUE|MAGIC_ERROR|MAGIC_MIME);
-    // NEED TO ABSTRACT THE PATH TO THE APPLICATION INSTALLATION PATH.
-    magic_load(magicptr, magicpath);
+    magicmimeptr = magic_open(MAGIC_MIME);
+    magicptr = magic_open(MAGIC_NONE);
+    magic_load(magicptr, magicpath.toStdString().c_str());
+    magic_load(magicmimeptr, magicpath.toStdString().c_str());
     SetupHexPage();
 }
 
@@ -1049,6 +1035,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
     }
     magic_close(magicptr);
+    magic_close(magicmimeptr);
     wombatdatabase->CloseLogDB();
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();

@@ -115,7 +115,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList 
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         QSqlQuery fquery(fcasedb);
-        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid, blockaddress, filesignature) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);");
+        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid, blockaddress, filemime, filesignature) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?);");
         fquery.addBindValue(tmpints[0]);
         fquery.addBindValue(tmpstrings[0]);
         fquery.addBindValue(tmpints[1]);
@@ -131,6 +131,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList 
         fquery.addBindValue(tmpints[8]);
         fquery.addBindValue(tmpstrings[3]);
         fquery.addBindValue(tmpstrings[4]);
+        fquery.addBindValue(tmpstrings[5]);
 
         //qDebug() << tmpstrings[0] << tmpstrings[3];
         
@@ -367,18 +368,33 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     proplist << "Block Address" << blockstring << "List of block addresses which contain the contents of the file";
 
     // BEGIN TEST AREA FOR GETTING THE FILE SIGNATURE STRING
+    // FILE MIME TYPE
     char magicbuffer[1024];
     ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
     {
-        const char* sigtype = magic_buffer(magicptr, magicbuffer, readlen);
-        char* sigp1 = strtok((char*)sigtype, ";");
+        const char* mimesig = magic_buffer(magicmimeptr, magicbuffer, readlen);
+        char* sigp1 = strtok((char*)mimesig, ";");
         filestrings.append(QString::fromStdString(string(sigp1)));
-        qDebug() << "sigtype:" << QString::fromStdString(string(sigp1));
     }
     else
         filestrings.append(QString("Zero File"));
     // END TEST AREA FOR GETTING THE FILE SIGNATURE STRING
+    // FILE SIGNATURE
+    proplist << "File Signature";
+    readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+    if(readlen > 0)
+    {
+        const char* sigtype = magic_buffer(magicptr, magicbuffer, readlen);
+        filestrings.append(QString::fromStdString(string(sigtype)));
+        char* sigp1 = strtok((char*)sigtype, ",");
+        proplist << QString::fromStdString(string(sigp1)) << QString::fromStdString(string(sigtype));
+    }
+    else
+    {
+        filestrings.append(QString("Zero File"));
+        proplist << "Zero File" << "Zero File";
+    }
 
     QVector<int> fileints;
     if(tmpfile->name != NULL)

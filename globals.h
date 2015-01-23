@@ -25,6 +25,7 @@ extern QList<FileSystemObject> fsobjectlist;
 extern QStringList propertylist;
 extern QString blockstring;
 extern struct magic_set* magicptr;
+extern struct magic_set* magicmimeptr;
 
 struct FilterValues
 {
