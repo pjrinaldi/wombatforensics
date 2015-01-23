@@ -2,7 +2,7 @@
 
 ImageViewer::ImageViewer(QWidget* parent) : QWidget(parent)
 {
-    qDebug() << QImageReader::supportedImageFormats();
+    //qDebug() << QImageReader::supportedImageFormats();
     this->hide();
 }
 

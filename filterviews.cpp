@@ -291,7 +291,7 @@ void FileTypeFilter::DisplayFilter()
     ui->categorycomboBox->clear();
     ui->typecomboBox->clear();
     QSqlQuery typequery(fcasedb);
-    typequery.prepare("SELECT DISTINCT filesignature FROM data WHERE objecttype = 5;");
+    typequery.prepare("SELECT DISTINCT filemime FROM data WHERE objecttype = 5;");
     if(typequery.exec())
     {
         while(typequery.next())
