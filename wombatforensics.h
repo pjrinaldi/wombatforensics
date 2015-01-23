@@ -669,7 +669,7 @@ public:
     ChangedDateFilter* changefilterview;
     FileTypeFilter* filetypefilterview;
     HashFilter* hashfilterview;
-    ImageViewer* imagewindow;
+    //ImageViewer* imagewindow;
 
 
 signals:
@@ -725,7 +725,6 @@ private slots:
     void FilterApplied()
     {
         UpdateFilterCount();
-        //qDebug() << "still doesn't work";
         emit ui->dirTreeView->header()->geometriesChanged();
     };
     void NextItem();

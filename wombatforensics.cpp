@@ -59,7 +59,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     changefilterview = new ChangedDateFilter(this);
     filetypefilterview = new FileTypeFilter(this);
     hashfilterview = new HashFilter(this);
-    imagewindow = new ImageViewer(this);
+    //imagewindow = new ImageViewer(this);
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -1120,10 +1120,11 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 {
     if(!checked) // hide viewer
     {
-        imagewindow->hide();
+        //imagewindow->hide();
     }
     else
     {
+        /*
         QStringList images = QFileDialog::getOpenFileNames(0, QObject::tr("Choose images"));
         ImageWatcher watcher;
         QFuture<QImage> result = QtConcurrent::mapped(images, MakeThumb);
@@ -1131,6 +1132,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
         imagewindow->SetFutureWatcher(&watcher);
         imagewindow->showMaximized();
         imagewindow->show();
+        */
     }
 }
 
