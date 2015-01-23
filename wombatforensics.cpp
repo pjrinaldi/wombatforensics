@@ -80,6 +80,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
+    connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
 
     treemenu = new QMenu(ui->dirTreeView);
     treemenu->addAction(ui->menuBookmark_Manager->menuAction());
@@ -395,6 +396,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         selectedindex = curitem.indexes().at(0);
         ui->actionView_Properties->setEnabled(true);
         ui->actionView_File->setEnabled(true);
+        ui->actionView_Image_Gallery->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
         wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
         wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
@@ -1114,6 +1116,24 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked) // modify t
         qDebug() << "show logviewer here.";
 }
 
+void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
+{
+    if(!checked) // hide viewer
+    {
+        imagewindow->hide();
+    }
+    else
+    {
+        QStringList images = QFileDialog::getOpenFileNames(0, QObject::tr("Choose images"));
+        ImageWatcher watcher;
+        QFuture<QImage> result = QtConcurrent::mapped(images, MakeThumb);
+        watcher.setFuture(result);
+        imagewindow->SetFutureWatcher(&watcher);
+        imagewindow->showMaximized();
+        imagewindow->show();
+    }
+}
+
 void WombatForensics::UpdateSelectValue(const QString &txt)
 {
     // set hex (which i'll probably remove anyway since it's highlighted in same window)
@@ -1279,4 +1299,10 @@ void WombatForensics::PreviousItem()
             }
         }
     }
+}
+
+void WombatForensics::UpdateFilterCount()
+{
+    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
+    filtercountlabel->setText("Filtered: " + QString::number(tmplist.count()));
 }

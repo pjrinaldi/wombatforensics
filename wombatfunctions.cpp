@@ -478,3 +478,8 @@ std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname)
     }
     return s;
 }
+
+QImage MakeThumb(const QString &img)
+{
+    return QImage(img).scaled(QSize(300, 300), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+}

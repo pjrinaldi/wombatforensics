@@ -684,6 +684,7 @@ private slots:
     void on_actionView_Properties_triggered(bool checked);
     void on_actionView_Progress_triggered(bool checked);
     void on_actionView_File_triggered(bool checked);
+    void on_actionView_Image_Gallery_triggered(bool checked);
     void UpdateProgress(int count, int processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);
@@ -723,6 +724,7 @@ private slots:
     void SetFilter(int headercolumn);
     void FilterApplied()
     {
+        UpdateFilterCount();
         //qDebug() << "still doesn't work";
         emit ui->dirTreeView->header()->geometriesChanged();
     };
@@ -750,6 +752,7 @@ private:
     void ExportFiles(FileExportData* exportdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
     void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
+    void UpdateFilterCount(void);
 
     void RemoveTmpFiles(void);
 
