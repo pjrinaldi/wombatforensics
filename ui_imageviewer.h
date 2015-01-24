@@ -13,14 +13,15 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -31,21 +32,24 @@ public:
     QHBoxLayout *horizontalLayout;
     QLabel *label;
     QSpinBox *spinBox;
+    QProgressBar *progressBar;
     QSpacerItem *horizontalSpacer;
     QListWidget *listWidget;
 
-    void setupUi(QWidget *ImageViewer)
+    void setupUi(QDialog *ImageViewer)
     {
         if (ImageViewer->objectName().isEmpty())
             ImageViewer->setObjectName(QStringLiteral("ImageViewer"));
         ImageViewer->resize(320, 240);
-        ImageViewer->setAutoFillBackground(false);
+        ImageViewer->setSizeGripEnabled(true);
         verticalLayout = new QVBoxLayout(ImageViewer);
         verticalLayout->setSpacing(0);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setSpacing(3);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setContentsMargins(5, -1, -1, -1);
         label = new QLabel(ImageViewer);
         label->setObjectName(QStringLiteral("label"));
 
@@ -54,9 +58,16 @@ public:
         spinBox = new QSpinBox(ImageViewer);
         spinBox->setObjectName(QStringLiteral("spinBox"));
         spinBox->setMinimum(16);
+        spinBox->setMaximum(320);
         spinBox->setSingleStep(16);
 
         horizontalLayout->addWidget(spinBox);
+
+        progressBar = new QProgressBar(ImageViewer);
+        progressBar->setObjectName(QStringLiteral("progressBar"));
+        progressBar->setValue(24);
+
+        horizontalLayout->addWidget(progressBar);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -70,6 +81,7 @@ public:
         listWidget->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
         listWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
         listWidget->setProperty("showDropIndicator", QVariant(false));
+        listWidget->setMovement(QListView::Static);
         listWidget->setResizeMode(QListView::Adjust);
         listWidget->setViewMode(QListView::IconMode);
 
@@ -81,10 +93,13 @@ public:
         QMetaObject::connectSlotsByName(ImageViewer);
     } // setupUi
 
-    void retranslateUi(QWidget *ImageViewer)
+    void retranslateUi(QDialog *ImageViewer)
     {
-        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Image Viewer", 0));
+        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Dialog", 0));
         label->setText(QApplication::translate("ImageViewer", "Thumbnail Size:", 0));
+        spinBox->setSuffix(QApplication::translate("ImageViewer", "px", 0));
+        spinBox->setPrefix(QString());
+        progressBar->setFormat(QApplication::translate("ImageViewer", "%v of %m %p%", 0));
     } // retranslateUi
 
 };

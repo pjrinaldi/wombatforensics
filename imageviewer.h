@@ -2,10 +2,16 @@
 #define IMAGEVIEWER_H
 
 #include "wombatinclude.h"
+#include "ui_imageviewer.h"
 
 typedef QFutureWatcher<QImage> ImageWatcher;
 
-class ImageViewer : public QListWidget
+namespace Ui
+{
+    class ImageViewer;
+}
+
+class ImageViewer : public QDialog
 {
     Q_OBJECT
 
@@ -15,6 +21,9 @@ public:
     void SetFutureWatcher(ImageWatcher* w);
 private slots:
     void ReadyAt(int which);
+
+private:
+    Ui::ImageViewer* ui;
 protected:
     ImageWatcher* watcher;
     QProgressBar* progressbar;

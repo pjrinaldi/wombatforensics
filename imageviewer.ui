@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ImageViewer</class>
- <widget class="QWidget" name="ImageViewer">
+ <widget class="QDialog" name="ImageViewer">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,10 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Image Viewer</string>
+   <string>Dialog</string>
   </property>
-  <property name="autoFillBackground">
-   <bool>false</bool>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -34,6 +34,12 @@
    </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>3</number>
+     </property>
+     <property name="leftMargin">
+      <number>5</number>
+     </property>
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
@@ -43,11 +49,30 @@
      </item>
      <item>
       <widget class="QSpinBox" name="spinBox">
+       <property name="suffix">
+        <string>px</string>
+       </property>
+       <property name="prefix">
+        <string/>
+       </property>
        <property name="minimum">
         <number>16</number>
        </property>
+       <property name="maximum">
+        <number>320</number>
+       </property>
        <property name="singleStep">
         <number>16</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>24</number>
+       </property>
+       <property name="format">
+        <string>%v of %m %p%</string>
        </property>
       </widget>
      </item>
@@ -76,6 +101,9 @@
      </property>
      <property name="showDropIndicator" stdset="0">
       <bool>false</bool>
+     </property>
+     <property name="movement">
+      <enum>QListView::Static</enum>
      </property>
      <property name="resizeMode">
       <enum>QListView::Adjust</enum>

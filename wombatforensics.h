@@ -669,7 +669,7 @@ public:
     ChangedDateFilter* changefilterview;
     FileTypeFilter* filetypefilterview;
     HashFilter* hashfilterview;
-    //ImageViewer* imagewindow;
+    ImageViewer* imagewindow;
 
 
 signals:

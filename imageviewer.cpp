@@ -1,14 +1,8 @@
 #include "imageviewer.h"
 
-ImageViewer::ImageViewer(QWidget* parent) : QListWidget(parent)
+ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
-    setViewMode(IconMode);
-    setResizeMode(Adjust);
-    setMovement(Static);
-    setVerticalScrollMode(ScrollPerPixel);
-    progressbar = new QProgressBar(this);
-    progressbar->setGeometry(10, 10, 200, progressbar->sizeHint().height());
-    progressbar->setFormat("%v of %m (%p%)");
+    ui->setupUi(this);
     //qDebug() << QImageReader::supportedImageFormats();
     this->hide();
 }
@@ -19,17 +13,17 @@ void ImageViewer::SetFutureWatcher(ImageWatcher* w)
     if(w)
     {
         connect(w, SIGNAL(resultReadyAt(int)), this, SLOT(ReadyAt(int)));
-        connect(w, SIGNAL(progressRangeChanged(int, int)), progressbar, SLOT(setRange(int, int)));
-        connect(w, SIGNAL(progressValueChanged(int)), progressbar, SLOT(setValue(int)));
-        connect(w, SIGNAL(finished()), progressbar, SLOT(hide()));
-        connect(w, SIGNAL(started()), progressbar, SLOT(show()));
+        connect(w, SIGNAL(progressRangeChanged(int, int)), ui->progressBar, SLOT(setRange(int, int)));
+        connect(w, SIGNAL(progressValueChanged(int)), ui->progressBar, SLOT(setValue(int)));
+        connect(w, SIGNAL(finished()), ui->progressBar, SLOT(hide()));
+        connect(w, SIGNAL(started()), ui->progressBar, SLOT(show()));
     }
 }
 
 void ImageViewer::ReadyAt(int which)
 {
     QFuture<QImage> f = watcher->future();
-    QListWidgetItem* item = new QListWidgetItem(this);
+    QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
     item->setData(Qt::DecorationRole, QPixmap::fromImage(f.resultAt(which)));
 }
 
