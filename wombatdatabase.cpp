@@ -186,6 +186,18 @@ void WombatDatabase::CreateLogDB()
     }
 }
 
+void WombatDatabase::CreateThumbDB()
+{
+    if(thumbdb.open())
+    {
+        QSqlQuery thumbquery(thumbdb);
+        thumbquery.exec("CREATE TABLE thumbs(thumbid INTERGER PRIMARY KEY, objectid INTEGER, address INTEGER, thumbblob TEXT);");
+        thumbquery.finish();
+    }
+    else
+        LogEntry(0, 0, 0, 0, thumbdb.lastError().text());
+}
+
 void WombatDatabase::CreateAppDB()
 {
     if(wombatptr->appdb.open())
@@ -224,6 +236,15 @@ void WombatDatabase::OpenCaseDB()
         wombatptr->casedb.open();
 }
 
+void WombatDatabase::OpenThumbDB()
+{
+    if(thumbdb.isOpen())
+    {
+    }
+    else
+        thumbdb.open();
+}
+
 void WombatDatabase::CloseAppDB()
 {
     if(wombatptr->appdb.isOpen())
@@ -255,10 +276,21 @@ void WombatDatabase::CloseCaseDB()
     QSqlDatabase::removeDatabase("casedb");
 }
 
+void WombatDatabase::CloseThumbDB()
+{
+    if(thumbdb.isOpen())
+    {
+        thumbdb.close();
+        thumbdb = QSqlDatabase();
+        QSqlDatabase::removeDatabase("thumbdb");
+    }
+}
+
 WombatDatabase::~WombatDatabase()
 {
     CloseLogDB();
     CloseAppDB();
+    CloseThumbDB();
 }
 
 void WombatDatabase::InsertVolumeObject()
@@ -708,4 +740,30 @@ void WombatDatabase::InsertVolumeProperties()
         wombatptr->bindvalues.append(evidpropertylist.at(3*i+2));
         InsertSql("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);", wombatptr->bindvalues);
     }
+}
+
+void WombatDatabase::GetThumbnails()
+{
+    thumblist.clear();
+    QSqlQuery thumbquery(thumbdb);
+    thumbquery.prepare("SELECT thumbblob FROM thumbs;");
+    if(thumbquery.exec())
+    {
+        while(thumbquery.next())
+        {
+            thumblist.append(thumbquery.value(0).toString());
+            //thumblist.append(thumbquery.values(1).toString());
+        }
+    }
+    /*
+     *    wombatptr->bindvalues.clear();
+    wombatptr->bindvalues.append(wombatptr->selectedobject.id);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT name, value, description FROM properties WHERE objectid = ?", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        propertylist << wombatptr->sqlrecords.at(i).value(0).toString() << wombatptr->sqlrecords.at(i).value(1).toString() << wombatptr->sqlrecords.at(i).value(2).toString();
+    }
+ 
+     */ 
 }

@@ -140,6 +140,7 @@ struct WombatVariable
     //QString tmpfilepath;
     QString curerrmsg;
     QString wombatdbname;
+    QString thumbdbname;
     QString evidremovestring;
     int evidremoveid;
     int evidrowsremoved;

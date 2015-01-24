@@ -14,12 +14,15 @@ public:
     void CreateAppDB(void);
     void CreateCaseDB(void);
     void CreateLogDB(void);
+    void CreateThumbDB(void);
     void OpenCaseDB(void);
     void OpenAppDB(void);
     void OpenLogDB(void);
+    void OpenThumbDB(void);
     void CloseAppDB(void);
     void CloseCaseDB(void);
     void CloseLogDB(void);
+    void CloseThumbDB(void);
     void InsertEvidenceObject(void);
     void GetEvidenceObject(void);
     void GetEvidenceObjects(void);
@@ -29,6 +32,7 @@ public:
     void InsertEvidenceProperties(void);
     void InsertVolumeProperties(void);
     void GetObjectValues(void);
+    void GetThumbnails(void);
 
     ~WombatDatabase();
 

@@ -2,6 +2,7 @@
 
 QSqlDatabase fcasedb;
 QSqlDatabase logdb;
+QSqlDatabase thumbdb;
 QString fdbname = "t.db";
 QThreadPool* threadpool = NULL;
 QVector<QFuture<void> > threadvector;
@@ -26,6 +27,7 @@ QList<QVariant> colvalues;
 QList<TskObject> curlist;
 QList<FileSystemObject> fsobjectlist;
 QStringList propertylist;
+QStringList thumblist;
 QString blockstring = "";
 struct magic_set* magicptr = NULL;
 struct magic_set* magicmimeptr = NULL;

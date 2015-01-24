@@ -109,7 +109,7 @@ bool ProcessingComplete()
     return processingcomplete;
 }
 
-void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList tmplist)
+void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList tmplist, QString thumbencstr)
 {
 
     if(fcasedb.isValid() && fcasedb.isOpen())
@@ -147,6 +147,16 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList 
             fquery.addBindValue(tmplist.at(3*i+2));
             fquery.exec();
             fquery.finish();
+        }
+        if(tmpstrings[4].contains("image/", Qt::CaseInsensitive))
+        {
+            QSqlQuery tquery(thumbdb);
+            tquery.prepare("INSERT INTO thumbs (objectid, address, thumbblob) VALUES(?, ?, ?);");
+            tquery.addBindValue(tmpid);
+            tquery.addBindValue(tmpints[7]);
+            tquery.addBindValue(thumbencstr);
+            tquery.exec();
+            tquery.finish();
         }
         filesprocessed++;
         isignals->ProgUpd();
@@ -370,12 +380,15 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     // BEGIN TEST AREA FOR GETTING THE FILE SIGNATURE STRING
     // FILE MIME TYPE
     char magicbuffer[1024];
+    bool isimage = false;
     ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
     {
         const char* mimesig = magic_buffer(magicmimeptr, magicbuffer, readlen);
         char* sigp1 = strtok((char*)mimesig, ";");
         filestrings.append(QString::fromStdString(string(sigp1)));
+        if(QString::fromStdString(string(sigp1)).contains("image/", Qt::CaseInsensitive))
+            isimage = true;
     }
     else
         filestrings.append(QString("Zero File"));
@@ -395,7 +408,28 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         filestrings.append(QString("Zero File"));
         proplist << "Zero File" << "Zero File";
     }
+    // BEGIN IMAGE SCALING OPERATION...
+    QString thumbencstr = "";
+    if(tmpfile->meta != NULL && isimage == true)
+    {
+        QByteArray thumbdata;
+        QImage thumbimage;
+        QBuffer thumbuf(&thumbdata);
+        QImage origimage;
+        char imagebuffer[tmpfile->meta->size];
+        ssize_t imglen = tsk_fs_file_read(tmpfile, 0, imagebuffer, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        bool imageloaded = origimage.loadFromData(QByteArray::fromRawData(imagebuffer, imglen));
+        if(imageloaded)
+        {
+            thumbimage = origimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
+            thumbuf.open(QIODevice::WriteOnly);
+            thumbimage.save(&thumbuf, "PNG");
+            thumbdata = thumbdata.toBase64();
+            thumbencstr = QString(thumbdata);
+        }
+    }
 
+    // END IMAGE SCALING OPERATION
     QVector<int> fileints;
     if(tmpfile->name != NULL)
     {
@@ -427,7 +461,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     fileints.append(currentfilesystemid);
 
-    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, proplist);
+    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, proplist, thumbencstr);
     filewatcher.setFuture(tmpfuture);
     threadvector.append(tmpfuture);
     filesfound++;
@@ -481,5 +515,7 @@ std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname)
 
 QImage MakeThumb(const QString &img)
 {
-    return QImage(img).scaled(QSize(300, 300), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QByteArray ba = QByteArray::fromBase64(QByteArray::fromStdString(img.toStdString()));
+    qDebug() << "bytearray length: " << ba.length();
+    return QImage::fromData(ba, "PNG");
 }

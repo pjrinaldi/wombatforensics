@@ -254,6 +254,22 @@ void WombatForensics::InitializeCaseStructure()
             if(wombatvarptr->curerrmsg.compare("") != 0)
                 DisplayError("1.1", "SQL Error", wombatvarptr->curerrmsg);
         }
+        thumbdb = QSqlDatabase::database("thumbdb");
+        if(!thumbdb.isValid())
+            thumbdb = QSqlDatabase::addDatabase("QSQLITE", "thumbdb");
+        thumbdb.setDatabaseName(wombatvarptr->caseobject.dirpath + "thumbs.db");
+        if(!FileExists((wombatvarptr->caseobject.dirpath + "thumbs.db").toStdString()))
+        {
+            wombatdatabase->CreateThumbDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.01", "Thumb DB Error", wombatvarptr->curerrmsg);
+        }
+        else
+        {
+            wombatdatabase->OpenThumbDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.02", "Thumb DB Open Error", wombatvarptr->curerrmsg);
+        }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         errorcount = 0;
         StartJob(0, wombatvarptr->caseobject.id, 0);
@@ -1030,6 +1046,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     
     propertywindow->close();
     fileviewer->close();
+    imagewindow->close();
     RemoveTmpFiles(); // can get rid of this function right now. I don't need to make temporary files to read.
     if(ProcessingComplete())
     {
@@ -1046,6 +1063,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     wombatdatabase->CloseLogDB();
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();
+    wombatdatabase->CloseThumbDB();
 }
 
 void WombatForensics::RemoveTmpFiles()
@@ -1129,11 +1147,12 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     }
     else
     {
+        wombatdatabase->GetThumbnails();
         //QStringList images = QFileDialog::getOpenFileNames(0, QObject::tr("Choose images"));
-        //ImageWatcher watcher;
-        //QFuture<QImage> result = QtConcurrent::mapped(images, MakeThumb);
-        //watcher.setFuture(result);
-        //imagewindow->SetFutureWatcher(&watcher);
+        ImageWatcher watcher;
+        QFuture<QImage> result = QtConcurrent::mapped(thumblist, MakeThumb);
+        watcher.setFuture(result);
+        imagewindow->SetFutureWatcher(&watcher);
         //imagewindow->showMaximized();
         imagewindow->show();
     }

@@ -5,6 +5,7 @@
 
 extern QSqlDatabase fcasedb;
 extern QSqlDatabase logdb;
+extern QSqlDatabase thumbdb;
 extern QString fdbname;
 extern QThreadPool* threadpool;
 extern QVector<QFuture<void> > threadvector;
@@ -23,6 +24,7 @@ extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;
 extern QList<FileSystemObject> fsobjectlist;
 extern QStringList propertylist;
+extern QStringList thumblist;
 extern QString blockstring;
 extern struct magic_set* magicptr;
 extern struct magic_set* magicmimeptr;
