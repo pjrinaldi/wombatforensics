@@ -3,6 +3,7 @@
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
     ui->setupUi(this);
+    lw = ui->listWidget;
     //qDebug() << QImageReader::supportedImageFormats();
     this->hide();
 }

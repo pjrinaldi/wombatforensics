@@ -19,6 +19,7 @@ public:
     ImageViewer(QWidget* parent = 0);
     ~ImageViewer();
     void SetFutureWatcher(ImageWatcher* w);
+    QListWidget* lw;
 private slots:
     void ReadyAt(int which);
 

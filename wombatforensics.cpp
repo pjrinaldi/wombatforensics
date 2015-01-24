@@ -1148,6 +1148,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     else
     {
         wombatdatabase->GetThumbnails();
+        //qDebug() << "thumblist count:" << thumblist.count();
         //QStringList images = QFileDialog::getOpenFileNames(0, QObject::tr("Choose images"));
         ImageWatcher watcher;
         QFuture<QImage> result = QtConcurrent::mapped(thumblist, MakeThumb);
