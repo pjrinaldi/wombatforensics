@@ -42,6 +42,7 @@ public:
             ImageViewer->setObjectName(QStringLiteral("ImageViewer"));
         ImageViewer->resize(320, 240);
         ImageViewer->setSizeGripEnabled(true);
+        ImageViewer->setModal(false);
         verticalLayout = new QVBoxLayout(ImageViewer);
         verticalLayout->setSpacing(0);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
@@ -95,7 +96,7 @@ public:
 
     void retranslateUi(QDialog *ImageViewer)
     {
-        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Dialog", 0));
+        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Image Viewer", 0));
         label->setText(QApplication::translate("ImageViewer", "Thumbnail Size:", 0));
         spinBox->setSuffix(QApplication::translate("ImageViewer", "px", 0));
         spinBox->setPrefix(QString());
