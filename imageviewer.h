@@ -3,8 +3,39 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
+#include "wombatfunctions.h"
 #include "ui_imageviewer.h"
 
+class ImageModel : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    ImageModel(QObject* parent = 0) : QAbstractListModel(parent)
+    {
+    };
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const
+    {
+        if(parent.row() >= thumblist.count())
+            return 0;
+        return thumblist.count();
+    };
+
+    QVariant data(const QModelIndex& index, int role) const
+    {
+        if(!index.isValid())
+            return QVariant();
+        if(index.row() >= thumblist.count())
+            return QVariant();
+        if(role == Qt::DecorationRole)
+        {
+            return QPixmap::fromImage(MakeThumb(thumblist.at(index.row())));
+        }
+        else
+            return QVariant();
+    };
+};
 /*
  *
 class PropertyModel : public QAbstractTableModel

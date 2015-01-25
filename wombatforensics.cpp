@@ -1162,8 +1162,9 @@ void WombatForensics::UpdateThumbnails(int tsize)
 {
     thumbsize = tsize;
     // POSSIBLY MAKE THE BELOW CODE A SEPARATE FUNCTION WHICH IS QTCONCURRENTLY HANDLED.
-    imagewindow->lw->clear();
+    //imagewindow->lw->clear();
     wombatdatabase->GetThumbnails();
+    /*
     for(int i=0; i < thumblist.count(); i++)
     {
         //QByteArray ba = QByteArray::fromBase64(QByteArray::fromStdString(thumblist.at(i).toStdString()));
@@ -1171,6 +1172,7 @@ void WombatForensics::UpdateThumbnails(int tsize)
         //tmpitem->setData(Qt::DecorationRole, QPixmap::fromImage(QImage::fromData(ba, "PNG")));
         tmpitem->setData(Qt::DecorationRole, QPixmap::fromImage(MakeThumb(thumblist.at(i))));
     }
+    */
     //imagewindow->UpdateGeometries();
 }
 
