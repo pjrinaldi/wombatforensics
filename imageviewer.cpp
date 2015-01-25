@@ -25,3 +25,8 @@ void ImageViewer::closeEvent(QCloseEvent* e)
 ImageViewer::~ImageViewer()
 {
 }
+
+void ImageViewer::UpdateGeometries()
+{
+    lw->repaint();
+}

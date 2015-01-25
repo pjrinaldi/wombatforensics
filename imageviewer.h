@@ -19,6 +19,7 @@ public:
     ~ImageViewer();
     QListWidget* lw;
     QSpinBox* sb;
+    void UpdateGeometries();
 private slots:
     void HideClicked();
 

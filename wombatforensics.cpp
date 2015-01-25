@@ -1180,7 +1180,10 @@ void WombatForensics::UpdateThumbnails(int tsize)
         QListWidgetItem* tmpitem = new QListWidgetItem(imagewindow->lw);
         //tmpitem->setData(Qt::DecorationRole, QPixmap::fromImage(QImage::fromData(ba, "PNG")));
         tmpitem->setData(Qt::DecorationRole, QPixmap::fromImage(MakeThumb(thumblist.at(i))));
+        if(i == 0)
+            imagewindow->lw->setCurrentItem(tmpitem);
     }
+    imagewindow->UpdateGeometries();
 }
 
 void WombatForensics::UpdateSelectValue(const QString &txt)
