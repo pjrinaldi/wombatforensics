@@ -10,6 +10,7 @@ ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageVie
     this->hide();
 }
 
+/*
 void ImageViewer::SetFutureWatcher(ImageWatcher* w)
 {
     watcher = w;
@@ -29,7 +30,7 @@ void ImageViewer::ReadyAt(int which)
     QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
     item->setData(Qt::DecorationRole, QPixmap::fromImage(f.resultAt(which)));
 }
-
+*/
 ImageViewer::~ImageViewer()
 {
 }

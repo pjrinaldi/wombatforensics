@@ -1165,6 +1165,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 void WombatForensics::UpdateThumbnails(int tsize)
 {
     thumbsize = tsize;
+    // POSSIBLY MAKE THE BELOW CODE A SEPARATE FUNCTION WHICH IS QTCONCURRENTLY HANDLED.
     imagewindow->lw->clear();
     wombatdatabase->GetThumbnails();
     for(int i=0; i < thumblist.count(); i++)
