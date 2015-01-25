@@ -1154,16 +1154,6 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     }
     else
     {
-        //qDebug() << "thumblist count:" << thumblist.count();
-        //QStringList images = QFileDialog::getOpenFileNames(0, QObject::tr("Choose images"));
-        /*
-        ImageWatcher watcher;
-        QFuture<QImage> result = QtConcurrent::mapped(thumblist, MakeThumb);
-        watcher.setFuture(result);
-        imagewindow->SetFutureWatcher(&watcher);
-        imagewindow->setModal(false);
-        //imagewindow->showMaximized();
-        */
         imagewindow->show();
     }
 }
@@ -1180,10 +1170,8 @@ void WombatForensics::UpdateThumbnails(int tsize)
         QListWidgetItem* tmpitem = new QListWidgetItem(imagewindow->lw);
         //tmpitem->setData(Qt::DecorationRole, QPixmap::fromImage(QImage::fromData(ba, "PNG")));
         tmpitem->setData(Qt::DecorationRole, QPixmap::fromImage(MakeThumb(thumblist.at(i))));
-        if(i == 0)
-            imagewindow->lw->setCurrentItem(tmpitem);
     }
-    imagewindow->UpdateGeometries();
+    //imagewindow->UpdateGeometries();
 }
 
 void WombatForensics::UpdateSelectValue(const QString &txt)

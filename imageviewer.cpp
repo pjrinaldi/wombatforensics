@@ -3,7 +3,7 @@
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
     ui->setupUi(this);
-    lw = ui->listWidget;
+    lw = ui->listView;
     sb = ui->spinBox;
     ui->spinBox->setValue(thumbsize);
     //qDebug() << QImageReader::supportedImageFormats();
@@ -28,5 +28,6 @@ ImageViewer::~ImageViewer()
 
 void ImageViewer::UpdateGeometries()
 {
-    lw->repaint();
+    //sb->setValue(32);
+    //sb->setValue(thumbsize);
 }

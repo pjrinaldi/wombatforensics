@@ -17,7 +17,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QListWidget>
+#include <QtWidgets/QListView>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
@@ -32,7 +32,7 @@ public:
     QLabel *label;
     QSpinBox *spinBox;
     QSpacerItem *horizontalSpacer;
-    QListWidget *listWidget;
+    QListView *listView;
 
     void setupUi(QDialog *ImageViewer)
     {
@@ -70,16 +70,17 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        listWidget = new QListWidget(ImageViewer);
-        listWidget->setObjectName(QStringLiteral("listWidget"));
-        listWidget->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
-        listWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        listWidget->setProperty("showDropIndicator", QVariant(false));
-        listWidget->setMovement(QListView::Static);
-        listWidget->setResizeMode(QListView::Adjust);
-        listWidget->setViewMode(QListView::IconMode);
+        listView = new QListView(ImageViewer);
+        listView->setObjectName(QStringLiteral("listView"));
+        listView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
+        listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        listView->setProperty("showDropIndicator", QVariant(false));
+        listView->setMovement(QListView::Free);
+        listView->setResizeMode(QListView::Adjust);
+        listView->setViewMode(QListView::IconMode);
+        listView->setUniformItemSizes(true);
 
-        verticalLayout->addWidget(listWidget);
+        verticalLayout->addWidget(listView);
 
 
         retranslateUi(ImageViewer);

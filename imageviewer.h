@@ -17,7 +17,7 @@ class ImageViewer : public QDialog
 public:
     ImageViewer(QWidget* parent = 0);
     ~ImageViewer();
-    QListWidget* lw;
+    QListView* lw;
     QSpinBox* sb;
     void UpdateGeometries();
 private slots:

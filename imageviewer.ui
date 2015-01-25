@@ -88,7 +88,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QListWidget" name="listWidget">
+    <widget class="QListView" name="listView">
      <property name="sizeAdjustPolicy">
       <enum>QAbstractScrollArea::AdjustIgnored</enum>
      </property>
@@ -99,13 +99,16 @@
       <bool>false</bool>
      </property>
      <property name="movement">
-      <enum>QListView::Static</enum>
+      <enum>QListView::Free</enum>
      </property>
      <property name="resizeMode">
       <enum>QListView::Adjust</enum>
      </property>
      <property name="viewMode">
       <enum>QListView::IconMode</enum>
+     </property>
+     <property name="uniformItemSizes">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
