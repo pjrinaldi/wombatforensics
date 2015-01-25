@@ -1173,7 +1173,7 @@ void WombatForensics::UpdateThumbnails(int tsize)
         tmpitem->setData(Qt::DecorationRole, QPixmap::fromImage(MakeThumb(thumblist.at(i))));
     }
     */
-    //imagewindow->UpdateGeometries();
+    imagewindow->UpdateGeometries();
 }
 
 void WombatForensics::UpdateSelectValue(const QString &txt)

@@ -28,6 +28,6 @@ ImageViewer::~ImageViewer()
 
 void ImageViewer::UpdateGeometries()
 {
-    //sb->setValue(32);
-    //sb->setValue(thumbsize);
+    imagemodel = new ImageModel();
+    ui->listView->setModel(imagemodel);
 }
