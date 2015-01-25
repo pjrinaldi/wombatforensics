@@ -2,6 +2,7 @@
 #define IMAGEVIEWER_H
 
 #include "wombatinclude.h"
+#include "globals.h"
 #include "ui_imageviewer.h"
 
 typedef QFutureWatcher<QImage> ImageWatcher;
@@ -20,6 +21,7 @@ public:
     ~ImageViewer();
     void SetFutureWatcher(ImageWatcher* w);
     QListWidget* lw;
+    QSpinBox* sb;
 private slots:
     void ReadyAt(int which);
 

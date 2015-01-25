@@ -19,6 +19,7 @@ extern int exportcount;
 extern int currentfilesystemid;
 extern int errorcount;
 extern int currentjobid;
+extern int thumbsize;
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;

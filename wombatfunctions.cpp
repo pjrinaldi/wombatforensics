@@ -516,6 +516,5 @@ std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname)
 QImage MakeThumb(const QString &img)
 {
     QByteArray ba = QByteArray::fromBase64(QByteArray::fromStdString(img.toStdString()));
-    //qDebug() << "bytearray length: " << ba.length();
-    return QImage::fromData(ba, "PNG");
+    return QImage::fromData(ba, "PNG").scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
 }

@@ -68,6 +68,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.minmodify = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
+    connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)));
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
@@ -1147,15 +1148,31 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     }
     else
     {
-        wombatdatabase->GetThumbnails();
         //qDebug() << "thumblist count:" << thumblist.count();
         //QStringList images = QFileDialog::getOpenFileNames(0, QObject::tr("Choose images"));
+        /*
         ImageWatcher watcher;
         QFuture<QImage> result = QtConcurrent::mapped(thumblist, MakeThumb);
         watcher.setFuture(result);
         imagewindow->SetFutureWatcher(&watcher);
+        imagewindow->setModal(false);
         //imagewindow->showMaximized();
+        */
         imagewindow->show();
+    }
+}
+
+void WombatForensics::UpdateThumbnails(int tsize)
+{
+    thumbsize = tsize;
+    imagewindow->lw->clear();
+    wombatdatabase->GetThumbnails();
+    for(int i=0; i < thumblist.count(); i++)
+    {
+        //QByteArray ba = QByteArray::fromBase64(QByteArray::fromStdString(thumblist.at(i).toStdString()));
+        QListWidgetItem* tmpitem = new QListWidgetItem(imagewindow->lw);
+        //tmpitem->setData(Qt::DecorationRole, QPixmap::fromImage(QImage::fromData(ba, "PNG")));
+        tmpitem->setData(Qt::DecorationRole, QPixmap::fromImage(MakeThumb(thumblist.at(i))));
     }
 }
 

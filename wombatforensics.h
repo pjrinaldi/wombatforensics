@@ -729,6 +729,7 @@ private slots:
     };
     void NextItem();
     void PreviousItem();
+    void UpdateThumbnails(int tsize);
 
 protected:
     void closeEvent(QCloseEvent* event);
