@@ -18,7 +18,6 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
-#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
@@ -32,7 +31,6 @@ public:
     QHBoxLayout *horizontalLayout;
     QLabel *label;
     QSpinBox *spinBox;
-    QProgressBar *progressBar;
     QSpacerItem *horizontalSpacer;
     QListWidget *listWidget;
 
@@ -61,14 +59,9 @@ public:
         spinBox->setMinimum(16);
         spinBox->setMaximum(320);
         spinBox->setSingleStep(16);
+        spinBox->setValue(320);
 
         horizontalLayout->addWidget(spinBox);
-
-        progressBar = new QProgressBar(ImageViewer);
-        progressBar->setObjectName(QStringLiteral("progressBar"));
-        progressBar->setValue(24);
-
-        horizontalLayout->addWidget(progressBar);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -100,7 +93,6 @@ public:
         label->setText(QApplication::translate("ImageViewer", "Thumbnail Size:", 0));
         spinBox->setSuffix(QApplication::translate("ImageViewer", "px", 0));
         spinBox->setPrefix(QString());
-        progressBar->setFormat(QApplication::translate("ImageViewer", "%v of %m %p%", 0));
     } // retranslateUi
 
 };

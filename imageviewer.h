@@ -5,8 +5,6 @@
 #include "globals.h"
 #include "ui_imageviewer.h"
 
-//typedef QFutureWatcher<QImage> ImageWatcher;
-
 namespace Ui
 {
     class ImageViewer;
@@ -19,17 +17,18 @@ class ImageViewer : public QDialog
 public:
     ImageViewer(QWidget* parent = 0);
     ~ImageViewer();
-    //void SetFutureWatcher(ImageWatcher* w);
     QListWidget* lw;
     QSpinBox* sb;
 private slots:
-    //void ReadyAt(int which);
+    void HideClicked();
 
+signals:
+    void HideImageWindow(bool checkstate);
 private:
     Ui::ImageViewer* ui;
 protected:
-    //ImageWatcher* watcher;
-    //QProgressBar* progressbar;
+    void closeEvent(QCloseEvent* event);
 };
 
+Q_DECLARE_METATYPE(ImageViewer*)
 #endif // IMAGEVIEWER_H

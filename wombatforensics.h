@@ -690,6 +690,7 @@ private slots:
     void HideProgressWindow(bool checkstate);
     void HidePropertyWindow(bool checkstate);
     void HideFileViewer(bool checkstate);
+    void HideImageWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
     void OpenParentImage(int imgid);

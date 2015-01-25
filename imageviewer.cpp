@@ -10,27 +10,18 @@ ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageVie
     this->hide();
 }
 
-/*
-void ImageViewer::SetFutureWatcher(ImageWatcher* w)
+void ImageViewer::HideClicked()
 {
-    watcher = w;
-    if(w)
-    {
-        connect(w, SIGNAL(resultReadyAt(int)), this, SLOT(ReadyAt(int)));
-        connect(w, SIGNAL(progressRangeChanged(int, int)), ui->progressBar, SLOT(setRange(int, int)));
-        connect(w, SIGNAL(progressValueChanged(int)), ui->progressBar, SLOT(setValue(int)));
-        connect(w, SIGNAL(finished()), ui->progressBar, SLOT(hide()));
-        connect(w, SIGNAL(started()), ui->progressBar, SLOT(show()));
-    }
+    this->hide();
+    emit HideImageWindow(false);
 }
 
-void ImageViewer::ReadyAt(int which)
+void ImageViewer::closeEvent(QCloseEvent* e)
 {
-    QFuture<QImage> f = watcher->future();
-    QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
-    item->setData(Qt::DecorationRole, QPixmap::fromImage(f.resultAt(which)));
+    emit HideImageWindow(false);
+    e->accept();
 }
-*/
+
 ImageViewer::~ImageViewer()
 {
 }

@@ -67,15 +67,8 @@
        <property name="singleStep">
         <number>16</number>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QProgressBar" name="progressBar">
        <property name="value">
-        <number>24</number>
-       </property>
-       <property name="format">
-        <string>%v of %m %p%</string>
+        <number>320</number>
        </property>
       </widget>
      </item>

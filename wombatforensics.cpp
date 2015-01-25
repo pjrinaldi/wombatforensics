@@ -59,7 +59,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     changefilterview = new ChangedDateFilter(this);
     filetypefilterview = new FileTypeFilter(this);
     hashfilterview = new HashFilter(this);
-    imagewindow = new ImageViewer(this);
+    imagewindow = new ImageViewer();
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -68,7 +68,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.minmodify = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
-    connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)));
+    connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
+    connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
@@ -131,6 +132,11 @@ void WombatForensics::HidePropertyWindow(bool checkedstate)
 void WombatForensics::HideFileViewer(bool checkedstate)
 {
     ui->actionView_File->setChecked(checkedstate);
+}
+
+void WombatForensics::HideImageWindow(bool checkstate)
+{
+    ui->actionView_Image_Gallery->setChecked(checkstate);
 }
 
 void WombatForensics::HideProgressWindow(bool checkedstate)
