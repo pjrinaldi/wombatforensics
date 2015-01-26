@@ -32,4 +32,5 @@ void ImageViewer::UpdateGeometries()
 {
     //imagemodel->GetThumbnails();
     ui->listView->setModel(imagemodel);
+    ui->listView->show();
 }
