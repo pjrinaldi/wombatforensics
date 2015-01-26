@@ -746,14 +746,17 @@ void WombatDatabase::GetThumbnails()
 {
     thumblist.clear();
     QSqlQuery thumbquery(thumbdb);
-    thumbquery.prepare("SELECT thumbblob FROM thumbs;");
+    thumbquery.prepare("SELECT objectid, address, thumbblob FROM thumbs;");
     if(thumbquery.exec())
     {
         while(thumbquery.next())
         {
-            if(thumbquery.value(0).toString().length() > 0)
+            if(thumbquery.value(2).toString().length() > 0)
+            {
                 thumblist.append(thumbquery.value(0).toString());
-            //thumblist.append(thumbquery.values(1).toString());
+                thumblist.append(thumbquery.value(1).toString());
+                thumblist.append(thumbquery.value(2).toString());
+            }
         }
     }
     thumbquery.finish();

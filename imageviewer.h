@@ -11,15 +11,14 @@ class ImageModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ImageModel(const QList<QPixmap> pixlist, QObject* parent = 0) : QAbstractListModel(parent), pixmaplist(pixlist)
+    ImageModel(const QList<QPixmap> pixlist, QStringList ids, QStringList addlist, QObject* parent = 0) : QAbstractListModel(parent), pixmaplist(pixlist), idlist(ids), addresslist(addlist)
     {
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
-        //qDebug() << "rowcount:" << pixmaplist.count();
-        //if(parent.row() >= pixmaplist.count())
-        //    return 0;
+        if(parent.row() >= pixmaplist.count())
+            return 0;
         return pixmaplist.count();
     };
 
@@ -27,29 +26,31 @@ public:
     {
         if(!index.isValid())
         {
-            //qDebug() << "index is not valid" << index.row();
             return QVariant();
         }
         if(index.row() >= thumblist.count())
         {
-            //qDebug() << "row is greater than thumblist count" << index.row();
             return QVariant();
         }
         if(role == Qt::DecorationRole)
         {
-            //qDebug() << "decoration role:" << index.row();
             return pixmaplist.at(index.row());
-            //return QPixmap::fromImage(MakeThumb(thumblist.at(index.row())));
         }
+        else if(role == Qt::UserRole)
+            return idlist.at(index.row());
+        else if(role == Qt::UserRole + 1)
+            return addresslist.at(index.row());
         else
         {
-            //qDebug() << "role is not the decoration role" << index.row();
             return QVariant();
         }
     };
 
+
 private:
     QList<QPixmap> pixmaplist;
+    QStringList idlist;
+    QStringList addresslist;
 };
 
 namespace Ui
@@ -69,6 +70,8 @@ public:
     void UpdateGeometries();
     void GetPixmaps();
 private slots:
+    void OpenImageWindow(const QModelIndex &index);
+    void HighlightTreeViewItem(const QModelIndex &index);
     void HideClicked();
 
 signals:
@@ -77,6 +80,8 @@ private:
     Ui::ImageViewer* ui;
     ImageModel* imagemodel;
     QList<QPixmap> pixmaps;
+    QStringList idlist;
+    QStringList addresslist;
 protected:
     void closeEvent(QCloseEvent* event);
 };
