@@ -6,6 +6,8 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <QAbstractItemModel>
+#include <QAbstractListModel>
 #include <QApplication>
 #include <QActionGroup>
 #include <QBoxLayout>
@@ -31,8 +33,6 @@
 #include <QSqlQuery>
 #include <QSqlQueryModel>
 #include <QSqlRecord>
-#include <QStandardItem>
-#include <QStandardItemModel>
 #include <QStatusBar>
 #include <QString>
 #include <QStringList>

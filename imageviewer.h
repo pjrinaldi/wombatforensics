@@ -17,17 +17,29 @@ public:
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
+        qDebug() << "rowcount:" << thumblist.count();
         if(parent.row() >= thumblist.count())
             return 0;
         return thumblist.count();
     };
 
+    /*
+    QModelIndex index(int row, int column = 0, const QModelIndex& parent = QModelIndex()) const
+    {
+    };
+    */
     QVariant data(const QModelIndex& index, int role) const
     {
         if(!index.isValid())
+        {
+            qDebug() << "index is not valid" << index.row();
             return QVariant();
-        //if(index.row() >= thumblist.count())
-        //    return QVariant();
+        }
+        if(index.row() >= thumblist.count())
+        {
+            qDebug() << "row is greater than thumblist count" << index.row();
+            return QVariant();
+        }
         if(role == Qt::DecorationRole)
         {
             qDebug() << "thumblistcount:" << thumblist.count();
@@ -35,19 +47,22 @@ public:
             return QPixmap::fromImage(MakeThumb(thumblist.at(index.row())));
         }
         else
+        {
+            qDebug() << "role is not the decoration role" << index.row();
             return QVariant();
+        }
     };
-
+/*
     void GetThumbnails(void)
     {
         qDebug() << "thumbnail called";
         int row = 0;
         thumblist.clear();
         QSqlQuery thumbquery(thumbdb);
-        thumbquery.prepare("SELECT thumbblobk FROM thumbs;");
+        thumbquery.prepare("SELECT thumbblob FROM thumbs;");
         if(thumbquery.exec())
         {
-            beginInsertRows(QModelIndex(), row, row);
+            beginInsertRows(QModelIndex(), row, thumbquery.size());
             while(thumbquery.next())
             {
                 qDebug() << "row:" << row;
@@ -57,7 +72,7 @@ public:
             endInsertRows();
         }
         thumbquery.finish();
-    };
+    };*/
 
     /*
      *    thumblist.clear();

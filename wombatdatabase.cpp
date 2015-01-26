@@ -755,6 +755,8 @@ void WombatDatabase::GetThumbnails()
             //thumblist.append(thumbquery.values(1).toString());
         }
     }
+    thumbquery.finish();
+    qDebug() << "db shows thumblist.count:" << thumblist.count();
     /*
      *    wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);

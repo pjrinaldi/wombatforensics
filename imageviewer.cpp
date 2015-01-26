@@ -4,8 +4,10 @@ ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageVie
 {
     ui->setupUi(this);
     lw = ui->listView;
+    ui->listView->setViewMode(QListView::IconMode);
     sb = ui->spinBox;
     ui->spinBox->setValue(thumbsize);
+    imagemodel = new ImageModel();
     //qDebug() << QImageReader::supportedImageFormats();
     this->hide();
 }
@@ -28,8 +30,6 @@ ImageViewer::~ImageViewer()
 
 void ImageViewer::UpdateGeometries()
 {
-    qDebug() << "Udpdate Geometry called";
-    imagemodel = new ImageModel();
-    imagemodel->GetThumbnails();
+    //imagemodel->GetThumbnails();
     ui->listView->setModel(imagemodel);
 }
