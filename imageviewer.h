@@ -18,8 +18,8 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
         //qDebug() << "rowcount:" << pixmaplist.count();
-        if(parent.row() >= pixmaplist.count())
-            return 0;
+        //if(parent.row() >= pixmaplist.count())
+        //    return 0;
         return pixmaplist.count();
     };
 

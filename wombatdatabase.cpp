@@ -751,21 +751,10 @@ void WombatDatabase::GetThumbnails()
     {
         while(thumbquery.next())
         {
-            thumblist.append(thumbquery.value(0).toString());
+            if(thumbquery.value(0).toString().length() > 0)
+                thumblist.append(thumbquery.value(0).toString());
             //thumblist.append(thumbquery.values(1).toString());
         }
     }
     thumbquery.finish();
-    qDebug() << "db shows thumblist.count:" << thumblist.count();
-    /*
-     *    wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(wombatptr->selectedobject.id);
-    wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT name, value, description FROM properties WHERE objectid = ?", wombatptr->bindvalues);
-    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-    {
-        propertylist << wombatptr->sqlrecords.at(i).value(0).toString() << wombatptr->sqlrecords.at(i).value(1).toString() << wombatptr->sqlrecords.at(i).value(2).toString();
-    }
- 
-     */ 
 }
