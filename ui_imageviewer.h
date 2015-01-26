@@ -39,7 +39,7 @@ public:
         if (ImageViewer->objectName().isEmpty())
             ImageViewer->setObjectName(QStringLiteral("ImageViewer"));
         ImageViewer->resize(320, 240);
-        ImageViewer->setSizeGripEnabled(true);
+        ImageViewer->setSizeGripEnabled(false);
         ImageViewer->setModal(false);
         verticalLayout = new QVBoxLayout(ImageViewer);
         verticalLayout->setSpacing(0);
@@ -75,10 +75,12 @@ public:
         listView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
         listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
         listView->setProperty("showDropIndicator", QVariant(false));
-        listView->setMovement(QListView::Free);
+        listView->setMovement(QListView::Static);
         listView->setResizeMode(QListView::Adjust);
+        listView->setLayoutMode(QListView::Batched);
         listView->setViewMode(QListView::IconMode);
         listView->setUniformItemSizes(true);
+        listView->setBatchSize(1);
 
         verticalLayout->addWidget(listView);
 
