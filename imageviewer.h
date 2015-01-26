@@ -76,6 +76,7 @@ private slots:
 
 signals:
     void HideImageWindow(bool checkstate);
+    void SendObjectToTreeView(int selectedid);
 private:
     Ui::ImageViewer* ui;
     ImageModel* imagemodel;

@@ -106,6 +106,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
     //connect(ui->dirTreeView->model(), SIGNAL(headerDataChanged(Qt::Orientation, int, int)), ui->dirTreeView->header(), SLOT(headerDataChanged(Qt::Orientation, int, int)));
+    connect(imagewindow, SIGNAL(SendObjectToTreeView(int)), this, SLOT(SetSelectedFromImageViewer(int)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(namefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(pathfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -122,6 +123,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     jumpbackward->setKey(Qt::CTRL + Qt::SHIFT + Qt::Key_J);
     connect(jumpforward, SIGNAL(activated()), this, SLOT(NextItem()));
     connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
+}
+
+void WombatForensics::SetSelectedFromImageViewer(int objectid)
+{
+    QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QString::number(objectid), Qt::MatchExactly | Qt::MatchRecursive);
+    qDebug() << "index count:" << indexlist.count();
+    //ui->dirTreeView->setCurrentIndex(
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)

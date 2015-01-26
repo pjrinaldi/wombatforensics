@@ -731,6 +731,7 @@ private slots:
     void NextItem();
     void PreviousItem();
     void UpdateThumbnails(int tsize);
+    void SetSelectedFromImageViewer(int selectedid);
 
 protected:
     void closeEvent(QCloseEvent* event);

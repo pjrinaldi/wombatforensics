@@ -54,5 +54,6 @@ void ImageViewer::OpenImageWindow(const QModelIndex &index)
 
 void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
 {
-    qDebug() << "select image in the treeview." << index.row();
+    //qDebug() << "select image in the treeview." << index.data(Qt::UserRole).toInt();
+    emit SendObjectToTreeView(index.data(Qt::UserRole).toInt()); 
 }
