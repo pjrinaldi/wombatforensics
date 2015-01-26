@@ -1163,7 +1163,8 @@ void WombatForensics::UpdateThumbnails(int tsize)
     thumbsize = tsize;
     // POSSIBLY MAKE THE BELOW CODE A SEPARATE FUNCTION WHICH IS QTCONCURRENTLY HANDLED.
     //imagewindow->lw->clear();
-    wombatdatabase->GetThumbnails();
+    qDebug() << "update thumbnails called";
+    //wombatdatabase->GetThumbnails();
     /*
     for(int i=0; i < thumblist.count(); i++)
     {

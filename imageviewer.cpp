@@ -28,6 +28,8 @@ ImageViewer::~ImageViewer()
 
 void ImageViewer::UpdateGeometries()
 {
+    qDebug() << "Udpdate Geometry called";
     imagemodel = new ImageModel();
+    imagemodel->GetThumbnails();
     ui->listView->setModel(imagemodel);
 }

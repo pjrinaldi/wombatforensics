@@ -26,15 +26,56 @@ public:
     {
         if(!index.isValid())
             return QVariant();
-        if(index.row() >= thumblist.count())
-            return QVariant();
+        //if(index.row() >= thumblist.count())
+        //    return QVariant();
         if(role == Qt::DecorationRole)
         {
+            qDebug() << "thumblistcount:" << thumblist.count();
+            qDebug() << "decoration role:" << index.row();
             return QPixmap::fromImage(MakeThumb(thumblist.at(index.row())));
         }
         else
             return QVariant();
     };
+
+    void GetThumbnails(void)
+    {
+        qDebug() << "thumbnail called";
+        int row = 0;
+        thumblist.clear();
+        QSqlQuery thumbquery(thumbdb);
+        thumbquery.prepare("SELECT thumbblobk FROM thumbs;");
+        if(thumbquery.exec())
+        {
+            beginInsertRows(QModelIndex(), row, row);
+            while(thumbquery.next())
+            {
+                qDebug() << "row:" << row;
+                row = thumblist.count();
+                thumblist.insert(row, thumbquery.value(0).toString());
+            }
+            endInsertRows();
+        }
+        thumbquery.finish();
+    };
+
+    /*
+     *    thumblist.clear();
+    QSqlQuery thumbquery(thumbdb);
+    thumbquery.prepare("SELECT thumbblob FROM thumbs;");
+    if(thumbquery.exec())
+    {
+        while(thumbquery.next())
+        {
+            thumblist.append(thumbquery.value(0).toString());
+            //thumblist.append(thumbquery.values(1).toString());
+        }
+    }
+
+     *
+     */ 
+//private:
+    //QList<QPixmap> pixmaplist;
 };
 
 namespace Ui
