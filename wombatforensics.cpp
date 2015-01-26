@@ -1154,8 +1154,8 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     }
     else
     {
-        imagewindow->UpdateGeometries();
         wombatdatabase->GetThumbnails();
+        imagewindow->UpdateGeometries();
         imagewindow->show();
     }
 }

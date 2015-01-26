@@ -11,86 +11,45 @@ class ImageModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ImageModel(QObject* parent = 0) : QAbstractListModel(parent)
+    ImageModel(const QList<QPixmap> pixlist, QObject* parent = 0) : QAbstractListModel(parent), pixmaplist(pixlist)
     {
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
-        qDebug() << "rowcount:" << thumblist.count();
-        if(parent.row() >= thumblist.count())
+        //qDebug() << "rowcount:" << pixmaplist.count();
+        if(parent.row() >= pixmaplist.count())
             return 0;
-        return thumblist.count();
+        return pixmaplist.count();
     };
 
-    /*
-    QModelIndex index(int row, int column = 0, const QModelIndex& parent = QModelIndex()) const
-    {
-    };
-    */
     QVariant data(const QModelIndex& index, int role) const
     {
         if(!index.isValid())
         {
-            qDebug() << "index is not valid" << index.row();
+            //qDebug() << "index is not valid" << index.row();
             return QVariant();
         }
         if(index.row() >= thumblist.count())
         {
-            qDebug() << "row is greater than thumblist count" << index.row();
+            //qDebug() << "row is greater than thumblist count" << index.row();
             return QVariant();
         }
         if(role == Qt::DecorationRole)
         {
-            qDebug() << "thumblistcount:" << thumblist.count();
-            qDebug() << "decoration role:" << index.row();
-            return QPixmap::fromImage(MakeThumb(thumblist.at(index.row())));
+            //qDebug() << "decoration role:" << index.row();
+            return pixmaplist.at(index.row());
+            //return QPixmap::fromImage(MakeThumb(thumblist.at(index.row())));
         }
         else
         {
-            qDebug() << "role is not the decoration role" << index.row();
+            //qDebug() << "role is not the decoration role" << index.row();
             return QVariant();
         }
     };
-/*
-    void GetThumbnails(void)
-    {
-        qDebug() << "thumbnail called";
-        int row = 0;
-        thumblist.clear();
-        QSqlQuery thumbquery(thumbdb);
-        thumbquery.prepare("SELECT thumbblob FROM thumbs;");
-        if(thumbquery.exec())
-        {
-            beginInsertRows(QModelIndex(), row, thumbquery.size());
-            while(thumbquery.next())
-            {
-                qDebug() << "row:" << row;
-                row = thumblist.count();
-                thumblist.insert(row, thumbquery.value(0).toString());
-            }
-            endInsertRows();
-        }
-        thumbquery.finish();
-    };*/
 
-    /*
-     *    thumblist.clear();
-    QSqlQuery thumbquery(thumbdb);
-    thumbquery.prepare("SELECT thumbblob FROM thumbs;");
-    if(thumbquery.exec())
-    {
-        while(thumbquery.next())
-        {
-            thumblist.append(thumbquery.value(0).toString());
-            //thumblist.append(thumbquery.values(1).toString());
-        }
-    }
-
-     *
-     */ 
-//private:
-    //QList<QPixmap> pixmaplist;
+private:
+    QList<QPixmap> pixmaplist;
 };
 
 namespace Ui
@@ -108,6 +67,7 @@ public:
     QListView* lw;
     QSpinBox* sb;
     void UpdateGeometries();
+    void GetPixmaps();
 private slots:
     void HideClicked();
 
@@ -116,6 +76,7 @@ signals:
 private:
     Ui::ImageViewer* ui;
     ImageModel* imagemodel;
+    QList<QPixmap> pixmaps;
 protected:
     void closeEvent(QCloseEvent* event);
 };
