@@ -5,6 +5,7 @@
 #include "globals.h"
 #include "wombatfunctions.h"
 #include "ui_imageviewer.h"
+#include "ui_imagewindow.h"
 
 class ImageModel : public QAbstractListModel
 {
@@ -56,7 +57,27 @@ private:
 namespace Ui
 {
     class ImageViewer;
+    class ImageWindow;
 }
+
+class ImageWindow : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ImageWindow(QWidget* parent = 0);
+    ~ImageWindow();
+    void GetImage(int objid);
+private slots:
+    void HideClicked();
+    void ShowImage();
+private:
+    Ui::ImageWindow* ui;
+    TskObject tskobj;
+    TskObject* tskptr;
+protected:
+    void mousePressEvent(QMouseEvent* event);
+};
 
 class ImageViewer : public QDialog
 {
@@ -80,6 +101,7 @@ signals:
 private:
     Ui::ImageViewer* ui;
     ImageModel* imagemodel;
+    ImageWindow* imagedialog;
     QList<QPixmap> pixmaps;
     QStringList idlist;
     QStringList addresslist;

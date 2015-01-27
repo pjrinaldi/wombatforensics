@@ -1,5 +1,88 @@
 #include "imageviewer.h"
 
+ImageWindow::ImageWindow(QWidget* parent) : QDialog(parent), ui(new Ui::ImageWindow)
+{
+    ui->setupUi(this);
+    tskptr = &tskobj;
+    tskptr->readimginfo = NULL;
+    tskptr->readfsinfo = NULL;
+    tskptr->readfileinfo = NULL;
+    this->hide();
+}
+
+ImageWindow::~ImageWindow()
+{
+}
+
+void ImageWindow::HideClicked()
+{
+    this->hide();
+}
+
+void ImageWindow::ShowImage()
+{
+    this->show();
+}
+
+void ImageWindow::mousePressEvent(QMouseEvent* e)
+{
+    if(e->type() == QEvent::MouseButtonPress)
+    {
+        qDebug() << "mouse pressed, so close.";
+        ui->label->clear();
+        this->hide();
+    }
+}
+
+void ImageWindow::GetImage(int objectid)
+{
+    // OpenParentImage
+    std::vector<std::string> pathvector;
+    int imgid = 0;
+    int fsid = 0;
+    int fsoffset = 0;
+    int address = 0;
+    pathvector.clear();
+    QSqlQuery pimgquery(fcasedb);
+    pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
+    pimgquery.addBindValue(objectid);
+    pimgquery.exec();
+    pimgquery.next();
+    imgid = pimgquery.value(0).toInt();
+    fsid = pimgquery.value(1).toInt();
+    address = pimgquery.value(2).toInt();
+    pimgquery.finish();
+    pimgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
+    pimgquery.addBindValue(imgid);
+    if(pimgquery.exec())
+    {
+        while(pimgquery.next())
+        {
+            pathvector.push_back(pimgquery.value(0).toString().toStdString());
+        }
+    }
+    pimgquery.finish();
+    tskptr->imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+    for(uint i=0; i < pathvector.size(); i++)
+    {
+        tskptr->imagepartspath[i] = pathvector.at(i).c_str();
+    }
+    tskptr->readimginfo = tsk_img_open(pathvector.size(), tskptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    free(tskptr->imagepartspath);
+    // OpenParentFileSystem
+    pimgquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+    pimgquery.addBindValue(fsid);
+    pimgquery.exec();
+    pimgquery.next();
+    fsoffset = pimgquery.value(0).toInt();
+    pimgquery.finish();
+    tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
+    // OpenFile
+    tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, address);
+    // ReadFileToImageUsingByteArray
+    // follow what i did to generate pixmaps.
+}
+
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
     ui->setupUi(this);
@@ -8,6 +91,9 @@ ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageVie
     sb = ui->spinBox;
     ui->spinBox->setValue(thumbsize);
     //qDebug() << QImageReader::supportedImageFormats();
+    imagedialog = new ImageWindow();
+    imagedialog->setModal(false);
+    imagedialog->hide();
     this->hide();
 }
 
@@ -49,11 +135,11 @@ void ImageViewer::UpdateGeometries()
 
 void ImageViewer::OpenImageWindow(const QModelIndex &index)
 {
-    qDebug() << "open image in new window here." << index.row();
+    imagedialog->GetImage(index.data(Qt::UserRole).toInt());
+    imagedialog->show();
 }
 
 void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
 {
-    //qDebug() << "select image in the treeview." << index.data(Qt::UserRole).toInt();
     emit SendObjectToTreeView(index.data(Qt::UserRole).toInt()); 
 }
