@@ -152,5 +152,13 @@ void ImageViewer::OpenImageWindow(const QModelIndex &index)
 
 void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
 {
+    QSqlQuery pathquery(fcasedb);
+    pathquery.prepare("SELECT (fullpath || name) AS fullname FROM data WHERE objectid = ?;");
+    pathquery.addBindValue(index.data(Qt::UserRole).toInt());
+    pathquery.exec();
+    pathquery.next();
+    thumbpath = pathquery.value(0).toString();
+    pathquery.finish();
+
     emit SendObjectToTreeView(index.data(Qt::UserRole).toInt()); 
 }

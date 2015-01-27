@@ -26,17 +26,11 @@ public:
     QVariant data(const QModelIndex& index, int role) const
     {
         if(!index.isValid())
-        {
             return QVariant();
-        }
         if(index.row() >= thumblist.count())
-        {
             return QVariant();
-        }
         if(role == Qt::DecorationRole)
-        {
             return pixmaplist.at(index.row());
-        }
         else if(role == Qt::UserRole)
             return idlist.at(index.row());
         else if(role == Qt::ToolTipRole)
@@ -46,15 +40,12 @@ public:
             pathquery.addBindValue(index.data(Qt::UserRole).toInt());
             pathquery.exec();
             pathquery.next();
-            qDebug() << "fullpath:" << pathquery.value(0).toString();
             thumbpath = pathquery.value(0).toString();
             pathquery.finish();
             return thumbpath; 
         }
         else
-        {
             return QVariant();
-        }
     };
 
 
