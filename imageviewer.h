@@ -39,8 +39,17 @@ public:
         }
         else if(role == Qt::UserRole)
             return idlist.at(index.row());
-        else if(role == Qt::TooltipRole)
+        else if(role == Qt::ToolTipRole)
         {
+            QSqlQuery pathquery(fcasedb);
+            pathquery.prepare("SELECT (fullpath || name) AS fullname FROM data WHERE objectid = ?;");
+            pathquery.addBindValue(index.data(Qt::UserRole).toInt());
+            pathquery.exec();
+            pathquery.next();
+            qDebug() << "fullpath:" << pathquery.value(0).toString();
+            thumbpath = pathquery.value(0).toString();
+            pathquery.finish();
+            return thumbpath; 
         }
         else
         {

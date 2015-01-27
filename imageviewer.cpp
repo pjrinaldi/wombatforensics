@@ -36,6 +36,7 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
 
 void ImageWindow::GetImage(int objectid)
 {
+    this->setWindowTitle("View Image - " + thumbpath);
     // OpenParentImage
     std::vector<std::string> pathvector;
     int imgid = 0;

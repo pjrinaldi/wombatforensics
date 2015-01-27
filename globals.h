@@ -27,6 +27,7 @@ extern QList<FileSystemObject> fsobjectlist;
 extern QStringList propertylist;
 extern QStringList thumblist;
 extern QString blockstring;
+extern QString thumbpath;
 extern struct magic_set* magicptr;
 extern struct magic_set* magicmimeptr;
 

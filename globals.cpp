@@ -30,6 +30,7 @@ QList<FileSystemObject> fsobjectlist;
 QStringList propertylist;
 QStringList thumblist;
 QString blockstring = "";
+QString thumbpath = "";
 struct magic_set* magicptr = NULL;
 struct magic_set* magicmimeptr = NULL;
 FilterValues filtervalues;
