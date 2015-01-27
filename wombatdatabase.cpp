@@ -751,12 +751,9 @@ void WombatDatabase::GetThumbnails()
     {
         while(thumbquery.next())
         {
-            if(thumbquery.value(2).toString().length() > 0)
-            {
-                thumblist.append(thumbquery.value(0).toString());
-                thumblist.append(thumbquery.value(1).toString());
-                thumblist.append(thumbquery.value(2).toString());
-            }
+            thumblist.append(thumbquery.value(0).toString());
+            thumblist.append(thumbquery.value(1).toString());
+            thumblist.append(thumbquery.value(2).toString());
         }
     }
     thumbquery.finish();

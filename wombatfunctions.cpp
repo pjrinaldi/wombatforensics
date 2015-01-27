@@ -519,5 +519,5 @@ QImage MakeThumb(const QString &img)
     if(ba.length() > 0)
         return QImage::fromData(ba, "PNG").scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
     else
-        return QImage::fromData(ba, "PNG");
+        return QImage(":/bar/missingthumb").scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
 }

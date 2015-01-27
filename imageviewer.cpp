@@ -90,6 +90,8 @@ void ImageWindow::GetImage(int objectid)
         bool isloaded = tmpimage.loadFromData(QByteArray::fromRawData(ibuffer, imglen));
         if(isloaded)
             ui->label->setPixmap(QPixmap::fromImage(tmpimage));
+        else
+            ui->label->setPixmap(QPixmap::fromImage(QImage(":/bar/missingthumb")));
     }
 }
 

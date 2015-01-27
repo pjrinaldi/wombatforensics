@@ -363,6 +363,22 @@ void WombatForensics::InitializeOpenCase()
             if(wombatvarptr->curerrmsg.compare("") != 0)
                 DisplayError("1.1", "SQL Error", wombatvarptr->curerrmsg);
         }
+        thumbdb = QSqlDatabase::database("thumbdb");
+        if(!thumbdb.isValid())
+            thumbdb = QSqlDatabase::addDatabase("QSQLITE", "thumbdb");
+        thumbdb.setDatabaseName(wombatvarptr->caseobject.dirpath + "thumbs.db");
+        if(!FileExists((wombatvarptr->caseobject.dirpath + "thumbs.db").toStdString()))
+        {
+            wombatdatabase->CreateThumbDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.01", "Thumb DB Error", wombatvarptr->curerrmsg);
+        }
+        else
+        {
+            wombatdatabase->OpenThumbDB();
+            if(wombatvarptr->curerrmsg.compare("") != 0)
+                DisplayError("1.02", "Thumb DB Open Error", wombatvarptr->curerrmsg);
+        }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
         wombatvarptr->casedb = QSqlDatabase::database("casedb");

@@ -31,6 +31,7 @@
         <file alias="bwrem">./Resources/remove.png</file>
         <file alias="newcase">./Resources/new-document.png</file>
         <file alias="opencase">./Resources/open-document.png</file>
+        <file alias="missingthumb">./Resources/thumbmissing.png</file>
     </qresource>
     <qresource prefix="/html">
         <file alias="infohtml">./Resources/information.html</file>
