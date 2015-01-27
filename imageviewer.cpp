@@ -80,7 +80,17 @@ void ImageWindow::GetImage(int objectid)
     // OpenFile
     tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, address);
     // ReadFileToImageUsingByteArray
-    // follow what i did to generate pixmaps.
+    if(tskptr->readfileinfo->meta != NULL)
+    {
+        QImage tmpimage;
+        QByteArray iba;
+        QBuffer ibuff(&iba);
+        char ibuffer[tskptr->readfileinfo->meta->size];
+        ssize_t imglen = tsk_fs_file_read(tskptr->readfileinfo, 0, ibuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        bool isloaded = tmpimage.loadFromData(QByteArray::fromRawData(ibuffer, imglen));
+        if(isloaded)
+            ui->label->setPixmap(QPixmap::fromImage(tmpimage));
+    }
 }
 
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)

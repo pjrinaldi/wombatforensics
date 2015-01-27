@@ -35,7 +35,7 @@ public:
     {
         if (ImageWindow->objectName().isEmpty())
             ImageWindow->setObjectName(QStringLiteral("ImageWindow"));
-        ImageWindow->resize(536, 370);
+        ImageWindow->resize(800, 600);
         horizontalLayout = new QHBoxLayout(ImageWindow);
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
@@ -45,7 +45,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 534, 368));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 798, 598));
         horizontalLayout_2 = new QHBoxLayout(scrollAreaWidgetContents);
         horizontalLayout_2->setSpacing(0);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
