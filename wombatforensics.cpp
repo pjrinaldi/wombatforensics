@@ -127,9 +127,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 
 void WombatForensics::SetSelectedFromImageViewer(int objectid)
 {
-    QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QString::number(objectid), Qt::MatchExactly | Qt::MatchRecursive);
+    qDebug() << "objectid:" << QString::number(objectid);
+    QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     qDebug() << "index count:" << indexlist.count();
-    //ui->dirTreeView->setCurrentIndex(
+    ui->dirTreeView->setCurrentIndex(indexlist.at(0));
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
