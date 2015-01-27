@@ -3,6 +3,7 @@
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
     ui->setupUi(this);
+    qDebug() << QImageReader::supportedImageFormats();
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
     this->menuBar()->hide();

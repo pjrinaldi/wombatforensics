@@ -102,7 +102,6 @@ ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageVie
     ui->listView->setViewMode(QListView::IconMode);
     sb = ui->spinBox;
     ui->spinBox->setValue(thumbsize);
-    //qDebug() << QImageReader::supportedImageFormats();
     imagedialog = new ImageWindow();
     imagedialog->setModal(false);
     imagedialog->hide();
