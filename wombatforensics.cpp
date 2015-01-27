@@ -127,10 +127,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 
 void WombatForensics::SetSelectedFromImageViewer(int objectid)
 {
-    qDebug() << "objectid:" << QString::number(objectid);
+    // MAY NEED TO REMOVE THE HIGHLIGHTING FEATURE, BUT RATHER DISPLAY INFROMATION FOR THE FILE
+    // SUCH AS THE PATH AND FILENAME
     QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    qDebug() << "index count:" << indexlist.count();
-    ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    if(indexlist.count() > 0)
+        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    else
+       DisplayError("!", "The Image Path Not Discovered", "The image has not been loaded in the treeview yet, so it cannot be selected."); 
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
