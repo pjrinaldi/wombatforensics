@@ -39,6 +39,9 @@ public:
         }
         else if(role == Qt::UserRole)
             return idlist.at(index.row());
+        else if(role == Qt::TooltipRole)
+        {
+        }
         else
         {
             return QVariant();
