@@ -191,7 +191,7 @@ void WombatDatabase::CreateThumbDB()
     if(thumbdb.open())
     {
         QSqlQuery thumbquery(thumbdb);
-        thumbquery.exec("CREATE TABLE thumbs(thumbid INTERGER PRIMARY KEY, objectid INTEGER, address INTEGER, thumbblob TEXT);");
+        thumbquery.exec("CREATE TABLE thumbs(thumbid INTERGER PRIMARY KEY, objectid INTEGER, thumbblob TEXT);");
         thumbquery.finish();
     }
     else
@@ -746,14 +746,13 @@ void WombatDatabase::GetThumbnails()
 {
     thumblist.clear();
     QSqlQuery thumbquery(thumbdb);
-    thumbquery.prepare("SELECT objectid, address, thumbblob FROM thumbs;");
+    thumbquery.prepare("SELECT objectid, thumbblob FROM thumbs;");
     if(thumbquery.exec())
     {
         while(thumbquery.next())
         {
             thumblist.append(thumbquery.value(0).toString());
             thumblist.append(thumbquery.value(1).toString());
-            thumblist.append(thumbquery.value(2).toString());
         }
     }
     thumbquery.finish();

@@ -127,18 +127,17 @@ ImageViewer::~ImageViewer()
 void ImageViewer::GetPixmaps()
 {
     pixmaps.clear();
-    for(int i=0; i < thumblist.count()/3; i++)
+    for(int i=0; i < thumblist.count()/2; i++)
     {
-        pixmaps.append(QPixmap::fromImage(MakeThumb(thumblist.at(3*i+2))));
-        idlist.append(thumblist.at(3*i));
-        addresslist.append(thumblist.at(3*i+1));
+        pixmaps.append(QPixmap::fromImage(MakeThumb(thumblist.at(2*i+1))));
+        idlist.append(thumblist.at(2*i));
     }
 }
 
 void ImageViewer::UpdateGeometries()
 {
     GetPixmaps();
-    imagemodel = new ImageModel(pixmaps, idlist, addresslist);
+    imagemodel = new ImageModel(pixmaps, idlist);
     ui->listView->setModel(imagemodel);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));

@@ -12,7 +12,7 @@ class ImageModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ImageModel(const QList<QPixmap> pixlist, QStringList ids, QStringList addlist, QObject* parent = 0) : QAbstractListModel(parent), pixmaplist(pixlist), idlist(ids), addresslist(addlist)
+    ImageModel(const QList<QPixmap> pixlist, QStringList ids, QObject* parent = 0) : QAbstractListModel(parent), pixmaplist(pixlist), idlist(ids)
     {
     };
 
@@ -39,8 +39,6 @@ public:
         }
         else if(role == Qt::UserRole)
             return idlist.at(index.row());
-        else if(role == Qt::UserRole + 1)
-            return addresslist.at(index.row());
         else
         {
             return QVariant();
@@ -51,7 +49,6 @@ public:
 private:
     QList<QPixmap> pixmaplist;
     QStringList idlist;
-    QStringList addresslist;
 };
 
 namespace Ui
@@ -104,7 +101,6 @@ private:
     ImageWindow* imagedialog;
     QList<QPixmap> pixmaps;
     QStringList idlist;
-    QStringList addresslist;
 protected:
     void closeEvent(QCloseEvent* event);
 };

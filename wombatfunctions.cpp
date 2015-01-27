@@ -151,9 +151,8 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList 
         if(tmpstrings[4].contains("image/", Qt::CaseInsensitive))
         {
             QSqlQuery tquery(thumbdb);
-            tquery.prepare("INSERT INTO thumbs (objectid, address, thumbblob) VALUES(?, ?, ?);");
+            tquery.prepare("INSERT INTO thumbs (objectid, thumbblob) VALUES(?, ?);");
             tquery.addBindValue(tmpid);
-            tquery.addBindValue(tmpints[7]);
             tquery.addBindValue(thumbencstr);
             tquery.exec();
             tquery.finish();
