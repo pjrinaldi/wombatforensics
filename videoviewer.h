@@ -3,7 +3,7 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
-#include "ui_videviewer.h"
+#include "ui_videoviewer.h"
 
 namespace Ui
 {
