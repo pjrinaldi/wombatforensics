@@ -15,7 +15,7 @@ VideoViewer::~VideoViewer()
 {
 }
 
-void VideoViewer::ShowVideo()
+void VideoViewer::ShowVideo(const QModelIndex &index)
 {
     this->show();
     vplayer->play("/home/pasquale/Downloads/small.mp4");

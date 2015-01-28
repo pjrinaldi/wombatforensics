@@ -17,8 +17,8 @@ public:
     VideoViewer(QWidget* parent = 0);
     ~VideoViewer();
 
-private slots:
-    void ShowVideo();
+public slots:
+    void ShowVideo(const QModelIndex &index);
     
 private:
     Ui::VideoViewer* ui;

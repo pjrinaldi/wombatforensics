@@ -737,6 +737,7 @@ private slots:
 
 protected:
     void closeEvent(QCloseEvent* event);
+    void mouseDoubleClickEvent(QMouseEvent* event);
 private:
     Ui::WombatForensics *ui;
 

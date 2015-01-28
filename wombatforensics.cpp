@@ -107,6 +107,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
+    connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), videowindow, SLOT(ShowVideo(const QModelIndex &)));
     //connect(ui->dirTreeView->model(), SIGNAL(headerDataChanged(Qt::Orientation, int, int)), ui->dirTreeView->header(), SLOT(headerDataChanged(Qt::Orientation, int, int)));
     connect(imagewindow, SIGNAL(SendObjectToTreeView(int)), this, SLOT(SetSelectedFromImageViewer(int)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -1071,6 +1072,11 @@ void WombatForensics::SetStepValues(int singlestep, int pagestep)
 WombatForensics::~WombatForensics()
 {
     delete ui;
+}
+
+void WombatForensics::mouseDoubleClickEvent(QMouseEvent* event)
+{
+
 }
 
 void WombatForensics::closeEvent(QCloseEvent* event)
