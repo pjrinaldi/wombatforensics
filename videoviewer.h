@@ -2,6 +2,7 @@
 #define VIDEOVIEWER_H
 
 #include "wombatinclude.h"
+#include "globals.h"
 #include "ui_videviewer.h"
 
 namespace Ui
@@ -16,6 +17,13 @@ class VideoViewer : public QDialog
 public:
     VideoViewer(QWidget* parent = 0);
     ~VideoViewer();
+    Node* NodeFromIndex(const QModelIndex &index) const
+    {
+        if(index.isValid())
+            return static_cast<Node*>(index.internalPointer());
+        else
+            return rootnode;
+    };
 
 public slots:
     void ShowVideo(const QModelIndex &index);
