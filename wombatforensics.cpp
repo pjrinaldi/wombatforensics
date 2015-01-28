@@ -61,6 +61,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filetypefilterview = new FileTypeFilter(this);
     hashfilterview = new HashFilter(this);
     imagewindow = new ImageViewer();
+    videowindow = new VideoViewer();
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();

@@ -6,6 +6,8 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <QtAV/QtAV.h>
+#include <QtAVWidgets>
 #include <QAbstractItemModel>
 #include <QAbstractListModel>
 #include <QApplication>

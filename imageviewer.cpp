@@ -28,7 +28,6 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
 {
     if(e->type() == QEvent::MouseButtonPress)
     {
-        qDebug() << "mouse pressed, so close.";
         ui->label->clear();
         this->hide();
     }

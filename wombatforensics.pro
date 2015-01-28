@@ -1,4 +1,4 @@
-QT += widgets gui core concurrent webkitwidgets sql
+QT += widgets gui core concurrent webkitwidgets sql av avwidgets
 QT -= opengl quick network qml
 mac:CONFIG += debug app_bundle
 linux:CONFIG += debug
@@ -19,8 +19,8 @@ VPATH += ../libewf_64bit/include/
 #VPATH += ../vlc-qt/src/widgets/
 #VPATH += ../vlc-qt/src/core/
 #VPATH += ../vlc-qt/src/
-HEADERS = wombatforensics.h wombatvariable.h wombatdatabase.h wombatframework.h wombatfunctions.h ui_wombatforensics.h progresswindow.h ui_progresswindow.h ui_exportdialog.h exportdialog.h cursor.h translate.h libtsk.h tskvariable.h globals.h wombatinclude.h propertieswindow.h ui_propertieswindow.h wombatproperties.h fileviewer.h ui_fileviewer.h imgreader.h imghexviewer.h filereader.h filehexviewer.h magic.h ui_accesseddatefilter.h ui_pathfilter.h ui_analysistypefilter.h ui_changeddatefilter.h ui_createddatefilter.h ui_filetypefilter.h ui_hashcategoryfilter.h ui_hashfilter.h ui_idfilter.h ui_modifieddatefilter.h ui_namefilter.h ui_sizefilter.h filterviews.h imageviewer.h ui_imagewindow.h ui_imageviewer.h
-SOURCES = main.cpp wombatforensics.cpp wombatdatabase.cpp wombatframework.cpp wombatfunctions.cpp progresswindow.cpp exportdialog.cpp cursor.cpp translate.cpp globals.cpp propertieswindow.cpp wombatproperties.cpp fileviewer.cpp imgreader.cpp imghexviewer.cpp filereader.cpp filehexviewer.cpp filterviews.cpp imageviewer.cpp
+HEADERS = wombatforensics.h wombatvariable.h wombatdatabase.h wombatframework.h wombatfunctions.h ui_wombatforensics.h progresswindow.h ui_progresswindow.h ui_exportdialog.h exportdialog.h cursor.h translate.h libtsk.h tskvariable.h globals.h wombatinclude.h propertieswindow.h ui_propertieswindow.h wombatproperties.h fileviewer.h ui_fileviewer.h imgreader.h imghexviewer.h filereader.h filehexviewer.h magic.h ui_accesseddatefilter.h ui_pathfilter.h ui_analysistypefilter.h ui_changeddatefilter.h ui_createddatefilter.h ui_filetypefilter.h ui_hashcategoryfilter.h ui_hashfilter.h ui_idfilter.h ui_modifieddatefilter.h ui_namefilter.h ui_sizefilter.h filterviews.h imageviewer.h ui_imagewindow.h ui_imageviewer.h ui_videoviewer.h videoviewer.h
+SOURCES = main.cpp wombatforensics.cpp wombatdatabase.cpp wombatframework.cpp wombatfunctions.cpp progresswindow.cpp exportdialog.cpp cursor.cpp translate.cpp globals.cpp propertieswindow.cpp wombatproperties.cpp fileviewer.cpp imgreader.cpp imghexviewer.cpp filereader.cpp filehexviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp
 RESOURCES += wombatforensics.qrc
 DESTDIR = ./
 mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk 
