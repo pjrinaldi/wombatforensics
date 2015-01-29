@@ -149,6 +149,12 @@ void ImageViewer::OpenImageWindow(const QModelIndex &index)
     imagedialog->show();
 }
 
+void ImageViewer::ShowImage(const QModelIndex &index)
+{
+    imagedialog->GetImage(index.sibling(index.row(), 0).data().toInt());
+    imagedialog->show();
+}
+
 void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
 {
     QSqlQuery pathquery(fcasedb);

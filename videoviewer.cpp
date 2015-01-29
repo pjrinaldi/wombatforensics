@@ -17,12 +17,12 @@ VideoViewer::~VideoViewer()
 
 void VideoViewer::ShowVideo(const QModelIndex &index)
 {
-    Node* tmpnode = NodeFromIndex(index);
-    if(tmpnode->nodevalues.at(16).toString().contains("video/"))
-    {
-        this->show();
-        vplayer->play("/home/pasquale/Downloads/small.mp4");
-    }
+    //Node* tmpnode = NodeFromIndex(index);
+    //if(tmpnode->nodevalues.at(16).toString().contains("video/"))
+    //{
+    this->show();
+    vplayer->play("/home/pasquale/Downloads/small.mp4");
+    //}
 }
 void VideoViewer::mousePressEvent(QMouseEvent* e)
 {

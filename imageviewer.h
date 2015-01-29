@@ -90,8 +90,10 @@ public:
     QSpinBox* sb;
     void UpdateGeometries();
     void GetPixmaps();
-private slots:
+    void ShowImage(const QModelIndex &index);
+public slots:
     void OpenImageWindow(const QModelIndex &index);
+private slots:
     void HighlightTreeViewItem(const QModelIndex &index);
     void HideClicked();
 

@@ -107,7 +107,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
-    connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), videowindow, SLOT(ShowVideo(const QModelIndex &)));
+    connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
+    //connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), videowindow, SLOT(ShowVideo(const QModelIndex &)));
     //connect(ui->dirTreeView->model(), SIGNAL(headerDataChanged(Qt::Orientation, int, int)), ui->dirTreeView->header(), SLOT(headerDataChanged(Qt::Orientation, int, int)));
     connect(imagewindow, SIGNAL(SendObjectToTreeView(int)), this, SLOT(SetSelectedFromImageViewer(int)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -137,6 +138,20 @@ void WombatForensics::SetSelectedFromImageViewer(int objectid)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     //else
        //DisplayError("!", "The Image Path Not Discovered", "The image has not been loaded in the treeview yet, so it cannot be selected."); 
+}
+
+void WombatForensics::ShowFile(const QModelIndex &index)
+{
+    //Node* tmpnode = NodeFromIndex(index);
+    //if(tmpnode->nodevalues.at(16).toString().contains("video/"))
+    if(index.sibling(index.row(), 16).data().toString().contains("image/"))
+    {
+        imagewindow->ShowImage(index);
+    }
+    if(index.sibling(index.row(), 16).data().toString().contains("video/"))
+    {
+        videowindow->ShowVideo(index);
+    }
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)

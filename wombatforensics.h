@@ -734,6 +734,7 @@ private slots:
     void PreviousItem();
     void UpdateThumbnails(int tsize);
     void SetSelectedFromImageViewer(int selectedid);
+    void ShowFile(const QModelIndex &index);
 
 protected:
     void closeEvent(QCloseEvent* event);
