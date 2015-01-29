@@ -17,6 +17,7 @@ class VideoViewer : public QDialog
 public:
     VideoViewer(QWidget* parent = 0);
     ~VideoViewer();
+    /*
     Node* NodeFromIndex(const QModelIndex &index) const
     {
         if(index.isValid())
@@ -24,6 +25,7 @@ public:
         else
             return rootnode;
     };
+    */
 
 public slots:
     void ShowVideo(const QModelIndex &index);

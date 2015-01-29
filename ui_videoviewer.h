@@ -16,22 +16,36 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
 
 class Ui_VideoViewer
 {
 public:
+    QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
+    QSlider *horizontalSlider;
 
     void setupUi(QDialog *VideoViewer)
     {
         if (VideoViewer->objectName().isEmpty())
             VideoViewer->setObjectName(QStringLiteral("VideoViewer"));
         VideoViewer->resize(479, 332);
-        horizontalLayout = new QHBoxLayout(VideoViewer);
+        verticalLayout = new QVBoxLayout(VideoViewer);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+
+        verticalLayout->addLayout(horizontalLayout);
+
+        horizontalSlider = new QSlider(VideoViewer);
+        horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
+        horizontalSlider->setOrientation(Qt::Horizontal);
+
+        verticalLayout->addWidget(horizontalSlider);
+
 
         retranslateUi(VideoViewer);
 

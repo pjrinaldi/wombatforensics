@@ -142,8 +142,6 @@ void WombatForensics::SetSelectedFromImageViewer(int objectid)
 
 void WombatForensics::ShowFile(const QModelIndex &index)
 {
-    //Node* tmpnode = NodeFromIndex(index);
-    //if(tmpnode->nodevalues.at(16).toString().contains("video/"))
     if(index.sibling(index.row(), 16).data().toString().contains("image/"))
     {
         imagewindow->ShowImage(index);
