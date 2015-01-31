@@ -10,6 +10,20 @@ namespace Ui
     class VideoViewer;
 }
 
+class Thread : public QThread
+{
+public:
+    Thread(QtAV::AVPlayer* player) : QThread(0), mplayer(player)
+    {
+    };
+protected:
+    virtual void run()
+    {
+        exec();
+    }
+    QtAV::AVPlayer* mplayer;
+};
+
 class VideoViewer : public QDialog
 {
     Q_OBJECT
@@ -29,11 +43,17 @@ public:
 
 public slots:
     void ShowVideo(const QModelIndex &index);
+    void Seek(int);
+    void PlayPause();
+    void UpdateSlider();
+    void GetVideo(int objid);
     
 private:
     Ui::VideoViewer* ui;
     QtAV::VideoOutput* vout;
     QtAV::AVPlayer* vplayer;
+    TskObject tskobj;
+    TskObject* tskptr;
 protected:
     void mousePressEvent(QMouseEvent* event);
 };

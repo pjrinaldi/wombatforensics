@@ -38,6 +38,7 @@
 #include <QStatusBar>
 #include <QString>
 #include <QStringList>
+#include <QThread>
 #include <QThreadPool>
 #include <QTreeWidgetItem>
 #include <QVector>

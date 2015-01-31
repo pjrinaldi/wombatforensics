@@ -14,8 +14,10 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QVBoxLayout>
 
@@ -26,25 +28,52 @@ class Ui_VideoViewer
 public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
+    QFrame *frame;
+    QHBoxLayout *horizontalLayout_2;
     QSlider *horizontalSlider;
+    QPushButton *pushButton;
 
     void setupUi(QDialog *VideoViewer)
     {
         if (VideoViewer->objectName().isEmpty())
             VideoViewer->setObjectName(QStringLiteral("VideoViewer"));
-        VideoViewer->resize(479, 332);
+        VideoViewer->resize(660, 398);
         verticalLayout = new QVBoxLayout(VideoViewer);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
 
         verticalLayout->addLayout(horizontalLayout);
 
-        horizontalSlider = new QSlider(VideoViewer);
+        frame = new QFrame(VideoViewer);
+        frame->setObjectName(QStringLiteral("frame"));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(frame->sizePolicy().hasHeightForWidth());
+        frame->setSizePolicy(sizePolicy);
+        frame->setMinimumSize(QSize(0, 0));
+        frame->setMaximumSize(QSize(16777215, 50));
+        frame->setFrameShape(QFrame::NoFrame);
+        frame->setFrameShadow(QFrame::Plain);
+        horizontalLayout_2 = new QHBoxLayout(frame);
+        horizontalLayout_2->setSpacing(0);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
+        horizontalSlider = new QSlider(frame);
         horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
         horizontalSlider->setOrientation(Qt::Horizontal);
 
-        verticalLayout->addWidget(horizontalSlider);
+        horizontalLayout_2->addWidget(horizontalSlider);
+
+        pushButton = new QPushButton(frame);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+
+        horizontalLayout_2->addWidget(pushButton);
+
+
+        verticalLayout->addWidget(frame);
 
 
         retranslateUi(VideoViewer);
@@ -55,6 +84,7 @@ public:
     void retranslateUi(QDialog *VideoViewer)
     {
         VideoViewer->setWindowTitle(QApplication::translate("VideoViewer", "View Video", 0));
+        pushButton->setText(QString());
     } // retranslateUi
 
 };
