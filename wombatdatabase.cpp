@@ -204,6 +204,7 @@ void WombatDatabase::CreateAppDB()
     {
         QSqlQuery appquery(wombatptr->appdb);
         appquery.exec("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
+        appquery.exec("CREATE TABLE externalviewers(viewerid INTEGER PRIMARY KEY, path TEXT, deleted INTEGER);");
         appquery.finish();
     }
     else

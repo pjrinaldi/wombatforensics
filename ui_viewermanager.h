@@ -21,6 +21,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -33,10 +34,13 @@ public:
     QHBoxLayout *horizontalLayout;
     QLabel *label;
     QLineEdit *lineEdit;
-    QPushButton *pushButton;
-    QPushButton *pushButton_2;
+    QPushButton *browsebutton;
+    QPushButton *addbutton;
     QLabel *label_2;
     QListView *listView;
+    QHBoxLayout *horizontalLayout_2;
+    QSpacerItem *horizontalSpacer;
+    QPushButton *removebutton;
 
     void setupUi(QDialog *ViewerManager)
     {
@@ -70,15 +74,16 @@ public:
 
         horizontalLayout->addWidget(lineEdit);
 
-        pushButton = new QPushButton(frame);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
+        browsebutton = new QPushButton(frame);
+        browsebutton->setObjectName(QStringLiteral("browsebutton"));
 
-        horizontalLayout->addWidget(pushButton);
+        horizontalLayout->addWidget(browsebutton);
 
-        pushButton_2 = new QPushButton(frame);
-        pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
+        addbutton = new QPushButton(frame);
+        addbutton->setObjectName(QStringLiteral("addbutton"));
+        addbutton->setEnabled(false);
 
-        horizontalLayout->addWidget(pushButton_2);
+        horizontalLayout->addWidget(addbutton);
 
 
         verticalLayout->addWidget(frame);
@@ -95,6 +100,21 @@ public:
 
         verticalLayout->addWidget(listView);
 
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_2->addItem(horizontalSpacer);
+
+        removebutton = new QPushButton(ViewerManager);
+        removebutton->setObjectName(QStringLiteral("removebutton"));
+        removebutton->setEnabled(false);
+
+        horizontalLayout_2->addWidget(removebutton);
+
+
+        verticalLayout->addLayout(horizontalLayout_2);
+
 
         retranslateUi(ViewerManager);
 
@@ -105,9 +125,10 @@ public:
     {
         ViewerManager->setWindowTitle(QApplication::translate("ViewerManager", "Viewer Manager", 0));
         label->setText(QApplication::translate("ViewerManager", "Path To Viewer:", 0));
-        pushButton->setText(QApplication::translate("ViewerManager", "Browse", 0));
-        pushButton_2->setText(QApplication::translate("ViewerManager", "Add", 0));
+        browsebutton->setText(QApplication::translate("ViewerManager", "Browse", 0));
+        addbutton->setText(QApplication::translate("ViewerManager", "Add", 0));
         label_2->setText(QApplication::translate("ViewerManager", "Existing Viewers", 0));
+        removebutton->setText(QApplication::translate("ViewerManager", "Remove Selected", 0));
     } // retranslateUi
 
 };
