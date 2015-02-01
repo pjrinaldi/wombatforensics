@@ -46,6 +46,7 @@ public:
     QAction *actionExisting_Bookmarks;
     QAction *actionView_File;
     QAction *actionView_Image_Gallery;
+    QAction *actionViewerManager;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -141,6 +142,12 @@ public:
         QIcon icon11;
         icon11.addFile(QStringLiteral(":/bar/bwimageview"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_Image_Gallery->setIcon(icon11);
+        actionViewerManager = new QAction(WombatForensics);
+        actionViewerManager->setObjectName(QStringLiteral("actionViewerManager"));
+        actionViewerManager->setCheckable(true);
+        QIcon icon12;
+        icon12.addFile(QStringLiteral(":/bar/viewermanager"), QSize(), QIcon::Normal, QIcon::Off);
+        actionViewerManager->setIcon(icon12);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -198,14 +205,14 @@ public:
         menuAbout->setIcon(icon7);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon12;
-        icon12.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon12);
+        QIcon icon13;
+        icon13.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon13);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon13;
-        icon13.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon13);
+        QIcon icon14;
+        icon14.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon14);
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
         analysisToolBar->setObjectName(QStringLiteral("analysisToolBar"));
@@ -253,6 +260,8 @@ public:
         analysisToolBar->addAction(actionView_Properties);
         analysisToolBar->addAction(actionView_File);
         analysisToolBar->addAction(actionView_Image_Gallery);
+        analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionViewerManager);
         analysisToolBar->addAction(actionView_Progress);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionExport_Evidence);
@@ -304,6 +313,7 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionView_Image_Gallery->setToolTip(QApplication::translate("WombatForensics", "View Image Gallery", 0));
 #endif // QT_NO_TOOLTIP
+        actionViewerManager->setText(QApplication::translate("WombatForensics", "Viewer Manager", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));

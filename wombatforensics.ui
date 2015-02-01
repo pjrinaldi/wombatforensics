@@ -210,6 +210,8 @@
    <addaction name="actionView_Properties"/>
    <addaction name="actionView_File"/>
    <addaction name="actionView_Image_Gallery"/>
+   <addaction name="separator"/>
+   <addaction name="actionViewerManager"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
    <addaction name="actionExport_Evidence"/>
@@ -397,6 +399,18 @@
    </property>
    <property name="toolTip">
     <string>View Image Gallery</string>
+   </property>
+  </action>
+  <action name="actionViewerManager">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/viewermanager</normaloff>:/bar/viewermanager</iconset>
+   </property>
+   <property name="text">
+    <string>Viewer Manager</string>
    </property>
   </action>
  </widget>
