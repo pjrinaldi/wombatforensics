@@ -17,6 +17,7 @@
 #include "filterviews.h"
 #include "imageviewer.h"
 #include "videoviewer.h"
+#include "viewermanager.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -672,7 +673,7 @@ public:
     HashFilter* hashfilterview;
     ImageViewer* imagewindow;
     VideoViewer* videowindow;
-
+    ViewerManager* viewmanage;
 
 signals:
     //void LogVariable(WombatVariable* wombatVariable);
@@ -687,12 +688,14 @@ private slots:
     void on_actionView_Progress_triggered(bool checked);
     void on_actionView_File_triggered(bool checked);
     void on_actionView_Image_Gallery_triggered(bool checked);
+    void on_actionViewerManager_triggered(bool checked);
     void UpdateProgress(int count, int processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);
     void HidePropertyWindow(bool checkstate);
     void HideFileViewer(bool checkstate);
     void HideImageWindow(bool checkstate);
+    void HideViewerManager(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
     void OpenParentImage(int imgid);

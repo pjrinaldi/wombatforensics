@@ -42,7 +42,9 @@ public:
     {
         if (ViewerManager->objectName().isEmpty())
             ViewerManager->setObjectName(QStringLiteral("ViewerManager"));
+        ViewerManager->setWindowModality(Qt::ApplicationModal);
         ViewerManager->resize(660, 506);
+        ViewerManager->setModal(true);
         verticalLayout = new QVBoxLayout(ViewerManager);
         verticalLayout->setSpacing(5);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));

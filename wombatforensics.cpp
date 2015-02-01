@@ -62,6 +62,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     hashfilterview = new HashFilter(this);
     imagewindow = new ImageViewer();
     videowindow = new VideoViewer();
+    viewmanage = new ViewerManager(this);
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -85,6 +86,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
+    connect(ui->actionViewerManager, SIGNAL(triggered(bool)), this, SLOT(on_actionViewerManager_triggered(bool)), Qt::DirectConnection);
+    connect(viewmanage, SIGNAL(HideManagerWindow(bool)), this, SLOT(HideViewerManager(bool)), Qt::DirectConnection);
 
     treemenu = new QMenu(ui->dirTreeView);
     treemenu->addAction(ui->menuBookmark_Manager->menuAction());
@@ -170,6 +173,10 @@ void WombatForensics::HideImageWindow(bool checkstate)
 void WombatForensics::HideProgressWindow(bool checkedstate)
 {
     ui->actionView_Progress->setChecked(checkedstate);
+}
+void WombatForensics::HideViewerManager(bool checkstate)
+{
+    ui->actionViewerManager->setChecked(checkstate);
 }
 
 void WombatForensics::InitializeAppStructure()
@@ -1206,6 +1213,16 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
         wombatdatabase->GetThumbnails();
         imagewindow->UpdateGeometries();
         imagewindow->show();
+    }
+}
+
+void WombatForensics::on_actionViewerManager_triggered(bool checked)
+{
+    if(!checked) // hide viewer
+        viewmanage->hide();
+    else
+    {
+        viewmanage->show();
     }
 }
 
