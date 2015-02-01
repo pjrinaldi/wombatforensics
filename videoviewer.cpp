@@ -111,9 +111,9 @@ void VideoViewer::GetVideo(int objectid)
 void VideoViewer::ShowVideo(const QModelIndex &index)
 {
     this->show();
-    Thread thread(vplayer);
-    vplayer->moveToThread(&thread);
-    thread.start();
+    //Thread thread(vplayer);
+    //vplayer->moveToThread(&thread);
+    //thread.start();
     GetVideo(index.sibling(index.row(), 0).data().toInt());
     vplayer->play();
     //vplayer->play("/home/pasquale/Downlaods/small.mp4");

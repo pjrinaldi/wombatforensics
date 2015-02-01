@@ -1111,6 +1111,8 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     propertywindow->close();
     fileviewer->close();
     imagewindow->close();
+    videowindow->close();
+    viewmanage->close();
     RemoveTmpFiles(); // can get rid of this function right now. I don't need to make temporary files to read.
     if(ProcessingComplete())
     {

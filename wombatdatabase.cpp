@@ -203,8 +203,10 @@ void WombatDatabase::CreateAppDB()
     if(wombatptr->appdb.open())
     {
         QSqlQuery appquery(wombatptr->appdb);
+        wombatptr->appdb.transaction();
         appquery.exec("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
         appquery.exec("CREATE TABLE externalviewers(viewerid INTEGER PRIMARY KEY, path TEXT, deleted INTEGER);");
+        wombatptr->appdb.commit();
         appquery.finish();
     }
     else
@@ -251,6 +253,8 @@ void WombatDatabase::CloseAppDB()
     if(wombatptr->appdb.isOpen())
     {
         wombatptr->appdb.close();
+        if(appdb.isOpen())
+            appdb.close();
         wombatptr->appdb = QSqlDatabase();
         QSqlDatabase::removeDatabase("appdb");
     }
