@@ -202,6 +202,7 @@ void WombatForensics::InitializeAppStructure()
     wombatvarptr->wombatdbname = wombatvarptr->datapath + "WombatApp.db";
     wombatvarptr->appdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
     wombatvarptr->appdb.setDatabaseName(wombatvarptr->wombatdbname);
+    appdb = wombatvarptr->appdb;
     bool appFileExist = FileExists(wombatvarptr->wombatdbname.toStdString());
     if(!appFileExist)
     {
