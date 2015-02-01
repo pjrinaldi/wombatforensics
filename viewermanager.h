@@ -31,6 +31,7 @@ protected:
     void closeEvent(QCloseEvent* event);
 private:
     Ui::ViewerManager* ui;
+    QString fileviewerpath;
     
 };
 

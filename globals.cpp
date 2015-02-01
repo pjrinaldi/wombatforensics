@@ -3,6 +3,7 @@
 QSqlDatabase fcasedb;
 QSqlDatabase logdb;
 QSqlDatabase thumbdb;
+QSqlDatabase appdb;
 QString fdbname = "t.db";
 QThreadPool* threadpool = NULL;
 QVector<QFuture<void> > threadvector;

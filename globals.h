@@ -6,6 +6,7 @@
 extern QSqlDatabase fcasedb;
 extern QSqlDatabase logdb;
 extern QSqlDatabase thumbdb;
+extern QSqlDatabase appdb;
 extern QString fdbname;
 extern QThreadPool* threadpool;
 extern QVector<QFuture<void> > threadvector;
