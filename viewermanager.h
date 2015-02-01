@@ -20,6 +20,10 @@ public:
 
 private slots:
     void HideClicked();
+    void ShowBrowser();
+    void AddViewer();
+    void RemoveSelected();
+    void SelectionChanged(const QItemSelection &newitem, const QItemSelection &previtem);
 signals:
     void HideManagerWindow(bool checkstate);
 

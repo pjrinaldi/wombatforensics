@@ -4,6 +4,10 @@ ViewerManager::ViewerManager(QWidget* parent) : QDialog(parent), ui(new Ui::View
 {
     ui->setupUi(this);
     this->hide();
+    connect(ui->browsebutton, SIGNAL(clicked()), this, SLOT(ShowBrowser()));
+    connect(ui->addbutton, SIGNAL(clicked()), this, SLOT(AddViewer()));
+    connect(ui->removebutton, SIGNAL(clicked()), this, SLOT(RemoveSelected()));
+    connect(ui->listView, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
 }
 
 ViewerManager::~ViewerManager()
@@ -23,3 +27,18 @@ void ViewerManager::closeEvent(QCloseEvent* e)
     e->accept();
 }
 
+void ViewerManager::ShowBrowser()
+{
+}
+
+void ViewerManager::AddViewer()
+{
+}
+
+void ViewerManager::RemoveSelected()
+{
+}
+
+void ViewerManager::SelectionChanged(const QItemSelection &newitem, const QItemSelection &olditem)
+{
+}
