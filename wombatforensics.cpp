@@ -140,6 +140,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 
 void WombatForensics::ShowExternalViewer()
 {
+    qDebug() << ((QAction*)QObject::sender())->text();
     qDebug() << "implement external viewer code here.";
 }
 
