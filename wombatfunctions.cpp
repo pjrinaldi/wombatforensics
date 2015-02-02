@@ -17,14 +17,17 @@ std::string GetTime()
 
 void LogEntry(int caseid, int evidenceid, int jobid, int type, QString msg)
 {
-    QSqlQuery logquery(logdb);
-    logquery.prepare("INSERT INTO msglog (caseid, evidenceid, jobid, type, datetime, logmsg) VALUES(?, ?, ?, ?, DATETIME('now', 'unixepoch'), ?)");
-    logquery.addBindValue(caseid);
-    logquery.addBindValue(evidenceid);
-    logquery.addBindValue(jobid);
-    logquery.addBindValue(type);
-    logquery.addBindValue(msg);
-    logquery.exec();
+    if(logdb.isOpen())
+    {
+        QSqlQuery logquery(logdb);
+        logquery.prepare("INSERT INTO msglog (caseid, evidenceid, jobid, type, datetime, logmsg) VALUES(?, ?, ?, ?, DATETIME('now', 'unixepoch'), ?)");
+        logquery.addBindValue(caseid);
+        logquery.addBindValue(evidenceid);
+        logquery.addBindValue(jobid);
+        logquery.addBindValue(type);
+        logquery.addBindValue(msg);
+        logquery.exec();
+    }
 }
 
 void StartJob(int type, int caseid, int evidenceid)

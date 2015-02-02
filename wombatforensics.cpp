@@ -225,9 +225,14 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         imagewindow->ShowImage(index);
     }
-    if(index.sibling(index.row(), 16).data().toString().contains("video/"))
+    else if(index.sibling(index.row(), 16).data().toString().contains("video/"))
     {
         videowindow->ShowVideo(wombatvarptr->tmpfilepath, index);
+    }
+    else
+    {
+        if(index.sibling(index.row(), 4).data().toInt() == 5)
+            treemenu->exec(QCursor::pos());
     }
 }
 
@@ -567,7 +572,8 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     QModelIndex index = ui->dirTreeView->indexAt(pt);
     if(index.isValid())
     {
-        treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
+        if(index.sibling(index.row(), 4).data().toInt() == 5)            
+            treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
 }
 
@@ -1192,7 +1198,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     imagewindow->close();
     videowindow->close();
     viewmanage->close();
-    RemoveTmpFiles(); // can get rid of this function right now. I don't need to make temporary files to read.
+    RemoveTmpFiles();
     if(ProcessingComplete())
     {
         event->accept();
