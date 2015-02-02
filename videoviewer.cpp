@@ -97,7 +97,7 @@ void VideoViewer::GetVideo(int objectid)
     // ReadFileToImageUsingByteArray
     if(tskptr->readfileinfo->meta != NULL)
     {
-        QImage tmpimage;
+        //QImage tmpimage;
         //QByteArray iba;
         QBuffer ibuff;
         char ibuffer[tskptr->readfileinfo->meta->size];

@@ -646,6 +646,8 @@ public:
     WombatVariable* wombatvarptr;
     TskObject tskobject;
     TskObject* tskobjptr;
+    TskObject tskexternalobject;
+    TskObject* tskexternalptr;
     WombatFramework* wombatframework;
     PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;

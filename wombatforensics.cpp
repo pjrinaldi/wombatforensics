@@ -41,6 +41,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->menuAbout->menuAction());
+    tskexternalptr = &tskexternalobject;
     tskobjptr = &tskobject;
     tskobjptr->readimginfo = NULL;
     tskobjptr->readfsinfo = NULL;
@@ -140,8 +141,60 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 
 void WombatForensics::ShowExternalViewer()
 {
+    //OpenParentImage
+    std::vector<std::string> pathvector;
+    int imgid = 0;
+    int fsid = 0;
+    int fsoffset = 0;
+    int address = 0;
+    pathvector.clear();
+    QSqlQuery pimgquery(fcasedb);
+    pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
+    pimgquery.addBindValue(wombatvarptr->selectedobject.id);
+    pimgquery.exec();
+    pimgquery.next();
+    imgid = pimgquery.value(0).toInt();
+    fsid = pimgquery.value(1).toInt();
+    address = pimgquery.value(2).toInt();
+    pimgquery.finish();
+    pimgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
+    pimgquery.addBindValue(imgid);
+    if(pimgquery.exec())
+    {
+        while(pimgquery.next())
+        {
+            pathvector.push_back(pimgquery.value(0).toString().toStdString());
+        }
+    }
+    pimgquery.finish();
+    tskexternalptr->imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+    for(uint i=0; i < pathvector.size(); i++)
+    {
+        tskexternalptr->imagepartspath[i] = pathvector.at(i).c_str();
+    }
+    tskexternalptr->readimginfo = tsk_img_open(pathvector.size(), tskexternalptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    free(tskexternalptr->imagepartspath);
+    // OpenParentFileSystem
+    pimgquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+    pimgquery.addBindValue(fsid);
+    pimgquery.exec();
+    pimgquery.next();
+    fsoffset = pimgquery.value(0).toInt();
+    pimgquery.finish();
+    tskexternalptr->readfsinfo = tsk_fs_open_img(tskexternalptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
+    // OpenFile
+    tskexternalptr->readfileinfo = tsk_fs_file_open_meta(tskexternalptr->readfsinfo, NULL, address);
+    // ReadFileToImageUsingByteArray
+    ssize_t filelen = 0;
+    char ibuffer[tskexternalptr->readfileinfo->meta->size+1];
+    filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE); 
     qDebug() << ((QAction*)QObject::sender())->text();
     qDebug() << "implement external viewer code here.";
+    QProcess* process = new QProcess(this);
+    ibuffer[filelen] = '\n';
+    qDebug() << ibuffer;
+    process->start(((QAction*)QObject::sender())->text(), QIODevice::ReadWrite);
+    process->write(ibuffer, (qint64)filelen+1);
 }
 
 void WombatForensics::SetSelectedFromImageViewer(int objectid)
