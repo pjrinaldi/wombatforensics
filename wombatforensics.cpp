@@ -186,16 +186,22 @@ void WombatForensics::ShowExternalViewer()
     tskexternalptr->readfileinfo = tsk_fs_file_open_meta(tskexternalptr->readfsinfo, NULL, address);
     // ReadFileToImageUsingByteArray
     ssize_t filelen = 0;
-    char ibuffer[tskexternalptr->readfileinfo->meta->size+1];
-    filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE); 
-    qDebug() << ((QAction*)QObject::sender())->text();
+    char* ibuffer = new char[tskexternalptr->readfileinfo->meta->size];
+    filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+    QString tmpstring = wombatvarptr->tmpfilepath + QString::number(wombatvarptr->selectedobject.id) + "-tmp";
+    QFile tmpfile(tmpstring);
+    if(tmpfile.open(QIODevice::WriteOnly))
+    {
+        QDataStream outbuffer(&tmpfile);
+        outbuffer.writeRawData(ibuffer, filelen);
+        tmpfile.close();
+    }
+    //qDebug() << ((QAction*)QObject::sender())->text();
     qDebug() << "implement external viewer code here.";
     QProcess* process = new QProcess(this);
-    ibuffer[filelen] = '\n';
-    qDebug() << ibuffer;
-    process->start(((QAction*)QObject::sender())->text(), QIODevice::ReadWrite);
-    process->write(ibuffer, (qint64)filelen+1);
-    process->closeWriteChannel();
+    QStringList arguments;
+    arguments << tmpstring;
+    process->startDetached(((QAction*)QObject::sender())->text(), arguments);
 }
 
 void WombatForensics::SetSelectedFromImageViewer(int objectid)
@@ -217,7 +223,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     if(index.sibling(index.row(), 16).data().toString().contains("video/"))
     {
-        videowindow->ShowVideo(index);
+        videowindow->ShowVideo(wombatvarptr->tmpfilepath, index);
     }
 }
 
@@ -252,7 +258,7 @@ void WombatForensics::InitializeAppStructure()
     wombatvarptr->settingspath = homePath + "settings";
     wombatvarptr->datapath = homePath + "data/";
     wombatvarptr->casespath = homePath + "cases/";
-    //wombatvarptr->tmpfilepath = homePath + "tmpfiles"; // currently not used if i continue to view objects in memory...
+    wombatvarptr->tmpfilepath = homePath + "tmpfiles/";
     bool mkPath = (new QDir())->mkpath(wombatvarptr->settingspath);
     if(mkPath == false)
         DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
@@ -262,9 +268,9 @@ void WombatForensics::InitializeAppStructure()
     mkPath = (new QDir())->mkpath(wombatvarptr->casespath);
     if(mkPath == false)
         DisplayError("2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
-    //mkPath = (new QDir())->mkpath(wombatvarptr->tmpfilepath);
-    //if(mkPath == false)
-    //    DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
+    mkPath = (new QDir())->mkpath(wombatvarptr->tmpfilepath);
+    if(mkPath == false)
+        DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
     wombatvarptr->wombatdbname = wombatvarptr->datapath + "WombatApp.db";
     wombatvarptr->appdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
     wombatvarptr->appdb.setDatabaseName(wombatvarptr->wombatdbname);

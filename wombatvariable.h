@@ -137,7 +137,7 @@ struct WombatVariable
     QString casespath;
     QString settingspath;
     QString datapath;
-    //QString tmpfilepath;
+    QString tmpfilepath;
     QString curerrmsg;
     QString wombatdbname;
     QString thumbdbname;

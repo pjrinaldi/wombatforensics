@@ -42,11 +42,11 @@ public:
     */
 
 public slots:
-    void ShowVideo(const QModelIndex &index);
+    void ShowVideo(QString tmpfilepath, const QModelIndex &index);
     void Seek(int);
     void PlayPause();
     void UpdateSlider();
-    void GetVideo(int objid);
+    void GetVideo(QString tmpfilepath, int objid);
     
 private:
     Ui::VideoViewer* ui;

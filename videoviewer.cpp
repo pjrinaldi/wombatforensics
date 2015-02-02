@@ -49,7 +49,7 @@ void VideoViewer::UpdateSlider()
     ui->horizontalSlider->setValue(int(vplayer->position()/1000LL));
 }
 
-void VideoViewer::GetVideo(int objectid)
+void VideoViewer::GetVideo(QString tmpfilepath, int objectid)
 {
     // OpenParentImage
     std::vector<std::string> pathvector;
@@ -97,32 +97,35 @@ void VideoViewer::GetVideo(int objectid)
     // ReadFileToImageUsingByteArray
     if(tskptr->readfileinfo->meta != NULL)
     {
-        //QImage tmpimage;
-        //QByteArray iba;
-        QBuffer ibuff;
-        char ibuffer[tskptr->readfileinfo->meta->size];
-        ssize_t imglen = tsk_fs_file_read(tskptr->readfileinfo, 0, ibuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE); 
-        ibuff.setData(ibuffer, imglen);
-        if(ibuff.open(QIODevice::ReadOnly))
-            vplayer->setIODevice(&ibuff);
+        char* ibuffer = new char[tskptr->readfileinfo->meta->size];
+        ssize_t imglen = tsk_fs_file_read(tskptr->readfileinfo, 0, ibuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        QString tmppath = tmpfilepath + QString::number(objectid) + "-tmp";
+        QFile tmpfile(tmppath);
+        if(tmpfile.open(QIODevice::WriteOnly))
+        {
+            QDataStream outbuffer(&tmpfile);
+            outbuffer.writeRawData(ibuffer, imglen);
+            tmpfile.close();
+        }
+        vplayer->setFile(tmppath);
     }
 }
 
-void VideoViewer::ShowVideo(const QModelIndex &index)
+void VideoViewer::ShowVideo(QString tmpfilepath, const QModelIndex &index)
 {
     this->show();
     //Thread thread(vplayer);
     //vplayer->moveToThread(&thread);
     //thread.start();
-    GetVideo(index.sibling(index.row(), 0).data().toInt());
+    GetVideo(tmpfilepath, index.sibling(index.row(), 0).data().toInt());
     vplayer->play();
-    //vplayer->play("/home/pasquale/Downlaods/small.mp4");
 }
 void VideoViewer::mousePressEvent(QMouseEvent* e)
 {
     if(e->type() == QEvent::MouseButtonPress)
     {
-        qDebug() << "mouse pressed, so close.";
+        vplayer->stop();
+        vplayer->unload();
         this->hide();
     }
 }
