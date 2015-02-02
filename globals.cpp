@@ -32,6 +32,7 @@ QStringList propertylist;
 QStringList thumblist;
 QString blockstring = "";
 QString thumbpath = "";
+QStringList externallist;
 struct magic_set* magicptr = NULL;
 struct magic_set* magicmimeptr = NULL;
 FilterValues filtervalues;

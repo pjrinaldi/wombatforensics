@@ -51,6 +51,7 @@ public:
             }
         }
         endRemoveRows();
+        externallist = externalviewers;
     };
 
     void AddViewer(QString viewpath)
@@ -91,6 +92,7 @@ public:
         }
         externalviewers.append(viewpath);
         endInsertRows();
+        externallist = externalviewers;
     };
 private:
     QStringList externalviewers;

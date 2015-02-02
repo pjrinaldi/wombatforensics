@@ -88,7 +88,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionViewerManager, SIGNAL(triggered(bool)), this, SLOT(on_actionViewerManager_triggered(bool)), Qt::DirectConnection);
 
     treemenu = new QMenu(ui->dirTreeView);
-    treemenu->addAction(ui->menuBookmark_Manager->menuAction());
+    //treemenu->addAction(ui->menuBookmark_Manager->menuAction());
+    for(int i=0; i < externallist.count(); i++)
+    {
+        QAction* tmpaction = new QAction(externallist.at(i), this);
+        //treemenu->addAction(tmpaction);
+        connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
+        ui->menuView_With->addAction(tmpaction);
+    }
+    treemenu->addAction(ui->menuView_With->menuAction());
     treemodel = new TreeModel(this);
     ui->dirTreeView->setModel(treemodel);
     ui->dirTreeView->hideColumn(4);
@@ -128,6 +136,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     jumpbackward->setKey(Qt::CTRL + Qt::SHIFT + Qt::Key_J);
     connect(jumpforward, SIGNAL(activated()), this, SLOT(NextItem()));
     connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
+}
+
+void WombatForensics::ShowExternalViewer()
+{
+    qDebug() << "implement external viewer code here.";
 }
 
 void WombatForensics::SetSelectedFromImageViewer(int objectid)

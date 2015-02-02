@@ -687,6 +687,7 @@ private slots:
     void HideFileViewer(bool checkstate);
     void HideImageWindow(bool checkstate);
     void HideViewerManager(bool checkstate);
+    void ShowExternalViewer();
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
     void OpenParentImage(int imgid);

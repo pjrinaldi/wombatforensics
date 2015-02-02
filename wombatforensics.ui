@@ -166,12 +166,25 @@
     </widget>
     <addaction name="menuAdd_File_to"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuView_With">
+     <property name="title">
+      <string>View With</string>
+     </property>
+     <addaction name="actionPlaceHolder"/>
+    </widget>
+    <addaction name="menuView_With"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEvidence"/>
    <addaction name="menuAction"/>
    <addaction name="menuSettings"/>
    <addaction name="menuAbout"/>
    <addaction name="menuBookmark_Manager"/>
+   <addaction name="menuView"/>
   </widget>
   <widget class="QToolBar" name="analysisToolBar">
    <property name="windowTitle">
@@ -411,6 +424,17 @@
    </property>
    <property name="text">
     <string>Viewer Manager</string>
+   </property>
+  </action>
+  <action name="actionPlaceHolder">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>PlaceHolder</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

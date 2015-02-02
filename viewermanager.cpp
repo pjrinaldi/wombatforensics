@@ -18,6 +18,7 @@ ViewerManager::ViewerManager(QWidget* parent) : QDialog(parent), ui(new Ui::View
         externlist.append(equery.value(0).toString());
     }
     equery.finish();
+    externallist = externlist;
     viewmodel = new ViewerModel(externlist);
     ui->listView->setModel(viewmodel);
     connect(ui->listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
