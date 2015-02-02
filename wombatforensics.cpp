@@ -702,6 +702,7 @@ void WombatForensics::LoadHexContents()
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
+        tskobjptr->fsoffset = wombatvarptr->selectedobject.byteoffset;
         tskobjptr->objecttype = 4;
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
@@ -712,10 +713,11 @@ void WombatForensics::LoadHexContents()
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
         OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
         tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
+        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
         tskobjptr->offset = 0;
         qDebug() << "tskobjptr->blocksize:" << tskobjptr->blocksize;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
-            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize;
+            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize + tskobjptr->fsoffset;
         else
             tskobjptr->offset = 0;
         qDebug() << "file object offset:" << tskobjptr->offset;

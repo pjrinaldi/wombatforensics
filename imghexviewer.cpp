@@ -899,7 +899,7 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
             paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
             for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
             {
-                int curblkstart = tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1;
+                int curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1;
                 int curblkend = curblkstart + tskptr->blocksize;
                 if(curoffset > curblkstart && curoffset <= curblkend)
                 {
@@ -931,7 +931,7 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
             paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
             for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
             {
-                int curblkstart = tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1;
+                int curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1;
                 int curblkend = curblkstart + tskptr->blocksize;
                 if(curoffset > curblkstart && curoffset <= curblkend)
                 {

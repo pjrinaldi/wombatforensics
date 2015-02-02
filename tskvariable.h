@@ -16,6 +16,7 @@ struct TskObject
     int type;
     int blocksize;
     int sectsize;
+    int fsoffset;
     QString blockaddress;
     QStringList blkaddrlist;
     TSK_IMG_INFO* readimginfo;
