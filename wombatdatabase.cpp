@@ -253,11 +253,12 @@ void WombatDatabase::CloseAppDB()
     if(wombatptr->appdb.isOpen())
     {
         wombatptr->appdb.close();
-        if(appdb.isOpen())
-            appdb.close();
-        wombatptr->appdb = QSqlDatabase();
-        QSqlDatabase::removeDatabase("appdb");
     }
+    if(fappdb.isOpen())
+        fappdb.close();
+    wombatptr->appdb = QSqlDatabase();
+    fappdb = QSqlDatabase();
+    QSqlDatabase::removeDatabase("appdb");
 }
 
 void WombatDatabase::CloseLogDB()

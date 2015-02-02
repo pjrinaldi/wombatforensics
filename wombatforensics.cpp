@@ -62,7 +62,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     hashfilterview = new HashFilter(this);
     imagewindow = new ImageViewer();
     videowindow = new VideoViewer();
-    viewmanage = new ViewerManager(this);
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -87,7 +86,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered(bool)), this, SLOT(on_actionViewerManager_triggered(bool)), Qt::DirectConnection);
-    connect(viewmanage, SIGNAL(HideManagerWindow(bool)), this, SLOT(HideViewerManager(bool)), Qt::DirectConnection);
 
     treemenu = new QMenu(ui->dirTreeView);
     treemenu->addAction(ui->menuBookmark_Manager->menuAction());
@@ -202,7 +200,6 @@ void WombatForensics::InitializeAppStructure()
     wombatvarptr->wombatdbname = wombatvarptr->datapath + "WombatApp.db";
     wombatvarptr->appdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
     wombatvarptr->appdb.setDatabaseName(wombatvarptr->wombatdbname);
-    appdb = wombatvarptr->appdb;
     bool appFileExist = FileExists(wombatvarptr->wombatdbname.toStdString());
     if(!appFileExist)
     {
@@ -216,6 +213,9 @@ void WombatForensics::InitializeAppStructure()
         if(wombatvarptr->curerrmsg.compare("") != 0)
             DisplayError("1.1", "SQL", wombatvarptr->curerrmsg);
     }
+    fappdb = wombatvarptr->appdb;
+    viewmanage = new ViewerManager(this);
+    connect(viewmanage, SIGNAL(HideManagerWindow(bool)), this, SLOT(HideViewerManager(bool)), Qt::DirectConnection);
     if(wombatdatabase->ReturnCaseCount() == 0)
     {
         ui->actionOpen_Case->setEnabled(false);

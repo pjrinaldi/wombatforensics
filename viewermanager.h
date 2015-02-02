@@ -32,6 +32,44 @@ public:
         else
             return QVariant();
     };
+    void AddViewer(QString viewpath)
+    {
+        bool viewexists = false;
+        int isdeleted = 0;
+        QSqlQuery existquery(fappdb);
+        existquery.prepare("SELECT path, deleted FROM externalviewers;");
+        existquery.exec();
+        while(existquery.next())
+        {
+            if(viewpath.compare(existquery.value(0).toString()) == 0)
+            {
+                viewexists = true;
+                isdeleted = existquery.value(1).toInt();
+            }
+        }
+        existquery.finish();
+        beginInsertRows(QModelIndex(), 0, 1);
+        if(viewexists == true)
+        {
+            if(isdeleted == 1)
+            {
+                existquery.prepare("UPDATE externalviewers SET deleted = 0 WHERE path = ?;");
+                existquery.addBindValue(viewpath);
+                existquery.exec();
+                existquery.next();
+                existquery.finish();
+            }
+        }
+        else
+        {
+            existquery.prepare("INSERT INTO externalviewers (path, deleted) VALUES(?, 0);");
+            existquery.addBindValue(viewpath);
+            existquery.exec();
+            existquery.next();
+            existquery.finish();
+        }
+        endInsertRows();
+    };
 private:
     QStringList externalviewers;
 };
@@ -65,6 +103,7 @@ private:
     QString fileviewerpath;
     ViewerModel* viewmodel; 
     QStringList externlist;
+    QModelIndex selectedindex;
 };
 
 Q_DECLARE_METATYPE(ViewerManager*);
