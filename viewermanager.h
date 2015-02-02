@@ -32,6 +32,27 @@ public:
         else
             return QVariant();
     };
+
+    void RemoveSelected(QModelIndex index)
+    {
+        QSqlQuery remquery(fappdb);
+        remquery.prepare("UPDATE externalviewers SET deleted = 1 WHERE path = ?;");
+        remquery.addBindValue(index.sibling(index.row(), 0).data().toString());
+        remquery.exec();
+        remquery.next();
+        remquery.finish();
+        beginRemoveRows(QModelIndex(), index.row(), index.row());
+        for(int i=0; i < externalviewers.count(); i++)
+        {
+            if(index.sibling(index.row(), 0).data().toString().compare(externalviewers.at(i)) == 0)
+            {
+                externalviewers.removeAt(i);
+                break;
+            }
+        }
+        endRemoveRows();
+    };
+
     void AddViewer(QString viewpath)
     {
         bool viewexists = false;
@@ -68,6 +89,7 @@ public:
             existquery.next();
             existquery.finish();
         }
+        externalviewers.append(viewpath);
         endInsertRows();
     };
 private:

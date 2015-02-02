@@ -102,14 +102,16 @@ void ViewerManager::AddViewer()
 
 void ViewerManager::RemoveSelected()
 {
+    viewmodel->RemoveSelected(selectedindex);
+    /*
     QSqlQuery remquery(fappdb);
     remquery.prepare("UPDATE externalviewers SET deleted = 1 WHERE path = ?;");
     remquery.addBindValue(selectedindex.sibling(selectedindex.row(), 0).data().toString());
     remquery.exec();
     remquery.next();
     remquery.finish();
+    */
     ui->removebutton->setEnabled(false);
-    //ui->listView->reset();
 }
 
 void ViewerManager::SelectionChanged(const QItemSelection &newitem, const QItemSelection &olditem)
