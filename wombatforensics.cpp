@@ -195,6 +195,7 @@ void WombatForensics::ShowExternalViewer()
     qDebug() << ibuffer;
     process->start(((QAction*)QObject::sender())->text(), QIODevice::ReadWrite);
     process->write(ibuffer, (qint64)filelen+1);
+    process->closeWriteChannel();
 }
 
 void WombatForensics::SetSelectedFromImageViewer(int objectid)
