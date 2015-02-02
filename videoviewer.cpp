@@ -22,6 +22,7 @@ VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoVie
 
 VideoViewer::~VideoViewer()
 {
+    //vout->close();
 }
 
 void VideoViewer::Seek(int pos)
@@ -45,8 +46,10 @@ void VideoViewer::PlayPause()
 
 void VideoViewer::UpdateSlider()
 {
+    ui->label3->setText(QTime(0, 0, 0).addMSecs(vplayer->mediaStopPosition()).toString("HH:mm:ss"));
     ui->horizontalSlider->setRange(0, int(vplayer->duration()/1000LL));
     ui->horizontalSlider->setValue(int(vplayer->position()/1000LL));
+    ui->label->setText(QTime(0, 0, 0).addMSecs(vplayer->position()).toString("HH:mm:ss"));
 }
 
 void VideoViewer::GetVideo(QString tmpfilepath, int objectid)

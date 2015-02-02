@@ -17,6 +17,7 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QVBoxLayout>
@@ -30,6 +31,9 @@ public:
     QHBoxLayout *horizontalLayout;
     QFrame *frame;
     QHBoxLayout *horizontalLayout_2;
+    QLabel *label;
+    QLabel *label2;
+    QLabel *label3;
     QSlider *horizontalSlider;
     QPushButton *pushButton;
 
@@ -54,13 +58,28 @@ public:
         sizePolicy.setHeightForWidth(frame->sizePolicy().hasHeightForWidth());
         frame->setSizePolicy(sizePolicy);
         frame->setMinimumSize(QSize(0, 0));
-        frame->setMaximumSize(QSize(16777215, 50));
+        frame->setMaximumSize(QSize(16777215, 20));
         frame->setFrameShape(QFrame::NoFrame);
         frame->setFrameShadow(QFrame::Plain);
         horizontalLayout_2 = new QHBoxLayout(frame);
         horizontalLayout_2->setSpacing(0);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
+        label = new QLabel(frame);
+        label->setObjectName(QStringLiteral("label"));
+
+        horizontalLayout_2->addWidget(label);
+
+        label2 = new QLabel(frame);
+        label2->setObjectName(QStringLiteral("label2"));
+
+        horizontalLayout_2->addWidget(label2);
+
+        label3 = new QLabel(frame);
+        label3->setObjectName(QStringLiteral("label3"));
+
+        horizontalLayout_2->addWidget(label3);
+
         horizontalSlider = new QSlider(frame);
         horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
         horizontalSlider->setOrientation(Qt::Horizontal);
@@ -84,6 +103,9 @@ public:
     void retranslateUi(QDialog *VideoViewer)
     {
         VideoViewer->setWindowTitle(QApplication::translate("VideoViewer", "View Video", 0));
+        label->setText(QApplication::translate("VideoViewer", "00:00:00", 0));
+        label2->setText(QApplication::translate("VideoViewer", "/", 0));
+        label3->setText(QApplication::translate("VideoViewer", "00:00:00", 0));
         pushButton->setText(QString());
     } // retranslateUi
 

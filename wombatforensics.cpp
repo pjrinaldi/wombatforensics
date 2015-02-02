@@ -63,6 +63,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     hashfilterview = new HashFilter(this);
     imagewindow = new ImageViewer();
     videowindow = new VideoViewer();
+    propertywindow->setWindowIcon(QIcon(":/bar/propview"));
+    fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
+    imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -89,7 +92,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionViewerManager, SIGNAL(triggered(bool)), this, SLOT(on_actionViewerManager_triggered(bool)), Qt::DirectConnection);
 
     treemenu = new QMenu(ui->dirTreeView);
-    //treemenu->addAction(ui->menuBookmark_Manager->menuAction());
+    // adds items to the viewmenu.
     for(int i=0; i < externallist.count(); i++)
     {
         QAction* tmpaction = new QAction(externallist.at(i), this);
@@ -97,6 +100,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
         ui->menuView_With->addAction(tmpaction);
     }
+    // make right click menu call up the treemenu with viewer list.
     treemenu->addAction(ui->menuView_With->menuAction());
     treemodel = new TreeModel(this);
     ui->dirTreeView->setModel(treemodel);
@@ -289,6 +293,7 @@ void WombatForensics::InitializeAppStructure()
     }
     fappdb = wombatvarptr->appdb;
     viewmanage = new ViewerManager(this);
+    viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
     connect(viewmanage, SIGNAL(HideManagerWindow(bool)), this, SLOT(HideViewerManager(bool)), Qt::DirectConnection);
     if(wombatdatabase->ReturnCaseCount() == 0)
     {
