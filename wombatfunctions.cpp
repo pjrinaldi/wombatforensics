@@ -198,6 +198,8 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
         blockstring += QString::number(addr) + "|";
+        //if(flags & TSK_FS_BLOCK_FLAG_RES)
+        //    qDebug() << "resident file, not sure what it yields:" << addr;
         //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
@@ -360,9 +362,12 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 {
                     //char type[512];
                     const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                    if(tmpattr->flags & TSK_FS_ATTR_NONRES)
+                    if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
                     {
                         tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+                    }
+                    else if(tmpattr->flags & TSK_FS_ATTR_RES) // resident attribute
+                    {
                     }
                 }
             }
