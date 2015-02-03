@@ -1614,7 +1614,14 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Volume Size (sectors)" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->vol_size_s)) << "Total Sectors in the file system (0x28-0x2F)";
         proplist << "MFT Starting Cluster Address" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->mft_clust)) << "Starting cluster address of the Master File Table (MFT) (0x30-0x37)";
         proplist << "MFT Mirror Starting Cluster Address" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->mftm_clust)) << "Starting cluster address of the MFT Mirror (0x38-0x3F)";
-        proplist << "MFT Record Size (clusters)" << QString::number(ntfsinfo->fs->mft_rsize_c) << "Size of file record (MFT Entry) (0x40-0x40)";
+        int recordsize = 0;
+        if(ntfsinfo->fs->mft_rsize_c > 0)
+        {
+            recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(curfsinfo->endian, ntfsinfo->fs->ssize);
+        }
+        else
+            recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
+        proplist << "MFT Record Size (bytes)" << QString::number(recordsize) << "Size of file record in bytes(MFT Entry) (0x40-0x40)";
         proplist << "Unused" << "Unused" << "Unused (0x41-0x43)";
         proplist << "Size of Index Record" << QString::number(ntfsinfo->fs->idx_rsize_c) << "Number of clusters per index record (0x44-0x44)";
         proplist << "Unused" << "Unused" << "Unused (0x45-0x47)";
