@@ -368,6 +368,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     }
                     else if(tmpattr->flags & TSK_FS_ATTR_RES) // resident attribute
                     {
+                        blockstring += "res|";
+                        qDebug() << "res attr:" << tmpattr->rd.buf_size << tmpattr->rd.offset;
                     }
                 }
             }
