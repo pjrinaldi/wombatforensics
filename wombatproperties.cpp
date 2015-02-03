@@ -1621,7 +1621,7 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         }
         else
             recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
-        proplist << "MFT Record Size (bytes)" << QString::number(recordsize) << "Size of file record in bytes(MFT Entry) (0x40-0x40)";
+        proplist << "MFT Record Size (bytes)" << QString::number(recordsize) << "Size of file record in bytes (MFT Entry) (0x40-0x40)";
         proplist << "Unused" << "Unused" << "Unused (0x41-0x43)";
         proplist << "Size of Index Record" << QString::number(ntfsinfo->fs->idx_rsize_c) << "Number of clusters per index record (0x44-0x44)";
         proplist << "Unused" << "Unused" << "Unused (0x45-0x47)";
