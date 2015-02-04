@@ -715,26 +715,15 @@ void WombatForensics::LoadHexContents()
         tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
         tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
         tskobjptr->offset = 0;
-        //qDebug() << "tskobjptr->blocksize:" << tskobjptr->blocksize;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
         {
-            //if(wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).compare("res") == 0)
-            //{
-                //int resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
-                //tskobjptr->offset = resoffset + tskobjptr->fsoffset;
-                //qDebug() << "resident offset: " << tskobjptr->offset;
-            //}
-            //else
-            //{
                 tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize + tskobjptr->fsoffset;
-            //}
         }
         else
         {
             int resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
             tskobjptr->offset = resoffset + tskobjptr->fsoffset;
         }
-            //tskobjptr->offset = 0;
         //qDebug() << "file object offset:" << tskobjptr->offset;
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;

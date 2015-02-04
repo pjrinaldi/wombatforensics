@@ -65,7 +65,10 @@ bool FileReader::openimage(TskObject* tskpointer)
     tskptr = tskpointer;
     if(is_open())
         close();
-    _size = tskptr->blocksize*tskptr->blkaddrlist.count();
+    if(tskptr->blkaddrlist.count() > 0)
+        _size = tskptr->blocksize*tskptr->blkaddrlist.count();
+    else
+        _size = tskptr->length;
     _pageSize = tskptr->blocksize;
     off_t npages = _size/_pageSize;
     if((_size - 1) % _pageSize != 0)
@@ -209,9 +212,17 @@ bool FileReader::loadimagepage(off_t pageIdx)
     --nFreePages();
     if(tskptr->objecttype == 5)
     {
-        if(pageIdx < tskptr->blkaddrlist.count())
+        if(tskptr->blkaddrlist.count() > 0)
         {
-            retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageIdx).toInt(), (char*)_data[pageIdx], _pageSize);
+            if(pageIdx < tskptr->blkaddrlist.count())
+            {
+                retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageIdx).toInt(), (char*)_data[pageIdx], _pageSize);
+            }
+        }
+        else
+        {
+            retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+            qDebug() << retval;
         }
     }
     if(retval > 0)
