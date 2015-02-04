@@ -366,12 +366,14 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     {
                         tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
                     }
+                    /*
                     else if((tmpattr->flags & TSK_FS_ATTR_RES) && (tmpattr->type & TSK_FS_ATTR_TYPE_NTFS_DATA)) // resident attribute
                     {
                         blockstring += "res|";
                         //qDebug() << tmpattr->rd.buf;
                         //qDebug() << "res attr:" << tmpattr->rd.buf_size << tmpattr->rd.offset;
                     }
+                    */
                 }
             }
         }
