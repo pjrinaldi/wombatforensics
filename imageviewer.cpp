@@ -100,6 +100,8 @@ ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageVie
     ui->setupUi(this);
     lw = ui->listView;
     ui->listView->setViewMode(QListView::IconMode);
+    ui->listView->setUniformItemSizes(false);
+    ui->listView->setResizeMode(QListView::Adjust);
     sb = ui->spinBox;
     ui->spinBox->setValue(thumbsize);
     imagedialog = new ImageWindow();

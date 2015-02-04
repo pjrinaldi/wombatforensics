@@ -52,6 +52,7 @@ public:
     int ReturnSqlRowsAffected(QString query, QVariantList invalues);
     int GetEvidenceFileCount(void);
     int ReturnFileSystemOffset(int fsid);
+    int GetResidentOffset(int fileaddress);
 
     WombatProperties* wombatprop;
 

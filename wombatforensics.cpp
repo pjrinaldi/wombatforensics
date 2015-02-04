@@ -717,7 +717,18 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = 0;
         //qDebug() << "tskobjptr->blocksize:" << tskobjptr->blocksize;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
-            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize + tskobjptr->fsoffset;
+        {
+            if(wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).compare("res") == 0)
+            {
+                int resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
+                tskobjptr->offset = resoffset + tskobjptr->fsoffset;
+                //qDebug() << "resident offset: " << tskobjptr->offset;
+            }
+            else
+            {
+                tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize + tskobjptr->fsoffset;
+            }
+        }
         else
             tskobjptr->offset = 0;
         //qDebug() << "file object offset:" << tskobjptr->offset;
@@ -1321,7 +1332,7 @@ void WombatForensics::UpdateThumbnails(int tsize)
     thumbsize = tsize;
     // POSSIBLY MAKE THE BELOW CODE A SEPARATE FUNCTION WHICH IS QTCONCURRENTLY HANDLED.
     //imagewindow->lw->clear();
-    qDebug() << "update thumbnails called";
+    //qDebug() << "update thumbnails called";
     //wombatdatabase->GetThumbnails();
     /*
     for(int i=0; i < thumblist.count(); i++)

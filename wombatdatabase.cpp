@@ -763,3 +763,22 @@ void WombatDatabase::GetThumbnails()
     }
     thumbquery.finish();
 }
+
+int WombatDatabase::GetResidentOffset(int fileaddress)
+{
+    QSqlQuery resquery(fcasedb);
+    QStringList inputs;
+    QList<int> outputs;
+    inputs << "%0x0B%" << "%0x0D%" << "%0x30%" << "%0x40%";
+    for(int i=0; i < inputs.count(); i++)
+    {
+        resquery.prepare("SELECT value from properties where objectid = ? and description like(?);");
+        resquery.addBindValue(wombatptr->selectedobject.parfsid);
+        resquery.addBindValue(inputs.at(i));
+        resquery.exec();
+        resquery.next();
+        outputs.append(resquery.value(0).toInt());
+    }
+    resquery.finish();
+    return ((outputs.at(0) * outputs.at(1) * outputs.at(2)) + (outputs.at(3)*fileaddress));
+}
