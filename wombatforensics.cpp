@@ -730,7 +730,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
-        //OpenFileSystemFile();
+        OpenFileSystemFile();
     }
     if(wombatvarptr->selectedobject.objtype == 1)
     {
