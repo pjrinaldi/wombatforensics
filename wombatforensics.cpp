@@ -721,8 +721,8 @@ void WombatForensics::LoadHexContents()
         }
         else
         {
-            int resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
-            tskobjptr->offset = resoffset + tskobjptr->fsoffset;
+            tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
+            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
         }
         //qDebug() << "file object offset:" << tskobjptr->offset;
         tskobjptr->objecttype = 5;

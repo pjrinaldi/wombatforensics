@@ -780,5 +780,6 @@ int WombatDatabase::GetResidentOffset(int fileaddress)
         outputs.append(resquery.value(0).toInt());
     }
     resquery.finish();
+    mftrecordsize = outputs.at(3);
     return ((outputs.at(0) * outputs.at(1) * outputs.at(2)) + (outputs.at(3)*fileaddress));
 }

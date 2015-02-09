@@ -27,6 +27,7 @@
 #define IMG_HEX_VIEWER
 
 #include "wombatinclude.h"
+#include "globals.h"
 #include "translate.h"
 #include "imgreader.h"
 

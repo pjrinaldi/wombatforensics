@@ -18,6 +18,7 @@ int exportcount = 0;
 int errorcount = 0;
 int currentjobid = 0;
 int thumbsize = 16;
+int mftrecordsize = 1024;
 QString currentevidencename = "t.dd";
 InterfaceSignals* isignals = new InterfaceSignals();
 Node* currentnode = 0;
