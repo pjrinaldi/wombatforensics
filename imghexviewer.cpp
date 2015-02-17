@@ -78,8 +78,8 @@ bool ImageHexViewer::openimage()
         QMessageBox::critical(this, "HexView", "Error opening image\n", QMessageBox::Ok, 0);
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
-    //_acursor.setRange(0, _reader.size());
-    //_acursor.setCharsPerByte(_charsPerByte);
+    _acursor.setRange(0, _reader.size());
+    _acursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
     emit rangeChanged(0, _reader.size()/bytesPerLine());
@@ -257,6 +257,13 @@ QRect ImageHexViewer::charBBox( off_t charIdx ) const {
 		fontHeight() );
 }
 
+QRect ImageHexViewer::acharBBox(off_t charIdx) const
+{
+    int wordIdx = (charIdx/charsPerByte())/bytesPerWord();
+    int localCharIdx = charIdx % charsPerWord();
+    return QRect(_asciiBBox[wordIdx].left() + localCharIdx*fontMaxWidth() + wordSpacing(), _asciiBBox[wordIdx].top(), fontMaxWidth(), fontHeight());
+}
+
 QRect ImageHexViewer::byteBBox( off_t byteIdx ) const {
   int wordIdx = byteIdx/bytesPerWord();
   int localByteIdx = byteIdx % bytesPerWord();
@@ -334,7 +341,7 @@ void ImageHexViewer::setOffset( off_t offset )
 {
   off_t oldWordOffset = localWordOffset();
   _cursor.setOffset( offset, 0 );
-  //_acursor.setOffset(offset, 0);
+  _acursor.setOffset(offset + 15, 0);
   // updateWord clamps the wordIdx to [0,_rows*_cols)
   updateWord( oldWordOffset ); 
   emit offsetChanged( _cursor.byteOffset() );
@@ -385,7 +392,7 @@ void ImageHexViewer::setCursorFromXY(int x,int y)
   off_t oldWordIdx = localWordOffset();
 
   _cursor.setOffset( _topLeft+localByteOffsetAtXY(x,y) ,0 );
-  //_acursor.setOffset(_topLeft + localByteOffsetAtXY(x,y), 0);
+  _acursor.setOffset(_topLeft + localByteOffsetAtXY(x,y), 0);
 
   // update where the cursor used to be, and where it is now
   if( oldWordIdx != localWordOffset() ) {
@@ -1023,5 +1030,7 @@ void ImageHexViewer::drawCursor( QPainter& paint )
     }
     QRect box = charBBox( localCharOffset() );
     paint.drawRect( box );
+    QRect abox = acharBBox(localCharOffset());
+    paint.drawRect(abox);
   }
 }

@@ -126,6 +126,7 @@ protected:
   // template setWord so I can call it with different types of string data
   // calculate the rectangle which bounds the word at _offset+idx
   QRect  charBBox( off_t charIdx ) const;
+  QRect acharBBox(off_t charIdx) const;
   QRect  byteBBox( off_t byteIdx ) const;
   QRect abyteBox(off_t byteIdx) const;
   QRect highlightBox(off_t byteIdx) const;
@@ -220,7 +221,7 @@ protected:
   int                 _rows;
   int                 _width;
   Cursor              _cursor; 
-  //Cursor              _acursor;
+  Cursor              _acursor;
 
   int                 _previousstep;
   //
