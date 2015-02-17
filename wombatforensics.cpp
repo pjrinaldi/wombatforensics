@@ -1341,7 +1341,8 @@ void WombatForensics::UpdateThumbnails(int tsize)
 
 void WombatForensics::UpdateSelectValue(const QString &txt)
 {
-    qDebug() << "Selected hex: " << txt;
+    // I HAVE SELECTED TEXT. I JUST NEED TO DO SOME KIND OF A BUTTON FOR IT.
+    //qDebug() << "Selected hex: " << txt;
     // set hex (which i'll probably remove anyway since it's highlighted in same window)
     int sellength = txt.size()/2;
     QString tmptext = "Length: " + QString::number(sellength);
