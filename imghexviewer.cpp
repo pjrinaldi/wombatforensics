@@ -78,8 +78,6 @@ bool ImageHexViewer::openimage()
         QMessageBox::critical(this, "HexView", "Error opening image\n", QMessageBox::Ok, 0);
     _cursor.setRange(0, _reader.size());
     _cursor.setCharsPerByte(_charsPerByte);
-    _acursor.setRange(0, _reader.size());
-    _acursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
     emit rangeChanged(0, _reader.size()/bytesPerLine());
@@ -341,7 +339,6 @@ void ImageHexViewer::setOffset( off_t offset )
 {
   off_t oldWordOffset = localWordOffset();
   _cursor.setOffset( offset, 0 );
-  _acursor.setOffset(offset + 15, 0);
   // updateWord clamps the wordIdx to [0,_rows*_cols)
   updateWord( oldWordOffset ); 
   emit offsetChanged( _cursor.byteOffset() );
@@ -392,7 +389,6 @@ void ImageHexViewer::setCursorFromXY(int x,int y)
   off_t oldWordIdx = localWordOffset();
 
   _cursor.setOffset( _topLeft+localByteOffsetAtXY(x,y) ,0 );
-  _acursor.setOffset(_topLeft + localByteOffsetAtXY(x,y), 0);
 
   // update where the cursor used to be, and where it is now
   if( oldWordIdx != localWordOffset() ) {
@@ -998,7 +994,7 @@ void ImageHexViewer::drawSelection( QPainter& paint )
     off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
     paint.setPen(Qt::NoPen);
     //paint.setBrush(QColor(255, 255, 255, 175));
-    paint.setBrush( qApp->palette().highlight() );
+    //paint.setBrush( qApp->palette().highlight() );
     paint.setBrush(QBrush(QColor(Qt::cyan)));
     stop--;
     while( start <= stop ) {

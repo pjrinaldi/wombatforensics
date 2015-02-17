@@ -253,6 +253,13 @@ QRect FileHexViewer::charBBox( off_t charIdx ) const {
 		fontHeight() );
 }
 
+QRect FileHexViewer::acharBBox(off_t charIdx) const
+{
+    int wordIdx = (charIdx/charsPerByte())/bytesPerWord();
+    int localCharIdx = charIdx % charsPerWord();
+    return QRect(_asciiBBox[wordIdx].left() + localCharIdx*fontMaxWidth() + wordSpacing(), _asciiBBox[wordIdx].top(), fontMaxWidth(), fontHeight());
+}
+
 QRect FileHexViewer::byteBBox( off_t byteIdx ) const {
   int wordIdx = byteIdx/bytesPerWord();
   int localByteIdx = byteIdx % bytesPerWord();
@@ -921,7 +928,8 @@ void FileHexViewer::drawSelection( QPainter& paint )
   if( start < bytesPerPage() ) {
     off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
     paint.setPen(Qt::NoPen);
-    paint.setBrush( qApp->palette().highlight() );
+    //paint.setBrush( qApp->palette().highlight() );
+    paint.setBrush(QBrush(QColor(Qt::cyan)));
     stop--;
     while( start <= stop ) {
       off_t linestop = min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
@@ -951,5 +959,7 @@ void FileHexViewer::drawCursor( QPainter& paint )
     }
     QRect box = charBBox( localCharOffset() );
     paint.drawRect( box );
+    QRect abox = acharBBox(localCharOffset());
+    paint.drawRect(abox);
   }
 }

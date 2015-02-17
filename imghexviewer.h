@@ -221,7 +221,6 @@ protected:
   int                 _rows;
   int                 _width;
   Cursor              _cursor; 
-  Cursor              _acursor;
 
   int                 _previousstep;
   //
