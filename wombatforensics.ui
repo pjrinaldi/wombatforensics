@@ -176,7 +176,15 @@
      </property>
      <addaction name="actionPlaceHolder"/>
     </widget>
+    <widget class="QMenu" name="menuCopy_To">
+     <property name="title">
+      <string>Copy to</string>
+     </property>
+     <addaction name="actionSection"/>
+     <addaction name="actionFile"/>
+    </widget>
     <addaction name="menuView_With"/>
+    <addaction name="menuCopy_To"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEvidence"/>
@@ -227,6 +235,7 @@
    <addaction name="actionViewerManager"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
+   <addaction name="actionCopy_Selection_To"/>
    <addaction name="actionExport_Evidence"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
@@ -435,6 +444,25 @@
    </property>
    <property name="visible">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionCopy_Selection_To">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/copyselect</normaloff>:/bar/copyselect</iconset>
+   </property>
+   <property name="text">
+    <string>Copy Selection To</string>
+   </property>
+  </action>
+  <action name="actionSection">
+   <property name="text">
+    <string>Copy to a Section</string>
+   </property>
+  </action>
+  <action name="actionFile">
+   <property name="text">
+    <string>Carve to a File</string>
    </property>
   </action>
  </widget>

@@ -90,6 +90,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered(bool)), this, SLOT(on_actionViewerManager_triggered(bool)), Qt::DirectConnection);
+    connect(ui->actionCopy_Selection_To, SIGNAL(triggered()), this, SLOT(on_actionCopy_Selection_To_triggered()), Qt::DirectConnection);
+
+    selectionmenu = new QMenu();
+    selectionmenu->addAction(ui->menuCopy_To->menuAction());
+    ui->actionCopy_Selection_To->setMenu(selectionmenu);
 
     treemenu = new QMenu(ui->dirTreeView);
     // adds items to the viewmenu.
@@ -320,6 +325,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionExport_Evidence->setEnabled(false);
     ui->menuBookmark_Manager->setEnabled(false);
     ui->actionView_Image_Gallery->setEnabled(false);
+    ui->actionCopy_Selection_To->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -1320,6 +1326,13 @@ void WombatForensics::on_actionViewerManager_triggered(bool checked)
     }
 }
 
+void WombatForensics::on_actionCopy_Selection_To_triggered()
+{
+    //selectionmenu->popup(QCursor::pos(), ui->actionCopy_Selection_To);
+    //selectionmenu->exec(QCursor::pos());
+    //treemenu->exec(QCursor::pos());
+}
+
 void WombatForensics::UpdateThumbnails(int tsize)
 {
     thumbsize = tsize;
@@ -1341,6 +1354,7 @@ void WombatForensics::UpdateThumbnails(int tsize)
 
 void WombatForensics::UpdateSelectValue(const QString &txt)
 {
+    ui->actionCopy_Selection_To->setEnabled(true);
     // I HAVE SELECTED TEXT. I JUST NEED TO DO SOME KIND OF A BUTTON FOR IT.
     //qDebug() << "Selected hex: " << txt;
     // set hex (which i'll probably remove anyway since it's highlighted in same window)

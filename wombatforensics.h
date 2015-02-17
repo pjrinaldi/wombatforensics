@@ -654,6 +654,7 @@ public:
     FileViewer* fileviewer;
     TreeModel* treemodel;
     QMenu* treemenu;
+    QMenu* selectionmenu;
     IdFilter* idfilterview;
     NameFilter* namefilterview;
     PathFilter* pathfilterview;
@@ -682,6 +683,7 @@ private slots:
     void on_actionView_File_triggered(bool checked);
     void on_actionView_Image_Gallery_triggered(bool checked);
     void on_actionViewerManager_triggered(bool checked);
+    void on_actionCopy_Selection_To_triggered();
     void UpdateProgress(int count, int processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);
