@@ -164,6 +164,9 @@ public:
         QIcon icon13;
         icon13.addFile(QStringLiteral(":/bar/copyselect"), QSize(), QIcon::Normal, QIcon::Off);
         actionCopy_Selection_To->setIcon(icon13);
+        actionCopy_Selection_To->setShortcutContext(Qt::WindowShortcut);
+        actionCopy_Selection_To->setAutoRepeat(true);
+        actionCopy_Selection_To->setMenuRole(QAction::TextHeuristicRole);
         actionSection = new QAction(WombatForensics);
         actionSection->setObjectName(QStringLiteral("actionSection"));
         actionFile = new QAction(WombatForensics);

@@ -90,10 +90,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered(bool)), this, SLOT(on_actionViewerManager_triggered(bool)), Qt::DirectConnection);
-    connect(ui->actionCopy_Selection_To, SIGNAL(triggered()), this, SLOT(on_actionCopy_Selection_To_triggered()), Qt::DirectConnection);
 
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->menuCopy_To->menuAction());
+    QWidget* testwidget = ui->analysisToolBar->widgetForAction(ui->actionCopy_Selection_To);
+    QToolButton* testbutton = qobject_cast<QToolButton*>(testwidget);
+    if(testbutton)
+    {
+        connect(ui->actionCopy_Selection_To, SIGNAL(triggered(bool)), testbutton, SLOT(showMenu()));
+    }
     ui->actionCopy_Selection_To->setMenu(selectionmenu);
 
     treemenu = new QMenu(ui->dirTreeView);
@@ -1328,6 +1333,7 @@ void WombatForensics::on_actionViewerManager_triggered(bool checked)
 
 void WombatForensics::on_actionCopy_Selection_To_triggered()
 {
+    //qDebug() << "no idea why it won't work how i want it.";
     //selectionmenu->popup(QCursor::pos(), ui->actionCopy_Selection_To);
     //selectionmenu->exec(QCursor::pos());
     //treemenu->exec(QCursor::pos());

@@ -454,6 +454,15 @@
    <property name="text">
     <string>Copy Selection To</string>
    </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="autoRepeat">
+    <bool>true</bool>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
   </action>
   <action name="actionSection">
    <property name="text">
