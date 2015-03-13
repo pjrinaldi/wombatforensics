@@ -91,6 +91,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered(bool)), this, SLOT(on_actionViewerManager_triggered(bool)), Qt::DirectConnection);
 
+    // NOT SURE IF THIS WILL WORK
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->menuCopy_To->menuAction());
     QWidget* testwidget = ui->analysisToolBar->widgetForAction(ui->actionCopy_Selection_To);
