@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wombatforensics.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.0
+** Created by: Qt User Interface Compiler version 5.4.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -51,6 +51,7 @@ public:
     QAction *actionCopy_Selection_To;
     QAction *actionSection;
     QAction *actionFile;
+    QAction *actionTextSection;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -171,6 +172,8 @@ public:
         actionSection->setObjectName(QStringLiteral("actionSection"));
         actionFile = new QAction(WombatForensics);
         actionFile->setObjectName(QStringLiteral("actionFile"));
+        actionTextSection = new QAction(WombatForensics);
+        actionTextSection->setObjectName(QStringLiteral("actionTextSection"));
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -285,6 +288,7 @@ public:
         menuView->addAction(menuCopy_To->menuAction());
         menuView_With->addAction(actionPlaceHolder);
         menuCopy_To->addAction(actionSection);
+        menuCopy_To->addAction(actionTextSection);
         menuCopy_To->addAction(actionFile);
         analysisToolBar->addAction(actionNew_Case);
         analysisToolBar->addAction(actionOpen_Case);
@@ -352,8 +356,9 @@ public:
         actionViewerManager->setText(QApplication::translate("WombatForensics", "Viewer Manager", 0));
         actionPlaceHolder->setText(QApplication::translate("WombatForensics", "PlaceHolder", 0));
         actionCopy_Selection_To->setText(QApplication::translate("WombatForensics", "Copy Selection To", 0));
-        actionSection->setText(QApplication::translate("WombatForensics", "Copy to a Section", 0));
+        actionSection->setText(QApplication::translate("WombatForensics", "Copy Hex to a Section", 0));
         actionFile->setText(QApplication::translate("WombatForensics", "Carve to a File", 0));
+        actionTextSection->setText(QApplication::translate("WombatForensics", "Copy Ascii to a Section", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));

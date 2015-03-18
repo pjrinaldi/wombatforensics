@@ -90,10 +90,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered(bool)), this, SLOT(on_actionViewerManager_triggered(bool)), Qt::DirectConnection);
+    connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
+    connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
+    connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
 
     // NOT SURE IF THIS WILL WORK
     selectionmenu = new QMenu();
-    selectionmenu->addAction(ui->menuCopy_To->menuAction());
+    selectionmenu->addAction(ui->actionSection);
+    selectionmenu->addAction(ui->actionTextSection);
+    selectionmenu->addAction(ui->actionFile);
     QWidget* testwidget = ui->analysisToolBar->widgetForAction(ui->actionCopy_Selection_To);
     QToolButton* testbutton = qobject_cast<QToolButton*>(testwidget);
     if(testbutton)
@@ -1361,10 +1366,16 @@ void WombatForensics::UpdateThumbnails(int tsize)
 
 void WombatForensics::UpdateSelectValue(const QString &txt)
 {
-    ui->actionCopy_Selection_To->setEnabled(true);
-    // I HAVE SELECTED TEXT. I JUST NEED TO DO SOME KIND OF A BUTTON FOR IT.
-    //qDebug() << "Selected hex: " << txt;
-    // set hex (which i'll probably remove anyway since it's highlighted in same window)
+    if(txt.compare("") != 0)
+    {
+        ui->actionCopy_Selection_To->setEnabled(true);
+        qDebug() << "Selected hex: " << txt;
+    }
+    else
+    {
+        ui->actionCopy_Selection_To->setEnabled(false);
+    }
+    hexselection = txt;
     int sellength = txt.size()/2;
     QString tmptext = "Length: " + QString::number(sellength);
     selectedhex->setText(tmptext);
@@ -1534,3 +1545,43 @@ void WombatForensics::UpdateFilterCount()
     QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     filtercountlabel->setText("Filtered: " + QString::number(tmplist.count()));
 }
+
+void WombatForensics::AddSection()
+{
+    qDebug() << "Add selected hex to a new section";
+}
+
+void WombatForensics::AddTextSection()
+{
+    qDebug() << "Add selected text to a new section";
+}
+
+void WombatForensics::CarveFile()
+{
+    QString carvefilename = QFileDialog::getSaveFileName(this, tr("Carve to a File"), QDir::homePath()); 
+    qDebug() << "Carve to a file...";
+    qDebug() << hexselection;
+}
+
+
+/*
+ *char* contentbuffer = new char[curobj.length];
+        retval = tsk_fs_file_read(curobj.readfileinfo, curobj.offset, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
+        if(retval > 0)
+        {
+            bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
+            if(tmpdir == true)
+            {
+                std::string filepath = fullpath + "/" + name;
+                QFile tmpfile(QString::fromStdString(filepath));
+                if(tmpfile.open(QIODevice::WriteOnly))
+                {
+                    QDataStream outbuffer(&tmpfile);
+                    outbuffer.writeRawData(contentbuffer, curobj.length);
+                    tmpfile.close();
+                }
+            }
+        }
+
+ *
+ */ 

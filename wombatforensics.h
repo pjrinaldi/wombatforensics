@@ -734,6 +734,9 @@ private slots:
     void UpdateThumbnails(int tsize);
     void SetSelectedFromImageViewer(int selectedid);
     void ShowFile(const QModelIndex &index);
+    void AddSection(void);
+    void AddTextSection(void);
+    void CarveFile(void);
 
 protected:
     void closeEvent(QCloseEvent* event);

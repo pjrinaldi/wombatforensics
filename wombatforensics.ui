@@ -181,6 +181,7 @@
       <string>Copy to</string>
      </property>
      <addaction name="actionSection"/>
+     <addaction name="actionTextSection"/>
      <addaction name="actionFile"/>
     </widget>
     <addaction name="menuView_With"/>
@@ -466,12 +467,17 @@
   </action>
   <action name="actionSection">
    <property name="text">
-    <string>Copy to a Section</string>
+    <string>Copy Hex to a Section</string>
    </property>
   </action>
   <action name="actionFile">
    <property name="text">
     <string>Carve to a File</string>
+   </property>
+  </action>
+  <action name="actionTextSection">
+   <property name="text">
+    <string>Copy Ascii to a Section</string>
    </property>
   </action>
  </widget>

@@ -30,6 +30,7 @@ extern QStringList propertylist;
 extern QStringList thumblist;
 extern QString blockstring;
 extern QString thumbpath;
+extern QString hexselection;
 extern QStringList externallist;
 extern struct magic_set* magicptr;
 extern struct magic_set* magicmimeptr;
