@@ -436,6 +436,26 @@ void ImageHexViewer::mouseReleaseEvent( QMouseEvent* e )
   setSelection( SelectionEnd, globalOffset( byte_offset ));
 }
 
+
+void ImageHexViewer::wheelEvent(QWheelEvent* e)
+{
+    //int numdegrees = e->delta() / 8;
+    //int numsteps = abs(numdegrees) / 15;
+    if(e->delta() < 0)
+    {
+        //for(int i=0; i < numsteps; i++)
+            cursorDown();
+    }
+    else
+    {
+        //for(int i=0; i < numsteps; i++)
+            cursorUp();
+        //prevPage();
+    }
+
+    e->accept();
+}
+
 off_t ImageHexViewer::selectionStart() const
 {
   if( _selection[SelectionStart] == -1 || _selection[SelectionEnd] == -1 )
