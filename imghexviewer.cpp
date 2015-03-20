@@ -400,14 +400,21 @@ void ImageHexViewer::setCursorFromXY(int x,int y)
 
 void ImageHexViewer::mousePressEvent( QMouseEvent* e )
 {
-  setCursorFromXY(e->x(),e->y());
-
-  off_t byte_offset = localByteOffset();
-  QRect bbox = byteBBox(byte_offset);
-  if( e->x() > bbox.right() ) {
-    byte_offset++;
-  }
-  setSelection( SelectionStart, globalOffset( byte_offset ));
+    if(e->button() == Qt::RightButton)
+    {
+        qDebug() << "right button pressed. emit signal to show menu here...";
+    }
+    else
+    {
+        setCursorFromXY(e->x(),e->y());
+        off_t byte_offset = localByteOffset();
+        QRect bbox = byteBBox(byte_offset);
+        if( e->x() > bbox.right() )
+        {
+            byte_offset++;
+        }
+        setSelection( SelectionStart, globalOffset( byte_offset ));
+    }
 }
 
 void ImageHexViewer::mouseMoveEvent( QMouseEvent* e )
@@ -425,15 +432,17 @@ void ImageHexViewer::mouseMoveEvent( QMouseEvent* e )
 
 void ImageHexViewer::mouseReleaseEvent( QMouseEvent* e )
 {
-  setCursorFromXY(e->x(),e->y());
-
-  off_t byte_offset = localByteOffset();
-  QRect bbox = byteBBox(byte_offset);
-  if(e->x() > bbox.right() ) {
-    byte_offset++;
-  }
-
-  setSelection( SelectionEnd, globalOffset( byte_offset ));
+    if(e->button() == Qt::LeftButton)
+    {
+        setCursorFromXY(e->x(),e->y());
+        off_t byte_offset = localByteOffset();
+        QRect bbox = byteBBox(byte_offset);
+        if(e->x() > bbox.right() )
+        {
+            byte_offset++;
+        }
+        setSelection( SelectionEnd, globalOffset( byte_offset ));
+    }
 }
 
 
