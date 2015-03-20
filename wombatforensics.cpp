@@ -1566,31 +1566,10 @@ void WombatForensics::CarveFile()
         if(tmpfile.open(QIODevice::WriteOnly))
         {
             QDataStream outbuffer(&tmpfile);
-            outbuffer.writeRawData(hexselection.toStdString().c_str(), hexselection.size());
+            QByteArray tmpba = hexselection.toUtf8();
+            const char* tmpcstr = tmpba.constData();
+            outbuffer.writeRawData(tmpcstr, strlen(tmpcstr));
             tmpfile.close();
         }
     }
 }
-
-
-/*
- *char* contentbuffer = new char[curobj.length];
-        retval = tsk_fs_file_read(curobj.readfileinfo, curobj.offset, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
-        if(retval > 0)
-        {
-            bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
-            if(tmpdir == true)
-            {
-                std::string filepath = fullpath + "/" + name;
-                QFile tmpfile(QString::fromStdString(filepath));
-                if(tmpfile.open(QIODevice::WriteOnly))
-                {
-                    QDataStream outbuffer(&tmpfile);
-                    outbuffer.writeRawData(contentbuffer, curobj.length);
-                    tmpfile.close();
-                }
-            }
-        }
-
- *
- */ 
