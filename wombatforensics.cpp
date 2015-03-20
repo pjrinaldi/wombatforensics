@@ -1567,18 +1567,5 @@ void WombatForensics::CarveFile()
         ofstream tmpfile(carvefilename.toStdString().c_str(), ios::out | ios::binary);
         tmpfile.write((const char*)&tmpbytes[0], tmpbytes.size());
         tmpfile.close();
-        /*
-        QFile tmpfile(carvefilename);
-        if(tmpfile.open(QIODevice::WriteOnly))
-        {
-            std::vector<uchar> tmpbytes;
-            Transate::HexToByte(tmpbytes, hexselection);
-            QDataStream outbuffer(&tmpfile);
-            QByteArray tmpba = hexselection.toUtf8();
-            //const char* tmpcstr = tmpba.constData();
-            //outbuffer.writeRawData(tmpcstr, strlen(tmpcstr));
-            tmpfile.write(tmpba);
-            tmpfile.close();
-        }*/
     }
 }
