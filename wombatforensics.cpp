@@ -1369,7 +1369,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     if(txt.compare("") != 0)
     {
         ui->actionCopy_Selection_To->setEnabled(true);
-        qDebug() << "Selected hex: " << txt;
+        //qDebug() << "Selected hex: " << txt;
     }
     else
     {
@@ -1559,8 +1559,17 @@ void WombatForensics::AddTextSection()
 void WombatForensics::CarveFile()
 {
     QString carvefilename = QFileDialog::getSaveFileName(this, tr("Carve to a File"), QDir::homePath()); 
-    qDebug() << "Carve to a file...";
-    qDebug() << hexselection;
+    qDebug() << "carve filename: " << carvefilename;
+    if(carvefilename.compare("") != 0)
+    {
+        QFile tmpfile(carvefilename);
+        if(tmpfile.open(QIODevice::WriteOnly))
+        {
+            QDataStream outbuffer(&tmpfile);
+            outbuffer.writeRawData(hexselection.toStdString().c_str(), hexselection.size());
+            tmpfile.close();
+        }
+    }
 }
 
 
