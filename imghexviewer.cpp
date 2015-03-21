@@ -402,7 +402,12 @@ void ImageHexViewer::mousePressEvent( QMouseEvent* e )
 {
     if(e->button() == Qt::RightButton)
     {
-        qDebug() << "right button pressed. emit signal to show menu here...";
+        QString data;
+        for(off_t i = selectionStart(); i < selectionEnd(); ++i)
+        {
+            data += Translate::ByteToHex(_reader[i]);
+        }
+        emit customContextMenuRequested(e->pos());
     }
     else
     {

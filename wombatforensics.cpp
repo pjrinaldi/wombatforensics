@@ -594,6 +594,11 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     }
 }
 
+void WombatForensics::ImgHexMenu(const QPoint &pt)
+{
+    if(hexselection.compare("") != 0)
+        selectionmenu->exec(hexwidget->mapToGlobal(pt));
+}
 /*
 // FUNCTION GETS IMPLEMNTED WHEN YOU CLICK ON A CHECKBOX, BUT DO NOT SELECT THE ROW
 void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIndex &previndex)
@@ -1179,6 +1184,7 @@ void WombatForensics::SetupHexPage(void)
     setAutoFillBackground(true);
     hexwidget->setObjectName("bt-hexview");
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
     hexLayout->addWidget(hexwidget);
     hexvsb = new QScrollBar(hexwidget);
     hexLayout->addWidget(hexvsb);
@@ -1190,6 +1196,7 @@ void WombatForensics::SetupHexPage(void)
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+    connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
 }
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)

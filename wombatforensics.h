@@ -723,6 +723,7 @@ private slots:
     };
     void SetStepValues(int singlestep, int pagestep);
     void TreeContextMenu(const QPoint &point);
+    void ImgHexMenu(const QPoint &point);
     void SetFilter(int headercolumn);
     void FilterApplied()
     {
