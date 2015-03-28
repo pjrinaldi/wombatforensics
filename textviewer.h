@@ -32,6 +32,8 @@ private:
     Ui::TextViewer* ui;
     TskObject tskobj;
     TskObject* tskptr;
+    QList<QTextCodec*> codecs;
+    void FindCodecs();
     void GetTextContent(int objectid);
 };
 

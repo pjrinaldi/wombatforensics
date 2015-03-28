@@ -7,6 +7,10 @@ TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer
     tskptr->readimginfo = NULL;
     tskptr->readfsinfo = NULL;
     tskptr->readfileinfo = NULL;
+    FindCodecs();
+    ui->comboBox->clear();
+    foreach(QTextCodec* codec, codecs)
+        ui->comboBox->addItem(codec->name(), codec->mibEnum());
     this->hide();
 }
 
@@ -32,6 +36,37 @@ void TextViewer::closeEvent(QCloseEvent* e)
 {
     emit HideTextViewerWindow(false);
     e->accept();
+}
+
+void TextViewer::FindCodecs()
+{
+    QMap<QString, QTextCodec*> codecmap;
+    QRegExp iso8859regex("ISO[- ]8859-([0-9]+).*");
+
+    foreach(int mib, QTextCodec::availableMibs())
+    {
+        QTextCodec* codec = QTextCodec::codecForMib(mib);
+
+        QString sortkey = codec->name().toUpper();
+        int rank;
+
+        if(sortkey.startsWith("UTF-8"))
+            rank = 1;
+        else if(sortkey.startsWith("UTF-16"))
+            rank = 2;
+        else if(iso8859regex.exactMatch(sortkey))
+        {
+            if(iso8859regex.cap(1).size() == 1)
+                rank = 3;
+            else
+                rank = 4;
+        }
+        else
+            rank = 5;
+        sortkey.prepend(QChar('0' + rank));
+        codecmap.insert(sortkey, codec);
+    }
+    codecs = codecmap.values();
 }
 
 void TextViewer::GetTextContent(int objectid)
