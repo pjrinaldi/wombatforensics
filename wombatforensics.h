@@ -18,6 +18,7 @@
 #include "imageviewer.h"
 #include "videoviewer.h"
 #include "viewermanager.h"
+#include "textviewer.h"
 
 
 class TreeModel : public QAbstractItemModel
@@ -668,6 +669,7 @@ public:
     ImageViewer* imagewindow;
     VideoViewer* videowindow;
     ViewerManager* viewmanage;
+    TextViewer* textviewer;
 
 signals:
     //void LogVariable(WombatVariable* wombatVariable);

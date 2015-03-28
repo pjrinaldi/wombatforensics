@@ -96,7 +96,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -231,6 +231,7 @@
    <addaction name="separator"/>
    <addaction name="actionView_Properties"/>
    <addaction name="actionView_File"/>
+   <addaction name="actionTextViewer"/>
    <addaction name="actionView_Image_Gallery"/>
    <addaction name="separator"/>
    <addaction name="actionViewerManager"/>
@@ -478,6 +479,18 @@
   <action name="actionTextSection">
    <property name="text">
     <string>Copy Ascii to a Section</string>
+   </property>
+  </action>
+  <action name="actionTextViewer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/textencode</normaloff>:/bar/textencode</iconset>
+   </property>
+   <property name="text">
+    <string>Text Viewer</string>
    </property>
   </action>
  </widget>

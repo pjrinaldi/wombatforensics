@@ -34,6 +34,7 @@
         <file alias="missingthumb">./Resources/thumbmissing.png</file>
         <file alias="viewermanager">./Resources/viewermanager.png</file>
         <file alias="copyselect">./Resources/editcopy.png</file>
+        <file alias="textencode">./Resources/textencoder.png</file>
     </qresource>
     <qresource prefix="/html">
         <file alias="infohtml">./Resources/information.html</file>
