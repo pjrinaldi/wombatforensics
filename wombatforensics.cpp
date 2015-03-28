@@ -63,9 +63,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     hashfilterview = new HashFilter(this);
     imagewindow = new ImageViewer();
     videowindow = new VideoViewer();
+    textviewer = new TextViewer();
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
+    textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -76,8 +78,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
+    connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
+    connect(ui->actionTextViewer, SIGNAL(triggered(bool)), this, SLOT(on_actionTextViewer_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
@@ -274,6 +278,11 @@ void WombatForensics::HideProgressWindow(bool checkedstate)
 void WombatForensics::HideViewerManager(bool checkstate)
 {
     ui->actionViewerManager->setChecked(checkstate);
+}
+
+void WombatForensics::HideTextViewer(bool checkstate)
+{
+    ui->actionTextViewer->setChecked(checkstate);
 }
 
 void WombatForensics::InitializeAppStructure()
@@ -1341,6 +1350,16 @@ void WombatForensics::on_actionViewerManager_triggered(bool checked)
     else
     {
         viewmanage->show();
+    }
+}
+
+void WombatForensics::on_actionTextViewer_triggered(bool checked)
+{
+    if(!checked) // hide viewer
+        textviewer->hide();
+    else
+    {
+        textviewer->show();
     }
 }
 

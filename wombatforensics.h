@@ -685,6 +685,7 @@ private slots:
     void on_actionView_File_triggered(bool checked);
     void on_actionView_Image_Gallery_triggered(bool checked);
     void on_actionViewerManager_triggered(bool checked);
+    void on_actionTextViewer_triggered(bool checked);
     void on_actionCopy_Selection_To_triggered();
     void UpdateProgress(int count, int processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
@@ -693,6 +694,7 @@ private slots:
     void HideFileViewer(bool checkstate);
     void HideImageWindow(bool checkstate);
     void HideViewerManager(bool checkstate);
+    void HideTextViewer(bool checkstate);
     void ShowExternalViewer();
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
