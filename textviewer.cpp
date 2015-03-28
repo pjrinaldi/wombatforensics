@@ -3,6 +3,10 @@
 TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer)
 {
     ui->setupUi(this);
+    tskptr = &tskobj;
+    tskptr->readimginfo = NULL;
+    tskptr->readfsinfo = NULL;
+    tskptr->readfileinfo = NULL;
     this->hide();
 }
 

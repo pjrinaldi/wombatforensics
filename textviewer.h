@@ -30,6 +30,8 @@ protected:
 
 private:
     Ui::TextViewer* ui;
+    TskObject tskobj;
+    TskObject* tskptr;
     void GetTextContent(int objectid);
 };
 
