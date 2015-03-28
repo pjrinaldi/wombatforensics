@@ -249,6 +249,10 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         videowindow->ShowVideo(wombatvarptr->tmpfilepath, index);
     }
+    else if(index.sibling(index.row(), 16).data().toString().contains("text/"))
+    {
+        textviewer->ShowText(index);
+    }
     else
     {
         if(index.sibling(index.row(), 4).data().toInt() == 5)

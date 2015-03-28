@@ -4,6 +4,7 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "ui_textviewer.h"
+#include "wombatfunctions.h"
 
 namespace Ui
 {
@@ -17,6 +18,7 @@ class TextViewer : public QDialog
 public:
     TextViewer(QWidget* parent = 0);
     ~TextViewer();
+    void ShowText(const QModelIndex &index);
     
 private slots:
     void HideClicked();
@@ -28,6 +30,7 @@ protected:
 
 private:
     Ui::TextViewer* ui;
+    void GetTextContent(int objectid);
 };
 
 Q_DECLARE_METATYPE(TextViewer*);
