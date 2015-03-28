@@ -346,6 +346,7 @@ void WombatForensics::InitializeAppStructure()
     ui->menuBookmark_Manager->setEnabled(false);
     ui->actionView_Image_Gallery->setEnabled(false);
     ui->actionCopy_Selection_To->setEnabled(false);
+    ui->actionTextViewer->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -583,6 +584,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionView_Properties->setEnabled(true);
         ui->actionView_File->setEnabled(true);
         ui->actionView_Image_Gallery->setEnabled(true);
+        ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
         wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
         wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
@@ -1237,6 +1239,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     imagewindow->close();
     videowindow->close();
     viewmanage->close();
+    textviewer->close();
     RemoveTmpFiles();
     if(ProcessingComplete())
     {

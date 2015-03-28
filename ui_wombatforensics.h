@@ -52,6 +52,7 @@ public:
     QAction *actionSection;
     QAction *actionFile;
     QAction *actionTextSection;
+    QAction *actionTextViewer;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -174,6 +175,12 @@ public:
         actionFile->setObjectName(QStringLiteral("actionFile"));
         actionTextSection = new QAction(WombatForensics);
         actionTextSection->setObjectName(QStringLiteral("actionTextSection"));
+        actionTextViewer = new QAction(WombatForensics);
+        actionTextViewer->setObjectName(QStringLiteral("actionTextViewer"));
+        actionTextViewer->setCheckable(true);
+        QIcon icon14;
+        icon14.addFile(QStringLiteral(":/bar/textencode"), QSize(), QIcon::Normal, QIcon::Off);
+        actionTextViewer->setIcon(icon14);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -216,7 +223,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QStringLiteral("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 800, 22));
+        mainMenubar->setGeometry(QRect(0, 0, 800, 21));
         mainMenubar->setAcceptDrops(true);
         menuFile = new QMenu(mainMenubar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
@@ -231,14 +238,14 @@ public:
         menuAbout->setIcon(icon7);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon14;
-        icon14.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon14);
+        QIcon icon15;
+        icon15.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon15);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon15;
-        icon15.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon15);
+        QIcon icon16;
+        icon16.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon16);
         menuView = new QMenu(mainMenubar);
         menuView->setObjectName(QStringLiteral("menuView"));
         menuView_With = new QMenu(menuView);
@@ -298,6 +305,7 @@ public:
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionView_Properties);
         analysisToolBar->addAction(actionView_File);
+        analysisToolBar->addAction(actionTextViewer);
         analysisToolBar->addAction(actionView_Image_Gallery);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionViewerManager);
@@ -359,6 +367,7 @@ public:
         actionSection->setText(QApplication::translate("WombatForensics", "Copy Hex to a Section", 0));
         actionFile->setText(QApplication::translate("WombatForensics", "Carve to a File", 0));
         actionTextSection->setText(QApplication::translate("WombatForensics", "Copy Ascii to a Section", 0));
+        actionTextViewer->setText(QApplication::translate("WombatForensics", "Text Viewer", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));
