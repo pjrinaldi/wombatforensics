@@ -22,6 +22,7 @@ public:
     
 private slots:
     void HideClicked();
+    void UpdateEncoding();
 signals:
     void HideTextViewerWindow(bool checkstate);
 
@@ -32,6 +33,8 @@ private:
     Ui::TextViewer* ui;
     TskObject tskobj;
     TskObject* tskptr;
+    QByteArray txtdata;
+    QString decodedstring;
     QList<QTextCodec*> codecs;
     void FindCodecs();
     void GetTextContent(int objectid);

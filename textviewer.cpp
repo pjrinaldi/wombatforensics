@@ -12,6 +12,7 @@ TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer
     foreach(QTextCodec* codec, codecs)
         ui->comboBox->addItem(codec->name(), codec->mibEnum());
     this->hide();
+    connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding()));
 }
 
 TextViewer::~TextViewer()
@@ -115,6 +116,29 @@ void TextViewer::GetTextContent(int objectid)
     tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
     // OpenFile
     tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, address);
+    // ReadFileToEncodedTextUsingByteArray
+    if(tskptr->readfileinfo->meta != NULL)
+    {
+        //QByteArray tba;
+        //QBuffer tbuff(&tba);
+        char tbuffer[tskptr->readfileinfo->meta->size];
+        ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        txtdata = QByteArray::fromRawData(tbuffer, textlen);
+        UpdateEncoding();
+    }
+}
+void TextViewer::UpdateEncoding()
+{
+    int mib = ui->comboBox->itemData(ui->comboBox->currentIndex()).toInt();
+    QTextCodec* codec = QTextCodec::codecForMib(mib);
+
+    QTextStream in(&txtdata);
+    in.setAutoDetectUnicode(false);
+    in.setCodec(codec);
+    decodedstring = in.readAll();
+    ui->textEdit->setPlainText(decodedstring);
+}
+
     /*
     // ReadFileToImageUsingByteArray
     if(tskptr->readfileinfo->meta != NULL)
@@ -131,4 +155,3 @@ void TextViewer::GetTextContent(int objectid)
             ui->label->setPixmap(QPixmap::fromImage(QImage(":/bar/missingthumb")));
     }
     */
-}
