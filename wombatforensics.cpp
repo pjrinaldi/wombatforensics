@@ -251,6 +251,9 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else if(index.sibling(index.row(), 16).data().toString().contains("text/"))
     {
+        // toggle the button...
+        ui->actionTextViewer->setChecked(true);
+        //ui->actionTextViewer->triggered(true);
         textviewer->ShowText(index);
     }
     else
@@ -351,6 +354,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionView_Image_Gallery->setEnabled(false);
     ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
+    ui->actionTextViewer->setVisible(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -596,6 +600,8 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         LoadHexContents();
         if(propertywindow->isVisible())
             UpdateProperties();
+        //if(textviewer->isVisible())
+        //    UpdateTextView();
     }
 }
 
@@ -1366,7 +1372,11 @@ void WombatForensics::on_actionTextViewer_triggered(bool checked)
         textviewer->hide();
     else
     {
-        textviewer->show();
+        if(selectedindex.sibling(selectedindex.row(), 16).data().toString().contains("text/"))
+        {
+            textviewer->ShowText(selectedindex);
+            textviewer->show();
+        }
     }
 }
 

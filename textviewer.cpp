@@ -12,7 +12,8 @@ TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer
     foreach(QTextCodec* codec, codecs)
         ui->comboBox->addItem(codec->name(), codec->mibEnum());
     this->hide();
-    connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding()));
+    connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(GetTextContent()));
+    //connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding()));
 }
 
 TextViewer::~TextViewer()
@@ -29,7 +30,8 @@ void TextViewer::HideClicked()
 
 void TextViewer::ShowText(const QModelIndex &index)
 {
-    GetTextContent(index.sibling(index.row(), 0).data().toInt());
+    curobjid = index.sibling(index.row(), 0).data().toInt();
+    GetTextContent();
     this->show();
 }
 
@@ -70,7 +72,7 @@ void TextViewer::FindCodecs()
     codecs = codecmap.values();
 }
 
-void TextViewer::GetTextContent(int objectid)
+void TextViewer::GetTextContent()
 {
     this->setWindowTitle("View Text - "); // populate filename here.
     // OpenParentImage
@@ -82,7 +84,7 @@ void TextViewer::GetTextContent(int objectid)
     pathvector.clear();
     QSqlQuery pimgquery(fcasedb);
     pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
-    pimgquery.addBindValue(objectid);
+    pimgquery.addBindValue(curobjid);
     pimgquery.exec();
     pimgquery.next();
     imgid = pimgquery.value(0).toInt();
@@ -119,8 +121,6 @@ void TextViewer::GetTextContent(int objectid)
     // ReadFileToEncodedTextUsingByteArray
     if(tskptr->readfileinfo->meta != NULL)
     {
-        //QByteArray tba;
-        //QBuffer tbuff(&tba);
         char tbuffer[tskptr->readfileinfo->meta->size];
         ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         txtdata = QByteArray::fromRawData(tbuffer, textlen);
@@ -138,20 +138,3 @@ void TextViewer::UpdateEncoding()
     decodedstring = in.readAll();
     ui->textEdit->setPlainText(decodedstring);
 }
-
-    /*
-    // ReadFileToImageUsingByteArray
-    if(tskptr->readfileinfo->meta != NULL)
-    {
-        QImage tmpimage;
-        QByteArray iba;
-        QBuffer ibuff(&iba);
-        char ibuffer[tskptr->readfileinfo->meta->size];
-        ssize_t imglen = tsk_fs_file_read(tskptr->readfileinfo, 0, ibuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-        bool isloaded = tmpimage.loadFromData(QByteArray::fromRawData(ibuffer, imglen));
-        if(isloaded)
-            ui->label->setPixmap(QPixmap::fromImage(tmpimage));
-        else
-            ui->label->setPixmap(QPixmap::fromImage(QImage(":/bar/missingthumb")));
-    }
-    */
