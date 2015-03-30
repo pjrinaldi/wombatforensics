@@ -74,7 +74,7 @@ void TextViewer::FindCodecs()
 
 void TextViewer::GetTextContent()
 {
-    this->setWindowTitle("View Text - "); // populate filename here.
+    //this->setWindowTitle("View Text - "); // populate filename here.
     // OpenParentImage
     std::vector<std::string> pathvector;
     int imgid = 0;
@@ -121,8 +121,18 @@ void TextViewer::GetTextContent()
     // ReadFileToEncodedTextUsingByteArray
     if(tskptr->readfileinfo->meta != NULL)
     {
+        ssize_t textlen;
         char tbuffer[tskptr->readfileinfo->meta->size];
-        ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        if(tskptr->readfileinfo->meta->size > 2000000000) // 2 GB
+        {
+            tbuffer[2000000000];
+            qDebug() << "File is larger than 2GB. Export the file or use an external viewer. Otherwise showing 1st 2GB of text only.";
+            textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, 2000000000, TSK_FS_FILE_READ_FLAG_NONE);
+        }
+        else
+        {
+            textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        }
         txtdata = QByteArray::fromRawData(tbuffer, textlen);
         UpdateEncoding();
     }
