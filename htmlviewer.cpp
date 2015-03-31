@@ -2,6 +2,12 @@
 
 HtmlViewer::HtmlViewer(QWidget* parent) : QDialog(parent), ui(new Ui::HtmlViewer)
 {
+    ui->setupUi(this);
+    tskptr = &tskobj;
+    tskptr->readimginfo = NULL;
+    tskptr->readfsinfo = NULL;
+    tskptr->readfileinfo = NULL;
+    this->hide();
 }
 
 HtmlViewer::~HtmlViewer()
@@ -81,16 +87,7 @@ void HtmlViewer::GetHtmlContent()
         char tbuffer[tskptr->readfileinfo->meta->size];
         ssize_t htmllen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         htmldata = QByteArray::fromRawData(tbuffer, htmllen);
-        /*
-        if(tskptr->readfileinfo->meta->size > 2000000000) // 2 GB
-        {
-            qDebug() << "File is larger than 2GB. Export the file or use an external viewer. Otherwise showing 1st 2GB of text only.";
-        }
-        char tbuffer[tskptr->readfileinfo->meta->size];
-        ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-        txtdata = QByteArray::fromRawData(tbuffer, textlen);
-        UpdateEncoding();
-        */
+        ui->webView->setContent(htmldata, "text/html", QUrl(""));
     }
 }
 

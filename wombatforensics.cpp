@@ -64,6 +64,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     imagewindow = new ImageViewer();
     videowindow = new VideoViewer();
     textviewer = new TextViewer();
+    htmlviewer = new HtmlViewer();
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
@@ -79,6 +80,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
+    //connect(htmlviewer, SIGNAL(HideHtmlViewerWindow(bool)), this, SLOT(HideHtmlViewer(bool)), Qt::DirectConnection);
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionTextViewer, SIGNAL(triggered(bool)), this, SLOT(on_actionTextViewer_triggered(bool)), Qt::DirectConnection);
@@ -249,12 +251,16 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         videowindow->ShowVideo(wombatvarptr->tmpfilepath, index);
     }
-    else if(index.sibling(index.row(), 16).data().toString().contains("text/"))
+    else if(index.sibling(index.row(), 16).data().toString().contains("text/plain"))
     {
         // toggle the button...
         ui->actionTextViewer->setChecked(true);
         //ui->actionTextViewer->triggered(true);
         textviewer->ShowText(index);
+    }
+    else if(index.sibling(index.row(), 16).data().toString().contains("text/html"))
+    {
+        htmlviewer->ShowHtml(index);
     }
     else
     {
@@ -1250,6 +1256,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     videowindow->close();
     viewmanage->close();
     textviewer->close();
+    htmlviewer->close();
     RemoveTmpFiles();
     if(ProcessingComplete())
     {

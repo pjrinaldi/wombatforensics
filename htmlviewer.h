@@ -31,7 +31,7 @@ protected:
     void closeEvent(QCloseEvent* event);
 
 private:
-    Ui::HtmlViewer ui;
+    Ui::HtmlViewer* ui;
     TskObject tskobj;
     TskObject* tskptr;
     int curobjid;
