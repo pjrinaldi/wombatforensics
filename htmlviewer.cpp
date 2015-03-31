@@ -1,80 +1,37 @@
-#include "textviewer.h"
+#include "htmlviewer.h"
 
-TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer)
+HtmlViewer::HtmlViewer(QWidget* parent) : QDialog(parent), ui(new Ui::HtmlViewer)
 {
-    ui->setupUi(this);
-    tskptr = &tskobj;
-    tskptr->readimginfo = NULL;
-    tskptr->readfsinfo = NULL;
-    tskptr->readfileinfo = NULL;
-    FindCodecs();
-    ui->comboBox->clear();
-    foreach(QTextCodec* codec, codecs)
-        ui->comboBox->addItem(codec->name(), codec->mibEnum());
-    this->hide();
-    connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(GetTextContent()));
-    //connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding()));
 }
 
-TextViewer::~TextViewer()
+HtmlViewer::~HtmlViewer()
 {
     delete ui;
     this->close();
 }
 
-void TextViewer::HideClicked()
+void HtmlViewer::HideClicked()
 {
     this->hide();
-    emit HideTextViewerWindow(false);
+    emit HideHtmlViewerWindow(false);
 }
 
-void TextViewer::ShowText(const QModelIndex &index)
+void HtmlViewer::ShowHtml(const QModelIndex &index)
 {
     curobjid = index.sibling(index.row(), 0).data().toInt();
-    GetTextContent();
+    GetHtmlContent();
     this->show();
 }
 
-void TextViewer::closeEvent(QCloseEvent* e)
+void HtmlViewer::closeEvent(QCloseEvent* e)
 {
-    emit HideTextViewerWindow(false);
+    emit HideHtmlViewerWindow(false);
     e->accept();
 }
 
-void TextViewer::FindCodecs()
+void HtmlViewer::GetHtmlContent()
 {
-    QMap<QString, QTextCodec*> codecmap;
-    QRegExp iso8859regex("ISO[- ]8859-([0-9]+).*");
-
-    foreach(int mib, QTextCodec::availableMibs())
-    {
-        QTextCodec* codec = QTextCodec::codecForMib(mib);
-
-        QString sortkey = codec->name().toUpper();
-        int rank;
-
-        if(sortkey.startsWith("UTF-8"))
-            rank = 1;
-        else if(sortkey.startsWith("UTF-16"))
-            rank = 2;
-        else if(iso8859regex.exactMatch(sortkey))
-        {
-            if(iso8859regex.cap(1).size() == 1)
-                rank = 3;
-            else
-                rank = 4;
-        }
-        else
-            rank = 5;
-        sortkey.prepend(QChar('0' + rank));
-        codecmap.insert(sortkey, codec);
-    }
-    codecs = codecmap.values();
-}
-
-void TextViewer::GetTextContent()
-{
-    //this->setWindowTitle("View Text - "); // populate filename here.
+    //this->setWindowTitle("View Html - "); // populate filename here.
     // OpenParentImage
     std::vector<std::string> pathvector;
     int imgid = 0;
@@ -121,6 +78,10 @@ void TextViewer::GetTextContent()
     // ReadFileToEncodedTextUsingByteArray
     if(tskptr->readfileinfo->meta != NULL)
     {
+        char tbuffer[tskptr->readfileinfo->meta->size];
+        ssize_t htmllen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        htmldata = QByteArray::fromRawData(tbuffer, htmllen);
+        /*
         if(tskptr->readfileinfo->meta->size > 2000000000) // 2 GB
         {
             qDebug() << "File is larger than 2GB. Export the file or use an external viewer. Otherwise showing 1st 2GB of text only.";
@@ -129,17 +90,7 @@ void TextViewer::GetTextContent()
         ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         txtdata = QByteArray::fromRawData(tbuffer, textlen);
         UpdateEncoding();
+        */
     }
 }
 
-void TextViewer::UpdateEncoding()
-{
-    int mib = ui->comboBox->itemData(ui->comboBox->currentIndex()).toInt();
-    QTextCodec* codec = QTextCodec::codecForMib(mib);
-
-    QTextStream in(&txtdata);
-    in.setAutoDetectUnicode(false);
-    in.setCodec(codec);
-    decodedstring = in.readAll();
-    ui->textEdit->setPlainText(decodedstring);
-}
