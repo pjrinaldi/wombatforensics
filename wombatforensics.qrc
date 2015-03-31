@@ -1,45 +1,48 @@
 <RCC>
-    <qresource prefix="/">
-	<file alias="appicon">./Resources/wombat_32.ico</file>
-    </qresource>
-    <qresource prefix="/basic">
-        <file alias="treefolder">./Resources/folder.png</file>
-        <file alias="treefile">./Resources/text-x-generic.png</file>
-        <file alias="treeimg">./Resources/emblem-package-2.png</file>
-        <file alias="treevol">./Resources/drive-harddisk.png</file>
-        <file alias="treepart">./Resources/gparted.png</file>
-        <file alias="treefs">./Resources/foldersexplorer.png</file>
-        <file alias="virtualfile">./Resources/virtualfile.png</file>
-        <file alias="virtualfolder">./Resources/virtualfolder.png</file>
-        <file alias="filterimg">./Resources/filterlist.png</file>
-    </qresource>
-    <qresource prefix="/bar">
-        <file alias="hexview">./Resources/hexeditor.png</file>
-        <file alias="txtview">./Resources/texteditor.png</file>
-        <file alias="omniview">./Resources/omniviewer.png</file>
-        <file alias="propview">./Resources/iproperties.png</file>
-	<file alias="export">./Resources/format-indent-more.png</file>
-        <file alias="window">./Resources/window-new.png</file>
-        <file alias="bookmarkmgr">./Resources/bookmarks-organize.png</file>
-        <file alias="addfileto">./Resources/bookmark-new-4.png</file>
-        <file alias="addtobkmrk">./Resources/bookmark.png</file>
-        <file alias="addtonewbkmrk">./Resources/bookmark-new.png</file>
-        <file alias="about">./Resources/about.png</file>
-        <file alias="fileview">./Resources/fileviewer.png</file>
-        <file alias="bwimageview">./Resources/imageviewer.png</file>
-        <file alias="bwadd">./Resources/add.png</file>
-        <file alias="bwrem">./Resources/remove.png</file>
-        <file alias="newcase">./Resources/new-document.png</file>
-        <file alias="opencase">./Resources/open-document.png</file>
-        <file alias="missingthumb">./Resources/thumbmissing.png</file>
-        <file alias="viewermanager">./Resources/viewermanager.png</file>
-        <file alias="copyselect">./Resources/editcopy.png</file>
-        <file alias="textencode">./Resources/textencoder.png</file>
-    </qresource>
-    <qresource prefix="/html">
-        <file alias="infohtml">./Resources/information.html</file>
-    </qresource>
-    <qresource prefix="/magic">
-        <file alias="magicfile">./Resources/magic.mgc</file>
-    </qresource>
+  <qresource prefix="/">
+    <file alias="appicon">./Resources/wombat_32.ico</file>
+  </qresource>
+  <qresource prefix="/basic">
+    <file alias="treefolder">./Resources/folder.png</file>
+    <file alias="treefile">./Resources/text-x-generic.png</file>
+    <file alias="treeimg">./Resources/emblem-package-2.png</file>
+    <file alias="treevol">./Resources/drive-harddisk.png</file>
+    <file alias="treepart">./Resources/gparted.png</file>
+    <file alias="treefs">./Resources/foldersexplorer.png</file>
+    <file alias="virtualfile">./Resources/virtualfile.png</file>
+    <file alias="virtualfolder">./Resources/virtualfolder.png</file>
+    <file alias="filterimg">./Resources/filterlist.png</file>
+  </qresource>
+  <qresource prefix="/bar">
+    <file alias="collapseall">Resources/collapseall.png</file>
+    <file alias="expandall">Resources/expandall.png</file>
+    <file alias="logview">Resources/messages.png</file>
+    <file alias="hexview">./Resources/hexeditor.png</file>
+    <file alias="txtview">./Resources/texteditor.png</file>
+    <file alias="omniview">./Resources/omniviewer.png</file>
+    <file alias="propview">./Resources/iproperties.png</file>
+    <file alias="export">./Resources/format-indent-more.png</file>
+    <file alias="window">./Resources/window-new.png</file>
+    <file alias="bookmarkmgr">./Resources/bookmarks-organize.png</file>
+    <file alias="addfileto">./Resources/bookmark-new-4.png</file>
+    <file alias="addtobkmrk">./Resources/bookmark.png</file>
+    <file alias="addtonewbkmrk">./Resources/bookmark-new.png</file>
+    <file alias="about">./Resources/about.png</file>
+    <file alias="fileview">./Resources/fileviewer.png</file>
+    <file alias="bwimageview">./Resources/imageviewer.png</file>
+    <file alias="bwadd">./Resources/add.png</file>
+    <file alias="bwrem">./Resources/remove.png</file>
+    <file alias="newcase">./Resources/new-document.png</file>
+    <file alias="opencase">./Resources/open-document.png</file>
+    <file alias="missingthumb">./Resources/thumbmissing.png</file>
+    <file alias="viewermanager">./Resources/viewermanager.png</file>
+    <file alias="copyselect">./Resources/editcopy.png</file>
+    <file alias="textencode">./Resources/textencoder.png</file>
+  </qresource>
+  <qresource prefix="/html">
+    <file alias="infohtml">./Resources/information.html</file>
+  </qresource>
+  <qresource prefix="/magic">
+    <file alias="magicfile">./Resources/magic.mgc</file>
+  </qresource>
 </RCC>

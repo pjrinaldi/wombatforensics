@@ -96,7 +96,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -235,8 +235,11 @@
    <addaction name="actionView_Image_Gallery"/>
    <addaction name="separator"/>
    <addaction name="actionViewerManager"/>
+   <addaction name="actionViewMessageLog"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
+   <addaction name="actionCollapseAll"/>
+   <addaction name="actionExpandAll"/>
    <addaction name="actionCopy_Selection_To"/>
    <addaction name="actionExport_Evidence"/>
   </widget>
@@ -285,6 +288,9 @@
    </property>
    <property name="toolTip">
     <string>Log Viewer</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionExit">
@@ -491,6 +497,45 @@
    </property>
    <property name="text">
     <string>Text Viewer</string>
+   </property>
+  </action>
+  <action name="actionViewMessageLog">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/logview</normaloff>:/bar/logview</iconset>
+   </property>
+   <property name="text">
+    <string>View Message Log</string>
+   </property>
+   <property name="toolTip">
+    <string>View Message Log</string>
+   </property>
+  </action>
+  <action name="actionExpandAll">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/expandall</normaloff>:/bar/expandall</iconset>
+   </property>
+   <property name="text">
+    <string>Expand All</string>
+   </property>
+   <property name="toolTip">
+    <string>Expand All</string>
+   </property>
+  </action>
+  <action name="actionCollapseAll">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/collapseall</normaloff>:/bar/collapseall</iconset>
+   </property>
+   <property name="text">
+    <string>Collapse All</string>
+   </property>
+   <property name="toolTip">
+    <string>Collapse All</string>
    </property>
   </action>
  </widget>
