@@ -53,6 +53,9 @@ public:
     QAction *actionFile;
     QAction *actionTextSection;
     QAction *actionTextViewer;
+    QAction *actionViewMessageLog;
+    QAction *actionExpandAll;
+    QAction *actionCollapseAll;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -94,6 +97,7 @@ public:
         QIcon icon2;
         icon2.addFile(QStringLiteral(":/bar/window"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_Progress->setIcon(icon2);
+        actionView_Progress->setVisible(false);
         actionExit = new QAction(WombatForensics);
         actionExit->setObjectName(QStringLiteral("actionExit"));
         actionAdd_Evidence = new QAction(WombatForensics);
@@ -181,6 +185,22 @@ public:
         QIcon icon14;
         icon14.addFile(QStringLiteral(":/bar/textencode"), QSize(), QIcon::Normal, QIcon::Off);
         actionTextViewer->setIcon(icon14);
+        actionViewMessageLog = new QAction(WombatForensics);
+        actionViewMessageLog->setObjectName(QStringLiteral("actionViewMessageLog"));
+        actionViewMessageLog->setCheckable(true);
+        QIcon icon15;
+        icon15.addFile(QStringLiteral(":/bar/logview"), QSize(), QIcon::Normal, QIcon::Off);
+        actionViewMessageLog->setIcon(icon15);
+        actionExpandAll = new QAction(WombatForensics);
+        actionExpandAll->setObjectName(QStringLiteral("actionExpandAll"));
+        QIcon icon16;
+        icon16.addFile(QStringLiteral(":/bar/expandall"), QSize(), QIcon::Normal, QIcon::Off);
+        actionExpandAll->setIcon(icon16);
+        actionCollapseAll = new QAction(WombatForensics);
+        actionCollapseAll->setObjectName(QStringLiteral("actionCollapseAll"));
+        QIcon icon17;
+        icon17.addFile(QStringLiteral(":/bar/collapseall"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCollapseAll->setIcon(icon17);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -223,7 +243,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QStringLiteral("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 800, 21));
+        mainMenubar->setGeometry(QRect(0, 0, 800, 22));
         mainMenubar->setAcceptDrops(true);
         menuFile = new QMenu(mainMenubar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
@@ -238,14 +258,14 @@ public:
         menuAbout->setIcon(icon7);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon15;
-        icon15.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon15);
+        QIcon icon18;
+        icon18.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon18);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon16;
-        icon16.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon16);
+        QIcon icon19;
+        icon19.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon19);
         menuView = new QMenu(mainMenubar);
         menuView->setObjectName(QStringLiteral("menuView"));
         menuView_With = new QMenu(menuView);
@@ -309,8 +329,11 @@ public:
         analysisToolBar->addAction(actionView_Image_Gallery);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionViewerManager);
+        analysisToolBar->addAction(actionViewMessageLog);
         analysisToolBar->addAction(actionView_Progress);
         analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionCollapseAll);
+        analysisToolBar->addAction(actionExpandAll);
         analysisToolBar->addAction(actionCopy_Selection_To);
         analysisToolBar->addAction(actionExport_Evidence);
 
@@ -368,6 +391,18 @@ public:
         actionFile->setText(QApplication::translate("WombatForensics", "Carve to a File", 0));
         actionTextSection->setText(QApplication::translate("WombatForensics", "Copy Ascii to a Section", 0));
         actionTextViewer->setText(QApplication::translate("WombatForensics", "Text Viewer", 0));
+        actionViewMessageLog->setText(QApplication::translate("WombatForensics", "View Message Log", 0));
+#ifndef QT_NO_TOOLTIP
+        actionViewMessageLog->setToolTip(QApplication::translate("WombatForensics", "View Message Log", 0));
+#endif // QT_NO_TOOLTIP
+        actionExpandAll->setText(QApplication::translate("WombatForensics", "Expand All", 0));
+#ifndef QT_NO_TOOLTIP
+        actionExpandAll->setToolTip(QApplication::translate("WombatForensics", "Expand All", 0));
+#endif // QT_NO_TOOLTIP
+        actionCollapseAll->setText(QApplication::translate("WombatForensics", "Collapse All", 0));
+#ifndef QT_NO_TOOLTIP
+        actionCollapseAll->setToolTip(QApplication::translate("WombatForensics", "Collapse All", 0));
+#endif // QT_NO_TOOLTIP
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));

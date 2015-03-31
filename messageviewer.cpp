@@ -1,47 +1,47 @@
-/*
-#include "textviewer.h"
+#include "messageviewer.h"
 
-TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer)
+MessageViewer::MessageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::MessageViewer)
 {
     ui->setupUi(this);
-    tskptr = &tskobj;
-    tskptr->readimginfo = NULL;
-    tskptr->readfsinfo = NULL;
-    tskptr->readfileinfo = NULL;
-    FindCodecs();
-    ui->comboBox->clear();
-    foreach(QTextCodec* codec, codecs)
-        ui->comboBox->addItem(codec->name(), codec->mibEnum());
+    msglog = ui->textEdit;
+    //tskptr = &tskobj;
+    //tskptr->readimginfo = NULL;
+    //tskptr->readfsinfo = NULL;
+    //tskptr->readfileinfo = NULL;
+    //FindCodecs();
+    //ui->comboBox->clear();
+    //foreach(QTextCodec* codec, codecs)
+    //    ui->comboBox->addItem(codec->name(), codec->mibEnum());
     this->hide();
-    connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(GetTextContent()));
+    //connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(GetTextContent()));
     //connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding()));
 }
 
-TextViewer::~TextViewer()
+MessageViewer::~MessageViewer()
 {
     delete ui;
     this->close();
 }
 
-void TextViewer::HideClicked()
+void MessageViewer::HideClicked()
 {
     this->hide();
-    emit HideTextViewerWindow(false);
+    emit HideMessageViewerWindow(false);
 }
-
-void TextViewer::ShowText(const QModelIndex &index)
+/*
+void MessageViewer::ShowText(const QModelIndex &index)
 {
     curobjid = index.sibling(index.row(), 0).data().toInt();
     GetTextContent();
     this->show();
 }
-
-void TextViewer::closeEvent(QCloseEvent* e)
+*/
+void MessageViewer::closeEvent(QCloseEvent* e)
 {
-    emit HideTextViewerWindow(false);
+    emit HideMessageViewerWindow(false);
     e->accept();
 }
-
+/*
 void TextViewer::FindCodecs()
 {
     QMap<QString, QTextCodec*> codecmap;

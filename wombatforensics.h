@@ -20,7 +20,8 @@
 #include "viewermanager.h"
 #include "textviewer.h"
 #include "htmlviewer.h"
-
+#include "messageviewer.h"
+//#include "qdebugstream.h"
 
 class TreeModel : public QAbstractItemModel
 {
@@ -672,6 +673,7 @@ public:
     ViewerManager* viewmanage;
     TextViewer* textviewer;
     HtmlViewer* htmlviewer;
+    MessageViewer* msgviewer;
 
 signals:
     //void LogVariable(WombatVariable* wombatVariable);
@@ -688,6 +690,7 @@ private slots:
     void on_actionView_Image_Gallery_triggered(bool checked);
     void on_actionViewerManager_triggered(bool checked);
     void on_actionTextViewer_triggered(bool checked);
+    void on_actionViewMessageLog_triggered(bool checked);
     void on_actionCopy_Selection_To_triggered();
     void UpdateProgress(int count, int processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
@@ -697,6 +700,7 @@ private slots:
     void HideImageWindow(bool checkstate);
     void HideViewerManager(bool checkstate);
     void HideTextViewer(bool checkstate);
+    void HideMessageViewer(bool checkstate);
     void ShowExternalViewer();
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);

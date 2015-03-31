@@ -3,7 +3,6 @@
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
     ui->setupUi(this);
-    qDebug() << QImageReader::supportedImageFormats();
     threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
     this->menuBar()->hide();
@@ -65,10 +64,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     videowindow = new VideoViewer();
     textviewer = new TextViewer();
     htmlviewer = new HtmlViewer();
+    msgviewer = new MessageViewer();
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
+    msgviewer->setWindowIcon(QIcon(":/bar/logview"));
+    new Q_DebugStream(std::cout, msgviewer->msglog);
+    Q_DebugStream::registerQDebugMessageHandler(); // redirect qDebug() output to QTextEdit
+    qDebug() << "[INFO]" << "Supported Image Formats:" << QImageReader::supportedImageFormats();
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -77,13 +81,17 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.minmodify = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
+    qRegisterMetaType<QTextBlock>();
+    qRegisterMetaType<QTextCursor>();
     connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
+    connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     //connect(htmlviewer, SIGNAL(HideHtmlViewerWindow(bool)), this, SLOT(HideHtmlViewer(bool)), Qt::DirectConnection);
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionTextViewer, SIGNAL(triggered(bool)), this, SLOT(on_actionTextViewer_triggered(bool)), Qt::DirectConnection);
+    connect(ui->actionViewMessageLog, SIGNAL(triggered(bool)), this, SLOT(on_actionViewMessageLog_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
@@ -223,7 +231,7 @@ void WombatForensics::ShowExternalViewer()
         tmpfile.close();
     }
     //qDebug() << ((QAction*)QObject::sender())->text();
-    qDebug() << "implement external viewer code here.";
+    //qDebug() << "implement external viewer code here.";
     QProcess* process = new QProcess(this);
     QStringList arguments;
     arguments << tmpstring;
@@ -296,6 +304,11 @@ void WombatForensics::HideViewerManager(bool checkstate)
 void WombatForensics::HideTextViewer(bool checkstate)
 {
     ui->actionTextViewer->setChecked(checkstate);
+}
+
+void WombatForensics::HideMessageViewer(bool checkstate)
+{
+    ui->actionViewMessageLog->setChecked(checkstate);
 }
 
 void WombatForensics::InitializeAppStructure()
@@ -1257,6 +1270,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     viewmanage->close();
     textviewer->close();
     htmlviewer->close();
+    msgviewer->close();
     RemoveTmpFiles();
     if(ProcessingComplete())
     {
@@ -1385,6 +1399,14 @@ void WombatForensics::on_actionTextViewer_triggered(bool checked)
             textviewer->show();
         }
     }
+}
+
+void WombatForensics::on_actionViewMessageLog_triggered(bool checked)
+{
+    if(!checked) // hide viewer
+        msgviewer->hide();
+    else
+        msgviewer->show();
 }
 
 void WombatForensics::on_actionCopy_Selection_To_triggered()
@@ -1598,18 +1620,18 @@ void WombatForensics::UpdateFilterCount()
 
 void WombatForensics::AddSection()
 {
-    qDebug() << "Add selected hex to a new section";
+    //qDebug() << "Add selected hex to a new section";
 }
 
 void WombatForensics::AddTextSection()
 {
-    qDebug() << "Add selected text to a new section";
+    //qDebug() << "Add selected text to a new section";
 }
 
 void WombatForensics::CarveFile()
 {
     QString carvefilename = QFileDialog::getSaveFileName(this, tr("Carve to a File"), QDir::homePath()); 
-    qDebug() << "carve filename: " << carvefilename;
+    //qDebug() << "carve filename: " << carvefilename;
     if(carvefilename.compare("") != 0)
     {
         std::vector<uchar> tmpbytes;

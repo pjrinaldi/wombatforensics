@@ -4,8 +4,7 @@
 #include <iostream>
 #include <streambuf>
 #include <string>
-
-#include "QTextEdit.h"
+#include <QTextEdit>
 
 /*
  * HOW TO USE IN CODE
@@ -78,5 +77,7 @@ private:
     QTextEdit* log_window;
 };
 
+Q_DECLARE_METATYPE(QTextCursor);
+Q_DECLARE_METATYPE(QTextBlock);
 
 #endif // Q_DEBUGSTREAM_H

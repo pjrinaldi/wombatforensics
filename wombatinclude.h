@@ -38,7 +38,10 @@
 #include <QStatusBar>
 #include <QString>
 #include <QStringList>
+#include <QTextBlock>
 #include <QTextCodec>
+#include <QTextCursor>
+#include <QTextEdit>
 #include <QThread>
 #include <QThreadPool>
 #include <QTreeWidgetItem>
@@ -99,5 +102,6 @@
 #include "fs/tsk_hfs.h"
 #include "fs/tsk_yaffs.h"
 #include "magic.h"
+#include "qdebugstream.h"
 
 #endif // WOMBATINCLUDE_H

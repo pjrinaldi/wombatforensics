@@ -1,49 +1,48 @@
-/*
-#ifndef TEXTVIEWER_H
+#ifndef MESSAGEVIEWER_H
 
-#define TEXTVIEWER_H
+#define MESSAGEVIEWER_H
 
 #include "wombatinclude.h"
 #include "globals.h"
-#include "ui_textviewer.h"
+#include "ui_messageviewer.h"
 #include "wombatfunctions.h"
 
 namespace Ui
 {
-    class TextViewer;
+    class MessageViewer;
 }
 
-class TextViewer : public QDialog
+class MessageViewer : public QDialog
 {
     Q_OBJECT
         
 public:
-    TextViewer(QWidget* parent = 0);
-    ~TextViewer();
-    void ShowText(const QModelIndex &index);
+    MessageViewer(QWidget* parent = 0);
+    ~MessageViewer();
+    QTextEdit* msglog;
+    //void ShowMessage(const QModelIndex &index);
     
 private slots:
     void HideClicked();
-    void UpdateEncoding();
-    void GetTextContent();
+    //void UpdateEncoding();
+    //void GetTextContent();
 signals:
-    void HideTextViewerWindow(bool checkstate);
+    void HideMessageViewerWindow(bool checkstate);
 
 protected:
     void closeEvent(QCloseEvent* event);
 
 private:
-    Ui::TextViewer* ui;
-    TskObject tskobj;
-    TskObject* tskptr;
-    QByteArray txtdata;
-    QString decodedstring;
-    int curobjid;
-    QList<QTextCodec*> codecs;
-    void FindCodecs();
+    Ui::MessageViewer* ui;
+    //TskObject tskobj;
+    //TskObject* tskptr;
+    //QByteArray txtdata;
+    //QString decodedstring;
+    //int curobjid;
+    //QList<QTextCodec*> codecs;
+    //void FindCodecs();
 };
 
-Q_DECLARE_METATYPE(TextViewer*);
+Q_DECLARE_METATYPE(MessageViewer*);
 
-#endif // TEXTVIEWER_H
-*/
+#endif // MESSAGEVIEWER_H
