@@ -157,7 +157,6 @@ public:
         actionView_Image_Gallery->setIcon(icon11);
         actionViewerManager = new QAction(WombatForensics);
         actionViewerManager->setObjectName(QStringLiteral("actionViewerManager"));
-        actionViewerManager->setCheckable(true);
         QIcon icon12;
         icon12.addFile(QStringLiteral(":/bar/viewermanager"), QSize(), QIcon::Normal, QIcon::Off);
         actionViewerManager->setIcon(icon12);

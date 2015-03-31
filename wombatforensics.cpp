@@ -103,7 +103,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
-    connect(ui->actionViewerManager, SIGNAL(triggered(bool)), this, SLOT(on_actionViewerManager_triggered(bool)), Qt::DirectConnection);
+    connect(ui->actionViewerManager, SIGNAL(triggered()), this, SLOT(on_actionViewerManager_triggered()), Qt::DirectConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
@@ -296,10 +296,12 @@ void WombatForensics::HideProgressWindow(bool checkedstate)
 {
     ui->actionView_Progress->setChecked(checkedstate);
 }
+/*
 void WombatForensics::HideViewerManager(bool checkstate)
 {
-    ui->actionViewerManager->setChecked(checkstate);
+    //ui->actionViewerManager->setChecked(checkstate);
 }
+*/
 
 void WombatForensics::HideTextViewer(bool checkstate)
 {
@@ -350,7 +352,7 @@ void WombatForensics::InitializeAppStructure()
     fappdb = wombatvarptr->appdb;
     viewmanage = new ViewerManager(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
-    connect(viewmanage, SIGNAL(HideManagerWindow(bool)), this, SLOT(HideViewerManager(bool)), Qt::DirectConnection);
+    //connect(viewmanage, SIGNAL(HideManagerWindow(bool)), this, SLOT(HideViewerManager(bool)), Qt::DirectConnection);
     if(wombatdatabase->ReturnCaseCount() == 0)
     {
         ui->actionOpen_Case->setEnabled(false);
@@ -1377,14 +1379,14 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     }
 }
 
-void WombatForensics::on_actionViewerManager_triggered(bool checked)
+void WombatForensics::on_actionViewerManager_triggered()
 {
-    if(!checked) // hide viewer
-        viewmanage->hide();
-    else
-    {
+    //if(!checked) // hide viewer
+    //    viewmanage->hide();
+    //else
+   // {
         viewmanage->show();
-    }
+   // }
 }
 
 void WombatForensics::on_actionTextViewer_triggered(bool checked)

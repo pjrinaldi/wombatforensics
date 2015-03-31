@@ -21,7 +21,7 @@
 #include "textviewer.h"
 #include "htmlviewer.h"
 #include "messageviewer.h"
-//#include "qdebugstream.h"
+#include "qdebugstream.h"
 
 class TreeModel : public QAbstractItemModel
 {
@@ -688,7 +688,7 @@ private slots:
     void on_actionView_Progress_triggered(bool checked);
     void on_actionView_File_triggered(bool checked);
     void on_actionView_Image_Gallery_triggered(bool checked);
-    void on_actionViewerManager_triggered(bool checked);
+    void on_actionViewerManager_triggered();
     void on_actionTextViewer_triggered(bool checked);
     void on_actionViewMessageLog_triggered(bool checked);
     void on_actionCopy_Selection_To_triggered();
@@ -698,7 +698,7 @@ private slots:
     void HidePropertyWindow(bool checkstate);
     void HideFileViewer(bool checkstate);
     void HideImageWindow(bool checkstate);
-    void HideViewerManager(bool checkstate);
+//    void HideViewerManager(bool checkstate);
     void HideTextViewer(bool checkstate);
     void HideMessageViewer(bool checkstate);
     void ShowExternalViewer();

@@ -432,9 +432,6 @@
    </property>
   </action>
   <action name="actionViewerManager">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
      <normaloff>:/bar/viewermanager</normaloff>:/bar/viewermanager</iconset>
