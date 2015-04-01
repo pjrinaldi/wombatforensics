@@ -56,6 +56,7 @@ public:
     QAction *actionViewMessageLog;
     QAction *actionExpandAll;
     QAction *actionCollapseAll;
+    QAction *actionDigDeeper;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -200,6 +201,11 @@ public:
         QIcon icon17;
         icon17.addFile(QStringLiteral(":/bar/collapseall"), QSize(), QIcon::Normal, QIcon::Off);
         actionCollapseAll->setIcon(icon17);
+        actionDigDeeper = new QAction(WombatForensics);
+        actionDigDeeper->setObjectName(QStringLiteral("actionDigDeeper"));
+        QIcon icon18;
+        icon18.addFile(QStringLiteral(":/bar/dig"), QSize(), QIcon::Normal, QIcon::Off);
+        actionDigDeeper->setIcon(icon18);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -257,14 +263,14 @@ public:
         menuAbout->setIcon(icon7);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon18;
-        icon18.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon18);
+        QIcon icon19;
+        icon19.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon19);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon19;
-        icon19.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon19);
+        QIcon icon20;
+        icon20.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon20);
         menuView = new QMenu(mainMenubar);
         menuView->setObjectName(QStringLiteral("menuView"));
         menuView_With = new QMenu(menuView);
@@ -321,6 +327,8 @@ public:
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionAdd_Evidence);
         analysisToolBar->addAction(actionRemove_Evidence);
+        analysisToolBar->addAction(actionCollapseAll);
+        analysisToolBar->addAction(actionExpandAll);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionView_Properties);
         analysisToolBar->addAction(actionView_File);
@@ -331,8 +339,7 @@ public:
         analysisToolBar->addAction(actionViewMessageLog);
         analysisToolBar->addAction(actionView_Progress);
         analysisToolBar->addSeparator();
-        analysisToolBar->addAction(actionCollapseAll);
-        analysisToolBar->addAction(actionExpandAll);
+        analysisToolBar->addAction(actionDigDeeper);
         analysisToolBar->addAction(actionCopy_Selection_To);
         analysisToolBar->addAction(actionExport_Evidence);
 
@@ -401,6 +408,10 @@ public:
         actionCollapseAll->setText(QApplication::translate("WombatForensics", "Collapse All", 0));
 #ifndef QT_NO_TOOLTIP
         actionCollapseAll->setToolTip(QApplication::translate("WombatForensics", "Collapse All", 0));
+#endif // QT_NO_TOOLTIP
+        actionDigDeeper->setText(QApplication::translate("WombatForensics", "Dig Deeper", 0));
+#ifndef QT_NO_TOOLTIP
+        actionDigDeeper->setToolTip(QApplication::translate("WombatForensics", "Dig Deeper", 0));
 #endif // QT_NO_TOOLTIP
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));

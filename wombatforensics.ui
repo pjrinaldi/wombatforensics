@@ -228,6 +228,8 @@
    <addaction name="separator"/>
    <addaction name="actionAdd_Evidence"/>
    <addaction name="actionRemove_Evidence"/>
+   <addaction name="actionCollapseAll"/>
+   <addaction name="actionExpandAll"/>
    <addaction name="separator"/>
    <addaction name="actionView_Properties"/>
    <addaction name="actionView_File"/>
@@ -238,8 +240,7 @@
    <addaction name="actionViewMessageLog"/>
    <addaction name="actionView_Progress"/>
    <addaction name="separator"/>
-   <addaction name="actionCollapseAll"/>
-   <addaction name="actionExpandAll"/>
+   <addaction name="actionDigDeeper"/>
    <addaction name="actionCopy_Selection_To"/>
    <addaction name="actionExport_Evidence"/>
   </widget>
@@ -533,6 +534,18 @@
    </property>
    <property name="toolTip">
     <string>Collapse All</string>
+   </property>
+  </action>
+  <action name="actionDigDeeper">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/dig</normaloff>:/bar/dig</iconset>
+   </property>
+   <property name="text">
+    <string>Dig Deeper</string>
+   </property>
+   <property name="toolTip">
+    <string>Dig Deeper</string>
    </property>
   </action>
  </widget>

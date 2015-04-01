@@ -14,6 +14,7 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="dig">Resources/dig.png</file>
     <file alias="collapseall">Resources/collapseall.png</file>
     <file alias="expandall">Resources/expandall.png</file>
     <file alias="logview">Resources/messages.png</file>
