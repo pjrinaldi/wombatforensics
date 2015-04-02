@@ -36,7 +36,7 @@ private:
     TskObject* tskptr;
     QByteArray txtdata;
     QString decodedstring;
-    int curobjid;
+    unsigned long long curobjid;
     QList<QTextCodec*> codecs;
     void FindCodecs();
 };
