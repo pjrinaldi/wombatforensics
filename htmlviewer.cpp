@@ -24,7 +24,7 @@ void HtmlViewer::HideClicked()
 
 void HtmlViewer::ShowHtml(const QModelIndex &index)
 {
-    curobjid = index.sibling(index.row(), 0).data().toInt();
+    curobjid = index.sibling(index.row(), 0).data().toULongLong();
     GetHtmlContent();
     this->show();
 }
@@ -40,19 +40,19 @@ void HtmlViewer::GetHtmlContent()
     //this->setWindowTitle("View Html - "); // populate filename here.
     // OpenParentImage
     std::vector<std::string> pathvector;
-    int imgid = 0;
-    int fsid = 0;
-    int fsoffset = 0;
-    int address = 0;
+    unsigned long long imgid = 0;
+    unsigned long long fsid = 0;
+    unsigned long long fsoffset = 0;
+    unsigned long long address = 0;
     pathvector.clear();
     QSqlQuery pimgquery(fcasedb);
     pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
     pimgquery.addBindValue(curobjid);
     pimgquery.exec();
     pimgquery.next();
-    imgid = pimgquery.value(0).toInt();
-    fsid = pimgquery.value(1).toInt();
-    address = pimgquery.value(2).toInt();
+    imgid = pimgquery.value(0).toULongLong();
+    fsid = pimgquery.value(1).toULongLong();
+    address = pimgquery.value(2).toULongLong();
     pimgquery.finish();
     pimgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
     pimgquery.addBindValue(imgid);
@@ -76,7 +76,7 @@ void HtmlViewer::GetHtmlContent()
     pimgquery.addBindValue(fsid);
     pimgquery.exec();
     pimgquery.next();
-    fsoffset = pimgquery.value(0).toInt();
+    fsoffset = pimgquery.value(0).toULongLong();
     pimgquery.finish();
     tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
     // OpenFile

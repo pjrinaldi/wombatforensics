@@ -34,7 +34,7 @@ private:
     Ui::HtmlViewer* ui;
     TskObject tskobj;
     TskObject* tskptr;
-    int curobjid;
+    unsigned long long curobjid;
     QByteArray htmldata;
     
 };
