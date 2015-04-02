@@ -46,7 +46,7 @@ protected:
     {
         if (v == '\n')
         {
-            log_window->append("");
+            //log_window->append("");
         }
         return v;
     }

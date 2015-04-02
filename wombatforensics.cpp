@@ -70,7 +70,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
-    msgviewer->show();
     // qdebugstream
     new Q_DebugStream(std::cout, msgviewer->msglog);
     Q_DebugStream::registerQDebugMessageHandler(); // redirect qDebug() output to QTextEdit
@@ -176,6 +175,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     jumpbackward->setKey(Qt::CTRL + Qt::SHIFT + Qt::Key_J);
     connect(jumpforward, SIGNAL(activated()), this, SLOT(NextItem()));
     connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
+    msgviewer->show();
 }
 
 void WombatForensics::ShowExternalViewer()
@@ -1277,6 +1277,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     viewmanage->close();
     textviewer->close();
     htmlviewer->close();
+    msgviewer->msglog->clear();
     msgviewer->close();
     RemoveTmpFiles();
     if(ProcessingComplete())
