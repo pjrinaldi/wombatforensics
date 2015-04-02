@@ -1288,16 +1288,16 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         event->ignore();
         LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
     }
-    msgviewer->msglog->clear();
-    msgviewer->close();
-    if(magicptr != NULL)
-        magic_close(magicptr);
-    if(magicmimeptr != NULL)
-        magic_close(magicmimeptr);
+    //if(magicptr != NULL)
+    magic_close(magicptr);
+    //if(magicmimeptr != NULL)
+    magic_close(magicmimeptr);
     wombatdatabase->CloseLogDB();
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();
     wombatdatabase->CloseThumbDB();
+    //msgviewer->msglog->clear();
+    //msgviewer->close();
 }
 
 void WombatForensics::RemoveTmpFiles()
