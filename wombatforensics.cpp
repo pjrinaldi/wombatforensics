@@ -175,7 +175,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     jumpbackward->setKey(Qt::CTRL + Qt::SHIFT + Qt::Key_J);
     connect(jumpforward, SIGNAL(activated()), this, SLOT(NextItem()));
     connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
-    msgviewer->show();
+    //msgviewer->show();
 }
 
 void WombatForensics::ShowExternalViewer()
@@ -1277,6 +1277,8 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     viewmanage->close();
     textviewer->close();
     htmlviewer->close();
+    msgviewer->msglog->clear();
+    msgviewer->close();
     RemoveTmpFiles();
     if(ProcessingComplete())
     {
@@ -1289,15 +1291,16 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
     }
     //if(magicptr != NULL)
+    //magicptr = NULL;
     magic_close(magicptr);
+    //magic_close(magicptr);
     //if(magicmimeptr != NULL)
+    magicmimeptr = NULL;
     magic_close(magicmimeptr);
     wombatdatabase->CloseLogDB();
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();
     wombatdatabase->CloseThumbDB();
-    //msgviewer->msglog->clear();
-    //msgviewer->close();
 }
 
 void WombatForensics::RemoveTmpFiles()
