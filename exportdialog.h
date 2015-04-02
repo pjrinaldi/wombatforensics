@@ -13,7 +13,7 @@ class ExportDialog : public QDialog
     Q_OBJECT
     
 public:
-    explicit ExportDialog(QWidget *parent = 0, int curcheckcount = 0, int curlistcount = 0);
+    explicit ExportDialog(QWidget *parent = 0, unsigned long long curcheckcount = 0, unsigned long long curlistcount = 0);
     ~ExportDialog();
 
 signals:
@@ -25,8 +25,8 @@ private slots:
 
 private:
     Ui::ExportDialog *ui;
-    int checkcount;
-    int listcount;
+    unsigned long long checkcount;
+    unsigned long long listcount;
     QWidget* parentwidget;
 };
 

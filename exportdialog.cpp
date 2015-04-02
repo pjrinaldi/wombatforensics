@@ -1,7 +1,7 @@
 #include "exportdialog.h"
 #include "ui_exportdialog.h"
 
-ExportDialog::ExportDialog(QWidget *parent, int curcheckcount, int curlistcount) :
+ExportDialog::ExportDialog(QWidget *parent, unsigned long long curcheckcount, unsigned long long curlistcount) :
     QDialog(parent),
     ui(new Ui::ExportDialog)
 {
