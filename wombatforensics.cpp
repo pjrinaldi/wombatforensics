@@ -99,7 +99,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionView_File, SIGNAL(triggered(bool)), this, SLOT(on_actionView_File_triggered(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
-    connect(isignals, SIGNAL(ProgressUpdate(int, int)), this, SLOT(UpdateProgress(int, int)), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
     wombatvarptr->caseobject.id = 0;
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     propertywindow->setModal(false);
@@ -158,7 +158,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
     //connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), videowindow, SLOT(ShowVideo(const QModelIndex &)));
     //connect(ui->dirTreeView->model(), SIGNAL(headerDataChanged(Qt::Orientation, int, int)), ui->dirTreeView->header(), SLOT(headerDataChanged(Qt::Orientation, int, int)));
-    connect(imagewindow, SIGNAL(SendObjectToTreeView(int)), this, SLOT(SetSelectedFromImageViewer(int)));
+    connect(imagewindow, SIGNAL(SendObjectToTreeView(unsigned long long)), this, SLOT(SetSelectedFromImageViewer(unsigned long long)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(namefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(pathfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -182,19 +182,19 @@ void WombatForensics::ShowExternalViewer()
 {
     //OpenParentImage
     std::vector<std::string> pathvector;
-    int imgid = 0;
-    int fsid = 0;
-    int fsoffset = 0;
-    int address = 0;
+    unsigned long long imgid = 0;
+    unsigned long long fsid = 0;
+    unsigned long long fsoffset = 0;
+    unsigned long long address = 0;
     pathvector.clear();
     QSqlQuery pimgquery(fcasedb);
     pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
     pimgquery.addBindValue(wombatvarptr->selectedobject.id);
     pimgquery.exec();
     pimgquery.next();
-    imgid = pimgquery.value(0).toInt();
-    fsid = pimgquery.value(1).toInt();
-    address = pimgquery.value(2).toInt();
+    imgid = pimgquery.value(0).toULongLong();
+    fsid = pimgquery.value(1).toULongLong();
+    address = pimgquery.value(2).toULongLong();
     pimgquery.finish();
     pimgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
     pimgquery.addBindValue(imgid);
@@ -218,7 +218,7 @@ void WombatForensics::ShowExternalViewer()
     pimgquery.addBindValue(fsid);
     pimgquery.exec();
     pimgquery.next();
-    fsoffset = pimgquery.value(0).toInt();
+    fsoffset = pimgquery.value(0).toULongLong();
     pimgquery.finish();
     tskexternalptr->readfsinfo = tsk_fs_open_img(tskexternalptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
     // OpenFile
@@ -243,7 +243,7 @@ void WombatForensics::ShowExternalViewer()
     process->startDetached(((QAction*)QObject::sender())->text(), arguments);
 }
 
-void WombatForensics::SetSelectedFromImageViewer(int objectid)
+void WombatForensics::SetSelectedFromImageViewer(unsigned long long objectid)
 {
     // MAY NEED TO REMOVE THE HIGHLIGHTING FEATURE, BUT RATHER DISPLAY INFROMATION FOR THE FILE
     // SUCH AS THE PATH AND FILENAME
@@ -620,7 +620,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionView_Image_Gallery->setEnabled(true);
         ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
-        wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toInt(); // object id
+        wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
         wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
         wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
         LoadHexContents();
@@ -895,7 +895,7 @@ void WombatForensics::LoadComplete(bool isok)
 }
 */
 
-void WombatForensics::OpenParentImage(int imgid)
+void WombatForensics::OpenParentImage(unsigned long long imgid)
 {
     wombatdatabase->GetEvidenceObjects();
     int curidx = 0;
@@ -918,9 +918,9 @@ void WombatForensics::OpenParentImage(int imgid)
     free(tskobjptr->imagepartspath);
 }
 
-void WombatForensics::OpenParentFileSystem(int fsid)
+void WombatForensics::OpenParentFileSystem(unsigned long long fsid)
 {
-    int fsoffset = wombatdatabase->ReturnFileSystemOffset(fsid);
+    unsigned long long fsoffset = wombatdatabase->ReturnFileSystemOffset(fsid);
     tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
 }
 
@@ -955,7 +955,7 @@ void WombatForensics::RemEvidence()
     wombatvarptr->evidremovestring = QInputDialog::getItem(this, tr("Remove Existing Evidence"), tr("Select the Evidence to Remove: "), wombatvarptr->evidencenamelist, 0, false, &ok);
     if(ok && !wombatvarptr->evidremovestring.isEmpty()) // remove selected evidence
     {
-        wombatvarptr->evidremoveid = wombatvarptr->evidremovestring.split(".").at(0).toInt();
+        wombatvarptr->evidremoveid = wombatvarptr->evidremovestring.split(".").at(0).toULongLong();
         if(wombatvarptr->evidremoveid > 0)
         {
             StartJob(4, wombatvarptr->caseobject.id, wombatvarptr->evidremoveid);
@@ -980,9 +980,9 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
             if(curnode->checkstate == 2)
             {
                 TskObject tmpobj;
-                tmpobj.address = curnode->nodevalues.at(5).toInt();
-                tmpobj.length = curnode->nodevalues.at(3).toInt();
-                tmpobj.type = curnode->nodevalues.at(12).toInt();
+                tmpobj.address = curnode->nodevalues.at(5).toULongLong();
+                tmpobj.length = curnode->nodevalues.at(3).toULongLong();
+                tmpobj.type = curnode->nodevalues.at(12).toULongLong();
                 tmpobj.objecttype = 5;
                 tmpobj.offset = 0;
                 tmpobj.readimginfo = NULL;
@@ -990,7 +990,7 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
                 tmpobj.readfileinfo = NULL;
                 curlist.append(tmpobj);
                 exportdata->exportcount = totalchecked;
-                exportdata->id = curnode->nodevalues.at(0).toInt();
+                exportdata->id = curnode->nodevalues.at(0).toULongLong();
                 exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
                 exportdata->fullpath = exportdata->exportpath;
                 exportdata->fullpath += "/";
@@ -1005,9 +1005,9 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
         else
         {
             TskObject tmpobj;
-            tmpobj.address = curnode->nodevalues.at(5).toInt();
-            tmpobj.length = curnode->nodevalues.at(3).toInt();
-            tmpobj.type = curnode->nodevalues.at(12).toInt();
+            tmpobj.address = curnode->nodevalues.at(5).toULongLong();
+            tmpobj.length = curnode->nodevalues.at(3).toULongLong();
+            tmpobj.type = curnode->nodevalues.at(12).toULongLong();
             tmpobj.objecttype = 5;
             tmpobj.offset = 0;
             tmpobj.readimginfo = NULL;
@@ -1015,7 +1015,7 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
             tmpobj.readfileinfo = NULL;
             curlist.append(tmpobj);
             exportdata->exportcount = totalchecked;
-            exportdata->id = curnode->nodevalues.at(0).toInt();
+            exportdata->id = curnode->nodevalues.at(0).toULongLong();
             exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
             exportdata->fullpath = exportdata->exportpath;
             exportdata->fullpath += "/";
@@ -1101,10 +1101,10 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         exportdata->fullpath += "/";
         exportfilelist.push_back(*exportdata);
         TskObject tmpobj;
-        tmpobj.address = selectedindex.sibling(selectedindex.row(), 5).data().toInt();
+        tmpobj.address = selectedindex.sibling(selectedindex.row(), 5).data().toULongLong();
         tmpobj.offset = 0;
-        tmpobj.length = selectedindex.sibling(selectedindex.row(), 3).data().toInt();
-        tmpobj.type = selectedindex.sibling(selectedindex.row(), 12).data().toInt();
+        tmpobj.length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
+        tmpobj.type = selectedindex.sibling(selectedindex.row(), 12).data().toULongLong();
         tmpobj.objecttype = 5;
         tmpobj.readimginfo = NULL;
         tmpobj.readfsinfo = NULL;
@@ -1190,7 +1190,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%"));
 }
 
-void WombatForensics::UpdateProgress(int filecount, int processcount)
+void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)
 {
     int curprogress = (int)((((float)processcount)/(float)filecount)*100);
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));

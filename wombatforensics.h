@@ -103,17 +103,17 @@ public:
         {
             if(filtervalues.maxidbool && filtervalues.minidbool == false)
             {
-                if(node->nodevalues.at(0).toInt() <= filtervalues.maxid)
+                if(node->nodevalues.at(0).toULongLong() <= filtervalues.maxid)
                     return QColor(Qt::lightGray);
             }
             if(filtervalues.minidbool && filtervalues.maxidbool == false)
             {
-                if(node->nodevalues.at(0).toInt() >= filtervalues.minid)
+                if(node->nodevalues.at(0).toULongLong() >= filtervalues.minid)
                     return QColor(Qt::lightGray);
             }
             if(filtervalues.maxidbool && filtervalues.minidbool)
             {
-                if(node->nodevalues.at(0).toInt() >= filtervalues.minid || node->nodevalues.at(0).toInt() <= filtervalues.maxid)
+                if(node->nodevalues.at(0).toULongLong() >= filtervalues.minid || node->nodevalues.at(0).toULongLong() <= filtervalues.maxid)
                     return QColor(Qt::lightGray);
             }
             if(filtervalues.namebool)
@@ -128,17 +128,17 @@ public:
             }
             if(filtervalues.maxsizebool && filtervalues.minsizebool == false)
             {
-                if(node->nodevalues.at(3).toInt() <= filtervalues.maxsize)
+                if(node->nodevalues.at(3).toULongLong() <= filtervalues.maxsize)
                     return QColor(Qt::lightGray);
             }
             if(filtervalues.minsizebool && filtervalues.maxsizebool == false)
             {
-                if(node->nodevalues.at(3).toInt() >= filtervalues.minsize)
+                if(node->nodevalues.at(3).toULongLong() >= filtervalues.minsize)
                     return QColor(Qt::lightGray);
             }
             if(filtervalues.maxsizebool && filtervalues.minsizebool)
             {
-                if(node->nodevalues.at(3).toInt() >= filtervalues.minsize || node->nodevalues.at(3).toInt() <= filtervalues.maxsize)
+                if(node->nodevalues.at(3).toULongLong() >= filtervalues.minsize || node->nodevalues.at(3).toULongLong() <= filtervalues.maxsize)
                     return QColor(Qt::lightGray);
             }
             if(node->nodevalues.at(4).toInt() == 5)
@@ -222,7 +222,7 @@ public:
                 {
                     for(int i=0; i < filtervalues.hashidlist.count(); i++)
                     {
-                        if(node->nodevalues.at(0).toInt() == filtervalues.hashidlist.at(i))
+                        if(node->nodevalues.at(0).toULongLong() == filtervalues.hashidlist.at(i))
                             return QColor(Qt::lightGray);
                     }
                 }
@@ -386,7 +386,7 @@ public:
         Node* parentnode = NodeFromIndex(parent);
         if(parentnode == rootnode)
             return false;
-        if(parentnode->children.count() < parentnode->childcount && parentnode->haschildren == true)
+        if((unsigned long long)parentnode->children.count() < parentnode->childcount && parentnode->haschildren == true)
             return true;
         return false;
     };
@@ -400,8 +400,8 @@ public:
         {
             QSqlQuery morequery(fcasedb);
             morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature FROM data WHERE objecttype == 5 AND parentid = ? AND parimgid = ?");
-            morequery.addBindValue(parentnode->nodevalues.at(5).toInt());
-            morequery.addBindValue(parentnode->nodevalues.at(13).toInt());
+            morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
+            morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
             if(morequery.exec())
             {
                 beginInsertRows(parent, 0, parentnode->childcount - 1);
@@ -419,7 +419,7 @@ public:
                     }
                     else
                     {
-                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toInt(), parentnode->nodevalues.at(13).toInt());
+                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong());
                         curchild->haschildren = curchild->HasChildren();
                     }
                     parentnode->children.append(curchild);
@@ -446,7 +446,7 @@ public:
         }
     };
 
-    void RemEvidence(int curid)
+    void RemEvidence(unsigned long long curid)
     {
         int rownumber = rootnode->GetChildRow(curid);
         beginRemoveRows(QModelIndex(), rownumber, rownumber);
@@ -455,7 +455,7 @@ public:
         endRemoveRows();
     };
 
-    void AddEvidence(int curid)
+    void AddEvidence(unsigned long long curid)
     {
         int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
@@ -479,7 +479,7 @@ public:
                     rootnode->childcount++;
                     rootnode->haschildren = rootnode->HasChildren();
                     currentnode->parent = rootnode;
-                    currentnode->childcount = GetChildCount(1, currentnode->nodevalues.at(0).toInt());
+                    currentnode->childcount = GetChildCount(1, currentnode->nodevalues.at(0).toULongLong());
                     currentnode->haschildren = currentnode->HasChildren();
                     parentnode = currentnode;
                 }
@@ -487,7 +487,7 @@ public:
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
-                    currentnode->childcount = GetChildCount(2, currentnode->nodevalues.at(0).toInt(), curid);
+                    currentnode->childcount = GetChildCount(2, currentnode->nodevalues.at(0).toULongLong(), curid);
                     currentnode->haschildren = currentnode->HasChildren();
                     parentnode = currentnode;
                 }
@@ -525,7 +525,7 @@ public:
                     {
                         for(int i=0; i < parentnode->children.count(); i++)
                         {
-                            if(filequery.value(14).toInt() == parentnode->children.at(i)->nodevalues.at(0).toInt())
+                            if(filequery.value(14).toULongLong() == parentnode->children.at(i)->nodevalues.at(0).toULongLong())
                                 rootdirectory = parentnode->children.at(i);
                         }
                         currentnode->parent = rootdirectory;
@@ -536,7 +536,7 @@ public:
                         }
                         else
                         {
-                            currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toInt(), curid);
+                            currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toULongLong(), curid);
                             currentnode->haschildren = currentnode->HasChildren();
                         }
                         rootdirectory->children.append(currentnode);
@@ -574,7 +574,7 @@ private:
     void SetParentCheckState(const QModelIndex &index)
     {
         Node* curnode = NodeFromIndex(index);
-        int checkcount = 0;
+        unsigned long long checkcount = 0;
         for(int i=0; i < curnode->children.count(); i++)
         {
             if(curnode->children[i]->checkstate == 2 || curnode->children[i]->checkstate == 1)
@@ -691,7 +691,7 @@ private slots:
     void on_actionTextViewer_triggered(bool checked);
     void on_actionViewMessageLog_triggered(bool checked);
     void on_actionCopy_Selection_To_triggered();
-    void UpdateProgress(int count, int processcount);
+    void UpdateProgress(unsigned long long count, unsigned long long processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);
     void HidePropertyWindow(bool checkstate);
@@ -703,8 +703,8 @@ private slots:
     void ShowExternalViewer();
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
-    void OpenParentImage(int imgid);
-    void OpenParentFileSystem(int fsid);
+    void OpenParentImage(unsigned long long imgid);
+    void OpenParentFileSystem(unsigned long long fsid);
     void OpenFileSystemFile(void);
     void ResizeViewColumns(const QModelIndex &index)
     {
@@ -742,7 +742,7 @@ private slots:
     void NextItem();
     void PreviousItem();
     void UpdateThumbnails(int tsize);
-    void SetSelectedFromImageViewer(int selectedid);
+    void SetSelectedFromImageViewer(unsigned long long selectedid);
     void ShowFile(const QModelIndex &index);
     void AddSection(void);
     void AddTextSection(void);
