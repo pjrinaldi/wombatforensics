@@ -17,9 +17,9 @@ void IdFilter::DisplayFilter()
     idquery.prepare("SELECT COUNT(objectid) FROM data;");
     idquery.exec();
     idquery.next();
-    ui->morespinBox->setMaximum(idquery.value(0).toInt());
+    ui->morespinBox->setMaximum(idquery.value(0).toULongLong());
     ui->morespinBox->setMinimum(1);
-    ui->lessspinBox->setMaximum(idquery.value(0).toInt());
+    ui->lessspinBox->setMaximum(idquery.value(0).toULongLong());
     ui->lessspinBox->setMinimum(1);
     ui->morespinBox->setValue(filtervalues.maxid);
     ui->lessspinBox->setValue(filtervalues.minid);
@@ -114,8 +114,8 @@ void SizeFilter::DisplayFilter()
     sizequery.prepare("SELECT MAX(size) FROM data;");
     sizequery.exec();
     sizequery.next();
-    ui->morespinBox->setMaximum(sizequery.value(0).toInt());
-    ui->lessspinBox->setMaximum(sizequery.value(0).toInt());
+    ui->morespinBox->setMaximum(sizequery.value(0).toULongLong());
+    ui->lessspinBox->setMaximum(sizequery.value(0).toULongLong());
     ui->morespinBox->setValue(filtervalues.maxsize);
     ui->lessspinBox->setValue(filtervalues.minsize);
     sizequery.finish();
@@ -368,7 +368,7 @@ void HashFilter::HideClicked()
             while(hashquery.next())
             {
                 filtervalues.hashlist.append(hashquery.value(0).toString());
-                filtervalues.hashcount.append(hashquery.value(1).toInt());
+                filtervalues.hashcount.append(hashquery.value(1).toULongLong());
             }
         }
         else
@@ -382,7 +382,7 @@ void HashFilter::HideClicked()
             {
                 while(hashquery.next())
                 {
-                    filtervalues.hashidlist.append(hashquery.value(0).toInt());
+                    filtervalues.hashidlist.append(hashquery.value(0).toULongLong());
                 }
             }
             else
