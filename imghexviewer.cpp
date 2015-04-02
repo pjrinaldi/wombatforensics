@@ -935,15 +935,15 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
         for(int c = col_start; c <= col_stop; c++)
         {
             int widx = r*_cols+c;
-            int curoffset = globalOffset(widx);
+            unsigned long long curoffset = globalOffset(widx);
             paint.setPen(QColor(0, 0, 0, 255)); // BLACK
             paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
             if(tskptr->blkaddrlist.count() > 0)
             {
                 for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
                 {
-                    int curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1;
-                    int curblkend = curblkstart + tskptr->blocksize;
+                    unsigned long long curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toULongLong()*tskptr->blocksize - 1;
+                    unsigned long long curblkend = curblkstart + tskptr->blocksize;
                     if(curoffset > curblkstart && curoffset <= curblkend)
                     {
                         paint.setPen(QColor(0, 0, 255, 255)); // BLUE
@@ -961,8 +961,8 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
             }
             else // resident attribute
             {
-                int curblkstart = tskptr->resoffset + tskptr->fsoffset;
-                int curblkend = curblkstart + mftrecordsize;
+                unsigned long long curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                unsigned long long curblkend = curblkstart + mftrecordsize;
                 //int curblkend = curblkstart + tskptr->length;
                 if(curoffset >= curblkstart && curoffset < curblkend)
                 {
@@ -981,15 +981,15 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
         for(int c = col_start; c <= col_stop; c++)
         {
             int widx = r*_cols+c;
-            int curoffset = globalOffset(widx);
+            unsigned long long curoffset = globalOffset(widx);
             paint.setPen(QColor(0, 0, 0, 255)); // BLACK
             paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
             if(tskptr->blkaddrlist.count() > 0)
             {
                 for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
                 {
-                    int curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toInt()*tskptr->blocksize - 1;
-                    int curblkend = curblkstart + tskptr->blocksize;
+                    unsigned long long curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toULongLong()*tskptr->blocksize - 1;
+                    unsigned long long curblkend = curblkstart + tskptr->blocksize;
                     if(curoffset > curblkstart && curoffset <= curblkend)
                     {
                         paint.setPen(QColor(0, 0, 255, 255)); // BLUE
@@ -1007,8 +1007,8 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
             }
             else // resident attribute
             {
-                int curblkstart = tskptr->resoffset + tskptr->fsoffset;
-                int curblkend = curblkstart + mftrecordsize;
+                unsigned long long curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                unsigned long long curblkend = curblkstart + mftrecordsize;
                 //int curblkend = curblkstart + tskptr->length;
                 if(curoffset >= curblkstart && curoffset < curblkend)
                 {
