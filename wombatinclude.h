@@ -102,6 +102,6 @@
 #include "fs/tsk_hfs.h"
 #include "fs/tsk_yaffs.h"
 #include "magic.h"
-#include "qdebugstream.h"
+//#include "qdebugstream.h"
 
 #endif // WOMBATINCLUDE_H

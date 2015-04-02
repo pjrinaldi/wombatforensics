@@ -21,7 +21,6 @@
 #include "textviewer.h"
 #include "htmlviewer.h"
 #include "messageviewer.h"
-#include "qdebugstream.h"
 
 class TreeModel : public QAbstractItemModel
 {

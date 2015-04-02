@@ -102,13 +102,14 @@ bool FileExists(const std::string& filename)
 bool ProcessingComplete()
 {
     bool processingcomplete = false;
-    if((threadvector.count() == 0) && ((filesfound - filesprocessed) > 0))
+    if((threadvector.count() == 0) && ((filesfound - filesprocessed) == 0))
         return true;
     for(int i = 0; i < threadvector.count(); i++)
     {
         processingcomplete = threadvector[i].isFinished();
     }
-    if(filesfound - filesprocessed > 0)
+    //qDebug() << "processing complete var:" << processingcomplete;
+    if(filesfound - filesprocessed == 0)
         return true;
     
     return processingcomplete;
@@ -141,7 +142,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList 
         //qDebug() << tmpstrings[0] << tmpstrings[3];
         
         fquery.exec();
-        int tmpid = fquery.lastInsertId().toInt();
+        long long int tmpid = fquery.lastInsertId().toLongLong();
         fquery.finish();
         for(int i=0; i < tmplist.count()/3; i++)
         {

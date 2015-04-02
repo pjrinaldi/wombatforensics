@@ -71,12 +71,12 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     // qdebugstream
-    new Q_DebugStream(std::cout, msgviewer->msglog);
-    Q_DebugStream::registerQDebugMessageHandler(); // redirect qDebug() output to QTextEdit
-    qDebug() << "[INFO]" << "Supported Image Formats:" << QImageReader::supportedImageFormats() << newline;
-    qDebug() << "[INFO]" << "test for line break." << newline;
+    //new Q_DebugStream(std::cout, msgviewer->msglog);
+    //Q_DebugStream::registerQDebugMessageHandler(); // redirect qDebug() output to QTextEdit
+    //qDebug() << "[INFO]" << "Supported Image Formats:" << QImageReader::supportedImageFormats(); //<< newline;
+    //qDebug() << "[INFO]" << "test for line break.";// << newline;
     //std::cout << "[INFO]" << "COUT test" << std::endl;
-    qDebug() << "have to fix this." << newline;
+    //qDebug() << "have to fix this.";// << newline;
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -85,8 +85,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.minmodify = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
-    qRegisterMetaType<QTextBlock>();
-    qRegisterMetaType<QTextCursor>();
+    //qRegisterMetaType<QTextBlock>();
+    //qRegisterMetaType<QTextCursor>();
     connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
@@ -1277,26 +1277,27 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     viewmanage->close();
     textviewer->close();
     htmlviewer->close();
-    msgviewer->msglog->clear();
+    //msgviewer->msglog->clear();
     msgviewer->close();
     RemoveTmpFiles();
     if(ProcessingComplete())
     {
         event->accept();
         LogEntry(0, 0, 0, 1, "All threads are done. Exiting...");
+        magic_close(magicptr);
+        magic_close(magicmimeptr);
     }
     else
     {
         event->ignore();
         LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
+        qDebug() << "processing complete has a glitch which is hanging this up.";
     }
     //if(magicptr != NULL)
     //magicptr = NULL;
-    magic_close(magicptr);
     //magic_close(magicptr);
     //if(magicmimeptr != NULL)
-    magicmimeptr = NULL;
-    magic_close(magicmimeptr);
+    //magicmimeptr = NULL;
     wombatdatabase->CloseLogDB();
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();
