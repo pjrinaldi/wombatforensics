@@ -11,15 +11,15 @@ extern QString fdbname;
 extern QThreadPool* threadpool;
 extern QVector<QFuture<void> > threadvector;
 extern QFutureWatcher<void> filewatcher;
-extern int filesfound;
-extern int filesprocessed;
-extern int totalcount;
-extern int totalchecked;
-extern int currentevidenceid;
-extern int exportcount;
-extern int currentfilesystemid;
-extern int errorcount;
-extern int currentjobid;
+extern unsigned long long filesfound;
+extern unsigned long long filesprocessed;
+extern unsigned long long totalcount;
+extern unsigned long long totalchecked;
+extern unsigned long long currentevidenceid;
+extern unsigned long long exportcount;
+extern unsigned long long currentfilesystemid;
+extern unsigned long long errorcount;
+extern unsigned long long currentjobid;
 extern int thumbsize;
 extern int mftrecordsize;
 extern QString currentevidencename;
@@ -40,16 +40,16 @@ struct FilterValues
 {
     bool maxidbool;
     bool minidbool;
-    int maxid;
-    int minid;
+    unsigned long long maxid;
+    unsigned long long minid;
     bool namebool;
     QString namefilter;
     bool pathbool;
     QString pathfilter;
     bool maxsizebool;
     bool minsizebool;
-    int maxsize;
-    int minsize;
+    unsigned long long maxsize;
+    unsigned long long minsize;
     bool maxcreatebool;
     bool mincreatebool;
     int maxcreate;
@@ -72,8 +72,8 @@ struct FilterValues
     QString filetype;
     bool hashbool;
     QStringList hashlist;
-    QVector<int> hashcount;
-    QVector<int> hashidlist;
+    QVector<unsigned long long> hashcount;
+    QVector<unsigned long long> hashidlist;
 };
 
 extern FilterValues filtervalues;
@@ -88,7 +88,7 @@ public:
     void ProgUpd(void) { emit(ProgressUpdate(filesfound, filesprocessed)); }
 
 signals:
-    void ProgressUpdate(int filecount, int processcount);
+    void ProgressUpdate(unsigned long long filecount, unsigned long long processcount);
 
 };
 
@@ -121,8 +121,8 @@ public:
     Node* parent;
     QList<Node*> children;
     bool haschildren;
-    int parentid;
-    int childcount;
+    unsigned long long parentid;
+    unsigned long long childcount;
     int checkstate;
     bool HasChildren(void)
     {
@@ -134,11 +134,11 @@ public:
     {
         children.removeAt(idx);
     };
-    int GetChildRow(int curid)
+    int GetChildRow(unsigned long long curid)
     {
         for(int i=0; i < children.count(); i++)
         {
-            if(curid == children.at(i)->nodevalues.at(0).toInt())
+            if(curid == children.at(i)->nodevalues.at(0).toULongLong())
                 return i;
         }
         return -1;

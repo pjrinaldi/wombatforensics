@@ -8,16 +8,16 @@ struct TskObject
 {
     const TSK_TCHAR** imagepartspath;
     int partcount;
-    int offset;
-    int length;
-    int imglength;
-    int address;
+    unsigned long long offset;
+    unsigned long long length;
+    unsigned long long imglength;
+    unsigned long long address;
     int objecttype;
     int type;
     int blocksize;
     int sectsize;
-    int fsoffset;
-    int resoffset;
+    unsigned long long fsoffset;
+    unsigned long long resoffset;
     QString blockaddress;
     QStringList blkaddrlist;
     TSK_IMG_INFO* readimginfo;
@@ -27,8 +27,8 @@ struct TskObject
 
 struct FileSystemObject
 {
-    int id;
-    int rootinum;
+    unsigned long long id;
+    unsigned long long rootinum;
 };
 
 #endif // TSKVARIABLE_H

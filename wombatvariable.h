@@ -5,7 +5,7 @@
 
 struct CaseObject
 {
-    int id;
+    unsigned long long id;
     QString name;
     QString dbname;
     QString dirpath;
@@ -13,15 +13,15 @@ struct CaseObject
 
 struct EvidenceObject
 {
-    int id;
+    unsigned long long id;
     int type;
     int objecttype;
-    int itemcount;
+    unsigned long long itemcount;
     QString name;
-    int size;
+    unsigned long long size;
     int sectsize;
-    int parentid;
-    int parimgid;
+    unsigned long long parentid;
+    unsigned long long parimgid;
     QStringList namelist;
     QString fullpath; 
     std::vector<std::string> fullpathvector;
@@ -29,7 +29,7 @@ struct EvidenceObject
     TSK_VS_INFO* volinfo;
     std::vector<const TSK_VS_PART_INFO*> partinfovector;
     std::vector<TSK_FS_INFO*> fsinfovector;
-    std::vector<int> fsidvector;
+    std::vector<unsigned long long> fsidvector;
     QString dbname;
     void Clear()
     {
@@ -67,34 +67,34 @@ struct FileExportData
     };
 
     std::string exportpath;
-    int id;
+    unsigned long long id;
     FileStatus filestatus;
     PathStatus pathstatus;
     std::string name;
     std::string fullpath;
     EvidenceObject evidenceobject;
-    int exportcount;
+    unsigned long long exportcount;
 };
 
 struct SelectedObject
 {
-    int id;
+    unsigned long long id;
     int objtype;
     QString name;
     QString fullpath;
     QString blockaddress;
     QString filesignature;
     QString filemime;
-    int size;
-    int parimgid;
-    int parfsid;
+    unsigned long long size;
+    unsigned long long parimgid;
+    unsigned long long parfsid;
     int sectsize;
-    int sectstart;
-    int sectlength;
+    unsigned long long sectstart;
+    unsigned long long sectlength;
     int blocksize;
-    int blockcount;
-    int byteoffset;
-    int address;
+    unsigned long long blockcount;
+    unsigned long long byteoffset;
+    unsigned long long address;
     int type;
     int flags;
 };
@@ -122,16 +122,16 @@ struct WombatVariable
 
     // id values
     int jobtype;
-    int jobid;
-    int fileid;
-    int volid;
-    int filecount;
-    int processcount;
-    int currentevidenceid;
-    int currentvolumeid;
-    int currentpartitionid;
-    int currentfilesystemid;
-    int currentrootinum;
+    unsigned long long jobid;
+    unsigned long long fileid;
+    unsigned long long volid;
+    unsigned long long filecount;
+    unsigned long long processcount;
+    unsigned long long currentevidenceid;
+    unsigned long long currentvolumeid;
+    unsigned long long currentpartitionid;
+    unsigned long long currentfilesystemid;
+    unsigned long long currentrootinum;
     QString currentevidencename;
     QString currentvolumename;
     QString casespath;
@@ -142,8 +142,8 @@ struct WombatVariable
     QString wombatdbname;
     QString thumbdbname;
     QString evidremovestring;
-    int evidremoveid;
-    int evidrowsremoved;
+    unsigned long long evidremoveid;
+    unsigned long long evidrowsremoved;
     CaseObject caseobject;
     QStringList casenamelist;
     QStringList evidencenamelist;
