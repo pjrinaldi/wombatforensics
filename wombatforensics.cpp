@@ -70,6 +70,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
+    // qdebugstream
     new Q_DebugStream(std::cout, msgviewer->msglog);
     Q_DebugStream::registerQDebugMessageHandler(); // redirect qDebug() output to QTextEdit
     qDebug() << "[INFO]" << "Supported Image Formats:" << QImageReader::supportedImageFormats();
