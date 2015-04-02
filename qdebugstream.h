@@ -55,6 +55,9 @@ protected:
     virtual std::streamsize xsputn(const char *p, std::streamsize n)
     {
         QString str(p);
+        log_window->moveCursor(QTextCursor::End);
+        log_window->insertPlainText(p);
+        /*
         if(str.contains("\n")){
             QStringList strSplitted = str.split("\n");
 
@@ -67,7 +70,7 @@ protected:
         }else{
             log_window->moveCursor (QTextCursor::End);
             log_window->insertPlainText (str);
-        }
+        }*/
         return n;
     }
 
