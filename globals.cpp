@@ -34,6 +34,15 @@ QStringList thumblist;
 QString blockstring = "";
 QString thumbpath = "";
 QString hexselection = "";
+#ifdef linux
+    QString newline = "\n";
+#endif
+#ifdef WIN32
+    QString newline = "\r\n";
+#endif
+#ifdef __APPLE__
+    QString newline = "\n";
+#endif
 QStringList externallist;
 struct magic_set* magicptr = NULL;
 struct magic_set* magicmimeptr = NULL;

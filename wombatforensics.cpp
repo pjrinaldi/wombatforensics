@@ -70,10 +70,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
+    msgviewer->show();
     // qdebugstream
     new Q_DebugStream(std::cout, msgviewer->msglog);
     Q_DebugStream::registerQDebugMessageHandler(); // redirect qDebug() output to QTextEdit
-    qDebug() << "[INFO]" << "Supported Image Formats:" << QImageReader::supportedImageFormats();
+    qDebug() << "[INFO]" << "Supported Image Formats:" << QImageReader::supportedImageFormats() << newline;
+    qDebug() << "[INFO]" << "test for line break." << newline;
+    //std::cout << "[INFO]" << "COUT test" << std::endl;
+    qDebug() << "have to fix this." << newline;
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();

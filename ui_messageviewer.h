@@ -52,6 +52,7 @@ public:
         textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         textEdit->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
         textEdit->setUndoRedoEnabled(false);
+        textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
         textEdit->setAcceptRichText(false);
         textEdit->setTextInteractionFlags(Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
 
