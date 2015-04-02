@@ -37,7 +37,7 @@ public:
         {
             QSqlQuery pathquery(fcasedb);
             pathquery.prepare("SELECT (fullpath || name) AS fullname FROM data WHERE objectid = ?;");
-            pathquery.addBindValue(index.data(Qt::UserRole).toInt());
+            pathquery.addBindValue(index.data(Qt::UserRole).toULongLong());
             pathquery.exec();
             pathquery.next();
             thumbpath = pathquery.value(0).toString();
@@ -67,7 +67,7 @@ class ImageWindow : public QDialog
 public:
     ImageWindow(QWidget* parent = 0);
     ~ImageWindow();
-    void GetImage(int objid);
+    void GetImage(unsigned long long objid);
 private slots:
     void HideClicked();
     void ShowImage();

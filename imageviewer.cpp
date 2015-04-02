@@ -33,24 +33,24 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
     }
 }
 
-void ImageWindow::GetImage(int objectid)
+void ImageWindow::GetImage(unsigned long long objectid)
 {
     this->setWindowTitle("View Image - " + thumbpath);
     // OpenParentImage
     std::vector<std::string> pathvector;
-    int imgid = 0;
-    int fsid = 0;
-    int fsoffset = 0;
-    int address = 0;
+    unsigned long long imgid = 0;
+    unsigned long long fsid = 0;
+    unsigned long long fsoffset = 0;
+    unsigned long long address = 0;
     pathvector.clear();
     QSqlQuery pimgquery(fcasedb);
     pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
     pimgquery.addBindValue(objectid);
     pimgquery.exec();
     pimgquery.next();
-    imgid = pimgquery.value(0).toInt();
-    fsid = pimgquery.value(1).toInt();
-    address = pimgquery.value(2).toInt();
+    imgid = pimgquery.value(0).toULongLong();
+    fsid = pimgquery.value(1).toULongLong();
+    address = pimgquery.value(2).toULongLong();
     pimgquery.finish();
     pimgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
     pimgquery.addBindValue(imgid);
@@ -74,7 +74,7 @@ void ImageWindow::GetImage(int objectid)
     pimgquery.addBindValue(fsid);
     pimgquery.exec();
     pimgquery.next();
-    fsoffset = pimgquery.value(0).toInt();
+    fsoffset = pimgquery.value(0).toULongLong();
     pimgquery.finish();
     tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
     // OpenFile
@@ -147,13 +147,13 @@ void ImageViewer::UpdateGeometries()
 
 void ImageViewer::OpenImageWindow(const QModelIndex &index)
 {
-    imagedialog->GetImage(index.data(Qt::UserRole).toInt());
+    imagedialog->GetImage(index.data(Qt::UserRole).toULongLong());
     imagedialog->show();
 }
 
 void ImageViewer::ShowImage(const QModelIndex &index)
 {
-    imagedialog->GetImage(index.sibling(index.row(), 0).data().toInt());
+    imagedialog->GetImage(index.sibling(index.row(), 0).data().toULongLong());
     imagedialog->show();
 }
 
@@ -161,11 +161,11 @@ void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
 {
     QSqlQuery pathquery(fcasedb);
     pathquery.prepare("SELECT (fullpath || name) AS fullname FROM data WHERE objectid = ?;");
-    pathquery.addBindValue(index.data(Qt::UserRole).toInt());
+    pathquery.addBindValue(index.data(Qt::UserRole).toULongLong());
     pathquery.exec();
     pathquery.next();
     thumbpath = pathquery.value(0).toString();
     pathquery.finish();
 
-    emit SendObjectToTreeView(index.data(Qt::UserRole).toInt()); 
+    emit SendObjectToTreeView(index.data(Qt::UserRole).toULongLong()); 
 }
