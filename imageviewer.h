@@ -99,7 +99,7 @@ private slots:
 
 signals:
     void HideImageWindow(bool checkstate);
-    void SendObjectToTreeView(int selectedid);
+    void SendObjectToTreeView(unsigned long long selectedid);
 private:
     Ui::ImageViewer* ui;
     ImageModel* imagemodel;
