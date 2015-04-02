@@ -46,7 +46,7 @@ public slots:
     void Seek(int);
     void PlayPause();
     void UpdateSlider();
-    void GetVideo(QString tmpfilepath, int objid);
+    void GetVideo(QString tmpfilepath, unsigned long long objid);
     
 private:
     Ui::VideoViewer* ui;
