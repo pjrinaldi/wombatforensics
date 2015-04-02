@@ -28,7 +28,7 @@ public:
     void GetEvidenceObjects(void);
     void InsertVolumeObject(void);
     void InsertPartitionObjects(void);
-    void InsertFileSystemProperties(int curfsid, TSK_FS_INFO* curfsinfo);
+    void InsertFileSystemProperties(unsigned long long curfsid, TSK_FS_INFO* curfsinfo);
     void InsertEvidenceProperties(void);
     void InsertVolumeProperties(void);
     void GetObjectValues(void);
@@ -36,23 +36,23 @@ public:
 
     ~WombatDatabase();
 
-    int ReturnCaseCount(void);
+    unsigned long long ReturnCaseCount(void);
     void InsertCase();
     void ReturnCaseNameList(void);
     void ReturnEvidenceNameList(void);
     void ReturnCaseID(void);
-    void ReturnFileSystemObjectList(int curid);
+    void ReturnFileSystemObjectList(unsigned long long curid);
     void ReturnObjectPropertyList(void);
     void RemoveEvidence(void);
 
     QList<QSqlRecord> GetSqlResults(QString query, QVariantList invalues);
-    int InsertSqlGetID(QString query, QVariantList invalues);
+    unsigned long long InsertSqlGetID(QString query, QVariantList invalues);
     void InsertSql(QString query, QVariantList invalues);
     void InsertSql(QString query);
-    int ReturnSqlRowsAffected(QString query, QVariantList invalues);
-    int GetEvidenceFileCount(void);
-    int ReturnFileSystemOffset(int fsid);
-    int GetResidentOffset(int fileaddress);
+    unsigned long long ReturnSqlRowsAffected(QString query, QVariantList invalues);
+    unsigned long long GetEvidenceFileCount(void);
+    unsigned long long ReturnFileSystemOffset(unsigned long long fsid);
+    unsigned long long GetResidentOffset(unsigned long long fileaddress);
 
     WombatProperties* wombatprop;
 
