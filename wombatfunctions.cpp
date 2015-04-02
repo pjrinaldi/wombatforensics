@@ -15,7 +15,7 @@ std::string GetTime()
     return timeStr;
 }
 
-void LogEntry(int caseid, int evidenceid, int jobid, int type, QString msg)
+void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned long long jobid, int type, QString msg)
 {
     if(logdb.isOpen())
     {
@@ -30,7 +30,7 @@ void LogEntry(int caseid, int evidenceid, int jobid, int type, QString msg)
     }
 }
 
-void StartJob(int type, int caseid, int evidenceid)
+void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid)
 {
     QSqlQuery jobquery(logdb);
     jobquery.prepare("INSERT INTO joblog (type, state, filecount, processcount, caseid, evidenceid, start, finish, errorcount) VALUES(?, 0, 0, 0, ?, ?, DATETIME('now', 'unixepoch'), 0, 0)");
@@ -38,10 +38,10 @@ void StartJob(int type, int caseid, int evidenceid)
     jobquery.addBindValue(caseid);
     jobquery.addBindValue(evidenceid);
     if(jobquery.exec())
-        currentjobid = jobquery.lastInsertId().toInt();
+        currentjobid = jobquery.lastInsertId().toULongLong();
 }
 
-void EndJob(int jobid, int filecount, int processcount, int errorcount)
+void EndJob(unsigned long long jobid, unsigned long long filecount, unsigned long long processcount, unsigned long long errorcount)
 {
     QSqlQuery jobquery(logdb);
     jobquery.prepare("UPDATE joblog SET state = 1, filecount = ?, processcount = ?, finish = DATETIME('now', 'unixepoch'), errorcount = ? WHERE jobid = ?");
@@ -67,7 +67,7 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
-int GetChildCount(int type, int address, int parimgid)
+unsigned long long GetChildCount(int type, unsigned long long address, unsigned long long parimgid)
 {
     QSqlQuery childquery(fcasedb);
     QString querystring = "SELECT COUNT(objectid) FROM data WHERE parentid = ?";
@@ -84,7 +84,7 @@ int GetChildCount(int type, int address, int parimgid)
     if(childquery.exec())
     {
         childquery.next();
-        return childquery.value(0).toInt();
+        return childquery.value(0).toULongLong();
     }
     return 0;
 }
@@ -115,7 +115,7 @@ bool ProcessingComplete()
     return processingcomplete;
 }
 
-void ProcessFile(QVector<QString> tmpstrings, QVector<int> tmpints, QStringList tmplist, QString thumbencstr)
+void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints, QStringList tmplist, QString thumbencstr)
 {
 
     if(fcasedb.isValid() && fcasedb.isOpen())
@@ -440,11 +440,11 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
 
     // END IMAGE SCALING OPERATION
-    QVector<int> fileints;
+    QVector<unsigned long long> fileints;
     if(tmpfile->name != NULL)
     {
-        fileints.append((int)tmpfile->name->type);
-        fileints.append((int)tmpfile->name->par_addr);
+        fileints.append((unsigned long long)tmpfile->name->type);
+        fileints.append((unsigned long long)tmpfile->name->par_addr);
     }
     else
     {
@@ -453,12 +453,12 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     if(tmpfile->meta != NULL)
     {
-        fileints.append((int)tmpfile->meta->atime);
-        fileints.append((int)tmpfile->meta->ctime);
-        fileints.append((int)tmpfile->meta->crtime);
-        fileints.append((int)tmpfile->meta->mtime);
-        fileints.append((int)tmpfile->meta->size);
-        fileints.append((int)tmpfile->meta->addr);
+        fileints.append((unsigned long long)tmpfile->meta->atime);
+        fileints.append((unsigned long long)tmpfile->meta->ctime);
+        fileints.append((unsigned long long)tmpfile->meta->crtime);
+        fileints.append((unsigned long long)tmpfile->meta->mtime);
+        fileints.append((unsigned long long)tmpfile->meta->size);
+        fileints.append((unsigned long long)tmpfile->meta->addr);
     }
     else
     {
