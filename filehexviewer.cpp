@@ -901,7 +901,7 @@ void FileHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int ro
         {
             int widx = r*_cols+c;
             /* REPRESENTS THE FILE SLACK */
-            if(globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
+            if((unsigned long long)globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
                 paint.setPen(QColor(255, 0, 0, 255));
 	    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2,charsPerWord()/2));
         }
@@ -914,7 +914,7 @@ void FileHexViewer::drawTextRegion(QPainter& paint, const QString& text, int row
     for(int c = col_start; c <= col_stop; c++) {
         int widx = r*_cols+c;
         /* REPRESENTS THE FILE SLACK */
-        if(globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
+        if((unsigned long long)globalOffset(widx) > tskptr->length - 1 && globalOffset(widx) < (tskptr->blkaddrlist.count()*tskptr->blocksize - 1))
             paint.setPen(QColor(255, 0, 0, 255));
         paint.drawText( _wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(),charsPerWord()) );
     }
