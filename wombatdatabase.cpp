@@ -316,7 +316,7 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->currentvolumename);
         wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, childcount, byteoffset, parentid, parimgid, name) VALUES(2, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertVolumeProperties);
-        threadvector.append(tmpfuture);
+        //threadvector.append(tmpfuture);
         //wombatprop->PopulateVolumeProperties();
     }
     else
@@ -389,7 +389,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
                 QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, tmpfsinfo);
-                threadvector.append(tmpfuture);
+                //threadvector.append(tmpfuture);
                 filesprocessed++;
             }
         }
@@ -424,7 +424,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, sectsize, blockcount, firstinum, lastinum, rootinum, address, blocksize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
                 QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, wombatptr->evidenceobject.fsinfovector[i]);
-                threadvector.append(tmpfuture);
+                //threadvector.append(tmpfuture);
                 filesprocessed++;
             }
         }
@@ -448,7 +448,7 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->evidenceobject.id = wombatptr->currentevidenceid;
     currentevidenceid = wombatptr->currentevidenceid;
     QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertEvidenceProperties);
-    threadvector.append(tmpfuture);
+    //threadvector.append(tmpfuture);
     for(unsigned int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
         wombatptr->bindvalues.clear();

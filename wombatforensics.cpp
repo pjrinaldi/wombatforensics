@@ -715,7 +715,7 @@ void WombatForensics::AddEvidence()
 
             sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
             sqlwatcher.setFuture(sqlfuture);
-            threadvector.append(sqlfuture);
+            //threadvector.append(sqlfuture);
         }
         else
             DisplayError("1.8", "Evidence already exists in the case.", "Add Evidence cancelled");
@@ -1196,8 +1196,10 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
-    if(curprogress == 100 && ProcessingComplete())
+    //if(curprogress == 100 && ProcessingComplete())
+    if(ProcessingComplete())
     {
+        InitializeQueryModel();
         filtercountlabel->setText("Filtered: " + QString::number(filesfound));
         statuslabel->setText("Processing Complete");
     }
