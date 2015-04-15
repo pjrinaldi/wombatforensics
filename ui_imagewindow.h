@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'imagewindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.0
+** Created by: Qt User Interface Compiler version 5.4.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -76,7 +76,7 @@ public:
     void retranslateUi(QDialog *ImageWindow)
     {
         ImageWindow->setWindowTitle(QApplication::translate("ImageWindow", "View Image", 0));
-        label->setText(QString());
+        label->setText(QApplication::translate("ImageWindow", "Loading...", 0));
     } // retranslateUi
 
 };

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'imageviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.0
+** Created by: Qt User Interface Compiler version 5.4.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -32,6 +32,8 @@ public:
     QLabel *label;
     QSpinBox *spinBox;
     QSpacerItem *horizontalSpacer;
+    QLabel *label_2;
+    QSpacerItem *horizontalSpacer_2;
     QListView *listView;
 
     void setupUi(QDialog *ImageViewer)
@@ -63,9 +65,18 @@ public:
 
         horizontalLayout->addWidget(spinBox);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(5, 20, QSizePolicy::Preferred, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
+
+        label_2 = new QLabel(ImageViewer);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        horizontalLayout->addWidget(label_2);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer_2);
 
 
         verticalLayout->addLayout(horizontalLayout);
@@ -96,6 +107,7 @@ public:
         label->setText(QApplication::translate("ImageViewer", "Thumbnail Size:", 0));
         spinBox->setSuffix(QApplication::translate("ImageViewer", "px", 0));
         spinBox->setPrefix(QString());
+        label_2->setText(QApplication::translate("ImageViewer", "Loading...", 0));
     } // retranslateUi
 
 };

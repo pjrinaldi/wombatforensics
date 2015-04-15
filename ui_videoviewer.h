@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'videoviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.0
+** Created by: Qt User Interface Compiler version 5.4.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -29,6 +29,7 @@ class Ui_VideoViewer
 public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
+    QLabel *label_2;
     QFrame *frame;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label;
@@ -47,6 +48,12 @@ public:
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+        label_2 = new QLabel(VideoViewer);
+        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout->addWidget(label_2);
+
 
         verticalLayout->addLayout(horizontalLayout);
 
@@ -103,6 +110,7 @@ public:
     void retranslateUi(QDialog *VideoViewer)
     {
         VideoViewer->setWindowTitle(QApplication::translate("VideoViewer", "View Video", 0));
+        label_2->setText(QApplication::translate("VideoViewer", "Loading...", 0));
         label->setText(QApplication::translate("VideoViewer", "00:00:00", 0));
         label2->setText(QApplication::translate("VideoViewer", "/", 0));
         label3->setText(QApplication::translate("VideoViewer", "00:00:00", 0));
