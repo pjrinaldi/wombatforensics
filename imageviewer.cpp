@@ -138,22 +138,33 @@ void ImageViewer::GetPixmaps()
 
 void ImageViewer::UpdateGeometries()
 {
-    GetPixmaps();
+    QFuture<void> thumbfuture = QtConcurrent::run(this, &ImageViewer::GetPixmaps);
+    thumbwatcher.setFuture(thumbfuture);
+    //GetPixmaps();
     imagemodel = new ImageModel(pixmaps, idlist);
     ui->listView->setModel(imagemodel);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
+    connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(SetModel()), Qt::QueuedConnection);
+}
+
+void ImageViewer::SetModel()
+{
+    imagemodel = new ImageModel(pixmaps, idlist);
+    ui->listView->setModel(imagemodel);
 }
 
 void ImageViewer::OpenImageWindow(const QModelIndex &index)
 {
-    imagedialog->GetImage(index.data(Qt::UserRole).toULongLong());
+    QtConcurrent::run(imagedialog, &ImageWindow::GetImage, index.data(Qt::UserRole).toULongLong());
+    //imagedialog->GetImage(index.data(Qt::UserRole).toULongLong());
     imagedialog->show();
 }
 
 void ImageViewer::ShowImage(const QModelIndex &index)
 {
-    imagedialog->GetImage(index.sibling(index.row(), 0).data().toULongLong());
+    QtConcurrent::run(imagedialog, &ImageWindow::GetImage, index.sibling(index.row(), 0).data().toULongLong());
+    //imagedialog->GetImage(index.sibling(index.row(), 0).data().toULongLong());
     imagedialog->show();
 }
 

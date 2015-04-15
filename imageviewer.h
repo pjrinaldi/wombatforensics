@@ -96,6 +96,7 @@ public slots:
 private slots:
     void HighlightTreeViewItem(const QModelIndex &index);
     void HideClicked();
+    void SetModel();
 
 signals:
     void HideImageWindow(bool checkstate);

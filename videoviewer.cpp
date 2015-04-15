@@ -120,7 +120,8 @@ void VideoViewer::ShowVideo(QString tmpfilepath, const QModelIndex &index)
     //Thread thread(vplayer);
     //vplayer->moveToThread(&thread);
     //thread.start();
-    GetVideo(tmpfilepath, index.sibling(index.row(), 0).data().toULongLong());
+    QtConcurrent::run(this, &VideoViewer::GetVideo, tmpfilepath, index.sibling(index.row(), 0).data().toULongLong());
+    //GetVideo(tmpfilepath, index.sibling(index.row(), 0).data().toULongLong());
     vplayer->play();
 }
 void VideoViewer::mousePressEvent(QMouseEvent* e)

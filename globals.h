@@ -11,6 +11,7 @@ extern QString fdbname;
 extern QThreadPool* threadpool;
 extern QVector<QFuture<void> > threadvector;
 extern QFutureWatcher<void> filewatcher;
+extern QFutureWatcher<void> thumbwatcher;
 extern unsigned long long filesfound;
 extern unsigned long long filesprocessed;
 extern unsigned long long totalcount;
