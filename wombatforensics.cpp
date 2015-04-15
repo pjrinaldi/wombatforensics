@@ -1433,6 +1433,18 @@ void WombatForensics::on_actionCopy_Selection_To_triggered()
     //treemenu->exec(QCursor::pos());
 }
 
+void WombatForensics::on_actionExpandAll_triggered()
+{
+    // this can take some time, must alert the user.
+    ui->dirTreeView->expandAll();
+}
+
+void WombatForensics::on_actionCollapseAll_triggered()
+{
+    // this can take some time, must alert the user.
+    ui->dirTreeView->collapseAll();
+}
+
 void WombatForensics::UpdateThumbnails(int tsize)
 {
     thumbsize = tsize;

@@ -691,6 +691,8 @@ private slots:
     void on_actionTextViewer_triggered(bool checked);
     void on_actionViewMessageLog_triggered(bool checked);
     void on_actionCopy_Selection_To_triggered();
+    void on_actionExpandAll_triggered();
+    void on_actionCollapseAll_triggered();
     void UpdateProgress(unsigned long long count, unsigned long long processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);
