@@ -171,10 +171,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(hashfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     jumpforward = new QShortcut(ui->dirTreeView);
     jumpbackward = new QShortcut(ui->dirTreeView);
+    showitem = new QShortcut(ui->dirTreeView);
     jumpforward->setKey(Qt::CTRL + Qt::Key_J);
     jumpbackward->setKey(Qt::CTRL + Qt::SHIFT + Qt::Key_J);
+    showitem->setKey(Qt::Key_Return);
     connect(jumpforward, SIGNAL(activated()), this, SLOT(NextItem()));
     connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
+    connect(showitem, SIGNAL(activated()), this, SLOT(ShowItem()));
     //msgviewer->show();
 }
 
@@ -1642,6 +1645,12 @@ void WombatForensics::PreviousItem()
             }
         }
     }
+}
+
+void WombatForensics::ShowItem()
+{
+    QModelIndex curindex = ui->dirTreeView->currentIndex();
+    ShowFile(curindex);
 }
 
 void WombatForensics::UpdateFilterCount()

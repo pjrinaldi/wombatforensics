@@ -743,6 +743,7 @@ private slots:
     };
     void NextItem();
     void PreviousItem();
+    void ShowItem();
     void UpdateThumbnails(int tsize);
     void SetSelectedFromImageViewer(unsigned long long selectedid);
     void ShowFile(const QModelIndex &index);
@@ -800,6 +801,7 @@ private:
     QVector<FileExportData> exportfilelist;
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
+    QShortcut* showitem;
 };
 
 #endif // WOMBATFORENSICS_H
