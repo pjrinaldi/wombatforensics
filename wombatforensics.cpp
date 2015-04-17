@@ -1436,13 +1436,17 @@ void WombatForensics::on_actionCopy_Selection_To_triggered()
 void WombatForensics::on_actionExpandAll_triggered()
 {
     // this can take some time, must alert the user.
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     ui->dirTreeView->expandAll();
+    QApplication::restoreOverrideCursor();
 }
 
 void WombatForensics::on_actionCollapseAll_triggered()
 {
     // this can take some time, must alert the user.
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     ui->dirTreeView->collapseAll();
+    QApplication::restoreOverrideCursor();
 }
 
 void WombatForensics::UpdateThumbnails(int tsize)
