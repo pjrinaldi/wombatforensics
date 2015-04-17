@@ -117,12 +117,14 @@ void VideoViewer::GetVideo(QString tmpfilepath, unsigned long long objectid)
 void VideoViewer::ShowVideo(QString tmpfilepath, const QModelIndex &index)
 {
     this->show();
+    ui->label_2->setVisible(true);
     //Thread thread(vplayer);
     //vplayer->moveToThread(&thread);
     //thread.start();
     QtConcurrent::run(this, &VideoViewer::GetVideo, tmpfilepath, index.sibling(index.row(), 0).data().toULongLong());
     //GetVideo(tmpfilepath, index.sibling(index.row(), 0).data().toULongLong());
     vplayer->play();
+    ui->label_2->setVisible(false);
 }
 void VideoViewer::mousePressEvent(QMouseEvent* e)
 {

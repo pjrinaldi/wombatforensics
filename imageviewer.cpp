@@ -138,6 +138,7 @@ void ImageViewer::GetPixmaps()
 
 void ImageViewer::UpdateGeometries()
 {
+    ui->label_2->setText("Loading...");
     QFuture<void> thumbfuture = QtConcurrent::run(this, &ImageViewer::GetPixmaps);
     thumbwatcher.setFuture(thumbfuture);
     //GetPixmaps();
@@ -152,20 +153,25 @@ void ImageViewer::SetModel()
 {
     imagemodel = new ImageModel(pixmaps, idlist);
     ui->listView->setModel(imagemodel);
+    ui->label_2->setText(QString::number(pixmaps.count()) + " Image(s)");
 }
 
 void ImageViewer::OpenImageWindow(const QModelIndex &index)
 {
+    ui->label->setText("Loading...");
     QtConcurrent::run(imagedialog, &ImageWindow::GetImage, index.data(Qt::UserRole).toULongLong());
     //imagedialog->GetImage(index.data(Qt::UserRole).toULongLong());
     imagedialog->show();
+    ui->label->setText("");
 }
 
 void ImageViewer::ShowImage(const QModelIndex &index)
 {
+    ui->label->setText("Loading...");
     QtConcurrent::run(imagedialog, &ImageWindow::GetImage, index.sibling(index.row(), 0).data().toULongLong());
     //imagedialog->GetImage(index.sibling(index.row(), 0).data().toULongLong());
     imagedialog->show();
+    ui->label->setText("");
 }
 
 void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
