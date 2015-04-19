@@ -13,32 +13,39 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
 
 class Ui_ByteConverter
 {
 public:
-    QHBoxLayout *horizontalLayout;
+    QVBoxLayout *verticalLayout;
     QLabel *label;
+    QCheckBox *checkBox;
 
     void setupUi(QDialog *ByteConverter)
     {
         if (ByteConverter->objectName().isEmpty())
             ByteConverter->setObjectName(QStringLiteral("ByteConverter"));
         ByteConverter->resize(240, 223);
-        horizontalLayout = new QHBoxLayout(ByteConverter);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        verticalLayout = new QVBoxLayout(ByteConverter);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         label = new QLabel(ByteConverter);
         label->setObjectName(QStringLiteral("label"));
         label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
         label->setMargin(10);
 
-        horizontalLayout->addWidget(label);
+        verticalLayout->addWidget(label);
+
+        checkBox = new QCheckBox(ByteConverter);
+        checkBox->setObjectName(QStringLiteral("checkBox"));
+
+        verticalLayout->addWidget(checkBox);
 
 
         retranslateUi(ByteConverter);
@@ -50,6 +57,7 @@ public:
     {
         ByteConverter->setWindowTitle(QApplication::translate("ByteConverter", "Dialog", 0));
         label->setText(QApplication::translate("ByteConverter", "one<br/>two<br/>three", 0));
+        checkBox->setText(QApplication::translate("ByteConverter", "Big Endian", 0));
     } // retranslateUi
 
 };

@@ -96,7 +96,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -235,6 +235,7 @@
    <addaction name="actionView_File"/>
    <addaction name="actionTextViewer"/>
    <addaction name="actionView_Image_Gallery"/>
+   <addaction name="actionByteConverter"/>
    <addaction name="separator"/>
    <addaction name="actionViewerManager"/>
    <addaction name="actionViewMessageLog"/>
@@ -546,6 +547,21 @@
    </property>
    <property name="toolTip">
     <string>Dig Deeper</string>
+   </property>
+  </action>
+  <action name="actionByteConverter">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/byteconverter</normaloff>:/bar/byteconverter</iconset>
+   </property>
+   <property name="text">
+    <string>Byte Converter</string>
+   </property>
+   <property name="toolTip">
+    <string>Byte Converter</string>
    </property>
   </action>
  </widget>

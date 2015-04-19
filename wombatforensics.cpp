@@ -65,11 +65,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     textviewer = new TextViewer();
     htmlviewer = new HtmlViewer();
     msgviewer = new MessageViewer();
+    byteviewer = new ByteConverter();
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
+    byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
     // qdebugstream
     //new Q_DebugStream(std::cout, msgviewer->msglog);
     //Q_DebugStream::registerQDebugMessageHandler(); // redirect qDebug() output to QTextEdit
@@ -91,6 +93,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
+    connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     //connect(htmlviewer, SIGNAL(HideHtmlViewerWindow(bool)), this, SLOT(HideHtmlViewer(bool)), Qt::DirectConnection);
     //connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(LoadComplete(bool)));
     connect(ui->actionView_Properties, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Properties_triggered(bool)), Qt::DirectConnection);
@@ -319,6 +322,11 @@ void WombatForensics::HideTextViewer(bool checkstate)
 void WombatForensics::HideMessageViewer(bool checkstate)
 {
     ui->actionViewMessageLog->setChecked(checkstate);
+}
+
+void WombatForensics::HideByteViewer(bool checkstate)
+{
+    ui->actionByteViewer->setChecked(checkstate);
 }
 
 void WombatForensics::InitializeAppStructure()
@@ -1284,6 +1292,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     htmlviewer->close();
     //msgviewer->msglog->clear();
     msgviewer->close();
+    byteviewer->close();
     RemoveTmpFiles();
     if(ProcessingComplete())
     {
@@ -1426,6 +1435,14 @@ void WombatForensics::on_actionViewMessageLog_triggered(bool checked)
         msgviewer->hide();
     else
         msgviewer->show();
+}
+
+void WombatForensics::on_actionByteConverter_triggered(bool checked)
+{
+    if(!checked) // hide viewer
+        byteviewer->hide();
+    else
+        byteviewer->show();
 }
 
 void WombatForensics::on_actionCopy_Selection_To_triggered()

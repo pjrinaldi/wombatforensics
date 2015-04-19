@@ -21,6 +21,7 @@
 #include "textviewer.h"
 #include "htmlviewer.h"
 #include "messageviewer.h"
+#include "byteconverter.h"
 
 class TreeModel : public QAbstractItemModel
 {
@@ -673,6 +674,7 @@ public:
     TextViewer* textviewer;
     HtmlViewer* htmlviewer;
     MessageViewer* msgviewer;
+    ByteConverter* byteviewer;
 
 signals:
     //void LogVariable(WombatVariable* wombatVariable);
@@ -690,6 +692,7 @@ private slots:
     void on_actionViewerManager_triggered();
     void on_actionTextViewer_triggered(bool checked);
     void on_actionViewMessageLog_triggered(bool checked);
+    void on_actionByteConverter_triggered(bool checked);
     void on_actionCopy_Selection_To_triggered();
     void on_actionExpandAll_triggered();
     void on_actionCollapseAll_triggered();
@@ -702,6 +705,7 @@ private slots:
 //    void HideViewerManager(bool checkstate);
     void HideTextViewer(bool checkstate);
     void HideMessageViewer(bool checkstate);
+    void HideByteViewer(bool checkstate);
     void ShowExternalViewer();
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
