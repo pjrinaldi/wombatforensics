@@ -12,7 +12,7 @@ ByteConverter::~ByteConverter()
     this->close();
 }
 
-ByteConverter::HideClicked()
+void ByteConverter::HideClicked()
 {
     this->hide();
     emit HideByteConverterWindow(false);
@@ -22,4 +22,9 @@ void ByteConverter::closeEvent(QCloseEvent* e)
 {
     emit HideByteConverterWindow(false);
     e->accept();
+}
+
+void ByteConverter::SetText(QString txt)
+{
+    ui->label->setText(txt);
 }

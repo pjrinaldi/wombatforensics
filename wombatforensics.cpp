@@ -326,7 +326,7 @@ void WombatForensics::HideMessageViewer(bool checkstate)
 
 void WombatForensics::HideByteViewer(bool checkstate)
 {
-    ui->actionByteViewer->setChecked(checkstate);
+    ui->actionByteConverter->setChecked(checkstate);
 }
 
 void WombatForensics::InitializeAppStructure()
@@ -391,6 +391,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionView_Image_Gallery->setEnabled(false);
     ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
+    ui->actionByteConverter->setEnabled(false);
     ui->actionTextViewer->setVisible(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
@@ -631,6 +632,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionView_Image_Gallery->setEnabled(true);
         ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
+        ui->actionByteConverter->setEnabled(true);
         wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
         wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
         wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
@@ -1502,14 +1504,14 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     hexselection = txt;
     int sellength = txt.size()/2;
     QString tmptext = "Length: " + QString::number(sellength);
+    QString bytetext = "";
     selectedhex->setText(tmptext);
-    /*
     // get initial bytes value and then update ascii
     std::vector<uchar> bytes;
     Translate::HexToByte(bytes, txt);
     QString ascii;
     Translate::ByteToChar(ascii, bytes);
-    tmptext = "Ascii: " + ascii;
+    bytetext += "Ascii: <span style='text-align: right;'>" + ascii + "</span><br/>";
     //selectedascii->setText(tmptext);
     QString strvalue;
     uchar * ucharPtr;
@@ -1519,7 +1521,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     ucharPtr = (uchar*) &intvalue;
     memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
     strvalue.setNum(intvalue);
-    tmptext = "Int: " + strvalue;
+    bytetext += "Integer: <span style='text-align: right;'>" + strvalue + "</span><br/>";
     //selectedinteger->setText(tmptext);
     // update float entry;
     float fvalue;
@@ -1543,7 +1545,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
         memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
     }
     strvalue.setNum( fvalue );
-    tmptext = "Float: " + strvalue;
+    bytetext += "Float: <span style='text-align: right;'>" + strvalue + "</span><br/>";
     //selectedfloat->setText(tmptext);
     // update double
     double dvalue;
@@ -1567,9 +1569,9 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
         memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
     }
     strvalue.setNum( dvalue );
-    tmptext = "Double: " + strvalue;
+    bytetext += "Double: <span style='text-align: right;'>" + strvalue + "</span><br/>";
+    byteviewer->SetText(bytetext);
     //selecteddouble->setText(tmptext);
-    */
 }
 
 void WombatForensics::SetOffsetLabel(off_t pos)

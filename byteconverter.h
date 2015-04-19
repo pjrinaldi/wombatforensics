@@ -17,6 +17,7 @@ class ByteConverter : public QDialog
 public:
     ByteConverter(QWidget* parent = 0);
     ~ByteConverter();
+    void SetText(QString txt);
 public slots:
    void HideClicked();
 signals:
