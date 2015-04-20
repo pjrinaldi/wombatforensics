@@ -1502,6 +1502,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
         ui->actionCopy_Selection_To->setEnabled(false);
     }
     hexselection = txt;
+    char buf[128];
     int sellength = txt.size()/2;
     QString tmptext = "Length: " + QString::number(sellength);
     QString bytetext = "";
@@ -1511,7 +1512,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     Translate::HexToByte(bytes, txt);
     QString ascii;
     Translate::ByteToChar(ascii, bytes);
-    bytetext += "Ascii: <span style='text-align: right;'>" + ascii + "</span><br/>";
+    bytetext += "<table border=0 width='100%' cellpadding=5><tr><td>Ascii:</td><td align=right>" + ascii + "</td></tr>";
     //selectedascii->setText(tmptext);
     QString strvalue;
     uchar * ucharPtr;
@@ -1521,7 +1522,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     ucharPtr = (uchar*) &intvalue;
     memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
     strvalue.setNum(intvalue);
-    bytetext += "Integer: <span style='text-align: right;'>" + strvalue + "</span><br/>";
+    bytetext += "<tr><td>Integer:</td><td align=right>" + strvalue + "</td></tr>";
     //selectedinteger->setText(tmptext);
     // update float entry;
     float fvalue;
@@ -1545,7 +1546,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
         memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
     }
     strvalue.setNum( fvalue );
-    bytetext += "Float: <span style='text-align: right;'>" + strvalue + "</span><br/>";
+    bytetext += "<tr><td>Float:</td><td align=right>" + strvalue + "</td></tr>";
     //selectedfloat->setText(tmptext);
     // update double
     double dvalue;
@@ -1569,7 +1570,31 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
         memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
     }
     strvalue.setNum( dvalue );
-    bytetext += "Double: <span style='text-align: right;'>" + strvalue + "</span><br/>";
+    bytetext += "<tr><td>Double: </td><td align=right>" + strvalue + "</td></tr>";
+    bytetext += "<tr><td>DOS Date:</td><td align=right>";
+    if(bytes.size() == 2)
+    {
+        //bytetext += tsk_fs_time_to_str(fatfs_dos_2_unix_time
+    }
+    bytetext += "</td></tr>";
+    bytetext += "<tr><td>DOS Time:</td><td align=right>";
+    if(bytes.size() == 2)
+    {
+    }
+    bytetext += "</td></tr>";
+    bytetext += "<tr><td>FILETIME:</td><td align=right>";
+    if(bytes.size() == 8)
+    {
+        bytetext += tsk_fs_time_to_str(nt2unixtime(intvalue), buf);
+    }
+    bytetext += "</td></tr>";
+    bytetext += "<tr><td>UNIX Time:</td><td align=right>";
+    if(bytes.size() == 4)
+    {
+        bytetext += tsk_fs_time_to_str(intvalue, buf);
+    }
+    bytetext += "</td></tr>";
+    bytetext += "</table>";
     byteviewer->SetText(bytetext);
     //selecteddouble->setText(tmptext);
 }
