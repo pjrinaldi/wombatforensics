@@ -1574,6 +1574,10 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     bytetext += "<tr><td>DOS Date:</td><td align=right>";
     if(bytes.size() == 2)
     {
+        /*
+        dosdate tmpdate = dosdate(intvalue);
+        bytetext += QString::number(tmpdate.dmon) + "/" + QString::number(tmpdate.dday) + "/" + QString::number(tmpdate.dyear);
+        */
         //bytetext += tsk_fs_time_to_str(fatfs_dos_2_unix_time
     }
     bytetext += "</td></tr>";

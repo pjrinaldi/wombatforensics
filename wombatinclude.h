@@ -70,7 +70,6 @@
 #include <sys/types.h>
 #include <stdexcept>
 #include <vector>
-
 #include <math.h>
 #include <assert.h>
 #include <errno.h>

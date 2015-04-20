@@ -37,6 +37,21 @@ extern QStringList externallist;
 extern struct magic_set* magicptr;
 extern struct magic_set* magicmimeptr;
 
+struct dosdate
+{
+    int dyear;
+    char dday;
+    char dmon;
+};
+
+struct dostime
+{
+    unsigned char dmin;
+    unsigned char dhour;
+    unsigned char dhund;
+    unsigned char dsec;
+};
+
 struct FilterValues
 {
     bool maxidbool;
