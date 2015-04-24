@@ -195,6 +195,8 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     {
         // remove compile warning
     }
+    //qDebug() << tmpfile->name->name << addr;
+
     // WILL HAVE TO CREATE A SWITCH TO ACCOUNT FOR THE DIFFERENT FILE SYSTEMS
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
     {
@@ -208,6 +210,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
+        qDebug() << tmpfile->name->name << addr;
         blockstring += QString::number(addr) + "|";
         //if(flags & TSK_FS_BLOCK_FLAG_RES)
         //    qDebug() << "resident file, not sure what it yields:" << addr;
@@ -220,6 +223,11 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
             blockstring += QString::number(addr) + "|";
             //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
         }
+    }
+    else if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0)) //else if(tmpfile->name->name.compare("FAT1") == 0)
+    {
+        qDebug() << tmpfile->name->name << addr;
+        blockstring += QString::number(addr) + "|";
     }
     else
     {
@@ -391,7 +399,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     else
         tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
     // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
-
+    qDebug() << tmpfile->name->name << blockstring;
     filestrings.append(blockstring);
     proplist << "Block Address" << blockstring << "List of block addresses which contain the contents of the file";
 
