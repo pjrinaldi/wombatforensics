@@ -1574,17 +1574,13 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     bytetext += "<tr><td>DOS Date:</td><td align=right>";
     if(bytes.size() == 2)
     {
-        bytetext += QString::number(bytes[0]) + QString::number(bytes[1]);
-        /*
-        dosdate tmpdate = dosdate(intvalue);
-        bytetext += QString::number(tmpdate.dmon) + "/" + QString::number(tmpdate.dday) + "/" + QString::number(tmpdate.dyear);
-        */
-        //bytetext += tsk_fs_time_to_str(fatfs_dos_2_unix_time
+        bytetext += QString::fromStdString(std::string(tsk_fs_time_to_str(fatfs_dos_2_unix_time(intvalue, intvalue, bytes[0]), buf)).substr(0, 10));
     }
     bytetext += "</td></tr>";
     bytetext += "<tr><td>DOS Time:</td><td align=right>";
     if(bytes.size() == 2)
     {
+        bytetext += QString::fromStdString(std::string(tsk_fs_time_to_str(fatfs_dos_2_unix_time(intvalue, intvalue, bytes[0]), buf)).substr(11, 14));
     }
     bytetext += "</td></tr>";
     bytetext += "<tr><td>FILETIME:</td><td align=right>";
