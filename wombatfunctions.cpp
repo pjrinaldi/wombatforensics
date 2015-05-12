@@ -221,10 +221,9 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
         if(flags & TSK_FS_BLOCK_FLAG_CONT)
         {
             blockstring += QString::number(addr) + "|";
-            //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr;
         }
     }
-    else if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0)) //else if(tmpfile->name->name.compare("FAT1") == 0)
+    else if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0))
     {
         qDebug() << tmpfile->name->name << addr;
         blockstring += QString::number(addr) + "|";
@@ -239,7 +238,6 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
                 if(addr)
                 {
                     blockstring += QString::number(addr + i) + "|";
-                    //qDebug() << "File Name:" << tmpfile->name->name << "Address:" << addr + i;
                 }
             }
         }
