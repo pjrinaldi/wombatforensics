@@ -32,7 +32,10 @@ void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned
 
 void LogMessage(QString logmsg)
 {
-    msgstream << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\t" << logmsg << "\n";
+    logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
+    logfile.write(QString(QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) + "\t" + logmsg + "\n").toStdString().c_str());
+    logfile.close();
+    //msgstream << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\t" << logmsg << "\n";
 }
 
 void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid)
