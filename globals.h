@@ -7,6 +7,7 @@ extern QSqlDatabase fcasedb;
 extern QSqlDatabase logdb;
 extern QSqlDatabase thumbdb;
 extern QSqlDatabase fappdb;
+extern QTextStream msgstream;
 extern QString fdbname;
 extern QThreadPool* threadpool;
 extern QVector<QFuture<void> > threadvector;

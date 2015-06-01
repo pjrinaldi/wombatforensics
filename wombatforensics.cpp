@@ -440,6 +440,8 @@ void WombatForensics::InitializeCaseStructure()
         // CREATE case log file HERE
         QFile logfile(wombatvarptr->caseobject.dirpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
+        msgstream.setDevice(&logfile);
+        msgstream << "Log File Created " << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\n";
         // CREATE CaseLog.DB HERE
         logdb = QSqlDatabase::database("logdb");
         if(!logdb.isValid())
