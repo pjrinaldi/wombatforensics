@@ -437,6 +437,9 @@ void WombatForensics::InitializeCaseStructure()
         bool mkPath = (new QDir())->mkpath(wombatvarptr->caseobject.dirpath);
         if(mkPath == false)
             DisplayError("2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
+        // CREATE case log file HERE
+        QFile logfile(wombatvarptr->caseobject.dirpath + "msglog");
+        logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         // CREATE CaseLog.DB HERE
         logdb = QSqlDatabase::database("logdb");
         if(!logdb.isValid())

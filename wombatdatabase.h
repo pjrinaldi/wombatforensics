@@ -14,6 +14,7 @@ public:
     void CreateAppDB(void);
     void CreateCaseDB(void);
     void CreateLogDB(void);
+    //void CreateLogFile(void);
     void CreateThumbDB(void);
     void OpenCaseDB(void);
     void OpenAppDB(void);
