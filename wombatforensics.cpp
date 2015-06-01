@@ -624,6 +624,9 @@ void WombatForensics::InitializeQueryModel()
         fcasedb.commit();
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "DB Commit finished");
         LogMessage("DB Commit finished");
+        // THIS CALL HERE IS ADDING THE EVIDENCE MORE THAN ONCE...
+        // NEED TO FIGURE OUT HOW THIS IS HAPPENING AND RESOLVE THIS ISSUE AS WELL AS WHERE THIS DOESN'T GET CALLED
+        // BECAUSE THE THREAD COUNT IS OFF AND HASN'T FINISHED.
         treemodel->AddEvidence(wombatvarptr->currentevidenceid);
         ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
         ResizeColumns();
