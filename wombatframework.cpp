@@ -20,6 +20,7 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     if(wombatptr->evidenceobject.imageinfo == NULL)
     {
         LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Evidence Image Access Failed.");
+        LogMessage("Evidence Image access failed");
         errorcount++;
     }
     filesfound++;
@@ -96,6 +97,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     if(walkreturn == 1)
     {
         LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Issues with Traversing the File Structure were encountered.");
+        LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
 }

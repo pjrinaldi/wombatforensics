@@ -13,6 +13,7 @@ bool ProcessingComplete(void);
 void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints, QStringList tmplist, QString thumbencstr);
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned long long jobid, int type, QString msg);
+void LogMessage(QString message);
 void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid);
 void EndJob(unsigned long long jobid, unsigned long long filecount, unsigned long long processcount, unsigned long long errorcount);
 void cnid_to_array(uint32_t cnid, uint8_t array[4]);

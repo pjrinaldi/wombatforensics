@@ -441,7 +441,7 @@ void WombatForensics::InitializeCaseStructure()
         QFile logfile(wombatvarptr->caseobject.dirpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         msgstream.setDevice(&logfile);
-        msgstream << "Log File Created " << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\n";
+        LogMessage("Log File Created");
         // CREATE CaseLog.DB HERE
         logdb = QSqlDatabase::database("logdb");
         if(!logdb.isValid())
@@ -479,6 +479,7 @@ void WombatForensics::InitializeCaseStructure()
         errorcount = 0;
         StartJob(0, wombatvarptr->caseobject.id, 0);
         LogEntry(wombatvarptr->caseobject.id, 0, currentjobid, 1, "Started Creating Case Structure");
+        LogMessage("Started Creating Case Structure");
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
         wombatvarptr->casedb = QSqlDatabase::database("casedb");
         if(!wombatvarptr->casedb.isValid())
@@ -490,6 +491,7 @@ void WombatForensics::InitializeCaseStructure()
             if(wombatvarptr->curerrmsg.compare("") != 0)
             {
                 LogEntry(wombatvarptr->caseobject.id, 0, currentjobid, 0, "Case DB Creation Error.");
+                LogMessage("Case DB Creation Error");
                 errorcount++;
                 DisplayError("1.2", "Case DB Creation Error", wombatvarptr->curerrmsg);
             }
@@ -508,6 +510,7 @@ void WombatForensics::InitializeCaseStructure()
         ui->actionAdd_Evidence->setEnabled(true);
         EndJob(currentjobid, 1, 1, errorcount);
         LogEntry(wombatvarptr->caseobject.id, 0, currentjobid, 1, "Case was created");
+        LogMessage("Case was created");
     }
 }
 
@@ -613,10 +616,13 @@ void WombatForensics::InitializeQueryModel()
     {
         EndJob(currentjobid, filesfound, filesprocessed, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Adding Evidence Finished");
+        LogMessage("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)");
         statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
+        LogMessage("All Threads have finished");
         fcasedb.commit();
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "DB Commit finished");
+        LogMessage("DB Commit finished");
         treemodel->AddEvidence(wombatvarptr->currentevidenceid);
         ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
         ResizeColumns();
@@ -680,6 +686,7 @@ void WombatForensics::InitializeEvidenceStructure()
     errorcount = 0;
     StartJob(1, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
     LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Adding Evidence");
+    LogMessage("Started Adding Evidence");
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
     wombatdatabase->InsertVolumeObject(); // add volume to data
@@ -932,6 +939,7 @@ void WombatForensics::OpenParentImage(unsigned long long imgid)
     if(tskobjptr->readimginfo == NULL)
     {
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, 0, 0, "Image opening error");
+        LogMessage("Image opening error");
     }
     free(tskobjptr->imagepartspath);
 }
@@ -979,6 +987,7 @@ void WombatForensics::RemEvidence()
             StartJob(4, wombatvarptr->caseobject.id, wombatvarptr->evidremoveid);
             errorcount = 0;
             LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 1, "Evidence Removal Started"); 
+            LogMessage("Evidence Removal Started");
             treemodel->RemEvidence(wombatvarptr->evidremoveid);
             remfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::RemoveEvidence);
             remwatcher.setFuture(remfuture);
@@ -1079,10 +1088,14 @@ void WombatForensics::FinishRemoval()
         filtercountlabel->setText("Filtered: " + QString::number(filesfound));
         EndJob(currentjobid, wombatvarptr->evidrowsremoved, wombatvarptr->evidrowsremoved, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 1, "Evidence Removal Completed");
+        LogMessage("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed");
         statuslabel->setText("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
     }
     else
+    {
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 2, "Still Removing Files");
+        LogMessage("Still Removing Files");
+    }
 }
 
 void WombatForensics::FinishExport()
@@ -1091,10 +1104,14 @@ void WombatForensics::FinishExport()
     {
         EndJob(currentjobid, exportcount, exportcount, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Export Completed");
+        LogMessage("Export Completed with " + QString::number(errorcount) + " error(s)");
         statuslabel->setText("Exporting completed with " + QString::number(errorcount) + "error(s)");
     }
     else
+    {
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 2, "Still Removing Files");
+        LogMessage("Still Removing Files");
+    }
 }
 
 void WombatForensics::ExportFiles(FileExportData* exportdata)
@@ -1105,6 +1122,7 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     errorcount = 0;
     StartJob(3, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
     LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Exporting EVidence");
+    LogMessage("Started Exporting Evidence");
     if(exportdata->filestatus == FileExportData::selected)
     {
         exportdata->exportcount = 1;
@@ -1166,6 +1184,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     if(curobj.readimginfo == NULL)
     {
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 0, "Image was not loaded properly");
+        LogMessage("Image was not loaded properly");
         errorcount++;
     }
     free(curobj.imagepartspath);
@@ -1179,6 +1198,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         if(!tmpdir)
         {
             LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 0, "creation of export dirtree for file: " + QString::fromStdString(name) + "failed.");
+            LogMessage("Creation of export directory tree for file: " + QString::fromStdString(name) + " failed");
             errorcount++;
         }
     }
@@ -1305,6 +1325,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     {
         event->accept();
         LogEntry(0, 0, 0, 1, "All threads are done. Exiting...");
+        LogMessage("All threads are done. Exiting...");
         magic_close(magicptr);
         magic_close(magicmimeptr);
     }
@@ -1312,6 +1333,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     {
         event->ignore();
         LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
+        LogMessage("All threads are not done yet. Exiting Cancelled");
         qDebug() << "processing complete has a glitch which is hanging this up.";
     }
     //if(magicptr != NULL)

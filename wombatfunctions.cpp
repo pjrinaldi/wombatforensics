@@ -30,6 +30,11 @@ void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned
     }
 }
 
+void LogMessage(QString message)
+{
+    msgstream << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\t" << message << "\n";
+}
+
 void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid)
 {
     QSqlQuery jobquery(logdb);
@@ -177,6 +182,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     else
     {
         LogEntry(0, currentevidenceid, currentjobid, 0, QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
+        LogMessage("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text());
         errorcount++;
     }
 }
@@ -318,7 +324,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         proplist << "allocation status for the file.";
     }
     if(tmpptr != NULL)
+    {
         LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
+        LogMessage("TmpPtr got a value somehow");
+    }
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     QString tmpstring;
