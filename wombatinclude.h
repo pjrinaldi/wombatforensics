@@ -14,6 +14,7 @@
 #include <QActionGroup>
 #include <QBoxLayout>
 #include <QByteArray>
+#include <QDateTime>
 #include <QDebug>
 #include <QDialog>
 #include <QDir>
@@ -42,6 +43,7 @@
 #include <QTextCodec>
 #include <QTextCursor>
 #include <QTextEdit>
+#include <QTextStream>
 #include <QThread>
 #include <QThreadPool>
 #include <QTreeWidgetItem>

@@ -687,7 +687,7 @@ void WombatForensics::InitializeEvidenceStructure()
     errorcount = 0;
     StartJob(1, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
     LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Adding Evidence");
-    LogMessage("Started Adding Evidence");
+    LogMessage(tr("Started Adding Evidence"));
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
     wombatdatabase->InsertVolumeObject(); // add volume to data
@@ -1326,7 +1326,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     {
         event->accept();
         LogEntry(0, 0, 0, 1, "All threads are done. Exiting...");
-        LogMessage("All threads are done. Exiting...");
+        //LogMessage("All threads are done. Exiting...");
         magic_close(magicptr);
         magic_close(magicmimeptr);
     }
@@ -1334,7 +1334,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     {
         event->ignore();
         LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
-        LogMessage("All threads are not done yet. Exiting Cancelled");
+        //LogMessage("All threads are not done yet. Exiting Cancelled");
         qDebug() << "processing complete has a glitch which is hanging this up.";
     }
     //if(magicptr != NULL)
