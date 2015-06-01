@@ -182,7 +182,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     else
     {
         LogEntry(0, currentevidenceid, currentjobid, 0, QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
-        LogMessage("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text());
+        LogMessage(QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
         errorcount++;
     }
 }

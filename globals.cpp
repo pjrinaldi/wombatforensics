@@ -4,6 +4,7 @@ QSqlDatabase fcasedb;
 QSqlDatabase logdb;
 QSqlDatabase thumbdb;
 QSqlDatabase fappdb;
+//QFile logfile;
 QTextStream msgstream;
 QString fdbname = "t.db";
 QThreadPool* threadpool = NULL;
