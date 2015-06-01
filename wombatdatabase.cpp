@@ -27,14 +27,14 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
         else
         {
             LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-            LogMessage(wombatptr->casedb.lastError().text());
+            //LogMessage(wombatptr->casedb.lastError().text());
         }
         casequery.finish();
     }
     else
     {
         LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
     }
 
     return tmplist;
@@ -61,14 +61,14 @@ void WombatDatabase::InsertSql(QString query, QVariantList invalues)
        else
        {
            LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-           LogMessage(wombatptr->casedb.lastError().text());
+           //LogMessage(wombatptr->casedb.lastError().text());
        }
        casequery.finish();
    }
    else
    {
         LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
    }
 }
 
@@ -86,14 +86,14 @@ void WombatDatabase::InsertSql(QString query)
        else
        {
             LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-            LogMessage(wombatptr->casedb.lastError().text());
+            //LogMessage(wombatptr->casedb.lastError().text());
        }
        casequery.finish();
    }
    else
    {
         LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
    }
 }
 
@@ -113,14 +113,14 @@ unsigned long long WombatDatabase::InsertSqlGetID(QString query, QVariantList in
        else
        {
             LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-            LogMessage(wombatptr->casedb.lastError().text());
+            //LogMessage(wombatptr->casedb.lastError().text());
        }
        casequery.finish();
    }
    else
    {
         LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
    }
 
    return tmpid;
@@ -181,7 +181,7 @@ void WombatDatabase::CreateCaseDB(void)
     else
     {
         LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
     }
 
 }
@@ -220,7 +220,7 @@ void WombatDatabase::CreateThumbDB()
     else
     {
         LogEntry(0, 0, 0, 0, thumbdb.lastError().text());
-        LogMessage(thumbdb.lastError().text());
+        //LogMessage(thumbdb.lastError().text());
     }
 }
 
@@ -238,7 +238,7 @@ void WombatDatabase::CreateAppDB()
     else
     {
         LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
 }
 
@@ -556,7 +556,7 @@ unsigned long long WombatDatabase::ReturnCaseCount() // from appdb
     else
     {
         LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 
@@ -575,7 +575,7 @@ void WombatDatabase::InsertCase()
     else
     {
         LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 }
@@ -591,7 +591,7 @@ void WombatDatabase::ReturnCaseNameList()
     else
     {
         LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 }
@@ -619,12 +619,12 @@ void WombatDatabase::ReturnCaseID()
         else
         {
             LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-            LogMessage(wombatptr->appdb.lastError().text());
+            //LogMessage(wombatptr->appdb.lastError().text());
         }
     else
     {
         LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 }

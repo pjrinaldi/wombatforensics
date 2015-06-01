@@ -30,9 +30,9 @@ void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned
     }
 }
 
-void LogMessage(QString message)
+void LogMessage(QString logmsg)
 {
-    msgstream << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\t" << message << "\n";
+    msgstream << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\t" << logmsg << "\n";
 }
 
 void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid)

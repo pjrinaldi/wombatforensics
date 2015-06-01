@@ -617,7 +617,7 @@ void WombatForensics::InitializeQueryModel()
     {
         EndJob(currentjobid, filesfound, filesprocessed, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Adding Evidence Finished");
-        LogMessage(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
+        //LogMessage(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
         LogMessage("All Threads have finished");
@@ -1089,7 +1089,7 @@ void WombatForensics::FinishRemoval()
         filtercountlabel->setText("Filtered: " + QString::number(filesfound));
         EndJob(currentjobid, wombatvarptr->evidrowsremoved, wombatvarptr->evidrowsremoved, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 1, "Evidence Removal Completed");
-        LogMessage(QString("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed"));
+        //LogMessage(QString("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed"));
         statuslabel->setText("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
     }
     else
@@ -1105,7 +1105,7 @@ void WombatForensics::FinishExport()
     {
         EndJob(currentjobid, exportcount, exportcount, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Export Completed");
-        LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
+        //LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
         statuslabel->setText("Exporting completed with " + QString::number(errorcount) + "error(s)");
     }
     else
@@ -1199,7 +1199,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         if(!tmpdir)
         {
             LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 0, "creation of export dirtree for file: " + QString::fromStdString(name) + "failed.");
-            LogMessage(QString("Creation of export directory tree for file: " + QString::fromStdString(name) + " failed"));
+            //LogMessage(QString("Creation of export directory tree for file: " + QString::fromStdString(name) + " failed"));
             errorcount++;
         }
     }
