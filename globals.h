@@ -9,6 +9,7 @@ extern QSqlDatabase thumbdb;
 extern QSqlDatabase fappdb;
 extern QFile logfile;
 extern QTextStream msgstream;
+extern QTextEdit* msglog;
 extern QString fdbname;
 extern QThreadPool* threadpool;
 extern QVector<QFuture<void> > threadvector;

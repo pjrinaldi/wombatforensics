@@ -440,6 +440,7 @@ void WombatForensics::InitializeCaseStructure()
         // CREATE case log file HERE
         //QFile logfile(wombatvarptr->caseobject.dirpath + "msglog");
         logfile.setFileName(wombatvarptr->caseobject.dirpath + "msglog");
+        msglog->clear();
         //logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         //msgstream.setDevice(&logfile);
         LogMessage("Log File Created");
@@ -1324,7 +1325,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     viewmanage->close();
     textviewer->close();
     htmlviewer->close();
-    //msgviewer->msglog->clear();
+    msglog->clear();
     msgviewer->close();
     byteviewer->close();
     RemoveTmpFiles();

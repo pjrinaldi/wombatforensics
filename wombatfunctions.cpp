@@ -32,8 +32,10 @@ void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned
 
 void LogMessage(QString logmsg)
 {
+    QString tmpstring = QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t"));
+    msglog->append(QString(tmpstring + " " + logmsg));
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
-    logfile.write(QString(QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) + "\t" + logmsg + "\n").toStdString().c_str());
+    logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
     logfile.close();
     //msgstream << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\t" << logmsg << "\n";
 }
