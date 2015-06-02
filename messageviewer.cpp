@@ -4,6 +4,7 @@ MessageViewer::MessageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::Mess
 {
     ui->setupUi(this);
     msglog = ui->textEdit;
+    ui->checkBox->setVisible(false);
     //tskptr = &tskobj;
     //tskptr->readimginfo = NULL;
     //tskptr->readfsinfo = NULL;
