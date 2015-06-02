@@ -358,7 +358,7 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->currentvolumename);
         wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, childcount, size, sectsize, byteoffset, parentid, parimgid, name) VALUES(2, 240, 0, ?, ?, 0, ?, ?, ?);", wombatptr->bindvalues);
     }
-    filesprocessed++;
+    //filesprocessed++;
 }
 
 void WombatDatabase::InsertPartitionObjects()
@@ -380,7 +380,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append(wombatptr->currentevidenceid);
                 wombatptr->bindvalues.append((unsigned long long)(wombatptr->evidenceobject.partinfovector[i]->len * wombatptr->evidenceobject.volinfo->block_size));
                 wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, sectsize, parentid, parimgid, size) VALUES(3, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-                filesprocessed++;
+                //filesprocessed++;
             }
             else if(wombatptr->evidenceobject.partinfovector[i]->flags == 0x01) // allocated partition
             {
@@ -388,7 +388,7 @@ void WombatDatabase::InsertPartitionObjects()
                 if(tmpfsinfo != NULL)
                 {
                     wombatptr->evidenceobject.fsinfovector.push_back(tmpfsinfo);
-                    filesfound++;
+                    //filesfound++;
                 }
                 else
                 {
@@ -420,7 +420,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
                 QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, tmpfsinfo);
                 //threadvector.append(tmpfuture);
-                filesprocessed++;
+                //filesprocessed++;
             }
         }
     }
@@ -455,7 +455,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
                 QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, wombatptr->evidenceobject.fsinfovector[i]);
                 //threadvector.append(tmpfuture);
-                filesprocessed++;
+                //filesprocessed++;
             }
         }
     }
@@ -469,7 +469,7 @@ void WombatDatabase::InsertEvidenceObject()
     currentevidenceid = 0;
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->itype);
-    qDebug() << "image size: " << wombatptr->evidenceobject.imageinfo->size;
+    //qDebug() << "image size: " << wombatptr->evidenceobject.imageinfo->size;
     wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.imageinfo->size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
     wombatptr->bindvalues.append(wombatptr->currentevidencename);
@@ -487,7 +487,7 @@ void WombatDatabase::InsertEvidenceObject()
         wombatptr->bindvalues.append(i+1);
         InsertSql("INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", wombatptr->bindvalues);
     }
-    filesprocessed++;
+    //filesprocessed++;
 }
 
 void WombatDatabase::GetEvidenceObject()
@@ -673,9 +673,10 @@ unsigned long long WombatDatabase::GetEvidenceFileCount()
 {
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-    wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+    //wombatptr->bindvalues.append(wombatptr->currentevidenceid);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(objectid) FROM data WHERE objectid = ? OR parimgid = ?", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(objectid) FROM data WHERE parimgid = ? and objecttype = 5;", wombatptr->bindvalues);
+    //wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(objectid) FROM data WHERE objectid = ? OR parimgid = ?", wombatptr->bindvalues);
     return wombatptr->sqlrecords.at(0).value(0).toULongLong();
 }
 

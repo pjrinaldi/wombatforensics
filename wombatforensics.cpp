@@ -612,17 +612,19 @@ void WombatForensics::InitializeOpenCase()
 
 void WombatForensics::InitializeQueryModel()
 {
-    fcasedb.commit();
-    if(ProcessingComplete())
-    {
+    //fcasedb.commit();
+    //if(ProcessingComplete())
+    //{
+    /*
         EndJob(currentjobid, filesfound, filesprocessed, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Adding Evidence Finished");
-        //LogMessage(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
+    */
+        LogMessage(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
-        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
+        //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
         LogMessage("All Threads have finished");
         fcasedb.commit();
-        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "DB Commit finished");
+        //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "DB Commit finished");
         LogMessage("DB Commit finished");
         // THIS CALL HERE IS ADDING THE EVIDENCE MORE THAN ONCE...
         // NEED TO FIGURE OUT HOW THIS IS HAPPENING AND RESOLVE THIS ISSUE AS WELL AS WHERE THIS DOESN'T GET CALLED
@@ -632,7 +634,7 @@ void WombatForensics::InitializeQueryModel()
         ResizeColumns();
         ui->actionRemove_Evidence->setEnabled(true);
         wombatframework->CloseInfoStructures();
-    }
+    //}
 }
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
@@ -1239,9 +1241,10 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     filecountlabel->setText("Files: " + QString::number(filesfound));
     statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
     //if(curprogress == 100 && ProcessingComplete())
+    fcasedb.commit();
     if(ProcessingComplete())
     {
-        InitializeQueryModel();
+        //InitializeQueryModel();
         filtercountlabel->setText("Filtered: " + QString::number(filesfound));
         statuslabel->setText("Processing Complete");
     }

@@ -109,14 +109,17 @@ bool FileExists(const std::string& filename)
 
 bool ProcessingComplete()
 {
-    qDebug() << "threadvector count: " << threadvector.count();
+    //qDebug() << "threadvector count: " << threadvector.count();
     //if((threadvector.count() == 0) && ((filesfound - filesprocessed) == 0))
     for(int i=0; i < threadvector.count(); i++)
     {
         if(threadvector.at(i).isFinished())
+        {
             threadvector.remove(i);
+            //qDebug() << "thread finished. new thread vector count: " << threadvector.count();
+        }
     }
-    if(threadvector.count() == 0)
+    if(threadvector.count() == 0 && filesfound > 0)
         return true;
     /*
     for(int i = 0; i < threadvector.count(); i++)
@@ -219,7 +222,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
-        qDebug() << tmpfile->name->name << addr;
+        //qDebug() << tmpfile->name->name << addr;
         blockstring += QString::number(addr) + "|";
         //if(flags & TSK_FS_BLOCK_FLAG_RES)
         //    qDebug() << "resident file, not sure what it yields:" << addr;
@@ -232,9 +235,9 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
             blockstring += QString::number(addr) + "|";
         }
     }
-    else if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0))
+    else if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0) || (strcmp(tmpfile->name->name, "$OprhanFiles") == 0))
     {
-        qDebug() << tmpfile->name->name << addr;
+        //qDebug() << tmpfile->name->name << addr;
         blockstring += QString::number(addr) + "|";
     }
     else
@@ -409,7 +412,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     else
         tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
     // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
-    qDebug() << tmpfile->name->name << blockstring;
+    //qDebug() << tmpfile->name->name << blockstring;
     filestrings.append(blockstring);
     proplist << "Block Address" << blockstring << "List of block addresses which contain the contents of the file";
 
@@ -497,11 +500,11 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     fileints.append(currentfilesystemid);
 
+    filesfound++;
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, proplist, thumbencstr);
     filewatcher.setFuture(tmpfuture);
     threadvector.append(tmpfuture);
-    filesfound++;
-
+    //qDebug() << "thread added. new thread vector count: " << threadvector.count();
     return TSK_WALK_CONT;
 }
 

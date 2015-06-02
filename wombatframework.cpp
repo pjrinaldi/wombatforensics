@@ -23,14 +23,14 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
         LogMessage("Evidence Image access failed");
         errorcount++;
     }
-    filesfound++;
+    //filesfound++;
     free(images);
 }
 
 void WombatFramework::OpenVolumeSystem() // open current volume system
 {
     wombatptr->evidenceobject.volinfo = tsk_vs_open(wombatptr->evidenceobject.imageinfo, 0, TSK_VS_TYPE_DETECT);
-    filesfound++;
+    //filesfound++;
 }
 
 void WombatFramework::GetVolumeSystemName() // get the volume system name
@@ -48,7 +48,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
     if(wombatptr->evidenceobject.volinfo == NULL)
     {
         wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_img(wombatptr->evidenceobject.imageinfo, 0, TSK_FS_TYPE_DETECT));
-        filesfound++;
+        //filesfound++;
     }
     else
     {
@@ -58,7 +58,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
             {
                 if(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->flags == 0x02) // if its an unallocated partition
                 {
-                    filesfound++;
+                    //filesfound++;
                 }
                 wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
                 /*
@@ -100,6 +100,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
+    isignals->ProgUpd();
 }
 
 void WombatFramework::CloseInfoStructures() // close all open info structures
