@@ -14,9 +14,10 @@ std::string GetTime()
 
     return timeStr;
 }
-
+/*
 void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned long long jobid, int type, QString msg)
 {
+    /*
     if(logdb.isOpen())
     {
         QSqlQuery logquery(logdb);
@@ -28,7 +29,8 @@ void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned
         logquery.addBindValue(msg);
         logquery.exec();
     }
-}
+    */
+//}
 
 void LogMessage(QString logmsg)
 {
@@ -39,7 +41,7 @@ void LogMessage(QString logmsg)
     logfile.close();
     //msgstream << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\t" << logmsg << "\n";
 }
-
+/*
 void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid)
 {
     QSqlQuery jobquery(logdb);
@@ -61,7 +63,7 @@ void EndJob(unsigned long long jobid, unsigned long long filecount, unsigned lon
     jobquery.addBindValue(jobid);
     jobquery.exec();
 }
-
+*/
 char* TskTimeToStringUTC(time_t time, char buf[128])
 {
     buf[0] = '\0';
@@ -189,7 +191,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     }
     else
     {
-        LogEntry(0, currentevidenceid, currentjobid, 0, QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
+        //LogEntry(0, currentevidenceid, currentjobid, 0, QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
         LogMessage(QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
         errorcount++;
     }
@@ -333,7 +335,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     if(tmpptr != NULL)
     {
-        LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
+        //LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
         LogMessage("TmpPtr got a value somehow");
     }
     TSK_FS_HASH_RESULTS hashresults;

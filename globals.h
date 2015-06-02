@@ -4,7 +4,7 @@
 #include "wombatinclude.h"
 
 extern QSqlDatabase fcasedb;
-extern QSqlDatabase logdb;
+//extern QSqlDatabase logdb;
 extern QSqlDatabase thumbdb;
 extern QSqlDatabase fappdb;
 extern QFile logfile;

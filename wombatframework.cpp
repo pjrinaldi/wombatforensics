@@ -19,7 +19,7 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
     if(wombatptr->evidenceobject.imageinfo == NULL)
     {
-        LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Evidence Image Access Failed.");
+        //LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Evidence Image Access Failed.");
         LogMessage("Evidence Image access failed");
         errorcount++;
     }
@@ -96,7 +96,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     }
     if(walkreturn == 1)
     {
-        LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Issues with Traversing the File Structure were encountered.");
+        //LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Issues with Traversing the File Structure were encountered.");
         LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }

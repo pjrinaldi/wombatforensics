@@ -1,7 +1,7 @@
 #include "globals.h"
 
 QSqlDatabase fcasedb;
-QSqlDatabase logdb;
+//QSqlDatabase logdb;
 QSqlDatabase thumbdb;
 QSqlDatabase fappdb;
 QFile logfile;
