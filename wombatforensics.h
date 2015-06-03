@@ -808,4 +808,6 @@ private:
     QShortcut* showitem;
 };
 
+Q_DECLARE_METATYPE(QTextCursor)
+
 #endif // WOMBATFORENSICS_H

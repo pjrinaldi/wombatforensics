@@ -26,6 +26,7 @@ extern unsigned long long errorcount;
 extern unsigned long long currentjobid;
 extern int thumbsize;
 extern int mftrecordsize;
+extern int threadstarted;
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;

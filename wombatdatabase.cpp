@@ -628,6 +628,7 @@ void WombatDatabase::ReturnCaseID()
     }
     appquery.finish();
 }
+
 void WombatDatabase::ReturnFileSystemObjectList(unsigned long long curevidenceid)
 {
     fsobjectlist.clear();

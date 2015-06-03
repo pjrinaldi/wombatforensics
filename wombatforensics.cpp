@@ -88,7 +88,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     //qRegisterMetaType<QTextBlock>();
-    //qRegisterMetaType<QTextCursor>();
+    qRegisterMetaType<QTextCursor>();
     connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
@@ -725,6 +725,7 @@ void WombatForensics::OpenEvidenceStructure()
 void WombatForensics::AddEvidence()
 {
     int isnew = 1;
+    threadstarted = 1;
     threadvector.clear();
     wombatdatabase->GetEvidenceObjects();
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
@@ -1334,17 +1335,20 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     htmlviewer->close();
     byteviewer->close();
     RemoveTmpFiles();
+    // going to attempt to find out if a case is open...
+    if(this->windowTitle().compare("WombatForensics") != 0 && threadstarted == 1)
+    {
     if(!ProcessingComplete())
     {
         int ret = QMessageBox::question(this, tr("Threads haven't finished."), tr("There are threads that haven't finished. Exiting will lose that work. Do you still want to exit?"), QMessageBox::Yes | QMessageBox::No);
         if (ret == QMessageBox::Yes)
         {
-            LogMessage("Exiting with unfinished threads at user request. Work might get lost.");
+            //LogMessage("Exiting with unfinished threads at user request. Work might get lost.");
             event->accept();
         }
         else
         {
-            LogMessage("User cancelled the exit request since some threads haven't finished.");
+            //LogMessage("User cancelled the exit request since some threads haven't finished.");
             event->ignore();
         }
 
@@ -1353,6 +1357,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         //LogMessage("All threads are done. Exiting...");
         magic_close(magicptr);
         magic_close(magicmimeptr);
+    }
     }
         //LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
         //LogMessage("All threads are not done yet. Exiting Cancelled");
@@ -1388,9 +1393,13 @@ void WombatForensics::on_actionNew_Case_triggered()
     {
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
         if (ret == QMessageBox::Yes)
+        {
             CloseCurrentCase();
+            InitializeCaseStructure();
+        }
     }
-    InitializeCaseStructure();
+    else
+        InitializeCaseStructure();
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()
@@ -1403,9 +1412,11 @@ void WombatForensics::on_actionOpen_Case_triggered()
         {
             statuslabel->setText("Closing Current Case...");
             CloseCurrentCase();
+            InitializeOpenCase();
         }
     }
-    InitializeOpenCase();
+    else
+        InitializeOpenCase();
 }
 
 void WombatForensics::on_actionView_Properties_triggered(bool checked)
