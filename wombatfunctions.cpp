@@ -112,18 +112,25 @@ bool FileExists(const std::string& filename)
 
 bool ProcessingComplete()
 {
+    if(filesfound == filesprocessed && filesfound > 0)
+        return true;
+    //unsigned long long threadcount = 0; 
     //qDebug() << "threadvector count: " << threadvector.count();
     //if((threadvector.count() == 0) && ((filesfound - filesprocessed) == 0))
-    for(unsigned long long i=0; i < (unsigned long long)threadvector.count(); i++)
+    /*
+    for(int i=0; i < threadvector.count(); i++)
     {
-        if(threadvector.at(i).isFinished())
+        //if(threadvector.at(i).isFinished())
+        if(threadvector.at(i).isRunning())
         {
-            threadvector.remove(i);
+            threadcount++;
+            //threadvector.remove(i);
             //qDebug() << "thread finished. new thread vector count: " << threadvector.count();
         }
     }
-    if(threadvector.count() == 0 && filesfound > 0)
+    if(threadcount == 0 && filesfound > 0)
         return true;
+    */
     /*
     for(int i = 0; i < threadvector.count(); i++)
     {
@@ -140,6 +147,12 @@ bool ProcessingComplete()
 void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints, QStringList tmplist, QString thumbencstr)
 {
 
+    if(thumbencstr.compare("") == 0)
+    {
+    }
+    if(tmplist.count() > 0)
+    {
+    }
     // PROCESS FILE NEEDS TO DO ONLY THE STANDARD STUFF....
     // IMAGE SCALING, BLOCK ADDRESSES, HASHING, AND SIGNATURE ANALYSIS SHOULD OCCUR AFTER IT BY PULLING THE INFO FROM THE DB
     // IN THEIR OWN ENCLOSED CONTAINER FOR EACH FILE. THEN I SIMPLY CALL AN UPDATE TO THE DATA TABLE TO STICK IN THE NEW VALUS...
@@ -174,8 +187,12 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
         //qDebug() << tmpstrings[0] << tmpstrings[3];
         
         fquery.exec();
-        long long int tmpid = fquery.lastInsertId().toLongLong();
+        //long long int tmpid = fquery.lastInsertId().toLongLong();
         fquery.finish();
+        //if(tmpid)
+        //{
+        //}
+        /*
         for(int i=0; i < tmplist.count()/3; i++)
         {
             fquery.prepare("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);");
@@ -186,6 +203,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
             fquery.exec();
             fquery.finish();
         }
+        */
         /*
         if(tmpstrings[4].contains("image/", Qt::CaseInsensitive))
         {
@@ -204,6 +222,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     {
         //LogEntry(0, currentevidenceid, currentjobid, 0, QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
         LogMessage(QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
+        filesprocessed++;
         errorcount++;
     }
 }
@@ -320,7 +339,9 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-    qDebug() << "start proplist";
+    QStringList proplist;
+    /*
+    //qDebug() << "start proplist";
     // NEED TO WORK ON THE DESCRIPTIONS FOR THE FILE PROPERTIES A LITTLE
     QStringList proplist;
     proplist.clear();
@@ -345,12 +366,13 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             proplist << "Unspecified";
         proplist << "allocation status for the file.";
     }
+    */
     if(tmpptr != NULL)
     {
         //LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
         LogMessage("TmpPtr got a value somehow");
     }
-    qDebug() << "end proplist";
+    //qDebug() << "end proplist";
     /*
     qDebug() << "begin hashing";
     TSK_FS_HASH_RESULTS hashresults;
@@ -538,8 +560,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
     filesfound++;
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, proplist, thumbencstr);
-    filewatcher.setFuture(tmpfuture);
-    threadvector.append(tmpfuture);
+    //filewatcher.setFuture(tmpfuture);
+    //threadvector.append(tmpfuture);
     //qDebug() << "thread added. new thread vector count: " << threadvector.count();
     return TSK_WALK_CONT;
 }

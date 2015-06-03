@@ -620,6 +620,8 @@ void WombatForensics::InitializeOpenCase()
 
 void WombatForensics::InitializeQueryModel()
 {
+    fcasedb.commit();
+    isignals->ProgUpd();
     //fcasedb.commit();
     //if(ProcessingComplete())
     //{
@@ -631,7 +633,6 @@ void WombatForensics::InitializeQueryModel()
         statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
         LogMessage("All Threads have finished");
-        fcasedb.commit();
         //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "DB Commit finished");
         LogMessage("DB Commit finished");
         // THIS CALL HERE IS ADDING THE EVIDENCE MORE THAN ONCE...
@@ -642,6 +643,7 @@ void WombatForensics::InitializeQueryModel()
         ResizeColumns();
         ui->actionRemove_Evidence->setEnabled(true);
         wombatframework->CloseInfoStructures();
+        fcasedb.commit();
     //}
 }
 
@@ -751,7 +753,7 @@ void WombatForensics::AddEvidence()
             wombatvarptr->evidenceobject.itemcount = tmplist.count();
             processcountlabel->setText("Processed: 0");
             filecountlabel->setText("Files: 0");
-            statuslabel->setText("Processed 0%");
+            //statuslabel->setText("Processed 0%");
             // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
 
             sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
@@ -1246,18 +1248,22 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
 
 void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)
 {
-    int curprogress = (int)((((float)processcount)/(float)filecount)*100);
+    qDebug() << "files: " << filecount << " processed: " << processcount;
+    //int curprogress = (int)((((float)processcount)/(float)filecount)*100);
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
+    //statuslabel->setText("Processing...");
+    //statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
+    filtercountlabel->setText("Filtered: " + QString::number(filesfound));
     //if(curprogress == 100 && ProcessingComplete())
-    fcasedb.commit();
+    //fcasedb.commit(); // COMMIT HERE CAUSES A LOCKUP.
+    /*
     if(ProcessingComplete())
     {
         //InitializeQueryModel();
-        filtercountlabel->setText("Filtered: " + QString::number(filesfound));
         statuslabel->setText("Processing Complete");
     }
+    */
 }
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)
