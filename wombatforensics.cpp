@@ -1315,7 +1315,9 @@ WombatForensics::~WombatForensics()
 
 void WombatForensics::mouseDoubleClickEvent(QMouseEvent* event)
 {
-
+    if(event)
+    {
+    }
 }
 
 void WombatForensics::closeEvent(QCloseEvent* event)

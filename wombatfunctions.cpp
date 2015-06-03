@@ -17,7 +17,6 @@ std::string GetTime()
 /*
 void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned long long jobid, int type, QString msg)
 {
-    /*
     if(logdb.isOpen())
     {
         QSqlQuery logquery(logdb);
@@ -29,8 +28,8 @@ void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned
         logquery.addBindValue(msg);
         logquery.exec();
     }
-    */
 //}
+    */
 
 void LogMessage(QString logmsg)
 {
@@ -115,7 +114,7 @@ bool ProcessingComplete()
 {
     //qDebug() << "threadvector count: " << threadvector.count();
     //if((threadvector.count() == 0) && ((filesfound - filesprocessed) == 0))
-    for(int i=0; i < threadvector.count(); i++)
+    for(unsigned long long i=0; i < (unsigned long long)threadvector.count(); i++)
     {
         if(threadvector.at(i).isFinished())
         {
@@ -309,6 +308,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    qDebug() << "start proplist";
     // NEED TO WORK ON THE DESCRIPTIONS FOR THE FILE PROPERTIES A LITTLE
     QStringList proplist;
     proplist.clear();
@@ -338,6 +338,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         //LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
         LogMessage("TmpPtr got a value somehow");
     }
+    qDebug() << "end proplist";
+    qDebug() << "begin hashing";
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     QString tmpstring;
@@ -354,6 +356,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     else
         tmpstring = QString("");
+    qDebug() << "end hashing";
 
     QVector<QString> filestrings;
     if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
@@ -361,6 +364,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     filestrings.append(QString("/") + QString(tmppath));
     filestrings.append(tmpstring);
 
+    qDebug() << "begin block address";
     // BEGIN TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
     blockstring = "";
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
@@ -419,7 +423,9 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     //qDebug() << tmpfile->name->name << blockstring;
     filestrings.append(blockstring);
     proplist << "Block Address" << blockstring << "List of block addresses which contain the contents of the file";
+    qDebug() << "end block address";
 
+    qDebug() << "begin magic";
     // BEGIN TEST AREA FOR GETTING THE FILE SIGNATURE STRING
     // FILE MIME TYPE
     char magicbuffer[1024];
@@ -451,6 +457,9 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         filestrings.append(QString("Zero File"));
         proplist << "Zero File" << "Zero File";
     }
+    qDebug() << "end magic";
+
+    qDebug() << "begin image scaling";
     // BEGIN IMAGE SCALING OPERATION...
     QString thumbencstr = "";
     if(tmpfile->meta != NULL && isimage == true)
@@ -473,6 +482,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
 
     // END IMAGE SCALING OPERATION
+    qDebug() << "end image scaling";
+
     QVector<unsigned long long> fileints;
     if(tmpfile->name != NULL)
     {
