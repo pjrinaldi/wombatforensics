@@ -1345,6 +1345,8 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     htmlviewer->close();
     byteviewer->close();
     RemoveTmpFiles();
+    wombatvarptr->casedb.commit();
+    fcasedb.commit();
     // going to attempt to find out if a case is open...
     //if(this->windowTitle().compare("WombatForensics") != 0 && threadstarted == 1)
     //{
