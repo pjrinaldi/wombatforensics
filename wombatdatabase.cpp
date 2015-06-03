@@ -324,6 +324,7 @@ void WombatDatabase::CloseThumbDB()
 WombatDatabase::~WombatDatabase()
 {
     //CloseLogDB();
+    CloseCaseDB();
     CloseAppDB();
     CloseThumbDB();
 }

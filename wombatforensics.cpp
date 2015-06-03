@@ -702,6 +702,7 @@ void WombatForensics::InitializeEvidenceStructure()
     errorcount = 0;
     //StartJob(1, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
     //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Adding Evidence");
+    statuslabel->setText("Processing...");
     LogMessage(tr("Started Adding Evidence"));
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
@@ -1248,7 +1249,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
 
 void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)
 {
-    qDebug() << "files: " << filecount << " processed: " << processcount;
+    //qDebug() << "files: " << filecount << " processed: " << processcount;
     //int curprogress = (int)((((float)processcount)/(float)filecount)*100);
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
@@ -1345,29 +1346,29 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     byteviewer->close();
     RemoveTmpFiles();
     // going to attempt to find out if a case is open...
-    if(this->windowTitle().compare("WombatForensics") != 0 && threadstarted == 1)
-    {
-    if(!ProcessingComplete())
-    {
-        int ret = QMessageBox::question(this, tr("Threads haven't finished."), tr("There are threads that haven't finished. Exiting will lose that work. Do you still want to exit?"), QMessageBox::Yes | QMessageBox::No);
-        if (ret == QMessageBox::Yes)
-        {
+    //if(this->windowTitle().compare("WombatForensics") != 0 && threadstarted == 1)
+    //{
+    //if(!ProcessingComplete())
+    //{
+        //int ret = QMessageBox::question(this, tr("Threads haven't finished."), tr("There are threads that haven't finished. Exiting will lose that work. Do you still want to exit?"), QMessageBox::Yes | QMessageBox::No);
+        //if (ret == QMessageBox::Yes)
+        //{
             //LogMessage("Exiting with unfinished threads at user request. Work might get lost.");
             event->accept();
-        }
-        else
-        {
+        //}
+        //else
+        //{
             //LogMessage("User cancelled the exit request since some threads haven't finished.");
-            event->ignore();
-        }
+        //    event->ignore();
+        //}
 
         //event->accept();
         //LogEntry(0, 0, 0, 1, "All threads are done. Exiting...");
         //LogMessage("All threads are done. Exiting...");
         magic_close(magicptr);
         magic_close(magicmimeptr);
-    }
-    }
+    //}
+    //}
         //LogEntry(0, 0, 0, 0, "All threads aren't done yet. Exiting Cancelled.");
         //LogMessage("All threads are not done yet. Exiting Cancelled");
     msglog->clear();

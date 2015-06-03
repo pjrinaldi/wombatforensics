@@ -224,6 +224,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
         LogMessage(QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
         filesprocessed++;
         errorcount++;
+        isignals->ProgUpd();
     }
 }
 
@@ -339,6 +340,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    filesfound++;
     QStringList proplist;
     /*
     //qDebug() << "start proplist";
@@ -558,7 +560,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     fileints.append(currentfilesystemid);
 
-    filesfound++;
+    //filesfound++;
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, proplist, thumbencstr);
     //filewatcher.setFuture(tmpfuture);
     //threadvector.append(tmpfuture);
