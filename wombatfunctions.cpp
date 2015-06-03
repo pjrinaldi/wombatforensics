@@ -152,7 +152,8 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         QSqlQuery fquery(fcasedb);
-        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid, blockaddress, filemime, filesignature) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?);");
+        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        //fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid, blockaddress, filemime, filesignature) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?);");
         fquery.addBindValue(tmpints[0]);
         fquery.addBindValue(tmpstrings[0]);
         fquery.addBindValue(tmpints[1]);
@@ -163,12 +164,12 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
         fquery.addBindValue(tmpints[5]);
         fquery.addBindValue(tmpints[6]);
         fquery.addBindValue(tmpints[7]);
-        fquery.addBindValue(tmpstrings[2]);
+        //fquery.addBindValue(tmpstrings[2]);
         fquery.addBindValue(currentevidenceid);
         fquery.addBindValue(tmpints[8]);
-        fquery.addBindValue(tmpstrings[3]);
-        fquery.addBindValue(tmpstrings[4]);
-        fquery.addBindValue(tmpstrings[5]);
+        //fquery.addBindValue(tmpstrings[3]);
+        //fquery.addBindValue(tmpstrings[4]);
+        //fquery.addBindValue(tmpstrings[5]);
 
         //qDebug() << tmpstrings[0] << tmpstrings[3];
         
@@ -185,6 +186,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
             fquery.exec();
             fquery.finish();
         }
+        /*
         if(tmpstrings[4].contains("image/", Qt::CaseInsensitive))
         {
             QSqlQuery tquery(thumbdb);
@@ -194,6 +196,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
             tquery.exec();
             tquery.finish();
         }
+        */
         filesprocessed++;
         isignals->ProgUpd();
     }
@@ -348,6 +351,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         LogMessage("TmpPtr got a value somehow");
     }
     qDebug() << "end proplist";
+    /*
     qDebug() << "begin hashing";
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
@@ -366,13 +370,15 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     else
         tmpstring = QString("");
     qDebug() << "end hashing";
+    */
 
     QVector<QString> filestrings;
     if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
     else filestrings.append(QString("unknown.wbt"));
     filestrings.append(QString("/") + QString(tmppath));
-    filestrings.append(tmpstring);
+    //filestrings.append(tmpstring); // adding the md5 hash.
 
+    /*
     qDebug() << "begin block address";
     // BEGIN TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
     blockstring = "";
@@ -430,10 +436,12 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
     // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
     //qDebug() << tmpfile->name->name << blockstring;
-    filestrings.append(blockstring);
+    filestrings.append(blockstring); // adding blockstring to sql
     proplist << "Block Address" << blockstring << "List of block addresses which contain the contents of the file";
     qDebug() << "end block address";
+    */
 
+    /*
     qDebug() << "begin magic";
     // BEGIN TEST AREA FOR GETTING THE FILE SIGNATURE STRING
     // FILE MIME TYPE
@@ -467,7 +475,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         proplist << "Zero File" << "Zero File";
     }
     qDebug() << "end magic";
+    */
 
+    QString thumbencstr = "";
+    /*
     qDebug() << "begin image scaling";
     // BEGIN IMAGE SCALING OPERATION...
     QString thumbencstr = "";
@@ -492,6 +503,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
     // END IMAGE SCALING OPERATION
     qDebug() << "end image scaling";
+    */
 
     QVector<unsigned long long> fileints;
     if(tmpfile->name != NULL)
@@ -530,6 +542,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     threadvector.append(tmpfuture);
     //qDebug() << "thread added. new thread vector count: " << threadvector.count();
     return TSK_WALK_CONT;
+}
+
+void SecondaryProcessing()
+{
 }
 
 void cnid_to_array(uint32_t cnid, uint8_t array[4])

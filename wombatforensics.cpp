@@ -708,6 +708,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
+    SecondaryProcessing();
 }
 
 void WombatForensics::OpenEvidenceStructure()

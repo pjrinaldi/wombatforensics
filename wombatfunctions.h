@@ -12,6 +12,7 @@ bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
 void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints, QStringList tmplist, QString thumbencstr);
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
+void SecondaryProcessing(void);
 //void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned long long jobid, int type, QString msg);
 void LogMessage(QString message);
 //void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid);
