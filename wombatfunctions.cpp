@@ -80,6 +80,7 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
 
 unsigned long long GetChildCount(int type, unsigned long long address, unsigned long long parimgid)
 {
+    unsigned long long tmpcount = 0;
     QSqlQuery childquery(fcasedb);
     QString querystring = "SELECT COUNT(objectid) FROM data WHERE parentid = ?";
     if(type < 4)
@@ -95,9 +96,10 @@ unsigned long long GetChildCount(int type, unsigned long long address, unsigned 
     if(childquery.exec())
     {
         childquery.next();
-        return childquery.value(0).toULongLong();
+        tmpcount = childquery.value(0).toULongLong();
     }
-    return 0;
+    childquery.finish();
+    return tmpcount;
 }
 
 bool FileExists(const std::string& filename)
@@ -165,6 +167,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         QSqlQuery fquery(fcasedb);
+        fqueryptr = &fquery;
         fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
         //fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid, blockaddress, filemime, filesignature) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?);");
         fquery.addBindValue(tmpints[0]);
@@ -188,6 +191,11 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
         
         fquery.exec();
         //long long int tmpid = fquery.lastInsertId().toLongLong();
+        //if(filesprocessed % 500 == 0)
+        //{
+        //    fcasedb.commit();
+        //    fcasedb.transaction();
+        //}
         fquery.finish();
         //if(tmpid)
         //{
@@ -224,7 +232,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
         LogMessage(QString("Error while processing " + tmpstrings[1] + " " + fcasedb.lastError().text()));
         filesprocessed++;
         errorcount++;
-        isignals->ProgUpd();
+        //isignals->ProgUpd();
     }
 }
 

@@ -4,6 +4,7 @@
 #include "wombatinclude.h"
 
 extern QSqlDatabase fcasedb;
+extern QSqlQuery* fqueryptr;
 //extern QSqlDatabase logdb;
 extern QSqlDatabase thumbdb;
 extern QSqlDatabase fappdb;

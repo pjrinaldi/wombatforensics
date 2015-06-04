@@ -621,6 +621,7 @@ void WombatForensics::InitializeOpenCase()
 void WombatForensics::InitializeQueryModel()
 {
     fcasedb.commit();
+    //fqueryptr->finish();
     isignals->ProgUpd();
     //fcasedb.commit();
     //if(ProcessingComplete())
@@ -630,6 +631,8 @@ void WombatForensics::InitializeQueryModel()
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Adding Evidence Finished");
     */
         LogMessage(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
+        processcountlabel->setText("Processed: " + QString::number(filesfound));
+        filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
         statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
         LogMessage("All Threads have finished");
@@ -643,7 +646,7 @@ void WombatForensics::InitializeQueryModel()
         ResizeColumns();
         ui->actionRemove_Evidence->setEnabled(true);
         wombatframework->CloseInfoStructures();
-        fcasedb.commit();
+        //fcasedb.commit();
     //}
 }
 
@@ -1251,11 +1254,13 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
 {
     //qDebug() << "files: " << filecount << " processed: " << processcount;
     //int curprogress = (int)((((float)processcount)/(float)filecount)*100);
-    processcountlabel->setText("Processed: " + QString::number(filesprocessed));
-    filecountlabel->setText("Files: " + QString::number(filesfound));
+    processcountlabel->setText("Processed: " + QString::number(processcount));
+    //processcountlabel->setText("Processed: " + QString::number(filesprocessed));
+    //filecountlabel->setText("Files: " + QString::number(filesfound));
+    filecountlabel->setText("Files: " + QString::number(filecount));
     //statuslabel->setText("Processing...");
     //statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
-    filtercountlabel->setText("Filtered: " + QString::number(filesfound));
+    filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
     //if(curprogress == 100 && ProcessingComplete())
     //fcasedb.commit(); // COMMIT HERE CAUSES A LOCKUP.
     /*
@@ -1345,8 +1350,6 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     htmlviewer->close();
     byteviewer->close();
     RemoveTmpFiles();
-    wombatvarptr->casedb.commit();
-    fcasedb.commit();
     // going to attempt to find out if a case is open...
     //if(this->windowTitle().compare("WombatForensics") != 0 && threadstarted == 1)
     //{

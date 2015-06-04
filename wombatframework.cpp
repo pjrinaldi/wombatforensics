@@ -90,6 +90,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         currentfilesystemid = wombatptr->evidenceobject.fsidvector[i];
         if(fcasedb.transaction())
         {
+            //(*fqueryptr).prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             blockstring = "";
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
         }
@@ -100,7 +101,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
-    isignals->ProgUpd();
+    //isignals->ProgUpd();
 }
 
 void WombatFramework::CloseInfoStructures() // close all open info structures

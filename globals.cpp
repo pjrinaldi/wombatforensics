@@ -1,6 +1,7 @@
 #include "globals.h"
 
 QSqlDatabase fcasedb;
+QSqlQuery* fqueryptr = NULL;
 //QSqlDatabase logdb;
 QSqlDatabase thumbdb;
 QSqlDatabase fappdb;

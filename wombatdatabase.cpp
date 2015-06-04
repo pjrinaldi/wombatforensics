@@ -302,10 +302,10 @@ void WombatDatabase::CloseLogDB()
 */
 void WombatDatabase::CloseCaseDB()
 {
-    if(fcasedb.isOpen())
-        fcasedb.close();
     if(wombatptr->casedb.isOpen())
         wombatptr->casedb.close();
+    if(fcasedb.isOpen())
+        fcasedb.close();
     wombatptr->casedb = QSqlDatabase();
     fcasedb = QSqlDatabase();
     QSqlDatabase::removeDatabase("casedb");
