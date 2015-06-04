@@ -88,12 +88,12 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     for(uint i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
     {
         currentfilesystemid = wombatptr->evidenceobject.fsidvector[i];
-        if(fcasedb.transaction())
-        {
+        //if(fcasedb.transaction())
+        //{
             //(*fqueryptr).prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             blockstring = "";
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
-        }
+        //}
     }
     if(walkreturn == 1)
     {

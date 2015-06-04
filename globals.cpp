@@ -11,6 +11,7 @@ QTextEdit* msglog = NULL;
 QString fdbname = "t.db";
 QThreadPool* threadpool = NULL;
 QVector<QFuture<void> > threadvector;
+QVector<FileData> filedatavector;
 QFutureWatcher<void> filewatcher;
 QFutureWatcher<void> thumbwatcher;
 unsigned long long filesfound = 0;

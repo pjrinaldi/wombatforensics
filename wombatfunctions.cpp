@@ -155,6 +155,20 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     if(tmplist.count() > 0)
     {
     }
+    FileData tmpdata;
+    tmpdata.type = tmpints[0];
+    tmpdata.name = tmpstrings[0];
+    tmpdata.paraddr = tmpints[1];
+    tmpdata.path = tmpstrings[1];
+    tmpdata.atime = tmpints[2];
+    tmpdata.ctime = tmpints[3];
+    tmpdata.crtime = tmpints[4];
+    tmpdata.mtime = tmpints[5];
+    tmpdata.size = tmpints[6];
+    tmpdata.addr = tmpints[7];
+    tmpdata.evid = currentevidenceid;
+    tmpdata.fsid = tmpints[8];
+    filedatavector.append(tmpdata);
     // PROCESS FILE NEEDS TO DO ONLY THE STANDARD STUFF....
     // IMAGE SCALING, BLOCK ADDRESSES, HASHING, AND SIGNATURE ANALYSIS SHOULD OCCUR AFTER IT BY PULLING THE INFO FROM THE DB
     // IN THEIR OWN ENCLOSED CONTAINER FOR EACH FILE. THEN I SIMPLY CALL AN UPDATE TO THE DATA TABLE TO STICK IN THE NEW VALUS...
@@ -163,6 +177,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     // NOW I JUST NEED TO IMPLEMENT THIS FUNCTIONALITY....
 
 
+    /*
 
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
@@ -200,6 +215,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
         //if(tmpid)
         //{
         //}
+        */
         /*
         for(int i=0; i < tmplist.count()/3; i++)
         {
@@ -225,6 +241,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
         */
         filesprocessed++;
         isignals->ProgUpd();
+        /*
     }
     else
     {
@@ -233,7 +250,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
         filesprocessed++;
         errorcount++;
         //isignals->ProgUpd();
-    }
+    }*/
 }
 
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)

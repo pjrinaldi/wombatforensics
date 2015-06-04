@@ -97,6 +97,24 @@ struct FilterValues
     QVector<unsigned long long> hashidlist;
 };
 
+struct FileData
+{
+    QAtomicInteger(unsigned long long) type;
+    unsigned long long paraddr;
+    unsigned long long atime;
+    unsigned long long ctime;
+    unsigned long long crtime;
+    unsigned long long mtime;
+    unsigned long long size;
+    unsigned long long addr;
+    unsigned long long fsid;
+    unsigned long long evid;
+    QString name;
+    QString path;
+};
+
+extern QVector<FileData> filedatavector;
+
 extern FilterValues filtervalues;
 
 class InterfaceSignals : public QObject
