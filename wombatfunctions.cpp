@@ -659,7 +659,9 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     // FILE MIME TYPE
     char magicbuffer[1024];
     const char* mimesig;
+    const char* sigtype;
     char* sigp1;
+    char* sigp2;
     bool isimage = false;
     ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
@@ -687,17 +689,50 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
     {
-        const char* sigtype = magic_buffer(magicptr, magicbuffer, readlen);
+        sigtype = magic_buffer(magicptr, magicbuffer, readlen);
         //filestrings.append(QString::fromStdString(string(sigtype)));
-        char* sigp1 = strtok((char*)sigtype, ",");
+        sigp2 = strtok((char*)sigtype, ",");
         //proplist << QString::fromStdString(string(sigp1)) << QString::fromStdString(string(sigtype));
     }
+    QSqlQuery sigquery(fcasedb);
+    sigquery.prepare("UPDATE data SET filesignature = ? WHERE objectid = ?;");
+    if(readlen > 0)
+        sigquery.bindValue(0, QString::fromStdString(sigp2));
     else
-    {
-        //filestrings.append(QString("Zero File"));
-        //proplist << "Zero File" << "Zero File";
-    }
+        sigquery.bindValue(0, QString("Zero File"));
+    sigquery.bindValue(1, objid);
+    sigquery.exec();
+    sigquery.next();
+    sigquery.finish();
     //qDebug() << "end magic";
+    //qDebug() << "Begin thumb encoding"
+    //QString thumbencstr = "";
+    if(tmpfile->meta != NULL && isimage == true)
+    {
+        QByteArray thumbdata;
+        QImage thumbimage;
+        QBuffer thumbuf(&thumbdata);
+        QImage origimage;
+        char imagebuffer[tmpfile->meta->size];
+        ssize_t imglen = tsk_fs_file_read(tmpfile, 0, imagebuffer, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        bool imageloaded = origimage.loadFromData(QByteArray::fromRawData(imagebuffer, imglen));
+        if(imageloaded)
+        {
+            thumbimage = origimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
+            thumbuf.open(QIODevice::WriteOnly);
+            thumbimage.save(&thumbuf, "PNG");
+            thumbdata = thumbdata.toBase64();
+            //thumbencstr = QString(thumbdata);
+            QSqlQuery imgquery(fcasedb);
+            imgquery.prepare("INSERT INTO thumbs(objectid, thumbblob) VALUES(?, ?);");
+            imgquery.bindValue(0, objid);
+            imgquery.bindValue(1, QString(thumbdata));
+            imgquery.exec();
+            imgquery.finish();
+        }
+    }
+    // END IMAGE SCALING OPERATION
+    //qDebug() << "end image scaling";
     mutex.unlock();
 }
 
