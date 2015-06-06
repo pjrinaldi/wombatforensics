@@ -624,12 +624,14 @@ void SecondaryProcessing()
             }
             imgquery.finish();
             TskObject tmptskobj;
+            /*
             if(tmptskobj.readimginfo != NULL)
                 tsk_img_close(tmptskobj.readimginfo);
             if(tmptskobj.readfsinfo != NULL)
                 tsk_fs_close(tmptskobj.readfsinfo);
             if(tmptskobj.readfileinfo != NULL)
                 tsk_fs_file_close(tmptskobj.readfileinfo);
+            */
             tmptskobj.imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
             for(uint i=0; i < pathvector.size(); i++)
             {
