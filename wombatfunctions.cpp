@@ -146,15 +146,16 @@ bool ProcessingComplete()
     return false;
 }
 
-void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints, QStringList tmplist, QString thumbencstr)
+void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints)
 {
-
+    /*
     if(thumbencstr.compare("") == 0)
     {
     }
     if(tmplist.count() > 0)
     {
     }
+    */
     FileData tmpdata;
     tmpdata.type = tmpints[0];
     tmpdata.name = tmpstrings[0];
@@ -372,7 +373,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 {
     filesfound++;
     isignals->ProgUpd();
-    QStringList proplist;
+    //QStringList proplist;
     /*
     //qDebug() << "start proplist";
     // NEED TO WORK ON THE DESCRIPTIONS FOR THE FILE PROPERTIES A LITTLE
@@ -423,7 +424,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             tmpstring = QString(sbuf);
     }
     else
-        tmpstring = QString("");
+        tmpstring);= QString("");
     qDebug() << "end hashing";
     */
 
@@ -532,7 +533,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     qDebug() << "end magic";
     */
 
-    QString thumbencstr = "";
+    //QString thumbencstr = "";
     /*
     qDebug() << "begin image scaling";
     // BEGIN IMAGE SCALING OPERATION...
@@ -592,7 +593,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     fileints.append(currentfilesystemid);
 
     //filesfound++;
-    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, proplist, thumbencstr);
+    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints);
     //filewatcher.setFuture(tmpfuture);
     //threadvector.append(tmpfuture);
     //qDebug() << "thread added. new thread vector count: " << threadvector.count();
@@ -601,6 +602,107 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 void SecondaryProcessing()
 {
+    QVector<TskObject> fileinfovector;
+    QSqlQuery filequery(fcasedb);
+    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;");
+    if(filequery.exec())
+    {
+        while(filequery.next())
+        {
+            // Open Parent Image
+            std::vector<std::string> pathvector;
+            pathvector.clear();
+            QSqlQuery imgquery(fcasedb);
+            imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
+            imgquery.bindValue(0, filequery.value(1).toULongLong());
+            if(imgquery.exec())
+            {
+                while(imgquery.next())
+                {
+                    pathvector.push_back(imgquery.value(0).toString().toStdString());
+                }
+            }
+            imgquery.finish();
+            TskObject tmptskobj;
+            if(tmptskobj.readimginfo != NULL)
+                tsk_img_close(tmptskobj.readimginfo);
+            if(tmptskobj.readfsinfo != NULL)
+                tsk_fs_close(tmptskobj.readfsinfo);
+            if(tmptskobj.readfileinfo != NULL)
+                tsk_fs_file_close(tmptskobj.readfileinfo);
+            tmptskobj.imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+            for(uint i=0; i < pathvector.size(); i++)
+            {
+                tmptskobj.imagepartspath[i] = pathvector.at(i).c_str();
+            }
+            tmptskobj.readimginfo = tsk_img_open(pathvector.size(), tmptskobj.imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+            free(tmptskobj.imagepartspath);
+            //OpenParentFileSystem
+            QSqlQuery fsquery(fcasedb);
+            fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+            fsquery.bindValue(0, filequery.value(2).toULongLong());
+            fsquery.exec();
+            fsquery.next();
+            tmptskobj.readfsinfo = tsk_fs_open_img(tmptskobj.readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
+            fsquery.finish();
+            //OpenFile
+            tmptskobj.readfileinfo = tsk_fs_file_open_meta(tmptskobj.readfsinfo, NULL, filequery.value(3).toULongLong());
+            fileinfovector.append(tmptskobj);
+        }
+    }
+    qDebug() << "fileinfovector" << fileinfovector.count();
+    /*
+    // OpenParentFileSystem
+    pimgquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+    pimgquery.addBindValue(fsid);
+    pimgquery.exec();
+    pimgquery.next();
+    fsoffset = pimgquery.value(0).toULongLong();
+    pimgquery.finish();
+    tskexternalptr->readfsinfo = tsk_fs_open_img(tskexternalptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
+    // OpenFile
+    tskexternalptr->readfileinfo = tsk_fs_file_open_meta(tskexternalptr->readfsinfo, NULL, address);
+    */
+/*    
+*/
+    // sqlquery to get all objectids, addresses to open the tmpfile.
+    // then for each one, i can call concurrent processes to spawn each function (thumbnail, blockaddress, md5 hash,
+    // file signature, file mime types, and file properties list...
+    //
+    //
+    //
+    /*
+    if(tskobjptr->readimginfo != NULL)
+        tsk_img_close(tskobjptr->readimginfo);
+    if(tskobjptr->readfsinfo != NULL)
+        tsk_fs_close(tskobjptr->readfsinfo);
+    if(tskobjptr->readfileinfo != NULL)
+        tsk_fs_file_close(tskobjptr->readfileinfo);
+
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
+        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
+        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
+        tskobjptr->offset = 0;
+        if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
+        {
+                tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize + tskobjptr->fsoffset;
+        }
+        else
+        {
+            tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
+            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
+        }
+        //qDebug() << "file object offset:" << tskobjptr->offset;
+        tskobjptr->objecttype = 5;
+        tskobjptr->address = wombatvarptr->selectedobject.address;
+        tskobjptr->length = wombatvarptr->selectedobject.size;
+        tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
+        tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
+        OpenFileSystemFile();
+    */
+
+
 }
 
 void cnid_to_array(uint32_t cnid, uint8_t array[4])

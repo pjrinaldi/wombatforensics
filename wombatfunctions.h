@@ -10,7 +10,7 @@ char* TskTimeToStringUTC(time_t time, char buf[128]);
 unsigned long long GetChildCount(int type, unsigned long long address, unsigned long long parimgid = 0);
 bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
-void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints, QStringList tmplist, QString thumbencstr);
+void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints); 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 void SecondaryProcessing(void);
 //void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned long long jobid, int type, QString msg);

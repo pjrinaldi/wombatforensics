@@ -128,6 +128,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
             }
             fcasedb.commit();
             fquery.finish();
+            filedatavector.clear();
         }
    }
     //isignals->ProgUpd();
