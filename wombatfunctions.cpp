@@ -624,6 +624,7 @@ void SecondaryProcessing()
             }
             imgquery.finish();
             TskObject tmptskobj;
+            tmptskobj.objectid = filequery.value(0).toULongLong();
             /*
             if(tmptskobj.readimginfo != NULL)
                 tsk_img_close(tmptskobj.readimginfo);
@@ -653,60 +654,49 @@ void SecondaryProcessing()
         }
     }
     qDebug() << "fileinfovector" << fileinfovector.count();
-    /*
-    // OpenParentFileSystem
-    pimgquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
-    pimgquery.addBindValue(fsid);
-    pimgquery.exec();
-    pimgquery.next();
-    fsoffset = pimgquery.value(0).toULongLong();
-    pimgquery.finish();
-    tskexternalptr->readfsinfo = tsk_fs_open_img(tskexternalptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
-    // OpenFile
-    tskexternalptr->readfileinfo = tsk_fs_file_open_meta(tskexternalptr->readfsinfo, NULL, address);
-    */
-/*    
-*/
+
+
+    for(int i=0; i < fileinfovector.count(); i++)
+    {
+        QFuture<void> hashfuture = QtConcurrent::run(HashFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid); 
+    }
     // sqlquery to get all objectids, addresses to open the tmpfile.
     // then for each one, i can call concurrent processes to spawn each function (thumbnail, blockaddress, md5 hash,
     // file signature, file mime types, and file properties list...
     //
     //
     //
-    /*
-    if(tskobjptr->readimginfo != NULL)
-        tsk_img_close(tskobjptr->readimginfo);
-    if(tskobjptr->readfsinfo != NULL)
-        tsk_fs_close(tskobjptr->readfsinfo);
-    if(tskobjptr->readfileinfo != NULL)
-        tsk_fs_file_close(tskobjptr->readfileinfo);
-
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
-        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
-        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
-        tskobjptr->offset = 0;
-        if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
-        {
-                tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize + tskobjptr->fsoffset;
-        }
-        else
-        {
-            tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
-            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
-        }
-        //qDebug() << "file object offset:" << tskobjptr->offset;
-        tskobjptr->objecttype = 5;
-        tskobjptr->address = wombatvarptr->selectedobject.address;
-        tskobjptr->length = wombatvarptr->selectedobject.size;
-        tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
-        tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
-        OpenFileSystemFile();
-    */
-
 
 }
 
+void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
+{
+    mutex.lock();
+    TSK_FS_HASH_RESULTS hashresults;
+    uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
+    if(retval == 0)
+    {
+        char sbuf[17];
+        int sint = 0;
+        for(int i=0; i < 16; i++)
+        {
+            sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
+        }
+        if(sint > 0)
+            fileshash.insert(objid, QString(sbuf)); 
+        else
+            fileshash.insert(objid, QString(""));
+        qDebug() << "objectid" << objid << "hash" << QString(sbuf); 
+        QSqlQuery hashquery(fcasedb);
+        hashquery.prepare("UPDATE data SET md5 = ? where objectid = ?;");
+        hashquery.bindValue(0, QString(sbuf));
+        hashquery.bindValue(1, objid);
+        hashquery.exec();
+        hashquery.next();
+        hashquery.finish();
+    }
+    mutex.unlock();
+}
 void cnid_to_array(uint32_t cnid, uint8_t array[4])
 {
     array[3] = (cnid >> 0) & 0xff;

@@ -88,20 +88,14 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     for(uint i=0; i < wombatptr->evidenceobject.fsinfovector.size(); i++)
     {
         currentfilesystemid = wombatptr->evidenceobject.fsidvector[i];
-        //if(fcasedb.transaction())
-        //{
-            //(*fqueryptr).prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             blockstring = "";
             walkreturn = tsk_fs_dir_walk(wombatptr->evidenceobject.fsinfovector[i], wombatptr->evidenceobject.fsinfovector[i]->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
-        //}
     }
     if(walkreturn == 1)
     {
-        //LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Issues with Traversing the File Structure were encountered.");
         LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
-    //qDebug() << filedatavector.count();
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         if(fcasedb.transaction())

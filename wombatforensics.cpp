@@ -108,6 +108,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     propertywindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+    //connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateDataTable()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered()), this, SLOT(on_actionViewerManager_triggered()), Qt::DirectConnection);
@@ -620,7 +621,7 @@ void WombatForensics::InitializeOpenCase()
 
 void WombatForensics::InitializeQueryModel()
 {
-    fcasedb.commit();
+    //fcasedb.commit();
     //fqueryptr->finish();
     isignals->ProgUpd();
     //fcasedb.commit();
@@ -714,7 +715,14 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
-    SecondaryProcessing();
+    secondfuture = QtConcurrent::run(SecondaryProcessing);
+    secondwatcher.setFuture(secondfuture);
+}
+
+
+void WombatForensics::UpdateDataTable()
+{
+    qDebug() << "data table function" << "fileshash count" << fileshash.count();
 }
 
 void WombatForensics::OpenEvidenceStructure()

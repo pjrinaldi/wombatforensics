@@ -42,6 +42,7 @@ extern QStringList externallist;
 extern struct magic_set* magicptr;
 extern struct magic_set* magicmimeptr;
 extern QMutex mutex;
+extern QHash<unsigned long long, QString> fileshash;
 
 struct dosdate
 {

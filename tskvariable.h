@@ -8,6 +8,7 @@ struct TskObject
 {
     const TSK_TCHAR** imagepartspath;
     int partcount;
+    unsigned long long objectid;
     unsigned long long offset;
     unsigned long long length;
     unsigned long long imglength;

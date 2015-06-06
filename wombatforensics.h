@@ -730,6 +730,7 @@ private slots:
     void UpdateSelectValue(const QString &txt);
     //void LoadComplete(bool isok);
     void InitializeQueryModel(void);
+    void UpdateDataTable(void);
     void FinishExport(void);
     void FinishRemoval(void);
     void StatusUpdate(QString tmptext)
@@ -786,6 +787,8 @@ private:
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
+    QFuture<void> secondfuture;
+    QFutureWatcher<void> secondwatcher;
     QFuture<void> exportfuture;
     QFutureWatcher<void> exportwatcher;
     QFuture<void> remfuture;
