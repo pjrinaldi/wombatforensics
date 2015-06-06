@@ -41,6 +41,7 @@ extern QString hexselection;
 extern QStringList externallist;
 extern struct magic_set* magicptr;
 extern struct magic_set* magicmimeptr;
+extern QMutex mutex;
 
 struct dosdate
 {
@@ -99,7 +100,8 @@ struct FilterValues
 
 struct FileData
 {
-    QAtomicInteger(unsigned long long) type;
+    //QAtomicInteger(unsigned long long) type;
+    unsigned long long type;
     unsigned long long paraddr;
     unsigned long long atime;
     unsigned long long ctime;

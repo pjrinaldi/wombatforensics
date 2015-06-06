@@ -55,4 +55,5 @@ QString hexselection = "";
 QStringList externallist;
 struct magic_set* magicptr = NULL;
 struct magic_set* magicmimeptr = NULL;
+QMutex mutex;
 FilterValues filtervalues;
