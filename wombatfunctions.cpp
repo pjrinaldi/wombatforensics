@@ -407,26 +407,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         LogMessage("TmpPtr got a value somehow");
     }
     //qDebug() << "end proplist";
-    /*
-    qDebug() << "begin hashing";
-    TSK_FS_HASH_RESULTS hashresults;
-    uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
-    QString tmpstring;
-    if(retval == 0)
-    {
-        char sbuf[17];
-        int sint = 0;
-        for(int i=0; i < 16; i++)
-        {
-            sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
-        }
-        if(sint > 0)
-            tmpstring = QString(sbuf);
-    }
-    else
-        tmpstring);= QString("");
-    qDebug() << "end hashing";
-    */
 
     QVector<QString> filestrings;
     if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
@@ -658,7 +638,9 @@ void SecondaryProcessing()
 
     for(int i=0; i < fileinfovector.count(); i++)
     {
-        QFuture<void> hashfuture = QtConcurrent::run(HashFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid); 
+        QFuture<void> hashfuture = QtConcurrent::run(HashFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
+        QFuture<void> magicfuture = QtConcurrent::run(MagicFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
+        //QFuture<void> thumbfuture = QtConcurrent::run(ThumbFile, fileinfovector.at(i).readfileinfo 
     }
     // sqlquery to get all objectids, addresses to open the tmpfile.
     // then for each one, i can call concurrent processes to spawn each function (thumbnail, blockaddress, md5 hash,
@@ -667,6 +649,56 @@ void SecondaryProcessing()
     //
     //
 
+}
+
+
+void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
+{
+    mutex.lock();
+    //qDebug() << "begin magic";
+    // FILE MIME TYPE
+    char magicbuffer[1024];
+    const char* mimesig;
+    char* sigp1;
+    bool isimage = false;
+    ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+    if(readlen > 0)
+    {
+        mimesig = magic_buffer(magicmimeptr, magicbuffer, readlen);
+        sigp1 = strtok((char*)mimesig, ";");
+    }
+    QSqlQuery mimequery(fcasedb);
+    mimequery.prepare("UPDATE data SET filemime = ? WHERE objectid = ?;");
+    if(readlen > 0)
+        mimequery.bindValue(0, QString::fromStdString(sigp1));
+    else
+        mimequery.bindValue(0, QString("Zero File"));
+    mimequery.bindValue(1, objid);
+    mimequery.exec();
+    mimequery.next();
+    mimequery.finish();
+    //filestrings.append(QString::fromStdString(string(sigp1)));
+    if(QString::fromStdString(string(sigp1)).contains("image/", Qt::CaseInsensitive))
+        isimage = true;
+
+
+    // FILE SIGNATURE
+    //proplist << "File Signature";
+    readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+    if(readlen > 0)
+    {
+        const char* sigtype = magic_buffer(magicptr, magicbuffer, readlen);
+        //filestrings.append(QString::fromStdString(string(sigtype)));
+        char* sigp1 = strtok((char*)sigtype, ",");
+        //proplist << QString::fromStdString(string(sigp1)) << QString::fromStdString(string(sigtype));
+    }
+    else
+    {
+        //filestrings.append(QString("Zero File"));
+        //proplist << "Zero File" << "Zero File";
+    }
+    //qDebug() << "end magic";
+    mutex.unlock();
 }
 
 void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
