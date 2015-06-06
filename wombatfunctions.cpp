@@ -244,8 +244,8 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
             tquery.finish();
         }
         */
-        filesprocessed++;
-        isignals->ProgUpd();
+        //filesprocessed++;
+        //isignals->ProgUpd();
         /*
     }
     else
@@ -371,6 +371,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     filesfound++;
+    isignals->ProgUpd();
     QStringList proplist;
     /*
     //qDebug() << "start proplist";
