@@ -157,9 +157,9 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     }
     FileData tmpdata;
     tmpdata.type = tmpints[0];
-    //tmpdata.name = tmpstrings[0];
+    tmpdata.name = tmpstrings[0];
     tmpdata.paraddr = tmpints[1];
-    //tmpdata.path = tmpstrings[1];
+    tmpdata.path = tmpstrings[1];
     tmpdata.atime = tmpints[2];
     tmpdata.ctime = tmpints[3];
     tmpdata.crtime = tmpints[4];
@@ -168,7 +168,6 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     tmpdata.addr = tmpints[7];
     tmpdata.evid = currentevidenceid;
     tmpdata.fsid = tmpints[8];
-    //filedatavector.prepend(tmpdata);
     mutex.lock();
     filedatavector.append(tmpdata);
     mutex.unlock();
