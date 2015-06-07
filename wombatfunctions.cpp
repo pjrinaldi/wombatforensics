@@ -662,6 +662,7 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     const char* sigtype;
     char* sigp1;
     char* sigp2;
+    std::size_t found;
     bool isimage = false;
     ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
@@ -679,9 +680,12 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     mimequery.exec();
     mimequery.next();
     mimequery.finish();
-    //filestrings.append(QString::fromStdString(string(sigp1)));
-    if(QString::fromStdString(string(sigp1)).contains("image/", Qt::CaseInsensitive))
+    found = string(sigp1).find("image/");
+    if(found != std::string::npos)
         isimage = true;
+    //filestrings.append(QString::fromStdString(string(sigp1)));
+    //if(QString::fromStdString(string(sigp1)).contains("image/", Qt::CaseInsensitive))
+    //    isimage = true;
     // FILE SIGNATURE
     //proplist << "File Signature";
     readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);

@@ -142,10 +142,8 @@ void ImageViewer::UpdateGeometries()
     QFuture<void> thumbfuture = QtConcurrent::run(this, &ImageViewer::GetPixmaps);
     thumbwatcher.setFuture(thumbfuture);
     //GetPixmaps();
-    imagemodel = new ImageModel(pixmaps, idlist);
-    ui->listView->setModel(imagemodel);
-    connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
-    connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
+    //imagemodel = new ImageModel(pixmaps, idlist);
+    //ui->listView->setModel(imagemodel);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(SetModel()), Qt::QueuedConnection);
 }
 
@@ -153,6 +151,8 @@ void ImageViewer::SetModel()
 {
     imagemodel = new ImageModel(pixmaps, idlist);
     ui->listView->setModel(imagemodel);
+    connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
+    connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
     ui->label_2->setText(QString::number(pixmaps.count()) + " Image(s)");
 }
 
