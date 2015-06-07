@@ -682,8 +682,6 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     //filestrings.append(QString::fromStdString(string(sigp1)));
     if(QString::fromStdString(string(sigp1)).contains("image/", Qt::CaseInsensitive))
         isimage = true;
-
-
     // FILE SIGNATURE
     //proplist << "File Signature";
     readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
@@ -707,8 +705,11 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     //qDebug() << "end magic";
     //qDebug() << "Begin thumb encoding"
     //QString thumbencstr = "";
+    mutex.unlock();
     if(tmpfile->meta != NULL && isimage == true)
     {
+        mutex.lock();
+        qDebug() << "isimage" << isimage;
         QByteArray thumbdata;
         QImage thumbimage;
         QBuffer thumbuf(&thumbdata);
@@ -716,24 +717,29 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         char imagebuffer[tmpfile->meta->size];
         ssize_t imglen = tsk_fs_file_read(tmpfile, 0, imagebuffer, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         bool imageloaded = origimage.loadFromData(QByteArray::fromRawData(imagebuffer, imglen));
+        mutex.unlock();
         if(imageloaded)
         {
             thumbimage = origimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
             thumbuf.open(QIODevice::WriteOnly);
             thumbimage.save(&thumbuf, "PNG");
             thumbdata = thumbdata.toBase64();
+            //qDebug() << thumbdata;
             //thumbencstr = QString(thumbdata);
-            QSqlQuery imgquery(fcasedb);
+            QSqlQuery imgquery(thumbdb);
             imgquery.prepare("INSERT INTO thumbs(objectid, thumbblob) VALUES(?, ?);");
             imgquery.bindValue(0, objid);
             imgquery.bindValue(1, QString(thumbdata));
             imgquery.exec();
+            //imgquery.next();
             imgquery.finish();
         }
     }
     // END IMAGE SCALING OPERATION
     //qDebug() << "end image scaling";
-    mutex.unlock();
+    filesprocessed++;
+    //mutex.unlock();
+    isignals->ProgUpd();
 }
 
 void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
@@ -753,7 +759,7 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
             fileshash.insert(objid, QString(sbuf)); 
         else
             fileshash.insert(objid, QString(""));
-        qDebug() << "objectid" << objid << "hash" << QString(sbuf); 
+        //qDebug() << "objectid" << objid << "hash" << QString(sbuf); 
         QSqlQuery hashquery(fcasedb);
         hashquery.prepare("UPDATE data SET md5 = ? where objectid = ?;");
         hashquery.bindValue(0, QString(sbuf));

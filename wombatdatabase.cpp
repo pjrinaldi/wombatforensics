@@ -214,7 +214,7 @@ void WombatDatabase::CreateThumbDB()
     if(thumbdb.open())
     {
         QSqlQuery thumbquery(thumbdb);
-        thumbquery.exec("CREATE TABLE thumbs(thumbid INTERGER PRIMARY KEY, objectid INTEGER, thumbblob TEXT);");
+        thumbquery.exec("CREATE TABLE thumbs(thumbid INTEGER PRIMARY KEY, objectid INTEGER, thumbblob TEXT);");
         thumbquery.finish();
     }
     else
