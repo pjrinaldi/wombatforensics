@@ -680,7 +680,9 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     mimequery.exec();
     mimequery.next();
     mimequery.finish();
+    mutex.unlock();
     found = string(sigp1).find("image/");
+    mutex.lock();
     if(found != std::string::npos)
         isimage = true;
     //filestrings.append(QString::fromStdString(string(sigp1)));
