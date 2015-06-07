@@ -149,6 +149,7 @@ void ImageViewer::UpdateGeometries()
 
 void ImageViewer::SetModel()
 {
+    qDebug() << pixmaps.count();
     imagemodel = new ImageModel(pixmaps, idlist);
     ui->listView->setModel(imagemodel);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
