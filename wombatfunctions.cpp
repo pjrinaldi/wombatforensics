@@ -630,13 +630,15 @@ void SecondaryProcessing()
             fsquery.finish();
             //OpenFile
             tmptskobj.readfileinfo = tsk_fs_file_open_meta(tmptskobj.readfsinfo, NULL, filequery.value(3).toULongLong());
-            fileinfovector.append(tmptskobj);
+            HashFile(tmptskobj.readfileinfo, tmptskobj.objectid);
+            //fileinfovector.append(tmptskobj);
         }
     }
     filequery.finish();
-    qDebug() << "fileinfovector" << fileinfovector.count();
+    //qDebug() << "fileinfovector" << fileinfovector.count();
 
 
+    /*
     for(int i=0; i < fileinfovector.count(); i++)
     {
         HashFile(fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
@@ -644,6 +646,7 @@ void SecondaryProcessing()
         //QFuture<void> magicfuture = QtConcurrent::run(MagicFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
         //QFuture<void> thumbfuture = QtConcurrent::run(ThumbFile, fileinfovector.at(i).readfileinfo 
     }
+    */
     // sqlquery to get all objectids, addresses to open the tmpfile.
     // then for each one, i can call concurrent processes to spawn each function (thumbnail, blockaddress, md5 hash,
     // file signature, file mime types, and file properties list...
