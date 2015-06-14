@@ -633,13 +633,14 @@ void SecondaryProcessing()
             fileinfovector.append(tmptskobj);
         }
     }
+    filequery.finish();
     qDebug() << "fileinfovector" << fileinfovector.count();
 
 
     for(int i=0; i < fileinfovector.count(); i++)
     {
         QFuture<void> hashfuture = QtConcurrent::run(HashFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
-        QFuture<void> magicfuture = QtConcurrent::run(MagicFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
+        //QFuture<void> magicfuture = QtConcurrent::run(MagicFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
         //QFuture<void> thumbfuture = QtConcurrent::run(ThumbFile, fileinfovector.at(i).readfileinfo 
     }
     // sqlquery to get all objectids, addresses to open the tmpfile.
@@ -774,6 +775,8 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         hashquery.next();
         hashquery.finish();
     }
+    filesprocessed++;
+    isignals->ProgUpd();
     mutex.unlock();
 }
 void cnid_to_array(uint32_t cnid, uint8_t array[4])
