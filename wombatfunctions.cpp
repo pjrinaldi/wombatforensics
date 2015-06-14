@@ -816,11 +816,7 @@ void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     blockquery.finish();
     processphase++;
     isignals->ProgUpd();
-    // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
-    //qDebug() << tmpfile->name->name << blockstring;
-    //filestrings.append(blockstring); // adding blockstring to sql
     //proplist << "Block Address" << blockstring << "List of block addresses which contain the contents of the file";
-    //qDebug() << "end block address";
     //*/
 
 }
