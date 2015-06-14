@@ -18,6 +18,7 @@ extern QFutureWatcher<void> filewatcher;
 extern QFutureWatcher<void> thumbwatcher;
 extern unsigned long long filesfound;
 extern unsigned long long filesprocessed;
+extern unsigned long long processphase;
 extern unsigned long long totalcount;
 extern unsigned long long totalchecked;
 extern unsigned long long currentevidenceid;

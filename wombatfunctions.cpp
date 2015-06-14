@@ -372,6 +372,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     filesfound++;
+    processphase++;
     isignals->ProgUpd();
     //QStringList proplist;
     /*
@@ -582,13 +583,18 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 void SecondaryProcessing()
 {
-    QVector<TskObject> fileinfovector;
+    //QVector<TskObject> fileinfovector;
     QSqlQuery filequery(fcasedb);
     filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;");
     if(filequery.exec())
     {
         while(filequery.next())
         {
+            const TSK_TCHAR** imagepartspath;
+            unsigned long long objectid = 0;
+            TSK_IMG_INFO* readimginfo;
+            TSK_FS_INFO* readfsinfo;
+            TSK_FS_FILE* readfileinfo;
             // Open Parent Image
             std::vector<std::string> pathvector;
             pathvector.clear();
@@ -603,8 +609,13 @@ void SecondaryProcessing()
                 }
             }
             imgquery.finish();
-            TskObject tmptskobj;
-            tmptskobj.objectid = filequery.value(0).toULongLong();
+
+            objectid = filequery.value(0).toULongLong();
+            imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+
+            /*
+            //TskObject tmptskobj;
+            //tmptskobj.objectid = filequery.value(0).toULongLong();
             if(tmptskobj.readimginfo != NULL)
                 tsk_img_close(tmptskobj.readimginfo);
             if(tmptskobj.readfsinfo != NULL)
@@ -612,24 +623,31 @@ void SecondaryProcessing()
             if(tmptskobj.readfileinfo != NULL)
                 tsk_fs_file_close(tmptskobj.readfileinfo);
             tmptskobj.imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+            */
             for(uint i=0; i < pathvector.size(); i++)
             {
-                tmptskobj.imagepartspath[i] = pathvector.at(i).c_str();
+                imagepartspath[i] = pathvector.at(i).c_str();
+                //tmptskobj.imagepartspath[i] = pathvector.at(i).c_str();
             }
-            tmptskobj.readimginfo = tsk_img_open(pathvector.size(), tmptskobj.imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-            free(tmptskobj.imagepartspath);
+            //tmptskobj.readimginfo = tsk_img_open(pathvector.size(), tmptskobj.imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+            readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+            //free(tmptskobj.imagepartspath);
+            free(imagepartspath);
             //OpenParentFileSystem
             QSqlQuery fsquery(fcasedb);
             fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
             fsquery.bindValue(0, filequery.value(2).toULongLong());
             fsquery.exec();
             fsquery.next();
-            tmptskobj.readfsinfo = tsk_fs_open_img(tmptskobj.readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
+            readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
+            //tmptskobj.readfsinfo = tsk_fs_open_img(tmptskobj.readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
             fsquery.finish();
             //OpenFile
-            tmptskobj.readfileinfo = tsk_fs_file_open_meta(tmptskobj.readfsinfo, NULL, filequery.value(3).toULongLong());
-            //HashFile(tmptskobj.readfileinfo, tmptskobj.objectid);
-            QtConcurrent::run(HashFile, tmptskobj.readfileinfo, tmptskobj.objectid);
+            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
+            //tmptskobj.readfileinfo = tsk_fs_file_open_meta(tmptskobj.readfsinfo, NULL, filequery.value(3).toULongLong());
+            HashFile(readfileinfo, objectid);
+            MagicFile(readfileinfo, objectid);
+            //QtConcurrent::run(HashFile, tmptskobj.readfileinfo, tmptskobj.objectid);
             //fileinfovector.append(tmptskobj);
             //tmptskobj.readfileinfo = NULL;
             //tmptskobj.readfsinfo = NULL;
@@ -661,7 +679,7 @@ void SecondaryProcessing()
 
 void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
-    mutex.lock();
+    //mutex.lock();
     //qDebug() << "begin magic";
     // FILE MIME TYPE
     char magicbuffer[1024];
@@ -687,14 +705,16 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     mimequery.exec();
     mimequery.next();
     mimequery.finish();
-    mutex.unlock();
-    found = string(sigp1).find("image/");
-    mutex.lock();
-    if(found != std::string::npos)
-        isimage = true;
-    //filestrings.append(QString::fromStdString(string(sigp1)));
-    //if(QString::fromStdString(string(sigp1)).contains("image/", Qt::CaseInsensitive))
+    //mutex.unlock();
+    //found = string(sigp1).find("image/");
+    //mutex.lock();
+    //if(found != std::string::npos)
     //    isimage = true;
+    //filestrings.append(QString::fromStdString(string(sigp1)));
+    /*
+    if(QString::fromStdString(string(sigp1)).contains("image/", Qt::CaseInsensitive))
+        isimage = true;
+    */
     // FILE SIGNATURE
     //proplist << "File Signature";
     readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
@@ -718,10 +738,11 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     //qDebug() << "end magic";
     //qDebug() << "Begin thumb encoding"
     //QString thumbencstr = "";
-    mutex.unlock();
+    //mutex.unlock();
+    /*
     if(tmpfile->meta != NULL && isimage == true)
     {
-        mutex.lock();
+        //mutex.lock();
         qDebug() << "isimage" << isimage;
         QByteArray thumbdata;
         QImage thumbimage;
@@ -730,7 +751,7 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         char imagebuffer[tmpfile->meta->size];
         ssize_t imglen = tsk_fs_file_read(tmpfile, 0, imagebuffer, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         bool imageloaded = origimage.loadFromData(QByteArray::fromRawData(imagebuffer, imglen));
-        mutex.unlock();
+        //mutex.unlock();
         if(imageloaded)
         {
             thumbimage = origimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
@@ -750,6 +771,8 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     }
     // END IMAGE SCALING OPERATION
     //qDebug() << "end image scaling";
+    */
+    processphase++;
     filesprocessed++;
     //mutex.unlock();
     isignals->ProgUpd();
@@ -781,7 +804,8 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         hashquery.next();
         hashquery.finish();
     }
-    filesprocessed++;
+    processphase++;
+    //filesprocessed++;
     isignals->ProgUpd();
     //mutex.unlock();
 }

@@ -16,6 +16,7 @@ QFutureWatcher<void> filewatcher;
 QFutureWatcher<void> thumbwatcher;
 unsigned long long filesfound = 0;
 unsigned long long filesprocessed = 0;
+unsigned long long processphase = 0;
 unsigned long long totalchecked = 0;
 unsigned long long totalcount = 0;
 unsigned long long currentevidenceid = 0;

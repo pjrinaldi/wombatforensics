@@ -634,7 +634,8 @@ void WombatForensics::InitializeQueryModel()
         LogMessage(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         processcountlabel->setText("Processed: " + QString::number(filesfound));
         filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
-        statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
+        statuslabel->setText(QString("Processing: " + QString::number(processphase) + "%"));
+        //statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
         LogMessage("All Threads have finished");
         //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "DB Commit finished");
@@ -1260,6 +1261,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
 
 void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)
 {
+    qDebug() << "process phase:" << processphase;
     //qDebug() << "files: " << filecount << " processed: " << processcount;
     //int curprogress = (int)((((float)processcount)/(float)filecount)*100);
     processcountlabel->setText("Processed: " + QString::number(processcount));
