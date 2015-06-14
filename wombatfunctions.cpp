@@ -605,14 +605,12 @@ void SecondaryProcessing()
             imgquery.finish();
             TskObject tmptskobj;
             tmptskobj.objectid = filequery.value(0).toULongLong();
-            /*
             if(tmptskobj.readimginfo != NULL)
                 tsk_img_close(tmptskobj.readimginfo);
             if(tmptskobj.readfsinfo != NULL)
                 tsk_fs_close(tmptskobj.readfsinfo);
             if(tmptskobj.readfileinfo != NULL)
                 tsk_fs_file_close(tmptskobj.readfileinfo);
-            */
             tmptskobj.imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
             for(uint i=0; i < pathvector.size(); i++)
             {
@@ -630,8 +628,12 @@ void SecondaryProcessing()
             fsquery.finish();
             //OpenFile
             tmptskobj.readfileinfo = tsk_fs_file_open_meta(tmptskobj.readfsinfo, NULL, filequery.value(3).toULongLong());
-            HashFile(tmptskobj.readfileinfo, tmptskobj.objectid);
+            //HashFile(tmptskobj.readfileinfo, tmptskobj.objectid);
+            QtConcurrent::run(HashFile, tmptskobj.readfileinfo, tmptskobj.objectid);
             //fileinfovector.append(tmptskobj);
+            //tmptskobj.readfileinfo = NULL;
+            //tmptskobj.readfsinfo = NULL;
+            //tmptskobj.readimginfo = NULL;
         }
     }
     filequery.finish();
