@@ -613,25 +613,11 @@ void SecondaryProcessing()
             objectid = filequery.value(0).toULongLong();
             imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
 
-            /*
-            //TskObject tmptskobj;
-            //tmptskobj.objectid = filequery.value(0).toULongLong();
-            if(tmptskobj.readimginfo != NULL)
-                tsk_img_close(tmptskobj.readimginfo);
-            if(tmptskobj.readfsinfo != NULL)
-                tsk_fs_close(tmptskobj.readfsinfo);
-            if(tmptskobj.readfileinfo != NULL)
-                tsk_fs_file_close(tmptskobj.readfileinfo);
-            tmptskobj.imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-            */
             for(uint i=0; i < pathvector.size(); i++)
             {
                 imagepartspath[i] = pathvector.at(i).c_str();
-                //tmptskobj.imagepartspath[i] = pathvector.at(i).c_str();
             }
-            //tmptskobj.readimginfo = tsk_img_open(pathvector.size(), tmptskobj.imagepartspath, TSK_IMG_TYPE_DETECT, 0);
             readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-            //free(tmptskobj.imagepartspath);
             free(imagepartspath);
             //OpenParentFileSystem
             QSqlQuery fsquery(fcasedb);
@@ -640,13 +626,15 @@ void SecondaryProcessing()
             fsquery.exec();
             fsquery.next();
             readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
-            //tmptskobj.readfsinfo = tsk_fs_open_img(tmptskobj.readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
             fsquery.finish();
             //OpenFile
             readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
-            //tmptskobj.readfileinfo = tsk_fs_file_open_meta(tmptskobj.readfsinfo, NULL, filequery.value(3).toULongLong());
             HashFile(readfileinfo, objectid);
             MagicFile(readfileinfo, objectid);
+
+            tsk_fs_file_close(readfileinfo);
+            tsk_fs_close(readfsinfo);
+            tsk_img_close(readimginfo);
             //QtConcurrent::run(HashFile, tmptskobj.readfileinfo, tmptskobj.objectid);
             //fileinfovector.append(tmptskobj);
             //tmptskobj.readfileinfo = NULL;
