@@ -687,21 +687,29 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     const char* sigtype;
     char* sigp1;
     char* sigp2;
-    std::size_t found;
-    bool isimage = false;
+    //std::size_t found;
+    //bool isimage = false;
     ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
     {
         mimesig = magic_buffer(magicmimeptr, magicbuffer, readlen);
         sigp1 = strtok((char*)mimesig, ";");
+        sigtype = magic_buffer(magicptr, magicbuffer, readlen);
+        sigp2 = strtok((char*)sigtype, ",");
     }
     QSqlQuery mimequery(fcasedb);
-    mimequery.prepare("UPDATE data SET filemime = ? WHERE objectid = ?;");
+    mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
     if(readlen > 0)
+    {
         mimequery.bindValue(0, QString::fromStdString(sigp1));
+        mimequery.bindValue(1, QString::fromStdString(sigp2));
+    }
     else
+    {
         mimequery.bindValue(0, QString("Zero File"));
-    mimequery.bindValue(1, objid);
+        mimequery.bindValue(1, QString("Zero File"));
+    }
+    mimequery.bindValue(2, objid);
     mimequery.exec();
     mimequery.next();
     mimequery.finish();
@@ -717,6 +725,7 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     */
     // FILE SIGNATURE
     //proplist << "File Signature";
+    /*
     readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
     {
@@ -735,6 +744,7 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     sigquery.exec();
     sigquery.next();
     sigquery.finish();
+    */
     //qDebug() << "end magic";
     //qDebug() << "Begin thumb encoding"
     //QString thumbencstr = "";
