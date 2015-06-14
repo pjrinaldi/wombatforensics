@@ -639,7 +639,8 @@ void SecondaryProcessing()
 
     for(int i=0; i < fileinfovector.count(); i++)
     {
-        QFuture<void> hashfuture = QtConcurrent::run(HashFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
+        HashFile(fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
+        //QFuture<void> hashfuture = QtConcurrent::run(HashFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
         //QFuture<void> magicfuture = QtConcurrent::run(MagicFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
         //QFuture<void> thumbfuture = QtConcurrent::run(ThumbFile, fileinfovector.at(i).readfileinfo 
     }
@@ -751,7 +752,7 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 
 void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
-    mutex.lock();
+    //mutex.lock();
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     if(retval == 0)
@@ -777,7 +778,7 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     }
     filesprocessed++;
     isignals->ProgUpd();
-    mutex.unlock();
+    //mutex.unlock();
 }
 void cnid_to_array(uint32_t cnid, uint8_t array[4])
 {
