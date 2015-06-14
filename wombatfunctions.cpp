@@ -583,7 +583,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 void SecondaryProcessing()
 {
-    //QVector<TskObject> fileinfovector;
     QSqlQuery filequery(fcasedb);
     filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;");
     if(filequery.exec())
@@ -635,16 +634,10 @@ void SecondaryProcessing()
             tsk_fs_file_close(readfileinfo);
             tsk_fs_close(readfsinfo);
             tsk_img_close(readimginfo);
-            //QtConcurrent::run(HashFile, tmptskobj.readfileinfo, tmptskobj.objectid);
-            //fileinfovector.append(tmptskobj);
-            //tmptskobj.readfileinfo = NULL;
-            //tmptskobj.readfsinfo = NULL;
-            //tmptskobj.readimginfo = NULL;
         }
     }
     filequery.finish();
 
-    //QSqlQuery filequery(fcasedb);
     filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5 AND filemime LIKE '%image/%';");
     if(filequery.exec())
     {
@@ -699,40 +692,147 @@ void SecondaryProcessing()
         }
     }
     filequery.finish();
-    //qDebug() << "fileinfovector" << fileinfovector.count();
 
-
-    /*
-    for(int i=0; i < fileinfovector.count(); i++)
+    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;"); 
+    if(filequery.exec())
     {
-        HashFile(fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
-        //QFuture<void> hashfuture = QtConcurrent::run(HashFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
-        //QFuture<void> magicfuture = QtConcurrent::run(MagicFile, fileinfovector.at(i).readfileinfo, fileinfovector.at(i).objectid);
-        //QFuture<void> thumbfuture = QtConcurrent::run(ThumbFile, fileinfovector.at(i).readfileinfo 
+        while(filequery.next())
+        {
+            const TSK_TCHAR** imagepartspath;
+            unsigned long long objectid = 0;
+            TSK_IMG_INFO* readimginfo;
+            TSK_FS_INFO* readfsinfo;
+            TSK_FS_FILE* readfileinfo;
+            // Open Parent Image
+            std::vector<std::string> pathvector;
+            pathvector.clear();
+            QSqlQuery imgquery(fcasedb);
+            imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
+            imgquery.bindValue(0, filequery.value(1).toULongLong());
+            if(imgquery.exec())
+            {
+                while(imgquery.next())
+                {
+                    pathvector.push_back(imgquery.value(0).toString().toStdString());
+                }
+            }
+            imgquery.finish();
+
+            objectid = filequery.value(0).toULongLong();
+            imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+
+            for(uint i=0; i < pathvector.size(); i++)
+            {
+                imagepartspath[i] = pathvector.at(i).c_str();
+            }
+            readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+            free(imagepartspath);
+            //OpenParentFileSystem
+            QSqlQuery fsquery(fcasedb);
+            fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+            fsquery.bindValue(0, filequery.value(2).toULongLong());
+            fsquery.exec();
+            fsquery.next();
+            readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
+            fsquery.finish();
+            //OpenFile
+            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
+
+            BlockFile(readfileinfo, objectid);
+
+            tsk_fs_file_close(readfileinfo);
+            tsk_fs_close(readfsinfo);
+            tsk_img_close(readimginfo);
+
+        }
     }
-    */
-    // sqlquery to get all objectids, addresses to open the tmpfile.
-    // then for each one, i can call concurrent processes to spawn each function (thumbnail, blockaddress, md5 hash,
-    // file signature, file mime types, and file properties list...
-    //
-    //
-    //
+    filequery.finish();
+
+
 
 }
 
+void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
+{
+    blockstring = "";
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
+    {
+        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
+        {
+            tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+        }
+        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
+        {
+            iso9660_inode* dinode;
+            dinode = (iso9660_inode*)tsk_malloc(sizeof(iso9660_inode));
+            iso9660_inode_node* n;
+            n = ((ISO_INFO*)tmpfile->fs_info)->in_list;
+            while(n && (n->inum != tmpfile->meta->addr))
+                n = n->next;
+            if(n)
+                memcpy(dinode, &n->inode, sizeof(iso9660_inode));
+            int block = tsk_getu32(tmpfile->fs_info->endian, dinode->dr.ext_loc_m);
+            TSK_OFF_T size = tmpfile->meta->size;
+            while((int64_t)size > 0)
+            {
+                blockstring += QString::number(block++) + "|";
+                //qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << block++;
+                size -= tmpfile->fs_info->block_size;
+            }
+        }
+        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+        {
+            if(tmpfile->meta != NULL)
+            {
+                if(tmpfile->meta->attr)
+                {
+                    int cnt, i;
+                    cnt = tsk_fs_file_attr_getsize(tmpfile);
+                    for(i = 0; i < cnt; i++)
+                    {
+                        //char type[512];
+                        const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                        if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
+                        {
+                            tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+                        }
+                    }
+                }
+            }
+        }
+        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
+        {
+            tsk_fs_file_walk(tmpfile, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+        }
+    }
+    else
+        tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
+    QSqlQuery blockquery(fcasedb);
+    blockquery.prepare("UPDATE data SET blockaddress = ? WHERE objectid = ?;");
+    blockquery.bindValue(0, blockstring);
+    blockquery.bindValue(1, objid);
+    blockquery.exec();
+    blockquery.next();
+    blockquery.finish();
+    processphase++;
+    isignals->ProgUpd();
+    // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
+    //qDebug() << tmpfile->name->name << blockstring;
+    //filestrings.append(blockstring); // adding blockstring to sql
+    //proplist << "Block Address" << blockstring << "List of block addresses which contain the contents of the file";
+    //qDebug() << "end block address";
+    //*/
+
+}
 
 void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
-    //mutex.lock();
-    //qDebug() << "begin magic";
     // FILE MIME TYPE
     char magicbuffer[1024];
     const char* mimesig;
     const char* sigtype;
     char* sigp1;
     char* sigp2;
-    //std::size_t found;
-    //bool isimage = false;
     ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
     {
@@ -757,78 +857,8 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     mimequery.exec();
     mimequery.next();
     mimequery.finish();
-    //mutex.unlock();
-    //found = string(sigp1).find("image/");
-    //mutex.lock();
-    //if(found != std::string::npos)
-    //    isimage = true;
-    //filestrings.append(QString::fromStdString(string(sigp1)));
-    /*
-    if(QString::fromStdString(string(sigp1)).contains("image/", Qt::CaseInsensitive))
-        isimage = true;
-    */
-    // FILE SIGNATURE
-    //proplist << "File Signature";
-    /*
-    readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
-    if(readlen > 0)
-    {
-        sigtype = magic_buffer(magicptr, magicbuffer, readlen);
-        //filestrings.append(QString::fromStdString(string(sigtype)));
-        sigp2 = strtok((char*)sigtype, ",");
-        //proplist << QString::fromStdString(string(sigp1)) << QString::fromStdString(string(sigtype));
-    }
-    QSqlQuery sigquery(fcasedb);
-    sigquery.prepare("UPDATE data SET filesignature = ? WHERE objectid = ?;");
-    if(readlen > 0)
-        sigquery.bindValue(0, QString::fromStdString(sigp2));
-    else
-        sigquery.bindValue(0, QString("Zero File"));
-    sigquery.bindValue(1, objid);
-    sigquery.exec();
-    sigquery.next();
-    sigquery.finish();
-    */
-    //qDebug() << "end magic";
-    //qDebug() << "Begin thumb encoding"
-    //QString thumbencstr = "";
-    //mutex.unlock();
-    /*
-    if(tmpfile->meta != NULL && isimage == true)
-    {
-        //mutex.lock();
-        qDebug() << "isimage" << isimage;
-        QByteArray thumbdata;
-        QImage thumbimage;
-        QBuffer thumbuf(&thumbdata);
-        QImage origimage;
-        char imagebuffer[tmpfile->meta->size];
-        ssize_t imglen = tsk_fs_file_read(tmpfile, 0, imagebuffer, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-        bool imageloaded = origimage.loadFromData(QByteArray::fromRawData(imagebuffer, imglen));
-        //mutex.unlock();
-        if(imageloaded)
-        {
-            thumbimage = origimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
-            thumbuf.open(QIODevice::WriteOnly);
-            thumbimage.save(&thumbuf, "PNG");
-            thumbdata = thumbdata.toBase64();
-            //qDebug() << thumbdata;
-            //thumbencstr = QString(thumbdata);
-            QSqlQuery imgquery(thumbdb);
-            imgquery.prepare("INSERT INTO thumbs(objectid, thumbblob) VALUES(?, ?);");
-            imgquery.bindValue(0, objid);
-            imgquery.bindValue(1, QString(thumbdata));
-            imgquery.exec();
-            //imgquery.next();
-            imgquery.finish();
-        }
-    }
-    // END IMAGE SCALING OPERATION
-    //qDebug() << "end image scaling";
-    */
     processphase++;
-    filesprocessed++;
-    //mutex.unlock();
+    //filesprocessed++;
     isignals->ProgUpd();
 }
 
@@ -849,8 +879,6 @@ void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
             thumbuf.open(QIODevice::WriteOnly);
             thumbimage.save(&thumbuf, "PNG");
             thumbdata = thumbdata.toBase64();
-            //qDebug() << thumbdata;
-            //thumbencstr = QString(thumbdata);
             QSqlQuery imgquery(thumbdb);
             imgquery.prepare("INSERT INTO thumbs(objectid, thumbblob) VALUES(?, ?);");
             imgquery.bindValue(0, objid);
@@ -860,11 +888,12 @@ void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
             imgquery.finish();
         }
     }
+    processphase++;
+    isignals->ProgUpd();
 }
 
 void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
-    //mutex.lock();
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     if(retval == 0)
@@ -879,7 +908,6 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
             fileshash.insert(objid, QString(sbuf)); 
         else
             fileshash.insert(objid, QString(""));
-        //qDebug() << "objectid" << objid << "hash" << QString(sbuf); 
         QSqlQuery hashquery(fcasedb);
         hashquery.prepare("UPDATE data SET md5 = ? where objectid = ?;");
         hashquery.bindValue(0, QString(sbuf));
@@ -889,10 +917,9 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         hashquery.finish();
     }
     processphase++;
-    //filesprocessed++;
     isignals->ProgUpd();
-    //mutex.unlock();
 }
+
 void cnid_to_array(uint32_t cnid, uint8_t array[4])
 {
     array[3] = (cnid >> 0) & 0xff;

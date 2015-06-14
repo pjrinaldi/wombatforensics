@@ -1269,6 +1269,7 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     //filecountlabel->setText("Files: " + QString::number(filesfound));
     filecountlabel->setText("Files: " + QString::number(filecount));
     //statuslabel->setText("Processing...");
+    statuslabel->setText("Processed: " + QString::number(processphase) + "%");
     //statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
     filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
     //if(curprogress == 100 && ProcessingComplete())
