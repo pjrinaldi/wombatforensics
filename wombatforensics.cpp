@@ -1262,14 +1262,14 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
 
 void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)
 {
-    int curprogress = (int)((((float)processphase)/((float)filecount*(float)6))*100);
+    int curprogress = (int)((((float)processphase)/((float)filesfound*(float)6))*100);
     //qDebug() << "process phase:" << processphase;
     //qDebug() << "files: " << filecount << " processed: " << processcount;
     //int curprogress = (int)((((float)processcount)/(float)filecount)*100);
-    processcountlabel->setText("Processed: " + QString::number(processcount));
+    processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     //processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     //filecountlabel->setText("Files: " + QString::number(filesfound));
-    filecountlabel->setText("Files: " + QString::number(filecount));
+    filecountlabel->setText("Files: " + QString::number(filesfound));
     //statuslabel->setText("Processing...");
     statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
     //statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
