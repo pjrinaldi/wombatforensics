@@ -748,8 +748,117 @@ void SecondaryProcessing()
     }
     filequery.finish();
 
+    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;"); 
+    if(filequery.exec())
+    {
+        while(filequery.next())
+        {
+            const TSK_TCHAR** imagepartspath;
+            unsigned long long objectid = 0;
+            TSK_IMG_INFO* readimginfo;
+            TSK_FS_INFO* readfsinfo;
+            TSK_FS_FILE* readfileinfo;
+            // Open Parent Image
+            std::vector<std::string> pathvector;
+            pathvector.clear();
+            QSqlQuery imgquery(fcasedb);
+            imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
+            imgquery.bindValue(0, filequery.value(1).toULongLong());
+            if(imgquery.exec())
+            {
+                while(imgquery.next())
+                {
+                    pathvector.push_back(imgquery.value(0).toString().toStdString());
+                }
+            }
+            imgquery.finish();
 
+            objectid = filequery.value(0).toULongLong();
+            imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
 
+            for(uint i=0; i < pathvector.size(); i++)
+            {
+                imagepartspath[i] = pathvector.at(i).c_str();
+            }
+            readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+            free(imagepartspath);
+            //OpenParentFileSystem
+            QSqlQuery fsquery(fcasedb);
+            fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+            fsquery.bindValue(0, filequery.value(2).toULongLong());
+            fsquery.exec();
+            fsquery.next();
+            readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
+            fsquery.finish();
+            //OpenFile
+            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
+
+            PropertyFile(readfileinfo, objectid);
+
+            tsk_fs_file_close(readfileinfo);
+            tsk_fs_close(readfsinfo);
+            tsk_img_close(readimginfo);
+
+        }
+    }
+    filequery.finish();
+
+    filesprocessed++;
+    isignals->ProgUpd();
+
+}
+
+void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
+{
+    QStringList proplist;
+    proplist.clear();
+    if(tmpfile->name != NULL) proplist << "Short Name" << tmpfile->name->shrt_name << "Short Name for a file";
+    if(tmpfile->meta != NULL)
+    {
+        proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbpv]|rw[sSx]|rw[sSx]|rw[tTx]";
+        proplist << "User ID" << QString::number(tmpfile->meta->uid) << "User ID";
+        proplist << "Group ID" << QString::number(tmpfile->meta->gid) << "Group ID";
+        proplist << "Allocation Status";
+        if(tmpfile->meta->flags == TSK_FS_META_FLAG_ALLOC)
+            proplist << "Currently Allocated";
+        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNALLOC)
+            proplist << "Currently Unallocated";
+        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_USED)
+            proplist << "Allocated at least once";
+        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNUSED)
+            proplist << "Never allocated";
+        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_COMP)
+            proplist << "Contents are compressed";
+        else
+            proplist << "Unspecified";
+        proplist << "allocation status for the file.";
+
+        QSqlQuery objquery(fcasedb);
+        objquery.prepare("SELECT blockaddress, filemime, filesignature FROM data WHERE objectid = ?;");
+        objquery.bindValue(0, objid);
+        objquery.exec();
+        objquery.next();
+        proplist << "Block Address" << objquery.value(0).toString() << "List of block addresses which contain the contents of the file";
+        proplist << "File Signature" << objquery.value(1).toString() << objquery.value(2).toString();
+        objquery.finish();
+
+        fcasedb.transaction();
+        QSqlQuery propquery(fcasedb);
+        propquery.prepare("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);");
+        for(int i=0; i < proplist.count()/3; i++)
+        {
+            propquery.bindValue(0, objid);
+            propquery.bindValue(1, proplist.at(3*i));
+            propquery.bindValue(2, proplist.at(3*i+1));
+            propquery.bindValue(3, proplist.at(3*i+2));
+            propquery.exec();
+        }
+        fcasedb.commit();
+        propquery.finish();
+        processphase++;
+        //filesprocessed++;
+        isignals->ProgUpd();
+    }
 }
 
 void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid)

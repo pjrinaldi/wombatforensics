@@ -17,6 +17,7 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
+void PropretyFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 //void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned long long jobid, int type, QString msg);
 void LogMessage(QString message);
 //void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid);
