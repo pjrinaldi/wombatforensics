@@ -96,13 +96,13 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
-    qDebug() << "filedatavector:" << filedatavector.count();
+    //qDebug() << "filedatavector:" << filedatavector.count();
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         if(fcasedb.transaction())
         {
             QSqlQuery fquery(fcasedb);
-            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "", "", "", "");");
+            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '');");
             for(int i=0; i < filedatavector.count(); i++)
             {
                 fquery.bindValue(0, filedatavector.at(i).type);
@@ -118,6 +118,8 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
                 fquery.bindValue(10, filedatavector.at(i).evid);
                 fquery.bindValue(11, filedatavector.at(i).fsid);
                 fquery.exec();
+                //qDebug() << "last insert id" << fquery.lastinsertId();
+                processphase++;
                 //filesprocessed++;
                 isignals->ProgUpd();
             }
@@ -125,7 +127,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
             fquery.finish();
             filedatavector.clear();
         }
-   }
+    }
     //isignals->ProgUpd();
 }
 

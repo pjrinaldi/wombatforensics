@@ -161,6 +161,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     tmpdata.addr = tmpints[7];
     tmpdata.evid = currentevidenceid;
     tmpdata.fsid = tmpints[8];
+    //qDebug() << tmpdata.addr << tmpdata.name;
     mutex.lock();
     filedatavector.append(tmpdata);
     mutex.unlock();
@@ -289,7 +290,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     filesfound++;
-    processphase++;
+    //processphase++;
     isignals->ProgUpd();
     if(tmpptr != NULL)
     {
