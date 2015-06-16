@@ -724,7 +724,7 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::UpdateDataTable()
 {
-    qDebug() << "processing complete. should be 100%";
+    qDebug() << "processing complete. should be 100%" << processphase;
     //qDebug() << "data table function" << "fileshash count" << fileshash.count();
 }
 
@@ -1269,7 +1269,7 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     if(processcount > 0)
     {
     }
-    int curprogress = (int)((((float)processphase)/((float)filesfound*(float)6))*100);
+    int curprogress = (int)((((float)processphase)/((float)filesfound*(float)5))*100);
     //qDebug() << "process phase:" << processphase;
     //qDebug() << "files: " << filecount << " processed: " << processcount;
     //int curprogress = (int)((((float)processcount)/(float)filecount)*100);
@@ -1278,8 +1278,8 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     //filecountlabel->setText("Files: " + QString::number(filesfound));
     filecountlabel->setText("Files: " + QString::number(filesfound));
     //statuslabel->setText("Processing...");
-    statuslabel->setText("Processed: " + QString::number(processphase) + "%");
-    //statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
+    //statuslabel->setText("Processed: " + QString::number(processphase) + "%");
+    statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
     filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
     //if(curprogress == 100 && ProcessingComplete())
     //fcasedb.commit(); // COMMIT HERE CAUSES A LOCKUP.
