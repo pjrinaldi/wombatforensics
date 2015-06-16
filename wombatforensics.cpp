@@ -108,7 +108,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     propertywindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    //connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateDataTable()), Qt::QueuedConnection);
+    connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateDataTable()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered()), this, SLOT(on_actionViewerManager_triggered()), Qt::DirectConnection);
@@ -631,15 +631,15 @@ void WombatForensics::InitializeQueryModel()
         EndJob(currentjobid, filesfound, filesprocessed, errorcount);
         LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Adding Evidence Finished");
     */
-        LogMessage(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
-        processcountlabel->setText("Processed: " + QString::number(filesfound));
-        filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
-        statuslabel->setText(QString("Processing: " + QString::number(processphase) + "%"));
+        //LogMessage(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
+        //processcountlabel->setText("Processed: " + QString::number(filesfound));
+        //filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
+        //statuslabel->setText(QString("Processing: " + QString::number(processphase) + "%"));
         //statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
         //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
-        LogMessage("All Threads have finished");
+        //LogMessage("All Threads have finished");
         //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "DB Commit finished");
-        LogMessage("DB Commit finished");
+        //LogMessage("DB Commit finished");
         // THIS CALL HERE IS ADDING THE EVIDENCE MORE THAN ONCE...
         // NEED TO FIGURE OUT HOW THIS IS HAPPENING AND RESOLVE THIS ISSUE AS WELL AS WHERE THIS DOESN'T GET CALLED
         // BECAUSE THE THREAD COUNT IS OFF AND HASN'T FINISHED.
@@ -723,7 +723,8 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::UpdateDataTable()
 {
-    qDebug() << "data table function" << "fileshash count" << fileshash.count();
+    qDebug() << "processing complete. should be 100%";
+    //qDebug() << "data table function" << "fileshash count" << fileshash.count();
 }
 
 void WombatForensics::OpenEvidenceStructure()
@@ -1261,6 +1262,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
 
 void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)
 {
+    int curprogress = (int)((((float)processphase)/((float)filecount*(float)6))*100);
     //qDebug() << "process phase:" << processphase;
     //qDebug() << "files: " << filecount << " processed: " << processcount;
     //int curprogress = (int)((((float)processcount)/(float)filecount)*100);
@@ -1269,7 +1271,7 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     //filecountlabel->setText("Files: " + QString::number(filesfound));
     filecountlabel->setText("Files: " + QString::number(filecount));
     //statuslabel->setText("Processing...");
-    statuslabel->setText("Processed: " + QString::number(processphase) + "%");
+    statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
     //statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
     filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
     //if(curprogress == 100 && ProcessingComplete())
