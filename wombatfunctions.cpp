@@ -148,14 +148,6 @@ bool ProcessingComplete()
 
 void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints)
 {
-    /*
-    if(thumbencstr.compare("") == 0)
-    {
-    }
-    if(tmplist.count() > 0)
-    {
-    }
-    */
     FileData tmpdata;
     tmpdata.type = tmpints[0];
     tmpdata.name = tmpstrings[0];
@@ -172,81 +164,6 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     mutex.lock();
     filedatavector.append(tmpdata);
     mutex.unlock();
-    //
-    //
-    //
-    // PROCESS FILE NEEDS TO DO ONLY THE STANDARD STUFF....
-    // IMAGE SCALING, BLOCK ADDRESSES, HASHING, AND SIGNATURE ANALYSIS SHOULD OCCUR AFTER IT BY PULLING THE INFO FROM THE DB
-    // IN THEIR OWN ENCLOSED CONTAINER FOR EACH FILE. THEN I SIMPLY CALL AN UPDATE TO THE DATA TABLE TO STICK IN THE NEW VALUS...
-    // THIS SHOULD ALLEVIATE SOME OF THE GUI RESPONSIVENESS ISSUES AND THE CRASHING WHILE TRYING TO PROCESS TOO MUCH ON A SINGLE
-    // CONCURRENT SPINOFF AND HOLDING THE DB COMMIT CALLS FOR TOO LONG...
-    // NOW I JUST NEED TO IMPLEMENT THIS FUNCTIONALITY....
-
-
-    /*
-
-    if(fcasedb.isValid() && fcasedb.isOpen())
-    {
-        QSqlQuery fquery(fcasedb);
-        fqueryptr = &fquery;
-        fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-        //fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, md5, parimgid, parfsid, blockaddress, filemime, filesignature) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?);");
-        fquery.addBindValue(tmpints[0]);
-        fquery.addBindValue(tmpstrings[0]);
-        fquery.addBindValue(tmpints[1]);
-        fquery.addBindValue(tmpstrings[1]);
-        fquery.addBindValue(tmpints[2]);
-        fquery.addBindValue(tmpints[3]);
-        fquery.addBindValue(tmpints[4]);
-        fquery.addBindValue(tmpints[5]);
-        fquery.addBindValue(tmpints[6]);
-        fquery.addBindValue(tmpints[7]);
-        //fquery.addBindValue(tmpstrings[2]);
-        fquery.addBindValue(currentevidenceid);
-        fquery.addBindValue(tmpints[8]);
-        //fquery.addBindValue(tmpstrings[3]);
-        //fquery.addBindValue(tmpstrings[4]);
-        //fquery.addBindValue(tmpstrings[5]);
-
-        //qDebug() << tmpstrings[0] << tmpstrings[3];
-        
-        fquery.exec();
-        //long long int tmpid = fquery.lastInsertId().toLongLong();
-        //if(filesprocessed % 500 == 0)
-        //{
-        //    fcasedb.commit();
-        //    fcasedb.transaction();
-        //}
-        fquery.finish();
-        //if(tmpid)
-        //{
-        //}
-        */
-        /*
-        for(int i=0; i < tmplist.count()/3; i++)
-        {
-            fquery.prepare("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);");
-            fquery.addBindValue(tmpid);
-            fquery.addBindValue(tmplist.at(3*i));
-            fquery.addBindValue(tmplist.at(3*i+1));
-            fquery.addBindValue(tmplist.at(3*i+2));
-            fquery.exec();
-            fquery.finish();
-        }
-        */
-        /*
-        if(tmpstrings[4].contains("image/", Qt::CaseInsensitive))
-        {
-            QSqlQuery tquery(thumbdb);
-            tquery.prepare("INSERT INTO thumbs (objectid, thumbblob) VALUES(?, ?);");
-            tquery.addBindValue(tmpid);
-            tquery.addBindValue(thumbencstr);
-            tquery.exec();
-            tquery.finish();
-        }
-        */
-        //filesprocessed++;
-        //isignals->ProgUpd();
         /*
     }
     else
@@ -374,173 +291,16 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     filesfound++;
     processphase++;
     isignals->ProgUpd();
-    //QStringList proplist;
-    /*
-    //qDebug() << "start proplist";
-    // NEED TO WORK ON THE DESCRIPTIONS FOR THE FILE PROPERTIES A LITTLE
-    QStringList proplist;
-    proplist.clear();
-    if(tmpfile->name != NULL) proplist << "Short Name" << tmpfile->name->shrt_name << "Short name for a file";
-    if(tmpfile->meta != NULL)
-    {
-        proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbpv]|rw[sSx]|rw[sSx]|rw[tTx]";
-        proplist << "User ID" << QString::number(tmpfile->meta->uid) << "User ID";
-        proplist << "Group ID" << QString::number(tmpfile->meta->gid) << "Group ID";
-        proplist << "Allocation Status";
-        if(tmpfile->meta->flags == TSK_FS_META_FLAG_ALLOC)
-            proplist << "Currently Allocated";
-        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNALLOC)
-            proplist << "Currently Unallocated";
-        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_USED)
-            proplist << "Allocated at least once";
-        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNUSED)
-            proplist << "Never allocated";
-        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_COMP)
-            proplist << "Contents are compressed";
-        else
-            proplist << "Unspecified";
-        proplist << "allocation status for the file.";
-    }
-    */
     if(tmpptr != NULL)
     {
         //LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
         LogMessage("TmpPtr got a value somehow");
     }
-    //qDebug() << "end proplist";
 
     QVector<QString> filestrings;
     if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
     else filestrings.append(QString("unknown.wbt"));
     filestrings.append(QString("/") + QString(tmppath));
-    //filestrings.append(tmpstring); // adding the md5 hash.
-
-    /*
-    qDebug() << "begin block address";
-    // BEGIN TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
-    blockstring = "";
-    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
-    {
-        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
-        {
-            tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
-        }
-        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
-        {
-            iso9660_inode* dinode;
-            dinode = (iso9660_inode*)tsk_malloc(sizeof(iso9660_inode));
-            iso9660_inode_node* n;
-            n = ((ISO_INFO*)tmpfile->fs_info)->in_list;
-            while(n && (n->inum != tmpfile->meta->addr))
-                n = n->next;
-            if(n)
-                memcpy(dinode, &n->inode, sizeof(iso9660_inode));
-            int block = tsk_getu32(tmpfile->fs_info->endian, dinode->dr.ext_loc_m);
-            TSK_OFF_T size = tmpfile->meta->size;
-            while((int64_t)size > 0)
-            {
-                blockstring += QString::number(block++) + "|";
-                //qDebug() << "File Name:" << tmpfile->name->name << "Block Address:" << block++;
-                size -= tmpfile->fs_info->block_size;
-            }
-        }
-        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
-        {
-            if(tmpfile->meta != NULL)
-            {
-                if(tmpfile->meta->attr)
-                {
-                    int cnt, i;
-                    cnt = tsk_fs_file_attr_getsize(tmpfile);
-                    for(i = 0; i < cnt; i++)
-                    {
-                        //char type[512];
-                        const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                        if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
-                        {
-                            tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
-                        }
-                    }
-                }
-            }
-        }
-        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
-        {
-            tsk_fs_file_walk(tmpfile, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
-        }
-    }
-    else
-        tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
-    // END TEST AREA FOR GETTING THE BLOCK ADDRESSES FOR A FILE
-    //qDebug() << tmpfile->name->name << blockstring;
-    filestrings.append(blockstring); // adding blockstring to sql
-    proplist << "Block Address" << blockstring << "List of block addresses which contain the contents of the file";
-    qDebug() << "end block address";
-    */
-
-    /*
-    qDebug() << "begin magic";
-    // BEGIN TEST AREA FOR GETTING THE FILE SIGNATURE STRING
-    // FILE MIME TYPE
-    char magicbuffer[1024];
-    bool isimage = false;
-    ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
-    if(readlen > 0)
-    {
-        const char* mimesig = magic_buffer(magicmimeptr, magicbuffer, readlen);
-        char* sigp1 = strtok((char*)mimesig, ";");
-        filestrings.append(QString::fromStdString(string(sigp1)));
-        if(QString::fromStdString(string(sigp1)).contains("image/", Qt::CaseInsensitive))
-            isimage = true;
-    }
-    else
-        filestrings.append(QString("Zero File"));
-    // END TEST AREA FOR GETTING THE FILE SIGNATURE STRING
-    // FILE SIGNATURE
-    proplist << "File Signature";
-    readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
-    if(readlen > 0)
-    {
-        const char* sigtype = magic_buffer(magicptr, magicbuffer, readlen);
-        filestrings.append(QString::fromStdString(string(sigtype)));
-        char* sigp1 = strtok((char*)sigtype, ",");
-        proplist << QString::fromStdString(string(sigp1)) << QString::fromStdString(string(sigtype));
-    }
-    else
-    {
-        filestrings.append(QString("Zero File"));
-        proplist << "Zero File" << "Zero File";
-    }
-    qDebug() << "end magic";
-    */
-
-    //QString thumbencstr = "";
-    /*
-    qDebug() << "begin image scaling";
-    // BEGIN IMAGE SCALING OPERATION...
-    QString thumbencstr = "";
-    if(tmpfile->meta != NULL && isimage == true)
-    {
-        QByteArray thumbdata;
-        QImage thumbimage;
-        QBuffer thumbuf(&thumbdata);
-        QImage origimage;
-        char imagebuffer[tmpfile->meta->size];
-        ssize_t imglen = tsk_fs_file_read(tmpfile, 0, imagebuffer, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-        bool imageloaded = origimage.loadFromData(QByteArray::fromRawData(imagebuffer, imglen));
-        if(imageloaded)
-        {
-            thumbimage = origimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
-            thumbuf.open(QIODevice::WriteOnly);
-            thumbimage.save(&thumbuf, "PNG");
-            thumbdata = thumbdata.toBase64();
-            thumbencstr = QString(thumbdata);
-        }
-    }
-
-    // END IMAGE SCALING OPERATION
-    qDebug() << "end image scaling";
-    */
 
     QVector<unsigned long long> fileints;
     if(tmpfile->name != NULL)
@@ -799,12 +559,12 @@ void SecondaryProcessing()
             tsk_fs_close(readfsinfo);
             tsk_img_close(readimginfo);
 
+            filesprocessed++;
+            isignals->ProgUpd();
         }
     }
     filequery.finish();
 
-    filesprocessed++;
-    isignals->ProgUpd();
 
 }
 

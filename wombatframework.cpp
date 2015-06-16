@@ -96,6 +96,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
+    qDebug() << "filedatavector:" << filedatavector.count();
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         if(fcasedb.transaction())
