@@ -108,7 +108,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     propertywindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateDataTable()), Qt::QueuedConnection);
+    //connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateDataTable()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered()), this, SLOT(on_actionViewerManager_triggered()), Qt::DirectConnection);
@@ -716,9 +716,10 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
-    //SecondaryProcessing();
-    secondfuture = QtConcurrent::run(SecondaryProcessing);
-    secondwatcher.setFuture(secondfuture);
+    SecondaryProcessing();
+    //secondfuture = QtConcurrent::run(SecondaryProcessing);
+    //secondwatcher.setFuture(secondfuture);
+    UpdateDataTable();
 }
 
 
@@ -1269,7 +1270,10 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     if(processcount > 0)
     {
     }
-    int curprogress = (int)(floor(((float)processphase)/((float)filesfound*(float)5))*100);
+    int curprogress = (int)(((((float)processphase)/((float)filesfound))/5)*100);
+    if(curprogress > 100)
+        curprogress = 100;
+    //int curprogress = (int)(floor(((float)processphase)/((float)filesfound*(float)5))*100);
     //qDebug() << "process phase:" << processphase;
     //qDebug() << "files: " << filecount << " processed: " << processcount;
     //int curprogress = (int)((((float)processcount)/(float)filecount)*100);

@@ -3,6 +3,7 @@
 ByteConverter::ByteConverter(QWidget* parent) : QDialog(parent), ui(new Ui::ByteConverter)
 {
     ui->setupUi(this);
+    ui->checkBox->setVisible(false);
     this->hide();
 }
 

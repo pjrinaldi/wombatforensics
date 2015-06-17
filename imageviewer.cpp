@@ -165,7 +165,7 @@ void ImageViewer::SetModel()
 void ImageViewer::OpenImageWindow(const QModelIndex &index)
 {
     ui->label->setText("Loading...");
-    qDebug() << "userrole:" << index.data(Qt::UserRole).toULongLong();
+    //qDebug() << "userrole:" << index.data(Qt::UserRole).toULongLong();
     //QtConcurrent::run(imagedialog, &ImageWindow::GetImage, index.data(Qt::UserRole).toULongLong());
     imagedialog->GetImage(index.data(Qt::UserRole).toULongLong());
     imagedialog->show();
