@@ -394,14 +394,20 @@ void SecondaryProcessing()
             readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
             HashFile(readfileinfo, objectid);
             MagicFile(readfileinfo, objectid);
+            ThumbFile(readfileinfo, objectid);
+            BlockFile(readfileinfo, objectid);
+            PropertyFile(readfileinfo, objectid);
 
             tsk_fs_file_close(readfileinfo);
             tsk_fs_close(readfsinfo);
             tsk_img_close(readimginfo);
+            filesprocessed++;
+            isignals->ProgUpd();
         }
     }
     filequery.finish();
 
+    /*
     filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5 AND filemime LIKE '%image/%';");
     if(filequery.exec())
     {
@@ -568,7 +574,7 @@ void SecondaryProcessing()
         }
     }
     filequery.finish();
-
+    */
 
 }
 
