@@ -394,15 +394,16 @@ void SecondaryProcessing()
             readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
             HashFile(readfileinfo, objectid);
             MagicFile(readfileinfo, objectid);
-            ThumbFile(readfileinfo, objectid);
+            //ThumbFile(readfileinfo, objectid);
             BlockFile(readfileinfo, objectid);
             PropertyFile(readfileinfo, objectid);
+
+            filesprocessed++;
+            isignals->ProgUpd();
 
             tsk_fs_file_close(readfileinfo);
             tsk_fs_close(readfsinfo);
             tsk_img_close(readimginfo);
-            filesprocessed++;
-            isignals->ProgUpd();
         }
     }
     filequery.finish();
@@ -575,6 +576,66 @@ void SecondaryProcessing()
     }
     filequery.finish();
     */
+
+}
+
+void GenerateThumbnails()
+{
+    QSqlQuery filequery(fcasedb);
+    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5 AND filemime LIKE '%image/%';");
+    if(filequery.exec())
+    {
+        while(filequery.next())
+        {
+            const TSK_TCHAR** imagepartspath;
+            unsigned long long objectid = 0;
+            TSK_IMG_INFO* readimginfo;
+            TSK_FS_INFO* readfsinfo;
+            TSK_FS_FILE* readfileinfo;
+            // Open Parent Image
+            std::vector<std::string> pathvector;
+            pathvector.clear();
+            QSqlQuery imgquery(fcasedb);
+            imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
+            imgquery.bindValue(0, filequery.value(1).toULongLong());
+            if(imgquery.exec())
+            {
+                while(imgquery.next())
+                {
+                    pathvector.push_back(imgquery.value(0).toString().toStdString());
+                }
+            }
+            imgquery.finish();
+
+            objectid = filequery.value(0).toULongLong();
+            imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+
+            for(uint i=0; i < pathvector.size(); i++)
+            {
+                imagepartspath[i] = pathvector.at(i).c_str();
+            }
+            readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+            free(imagepartspath);
+            //OpenParentFileSystem
+            QSqlQuery fsquery(fcasedb);
+            fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+            fsquery.bindValue(0, filequery.value(2).toULongLong());
+            fsquery.exec();
+            fsquery.next();
+            readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
+            fsquery.finish();
+            //OpenFile
+            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
+
+            ThumbFile(readfileinfo, objectid);
+
+            tsk_fs_file_close(readfileinfo);
+            tsk_fs_close(readfsinfo);
+            tsk_img_close(readimginfo);
+
+        }
+    }
+    filequery.finish();
 
 }
 
@@ -763,8 +824,8 @@ void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
             imgquery.finish();
         }
     }
-    processphase++;
-    isignals->ProgUpd();
+    //processphase++;
+    //isignals->ProgUpd();
 }
 
 void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)

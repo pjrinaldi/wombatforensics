@@ -13,6 +13,7 @@ bool ProcessingComplete(void);
 void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints); 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 void SecondaryProcessing(void);
+void GenerateThumbnails(void);
 void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid);

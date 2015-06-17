@@ -717,6 +717,9 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
     SecondaryProcessing();
+    statuslabel->setText("Generating Thumbnails...");
+    GenerateThumbnails();
+    statuslabel->setText("Processing Complete");
     //secondfuture = QtConcurrent::run(SecondaryProcessing);
     //secondwatcher.setFuture(secondfuture);
     UpdateDataTable();
