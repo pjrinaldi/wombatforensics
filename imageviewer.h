@@ -27,7 +27,7 @@ public:
     {
         if(!index.isValid())
             return QVariant();
-        if(index.row() >= thumblist.count())
+        if(index.row() >= thumblist.count()/2)
             return QVariant();
         if(role == Qt::DecorationRole)
             return pixmaplist.at(index.row());

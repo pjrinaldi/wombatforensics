@@ -1269,7 +1269,7 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     if(processcount > 0)
     {
     }
-    int curprogress = (int)((((float)processphase)/((float)filesfound*(float)5))*100);
+    int curprogress = (int)(floor(((float)processphase)/((float)filesfound*(float)5))*100);
     //qDebug() << "process phase:" << processphase;
     //qDebug() << "files: " << filecount << " processed: " << processcount;
     //int curprogress = (int)((((float)processcount)/(float)filecount)*100);

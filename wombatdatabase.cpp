@@ -806,6 +806,7 @@ void WombatDatabase::GetThumbnails()
     {
         while(thumbquery.next())
         {
+            qDebug() << "objectid" << thumbquery.value(0).toInt();
             thumblist.append(thumbquery.value(0).toString());
             thumblist.append(thumbquery.value(1).toString());
         }
