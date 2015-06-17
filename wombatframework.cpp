@@ -119,9 +119,9 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
                 fquery.bindValue(11, filedatavector.at(i).fsid);
                 fquery.exec();
                 //qDebug() << "last insert id" << fquery.lastinsertId();
-                processphase++;
+                //processphase++;
                 //filesprocessed++;
-                isignals->ProgUpd();
+                //isignals->ProgUpd();
             }
             fcasedb.commit();
             fquery.finish();

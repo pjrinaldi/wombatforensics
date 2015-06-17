@@ -1273,7 +1273,9 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     if(processcount > 0)
     {
     }
-    int curprogress = (int)(((((float)processphase)/((float)filesfound))/5)*100);
+    double curprogress = (((double)processphase)/(((double)filesfound)*4.0))*100;
+    //qDebug() << processphase << "" << QString::number(curprogress, 'f', 2) << "%";
+    //int curprogress = (int)(((((float)processphase)/((float)filesfound))/5)*100);
     if(curprogress > 100)
         curprogress = 100;
     //int curprogress = (int)(floor(((float)processphase)/((float)filesfound*(float)5))*100);
@@ -1286,7 +1288,7 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     filecountlabel->setText("Files: " + QString::number(filesfound));
     //statuslabel->setText("Processing...");
     //statuslabel->setText("Processed: " + QString::number(processphase) + "%");
-    statuslabel->setText("Processed: " + QString::number(curprogress) + "%");
+    statuslabel->setText("Processing: " + QString::number(curprogress, 'f', 2) + "%");
     filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
     //if(curprogress == 100 && ProcessingComplete())
     //fcasedb.commit(); // COMMIT HERE CAUSES A LOCKUP.
