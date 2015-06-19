@@ -1405,6 +1405,13 @@ void WombatForensics::on_actionCheck_triggered()
 
 void WombatForensics::on_actionExport_triggered()
 {
+    totalcount = 0;
+    totalchecked = 0;
+    exportcount = 0;
+    //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
+    exportdialog = new ExportDialog(this, totalchecked, totalcount);
+    connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
+    exportdialog->show();
     qDebug() << "export current file";
 }
 
