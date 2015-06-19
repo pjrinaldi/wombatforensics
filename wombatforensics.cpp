@@ -620,6 +620,7 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     QModelIndex index = ui->dirTreeView->indexAt(pt);
     if(index.isValid())
     {
+        actionnode = static_cast<Node*>(index.internalPointer());
         if(index.sibling(index.row(), 4).data().toInt() == 5)            
             treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
@@ -1399,7 +1400,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
 
 void WombatForensics::on_actionCheck_triggered()
 {
-    qDebug() << "check current file";
+    actionnode->checkstate = 2;
 }
 
 void WombatForensics::on_actionExport_triggered()

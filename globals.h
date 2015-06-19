@@ -193,5 +193,6 @@ extern Node* dummynode;
 extern Node* parentnode;
 extern Node* currentnode;
 extern Node* toplevelnode;
+extern Node* actionnode;
 
 #endif
