@@ -791,14 +791,14 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = 0;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
         {
-                tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toInt()*tskobjptr->blocksize + tskobjptr->fsoffset;
+                tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
         }
         else
         {
             tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
             tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
         }
-        //qDebug() << "file object offset:" << tskobjptr->offset;
+        qDebug() << "file object byteoffset:" << tskobjptr->offset;
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvarptr->selectedobject.address;
         tskobjptr->length = wombatvarptr->selectedobject.size;
