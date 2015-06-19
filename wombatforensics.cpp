@@ -1400,7 +1400,10 @@ void WombatForensics::on_actionOpen_Case_triggered()
 
 void WombatForensics::on_actionCheck_triggered()
 {
-    actionnode->checkstate = 2;
+    if(actionnode->checkstate < 2)
+        actionnode->checkstate = 2;
+    else
+        actionnode->checkstate = 0;
 }
 
 void WombatForensics::on_actionExport_triggered()

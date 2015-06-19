@@ -15,6 +15,14 @@ ExportDialog::ExportDialog(QWidget *parent, unsigned long long curcheckcount, un
     ui->listedFileRadioButton->setText(listtext);
     ui->exportButton->setEnabled(false);
     ui->selectedFileRadioButton->setChecked(true);
+    if(checkcount <= 0)
+        ui->checkedFileRadioButton->setEnabled(false);
+    else
+        ui->checkedFileRadioButton->setEnabled(true);
+    if(listcount <= 0)
+        ui->listedFileRadioButton->setEnabled(false);
+    else
+        ui->listedFileRadioButton->setEnabled(true);
     ui->includePathRadioButton->setChecked(true);
     connect(ui->browseButton, SIGNAL(clicked()), this, SLOT(SelectDirectory()));
     connect(ui->exportButton, SIGNAL(clicked()), this, SLOT(ExportFiles()));

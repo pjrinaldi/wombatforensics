@@ -568,7 +568,7 @@
   </action>
   <action name="actionCheck">
    <property name="text">
-    <string>Check</string>
+    <string>(Un)Check</string>
    </property>
   </action>
   <action name="actionExport">

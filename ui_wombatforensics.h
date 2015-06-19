@@ -433,7 +433,7 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionByteConverter->setToolTip(QApplication::translate("WombatForensics", "Byte Converter", 0));
 #endif // QT_NO_TOOLTIP
-        actionCheck->setText(QApplication::translate("WombatForensics", "Check", 0));
+        actionCheck->setText(QApplication::translate("WombatForensics", "(Un)Check", 0));
         actionExport->setText(QApplication::translate("WombatForensics", "Export...", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
