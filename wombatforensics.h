@@ -685,6 +685,8 @@ private slots:
     void ExportEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
+    void on_actionCheck_triggered();
+    void on_actionExport_triggered();
     void on_actionView_Properties_triggered(bool checked);
     void on_actionView_Progress_triggered(bool checked);
     void on_actionView_File_triggered(bool checked);

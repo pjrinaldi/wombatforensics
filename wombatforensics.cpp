@@ -140,6 +140,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     }
     // make right click menu call up the treemenu with viewer list.
     treemenu->addAction(ui->menuView_With->menuAction());
+    treemenu->addAction(ui->actionCheck);
+    treemenu->addAction(ui->actionExport);
     treemodel = new TreeModel(this);
     ui->dirTreeView->setModel(treemodel);
     ui->dirTreeView->hideColumn(4);
@@ -585,7 +587,7 @@ void WombatForensics::InitializeQueryModel()
     ResizeColumns();
     ui->actionRemove_Evidence->setEnabled(true);
     wombatframework->CloseInfoStructures();
-    statuslabel->setText("Evidence Ready");
+    statuslabel->setText("Evidence ready");
     LogMessage("Evidence Ready");
 }
 
@@ -1393,6 +1395,16 @@ void WombatForensics::on_actionOpen_Case_triggered()
     }
     else
         InitializeOpenCase();
+}
+
+void WombatForensics::on_actionCheck_triggered()
+{
+    qDebug() << "check current file";
+}
+
+void WombatForensics::on_actionExport_triggered()
+{
+    qDebug() << "export current file";
 }
 
 void WombatForensics::on_actionView_Properties_triggered(bool checked)

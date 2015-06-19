@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wombatforensics.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.1
+** Created by: Qt User Interface Compiler version 5.4.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -58,6 +58,8 @@ public:
     QAction *actionCollapseAll;
     QAction *actionDigDeeper;
     QAction *actionByteConverter;
+    QAction *actionCheck;
+    QAction *actionExport;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -213,6 +215,10 @@ public:
         QIcon icon19;
         icon19.addFile(QStringLiteral(":/bar/byteconverter"), QSize(), QIcon::Normal, QIcon::Off);
         actionByteConverter->setIcon(icon19);
+        actionCheck = new QAction(WombatForensics);
+        actionCheck->setObjectName(QStringLiteral("actionCheck"));
+        actionExport = new QAction(WombatForensics);
+        actionExport->setObjectName(QStringLiteral("actionExport"));
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -255,7 +261,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QStringLiteral("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 800, 21));
+        mainMenubar->setGeometry(QRect(0, 0, 800, 22));
         mainMenubar->setAcceptDrops(true);
         menuFile = new QMenu(mainMenubar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
@@ -325,6 +331,8 @@ public:
         menuAdd_File_to->addSeparator();
         menuView->addAction(menuView_With->menuAction());
         menuView->addAction(menuCopy_To->menuAction());
+        menuView->addAction(actionCheck);
+        menuView->addAction(actionExport);
         menuView_With->addAction(actionPlaceHolder);
         menuCopy_To->addAction(actionSection);
         menuCopy_To->addAction(actionTextSection);
@@ -425,6 +433,8 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionByteConverter->setToolTip(QApplication::translate("WombatForensics", "Byte Converter", 0));
 #endif // QT_NO_TOOLTIP
+        actionCheck->setText(QApplication::translate("WombatForensics", "Check", 0));
+        actionExport->setText(QApplication::translate("WombatForensics", "Export...", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));
