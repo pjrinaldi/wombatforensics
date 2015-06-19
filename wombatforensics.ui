@@ -96,7 +96,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -186,6 +186,8 @@
     </widget>
     <addaction name="menuView_With"/>
     <addaction name="menuCopy_To"/>
+    <addaction name="actionCheck"/>
+    <addaction name="actionExport"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEvidence"/>
@@ -562,6 +564,16 @@
    </property>
    <property name="toolTip">
     <string>Byte Converter</string>
+   </property>
+  </action>
+  <action name="actionCheck">
+   <property name="text">
+    <string>Check</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export...</string>
    </property>
   </action>
  </widget>

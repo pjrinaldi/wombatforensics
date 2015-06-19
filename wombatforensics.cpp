@@ -445,26 +445,6 @@ void WombatForensics::InitializeCaseStructure()
         //logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         //msgstream.setDevice(&logfile);
         LogMessage("Log File Created");
-        // CREATE CaseLog.DB HERE
-        /*logdb = QSqlDatabase::database("logdb");
-        if(!logdb.isValid())
-            logdb = QSqlDatabase::addDatabase("QSQLITE", "logdb");
-        logdb.setDatabaseName(wombatvarptr->caseobject.dirpath + "caselog.db");
-        */
-        /*
-        if(!FileExists((wombatvarptr->caseobject.dirpath + "caselog.db").toStdString()))
-        {
-            //wombatdatabase->CreateLogDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.1", "Course Log Creation Error", wombatvarptr->curerrmsg);
-        }
-        else
-        {
-            wombatdatabase->OpenLogDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.1", "SQL Error", wombatvarptr->curerrmsg);
-        }
-        */
         thumbdb = QSqlDatabase::database("thumbdb");
         if(!thumbdb.isValid())
             thumbdb = QSqlDatabase::addDatabase("QSQLITE", "thumbdb");
@@ -483,8 +463,6 @@ void WombatForensics::InitializeCaseStructure()
         }
         // CREATE CASEID-CASENAME.DB RIGHT HERE.
         errorcount = 0;
-        //StartJob(0, wombatvarptr->caseobject.id, 0);
-        //LogEntry(wombatvarptr->caseobject.id, 0, currentjobid, 1, "Started Creating Case Structure");
         LogMessage("Started Creating Case Structure");
         wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
         wombatvarptr->casedb = QSqlDatabase::database("casedb");
@@ -496,7 +474,6 @@ void WombatForensics::InitializeCaseStructure()
             wombatdatabase->CreateCaseDB();
             if(wombatvarptr->curerrmsg.compare("") != 0)
             {
-                //LogEntry(wombatvarptr->caseobject.id, 0, currentjobid, 0, "Case DB Creation Error.");
                 LogMessage("Case DB Creation Error");
                 errorcount++;
                 DisplayError("1.2", "Case DB Creation Error", wombatvarptr->curerrmsg);
@@ -514,8 +491,6 @@ void WombatForensics::InitializeCaseStructure()
             ui->actionOpen_Case->setEnabled(true);
         }
         ui->actionAdd_Evidence->setEnabled(true);
-        //EndJob(currentjobid, 1, 1, errorcount);
-        //LogEntry(wombatvarptr->caseobject.id, 0, currentjobid, 1, "Case was created");
         LogMessage("Case was created");
     }
 }
@@ -543,25 +518,6 @@ void WombatForensics::InitializeOpenCase()
         }
         logfile.setFileName(wombatvarptr->caseobject.dirpath + "msglog");
         msglog->clear();
-        // CREATE CaseLog.DB HERE
-        //logdb = QSqlDatabase::database("logdb");
-        //if(!logdb.isValid())
-        //    logdb = QSqlDatabase::addDatabase("QSQLITE", "logdb");
-        //logdb.setDatabaseName(wombatvarptr->caseobject.dirpath + "caselog.db");
-        /*
-        if(!FileExists((wombatvarptr->caseobject.dirpath + "caselog.db").toStdString()))
-        {
-            wombatdatabase->CreateLogDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.1", "Course Log Creation Error", wombatvarptr->curerrmsg);
-        }
-        else
-        {
-            wombatdatabase->OpenLogDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.1", "SQL Error", wombatvarptr->curerrmsg);
-        }
-        */
         thumbdb = QSqlDatabase::database("thumbdb");
         if(!thumbdb.isValid())
             thumbdb = QSqlDatabase::addDatabase("QSQLITE", "thumbdb");
@@ -621,35 +577,16 @@ void WombatForensics::InitializeOpenCase()
 
 void WombatForensics::InitializeQueryModel()
 {
-    //fcasedb.commit();
-    //fqueryptr->finish();
-    isignals->ProgUpd();
-    //fcasedb.commit();
-    //if(ProcessingComplete())
-    //{
-    /*
-        EndJob(currentjobid, filesfound, filesprocessed, errorcount);
-        LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Adding Evidence Finished");
-    */
-        //LogMessage(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
-        //processcountlabel->setText("Processed: " + QString::number(filesfound));
-        //filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
-        //statuslabel->setText(QString("Processing: " + QString::number(processphase) + "%"));
-        //statuslabel->setText(QString("Adding Evidence Finished with " + QString::number(errorcount) + " error(s)"));
-        //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "All Threads have finished");
-        //LogMessage("All Threads have finished");
-        //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "DB Commit finished");
-        //LogMessage("DB Commit finished");
-        // THIS CALL HERE IS ADDING THE EVIDENCE MORE THAN ONCE...
-        // NEED TO FIGURE OUT HOW THIS IS HAPPENING AND RESOLVE THIS ISSUE AS WELL AS WHERE THIS DOESN'T GET CALLED
-        // BECAUSE THE THREAD COUNT IS OFF AND HASN'T FINISHED.
-        treemodel->AddEvidence(wombatvarptr->currentevidenceid);
-        ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
-        ResizeColumns();
-        ui->actionRemove_Evidence->setEnabled(true);
-        wombatframework->CloseInfoStructures();
-        //fcasedb.commit();
-    //}
+    //isignals->ProgUpd();
+    statuslabel->setText("Building Evidence Tree...");
+    LogMessage("Building Evidence Tree...");
+    treemodel->AddEvidence(wombatvarptr->currentevidenceid);
+    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    ResizeColumns();
+    ui->actionRemove_Evidence->setEnabled(true);
+    wombatframework->CloseInfoStructures();
+    statuslabel->setText("Evidence Ready");
+    LogMessage("Evidence Ready");
 }
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
@@ -705,8 +642,6 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     errorcount = 0;
-    //StartJob(1, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
-    //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Adding Evidence");
     statuslabel->setText("Processing...");
     LogMessage(tr("Started Adding Evidence"));
     wombatframework->OpenVolumeSystem();
@@ -717,9 +652,12 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
     SecondaryProcessing();
+    LogMessage("Processing Complete");
+    LogMessage("Generating Thumbnails...");
     statuslabel->setText("Generating Thumbnails...");
     GenerateThumbnails();
     statuslabel->setText("Processing Complete");
+    LogMessage("Finished Generating Thumbnails...");
     //secondfuture = QtConcurrent::run(SecondaryProcessing);
     //secondwatcher.setFuture(secondfuture);
     UpdateDataTable();
@@ -728,8 +666,9 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::UpdateDataTable()
 {
-    qDebug() << "processing complete. should be 100%" << processphase;
-    //qDebug() << "data table function" << "fileshash count" << fileshash.count();
+    statuslabel->setText("Processing Complete");
+    LogMessage("Evidence has been successfully added");
+    //qDebug() << "processing complete. should be 100%" << processphase;
 }
 
 void WombatForensics::OpenEvidenceStructure()
@@ -742,6 +681,7 @@ void WombatForensics::OpenEvidenceStructure()
     treemodel->AddEvidence(wombatvarptr->currentevidenceid);
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     statuslabel->setText("Opening Case Evidence Completed");
+    LogMessage("Case evidence successfully opened");
 }
 
 void WombatForensics::AddEvidence()
@@ -1123,14 +1063,11 @@ void WombatForensics::FinishRemoval()
         processcountlabel->setText("Processed: " + QString::number(filesprocessed));
         filecountlabel->setText("Files: " + QString::number(filesfound));
         filtercountlabel->setText("Filtered: " + QString::number(filesfound));
-        //EndJob(currentjobid, wombatvarptr->evidrowsremoved, wombatvarptr->evidrowsremoved, errorcount);
-        //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 1, "Evidence Removal Completed");
-        //LogMessage(QString("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed"));
+        LogMessage(QString("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed"));
         statuslabel->setText("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
     }
     else
     {
-        //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 2, "Still Removing Files");
         LogMessage("Still Removing Files");
     }
 }
@@ -1139,14 +1076,11 @@ void WombatForensics::FinishExport()
 {
     if(ProcessingComplete())
     {
-        //EndJob(currentjobid, exportcount, exportcount, errorcount);
-        //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Export Completed");
-        //LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
+        LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
         statuslabel->setText("Exporting completed with " + QString::number(errorcount) + "error(s)");
     }
     else
     {
-        //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->evidremoveid, currentjobid, 2, "Still Removing Files");
         LogMessage("Still Removing Files");
     }
 }
@@ -1157,8 +1091,6 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     exportfilelist.clear();
     curlist.clear();
     errorcount = 0;
-    //StartJob(3, wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid);
-    //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 1, "Started Exporting EVidence");
     LogMessage("Started Exporting Evidence");
     if(exportdata->filestatus == FileExportData::selected)
     {

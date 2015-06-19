@@ -14,22 +14,6 @@ std::string GetTime()
 
     return timeStr;
 }
-/*
-void LogEntry(unsigned long long caseid, unsigned long long evidenceid, unsigned long long jobid, int type, QString msg)
-{
-    if(logdb.isOpen())
-    {
-        QSqlQuery logquery(logdb);
-        logquery.prepare("INSERT INTO msglog (caseid, evidenceid, jobid, type, datetime, logmsg) VALUES(?, ?, ?, ?, DATETIME('now', 'unixepoch'), ?)");
-        logquery.addBindValue(caseid);
-        logquery.addBindValue(evidenceid);
-        logquery.addBindValue(jobid);
-        logquery.addBindValue(type);
-        logquery.addBindValue(msg);
-        logquery.exec();
-    }
-//}
-    */
 
 void LogMessage(QString logmsg)
 {
@@ -38,31 +22,8 @@ void LogMessage(QString logmsg)
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
     logfile.close();
-    //msgstream << QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t")) << "\t" << logmsg << "\n";
-}
-/*
-void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid)
-{
-    QSqlQuery jobquery(logdb);
-    jobquery.prepare("INSERT INTO joblog (type, state, filecount, processcount, caseid, evidenceid, start, finish, errorcount) VALUES(?, 0, 0, 0, ?, ?, DATETIME('now', 'unixepoch'), 0, 0)");
-    jobquery.addBindValue(type);
-    jobquery.addBindValue(caseid);
-    jobquery.addBindValue(evidenceid);
-    if(jobquery.exec())
-        currentjobid = jobquery.lastInsertId().toULongLong();
 }
 
-void EndJob(unsigned long long jobid, unsigned long long filecount, unsigned long long processcount, unsigned long long errorcount)
-{
-    QSqlQuery jobquery(logdb);
-    jobquery.prepare("UPDATE joblog SET state = 1, filecount = ?, processcount = ?, finish = DATETIME('now', 'unixepoch'), errorcount = ? WHERE jobid = ?");
-    jobquery.addBindValue(filecount);
-    jobquery.addBindValue(processcount);
-    jobquery.addBindValue(errorcount);
-    jobquery.addBindValue(jobid);
-    jobquery.exec();
-}
-*/
 char* TskTimeToStringUTC(time_t time, char buf[128])
 {
     buf[0] = '\0';
@@ -116,32 +77,6 @@ bool ProcessingComplete()
 {
     if(filesfound == filesprocessed && filesfound > 0)
         return true;
-    //unsigned long long threadcount = 0; 
-    //qDebug() << "threadvector count: " << threadvector.count();
-    //if((threadvector.count() == 0) && ((filesfound - filesprocessed) == 0))
-    /*
-    for(int i=0; i < threadvector.count(); i++)
-    {
-        //if(threadvector.at(i).isFinished())
-        if(threadvector.at(i).isRunning())
-        {
-            threadcount++;
-            //threadvector.remove(i);
-            //qDebug() << "thread finished. new thread vector count: " << threadvector.count();
-        }
-    }
-    if(threadcount == 0 && filesfound > 0)
-        return true;
-    */
-    /*
-    for(int i = 0; i < threadvector.count(); i++)
-    {
-        //processingcomplete = threadvector[i].isFinished();
-    }
-    */
-    //qDebug() << "processing complete var:" << processingcomplete;
-    //if(filesfound - filesprocessed == 0)
-    //    return true;
     
     return false;
 }
@@ -161,7 +96,6 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     tmpdata.addr = tmpints[7];
     tmpdata.evid = currentevidenceid;
     tmpdata.fsid = tmpints[8];
-    //qDebug() << tmpdata.addr << tmpdata.name;
     mutex.lock();
     filedatavector.append(tmpdata);
     mutex.unlock();
@@ -297,7 +231,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     isignals->ProgUpd();
     if(tmpptr != NULL)
     {
-        //LogEntry(0, 0, currentjobid, 2, "TmpPtr got a value somehow");
         LogMessage("TmpPtr got a value somehow");
     }
 
@@ -394,7 +327,6 @@ void SecondaryProcessing()
             readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
             HashFile(readfileinfo, objectid);
             MagicFile(readfileinfo, objectid);
-            //ThumbFile(readfileinfo, objectid);
             BlockFile(readfileinfo, objectid);
             PropertyFile(readfileinfo, objectid);
 
@@ -407,176 +339,6 @@ void SecondaryProcessing()
         }
     }
     filequery.finish();
-
-    /*
-    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5 AND filemime LIKE '%image/%';");
-    if(filequery.exec())
-    {
-        while(filequery.next())
-        {
-            const TSK_TCHAR** imagepartspath;
-            unsigned long long objectid = 0;
-            TSK_IMG_INFO* readimginfo;
-            TSK_FS_INFO* readfsinfo;
-            TSK_FS_FILE* readfileinfo;
-            // Open Parent Image
-            std::vector<std::string> pathvector;
-            pathvector.clear();
-            QSqlQuery imgquery(fcasedb);
-            imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
-            imgquery.bindValue(0, filequery.value(1).toULongLong());
-            if(imgquery.exec())
-            {
-                while(imgquery.next())
-                {
-                    pathvector.push_back(imgquery.value(0).toString().toStdString());
-                }
-            }
-            imgquery.finish();
-
-            objectid = filequery.value(0).toULongLong();
-            imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-
-            for(uint i=0; i < pathvector.size(); i++)
-            {
-                imagepartspath[i] = pathvector.at(i).c_str();
-            }
-            readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-            free(imagepartspath);
-            //OpenParentFileSystem
-            QSqlQuery fsquery(fcasedb);
-            fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
-            fsquery.bindValue(0, filequery.value(2).toULongLong());
-            fsquery.exec();
-            fsquery.next();
-            readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
-            fsquery.finish();
-            //OpenFile
-            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
-
-            ThumbFile(readfileinfo, objectid);
-
-            tsk_fs_file_close(readfileinfo);
-            tsk_fs_close(readfsinfo);
-            tsk_img_close(readimginfo);
-
-        }
-    }
-    filequery.finish();
-
-    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;"); 
-    if(filequery.exec())
-    {
-        while(filequery.next())
-        {
-            const TSK_TCHAR** imagepartspath;
-            unsigned long long objectid = 0;
-            TSK_IMG_INFO* readimginfo;
-            TSK_FS_INFO* readfsinfo;
-            TSK_FS_FILE* readfileinfo;
-            // Open Parent Image
-            std::vector<std::string> pathvector;
-            pathvector.clear();
-            QSqlQuery imgquery(fcasedb);
-            imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
-            imgquery.bindValue(0, filequery.value(1).toULongLong());
-            if(imgquery.exec())
-            {
-                while(imgquery.next())
-                {
-                    pathvector.push_back(imgquery.value(0).toString().toStdString());
-                }
-            }
-            imgquery.finish();
-
-            objectid = filequery.value(0).toULongLong();
-            imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-
-            for(uint i=0; i < pathvector.size(); i++)
-            {
-                imagepartspath[i] = pathvector.at(i).c_str();
-            }
-            readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-            free(imagepartspath);
-            //OpenParentFileSystem
-            QSqlQuery fsquery(fcasedb);
-            fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
-            fsquery.bindValue(0, filequery.value(2).toULongLong());
-            fsquery.exec();
-            fsquery.next();
-            readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
-            fsquery.finish();
-            //OpenFile
-            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
-
-            BlockFile(readfileinfo, objectid);
-
-            tsk_fs_file_close(readfileinfo);
-            tsk_fs_close(readfsinfo);
-            tsk_img_close(readimginfo);
-
-        }
-    }
-    filequery.finish();
-
-    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;"); 
-    if(filequery.exec())
-    {
-        while(filequery.next())
-        {
-            const TSK_TCHAR** imagepartspath;
-            unsigned long long objectid = 0;
-            TSK_IMG_INFO* readimginfo;
-            TSK_FS_INFO* readfsinfo;
-            TSK_FS_FILE* readfileinfo;
-            // Open Parent Image
-            std::vector<std::string> pathvector;
-            pathvector.clear();
-            QSqlQuery imgquery(fcasedb);
-            imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
-            imgquery.bindValue(0, filequery.value(1).toULongLong());
-            if(imgquery.exec())
-            {
-                while(imgquery.next())
-                {
-                    pathvector.push_back(imgquery.value(0).toString().toStdString());
-                }
-            }
-            imgquery.finish();
-
-            objectid = filequery.value(0).toULongLong();
-            imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-
-            for(uint i=0; i < pathvector.size(); i++)
-            {
-                imagepartspath[i] = pathvector.at(i).c_str();
-            }
-            readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-            free(imagepartspath);
-            //OpenParentFileSystem
-            QSqlQuery fsquery(fcasedb);
-            fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
-            fsquery.bindValue(0, filequery.value(2).toULongLong());
-            fsquery.exec();
-            fsquery.next();
-            readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
-            fsquery.finish();
-            //OpenFile
-            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
-
-            PropertyFile(readfileinfo, objectid);
-
-            tsk_fs_file_close(readfileinfo);
-            tsk_fs_close(readfsinfo);
-            tsk_img_close(readimginfo);
-
-            filesprocessed++;
-            isignals->ProgUpd();
-        }
-    }
-    filequery.finish();
-    */
-
 }
 
 void GenerateThumbnails()
