@@ -811,16 +811,20 @@ void WombatForensics::LoadHexContents()
     if(wombatvarptr->selectedobject.objtype == 1)
     {
         off_t retval = 0;
-        char* contentbuffer = new char[tskobjptr->length];
-        //char contentbuffer[tskobjptr->length];
-        //char* cb = &contentbuffer;
-        retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, contentbuffer, tskobjptr->length);
+        QByteArray ba;
+        QBuffer buffer(&ba);
+        buffer.open(QIODevice::ReadWrite);
+        // THIS OVERLOADS FOR LARGE FILES, BUT IF I CAN STORE THE DATA IN A QBUFFER, THE QIODEVICE SHOULD HANDLE IT PROPERLY....
+        // THE QUESTION IS WHETHER I CAN CONVERT THE TSK FUNCTIONS TO USE A QBUFFER ???????
+        //char* contentbuffer = new char[tskobjptr->length];
+        retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, ba.data(), tskobjptr->length);
+        //retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, contentbuffer, tskobjptr->length);
         //
-        hexeditdata = QHexEditData::fromMemory(QByteArray::fromRawData(contentbuffer, tskobjptr->length));
+        //
+        hexeditdata = QHexEditData::fromDevice(&buffer);
+        //hexeditdata = QHexEditData::fromMemory(QByteArray::fromRawData(contentbuffer, tskobjptr->length));
         hexedit->setData(hexeditdata);
-        //delete [] contentbuffer;
         //
-        //retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         /*
         hexwidget->openimage();
         hexwidget->set1BPC();
