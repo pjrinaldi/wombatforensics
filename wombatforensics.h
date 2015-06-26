@@ -813,8 +813,10 @@ private:
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
     QShortcut* showitem;
-    QHexEditData* hexeditdata;
+    //QHexEditData* hexeditdata;
+    //QHexEdit* hexedit;
     QHexEdit* hexedit;
+
 };
 
 Q_DECLARE_METATYPE(QTextCursor)

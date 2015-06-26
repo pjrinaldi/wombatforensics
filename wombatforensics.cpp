@@ -816,14 +816,18 @@ void WombatForensics::LoadHexContents()
         buffer.open(QIODevice::ReadWrite);
         // THIS OVERLOADS FOR LARGE FILES, BUT IF I CAN STORE THE DATA IN A QBUFFER, THE QIODEVICE SHOULD HANDLE IT PROPERLY....
         // THE QUESTION IS WHETHER I CAN CONVERT THE TSK FUNCTIONS TO USE A QBUFFER ???????
-        //char* contentbuffer = new char[tskobjptr->length];
-        retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, ba.data(), tskobjptr->length);
-        //retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, contentbuffer, tskobjptr->length);
+        char* contentbuffer = new char[tskobjptr->length];
+        //retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, ba.data(), tskobjptr->length);
+        //hexedit->setData(buffer);
+        retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, contentbuffer, tskobjptr->length);
+        buffer.setData(contentbuffer);
+        //delete [] contentbuffer;
+        hexedit->setData(buffer);
         //
         //
-        hexeditdata = QHexEditData::fromDevice(&buffer);
+        //hexeditdata = QHexEditData::fromDevice(&buffer);
         //hexeditdata = QHexEditData::fromMemory(QByteArray::fromRawData(contentbuffer, tskobjptr->length));
-        hexedit->setData(hexeditdata);
+        //hexedit->setData(hexeditdata);
         //
         /*
         hexwidget->openimage();
@@ -834,7 +838,8 @@ void WombatForensics::LoadHexContents()
     }
     else
     {
-        hexedit->setCursorPos(tskobjptr->offset);
+        hexedit->setCursorPosition(tskobjptr->offset);
+        //hexedit->setCursorPos(tskobjptr->offset);
         //hexwidget->SetTopLeft(tskobjptr->offset);
         if(wombatvarptr->selectedobject.objtype == 5)
         {
