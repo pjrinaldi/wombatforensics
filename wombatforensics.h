@@ -23,6 +23,8 @@
 #include "messageviewer.h"
 #include "byteconverter.h"
 
+#include "qhexedit.h"
+
 class TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -811,6 +813,8 @@ private:
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
     QShortcut* showitem;
+    QHexEditData* hexeditdata;
+    QHexEdit* hexedit;
 };
 
 Q_DECLARE_METATYPE(QTextCursor)
