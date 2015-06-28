@@ -628,10 +628,8 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
 
 void WombatForensics::ImgHexMenu(const QPoint &pt)
 {
-    /*
     if(hexselection.compare("") != 0)
         selectionmenu->exec(hexwidget->mapToGlobal(pt));
-    */
 }
 /*
 // FUNCTION GETS IMPLEMNTED WHEN YOU CLICK ON A CHECKBOX, BUT DO NOT SELECT THE ROW
@@ -810,37 +808,35 @@ void WombatForensics::LoadHexContents()
     }
     if(wombatvarptr->selectedobject.objtype == 1)
     {
-        off_t retval = 0;
-        QByteArray ba;
-        QBuffer buffer(&ba);
-        buffer.open(QIODevice::ReadWrite);
+        //off_t retval = 0;
+        //QByteArray ba;
+        //QBuffer buffer(&ba);
+        //buffer.open(QIODevice::ReadWrite);
         // THIS OVERLOADS FOR LARGE FILES, BUT IF I CAN STORE THE DATA IN A QBUFFER, THE QIODEVICE SHOULD HANDLE IT PROPERLY....
         // THE QUESTION IS WHETHER I CAN CONVERT THE TSK FUNCTIONS TO USE A QBUFFER ???????
-        char* contentbuffer = new char[tskobjptr->length];
+        //char* contentbuffer = new char[tskobjptr->length];
         //retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, ba.data(), tskobjptr->length);
         //hexedit->setData(buffer);
-        retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, contentbuffer, tskobjptr->length);
-        buffer.setData(contentbuffer);
+        //retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, contentbuffer, tskobjptr->length);
+        //buffer.setData(contentbuffer);
         //delete [] contentbuffer;
-        hexedit->setData(buffer);
+        //hexedit->setData(buffer);
         //
         //
         //hexeditdata = QHexEditData::fromDevice(&buffer);
         //hexeditdata = QHexEditData::fromMemory(QByteArray::fromRawData(contentbuffer, tskobjptr->length));
         //hexedit->setData(hexeditdata);
         //
-        /*
         hexwidget->openimage();
         hexwidget->set1BPC();
         hexwidget->setBaseHex();
         hexwidget->SetTopLeft(0);
-        */
     }
     else
     {
-        hexedit->setCursorPosition(tskobjptr->offset);
+        //hexedit->setCursorPosition(tskobjptr->offset);
         //hexedit->setCursorPos(tskobjptr->offset);
-        //hexwidget->SetTopLeft(tskobjptr->offset);
+        hexwidget->SetTopLeft(tskobjptr->offset);
         if(wombatvarptr->selectedobject.objtype == 5)
         {
             fileviewer->filehexview->openimage();
@@ -1284,32 +1280,32 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    hexedit = new QHexEdit();
-    //hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
+    //hexedit = new QHexEdit();
+    hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
-    //hexwidget->setObjectName("bt-hexview");
-    //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    //hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    //hexLayout->addWidget(hexwidget);
-    //hexvsb = new QScrollBar(hexwidget);
-    //hexLayout->addWidget(hexvsb);
-    //hexvsb->setRange(0, 0);
-    hexLayout->addWidget(hexedit);
+    hexwidget->setObjectName("bt-hexview");
+    hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    hexLayout->addWidget(hexwidget);
+    hexvsb = new QScrollBar(hexwidget);
+    hexLayout->addWidget(hexvsb);
+    hexvsb->setRange(0, 0);
+    //hexLayout->addWidget(hexedit);
     mainlayout->addLayout(hexLayout);
-    //connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
-    //connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
-    //connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    //connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
-    //connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
-    //connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
-    //connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
+    connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
+    connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
+    connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
+    connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
+    connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+    connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
 }
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
-    //hexvsb->setSingleStep(singlestep);
-    //hexvsb->setPageStep(pagestep);
+    hexvsb->setSingleStep(singlestep);
+    hexvsb->setPageStep(pagestep);
 }
 
 WombatForensics::~WombatForensics()
@@ -1711,7 +1707,7 @@ void WombatForensics::setScrollBarValue(off_t pos)
 {
     // THIS IS THE LINE # THAT THE OFFSET FALLS UNDER
 
-    //hexvsb->setValue(pos);
+    hexvsb->setValue(pos);
 
   // pos is the topLeft pos, set the scrollbar to the
   // location of the last byte on the page
