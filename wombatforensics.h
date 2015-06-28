@@ -815,7 +815,7 @@ private:
     QShortcut* showitem;
     //QHexEditData* hexeditdata;
     //QHexEdit* hexedit;
-    //QHexEdit* hexedit;
+    QHexEdit* hexedit;
 
 };
 

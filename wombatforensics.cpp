@@ -808,19 +808,21 @@ void WombatForensics::LoadHexContents()
     }
     if(wombatvarptr->selectedobject.objtype == 1)
     {
-        //off_t retval = 0;
-        //QByteArray ba;
-        //QBuffer buffer(&ba);
-        //buffer.open(QIODevice::ReadWrite);
+        /*
+        off_t retval = 0;
+        QByteArray ba;
+        QBuffer buffer(&ba);
+        buffer.open(QIODevice::ReadWrite);
         // THIS OVERLOADS FOR LARGE FILES, BUT IF I CAN STORE THE DATA IN A QBUFFER, THE QIODEVICE SHOULD HANDLE IT PROPERLY....
         // THE QUESTION IS WHETHER I CAN CONVERT THE TSK FUNCTIONS TO USE A QBUFFER ???????
-        //char* contentbuffer = new char[tskobjptr->length];
+        char* contentbuffer = new char[tskobjptr->length];
         //retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, ba.data(), tskobjptr->length);
         //hexedit->setData(buffer);
-        //retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, contentbuffer, tskobjptr->length);
-        //buffer.setData(contentbuffer);
+        retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, contentbuffer, tskobjptr->length);
+        buffer.setData(contentbuffer);
         //delete [] contentbuffer;
-        //hexedit->setData(buffer);
+        hexedit->setData(QByteArray::fromRawData(contentbuffer, tskobjptr->length));
+        */
         //
         //
         //hexeditdata = QHexEditData::fromDevice(&buffer);
@@ -836,6 +838,7 @@ void WombatForensics::LoadHexContents()
     {
         //hexedit->setCursorPosition(tskobjptr->offset);
         //hexedit->setCursorPos(tskobjptr->offset);
+
         hexwidget->SetTopLeft(tskobjptr->offset);
         if(wombatvarptr->selectedobject.objtype == 5)
         {
@@ -1281,6 +1284,7 @@ void WombatForensics::SetupHexPage(void)
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
     //hexedit = new QHexEdit();
+    //hexedit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);

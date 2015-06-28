@@ -250,6 +250,7 @@ uchar ImageReader::operator[] (off_t offset)
   off_t page_idx = offset/_pageSize;
   qDebug() << "page idx" << page_idx << offset << _pageSize;
   qDebug() << "modulo" << offset%_pageSize;
+  qDebug() << "data[][]" << _data[page_idx][offset%_pageSize];
   return _data[page_idx][ offset%_pageSize ];
 }
 
