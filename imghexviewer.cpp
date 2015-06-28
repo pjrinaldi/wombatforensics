@@ -501,6 +501,8 @@ void ImageHexViewer::setSelection(SelectionPos_e pos, off_t offset)
   if( _selection[SelectionStart] < 0 ) {
     emit selectionChanged("");
   } else {
+      // ERROR OCCURS WHEN CROSSING A PAGE BOUNDARY AND TRYING TO HIGHLIGHT SOMETHING...
+      // NOW I JUST NEED TO FIGURE OUT HOW IT HAPPENS AND ADDRESS IT...
     if( selectionEnd() > -1 && selectionEnd() <= _reader.size() ) {
       QString data;
       for(off_t i = selectionStart();
