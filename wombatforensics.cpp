@@ -1269,15 +1269,19 @@ void WombatForensics::SetupHexPage(void)
     hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
     hexLayout->addWidget(hexwidget);
     hexvsb = new QScrollBar(ui->hexPage);
-    hexslider = new QwtSlider(ui->hexPage, Qt::Vertical, QwtSlider::NoScale);
+    hexslider = new QwtSlider(Qt::Vertical, ui->hexPage);
+    hexslider->setScalePosition(QwtSlider::NoScale);
     //hexvsb = new QScrollBar(hexwidget);
     hexLayout->addWidget(hexvsb);
+    hexLayout->addWidget(hexslider);
     hexvsb->setRange(0, 0);
+    hexslider->setRange(0.0, 0.0);
     mainlayout->addLayout(hexLayout);
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
     connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    connect(hexslider, SIGNAL(valueChanged(double)), hexwidget, SLOT(setTopLeftToDouble(double)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
     connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
@@ -1689,6 +1693,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // range must be contained in the space of an integer, just do 100
    // increments
    hexvsb->setRange(low, high);
+   hexslider->setRange(low, high);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)

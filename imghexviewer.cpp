@@ -332,6 +332,32 @@ void ImageHexViewer::setTopLeftToFloat( float offset )
     _previousstep = (int)percent;
 }
 
+void ImageHexViewer::setTopLeftToDouble(double offset)
+{
+    double percent = offset*bytesPerLine();
+    if(_previousstep < (unsigned long long)percent)
+    {
+        unsigned long long stepdiff = (unsigned long long)percent - _previousstep;
+        if(stepdiff == bytesPerLine())
+            nextLine();
+        else if(stepdiff == bytesPerPage())
+            nextPage();
+        else
+            setTopLeft(percent);
+    }
+    else if(_previousstep > (unsigned long long)percent)
+    {
+        unsigned long long stepdiff = _previousstep - (unsigned long long)percent;
+        if(stepdiff == bytesPerLine())
+            prevLine();
+        else if(stepdiff == bytesPerPage())
+            prevPage();
+        else
+            setTopLeft(percent);
+    }
+    _previousstep = (unsigned long long)percent;
+}
+
 // 
 // slot for setting cursor offset.
 //
