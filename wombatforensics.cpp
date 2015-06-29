@@ -1268,7 +1268,8 @@ void WombatForensics::SetupHexPage(void)
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
     hexLayout->addWidget(hexwidget);
-    hexvsb = new QScrollBar(hexwidget);
+    hexvsb = new QScrollBar(ui->hexPage);
+    //hexvsb = new QScrollBar(hexwidget);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
     mainlayout->addLayout(hexLayout);

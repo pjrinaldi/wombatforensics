@@ -592,7 +592,7 @@ void ImageHexViewer::resizeEvent( QResizeEvent * e )
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
-  emit rangeChanged(0,_reader.size()/bytesPerLine());
+  emit rangeChanged(0, _reader.size()/bytesPerLine());
   emit StepValues(1, bytesPerPage()/bytesPerLine());
 }
 //
