@@ -808,27 +808,6 @@ void WombatForensics::LoadHexContents()
     }
     if(wombatvarptr->selectedobject.objtype == 1)
     {
-        /*
-        off_t retval = 0;
-        QByteArray ba;
-        QBuffer buffer(&ba);
-        buffer.open(QIODevice::ReadWrite);
-        // THIS OVERLOADS FOR LARGE FILES, BUT IF I CAN STORE THE DATA IN A QBUFFER, THE QIODEVICE SHOULD HANDLE IT PROPERLY....
-        // THE QUESTION IS WHETHER I CAN CONVERT THE TSK FUNCTIONS TO USE A QBUFFER ???????
-        char* contentbuffer = new char[tskobjptr->length];
-        //retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, ba.data(), tskobjptr->length);
-        //hexedit->setData(buffer);
-        retval = tsk_img_read(tskobjptr->readimginfo, tskobjptr->offset, contentbuffer, tskobjptr->length);
-        buffer.setData(contentbuffer);
-        //delete [] contentbuffer;
-        hexedit->setData(QByteArray::fromRawData(contentbuffer, tskobjptr->length));
-        */
-        //
-        //
-        //hexeditdata = QHexEditData::fromDevice(&buffer);
-        //hexeditdata = QHexEditData::fromMemory(QByteArray::fromRawData(contentbuffer, tskobjptr->length));
-        //hexedit->setData(hexeditdata);
-        //
         hexwidget->openimage();
         hexwidget->set1BPC();
         hexwidget->setBaseHex();
@@ -836,9 +815,6 @@ void WombatForensics::LoadHexContents()
     }
     else
     {
-        //hexedit->setCursorPosition(tskobjptr->offset);
-        //hexedit->setCursorPos(tskobjptr->offset);
-
         hexwidget->SetTopLeft(tskobjptr->offset);
         if(wombatvarptr->selectedobject.objtype == 5)
         {
@@ -1283,8 +1259,6 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    //hexedit = new QHexEdit();
-    //hexedit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -1295,7 +1269,6 @@ void WombatForensics::SetupHexPage(void)
     hexvsb = new QScrollBar(hexwidget);
     hexLayout->addWidget(hexvsb);
     hexvsb->setRange(0, 0);
-    //hexLayout->addWidget(hexedit);
     mainlayout->addLayout(hexLayout);
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));

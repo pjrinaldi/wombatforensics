@@ -260,6 +260,7 @@ uchar FileReader::operator[] (off_t offset)
 		       "attempt to access past end of file");
 
   off_t page_idx = offset/_pageSize;
+  bool loaded = loadimagepage(page_idx);
   return _data[page_idx][ offset%_pageSize ];
 }
 

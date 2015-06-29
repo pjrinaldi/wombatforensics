@@ -418,7 +418,6 @@ void ImageHexViewer::mousePressEvent( QMouseEvent* e )
         {
             byte_offset++;
         }
-        //qDebug() << "selectionstart" << globalOffset(byte_offset);
         setSelection( SelectionStart, globalOffset( byte_offset ));
     }
 }
@@ -433,7 +432,6 @@ void ImageHexViewer::mouseMoveEvent( QMouseEvent* e )
     byte_offset++;
   }
 
-  //qDebug() << "move" << selectionStart();
   setSelection( SelectionEnd, globalOffset( byte_offset ));
 }
 
@@ -448,7 +446,6 @@ void ImageHexViewer::mouseReleaseEvent( QMouseEvent* e )
         {
             byte_offset++;
         }
-        //qDebug() << "release" << selectionStart();
         setSelection( SelectionEnd, globalOffset( byte_offset ));
     }
 }
