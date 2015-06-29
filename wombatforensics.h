@@ -23,6 +23,9 @@
 #include "messageviewer.h"
 #include "byteconverter.h"
 
+#include "qabstractsliderlong.h"
+#include "qscrollbarlong.h"
+
 class TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
