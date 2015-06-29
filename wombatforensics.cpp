@@ -1677,6 +1677,13 @@ void WombatForensics::SetOffsetLabel(off_t pos)
 
 void WombatForensics::setScrollBarRange(off_t low, off_t high)
 {
+    if(high > 32767)
+        qDebug() << "high is too big" << high;
+    if(high > 2147483647)
+        qDebug() << "high is too long big" << high;
+    if(high > 9223372036854775807)
+        qDebug() << "high is too long long big" << high;
+    qDebug() << "high is:" << high;
    (void)low;(void)high;
    // range must be contained in the space of an integer, just do 100
    // increments
