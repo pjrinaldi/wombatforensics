@@ -23,8 +23,7 @@
 #include "messageviewer.h"
 #include "byteconverter.h"
 
-#include "qabstractsliderlong.h"
-#include "qscrollbarlong.h"
+#include "qwt_slider.h"
 
 class TreeModel : public QAbstractItemModel
 {
@@ -802,6 +801,7 @@ private:
     off_t offset() const;
     ImageHexViewer* hexwidget;
     QScrollBar* hexvsb;
+    QwtSlider* hexslider;
     QLabel* selectedoffset;
     QLabel* selectedhex;
     QLabel* filecountlabel;
