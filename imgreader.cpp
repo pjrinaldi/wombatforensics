@@ -71,6 +71,7 @@ bool ImageReader::openimage(TskObject* tskpointer)
     if((_size - 1) % _pageSize != 0)
         npages++;
     _numpages = npages;
+    qDebug() << "npages" << npages;
     _data.resize(npages);
     fill(_data.begin(), _data.begin()+npages, (uchar*)0);
     _is_open = true;
