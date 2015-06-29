@@ -818,7 +818,7 @@ unsigned long long WombatDatabase::GetResidentOffset(unsigned long long fileaddr
 {
     QSqlQuery resquery(fcasedb);
     QStringList inputs;
-    QList<int> outputs;
+    QList<unsigned long long> outputs;
     inputs << "%0x0B%" << "%0x0D%" << "%0x30%" << "%0x40%";
     for(int i=0; i < inputs.count(); i++)
     {
@@ -827,7 +827,7 @@ unsigned long long WombatDatabase::GetResidentOffset(unsigned long long fileaddr
         resquery.addBindValue(inputs.at(i));
         resquery.exec();
         resquery.next();
-        outputs.append(resquery.value(0).toInt());
+        outputs.append(resquery.value(0).toULongLong());
     }
     resquery.finish();
     mftrecordsize = outputs.at(3);

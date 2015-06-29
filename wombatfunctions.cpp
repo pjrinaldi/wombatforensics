@@ -281,11 +281,14 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 void SecondaryProcessing()
 {
     QSqlQuery filequery(fcasedb);
+    unsigned long long fsoffset = 0;
+    unsigned long long parfsid = 0;
     filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;");
     if(filequery.exec())
     {
         while(filequery.next())
         {
+            parfsid = filequery.value(2).toULongLong();
             const TSK_TCHAR** imagepartspath;
             unsigned long long objectid = 0;
             TSK_IMG_INFO* readimginfo;
@@ -321,6 +324,7 @@ void SecondaryProcessing()
             fsquery.bindValue(0, filequery.value(2).toULongLong());
             fsquery.exec();
             fsquery.next();
+            fsoffset = fsquery.value(0).toULongLong();
             readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
             fsquery.finish();
             //OpenFile
@@ -328,7 +332,7 @@ void SecondaryProcessing()
             HashFile(readfileinfo, objectid);
             MagicFile(readfileinfo, objectid);
             BlockFile(readfileinfo, objectid);
-            PropertyFile(readfileinfo, objectid);
+            PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
 
             filesprocessed++;
             isignals->ProgUpd();
@@ -401,7 +405,7 @@ void GenerateThumbnails()
 
 }
 
-void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
+void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long long fsoffset, int blksize, unsigned long long parfsid)
 {
     QStringList proplist;
     proplist.clear();
@@ -427,11 +431,40 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         proplist << "allocation status for the file.";
 
         QSqlQuery objquery(fcasedb);
-        objquery.prepare("SELECT blockaddress, filemime, filesignature FROM data WHERE objectid = ?;");
+        objquery.prepare("SELECT blockaddress, filemime, filesignature, address FROM data WHERE objectid = ?;");
         objquery.bindValue(0, objid);
         objquery.exec();
         objquery.next();
         proplist << "Block Address" << objquery.value(0).toString() << "List of block addresses which contain the contents of the file";
+        unsigned long long tmpoffset = 0;
+        unsigned long long resoffset = 0;
+        unsigned long long fileaddress = 0;
+        fileaddress = objquery.value(3).toULongLong();
+        proplist << "Byte Offset";
+        if(objquery.value(0).toString().compare("") != 0)
+            tmpoffset = objquery.value(0).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong()*blksize + fsoffset;
+        else
+        {
+            QSqlQuery resquery(fcasedb);
+            QStringList inputs;
+            QList<unsigned long long> outputs;
+            inputs << "%0x0B%" << "%0x0D%" << "%0x30%" << "%0x40%";
+            for(int i=0; i < inputs.count(); i++)
+            {
+                resquery.prepare("SELECT value from properties where objectid = ? and description like(?);");
+                resquery.addBindValue(parfsid);
+                resquery.addBindValue(inputs.at(i));
+                resquery.exec();
+                resquery.next();
+                outputs.append(resquery.value(0).toULongLong());
+            }
+            resquery.finish();
+            mftrecordsize = outputs.at(3);
+            resoffset = ((outputs.at(0) * outputs.at(1) * outputs.at(2)) + (outputs.at(3)*fileaddress));
+
+            tmpoffset = resoffset + fsoffset;
+        }
+        proplist << QString::number(tmpoffset) << "Byte offset for the start of the file in a block or in the MFT";
         proplist << "File Signature" << objquery.value(1).toString() << objquery.value(2).toString();
         objquery.finish();
 
