@@ -929,7 +929,8 @@ void FileHexViewer::drawSelection( QPainter& paint )
     off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
     paint.setPen(Qt::NoPen);
     //paint.setBrush( qApp->palette().highlight() );
-    paint.setBrush(QBrush(QColor(Qt::cyan)));
+    //paint.setBrush(QBrush(QColor(Qt::cyan)));
+    paint.setBrush(QBrush(QColor(177, 177, 177, 255)));
     stop--;
     while( start <= stop ) {
       off_t linestop = min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
