@@ -1034,7 +1034,7 @@ void ImageHexViewer::drawSelection( QPainter& paint )
     paint.setPen(Qt::NoPen);
     //paint.setBrush(QColor(255, 255, 255, 175));
     //paint.setBrush( qApp->palette().highlight() );
-    paint.setBrush(QBrush(QColor(Qt::cyan)));
+    paint.setBrush(QBrush(QColor(177, 177, 177, 255)));
     stop--;
     while( start <= stop ) {
       // linestop = min(stop,endofline)

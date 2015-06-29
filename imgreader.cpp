@@ -247,7 +247,10 @@ uchar ImageReader::operator[] (off_t offset)
     throw out_of_range("ImageReader::operator[] - "
 		       "attempt to access past end of file");
 
+  qDebug() << "pageindex" << offset/_pageSize;
   off_t page_idx = offset/_pageSize;
+  //bool loaded = loadPage(page_idx);
+  bool loaded = loadimagepage(page_idx);
   return _data[page_idx][ offset%_pageSize ];
 }
 
