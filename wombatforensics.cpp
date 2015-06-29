@@ -1275,7 +1275,8 @@ void WombatForensics::SetupHexPage(void)
     hexLayout->addWidget(hexvsb);
     hexLayout->addWidget(hexslider);
     hexvsb->setRange(0, 0);
-    hexslider->setRange(0.0, 0.0);
+    //hexslider->setRange(0.0, 0.0);
+    hexslider->setScale(0.0, 0.0);
     mainlayout->addLayout(hexLayout);
     connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
@@ -1291,6 +1292,8 @@ void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
     hexvsb->setSingleStep(singlestep);
     hexvsb->setPageStep(pagestep);
+    hexslider->setSingleSteps(singlestep);
+    hexslider->setPageSteps(pagestep);
 }
 
 WombatForensics::~WombatForensics()
@@ -1682,8 +1685,6 @@ void WombatForensics::SetOffsetLabel(off_t pos)
 
 void WombatForensics::setScrollBarRange(off_t low, off_t high)
 {
-    if(high > 32767)
-        qDebug() << "high is too big" << high;
     if(high > 2147483647)
         qDebug() << "high is too long big" << high;
     if(high > 9223372036854775807)
@@ -1693,7 +1694,8 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // range must be contained in the space of an integer, just do 100
    // increments
    hexvsb->setRange(low, high);
-   hexslider->setRange(low, high);
+   //hexslider->setRange(low, high);
+   hexslider->setScale((double)low, (double)high);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)
@@ -1701,6 +1703,7 @@ void WombatForensics::setScrollBarValue(off_t pos)
     // THIS IS THE LINE # THAT THE OFFSET FALLS UNDER
 
     hexvsb->setValue(pos);
+    hexslider->setValue((double)pos);
 
   // pos is the topLeft pos, set the scrollbar to the
   // location of the last byte on the page
