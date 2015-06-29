@@ -5,7 +5,6 @@
 
 extern QSqlDatabase fcasedb;
 extern QSqlQuery* fqueryptr;
-//extern QSqlDatabase logdb;
 extern QSqlDatabase thumbdb;
 extern QSqlDatabase fappdb;
 extern QFile logfile;
@@ -43,7 +42,6 @@ extern QStringList externallist;
 extern struct magic_set* magicptr;
 extern struct magic_set* magicmimeptr;
 extern QMutex mutex;
-extern QHash<unsigned long long, QString> fileshash;
 
 struct dosdate
 {

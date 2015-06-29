@@ -2,7 +2,6 @@
 
 QSqlDatabase fcasedb;
 QSqlQuery* fqueryptr = NULL;
-//QSqlDatabase logdb;
 QSqlDatabase thumbdb;
 QSqlDatabase fappdb;
 QFile logfile;
@@ -58,5 +57,4 @@ QStringList externallist;
 struct magic_set* magicptr = NULL;
 struct magic_set* magicmimeptr = NULL;
 QMutex mutex;
-QHash<unsigned long long, QString> fileshash;
 FilterValues filtervalues;

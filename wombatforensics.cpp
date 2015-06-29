@@ -671,6 +671,7 @@ void WombatForensics::UpdateDataTable()
 {
     statuslabel->setText("Processing Complete");
     LogMessage("Evidence has been successfully added");
+    statuslabel->setText("Evidence ready");
     //qDebug() << "processing complete. should be 100%" << processphase;
 }
 
@@ -685,6 +686,7 @@ void WombatForensics::OpenEvidenceStructure()
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     statuslabel->setText("Opening Case Evidence Completed");
     LogMessage("Case evidence successfully opened");
+    statuslabel->setText("Evidence ready");
 }
 
 void WombatForensics::AddEvidence()

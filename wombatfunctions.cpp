@@ -602,13 +602,18 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         {
             sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
         }
+        /*
         if(sint > 0)
             fileshash.insert(objid, QString(sbuf)); 
         else
             fileshash.insert(objid, QString(""));
+        */
         QSqlQuery hashquery(fcasedb);
         hashquery.prepare("UPDATE data SET md5 = ? where objectid = ?;");
-        hashquery.bindValue(0, QString(sbuf));
+        if(sint > 0)
+            hashquery.bindValue(0, QString(sbuf));
+        else
+            hashquery.bindValue(0, QString(""));
         hashquery.bindValue(1, objid);
         hashquery.exec();
         hashquery.next();
