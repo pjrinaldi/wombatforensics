@@ -1271,6 +1271,7 @@ void WombatForensics::SetupHexPage(void)
     hexvsb = new QScrollBar(ui->hexPage);
     hexslider = new QwtSlider(Qt::Vertical, ui->hexPage);
     hexslider->setScalePosition(QwtSlider::NoScale);
+    hexslider->setInvertedControls(true);
     //hexvsb = new QScrollBar(hexwidget);
     hexLayout->addWidget(hexvsb);
     hexLayout->addWidget(hexslider);
@@ -1292,6 +1293,7 @@ void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
     hexvsb->setSingleStep(singlestep);
     hexvsb->setPageStep(pagestep);
+    hexslider->setScaleStepSize((double)singlestep);
     hexslider->setSingleSteps(singlestep);
     hexslider->setPageSteps(pagestep);
 }
@@ -1695,7 +1697,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // increments
    hexvsb->setRange(low, high);
    //hexslider->setRange(low, high);
-   hexslider->setScale((double)low, (double)high);
+   hexslider->setScale((double)high, (double)low);
 }
 
 void WombatForensics::setScrollBarValue(off_t pos)
