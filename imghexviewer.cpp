@@ -81,7 +81,8 @@ bool ImageHexViewer::openimage()
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
     emit rangeChanged(0, _reader.size()/bytesPerLine());
-    emit StepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
+    emit DoubleStepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
+    //emit StepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
     //qDebug() << "bytesperpage:" << bytesPerPage();
     //qDebug() << "hexviewer totalsteps:" << _reader.size()/bytesPerPage();
     calculateFontMetrics();
@@ -623,7 +624,8 @@ void ImageHexViewer::resizeEvent( QResizeEvent * e )
   emit rangeChanged(0, _reader.size()/bytesPerLine());
   //emit StepValues(1, bytesPerPage()/bytesPerLine());
   //qDebug() << "hexview totalstep:" << _reader.size()/bytesPerPage();
-  emit StepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
+  emit DoubleStepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
+  //emit StepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on

@@ -741,7 +741,8 @@ private slots:
     {
         statuslabel->setText(tmptext);
     };
-    void SetStepValues(int singlestep, int pagestep);
+    //void SetStepValues(int singlestep, int pagestep);
+    void SetStepValues(off_t singlestep, off_t pagestep);
     void TreeContextMenu(const QPoint &point);
     void ImgHexMenu(const QPoint &point);
     void SetFilter(int headercolumn);

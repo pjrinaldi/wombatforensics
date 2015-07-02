@@ -1285,15 +1285,21 @@ void WombatForensics::SetupHexPage(void)
     //connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexslider, SIGNAL(valueChanged(double)), hexwidget, SLOT(setTopLeftToDouble(double)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
-    connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+    //connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+    connect(hexwidget, SIGNAL(DoubleStepValues(off_t, off_t)), this, SLOT(SetStepValues(off_t, off_t)));
     connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
 }
 
-void WombatForensics::SetStepValues(int singlestep, int pagestep)
+//void WombatForensics::SetStepValues(int singlestep, int pagestep)
+void WombatForensics::SetStepValues(off_t singlestep, off_t pagestep)
 {
     //hexvsb->setSingleStep(singlestep);
     //hexvsb->setPageStep(pagestep);
     //hexslider->setScaleStepSize((double)singlestep);
+    qDebug() << "total steps:" << pagestep;
+    if(pagestep > 0)
+        qDebug() << "pagestep:" << hexwidget->reader()->size()/pagestep;
+    qDebug() << "singlestep:" << singlestep;
     hexslider->setTotalSteps(pagestep);
     if(pagestep > 0)
         hexslider->setPageSteps(hexwidget->reader()->size()/pagestep);
