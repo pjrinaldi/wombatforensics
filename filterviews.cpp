@@ -63,7 +63,7 @@ void JumpFilter::DisplayFilter()
 
 void JumpFilter::HideClicked()
 {
-    jumpoffset = ui->lineEdit->text().toULongLong();
+    jumpoffset = ui->lineEdit->text().toULongLong(0, 16);
     emit SetOffset(); 
     this->hide();
 }
