@@ -25,6 +25,7 @@ extern unsigned long long exportcount;
 extern unsigned long long currentfilesystemid;
 extern unsigned long long errorcount;
 extern unsigned long long currentjobid;
+extern unsigned long long jumpoffset;
 extern int thumbsize;
 extern int mftrecordsize;
 extern int threadstarted;

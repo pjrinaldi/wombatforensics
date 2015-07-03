@@ -51,6 +51,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     fileviewer = new FileViewer(this, tskobjptr);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
+    jumpfilterview = new JumpFilter(this);
     namefilterview = new NameFilter(this);
     pathfilterview = new PathFilter(this);
     sizefilterview = new SizeFilter(this);
@@ -1273,6 +1274,7 @@ void WombatForensics::SetupHexPage(void)
     linedown = new QPushButton(QIcon(":/basic/linedown"), "", ui->hexPage);
     pageup = new QPushButton(QIcon(":/basic/pageup"), "", ui->hexPage);
     pagedown = new QPushButton(QIcon(":/basic/pagedown"), "", ui->hexPage);
+    jumpto = new QPushButton("J", ui->hexPage);
     linedown->setAutoRepeat(true);
     lineup->setAutoRepeat(true);
     pagedown->setAutoRepeat(true);
@@ -1283,9 +1285,10 @@ void WombatForensics::SetupHexPage(void)
     navlayout->addWidget(lineup);
     navlayout->addWidget(linedown);
     navlayout->addWidget(pagedown);
+    navlayout->addWidget(jumpto);
     navlayout->addStretch(1);
     hexLayout->addLayout(navlayout);
-    //hexrocker = new QSlider(ui->hexPage);
+    //hexrocker = new QSlider(ui->hexPage); // has setRepeatAction() function which could implement the rocker stuff, but i would have to figure out how to switch the repeat action depending on how far away from center you are.
     //hexrocker->setRange(-100, 100);
     //hexrocker->setValue(0);
     //hexvsb = new QScrollBar(ui->hexPage);
@@ -1304,6 +1307,8 @@ void WombatForensics::SetupHexPage(void)
     connect(lineup, SIGNAL(clicked()), hexwidget, SLOT(prevLine()));
     connect(pagedown, SIGNAL(clicked()), hexwidget, SLOT(nextPage()));
     connect(pageup, SIGNAL(clicked()), hexwidget, SLOT(prevPage()));
+    connect(jumpto, SIGNAL(clicked()), jumpfilterview, SLOT(DisplayFilter()));
+    connect(jumpfilterview, SIGNAL(SetOffset()), hexwidget, SLOT(SetOffset()));
     //connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     //connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));

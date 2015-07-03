@@ -415,6 +415,12 @@ void ImageHexViewer::setTopLeftToDouble(double offset)
 // 
 // slot for setting cursor offset.
 //
+
+void ImageHexViewer::SetOffset()
+{
+    setOffset(jumpoffset);
+}
+
 void ImageHexViewer::setOffset( off_t offset )
 {
   off_t oldWordOffset = localWordOffset();

@@ -15,6 +15,7 @@
 #include "ui_namefilter.h"
 #include "ui_pathfilter.h"
 #include "ui_sizefilter.h"
+#include "ui_jumpto.h"
 
 namespace Ui {
     /*
@@ -31,6 +32,7 @@ namespace Ui {
     class ChangedDateFilter;
     class FileTypeFilter;
     class HashFilter;
+    class JumpFilter;
 }
 
 class IdFilter : public QFrame
@@ -49,6 +51,24 @@ private slots:
 
 private:
     Ui::IdFilter* ui;
+};
+
+class JumpFilter : public QFrame
+{
+    Q_OBJECT
+public:
+    JumpFilter(QWidget* parent = 0);
+    ~JumpFilter();
+
+signals:
+    void SetOffset();
+
+private slots:
+    void HideClicked();
+    void DisplayFilter(void);
+
+private:
+    Ui::JumpFilter* ui;
 };
 
 class NameFilter : public QWidget
@@ -220,5 +240,5 @@ Q_DECLARE_METATYPE(ModifiedDateFilter*);
 Q_DECLARE_METATYPE(ChangedDateFilter*);
 Q_DECLARE_METATYPE(FileTypeFilter*);
 Q_DECLARE_METATYPE(HashFilter*);
-
+Q_DECLARE_METATYPE(JumpFilter*);
 #endif

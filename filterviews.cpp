@@ -41,6 +41,33 @@ void IdFilter::HideClicked()
     emit HeaderChanged();
 }
 
+JumpFilter::JumpFilter(QWidget* parent) : QFrame(parent), ui(new Ui::JumpFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+JumpFilter::~JumpFilter()
+{
+}
+
+void JumpFilter::DisplayFilter()
+{
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
+    if(this->pos().x() == 0)
+        this->move(newpos);
+    this->show();
+}
+
+void JumpFilter::HideClicked()
+{
+    jumpoffset = ui->lineEdit->text().toULongLong();
+    emit SetOffset(); 
+    this->hide();
+}
+
 NameFilter::NameFilter(QWidget* parent) : QWidget(parent), ui(new Ui::NameFilter)
 {
     ui->setupUi(this);

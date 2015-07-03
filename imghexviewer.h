@@ -94,6 +94,7 @@ signals:
 
 public slots:
   void setOffset(off_t offset);     // sets cursor offset
+  void SetOffset();
   void setTopLeftToPercent( int percent ); // for setting pos from scroll
   void setTopLeftToPercent(); // for setting pos from scroll
   void setTopLeftToFloat(float offset);

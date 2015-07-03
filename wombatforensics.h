@@ -661,6 +661,7 @@ public:
     QMenu* treemenu;
     QMenu* selectionmenu;
     IdFilter* idfilterview;
+    JumpFilter* jumpfilterview;
     NameFilter* namefilterview;
     PathFilter* pathfilterview;
     SizeFilter* sizefilterview;
@@ -807,6 +808,7 @@ private:
     QPushButton* linedown;
     QPushButton* pageup;
     QPushButton* pagedown;
+    QPushButton* jumpto;
     //QwtSlider* hexslider;
     QLabel* selectedoffset;
     QLabel* selectedhex;
