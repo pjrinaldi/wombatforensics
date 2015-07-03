@@ -12,6 +12,10 @@
     <file alias="virtualfile">./Resources/virtualfile.png</file>
     <file alias="virtualfolder">./Resources/virtualfolder.png</file>
     <file alias="filterimg">./Resources/filterlist.png</file>
+    <file alias="lineup">./Resources/up.png</file>
+    <file alias="linedown">./Resources/down.png</file>
+    <file alias="pageup">./Resources/top.png</file>
+    <file alias="pagedown">./Resources/bottom.png</file>
   </qresource>
   <qresource prefix="/bar">
     <file alias="byteconverter">Resources/calc.png</file>

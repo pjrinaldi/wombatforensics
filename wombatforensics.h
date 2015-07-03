@@ -803,6 +803,10 @@ private:
     ImageHexViewer* hexwidget;
     //QScrollBar* hexvsb;
     QSlider* hexrocker;
+    QPushButton* lineup;
+    QPushButton* linedown;
+    QPushButton* pageup;
+    QPushButton* pagedown;
     //QwtSlider* hexslider;
     QLabel* selectedoffset;
     QLabel* selectedhex;

@@ -283,12 +283,18 @@ QRect ImageHexViewer::abyteBox(off_t byteIdx) const
     return QRect(_asciiBBox[wordIdx].left() + localByteIdx*fontMaxWidth() + wordSpacing(), _asciiBBox[wordIdx].top(), fontMaxWidth(), lineSpacing());
 }
 
+void ImageHexViewer::setTopLeftToPercent()
+{
+    qDebug() << ((QAction*)QObject::sender())->text();
+    //qDebug() << "pressed";
+}
 void ImageHexViewer::setTopLeftToPercent( int percent )
 {
     int pagestep = bytesPerPage()/bytesPerLine();
     qDebug() << "offset:" << percent;
     if(percent > 0) // move down
     {
+        /*
         while(percent < pagestep)
         {
             nextLine();
@@ -297,6 +303,7 @@ void ImageHexViewer::setTopLeftToPercent( int percent )
         {
             nextPage();
         }
+        */
         /*
         if(percent < pagestep) 
         {
