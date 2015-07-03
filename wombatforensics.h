@@ -741,8 +741,8 @@ private slots:
     {
         statuslabel->setText(tmptext);
     };
-    //void SetStepValues(int singlestep, int pagestep);
-    void SetStepValues(off_t singlestep, off_t pagestep);
+    void SetStepValues(int singlestep, int pagestep);
+    //void SetStepValues(off_t singlestep, off_t pagestep);
     void TreeContextMenu(const QPoint &point);
     void ImgHexMenu(const QPoint &point);
     void SetFilter(int headercolumn);
@@ -801,8 +801,9 @@ private:
 
     off_t offset() const;
     ImageHexViewer* hexwidget;
-    QScrollBar* hexvsb;
-    QwtSlider* hexslider;
+    //QScrollBar* hexvsb;
+    QSlider* hexrocker;
+    //QwtSlider* hexslider;
     QLabel* selectedoffset;
     QLabel* selectedhex;
     QLabel* filecountlabel;

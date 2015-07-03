@@ -1268,42 +1268,50 @@ void WombatForensics::SetupHexPage(void)
     hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
     hexLayout->addWidget(hexwidget);
+    hexrocker = new QSlider(ui->hexPage);
+    hexrocker->setRange(-100, 100);
+    hexrocker->setValue(0);
     //hexvsb = new QScrollBar(ui->hexPage);
-    hexslider = new QwtSlider(Qt::Vertical, ui->hexPage);
-    hexslider->setScalePosition(QwtSlider::NoScale);
-    hexslider->setInvertedControls(true);
+    //hexslider = new QwtSlider(Qt::Vertical, ui->hexPage);
+    //hexslider->setScalePosition(QwtSlider::NoScale);
+    //hexslider->setInvertedControls(true);
     //hexvsb = new QScrollBar(hexwidget);
     //hexLayout->addWidget(hexvsb);
-    hexLayout->addWidget(hexslider);
+    //hexLayout->addWidget(hexslider);
+    hexLayout->addWidget(hexrocker);
     //hexvsb->setRange(0, 0);
     //hexslider->setRange(0.0, 0.0);
-    hexslider->setScale(0.1, 0.0);
+    //hexslider->setScale(0.1, 0.0);
     mainlayout->addLayout(hexLayout);
-    connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
+    //connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
+    connect(hexrocker, SIGNAL(sliderMoved(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    //connect(hexrocker, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     //connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
-    connect(hexslider, SIGNAL(valueChanged(double)), hexwidget, SLOT(setTopLeftToDouble(double)));
+    //connect(hexslider, SIGNAL(valueChanged(double)), hexwidget, SLOT(setTopLeftToDouble(double)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
+    connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
     //connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
-    connect(hexwidget, SIGNAL(DoubleStepValues(off_t, off_t)), this, SLOT(SetStepValues(off_t, off_t)));
+    //connect(hexwidget, SIGNAL(DoubleStepValues(off_t, off_t)), this, SLOT(SetStepValues(off_t, off_t)));
     connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
 }
 
-//void WombatForensics::SetStepValues(int singlestep, int pagestep)
-void WombatForensics::SetStepValues(off_t singlestep, off_t pagestep)
+void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
     //hexvsb->setSingleStep(singlestep);
     //hexvsb->setPageStep(pagestep);
     //hexslider->setScaleStepSize((double)singlestep);
-    qDebug() << "total steps:" << pagestep;
-    if(pagestep > 0)
-        qDebug() << "pagestep:" << hexwidget->reader()->size()/pagestep;
+    hexrocker->setSingleStep(singlestep);
+    hexrocker->setPageStep(pagestep);
+    qDebug() << "page steps:" << pagestep;
+    //if(pagestep > 0)
+    //    qDebug() << "pagestep:" << hexwidget->reader()->size()/pagestep;
     qDebug() << "singlestep:" << singlestep;
-    hexslider->setTotalSteps(pagestep);
-    if(pagestep > 0)
-        hexslider->setPageSteps(hexwidget->reader()->size()/pagestep);
-    hexslider->setSingleSteps(singlestep);
+    //hexslider->setTotalSteps(pagestep);
+    //if(pagestep > 0)
+    //    hexslider->setPageSteps(hexwidget->reader()->size()/pagestep);
+    //hexslider->setSingleSteps(singlestep);
     //hexslider->setSingleSteps(singlestep);
     //hexslider->setPageSteps(singlestep);
     //hexslider->setPageStep(
@@ -1701,6 +1709,7 @@ void WombatForensics::SetOffsetLabel(off_t pos)
 
 void WombatForensics::setScrollBarRange(off_t low, off_t high)
 {
+    // not sure if i need to adjust the scroll bar range, since it will always be a function of the page height.
     if(high > 2147483647)
         qDebug() << "high is too long big" << high;
     if(high > 9223372036854775807)
@@ -1711,7 +1720,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    // increments
    //hexvsb->setRange(low, high);
    //hexslider->setRange(low, high);
-   hexslider->setScale((double)high, (double)low);
+   //hexslider->setScale((double)high, (double)low);
    qDebug() << "stepcount" << high;
    //hexslider->setTotalSteps(high/252);
 }
@@ -1721,7 +1730,7 @@ void WombatForensics::setScrollBarValue(off_t pos)
     // THIS IS THE LINE # THAT THE OFFSET FALLS UNDER
 
     //hexvsb->setValue(pos);
-    hexslider->setValue((double)pos);
+    //hexslider->setValue((double)pos);
 
   // pos is the topLeft pos, set the scrollbar to the
   // location of the last byte on the page

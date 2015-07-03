@@ -80,8 +80,9 @@ bool ImageHexViewer::openimage()
     _cursor.setCharsPerByte(_charsPerByte);
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
-    emit rangeChanged(0, _reader.size()/bytesPerLine());
-    emit DoubleStepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
+    emit StepValues(1, bytesPerPage()/bytesPerLine());
+    //emit rangeChanged(0, _reader.size()/bytesPerLine());
+    //emit DoubleStepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
     //emit StepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
     //qDebug() << "bytesperpage:" << bytesPerPage();
     //qDebug() << "hexviewer totalsteps:" << _reader.size()/bytesPerPage();
@@ -284,7 +285,49 @@ QRect ImageHexViewer::abyteBox(off_t byteIdx) const
 
 void ImageHexViewer::setTopLeftToPercent( int percent )
 {
+    int pagestep = bytesPerPage()/bytesPerLine();
+    qDebug() << "offset:" << percent;
+    if(percent > 0) // move down
+    {
+        while(percent < pagestep)
+        {
+            nextLine();
+        }
+        while(percent > pagestep)
+        {
+            nextPage();
+        }
+        /*
+        if(percent < pagestep) 
+        {
+            for(int i=0; i < percent; i++)
+                nextLine();
+        }
+        else if(percent > pagestep)
+        {
+            for(int i=0; i < percent/pagestep; i++)
+                nextPage();
+        }
+        */
+    }
+    else if(percent < 0) // move up
+    {
+        if(abs(percent) <= pagestep)
+        {
+            for(int i=0; i < abs(percent); i++)
+                prevLine();
+        }
+        else if(abs(percent) > pagestep)
+        {
+            for(int i=0; i < abs(percent)/pagestep; i++)
+                prevPage();
+        }
+    }
+    else // do nothing...
+    {
+    }
     //setTopLeft((_reader.size()/100)*percent);
+    /*
     percent = percent*bytesPerLine();
     if(_previousstep < percent)
     {
@@ -307,6 +350,7 @@ void ImageHexViewer::setTopLeftToPercent( int percent )
             setTopLeft(percent);
     }
     _previousstep = percent;
+    */
 }
 
 void ImageHexViewer::setTopLeftToFloat( float offset )
@@ -621,10 +665,10 @@ void ImageHexViewer::resizeEvent( QResizeEvent * e )
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
-  emit rangeChanged(0, _reader.size()/bytesPerLine());
-  //emit StepValues(1, bytesPerPage()/bytesPerLine());
+  //emit rangeChanged(0, _reader.size()/bytesPerLine());
+  emit StepValues(1, bytesPerPage()/bytesPerLine());
   //qDebug() << "hexview totalstep:" << _reader.size()/bytesPerPage();
-  emit DoubleStepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
+  //emit DoubleStepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
   //emit StepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
 }
 //
