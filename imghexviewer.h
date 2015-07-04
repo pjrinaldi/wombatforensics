@@ -93,6 +93,8 @@ signals:
   void DoubleStepValues(off_t singlestep, off_t pagestep);
   void SkipDown(void);
   void SkipUp(void);
+  void PageUp(void);
+  void PageDown(void);
 
 public slots:
   void setOffset(off_t offset);     // sets cursor offset

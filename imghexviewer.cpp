@@ -295,9 +295,11 @@ void ImageHexViewer::setTopLeftToPercent( int percent )
     //qDebug() << "offset:" << percent;
     if(percent > 0) // move down
     {
-            linefactor = percent;
-            //emit StepValues(percent, pagestep);
+        linefactor = percent;
+        if(percent < pagestep)
             emit SkipUp();
+        else
+            emit PageUp();
         /*
         while(percent < pagestep)
         {
@@ -324,7 +326,10 @@ void ImageHexViewer::setTopLeftToPercent( int percent )
     else if(percent < 0) // move up
     {
         linefactor = abs(percent);
-        emit SkipDown();
+        if(abs(percent) < pagestep)
+            emit SkipDown();
+        else
+            emit PageDown();
     }
     //setTopLeft((_reader.size()/100)*percent);
     /*
@@ -429,15 +434,15 @@ void ImageHexViewer::nextLine()
 }
 void ImageHexViewer::prevLine()
 {
-  setTopLeft(_topLeft- (linefactor*bytesPerLine()));
+  setTopLeft(_topLeft - (linefactor*bytesPerLine()));
 }
 void ImageHexViewer::nextPage()
 {
-  setTopLeft(_topLeft+bytesPerPage());
+  setTopLeft(_topLeft + (linefactor*bytesPerPage()));
 }
 void ImageHexViewer::prevPage()
 {
-  setTopLeft(_topLeft-bytesPerPage());
+  setTopLeft(_topLeft - (linefactor*bytesPerPage()));
 }
 
 off_t ImageHexViewer::localByteOffsetAtXY(off_t x, off_t y) 

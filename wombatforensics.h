@@ -735,6 +735,8 @@ private slots:
     void ResetSlider(void);
     void SkipDown(void);
     void SkipUp(void);
+    void PageUp(void);
+    void PageDown(void);
     void UpdateSelectValue(const QString &txt);
     //void LoadComplete(bool isok);
     void InitializeQueryModel(void);
@@ -809,11 +811,9 @@ private:
     QSlider* hexrocker;
     QPushButton* lineup;
     QPushButton* linedown;
-    /*
     QPushButton* pageup;
     QPushButton* pagedown;
-    */
-    QPushButton* jumpto;
+    //QPushButton* jumpto;
     //QwtSlider* hexslider;
     QLabel* selectedoffset;
     QLabel* selectedhex;

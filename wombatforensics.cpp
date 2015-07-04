@@ -1272,24 +1272,18 @@ void WombatForensics::SetupHexPage(void)
     hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
     lineup = new QPushButton(QIcon(":/basic/lineup"), "", ui->hexPage);
     linedown = new QPushButton(QIcon(":/basic/linedown"), "", ui->hexPage);
-    /*
     pageup = new QPushButton(QIcon(":/basic/pageup"), "", ui->hexPage);
     pagedown = new QPushButton(QIcon(":/basic/pagedown"), "", ui->hexPage);
-    */
-    jumpto = new QPushButton("J", ui->hexPage);
+    //jumpto = new QPushButton("J", ui->hexPage);
     linedown->setAutoRepeat(true);
     lineup->setAutoRepeat(true);
-    /*
     pagedown->setAutoRepeat(true);
     pageup->setAutoRepeat(true);
-    */
     linedown->setVisible(false);
     lineup->setVisible(false);
-    /*
     pageup->setVisible(false);
     pagedown->setVisible(false);
-    */
-    jumpto->setVisible(false);
+    //jumpto->setVisible(false);
     hexLayout->addWidget(hexwidget);
     /*
     navlayout->addStretch(1);
@@ -1302,7 +1296,7 @@ void WombatForensics::SetupHexPage(void)
     */
     //hexLayout->addLayout(navlayout);
     hexrocker = new QSlider(ui->hexPage); // has setRepeatAction() function which could implement the rocker stuff, but i would have to figure out how to switch the repeat action depending on how far away from center you are.
-    hexrocker->setRange(-10000, 10000);
+    hexrocker->setRange(-100, 100);
     hexrocker->setValue(0);
     hexrocker->setSingleStep(1);
     //hexrocker->setRepeatAction(QAbstractSlider::SliderSingleStepAdd, 500, 50);
@@ -1321,12 +1315,10 @@ void WombatForensics::SetupHexPage(void)
     mainlayout->addLayout(hexLayout);
     connect(linedown, SIGNAL(clicked()), hexwidget, SLOT(nextLine()));
     connect(lineup, SIGNAL(clicked()), hexwidget, SLOT(prevLine()));
-    /*
     connect(pagedown, SIGNAL(clicked()), hexwidget, SLOT(nextPage()));
     connect(pageup, SIGNAL(clicked()), hexwidget, SLOT(prevPage()));
-    */
-    connect(jumpto, SIGNAL(clicked()), jumpfilterview, SLOT(DisplayFilter()));
-    connect(jumpfilterview, SIGNAL(SetOffset()), hexwidget, SLOT(SetOffset()));
+    //connect(jumpto, SIGNAL(clicked()), jumpfilterview, SLOT(DisplayFilter()));
+    //connect(jumpfilterview, SIGNAL(SetOffset()), hexwidget, SLOT(SetOffset()));
     //connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     //connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
@@ -1341,6 +1333,8 @@ void WombatForensics::SetupHexPage(void)
     //connect(hexwidget, SIGNAL(clicktest()), linedown, SLOT(click()));
     connect(hexwidget, SIGNAL(SkipDown()), this, SLOT(SkipDown()));
     connect(hexwidget, SIGNAL(SkipUp()), this, SLOT(SkipUp()));
+    connect(hexwidget, SIGNAL(PageUp()), this, SLOT(PageUp()));
+    connect(hexwidget, SIGNAL(PageDown()), this, SLOT(PageDown()));
     //connect(hexwidget, SIGNAL(DoubleStepValues(off_t, off_t)), this, SLOT(SetStepValues(off_t, off_t)));
     connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
 }
@@ -1351,21 +1345,55 @@ void WombatForensics::ResetSlider()
         linedown->setDown(false);
     if(lineup->isDown())
         lineup->setDown(false);
+    if(pagedown->isDown())
+        pagedown->setDown(false);
+    if(pageup->isDown())
+        pageup->setDown(false);
     hexrocker->setValue(0);
 }
 
 void WombatForensics::SkipDown()
 {
+    if(pagedown->isDown())
+        pagedown->setDown(false);
     if(lineup->isDown())
         lineup->setDown(false);
+    if(pageup->isDown())
+        pageup->setDown(false);
     linedown->setDown(true);
 }
 
 void WombatForensics::SkipUp()
 {
+    if(pageup->isDown())
+        pageup->setDown(false);
     if(linedown->isDown())
         linedown->setDown(false);
+    if(pagedown->isDown())
+        pagedown->setDown(false);
     lineup->setDown(true);
+}
+
+void WombatForensics::PageUp()
+{
+    if(lineup->isDown())
+        lineup->setDown(false);
+    if(linedown->isDown())
+        linedown->setDown(false);
+    if(pagedown->isDown())
+        pagedown->setDown(false);
+    pageup->setDown(true);
+}
+
+void WombatForensics::PageDown()
+{
+    if(linedown->isDown())
+        linedown->setDown(false);
+    if(lineup->isDown())
+        lineup->setDown(false);
+    if(pageup->isDown())
+        pageup->setDown(false);
+    pagedown->setDown(true);
 }
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
