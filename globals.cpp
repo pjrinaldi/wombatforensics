@@ -24,6 +24,7 @@ unsigned long long exportcount = 0;
 unsigned long long errorcount = 0;
 unsigned long long currentjobid = 0;
 unsigned long long jumpoffset = 0;
+int linefactor = 0;
 int threadstarted = 0;
 int thumbsize = 64;
 int mftrecordsize = 1024;

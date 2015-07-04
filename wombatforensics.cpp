@@ -1262,8 +1262,8 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    QVBoxLayout* navlayout = new QVBoxLayout();
-    navlayout->setSpacing(1);
+    //QVBoxLayout* navlayout = new QVBoxLayout();
+    //navlayout->setSpacing(1);
     hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -1272,14 +1272,26 @@ void WombatForensics::SetupHexPage(void)
     hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
     lineup = new QPushButton(QIcon(":/basic/lineup"), "", ui->hexPage);
     linedown = new QPushButton(QIcon(":/basic/linedown"), "", ui->hexPage);
+    /*
     pageup = new QPushButton(QIcon(":/basic/pageup"), "", ui->hexPage);
     pagedown = new QPushButton(QIcon(":/basic/pagedown"), "", ui->hexPage);
+    */
     jumpto = new QPushButton("J", ui->hexPage);
     linedown->setAutoRepeat(true);
     lineup->setAutoRepeat(true);
+    /*
     pagedown->setAutoRepeat(true);
     pageup->setAutoRepeat(true);
+    */
+    linedown->setVisible(false);
+    lineup->setVisible(false);
+    /*
+    pageup->setVisible(false);
+    pagedown->setVisible(false);
+    */
+    jumpto->setVisible(false);
     hexLayout->addWidget(hexwidget);
+    /*
     navlayout->addStretch(1);
     navlayout->addWidget(pageup);
     navlayout->addWidget(lineup);
@@ -1287,10 +1299,14 @@ void WombatForensics::SetupHexPage(void)
     navlayout->addWidget(pagedown);
     navlayout->addWidget(jumpto);
     navlayout->addStretch(1);
-    hexLayout->addLayout(navlayout);
-    //hexrocker = new QSlider(ui->hexPage); // has setRepeatAction() function which could implement the rocker stuff, but i would have to figure out how to switch the repeat action depending on how far away from center you are.
-    //hexrocker->setRange(-100, 100);
-    //hexrocker->setValue(0);
+    */
+    //hexLayout->addLayout(navlayout);
+    hexrocker = new QSlider(ui->hexPage); // has setRepeatAction() function which could implement the rocker stuff, but i would have to figure out how to switch the repeat action depending on how far away from center you are.
+    hexrocker->setRange(-10000, 10000);
+    hexrocker->setValue(0);
+    hexrocker->setSingleStep(1);
+    //hexrocker->setRepeatAction(QAbstractSlider::SliderSingleStepAdd, 500, 50);
+    //hexrocker->setRepeatAction(QAbstractSlider::SliderSingleStepSub, 500, 50);
     //hexvsb = new QScrollBar(ui->hexPage);
     //hexslider = new QwtSlider(Qt::Vertical, ui->hexPage);
     //hexslider->setScalePosition(QwtSlider::NoScale);
@@ -1298,29 +1314,58 @@ void WombatForensics::SetupHexPage(void)
     //hexvsb = new QScrollBar(hexwidget);
     //hexLayout->addWidget(hexvsb);
     //hexLayout->addWidget(hexslider);
-    //hexLayout->addWidget(hexrocker);
+    hexLayout->addWidget(hexrocker);
     //hexvsb->setRange(0, 0);
     //hexslider->setRange(0.0, 0.0);
     //hexslider->setScale(0.1, 0.0);
     mainlayout->addLayout(hexLayout);
     connect(linedown, SIGNAL(clicked()), hexwidget, SLOT(nextLine()));
     connect(lineup, SIGNAL(clicked()), hexwidget, SLOT(prevLine()));
+    /*
     connect(pagedown, SIGNAL(clicked()), hexwidget, SLOT(nextPage()));
     connect(pageup, SIGNAL(clicked()), hexwidget, SLOT(prevPage()));
+    */
     connect(jumpto, SIGNAL(clicked()), jumpfilterview, SLOT(DisplayFilter()));
     connect(jumpfilterview, SIGNAL(SetOffset()), hexwidget, SLOT(SetOffset()));
     //connect(hexwidget, SIGNAL(rangeChanged(off_t,off_t)), this, SLOT(setScrollBarRange(off_t,off_t)));
     //connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    //connect(hexrocker, SIGNAL(sliderMoved(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    connect(hexrocker, SIGNAL(sliderMoved(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    connect(hexrocker, SIGNAL(sliderReleased()), this, SLOT(ResetSlider()));
     //connect(hexrocker, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     //connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     //connect(hexslider, SIGNAL(valueChanged(double)), hexwidget, SLOT(setTopLeftToDouble(double)));
     connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
     //connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
     //connect(hexwidget, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
+    //connect(hexwidget, SIGNAL(clicktest()), linedown, SLOT(click()));
+    connect(hexwidget, SIGNAL(SkipDown()), this, SLOT(SkipDown()));
+    connect(hexwidget, SIGNAL(SkipUp()), this, SLOT(SkipUp()));
     //connect(hexwidget, SIGNAL(DoubleStepValues(off_t, off_t)), this, SLOT(SetStepValues(off_t, off_t)));
     connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
+}
+
+void WombatForensics::ResetSlider()
+{
+    if(linedown->isDown())
+        linedown->setDown(false);
+    if(lineup->isDown())
+        lineup->setDown(false);
+    hexrocker->setValue(0);
+}
+
+void WombatForensics::SkipDown()
+{
+    if(lineup->isDown())
+        lineup->setDown(false);
+    linedown->setDown(true);
+}
+
+void WombatForensics::SkipUp()
+{
+    if(linedown->isDown())
+        linedown->setDown(false);
+    lineup->setDown(true);
 }
 
 void WombatForensics::SetStepValues(int singlestep, int pagestep)

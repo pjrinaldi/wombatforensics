@@ -91,6 +91,8 @@ signals:
   void selectionChanged(const QString& selection);
   void StepValues(int singlestep, int pagestep);
   void DoubleStepValues(off_t singlestep, off_t pagestep);
+  void SkipDown(void);
+  void SkipUp(void);
 
 public slots:
   void setOffset(off_t offset);     // sets cursor offset

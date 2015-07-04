@@ -285,15 +285,19 @@ QRect ImageHexViewer::abyteBox(off_t byteIdx) const
 
 void ImageHexViewer::setTopLeftToPercent()
 {
-    qDebug() << ((QAction*)QObject::sender())->text();
+    //int pagestep = bytesPerPage()/bytesPerLine();
+    //qDebug() << ((QAction*)QObject::sender())->text();
     //qDebug() << "pressed";
 }
 void ImageHexViewer::setTopLeftToPercent( int percent )
 {
     int pagestep = bytesPerPage()/bytesPerLine();
-    qDebug() << "offset:" << percent;
+    //qDebug() << "offset:" << percent;
     if(percent > 0) // move down
     {
+            linefactor = percent;
+            //emit StepValues(percent, pagestep);
+            emit SkipUp();
         /*
         while(percent < pagestep)
         {
@@ -319,19 +323,8 @@ void ImageHexViewer::setTopLeftToPercent( int percent )
     }
     else if(percent < 0) // move up
     {
-        if(abs(percent) <= pagestep)
-        {
-            for(int i=0; i < abs(percent); i++)
-                prevLine();
-        }
-        else if(abs(percent) > pagestep)
-        {
-            for(int i=0; i < abs(percent)/pagestep; i++)
-                prevPage();
-        }
-    }
-    else // do nothing...
-    {
+        linefactor = abs(percent);
+        emit SkipDown();
     }
     //setTopLeft((_reader.size()/100)*percent);
     /*
@@ -432,11 +425,11 @@ void ImageHexViewer::setOffset( off_t offset )
 
 void ImageHexViewer::nextLine()
 {
-  setTopLeft(_topLeft+bytesPerLine());
+  setTopLeft(_topLeft + (linefactor*bytesPerLine()));
 }
 void ImageHexViewer::prevLine()
 {
-  setTopLeft(_topLeft-bytesPerLine());
+  setTopLeft(_topLeft- (linefactor*bytesPerLine()));
 }
 void ImageHexViewer::nextPage()
 {

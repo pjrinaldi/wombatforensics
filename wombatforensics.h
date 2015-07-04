@@ -732,6 +732,9 @@ private slots:
     void setScrollBarRange(off_t low, off_t high);
     void setScrollBarValue(off_t pos);
     void SetOffsetLabel(off_t pos);
+    void ResetSlider(void);
+    void SkipDown(void);
+    void SkipUp(void);
     void UpdateSelectValue(const QString &txt);
     //void LoadComplete(bool isok);
     void InitializeQueryModel(void);
@@ -806,8 +809,10 @@ private:
     QSlider* hexrocker;
     QPushButton* lineup;
     QPushButton* linedown;
+    /*
     QPushButton* pageup;
     QPushButton* pagedown;
+    */
     QPushButton* jumpto;
     //QwtSlider* hexslider;
     QLabel* selectedoffset;
