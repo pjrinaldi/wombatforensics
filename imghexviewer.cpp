@@ -417,6 +417,7 @@ void ImageHexViewer::setTopLeftToDouble(double offset)
 void ImageHexViewer::SetOffset()
 {
     setOffset(jumpoffset);
+    setTopLeft(jumpoffset);
 }
 
 void ImageHexViewer::setOffset( off_t offset )

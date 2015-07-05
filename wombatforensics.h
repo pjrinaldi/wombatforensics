@@ -23,7 +23,31 @@
 #include "messageviewer.h"
 #include "byteconverter.h"
 
-#include "qwt_slider.h"
+class WombatSlider : public QSlider
+{
+    Q_OBJECT
+
+public:
+    WombatSlider(QWidget* parent = 0) : QSlider(parent) {};
+signals:
+    void ShowJumpFilter(void);
+
+protected:
+    void mousePressEvent(QMouseEvent* event)
+    {
+        if(event->button() == Qt::RightButton)
+        {
+            emit ShowJumpFilter();
+            event->accept();
+        }
+        else
+        {
+            event->accept();
+            QSlider::mousePressEvent(event);
+        }
+        //QSlider::mousePressEvent(event);
+    };
+};
 
 class TreeModel : public QAbstractItemModel
 {
@@ -734,6 +758,7 @@ private slots:
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
     void ShowRockerToolTip(int moved);
+    void JumpToOffset(void);
     void SkipDown(void);
     void SkipUp(void);
     void PageUp(void);
@@ -809,13 +834,13 @@ private:
     off_t offset() const;
     ImageHexViewer* hexwidget;
     //QScrollBar* hexvsb;
-    QSlider* hexrocker;
+    //QSlider* hexrocker;
+    WombatSlider* hexrocker;
     QPushButton* lineup;
     QPushButton* linedown;
     QPushButton* pageup;
     QPushButton* pagedown;
     //QPushButton* jumpto;
-    //QwtSlider* hexslider;
     QLabel* selectedoffset;
     QLabel* selectedhex;
     QLabel* filecountlabel;
