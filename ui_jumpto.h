@@ -45,6 +45,7 @@ public:
         lineEdit = new QLineEdit(JumpFilter);
         lineEdit->setObjectName(QStringLiteral("lineEdit"));
         lineEdit->setMinimumSize(QSize(100, 0));
+        lineEdit->setClearButtonEnabled(false);
 
         gridLayout->addWidget(lineEdit, 0, 1, 1, 1);
 
@@ -69,6 +70,7 @@ public:
         font.setStrikeOut(false);
         pushButton->setFont(font);
         pushButton->setCursor(QCursor(Qt::ArrowCursor));
+        pushButton->setAutoDefault(true);
         pushButton->setDefault(true);
         pushButton->setFlat(true);
 
@@ -83,8 +85,10 @@ public:
     void retranslateUi(QFrame *JumpFilter)
     {
         JumpFilter->setWindowTitle(QApplication::translate("JumpFilter", "Frame", 0));
+        lineEdit->setPlaceholderText(QApplication::translate("JumpFilter", "Enter Hex Offset", 0));
         label->setText(QApplication::translate("JumpFilter", "Jump to:", 0));
         pushButton->setText(QApplication::translate("JumpFilter", "Go", 0));
+        pushButton->setShortcut(QApplication::translate("JumpFilter", "Return", 0));
     } // retranslateUi
 
 };
