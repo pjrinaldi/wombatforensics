@@ -365,6 +365,7 @@ void FileHexViewer::SetOffset()
 {
     setOffset(filejumpoffset);
     setTopLeft(filejumpoffset);
+    seeCursor();
 }
 
 
