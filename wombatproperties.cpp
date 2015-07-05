@@ -1897,6 +1897,16 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
         proplist << "Fork Data Attributes File" << "" << "Location and size of attributes file (0x0160-0x01AF)";
         proplist << "Fork Data Startup File" << "" << "Location and size of startup file (0x01B0-0x01FF)";
     }
+    proplist << "Endian Ordering";
+    if(curfsinfo->endian == TSK_UNKNOWN_ENDIAN)
+        proplist << "Endianness is unknown";
+    else if(curfsinfo->endian == TSK_LIT_ENDIAN)
+        proplist << "Data is in Little Endian";
+    else if(curfsinfo->endian == TSK_BIG_ENDIAN)
+        proplist << "Data is in Big Endian";
+    else
+        proplist << "Endianness is unknown";
+    proplist << "Identifies the endian ordering of the data being read.";
     return proplist;
 }
 
