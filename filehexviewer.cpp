@@ -279,6 +279,24 @@ QRect FileHexViewer::abyteBox(off_t byteIdx) const
 
 void FileHexViewer::setTopLeftToPercent( int percent )
 {
+    int pagestep = bytesPerPage()/bytesPerLine();
+    if(percent > 0) // move down
+    {
+        filelinefactor = percent;
+        if(percent < pagestep)
+            emit SkipUp();
+        else
+            emit PageUp();
+    }
+    else if(percent < 0) // move up
+    {
+        filelinefactor = abs(percent);
+        if(abs(percent) < pagestep)
+            emit SkipDown();
+        else
+            emit PageDown();
+    }
+    /*
     //setTopLeft((_reader.size()/100)*percent);
     percent = percent*bytesPerLine();
     if(_previousstep < percent)
@@ -302,6 +320,7 @@ void FileHexViewer::setTopLeftToPercent( int percent )
             setTopLeft(percent);
     }
     _previousstep = percent;
+    */
 }
 
 void FileHexViewer::setTopLeftToFloat( float offset )
@@ -342,21 +361,36 @@ void FileHexViewer::setOffset( off_t offset )
   emit offsetChanged( _cursor.byteOffset() );
 }
 
+void FileHexViewer::SetOffset()
+{
+    setOffset(filejumpoffset);
+    setTopLeft(filejumpoffset);
+}
+
+
 void FileHexViewer::nextLine()
 {
-  setTopLeft(_topLeft+bytesPerLine());
+  setTopLeft(_topLeft+(filelinefactor*bytesPerLine()));
+  setOffset(_topLeft);
+  seeCursor();
 }
 void FileHexViewer::prevLine()
 {
-  setTopLeft(_topLeft-bytesPerLine());
+  setTopLeft(_topLeft-(filelinefactor*bytesPerLine()));
+  setOffset(_topLeft);
+  seeCursor();
 }
 void FileHexViewer::nextPage()
 {
-  setTopLeft(_topLeft+bytesPerPage());
+  setTopLeft(_topLeft+(filelinefactor*bytesPerPage()));
+  setOffset(_topLeft);
+  seeCursor();
 }
 void FileHexViewer::prevPage()
 {
-  setTopLeft(_topLeft-bytesPerPage());
+  setTopLeft(_topLeft-(filelinefactor*bytesPerPage()));
+  setOffset(_topLeft);
+  seeCursor();
 }
 
 off_t FileHexViewer::localByteOffsetAtXY(off_t x, off_t y) 
@@ -406,6 +440,25 @@ void FileHexViewer::mousePressEvent( QMouseEvent* e )
     byte_offset++;
   }
   setSelection( SelectionStart, globalOffset( byte_offset ));
+}
+
+void FileHexViewer::wheelEvent(QWheelEvent* e)
+{
+    //int numdegrees = e->delta() / 8;
+    //int numsteps = abs(numdegrees) / 15;
+    if(e->delta() < 0)
+    {
+        //for(int i=0; i < numsteps; i++)
+            cursorDown();
+    }
+    else
+    {
+        //for(int i=0; i < numsteps; i++)
+            cursorUp();
+        //prevPage();
+    }
+
+    e->accept();
 }
 
 void FileHexViewer::mouseMoveEvent( QMouseEvent* e )

@@ -33,6 +33,7 @@ namespace Ui {
     class FileTypeFilter;
     class HashFilter;
     class JumpFilter;
+    class FileJumpFilter;
 }
 
 class IdFilter : public QFrame
@@ -70,6 +71,25 @@ private slots:
 private:
     Ui::JumpFilter* ui;
 };
+
+class FileJumpFilter : public QFrame
+{
+    Q_OBJECT
+public:
+    FileJumpFilter(QWidget* parent = 0);
+    ~FileJumpFilter();
+
+signals:
+    void SetOffset();
+
+private slots:
+    void HideClicked();
+    void DisplayFilter(void);
+
+private:
+    Ui::JumpFilter* ui;
+};
+
 
 class NameFilter : public QWidget
 {

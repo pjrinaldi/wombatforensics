@@ -68,6 +68,33 @@ void JumpFilter::HideClicked()
     this->hide();
 }
 
+FileJumpFilter::FileJumpFilter(QWidget* parent) : QFrame(parent), ui(new Ui::JumpFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+FileJumpFilter::~FileJumpFilter()
+{
+}
+
+void FileJumpFilter::DisplayFilter()
+{
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
+    if(this->pos().x() == 0)
+        this->move(newpos);
+    this->show();
+}
+
+void FileJumpFilter::HideClicked()
+{
+    filejumpoffset = ui->lineEdit->text().toULongLong(0, 16);
+    emit SetOffset(); 
+    this->hide();
+}
+
 NameFilter::NameFilter(QWidget* parent) : QWidget(parent), ui(new Ui::NameFilter)
 {
     ui->setupUi(this);

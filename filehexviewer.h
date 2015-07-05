@@ -27,6 +27,7 @@
 #define FILE_HEX_VIEWER
 
 #include "wombatinclude.h"
+#include "globals.h"
 #include "translate.h"
 #include "filereader.h"
 
@@ -89,9 +90,14 @@ signals:
   void topLeftChanged(off_t offset);
   void selectionChanged(const QString& selection);
   void StepValues(int singlestep, int pagestep);
+  void SkipDown(void);
+  void SkipUp(void);
+  void PageUp(void);
+  void PageDown(void);
 
 public slots:
   void setOffset(off_t offset);     // sets cursor offset
+  void SetOffset();
   void setTopLeftToPercent( int percent ); // for setting pos from scroll
   void setTopLeftToFloat(float offset);
   //
@@ -183,6 +189,7 @@ protected:
   void mousePressEvent  ( QMouseEvent * e );
   void mouseReleaseEvent( QMouseEvent *e );
   void mouseMoveEvent   ( QMouseEvent *e );
+  void wheelEvent(QWheelEvent* e);
 
 protected:
   FileReader              _reader;
