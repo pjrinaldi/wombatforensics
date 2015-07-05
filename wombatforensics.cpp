@@ -572,7 +572,10 @@ void WombatForensics::InitializeOpenCase()
             statuslabel->setText("Opening Case Evidence...");
             OpenEvidenceStructure();
             if(ui->dirTreeView->model() != NULL)
+            {
                 ui->actionRemove_Evidence->setEnabled(true);
+                hexrocker->setEnabled(true);
+            }
         }
     }
 
@@ -587,6 +590,7 @@ void WombatForensics::InitializeQueryModel()
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     ResizeColumns();
     ui->actionRemove_Evidence->setEnabled(true);
+    hexrocker->setEnabled(true);
     wombatframework->CloseInfoStructures();
     statuslabel->setText("Evidence ready");
     LogMessage("Evidence Ready");
@@ -1299,6 +1303,7 @@ void WombatForensics::SetupHexPage(void)
     hexrocker->setRange(-100, 100);
     hexrocker->setValue(0);
     hexrocker->setSingleStep(1);
+    hexrocker->setEnabled(false);
     //hexrocker->setRepeatAction(QAbstractSlider::SliderSingleStepAdd, 500, 50);
     //hexrocker->setRepeatAction(QAbstractSlider::SliderSingleStepSub, 500, 50);
     //hexvsb = new QScrollBar(ui->hexPage);

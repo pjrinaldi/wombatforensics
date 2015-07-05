@@ -431,6 +431,9 @@ void ImageHexViewer::setOffset( off_t offset )
 void ImageHexViewer::nextLine()
 {
   setTopLeft(_topLeft + (linefactor*bytesPerLine()));
+  _cursor.setOffset(_topLeft + (linefactor*bytesPerLine()), 0);
+  //seeCursor();
+  emit offsetChanged( _cursor.byteOffset() );
 }
 void ImageHexViewer::prevLine()
 {
