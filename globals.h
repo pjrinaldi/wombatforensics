@@ -27,6 +27,7 @@ extern unsigned long long errorcount;
 extern unsigned long long currentjobid;
 extern unsigned long long jumpoffset;
 extern int linefactor;
+extern int pageskip;
 extern int thumbsize;
 extern int mftrecordsize;
 extern int threadstarted;

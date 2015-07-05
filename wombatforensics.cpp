@@ -677,7 +677,7 @@ void WombatForensics::UpdateDataTable()
     statuslabel->setText("Processing Complete");
     LogMessage("Evidence has been successfully added");
     statuslabel->setText("Evidence ready");
-    //qDebug() << "processing complete. should be 100%" << processphase;
+    //qDebu() << "processing complete. should be 100%" << processphase;
 }
 
 void WombatForensics::OpenEvidenceStructure()
@@ -1304,8 +1304,6 @@ void WombatForensics::SetupHexPage(void)
     hexrocker->setValue(0);
     hexrocker->setSingleStep(1);
     hexrocker->setEnabled(false);
-    //hexrocker->setRepeatAction(QAbstractSlider::SliderSingleStepAdd, 500, 50);
-    //hexrocker->setRepeatAction(QAbstractSlider::SliderSingleStepSub, 500, 50);
     //hexvsb = new QScrollBar(ui->hexPage);
     //hexslider = new QwtSlider(Qt::Vertical, ui->hexPage);
     //hexslider->setScalePosition(QwtSlider::NoScale);
@@ -1328,6 +1326,7 @@ void WombatForensics::SetupHexPage(void)
     //connect(hexwidget, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
     connect(hexrocker, SIGNAL(sliderMoved(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    connect(hexrocker, SIGNAL(sliderMoved(int)), this, SLOT(ShowRockerToolTip(int)));
     connect(hexrocker, SIGNAL(sliderReleased()), this, SLOT(ResetSlider()));
     //connect(hexrocker, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     //connect(hexvsb, SIGNAL(valueChanged(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
@@ -1342,6 +1341,13 @@ void WombatForensics::SetupHexPage(void)
     connect(hexwidget, SIGNAL(PageDown()), this, SLOT(PageDown()));
     //connect(hexwidget, SIGNAL(DoubleStepValues(off_t, off_t)), this, SLOT(SetStepValues(off_t, off_t)));
     connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
+}
+
+void WombatForensics::ShowRockerToolTip(int moved)
+{
+    //qDebug() << linefactor << moved;
+    //hexrocker->setToolTip(QString::number(moved));
+    QToolTip::showText(QCursor::pos(), QString::number(linefactor), hexrocker);
 }
 
 void WombatForensics::ResetSlider()
@@ -1408,10 +1414,10 @@ void WombatForensics::SetStepValues(int singlestep, int pagestep)
     //hexslider->setScaleStepSize((double)singlestep);
     //hexrocker->setSingleStep(singlestep);
     //hexrocker->setPageStep(pagestep);
-    qDebug() << "page steps:" << pagestep;
+    //qDebug() << "page steps:" << pagestep;
     //if(pagestep > 0)
     //    qDebug() << "pagestep:" << hexwidget->reader()->size()/pagestep;
-    qDebug() << "singlestep:" << singlestep;
+    //qDebug() << "singlestep:" << singlestep;
     //hexslider->setTotalSteps(pagestep);
     //if(pagestep > 0)
     //    hexslider->setPageSteps(hexwidget->reader()->size()/pagestep);

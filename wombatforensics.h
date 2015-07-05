@@ -733,6 +733,7 @@ private slots:
     void setScrollBarValue(off_t pos);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
+    void ShowRockerToolTip(int moved);
     void SkipDown(void);
     void SkipUp(void);
     void PageUp(void);

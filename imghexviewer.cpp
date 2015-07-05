@@ -430,22 +430,27 @@ void ImageHexViewer::setOffset( off_t offset )
 
 void ImageHexViewer::nextLine()
 {
-  setTopLeft(_topLeft + (linefactor*bytesPerLine()));
-  _cursor.setOffset(_topLeft + (linefactor*bytesPerLine()), 0);
-  //seeCursor();
-  emit offsetChanged( _cursor.byteOffset() );
+    setTopLeft(_topLeft + (linefactor*bytesPerLine()));
+    setOffset(_topLeft);
+    seeCursor();
 }
 void ImageHexViewer::prevLine()
 {
   setTopLeft(_topLeft - (linefactor*bytesPerLine()));
+  setOffset(_topLeft);
+  seeCursor();
 }
 void ImageHexViewer::nextPage()
 {
   setTopLeft(_topLeft + (linefactor*bytesPerPage()));
+  setOffset(_topLeft);
+  seeCursor();
 }
 void ImageHexViewer::prevPage()
 {
   setTopLeft(_topLeft - (linefactor*bytesPerPage()));
+  setOffset(_topLeft);
+  seeCursor();
 }
 
 off_t ImageHexViewer::localByteOffsetAtXY(off_t x, off_t y) 
