@@ -430,6 +430,38 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
             proplist << "Unspecified";
         proplist << "allocation status for the file.";
 
+        /* insert ntfs and hfs attributes here */
+        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+        {
+            int cnt, i;
+            cnt = tsk_fs_file_attr_getsize(tmpfile);
+            for(i = 0; i < cnt; i++)
+            {
+                char type[512];
+                const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512))
+                {
+                    // the above gets me the attribute name such as $STANDARD_INFORMATION, $DATA, $FILE_NAME, $OBJECT_ID, etc.
+                }
+            }
+            /*
+            const TSK_FS_ATTR* fsattr;
+            fsattr = tsk_fs_attrlist_get(tmpfile->meta->attr, NTFS_ATYPE_SI);
+            if(fsattr)
+            {
+                ntfs_attr_si* si = (ntfs_attr_si*)fsattr->rd.buf;
+                char* sidstr;
+                int a = 0;
+                proplist << "$STANDARD_INFORMATION Attribute Values";
+                // ntfs.c line 4214 working on Flags.
+            }
+            */
+        }
+        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
+        {
+            // hfs.c line 5446 working on hfs file information.
+        }
+
         QSqlQuery objquery(fcasedb);
         objquery.prepare("SELECT blockaddress, filemime, filesignature, address FROM data WHERE objectid = ?;");
         objquery.bindValue(0, objid);
