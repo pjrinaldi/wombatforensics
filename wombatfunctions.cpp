@@ -270,6 +270,80 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     fileints.append(currentfilesystemid);
 
+
+    // add the extra file info for the alternate data stream
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    {
+        int cnt, i;
+        cnt = tsk_fs_file_attr_getsize(tmpfile);
+        for(i = 0; i < cnt; i++)
+        {
+            char type[512];
+            const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+            if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
+            {
+                if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                {
+                    if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
+                    {
+                        // NOW I NEED TO CREATE A FILE ENTRY WITH THE SAME INFO, EXCEPT IT CONTAINS DIFFERENT CONTENT, SO I NEED
+                        // A WAY TO REFERENCE THAT DIFFERENT CONTENT WHEN I CLICK ON IT...
+                        // 
+                        // ICAT USES TSK_FS_FILE_WALK_TYPE(TMPFILE, ATTR TYPE 128, ID 6, CALLBACK) TO PRINT IT... 
+                        // I'LL HAVE TO FIGURE OUT SOME WAY TO STORE THAT INFORMATION SO I CAN RETRIEVE THE INFORMATION I NEED...
+                        qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
+                    }
+                }
+                // the above gets me the attribute name such as $STANDARD_INFORMATION, $DATA, $FILE_NAME, $OBJECT_ID, etc.
+            }
+        }
+    }
+
+    /*
+     *
+     * NTFS ALTERNATE DATA STREAM CODE
+     * 
+     * if ((TSK_FS_TYPE_ISNTFS(fs_file->fs_info->ftype))
+            && (fs_file->meta)) {
+            uint8_t printed = 0;
+            int i, cnt;
+
+            // cycle through the attributes
+            cnt = tsk_fs_file_attr_getsize(fs_file);
+            for (i = 0; i < cnt; i++) {
+                const TSK_FS_ATTR *fs_attr =
+                    tsk_fs_file_attr_get_idx(fs_file, i);
+                if (!fs_attr)
+                    continue;
+
+                if (fs_attr->type == TSK_FS_ATTR_TYPE_NTFS_DATA) {
+                    printed = 1;
+
+                    if (fs_file->meta->type == TSK_FS_META_TYPE_DIR) {
+
+                        if ((fs_file->name->name[0] == '.')
+                            && (fs_file->name->name[1])
+                            && (fs_file->name->name[2] == '\0')
+                            && ((fls_data->flags & TSK_FS_FLS_DOT) == 0)) {
+                            continue;
+                        }
+                    }
+
+                    printit(fs_file, a_path, fs_attr, fls_data);
+
+		    if ((fs_attr) && (fs_attr->name)) {
+		        if ((fs_attr->type != TSK_FS_ATTR_TYPE_NTFS_IDXROOT) ||
+		            (strcmp(fs_attr->name, "$I30") != 0)) {
+		            tsk_fprintf(hFile, ":");
+		            buf = malloc(strlen(fs_attr->name) + 1);
+		            strcpy(buf, fs_attr->name);
+		            for (i = 0; i < strlen(buf); i++) {
+		                if (TSK_IS_CNTRL(buf[i])) buf[i] = '^';
+		            }
+		            tsk_fprintf(hFile, "%s", buf);
+     *
+     */ 
+
     //filesfound++;
     QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints);
     //filewatcher.setFuture(tmpfuture);
@@ -439,8 +513,15 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
             {
                 char type[512];
                 const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512))
+                if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
                 {
+                    if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                    {
+                        if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
+                        {
+                            qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
+                        }
+                    }
                     // the above gets me the attribute name such as $STANDARD_INFORMATION, $DATA, $FILE_NAME, $OBJECT_ID, etc.
                 }
             }
