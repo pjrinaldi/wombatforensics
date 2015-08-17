@@ -630,6 +630,8 @@ void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
+            // NEED TO COMPARE TMPFILE->MFTATTRID == TMPATTR->ID TO ENSURE ITS THE CORRECT ATTRIBUTE FILE.
+            // CURRENTLY I'M GETTING THE BLOCKS FOR THE REGULAR DATA AND THE ADS DATA.
             if(tmpfile->meta != NULL)
             {
                 if(tmpfile->meta->attr)
