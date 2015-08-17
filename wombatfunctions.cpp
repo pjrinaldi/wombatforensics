@@ -286,6 +286,17 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 {
                     if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                     {
+                        FileData tmpdata;
+                        tmpdata.type = (unsigned long long)tmpfile->name->type;
+                        tmpdata.paraddr = (unsigned long long)tmpfile->meta->addr;
+                        tmpdata.name = QString(":") + QString(fsattr->name);
+                        tmpdata.size = (unsigned long long)fsattr->size;
+                        tmpdata.mftattrid = (unsigned long long)fsattr->id;
+
+                        // IF I WANT TO ADD THIS TO THE DB AFTER I ADD THE MAIN FILE, I'LL NEED TO STORE THIS AND CALL IT SOMEWHERE
+                        // ELSE AFTER I CALL THE MAIN ONE...
+                        //
+                        //
                         // NOW I NEED TO CREATE A FILE ENTRY WITH THE SAME INFO, EXCEPT IT CONTAINS DIFFERENT CONTENT, SO I NEED
                         // A WAY TO REFERENCE THAT DIFFERENT CONTENT WHEN I CLICK ON IT...
                         // 

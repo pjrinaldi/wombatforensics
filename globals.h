@@ -116,6 +116,7 @@ struct FileData
     unsigned long long addr;
     unsigned long long fsid;
     unsigned long long evid;
+    unsigned long long mftattrid;
     QString name;
     QString path;
 };
