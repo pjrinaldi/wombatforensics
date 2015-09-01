@@ -284,6 +284,13 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             {
                 if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
                 {
+                    // INVALID IDEA BECAUSE THE ID CAN BE 1 FOR AN ADS
+                    /*
+                    if(fsattr->id > 1)
+                    {
+                        qDebug() << "attr id:" << fsattr->id << "Already a $DATA attribute";
+                    }
+                    */
                     if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                     {
                         FileData tmpdata;
@@ -291,7 +298,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                         tmpdata.paraddr = (unsigned long long)tmpfile->meta->addr;
                         tmpdata.name = QString(":") + QString(fsattr->name);
                         tmpdata.size = (unsigned long long)fsattr->size;
-                        tmpdata.mftattrid = (unsigned long long)fsattr->id;
+                        tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
 
                         // IF I WANT TO ADD THIS TO THE DB AFTER I ADD THE MAIN FILE, I'LL NEED TO STORE THIS AND CALL IT SOMEWHERE
                         // ELSE AFTER I CALL THE MAIN ONE...
