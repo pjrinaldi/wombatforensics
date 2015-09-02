@@ -291,6 +291,12 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                         {
                             if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                             {
+                                // MAKE THIS A FILE VARIABLE ADSDATA, WHICH WHEN I CALL THE NEXT FUNCTION, IT LOOKS TO SEE IF THE
+                                // BOOLEAN VARIABLE HASADS IS SET TO TRUE. IF ITS TRUE, THEN CALL THE NEXT DB ENTRY TO ENTER
+                                // THE ADSDATA AFTER THE FILEDATA, THEN SET THE ADS VARIABLE TO FALSE AND RESET ADSDATA TO 0'S AND "".
+                                // 
+                                // ACTUALLY, BECUASE ITS CONCURRENT, I'LL HAVE TO SEND THE ADS DATA AND ADSBOOLEAN VARIABLES
+                                // TO THE CONCURRENT FUNCTION CALL SO THEY STAY WITH THE CORRECT THREAD...
                                 FileData tmpdata;
                                 tmpdata.type = (unsigned long long)tmpfile->name->type;
                                 tmpdata.paraddr = (unsigned long long)tmpfile->meta->addr;
