@@ -81,7 +81,7 @@ bool ProcessingComplete()
     return false;
 }
 
-void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints)
+void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints, FileData adsdata, bool adsbool)
 {
     FileData tmpdata;
     tmpdata.type = tmpints[0];
@@ -96,8 +96,13 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     tmpdata.addr = tmpints[7];
     tmpdata.evid = currentevidenceid;
     tmpdata.fsid = tmpints[8];
+    tmpdata.mftattrid = 0;
     mutex.lock();
     filedatavector.append(tmpdata);
+    if(adsbool == true)
+    {
+        filedatavector.append(adsdata);
+    }
     mutex.unlock();
         /*
     }
@@ -271,6 +276,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     fileints.append(currentfilesystemid);
 
 
+    FileData tmpdata;
+    bool adsbool = false;
     // add the extra file info for the alternate data stream
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
@@ -280,11 +287,12 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             {
                 int cnt, i;
                 cnt = tsk_fs_file_attr_getsize(tmpfile);
-                qDebug() << "file name:" << tmpfile->name->name;
+                //qDebug() << "file name:" << tmpfile->name->name;
                 for(i = 0; i < cnt; i++)
                 {
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                    // if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA)
                     if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
                     {
                         if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
@@ -297,79 +305,29 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 // 
                                 // ACTUALLY, BECUASE ITS CONCURRENT, I'LL HAVE TO SEND THE ADS DATA AND ADSBOOLEAN VARIABLES
                                 // TO THE CONCURRENT FUNCTION CALL SO THEY STAY WITH THE CORRECT THREAD...
-                                FileData tmpdata;
                                 tmpdata.type = (unsigned long long)tmpfile->name->type;
                                 tmpdata.paraddr = (unsigned long long)tmpfile->meta->addr;
                                 tmpdata.name = QString(":") + QString(fsattr->name);
+                                tmpdata.path = "";
+                                tmpdata.atime = 0;
+                                tmpdata.ctime = 0;
+                                tmpdata.crtime = 0;
+                                tmpdata.mtime = 0;
+                                tmpdata.evid = currentevidenceid;
+                                tmpdata.fsid = currentfilesystemid;
                                 tmpdata.size = (unsigned long long)fsattr->size;
                                 tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
-
-                                // IF I WANT TO ADD THIS TO THE DB AFTER I ADD THE MAIN FILE, I'LL NEED TO STORE THIS AND CALL IT SOMEWHERE
-                                // ELSE AFTER I CALL THE MAIN ONE...
-                                //
-                                //
-                                // NOW I NEED TO CREATE A FILE ENTRY WITH THE SAME INFO, EXCEPT IT CONTAINS DIFFERENT CONTENT, SO I NEED
-                                // A WAY TO REFERENCE THAT DIFFERENT CONTENT WHEN I CLICK ON IT...
-                                // 
-                                // ICAT USES TSK_FS_FILE_WALK_TYPE(TMPFILE, ATTR TYPE 128, ID 6, CALLBACK) TO PRINT IT... 
-                                // I'LL HAVE TO FIGURE OUT SOME WAY TO STORE THAT INFORMATION SO I CAN RETRIEVE THE INFORMATION I NEED...
-                                qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
+                                adsbool = true;
+                                //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
                             }
                         }
-                        // the above gets me the attribute name such as $STANDARD_INFORMATION, $DATA, $FILE_NAME, $OBJECT_ID, etc.
                     }
                 }
             }
         }
     }
-
-    /*
-     *
-     * NTFS ALTERNATE DATA STREAM CODE
-     * 
-     * if ((TSK_FS_TYPE_ISNTFS(fs_file->fs_info->ftype))
-            && (fs_file->meta)) {
-            uint8_t printed = 0;
-            int i, cnt;
-
-            // cycle through the attributes
-            cnt = tsk_fs_file_attr_getsize(fs_file);
-            for (i = 0; i < cnt; i++) {
-                const TSK_FS_ATTR *fs_attr =
-                    tsk_fs_file_attr_get_idx(fs_file, i);
-                if (!fs_attr)
-                    continue;
-
-                if (fs_attr->type == TSK_FS_ATTR_TYPE_NTFS_DATA) {
-                    printed = 1;
-
-                    if (fs_file->meta->type == TSK_FS_META_TYPE_DIR) {
-
-                        if ((fs_file->name->name[0] == '.')
-                            && (fs_file->name->name[1])
-                            && (fs_file->name->name[2] == '\0')
-                            && ((fls_data->flags & TSK_FS_FLS_DOT) == 0)) {
-                            continue;
-                        }
-                    }
-
-                    printit(fs_file, a_path, fs_attr, fls_data);
-
-		    if ((fs_attr) && (fs_attr->name)) {
-		        if ((fs_attr->type != TSK_FS_ATTR_TYPE_NTFS_IDXROOT) ||
-		            (strcmp(fs_attr->name, "$I30") != 0)) {
-		            tsk_fprintf(hFile, ":");
-		            buf = malloc(strlen(fs_attr->name) + 1);
-		            strcpy(buf, fs_attr->name);
-		            for (i = 0; i < strlen(buf); i++) {
-		                if (TSK_IS_CNTRL(buf[i])) buf[i] = '^';
-		            }
-		            tsk_fprintf(hFile, "%s", buf);
-     *
-     */ 
-
     //filesfound++;
-    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints);
+    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, tmpdata, adsbool);
     //filewatcher.setFuture(tmpfuture);
     //threadvector.append(tmpfuture);
     //qDebug() << "thread added. new thread vector count: " << threadvector.count();
@@ -381,7 +339,7 @@ void SecondaryProcessing()
     QSqlQuery filequery(fcasedb);
     unsigned long long fsoffset = 0;
     unsigned long long parfsid = 0;
-    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;");
+    filequery.prepare("SELECT objectid, parimgid, parfsid, address, mftattrid FROM data WHERE objecttype = 5;");
     if(filequery.exec())
     {
         while(filequery.next())

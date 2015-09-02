@@ -102,7 +102,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         if(fcasedb.transaction())
         {
             QSqlQuery fquery(fcasedb);
-            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '');");
+            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5, mftattrid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '');");
             for(int i=0; i < filedatavector.count(); i++)
             {
                 fquery.bindValue(0, filedatavector.at(i).type);
@@ -117,6 +117,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
                 fquery.bindValue(9, filedatavector.at(i).addr);
                 fquery.bindValue(10, filedatavector.at(i).evid);
                 fquery.bindValue(11, filedatavector.at(i).fsid);
+                fquery.bindValue(12, filedatavector.at(i).mftattrid);
                 fquery.exec();
                 //qDebug() << "last insert id" << fquery.lastinsertId();
                 //processphase++;

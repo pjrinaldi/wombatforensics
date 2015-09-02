@@ -659,11 +659,11 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
-    SecondaryProcessing();
+    //SecondaryProcessing();
     LogMessage("Processing Complete");
     LogMessage("Generating Thumbnails...");
     statuslabel->setText("Generating Thumbnails...");
-    GenerateThumbnails();
+    //GenerateThumbnails();
     statuslabel->setText("Processing Complete");
     LogMessage("Finished Generating Thumbnails...");
     //secondfuture = QtConcurrent::run(SecondaryProcessing);
