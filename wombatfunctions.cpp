@@ -276,6 +276,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     {
         int cnt, i;
         cnt = tsk_fs_file_attr_getsize(tmpfile);
+        qDebug() << "attribute count:" << cnt;
         for(i = 0; i < cnt; i++)
         {
             char type[512];
