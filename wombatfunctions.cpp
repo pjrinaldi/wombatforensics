@@ -274,46 +274,45 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     // add the extra file info for the alternate data stream
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
-        int cnt, i;
-        cnt = tsk_fs_file_attr_getsize(tmpfile);
-        qDebug() << "attribute count:" << cnt;
-        for(i = 0; i < cnt; i++)
+        if(strcmp(tmpfile->name->name, ".") != 0)
         {
-            char type[512];
-            const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-            if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
+            if(strcmp(tmpfile->name->name, "..") != 0)
             {
-                if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                int cnt, i;
+                cnt = tsk_fs_file_attr_getsize(tmpfile);
+                qDebug() << "file name:" << tmpfile->name->name;
+                for(i = 0; i < cnt; i++)
                 {
-                    // INVALID IDEA BECAUSE THE ID CAN BE 1 FOR AN ADS
-                    /*
-                    if(fsattr->id > 1)
+                    char type[512];
+                    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                    if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
                     {
-                        qDebug() << "attr id:" << fsattr->id << "Already a $DATA attribute";
-                    }
-                    */
-                    if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
-                    {
-                        FileData tmpdata;
-                        tmpdata.type = (unsigned long long)tmpfile->name->type;
-                        tmpdata.paraddr = (unsigned long long)tmpfile->meta->addr;
-                        tmpdata.name = QString(":") + QString(fsattr->name);
-                        tmpdata.size = (unsigned long long)fsattr->size;
-                        tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
+                        if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                        {
+                            if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
+                            {
+                                FileData tmpdata;
+                                tmpdata.type = (unsigned long long)tmpfile->name->type;
+                                tmpdata.paraddr = (unsigned long long)tmpfile->meta->addr;
+                                tmpdata.name = QString(":") + QString(fsattr->name);
+                                tmpdata.size = (unsigned long long)fsattr->size;
+                                tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
 
-                        // IF I WANT TO ADD THIS TO THE DB AFTER I ADD THE MAIN FILE, I'LL NEED TO STORE THIS AND CALL IT SOMEWHERE
-                        // ELSE AFTER I CALL THE MAIN ONE...
-                        //
-                        //
-                        // NOW I NEED TO CREATE A FILE ENTRY WITH THE SAME INFO, EXCEPT IT CONTAINS DIFFERENT CONTENT, SO I NEED
-                        // A WAY TO REFERENCE THAT DIFFERENT CONTENT WHEN I CLICK ON IT...
-                        // 
-                        // ICAT USES TSK_FS_FILE_WALK_TYPE(TMPFILE, ATTR TYPE 128, ID 6, CALLBACK) TO PRINT IT... 
-                        // I'LL HAVE TO FIGURE OUT SOME WAY TO STORE THAT INFORMATION SO I CAN RETRIEVE THE INFORMATION I NEED...
-                        qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
+                                // IF I WANT TO ADD THIS TO THE DB AFTER I ADD THE MAIN FILE, I'LL NEED TO STORE THIS AND CALL IT SOMEWHERE
+                                // ELSE AFTER I CALL THE MAIN ONE...
+                                //
+                                //
+                                // NOW I NEED TO CREATE A FILE ENTRY WITH THE SAME INFO, EXCEPT IT CONTAINS DIFFERENT CONTENT, SO I NEED
+                                // A WAY TO REFERENCE THAT DIFFERENT CONTENT WHEN I CLICK ON IT...
+                                // 
+                                // ICAT USES TSK_FS_FILE_WALK_TYPE(TMPFILE, ATTR TYPE 128, ID 6, CALLBACK) TO PRINT IT... 
+                                // I'LL HAVE TO FIGURE OUT SOME WAY TO STORE THAT INFORMATION SO I CAN RETRIEVE THE INFORMATION I NEED...
+                                qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
+                            }
+                        }
+                        // the above gets me the attribute name such as $STANDARD_INFORMATION, $DATA, $FILE_NAME, $OBJECT_ID, etc.
                     }
                 }
-                // the above gets me the attribute name such as $STANDARD_INFORMATION, $DATA, $FILE_NAME, $OBJECT_ID, etc.
             }
         }
     }
@@ -538,7 +537,7 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
                     {
                         if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                         {
-                            qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
+                            //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
                         }
                     }
                     // the above gets me the attribute name such as $STANDARD_INFORMATION, $DATA, $FILE_NAME, $OBJECT_ID, etc.
