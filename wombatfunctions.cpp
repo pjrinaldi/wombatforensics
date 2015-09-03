@@ -388,11 +388,29 @@ void SecondaryProcessing()
             fsoffset = fsquery.value(0).toULongLong();
             readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
             fsquery.finish();
+            QHash<unsigned long long, unsigned long long> adshash;
+            adshash.clear();
+            if(readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+                // get ads dataset
+                QSqlQuery adsquery(fcasedb);
+                adsquery.prepare("SELECT objectid, mftattrid FROM data WHERE objecttype = 6 and parentid = ?;");
+                adsquery.bindValue(0, objectid);
+                if(adsquery.exec())
+                {
+                    while(adsquery.next())
+                    {
+                        adshash.insert(adsquery.value(0).toULongLong(), adsquery.value(1).toULongLong());
+                    }
+                }
+                adsquery.finish();
+            }
+            qDebug() << "adshash count before block call:" << adshash.count();
             //OpenFile
             readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
             HashFile(readfileinfo, objectid);
             MagicFile(readfileinfo, objectid);
-            BlockFile(readfileinfo, objectid);
+            BlockFile(readfileinfo, objectid, adshash); // add adsvector as a variable.
             PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
 
             filesprocessed++;
@@ -587,7 +605,7 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
     }
 }
 
-void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
+void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QHash<unsigned long long, unsigned long long> adshash)
 {
     blockstring = "";
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
@@ -617,6 +635,14 @@ void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
+            unsigned long long minads = 1000;
+            qDebug() << "adshash count:" << adshash.count();
+            foreach(unsigned long long adsid, adshash)
+            {
+                if(adsid < minads)
+                    minads = adsid;
+            }
+            //qDebug() << "minimum ads id:" << minads;
             // NEED TO COMPARE TMPFILE->MFTATTRID == TMPATTR->ID TO ENSURE ITS THE CORRECT ATTRIBUTE FILE.
             // CURRENTLY I'M GETTING THE BLOCKS FOR THE REGULAR DATA AND THE ADS DATA.
             if(tmpfile->meta != NULL)
@@ -631,7 +657,11 @@ void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
                         const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
                         if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
                         {
-                            tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+                            qDebug() << "tmpattr id:" << tmpattr->id << "minads id:" << minads;
+                            if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id < (int)minads)
+                            {
+                                tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+                            }
                         }
                     }
                 }
