@@ -47,7 +47,7 @@ unsigned long long GetChildCount(int type, unsigned long long address, unsigned 
     if(type < 4)
         querystring += " AND objecttype < 5";
     else
-        querystring += " AND objecttype = 5";
+        querystring += " AND objecttype >= 5";
     if(type != 1)
         querystring += " AND parimgid = ?";
     childquery.prepare(querystring);
@@ -339,7 +339,7 @@ void SecondaryProcessing()
     QSqlQuery filequery(fcasedb);
     unsigned long long fsoffset = 0;
     unsigned long long parfsid = 0;
-    filequery.prepare("SELECT objectid, parimgid, parfsid, address, mftattrid FROM data WHERE objecttype = 5;");
+    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;");
     if(filequery.exec())
     {
         while(filequery.next())

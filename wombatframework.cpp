@@ -102,22 +102,26 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         if(fcasedb.transaction())
         {
             QSqlQuery fquery(fcasedb);
-            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5, mftattrid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '', ?);");
+            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5, mftattrid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '', ?);");
             for(int i=0; i < filedatavector.count(); i++)
             {
-                fquery.bindValue(0, filedatavector.at(i).type);
-                fquery.bindValue(1, filedatavector.at(i).name);
-                fquery.bindValue(2, filedatavector.at(i).paraddr);
-                fquery.bindValue(3, filedatavector.at(i).path);
-                fquery.bindValue(4, filedatavector.at(i).atime);
-                fquery.bindValue(5, filedatavector.at(i).ctime);
-                fquery.bindValue(6, filedatavector.at(i).crtime);
-                fquery.bindValue(7, filedatavector.at(i).mtime);
-                fquery.bindValue(8, filedatavector.at(i).size);
-                fquery.bindValue(9, filedatavector.at(i).addr);
-                fquery.bindValue(10, filedatavector.at(i).evid);
-                fquery.bindValue(11, filedatavector.at(i).fsid);
-                fquery.bindValue(12, filedatavector.at(i).mftattrid);
+                if(filedatavector.at(i).mftattrid == 0)
+                    fquery.bindValue(0, 5);
+                else
+                    fquery.bindValue(0, 6);
+                fquery.bindValue(1, filedatavector.at(i).type);
+                fquery.bindValue(2, filedatavector.at(i).name);
+                fquery.bindValue(3, filedatavector.at(i).paraddr);
+                fquery.bindValue(4, filedatavector.at(i).path);
+                fquery.bindValue(5, filedatavector.at(i).atime);
+                fquery.bindValue(6, filedatavector.at(i).ctime);
+                fquery.bindValue(7, filedatavector.at(i).crtime);
+                fquery.bindValue(8, filedatavector.at(i).mtime);
+                fquery.bindValue(9, filedatavector.at(i).size);
+                fquery.bindValue(10, filedatavector.at(i).addr);
+                fquery.bindValue(11, filedatavector.at(i).evid);
+                fquery.bindValue(12, filedatavector.at(i).fsid);
+                fquery.bindValue(13, filedatavector.at(i).mftattrid);
                 fquery.exec();
                 //qDebug() << "last insert id" << fquery.lastinsertId();
                 //processphase++;
