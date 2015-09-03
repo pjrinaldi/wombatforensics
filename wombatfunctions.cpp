@@ -308,7 +308,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 tmpdata.type = (unsigned long long)tmpfile->name->type;
                                 tmpdata.paraddr = (unsigned long long)tmpfile->meta->addr;
                                 tmpdata.name = QString(":") + QString(fsattr->name);
-                                tmpdata.path = "";
+                                tmpdata.path = QString("/") + QString(tmppath);
                                 tmpdata.atime = 0;
                                 tmpdata.ctime = 0;
                                 tmpdata.crtime = 0;

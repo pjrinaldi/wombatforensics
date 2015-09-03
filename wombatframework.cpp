@@ -102,7 +102,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         if(fcasedb.transaction())
         {
             QSqlQuery fquery(fcasedb);
-            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5, mftattrid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '');");
+            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5, mftattrid) VALUES(5, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '', ?);");
             for(int i=0; i < filedatavector.count(); i++)
             {
                 fquery.bindValue(0, filedatavector.at(i).type);
