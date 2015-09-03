@@ -339,6 +339,11 @@ void SecondaryProcessing()
     QSqlQuery filequery(fcasedb);
     unsigned long long fsoffset = 0;
     unsigned long long parfsid = 0;
+    // I NEED TO ADD ANOTHER SQL SET TO GET THE BLOCK ADDRESS FOR ADS.
+    // FOR THE BELOW, IT SHOULD GET THE MFTATTRID AND THEN COMPARE WHERE DATA != MFTATTRID, SO IT ONLY GETS THE BLOCKS FOR THE
+    // REGULAR DATA STREAM.
+    // THEN THE SECOND QUERY, WILL GET THE PARADDR, MFTATTRID AND USE THE PARADDR TO GET THE BLOCK INFO AND THEN RUN THE SAME
+    // BLOCK CODE BUT RUN DATA ATTRIBUTE ID == MFTATTRID.
     filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;");
     if(filequery.exec())
     {
