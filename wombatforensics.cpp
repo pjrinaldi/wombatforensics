@@ -829,6 +829,12 @@ void WombatForensics::LoadHexContents()
             tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address); // WRONG CAUSE I NEED TO GET THE ADDRESS FOR THE PARENTID...
             tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset; // THIS WILL BE WRONG CAUSE I WOULD NEED TO ADD THE FILESIZE OF THE PARENTADDRESS TO THIS VALUE TO GET THE START OF THE ADS DATA VALUE, BUT ITS DECENT FOR NOW...
         }
+        tskobjptr->objecttype = 6;
+        tskobjptr->address = wombatvarptr->selectedobject.address;
+        tskobjptr->length = wombatvarptr->selectedobject.size;
+        tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
+        tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
+        OpenFileSystemFile();
     }
     if(wombatvarptr->selectedobject.objtype == 1)
     {
