@@ -210,7 +210,7 @@ bool FileReader::loadimagepage(off_t pageIdx)
     }
     _data[pageIdx] = new uchar[_pageSize];
     --nFreePages();
-    if(tskptr->objecttype == 5)
+    if(tskptr->objecttype == 5 || tskptr->objecttype == 6)
     {
         if(tskptr->blkaddrlist.count() > 0)
         {

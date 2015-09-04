@@ -210,7 +210,7 @@ bool ImageReader::loadimagepage(off_t pageIdx)
     }
     _data[pageIdx] = new uchar[_pageSize];
     --nFreePages();
-    if(tskptr->objecttype <= 5)
+    if(tskptr->objecttype <= 6)
     {
         retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     }
