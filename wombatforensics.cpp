@@ -798,7 +798,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = 0;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
         {
-                tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
+            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
         }
         else
         {
@@ -813,6 +813,23 @@ void WombatForensics::LoadHexContents()
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         OpenFileSystemFile();
     }
+    else if(wombatvarptr->selectedobject.objtype == 6) // ads file object
+    {
+        OpenParentImage(wombatvarptr->selectedobject.parimgid);
+        OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
+        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
+        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
+        tskobjptr->offset = 0;
+        if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
+        {
+            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
+        }
+        else
+        {
+            tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address); // WRONG CAUSE I NEED TO GET THE ADDRESS FOR THE PARENTID...
+            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset; // THIS WILL BE WRONG CAUSE I WOULD NEED TO ADD THE FILESIZE OF THE PARENTADDRESS TO THIS VALUE TO GET THE START OF THE ADS DATA VALUE, BUT ITS DECENT FOR NOW...
+        }
+    }
     if(wombatvarptr->selectedobject.objtype == 1)
     {
         hexwidget->openimage();
@@ -823,7 +840,7 @@ void WombatForensics::LoadHexContents()
     else
     {
         hexwidget->SetTopLeft(tskobjptr->offset);
-        if(wombatvarptr->selectedobject.objtype == 5)
+        if(wombatvarptr->selectedobject.objtype == 5 || wombatvarptr->selectedobject.objtype == 6)
         {
             fileviewer->filehexview->openimage();
             fileviewer->filehexview->set1BPC();
