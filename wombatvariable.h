@@ -95,6 +95,7 @@ struct SelectedObject
     unsigned long long blockcount;
     unsigned long long byteoffset;
     unsigned long long address;
+    unsigned long long parentid;
     int type;
     int flags;
 };

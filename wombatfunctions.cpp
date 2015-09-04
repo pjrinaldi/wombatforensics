@@ -404,7 +404,7 @@ void SecondaryProcessing()
                     {
                         adsobjid.append(adsquery.value(0).toULongLong());
                         adsattrid.append(adsquery.value(1).toULongLong());
-                        qDebug() << "object id:" << adsquery.value(0).toULongLong() << "parent id:" << filequery.value(3).toULongLong() << "ads id:" << adsquery.value(1).toULongLong();
+                        //qDebug() << "object id:" << adsquery.value(0).toULongLong() << "parent id:" << filequery.value(3).toULongLong() << "ads id:" << adsquery.value(1).toULongLong();
                     }
                 }
                 adsquery.finish();
