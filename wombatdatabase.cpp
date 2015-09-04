@@ -833,3 +833,16 @@ unsigned long long WombatDatabase::GetResidentOffset(unsigned long long fileaddr
     mftrecordsize = outputs.at(3);
     return ((outputs.at(0) * outputs.at(1) * outputs.at(2)) + (outputs.at(3)*fileaddress));
 }
+
+unsigned long long WombatDatabase::GetParentSize(unsigned long long fileaddress)
+{
+    unsigned long long parentsize = 0;
+    QSqlQuery sizequery(fcasedb);
+    sizequery.prepare("SELECT size FROM data WHERE address = ?;");
+    sizequery.addBindValue(fileaddress);
+    sizequery.exec();
+    sizequery.next();
+    parentsize = sizequery.value(0).toULongLong();
+    sizequery.finish();
+    return parentsize;
+}

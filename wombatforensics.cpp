@@ -822,12 +822,18 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = 0;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
         {
-            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
+            if(wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
+            {
+                tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
+                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
+            }
+            else
+                tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
         }
         else
         {
             tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
-            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset; // THIS WILL BE WRONG CAUSE I WOULD NEED TO ADD THE FILESIZE OF THE PARENTADDRESS TO THIS VALUE TO GET THE START OF THE ADS DATA VALUE, BUT ITS DECENT FOR NOW...
+            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
         }
         tskobjptr->objecttype = 6;
         tskobjptr->address = wombatvarptr->selectedobject.parentid;

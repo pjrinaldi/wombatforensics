@@ -54,6 +54,7 @@ public:
     unsigned long long GetEvidenceFileCount(void);
     unsigned long long ReturnFileSystemOffset(unsigned long long fsid);
     unsigned long long GetResidentOffset(unsigned long long fileaddress);
+    unsigned long long GetParentSize(unsigned long long fileaddress);
 
     WombatProperties* wombatprop;
 
