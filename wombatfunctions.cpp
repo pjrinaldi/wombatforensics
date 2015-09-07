@@ -278,6 +278,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
     FileData tmpdata;
     bool adsbool = false;
+    unsigned long long adssize = 0;
     // add the extra file info for the alternate data stream
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
@@ -292,6 +293,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 {
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                    adssize += (unsigned long long)fsattr->size;
+                    //qDebug() << "ads size:" << adssize;
                     // if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA)
                     if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
                     {
@@ -316,6 +319,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 tmpdata.evid = currentevidenceid;
                                 tmpdata.fsid = currentfilesystemid;
                                 tmpdata.size = (unsigned long long)fsattr->size;
+                                tmpdata.addr = adssize - (unsigned long long)fsattr->size;
                                 tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
                                 adsbool = true;
                                 //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
@@ -661,7 +665,7 @@ void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned 
                         {
                             if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id < (int)minads)
                             {
-                                qDebug() << "tmpattr id:" << tmpattr->id << "parent id:" << tmpfile->meta->addr << "minads id:" << minads;
+                                //qDebug() << "tmpattr id:" << tmpattr->id << "parent id:" << tmpfile->meta->addr << "minads id:" << minads;
                                 tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
                             }
                         }

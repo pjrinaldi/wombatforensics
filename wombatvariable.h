@@ -96,6 +96,7 @@ struct SelectedObject
     unsigned long long byteoffset;
     unsigned long long address;
     unsigned long long parentid;
+    unsigned long long mftattrid;
     int type;
     int flags;
 };

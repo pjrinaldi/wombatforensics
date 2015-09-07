@@ -113,6 +113,7 @@ struct FileData
     unsigned long long crtime;
     unsigned long long mtime;
     unsigned long long size;
+    unsigned long long offset;
     unsigned long long addr;
     unsigned long long fsid;
     unsigned long long evid;

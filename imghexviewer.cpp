@@ -1059,7 +1059,15 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
             }
             else // resident attribute
             {
-                unsigned long long curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                unsigned long long curblkstart = 0;
+                if(tskptr->objecttype == 6)
+                {
+                    curblkstart = tskptr->resoffset + tskptr->fsoffset + tskptr->adsoffset;
+                }
+                else
+                {
+                    curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                }
                 unsigned long long curblkend = curblkstart + mftrecordsize;
                 //int curblkend = curblkstart + tskptr->length;
                 if(curoffset >= curblkstart && curoffset < curblkend)
@@ -1105,7 +1113,15 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
             }
             else // resident attribute
             {
-                unsigned long long curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                unsigned long long curblkstart = 0;
+                if(tskptr->objecttype == 6)
+                {
+                    curblkstart = tskptr->resoffset + tskptr->fsoffset + tskptr->adsoffset;
+                }
+                else
+                {
+                    curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                }
                 unsigned long long curblkend = curblkstart + mftrecordsize;
                 //int curblkend = curblkstart + tskptr->length;
                 if(curoffset >= curblkstart && curoffset < curblkend)

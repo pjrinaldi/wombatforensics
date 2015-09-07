@@ -19,6 +19,8 @@ struct TskObject
     int sectsize;
     unsigned long long fsoffset;
     unsigned long long resoffset;
+    unsigned long long adsoffset;
+    unsigned long long mftattrid;
     QString blockaddress;
     QStringList blkaddrlist;
     TSK_IMG_INFO* readimginfo;

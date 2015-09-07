@@ -216,7 +216,14 @@ bool FileReader::loadimagepage(off_t pageIdx)
         {
             if(tskptr->blkaddrlist.at(0) == 0)
             {
-                retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+                if(tskptr->objecttype == 6)
+                {
+                    retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, tskptr->mftattrid, tskptr->adsoffset, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+                }
+                else
+                {
+                    retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+                }
             }
             else
             {
@@ -228,7 +235,14 @@ bool FileReader::loadimagepage(off_t pageIdx)
         }
         else
         {
-            retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+            if(tskptr->objecttype == 6)
+            {
+                retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, tskptr->mftattrid, tskptr->adsoffset, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+            }
+            else
+            {
+                retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+            }
             //qDebug() << retval;
         }
     }

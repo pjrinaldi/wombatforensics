@@ -820,12 +820,15 @@ void WombatForensics::LoadHexContents()
         tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
         tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
         tskobjptr->offset = 0;
+        tskobjptr->adsoffset = wombatvarptr->selectedobject.address;
+        tskobjptr->mftattrid = wombatvarptr->selectedobject.mftattrid;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
         {
             if(wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
             {
                 tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
-                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
+                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
+                //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
             }
             else
                 tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
@@ -833,7 +836,8 @@ void WombatForensics::LoadHexContents()
         else
         {
             tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
-            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
+            //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
+            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
         }
         tskobjptr->objecttype = 6;
         tskobjptr->address = wombatvarptr->selectedobject.parentid;
