@@ -278,7 +278,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
     FileData tmpdata;
     bool adsbool = false;
-    unsigned long long adssize = 0;
+    unsigned long long adssize = 43;
     // add the extra file info for the alternate data stream
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
@@ -288,11 +288,13 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             {
                 int cnt, i;
                 cnt = tsk_fs_file_attr_getsize(tmpfile);
+                //adssize += cnt;
                 //qDebug() << "file name:" << tmpfile->name->name;
                 for(i = 0; i < cnt; i++)
                 {
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                    adssize += 25;
                     adssize += (unsigned long long)fsattr->size;
                     //qDebug() << "ads size:" << adssize;
                     // if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA)
@@ -319,7 +321,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 tmpdata.evid = currentevidenceid;
                                 tmpdata.fsid = currentfilesystemid;
                                 tmpdata.size = (unsigned long long)fsattr->size;
-                                tmpdata.addr = adssize - (unsigned long long)fsattr->size;
+                                tmpdata.addr = adssize - (unsigned long long)fsattr->size + 23;
                                 tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
                                 adsbool = true;
                                 //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;

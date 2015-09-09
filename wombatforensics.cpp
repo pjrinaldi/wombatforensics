@@ -827,6 +827,8 @@ void WombatForensics::LoadHexContents()
             if(wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
             {
                 tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
+                //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + mftrecordsize - wombatvarptr->selectedobject.size;
+                qDebug() << "adsoffset:" << wombatvarptr->selectedobject.address;
                 tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
                 //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
             }
@@ -836,6 +838,7 @@ void WombatForensics::LoadHexContents()
         else
         {
             tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
+            //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + mftrecordsize - wombatvarptr->selectedobject.size;
             //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
             tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
         }

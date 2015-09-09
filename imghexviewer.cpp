@@ -1038,20 +1038,37 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
             paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
             if(tskptr->blkaddrlist.count() > 0)
             {
-                for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
+                if(tskptr->blkaddrlist.at(0).toInt() == 0) // resident attribute
                 {
-                    unsigned long long curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toULongLong()*tskptr->blocksize - 1;
-                    unsigned long long curblkend = curblkstart + tskptr->blocksize;
-                    if(curoffset > curblkstart && curoffset <= curblkend)
+                    unsigned long long curblkstart = 0;
+                    if(tskptr->objecttype == 6)
+                        curblkstart = tskptr->resoffset + tskptr->fsoffset + tskptr->adsoffset;
+                    else
+                        curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                    unsigned long long curblkend = curblkstart + mftrecordsize;
+                    if(curoffset >= curblkstart && curoffset < curblkend)
                     {
-                        paint.setPen(QColor(0, 0, 255, 255)); // BLUE
+                        paint.setPen(QColor(0, 0, 255, 255));
                         paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
-                        if(i == (tskptr->blkaddrlist.count() - 1))
+                    }
+                }
+                else
+                {
+                    for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
+                    {
+                        unsigned long long curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toULongLong()*tskptr->blocksize - 1;
+                        unsigned long long curblkend = curblkstart + tskptr->blocksize;
+                        if(curoffset > curblkstart && curoffset <= curblkend)
                         {
-                            if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize*i)) && curoffset <= curblkend)
+                            paint.setPen(QColor(0, 0, 255, 255)); // BLUE
+                            paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                            if(i == (tskptr->blkaddrlist.count() - 1))
                             {
-                                paint.setPen(QColor(255, 0, 0, 255)); // RED
-                                paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                                if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize*i)) && curoffset <= curblkend)
+                                {
+                                    paint.setPen(QColor(255, 0, 0, 255)); // RED
+                                    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                                }
                             }
                         }
                     }
@@ -1092,20 +1109,42 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
             paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
             if(tskptr->blkaddrlist.count() > 0)
             {
-                for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
+                if(tskptr->blkaddrlist.at(0).toInt() == 0) // resident attribute
                 {
-                    unsigned long long curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toULongLong()*tskptr->blocksize - 1;
-                    unsigned long long curblkend = curblkstart + tskptr->blocksize;
-                    if(curoffset > curblkstart && curoffset <= curblkend)
+                    unsigned long long curblkstart = 0;
+                    if(tskptr->objecttype == 6)
+                        curblkstart = tskptr->resoffset + tskptr->fsoffset + tskptr->adsoffset;
+                    else
+                        curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                    unsigned long long curblkend = curblkstart + mftrecordsize;
+                    if(curoffset >= curblkstart && curoffset < curblkend)
                     {
-                        paint.setPen(QColor(0, 0, 255, 255)); // BLUE
+                        paint.setPen(QColor(0, 0, 255, 255));
                         paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
-                        if(i == (tskptr->blkaddrlist.count() - 1))
+                        if((curoffset > (curblkstart + tskptr->length)) && curoffset <= curblkend)
                         {
-                            if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize*i)) && curoffset <= curblkend)
+                            paint.setPen(QColor(255, 0, 0, 255)); // RED
+                            paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
+                        }
+                    }
+                }
+                else
+                {
+                    for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
+                    {
+                        unsigned long long curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(i).toULongLong()*tskptr->blocksize - 1;
+                        unsigned long long curblkend = curblkstart + tskptr->blocksize;
+                        if(curoffset > curblkstart && curoffset <= curblkend)
+                        {
+                            paint.setPen(QColor(0, 0, 255, 255)); // BLUE
+                            paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
+                            if(i == (tskptr->blkaddrlist.count() - 1))
                             {
-                                paint.setPen(QColor(255, 0, 0, 255)); // RED
-                                paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
+                                if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize*i)) && curoffset <= curblkend)
+                                {
+                                    paint.setPen(QColor(255, 0, 0, 255)); // RED
+                                    paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
+                                }
                             }
                         }
                     }
@@ -1128,6 +1167,11 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
                 {
                     paint.setPen(QColor(0, 0, 255, 255));
                     paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
+                    if((curoffset > (curblkstart + tskptr->length)) && curoffset <= curblkend)
+                    {
+                        paint.setPen(QColor(255, 0, 0, 255)); // RED
+                        paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
+                    }
                 }
             }
         }
