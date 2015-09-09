@@ -828,7 +828,6 @@ void WombatForensics::LoadHexContents()
             {
                 tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
                 //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + mftrecordsize - wombatvarptr->selectedobject.size;
-                qDebug() << "adsoffset:" << wombatvarptr->selectedobject.address;
                 tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
                 //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
             }
