@@ -1050,6 +1050,11 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
                     {
                         paint.setPen(QColor(0, 0, 255, 255));
                         paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                        if((curoffset > (curblkstart + tskptr->length)) && curoffset <= curblkend)
+                        {
+                            paint.setPen(QColor(255, 0, 0, 255)); // RED
+                            paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                        }
                     }
                 }
                 else
@@ -1091,6 +1096,11 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
                 {
                     paint.setPen(QColor(0, 0, 255, 255));
                     paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                    if((curoffset > (curblkstart + tskptr->length)) && curoffset <= curblkend)
+                    {
+                        paint.setPen(QColor(255, 0, 0, 255)); // RED
+                        paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                    }
                 }
             }
         }

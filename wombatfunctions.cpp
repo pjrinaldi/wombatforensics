@@ -294,7 +294,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 {
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                    adssize += 25;
+                    adssize += 24;
                     adssize += (unsigned long long)fsattr->size;
                     //qDebug() << "ads size:" << adssize;
                     // if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA)
@@ -321,7 +321,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 tmpdata.evid = currentevidenceid;
                                 tmpdata.fsid = currentfilesystemid;
                                 tmpdata.size = (unsigned long long)fsattr->size;
-                                tmpdata.addr = adssize - (unsigned long long)fsattr->size + 23;
+                                tmpdata.addr = adssize - (unsigned long long)fsattr->size + 16;
                                 tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
                                 adsbool = true;
                                 //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
