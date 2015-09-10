@@ -278,7 +278,24 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
     FileData tmpdata;
     bool adsbool = false;
-    unsigned long long adssize = 42;
+    unsigned long long adssize = 0;
+    NTFS_INFO* ntfsinfo = (NTFS_INFO*)tmpfile->fs_info;
+    int recordsize = 0;
+    if(ntfsinfo->fs->mft_rsize_c > 0)
+    {
+        recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize);
+    }
+    else
+        recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
+    TSK_OFF_T curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * tmpfile->meta->addr + 20;
+    char startoffset[2];
+    ssize_t offsetcount = tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
+    //qDebug() << "bytes read:" << offsetcount << "value of bytes:" << Translate::ByteToHex(startoffset[0]) << Translate::ByteToHex(startoffset[1]);
+    uint16_t teststart = startoffset[1] * 256 + startoffset[0];
+    //adssize = *((int*)startoffset);
+    adssize = (unsigned long long)teststart;
+    //qDebug() << "name:" << tmpfile->name->name << "1st attribute offset:" << adssize << "byte value:" << Translate::ByteToHex(startoffset[0]) << Translate::ByteToHex(startoffset[1]);
+    //qDebug() << "test start point:" << (unsigned long long)teststart;
     // add the extra file info for the alternate data stream
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
@@ -294,7 +311,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 {
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                    //adssize += 24;
+                    adssize += 24;
                     adssize += (unsigned long long)fsattr->size;
                     //qDebug() << "ads size:" << adssize;
                     // if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA)
@@ -322,7 +339,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 tmpdata.fsid = currentfilesystemid;
                                 tmpdata.size = (unsigned long long)fsattr->size;
                                 //qDebug() << "i:" << i + 1;
-                                tmpdata.addr = adssize - (unsigned long long)fsattr->size + (unsigned long long)((i+2)*24);
+                                tmpdata.addr = adssize - (unsigned long long)fsattr->size + 16;
+                                //tmpdata.addr = adssize - (unsigned long long)fsattr->size + (unsigned long long)((i+2)*24);
                                 tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
                                 adsbool = true;
                                 //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
