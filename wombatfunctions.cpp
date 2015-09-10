@@ -646,8 +646,20 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, unsigned long long ob
         QString adsinfo = "Alternate Data Stream for " + QString::fromStdString(std::string(tmpfile->name->name));
         proplist << "Alternate Data Stream (ADS)" << adsinfo << "Alternate data stream which contains different content from what the file's standard content is.";
     }
+    /*
+    if(strcmp(tmpfile->name->name, ".") != 0)
+    {
+        if(strcmp(tmpfile->name->name, "..") != 0)
+        {*/
     for(int i = 0; i < adsobjid.count(); i++)
     {
+        if(tmpfile->name != NULL)
+        {
+            if(strcmp(tmpfile->name->name, ".") == 0)
+                break;
+            if(strcmp(tmpfile->name->name, "..") == 0)
+                break;
+        }
         QSqlQuery adsquery(fcasedb);
         adsquery.prepare("SELECT name, parentid, blockaddress FROM data WHERE objectid = ?;");
         adsquery.bindValue(0, adsobjid.at(i));
@@ -674,6 +686,8 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, unsigned long long ob
         fcasedb.commit();
         propquery.finish();
    }
+   //     }
+   /// }
 }
 
 void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
