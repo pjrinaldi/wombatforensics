@@ -651,6 +651,7 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, unsigned long long ob
     {
         if(strcmp(tmpfile->name->name, "..") != 0)
         {*/
+    qDebug() << "adsobjid count:" << adsobjid.count();
     for(int i = 0; i < adsobjid.count(); i++)
     {
         if(tmpfile->name != NULL)
@@ -662,6 +663,7 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, unsigned long long ob
         }
         QSqlQuery adsquery(fcasedb);
         adsquery.prepare("SELECT name, parentid, blockaddress FROM data WHERE objectid = ?;");
+        qDebug() << "adsobjid:" << adsobjid.at(i);
         adsquery.bindValue(0, adsobjid.at(i));
         adsquery.exec();
         adsquery.next();
