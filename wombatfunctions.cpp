@@ -439,9 +439,12 @@ void SecondaryProcessing()
             HashFile(readfileinfo, objectid);
             MagicFile(readfileinfo, objectid);
             BlockFile(readfileinfo, objectid, adsobjid, adsattrid);
-            AlternateDataStreamBlockFile(readfileinfo, objectid, adsobjid, adsattrid);
-            PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
 
+            if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+                AlternateDataStreamBlockFile(readfileinfo, objectid, adsobjid, adsattrid);
+            PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
+            if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+                AlternateDataStreamPropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid, adsobjid, adsattrid);
             filesprocessed++;
             isignals->ProgUpd();
 
@@ -539,6 +542,7 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
         proplist << "allocation status for the file.";
 
         /* insert ntfs and hfs attributes here */
+        /*
         if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
             int cnt, i;
@@ -559,7 +563,6 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
                     // the above gets me the attribute name such as $STANDARD_INFORMATION, $DATA, $FILE_NAME, $OBJECT_ID, etc.
                 }
             }
-            /*
             const TSK_FS_ATTR* fsattr;
             fsattr = tsk_fs_attrlist_get(tmpfile->meta->attr, NTFS_ATYPE_SI);
             if(fsattr)
@@ -570,13 +573,12 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
                 proplist << "$STANDARD_INFORMATION Attribute Values";
                 // ntfs.c line 4214 working on Flags.
             }
-            */
         }
         if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
         {
             // hfs.c line 5446 working on hfs file information.
         }
-
+        */
         QSqlQuery objquery(fcasedb);
         objquery.prepare("SELECT blockaddress, filemime, filesignature, address FROM data WHERE objectid = ?;");
         objquery.bindValue(0, objid);
@@ -632,6 +634,46 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
         //filesprocessed++;
         isignals->ProgUpd();
     }
+}
+
+void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long long fsoffset, int blksize, unsigned long long parfsid, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
+{
+    QStringList proplist;
+    proplist.clear();
+    //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
+    if(tmpfile->name != NULL)
+    {
+        QString adsinfo = "Alternate Data Stream for " + QString::fromStdString(std::string(tmpfile->name->name));
+        proplist << "Alternate Data Stream (ADS)" << adsinfo << "Alternate data stream which contains different content from what the file's standard content is.";
+    }
+    for(int i = 0; i < adsobjid.count(); i++)
+    {
+        QSqlQuery adsquery(fcasedb);
+        adsquery.prepare("SELECT name, parentid, blockaddress FROM data WHERE objectid = ?;");
+        adsquery.bindValue(0, adsobjid.at(i));
+        adsquery.exec();
+        adsquery.next();
+        proplist << "Name" << adsquery.value(0).toString() << "Name for the NTFS parent file additional $Data attribute";
+        proplist << "Parent Address" << adsquery.value(1).toString() << "NTFS address ID for the parent file";
+        if(tmpfile->name != NULL)
+            proplist << "Parent File Name" << QString(tmpfile->name->name) << "File name of the parent file";
+        proplist << "Block Address" << adsquery.value(2).toString() << "List of block addresses which contain the contents of the ADS";
+        proplist << "Attribute ID" << QString::number(adsattrid.at(i)) << "ID for the file's ADS attribute";
+        adsquery.finish();
+        fcasedb.transaction();
+        QSqlQuery propquery(fcasedb);
+        propquery.prepare("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);");
+        for(int j = 0; j < proplist.count()/3; j++)
+        {
+            propquery.bindValue(0, adsobjid.at(i));
+            propquery.bindValue(1, proplist.at(3*j));
+            propquery.bindValue(2, proplist.at(3*j+1));
+            propquery.bindValue(3, proplist.at(3*j+2));
+            propquery.exec();
+        }
+        fcasedb.commit();
+        propquery.finish();
+   }
 }
 
 void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
