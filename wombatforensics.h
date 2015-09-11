@@ -612,9 +612,31 @@ private:
         if(curnode->childcount > checkcount && checkcount > 0)
             curnode->checkstate = 1;
         else if(curnode->childcount == checkcount)
+        {
+            // i think this is where i should update the db with the checkstate...
             curnode->checkstate = 2;
+            /*
+            QSqlQuery chkquery(fcasedb);
+            chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
+            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
+            chkquery.exec();
+            chkquery.next();
+            chkquery.finish();
+            */
+        }
         else if(checkcount == 0)
+        {
+            // i think this is where i should update the db with the checkstate...
             curnode->checkstate = 0;
+            /*
+            QSqlQuery chkquery(fcasedb);
+            chkquery.prepare("UPDATE data SET checked = 0 WHERE objectid = ?;");
+            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
+            chkquery.exec();
+            chkquery.next();
+            chkquery.finish();
+            */
+        }
         emit dataChanged(index, index);
         emit checkedNodesChanged();
         if(curnode->parent != 0)
@@ -642,6 +664,15 @@ private:
             curnode->checkstate = 0;
             if(curnode->haschildren)
                 SetChildCheckState(index);
+            /*
+            // i think is where i should update the db with the checkstate...
+            QSqlQuery chkquery(fcasedb);
+            chkquery.prepare("UPDATE data SET checked = 0 WHERE objectid = ?;");
+            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
+            chkquery.exec();
+            chkquery.next();
+            chkquery.finish();
+            */
         }
         else if(state == Qt::PartiallyChecked) // curnode is now partially checked
             curnode->checkstate = 1;
@@ -650,6 +681,15 @@ private:
             curnode->checkstate = 2;
             if(curnode->haschildren)
                 SetChildCheckState(index);
+            /*
+            // i think this is where i should update the db with the checkstate...
+            QSqlQuery chkquery(fcasedb);
+            chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
+            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
+            chkquery.exec();
+            chkquery.next();
+            chkquery.finish();
+            */
         }
         emit dataChanged(index, index);
         emit checkedNodesChanged();
