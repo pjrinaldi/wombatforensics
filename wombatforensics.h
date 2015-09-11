@@ -453,6 +453,8 @@ public:
                     }
                     if(morequery.value(18).toInt() == 0)
                         curchild->checkstate = 0;
+                    else if(morequery.value(18).toInt() == 1)
+                        curchild->checkstate = 1;
                     else
                         curchild->checkstate = 2;
                     parentnode->children.append(curchild);
@@ -547,6 +549,8 @@ public:
                 }
                 if(addevidquery.value(18).toInt() == 0)
                     currentnode->checkstate = 0;
+                else if(addevidquery.value(18).toInt() == 1)
+                    currentnode->checkstate = 1;
                 else
                     currentnode->checkstate = 2;
             }
@@ -620,11 +624,35 @@ private:
                 checkcount++;
         }
         if(curnode->childcount > checkcount && checkcount > 0)
+        {
             curnode->checkstate = 1;
+            QSqlQuery chkquery(fcasedb);
+            chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
+            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
+            chkquery.exec();
+            chkquery.next();
+            chkquery.finish();
+        }
         else if(curnode->childcount == checkcount)
-            curnode->checkstate = 2;
+        {
+            curnode->checkstate = 1;
+            QSqlQuery chkquery(fcasedb);
+            chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
+            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
+            chkquery.exec();
+            chkquery.next();
+            chkquery.finish();
+        }
         else if(checkcount == 0)
+        {
             curnode->checkstate = 0;
+            QSqlQuery chkquery(fcasedb);
+            chkquery.prepare("UPDATE data SET checked = 0 WHERE objectid = ?;");
+            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
+            chkquery.exec();
+            chkquery.next();
+            chkquery.finish();
+        }
         emit dataChanged(index, index);
         emit checkedNodesChanged();
         if(curnode->parent != 0)
@@ -661,7 +689,15 @@ private:
             chkquery.finish();
         }
         else if(state == Qt::PartiallyChecked) // curnode is now partially checked
+        {
             curnode->checkstate = 1;
+            QSqlQuery chkquery(fcasedb);
+            chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
+            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
+            chkquery.exec();
+            chkquery.next();
+            chkquery.finish();
+        }
         else if(state == Qt::Checked) // currentnode is now checked
         {
             curnode->checkstate = 2;
@@ -669,7 +705,7 @@ private:
                 SetChildCheckState(index);
             // i think this is where i should update the db with the checkstate...
             QSqlQuery chkquery(fcasedb);
-            chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
+            chkquery.prepare("UPDATE data SET checked = 2 WHERE objectid = ?;");
             chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
             chkquery.exec();
             chkquery.next();
