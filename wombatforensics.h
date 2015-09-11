@@ -428,7 +428,7 @@ public:
         if(parentnode->haschildren == true)
         {
             QSqlQuery morequery(fcasedb);
-            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ?");
+            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ?");
             morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
             morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
             if(morequery.exec())
@@ -437,7 +437,7 @@ public:
                 while(morequery.next())
                 {
                     fetchvalues.clear();
-                    for(int i=0; i < morequery.record().count(); i++)
+                    for(int i=0; i < morequery.record().count()-1; i++)
                         fetchvalues.append(morequery.value(i));
                     Node* curchild = new Node(fetchvalues);
                     curchild->parent = parentnode;
@@ -451,9 +451,14 @@ public:
                         curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong());
                         curchild->haschildren = curchild->HasChildren();
                     }
+                    if(morequery.value(18).toInt() == 0)
+                        curchild->checkstate = 0;
+                    else
+                        curchild->checkstate = 2;
                     parentnode->children.append(curchild);
                 }
                 endInsertRows();
+                emit checkedNodesChanged();
             }
         }
     };
@@ -488,7 +493,7 @@ public:
     {
         int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
-        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature FROM data WHERE objectid = ? OR (objecttype < 6 AND parimgid = ?)");
+        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked FROM data WHERE objectid = ? OR (objecttype < 6 AND parimgid = ?)");
         addevidquery.addBindValue(curid);
         addevidquery.addBindValue(curid);
         if(addevidquery.exec())
@@ -498,7 +503,7 @@ public:
             {
                 currentnode = 0;
                 colvalues.clear();
-                for(int i=0; i < addevidquery.record().count(); i++)
+                for(int i=0; i < addevidquery.record().count() - 1; i++)
                     colvalues.append(addevidquery.value(i));
                 currentnode = new Node(colvalues);
                 if(currentnode->nodevalues.at(4).toInt() == 1) // image file
@@ -540,6 +545,10 @@ public:
                     }
                     currentnode->haschildren = currentnode->HasChildren();
                 }
+                if(addevidquery.value(18).toInt() == 0)
+                    currentnode->checkstate = 0;
+                else
+                    currentnode->checkstate = 2;
             }
             QSqlQuery filequery(fcasedb);
             Node* rootdirectory = 0;
@@ -573,7 +582,8 @@ public:
                 }
                 filequery.finish();
             }
-           endInsertRows();
+            endInsertRows();
+            emit checkedNodesChanged();
         }
     };
 
