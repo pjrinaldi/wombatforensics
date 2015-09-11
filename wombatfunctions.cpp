@@ -369,7 +369,7 @@ void SecondaryProcessing()
     // REGULAR DATA STREAM.
     // THEN THE SECOND QUERY, WILL GET THE PARADDR, MFTATTRID AND USE THE PARADDR TO GET THE BLOCK INFO AND THEN RUN THE SAME
     // BLOCK CODE BUT RUN DATA ATTRIBUTE ID == MFTATTRID.
-    filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5;");
+    filequery.prepare("SELECT objectid, parimgid, parfsid, address, name FROM data WHERE objecttype = 5;");
     if(filequery.exec())
     {
         while(filequery.next())
@@ -377,6 +377,7 @@ void SecondaryProcessing()
             parfsid = filequery.value(2).toULongLong();
             const TSK_TCHAR** imagepartspath;
             unsigned long long objectid = 0;
+            QString objectname = "";
             TSK_IMG_INFO* readimginfo;
             TSK_FS_INFO* readfsinfo;
             TSK_FS_FILE* readfileinfo;
@@ -396,6 +397,7 @@ void SecondaryProcessing()
             imgquery.finish();
 
             objectid = filequery.value(0).toULongLong();
+            objectname = filequery.value(4).toString();
             imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
 
             for(uint i=0; i < pathvector.size(); i++)
@@ -429,7 +431,6 @@ void SecondaryProcessing()
                     {
                         adsobjid.append(adsquery.value(0).toULongLong());
                         adsattrid.append(adsquery.value(1).toULongLong());
-                        //qDebug() << "object id:" << adsquery.value(0).toULongLong() << "parent id:" << filequery.value(3).toULongLong() << "ads id:" << adsquery.value(1).toULongLong();
                     }
                 }
                 adsquery.finish();
@@ -441,10 +442,22 @@ void SecondaryProcessing()
             BlockFile(readfileinfo, objectid, adsobjid, adsattrid);
 
             if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
-                AlternateDataStreamBlockFile(readfileinfo, objectid, adsobjid, adsattrid);
+            {
+                if(QString::compare(objectname, ".") == 0 || QString::compare(objectname, "..") == 0)
+                {
+                }
+                else
+                    AlternateDataStreamBlockFile(readfileinfo, objectid, adsobjid, adsattrid);
+            }
             PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
             if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
-                AlternateDataStreamPropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid, adsobjid, adsattrid);
+            {
+                if(QString::compare(objectname, ".") == 0 || QString::compare(objectname, "..") == 0)
+                {
+                }
+                else
+                    AlternateDataStreamPropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid, adsobjid, adsattrid);
+            }
             filesprocessed++;
             isignals->ProgUpd();
 
@@ -651,19 +664,10 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, unsigned long long ob
     {
         if(strcmp(tmpfile->name->name, "..") != 0)
         {*/
-    qDebug() << "adsobjid count:" << adsobjid.count();
     for(int i = 0; i < adsobjid.count(); i++)
     {
-        if(tmpfile->name != NULL)
-        {
-            if(strcmp(tmpfile->name->name, ".") == 0)
-                break;
-            if(strcmp(tmpfile->name->name, "..") == 0)
-                break;
-        }
         QSqlQuery adsquery(fcasedb);
         adsquery.prepare("SELECT name, parentid, blockaddress FROM data WHERE objectid = ?;");
-        qDebug() << "adsobjid:" << adsobjid.at(i);
         adsquery.bindValue(0, adsobjid.at(i));
         adsquery.exec();
         adsquery.next();
