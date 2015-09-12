@@ -343,6 +343,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 //tmpdata.addr = adssize - (unsigned long long)fsattr->size + (unsigned long long)((i+2)*24);
                                 tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
                                 adsbool = true;
+                                filesfound++; // NEED TO DECIDE IF I SHOULD INCLUDE THIS AS A FILE OR NOT???
                                 //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
                             }
                         }
@@ -456,7 +457,10 @@ void SecondaryProcessing()
                 {
                 }
                 else
+                {
                     AlternateDataStreamPropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid, adsobjid, adsattrid);
+                    filesprocessed++;
+                }
             }
             filesprocessed++;
             isignals->ProgUpd();

@@ -1032,7 +1032,7 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
                 tmpobj.address = curnode->nodevalues.at(5).toULongLong();
                 tmpobj.length = curnode->nodevalues.at(3).toULongLong();
                 tmpobj.type = curnode->nodevalues.at(12).toULongLong();
-                tmpobj.objecttype = 5;
+                tmpobj.objecttype = curnode->nodevalues.at(4).toInt();
                 tmpobj.offset = 0;
                 tmpobj.readimginfo = NULL;
                 tmpobj.readfsinfo = NULL;
@@ -1057,7 +1057,7 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
             tmpobj.address = curnode->nodevalues.at(5).toULongLong();
             tmpobj.length = curnode->nodevalues.at(3).toULongLong();
             tmpobj.type = curnode->nodevalues.at(12).toULongLong();
-            tmpobj.objecttype = 5;
+            tmpobj.objecttype = curnode->nodevalues.at(4).toInt();
             tmpobj.offset = 0;
             tmpobj.readimginfo = NULL;
             tmpobj.readfsinfo = NULL;

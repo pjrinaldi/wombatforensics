@@ -467,7 +467,7 @@ public:
     
     void GetModelCount(Node* curnode)
     {
-        if(curnode->nodevalues.at(4).toInt() == 5)
+        if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
         {
             totalcount++;
             if(curnode->checkstate == 2)
