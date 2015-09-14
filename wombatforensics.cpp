@@ -1021,6 +1021,7 @@ void WombatForensics::RemEvidence()
 
 void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
 {
+    qDebug() << "curnode id/name:" << curnode->nodevalues.at(0).toInt() << curnode->nodevalues.at(1).toString();
     if(curnode->nodevalues.at(4).toInt() == 5)
     {
         QVariant tmpvariant;
