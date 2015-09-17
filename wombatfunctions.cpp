@@ -343,7 +343,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 //tmpdata.addr = adssize - (unsigned long long)fsattr->size + (unsigned long long)((i+2)*24);
                                 tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
                                 adsbool = true;
-                                filesfound++; // NEED TO DECIDE IF I SHOULD INCLUDE THIS AS A FILE OR NOT???
+                                //filesfound++; // NEED TO DECIDE IF I SHOULD INCLUDE THIS AS A FILE OR NOT???
                                 //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
                             }
                         }
@@ -422,6 +422,11 @@ void SecondaryProcessing()
             adsattrid.clear();
             if(readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
             {
+                if(QString::compare(objectname, ".") == 0 || QString::compare(objectname, "..") == 0)
+                {
+                }
+                else
+                {
                 // get ads dataset
                 QSqlQuery adsquery(fcasedb);
                 adsquery.prepare("SELECT objectid, mftattrid FROM data WHERE objecttype = 6 and parentid = ?;");
@@ -435,21 +440,13 @@ void SecondaryProcessing()
                     }
                 }
                 adsquery.finish();
+                }
             }
             //OpenFile
             readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
-            HashFile(readfileinfo, objectid);
+            //HashFile(readfileinfo, objectid);
             MagicFile(readfileinfo, objectid);
             BlockFile(readfileinfo, objectid, adsobjid, adsattrid);
-
-            if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
-            {
-                if(QString::compare(objectname, ".") == 0 || QString::compare(objectname, "..") == 0)
-                {
-                }
-                else
-                    AlternateDataStreamBlockFile(readfileinfo, objectid, adsobjid, adsattrid);
-            }
             PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
             if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
             {
@@ -458,8 +455,9 @@ void SecondaryProcessing()
                 }
                 else
                 {
+                    AlternateDataStreamMagicFile(readfileinfo, objectid, adsobjid, adsattrid);
+                    AlternateDataStreamBlockFile(readfileinfo, objectid, adsobjid, adsattrid);
                     AlternateDataStreamPropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid, adsobjid, adsattrid);
-                    filesprocessed++;
                 }
             }
             filesprocessed++;
@@ -801,6 +799,7 @@ void AlternateDataStreamBlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid
             blockquery.exec();
             blockquery.next();
             blockquery.finish();
+            //filesprocessed++;
         }
     }
 }
@@ -839,6 +838,12 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     processphase++;
     //filesprocessed++;
     isignals->ProgUpd();
+}
+
+void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
+{
+    // NEED TO READ THE CONTENT FOR THE ATTRIBUTE USING TSK FUNCTION... THEN RUN IT AGAINST MIME TYPE HERE...
+
 }
 
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
@@ -900,7 +905,7 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         hashquery.next();
         hashquery.finish();
     }
-    processphase++;
+    //processphase++;
     isignals->ProgUpd();
 }
 

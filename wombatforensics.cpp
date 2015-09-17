@@ -661,11 +661,17 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenFiles();
     SecondaryProcessing();
     LogMessage("Processing Complete");
+    /*
+     * THUMBNAIL GENERATION WILL BE OPTIONAL TO SPEED UP PROCESSING. IT WILL BE ACTIVATED IF/WHEN THE USER
+     * CLICKS ON THE THUMBNAIL GALLERY BUTTON, BY TELLING THE USER THUMBNAILS ARE NOT GENERATED AND NEED TO BE
+     * PRIOR TO REVIEWING, DO THEY WANT TO GENERATE THEM NOW? YES/NO... YES->OPENS DIG DEEPER WITH THUMBNAIL GENERATION CHECKED
+     * NO->CLOSES DIALOG WITHOUT DOING ANYTHING.
     LogMessage("Generating Thumbnails...");
     statuslabel->setText("Generating Thumbnails...");
     GenerateThumbnails();
     statuslabel->setText("Processing Complete");
     LogMessage("Finished Generating Thumbnails...");
+    */
     //secondfuture = QtConcurrent::run(SecondaryProcessing);
     //secondwatcher.setFuture(secondfuture);
     UpdateDataTable();
@@ -1140,6 +1146,8 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     LogMessage("Started Exporting Evidence");
     if(exportdata->filestatus == FileExportData::selected)
     {
+        qDebug() << "export id:" << wombatvarptr->selectedobject.id << "name:" << wombatvarptr->selectedobject.name;
+        qDebug() << "exportpath:" << QString::fromStdString(exportdata->exportpath) << "item path:" << selectedindex.sibling(selectedindex.row(), 2).data().toString();
         exportdata->exportcount = 1;
         exportdata->id = wombatvarptr->selectedobject.id;
         exportdata->name = wombatvarptr->selectedobject.name.toStdString();
@@ -1251,7 +1259,7 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     if(processcount > 0)
     {
     }
-    double curprogress = (((double)processphase)/(((double)filesfound)*4.0))*100;
+    double curprogress = (((double)processphase)/(((double)filesfound)*3.0))*100;
     //qDebug() << processphase << "" << QString::number(curprogress, 'f', 2) << "%";
     //int curprogress = (int)(((((float)processphase)/((float)filesfound))/5)*100);
     if(curprogress > 100)
