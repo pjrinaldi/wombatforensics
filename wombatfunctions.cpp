@@ -864,6 +864,7 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
             else
             {
                 // WILL NEED TO RESEARCH FURTHER TO FIX THIS SO IT GETS THE CORRECT OFFSET VALUE USING GET RESIDENT OFFSET...
+                // I THINK IT IS CORRECT THOUGH.... WILL HAVE TO TEST ONCE ITS COMPLETE...
                 retval = tsk_fs_read_block(tmpfile->fs_info, adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong(), magicbuffer, adsquery.value(7).toULongLong());
             }
         }
