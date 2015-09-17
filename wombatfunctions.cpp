@@ -842,11 +842,35 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 
 void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
 {
+    off_t retval = 0;
+    char magicbuffer[1024];
+    const char* mimesig;
+    const char* sigtype;
+    char* sigp1;
+    char* sigp2;
+    for(int i = 0; i < adsobjid.count(); i++)
+    {
+        QSqlQuery adsquery(fcasedb);
+        adsquery.prepare("SELECT name, fullpath, parimgid, parfsid, parentid, address, mftattrid, size, blockaddress FROM data WHERE bojectid = ?;");
+        adsquery.bindValue(0, adsobjid.at(i));
+        adsquery.exec();
+        adsquery.next();
+        if(adsquery.value(8).toString().compare("") != 0)
+        {
+            if(adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
+            {
+                retval = tsk_fs_file_read_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, adsquery.value(6).toInt(), 0, magicbuffer, adsquery.value(7).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+            }
+            else
+            {
+                // WILL NEED TO RESEARCH FURTHER TO FIX THIS SO IT GETS THE CORRECT OFFSET VALUE USING GET RESIDENT OFFSET...
+                retval = tsk_fs_read_block(tmpfile->fs_info, adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong(), magicbuffer, adsquery.value(7).toULongLong());
+            }
+        }
+        adsquery.finish();
     // NEED TO READ THE CONTENT FOR THE ATTRIBUTE USING TSK FUNCTION... THEN RUN IT AGAINST MIME TYPE HERE...
     /*
      *
-     *        OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
         tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
         tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
         tskobjptr->offset = 0;
@@ -877,11 +901,6 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
 
-     *
-     *
-     *
-     *
-     *
      *
      *
      *        if(tskptr->blkaddrlist.count() > 0)
