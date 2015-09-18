@@ -27,7 +27,7 @@ void LogMessage(QString message);
 //void StartJob(int type, unsigned long long caseid, unsigned long long evidenceid);
 //void EndJob(unsigned long long jobid, unsigned long long filecount, unsigned long long processcount, unsigned long long errorcount);
 void cnid_to_array(uint32_t cnid, uint8_t array[4]);
-std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname);
+//std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname);
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr);
 QString GetFilePermissions(TSK_FS_META* tmpmeta);
 QImage MakeThumb(const QString &img);

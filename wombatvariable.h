@@ -161,13 +161,15 @@ struct WombatVariable
     QList<QVariant> bindvalues;
 };
 
+/*
 typedef struct
 {
     TSK_IMG_INFO imginfo;
-    AFFILE* affile;
+    //AFFILE* affile;
     TSK_OFF_T seekpos;
     uint16_t type;
 } IMG_AFF_INFO;
+*/
 
 typedef struct
 {
@@ -186,7 +188,7 @@ Q_DECLARE_METATYPE(FileExportData)
 Q_DECLARE_METATYPE(CaseObject)
 Q_DECLARE_METATYPE(EvidenceObject)
 Q_DECLARE_METATYPE(SelectedObject);
-Q_DECLARE_METATYPE(IMG_AFF_INFO);
+//Q_DECLARE_METATYPE(IMG_AFF_INFO);
 Q_DECLARE_METATYPE(IMG_EWF_INFO);
 
 #endif // WOMBATVARIABLE_H

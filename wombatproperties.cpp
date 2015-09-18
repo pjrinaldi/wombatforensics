@@ -724,7 +724,7 @@ TSK_INUM_T hfs_follow_hard_link(HFS_INFO * hfs, hfs_file * cat, unsigned char *i
 WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
 {
     wombatptr = wombatvarptr;
-    affinfo = NULL;
+    //affinfo = NULL;
     ewfinfo = NULL;
     ewfvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
     uvalue8bit = 0;
@@ -889,6 +889,7 @@ QStringList WombatProperties::PopulateEvidenceImageProperties()
     proplist << QString("Image Path") << QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]) << QString("Location where the evidence image is stored and read from.");
     if(TSK_IMG_TYPE_ISAFF(wombatptr->evidenceobject.imageinfo->itype)) // its AFF
     {
+        /*
         affinfo = (IMG_AFF_INFO*)wombatptr->evidenceobject.imageinfo;
         proplist << "MD5" << QString::fromStdString(GetSegmentValue(affinfo, AF_MD5)) << "The MD5 hash algorithm of the uncompressed image file, stored as a 128-bit value";
         proplist << "Image GID" << QString::fromStdString(GetSegmentValue(affinfo, AF_IMAGE_GID)) << "A unique global identifier for the image";
@@ -902,6 +903,7 @@ QStringList WombatProperties::PopulateEvidenceImageProperties()
         proplist << "AFFLib Version" << QString::fromStdString(GetSegmentValue(affinfo, AF_AFFLIB_VERSION)) << "Verion of the AFFLib Library used";
         proplist << "Device Manufacturer" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_MANUFACTURER)) << "Maker of the drive";
         proplist << "Device Serial Number" << QString::fromStdString(GetSegmentValue(affinfo, AF_DEVICE_SN)) << "Serial number of the drive";
+        */
     }
     else if(TSK_IMG_TYPE_ISEWF(wombatptr->evidenceobject.imageinfo->itype)) // its EWF
     {

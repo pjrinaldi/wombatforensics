@@ -851,7 +851,7 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
     for(int i = 0; i < adsobjid.count(); i++)
     {
         QSqlQuery adsquery(fcasedb);
-        adsquery.prepare("SELECT name, fullpath, parimgid, parfsid, parentid, address, mftattrid, size, blockaddress FROM data WHERE bojectid = ?;");
+        adsquery.prepare("SELECT name, fullpath, parimgid, parfsid, parentid, address, mftattrid, size, blockaddress FROM data WHERE objectid = ?;");
         adsquery.bindValue(0, adsobjid.at(i));
         adsquery.exec();
         adsquery.next();
@@ -859,7 +859,7 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
         {
             if(adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
             {
-                retval = tsk_fs_file_read_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, adsquery.value(6).toInt(), 0, magicbuffer, adsquery.value(7).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+                retval = tsk_fs_file_read_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, adsquery.value(6).toInt(), 0, magicbuffer, adsquery.value(7).toULongLong(), TSK_FS_FILE_READ_FLAG_NONE);
             }
             else
             {
@@ -868,17 +868,16 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
                 retval = tsk_fs_read_block(tmpfile->fs_info, adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong(), magicbuffer, adsquery.value(7).toULongLong());
             }
         }
-        adsquery.finish();
-        if(readlen > 0)
+        if(retval > 0)
         {
-            mimesig = magic_buffer(magicmimeptr, magicbuffer, readlen);
+            mimesig = magic_buffer(magicmimeptr, magicbuffer, adsquery.value(7).toULongLong());
             sigp1 = strtok((char*)mimesig, ";");
-            sigtype = magic_buffer(magicptr, magicbuffer, readlen);
+            sigtype = magic_buffer(magicptr, magicbuffer, adsquery.value(7).toULongLong());
             sigp2 = strtok((char*)sigtype, ";");
         }
         QSqlQuery mimequery(fcasedb);
         mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
-        if(readlen > 0)
+        if(retval > 0)
         {
             mimequery.bindValue(0, QString::fromStdString(sigp1));
             mimequery.bindValue(1, QString::fromStdString(sigp2));
@@ -892,6 +891,7 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
         mimequery.exec();
         mimequery.next();
         mimequery.finish();
+        adsquery.finish();
     }
     // NEED TO READ THE CONTENT FOR THE ATTRIBUTE USING TSK FUNCTION... THEN RUN IT AGAINST MIME TYPE HERE...
     /*
@@ -1038,7 +1038,7 @@ void cnid_to_array(uint32_t cnid, uint8_t array[4])
     array[0] = (cnid >> 24) & 0xff;
 }
 
-
+/*
 std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname)
 {
     unsigned char buf[512];
@@ -1072,7 +1072,7 @@ std::string GetSegmentValue(IMG_AFF_INFO* curaffinfo, const char* segname)
         }
     }
     return s;
-}
+}*/
 
 QImage MakeThumb(const QString &img)
 {
