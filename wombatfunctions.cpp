@@ -869,6 +869,30 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
             }
         }
         adsquery.finish();
+        if(readlen > 0)
+        {
+            mimesig = magic_buffer(magicmimeptr, magicbuffer, readlen);
+            sigp1 = strtok((char*)mimesig, ";");
+            sigtype = magic_buffer(magicptr, magicbuffer, readlen);
+            sigp2 = strtok((char*)sigtype, ";");
+        }
+        QSqlQuery mimequery(fcasedb);
+        mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
+        if(readlen > 0)
+        {
+            mimequery.bindValue(0, QString::fromStdString(sigp1));
+            mimequery.bindValue(1, QString::fromStdString(sigp2));
+        }
+        else
+        {
+            mimequery.bindValue(0, QString("Zero File"));
+            mimequery.bindValue(1, QString("Zero File"));
+        }
+        mimequery.bindValue(2,  adsobjid.at(i));
+        mimequery.exec();
+        mimequery.next();
+        mimequery.finish();
+    }
     // NEED TO READ THE CONTENT FOR THE ATTRIBUTE USING TSK FUNCTION... THEN RUN IT AGAINST MIME TYPE HERE...
     /*
      *
@@ -941,7 +965,6 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
      *
      *
      */ 
-
 }
 
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
