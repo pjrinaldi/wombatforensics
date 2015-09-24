@@ -868,6 +868,7 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
                 retval = tsk_fs_read_block(tmpfile->fs_info, adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong(), magicbuffer, adsquery.value(7).toULongLong());
             }
         }
+        qDebug() << "retval:" << retval;
         if(retval > 0)
         {
             mimesig = magic_buffer(magicmimeptr, magicbuffer, adsquery.value(7).toULongLong());
@@ -893,78 +894,6 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
         mimequery.finish();
         adsquery.finish();
     }
-    // NEED TO READ THE CONTENT FOR THE ATTRIBUTE USING TSK FUNCTION... THEN RUN IT AGAINST MIME TYPE HERE...
-    /*
-     *
-        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
-        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
-        tskobjptr->offset = 0;
-        tskobjptr->adsoffset = wombatvarptr->selectedobject.address;
-        tskobjptr->mftattrid = wombatvarptr->selectedobject.mftattrid;
-        if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
-        {
-            if(wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
-            {
-                tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
-                //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + mftrecordsize - wombatvarptr->selectedobject.size;
-                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
-                //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
-            }
-            else
-                tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
-        }
-        else
-        {
-            tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
-            //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + mftrecordsize - wombatvarptr->selectedobject.size;
-            //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatdatabase->GetParentSize(wombatvarptr->selectedobject.parentid);
-            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
-        }
-        tskobjptr->objecttype = 6;
-        tskobjptr->address = wombatvarptr->selectedobject.parentid;
-        tskobjptr->length = wombatvarptr->selectedobject.size;
-        tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
-        tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
-
-     *
-     *
-     *        if(tskptr->blkaddrlist.count() > 0)
-        {
-            if(tskptr->blkaddrlist.at(0).toInt() == 0)
-            {
-                if(tskptr->objecttype == 6)
-                {
-                    retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, tskptr->mftattrid, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
-                }
-                else
-                {
-                    retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
-                }
-            }
-            else
-            {
-                if(pageIdx < tskptr->blkaddrlist.count())
-                {
-                    retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageIdx).toInt(), (char*)_data[pageIdx], _pageSize);
-                }
-            }
-        }
-        else
-        {
-            if(tskptr->objecttype == 6)
-            {
-                retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, tskptr->mftattrid, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
-            }
-            else
-            {
-                retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
-            }
-            //qDebug() << retval;
-        }
-
-     *
-     *
-     */ 
 }
 
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
