@@ -55,10 +55,10 @@ class TreeModel : public QAbstractItemModel
 public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
-        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category";
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
         rootnode = 0;
         QList<QVariant> emptyset;
-        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
         rootnode = new Node(emptyset);
         rootnode->parent = 0;
         rootnode->childcount = 0;
@@ -437,7 +437,7 @@ public:
                 while(morequery.next())
                 {
                     fetchvalues.clear();
-                    for(int i=0; i < morequery.record().count()-1; i++)
+                    for(int i=0; i < morequery.record().count(); i++)
                         fetchvalues.append(morequery.value(i));
                     Node* curchild = new Node(fetchvalues);
                     curchild->parent = parentnode;
@@ -505,7 +505,7 @@ public:
             {
                 currentnode = 0;
                 colvalues.clear();
-                for(int i=0; i < addevidquery.record().count() - 1; i++)
+                for(int i=0; i < addevidquery.record().count(); i++)
                     colvalues.append(addevidquery.value(i));
                 currentnode = new Node(colvalues);
                 if(currentnode->nodevalues.at(4).toInt() == 1) // image file
