@@ -1044,7 +1044,10 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
             if(curnode->checkstate == 2)
             {
                 TskObject tmpobj;
-                tmpobj.address = curnode->nodevalues.at(5).toULongLong();
+                if(curnode->nodevalues.at(4).toInt() == 6)
+                    tmpobj.address = curnode->nodevalues.at(11).toULongLong();
+                else
+                    tmpobj.address = curnode->nodevalues.at(5).toULongLong();
                 tmpobj.length = curnode->nodevalues.at(3).toULongLong();
                 tmpobj.type = curnode->nodevalues.at(12).toULongLong();
                 tmpobj.objecttype = curnode->nodevalues.at(4).toInt();
@@ -1074,7 +1077,10 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
         else
         {
             TskObject tmpobj;
-            tmpobj.address = curnode->nodevalues.at(5).toULongLong();
+            if(curnode->nodevalues.at(4).toInt() == 6)
+                tmpobj.address = curnode->nodevalues.at(11).toULongLong();
+            else
+                tmpobj.address = curnode->nodevalues.at(5).toULongLong();
             tmpobj.length = curnode->nodevalues.at(3).toULongLong();
             tmpobj.type = curnode->nodevalues.at(12).toULongLong();
             tmpobj.objecttype = curnode->nodevalues.at(4).toInt();
@@ -1180,7 +1186,10 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         exportdata->fullpath += "/";
         exportfilelist.push_back(*exportdata);
         TskObject tmpobj;
-        tmpobj.address = selectedindex.sibling(selectedindex.row(), 5).data().toULongLong();
+        if(wombatvarptr->selectedobject.objtype == 6)
+            tmpobj.address = selectedindex.sibling(selectedindex.row(), 11).data().toULongLong();
+        else
+            tmpobj.address = selectedindex.sibling(selectedindex.row(), 5).data().toULongLong();
         tmpobj.offset = 0;
         tmpobj.length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tmpobj.type = selectedindex.sibling(selectedindex.row(), 12).data().toULongLong();
@@ -1259,6 +1268,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         {
             retval = tsk_fs_file_read_type(curobj.readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, curobj.mftattrid, 0, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
         }
+        qDebug() << "retval:" << retval;
         if(retval > 0)
         {
             bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
