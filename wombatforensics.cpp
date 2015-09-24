@@ -1027,7 +1027,16 @@ void WombatForensics::RemEvidence()
 
 void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
 {
-    if(curnode->nodevalues.at(4).toInt() == 5)
+    /*
+     *
+     *        if(wombatvarptr->selectedobject.objtype == 6)
+            exportdata->name = QString::number(wombatvarptr->selectedobject.id).toStdString() + wombatvarptr->selectedobject.name.toStdString() + string(".ads.dat");
+        else
+            exportdata->name = wombatvarptr->selectedobject.name.toStdString();
+
+     *
+     */ 
+    if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
     {
         QVariant tmpvariant;
         if(exportdata->filestatus == FileExportData::checked)
@@ -1046,7 +1055,10 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
                 curlist.append(tmpobj);
                 exportdata->exportcount = totalchecked;
                 exportdata->id = curnode->nodevalues.at(0).toULongLong();
-                exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
+                if(curnode->nodevalues.at(4).toInt() == 6)
+                    exportdata->name = curnode->nodevalues.at(0).toString().toStdString() + curnode->nodevalues.at(1).toString().toStdString() + string(".ads.dat");
+                else
+                    exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
                 exportdata->fullpath = exportdata->exportpath;
                 exportdata->fullpath += "/";
                 exportdata->fullpath += currentevidencename.toStdString();
@@ -1071,7 +1083,10 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
             curlist.append(tmpobj);
             exportdata->exportcount = totalchecked;
             exportdata->id = curnode->nodevalues.at(0).toULongLong();
-            exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
+            if(curnode->nodevalues.at(4).toInt() == 6)
+                exportdata->name = curnode->nodevalues.at(0).toString().toStdString() + curnode->nodevalues.at(1).toString().toStdString() + string(".ads.dat");
+            else
+                exportdata->name = curnode->nodevalues.at(1).toString().toStdString();
             exportdata->fullpath = exportdata->exportpath;
             exportdata->fullpath += "/";
             exportdata->fullpath += currentevidencename.toStdString();
@@ -1152,7 +1167,6 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
             exportdata->name = QString::number(wombatvarptr->selectedobject.id).toStdString() + wombatvarptr->selectedobject.name.toStdString() + string(".ads.dat");
         else
             exportdata->name = wombatvarptr->selectedobject.name.toStdString();
-        qDebug() << "export data name:" << QString::fromStdString(exportdata->name);
         exportdata->fullpath = exportdata->exportpath;
         exportdata->fullpath += "/";
         exportdata->fullpath += currentevidencename.toStdString();
@@ -1232,7 +1246,15 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     {
         int retval = 0;
         char* contentbuffer = new char[curobj.length];
-        retval = tsk_fs_file_read(curobj.readfileinfo, curobj.offset, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
+        if(curobj.objecttype == 5)
+        {
+            retval = tsk_fs_file_read(curobj.readfileinfo, curobj.offset, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
+        }
+        else
+        {
+            // NEED TO PULL THE MFT ATTRIBUTE ID INTO THE CUROBJ VARIABLE.
+            //retval = tsk_fs_file_read_type(curobj.readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, curobj.mftattrid, 0, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
+        }
         if(retval > 0)
         {
             bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
