@@ -1146,12 +1146,13 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     LogMessage("Started Exporting Evidence");
     if(exportdata->filestatus == FileExportData::selected)
     {
-        qDebug() << "export id:" << wombatvarptr->selectedobject.id << "name:" << wombatvarptr->selectedobject.name;
-        qDebug() << "exportpath:" << QString::fromStdString(exportdata->exportpath) << "item path:" << selectedindex.sibling(selectedindex.row(), 2).data().toString();
-        qDebug() << "export type:" << wombatvarptr->selectedobject.objtype;
         exportdata->exportcount = 1;
         exportdata->id = wombatvarptr->selectedobject.id;
-        exportdata->name = wombatvarptr->selectedobject.name.toStdString();
+        if(wombatvarptr->selectedobject.objtype == 6)
+            exportdata->name = QString::number(wombatvarptr->selectedobject.id).toStdString() + string("-") + wombatvarptr->selectedobject.name.toStdString() + string(".ads.dat");
+        else
+            exportdata->name = wombatvarptr->selectedobject.name.toStdString();
+        qDebug() << "export data name:" << QString::fromStdString(exportdata->name);
         exportdata->fullpath = exportdata->exportpath;
         exportdata->fullpath += "/";
         exportdata->fullpath += currentevidencename.toStdString();
@@ -1165,7 +1166,7 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         tmpobj.offset = 0;
         tmpobj.length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tmpobj.type = selectedindex.sibling(selectedindex.row(), 12).data().toULongLong();
-        tmpobj.objecttype = 5;
+        tmpobj.objecttype = wombatvarptr->selectedobject.objtype;
         tmpobj.readimginfo = NULL;
         tmpobj.readfsinfo = NULL;
         tmpobj.readfileinfo = NULL;
@@ -1174,6 +1175,7 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     else
         GetExportData(rootnode, exportdata);
     int curprogress = (int)((((float)exportcount)/(float)curlist.count())*100);
+    LogMessage("Exported: " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
     statuslabel->setText("Exported: " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
     for(int i=0; i < curlist.count(); i++)
     {
