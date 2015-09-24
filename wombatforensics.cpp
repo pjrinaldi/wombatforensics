@@ -1149,7 +1149,7 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         exportdata->exportcount = 1;
         exportdata->id = wombatvarptr->selectedobject.id;
         if(wombatvarptr->selectedobject.objtype == 6)
-            exportdata->name = QString::number(wombatvarptr->selectedobject.id).toStdString() + string("-") + wombatvarptr->selectedobject.name.toStdString() + string(".ads.dat");
+            exportdata->name = QString::number(wombatvarptr->selectedobject.id).toStdString() + wombatvarptr->selectedobject.name.toStdString() + string(".ads.dat");
         else
             exportdata->name = wombatvarptr->selectedobject.name.toStdString();
         qDebug() << "export data name:" << QString::fromStdString(exportdata->name);
