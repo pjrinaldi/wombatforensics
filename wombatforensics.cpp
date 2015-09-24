@@ -1052,6 +1052,8 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
                 tmpobj.readimginfo = NULL;
                 tmpobj.readfsinfo = NULL;
                 tmpobj.readfileinfo = NULL;
+                if(curnode->nodevalues.at(4).toInt() == 6)
+                    tmpobj.mftattrid = curnode->nodevalues.at(19).toULongLong();
                 curlist.append(tmpobj);
                 exportdata->exportcount = totalchecked;
                 exportdata->id = curnode->nodevalues.at(0).toULongLong();
@@ -1080,6 +1082,8 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
             tmpobj.readimginfo = NULL;
             tmpobj.readfsinfo = NULL;
             tmpobj.readfileinfo = NULL;
+            if(curnode->nodevalues.at(4).toInt() == 6)
+                tmpobj.mftattrid = curnode->nodevalues.at(19).toULongLong();
             curlist.append(tmpobj);
             exportdata->exportcount = totalchecked;
             exportdata->id = curnode->nodevalues.at(0).toULongLong();
@@ -1181,6 +1185,7 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         tmpobj.length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tmpobj.type = selectedindex.sibling(selectedindex.row(), 12).data().toULongLong();
         tmpobj.objecttype = wombatvarptr->selectedobject.objtype;
+        tmpobj.mftattrid = wombatvarptr->selectedobject.mftattrid;
         tmpobj.readimginfo = NULL;
         tmpobj.readfsinfo = NULL;
         tmpobj.readfileinfo = NULL;
@@ -1252,8 +1257,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         }
         else
         {
-            // NEED TO PULL THE MFT ATTRIBUTE ID INTO THE CUROBJ VARIABLE.
-            //retval = tsk_fs_file_read_type(curobj.readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, curobj.mftattrid, 0, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
+            retval = tsk_fs_file_read_type(curobj.readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, curobj.mftattrid, 0, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
         }
         if(retval > 0)
         {
