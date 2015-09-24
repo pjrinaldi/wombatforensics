@@ -1148,6 +1148,7 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     {
         qDebug() << "export id:" << wombatvarptr->selectedobject.id << "name:" << wombatvarptr->selectedobject.name;
         qDebug() << "exportpath:" << QString::fromStdString(exportdata->exportpath) << "item path:" << selectedindex.sibling(selectedindex.row(), 2).data().toString();
+        qDebug() << "export type:" << wombatvarptr->selectedobject.objtype;
         exportdata->exportcount = 1;
         exportdata->id = wombatvarptr->selectedobject.id;
         exportdata->name = wombatvarptr->selectedobject.name.toStdString();
@@ -1452,6 +1453,7 @@ void WombatForensics::PageDown()
     pagedown->setDown(true);
 }
 
+/*
 void WombatForensics::SetStepValues(int singlestep, int pagestep)
 {
     //hexvsb->setSingleStep(singlestep);
@@ -1464,6 +1466,7 @@ void WombatForensics::SetStepValues(int singlestep, int pagestep)
     //qDebug() << "singlestep:" << singlestep;
     //if(pagestep > 0)
 }
+*/
 
 WombatForensics::~WombatForensics()
 {
@@ -1867,6 +1870,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    qDebug() << "stepcount" << high;
 }
 
+/*
 void WombatForensics::setScrollBarValue(off_t pos)
 {
     // THIS IS THE LINE # THAT THE OFFSET FALLS UNDER
@@ -1879,6 +1883,7 @@ void WombatForensics::setScrollBarValue(off_t pos)
   // have to worry about if this is the topLeft or bottom right
   //hexvsb->setValue(hexwidget->offsetToPercent(pos));
 }
+*/
 
 void WombatForensics::SetFilter(int headercolumn)
 {

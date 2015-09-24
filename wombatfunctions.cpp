@@ -289,7 +289,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
     TSK_OFF_T curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * tmpfile->meta->addr + 20;
     char startoffset[2];
-    ssize_t offsetcount = tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
+    tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
     //qDebug() << "bytes read:" << offsetcount << "value of bytes:" << Translate::ByteToHex(startoffset[0]) << Translate::ByteToHex(startoffset[1]);
     uint16_t teststart = startoffset[1] * 256 + startoffset[0];
     //adssize = *((int*)startoffset);
@@ -446,7 +446,7 @@ void SecondaryProcessing()
             readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
             //HashFile(readfileinfo, objectid);
             MagicFile(readfileinfo, objectid);
-            BlockFile(readfileinfo, objectid, adsobjid, adsattrid);
+            BlockFile(readfileinfo, objectid, adsattrid);
             PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
             if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
             {
@@ -455,9 +455,9 @@ void SecondaryProcessing()
                 }
                 else
                 {
-                    AlternateDataStreamMagicFile(readfileinfo, objectid, adsobjid, adsattrid);
-                    AlternateDataStreamBlockFile(readfileinfo, objectid, adsobjid, adsattrid);
-                    AlternateDataStreamPropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid, adsobjid, adsattrid);
+                    AlternateDataStreamMagicFile(readfileinfo, adsobjid);
+                    AlternateDataStreamBlockFile(readfileinfo, adsobjid, adsattrid);
+                    AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
                 }
             }
             filesprocessed++;
@@ -651,21 +651,15 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
     }
 }
 
-void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long long fsoffset, int blksize, unsigned long long parfsid, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
+void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
 {
     QStringList proplist;
     proplist.clear();
-    //qDebug() << "attr type:" << QString::fromStdString(std::string(type)) << "attr name:" << fsattr->name;
     if(tmpfile->name != NULL)
     {
         QString adsinfo = "Alternate Data Stream for " + QString::fromStdString(std::string(tmpfile->name->name));
         proplist << "Alternate Data Stream (ADS)" << adsinfo << "Alternate data stream which contains different content from what the file's standard content is.";
     }
-    /*
-    if(strcmp(tmpfile->name->name, ".") != 0)
-    {
-        if(strcmp(tmpfile->name->name, "..") != 0)
-        {*/
     for(int i = 0; i < adsobjid.count(); i++)
     {
         QSqlQuery adsquery(fcasedb);
@@ -694,11 +688,9 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, unsigned long long ob
         fcasedb.commit();
         propquery.finish();
    }
-   //     }
-   /// }
 }
 
-void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
+void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsattrid)
 {
     blockstring = "";
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
@@ -779,7 +771,7 @@ void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned 
 
 }
 
-void AlternateDataStreamBlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
+void AlternateDataStreamBlockFile(TSK_FS_FILE* tmpfile, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
 {
     blockstring = "";
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -840,7 +832,7 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     isignals->ProgUpd();
 }
 
-void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid)
+void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, QVector<unsigned long long> adsobjid)
 {
     off_t retval = 0;
     char magicbuffer[1024];
@@ -856,7 +848,7 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
         adsquery.bindValue(0, adsobjid.at(i));
         adsquery.exec();
         adsquery.next();
-        if(adsquery.value(7).toULongLong() < chunksize)
+        if(adsquery.value(7).toULongLong() < (unsigned)chunksize)
             chunksize = adsquery.value(7).toULongLong();
         if(adsquery.value(8).toString().compare("") != 0)
         {

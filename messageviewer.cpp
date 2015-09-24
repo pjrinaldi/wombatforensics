@@ -14,7 +14,7 @@ MessageViewer::MessageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::Mess
     //foreach(QTextCodec* codec, codecs)
     //    ui->comboBox->addItem(codec->name(), codec->mibEnum());
     this->hide();
-    connect(ui->checkBox, SIGNAL(stateChanged(int)), this, SLOT(UpdateMessages(int)));
+    //connect(ui->checkBox, SIGNAL(stateChanged(int)), this, SLOT(UpdateMessages(int)));
     //connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(GetTextContent()));
     //connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding()));
 }
@@ -31,9 +31,11 @@ void MessageViewer::HideClicked()
     emit HideMessageViewerWindow(false);
 }
 
+/*
 void MessageViewer::UpdateMessages(int chkstate)
 {
 }
+*/
 /*
 void MessageViewer::ShowText(const QModelIndex &index)
 {

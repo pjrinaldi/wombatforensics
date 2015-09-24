@@ -24,7 +24,7 @@ public:
     
 private slots:
     void HideClicked();
-    void UpdateMessages(int chkstate);
+    //void UpdateMessages(int chkstate);
     //void UpdateEncoding();
     //void GetTextContent();
 signals:

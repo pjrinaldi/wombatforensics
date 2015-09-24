@@ -816,7 +816,7 @@ private slots:
     };
     void FileExport(FileExportData* exportdata);
     void setScrollBarRange(off_t low, off_t high);
-    void setScrollBarValue(off_t pos);
+    //void setScrollBarValue(off_t pos);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
     void ShowRockerToolTip(int moved);
@@ -835,7 +835,7 @@ private slots:
     {
         statuslabel->setText(tmptext);
     };
-    void SetStepValues(int singlestep, int pagestep);
+    //void SetStepValues(int singlestep, int pagestep);
     //void SetStepValues(off_t singlestep, off_t pagestep);
     void TreeContextMenu(const QPoint &point);
     void ImgHexMenu(const QPoint &point);
