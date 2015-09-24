@@ -844,6 +844,7 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
 {
     off_t retval = 0;
     char magicbuffer[1024];
+    int chunksize = 1024;
     const char* mimesig;
     const char* sigtype;
     char* sigp1;
@@ -855,25 +856,31 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid
         adsquery.bindValue(0, adsobjid.at(i));
         adsquery.exec();
         adsquery.next();
+        if(adsquery.value(7).toULongLong() < chunksize)
+            chunksize = adsquery.value(7).toULongLong();
         if(adsquery.value(8).toString().compare("") != 0)
         {
-            if(adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
+            if(adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0) // block address empty
             {
-                retval = tsk_fs_file_read_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, adsquery.value(6).toInt(), 0, magicbuffer, adsquery.value(7).toULongLong(), TSK_FS_FILE_READ_FLAG_NONE);
+                retval = tsk_fs_file_read_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, adsquery.value(6).toInt(), 0, magicbuffer, chunksize, TSK_FS_FILE_READ_FLAG_NONE);
             }
-            else
+            else // block address contains valid data
             {
-                // WILL NEED TO RESEARCH FURTHER TO FIX THIS SO IT GETS THE CORRECT OFFSET VALUE USING GET RESIDENT OFFSET...
-                // I THINK IT IS CORRECT THOUGH.... WILL HAVE TO TEST ONCE ITS COMPLETE...
-                retval = tsk_fs_read_block(tmpfile->fs_info, adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong(), magicbuffer, adsquery.value(7).toULongLong());
+                retval = tsk_fs_read_block(tmpfile->fs_info, adsquery.value(8).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong(), magicbuffer, chunksize);
             }
         }
-        qDebug() << "retval:" << retval;
+        else // blockaddress = ""
+        {
+            if(adsquery.value(7).toULongLong() != 0)
+            {
+                retval = tsk_fs_file_read_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, adsquery.value(6).toInt(), 0, magicbuffer, chunksize, TSK_FS_FILE_READ_FLAG_NONE);
+            }
+        }
         if(retval > 0)
         {
-            mimesig = magic_buffer(magicmimeptr, magicbuffer, adsquery.value(7).toULongLong());
+            mimesig = magic_buffer(magicmimeptr, magicbuffer, chunksize);
             sigp1 = strtok((char*)mimesig, ";");
-            sigtype = magic_buffer(magicptr, magicbuffer, adsquery.value(7).toULongLong());
+            sigtype = magic_buffer(magicptr, magicbuffer, chunksize);
             sigp2 = strtok((char*)sigtype, ";");
         }
         QSqlQuery mimequery(fcasedb);
