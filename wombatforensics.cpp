@@ -198,17 +198,24 @@ void WombatForensics::ShowExternalViewer()
     unsigned long long fsid = 0;
     unsigned long long fsoffset = 0;
     unsigned long long address = 0;
-    unsigned long long parentid = 0;
+    unsigned long long filelength = 0;
+    int objtype = 0;
+    unsigned long long mftattrid = 0;
     pathvector.clear();
     QSqlQuery pimgquery(fcasedb);
-    // UPDATE FUNCTIONALITY TO LOAD THE CONTENT FOR THE ADS FILE AS WELL AS A REGULAR FILE...
-    pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
+    pimgquery.prepare("SELECT parimgid, parfsid, address, parentid, objecttype, mftattrid, length FROM Data WHERE objectid = ?;");
     pimgquery.addBindValue(wombatvarptr->selectedobject.id);
     pimgquery.exec();
     pimgquery.next();
     imgid = pimgquery.value(0).toULongLong();
     fsid = pimgquery.value(1).toULongLong();
-    address = pimgquery.value(2).toULongLong();
+    objtype = pimgquery.value(4).toInt();
+    if(objtype == 5)
+        address = pimgquery.value(2).toULongLong();
+    else
+        address = pimgquery.value(3).toULongLong();
+    mftattrid = pimgquery.value(5).toULongLong();
+    filelength = pimgquery.value(6).toULongLong();
     pimgquery.finish();
     pimgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
     pimgquery.addBindValue(imgid);
@@ -239,8 +246,11 @@ void WombatForensics::ShowExternalViewer()
     tskexternalptr->readfileinfo = tsk_fs_file_open_meta(tskexternalptr->readfsinfo, NULL, address);
     // ReadFileToImageUsingByteArray
     ssize_t filelen = 0;
-    char* ibuffer = new char[tskexternalptr->readfileinfo->meta->size];
-    filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+    char* ibuffer = new char[filelength];
+    if(objtype == 5)
+        filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, filelength, TSK_FS_FILE_READ_FLAG_NONE);
+    else
+        filelen = tsk_fs_file_read_type(tskexternalptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, mftattrid, 0, ibuffer, filelength, TSK_FS_FILE_READ_FLAG_NONE);
     QString tmpstring = wombatvarptr->tmpfilepath + QString::number(wombatvarptr->selectedobject.id) + "-tmp";
     QFile tmpfile(tmpstring);
     if(tmpfile.open(QIODevice::WriteOnly))
