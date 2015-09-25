@@ -861,6 +861,7 @@ private slots:
     void AddSection(void);
     void AddTextSection(void);
     void CarveFile(void);
+    void AutoSaveState(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -923,6 +924,7 @@ private:
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
     QShortcut* showitem;
+    QTimer* autosavetimer;
 };
 
 Q_DECLARE_METATYPE(QTextCursor)

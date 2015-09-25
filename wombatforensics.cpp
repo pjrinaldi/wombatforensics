@@ -188,6 +188,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
     connect(showitem, SIGNAL(activated()), this, SLOT(ShowItem()));
     checkhash.clear();
+    autosavetimer = new QTimer(this);
+    connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
+    autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+    //autosavetimer->start(600000); // 10 minutes in milliseconds
     //msgviewer->show();
 }
 
@@ -2063,4 +2067,13 @@ void WombatForensics::SaveState()
     }
     fcasedb.commit();
     hashquery.finish();
+}
+
+void WombatForensics::AutoSaveState()
+{
+    // change display text
+    statuslabel->setText("Saving State Started");
+    SaveState();
+    statuslabel->setText("Evidence ready");
+    // change display text
 }
