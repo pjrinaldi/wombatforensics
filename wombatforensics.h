@@ -22,6 +22,7 @@
 #include "htmlviewer.h"
 #include "messageviewer.h"
 #include "byteconverter.h"
+#include "digdeeperdialog.h"
 
 class WombatSlider : public QSlider
 {
@@ -748,6 +749,7 @@ public:
     WombatFramework* wombatframework;
     PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
+    DigDeeperDialog* digdeeperdialog;
     FileViewer* fileviewer;
     TreeModel* treemodel;
     QMenu* treemenu;
@@ -783,6 +785,7 @@ private slots:
     void on_actionSaveState_triggered();
     void on_actionCheck_triggered();
     void on_actionExport_triggered();
+    void on_actionDigDeeper_triggered();
     void on_actionView_Properties_triggered(bool checked);
     void on_actionView_Progress_triggered(bool checked);
     void on_actionView_File_triggered(bool checked);

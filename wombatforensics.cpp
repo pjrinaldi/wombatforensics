@@ -142,6 +142,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     // make right click menu call up the treemenu with viewer list.
     treemenu->addAction(ui->menuView_With->menuAction());
     treemenu->addAction(ui->actionCheck);
+    treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
     treemodel = new TreeModel(this);
     ui->dirTreeView->setModel(treemodel);
@@ -411,6 +412,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionView_Properties->setEnabled(false);
     ui->actionView_File->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
+    ui->actionDigDeeper->setEnabled(false);
     ui->menuBookmark_Manager->setEnabled(false);
     ui->actionView_Image_Gallery->setEnabled(false);
     ui->actionCopy_Selection_To->setEnabled(false);
@@ -595,6 +597,7 @@ void WombatForensics::InitializeOpenCase()
             {
                 ui->actionRemove_Evidence->setEnabled(true);
                 ui->actionSaveState->setEnabled(true);
+                ui->actionDigDeeper->setEnabled(true);
                 hexrocker->setEnabled(true);
             }
         }
@@ -612,6 +615,7 @@ void WombatForensics::InitializeQueryModel()
     ResizeColumns();
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
+    ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
     wombatframework->CloseInfoStructures();
     //statuslabel->setText("Evidence Added. Begin Processing...");
@@ -637,6 +641,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionView_Image_Gallery->setEnabled(true);
         ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
+        //ui->actionDigDeeper->setEnabled(true);
         ui->actionByteConverter->setEnabled(true);
         wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
         wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
@@ -1677,6 +1682,16 @@ void WombatForensics::on_actionExport_triggered()
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
     exportdialog->show();
     qDebug() << "export current file";
+}
+
+void WombatForensics::on_actionDigDeeper_triggered()
+{
+    totalcount = 0;
+    totalchecked = 0;
+    //deepercount = 0;
+    digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
+    //connect(digdeeperdialog, SIGNAL(FileDeeper(FileDeeperData*)), this, SLOT(FileDeeper(FileDeeperData*)), Qt::DirectConnection);
+    digdeeperdialog->show();
 }
 
 void WombatForensics::on_actionView_Properties_triggered(bool checked)
