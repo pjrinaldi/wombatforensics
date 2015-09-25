@@ -198,8 +198,10 @@ void WombatForensics::ShowExternalViewer()
     unsigned long long fsid = 0;
     unsigned long long fsoffset = 0;
     unsigned long long address = 0;
+    unsigned long long parentid = 0;
     pathvector.clear();
     QSqlQuery pimgquery(fcasedb);
+    // UPDATE FUNCTIONALITY TO LOAD THE CONTENT FOR THE ADS FILE AS WELL AS A REGULAR FILE...
     pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
     pimgquery.addBindValue(wombatvarptr->selectedobject.id);
     pimgquery.exec();
@@ -289,7 +291,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else
     {
-        if(index.sibling(index.row(), 4).data().toInt() == 5)
+        if(index.sibling(index.row(), 4).data().toInt() == 5 || index.sibling(index.row(), 4).data().toInt() == 6)
             treemenu->exec(QCursor::pos());
     }
 }
@@ -628,7 +630,7 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     if(index.isValid())
     {
         actionnode = static_cast<Node*>(index.internalPointer());
-        if(index.sibling(index.row(), 4).data().toInt() == 5)            
+        if(index.sibling(index.row(), 4).data().toInt() == 5 || index.sibling(index.row(), 4).data().toInt() == 6)
             treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
 }
