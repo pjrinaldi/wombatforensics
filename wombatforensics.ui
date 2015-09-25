@@ -96,7 +96,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -227,6 +227,7 @@
    </attribute>
    <addaction name="actionNew_Case"/>
    <addaction name="actionOpen_Case"/>
+   <addaction name="actionSaveState"/>
    <addaction name="separator"/>
    <addaction name="actionAdd_Evidence"/>
    <addaction name="actionRemove_Evidence"/>
@@ -574,6 +575,21 @@
   <action name="actionExport">
    <property name="text">
     <string>Export...</string>
+   </property>
+  </action>
+  <action name="actionSaveState">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/savestate</normaloff>:/bar/savestate</iconset>
+   </property>
+   <property name="text">
+    <string>SaveState</string>
+   </property>
+   <property name="toolTip">
+    <string>Save State</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

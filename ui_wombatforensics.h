@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wombatforensics.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.2
+** Created by: Qt User Interface Compiler version 5.5.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -60,6 +60,7 @@ public:
     QAction *actionByteConverter;
     QAction *actionCheck;
     QAction *actionExport;
+    QAction *actionSaveState;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -219,6 +220,11 @@ public:
         actionCheck->setObjectName(QStringLiteral("actionCheck"));
         actionExport = new QAction(WombatForensics);
         actionExport->setObjectName(QStringLiteral("actionExport"));
+        actionSaveState = new QAction(WombatForensics);
+        actionSaveState->setObjectName(QStringLiteral("actionSaveState"));
+        QIcon icon20;
+        icon20.addFile(QStringLiteral(":/bar/savestate"), QSize(), QIcon::Normal, QIcon::Off);
+        actionSaveState->setIcon(icon20);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -261,7 +267,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QStringLiteral("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 800, 22));
+        mainMenubar->setGeometry(QRect(0, 0, 800, 21));
         mainMenubar->setAcceptDrops(true);
         menuFile = new QMenu(mainMenubar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
@@ -276,14 +282,14 @@ public:
         menuAbout->setIcon(icon7);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon20;
-        icon20.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon20);
+        QIcon icon21;
+        icon21.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon21);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon21;
-        icon21.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon21);
+        QIcon icon22;
+        icon22.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon22);
         menuView = new QMenu(mainMenubar);
         menuView->setObjectName(QStringLiteral("menuView"));
         menuView_With = new QMenu(menuView);
@@ -339,6 +345,7 @@ public:
         menuCopy_To->addAction(actionFile);
         analysisToolBar->addAction(actionNew_Case);
         analysisToolBar->addAction(actionOpen_Case);
+        analysisToolBar->addAction(actionSaveState);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionAdd_Evidence);
         analysisToolBar->addAction(actionRemove_Evidence);
@@ -435,6 +442,11 @@ public:
 #endif // QT_NO_TOOLTIP
         actionCheck->setText(QApplication::translate("WombatForensics", "(Un)Check", 0));
         actionExport->setText(QApplication::translate("WombatForensics", "Export...", 0));
+        actionSaveState->setText(QApplication::translate("WombatForensics", "SaveState", 0));
+#ifndef QT_NO_TOOLTIP
+        actionSaveState->setToolTip(QApplication::translate("WombatForensics", "Save State", 0));
+#endif // QT_NO_TOOLTIP
+        actionSaveState->setShortcut(QApplication::translate("WombatForensics", "Ctrl+S", 0));
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", 0));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", 0));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", 0));
