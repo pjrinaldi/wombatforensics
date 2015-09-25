@@ -109,7 +109,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     propertywindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    //connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateDataTable()), Qt::QueuedConnection);
+    connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered()), this, SLOT(on_actionViewerManager_triggered()), Qt::DirectConnection);
@@ -614,6 +614,13 @@ void WombatForensics::InitializeQueryModel()
     ui->actionSaveState->setEnabled(true);
     hexrocker->setEnabled(true);
     wombatframework->CloseInfoStructures();
+    //statuslabel->setText("Evidence Added. Begin Processing...");
+    //LogMessage("Evidence Added. Begin Processing...");
+    //secondfuture = QtConcurrent::run(SecondaryProcessing);
+    //secondwatcher.setFuture(secondfuture);
+    //sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
+    //sqlwatcher.setFuture(sqlfuture);
+
     statuslabel->setText("Evidence ready");
     LogMessage("Evidence Ready");
 }
@@ -681,7 +688,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
-    //SecondaryProcessing();
+    SecondaryProcessing();
     LogMessage("Processing Complete");
     /*
      * THUMBNAIL GENERATION WILL BE OPTIONAL TO SPEED UP PROCESSING. IT WILL BE ACTIVATED IF/WHEN THE USER
@@ -706,6 +713,11 @@ void WombatForensics::UpdateDataTable()
     LogMessage("Evidence has been successfully added");
     statuslabel->setText("Evidence ready");
     //qDebu() << "processing complete. should be 100%" << processphase;
+}
+void WombatForensics::UpdateStatus()
+{
+    ui->dirTreeView->setModel(treemodel);
+    qDebug() << "secondary processing is complete.";
 }
 
 void WombatForensics::OpenEvidenceStructure()
