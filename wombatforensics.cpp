@@ -681,7 +681,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
-    SecondaryProcessing();
+    //SecondaryProcessing();
     LogMessage("Processing Complete");
     /*
      * THUMBNAIL GENERATION WILL BE OPTIONAL TO SPEED UP PROCESSING. IT WILL BE ACTIVATED IF/WHEN THE USER
