@@ -203,7 +203,7 @@ void WombatForensics::ShowExternalViewer()
     unsigned long long mftattrid = 0;
     pathvector.clear();
     QSqlQuery pimgquery(fcasedb);
-    pimgquery.prepare("SELECT parimgid, parfsid, address, parentid, objecttype, mftattrid, length FROM Data WHERE objectid = ?;");
+    pimgquery.prepare("SELECT parimgid, parfsid, address, parentid, objecttype, mftattrid, size FROM data WHERE objectid = ?;");
     pimgquery.addBindValue(wombatvarptr->selectedobject.id);
     pimgquery.exec();
     pimgquery.next();
