@@ -1639,7 +1639,9 @@ void WombatForensics::on_actionOpen_Case_triggered()
 
 void WombatForensics::on_actionSaveState_triggered()
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     SaveState();
+    QApplication::restoreOverrideCursor();
 }
 
 void WombatForensics::on_actionCheck_triggered()
