@@ -62,4 +62,5 @@ QStringList externallist;
 struct magic_set* magicptr = NULL;
 struct magic_set* magicmimeptr = NULL;
 QMutex mutex;
+QHash<unsigned long long, int> checkhash;
 FilterValues filtervalues;

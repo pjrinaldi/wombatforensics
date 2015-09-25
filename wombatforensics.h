@@ -626,32 +626,35 @@ private:
         if(curnode->childcount > checkcount && checkcount > 0)
         {
             curnode->checkstate = 1;
-            QSqlQuery chkquery(fcasedb);
+            checkhash[curnode->nodevalues.at(0).toULongLong()] = 1;
+            /*QSqlQuery chkquery(fcasedb);
             chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
             chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
             chkquery.exec();
             chkquery.next();
-            chkquery.finish();
+            chkquery.finish(); */
         }
         else if(curnode->childcount == checkcount)
         {
             curnode->checkstate = 1;
-            QSqlQuery chkquery(fcasedb);
+            checkhash[curnode->nodevalues.at(0).toULongLong()] = 1;
+            /*QSqlQuery chkquery(fcasedb);
             chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
             chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
             chkquery.exec();
             chkquery.next();
-            chkquery.finish();
+            chkquery.finish();*/
         }
         else if(checkcount == 0)
         {
             curnode->checkstate = 0;
-            QSqlQuery chkquery(fcasedb);
+            checkhash[curnode->nodevalues.at(0).toULongLong()] = 0;
+            /*QSqlQuery chkquery(fcasedb);
             chkquery.prepare("UPDATE data SET checked = 0 WHERE objectid = ?;");
             chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
             chkquery.exec();
             chkquery.next();
-            chkquery.finish();
+            chkquery.finish();*/
         }
         emit dataChanged(index, index);
         emit checkedNodesChanged();
@@ -680,23 +683,25 @@ private:
             curnode->checkstate = 0;
             if(curnode->haschildren)
                 SetChildCheckState(index);
+            checkhash[curnode->nodevalues.at(0).toULongLong()] = 0;
             // i think is where i should update the db with the checkstate...
-            QSqlQuery chkquery(fcasedb);
+            /*QSqlQuery chkquery(fcasedb);
             chkquery.prepare("UPDATE data SET checked = 0 WHERE objectid = ?;");
             chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
             chkquery.exec();
             chkquery.next();
-            chkquery.finish();
+            chkquery.finish();*/
         }
         else if(state == Qt::PartiallyChecked) // curnode is now partially checked
         {
             curnode->checkstate = 1;
-            QSqlQuery chkquery(fcasedb);
+            checkhash[curnode->nodevalues.at(0).toULongLong()] = 1;
+            /*QSqlQuery chkquery(fcasedb);
             chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
             chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
             chkquery.exec();
             chkquery.next();
-            chkquery.finish();
+            chkquery.finish();*/
         }
         else if(state == Qt::Checked) // currentnode is now checked
         {
@@ -704,12 +709,13 @@ private:
             if(curnode->haschildren)
                 SetChildCheckState(index);
             // i think this is where i should update the db with the checkstate...
-            QSqlQuery chkquery(fcasedb);
+            checkhash[curnode->nodevalues.at(0).toULongLong()] = 2;
+            /*QSqlQuery chkquery(fcasedb);
             chkquery.prepare("UPDATE data SET checked = 2 WHERE objectid = ?;");
             chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
             chkquery.exec();
             chkquery.next();
-            chkquery.finish();
+            chkquery.finish();*/
         }
         emit dataChanged(index, index);
         emit checkedNodesChanged();
@@ -878,6 +884,7 @@ private:
     void GetExportData(Node* curnode, FileExportData* exportdata);
     void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
     void UpdateFilterCount(void);
+    void SaveState(void);
 
     void RemoveTmpFiles(void);
 
@@ -915,7 +922,6 @@ private:
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
     QShortcut* showitem;
-
 };
 
 Q_DECLARE_METATYPE(QTextCursor)

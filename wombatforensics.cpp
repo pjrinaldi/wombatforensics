@@ -187,6 +187,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(jumpforward, SIGNAL(activated()), this, SLOT(NextItem()));
     connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
     connect(showitem, SIGNAL(activated()), this, SLOT(ShowItem()));
+    checkhash.clear();
     //msgviewer->show();
 }
 
@@ -2030,4 +2031,21 @@ void WombatForensics::CarveFile()
         tmpfile.write((const char*)&tmpbytes[0], tmpbytes.size());
         tmpfile.close();
     }
+}
+
+void WombatForensics::SaveState()
+{
+    fcasedb.transaction();
+    QSqlQuery hashquery(fcasedb);
+    hashquery.prepare("UPDATE data SET checked = ? WHERE objectid = ?;");
+    QHashIterator<unsigned long long, int> i(checkhash);
+    while(i.hasNext())
+    {
+        hashquery.bindValue(0, i.value());
+        hashquery.bindValue(1, i.key());
+        hashquery.exec();
+        checkhash.remove(i.key());
+    }
+    fcasedb.commit();
+    hashquery.finish();
 }
