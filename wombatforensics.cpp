@@ -400,6 +400,7 @@ void WombatForensics::InitializeAppStructure()
     {
         DisplayError("1.0", "Case Count", "Invalid Case Count returned.");
     }
+    ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
     ui->actionView_Progress->setEnabled(false);
@@ -589,6 +590,7 @@ void WombatForensics::InitializeOpenCase()
             if(ui->dirTreeView->model() != NULL)
             {
                 ui->actionRemove_Evidence->setEnabled(true);
+                ui->actionSaveState->setEnabled(true);
                 hexrocker->setEnabled(true);
             }
         }
@@ -605,6 +607,7 @@ void WombatForensics::InitializeQueryModel()
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     ResizeColumns();
     ui->actionRemove_Evidence->setEnabled(true);
+    ui->actionSaveState->setEnabled(true);
     hexrocker->setEnabled(true);
     wombatframework->CloseInfoStructures();
     statuslabel->setText("Evidence ready");
@@ -1634,6 +1637,11 @@ void WombatForensics::on_actionOpen_Case_triggered()
         InitializeOpenCase();
 }
 
+void WombatForensics::on_actionSaveState_triggered()
+{
+    SaveState();
+}
+
 void WombatForensics::on_actionCheck_triggered()
 {
     if(actionnode->checkstate < 2)
@@ -2038,13 +2046,18 @@ void WombatForensics::SaveState()
     fcasedb.transaction();
     QSqlQuery hashquery(fcasedb);
     hashquery.prepare("UPDATE data SET checked = ? WHERE objectid = ?;");
-    QHashIterator<unsigned long long, int> i(checkhash);
+    QMapIterator<unsigned long long, int> i(checkhash);
     while(i.hasNext())
     {
-        hashquery.bindValue(0, i.value());
-        hashquery.bindValue(1, i.key());
-        hashquery.exec();
-        checkhash.remove(i.key());
+        i.next();
+        // ISSUE WITH ITEM_EXISTS BIT
+        if(checkhash.contains(i.key()))
+        {
+            hashquery.bindValue(0, i.value());
+            hashquery.bindValue(1, i.key());
+            hashquery.exec();
+        }
+        //checkhash.remove(i.key());
     }
     fcasedb.commit();
     hashquery.finish();

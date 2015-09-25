@@ -52,7 +52,7 @@ public slots:
 
 private slots:
     void SetScrollBarRange(off_t low, off_t high);
-    void setScrollBarValue(off_t pos);
+    //void setScrollBarValue(off_t pos);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
     void ShowRockerToolTip(int moved);
@@ -61,7 +61,7 @@ private slots:
     void PageUp(void);
     void PageDown(void);
     void UpdateSelectValue(const QString &txt);
-    void SetStepValues(int singlestep, int pagestep);
+    //void SetStepValues(int singlestep, int pagestep);
     void HideClicked();
 
 signals:

@@ -387,22 +387,22 @@ void ImageHexViewer::setTopLeftToFloat( float offset )
 void ImageHexViewer::setTopLeftToDouble(double offset)
 {
     double percent = offset*bytesPerLine();
-    if(_previousstep < (unsigned long long)percent)
+    if((unsigned)_previousstep < (unsigned long long)percent)
     {
         unsigned long long stepdiff = (unsigned long long)percent - _previousstep;
-        if(stepdiff == bytesPerLine())
+        if(stepdiff == (unsigned)bytesPerLine())
             nextLine();
-        else if(stepdiff == bytesPerPage())
+        else if(stepdiff == (unsigned)bytesPerPage())
             nextPage();
         else
             setTopLeft(percent);
     }
-    else if(_previousstep > (unsigned long long)percent)
+    else if((unsigned)_previousstep > (unsigned long long)percent)
     {
         unsigned long long stepdiff = _previousstep - (unsigned long long)percent;
-        if(stepdiff == bytesPerLine())
+        if(stepdiff == (unsigned)bytesPerLine())
             prevLine();
-        else if(stepdiff == bytesPerPage())
+        else if(stepdiff == (unsigned)bytesPerPage())
             prevPage();
         else
             setTopLeft(percent);

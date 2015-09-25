@@ -150,12 +150,12 @@ void FileViewer::SetScrollBarRange(off_t low, off_t high)
     (void)low; (void)high;
    //filehexvsb->setRange(low, high);
 }
-
+/*
 void FileViewer::setScrollBarValue(off_t pos)
 {
     //filehexvsb->setValue(pos);
 }
-
+*/
 void FileViewer::SetOffsetLabel(off_t pos)
 {
     QString label;
@@ -244,9 +244,10 @@ void FileViewer::UpdateSelectValue(const QString &txt)
     //selecteddouble->setText(tmptext);
     */
 }
-
+/*
 void FileViewer::SetStepValues(int singlestep, int pagestep)
 {
     //filehexvsb->setSingleStep(singlestep);
     //filehexvsb->setPageStep(pagestep);
 }
+*/
