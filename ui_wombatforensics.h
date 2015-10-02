@@ -220,6 +220,7 @@ public:
         actionCheck->setObjectName(QStringLiteral("actionCheck"));
         actionExport = new QAction(WombatForensics);
         actionExport->setObjectName(QStringLiteral("actionExport"));
+        actionExport->setIcon(icon5);
         actionSaveState = new QAction(WombatForensics);
         actionSaveState->setObjectName(QStringLiteral("actionSaveState"));
         QIcon icon20;

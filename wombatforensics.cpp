@@ -331,12 +331,26 @@ void WombatForensics::HideProgressWindow(bool checkedstate)
 {
     ui->actionView_Progress->setChecked(checkedstate);
 }
-/*
-void WombatForensics::HideViewerManager(bool checkstate)
+void WombatForensics::HideViewerManager()
 {
+    // I NEED TO UPDATE THE TREEMENU VALUES...
     //ui->actionViewerManager->setChecked(checkstate);
+    treemenu->clear();
+    ui->menuView_With->clear();
+    for(int i=0; i < externallist.count(); i++)
+    {
+        QAction* tmpaction = new QAction(externallist.at(i), this);
+        //treemenu->addAction(tmpaction);
+        connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
+        ui->menuView_With->addAction(tmpaction);
+    }
+    // make right click menu call up the treemenu with viewer list.
+    treemenu->addAction(ui->menuView_With->menuAction());
+    treemenu->addAction(ui->actionCheck);
+    treemenu->addAction(ui->actionDigDeeper);
+    treemenu->addAction(ui->actionExport);
+
 }
-*/
 
 void WombatForensics::HideTextViewer(bool checkstate)
 {
@@ -392,7 +406,7 @@ void WombatForensics::InitializeAppStructure()
     fappdb = wombatvarptr->appdb;
     viewmanage = new ViewerManager(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
-    //connect(viewmanage, SIGNAL(HideManagerWindow(bool)), this, SLOT(HideViewerManager(bool)), Qt::DirectConnection);
+    connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
     if(wombatdatabase->ReturnCaseCount() == 0)
     {
         ui->actionOpen_Case->setEnabled(false);
@@ -1681,7 +1695,7 @@ void WombatForensics::on_actionExport_triggered()
     exportdialog = new ExportDialog(this, totalchecked, totalcount);
     connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
     exportdialog->show();
-    qDebug() << "export current file";
+    //qDebug() << "export current file";
 }
 
 void WombatForensics::on_actionDigDeeper_triggered()

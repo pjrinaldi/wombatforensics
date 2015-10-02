@@ -33,12 +33,12 @@ ViewerManager::~ViewerManager()
 void ViewerManager::HideClicked()
 {
     this->hide();
-    emit HideManagerWindow(false);
+    emit HideManagerWindow();
 }
 
 void ViewerManager::closeEvent(QCloseEvent* e)
 {
-    emit HideManagerWindow(false);
+    emit HideManagerWindow();
     e->accept();
 }
 

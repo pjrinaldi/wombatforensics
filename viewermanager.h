@@ -118,7 +118,7 @@ private slots:
     void RemoveSelected();
     void SelectionChanged(const QItemSelection &newitem, const QItemSelection &previtem);
 signals:
-    void HideManagerWindow(bool checkstate);
+    void HideManagerWindow();
 
 protected:
     void closeEvent(QCloseEvent* event);

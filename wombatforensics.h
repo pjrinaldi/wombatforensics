@@ -803,7 +803,7 @@ private slots:
     void HidePropertyWindow(bool checkstate);
     void HideFileViewer(bool checkstate);
     void HideImageWindow(bool checkstate);
-//    void HideViewerManager(bool checkstate);
+    void HideViewerManager(void);
     void HideTextViewer(bool checkstate);
     void HideMessageViewer(bool checkstate);
     void HideByteViewer(bool checkstate);

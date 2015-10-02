@@ -573,6 +573,10 @@
    </property>
   </action>
   <action name="actionExport">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/export</normaloff>:/bar/export</iconset>
+   </property>
    <property name="text">
     <string>Export...</string>
    </property>
