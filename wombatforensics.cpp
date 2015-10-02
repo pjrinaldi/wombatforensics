@@ -1080,15 +1080,6 @@ void WombatForensics::RemEvidence()
 
 void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
 {
-    /*
-     *
-     *        if(wombatvarptr->selectedobject.objtype == 6)
-            exportdata->name = QString::number(wombatvarptr->selectedobject.id).toStdString() + wombatvarptr->selectedobject.name.toStdString() + string(".ads.dat");
-        else
-            exportdata->name = wombatvarptr->selectedobject.name.toStdString();
-
-     *
-     */ 
     if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
     {
         QVariant tmpvariant;
@@ -1144,7 +1135,7 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
             if(curnode->nodevalues.at(4).toInt() == 6)
                 tmpobj.mftattrid = curnode->nodevalues.at(19).toULongLong();
             curlist.append(tmpobj);
-            exportdata->exportcount = totalchecked;
+            exportdata->exportcount = totalchecked; // I THINK THIS SHOULD BE TOTAL LISTED
             exportdata->id = curnode->nodevalues.at(0).toULongLong();
             if(curnode->nodevalues.at(4).toInt() == 6)
                 exportdata->name = curnode->nodevalues.at(0).toString().toStdString() + curnode->nodevalues.at(1).toString().toStdString() + string(".ads.dat");
@@ -1163,9 +1154,65 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
     if(curnode->haschildren)
     {
         for(int i=0; i < curnode->children.count(); i++)
-            GetExportData(curnode->children[i], exportdata);
+            GetExportData(curnode->children.at(i), exportdata);
     }
-};
+}
+
+void WombatForensics::GetDigData(Node* curnode, FileDeepData* deepdata)
+{
+    if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
+    {
+        QVariant tmpvariant;
+        if(deepdata->filestatus == FileDeepData::checked)
+        {
+            if(curnode->checkstate == 2)
+            {
+                TskObject tmpobj;
+                if(curnode->nodevalues.at(4).toInt() == 6)
+                    tmpobj.address = curnode->nodevalues.at(11).toULongLong();
+                else
+                    tmpobj.address = curnode->nodevalues.at(5).toULongLong();
+                tmpobj.length = curnode->nodevalues.at(3).toULongLong();
+                tmpobj.type = curnode->nodevalues.at(12).toULongLong();
+                tmpobj.objecttype = curnode->nodevalues.at(4).toInt();
+                tmpobj.offset = 0;
+                tmpobj.readimginfo = NULL;
+                tmpobj.readfsinfo = NULL;
+                tmpobj.readfileinfo = NULL;
+                if(curnode->nodevalues.at(4).toInt() == 6)
+                    tmpobj.mftattrid = curnode->nodevalues.at(19).toULongLong();
+                curlist.append(tmpobj);
+                deepdata->digcount = totalchecked;
+                deepdata->id = curnode->nodevalues.at(0).toULongLong();
+                digfilelist.push_back(*deepdata);
+            }
+        }
+        else
+        {
+            TskObject tmpobj;
+            if(curnode->nodevalues.at(4).toInt() == 6)
+                tmpobj.address = curnode->nodevalues.at(11).toULongLong();
+            else
+                tmpobj.address = curnode->nodevalues.at(5).toULongLong();
+            tmpobj.objecttype = curnode->nodevalues.at(4).toInt();
+            tmpobj.offset = 0;
+            tmpobj.readimginfo = NULL;
+            tmpobj.readfsinfo = NULL;
+            tmpobj.readfileinfo = NULL;
+            if(curnode->nodevalues.at(4).toInt() == 6)
+                tmpobj.mftattrid = curnode->nodevalues.at(19).toULongLong();
+            curlist.append(tmpobj);
+            deepdata->digcount = totalchecked; //  I THINK THIS SHOULD BE TOTAL LISTED...
+            deepdata->id = curnode->nodevalues.at(0).toULongLong();
+            digfilelist.push_back(*deepdata);
+        }
+    }
+    if(curnode->haschildren)
+    {
+        for(int i = 0; i < curnode->children.count(); i++)
+            GetDigData(curnode->children.at(i), deepdata);
+    }
+}
 
 void WombatForensics::ExportEvidence()
 {
@@ -1180,6 +1227,7 @@ void WombatForensics::ExportEvidence()
 
 void WombatForensics::FileDig(FileDeepData* deeperdata)
 {
+    DigFiles(deeperdata);
     if(deeperdata)
         qDebug() << "launch in a new thread the dig deeper functionality...";
     qDebug() << "update message and status text";
@@ -1273,6 +1321,53 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     }
 }
 
+void WombatForensics::DigFiles(FileDeepData* deepdata)
+{
+    threadvector.clear();
+    digfilelist.clear();
+    curlist.clear();
+    errorcount = 0;
+    LogMessage("Digging Deeper into Evidence");
+    if(deepdata->filestatus == FileDeepData::selected)
+    {
+        deepdata->digcount = 1;
+        deepdata->id = wombatvarptr->selectedobject.id;
+        /*
+        if(wombatvarptr->selectedobject.objtype == 6)
+            deepdata->name = QString::number(wombatvarptr->selectedobject.id).toStdString() + wombatvarptr->selectedobject.name.toStdString() + string(".ads.dat");
+        else
+            deepdata->name = wombatvarptr->selectedobject.name.toStdString();
+        deepdata->fullpath
+        */
+        digfilelist.push_back(*deepdata);
+        TskObject tmpobj;
+        if(wombatvarptr->selectedobject.objtype == 6)
+            tmpobj.address = selectedindex.sibling(selectedindex.row(), 11).data().toULongLong();
+        else
+            tmpobj.address = selectedindex.sibling(selectedindex.row(), 5).data().toULongLong();
+        tmpobj.offset = 0;
+        tmpobj.length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
+        tmpobj.type = selectedindex.sibling(selectedindex.row(), 12).data().toULongLong();
+        tmpobj.objecttype = wombatvarptr->selectedobject.objtype;
+        tmpobj.mftattrid = wombatvarptr->selectedobject.mftattrid;
+        tmpobj.readimginfo = NULL;
+        tmpobj.readfsinfo = NULL;
+        tmpobj.readfileinfo = NULL;
+        curlist.append(tmpobj);
+    }
+    else
+        GetDigData(rootnode, deepdata);
+    int curprogress = (int)((((float)digcount)/(float)curlist.count())*100);
+    LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
+    statuslabel->setText("Dug: " + QString::number(digcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
+    for(int i = 0; i < curlist.count(); i++)
+    {
+        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessDig, curlist.at(i), digfilelist.at(i).id, digfilelist.at(i).name);
+        digwatcher.setFuture(tmpfuture);
+        threadvector.append(tmpfuture);
+    }
+}
+
 void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std::string name)
 {
     if(curobj.readimginfo != NULL)
@@ -1348,6 +1443,43 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     exportcount++;
     int curprogress = (int)((((float)exportcount)/(float)curlist.count())*100);
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%"));
+}
+
+void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, std::string name)
+{
+    if(curobj.readimginfo != NULL)
+        tsk_img_close(curobj.readimginfo);
+    if(curobj.readfsinfo != NULL)
+        tsk_fs_close(curobj.readfsinfo);
+    if(curobj.readfileinfo != NULL)
+        tsk_fs_file_close(curobj.readfileinfo);
+
+    int curidx = 0;
+    for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
+    {
+        if(wombatvarptr->currentevidenceid == wombatvarptr->evidenceobjectvector[i].id)
+            curidx = i;
+    }
+    curobj.imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
+    curobj.partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
+    for(uint i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
+    {
+        curobj.imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
+    }
+    curobj.readimginfo = tsk_img_open(curobj.partcount, curobj.imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    if(curobj.readimginfo == NULL)
+    {
+        //LogEntry(wombatvarptr->caseobject.id, wombatvarptr->currentevidenceid, currentjobid, 0, "Image was not loaded properly");
+        LogMessage("Image was not loaded properly");
+        errorcount++;
+    }
+    free(curobj.imagepartspath);
+
+    curobj.readfsinfo = tsk_fs_open_img(curobj.readimginfo, 0, TSK_FS_TYPE_DETECT);
+    curobj.readfileinfo = tsk_fs_file_open_meta(curobj.readfsinfo, NULL, curobj.address);
+    // HERE is where we would call md5 info for the respective readfileinfo and thumbnail for the readfileinfo...
+    HashFile(curobj.readfileinfo, objectid);
+
 }
 
 void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)

@@ -888,7 +888,10 @@ private:
     //void LoadVidContents(void);
     void OpenEvidenceStructure(void);
     void ExportFiles(FileExportData* exportdata);
+    void DigFiles(FileDeepData* deepdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
+    void GetDigData(Node* curnode, FileDeepData* deepdata);
+    void ProcessDig(TskObject curobject, unsigned long long objectid, std::string name);
     void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
     void UpdateFilterCount(void);
     void SaveState(void);
@@ -904,6 +907,7 @@ private:
     QFutureWatcher<void> secondwatcher;
     QFuture<void> exportfuture;
     QFutureWatcher<void> exportwatcher;
+    QFutureWatcher<void> digwatcher;
     QFuture<void> remfuture;
     QFutureWatcher<void> remwatcher;
 
@@ -926,6 +930,7 @@ private:
     QFrame* vline1;
     QFrame* vline2;
     QVector<FileExportData> exportfilelist;
+    QVector<FileDeepData> digfilelist;
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
     QShortcut* showitem;

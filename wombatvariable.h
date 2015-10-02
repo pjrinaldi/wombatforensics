@@ -93,6 +93,11 @@ struct FileDeepData
 
     std::vector<DigOptions> digoptions;
     FileStatus filestatus;
+    unsigned long long id;
+    std::string name;
+    std::string fullpath;
+    EvidenceObject evidenceobject;
+    unsigned long long digcount;
 };
 
 struct SelectedObject
