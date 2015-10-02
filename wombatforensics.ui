@@ -568,6 +568,10 @@
    </property>
   </action>
   <action name="actionCheck">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/checkbox</normaloff>:/bar/checkbox</iconset>
+   </property>
    <property name="text">
     <string>(Un)Check</string>
    </property>
