@@ -1178,6 +1178,13 @@ void WombatForensics::ExportEvidence()
     exportdialog->show();
 }
 
+void WombatForensics::FileDig(FileDeepData* deeperdata)
+{
+    if(deeperdata)
+        qDebug() << "launch in a new thread the dig deeper functionality...";
+    qDebug() << "update message and status text";
+}
+
 void WombatForensics::FileExport(FileExportData* exportdata)
 {
     ExportFiles(exportdata);
@@ -1702,9 +1709,10 @@ void WombatForensics::on_actionDigDeeper_triggered()
 {
     totalcount = 0;
     totalchecked = 0;
-    //deepercount = 0;
+    ((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
+    digcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
-    //connect(digdeeperdialog, SIGNAL(FileDeeper(FileDeeperData*)), this, SLOT(FileDeeper(FileDeeperData*)), Qt::DirectConnection);
+    connect(digdeeperdialog, SIGNAL(FileDig(FileDeepData*)), this, SLOT(FileDig(FileDeepData*)), Qt::DirectConnection);
     digdeeperdialog->show();
 }
 

@@ -22,6 +22,7 @@ extern unsigned long long totalcount;
 extern unsigned long long totalchecked;
 extern unsigned long long currentevidenceid;
 extern unsigned long long exportcount;
+extern unsigned long long digcount;
 extern unsigned long long currentfilesystemid;
 extern unsigned long long errorcount;
 extern unsigned long long currentjobid;

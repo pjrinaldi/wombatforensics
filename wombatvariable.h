@@ -76,6 +76,25 @@ struct FileExportData
     unsigned long long exportcount;
 };
 
+struct FileDeepData
+{
+    enum FileStatus
+    {
+        selected = 0,
+        checked = 1,
+        listed = 2
+    };
+    
+    enum DigOptions
+    {
+        md5 = 0,
+        thumb = 1
+    };
+
+    std::vector<DigOptions> digoptions;
+    FileStatus filestatus;
+};
+
 struct SelectedObject
 {
     unsigned long long id;
@@ -183,10 +202,11 @@ typedef struct
     tsk_lock_t readlock;
 } IMG_EWF_INFO;
 
-Q_DECLARE_METATYPE(WombatVariable)
-Q_DECLARE_METATYPE(FileExportData)
-Q_DECLARE_METATYPE(CaseObject)
-Q_DECLARE_METATYPE(EvidenceObject)
+Q_DECLARE_METATYPE(WombatVariable);
+Q_DECLARE_METATYPE(FileExportData);
+Q_DECLARE_METATYPE(FileDeepData);
+Q_DECLARE_METATYPE(CaseObject);
+Q_DECLARE_METATYPE(EvidenceObject);
 Q_DECLARE_METATYPE(SelectedObject);
 //Q_DECLARE_METATYPE(IMG_AFF_INFO);
 Q_DECLARE_METATYPE(IMG_EWF_INFO);

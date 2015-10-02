@@ -21,6 +21,7 @@ unsigned long long totalcount = 0;
 unsigned long long currentevidenceid = 0;
 unsigned long long currentfilesystemid = 0;
 unsigned long long exportcount = 0;
+unsigned long long digcount = 0;
 unsigned long long errorcount = 0;
 unsigned long long currentjobid = 0;
 unsigned long long jumpoffset = 0;

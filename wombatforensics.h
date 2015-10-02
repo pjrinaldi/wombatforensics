@@ -825,6 +825,7 @@ private slots:
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
+    void FileDig(FileDeepData* deeperdata);
     void setScrollBarRange(off_t low, off_t high);
     //void setScrollBarValue(off_t pos);
     void SetOffsetLabel(off_t pos);

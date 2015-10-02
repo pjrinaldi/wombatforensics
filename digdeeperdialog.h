@@ -17,9 +17,11 @@ public:
     ~DigDeeperDialog();
 
 signals:
-    //void FileDeeper(FileDeeperData* deeperdata);
+    void FileDig(FileDeepData* deeperdata);
 
 private slots:
+    void EnableProcess(bool checked);
+    void DigDeeperFiles(void);
     //void SelectDirectory(void);
     //void ExportFiles(void);
 
