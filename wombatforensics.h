@@ -327,7 +327,87 @@ public:
             Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
             return SetCheckState(index, state);
         }
+        /*
+        if(index.column() > 0)
+        {
+            Node* currentnode = NodeFromIndex(index);
+            QSqlQuery updatequery(fcasedb);
+            updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?");
+            updatequery.addBindValue(currentnode->nodevalues.at(0).toULongLong());
+            updatequery.exec();
+            updatequery.next();
+            updatequery.finish();
+            return true;
+            */
+            /*
+             *
+             *        Node* parentnode = NodeFromIndex(parent);
+        QList<QVariant> fetchvalues;
+        fetchvalues.clear();
+        if(parentnode->haschildren == true)
+        {
+            QSqlQuery morequery(fcasedb);
+            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ?");
+            morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
+            morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
+            if(morequery.exec())
+            {
+                beginInsertRows(parent, 0, parentnode->childcount - 1);
+                while(morequery.next())
+                {
+                    fetchvalues.clear();
+                    for(int i=0; i < morequery.record().count(); i++)
+                        fetchvalues.append(morequery.value(i));
+                    Node* curchild = new Node(fetchvalues);
+                    curchild->parent = parentnode;
+                    if(QString(".").compare(curchild->nodevalues.at(1).toString()) == 0 || QString("..").compare(curchild->nodevalues.at(1).toString()) == 0)
+                    {
+                        curchild->childcount = 0;
+                        curchild->haschildren = false;
+                    }
+                    else
+                    {
+                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong());
+                        curchild->haschildren = curchild->HasChildren();
+                    }
+                    if(morequery.value(18).toInt() == 0)
+                        curchild->checkstate = 0;
+                    else if(morequery.value(18).toInt() == 1)
+                        curchild->checkstate = 1;
+                    else
+                        curchild->checkstate = 2;
+                    parentnode->children.append(curchild);
+                }
+                endInsertRows();
+                emit checkedNodesChanged();
+
+             *
+             */ 
         return false;
+    };
+
+    void dataChanged(const QModelIndex &topleftindex, const QModelIndex &botrightindex, const QVector<int> &roles = QVector<int>())
+    {
+        foreach(int role, roles)
+        {
+        if(role == Qt::DisplayRole)
+        {
+            Node* startnode = NodeFromIndex(topleftindex);
+            Node* endnode = NodeFromIndex(botrightindex);
+            QSqlQuery updatequery(fcasedb);
+            updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid == ? OR objectid == ?;");
+            updatequery.addBindValue(startnode->nodevalues.at(0).toULongLong());
+            updatequery.exec();
+            updatequery.next();
+            startnode->nodevalues[10] = updatequery.value(10).toString();
+            updatequery.addBindValue(endnode->nodevalues.at(0).toULongLong());
+            updatequery.exec();
+            updatequery.next();
+            endnode->nodevalues[10] = updatequery.value(10).toString();
+            updatequery.finish();
+            // not sure if updating the nodevalues will update the md5 values or not...
+        }
+        }
     };
 
     /*

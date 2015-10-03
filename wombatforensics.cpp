@@ -1366,6 +1366,7 @@ void WombatForensics::DigFiles(FileDeepData* deepdata)
         digwatcher.setFuture(tmpfuture);
         threadvector.append(tmpfuture);
     }
+    emit ui->dirTreeView->model()->dataChanged(selectedindex, selectedindex);
 }
 
 void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std::string name)
@@ -1479,6 +1480,7 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
     curobj.readfileinfo = tsk_fs_file_open_meta(curobj.readfsinfo, NULL, curobj.address);
     // HERE is where we would call md5 info for the respective readfileinfo and thumbnail for the readfileinfo...
     HashFile(curobj.readfileinfo, objectid);
+    //emit dirTreeView->model()->dataChanged();
 
 }
 
