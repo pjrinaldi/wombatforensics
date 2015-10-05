@@ -34,7 +34,7 @@ extern int filelinefactor;
 extern int thumbsize;
 extern int mftrecordsize;
 extern int threadstarted;
-extern int datatype;
+extern int datatype; // used to determine what column in the datamodel i am updating
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;
