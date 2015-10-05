@@ -1363,7 +1363,7 @@ void WombatForensics::DigFiles(FileDeepData* deepdata)
     statuslabel->setText("Dug: " + QString::number(digcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
     for(int i = 0; i < curlist.count(); i++)
     {
-        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessDig, curlist.at(i), digfilelist.at(i).id, digfilelist.at(i).name);
+        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessDig, curlist.at(i), digfilelist.at(i).id, digfilelist.at(i).digoptions);
         digwatcher.setFuture(tmpfuture);
         threadvector.append(tmpfuture);
     }
@@ -1447,7 +1447,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%"));
 }
 
-void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, std::string name)
+void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, std::vector<FileDeepData::DigOptions> digoptions)
 {
     if(curobj.readimginfo != NULL)
         tsk_img_close(curobj.readimginfo);
@@ -1480,6 +1480,13 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
     curobj.readfsinfo = tsk_fs_open_img(curobj.readimginfo, 0, TSK_FS_TYPE_DETECT);
     curobj.readfileinfo = tsk_fs_file_open_meta(curobj.readfsinfo, NULL, curobj.address);
     // HERE is where we would call md5 info for the respective readfileinfo and thumbnail for the readfileinfo...
+    for(uint i=0; i < digoptions.size(); i++)
+    {
+        if(digoptions.at(i) == 0)
+        {
+            datatype = 0;
+        }
+    }
     QVariant tmpvariant = HashFile(curobj.readfileinfo, objectid);
     qDebug() << "tmpvariant:" << tmpvariant.toString();
     ui->dirTreeView->model()->setData(selectedindex, tmpvariant, Qt::DisplayRole);

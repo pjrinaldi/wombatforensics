@@ -335,7 +335,8 @@ public:
             qDebug() << "index.column() should be 10:" << index.column();
             qDebug() << "model selected data should get updated here..." << value.toString();
             Node* curnode = NodeFromIndex(index);
-            curnode->nodevalues[10] = value.toString();
+            if(datatype == 0)
+                curnode->nodevalues[10] = value.toString();
             emit dataChanged(index, index);
             return true;
         }
@@ -983,7 +984,7 @@ private:
     void DigFiles(FileDeepData* deepdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
     void GetDigData(Node* curnode, FileDeepData* deepdata);
-    void ProcessDig(TskObject curobject, unsigned long long objectid, std::string name);
+    void ProcessDig(TskObject curobject, unsigned long long objectid, std::vector<FileDeepData::DigOptions> digoptions);
     void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
     void UpdateFilterCount(void);
     void SaveState(void);
