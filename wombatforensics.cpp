@@ -1491,7 +1491,10 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
         if(digoptions.at(i) == 0)
         {
             datatype = 0;
-            ui->dirTreeView->model()->setData(selectedindex, HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
+            QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
+            if(indexlist.count() > 0)
+                ui->dirTreeView->model()->setData(indexlist.at(0), HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
+            //ui->dirTreeView->model()->setData(selectedindex, HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
             ResizeColumns();
         }
         if(digoptions.at(i) == 2)
