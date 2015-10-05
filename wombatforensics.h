@@ -327,6 +327,18 @@ public:
             Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
             return SetCheckState(index, state);
         }
+        // THIS BRINGS UP AN ISSUE WHERE I DON'T KNOW WHICH COLUMN SHOULD BE UPDATED BECAUSE IT ALWAYS ASSUMES COLUMN 0 FOR THE ROW...
+        // I WILL HAVE TO THINK OF SOME WAY TO SEND SETDATA INFO ABOUT WHAT SHOULD BE UPDATED....
+        // MAYBE A GLOBAL VARIABLE DATATYPE = MD5, ETC WHICH IS CHECKED HERE AND SET PRIOR TO CALLING SET DATA...
+        if(role == Qt::DisplayRole)
+        {
+            qDebug() << "index.column() should be 10:" << index.column();
+            qDebug() << "model selected data should get updated here..." << value.toString();
+            Node* curnode = NodeFromIndex(index);
+            curnode->nodevalues[10] = value.toString();
+            emit dataChanged(index, index);
+            return true;
+        }
         /*
         if(index.column() > 0)
         {

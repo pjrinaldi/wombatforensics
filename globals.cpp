@@ -32,6 +32,7 @@ int filelinefactor = 0;
 int threadstarted = 0;
 int thumbsize = 64;
 int mftrecordsize = 1024;
+int datatype = 0;
 QString currentevidencename = "t.dd";
 InterfaceSignals* isignals = new InterfaceSignals();
 Node* currentnode = 0;

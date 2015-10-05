@@ -90,6 +90,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     //qRegisterMetaType<QTextBlock>();
     qRegisterMetaType<QTextCursor>();
+    qRegisterMetaType<QVector<int> >();
     connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
@@ -1366,7 +1367,7 @@ void WombatForensics::DigFiles(FileDeepData* deepdata)
         digwatcher.setFuture(tmpfuture);
         threadvector.append(tmpfuture);
     }
-    emit ui->dirTreeView->model()->dataChanged(selectedindex, selectedindex);
+    //emit ui->dirTreeView->model()->dataChanged(ui->dirTreeView->model()->index(0, 0), ui->dirTreeView->model()->index(ui->dirTreeView->model()->rowCount() - 1, ui->dirTreeView->model()->columnCount() - 1));
 }
 
 void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std::string name)
@@ -1479,8 +1480,13 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
     curobj.readfsinfo = tsk_fs_open_img(curobj.readimginfo, 0, TSK_FS_TYPE_DETECT);
     curobj.readfileinfo = tsk_fs_file_open_meta(curobj.readfsinfo, NULL, curobj.address);
     // HERE is where we would call md5 info for the respective readfileinfo and thumbnail for the readfileinfo...
-    HashFile(curobj.readfileinfo, objectid);
-    //emit dirTreeView->model()->dataChanged();
+    QVariant tmpvariant = HashFile(curobj.readfileinfo, objectid);
+    qDebug() << "tmpvariant:" << tmpvariant.toString();
+    ui->dirTreeView->model()->setData(selectedindex, tmpvariant, Qt::DisplayRole);
+    //HashFile(curobj.readfileinfo, objectid);
+    //emit ui->dirTreeView->model()->modelReset();
+    emit ui->dirTreeView->dataChanged(selectedindex, selectedindex);
+    //emit ui->dirTreeView->dataChanged(ui->dirTreeView->model()->index(0, 0), ui->dirTreeView->model()->index(ui->dirTreeView->model()->rowCount() - 1, ui->dirTreeView->model()->columnCount() - 1));
 
 }
 

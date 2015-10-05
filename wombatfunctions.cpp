@@ -932,8 +932,9 @@ void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     //isignals->ProgUpd();
 }
 
-void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
+QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
+    QVariant tmpvariant;
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     if(retval == 0)
@@ -953,9 +954,15 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         QSqlQuery hashquery(fcasedb);
         hashquery.prepare("UPDATE data SET md5 = ? where objectid = ?;");
         if(sint > 0)
+        {
             hashquery.bindValue(0, QString(sbuf));
+            tmpvariant = QVariant(QString(sbuf));
+        }
         else
+        {
             hashquery.bindValue(0, QString(""));
+            tmpvariant = QVariant(QString(""));
+        }
         hashquery.bindValue(1, objid);
         hashquery.exec();
         hashquery.next();
@@ -963,6 +970,7 @@ void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     }
     //processphase++;
     isignals->ProgUpd();
+    return tmpvariant;
 }
 
 void cnid_to_array(uint32_t cnid, uint8_t array[4])

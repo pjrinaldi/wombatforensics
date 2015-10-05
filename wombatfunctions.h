@@ -14,7 +14,8 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 void SecondaryProcessing(void);
 void GenerateThumbnails(void);
-void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
+QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
+//void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 void AlternateDataStreamMagicFile(TSK_FS_FILE* readfileinfo, QVector<unsigned long long> adsobjid);
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid);

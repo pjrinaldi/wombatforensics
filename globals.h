@@ -34,6 +34,7 @@ extern int filelinefactor;
 extern int thumbsize;
 extern int mftrecordsize;
 extern int threadstarted;
+extern int datatype;
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;
