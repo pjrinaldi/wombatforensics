@@ -736,7 +736,9 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
-    QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 4, QModelIndex()), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+//    QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
+    //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 4), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
+    //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     qDebug() << "indexlist count:" << indexlist.count();
 
     //ui->dirTreeView->setModel(treemodel);
@@ -1490,14 +1492,20 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
         if(digoptions.at(i) == 0)
         {
             datatype = 0;
+            ui->dirTreeView->model()->setData(selectedindex, HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
+        }
+        if(digoptions.at(i) == 2)
+        {
+            // do seomthing else here...
         }
     }
-    QVariant tmpvariant = HashFile(curobj.readfileinfo, objectid);
-    qDebug() << "tmpvariant:" << tmpvariant.toString();
-    ui->dirTreeView->model()->setData(selectedindex, tmpvariant, Qt::DisplayRole);
+    //QVariant tmpvariant = HashFile(curobj.readfileinfo, objectid);
+    //qDebug() << "tmpvariant:" << tmpvariant.toString();
     //HashFile(curobj.readfileinfo, objectid);
     //emit ui->dirTreeView->model()->modelReset();
-    emit ui->dirTreeView->dataChanged(selectedindex, selectedindex);
+    //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), MyDataRoles::IndexPtrRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchRecursive));
+    //qDebug() << "indexlist count:" << indexlist.count();
+    //emit ui->dirTreeView->dataChanged(selectedindex, selectedindex);
     //emit ui->dirTreeView->dataChanged(ui->dirTreeView->model()->index(0, 0), ui->dirTreeView->model()->index(ui->dirTreeView->model()->rowCount() - 1, ui->dirTreeView->model()->columnCount() - 1));
 
 }

@@ -70,6 +70,11 @@ public:
         delete rootnode;
     };
 
+    enum MyDataRoles
+    {
+        IndexPtrRole = Qt::UserRole + 1
+    };
+
     QModelIndex index(int row, int col, const QModelIndex &parent) const
     {
         if(!rootnode || row < 0 || col < 0)
@@ -273,6 +278,10 @@ public:
             }
             else
                 return node->nodevalues.at(index.column());
+        }
+        if(role == MyDataRoles::IndexPtrRole)
+        {
+            return node->parent;
         }
         if(role == Qt::DecorationRole)
         {
