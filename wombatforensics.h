@@ -946,6 +946,7 @@ private slots:
     void InitializeQueryModel(void);
     void UpdateDataTable(void);
     void UpdateStatus(void);
+    void UpdateDigging(void);
     void FinishExport(void);
     void FinishRemoval(void);
     void StatusUpdate(QString tmptext)

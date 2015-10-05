@@ -111,6 +111,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+    connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
     connect(ui->actionViewerManager, SIGNAL(triggered()), this, SLOT(on_actionViewerManager_triggered()), Qt::DirectConnection);
@@ -747,6 +748,12 @@ void WombatForensics::UpdateStatus()
     //ResizeColumns();
     //emit ui->dirTreeView->model()->dataChanged(ui->dirTreeView->model()->index(0, 0), ui->dirTreeView->model()->index(ui->dirTreeView->model()->rowCount() - 1, ui->dirTreeView->model()->columnCount() - 1));
     qDebug() << "secondary processing is complete.";
+}
+
+void WombatForensics::UpdateDigging()
+{
+    ResizeColumns();
+    qDebug() << "digging complete";
 }
 
 void WombatForensics::OpenEvidenceStructure()
