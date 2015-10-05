@@ -330,6 +330,7 @@ public:
         // THIS BRINGS UP AN ISSUE WHERE I DON'T KNOW WHICH COLUMN SHOULD BE UPDATED BECAUSE IT ALWAYS ASSUMES COLUMN 0 FOR THE ROW...
         // I WILL HAVE TO THINK OF SOME WAY TO SEND SETDATA INFO ABOUT WHAT SHOULD BE UPDATED....
         // MAYBE A GLOBAL VARIABLE DATATYPE = MD5, ETC WHICH IS CHECKED HERE AND SET PRIOR TO CALLING SET DATA...
+        /*
         if(role == Qt::DisplayRole)
         {
             qDebug() << "index.column() should be 10:" << index.column();
@@ -340,8 +341,9 @@ public:
             emit dataChanged(index, index);
             return true;
         }
-        /*
-        if(index.column() > 0)
+        */
+        // THIS METHOD WORKS, AND I'M NOT REQUIRED TO MESS WITH THE QVARIANT VALUE OR WHICH COLUMN CHANGES...
+        if(role == Qt::DisplayRole)
         {
             Node* currentnode = NodeFromIndex(index);
             QSqlQuery updatequery(fcasedb);
@@ -349,9 +351,14 @@ public:
             updatequery.addBindValue(currentnode->nodevalues.at(0).toULongLong());
             updatequery.exec();
             updatequery.next();
+            for(int i=0; i < updatequery.record().count(); i++)
+            {
+                currentnode->nodevalues[i] = updatequery.value(i);
+            }
             updatequery.finish();
+            emit dataChanged(index, index);
             return true;
-            */
+        }
             /*
              *
              *        Node* parentnode = NodeFromIndex(parent);

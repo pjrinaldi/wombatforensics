@@ -633,10 +633,10 @@ void WombatForensics::InitializeQueryModel()
     ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
     wombatframework->CloseInfoStructures();
-    //statuslabel->setText("Evidence Added. Begin Processing...");
-    //LogMessage("Evidence Added. Begin Processing...");
-    //secondfuture = QtConcurrent::run(SecondaryProcessing);
-    //secondwatcher.setFuture(secondfuture);
+    statuslabel->setText("Evidence Added. Begin Processing...");
+    LogMessage("Evidence Added. Begin Processing...");
+    secondfuture = QtConcurrent::run(SecondaryProcessing);
+    secondwatcher.setFuture(secondfuture);
     //sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
     //sqlwatcher.setFuture(sqlfuture);
 
@@ -708,7 +708,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
-    SecondaryProcessing();
+    //SecondaryProcessing();
     LogMessage("Processing Complete");
     /*
      * THUMBNAIL GENERATION WILL BE OPTIONAL TO SPEED UP PROCESSING. IT WILL BE ACTIVATED IF/WHEN THE USER
@@ -736,7 +736,12 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
-    ui->dirTreeView->setModel(treemodel);
+    QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 4, QModelIndex()), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    qDebug() << "indexlist count:" << indexlist.count();
+
+    //ui->dirTreeView->setModel(treemodel);
+    //ResizeColumns();
+    //emit ui->dirTreeView->model()->dataChanged(ui->dirTreeView->model()->index(0, 0), ui->dirTreeView->model()->index(ui->dirTreeView->model()->rowCount() - 1, ui->dirTreeView->model()->columnCount() - 1));
     qDebug() << "secondary processing is complete.";
 }
 
