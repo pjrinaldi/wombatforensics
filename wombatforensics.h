@@ -279,10 +279,6 @@ public:
             else
                 return node->nodevalues.at(index.column());
         }
-        if(role == MyDataRoles::IndexPtrRole)
-        {
-            return node->parent;
-        }
         if(role == Qt::DecorationRole)
         {
             int nodetype = node->nodevalues.at(4).toInt();

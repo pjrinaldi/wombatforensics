@@ -739,7 +739,6 @@ void WombatForensics::UpdateStatus()
 //    QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 4), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    qDebug() << "indexlist count:" << indexlist.count();
 
     //ui->dirTreeView->setModel(treemodel);
     //ResizeColumns();
@@ -1493,6 +1492,7 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
         {
             datatype = 0;
             ui->dirTreeView->model()->setData(selectedindex, HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
+            ResizeColumns();
         }
         if(digoptions.at(i) == 2)
         {
