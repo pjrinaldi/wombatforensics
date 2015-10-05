@@ -987,6 +987,7 @@ private:
     void CloseCurrentCase(void);
     void UpdateProperties(void);
     void LoadHexContents(void);
+    void SecondaryProcessing(void);
     //void LoadTxtContents(void);
     //void LoadWebContents(void);
     //void LoadImgContents(void);

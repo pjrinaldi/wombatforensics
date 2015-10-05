@@ -635,8 +635,10 @@ void WombatForensics::InitializeQueryModel()
     wombatframework->CloseInfoStructures();
     statuslabel->setText("Evidence Added. Begin Processing...");
     LogMessage("Evidence Added. Begin Processing...");
-    //secondfuture = QtConcurrent::run(SecondaryProcessing);
-    //secondwatcher.setFuture(secondfuture);
+    //ExpandAll();
+    ui->dirTreeView->expandAll();
+    secondfuture = QtConcurrent::run(this, &WombatForensics::SecondaryProcessing);
+    secondwatcher.setFuture(secondfuture);
     //sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
     //sqlwatcher.setFuture(sqlfuture);
 
@@ -708,7 +710,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
-    SecondaryProcessing();
+    //SecondaryProcessing();
     LogMessage("Processing Complete");
     /*
      * THUMBNAIL GENERATION WILL BE OPTIONAL TO SPEED UP PROCESSING. IT WILL BE ACTIVATED IF/WHEN THE USER
@@ -2288,4 +2290,127 @@ void WombatForensics::AutoSaveState()
     SaveState();
     statuslabel->setText("Evidence ready");
     // change display text
+}
+
+
+void WombatForensics::SecondaryProcessing()
+{
+    QSqlQuery filequery(fcasedb);
+    unsigned long long fsoffset = 0;
+    unsigned long long parfsid = 0;
+    // I NEED TO ADD ANOTHER SQL SET TO GET THE BLOCK ADDRESS FOR ADS.
+    // FOR THE BELOW, IT SHOULD GET THE MFTATTRID AND THEN COMPARE WHERE DATA != MFTATTRID, SO IT ONLY GETS THE BLOCKS FOR THE
+    // REGULAR DATA STREAM.
+    // THEN THE SECOND QUERY, WILL GET THE PARADDR, MFTATTRID AND USE THE PARADDR TO GET THE BLOCK INFO AND THEN RUN THE SAME
+    // BLOCK CODE BUT RUN DATA ATTRIBUTE ID == MFTATTRID.
+    filequery.prepare("SELECT objectid, parimgid, parfsid, address, name FROM data WHERE objecttype = 5;");
+    if(filequery.exec())
+    {
+        while(filequery.next())
+        {
+            parfsid = filequery.value(2).toULongLong();
+            const TSK_TCHAR** imagepartspath;
+            unsigned long long objectid = 0;
+            QString objectname = "";
+            TSK_IMG_INFO* readimginfo;
+            TSK_FS_INFO* readfsinfo;
+            TSK_FS_FILE* readfileinfo;
+            // Open Parent Image
+            std::vector<std::string> pathvector;
+            pathvector.clear();
+            QSqlQuery imgquery(fcasedb);
+            imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
+            imgquery.bindValue(0, filequery.value(1).toULongLong());
+            if(imgquery.exec())
+            {
+                while(imgquery.next())
+                {
+                    pathvector.push_back(imgquery.value(0).toString().toStdString());
+                }
+            }
+            imgquery.finish();
+
+            objectid = filequery.value(0).toULongLong();
+            objectname = filequery.value(4).toString();
+            imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+
+            for(uint i=0; i < pathvector.size(); i++)
+            {
+                imagepartspath[i] = pathvector.at(i).c_str();
+            }
+            readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+            free(imagepartspath);
+            //OpenParentFileSystem
+            QSqlQuery fsquery(fcasedb);
+            fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+            fsquery.bindValue(0, filequery.value(2).toULongLong());
+            fsquery.exec();
+            fsquery.next();
+            fsoffset = fsquery.value(0).toULongLong();
+            readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
+            fsquery.finish();
+            QVector<unsigned long long> adsobjid;
+            QVector<unsigned long long> adsattrid;
+            adsobjid.clear();
+            adsattrid.clear();
+            if(readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+                if(QString::compare(objectname, ".") == 0 || QString::compare(objectname, "..") == 0)
+                {
+                }
+                else
+                {
+                // get ads dataset
+                QSqlQuery adsquery(fcasedb);
+                adsquery.prepare("SELECT objectid, mftattrid FROM data WHERE objecttype = 6 and parentid = ?;");
+                adsquery.bindValue(0, filequery.value(3).toULongLong());
+                if(adsquery.exec())
+                {
+                    while(adsquery.next())
+                    {
+                        adsobjid.append(adsquery.value(0).toULongLong());
+                        adsattrid.append(adsquery.value(1).toULongLong());
+                    }
+                }
+                adsquery.finish();
+                }
+            }
+            //OpenFile
+            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
+            QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
+            if(indexlist.count() > 0)
+                ui->dirTreeView->model()->setData(indexlist.at(0), MagicFile(readfileinfo, objectid), Qt::DisplayRole);
+            /*
+            MagicFile(readfileinfo, objectid);
+            BlockFile(readfileinfo, objectid, adsattrid);
+            PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
+            if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+                if(QString::compare(objectname, ".") == 0 || QString::compare(objectname, "..") == 0)
+                {
+                }
+                else
+                {
+                    AlternateDataStreamMagicFile(readfileinfo, adsobjid);
+                    AlternateDataStreamBlockFile(readfileinfo, adsobjid, adsattrid);
+                    AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
+                }
+            }
+            QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
+            if(indexlist.count() > 0)
+                ui->dirTreeView->model()->setData(indexlist.at(0), HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
+            //ui->dirTreeView->model()->setData(selectedindex, HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
+            ResizeColumns();
+
+            */
+            filesprocessed++;
+            isignals->ProgUpd();
+            ResizeColumns();
+
+            tsk_fs_file_close(readfileinfo);
+            tsk_fs_close(readfsinfo);
+            tsk_img_close(readimginfo);
+        }
+    }
+    filequery.finish();
 }

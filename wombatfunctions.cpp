@@ -802,8 +802,9 @@ void AlternateDataStreamBlockFile(TSK_FS_FILE* tmpfile, QVector<unsigned long lo
         }
     }
 }
-void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
+QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
+    QVariant tmpvariant;
     // FILE MIME TYPE
     char magicbuffer[1024];
     const char* mimesig;
@@ -822,11 +823,13 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
     if(readlen > 0)
     {
+        tmpvariant = QVariant(QString::fromStdString(sigp2));
         mimequery.bindValue(0, QString::fromStdString(sigp1));
         mimequery.bindValue(1, QString::fromStdString(sigp2));
     }
     else
     {
+        tmpvariant = QVariant(QString::fromStdString("Zero File"));
         mimequery.bindValue(0, QString("Zero File"));
         mimequery.bindValue(1, QString("Zero File"));
     }
@@ -837,6 +840,7 @@ void MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     processphase++;
     //filesprocessed++;
     isignals->ProgUpd();
+    return tmpvariant;
 }
 
 void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, QVector<unsigned long long> adsobjid)
