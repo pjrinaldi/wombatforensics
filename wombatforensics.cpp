@@ -635,8 +635,8 @@ void WombatForensics::InitializeQueryModel()
     wombatframework->CloseInfoStructures();
     statuslabel->setText("Evidence Added. Begin Processing...");
     LogMessage("Evidence Added. Begin Processing...");
-    secondfuture = QtConcurrent::run(SecondaryProcessing);
-    secondwatcher.setFuture(secondfuture);
+    //secondfuture = QtConcurrent::run(SecondaryProcessing);
+    //secondwatcher.setFuture(secondfuture);
     //sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
     //sqlwatcher.setFuture(sqlfuture);
 
@@ -708,7 +708,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
-    //SecondaryProcessing();
+    SecondaryProcessing();
     LogMessage("Processing Complete");
     /*
      * THUMBNAIL GENERATION WILL BE OPTIONAL TO SPEED UP PROCESSING. IT WILL BE ACTIVATED IF/WHEN THE USER
