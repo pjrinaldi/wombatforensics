@@ -17,7 +17,7 @@ void GenerateThumbnails(void);
 QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 //void HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
-void AlternateDataStreamMagicFile(TSK_FS_FILE* readfileinfo, QVector<unsigned long long> adsobjid);
+QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* readfileinfo, unsigned long long adsobjid);
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsattrid);
 void AlternateDataStreamBlockFile(TSK_FS_FILE* tmpfile, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid);

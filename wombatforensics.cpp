@@ -635,8 +635,8 @@ void WombatForensics::InitializeQueryModel()
     wombatframework->CloseInfoStructures();
     statuslabel->setText("Evidence Added. Begin Processing...");
     LogMessage("Evidence Added. Begin Processing...");
-    //ExpandAll();
     ui->dirTreeView->expandAll();
+    //this->SecondaryProcessing();
     secondfuture = QtConcurrent::run(this, &WombatForensics::SecondaryProcessing);
     secondwatcher.setFuture(secondfuture);
     //sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
@@ -738,6 +738,7 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
+    ResizeColumns();
 //    QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 4), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -1497,7 +1498,7 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
             if(indexlist.count() > 0)
                 ui->dirTreeView->model()->setData(indexlist.at(0), HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
             //ui->dirTreeView->model()->setData(selectedindex, HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
-            ResizeColumns();
+            //ResizeColumns();
         }
         if(digoptions.at(i) == 2)
         {
@@ -2380,8 +2381,6 @@ void WombatForensics::SecondaryProcessing()
             QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
             if(indexlist.count() > 0)
                 ui->dirTreeView->model()->setData(indexlist.at(0), MagicFile(readfileinfo, objectid), Qt::DisplayRole);
-            /*
-            MagicFile(readfileinfo, objectid);
             BlockFile(readfileinfo, objectid, adsattrid);
             PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
             if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -2391,21 +2390,19 @@ void WombatForensics::SecondaryProcessing()
                 }
                 else
                 {
-                    AlternateDataStreamMagicFile(readfileinfo, adsobjid);
+                    for(int i = 0; i < adsobjid.count(); i++)
+                    {
+                        QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(adsobjid.at(i)), 1, Qt::MatchFlags(Qt::MatchRecursive));
+                        if(indexlist.count() > 0)
+                            ui->dirTreeView->model()->setData(indexlist.at(0), AlternateDataStreamMagicFile(readfileinfo, adsobjid.at(i)), Qt::DisplayRole);
+                    }
                     AlternateDataStreamBlockFile(readfileinfo, adsobjid, adsattrid);
                     AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
                 }
             }
-            QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
-            if(indexlist.count() > 0)
-                ui->dirTreeView->model()->setData(indexlist.at(0), HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
-            //ui->dirTreeView->model()->setData(selectedindex, HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
-            ResizeColumns();
-
-            */
             filesprocessed++;
             isignals->ProgUpd();
-            ResizeColumns();
+            //ResizeColumns();
 
             tsk_fs_file_close(readfileinfo);
             tsk_fs_close(readfsinfo);

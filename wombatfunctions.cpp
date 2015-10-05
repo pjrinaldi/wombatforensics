@@ -366,7 +366,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     //qDebug() << "thread added. new thread vector count: " << threadvector.count();
     return TSK_WALK_CONT;
 }
-
+// I SHOULD BE ABLE TO REMOVE THIS FUNCTION SINCE I REIMPLMENETED IN WOMBATFORENSICS CLASS
 void SecondaryProcessing()
 {
     QSqlQuery filequery(fcasedb);
@@ -452,7 +452,7 @@ void SecondaryProcessing()
             //OpenFile
             readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
             //HashFile(readfileinfo, objectid);
-            MagicFile(readfileinfo, objectid);
+            //MagicFile(readfileinfo, objectid);
             BlockFile(readfileinfo, objectid, adsattrid);
             PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
             if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -462,7 +462,7 @@ void SecondaryProcessing()
                 }
                 else
                 {
-                    AlternateDataStreamMagicFile(readfileinfo, adsobjid);
+                    //AlternateDataStreamMagicFile(readfileinfo, adsobjid);
                     AlternateDataStreamBlockFile(readfileinfo, adsobjid, adsattrid);
                     AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
                 }
@@ -843,8 +843,9 @@ QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     return tmpvariant;
 }
 
-void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, QVector<unsigned long long> adsobjid)
+QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long adsobjid)
 {
+    QVariant tmpvariant;
     off_t retval = 0;
     char magicbuffer[1024];
     int chunksize = 1024;
@@ -852,11 +853,12 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, QVector<unsigned long lo
     const char* sigtype;
     char* sigp1;
     char* sigp2;
-    for(int i = 0; i < adsobjid.count(); i++)
+    //for(int i = 0; i < adsobjid.count(); i++)
     {
         QSqlQuery adsquery(fcasedb);
         adsquery.prepare("SELECT name, fullpath, parimgid, parfsid, parentid, address, mftattrid, size, blockaddress FROM data WHERE objectid = ?;");
-        adsquery.bindValue(0, adsobjid.at(i));
+        adsquery.bindValue(0, adsobjid);
+        //adsquery.bindValue(0, adsobjid.at(i));
         adsquery.exec();
         adsquery.next();
         if(adsquery.value(7).toULongLong() < (unsigned)chunksize)
@@ -890,19 +892,23 @@ void AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, QVector<unsigned long lo
         mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
         if(retval > 0)
         {
+            tmpvariant = QVariant(QString::fromStdString(sigp2));
             mimequery.bindValue(0, QString::fromStdString(sigp1));
             mimequery.bindValue(1, QString::fromStdString(sigp2));
         }
         else
         {
+            tmpvariant = QVariant(QString("Zero File"));
             mimequery.bindValue(0, QString("Zero File"));
             mimequery.bindValue(1, QString("Zero File"));
         }
-        mimequery.bindValue(2,  adsobjid.at(i));
+        mimequery.bindValue(2,  adsobjid);
+        //mimequery.bindValue(2,  adsobjid.at(i));
         mimequery.exec();
         mimequery.next();
         mimequery.finish();
         adsquery.finish();
+        return tmpvariant;
     }
 }
 
