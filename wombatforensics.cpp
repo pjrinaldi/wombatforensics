@@ -634,9 +634,12 @@ void WombatForensics::InitializeQueryModel()
     ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
     wombatframework->CloseInfoStructures();
-    statuslabel->setText("Evidence Added. Begin Processing...");
-    LogMessage("Evidence Added. Begin Processing...");
+    statuslabel->setText("Evidence Added. Begin File Structure Analysis...");
+    LogMessage("Evidence Added. Begin File Structure Analysis...");
     ui->dirTreeView->expandAll();
+    ui->dirTreeView->collapseAll();
+    statuslabel->setText("File Structure Analysis Finished. Begin Secondary Processing...");
+    LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
     //this->SecondaryProcessing();
     secondfuture = QtConcurrent::run(this, &WombatForensics::SecondaryProcessing);
     secondwatcher.setFuture(secondfuture);
