@@ -979,7 +979,7 @@ QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         hashquery.finish();
     }
     //processphase++;
-    isignals->ProgUpd();
+    //isignals->ProgUpd();
     return tmpvariant;
 }
 

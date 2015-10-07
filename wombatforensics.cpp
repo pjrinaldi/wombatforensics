@@ -767,6 +767,8 @@ void WombatForensics::UpdateStatus()
 void WombatForensics::UpdateDigging()
 {
     ResizeColumns();
+    LogMessage("Digging Complete");
+    statuslabel->setText("Evidence ready");
     qDebug() << "digging complete";
 }
 
@@ -1529,6 +1531,9 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
             // do seomthing else here...
         }
     }
+    digcount++;
+    int curprogress = (int)((((float)digcount/(float)curlist.count()))*100);
+    StatusUpdate(QString("Dug " + QString::number(digcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%"));
     //QVariant tmpvariant = HashFile(curobj.readfileinfo, objectid);
     //qDebug() << "tmpvariant:" << tmpvariant.toString();
     //HashFile(curobj.readfileinfo, objectid);
