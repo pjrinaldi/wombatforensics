@@ -636,8 +636,8 @@ void WombatForensics::InitializeQueryModel()
     wombatframework->CloseInfoStructures();
     statuslabel->setText("Evidence Added. Begin File Structure Analysis...");
     LogMessage("Evidence Added. Begin File Structure Analysis...");
-    ui->dirTreeView->expandAll();
-    ui->dirTreeView->collapseAll();
+    //ui->dirTreeView->expandAll();
+    //ui->dirTreeView->collapseAll();
     statuslabel->setText("File Structure Analysis Finished. Begin Secondary Processing...");
     LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
     //this->SecondaryProcessing();
@@ -715,7 +715,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
     //SecondaryProcessing();
-    LogMessage("Processing Complete");
+    //LogMessage("Processing Complete");
     /*
      * THUMBNAIL GENERATION WILL BE OPTIONAL TO SPEED UP PROCESSING. IT WILL BE ACTIVATED IF/WHEN THE USER
      * CLICKS ON THE THUMBNAIL GALLERY BUTTON, BY TELLING THE USER THUMBNAILS ARE NOT GENERATED AND NEED TO BE
@@ -729,7 +729,7 @@ void WombatForensics::InitializeEvidenceStructure()
     */
     //secondfuture = QtConcurrent::run(SecondaryProcessing);
     //secondwatcher.setFuture(secondfuture);
-    UpdateDataTable();
+    //UpdateDataTable();
 }
 
 
@@ -743,6 +743,8 @@ void WombatForensics::UpdateDataTable()
 void WombatForensics::UpdateStatus()
 {
     ResizeColumns();
+    LogMessage("Processing Complete.");
+    statuslabel->setText("Evidence ready");
 //    QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 4), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -750,7 +752,6 @@ void WombatForensics::UpdateStatus()
     //ui->dirTreeView->setModel(treemodel);
     //ResizeColumns();
     //emit ui->dirTreeView->model()->dataChanged(ui->dirTreeView->model()->index(0, 0), ui->dirTreeView->model()->index(ui->dirTreeView->model()->rowCount() - 1, ui->dirTreeView->model()->columnCount() - 1));
-    qDebug() << "secondary processing is complete.";
 }
 
 void WombatForensics::UpdateDigging()

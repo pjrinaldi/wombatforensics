@@ -348,21 +348,44 @@ public:
         }
         */
         // THIS METHOD WORKS, AND I'M NOT REQUIRED TO MESS WITH THE QVARIANT VALUE OR WHICH COLUMN CHANGES...
+        qDebug() << "value:" << value.toInt();
         if(role == Qt::DisplayRole)
         {
-            Node* currentnode = NodeFromIndex(index);
-            QSqlQuery updatequery(fcasedb);
-            updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?");
-            updatequery.addBindValue(currentnode->nodevalues.at(0).toULongLong());
-            updatequery.exec();
-            updatequery.next();
-            for(int i=0; i < updatequery.record().count(); i++)
+            if(value.toInt() == -15)
             {
-                currentnode->nodevalues[i] = updatequery.value(i);
+                Node* parentnode = NodeFromIndex(index);
+                qDebug() << "hopefully will update" << parentnode->children.count() << "children here...";
+                QSqlQuery childupdatequery(fcasedb);
+                childupdatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?");
+                for(int i=0; i < parentnode->children.count(); i++)
+                {
+                    childupdatequery.addBindValue(parentnode->children.at(i)->nodevalues.at(0).toULongLong());
+                    childupdatequery.exec();
+                    childupdatequery.next();
+                    for(int j=0; j < childupdatequery.record().count(); i++)
+                    {
+                        parentnode->children.at(i)->nodevalues[j] = childupdatequery.value(j);
+                    }
+                }
+                childupdatequery.finish();
+                emit dataChanged(index.child(0, 0), index.child(parentnode->children.count() - 1, 0));
             }
-            updatequery.finish();
-            emit dataChanged(index, index);
-            return true;
+            else
+            {
+                Node* currentnode = NodeFromIndex(index);
+                QSqlQuery updatequery(fcasedb);
+                updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?");
+                updatequery.addBindValue(currentnode->nodevalues.at(0).toULongLong());
+                updatequery.exec();
+                updatequery.next();
+                for(int i=0; i < updatequery.record().count(); i++)
+                {
+                    currentnode->nodevalues[i] = updatequery.value(i);
+                }
+                updatequery.finish();
+                emit dataChanged(index, index);
+                return true;
+            }
         }
             /*
              *
@@ -926,7 +949,11 @@ private slots:
     void ExpandCollapseResize(const QModelIndex &index)
     {
         if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
+        {
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
+            ui->dirTreeView->model()->setData(index, QVariant(-15), Qt::DisplayRole);
+            ResizeColumns();
+        }
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
