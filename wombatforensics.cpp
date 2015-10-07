@@ -164,6 +164,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->dirTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+    //connect(ui->dirTreeView->model(), SIGNAL(UpdateChildIndexData(const QModelIndex &)), this, SLOT(UpdateChildIndexData(const QModelIndex )));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
@@ -193,11 +194,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkhash.clear();
     autosavetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
-    autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+    //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     //autosavetimer->start(600000); // 10 minutes in milliseconds
     //msgviewer->show();
 }
-
+/*
+void UpdateChildIndexData(const QModelIndex &index)
+{
+    qDebug() << "possibly call set data here...";
+}*/
 void WombatForensics::ShowExternalViewer()
 {
     //OpenParentImage
@@ -533,6 +538,9 @@ void WombatForensics::InitializeCaseStructure()
         }
         ui->actionAdd_Evidence->setEnabled(true);
         LogMessage("Case was created");
+        autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+        //autosavetimer->start(600000); // 10 minutes in milliseconds
+
     }
 }
 
@@ -598,6 +606,8 @@ void WombatForensics::InitializeOpenCase()
         ui->actionAdd_Evidence->setEnabled(true);
         processcountlabel->setText("Processed: 0");
         filecountlabel->setText("Files: 0");
+        autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+        //autosavetimer->start(600000); // 10 minutes in milliseconds
         wombatdatabase->GetEvidenceObjects();
 
         for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
@@ -1059,6 +1069,9 @@ void WombatForensics::OpenFileSystemFile()
 
 void WombatForensics::CloseCurrentCase()
 {
+    //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+    //autosavetimer->start(600000); // 10 minutes in milliseconds
+    autosavetimer->stop();
     setWindowTitle("WombatForensics");
     wombatdatabase->GetEvidenceObjects();
     for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
@@ -1837,6 +1850,9 @@ void WombatForensics::on_actionNew_Case_triggered()
     }
     else
         InitializeCaseStructure();
+    //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+    //autosavetimer->start(600000); // 10 minutes in milliseconds
+
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()
@@ -2392,6 +2408,8 @@ void WombatForensics::SecondaryProcessing()
             QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
             if(indexlist.count() > 0)
                 ui->dirTreeView->model()->setData(indexlist.at(0), MagicFile(readfileinfo, objectid), Qt::DisplayRole);
+            else
+                MagicFile(readfileinfo, objectid);
             BlockFile(readfileinfo, objectid, adsattrid);
             PropertyFile(readfileinfo, objectid, fsoffset, readfsinfo->block_size, parfsid);
             if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -2406,6 +2424,8 @@ void WombatForensics::SecondaryProcessing()
                         QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(adsobjid.at(i)), 1, Qt::MatchFlags(Qt::MatchRecursive));
                         if(indexlist.count() > 0)
                             ui->dirTreeView->model()->setData(indexlist.at(0), AlternateDataStreamMagicFile(readfileinfo, adsobjid.at(i)), Qt::DisplayRole);
+                        else
+                            AlternateDataStreamMagicFile(readfileinfo, adsobjid.at(i));
                     }
                     AlternateDataStreamBlockFile(readfileinfo, adsobjid, adsattrid);
                     AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
