@@ -157,7 +157,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->dirTreeView->hideColumn(13);
     ui->dirTreeView->hideColumn(14);
     ui->dirTreeView->hideColumn(15);
-    ui->dirTreeView->hideColumn(17);
+    //ui->dirTreeView->hideColumn(17);
     ui->dirTreeView->hideColumn(18);
     ui->dirTreeView->hideColumn(19);
     ui->dirTreeView->setSortingEnabled(true); // enables the sorting arrow, but doesn't sort anything.
