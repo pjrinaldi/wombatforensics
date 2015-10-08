@@ -111,6 +111,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+    connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     //connect(ui->actionView_Image_Gallery, SIGNAL(triggered(bool)), this, SLOT(on_actionView_Image_Gallery_triggered(bool)), Qt::DirectConnection);
@@ -1956,13 +1957,42 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     }
     else
     {
-        qDebug() << "dialog prompt user to create thumbnails if not already created.";
-        /*
-        wombatdatabase->GetThumbnails();
-        imagewindow->UpdateGeometries();
-        imagewindow->show();
-        */
+        if(wombatdatabase->ThumbnailCount() == 0)
+        {
+            int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate them now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
+            if(ret == QMessageBox::Yes)
+            {
+                thumbfuture = QtConcurrent::run(this, &WombatForensics::StartThumbnails);
+                thumbwatcher.setFuture(thumbfuture);
+            }
+            else
+                ui->actionView_Image_Gallery->setChecked(false);
+        }
+        else
+        {
+            wombatdatabase->GetThumbnails();
+            imagewindow->UpdateGeometries();
+            imagewindow->show();
+        }
     }
+}
+
+void WombatForensics::StartThumbnails()
+{
+    LogMessage("Generating Thumbnails...");
+    StatusUpdate("Generating Thumbnails...");
+    GenerateThumbnails();
+    StatusUpdate("Thumbnail generation finished.");
+    LogMessage("Thumbnail generation finished.");
+}
+
+void WombatForensics::FinishThumbs()
+{
+    wombatdatabase->GetThumbnails();
+    imagewindow->UpdateGeometries();
+    imagewindow->show();
+    LogMessage("Evidence ready");
+    StatusUpdate("Evidence ready");
 }
 
 void WombatForensics::on_actionViewerManager_triggered()

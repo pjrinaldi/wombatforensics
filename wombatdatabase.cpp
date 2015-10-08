@@ -815,6 +815,18 @@ void WombatDatabase::GetThumbnails()
     thumbquery.finish();
 }
 
+unsigned long long WombatDatabase::ThumbnailCount()
+{
+    unsigned long long thumbcount = 0;
+    QSqlQuery thumbquery(thumbdb);
+    thumbquery.prepare("SELECT COUNT(objectid) FROM thumbs;");
+    thumbquery.exec();
+    thumbquery.next();
+    thumbcount = thumbquery.value(0).toULongLong();
+    thumbquery.finish();
+    return thumbcount;
+}
+
 unsigned long long WombatDatabase::GetResidentOffset(unsigned long long fileaddress)
 {
     QSqlQuery resquery(fcasedb);

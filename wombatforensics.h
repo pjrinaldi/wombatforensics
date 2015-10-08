@@ -985,6 +985,7 @@ private slots:
     void UpdateDigging(void);
     void FinishExport(void);
     void FinishRemoval(void);
+    void FinishThumbs(void);
     void StatusUpdate(QString tmptext)
     {
         statuslabel->setText(tmptext);
@@ -1030,6 +1031,7 @@ private:
     //void LoadImgContents(void);
     //void LoadVidContents(void);
     void OpenEvidenceStructure(void);
+    void StartThumbnails(void);
     void ExportFiles(FileExportData* exportdata);
     void DigFiles(FileDeepData* deepdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
@@ -1048,6 +1050,8 @@ private:
     QFutureWatcher<void> sqlwatcher;
     QFuture<void> secondfuture;
     QFutureWatcher<void> secondwatcher;
+    QFuture<void> thumbfuture;
+    QFutureWatcher<void> thumbwatcher;
     QFuture<void> exportfuture;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;
