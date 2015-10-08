@@ -903,8 +903,13 @@ void WombatForensics::LoadHexContents()
         }
         else
         {
-            tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
-            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
+            if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+                tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
+                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
+            }
+            else
+                tskobjptr->offset = tskobjptr->fsoffset;
         }
         //qDebug() << "file object byteoffset:" << tskobjptr->offset;
         tskobjptr->objecttype = 5;
@@ -2412,7 +2417,8 @@ void WombatForensics::SecondaryProcessing()
     // REGULAR DATA STREAM.
     // THEN THE SECOND QUERY, WILL GET THE PARADDR, MFTATTRID AND USE THE PARADDR TO GET THE BLOCK INFO AND THEN RUN THE SAME
     // BLOCK CODE BUT RUN DATA ATTRIBUTE ID == MFTATTRID.
-    filequery.prepare("SELECT objectid, parimgid, parfsid, address, name FROM data WHERE objecttype = 5;");
+    filequery.prepare("SELECT objectid, parimgid, parfsid, address, name FROM data WHERE objecttype = 5 AND parimgid = ?;");
+    filequery.addBindValue(wombatvarptr->currentevidenceid);
     if(filequery.exec())
     {
         while(filequery.next())

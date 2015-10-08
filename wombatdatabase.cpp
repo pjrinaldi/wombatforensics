@@ -647,6 +647,33 @@ void WombatDatabase::ReturnFileSystemObjectList(unsigned long long curevidenceid
 
 void WombatDatabase::GetObjectValues()
 {
+    /*
+    QSqlQuery objectquery(fcasedb);
+    objectquery.prepare("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type, flags, blocksize, parfsid, fullpath, blockaddress, filesignature, filemime, parentid, mftattrid FROM data WHERE objectid = ?;");
+    objectquery.addBindValue(wombatptr->selectedobject.id);
+    objectquery.exec();
+    objectquery.next();
+    wombatptr->selectedobject.objtype = objectquery.value(0).toInt();
+    wombatptr->selectedobject.size = objectquery.value(1).toULongLong();
+    wombatptr->selectedobject.parimgid = objectquery.value(2).toULongLong();
+    wombatptr->selectedobject.sectstart = objectquery.value(3).toULongLong();
+    wombatptr->selectedobject.sectlength = objectquery.value(4).toULongLong();
+    wombatptr->selectedobject.sectsize = objectquery.value(5).toInt();
+    wombatptr->selectedobject.blockcount = objectquery.value(6).toULongLong();
+    wombatptr->selectedobject.byteoffset = objectquery.value(7).toULongLong();
+    wombatptr->selectedobject.address = objectquery.value(8).toULongLong();
+    wombatptr->selectedobject.type = objectquery.value(9).toInt();
+    wombatptr->selectedobject.flags = objectquery.value(10).toInt();
+    wombatptr->selectedobject.blocksize = objectquery.value(11).toInt();
+    wombatptr->selectedobject.parfsid = objectquery.value(12).toULongLong();
+    wombatptr->selectedobject.fullpath = objectquery.value(13).toString();
+    wombatptr->selectedobject.blockaddress = objectquery.value(14).toString();
+    wombatptr->selectedobject.filesignature = objectquery.value(15).toString();
+    wombatptr->selectedobject.filemime = objectquery.value(16).toString();
+    wombatptr->selectedobject.parentid = objectquery.value(17).toULongLong();
+    wombatptr->selectedobject.mftattrid = objectquery.value(18).toULongLong();
+    objectquery.finish();
+    */
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();

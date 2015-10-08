@@ -620,24 +620,28 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
             tmpoffset = objquery.value(0).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong()*blksize + fsoffset;
         else
         {
-            QSqlQuery resquery(fcasedb);
-            QStringList inputs;
-            QList<unsigned long long> outputs;
-            inputs << "%0x0B%" << "%0x0D%" << "%0x30%" << "%0x40%";
-            for(int i=0; i < inputs.count(); i++)
+            if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
             {
-                resquery.prepare("SELECT value from properties where objectid = ? and description like(?);");
-                resquery.addBindValue(parfsid);
-                resquery.addBindValue(inputs.at(i));
-                resquery.exec();
-                resquery.next();
-                outputs.append(resquery.value(0).toULongLong());
+                QSqlQuery resquery(fcasedb);
+                QStringList inputs;
+                QList<unsigned long long> outputs;
+                inputs << "%0x0B%" << "%0x0D%" << "%0x30%" << "%0x40%";
+                for(int i=0; i < inputs.count(); i++)
+                {
+                    resquery.prepare("SELECT value from properties where objectid = ? and description like(?);");
+                    resquery.addBindValue(parfsid);
+                    resquery.addBindValue(inputs.at(i));
+                    resquery.exec();
+                    resquery.next();
+                    outputs.append(resquery.value(0).toULongLong());
+                }
+                resquery.finish();
+                mftrecordsize = outputs.at(3);
+                resoffset = ((outputs.at(0) * outputs.at(1) * outputs.at(2)) + (outputs.at(3)*fileaddress));
+                tmpoffset = resoffset + fsoffset;
             }
-            resquery.finish();
-            mftrecordsize = outputs.at(3);
-            resoffset = ((outputs.at(0) * outputs.at(1) * outputs.at(2)) + (outputs.at(3)*fileaddress));
-
-            tmpoffset = resoffset + fsoffset;
+            else
+                tmpoffset = fsoffset;
         }
         proplist << QString::number(tmpoffset) << "Byte offset for the start of the file in a block or in the MFT";
         proplist << "File Signature" << objquery.value(1).toString() << objquery.value(2).toString();
