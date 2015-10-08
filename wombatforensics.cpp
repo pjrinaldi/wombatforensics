@@ -88,6 +88,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.minmodify = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
+    curimgcount = 0;
     //qRegisterMetaType<QTextBlock>();
     qRegisterMetaType<QTextCursor>();
     qRegisterMetaType<QVector<int> >();
@@ -640,10 +641,12 @@ void WombatForensics::InitializeQueryModel()
     treemodel->AddEvidence(wombatvarptr->currentevidenceid);
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     ResizeColumns();
+    /*
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
+    */
     wombatframework->CloseInfoStructures();
     statuslabel->setText("Evidence Added. Begin File Structure Analysis...");
     LogMessage("Evidence Added. Begin File Structure Analysis...");
@@ -753,9 +756,14 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
+    ui->actionRemove_Evidence->setEnabled(true);
+    ui->actionSaveState->setEnabled(true);
+    ui->actionDigDeeper->setEnabled(true);
+    hexrocker->setEnabled(true);
     ResizeColumns();
     LogMessage("Processing Complete.");
     statuslabel->setText("Evidence ready");
+    //curimgcount = wombatdatabase->ImageFileCount();
 //    QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 4), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -770,7 +778,6 @@ void WombatForensics::UpdateDigging()
     ResizeColumns();
     LogMessage("Digging Complete");
     statuslabel->setText("Evidence ready");
-    qDebug() << "digging complete";
 }
 
 void WombatForensics::OpenEvidenceStructure()
@@ -785,6 +792,7 @@ void WombatForensics::OpenEvidenceStructure()
     statuslabel->setText("Opening Case Evidence Completed");
     LogMessage("Case evidence successfully opened");
     statuslabel->setText("Evidence ready");
+    curimgcount = wombatdatabase->ImageFileCount();
 }
 
 void WombatForensics::AddEvidence()
@@ -1365,6 +1373,15 @@ void WombatForensics::DigFiles(FileDeepData* deepdata)
     curlist.clear();
     errorcount = 0;
     LogMessage("Digging Deeper into Evidence");
+    /*
+    for(uint i=0; i < deepdata->digoptions.size(); i++)
+    {
+        if(deepdata->digoptions.at(i) == 1)
+        {
+            QtConcurrent::run(this, &WombatForensics::StartThumbnails);
+        }
+    }
+    */
     if(deepdata->filestatus == FileDeepData::selected)
     {
         deepdata->digcount = 1;
@@ -1526,6 +1543,15 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
                 ui->dirTreeView->model()->setData(indexlist.at(0), HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
             //ui->dirTreeView->model()->setData(selectedindex, HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
             //ResizeColumns();
+        }
+        if(digoptions.at(i) == 1) // generate thumbnails
+        {
+            QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
+            if(indexlist.count() > 0)
+            {
+                ThumbFile(curobj.readfileinfo, objectid);
+                ui->dirTreeView->model()->setData(indexlist.at(0), QVariant(0), Qt::DisplayRole);
+            }
         }
         if(digoptions.at(i) == 2)
         {
@@ -1957,9 +1983,10 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     }
     else
     {
+        //qDebug() << "thmb cnt:" << wombatdatabase->ThumbnailCount() << "img cnt:" << curimgcount;
         if(wombatdatabase->ThumbnailCount() == 0)
         {
-            int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate them now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
+            int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
                 thumbfuture = QtConcurrent::run(this, &WombatForensics::StartThumbnails);
@@ -1974,6 +2001,22 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             imagewindow->UpdateGeometries();
             imagewindow->show();
         }
+        /*
+        else if(wombatdatabase->ThumbnailCount() < curimgcount)
+        {
+            int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Some Thumbnails have not been generated. Do you want to generate them now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
+            if(ret == QMessageBox::Yes)
+            {
+                thumbfuture = QtConcurrent::run(this, &WombatForensics::StartThumbnails);
+                thumbwatcher.setFuture(thumbfuture);
+            }
+            else
+            {
+                wombatdatabase->GetThumbnails();
+                imagewindow->UpdateGeometries();
+                imagewindow->show();
+            }
+        }*/
     }
 }
 

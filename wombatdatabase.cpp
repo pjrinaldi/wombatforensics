@@ -827,6 +827,20 @@ unsigned long long WombatDatabase::ThumbnailCount()
     return thumbcount;
 }
 
+unsigned long long WombatDatabase::ImageFileCount()
+{
+    unsigned long long imgfilecount = 0;
+    QSqlQuery imgquery(fcasedb);
+    imgquery.prepare("SELECT count(objectid) FROM data WHERE objecttype = 5 AND filemime LIKE '%image/%';");
+    imgquery.exec();
+    imgquery.next();
+    imgfilecount = imgquery.value(0).toULongLong();
+    imgquery.finish();
+    return imgfilecount;
+}
+
+// filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE (objecttype = 5 OR objecttype == 6) AND filemime LIKE '%image/%';");
+
 unsigned long long WombatDatabase::GetResidentOffset(unsigned long long fileaddress)
 {
     QSqlQuery resquery(fcasedb);

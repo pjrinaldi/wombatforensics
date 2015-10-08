@@ -38,6 +38,7 @@ public:
     ~WombatDatabase();
 
     unsigned long long ThumbnailCount(void);
+    unsigned long long ImageFileCount(void);
     unsigned long long ReturnCaseCount(void);
     void InsertCase();
     void ReturnCaseNameList(void);

@@ -1082,6 +1082,7 @@ private:
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
+    unsigned long long curimgcount;
 };
 
 Q_DECLARE_METATYPE(QTextCursor)

@@ -486,56 +486,60 @@ void GenerateThumbnails()
     {
         while(filequery.next())
         {
+            // get thumb objectid's from here...compare to objectid and then do the following if doesn't exist...
             const TSK_TCHAR** imagepartspath;
             unsigned long long objectid = 0;
-            TSK_IMG_INFO* readimginfo;
-            TSK_FS_INFO* readfsinfo;
-            TSK_FS_FILE* readfileinfo;
-            // Open Parent Image
-            std::vector<std::string> pathvector;
-            pathvector.clear();
-            QSqlQuery imgquery(fcasedb);
-            imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
-            imgquery.bindValue(0, filequery.value(1).toULongLong());
-            if(imgquery.exec())
-            {
-                while(imgquery.next())
-                {
-                    pathvector.push_back(imgquery.value(0).toString().toStdString());
-                }
-            }
-            imgquery.finish();
-
             objectid = filequery.value(0).toULongLong();
-            imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-
-            for(uint i=0; i < pathvector.size(); i++)
+            QSqlQuery thumbquery(thumbdb);
+            thumbquery.prepare("SELECT COUNT(thumbid) FROM thumbs WHERE objectid = ?;");
+            thumbquery.addBindValue(objectid);
+            thumbquery.exec();
+            thumbquery.next();
+            if(thumbquery.value(0).toInt() == 0)
             {
-                imagepartspath[i] = pathvector.at(i).c_str();
+                TSK_IMG_INFO* readimginfo;
+                TSK_FS_INFO* readfsinfo;
+                TSK_FS_FILE* readfileinfo;
+                // Open Parent Image
+                std::vector<std::string> pathvector;
+                pathvector.clear();
+                QSqlQuery imgquery(fcasedb);
+                imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
+                imgquery.bindValue(0, filequery.value(1).toULongLong());
+                if(imgquery.exec())
+                {
+                    while(imgquery.next())
+                    {
+                        pathvector.push_back(imgquery.value(0).toString().toStdString());
+                    }
+                }
+                imgquery.finish();
+                imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+                for(uint i=0; i < pathvector.size(); i++)
+                {
+                    imagepartspath[i] = pathvector.at(i).c_str();
+                }
+                readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+                free(imagepartspath);
+                //OpenParentFileSystem
+                QSqlQuery fsquery(fcasedb);
+                fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+                fsquery.bindValue(0, filequery.value(2).toULongLong());
+                fsquery.exec();
+                fsquery.next();
+                readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
+                fsquery.finish();
+                //OpenFile
+                readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
+                ThumbFile(readfileinfo, objectid);    
+                tsk_fs_file_close(readfileinfo);
+                tsk_fs_close(readfsinfo);
+                tsk_img_close(readimginfo);
             }
-            readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-            free(imagepartspath);
-            //OpenParentFileSystem
-            QSqlQuery fsquery(fcasedb);
-            fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
-            fsquery.bindValue(0, filequery.value(2).toULongLong());
-            fsquery.exec();
-            fsquery.next();
-            readfsinfo = tsk_fs_open_img(readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
-            fsquery.finish();
-            //OpenFile
-            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, filequery.value(3).toULongLong());
-
-            ThumbFile(readfileinfo, objectid);
-
-            tsk_fs_file_close(readfileinfo);
-            tsk_fs_close(readfsinfo);
-            tsk_img_close(readimginfo);
-
+            thumbquery.finish();
         }
     }
     filequery.finish();
-
 }
 
 void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long long fsoffset, int blksize, unsigned long long parfsid)
@@ -914,28 +918,36 @@ QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long a
 
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
-    if(tmpfile->meta != NULL)
+    QSqlQuery thumbquery(thumbdb);
+    thumbquery.prepare("SELECT COUNT(thumbid) FROM thumbs WHERE objectid = ?;");
+    thumbquery.addBindValue(objid);
+    thumbquery.exec();
+    thumbquery.next();
+    if(thumbquery.value(0).toInt() == 0)
     {
-        QByteArray thumbdata;
-        QImage thumbimage;
-        QBuffer thumbuf(&thumbdata);
-        QImage origimage;
-        char imagebuffer[tmpfile->meta->size];
-        ssize_t imglen = tsk_fs_file_read(tmpfile, 0, imagebuffer, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-        bool imageloaded = origimage.loadFromData(QByteArray::fromRawData(imagebuffer, imglen));
-        if(imageloaded)
+        if(tmpfile->meta != NULL)
         {
-            thumbimage = origimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
-            thumbuf.open(QIODevice::WriteOnly);
-            thumbimage.save(&thumbuf, "PNG");
-            thumbdata = thumbdata.toBase64();
-            QSqlQuery imgquery(thumbdb);
-            imgquery.prepare("INSERT INTO thumbs(objectid, thumbblob) VALUES(?, ?);");
-            imgquery.bindValue(0, objid);
-            imgquery.bindValue(1, QString(thumbdata));
-            imgquery.exec();
-            imgquery.next();
-            imgquery.finish();
+            QByteArray thumbdata;
+            QImage thumbimage;
+            QBuffer thumbuf(&thumbdata);
+            QImage origimage;
+            char imagebuffer[tmpfile->meta->size];
+            ssize_t imglen = tsk_fs_file_read(tmpfile, 0, imagebuffer, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+            bool imageloaded = origimage.loadFromData(QByteArray::fromRawData(imagebuffer, imglen));
+            if(imageloaded)
+            {
+                thumbimage = origimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
+                thumbuf.open(QIODevice::WriteOnly);
+                thumbimage.save(&thumbuf, "PNG");
+                thumbdata = thumbdata.toBase64();
+                QSqlQuery imgquery(thumbdb);
+                imgquery.prepare("INSERT INTO thumbs(objectid, thumbblob) VALUES(?, ?);");
+                imgquery.bindValue(0, objid);
+                imgquery.bindValue(1, QString(thumbdata));
+                imgquery.exec();
+                imgquery.next();
+                imgquery.finish();
+            }
         }
     }
     //processphase++;
