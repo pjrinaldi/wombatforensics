@@ -51,7 +51,7 @@
    <item row="0" column="0">
     <widget class="QCheckBox" name="categorycheckBox">
      <property name="text">
-      <string>Show Items where category matches</string>
+      <string>Show Items where group matches</string>
      </property>
     </widget>
    </item>

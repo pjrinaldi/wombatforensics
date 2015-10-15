@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'filetypefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.0
+** Created by: Qt User Interface Compiler version 5.5.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -70,13 +70,15 @@ public:
 
         pushButton = new QPushButton(FileTypeFilter);
         pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setDefault(true);
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 2, 1, 1, 1);
 
 
         retranslateUi(FileTypeFilter);
+
+        pushButton->setDefault(true);
+
 
         QMetaObject::connectSlotsByName(FileTypeFilter);
     } // setupUi
@@ -85,7 +87,7 @@ public:
     {
         FileTypeFilter->setWindowTitle(QApplication::translate("FileTypeFilter", "Filter", 0));
         categorycomboBox->setCurrentText(QString());
-        categorycheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where category matches", 0));
+        categorycheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where group matches", 0));
         typecheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where type matches", 0));
         pushButton->setText(QApplication::translate("FileTypeFilter", "Apply", 0));
     } // retranslateUi

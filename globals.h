@@ -100,6 +100,8 @@ struct FilterValues
     bool filetypebool;
     QString filecategory;
     QString filetype;
+    QString filegroup;
+    bool filegroupbool;
     bool hashbool;
     QStringList hashlist;
     QVector<unsigned long long> hashcount;

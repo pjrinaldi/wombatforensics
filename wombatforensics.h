@@ -251,6 +251,11 @@ public:
                     if(node->nodevalues.at(16).toString().contains(filtervalues.filecategory) == false || node->nodevalues.at(16).toString().contains(filtervalues.filetype) == false)
                         return QColor(Qt::lightGray);
                 }
+                if(filtervalues.filegroupbool)
+                {
+                    if(node->nodevalues.at(17).toString().contains(filtervalues.filegroup) == false)
+                            return QColor(Qt::lightGray);
+                }
                 if(filtervalues.hashbool)
                 {
                     for(int i=0; i < filtervalues.hashidlist.count(); i++)
@@ -504,6 +509,8 @@ public:
             if(section == 16 && (filtervalues.filecategorybool || filtervalues.filetypebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 10 && filtervalues.hashbool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 17 && filtervalues.filegroupbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -900,6 +907,7 @@ public:
     ModifiedDateFilter* modifyfilterview;
     ChangedDateFilter* changefilterview;
     FileTypeFilter* filetypefilterview;
+    FileCategoryFilter* filecategoryfilterview;
     HashFilter* hashfilterview;
     ImageViewer* imagewindow;
     VideoViewer* videowindow;

@@ -387,6 +387,51 @@ void FileTypeFilter::HideClicked()
     emit HeaderChanged();
 }
 
+FileCategoryFilter::FileCategoryFilter(QWidget* parent) : QWidget(parent), ui(new Ui::FileCategoryFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+FileCategoryFilter::~FileCategoryFilter()
+{
+}
+
+void FileCategoryFilter::DisplayFilter()
+{
+    QStringList tmpcategory;
+    tmpcategory.clear();
+    ui->categorycomboBox->clear();
+    QSqlQuery typequery(fcasedb);
+    typequery.prepare("SELECT DISTINCT filesignature FROM data WHERE objecttype = 5 OR objecttype = 6;");
+    typequery.exec();
+    while(typequery.next())
+    {
+        tmpcategory.append(typequery.value(0).toString());
+    }
+    typequery.finish();
+    tmpcategory.removeDuplicates();
+    for(int i=0; i < tmpcategory.count(); i++)
+        ui->categorycomboBox->addItem(tmpcategory.at(i));
+    if(filtervalues.filegroup.compare("") != 0)
+        ui->categorycomboBox->setCurrentText(filtervalues.filegroup);
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
+    if(this->pos().x() == 0)
+        this->move(newpos);
+    this->show();
+}
+
+void FileCategoryFilter::HideClicked()
+{
+    filtervalues.filegroupbool = ui->categorycheckBox->isChecked();
+    if(filtervalues.filegroupbool)
+        filtervalues.filegroup = ui->categorycomboBox->currentText();
+    this->hide();
+    emit HeaderChanged();
+}
+
 HashFilter::HashFilter(QWidget* parent) : QWidget(parent), ui(new Ui::HashFilter)
 {
     ui->setupUi(this);

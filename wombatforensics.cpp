@@ -60,6 +60,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     modifyfilterview = new ModifiedDateFilter(this);
     changefilterview = new ChangedDateFilter(this);
     filetypefilterview = new FileTypeFilter(this);
+    filecategoryfilterview = new FileCategoryFilter(this);
     hashfilterview = new HashFilter(this);
     imagewindow = new ImageViewer();
     videowindow = new VideoViewer();
@@ -183,6 +184,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(modifyfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(changefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(filetypefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(filecategoryfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(hashfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     jumpforward = new QShortcut(ui->dirTreeView);
     jumpbackward = new QShortcut(ui->dirTreeView);
@@ -2300,6 +2302,8 @@ void WombatForensics::SetFilter(int headercolumn)
         changefilterview->DisplayFilter();
     if(headercolumn == 16)
         filetypefilterview->DisplayFilter();
+    if(headercolumn == 17)
+        filecategoryfilterview->DisplayFilter();
     if(headercolumn == 10)
         hashfilterview->DisplayFilter();
     ResizeColumns();
