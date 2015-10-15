@@ -1,7 +1,7 @@
-QT += widgets gui core concurrent webkitwidgets sql av avwidgets
-QT -= opengl quick network qml
+QT += widgets core concurrent webkitwidgets sql av avwidgets
+QT -= opengl gui quick network qml
 mac:CONFIG += debug app_bundle
-linux:CONFIG += debug #c++11
+linux:CONFIG += debug qt #c++11
 #linux:CONFIG += debug qwt #c++11
 mac:TEMPLATE = app
 INCLUDEPATH += ../sleuthkit/
