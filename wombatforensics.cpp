@@ -3,7 +3,7 @@
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
     ui->setupUi(this);
-    threadpool = QThreadPool::globalInstance();
+    //threadpool = QThreadPool::globalInstance();
     wombatvarptr = &wombatvariable;
     this->menuBar()->hide();
     this->statusBar()->setSizeGripEnabled(true);
@@ -18,7 +18,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     processcountlabel = new QLabel(this);
     processcountlabel->setText("Processed: 0");
     statuslabel = new QLabel(this);
-    statuslabel->setText("");
+    StatusUpdate("");
     vline1 = new QFrame(this);
     vline1->setFrameStyle(QFrame::VLine | QFrame::Raised);
     vline1->setLineWidth(1);
@@ -89,9 +89,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.minmodify = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
-    curimgcount = 0;
+    //curimgcount = 0;
     //qRegisterMetaType<QTextBlock>();
-    qRegisterMetaType<QTextCursor>();
+    //qRegisterMetaType<QTextCursor>();
     qRegisterMetaType<QVector<int> >();
     connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
@@ -621,7 +621,7 @@ void WombatForensics::InitializeOpenCase()
             wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->evidenceobjectvector.at(i).id);
             wombatvarptr->currentevidenceid = wombatvarptr->evidenceobjectvector.at(i).id;
             wombatvarptr->evidenceobject = wombatvarptr->evidenceobjectvector.at(i);
-            statuslabel->setText("Opening Case Evidence...");
+            StatusUpdate("Opening Case Evidence...");
             OpenEvidenceStructure();
             if(ui->dirTreeView->model() != NULL)
             {
@@ -638,7 +638,7 @@ void WombatForensics::InitializeOpenCase()
 void WombatForensics::InitializeQueryModel()
 {
     //isignals->ProgUpd();
-    statuslabel->setText("Building Evidence Tree...");
+    StatusUpdate("Building Evidence Tree...");
     LogMessage("Building Evidence Tree...");
     treemodel->AddEvidence(wombatvarptr->currentevidenceid);
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
@@ -650,11 +650,11 @@ void WombatForensics::InitializeQueryModel()
     hexrocker->setEnabled(true);
     */
     wombatframework->CloseInfoStructures();
-    statuslabel->setText("Evidence Added. Begin File Structure Analysis...");
+    StatusUpdate("Evidence Added. Begin File Structure Analysis...");
     LogMessage("Evidence Added. Begin File Structure Analysis...");
     //ui->dirTreeView->expandAll();
     //ui->dirTreeView->collapseAll();
-    statuslabel->setText("File Structure Analysis Finished. Begin Secondary Processing...");
+    StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
     LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
     //this->SecondaryProcessing();
     secondfuture = QtConcurrent::run(this, &WombatForensics::SecondaryProcessing);
@@ -662,7 +662,7 @@ void WombatForensics::InitializeQueryModel()
     //sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
     //sqlwatcher.setFuture(sqlfuture);
 
-    statuslabel->setText("Evidence ready");
+    StatusUpdate("Evidence ready");
     LogMessage("Evidence Ready");
 }
 
@@ -721,7 +721,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     errorcount = 0;
-    statuslabel->setText("Processing...");
+    StatusUpdate("Processing...");
     LogMessage(tr("Started Adding Evidence"));
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
@@ -738,9 +738,9 @@ void WombatForensics::InitializeEvidenceStructure()
      * PRIOR TO REVIEWING, DO THEY WANT TO GENERATE THEM NOW? YES/NO... YES->OPENS DIG DEEPER WITH THUMBNAIL GENERATION CHECKED
      * NO->CLOSES DIALOG WITHOUT DOING ANYTHING.
     LogMessage("Generating Thumbnails...");
-    statuslabel->setText("Generating Thumbnails...");
+    StatusUpdate("Generating Thumbnails...");
     GenerateThumbnails();
-    statuslabel->setText("Processing Complete");
+    StatusUpdate("Processing Complete");
     LogMessage("Finished Generating Thumbnails...");
     */
     //secondfuture = QtConcurrent::run(SecondaryProcessing);
@@ -751,9 +751,9 @@ void WombatForensics::InitializeEvidenceStructure()
 
 void WombatForensics::UpdateDataTable()
 {
-    statuslabel->setText("Processing Complete");
+    StatusUpdate("Processing Complete");
     LogMessage("Evidence has been successfully added");
-    statuslabel->setText("Evidence ready");
+    StatusUpdate("Evidence ready");
     //qDebu() << "processing complete. should be 100%" << processphase;
 }
 void WombatForensics::UpdateStatus()
@@ -764,7 +764,7 @@ void WombatForensics::UpdateStatus()
     hexrocker->setEnabled(true);
     ResizeColumns();
     LogMessage("Processing Complete.");
-    statuslabel->setText("Evidence ready");
+    StatusUpdate("Evidence ready");
     //curimgcount = wombatdatabase->ImageFileCount();
 //    QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 4), Qt::DisplayRole, QVariant(5), -1, Qt::MatchFlags(Qt::MatchRecursive));
@@ -779,7 +779,7 @@ void WombatForensics::UpdateDigging()
 {
     ResizeColumns();
     LogMessage("Digging Complete");
-    statuslabel->setText("Evidence ready");
+    StatusUpdate("Evidence ready");
 }
 
 void WombatForensics::OpenEvidenceStructure()
@@ -791,17 +791,17 @@ void WombatForensics::OpenEvidenceStructure()
     filecountlabel->setText("Files: " + QString::number(filesfound));
     treemodel->AddEvidence(wombatvarptr->currentevidenceid);
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
-    statuslabel->setText("Opening Case Evidence Completed");
+    StatusUpdate("Opening Case Evidence Completed");
     LogMessage("Case evidence successfully opened");
-    statuslabel->setText("Evidence ready");
-    curimgcount = wombatdatabase->ImageFileCount();
+    StatusUpdate("Evidence ready");
+    //curimgcount = wombatdatabase->ImageFileCount();
 }
 
 void WombatForensics::AddEvidence()
 {
     int isnew = 1;
-    threadstarted = 1;
-    threadvector.clear();
+    //threadstarted = 1;
+    //threadvector.clear();
     wombatdatabase->GetEvidenceObjects();
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
@@ -825,7 +825,7 @@ void WombatForensics::AddEvidence()
             wombatvarptr->evidenceobject.itemcount = tmplist.count();
             processcountlabel->setText("Processed: 0");
             filecountlabel->setText("Files: 0");
-            //statuslabel->setText("Processed 0%");
+            //StatusUpdate("Processed 0%");
             // THIS SHOULD HANDLE WHEN THE THREADS ARE ALL DONE.
 
             sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
@@ -1101,13 +1101,13 @@ void WombatForensics::CloseCurrentCase()
     filtercountlabel->setText("Filtered: 0");
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    statuslabel->setText("Current Case was Closed Successfully"); 
+    StatusUpdate("Current Case was Closed Successfully"); 
     wombatdatabase->CloseCaseDB();
 }
 
 void WombatForensics::RemEvidence()
 {
-    threadvector.clear();
+    //threadvector.clear();
     wombatvarptr->evidencenamelist.clear();
     wombatdatabase->ReturnEvidenceNameList();
     bool ok;
@@ -1124,7 +1124,7 @@ void WombatForensics::RemEvidence()
             treemodel->RemEvidence(wombatvarptr->evidremoveid);
             remfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::RemoveEvidence);
             remwatcher.setFuture(remfuture);
-            threadvector.append(remfuture);
+            //threadvector.append(remfuture);
  
         }
     }
@@ -1301,7 +1301,7 @@ void WombatForensics::FinishRemoval()
         filecountlabel->setText("Files: " + QString::number(filesfound));
         filtercountlabel->setText("Filtered: " + QString::number(filesfound));
         LogMessage(QString("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed"));
-        statuslabel->setText("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
+        StatusUpdate("Evidence Removal of " + QString::number(wombatvarptr->evidrowsremoved) + " completed.");
     }
     else
     {
@@ -1314,7 +1314,7 @@ void WombatForensics::FinishExport()
     if(ProcessingComplete())
     {
         LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
-        statuslabel->setText("Exporting completed with " + QString::number(errorcount) + "error(s)");
+        StatusUpdate("Exporting completed with " + QString::number(errorcount) + "error(s)");
     }
     else
     {
@@ -1324,7 +1324,7 @@ void WombatForensics::FinishExport()
 
 void WombatForensics::ExportFiles(FileExportData* exportdata)
 {
-    threadvector.clear();
+    //threadvector.clear();
     exportfilelist.clear();
     curlist.clear();
     errorcount = 0;
@@ -1364,18 +1364,18 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         GetExportData(rootnode, exportdata);
     int curprogress = (int)((((float)exportcount)/(float)curlist.count())*100);
     LogMessage("Exported: " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
-    statuslabel->setText("Exported: " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
+    StatusUpdate("Exported: " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
     for(int i=0; i < curlist.count(); i++)
     {
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, curlist.at(i), exportfilelist[i].fullpath, exportfilelist[i].name);
         exportwatcher.setFuture(tmpfuture);
-        threadvector.append(tmpfuture);
+        //threadvector.append(tmpfuture);
     }
 }
 
 void WombatForensics::DigFiles(FileDeepData* deepdata)
 {
-    threadvector.clear();
+    //threadvector.clear();
     digfilelist.clear();
     curlist.clear();
     errorcount = 0;
@@ -1420,12 +1420,12 @@ void WombatForensics::DigFiles(FileDeepData* deepdata)
         GetDigData(rootnode, deepdata);
     int curprogress = (int)((((float)digcount)/(float)curlist.count())*100);
     LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
-    statuslabel->setText("Dug: " + QString::number(digcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
+    StatusUpdate("Dug: " + QString::number(digcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%");
     for(int i = 0; i < curlist.count(); i++)
     {
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessDig, curlist.at(i), digfilelist.at(i).id, digfilelist.at(i).digoptions);
         digwatcher.setFuture(tmpfuture);
-        threadvector.append(tmpfuture);
+        //threadvector.append(tmpfuture);
     }
     //emit ui->dirTreeView->model()->dataChanged(ui->dirTreeView->model()->index(0, 0), ui->dirTreeView->model()->index(ui->dirTreeView->model()->rowCount() - 1, ui->dirTreeView->model()->columnCount() - 1));
 }
@@ -1544,7 +1544,7 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
     {
         if(digoptions.at(i) == 0)
         {
-            datatype = 0;
+            //datatype = 0;
             QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
             if(indexlist.count() > 0)
                 ui->dirTreeView->model()->setData(indexlist.at(0), HashFile(curobj.readfileinfo, objectid), Qt::DisplayRole);
@@ -1600,9 +1600,9 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     //processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     //filecountlabel->setText("Files: " + QString::number(filesfound));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    //statuslabel->setText("Processing...");
-    //statuslabel->setText("Processed: " + QString::number(processphase) + "%");
-    statuslabel->setText("Processing: " + QString::number(curprogress, 'f', 2) + "%");
+    //StatusUpdate("Processing...");
+    //StatusUpdate("Processed: " + QString::number(processphase) + "%");
+    StatusUpdate("Processing: " + QString::number(curprogress, 'f', 2) + "%");
     filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
     //if(curprogress == 100 && ProcessingComplete())
     //fcasedb.commit(); // COMMIT HERE CAUSES A LOCKUP.
@@ -1610,7 +1610,7 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     if(ProcessingComplete())
     {
         //InitializeQueryModel();
-        statuslabel->setText("Processing Complete");
+        StatusUpdate("Processing Complete");
     }
     */
 }
@@ -1902,7 +1902,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
         if (ret == QMessageBox::Yes)
         {
-            statuslabel->setText("Closing Current Case...");
+            StatusUpdate("Closing Current Case...");
             CloseCurrentCase();
             InitializeOpenCase();
         }
@@ -2252,6 +2252,7 @@ void WombatForensics::SetOffsetLabel(off_t pos)
     selectedoffset->setText(label);
 }
 
+/*
 void WombatForensics::setScrollBarRange(off_t low, off_t high)
 {
     // not sure if i need to adjust the scroll bar range, since it will always be a function of the page height.
@@ -2266,6 +2267,7 @@ void WombatForensics::setScrollBarRange(off_t low, off_t high)
    //hexvsb->setRange(low, high);
    qDebug() << "stepcount" << high;
 }
+*/
 
 /*
 void WombatForensics::setScrollBarValue(off_t pos)
@@ -2404,9 +2406,9 @@ void WombatForensics::SaveState()
 void WombatForensics::AutoSaveState()
 {
     // change display text
-    statuslabel->setText("Saving State Started");
+    StatusUpdate("Saving State Started");
     SaveState();
-    statuslabel->setText("Evidence ready");
+    StatusUpdate("Evidence ready");
     // change display text
 }
 

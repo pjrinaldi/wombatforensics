@@ -4,16 +4,16 @@
 #include "wombatinclude.h"
 
 extern QSqlDatabase fcasedb;
-extern QSqlQuery* fqueryptr;
+//extern QSqlQuery* fqueryptr;
 extern QSqlDatabase thumbdb;
 extern QSqlDatabase fappdb;
 extern QFile logfile;
-extern QTextStream msgstream;
+//extern QTextStream msgstream;
 extern QTextEdit* msglog;
-extern QString fdbname;
-extern QThreadPool* threadpool;
-extern QVector<QFuture<void> > threadvector;
-extern QFutureWatcher<void> filewatcher;
+//extern QString fdbname;
+//extern QThreadPool* threadpool;
+//extern QVector<QFuture<void> > threadvector;
+//extern QFutureWatcher<void> filewatcher;
 extern QFutureWatcher<void> thumbwatcher;
 extern unsigned long long filesfound;
 extern unsigned long long filesprocessed;
@@ -25,7 +25,7 @@ extern unsigned long long exportcount;
 extern unsigned long long digcount;
 extern unsigned long long currentfilesystemid;
 extern unsigned long long errorcount;
-extern unsigned long long currentjobid;
+//extern unsigned long long currentjobid;
 extern unsigned long long jumpoffset;
 extern unsigned long long filejumpoffset;
 extern int linefactor;
@@ -33,8 +33,8 @@ extern int filelinefactor;
 //extern int pageskip;
 extern int thumbsize;
 extern int mftrecordsize;
-extern int threadstarted;
-extern int datatype; // used to determine what column in the datamodel i am updating
+//extern int threadstarted;
+//extern int datatype; // used to determine what column in the datamodel i am updating
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
 extern QList<TskObject> curlist;

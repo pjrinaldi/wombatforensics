@@ -12,7 +12,7 @@ public:
     WombatFramework(WombatVariable* wombatvariable);
     ~WombatFramework();
 
-    void BuildEvidenceModel(void);
+    //void BuildEvidenceModel(void);
     void OpenEvidenceImage(void);
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);

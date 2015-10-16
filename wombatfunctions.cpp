@@ -367,7 +367,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     return TSK_WALK_CONT;
 }
 // I SHOULD BE ABLE TO REMOVE THIS FUNCTION SINCE I REIMPLMENETED IN WOMBATFORENSICS CLASS
-void SecondaryProcessing()
+/*void SecondaryProcessing()
 {
     QSqlQuery filequery(fcasedb);
     unsigned long long fsoffset = 0;
@@ -476,7 +476,7 @@ void SecondaryProcessing()
         }
     }
     filequery.finish();
-}
+}*/
 
 void GenerateThumbnails()
 {

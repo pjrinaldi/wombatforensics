@@ -975,7 +975,7 @@ private slots:
     };
     void FileExport(FileExportData* exportdata);
     void FileDig(FileDeepData* deeperdata);
-    void setScrollBarRange(off_t low, off_t high);
+    //void setScrollBarRange(off_t low, off_t high);
     //void setScrollBarValue(off_t pos);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
@@ -1090,9 +1090,9 @@ private:
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
-    unsigned long long curimgcount;
+    //unsigned long long curimgcount;
 };
 
-Q_DECLARE_METATYPE(QTextCursor)
+//Q_DECLARE_METATYPE(QTextCursor)
 
 #endif // WOMBATFORENSICS_H

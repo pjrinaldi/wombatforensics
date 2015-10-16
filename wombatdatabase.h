@@ -25,7 +25,7 @@ public:
     //void CloseLogDB(void);
     void CloseThumbDB(void);
     void InsertEvidenceObject(void);
-    void GetEvidenceObject(void);
+    //void GetEvidenceObject(void);
     void GetEvidenceObjects(void);
     void InsertVolumeObject(void);
     void InsertPartitionObjects(void);
@@ -38,7 +38,7 @@ public:
     ~WombatDatabase();
 
     unsigned long long ThumbnailCount(void);
-    unsigned long long ImageFileCount(void);
+    //unsigned long long ImageFileCount(void);
     unsigned long long ReturnCaseCount(void);
     void InsertCase();
     void ReturnCaseNameList(void);

@@ -490,6 +490,7 @@ void WombatDatabase::InsertEvidenceObject()
     //filesprocessed++;
 }
 
+/*
 void WombatDatabase::GetEvidenceObject()
 {
     // already have id and name from adding/opening the evidence
@@ -513,7 +514,7 @@ void WombatDatabase::GetEvidenceObject()
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
         wombatptr->evidenceobject.fullpathvector.push_back(wombatptr->sqlrecords[i].value(0).toString().toStdString());
     wombatptr->evidenceobject.itemcount = wombatptr->evidenceobject.fullpathvector.size();
-}
+}*/
 
 void WombatDatabase::GetEvidenceObjects()
 {
@@ -854,7 +855,7 @@ unsigned long long WombatDatabase::ThumbnailCount()
     return thumbcount;
 }
 
-unsigned long long WombatDatabase::ImageFileCount()
+/*unsigned long long WombatDatabase::ImageFileCount()
 {
     unsigned long long imgfilecount = 0;
     QSqlQuery imgquery(fcasedb);
@@ -864,7 +865,7 @@ unsigned long long WombatDatabase::ImageFileCount()
     imgfilecount = imgquery.value(0).toULongLong();
     imgquery.finish();
     return imgfilecount;
-}
+}*/
 
 // filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE (objecttype = 5 OR objecttype == 6) AND filemime LIKE '%image/%';");
 
