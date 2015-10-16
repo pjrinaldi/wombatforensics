@@ -86,7 +86,7 @@
 #include "cursor.h"
 
 #include "tsk/libtsk.h"
-#include "img/aff.h"
+//#include "img/aff.h"
 //#include "afflib.h" // won't compile anymore on arch linux. requires older libncurses than what is currently installed as 9/18/15
 #include "img/ewf.h"
 #include "libewf.h"
