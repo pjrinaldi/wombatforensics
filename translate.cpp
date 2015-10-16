@@ -33,7 +33,6 @@ void Translate::CharToByte(vector<uchar>& dst, const QString& src)
   dst.resize( src.length() );
   for(int i =0 ; i < src.length(); ++i)
       dst[i] = src[i].toLatin1();
-    //dst[i] = src[i].toAscii();
 }
 
 
@@ -83,8 +82,8 @@ void Translate::HexToByte(vector<uchar>& dst, const QString& src)
       i = 1;
   }
   for(; i < src.length(); i+=2) {
-    uchar hi = src[i].toLatin1();//src[i].toAscii();
-    uchar lo = src[i+1].toLatin1();//src[i+1].toAscii();
+    uchar hi = src[i].toLatin1();
+    uchar lo = src[i+1].toLatin1();
     dst.push_back( TranslationTables::hexToByteMap[hi]*16 +
 		   TranslationTables::hexToByteMap[lo] );
   }

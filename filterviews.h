@@ -19,10 +19,6 @@
 #include "ui_filecategoryfilter.h"
 
 namespace Ui {
-    /*
-    class analysistypefilter;
-    class hashcategoryfilter;
-    */
     class IdFilter;
     class NameFilter;
     class PathFilter;

@@ -129,7 +129,6 @@ ImageViewer::~ImageViewer()
 void ImageViewer::GetPixmaps()
 {
     pixmaps.clear();
-    //qDebug() << "thumblist count:" << thumblist.count();
     for(int i=0; i < thumblist.count()/2; i++)
     {
         pixmaps.append(QPixmap::fromImage(MakeThumb(thumblist.at(2*i+1))));
@@ -141,20 +140,16 @@ void ImageViewer::UpdateGeometries()
 {
     pixmaps.clear();
     ui->label_2->setText("Loading...");
-    //QFuture<void> thumbfuture = QtConcurrent::run(this, &ImageViewer::GetPixmaps);
-    //thumbwatcher.setFuture(thumbfuture);
     GetPixmaps();
     imagemodel = new ImageModel(pixmaps, idlist);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
     ui->label_2->setText(QString::number(pixmaps.count()) + " Image(s)");
     ui->listView->setModel(imagemodel);
-    //connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(SetModel()), Qt::QueuedConnection);
 }
 
 void ImageViewer::SetModel()
 {
-    //qDebug() << "pixmap count:" << pixmaps.count();
     imagemodel = new ImageModel(pixmaps, idlist);
     ui->listView->setModel(imagemodel);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
@@ -165,8 +160,6 @@ void ImageViewer::SetModel()
 void ImageViewer::OpenImageWindow(const QModelIndex &index)
 {
     ui->label->setText("Loading...");
-    //qDebug() << "userrole:" << index.data(Qt::UserRole).toULongLong();
-    //QtConcurrent::run(imagedialog, &ImageWindow::GetImage, index.data(Qt::UserRole).toULongLong());
     imagedialog->GetImage(index.data(Qt::UserRole).toULongLong());
     imagedialog->show();
     ui->label->setText("");
@@ -176,7 +169,6 @@ void ImageViewer::ShowImage(const QModelIndex &index)
 {
     ui->label->setText("Loading...");
     QtConcurrent::run(imagedialog, &ImageWindow::GetImage, index.sibling(index.row(), 0).data().toULongLong());
-    //imagedialog->GetImage(index.sibling(index.row(), 0).data().toULongLong());
     imagedialog->show();
     ui->label->setText("");
 }

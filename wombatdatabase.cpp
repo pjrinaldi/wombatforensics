@@ -26,15 +26,13 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
         }
         else
         {
-            //LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-            //LogMessage(wombatptr->casedb.lastError().text());
+            LogMessage(wombatptr->casedb.lastError().text());
         }
         casequery.finish();
     }
     else
     {
-        //LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        //LogMessage(wombatptr->casedb.lastError().text());
+        LogMessage(wombatptr->casedb.lastError().text());
     }
 
     return tmplist;
@@ -55,20 +53,17 @@ void WombatDatabase::InsertSql(QString query, QVariantList invalues)
        {
            while(casequery.next())
            {
-               //qDebug() << "successful insert with bind";
            }
        }
        else
        {
-           //LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-           //LogMessage(wombatptr->casedb.lastError().text());
+           LogMessage(wombatptr->casedb.lastError().text());
        }
        casequery.finish();
    }
    else
    {
-        //LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        //LogMessage(wombatptr->casedb.lastError().text());
+        LogMessage(wombatptr->casedb.lastError().text());
    }
 }
 
@@ -81,19 +76,16 @@ void WombatDatabase::InsertSql(QString query)
        casequery.prepare(query);
        if(casequery.exec())
        {
-           //qDebug() << "successful query";
        }
        else
        {
-            //LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-            //LogMessage(wombatptr->casedb.lastError().text());
+            LogMessage(wombatptr->casedb.lastError().text());
        }
        casequery.finish();
    }
    else
    {
-        //LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        //LogMessage(wombatptr->casedb.lastError().text());
+        LogMessage(wombatptr->casedb.lastError().text());
    }
 }
 
@@ -112,15 +104,13 @@ unsigned long long WombatDatabase::InsertSqlGetID(QString query, QVariantList in
            tmpid = casequery.lastInsertId().toULongLong();
        else
        {
-            //LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-            //LogMessage(wombatptr->casedb.lastError().text());
+            LogMessage(wombatptr->casedb.lastError().text());
        }
        casequery.finish();
    }
    else
    {
-        //LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        //LogMessage(wombatptr->casedb.lastError().text());
+        LogMessage(wombatptr->casedb.lastError().text());
    }
 
    return tmpid;
@@ -180,35 +170,11 @@ void WombatDatabase::CreateCaseDB(void)
     }
     else
     {
-        //LogEntry(0, 0, 0, 0, wombatptr->casedb.lastError().text());
-        //LogMessage(wombatptr->casedb.lastError().text());
+        LogMessage(wombatptr->casedb.lastError().text());
     }
 
 }
-/*
-void WombatDatabase::CreateLogDB()
-{
-    QStringList loglist;
-    loglist.clear();
-    loglist << "CREATE TABLE joblog(jobid INTEGER PRIMARY KEY, type INTEGER, state INTEGER, filecount INTEGER, processcount INTEGER, caseid INTEGER, evidenceid INTEGER, start INT, finish INT, errorcount INT)";
-    loglist << "CREATE TABLE msglog(logid INTEGER PRIMARY KEY, caseid INTEGER, evidenceid INTEGER, jobid INTEGER, type INTEGER, datetime INT, logmsg TEXT)";
-    if(logdb.open())
-    {
-        QSqlQuery logquery(logdb);
-        logdb.transaction();
-        for(int i=0; i < loglist.count(); i++)
-        {
-            logquery.exec(loglist.at(i));
-        }
-        logdb.commit();
-        logquery.finish();
-    }
-    else
-    {
-        wombatptr->curerrmsg = logdb.lastError().text();
-    }
-}
-*/
+
 void WombatDatabase::CreateThumbDB()
 {
     if(thumbdb.open())
@@ -219,8 +185,7 @@ void WombatDatabase::CreateThumbDB()
     }
     else
     {
-        //LogEntry(0, 0, 0, 0, thumbdb.lastError().text());
-        //LogMessage(thumbdb.lastError().text());
+        LogMessage(thumbdb.lastError().text());
     }
 }
 
@@ -237,8 +202,7 @@ void WombatDatabase::CreateAppDB()
     }
     else
     {
-        //LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        //LogMessage(wombatptr->appdb.lastError().text());
+        LogMessage(wombatptr->appdb.lastError().text());
     }
 }
 
@@ -246,23 +210,15 @@ void WombatDatabase::OpenAppDB()
 {
     if(wombatptr->appdb.isOpen())
     {
-        //qDebug() << "appdb is open";
     }
     else
         wombatptr->appdb.open();
 }
-/*
-void WombatDatabase::OpenLogDB()
-{
-    if(!logdb.isOpen())
-        logdb.open();
-}
-*/
+
 void WombatDatabase::OpenCaseDB()
 {
     if(wombatptr->casedb.isOpen())
     {
-        //qDebug() << "case is open.";
     }
     else
         wombatptr->casedb.open();
@@ -289,17 +245,7 @@ void WombatDatabase::CloseAppDB()
     fappdb = QSqlDatabase();
     QSqlDatabase::removeDatabase("appdb");
 }
-/*
-void WombatDatabase::CloseLogDB()
-{
-    if(logdb.isOpen())
-    {
-        logdb.close();
-        logdb = QSqlDatabase();
-        QSqlDatabase::removeDatabase("logdb");
-    }
-}
-*/
+
 void WombatDatabase::CloseCaseDB()
 {
     if(wombatptr->casedb.isOpen())
@@ -323,7 +269,6 @@ void WombatDatabase::CloseThumbDB()
 
 WombatDatabase::~WombatDatabase()
 {
-    //CloseLogDB();
     CloseCaseDB();
     CloseAppDB();
     CloseThumbDB();
@@ -345,8 +290,6 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->currentvolumename);
         wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, childcount, byteoffset, parentid, parimgid, name) VALUES(2, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertVolumeProperties);
-        //threadvector.append(tmpfuture);
-        //wombatprop->PopulateVolumeProperties();
     }
     else
     {
@@ -358,7 +301,6 @@ void WombatDatabase::InsertVolumeObject()
         wombatptr->bindvalues.append(wombatptr->currentvolumename);
         wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, childcount, size, sectsize, byteoffset, parentid, parimgid, name) VALUES(2, 240, 0, ?, ?, 0, ?, ?, ?);", wombatptr->bindvalues);
     }
-    //filesprocessed++;
 }
 
 void WombatDatabase::InsertPartitionObjects()
@@ -380,7 +322,6 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append(wombatptr->currentevidenceid);
                 wombatptr->bindvalues.append((unsigned long long)(wombatptr->evidenceobject.partinfovector[i]->len * wombatptr->evidenceobject.volinfo->block_size));
                 wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, sectsize, parentid, parimgid, size) VALUES(3, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-                //filesprocessed++;
             }
             else if(wombatptr->evidenceobject.partinfovector[i]->flags == 0x01) // allocated partition
             {
@@ -388,11 +329,9 @@ void WombatDatabase::InsertPartitionObjects()
                 if(tmpfsinfo != NULL)
                 {
                     wombatptr->evidenceobject.fsinfovector.push_back(tmpfsinfo);
-                    //filesfound++;
                 }
                 else
                 {
-                    //LogEntry(wombatptr->caseobject.id, wombatptr->currentevidenceid, currentjobid, 0, "Failed to Open Partition/FileSystem");
                     LogMessage("Failed to open Partition/FileSystem");
                     errorcount++;
                 }
@@ -412,15 +351,12 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->last_inum);
                 wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
                 wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
-                //wombatptr->bindvalues.append((int)wombatptr->evidenceobject.volinfo->block_size);
                 wombatptr->bindvalues.append((int)tmpfsinfo->dev_bsize); // device sector size
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->start);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->len);
                 wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
                 QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, tmpfsinfo);
-                //threadvector.append(tmpfuture);
-                //filesprocessed++;
             }
         }
     }
@@ -441,7 +377,6 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append(wombatptr->currentvolumeid);
                 wombatptr->bindvalues.append(wombatptr->currentevidenceid);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->block_size * (unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->block_count);
-                //wombatptr->bindvalues.append((int)wombatptr->evidenceobject.imageinfo->sector_size);
                 wombatptr->bindvalues.append((int)wombatptr->evidenceobject.fsinfovector[i]->dev_bsize); // sector size
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->block_count);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->first_inum);
@@ -454,8 +389,6 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, sectsize, blockcount, firstinum, lastinum, rootinum, address, blocksize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
                 wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
                 QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, wombatptr->evidenceobject.fsinfovector[i]);
-                //threadvector.append(tmpfuture);
-                //filesprocessed++;
             }
         }
     }
@@ -469,7 +402,6 @@ void WombatDatabase::InsertEvidenceObject()
     currentevidenceid = 0;
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->itype);
-    //qDebug() << "image size: " << wombatptr->evidenceobject.imageinfo->size;
     wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.imageinfo->size);
     wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
     wombatptr->bindvalues.append(wombatptr->currentevidencename);
@@ -478,7 +410,6 @@ void WombatDatabase::InsertEvidenceObject()
     wombatptr->evidenceobject.id = wombatptr->currentevidenceid;
     currentevidenceid = wombatptr->currentevidenceid;
     QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertEvidenceProperties);
-    //threadvector.append(tmpfuture);
     for(unsigned int i=0; i < wombatptr->evidenceobject.itemcount; i++)
     {
         wombatptr->bindvalues.clear();
@@ -487,34 +418,7 @@ void WombatDatabase::InsertEvidenceObject()
         wombatptr->bindvalues.append(i+1);
         InsertSql("INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", wombatptr->bindvalues);
     }
-    //filesprocessed++;
 }
-
-/*
-void WombatDatabase::GetEvidenceObject()
-{
-    // already have id and name from adding/opening the evidence
-    wombatptr->bindvalues.clear();
-    wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-    wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objecttype, type, size, sectsize, name, fullpath, objectid FROM data WHERE objectid = ?;", wombatptr->bindvalues);
-    wombatptr->evidenceobject.objecttype = wombatptr->sqlrecords[0].value(0).toInt();
-    wombatptr->evidenceobject.type = wombatptr->sqlrecords[0].value(1).toInt();
-    wombatptr->evidenceobject.size = wombatptr->sqlrecords[0].value(2).toULongLong();
-    wombatptr->evidenceobject.sectsize = wombatptr->sqlrecords[0].value(3).toULongLong();
-    wombatptr->evidenceobject.name = wombatptr->sqlrecords[0].value(4).toString();
-    wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[0].value(5).toString();
-    wombatptr->evidenceobject.id = wombatptr->sqlrecords[0].value(6).toULongLong();
-    wombatptr->evidenceobject.parimgid = 0;
-    wombatptr->bindvalues.clear();
-    wombatptr->evidenceobject.fullpathvector.clear();
-    wombatptr->bindvalues.append(wombatptr->evidenceobject.id);
-    wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
-    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-        wombatptr->evidenceobject.fullpathvector.push_back(wombatptr->sqlrecords[i].value(0).toString().toStdString());
-    wombatptr->evidenceobject.itemcount = wombatptr->evidenceobject.fullpathvector.size();
-}*/
 
 void WombatDatabase::GetEvidenceObjects()
 {
@@ -556,8 +460,7 @@ unsigned long long WombatDatabase::ReturnCaseCount() // from appdb
         retval = appquery.value(0).toInt();
     else
     {
-        //LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        //LogMessage(wombatptr->appdb.lastError().text());
+        LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 
@@ -575,8 +478,7 @@ void WombatDatabase::InsertCase()
         wombatptr->caseobject.id = appquery.lastInsertId().toULongLong();
     else
     {
-        //LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        //LogMessage(wombatptr->appdb.lastError().text());
+        LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 }
@@ -591,8 +493,7 @@ void WombatDatabase::ReturnCaseNameList()
     }
     else
     {
-        //LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        //LogMessage(wombatptr->appdb.lastError().text());
+        LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 }
@@ -619,13 +520,11 @@ void WombatDatabase::ReturnCaseID()
             wombatptr->caseobject.id = appquery.value(0).toULongLong();
         else
         {
-            //LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-            //LogMessage(wombatptr->appdb.lastError().text());
+            LogMessage(wombatptr->appdb.lastError().text());
         }
     else
     {
-        //LogEntry(0, 0, 0, 0, wombatptr->appdb.lastError().text());
-        //LogMessage(wombatptr->appdb.lastError().text());
+        LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 }
@@ -648,33 +547,6 @@ void WombatDatabase::ReturnFileSystemObjectList(unsigned long long curevidenceid
 
 void WombatDatabase::GetObjectValues()
 {
-    /*
-    QSqlQuery objectquery(fcasedb);
-    objectquery.prepare("SELECT objecttype, size, parimgid, sectstart, sectlength, sectsize, blockcount, byteoffset, address, type, flags, blocksize, parfsid, fullpath, blockaddress, filesignature, filemime, parentid, mftattrid FROM data WHERE objectid = ?;");
-    objectquery.addBindValue(wombatptr->selectedobject.id);
-    objectquery.exec();
-    objectquery.next();
-    wombatptr->selectedobject.objtype = objectquery.value(0).toInt();
-    wombatptr->selectedobject.size = objectquery.value(1).toULongLong();
-    wombatptr->selectedobject.parimgid = objectquery.value(2).toULongLong();
-    wombatptr->selectedobject.sectstart = objectquery.value(3).toULongLong();
-    wombatptr->selectedobject.sectlength = objectquery.value(4).toULongLong();
-    wombatptr->selectedobject.sectsize = objectquery.value(5).toInt();
-    wombatptr->selectedobject.blockcount = objectquery.value(6).toULongLong();
-    wombatptr->selectedobject.byteoffset = objectquery.value(7).toULongLong();
-    wombatptr->selectedobject.address = objectquery.value(8).toULongLong();
-    wombatptr->selectedobject.type = objectquery.value(9).toInt();
-    wombatptr->selectedobject.flags = objectquery.value(10).toInt();
-    wombatptr->selectedobject.blocksize = objectquery.value(11).toInt();
-    wombatptr->selectedobject.parfsid = objectquery.value(12).toULongLong();
-    wombatptr->selectedobject.fullpath = objectquery.value(13).toString();
-    wombatptr->selectedobject.blockaddress = objectquery.value(14).toString();
-    wombatptr->selectedobject.filesignature = objectquery.value(15).toString();
-    wombatptr->selectedobject.filemime = objectquery.value(16).toString();
-    wombatptr->selectedobject.parentid = objectquery.value(17).toULongLong();
-    wombatptr->selectedobject.mftattrid = objectquery.value(18).toULongLong();
-    objectquery.finish();
-    */
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->selectedobject.id);
     wombatptr->sqlrecords.clear();
@@ -704,10 +576,8 @@ unsigned long long WombatDatabase::GetEvidenceFileCount()
 {
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-    //wombatptr->bindvalues.append(wombatptr->currentevidenceid);
     wombatptr->sqlrecords.clear();
     wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(objectid) FROM data WHERE parimgid = ? and objecttype = 5;", wombatptr->bindvalues);
-    //wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(objectid) FROM data WHERE objectid = ? OR parimgid = ?", wombatptr->bindvalues);
     return wombatptr->sqlrecords.at(0).value(0).toULongLong();
 }
 
@@ -722,39 +592,6 @@ void WombatDatabase::ReturnObjectPropertyList()
     {
         propertylist << wombatptr->sqlrecords.at(i).value(0).toString() << wombatptr->sqlrecords.at(i).value(1).toString() << wombatptr->sqlrecords.at(i).value(2).toString();
     }
-    // PROBABLY DON'T NEED TO DIFFERENTIATE, SINCE I'M PULLING THE DATA FROM THE DB, WHICH DOES THE DIFFERENTIATING BY OBJECTID
-    /*
-    if(wombatptr->selectedobject.objtype == 1 || wombatptr->selectedobject.) // image file
-    {
-        wombatptr->bindvalues.clear();
-        wombatptr->bindvalues.append(wombatptr->selectedobject.id);
-        wombatptr->sqlrecords.clear();
-        wombatptr->sqlrecords = GetSqlResults("SELECT name, value, description FROM properties WHERE objectid = ?", wombatptr->bindvalues);
-        for(int i=0; i < wombatptr->sqlrecords.count(); i++)
-        {
-            propertylist << wombatptr->sqlrecords.at(i).value(0).toString() << wombatptr->sqlrecords.at(i).value(1).toString() << wombatptr->sqlrecords.at(i).value(2).toString();
-        }
-    }
-    else if(wombatptr->selectedobject.objtype == 2) // volume information
-    {
-        if(wombatptr->selectedobject.type == 240) // dummy volume system
-        {
-            // there is no relevant information for a dummy volume.
-        }
-        else // actual volume system
-        {
-            // get the partition table information, offset, block size, endian ordering, volume system type.
-        }
-    }
-    else if(wombatptr->selectedobject.objtype == 3) // partition information (shouldn't exist) its combined with fs
-    {
-    }
-    else if(wombatptr->selectedobject.objtype == 4) // file system information
-    {
-    }
-    else if(wombatptr->selectedobject.objtype == 5) // dir/file information
-    {
-    }*/
 }
 
 void WombatDatabase::RemoveEvidence()
@@ -835,7 +672,6 @@ void WombatDatabase::GetThumbnails()
     {
         while(thumbquery.next())
         {
-            //qDebug() << "objectid" << thumbquery.value(0).toInt();
             thumblist.append(thumbquery.value(0).toString());
             thumblist.append(thumbquery.value(1).toString());
         }
@@ -854,20 +690,6 @@ unsigned long long WombatDatabase::ThumbnailCount()
     thumbquery.finish();
     return thumbcount;
 }
-
-/*unsigned long long WombatDatabase::ImageFileCount()
-{
-    unsigned long long imgfilecount = 0;
-    QSqlQuery imgquery(fcasedb);
-    imgquery.prepare("SELECT count(objectid) FROM data WHERE objecttype = 5 AND filemime LIKE '%image/%';");
-    imgquery.exec();
-    imgquery.next();
-    imgfilecount = imgquery.value(0).toULongLong();
-    imgquery.finish();
-    return imgfilecount;
-}*/
-
-// filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE (objecttype = 5 OR objecttype == 6) AND filemime LIKE '%image/%';");
 
 unsigned long long WombatDatabase::GetResidentOffset(unsigned long long fileaddress)
 {

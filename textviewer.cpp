@@ -13,7 +13,6 @@ TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer
         ui->comboBox->addItem(codec->name(), codec->mibEnum());
     this->hide();
     connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(GetTextContent()));
-    //connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding()));
 }
 
 TextViewer::~TextViewer()
@@ -74,7 +73,6 @@ void TextViewer::FindCodecs()
 
 void TextViewer::GetTextContent()
 {
-    //this->setWindowTitle("View Text - "); // populate filename here.
     // OpenParentImage
     std::vector<std::string> pathvector;
     unsigned long long imgid = 0;

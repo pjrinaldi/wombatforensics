@@ -13,8 +13,6 @@ ProgressWindow::ProgressWindow(WombatDatabase* wdata, QWidget* parent) : QDialog
 
 ProgressWindow::~ProgressWindow()
 {
-    //this->close();
-    //delete ui;
 }
 
 void ProgressWindow::HideClicked()
@@ -26,7 +24,6 @@ void ProgressWindow::HideClicked()
 void ProgressWindow::JobClicked(QTreeWidgetItem* item)
 {
     int jobid = item->data(1,0).toInt();
-    //QStringList joblist = pdata->ReturnJobDetails(jobid);
     ClearTableWidget();
     if(jobid == 0)
     {
@@ -38,20 +35,6 @@ void ProgressWindow::JobClicked(QTreeWidgetItem* item)
     else
     {
         UpdateProgressBar(100);
-        /*
-        if(joblist[1].toInt() == 0)
-        {
-            UpdateFilesFound("");
-            UpdateFilesProcessed("");
-        }
-        else
-        {
-            //UpdateFilesFound(joblist[1]);
-            //UpdateFilesProcessed(joblist[2]);
-        }*/
-        //UpdateAnalysisState(joblist[3]);
-        //QStringList tmplist = pdata->ReturnMessageTableEntries(jobid);
-        //UpdateMessageTable(tmplist);
    }
 }
 

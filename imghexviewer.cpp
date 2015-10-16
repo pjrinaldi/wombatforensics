@@ -56,16 +56,6 @@ ImageHexViewer::~ImageHexViewer()
 {
   _reader.close();
 }
-/*
-void ImageHexViewer::ClearContent()
-{
-    //_reader.Clear();
-    //_reader.seekimage(_topLeft);
-    //_reader.seek(_topLeft);
-    //_reader.readimage(_data,bytesPerPage());
-    //setTopLeft(0);
-}
-*/
 
 void ImageHexViewer::SetTopLeft(off_t offset)
 {
@@ -81,11 +71,6 @@ bool ImageHexViewer::openimage()
     setSelection(SelectionStart, -1);
     setSelection(SelectionEnd, -1);
     emit StepValues(1, bytesPerPage()/bytesPerLine());
-    //emit rangeChanged(0, _reader.size()/bytesPerLine());
-    //emit DoubleStepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
-    //emit StepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
-    //qDebug() << "bytesperpage:" << bytesPerPage();
-    //qDebug() << "hexviewer totalsteps:" << _reader.size()/bytesPerPage();
     calculateFontMetrics();
     setTopLeft(0);
 
@@ -146,7 +131,6 @@ void ImageHexViewer::setFont(const QFont& font )
 // set the top left editor to offset in reader
 void ImageHexViewer::setTopLeft( off_t offset )
 {
-    //qDebug() << "new topleft:" << offset;
   static bool inTopLeft;
   if( inTopLeft ) {
      // don't nest
@@ -163,7 +147,6 @@ void ImageHexViewer::setTopLeft( off_t offset )
      }
      // only let _topLeft be an integer multiple of the line length (round down)
      // update the labels
-     //setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
      _reader.readimage(_data,bytesPerPage()); // replaced with AdjustData()
      
@@ -175,11 +158,6 @@ void ImageHexViewer::setTopLeft( off_t offset )
   }
   inTopLeft = false;
 }
-
-//void ImageHexViewer::setOffsetLabels( off_t topLeft )
-//{
-  // need to impliment manually printing labels
-//}
 
 int ImageHexViewer::topMargin() const
 {
@@ -283,16 +261,9 @@ QRect ImageHexViewer::abyteBox(off_t byteIdx) const
     return QRect(_asciiBBox[wordIdx].left() + localByteIdx*fontMaxWidth() + wordSpacing(), _asciiBBox[wordIdx].top(), fontMaxWidth(), lineSpacing());
 }
 
-void ImageHexViewer::setTopLeftToPercent()
-{
-    //int pagestep = bytesPerPage()/bytesPerLine();
-    //qDebug() << ((QAction*)QObject::sender())->text();
-    //qDebug() << "pressed";
-}
 void ImageHexViewer::setTopLeftToPercent( int percent )
 {
     int pagestep = bytesPerPage()/bytesPerLine();
-    //qDebug() << "offset:" << percent;
     if(percent > 0) // move down
     {
         linefactor = percent;
@@ -300,28 +271,6 @@ void ImageHexViewer::setTopLeftToPercent( int percent )
             emit SkipUp();
         else
             emit PageUp();
-        /*
-        while(percent < pagestep)
-        {
-            nextLine();
-        }
-        while(percent > pagestep)
-        {
-            nextPage();
-        }
-        */
-        /*
-        if(percent < pagestep) 
-        {
-            for(int i=0; i < percent; i++)
-                nextLine();
-        }
-        else if(percent > pagestep)
-        {
-            for(int i=0; i < percent/pagestep; i++)
-                nextPage();
-        }
-        */
     }
     else if(percent < 0) // move up
     {
@@ -331,31 +280,6 @@ void ImageHexViewer::setTopLeftToPercent( int percent )
         else
             emit PageDown();
     }
-    //setTopLeft((_reader.size()/100)*percent);
-    /*
-    percent = percent*bytesPerLine();
-    if(_previousstep < percent)
-    {
-        int stepdiff = percent - _previousstep;
-        if(stepdiff == bytesPerLine())
-            nextLine();
-        else if(stepdiff == bytesPerPage())
-            nextPage();
-        else
-            setTopLeft(percent);
-    }
-    else if(_previousstep > percent)
-    {
-        int stepdiff = _previousstep - percent;
-        if(stepdiff == bytesPerLine())
-            prevLine();
-        else if(stepdiff == bytesPerPage())
-            prevPage();
-        else
-            setTopLeft(percent);
-    }
-    _previousstep = percent;
-    */
 }
 
 void ImageHexViewer::setTopLeftToFloat( float offset )
@@ -546,18 +470,13 @@ void ImageHexViewer::mouseReleaseEvent( QMouseEvent* e )
 
 void ImageHexViewer::wheelEvent(QWheelEvent* e)
 {
-    //int numdegrees = e->delta() / 8;
-    //int numsteps = abs(numdegrees) / 15;
     if(e->delta() < 0)
     {
-        //for(int i=0; i < numsteps; i++)
-            cursorDown();
+        cursorDown();
     }
     else
     {
-        //for(int i=0; i < numsteps; i++)
-            cursorUp();
-        //prevPage();
+        cursorUp();
     }
 
     e->accept();
@@ -685,11 +604,7 @@ void ImageHexViewer::resizeEvent( QResizeEvent * e )
 		     
   // do this to recalculate the amount of displayed data.
   setTopLeft(_topLeft);
-  //emit rangeChanged(0, _reader.size()/bytesPerLine());
   emit StepValues(1, bytesPerPage()/bytesPerLine());
-  //qDebug() << "hexview totalstep:" << _reader.size()/bytesPerPage();
-  //emit DoubleStepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
-  //emit StepValues(bytesPerLine(), _reader.size()/(bytesPerPage()/bytesPerLine()));
 }
 //
 // Reimplimented to be more efficient then repainting the whole screen on
@@ -718,7 +633,6 @@ void ImageHexViewer::paintLabels( QPainter* paintPtr)
   unsigned int i;
   off_t offset = _topLeft;
   uchar *ucptr;
-  //uchar* offsetptr;
   QString label;
 
   for(int row = 0; row < _rows;++row) {
@@ -777,7 +691,6 @@ void ImageHexViewer::paintEvent( QPaintEvent* e)
   drawSelection( paint );
   
   // Find the stop/start row/col idx's for the repaint
-  //int totalWordWidth = wordWidth()+1;
   int totalWordWidth = wordWidth()+wordSpacing();
   int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );
   int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
@@ -872,19 +785,12 @@ void ImageHexViewer::seeCursor()
       if(_cursor.byteOffset() < _topLeft)
       {
           setTopLeft(_topLeft - bytesPerLine());
-          // just need to replace setTopLeft with however we move the cursor, i think with updateWord...
-          //setTopLeft(_cursor.byteOffset() - bytesPerLine()-1);
       }
       else
       {
-          //qDebug() << "topleft:" << _topLeft << "bytes per line:" << bytesPerLine();
-          //qDebug() << "topleft + bytesperline:" << _topLeft + bytesPerLine();
           setTopLeft(_topLeft + bytesPerLine());
-          //setTopLeft(_cursor.byteOffset() + bytesPerLine()-1);
       }
       repaint();
-    // setTopLeft so cursor is in middle line of screen
-    //setTopLeft( max(_cursor.byteOffset() - bytesPerPage()/2, (off_t)0) );
   }
 }
 
@@ -893,7 +799,6 @@ void ImageHexViewer::cursorLeft()
   off_t oldWordIdx = localWordOffset();
   // move the cursor
   _cursor.decrByChar(2);
-  //_cursor.decrByChar(1);
   // make sure the user can see the cursor
   seeCursor();
   // redraw where the cursor used to be
@@ -905,7 +810,6 @@ void ImageHexViewer::cursorRight()
 {
   off_t oldWordIdx = localWordOffset();
   _cursor.incrByChar(2);
-  //_cursor.incrByChar(1);
   seeCursor();
   if( localWordOffset() != oldWordIdx ) 
     updateWord( oldWordIdx );
@@ -976,7 +880,6 @@ void ImageHexViewer::setBase(int base)
   switch(base) {
   case -1:
     // setup ascii editing mode
-    //_charsPerByte = 2;
     _charsPerByte = 1;
     break;
   case 2:
@@ -1091,7 +994,6 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
                     curblkstart = tskptr->resoffset + tskptr->fsoffset;
                 }
                 unsigned long long curblkend = curblkstart + mftrecordsize;
-                //int curblkend = curblkstart + tskptr->length;
                 if(curoffset >= curblkstart && curoffset < curblkend)
                 {
                     paint.setPen(QColor(0, 0, 255, 255));
@@ -1172,7 +1074,6 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
                     curblkstart = tskptr->resoffset + tskptr->fsoffset;
                 }
                 unsigned long long curblkend = curblkstart + mftrecordsize;
-                //int curblkend = curblkstart + tskptr->length;
                 if(curoffset >= curblkstart && curoffset < curblkend)
                 {
                     paint.setPen(QColor(0, 0, 255, 255));
@@ -1195,12 +1096,9 @@ void ImageHexViewer::drawSelection( QPainter& paint )
   if( start < bytesPerPage() ) {
     off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
     paint.setPen(Qt::NoPen);
-    //paint.setBrush(QColor(255, 255, 255, 175));
-    //paint.setBrush( qApp->palette().highlight() );
     paint.setBrush(QBrush(QColor(177, 177, 177, 255)));
     stop--;
     while( start <= stop ) {
-      // linestop = min(stop,endofline)
       off_t linestop = min(stop, start+bytesPerLine()-1 -(start % bytesPerLine()));
       QRect bbox = byteBBox(start);
       QRect abox = abyteBox(start);

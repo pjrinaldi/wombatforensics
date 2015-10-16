@@ -13,19 +13,14 @@ public:
     WombatDatabase(WombatVariable* wombatvarptr);
     void CreateAppDB(void);
     void CreateCaseDB(void);
-    //void CreateLogDB(void);
-    //void CreateLogFile(void);
     void CreateThumbDB(void);
     void OpenCaseDB(void);
     void OpenAppDB(void);
-    //void OpenLogDB(void);
     void OpenThumbDB(void);
     void CloseAppDB(void);
     void CloseCaseDB(void);
-    //void CloseLogDB(void);
     void CloseThumbDB(void);
     void InsertEvidenceObject(void);
-    //void GetEvidenceObject(void);
     void GetEvidenceObjects(void);
     void InsertVolumeObject(void);
     void InsertPartitionObjects(void);
@@ -38,7 +33,6 @@ public:
     ~WombatDatabase();
 
     unsigned long long ThumbnailCount(void);
-    //unsigned long long ImageFileCount(void);
     unsigned long long ReturnCaseCount(void);
     void InsertCase();
     void ReturnCaseNameList(void);

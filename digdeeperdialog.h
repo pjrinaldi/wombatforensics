@@ -22,8 +22,6 @@ signals:
 private slots:
     void EnableProcess(bool checked);
     void DigDeeperFiles(void);
-    //void SelectDirectory(void);
-    //void ExportFiles(void);
 
 private:
     Ui::DigDeeperDialog *ui;

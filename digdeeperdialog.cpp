@@ -14,7 +14,6 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, unsigned long long curcheckcou
     ui->checkedFileRadioButton->setText(checktext);
     ui->listedFileRadioButton->setText(listtext);
     ui->processButton->setEnabled(false);
-    //ui->exportButton->setEnabled(false);
     ui->selectedFileRadioButton->setChecked(true);
     if(checkcount <= 0)
         ui->checkedFileRadioButton->setEnabled(false);
@@ -26,7 +25,6 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, unsigned long long curcheckcou
         ui->listedFileRadioButton->setEnabled(true);
     connect(ui->md5checkBox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->thumbnailcheckBox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
-    //connect(ui->browseButton, SIGNAL(clicked()), this, SLOT(SelectDirectory()));
     connect(ui->processButton, SIGNAL(clicked()), this, SLOT(DigDeeperFiles()));
 }
 
@@ -39,17 +37,7 @@ void DigDeeperDialog::EnableProcess(bool checked)
 {
     ui->processButton->setEnabled(checked);
 }
-/*
-void DigDeeperDialog::SelectDirectory()
-{
-    QString dirname = QFileDialog::getExistingDirectory(this, tr("Select Directory"), QDir::homePath(), QFileDialog::ShowDirsOnly);
-    if(!dirname.isEmpty())
-    {
-        ui->exportDirectoryLineEdit->setText(dirname);
-        ui->exportButton->setEnabled(true);
-    }
-}
-*/
+
 void DigDeeperDialog::DigDeeperFiles()
 {
     FileDeepData exportdata;

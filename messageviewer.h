@@ -19,14 +19,9 @@ class MessageViewer : public QDialog
 public:
     MessageViewer(QWidget* parent = 0);
     ~MessageViewer();
-    //QTextEdit* msglog;
-    //void ShowMessage(const QModelIndex &index);
     
 private slots:
     void HideClicked();
-    //void UpdateMessages(int chkstate);
-    //void UpdateEncoding();
-    //void GetTextContent();
 signals:
     void HideMessageViewerWindow(bool checkstate);
 
@@ -35,13 +30,6 @@ protected:
 
 private:
     Ui::MessageViewer* ui;
-    //TskObject tskobj;
-    //TskObject* tskptr;
-    //QByteArray txtdata;
-    //QString decodedstring;
-    //int curobjid;
-    //QList<QTextCodec*> codecs;
-    //void FindCodecs();
 };
 
 Q_DECLARE_METATYPE(MessageViewer*);

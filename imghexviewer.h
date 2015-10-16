@@ -38,10 +38,8 @@ public:
   ~ImageHexViewer();
 
   bool openimage();
-  //bool bigopen(startbyte, bytelen);
   ImageReader* reader();
   off_t offset() const;
-  //void ClearContent(); 
   void SetTopLeft(off_t offset);
 
   // returns the word (string representation) that the cursor is in
@@ -100,7 +98,6 @@ public slots:
   void setOffset(off_t offset);     // sets cursor offset
   void SetOffset();
   void setTopLeftToPercent( int percent ); // for setting pos from scroll
-  void setTopLeftToPercent(); // for setting pos from scroll
   void setTopLeftToFloat(float offset);
   void setTopLeftToDouble(double offset);
   //
@@ -127,7 +124,6 @@ public slots:
 
 
 protected:
-  //  void setOffsetLabels( off_t topLeft );
   void setTopLeft( off_t offset );
 
 protected:

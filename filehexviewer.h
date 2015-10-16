@@ -38,10 +38,8 @@ public:
   ~FileHexViewer();
 
   bool openimage();
-  //bool bigopen(startbyte, bytelen);
   FileReader* reader();
   off_t offset() const;
-  //void ClearContent(); 
   void SetTopLeft(off_t offset);
 
   // returns the word (string representation) that the cursor is in
@@ -124,7 +122,6 @@ public slots:
 
 
 protected:
-  //  void setOffsetLabels( off_t topLeft );
   void setTopLeft( off_t offset );
 
 protected:

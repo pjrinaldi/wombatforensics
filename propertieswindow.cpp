@@ -33,8 +33,6 @@ void PropertiesWindow::UpdateTableView()
         if(pmodel->index(i, 1).data().toString().size() > 30)
             ui->tableView->resizeRowToContents(i);
     }
-    //qDebug() << ui->label->
-    //ui->tableView->resizeRowsToContents();
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
 }
 

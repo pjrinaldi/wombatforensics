@@ -22,7 +22,6 @@ VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoVie
 
 VideoViewer::~VideoViewer()
 {
-    //vout->close();
 }
 
 void VideoViewer::Seek(int pos)
@@ -118,11 +117,7 @@ void VideoViewer::ShowVideo(QString tmpfilepath, const QModelIndex &index)
 {
     this->show();
     ui->label_2->setVisible(true);
-    //Thread thread(vplayer);
-    //vplayer->moveToThread(&thread);
-    //thread.start();
     QtConcurrent::run(this, &VideoViewer::GetVideo, tmpfilepath, index.sibling(index.row(), 0).data().toULongLong());
-    //GetVideo(tmpfilepath, index.sibling(index.row(), 0).data().toULongLong());
     vplayer->play();
     ui->label_2->setVisible(false);
 }

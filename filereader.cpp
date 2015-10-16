@@ -182,7 +182,6 @@ off_t FileReader::size() const
 off_t FileReader::NumberPages() const
 {
     return _numpages;
-    //return _maxPages;
 }
 
 const char* FileReader::lastError() const
@@ -243,7 +242,6 @@ bool FileReader::loadimagepage(off_t pageIdx)
             {
                 retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
             }
-            //qDebug() << retval;
         }
     }
     if(retval > 0)
@@ -288,7 +286,6 @@ uchar FileReader::operator[] (off_t offset)
 off_t
 FileReader::nFreePages() const
 {
-    //qDebug() << "Free Pages" << _freePages;
    return _freePages;
 }
 

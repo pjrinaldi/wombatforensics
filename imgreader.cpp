@@ -71,7 +71,6 @@ bool ImageReader::openimage(TskObject* tskpointer)
     if((_size - 1) % _pageSize != 0)
         npages++;
     _numpages = npages;
-    //qDebug() << "npages" << npages;
     _data.resize(npages);
     fill(_data.begin(), _data.begin()+npages, (uchar*)0);
     _is_open = true;
@@ -180,7 +179,6 @@ off_t ImageReader::size() const
 off_t ImageReader::NumberPages() const
 {
     return _numpages;
-    //return _maxPages;
 }
 
 const char* ImageReader::lastError() const
@@ -197,10 +195,6 @@ bool ImageReader::loadimagepage(off_t pageIdx)
     off_t retval = 0;
     if(!is_open())
         return false;
-    /*
-    if(_data[pageIdx] != 0)
-        return true;
-    */
     if(!nFreePages())
     {
         if(abs(_firstPage - pageIdx) > abs(_lastPage - pageIdx))
@@ -256,7 +250,6 @@ uchar ImageReader::operator[] (off_t offset)
 off_t
 ImageReader::nFreePages() const
 {
-    //qDebug() << "Free Pages" << _freePages;
    return _freePages;
 }
 

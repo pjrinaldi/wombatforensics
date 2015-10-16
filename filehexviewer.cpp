@@ -56,16 +56,7 @@ FileHexViewer::~FileHexViewer()
 {
   _reader.close();
 }
-/*
-void FileHexViewer::ClearContent()
-{
-    //_reader.Clear();
-    //_reader.seekimage(_topLeft);
-    //_reader.seek(_topLeft);
-    //_reader.readimage(_data,bytesPerPage());
-    //setTopLeft(0);
-}
-*/
+
 void FileHexViewer::SetTopLeft(off_t offset)
 {
     setTopLeft(offset);
@@ -157,7 +148,6 @@ void FileHexViewer::setTopLeft( off_t offset )
      }
      // only let _topLeft be an integer multiple of the line length (round down)
      // update the labels
-     //setOffsetLabels(_topLeft);
      _reader.seekimage(_topLeft);
      _reader.readimage(_data,bytesPerPage()); // replaced with AdjustData()
      
@@ -169,11 +159,6 @@ void FileHexViewer::setTopLeft( off_t offset )
   }
   inTopLeft = false;
 }
-
-//void FileHexViewer::setOffsetLabels( off_t topLeft )
-//{
-  // need to impliment manually printing labels
-//}
 
 int FileHexViewer::topMargin() const
 {
@@ -296,31 +281,6 @@ void FileHexViewer::setTopLeftToPercent( int percent )
         else
             emit PageDown();
     }
-    /*
-    //setTopLeft((_reader.size()/100)*percent);
-    percent = percent*bytesPerLine();
-    if(_previousstep < percent)
-    {
-        int stepdiff = percent - _previousstep;
-        if(stepdiff == bytesPerLine())
-            nextLine();
-        else if(stepdiff == bytesPerPage())
-            nextPage();
-        else
-            setTopLeft(percent);
-    }
-    else if(_previousstep > percent)
-    {
-        int stepdiff = _previousstep - percent;
-        if(stepdiff == bytesPerLine())
-            prevLine();
-        else if(stepdiff == bytesPerPage())
-            prevPage();
-        else
-            setTopLeft(percent);
-    }
-    _previousstep = percent;
-    */
 }
 
 void FileHexViewer::setTopLeftToFloat( float offset )
@@ -409,7 +369,6 @@ off_t FileHexViewer::localByteOffsetAtXY(off_t x, off_t y)
   wordIdx = line*wordsPerLine() + x/wordLength;
   
   off_t byteOffsetInWord = (x%wordLength)*bytesPerWord()/wordLength;
-  // =  wordIdx*bytesPerWord + byteOffsetInWord
   return min( (off_t) bytesPerPage()-1, 
 	     wordIdx*bytesPerWord() + byteOffsetInWord);
 
@@ -638,7 +597,6 @@ void FileHexViewer::paintLabels( QPainter* paintPtr)
   unsigned int i;
   off_t offset = _topLeft;
   uchar *ucptr;
-  //uchar* offsetptr;
   QString label;
 
 
@@ -698,7 +656,6 @@ void FileHexViewer::paintEvent( QPaintEvent* e)
   drawSelection( paint );
   
   // Find the stop/start row/col idx's for the repaint
-  //int totalWordWidth = wordWidth()+1;
   int totalWordWidth = wordWidth()+wordSpacing();
   int row_start = max(0,(e->rect().top()-topMargin())/lineSpacing() );
   int col_start = max(0,(e->rect().left()-leftMargin())/totalWordWidth);
@@ -793,19 +750,12 @@ void FileHexViewer::seeCursor()
       if(_cursor.byteOffset() < _topLeft)
       {
           setTopLeft(_topLeft - bytesPerLine());
-          // just need to replace setTopLeft with however we move the cursor, i think with updateWord...
-          //setTopLeft(_cursor.byteOffset() - bytesPerLine()-1);
       }
       else
       {
-          //qDebug() << "topleft:" << _topLeft << "bytes per line:" << bytesPerLine();
-          //qDebug() << "topleft + bytesperline:" << _topLeft + bytesPerLine();
           setTopLeft(_topLeft + bytesPerLine());
-          //setTopLeft(_cursor.byteOffset() + bytesPerLine()-1);
       }
       repaint();
-    // setTopLeft so cursor is in middle line of screen
-    //setTopLeft( max(_cursor.byteOffset() - bytesPerPage()/2, (off_t)0) );
   }
 }
 
@@ -814,7 +764,6 @@ void FileHexViewer::cursorLeft()
   off_t oldWordIdx = localWordOffset();
   // move the cursor
   _cursor.decrByChar(2);
-  //_cursor.decrByChar(1);
   // make sure the user can see the cursor
   seeCursor();
   // redraw where the cursor used to be
@@ -826,7 +775,6 @@ void FileHexViewer::cursorRight()
 {
   off_t oldWordIdx = localWordOffset();
   _cursor.incrByChar(2);
-  //_cursor.incrByChar(1);
   seeCursor();
   if( localWordOffset() != oldWordIdx ) 
     updateWord( oldWordIdx );
@@ -897,7 +845,6 @@ void FileHexViewer::setBase(int base)
   switch(base) {
   case -1:
     // setup ascii editing mode
-    //_charsPerByte = 2;
     _charsPerByte = 1;
     break;
   case 2:
@@ -982,8 +929,6 @@ void FileHexViewer::drawSelection( QPainter& paint )
   if( start < bytesPerPage() ) {
     off_t stop = min(selectionEnd() - _topLeft, (off_t)bytesPerPage());
     paint.setPen(Qt::NoPen);
-    //paint.setBrush( qApp->palette().highlight() );
-    //paint.setBrush(QBrush(QColor(Qt::cyan)));
     paint.setBrush(QBrush(QColor(177, 177, 177, 255)));
     stop--;
     while( start <= stop ) {
