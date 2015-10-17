@@ -38,7 +38,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addAction(ui->menuBookmark_Manager->menuAction());
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
-    ui->analysisToolBar->addAction(ui->menuAbout->menuAction());
+    ui->analysisToolBar->addAction(ui->actionAbout);
     tskexternalptr = &tskexternalobject;
     tskobjptr = &tskobject;
     tskobjptr->readimginfo = NULL;
@@ -67,12 +67,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     htmlviewer = new HtmlViewer();
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
+    aboutbox = new AboutBox(this);
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
+    aboutbox->setWindowIcon(QIcon(":/bar/about"));
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -1533,6 +1535,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     textviewer->close();
     htmlviewer->close();
     byteviewer->close();
+    aboutbox->close();
     RemoveTmpFiles();
     event->accept();
     magic_close(magicptr);
@@ -1762,6 +1765,18 @@ void WombatForensics::on_actionCollapseAll_triggered()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     ui->dirTreeView->collapseAll();
     QApplication::restoreOverrideCursor();
+}
+
+void WombatForensics::on_actionAbout_triggered()
+{
+    qDebug() << "action about clicked";
+    aboutbox->show();
+}
+
+void WombatForensics::on_actionActionAbout_triggered()
+{
+    qDebug() << "action action about clicked";
+    aboutbox->show();
 }
 
 void WombatForensics::UpdateThumbnails(int tsize)

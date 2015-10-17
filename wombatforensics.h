@@ -23,6 +23,7 @@
 #include "messageviewer.h"
 #include "byteconverter.h"
 #include "digdeeperdialog.h"
+#include "aboutbox.h"
 
 class WombatSlider : public QSlider
 {
@@ -799,6 +800,7 @@ public:
     HtmlViewer* htmlviewer;
     MessageViewer* msgviewer;
     ByteConverter* byteviewer;
+    AboutBox* aboutbox;
 
 signals:
 
@@ -823,6 +825,8 @@ private slots:
     void on_actionCopy_Selection_To_triggered();
     void on_actionExpandAll_triggered();
     void on_actionCollapseAll_triggered();
+    void on_actionAbout_triggered();
+    void on_actionActionAbout_triggered();
     void UpdateProgress(unsigned long long count, unsigned long long processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);
