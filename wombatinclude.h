@@ -86,8 +86,6 @@
 #include "cursor.h"
 
 #include "tsk/libtsk.h"
-//#include "img/aff.h"
-//#include "afflib.h" // won't compile anymore on arch linux. requires older libncurses than what is currently installed as 9/18/15
 #include "img/ewf.h"
 #include "libewf.h"
 #include "vs/tsk_bsd.h"
@@ -104,6 +102,5 @@
 #include "fs/tsk_hfs.h"
 #include "fs/tsk_yaffs.h"
 #include "magic.h"
-//#include "qdebugstream.h"
 
 #endif // WOMBATINCLUDE_H

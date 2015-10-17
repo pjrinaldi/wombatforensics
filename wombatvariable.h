@@ -127,25 +127,6 @@ struct SelectedObject
 
 struct WombatVariable
 {
-    /*
-    // ADD ENUMS FOR JOBSTATUS, JOBTYPE, ETC TO SIMPLIFY INTEGER ASSOCIATION AND READABILITY IN CODE
-    enum JobStatus
-    {
-        failed = 0,
-        finish = 1,
-        finisherror = 2,
-        cancelled = 3
-    };
-
-    enum JobType
-    {
-        generic = 0,
-        addevidence = 1,
-        remedvidence = 2,
-        exportfiles = 3
-    };
-    */
-
     // id values
     int jobtype;
     unsigned long long jobid;
@@ -185,16 +166,6 @@ struct WombatVariable
     QList<QVariant> bindvalues;
 };
 
-/*
-typedef struct
-{
-    TSK_IMG_INFO imginfo;
-    //AFFILE* affile;
-    TSK_OFF_T seekpos;
-    uint16_t type;
-} IMG_AFF_INFO;
-*/
-
 typedef struct
 {
     TSK_IMG_INFO imginfo;
@@ -213,7 +184,6 @@ Q_DECLARE_METATYPE(FileDeepData);
 Q_DECLARE_METATYPE(CaseObject);
 Q_DECLARE_METATYPE(EvidenceObject);
 Q_DECLARE_METATYPE(SelectedObject);
-//Q_DECLARE_METATYPE(IMG_AFF_INFO);
 Q_DECLARE_METATYPE(IMG_EWF_INFO);
 
 #endif // WOMBATVARIABLE_H

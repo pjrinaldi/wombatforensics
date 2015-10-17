@@ -12,14 +12,12 @@ public:
     WombatFramework(WombatVariable* wombatvariable);
     ~WombatFramework();
 
-    //void BuildEvidenceModel(void);
     void OpenEvidenceImage(void);
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);
     void OpenPartitions(void);
     void OpenFiles(void);
     void CloseInfoStructures(void);
-    //void GetBootCode(int idx);
 
 private:
     WombatVariable* wombatptr;

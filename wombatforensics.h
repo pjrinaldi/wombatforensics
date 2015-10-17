@@ -46,7 +46,6 @@ protected:
             event->accept();
             QSlider::mousePressEvent(event);
         }
-        //QSlider::mousePressEvent(event);
     };
 };
 
@@ -337,28 +336,11 @@ public:
             Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
             return SetCheckState(index, state);
         }
-        // THIS BRINGS UP AN ISSUE WHERE I DON'T KNOW WHICH COLUMN SHOULD BE UPDATED BECAUSE IT ALWAYS ASSUMES COLUMN 0 FOR THE ROW...
-        // I WILL HAVE TO THINK OF SOME WAY TO SEND SETDATA INFO ABOUT WHAT SHOULD BE UPDATED....
-        // MAYBE A GLOBAL VARIABLE DATATYPE = MD5, ETC WHICH IS CHECKED HERE AND SET PRIOR TO CALLING SET DATA...
-        /*
-        if(role == Qt::DisplayRole)
-        {
-            qDebug() << "index.column() should be 10:" << index.column();
-            qDebug() << "model selected data should get updated here..." << value.toString();
-            Node* curnode = NodeFromIndex(index);
-            if(datatype == 0)
-                curnode->nodevalues[10] = value.toString();
-            emit dataChanged(index, index);
-            return true;
-        }
-        */
-        // THIS METHOD WORKS, AND I'M NOT REQUIRED TO MESS WITH THE QVARIANT VALUE OR WHICH COLUMN CHANGES...
         if(role == Qt::DisplayRole)
         {
             if(value.toInt() == -15)
             {
                 Node* parentnode = NodeFromIndex(index);
-                //qDebug() << "hopefully will update" << parentnode->children.count() << "children here...";
                 QSqlQuery childupdatequery(fcasedb);
                 childupdatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
                 for(int i=0; i < parentnode->children.count(); i++)
@@ -369,12 +351,7 @@ public:
                     for(int j=0; j < childupdatequery.record().count(); j++)
                     {
                         parentnode->children.at(i)->nodevalues[j] = childupdatequery.value(j);
-                        //if(j == 16)
-                            //qDebug() << "nodevalue for magic file:" << childupdatequery.value(j).toString();
                     }
-                    //qDebug() << "index name:" << index.sibling(index.row(), 16).data().toString();
-                    //qDebug() << "index child name:" << index.child(i, 0).sibling(index.child(i, 0).row(), 16).data().toString();
-                    //emit dataChanged(index.child(i, 0), index.child(i, 0));
                 }
                 childupdatequery.finish();
                 emit dataChanged(index.child(0, 0), index.child(parentnode->children.count() - 1, 0));
@@ -397,50 +374,6 @@ public:
                 return true;
             }
         }
-            /*
-             *
-             *        Node* parentnode = NodeFromIndex(parent);
-        QList<QVariant> fetchvalues;
-        fetchvalues.clear();
-        if(parentnode->haschildren == true)
-        {
-            QSqlQuery morequery(fcasedb);
-            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ?");
-            morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
-            morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
-            if(morequery.exec())
-            {
-                beginInsertRows(parent, 0, parentnode->childcount - 1);
-                while(morequery.next())
-                {
-                    fetchvalues.clear();
-                    for(int i=0; i < morequery.record().count(); i++)
-                        fetchvalues.append(morequery.value(i));
-                    Node* curchild = new Node(fetchvalues);
-                    curchild->parent = parentnode;
-                    if(QString(".").compare(curchild->nodevalues.at(1).toString()) == 0 || QString("..").compare(curchild->nodevalues.at(1).toString()) == 0)
-                    {
-                        curchild->childcount = 0;
-                        curchild->haschildren = false;
-                    }
-                    else
-                    {
-                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong());
-                        curchild->haschildren = curchild->HasChildren();
-                    }
-                    if(morequery.value(18).toInt() == 0)
-                        curchild->checkstate = 0;
-                    else if(morequery.value(18).toInt() == 1)
-                        curchild->checkstate = 1;
-                    else
-                        curchild->checkstate = 2;
-                    parentnode->children.append(curchild);
-                }
-                endInsertRows();
-                emit checkedNodesChanged();
-
-             *
-             */ 
         return false;
     };
 
@@ -463,18 +396,9 @@ public:
             updatequery.next();
             endnode->nodevalues[10] = updatequery.value(10).toString();
             updatequery.finish();
-            // not sure if updating the nodevalues will update the md5 values or not...
         }
         }
     };
-
-    /*
-    bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
-    {
-        emit headerDataChanged(orientation, section, section);
-        return true;
-    };
-    */
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
     {
@@ -487,7 +411,6 @@ public:
         {
             if(section == 0 && (filtervalues.maxidbool || filtervalues.minidbool))
             {
-                //emit headerDataChanged(orientation, section, section);
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             }
             if(section == 1 && filtervalues.namebool)
@@ -602,7 +525,6 @@ public:
                 }
                 endInsertRows();
                 emit checkedNodesChanged();
-                //emit UpdateChildIndexData(parent);
                 setData(parent, QVariant(-15), Qt::DisplayRole);
             }
         }
@@ -744,7 +666,6 @@ public:
  
 signals:
     void checkedNodesChanged();
-    //void UpdateChildIndexData(const QModelIndex &index);
 
 private:
     Qt::CheckState GetCheckState(Node* curnode) const
@@ -771,34 +692,16 @@ private:
         {
             curnode->checkstate = 1;
             checkhash[curnode->nodevalues.at(0).toULongLong()] = 1;
-            /*QSqlQuery chkquery(fcasedb);
-            chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
-            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
-            chkquery.exec();
-            chkquery.next();
-            chkquery.finish(); */
         }
         else if(curnode->childcount == checkcount)
         {
             curnode->checkstate = 1;
             checkhash[curnode->nodevalues.at(0).toULongLong()] = 1;
-            /*QSqlQuery chkquery(fcasedb);
-            chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
-            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
-            chkquery.exec();
-            chkquery.next();
-            chkquery.finish();*/
         }
         else if(checkcount == 0)
         {
             curnode->checkstate = 0;
             checkhash[curnode->nodevalues.at(0).toULongLong()] = 0;
-            /*QSqlQuery chkquery(fcasedb);
-            chkquery.prepare("UPDATE data SET checked = 0 WHERE objectid = ?;");
-            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
-            chkquery.exec();
-            chkquery.next();
-            chkquery.finish();*/
         }
         emit dataChanged(index, index);
         emit checkedNodesChanged();
@@ -828,38 +731,18 @@ private:
             if(curnode->haschildren)
                 SetChildCheckState(index);
             checkhash[curnode->nodevalues.at(0).toULongLong()] = 0;
-            // i think is where i should update the db with the checkstate...
-            /*QSqlQuery chkquery(fcasedb);
-            chkquery.prepare("UPDATE data SET checked = 0 WHERE objectid = ?;");
-            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
-            chkquery.exec();
-            chkquery.next();
-            chkquery.finish();*/
         }
         else if(state == Qt::PartiallyChecked) // curnode is now partially checked
         {
             curnode->checkstate = 1;
             checkhash[curnode->nodevalues.at(0).toULongLong()] = 1;
-            /*QSqlQuery chkquery(fcasedb);
-            chkquery.prepare("UPDATE data SET checked = 1 WHERE objectid = ?;");
-            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
-            chkquery.exec();
-            chkquery.next();
-            chkquery.finish();*/
         }
         else if(state == Qt::Checked) // currentnode is now checked
         {
             curnode->checkstate = 2;
             if(curnode->haschildren)
                 SetChildCheckState(index);
-            // i think this is where i should update the db with the checkstate...
             checkhash[curnode->nodevalues.at(0).toULongLong()] = 2;
-            /*QSqlQuery chkquery(fcasedb);
-            chkquery.prepare("UPDATE data SET checked = 2 WHERE objectid = ?;");
-            chkquery.addBindValue(curnode->nodevalues.at(0).toULongLong());
-            chkquery.exec();
-            chkquery.next();
-            chkquery.finish();*/
         }
         emit dataChanged(index, index);
         emit checkedNodesChanged();
@@ -918,8 +801,6 @@ public:
     ByteConverter* byteviewer;
 
 signals:
-    //void UpdateChildIndexData(const QModelIndex &index);
-    //void LogVariable(WombatVariable* wombatVariable);
 
 private slots:
     void AddEvidence();
@@ -968,15 +849,11 @@ private slots:
         if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
         {
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
-            //ui->dirTreeView->model()->setData(index, QVariant(-15), Qt::DisplayRole);
-            //ResizeColumns();
         }
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
     void FileDig(FileDeepData* deeperdata);
-    //void setScrollBarRange(off_t low, off_t high);
-    //void setScrollBarValue(off_t pos);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
     void ShowRockerToolTip(int moved);
@@ -986,7 +863,6 @@ private slots:
     void PageUp(void);
     void PageDown(void);
     void UpdateSelectValue(const QString &txt);
-    //void LoadComplete(bool isok);
     void InitializeQueryModel(void);
     void UpdateDataTable(void);
     void UpdateStatus(void);
@@ -998,8 +874,6 @@ private slots:
     {
         statuslabel->setText(tmptext);
     };
-    //void SetStepValues(int singlestep, int pagestep);
-    //void SetStepValues(off_t singlestep, off_t pagestep);
     void TreeContextMenu(const QPoint &point);
     void ImgHexMenu(const QPoint &point);
     void SetFilter(int headercolumn);
@@ -1034,10 +908,6 @@ private:
     void UpdateProperties(void);
     void LoadHexContents(void);
     void SecondaryProcessing(void);
-    //void LoadTxtContents(void);
-    //void LoadWebContents(void);
-    //void LoadImgContents(void);
-    //void LoadVidContents(void);
     void OpenEvidenceStructure(void);
     void StartThumbnails(void);
     void ExportFiles(FileExportData* exportdata);
@@ -1068,14 +938,11 @@ private:
 
     off_t offset() const;
     ImageHexViewer* hexwidget;
-    //QScrollBar* hexvsb;
-    //QSlider* hexrocker;
     WombatSlider* hexrocker;
     QPushButton* lineup;
     QPushButton* linedown;
     QPushButton* pageup;
     QPushButton* pagedown;
-    //QPushButton* jumpto;
     QLabel* selectedoffset;
     QLabel* selectedhex;
     QLabel* filecountlabel;
@@ -1090,9 +957,6 @@ private:
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
-    //unsigned long long curimgcount;
 };
-
-//Q_DECLARE_METATYPE(QTextCursor)
 
 #endif // WOMBATFORENSICS_H
