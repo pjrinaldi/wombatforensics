@@ -7,7 +7,7 @@ AboutBox::AboutBox(QWidget* parent) : QDialog(parent), ui(new Ui::AboutBox)
 {
     ui->setupUi(this);
     QString abouttext = "<h3>About WombatForensics v1.0</h3>";
-    abouttext += "<h5>License: GPLv3</h5>";
+    abouttext += "<h5>License: GPLv2</h5>";
     abouttext += "<4>Copyright 2015 Pasquale J. Rinaldi, Jr.</h4>";
     abouttext += "<h5>Email: pjrinaldi@gmail.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Phone: (865) 206-8130</h5>";
     abouttext += "<p>This program incorporates modified code from the lfhex project to implement the hexviewers.";
