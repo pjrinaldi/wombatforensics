@@ -60,7 +60,8 @@ public:
         sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
         label->setSizePolicy(sizePolicy);
         label->setLineWidth(0);
-        label->setAlignment(Qt::AlignCenter);
+        label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+        label->setMargin(15);
         label->setTextInteractionFlags(Qt::NoTextInteraction);
 
         horizontalLayout_2->addWidget(label);

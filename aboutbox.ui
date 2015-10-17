@@ -80,10 +80,16 @@
           <string>Loading...</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="margin">
+          <number>15</number>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
+          <set>Qt::LinksAccessibleByMouse</set>
          </property>
         </widget>
        </item>

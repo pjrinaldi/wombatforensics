@@ -3,7 +3,13 @@
 AboutBox::AboutBox(QWidget* parent) : QDialog(parent), ui(new Ui::AboutBox)
 {
     ui->setupUi(this);
-    ui->label->setText("<b>Test</b>");
+    QString abouttext = "<h3>About WombatForensics v1.0</h3>";
+    abouttext += "<h5>License: GPLv3</h5>";
+    abouttext += "<h4>Created by Pasquale J. Rinaldi, Jr.</h4>";
+    abouttext += "<4>Copyright &copyright; 2015 Pasquale Rinaldi</h4>";
+    abouttext += "<h5>Email: pjrinaldi@gmail.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Phone: (865) 206-8130</h5><br/><br/>";
+    abouttext += "qt5 lgplv2.1/3 | lfhex gplv2 | treepata glpv3 | sleuthkit gpl/cpl/ibm";
+    ui->label->setText(abouttext);
     this->hide();
 }
 
