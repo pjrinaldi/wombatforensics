@@ -61,8 +61,9 @@ public:
         label->setSizePolicy(sizePolicy);
         label->setLineWidth(0);
         label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+        label->setWordWrap(true);
         label->setMargin(15);
-        label->setTextInteractionFlags(Qt::NoTextInteraction);
+        label->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
 
         horizontalLayout_2->addWidget(label);
 

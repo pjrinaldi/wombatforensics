@@ -815,7 +815,7 @@ private slots:
     void on_actionExport_triggered();
     void on_actionDigDeeper_triggered();
     void on_actionView_Properties_triggered(bool checked);
-    void on_actionView_Progress_triggered(bool checked);
+    //void on_actionView_Progress_triggered(bool checked);
     void on_actionView_File_triggered(bool checked);
     void on_actionView_Image_Gallery_triggered(bool checked);
     void on_actionViewerManager_triggered();
@@ -826,7 +826,6 @@ private slots:
     void on_actionExpandAll_triggered();
     void on_actionCollapseAll_triggered();
     void on_actionAbout_triggered();
-    void on_actionActionAbout_triggered();
     void UpdateProgress(unsigned long long count, unsigned long long processcount);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideProgressWindow(bool checkstate);

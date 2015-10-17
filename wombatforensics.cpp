@@ -1100,9 +1100,9 @@ void WombatForensics::ExportEvidence()
 void WombatForensics::FileDig(FileDeepData* deeperdata)
 {
     DigFiles(deeperdata);
-    if(deeperdata)
-        qDebug() << "launch in a new thread the dig deeper functionality...";
-    qDebug() << "update message and status text";
+    //if(deeperdata)
+        //qDebug() << "launch in a new thread the dig deeper functionality...";
+    //qDebug() << "update message and status text";
 }
 
 void WombatForensics::FileExport(FileExportData* exportdata)
@@ -1281,7 +1281,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         {
             retval = tsk_fs_file_read_type(curobj.readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, curobj.mftattrid, 0, contentbuffer, curobj.length, TSK_FS_FILE_READ_FLAG_SLACK);
         }
-        qDebug() << "retval:" << retval;
+        //qDebug() << "retval:" << retval;
         if(retval > 0)
         {
             bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(QString::fromStdString(fullpath)));
@@ -1654,13 +1654,14 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
     }
 }
 
+/*
 void WombatForensics::on_actionView_Progress_triggered(bool checked) // modify this to be the logviewer.
 {
     if(!checked) // hide logviewer
-        qDebug() << "hide logviewer here.";
+        //qDebug() << "hide logviewer here.";
     else// show logviewer
-        qDebug() << "show logviewer here.";
-}
+        //qDebug() << "show logviewer here.";
+}*/
 
 void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 {
@@ -1769,13 +1770,6 @@ void WombatForensics::on_actionCollapseAll_triggered()
 
 void WombatForensics::on_actionAbout_triggered()
 {
-    qDebug() << "action about clicked";
-    aboutbox->show();
-}
-
-void WombatForensics::on_actionActionAbout_triggered()
-{
-    qDebug() << "action action about clicked";
     aboutbox->show();
 }
 
