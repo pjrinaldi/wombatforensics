@@ -18,7 +18,7 @@
 
 /*
  * Updates to enable editor to open a forensic image.
- * Copyright (C) 2014 Pasquale J. Rinaldi, Jr. <pjrinaldi@gmail.com>
+ * Copyright (C) 2015 Pasquale J. Rinaldi, Jr. <pjrinaldi@gmail.com>
  */ 
 #include <stdexcept>
 #include <algorithm>

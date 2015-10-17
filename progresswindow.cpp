@@ -1,5 +1,8 @@
 #include "progresswindow.h"
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2.1
+
 ProgressWindow::ProgressWindow(WombatDatabase* wdata, QWidget* parent) : QDialog(parent), ui(new Ui::ProgressWindow)
 {
     ui->setupUi(this);

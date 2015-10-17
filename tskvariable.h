@@ -1,6 +1,9 @@
 #ifndef TSKVARIABLE_H
 #define TSKVARIABLE_H
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2.1
+
 #include "tsk/libtsk.h"
 #include <QDebug>
 

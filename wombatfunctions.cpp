@@ -1,5 +1,8 @@
 #include "wombatfunctions.h"
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2.1
+
 std::string GetTime()
 {
     struct tm *newtime;

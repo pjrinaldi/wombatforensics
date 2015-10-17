@@ -1,6 +1,9 @@
 #ifndef WOMBATINCLUDE_H
 #define WOMBATINCLUDE_H
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2.1
+
 #include <bitset>
 #include <cstdio>
 #include <fstream>

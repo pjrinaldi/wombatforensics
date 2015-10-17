@@ -1,6 +1,9 @@
 #ifndef FILEVIEWER_H
 #define FILEVIEWER_H
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2.1
+
 #include "wombatinclude.h"
 #include "filehexviewer.h"
 #include "ui_fileviewer.h"
@@ -28,7 +31,6 @@ protected:
             event->accept();
             QSlider::mousePressEvent(event);
         }
-        //QSlider::mousePressEvent(event);
     };
 };
 
@@ -52,7 +54,6 @@ public slots:
 
 private slots:
     void SetScrollBarRange(off_t low, off_t high);
-    //void setScrollBarValue(off_t pos);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
     void ShowRockerToolTip(int moved);
@@ -61,7 +62,6 @@ private slots:
     void PageUp(void);
     void PageDown(void);
     void UpdateSelectValue(const QString &txt);
-    //void SetStepValues(int singlestep, int pagestep);
     void HideClicked();
 
 signals:
@@ -74,7 +74,6 @@ private:
 
     QLabel* selectedoffset;
     QLabel* selectedhex;
-    //QScrollBar* filehexvsb;
     FileSlider* hexrocker;
     QPushButton* lineup;
     QPushButton* linedown;

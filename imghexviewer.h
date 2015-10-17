@@ -18,7 +18,7 @@
 
 /*
  *
- * Copyright (C) 2013 Pasquale Rinaldi <pjrinaldi@gmail.com>
+ * Copyright (C) 2015 Pasquale Rinaldi <pjrinaldi@gmail.com>
  * Removed dependence on local.h since most of the file was not needed
  *
  */ 

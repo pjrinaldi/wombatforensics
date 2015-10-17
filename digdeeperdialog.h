@@ -1,6 +1,9 @@
 #ifndef DIGDEEPERDIALOG_H
 #define DIGDEEPERDIALOG_H
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2.1
+
 #include "wombatinclude.h"
 #include "wombatvariable.h"
 

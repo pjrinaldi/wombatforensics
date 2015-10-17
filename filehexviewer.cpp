@@ -18,7 +18,7 @@
 
 /*
  *
- * Copyright (C) 2013 Pasquale Rinaldi <pjrinaldi@gmail.com>
+ * Copyright (C) 2015 Pasquale Rinaldi <pjrinaldi@gmail.com>
  * Modifying the code to open tsk_img_byte data in addition to a real file.
  * Modifying to make it a viewer and not an editor.
  * Modifying to add a statusbar providing conversions.

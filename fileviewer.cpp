@@ -1,5 +1,8 @@
 #include "fileviewer.h"
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2.1
+
 FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(parent), ui(new Ui::FileViewer)
 {
     tskptr = tskobjptr;
@@ -23,8 +26,6 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     linedown = new QPushButton(QIcon(":/basic/linedown"), "", ui->centralwidget);
     pageup = new QPushButton(QIcon(":/basic/pageup"), "", ui->centralwidget);
     pagedown = new QPushButton(QIcon(":/basic/pagedown"), "", ui->centralwidget);
-    //jumpto = new QPushButton("J", ui->hexPage);
-    linedown->setAutoRepeat(true);
     lineup->setAutoRepeat(true);
     pagedown->setAutoRepeat(true);
     pageup->setAutoRepeat(true);
@@ -32,18 +33,11 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     lineup->setVisible(false);
     pageup->setVisible(false);
     pagedown->setVisible(false);
-    //jumpto->setVisible(false);
     hexrocker = new FileSlider(ui->centralwidget);
     hexrocker->setRange(-100, 100);
     hexrocker->setValue(0);
     hexrocker->setSingleStep(1);
     ui->horizontalLayout->addWidget(hexrocker);
-
-    /*
-    filehexvsb = new QScrollBar(filehexview);
-    filehexvsb->setRange(0, 0);
-    ui->horizontalLayout->addWidget(filehexvsb);
-    */
     connect(linedown, SIGNAL(clicked()), filehexview, SLOT(nextLine()));
     connect(lineup, SIGNAL(clicked()), filehexview, SLOT(prevLine()));
     connect(pagedown, SIGNAL(clicked()), filehexview, SLOT(nextPage()));
@@ -57,13 +51,8 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     connect(filehexview, SIGNAL(SkipUp()), this, SLOT(SkipUp()));
     connect(filehexview, SIGNAL(PageUp()), this, SLOT(PageUp()));
     connect(filehexview, SIGNAL(PageDown()), this, SLOT(PageDown()));
-
-    //connect(filehexview, SIGNAL(rangeChanged(off_t, off_t)), this, SLOT(SetScrollBarRange(off_t, off_t)));
-    //connect(filehexview, SIGNAL(topLeftChanged(off_t)), this, SLOT(setScrollBarValue(off_t)));
     connect(filehexview, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    //connect(filehexvsb, SIGNAL(valueChanged(int)), filehexview, SLOT(setTopLeftToPercent(int)));
     connect(filehexview, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
-    //connect(filehexview, SIGNAL(StepValues(int, int)), this, SLOT(SetStepValues(int, int)));
 }
 
 void FileViewer::ShowRockerToolTip(int moved)
@@ -148,14 +137,8 @@ void FileViewer::closeEvent(QCloseEvent* event)
 void FileViewer::SetScrollBarRange(off_t low, off_t high)
 {
     (void)low; (void)high;
-   //filehexvsb->setRange(low, high);
 }
-/*
-void FileViewer::setScrollBarValue(off_t pos)
-{
-    //filehexvsb->setValue(pos);
-}
-*/
+
 void FileViewer::SetOffsetLabel(off_t pos)
 {
     QString label;
@@ -172,82 +155,7 @@ void FileViewer::SetOffsetLabel(off_t pos)
 
 void FileViewer::UpdateSelectValue(const QString &txt)
 {
-    // set hex (which i'll probably remove anyway since it's highlighted in same window)
     int sellength = txt.size()/2;
     QString tmptext = "Length: " + QString::number(sellength);
     selectedhex->setText(tmptext);
-    /*
-    // get initial bytes value and then update ascii
-    std::vector<uchar> bytes;
-    Translate::HexToByte(bytes, txt);
-    QString ascii;
-    Translate::ByteToChar(ascii, bytes);
-    tmptext = "Ascii: " + ascii;
-    //selectedascii->setText(tmptext);
-    QString strvalue;
-    uchar * ucharPtr;
-    // update the int entry:
-    // pad right with 0x00
-    int intvalue = 0;
-    ucharPtr = (uchar*) &intvalue;
-    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
-    strvalue.setNum(intvalue);
-    tmptext = "Int: " + strvalue;
-    //selectedinteger->setText(tmptext);
-    // update float entry;
-    float fvalue;
-    ucharPtr = (uchar*)(&fvalue);
-    if(bytes.size() < sizeof(float) )
-    {
-        for(unsigned int i= 0; i < sizeof(float); ++i)
-        {
-            if( i < bytes.size() )
-            {
-                *ucharPtr++ = bytes[i];
-            }
-            else
-            {
-                *ucharPtr++ = 0x00;
-            }
-        }
-    }
-    else
-    {
-        memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
-    }
-    strvalue.setNum( fvalue );
-    tmptext = "Float: " + strvalue;
-    //selectedfloat->setText(tmptext);
-    // update double
-    double dvalue;
-    ucharPtr = (uchar*)&dvalue;
-    if(bytes.size() < sizeof(double) )
-    {
-        for(unsigned int i= 0; i < sizeof(double); ++i)
-        {
-            if( i < bytes.size() )
-            {
-                *ucharPtr++ = bytes[i];
-            }
-            else
-            {
-                *ucharPtr++ = 0x00;
-            }
-        }
-    }
-    else
-    {
-        memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
-    }
-    strvalue.setNum( dvalue );
-    tmptext = "Double: " + strvalue;
-    //selecteddouble->setText(tmptext);
-    */
 }
-/*
-void FileViewer::SetStepValues(int singlestep, int pagestep)
-{
-    //filehexvsb->setSingleStep(singlestep);
-    //filehexvsb->setPageStep(pagestep);
-}
-*/

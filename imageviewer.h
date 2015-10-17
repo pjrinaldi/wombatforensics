@@ -1,6 +1,9 @@
 #ifndef IMAGEVIEWER_H
 #define IMAGEVIEWER_H
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2.1
+
 #include "wombatinclude.h"
 #include "globals.h"
 #include "wombatfunctions.h"

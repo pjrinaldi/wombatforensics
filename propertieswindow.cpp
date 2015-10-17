@@ -1,5 +1,8 @@
 #include "propertieswindow.h"
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2.1
+
 PropertiesWindow::PropertiesWindow(WombatDatabase* wdata, QWidget* parent) : QDialog(parent), ui(new Ui::PropertiesWindow)
 {
     ui->setupUi(this);
