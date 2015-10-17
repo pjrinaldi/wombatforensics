@@ -1448,16 +1448,6 @@ void WombatForensics::ShowRockerToolTip(int moved)
     QToolTip::showText(QCursor::pos(), QString::number(abs(moved)), hexrocker);
 }
 
-void WombatForensics::JumpToOffset()
-{
-    //qDebug() << hexrocker->isSliderDown();
-    /*
-    if(!hexrocker->isSliderDown())
-        emit jumpto->clicked();
-        //jumpfilterview->DisplayFilter();
-    */
-}
-
 void WombatForensics::ResetSlider()
 {
     if(linedown->isDown())
@@ -1834,7 +1824,6 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     }
     strvalue.setNum( fvalue );
     bytetext += "<tr><td>Float:</td><td align=right>" + strvalue + "</td></tr>";
-    //selectedfloat->setText(tmptext);
     // update double
     double dvalue;
     ucharPtr = (uchar*)&dvalue;
@@ -1884,7 +1873,6 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     bytetext += "</td></tr>";
     bytetext += "</table>";
     byteviewer->SetText(bytetext);
-    //selecteddouble->setText(tmptext);
 }
 
 void WombatForensics::SetOffsetLabel(off_t pos)
@@ -1900,38 +1888,6 @@ void WombatForensics::SetOffsetLabel(off_t pos)
     label += buffer;
     selectedoffset->setText(label);
 }
-
-/*
-void WombatForensics::setScrollBarRange(off_t low, off_t high)
-{
-    // not sure if i need to adjust the scroll bar range, since it will always be a function of the page height.
-    if(high > 2147483647)
-        qDebug() << "high is too long big" << high;
-    if(high > 9223372036854775807)
-        qDebug() << "high is too long long big" << high;
-    qDebug() << "high is:" << high;
-   (void)low;(void)high;
-   // range must be contained in the space of an integer, just do 100
-   // increments
-   //hexvsb->setRange(low, high);
-   qDebug() << "stepcount" << high;
-}
-*/
-
-/*
-void WombatForensics::setScrollBarValue(off_t pos)
-{
-    // THIS IS THE LINE # THAT THE OFFSET FALLS UNDER
-
-    //hexvsb->setValue(pos);
-
-  // pos is the topLeft pos, set the scrollbar to the
-  // location of the last byte on the page
-  // Note: offsetToPercent now rounds up, so we don't
-  // have to worry about if this is the topLeft or bottom right
-  //hexvsb->setValue(hexwidget->offsetToPercent(pos));
-}
-*/
 
 void WombatForensics::SetFilter(int headercolumn)
 {
@@ -2019,7 +1975,6 @@ void WombatForensics::AddTextSection()
 void WombatForensics::CarveFile()
 {
     QString carvefilename = QFileDialog::getSaveFileName(this, tr("Carve to a File"), QDir::homePath()); 
-    //qDebug() << "carve filename: " << carvefilename;
     if(carvefilename.compare("") != 0)
     {
         std::vector<uchar> tmpbytes;
@@ -2039,14 +1994,12 @@ void WombatForensics::SaveState()
     while(i.hasNext())
     {
         i.next();
-        // ISSUE WITH ITEM_EXISTS BIT
         if(checkhash.contains(i.key()))
         {
             hashquery.bindValue(0, i.value());
             hashquery.bindValue(1, i.key());
             hashquery.exec();
         }
-        //checkhash.remove(i.key());
     }
     fcasedb.commit();
     hashquery.finish();
@@ -2067,11 +2020,6 @@ void WombatForensics::SecondaryProcessing()
     QSqlQuery filequery(fcasedb);
     unsigned long long fsoffset = 0;
     unsigned long long parfsid = 0;
-    // I NEED TO ADD ANOTHER SQL SET TO GET THE BLOCK ADDRESS FOR ADS.
-    // FOR THE BELOW, IT SHOULD GET THE MFTATTRID AND THEN COMPARE WHERE DATA != MFTATTRID, SO IT ONLY GETS THE BLOCKS FOR THE
-    // REGULAR DATA STREAM.
-    // THEN THE SECOND QUERY, WILL GET THE PARADDR, MFTATTRID AND USE THE PARADDR TO GET THE BLOCK INFO AND THEN RUN THE SAME
-    // BLOCK CODE BUT RUN DATA ATTRIBUTE ID == MFTATTRID.
     filequery.prepare("SELECT objectid, parimgid, parfsid, address, name FROM data WHERE objecttype = 5 AND parimgid = ?;");
     filequery.addBindValue(wombatvarptr->currentevidenceid);
     if(filequery.exec())
@@ -2175,7 +2123,6 @@ void WombatForensics::SecondaryProcessing()
             }
             filesprocessed++;
             isignals->ProgUpd();
-            //ResizeColumns();
 
             tsk_fs_file_close(readfileinfo);
             tsk_fs_close(readfsinfo);
