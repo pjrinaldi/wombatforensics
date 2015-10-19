@@ -4,7 +4,7 @@
 #include "wombatinclude.h"
 
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2.1
+// Distrubted under the terms of the GNU General Public License version 2
 
 extern QSqlDatabase fcasedb;
 extern QSqlDatabase thumbdb;

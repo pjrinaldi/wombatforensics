@@ -1,7 +1,7 @@
 #include "wombatforensics.h"
 
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2.1
+// Distrubted under the terms of the GNU General Public License version 2
 
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
@@ -304,10 +304,6 @@ void WombatForensics::HideImageWindow(bool checkstate)
     ui->actionView_Image_Gallery->setChecked(checkstate);
 }
 
-void WombatForensics::HideProgressWindow(bool checkedstate)
-{
-    ui->actionView_Progress->setChecked(checkedstate);
-}
 void WombatForensics::HideViewerManager()
 {
     treemenu->clear();

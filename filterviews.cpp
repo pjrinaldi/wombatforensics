@@ -1,5 +1,8 @@
 #include "filterviews.h"
 
+// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2
+
 IdFilter::IdFilter(QWidget* parent) : QFrame(parent), ui(new Ui::IdFilter)
 {
     ui->setupUi(this);

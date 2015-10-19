@@ -2,7 +2,7 @@
 #include "ui_digdeeperdialog.h"
 
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2.1
+// Distrubted under the terms of the GNU General Public License version 2
 
 DigDeeperDialog::DigDeeperDialog(QWidget *parent, unsigned long long curcheckcount, unsigned long long curlistcount) :
     QDialog(parent),

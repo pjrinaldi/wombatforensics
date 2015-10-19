@@ -1,7 +1,7 @@
 #include "wombatproperties.h"
 
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2.1
+// Distrubted under the terms of the GNU General Public License version 2
 
 uint16_t hfs_get_idxkeylen(HFS_INFO * hfs, uint16_t keylen, const hfs_btree_header_record * header)
 {

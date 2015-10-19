@@ -1,7 +1,7 @@
 #include "videoviewer.h"
 
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2.1
+// Distrubted under the terms of the GNU General Public License version 2
 
 VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoViewer)
 {
