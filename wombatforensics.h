@@ -10,7 +10,6 @@
 #include "wombatframework.h"
 #include "wombatfunctions.h"
 #include "ui_wombatforensics.h"
-#include "progresswindow.h"
 #include "propertieswindow.h"
 #include "exportdialog.h"
 #include "fileviewer.h"
