@@ -38,15 +38,15 @@ AC_CHECK_LIB([Qt5WebKit], [main])
 # FIXME: Replace `main' with a function in `-lQt5WebKitWidgets':
 AC_CHECK_LIB([Qt5WebKitWidgets], [main])
 # FIXME: Replace `main' with a function in `-lQt5Widgets':
-AC_CHECK_LIB([Qt5Widgets], [main])
+AC_CHECK_LIB([Qt5Widgets], [close])
 # FIXME: Replace `main' with a function in `-lewf':
-AC_CHECK_LIB([ewf], [main])
+AC_CHECK_LIB([ewf], [libewf_handle_close])
 # FIXME: Replace `main' with a function in `-lmagic':
-AC_CHECK_LIB([magic], [main])
+AC_CHECK_LIB([magic], [magic_open])
 # FIXME: Replace `main' with a function in `-lpthread':
 AC_CHECK_LIB([pthread], [main])
 # FIXME: Replace `main' with a function in `-ltsk':
-AC_CHECK_LIB([tsk], [main])
+AC_CHECK_LIB([tsk], [tsk_img_open])
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdlib.h string.h unistd.h])
