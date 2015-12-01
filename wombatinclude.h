@@ -45,7 +45,7 @@
 #include <QStringList>
 #include <QTextBlock>
 #include <QTextCodec>
-#include <QTextCursor>
+//#include <QTextCursor>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QThread>
