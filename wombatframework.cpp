@@ -22,7 +22,7 @@ void WombatFramework::OpenEvidenceImage() // open current evidence image
     wombatptr->evidenceobject.imageinfo = tsk_img_open(wombatptr->evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
     if(wombatptr->evidenceobject.imageinfo == NULL)
     {
-        LogMessage("Evidence Image access failed");
+        //LogMessage("Evidence Image access failed");
         errorcount++;
     }
     free(images);
@@ -76,7 +76,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     }
     if(walkreturn == 1)
     {
-        LogMessage("Issues with traversing the file structure were encountered");
+        //LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
     if(fcasedb.isValid() && fcasedb.isOpen())

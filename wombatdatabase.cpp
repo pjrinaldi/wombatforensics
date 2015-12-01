@@ -29,13 +29,13 @@ QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList inva
         }
         else
         {
-            LogMessage(wombatptr->casedb.lastError().text());
+            //LogMessage(wombatptr->casedb.lastError().text());
         }
         casequery.finish();
     }
     else
     {
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
     }
 
     return tmplist;
@@ -60,13 +60,13 @@ void WombatDatabase::InsertSql(QString query, QVariantList invalues)
        }
        else
        {
-           LogMessage(wombatptr->casedb.lastError().text());
+           //LogMessage(wombatptr->casedb.lastError().text());
        }
        casequery.finish();
    }
    else
    {
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
    }
 }
 
@@ -82,13 +82,13 @@ void WombatDatabase::InsertSql(QString query)
        }
        else
        {
-            LogMessage(wombatptr->casedb.lastError().text());
+            //LogMessage(wombatptr->casedb.lastError().text());
        }
        casequery.finish();
    }
    else
    {
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
    }
 }
 
@@ -107,13 +107,13 @@ unsigned long long WombatDatabase::InsertSqlGetID(QString query, QVariantList in
            tmpid = casequery.lastInsertId().toULongLong();
        else
        {
-            LogMessage(wombatptr->casedb.lastError().text());
+            //LogMessage(wombatptr->casedb.lastError().text());
        }
        casequery.finish();
    }
    else
    {
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
    }
 
    return tmpid;
@@ -173,7 +173,7 @@ void WombatDatabase::CreateCaseDB(void)
     }
     else
     {
-        LogMessage(wombatptr->casedb.lastError().text());
+        //LogMessage(wombatptr->casedb.lastError().text());
     }
 
 }
@@ -188,7 +188,7 @@ void WombatDatabase::CreateThumbDB()
     }
     else
     {
-        LogMessage(thumbdb.lastError().text());
+        //LogMessage(thumbdb.lastError().text());
     }
 }
 
@@ -205,7 +205,7 @@ void WombatDatabase::CreateAppDB()
     }
     else
     {
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
 }
 
@@ -335,7 +335,7 @@ void WombatDatabase::InsertPartitionObjects()
                 }
                 else
                 {
-                    LogMessage("Failed to open Partition/FileSystem");
+                    //LogMessage("Failed to open Partition/FileSystem");
                     errorcount++;
                 }
                 wombatptr->currentfilesystemid = 0;
@@ -463,7 +463,7 @@ unsigned long long WombatDatabase::ReturnCaseCount() // from appdb
         retval = appquery.value(0).toInt();
     else
     {
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 
@@ -481,7 +481,7 @@ void WombatDatabase::InsertCase()
         wombatptr->caseobject.id = appquery.lastInsertId().toULongLong();
     else
     {
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 }
@@ -496,7 +496,7 @@ void WombatDatabase::ReturnCaseNameList()
     }
     else
     {
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 }
@@ -523,11 +523,11 @@ void WombatDatabase::ReturnCaseID()
             wombatptr->caseobject.id = appquery.value(0).toULongLong();
         else
         {
-            LogMessage(wombatptr->appdb.lastError().text());
+            //LogMessage(wombatptr->appdb.lastError().text());
         }
     else
     {
-        LogMessage(wombatptr->appdb.lastError().text());
+        //LogMessage(wombatptr->appdb.lastError().text());
     }
     appquery.finish();
 }

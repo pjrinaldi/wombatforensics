@@ -1223,13 +1223,14 @@ QStringList WombatProperties::PopulateVolumeProperties()
             ssize_t cnt;
             TSK_ENDIAN_ENUM endian = wombatptr->evidenceobject.volinfo->endian;
             sect_buf = (char*)tsk_malloc(wombatptr->evidenceobject.volinfo->block_size);
+            gptpart = (gpt_head*)sect_buf;
             cnt = tsk_vs_read_block(wombatptr->evidenceobject.volinfo, GPT_PART_SOFFSET + 1, sect_buf, wombatptr->evidenceobject.volinfo->block_size);
             if(cnt != wombatptr->evidenceobject.volinfo->block_size)
             {
                 // print error here
             }
             free(sect_buf);
-            proplist << "Signature" << QString::number(tsk_getu64(endian, gptpart->signature)) << "Signature Value should ve EFI PART (0x00-0x07)";
+            proplist << "Signature" << QString::number(tsk_getu64(endian, gptpart->signature)) << "Signature Value should be EFI PART (0x00-0x07)";
             proplist << "Version" << QString::number(tsk_getu32(endian, gptpart->version)) << "Version (0x08-0x0B)";
             proplist << "GPT Header Size (bytes)" << QString::number(tsk_getu32(endian, gptpart->head_size_b)) << "Size of GPT header in bytes (0x0C-0x0F)";
             proplist << "GPT Header Checksum" << QString::number(tsk_getu32(endian, gptpart->head_crc)) << "CRC32 checksum of GPT header (0x10-0x13)";

@@ -219,7 +219,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     isignals->ProgUpd();
     if(tmpptr != NULL)
     {
-        LogMessage("TmpPtr got a value somehow");
+        //LogMessage("TmpPtr got a value somehow");
     }
 
     QVector<QString> filestrings;
