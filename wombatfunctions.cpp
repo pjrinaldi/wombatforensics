@@ -21,7 +21,7 @@ std::string GetTime()
 void LogMessage(QString logmsg)
 {
     QString tmpstring = QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t"));
-    msglog->append(QString(tmpstring + " " + logmsg));
+    //msglog->append(QString(tmpstring + " " + logmsg));
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
     logfile.close();

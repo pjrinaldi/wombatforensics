@@ -661,7 +661,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     errorcount = 0;
     StatusUpdate("Processing...");
-    LogMessage(tr("Started Adding Evidence"));
+    //LogMessage(tr("Started Adding Evidence"));
     wombatframework->OpenVolumeSystem();
     wombatframework->GetVolumeSystemName();
     wombatdatabase->InsertVolumeObject(); // add volume to data
@@ -734,6 +734,7 @@ void WombatForensics::AddEvidence()
             processcountlabel->setText("Processed: 0");
             filecountlabel->setText("Files: 0");
 
+            LogMessage("Start Adding Evidence");
             sqlfuture = QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure);
             sqlwatcher.setFuture(sqlfuture);
         }

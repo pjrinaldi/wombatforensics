@@ -758,130 +758,133 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
 
 QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curinfo)
 {
-    if(curinfo->ftype == TSK_FS_TYPE_EXT2 || curinfo->ftype == TSK_FS_TYPE_EXT3 || curinfo->ftype == TSK_FS_TYPE_EXT4 || curinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
+    if(curinfo != NULL)
     {
-        return QString::fromStdString(string(((EXT2FS_INFO*)curinfo)->fs->s_volume_name));
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_FFS1 || curinfo->ftype == TSK_FS_TYPE_FFS1B)
-    {
-        return "UFS1";
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_FFS2 || curinfo->ftype == TSK_FS_TYPE_FFS_DETECT)
-    {
-        return QString::fromUtf8(reinterpret_cast<char*>(((FFS_INFO*)curinfo)->fs.sb2->volname));
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_FAT12 || curinfo->ftype == TSK_FS_TYPE_FAT16)
-    {
-        sprintf(asc, "%c%c%c%c%c%c%c%c%c%c%c", ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[0], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[1], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[2], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[3], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[4], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[5], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[6], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[7], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[8], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[9], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[10]);
-        return QString::fromStdString(string(asc));
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_FAT32)
-    {
-        sprintf(asc, "%c%c%c%c%c%c%c%c%c%c%c", ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[0], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[1], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[2], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[3], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[4], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[5], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[6], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[7], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[8], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[9], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[10]);
-        return QString::fromStdString(string(asc));
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_NTFS)
-    {
-        TSK_FS_FILE* tmpfile = NULL;
-        const TSK_FS_ATTR* tmpattr;
-        if((tmpfile = tsk_fs_file_open_meta(curinfo, NULL, NTFS_MFT_VOL)) != NULL)
+        if(curinfo->ftype == TSK_FS_TYPE_EXT2 || curinfo->ftype == TSK_FS_TYPE_EXT3 || curinfo->ftype == TSK_FS_TYPE_EXT4 || curinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
         {
-            tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, TSK_FS_ATTR_TYPE_NTFS_VNAME);
-            if((tmpattr->flags & TSK_FS_ATTR_RES) && (tmpattr->size))
+            return QString::fromStdString(string(((EXT2FS_INFO*)curinfo)->fs->s_volume_name));
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_FFS1 || curinfo->ftype == TSK_FS_TYPE_FFS1B)
+        {
+            return "UFS1";
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_FFS2 || curinfo->ftype == TSK_FS_TYPE_FFS_DETECT)
+        {
+            return QString::fromUtf8(reinterpret_cast<char*>(((FFS_INFO*)curinfo)->fs.sb2->volname));
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_FAT12 || curinfo->ftype == TSK_FS_TYPE_FAT16)
+        {
+            sprintf(asc, "%c%c%c%c%c%c%c%c%c%c%c", ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[0], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[1], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[2], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[3], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[4], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[5], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[6], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[7], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[8], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[9], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[10]);
+            return QString::fromStdString(string(asc));
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_FAT32)
+        {
+            sprintf(asc, "%c%c%c%c%c%c%c%c%c%c%c", ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[0], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[1], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[2], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[3], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[4], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[5], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[6], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[7], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[8], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[9], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[10]);
+            return QString::fromStdString(string(asc));
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_NTFS)
+        {
+            TSK_FS_FILE* tmpfile = NULL;
+            const TSK_FS_ATTR* tmpattr;
+            if((tmpfile = tsk_fs_file_open_meta(curinfo, NULL, NTFS_MFT_VOL)) != NULL)
             {
-                UTF16* name16 = (UTF16*) tmpattr->rd.buf;
-                UTF8* name8 = (UTF8*) asc;
-                int retval;
-                retval = tsk_UTF16toUTF8(curinfo->endian, (const UTF16**)&name16, (UTF16*) ((uintptr_t)name16 + (int) tmpattr->size), &name8, (UTF8*) ((uintptr_t)name8 + sizeof(asc)), TSKlenientConversion);
-                if(retval != TSKconversionOK)
-                    *name8 = '\0';
-                else if((uintptr_t)name8 >= (uintptr_t)asc + sizeof(asc))
-                    asc[sizeof(asc)-1] = '\0';
-                else
-                    *name8 = '\0';
-                return QString::fromStdString(string(asc));
+                tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, TSK_FS_ATTR_TYPE_NTFS_VNAME);
+                if((tmpattr->flags & TSK_FS_ATTR_RES) && (tmpattr->size))
+                {
+                    UTF16* name16 = (UTF16*) tmpattr->rd.buf;
+                    UTF8* name8 = (UTF8*) asc;
+                    int retval;
+                    retval = tsk_UTF16toUTF8(curinfo->endian, (const UTF16**)&name16, (UTF16*) ((uintptr_t)name16 + (int) tmpattr->size), &name8, (UTF8*) ((uintptr_t)name8 + sizeof(asc)), TSKlenientConversion);
+                    if(retval != TSKconversionOK)
+                        *name8 = '\0';
+                    else if((uintptr_t)name8 >= (uintptr_t)asc + sizeof(asc))
+                        asc[sizeof(asc)-1] = '\0';
+                    else
+                        *name8 = '\0';
+                    return QString::fromStdString(string(asc));
+                }
             }
         }
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_EXFAT)
-    {
-        char* databuffer = NULL;
-        TSK_DADDR_T cursector = 0;
-        TSK_DADDR_T endsector = 0;
-        int8_t isallocsec = 0;
-        TSK_INUM_T curinum = 0;
-        FATFS_DENTRY* dentry = NULL;
-        TSK_FS_FILE* tmpfile = NULL;
-        ssize_t bytesread = 0;
-        if((tmpfile = tsk_fs_file_alloc(curinfo)) != NULL)
+        else if(curinfo->ftype == TSK_FS_TYPE_EXFAT)
         {
-            if((tmpfile->meta = tsk_fs_meta_alloc(FATFS_FILE_CONTENT_LEN)) != NULL)
+            char* databuffer = NULL;
+            TSK_DADDR_T cursector = 0;
+            TSK_DADDR_T endsector = 0;
+            int8_t isallocsec = 0;
+            TSK_INUM_T curinum = 0;
+            FATFS_DENTRY* dentry = NULL;
+            TSK_FS_FILE* tmpfile = NULL;
+            ssize_t bytesread = 0;
+            if((tmpfile = tsk_fs_file_alloc(curinfo)) != NULL)
             {
-                if((databuffer = (char*)tsk_malloc(((FATFS_INFO*)curinfo)->ssize)) != NULL)
+                if((tmpfile->meta = tsk_fs_meta_alloc(FATFS_FILE_CONTENT_LEN)) != NULL)
                 {
-                    cursector = ((FATFS_INFO*)curinfo)->rootsect;
-                    endsector = (((FATFS_INFO*)curinfo)->firstdatasect + ((FATFS_INFO*)curinfo)->clustcnt * ((FATFS_INFO*)curinfo)->csize) - 1;
-                    while(cursector < endsector)
+                    if((databuffer = (char*)tsk_malloc(((FATFS_INFO*)curinfo)->ssize)) != NULL)
                     {
-                    }
-                    bytesread = tsk_fs_read_block(curinfo, cursector, databuffer, ((FATFS_INFO*)curinfo)->ssize);
-                    if(bytesread == ((FATFS_INFO*)curinfo)->ssize)
-                    {
-                        isallocsec = fatfs_is_sectalloc(((FATFS_INFO*)curinfo), cursector);
-                        if(isallocsec != -1)
+                        cursector = ((FATFS_INFO*)curinfo)->rootsect;
+                        endsector = (((FATFS_INFO*)curinfo)->firstdatasect + ((FATFS_INFO*)curinfo)->clustcnt * ((FATFS_INFO*)curinfo)->csize) - 1;
+                        while(cursector < endsector)
                         {
-                            curinum = FATFS_SECT_2_INODE(((FATFS_INFO*)curinfo), cursector);
-                            for(int i = 0; i < ((FATFS_INFO*)curinfo)->ssize; i+= sizeof(FATFS_DENTRY))
+                        }
+                        bytesread = tsk_fs_read_block(curinfo, cursector, databuffer, ((FATFS_INFO*)curinfo)->ssize);
+                        if(bytesread == ((FATFS_INFO*)curinfo)->ssize)
+                        {
+                            isallocsec = fatfs_is_sectalloc(((FATFS_INFO*)curinfo), cursector);
+                            if(isallocsec != -1)
                             {
-                                dentry = (FATFS_DENTRY*)&(databuffer[i]);
-                                if(exfatfs_get_enum_from_type(dentry->data[0]) == EXFATFS_DIR_ENTRY_TYPE_VOLUME_LABEL)
+                                curinum = FATFS_SECT_2_INODE(((FATFS_INFO*)curinfo), cursector);
+                                for(int i = 0; i < ((FATFS_INFO*)curinfo)->ssize; i+= sizeof(FATFS_DENTRY))
                                 {
-                                    if(exfatfs_dinode_copy(((FATFS_INFO*)curinfo), curinum, dentry, isallocsec, tmpfile) == TSK_OK)
-                                        return QString::fromStdString(tmpfile->meta->name2->name);
+                                    dentry = (FATFS_DENTRY*)&(databuffer[i]);
+                                    if(exfatfs_get_enum_from_type(dentry->data[0]) == EXFATFS_DIR_ENTRY_TYPE_VOLUME_LABEL)
+                                    {
+                                        if(exfatfs_dinode_copy(((FATFS_INFO*)curinfo), curinum, dentry, isallocsec, tmpfile) == TSK_OK)
+                                            return QString::fromStdString(tmpfile->meta->name2->name);
+                                    }
                                 }
                             }
                         }
                     }
+                    tsk_fs_file_close(tmpfile);
+                    free(databuffer);
                 }
-                tsk_fs_file_close(tmpfile);
-                free(databuffer);
             }
         }
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_ISO9660)
-    {
-        for(p = ((ISO_INFO*)curinfo)->pvd; p != NULL; p = p->next)
+        else if(curinfo->ftype == TSK_FS_TYPE_ISO9660)
         {
-            return QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_id));
+            for(p = ((ISO_INFO*)curinfo)->pvd; p != NULL; p = p->next)
+            {
+                return QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_id));
+            }
         }
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_YAFFS2)
-    {
-        return "YAFFS2";
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_SWAP)
-    {
-        return "SWAP";
-    }
-    else if(curinfo->ftype == TSK_FS_TYPE_HFS)
-    {
-        hfs = (HFS_INFO*)curinfo;
-        char fn[HFS_MAXNAMLEN + 1];
-        HFS_ENTRY entry;
-        if(hfs_cat_file_lookup(hfs, HFS_ROOT_INUM, &entry, FALSE))
+        else if(curinfo->ftype == TSK_FS_TYPE_YAFFS2)
         {
-            // log error here
+            return "YAFFS2";
         }
-        if(hfs_UTF16toUTF8(curinfo, entry.thread.name.unicode, tsk_getu16(curinfo->endian, entry.thread.name.length), fn, HFS_MAXNAMLEN + 1, HFS_U16U8_FLAG_REPLACE_SLASH))
+        else if(curinfo->ftype == TSK_FS_TYPE_SWAP)
         {
-            // log error here
+            return "SWAP";
         }
-        sprintf(asc, "%s", fn);
-        return QString::fromStdString(string(asc));
+        else if(curinfo->ftype == TSK_FS_TYPE_HFS)
+        {
+            hfs = (HFS_INFO*)curinfo;
+            char fn[HFS_MAXNAMLEN + 1];
+            HFS_ENTRY entry;
+            if(hfs_cat_file_lookup(hfs, HFS_ROOT_INUM, &entry, FALSE))
+            {
+                // log error here
+            }
+            if(hfs_UTF16toUTF8(curinfo, entry.thread.name.unicode, tsk_getu16(curinfo->endian, entry.thread.name.length), fn, HFS_MAXNAMLEN + 1, HFS_U16U8_FLAG_REPLACE_SLASH))
+            {
+                // log error here
+            }
+            sprintf(asc, "%s", fn);
+            return QString::fromStdString(string(asc));
+        }
+        return "";
     }
     return "";
 }
-
 QStringList WombatProperties::PopulateEvidenceImageProperties()
 {
     proplist.clear();
