@@ -338,28 +338,31 @@ void WombatDatabase::InsertPartitionObjects()
                     //LogMessage("Failed to open Partition/FileSystem");
                     errorcount++;
                 }
-                wombatptr->currentfilesystemid = 0;
-                wombatptr->bindvalues.clear();
-                wombatptr->bindvalues.append(wombatprop->GetFileSystemLabel(tmpfsinfo));
-                wombatptr->bindvalues.append(QString("/"));
-                wombatptr->bindvalues.append(tmpfsinfo->ftype);
-                wombatptr->bindvalues.append(tmpfsinfo->flags);
-                wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->offset);
-                wombatptr->bindvalues.append(wombatptr->currentvolumeid);
-                wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-                wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->block_size * (unsigned long long)tmpfsinfo->block_count);
-                wombatptr->bindvalues.append(tmpfsinfo->block_size);
-                wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->block_count);
-                wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->first_inum);
-                wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->last_inum);
-                wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
-                wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
-                wombatptr->bindvalues.append((int)tmpfsinfo->dev_bsize); // device sector size
-                wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->start);
-                wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->len);
-                wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-                wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
-                QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, tmpfsinfo);
+                if(tmpfsinfo != NULL)
+                {
+                    wombatptr->currentfilesystemid = 0;
+                    wombatptr->bindvalues.clear();
+                    wombatptr->bindvalues.append(wombatprop->GetFileSystemLabel(tmpfsinfo));
+                    wombatptr->bindvalues.append(QString("/"));
+                    wombatptr->bindvalues.append(tmpfsinfo->ftype);
+                    wombatptr->bindvalues.append(tmpfsinfo->flags);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->offset);
+                    wombatptr->bindvalues.append(wombatptr->currentvolumeid);
+                    wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->block_size * (unsigned long long)tmpfsinfo->block_count);
+                    wombatptr->bindvalues.append(tmpfsinfo->block_size);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->block_count);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->first_inum);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->last_inum);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
+                    wombatptr->bindvalues.append((int)tmpfsinfo->dev_bsize); // device sector size
+                    wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->start);
+                    wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->len);
+                    wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+                    wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
+                    QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, tmpfsinfo);
+                }
             }
         }
     }
