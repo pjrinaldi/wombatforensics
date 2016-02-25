@@ -311,6 +311,7 @@ void WombatDatabase::InsertPartitionObjects()
 {
     if(wombatptr->evidenceobject.volinfo != NULL)
     {
+        qDebug() << "Volume is not null.";
         for(uint32_t i=0; i < wombatptr->evidenceobject.partinfovector.size(); i++)
         {
             if(wombatptr->evidenceobject.partinfovector[i]->flags == 0x02) // unallocated partition
@@ -370,6 +371,7 @@ void WombatDatabase::InsertPartitionObjects()
     }
     else // handle when there is no volume...
     {
+        qDebug() << "Volume is NULL";
         wombatptr->evidenceobject.fsidvector.clear();
         if(wombatptr->evidenceobject.fsinfovector.size() > 0)
         {
