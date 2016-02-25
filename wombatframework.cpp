@@ -55,14 +55,14 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
         {
             for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
             {
-                if(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->flags == 0x02) // if its an unallocated partition
-                {
-                }
+                //if(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->flags == 0x02) // if its an unallocated partition
+                //{
+                //}
                 // need to figure out why i had this if unallocated with not values and then add all the partitions anyway...
-                else
-                {
-                    wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
-                }
+                //else
+                //{
+                wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
+                //}
             }
         }
     }
