@@ -100,13 +100,13 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     tmpdata.evid = currentevidenceid;
     tmpdata.fsid = tmpints[8];
     tmpdata.mftattrid = 0;
-    mutex.lock();
+    //mutex.lock();
     filedatavector.append(tmpdata);
     if(adsbool == true)
     {
         filedatavector.append(adsdata);
     }
-    mutex.unlock();
+    //mutex.unlock();
 }
 
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
@@ -323,7 +323,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             }
         }
     }
-    QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, tmpdata, adsbool);
+    ProcessFile(filestrings, fileints, tmpdata, adsbool);
+    //QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, tmpdata, adsbool);
     return TSK_WALK_CONT;
 }
 
