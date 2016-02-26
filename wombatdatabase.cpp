@@ -357,7 +357,7 @@ void WombatDatabase::InsertPartitionObjects()
                     wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->first_inum);
                     wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->last_inum);
                     wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
-                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
+                    wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->start);
                     wombatptr->bindvalues.append((int)tmpfsinfo->dev_bsize); // device sector size
                     wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->start);
                     wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->len);
@@ -392,7 +392,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->first_inum);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->last_inum);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
-                wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
+                wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->offset);
                 wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->block_size);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->offset);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->block_count);

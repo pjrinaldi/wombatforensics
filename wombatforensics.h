@@ -578,18 +578,34 @@ public:
 
     void fetchMore(const QModelIndex &parent = QModelIndex())
     {
+        qDebug() << "parentnode->children.count():" << parentnode->children.count();
+        qDebug() << "parentnode->childcount:" << parentnode->childcount;
         Node* parentnode = NodeFromIndex(parent);
         QList<QVariant> fetchvalues;
         fetchvalues.clear();
         if(parentnode->haschildren == true)
         {
             QSqlQuery morequery(fcasedb);
-            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ?");
-            morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
-            morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
+            QString morestring = "SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6)";
+            if(parentnode->nodevalues.at(4).toInt() == 4)
+            {
+                morestring += " AND parfsid = ?";
+                morequery.prepare(morestring);
+                morequery.addBindValue(parentnode->nodevalues.at(0).toULongLong());
+            }
+            else
+            {
+                morestring += " AND parentid = ? AND parimgid = ?";
+                morequery.prepare(morestring);
+                morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
+                morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
+            }
+            //morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ?");
+            //morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
+            //morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
+            //beginInsertRows(parent, 0, 0);
             if(morequery.exec())
             {
-                beginInsertRows(parent, 0, parentnode->childcount - 1);
                 while(morequery.next())
                 {
                     fetchvalues.clear();
@@ -604,6 +620,7 @@ public:
                     }
                     else
                     {
+                        // CHILDCOUNT SET HERE
                         curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong());
                         curchild->haschildren = curchild->HasChildren();
                     }
@@ -615,7 +632,6 @@ public:
                         curchild->checkstate = 2;
                     parentnode->children.append(curchild);
                 }
-                endInsertRows();
                 emit checkedNodesChanged();
                 setData(parent, QVariant(-15), Qt::DisplayRole);
             }
@@ -938,10 +954,12 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
+        
         if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
         {
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
         }
+        
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
