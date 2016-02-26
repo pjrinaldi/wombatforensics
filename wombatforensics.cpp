@@ -597,7 +597,6 @@ void WombatForensics::InitializeQueryModel()
     treemodel->AddEvidence(wombatvarptr->currentevidenceid);
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     ResizeColumns();
-    wombatframework->CloseInfoStructures();
     StatusUpdate("Evidence Added. Begin File Structure Analysis...");
     LogMessage("Evidence Added. Begin File Structure Analysis...");
     StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
@@ -687,6 +686,7 @@ void WombatForensics::UpdateStatus()
     ResizeColumns();
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
+    wombatframework->CloseInfoStructures();
 }
 
 void WombatForensics::UpdateDigging()
