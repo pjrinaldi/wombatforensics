@@ -85,7 +85,7 @@ public:
     {
         if (WombatForensics->objectName().isEmpty())
             WombatForensics->setObjectName(QStringLiteral("WombatForensics"));
-        WombatForensics->resize(800, 600);
+        WombatForensics->resize(1366, 768);
         actionNew_Case = new QAction(WombatForensics);
         actionNew_Case->setObjectName(QStringLiteral("actionNew_Case"));
         QIcon icon;
