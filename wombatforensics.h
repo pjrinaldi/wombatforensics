@@ -51,7 +51,96 @@ protected:
         }
     };
 };
+/*
+class TableModel : public QAbstractTableModel
+{
+    Q_OBJECT
+public:
+    TableModel(QObject* parent = 0) : QAbstractTableModel(parent)
+    {
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created" << "Accessed" << "Modified" << "Status Changed" << "MD5" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
+        QList<QVariant> emptyset;
+        dummynode = 0;
+        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+    };
 
+    ~TableModel()
+    {
+    };
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const
+    {
+        if(parent.isValid())
+            return 0;
+        return 5;
+    };
+
+    int columnCount(const QModelIndex &parent = QModelIndex()) const
+    {
+        if(parent.isValid())
+            return 0;
+        else
+            return 20;
+    };
+
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const
+    {
+        return QVariant();
+    };
+
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const
+    {
+        return QVariant();
+    };
+
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole)
+    {
+        return false;
+    };
+
+    Qt::ItemFlags flags(const QModelIndex &index) const
+    {
+        Qt::ItemFlags flags = QAbstractTableModel::flags(index);
+
+        if(!index.isValid())
+            return Qt::NoItemFlags;
+        if(index == QModelIndex())
+            return Qt::NoItemFlags;
+        if(index.column() == 0)
+        {
+            flags |= Qt::ItemIsUserCheckable;
+            if(index.model()->hasChildren(index))
+                flags |= Qt::ItemIsTristate;
+        }
+        
+        return flags;
+    };
+
+    bool canFetchMore(const QModelIndex &parent = QModelIndex()) const
+    {
+        if(parent.isValid())
+            return false;
+        else
+            return false;
+    };
+
+    void fetchMore(const QModelIndex &parent = QModelIndex())
+    {
+        if(parent.isValid())
+            qDebug() << "its broken";
+    };
+
+    Node* NodeFromIndex(const QModelIndex &index) const
+    {
+        if(index.isValid())
+            return static_cast<Node*>(index.internalPointer());
+        else
+            return rootnode;
+    };
+
+    QStringList headerdata;
+};
+*/
 class TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
