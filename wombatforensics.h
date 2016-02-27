@@ -498,7 +498,6 @@ public:
             morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ?");
             morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
             morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
-            if(morequery.exec())
             {
                 beginInsertRows(parent, 0, parentnode->childcount - 1);
                 while(morequery.next())
@@ -563,7 +562,7 @@ public:
     {
         int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
-        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 6 AND parimgid = ?)");
+        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
         addevidquery.addBindValue(curid);
         addevidquery.addBindValue(curid);
         if(addevidquery.exec())
@@ -626,9 +625,11 @@ public:
             Node* rootdirectory = 0;
             for(int j=0; j < fsobjectlist.count(); j++)
             {
-                filequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parimgid = ? AND parentid = ?)");
+                filequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parimgid = ? AND parentid = ? AND parfsid = ?)");
                 filequery.addBindValue(curid);
                 filequery.addBindValue(fsobjectlist.at(j).rootinum);
+                filequery.addBindValue(fsobjectlist.at(j).id);
+                qDebug() << "parent fs id: " << fsobjectlist.at(j).id;
                 if(filequery.exec())
                 {
                     while(filequery.next())
