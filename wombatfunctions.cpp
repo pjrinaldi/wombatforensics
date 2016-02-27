@@ -231,7 +231,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     if(tmpfile->name != NULL)
     {
         fileints.append((unsigned long long)tmpfile->name->type);
-        fileints.append((unsigned long long)tmpfile->name->par_addr);
+        if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
+            fileints.append((unsigned long long)currentfilesystemid);
+        else
+            fileints.append((unsigned long long)tmpfile->name->par_addr);
     }
     else
     {

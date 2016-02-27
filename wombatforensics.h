@@ -715,7 +715,6 @@ public:
                     parentnode->children.append(currentnode);
                     if(filesystemcount <= fsobjectlist.count())
                     {
-                        //currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).address, curid);
                         currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid);
                         filesystemcount++;
                     }
@@ -734,7 +733,6 @@ public:
             {
                 filequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parimgid = ? AND parentid = ?)");
                 filequery.addBindValue(curid);
-                //filequery.addBindValue(fsobjectlist.at(j).address);
                 filequery.addBindValue(fsobjectlist.at(j).rootinum);
                 if(filequery.exec())
                 {
@@ -956,10 +954,12 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
-       /* if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
+        
+        if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
         {
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
-        }*/
+        }
+        
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
