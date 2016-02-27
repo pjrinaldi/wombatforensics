@@ -47,7 +47,7 @@ unsigned long long GetChildCount(int type, unsigned long long address, unsigned 
     unsigned long long tmpcount = 0;
     QSqlQuery childquery(fcasedb);
     QString querystring = "SELECT COUNT(objectid) FROM data WHERE parentid = ?";
-    if(type < 5)
+    if(type < 4)
         querystring += " AND objecttype < 5";
     else
         querystring += " AND objecttype >= 5";
@@ -231,10 +231,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     if(tmpfile->name != NULL)
     {
         fileints.append((unsigned long long)tmpfile->name->type);
-        if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
-            fileints.append((unsigned long long)currentfilesystemid);
-        else
-            fileints.append((unsigned long long)tmpfile->name->par_addr);
+        fileints.append((unsigned long long)tmpfile->name->par_addr);
     }
     else
     {

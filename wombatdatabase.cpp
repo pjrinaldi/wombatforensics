@@ -357,7 +357,7 @@ void WombatDatabase::InsertPartitionObjects()
                     wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->first_inum);
                     wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->last_inum);
                     wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
-                    wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->start);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
                     wombatptr->bindvalues.append((int)tmpfsinfo->dev_bsize); // device sector size
                     wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->start);
                     wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->len);
@@ -392,7 +392,7 @@ void WombatDatabase::InsertPartitionObjects()
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->first_inum);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->last_inum);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
-                wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->offset);
+                wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->root_inum);
                 wombatptr->bindvalues.append(wombatptr->evidenceobject.fsinfovector[i]->block_size);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->offset);
                 wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.fsinfovector[i]->block_count);
@@ -548,12 +548,11 @@ void WombatDatabase::ReturnFileSystemObjectList(unsigned long long curevidenceid
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(curevidenceid);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, rootinum, address FROM data WHERE objecttype = 4 and parimgid = ?", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, rootinum FROM data WHERE objecttype = 4 and parimgid = ?", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         tmpobject.id = wombatptr->sqlrecords.at(i).value(0).toULongLong();
         tmpobject.rootinum = wombatptr->sqlrecords.at(i).value(1).toULongLong();
-        tmpobject.address = wombatptr->sqlrecords.at(i).value(2).toULongLong();
         fsobjectlist.append(tmpobject);
     }
 }
