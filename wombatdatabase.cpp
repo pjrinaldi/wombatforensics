@@ -548,11 +548,12 @@ void WombatDatabase::ReturnFileSystemObjectList(unsigned long long curevidenceid
     wombatptr->bindvalues.clear();
     wombatptr->bindvalues.append(curevidenceid);
     wombatptr->sqlrecords.clear();
-    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, rootinum FROM data WHERE objecttype = 4 and parimgid = ?", wombatptr->bindvalues);
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, rootinum, address FROM data WHERE objecttype = 4 and parimgid = ?", wombatptr->bindvalues);
     for(int i=0; i < wombatptr->sqlrecords.count(); i++)
     {
         tmpobject.id = wombatptr->sqlrecords.at(i).value(0).toULongLong();
         tmpobject.rootinum = wombatptr->sqlrecords.at(i).value(1).toULongLong();
+        tmpobject.address = wombatptr->sqlrecords.at(i).value(2).toULongLong();
         fsobjectlist.append(tmpobject);
     }
 }

@@ -35,6 +35,7 @@ struct FileSystemObject
 {
     unsigned long long id;
     unsigned long long rootinum;
+    unsigned long long address;
 };
 
 #endif // TSKVARIABLE_H
