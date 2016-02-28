@@ -496,7 +496,6 @@ public:
         {
             QSqlQuery morequery(fcasedb);
             morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ? AND parfsid = ?");
-            //qDebug() << "current parfsid:" << parentnode->nodevalues.at(0).toULongLong();
             morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
             morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
             if(parentnode->nodevalues.at(4).toInt() == 4)
@@ -522,8 +521,6 @@ public:
                     else
                     {
                         curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), curchild->nodevalues.at(13).toULongLong(), curchild->nodevalues.at(14).toULongLong());
-                        //qDebug() << "currentnode info:" << curchild->nodevalues.at(0).toULongLong() << curchild->nodevalues.at(1).toString() << curchild->nodevalues.at(5).toULongLong() << curchild->nodevalues.at(14).toULongLong();
-                        qDebug() << "curchild childcount:" << curchild->childcount;
                         curchild->haschildren = curchild->HasChildren();
                     }
                     if(morequery.value(18).toInt() == 0)
@@ -656,7 +653,6 @@ public:
                         else
                         {
                             currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toULongLong(), curid, currentnode->nodevalues.at(14).toULongLong());
-                            qDebug() << "childcount:" << currentnode->childcount;
                             currentnode->haschildren = currentnode->HasChildren();
                         }
                         rootdirectory->children.append(currentnode);
