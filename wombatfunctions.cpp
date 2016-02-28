@@ -65,6 +65,7 @@ unsigned long long GetChildCount(int type, unsigned long long address, unsigned 
     {
         childquery.next();
         tmpcount = childquery.value(0).toULongLong();
+        qDebug() << "tmpcount:" << tmpcount;
     }
     childquery.finish();
     return tmpcount;

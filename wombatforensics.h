@@ -521,7 +521,9 @@ public:
                     }
                     else
                     {
-                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong(), parentnode->nodevalues.at(14).toULongLong());
+                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), curchild->nodevalues.at(13).toULongLong(), curchild->nodevalues.at(14).toULongLong());
+                        //qDebug() << "currentnode info:" << curchild->nodevalues.at(0).toULongLong() << curchild->nodevalues.at(1).toString() << curchild->nodevalues.at(5).toULongLong() << curchild->nodevalues.at(14).toULongLong();
+                        qDebug() << "curchild childcount:" << curchild->childcount;
                         curchild->haschildren = curchild->HasChildren();
                     }
                     if(morequery.value(18).toInt() == 0)
@@ -654,6 +656,7 @@ public:
                         else
                         {
                             currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toULongLong(), curid, currentnode->nodevalues.at(14).toULongLong());
+                            qDebug() << "childcount:" << currentnode->childcount;
                             currentnode->haschildren = currentnode->HasChildren();
                         }
                         rootdirectory->children.append(currentnode);
