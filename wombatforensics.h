@@ -517,6 +517,7 @@ public:
                     }
                     else
                     {
+                        qDebug() << "GetChildCount(type,addr,parimgid) : (5," << curchild->nodevalues.at(5).toULongLong() << parentnode->nodevalues.at(13).toULongLong() << ")";
                         curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong());
                         curchild->haschildren = curchild->HasChildren();
                     }
