@@ -495,9 +495,12 @@ public:
         if(parentnode->haschildren == true)
         {
             QSqlQuery morequery(fcasedb);
-            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ?");
+            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ? AND parfsid = ?");
+            qDebug() << "current parfsid:" << parentnode->nodevalues.at(0).toULongLong();
             morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
             morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
+            morequery.addBindValue(parentnode->nodevalues.at(0).toULongLong());
+            if(morequery.exec())
             {
                 beginInsertRows(parent, 0, parentnode->childcount - 1);
                 while(morequery.next())
@@ -850,10 +853,12 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
+        /*
         if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
         {
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
         }
+        */
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);
