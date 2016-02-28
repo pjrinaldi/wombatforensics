@@ -1336,7 +1336,7 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
     curobj.readfileinfo = tsk_fs_file_open_meta(curobj.readfsinfo, NULL, curobj.address);
     for(uint i=0; i < digoptions.size(); i++)
     {
-        if(digoptions.at(i) == 0)
+        if(digoptions.at(i) == 0) // generate md5 hash
         {
             QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
             if(indexlist.count() > 0)
