@@ -517,7 +517,6 @@ public:
                     }
                     else
                     {
-                        qDebug() << "GetChildCount(type,addr,parimgid) : (5," << curchild->nodevalues.at(5).toULongLong() << parentnode->nodevalues.at(13).toULongLong() << ")";
                         curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong());
                         curchild->haschildren = curchild->HasChildren();
                     }
@@ -614,6 +613,8 @@ public:
                     if(filesystemcount <= fsobjectlist.count())
                     {
                         currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid);
+                        qDebug() << "fsid" << currentnode->nodevalues.at(0).toULongLong() << "childcount:" << currentnode->childcount;
+                        qDebug() << "GetChildCount(type,addr,parimgid) : (4," << currentnode->nodevalues.at(5).toULongLong() << parentnode->nodevalues.at(13).toULongLong() << ")";
                         filesystemcount++;
                     }
                     currentnode->haschildren = currentnode->HasChildren();
