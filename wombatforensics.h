@@ -521,7 +521,7 @@ public:
                     }
                     else
                     {
-                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong());
+                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), parentnode->nodevalues.at(13).toULongLong(), parentnode->nodevalues.at(14).toULongLong());
                         curchild->haschildren = curchild->HasChildren();
                     }
                     if(morequery.value(18).toInt() == 0)
@@ -653,7 +653,7 @@ public:
                         }
                         else
                         {
-                            currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toULongLong(), curid);
+                            currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toULongLong(), curid, currentnode->nodevalues.at(14).toULongLong());
                             currentnode->haschildren = currentnode->HasChildren();
                         }
                         rootdirectory->children.append(currentnode);
