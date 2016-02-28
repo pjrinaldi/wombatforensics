@@ -496,10 +496,14 @@ public:
         {
             QSqlQuery morequery(fcasedb);
             morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ? AND parfsid = ?");
-            qDebug() << "current parfsid:" << parentnode->nodevalues.at(0).toULongLong();
+            //qDebug() << "current parfsid:" << parentnode->nodevalues.at(0).toULongLong();
             morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
             morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
-            morequery.addBindValue(parentnode->nodevalues.at(0).toULongLong());
+            if(parentnode->nodevalues.at(4).toInt() == 4)
+                morequery.addBindValue(parentnode->nodevalues.at(0).toULongLong());
+            else
+                morequery.addBindValue(parentnode->nodevalues.at(14).toULongLong());
+            //morequery.addBindValue(parentnode->nodevalues.at(0).toULongLong());
             if(morequery.exec())
             {
                 beginInsertRows(parent, 0, parentnode->childcount - 1);
@@ -613,8 +617,6 @@ public:
                     if(filesystemcount <= fsobjectlist.count())
                     {
                         currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid, currentnode->nodevalues.at(0).toULongLong());
-                        qDebug() << "fsid" << currentnode->nodevalues.at(0).toULongLong() << "childcount:" << currentnode->childcount;
-                        //qDebug() << "GetChildCount(type,addr,parimgid) : (4," << currentnode->nodevalues.at(5).toULongLong() << parentnode->nodevalues.at(13).toULongLong() << ")";
                         filesystemcount++;
                     }
                     currentnode->haschildren = currentnode->HasChildren();
@@ -634,7 +636,6 @@ public:
                 filequery.addBindValue(curid);
                 filequery.addBindValue(fsobjectlist.at(j).rootinum);
                 filequery.addBindValue(fsobjectlist.at(j).id);
-                //qDebug() << "parent fs id: " << fsobjectlist.at(j).id;
                 if(filequery.exec())
                 {
                     while(filequery.next())
@@ -855,12 +856,10 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
-        /*
         if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
         {
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
         }
-        */
         ResizeViewColumns(index);
     };
     void FileExport(FileExportData* exportdata);

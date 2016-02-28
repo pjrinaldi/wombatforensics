@@ -46,10 +46,6 @@ unsigned long long GetChildCount(int type, unsigned long long address, unsigned 
 {
     unsigned long long tmpcount = 0;
     QSqlQuery childquery(fcasedb);
-    // GET CHILD COUNT SELECT QUERY IS COMPLETELY INVALID FOR A FILE SYSTEM SEARCH.... FOR A FS GETCHILDCOUNT IT IS
-    // SELECT COUNT(OBJECTID) FROM DATA WHERE OBJECTTYPE < 5 AND PARENTID = 2 AND PARIMGID = 1 (EQUATES TO FS, UNALLOCATED PARTITIONS) OF THE IMAGE, NOT THE CHILDREN OF THE CURRENT FILESYSTEM
-    // I WILL HAVE TO MODIFY THE COUNT STATEMENT FOR THE VARIOUS TYPES WHETHER IT BE AN IMAGE, A VOLUME, A FILE SYSTEM OR A FILE... TO IMPROVE TEHE GET CHILD COUNT SO IT WORKS CORRECTLY,
-    // THEN SEE WHERE I STAND WITH THE EXT-PARTITION LOADING AS WELL AS FETCHMORE AND BIGGER IMAGES...
     QString querystring = "SELECT COUNT(objectid) FROM data WHERE parentid = ?";
     if(type < 4)
         querystring += " AND objecttype < 5";
@@ -69,7 +65,6 @@ unsigned long long GetChildCount(int type, unsigned long long address, unsigned 
     {
         childquery.next();
         tmpcount = childquery.value(0).toULongLong();
-        qDebug() << "childquerycount: " << tmpcount;
     }
     childquery.finish();
     return tmpcount;
