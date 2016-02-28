@@ -612,9 +612,9 @@ public:
                     parentnode->children.append(currentnode);
                     if(filesystemcount <= fsobjectlist.count())
                     {
-                        currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid);
+                        currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid, currentnode->nodevalues.at(0).toULongLong());
                         qDebug() << "fsid" << currentnode->nodevalues.at(0).toULongLong() << "childcount:" << currentnode->childcount;
-                        qDebug() << "GetChildCount(type,addr,parimgid) : (4," << currentnode->nodevalues.at(5).toULongLong() << parentnode->nodevalues.at(13).toULongLong() << ")";
+                        //qDebug() << "GetChildCount(type,addr,parimgid) : (4," << currentnode->nodevalues.at(5).toULongLong() << parentnode->nodevalues.at(13).toULongLong() << ")";
                         filesystemcount++;
                     }
                     currentnode->haschildren = currentnode->HasChildren();
@@ -634,7 +634,7 @@ public:
                 filequery.addBindValue(curid);
                 filequery.addBindValue(fsobjectlist.at(j).rootinum);
                 filequery.addBindValue(fsobjectlist.at(j).id);
-                qDebug() << "parent fs id: " << fsobjectlist.at(j).id;
+                //qDebug() << "parent fs id: " << fsobjectlist.at(j).id;
                 if(filequery.exec())
                 {
                     while(filequery.next())

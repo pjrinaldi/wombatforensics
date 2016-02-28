@@ -42,7 +42,7 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
-unsigned long long GetChildCount(int type, unsigned long long address, unsigned long long parimgid)
+unsigned long long GetChildCount(int type, unsigned long long address, unsigned long long parimgid, unsigned long long parfsid)
 {
     unsigned long long tmpcount = 0;
     QSqlQuery childquery(fcasedb);
@@ -51,14 +51,18 @@ unsigned long long GetChildCount(int type, unsigned long long address, unsigned 
     // I WILL HAVE TO MODIFY THE COUNT STATEMENT FOR THE VARIOUS TYPES WHETHER IT BE AN IMAGE, A VOLUME, A FILE SYSTEM OR A FILE... TO IMPROVE TEHE GET CHILD COUNT SO IT WORKS CORRECTLY,
     // THEN SEE WHERE I STAND WITH THE EXT-PARTITION LOADING AS WELL AS FETCHMORE AND BIGGER IMAGES...
     QString querystring = "SELECT COUNT(objectid) FROM data WHERE parentid = ?";
-    if(type < 5)
+    if(type < 4)
         querystring += " AND objecttype < 5";
     else
-        querystring += " AND objecttype >= 5";
+    {
+        querystring += " AND objecttype >= 5 AND parfsid = ?";
+    }
     if(type != 1)
         querystring += " AND parimgid = ?";
     childquery.prepare(querystring);
     childquery.addBindValue(address);
+    if(type >= 4)
+        childquery.addBindValue(parfsid);
     if(type != 1)
         childquery.addBindValue(parimgid);
     if(childquery.exec())
