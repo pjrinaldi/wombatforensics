@@ -219,6 +219,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    FileData tmpdata;
     filesfound++;
     isignals->ProgUpd();
     if(tmpptr != NULL)
@@ -226,45 +227,77 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         //LogMessage("TmpPtr got a value somehow");
     }
 
-    QVector<QString> filestrings;
-    if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
-    else filestrings.append(QString("unknown.wbt"));
-    filestrings.append(QString("/") + QString(tmppath));
+    //QVector<QString> filestrings;
+    //if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
+    //else filestrings.append(QString("unknown.wbt"));
+    if(tmpfile->name != NULL) tmpdata.name = QString(tmpfile->name->name);
+    else tmpdata.name = QString("unknown.dat");
+    //filestrings.append(QString("/") + QString(tmppath));
+    tmpdata.path = QString("/") + QString(tmppath);
 
-    QVector<unsigned long long> fileints;
+    //QVector<unsigned long long> fileints;
     if(tmpfile->name != NULL)
     {
-        fileints.append((unsigned long long)tmpfile->name->type);
-        fileints.append((unsigned long long)tmpfile->name->par_addr);
+        //fileints.append((unsigned long long)tmpfile->name->type);
+        //fileints.append((unsigned long long)tmpfile->name->par_addr);
+        tmpdata.type = (unsigned long long)tmpfile->name->type;
+        tmpdata.paraddr = (unsigned long long)tmpfile->name->par_addr;
     }
     else
     {
-        fileints.append(0);
-        fileints.append(0);
+        //fileints.append(0);
+        //fileints.append(0);
+        tmpdata.type = 0;
+        tmpdata.type = 0;
     }
     if(tmpfile->meta != NULL)
     {
+        /*
         fileints.append((unsigned long long)tmpfile->meta->atime);
         fileints.append((unsigned long long)tmpfile->meta->ctime);
         fileints.append((unsigned long long)tmpfile->meta->crtime);
         fileints.append((unsigned long long)tmpfile->meta->mtime);
         fileints.append((unsigned long long)tmpfile->meta->size);
         fileints.append((unsigned long long)tmpfile->meta->addr);
+        */
+        tmpdata.atime = (unsigned long long)tmpfile->meta->atime;
+        tmpdata.ctime = (unsigned long long)tmpfile->meta->ctime;
+        tmpdata.crtime = (unsigned long long)tmpfile->meta->crtime;
+        tmpdata.mtime = (unsigned long long)tmpfile->meta->mtime;
+        tmpdata.size = (unsigned long long)tmpfile->meta->size;
+        tmpdata.addr = (unsigned long long)tmpfile->meta->addr;
     }
     else
     {
+        /*
         fileints.append(0);
         fileints.append(0);
         fileints.append(0);
         fileints.append(0);
         fileints.append(0);
         fileints.append(0);
+        */
+        tmpdata.atime = 0;
+        tmpdata.ctime = 0;
+        tmpdata.crtime = 0;
+        tmpdata.mtime = 0;
+        tmpdata.size = 0;
+        tmpdata.addr = 0;
     }
-    fileints.append(currentfilesystemid);
+    //fileints.append(currentfilesystemid);
+    tmpdata.evid = currentevidenceid;
+    tmpdata.fsid = currentfilesystemid;
+    tmpdata.mftattrid = 0;
+    filedatavector.append(tmpdata);
+    /*
+    if(adsbool == true)
+    {
+        filedatavector.append(adsdata);
+    }
+    */
 
-
-    FileData tmpdata;
-    bool adsbool = false;
+    FileData adsdata;
+    //bool adsbool = false;
     unsigned long long adssize = 0;
     TSK_OFF_T curmftentrystart = 0;
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -306,20 +339,21 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                         {
                             if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                             {
-                                tmpdata.type = (unsigned long long)tmpfile->name->type;
-                                tmpdata.paraddr = (unsigned long long)tmpfile->meta->addr;
-                                tmpdata.name = QString(":") + QString(fsattr->name);
-                                tmpdata.path = QString("/") + QString(tmppath);
-                                tmpdata.atime = 0;
-                                tmpdata.ctime = 0;
-                                tmpdata.crtime = 0;
-                                tmpdata.mtime = 0;
-                                tmpdata.evid = currentevidenceid;
-                                tmpdata.fsid = currentfilesystemid;
-                                tmpdata.size = (unsigned long long)fsattr->size;
-                                tmpdata.addr = adssize - (unsigned long long)fsattr->size + 16;
-                                tmpdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
-                                adsbool = true;
+                                adsdata.type = (unsigned long long)tmpfile->name->type;
+                                adsdata.paraddr = (unsigned long long)tmpfile->meta->addr;
+                                adsdata.name = QString(":") + QString(fsattr->name);
+                                adsdata.path = QString("/") + QString(tmppath);
+                                adsdata.atime = 0;
+                                adsdata.ctime = 0;
+                                adsdata.crtime = 0;
+                                adsdata.mtime = 0;
+                                adsdata.evid = currentevidenceid;
+                                adsdata.fsid = currentfilesystemid;
+                                adsdata.size = (unsigned long long)fsattr->size;
+                                adsdata.addr = adssize - (unsigned long long)fsattr->size + 16;
+                                adsdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
+                                //adsbool = true;
+                                filedatavector.append(adsdata);
                             }
                         }
                     }
@@ -327,7 +361,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             }
         }
     }
-    ProcessFile(filestrings, fileints, tmpdata, adsbool);
+    //ProcessFile(filestrings, fileints, adsdata, adsbool);
     //QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, tmpdata, adsbool);
     return TSK_WALK_CONT;
 }

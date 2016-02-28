@@ -601,8 +601,9 @@ void WombatForensics::InitializeQueryModel()
     LogMessage("Evidence Added. Begin File Structure Analysis...");
     StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
     LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
-    secondfuture = QtConcurrent::run(this, &WombatForensics::SecondaryProcessing);
-    secondwatcher.setFuture(secondfuture);
+    // ATTEMPT MULTI THREADING WITH SECONDARY PROCESSING FUNCTIONALITY......
+    //secondfuture = QtConcurrent::run(this, &WombatForensics::SecondaryProcessing);
+    //secondwatcher.setFuture(secondfuture);
     StatusUpdate("Evidence ready");
     LogMessage("Evidence Ready");
 }

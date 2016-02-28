@@ -53,7 +53,7 @@ void WombatFramework::OpenPartitions() // open the partitions in the volume
     {
         if(wombatptr->evidenceobject.volinfo->part_count > 0)
         {
-            qDebug() << "part count:" << wombatptr->evidenceobject.volinfo->part_count;
+            //qDebug() << "part count:" << wombatptr->evidenceobject.volinfo->part_count;
             for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
             {
                 //if(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->flags == 0x02) // if its an unallocated partition
