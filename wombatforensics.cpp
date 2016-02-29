@@ -2123,14 +2123,20 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     }
     //Open File
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, secprocobj.address);
+    char magicbuffer[1024];
+    ssize_t readlen = tsk_fs_file_read(readfileinfo, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+
+    QMimeDatabase mimedb;
+    QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
+    //QMagicFile(readfileinfo, secprocjob.objectid);
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(secprocjob.objectid), 1, Qt::MatchFlags(Qt:::MatchRecursive));
     //if(indexlist.count() > 0)
         //ui->dirTreeView->model()->setData(indexlist.at(0), MagicFile(readfileinfo, secprocjob.objectid), Qt::DisplayRole);
     //else
         //MagicFile(readfileinfo, secprocjob.objectid);
     //MagicFile(readfileinfo, secprocobj.objectid);
-    BlockFile(readfileinfo, secprocobj.objectid, adsattrid);
-    PropertyFile(readfileinfo, secprocobj.objectid, fsoffset, readfsinfo->block_size, secprocobj.parfsid);
+    //BlockFile(readfileinfo, secprocobj.objectid, adsattrid);
+    //PropertyFile(readfileinfo, secprocobj.objectid, fsoffset, readfsinfo->block_size, secprocobj.parfsid);
     if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
         if(QString::compare(secprocobj.name, ".") == 0 || QString::compare(secprocobj.name, "..") == 0)
@@ -2142,8 +2148,8 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
             //{
                 //AlternateDataStreamMagicFile(readfileinfo, adsobjid.at(i));
             //}
-            AlternateDataStreamBlockFile(readfileinfo, adsobjid, adsattrid);
-            AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
+            //AlternateDataStreamBlockFile(readfileinfo, adsobjid, adsattrid);
+            //AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
         }
     }
     filesprocessed++;
