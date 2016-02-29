@@ -2128,7 +2128,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
         //ui->dirTreeView->model()->setData(indexlist.at(0), MagicFile(readfileinfo, secprocjob.objectid), Qt::DisplayRole);
     //else
         //MagicFile(readfileinfo, secprocjob.objectid);
-    MagicFile(readfileinfo, secprocobj.objectid);
+    //MagicFile(readfileinfo, secprocobj.objectid);
     BlockFile(readfileinfo, secprocobj.objectid, adsattrid);
     PropertyFile(readfileinfo, secprocobj.objectid, fsoffset, readfsinfo->block_size, secprocobj.parfsid);
     if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -2138,10 +2138,10 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
         }
         else
         {
-            for(int i = 0; i < adsobjid.count(); i++)
-            {
-                AlternateDataStreamMagicFile(readfileinfo, adsobjid.at(i));
-            }
+            //for(int i = 0; i < adsobjid.count(); i++)
+            //{
+                //AlternateDataStreamMagicFile(readfileinfo, adsobjid.at(i));
+            //}
             AlternateDataStreamBlockFile(readfileinfo, adsobjid, adsattrid);
             AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
         }
