@@ -104,6 +104,5 @@
 #include "tsk_iso9660.h"
 #include "tsk_hfs.h"
 #include "tsk_yaffs.h"
-#include "magic.h"
 
 #endif // WOMBATINCLUDE_H

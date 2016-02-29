@@ -50,7 +50,4 @@
   <qresource prefix="/html">
     <file alias="infohtml">./Resources/information.html</file>
   </qresource>
-  <qresource prefix="/magic">
-    <file alias="magicfile">./Resources/magic.mgc</file>
-  </qresource>
 </RCC>

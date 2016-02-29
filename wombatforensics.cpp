@@ -422,10 +422,10 @@ void WombatForensics::InitializeAppStructure()
            }
         }
     }
-    magicmimeptr = magic_open(MAGIC_MIME);
-    magicptr = magic_open(MAGIC_NONE);
-    magic_load(magicptr, magicpath.toStdString().c_str());
-    magic_load(magicmimeptr, magicpath.toStdString().c_str());
+    //magicmimeptr = magic_open(MAGIC_MIME);
+    //magicptr = magic_open(MAGIC_NONE);
+    //magic_load(magicptr, magicpath.toStdString().c_str());
+    //magic_load(magicmimeptr, magicpath.toStdString().c_str());
     SetupHexPage();
 }
 
@@ -1597,8 +1597,8 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     aboutbox->close();
     RemoveTmpFiles();
     event->accept();
-    magic_close(magicptr);
-    magic_close(magicmimeptr);
+    //magic_close(magicptr);
+    //magic_close(magicmimeptr);
     msglog->clear();
     msgviewer->close();
     wombatdatabase->CloseCaseDB();

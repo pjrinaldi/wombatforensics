@@ -652,18 +652,21 @@ QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     QVariant tmpvariant;
     // FILE MIME TYPE
     char magicbuffer[1024];
-    const char* mimesig;
-    const char* sigtype;
-    char* sigp1;
-    char* sigp2;
+    //const char* mimesig;
+    //const char* sigtype;
+    //char* sigp1;
+    //char* sigp2;
     ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
     {
+        /*
         mimesig = magic_buffer(magicmimeptr, magicbuffer, readlen);
         sigp1 = strtok((char*)mimesig, ";");
         sigtype = magic_buffer(magicptr, magicbuffer, readlen);
         sigp2 = strtok((char*)sigtype, ",");
+        */
     }
+    /*
     QSqlQuery mimequery(fcasedb);
     mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
     if(readlen > 0)
@@ -682,6 +685,7 @@ QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     mimequery.exec();
     mimequery.next();
     mimequery.finish();
+    */
     processphase++;
     isignals->ProgUpd();
     return tmpvariant;
@@ -693,10 +697,10 @@ QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long a
     off_t retval = 0;
     char magicbuffer[1024];
     int chunksize = 1024;
-    const char* mimesig;
-    const char* sigtype;
-    char* sigp1;
-    char* sigp2;
+    //const char* mimesig;
+    //const char* sigtype;
+    //char* sigp1;
+    //char* sigp2;
     QSqlQuery adsquery(fcasedb);
     adsquery.prepare("SELECT name, fullpath, parimgid, parfsid, parentid, address, mftattrid, size, blockaddress FROM data WHERE objectid = ?;");
     adsquery.bindValue(0, adsobjid);
@@ -724,11 +728,14 @@ QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long a
     }
     if(retval > 0)
     {
+        /*
         mimesig = magic_buffer(magicmimeptr, magicbuffer, chunksize);
         sigp1 = strtok((char*)mimesig, ";");
         sigtype = magic_buffer(magicptr, magicbuffer, chunksize);
         sigp2 = strtok((char*)sigtype, ";");
+        */
     }
+    /*
     QSqlQuery mimequery(fcasedb);
     mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
     if(retval > 0)
@@ -747,6 +754,7 @@ QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long a
     mimequery.exec();
     mimequery.next();
     mimequery.finish();
+    */
     adsquery.finish();
     return tmpvariant;
 }
