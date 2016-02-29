@@ -2130,6 +2130,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     QVector<unsigned long long> adsattrid;
     adsobjid.clear();
     adsattrid.clear();
+    /*
     if(readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {        
         if(QString::compare(secprocobj.name, ".") == 0 || QString::compare(secprocobj.name, "..") == 0)
@@ -2152,6 +2153,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
             adsquery.finish();
         }
     }
+    */
     //Open File
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, secprocobj.address);
     char magicbuffer[1024];
