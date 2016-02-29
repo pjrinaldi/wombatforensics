@@ -48,3 +48,4 @@ struct magic_set* magicmimeptr = NULL;
 QMutex mutex;
 QMap<unsigned long long, int> checkhash;
 FilterValues filtervalues;
+TSK_IMG_INFO* IMG_2ND_PROC = NULL;

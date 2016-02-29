@@ -619,6 +619,29 @@ void WombatForensics::InitializeQueryModel()
         }
     }
     filequery.finish();
+    // IMG INFO HERE....
+    const TSK_TCHAR** imagepartspath;
+    // Open Parent Image
+    std::vector<std::string> pathvector;
+    pathvector.clear();
+    QSqlQuery imgquery(fcasedb);
+    imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
+    imgquery.bindValue(0, wombatvarptr->currentevidenceid);
+    if(imgquery.exec())
+    {
+        while(imgquery.next())
+        {
+            pathvector.push_back(imgquery.value(0).toString().toStdString());
+        }
+    }
+    imgquery.finish();
+    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+    for(uint i=0; i < pathvector.size(); i++)
+    {
+        imagepartspath[i] = pathvector.at(i).c_str();
+    }
+    IMG_2ND_PROC = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    free(imagepartspath);
     secondwatcher.setFuture(QtConcurrent::map(secondprocessvector, SecondaryProcessing));
 /*
  *    QSqlQuery filequery(fcasedb);
@@ -713,6 +736,8 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
+
+    tsk_img_close(IMG_2ND_PROC);
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
@@ -2060,11 +2085,16 @@ void WombatForensics::AutoSaveState()
 
 void SecondaryProcessing(SecondaryProcessObject &secprocobj)
 {
+    /*
     const TSK_TCHAR** imagepartspath;
+    */
     unsigned long long fsoffset = 0;
+    /*
     TSK_IMG_INFO* readimginfo;
+    */
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
+    /*
     // Open Parent Image
     std::vector<std::string> pathvector;
     pathvector.clear();
@@ -2086,6 +2116,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     }
     readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     free(imagepartspath);
+    */
     //OpenParentFileSystem
     QSqlQuery fsquery(fcasedb);
     fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
@@ -2094,7 +2125,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     fsquery.next();
     fsoffset = fsquery.value(0).toULongLong();
     fsquery.finish();
-    readfsinfo = tsk_fs_open_img(readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
+    readfsinfo = tsk_fs_open_img(IMG_2ND_PROC, fsoffset, TSK_FS_TYPE_DETECT);
     QVector<unsigned long long> adsobjid;
     QVector<unsigned long long> adsattrid;
     adsobjid.clear();
@@ -2124,10 +2155,15 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     //Open File
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, secprocobj.address);
     char magicbuffer[1024];
-    ssize_t readlen = tsk_fs_file_read(readfileinfo, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+    tsk_fs_file_read(readfileinfo, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+
 
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
+    qDebug() << "mimetype for file:" << secprocobj.name << ":" << mimetype.name();
+    // STORE MIMETYPE IN SECPROCOBJ.MIME = MIMETYPE.NAME WHICH WOULD GO BACK IN MY VECTOR FUNCTION TO WRITE TO THE DB LATER AS A SINGLE TRANSACTION FOR SPEED....
+    //
+    //
     //QMagicFile(readfileinfo, secprocjob.objectid);
     //QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(secprocjob.objectid), 1, Qt::MatchFlags(Qt:::MatchRecursive));
     //if(indexlist.count() > 0)
@@ -2137,7 +2173,8 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     //MagicFile(readfileinfo, secprocobj.objectid);
     //BlockFile(readfileinfo, secprocobj.objectid, adsattrid);
     //PropertyFile(readfileinfo, secprocobj.objectid, fsoffset, readfsinfo->block_size, secprocobj.parfsid);
-    if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    /*
+    if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT) // TO AVOID A LOCK WILL NEED TO STORE THIS VALUE UP FRONT AS WELL AHEAD OF TIME
     {
         if(QString::compare(secprocobj.name, ".") == 0 || QString::compare(secprocobj.name, "..") == 0)
         {
@@ -2152,11 +2189,12 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
             //AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
         }
     }
+    */
     filesprocessed++;
     isignals->ProgUpd();
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
-    tsk_img_close(readimginfo);
+    //tsk_img_close(readimginfo);
 }
 
 /*

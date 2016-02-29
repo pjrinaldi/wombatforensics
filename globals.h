@@ -195,5 +195,6 @@ extern Node* parentnode;
 extern Node* currentnode;
 extern Node* toplevelnode;
 extern Node* actionnode;
+extern TSK_IMG_INFO* IMG_2ND_PROC;
 
 #endif
