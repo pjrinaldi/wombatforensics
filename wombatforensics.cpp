@@ -2085,51 +2085,30 @@ void WombatForensics::AutoSaveState()
 
 void SecondaryProcessing(SecondaryProcessObject &secprocobj)
 {
-    /*
-    const TSK_TCHAR** imagepartspath;
-    */
     unsigned long long fsoffset = 0;
-    /*
-    TSK_IMG_INFO* readimginfo;
-    */
+    int fstype = 0;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
-    /*
-    // Open Parent Image
-    std::vector<std::string> pathvector;
-    pathvector.clear();
-    QSqlQuery imgquery(fcasedb);
-    imgquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum;");
-    imgquery.bindValue(0, secprocobj.parimgid);
-    if(imgquery.exec())
-    {
-        while(imgquery.next())
-        {
-            pathvector.push_back(imgquery.value(0).toString().toStdString());
-        }
-    }
-    imgquery.finish();
-    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(uint i=0; i < pathvector.size(); i++)
-    {
-        imagepartspath[i] = pathvector.at(i).c_str();
-    }
-    readimginfo = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    free(imagepartspath);
-    */
     //OpenParentFileSystem
     QSqlQuery fsquery(fcasedb);
-    fsquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
+    fsquery.prepare("SELECT byteoffset, type FROM data where objectid = ?;");
     fsquery.bindValue(0, secprocobj.parfsid);
     fsquery.exec();
     fsquery.next();
     fsoffset = fsquery.value(0).toULongLong();
+    fstype = fsquery.value(1).toInt();
     fsquery.finish();
     readfsinfo = tsk_fs_open_img(IMG_2ND_PROC, fsoffset, TSK_FS_TYPE_DETECT);
-    QVector<unsigned long long> adsobjid;
-    QVector<unsigned long long> adsattrid;
-    adsobjid.clear();
-    adsattrid.clear();
+    //QVector<unsigned long long> adsobjid;
+    //QVector<unsigned long long> adsattrid;
+    //adsobjid.clear();
+    //adsattrid.clear();
+    if(fstype == 1)
+    {
+        // IF IT HAS ADS, NOTE THE CURRENT FILE AND ADD IT TO A VECTOR. THEN WHEN THIS IS FINISHED. RUN THROUGH THOSE FILES USING ANOTHER ADS PROCESSESING SETUP QUEUE...
+        // WHICH I CAN CHECK BY RUNNING IF THE ADSVECTOR.COUNT IS > 0.... I STILL WILL NEED TO INITIALIZE AND CLEAR IT BEFORE I LAUNCH SECONDARY PROCESSING.
+        /////////////////////adsvector.append(secprocobj);
+    }
     /*
     if(readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {        
