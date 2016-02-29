@@ -915,7 +915,7 @@ private:
     void CloseCurrentCase(void);
     void UpdateProperties(void);
     void LoadHexContents(void);
-    void SecondaryProcessing(void);
+    //void SecondaryProcessing(void);
     void OpenEvidenceStructure(void);
     void StartThumbnails(void);
     void ExportFiles(FileExportData* exportdata);
@@ -961,10 +961,13 @@ private:
     QFrame* vline2;
     QVector<FileExportData> exportfilelist;
     QVector<FileDeepData> digfilelist;
+    QVector<SecondaryProcessObject> secondprocessvector;
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
 };
+
+void SecondaryProcessing(SecondaryProcessObject &secprocobj);
 
 #endif // WOMBATFORENSICS_H

@@ -103,6 +103,15 @@ struct FileDeepData
     unsigned long long digcount;
 };
 
+struct SecondaryProcessObject
+{
+    unsigned long long objectid;
+    unsigned long long parimgid;
+    unsigned long long parfsid;
+    unsigned long long address;
+    QString name;
+};
+
 struct SelectedObject
 {
     unsigned long long id;
@@ -184,6 +193,7 @@ typedef struct
 Q_DECLARE_METATYPE(WombatVariable);
 Q_DECLARE_METATYPE(FileExportData);
 Q_DECLARE_METATYPE(FileDeepData);
+Q_DECLARE_METATYPE(SecondaryProcessObject);
 Q_DECLARE_METATYPE(CaseObject);
 Q_DECLARE_METATYPE(EvidenceObject);
 Q_DECLARE_METATYPE(SelectedObject);
