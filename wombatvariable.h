@@ -109,6 +109,7 @@ struct SecondaryProcessObject
     unsigned long long parimgid;
     unsigned long long parfsid;
     unsigned long long address;
+    QString mimetype;
     QString name;
 };
 

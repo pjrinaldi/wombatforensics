@@ -38,8 +38,8 @@ extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
 extern QStringList externallist;
-extern struct magic_set* magicptr;
-extern struct magic_set* magicmimeptr;
+//extern struct magic_set* magicptr;
+//extern struct magic_set* magicmimeptr;
 extern QMutex mutex;
 extern QMap<unsigned long long, int> checkhash;
 
@@ -99,6 +99,14 @@ struct FilterValues
     QVector<unsigned long long> hashcount;
     QVector<unsigned long long> hashidlist;
 };
+
+struct AdsProcessObject
+{
+    unsigned long long objectid;
+    unsigned long long attrid;
+};
+
+extern QVector<AdsProcessObject> adsprocessvector;
 
 struct FileData
 {

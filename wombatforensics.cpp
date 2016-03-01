@@ -602,6 +602,7 @@ void WombatForensics::InitializeQueryModel()
     StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
     LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
     secondprocessvector.clear();
+    adsprocessvector.clear();
     QSqlQuery filequery(fcasedb);
     filequery.prepare("SELECT objectid, parimgid, parfsid, address, name FROM data WHERE objecttype = 5 AND parimgid = ?;");
     filequery.addBindValue(wombatvarptr->currentevidenceid);
@@ -2105,9 +2106,26 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     //adsattrid.clear();
     if(fstype == 1)
     {
-        // IF IT HAS ADS, NOTE THE CURRENT FILE AND ADD IT TO A VECTOR. THEN WHEN THIS IS FINISHED. RUN THROUGH THOSE FILES USING ANOTHER ADS PROCESSESING SETUP QUEUE...
-        // WHICH I CAN CHECK BY RUNNING IF THE ADSVECTOR.COUNT IS > 0.... I STILL WILL NEED TO INITIALIZE AND CLEAR IT BEFORE I LAUNCH SECONDARY PROCESSING.
-        /////////////////////adsvector.append(secprocobj);
+        if(QString::compare(secprocobj.name, ",") == 0 || QString::compare(secprocobj.name, "..") == 0)
+        {
+        }
+        else
+        {
+            QSqlQuery adsquery(fcasedb);
+            adsquery.prepare("SELECT objectid, mftattrid FROM data where objecttype = 6 AND parentid = ?;");
+            adsquery.bindValue(0, secprocobj.address);
+            if(adsquery.exec())
+            {
+                while(adsquery.next())
+                {
+                    AdsProcessObject adsprocobj;
+                    adsprocobj.objectid = adsquery.value(0).toULongLong();
+                    adsprocobj.attrid = adsquery.value(1).toULongLong();
+                    adsprocessvector.append(adsprocobj);
+                }
+            }
+            adsquery.finish();
+        }
     }
     /*
     if(readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -2141,7 +2159,8 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
 
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
-    qDebug() << "mimetype for file:" << secprocobj.name << ":" << mimetype.name();
+    secprocobj.mimetype = mimetype.name();
+    //qDebug() << "mimetype for file:" << secprocobj.name << ":" << mimetype.name();
     // STORE MIMETYPE IN SECPROCOBJ.MIME = MIMETYPE.NAME WHICH WOULD GO BACK IN MY VECTOR FUNCTION TO WRITE TO THE DB LATER AS A SINGLE TRANSACTION FOR SPEED....
     //
     //
