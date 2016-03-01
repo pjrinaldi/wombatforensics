@@ -99,14 +99,14 @@ struct FilterValues
     QVector<unsigned long long> hashcount;
     QVector<unsigned long long> hashidlist;
 };
-
+/*
 struct AdsProcessObject
 {
     unsigned long long objectid;
     unsigned long long attrid;
 };
-
-extern QVector<AdsProcessObject> adsprocessvector;
+*/
+//extern QVector<AdsProcessObject> adsprocessvector;
 
 struct FileData
 {

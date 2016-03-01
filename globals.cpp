@@ -47,6 +47,6 @@ QStringList externallist;
 //struct magic_set* magicmimeptr = NULL;
 QMutex mutex;
 QMap<unsigned long long, int> checkhash;
-QVector<AdsProcessObject> adsprocessvector;
+//QVector<AdsProcessObject> adsprocessvector;
 FilterValues filtervalues;
 TSK_IMG_INFO* IMG_2ND_PROC = NULL;

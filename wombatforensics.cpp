@@ -602,7 +602,7 @@ void WombatForensics::InitializeQueryModel()
     StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
     LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
     secondprocessvector.clear();
-    adsprocessvector.clear();
+    //adsprocessvector.clear();
     QSqlQuery filequery(fcasedb);
     filequery.prepare("SELECT objectid, parimgid, parfsid, address, name FROM data WHERE objecttype = 5 AND parimgid = ?;");
     filequery.addBindValue(wombatvarptr->currentevidenceid);
@@ -611,6 +611,7 @@ void WombatForensics::InitializeQueryModel()
         while(filequery.next())
         {
             SecondaryProcessObject tmpprocessobject;
+            tmpprocessobject.adsprocessvector.clear();
             tmpprocessobject.objectid = filequery.value(0).toULongLong();
             tmpprocessobject.parimgid = filequery.value(1).toULongLong();
             tmpprocessobject.parfsid = filequery.value(2).toULongLong();
@@ -2121,7 +2122,8 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
                     AdsProcessObject adsprocobj;
                     adsprocobj.objectid = adsquery.value(0).toULongLong();
                     adsprocobj.attrid = adsquery.value(1).toULongLong();
-                    adsprocessvector.append(adsprocobj);
+                    secprocobj.adsprocessvector.append(adsprocobj);
+                    //adsprocessvector.append(adsprocobj);
                 }
             }
             adsquery.finish();
