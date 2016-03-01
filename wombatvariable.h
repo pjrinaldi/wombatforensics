@@ -117,6 +117,7 @@ struct SecondaryProcessObject
     unsigned long long address;
     QString mimetype;
     QString name;
+    QString blockaddress;
     QVector<AdsProcessObject> adsprocessvector;
 };
 

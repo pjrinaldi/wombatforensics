@@ -87,7 +87,7 @@ bool ProcessingComplete()
     
     return false;
 }
-
+/*
 void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints, FileData adsdata, bool adsbool)
 {
     FileData tmpdata;
@@ -112,7 +112,7 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
     }
     //mutex.unlock();
 }
-
+*/
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
 {
     if(off < 0)
@@ -227,39 +227,22 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         //LogMessage("TmpPtr got a value somehow");
     }
 
-    //QVector<QString> filestrings;
-    //if(tmpfile->name != NULL) filestrings.append(QString(tmpfile->name->name));
-    //else filestrings.append(QString("unknown.wbt"));
     if(tmpfile->name != NULL) tmpdata.name = QString(tmpfile->name->name);
     else tmpdata.name = QString("unknown.dat");
-    //filestrings.append(QString("/") + QString(tmppath));
     tmpdata.path = QString("/") + QString(tmppath);
 
-    //QVector<unsigned long long> fileints;
     if(tmpfile->name != NULL)
     {
-        //fileints.append((unsigned long long)tmpfile->name->type);
-        //fileints.append((unsigned long long)tmpfile->name->par_addr);
         tmpdata.type = (unsigned long long)tmpfile->name->type;
         tmpdata.paraddr = (unsigned long long)tmpfile->name->par_addr;
     }
     else
     {
-        //fileints.append(0);
-        //fileints.append(0);
         tmpdata.type = 0;
         tmpdata.type = 0;
     }
     if(tmpfile->meta != NULL)
     {
-        /*
-        fileints.append((unsigned long long)tmpfile->meta->atime);
-        fileints.append((unsigned long long)tmpfile->meta->ctime);
-        fileints.append((unsigned long long)tmpfile->meta->crtime);
-        fileints.append((unsigned long long)tmpfile->meta->mtime);
-        fileints.append((unsigned long long)tmpfile->meta->size);
-        fileints.append((unsigned long long)tmpfile->meta->addr);
-        */
         tmpdata.atime = (unsigned long long)tmpfile->meta->atime;
         tmpdata.ctime = (unsigned long long)tmpfile->meta->ctime;
         tmpdata.crtime = (unsigned long long)tmpfile->meta->crtime;
@@ -269,14 +252,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     else
     {
-        /*
-        fileints.append(0);
-        fileints.append(0);
-        fileints.append(0);
-        fileints.append(0);
-        fileints.append(0);
-        fileints.append(0);
-        */
         tmpdata.atime = 0;
         tmpdata.ctime = 0;
         tmpdata.crtime = 0;
@@ -284,20 +259,12 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         tmpdata.size = 0;
         tmpdata.addr = 0;
     }
-    //fileints.append(currentfilesystemid);
     tmpdata.evid = currentevidenceid;
     tmpdata.fsid = currentfilesystemid;
     tmpdata.mftattrid = 0;
     filedatavector.append(tmpdata);
-    /*
-    if(adsbool == true)
-    {
-        filedatavector.append(adsdata);
-    }
-    */
 
     FileData adsdata;
-    //bool adsbool = false;
     unsigned long long adssize = 0;
     TSK_OFF_T curmftentrystart = 0;
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -352,7 +319,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 adsdata.size = (unsigned long long)fsattr->size;
                                 adsdata.addr = adssize - (unsigned long long)fsattr->size + 16;
                                 adsdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
-                                //adsbool = true;
                                 filedatavector.append(adsdata);
                             }
                         }
@@ -361,8 +327,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             }
         }
     }
-    //ProcessFile(filestrings, fileints, adsdata, adsbool);
-    //QFuture<void> tmpfuture = QtConcurrent::run(ProcessFile, filestrings, fileints, tmpdata, adsbool);
     return TSK_WALK_CONT;
 }
 
@@ -647,6 +611,7 @@ void AlternateDataStreamBlockFile(TSK_FS_FILE* tmpfile, QVector<unsigned long lo
         }
     }
 }
+/*
 QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
     QVariant tmpvariant;
@@ -659,14 +624,11 @@ QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     ssize_t readlen = tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     if(readlen > 0)
     {
-        /*
         mimesig = magic_buffer(magicmimeptr, magicbuffer, readlen);
         sigp1 = strtok((char*)mimesig, ";");
         sigtype = magic_buffer(magicptr, magicbuffer, readlen);
         sigp2 = strtok((char*)sigtype, ",");
-        */
     }
-    /*
     QSqlQuery mimequery(fcasedb);
     mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
     if(readlen > 0)
@@ -685,12 +647,12 @@ QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     mimequery.exec();
     mimequery.next();
     mimequery.finish();
-    */
     processphase++;
     isignals->ProgUpd();
     return tmpvariant;
 }
-
+*/
+/*
 QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long adsobjid)
 {
     QVariant tmpvariant;
@@ -728,14 +690,11 @@ QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long a
     }
     if(retval > 0)
     {
-        /*
         mimesig = magic_buffer(magicmimeptr, magicbuffer, chunksize);
         sigp1 = strtok((char*)mimesig, ";");
         sigtype = magic_buffer(magicptr, magicbuffer, chunksize);
         sigp2 = strtok((char*)sigtype, ";");
-        */
     }
-    /*
     QSqlQuery mimequery(fcasedb);
     mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
     if(retval > 0)
@@ -754,10 +713,10 @@ QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long a
     mimequery.exec();
     mimequery.next();
     mimequery.finish();
-    */
     adsquery.finish();
     return tmpvariant;
 }
+*/
 
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
