@@ -2087,6 +2087,7 @@ void WombatForensics::AutoSaveState()
 
 void SecondaryProcessing(SecondaryProcessObject &secprocobj)
 {
+    QMutexLocker locker(&mutex);
     unsigned long long fsoffset = 0;
     int fstype = 0;
     TSK_FS_INFO* readfsinfo;
@@ -2136,7 +2137,6 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     secprocobj.mimetype = mimetype.name();
     // End Mime Type Determination
 
-    /*
     //Begin Block Address Determination
     if((TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_HFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_ISO9660_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_NTFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_FAT_DETECT)
     {
@@ -2197,7 +2197,6 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
         tsk_fs_file_walk(readfileinfo, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
     }
     secprocobj.blockaddress = blockstring;
-    */
 
     /*
      * STILL NEED TO DO THE ADS BLOCK ADDRESS ......
@@ -2221,7 +2220,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
         }
     }
 
-     *
+     */
 
 
     //End Block Address Determination
@@ -2239,6 +2238,8 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
         //MagicFile(readfileinfo, secprocjob.objectid);
     //BlockFile(readfileinfo, secprocobj.objectid, adsattrid);
     //PropertyFile(readfileinfo, secprocobj.objectid, fsoffset, readfsinfo->block_size, secprocobj.parfsid);
+
+    /*
     if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT) // TO AVOID A LOCK WILL NEED TO STORE THIS VALUE UP FRONT AS WELL AHEAD OF TIME
     {
         if(QString::compare(secprocobj.name, ".") == 0 || QString::compare(secprocobj.name, "..") == 0)
