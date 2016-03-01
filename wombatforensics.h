@@ -966,7 +966,6 @@ private:
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
-    QMutex mutex;
 };
 
 void SecondaryProcessing(SecondaryProcessObject &secprocobj);
