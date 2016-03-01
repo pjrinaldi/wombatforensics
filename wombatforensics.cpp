@@ -2136,6 +2136,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     secprocobj.mimetype = mimetype.name();
     // End Mime Type Determination
 
+    /*
     //Begin Block Address Determination
     if((TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_HFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_ISO9660_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_NTFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_FAT_DETECT)
     {
@@ -2196,87 +2197,36 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
         tsk_fs_file_walk(readfileinfo, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
     }
     secprocobj.blockaddress = blockstring;
+    */
+
+    /*
+     * STILL NEED TO DO THE ADS BLOCK ADDRESS ......
+     *
+     *    blockstring = "";
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    {
+        for(int j=0; j < adsattrid.count(); j++)
+        {
+            if(tmpfile->meta != NULL)
+            {
+                tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, adsattrid.at(j), (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+            }
+            QSqlQuery blockquery(fcasedb);
+            blockquery.prepare("UPDATE data SET blockaddress = ? WHERE objectid = ?;");
+            blockquery.bindValue(0, blockstring);
+            blockquery.bindValue(1, adsobjid.at(j));
+            blockquery.exec();
+            blockquery.next();
+            blockquery.finish();
+        }
+    }
+
+     *
+
+
     //End Block Address Determination
 
 
-
-    /*
-     *
-     *
-      if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
-    {
-        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
-        {
-            tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
-        }
-        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
-        {
-            iso9660_inode* dinode;
-            dinode = (iso9660_inode*)tsk_malloc(sizeof(iso9660_inode));
-            iso9660_inode_node* n;
-            n = ((ISO_INFO*)tmpfile->fs_info)->in_list;
-            while(n && (n->inum != tmpfile->meta->addr))
-                n = n->next;
-            if(n)
-                memcpy(dinode, &n->inode, sizeof(iso9660_inode));
-            int block = tsk_getu32(tmpfile->fs_info->endian, dinode->dr.ext_loc_m);
-            TSK_OFF_T size = tmpfile->meta->size;
-            while((int64_t)size > 0)
-            {
-                blockstring += QString::number(block++) + "|";
-                size -= tmpfile->fs_info->block_size;
-            }
-        }
-        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
-        {
-            unsigned long long minads = 1000;
-            for(int i = 0; i < adsattrid.count(); i++)
-            {
-                if(adsattrid.at(i) < minads)
-                    minads = adsattrid.at(i);
-            }
-            if(tmpfile->meta != NULL)
-            {
-                if(tmpfile->meta->attr)
-                {
-                    int cnt, i;
-                    cnt = tsk_fs_file_attr_getsize(tmpfile);
-                    for(i = 0; i < cnt; i++)
-                    {
-                        const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                        if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
-                        {
-                            if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id < (int)minads)
-                            {
-                                tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
-        {
-            tsk_fs_file_walk(tmpfile, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
-        }
-    }
-    else
-        tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
-    QSqlQuery blockquery(fcasedb);
-    blockquery.prepare("UPDATE data SET blockaddress = ? WHERE objectid = ?;");
-    blockquery.bindValue(0, blockstring);
-    blockquery.bindValue(1, objid);
-    blockquery.exec();
-    blockquery.next();
-    blockquery.finish();
-    processphase++;
-    isignals->ProgUpd();
-   *
-     *
-     *
-     *
-     *
-     */ 
 
 
 
@@ -2289,7 +2239,6 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
         //MagicFile(readfileinfo, secprocjob.objectid);
     //BlockFile(readfileinfo, secprocobj.objectid, adsattrid);
     //PropertyFile(readfileinfo, secprocobj.objectid, fsoffset, readfsinfo->block_size, secprocobj.parfsid);
-    /*
     if(readfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT) // TO AVOID A LOCK WILL NEED TO STORE THIS VALUE UP FRONT AS WELL AHEAD OF TIME
     {
         if(QString::compare(secprocobj.name, ".") == 0 || QString::compare(secprocobj.name, "..") == 0)

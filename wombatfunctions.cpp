@@ -516,7 +516,7 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, QVector<unsigned long
         propquery.finish();
    }
 }
-
+/*
 void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsattrid)
 {
     blockstring = "";
@@ -611,6 +611,7 @@ void AlternateDataStreamBlockFile(TSK_FS_FILE* tmpfile, QVector<unsigned long lo
         }
     }
 }
+*/
 /*
 QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
