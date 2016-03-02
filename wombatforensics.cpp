@@ -2094,7 +2094,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     TSK_FS_FILE* readfileinfo;
     //OpenParentFileSystem
     QSqlQuery fsquery(fcasedb);
-    fsquery.prepare("SELECT byteoffset, type FROM data where objectid = ?;");
+    fsquery.prepare("SELECT byteoffset, type FROM data WHERE objectid = ?;");
     fsquery.bindValue(0, secprocobj.parfsid);
     fsquery.exec();
     fsquery.next();
@@ -2104,13 +2104,13 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     readfsinfo = tsk_fs_open_img(IMG_2ND_PROC, fsoffset, TSK_FS_TYPE_DETECT);
     if(fstype == 1)
     {
-        if(QString::compare(secprocobj.name, ",") == 0 || QString::compare(secprocobj.name, "..") == 0)
+        if(QString::compare(secprocobj.name, ".") == 0 || QString::compare(secprocobj.name, "..") == 0)
         {
         }
         else
         {
             QSqlQuery adsquery(fcasedb);
-            adsquery.prepare("SELECT objectid, mftattrid FROM data where objecttype = 6 AND parentid = ?;");
+            adsquery.prepare("SELECT objectid, mftattrid FROM data WHERE objecttype = 6 AND parentid = ?;");
             adsquery.bindValue(0, secprocobj.address);
             if(adsquery.exec())
             {
@@ -2197,6 +2197,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
         tsk_fs_file_walk(readfileinfo, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
     }
     secprocobj.blockaddress = blockstring;
+    qDebug() << "current id. filename:" << secprocobj.objectid << "." << secprocobj.name;
 
     /*
      * STILL NEED TO DO THE ADS BLOCK ADDRESS ......
