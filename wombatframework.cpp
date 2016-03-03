@@ -84,6 +84,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         //LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
+    // THIS FUNCTION I CAN NOW SPAWN OFF INTO A CONCURRENT MAP MAYBE??? NOT SURE IF THERE IS VALUE IN IT... I COULD TRY IT AND COMPARE...
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         if(fcasedb.transaction())
