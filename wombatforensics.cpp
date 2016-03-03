@@ -2225,6 +2225,13 @@ void SecondaryProcessing(QVariantMap &jsonstore)
     }
     //secprocobj.blockaddress = blockstring;
     jsonstore.insert("blockaddress", blockstring);
+    QJsonObject object = QJsonObject::fromVariantMap(jsonstore);
+    QJsonDocument document;
+    document.setObject(object);
+    QFile jsonfile("./testfile.json");
+    jsonfile.open(QFile::Append);
+    jsonfile.write(document.toJson(QJsonDocument::Compact));
+    jsonfile.close();
     //qDebug() << "current id. filename:" << secprocobj.objectid << "." << secprocobj.name;
 
     /*
