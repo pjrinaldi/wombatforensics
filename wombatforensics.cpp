@@ -406,8 +406,9 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
-    QFile magfile(":/magic/magicfile");
-    QString magicpath = wombatvarptr->datapath + "magic.mgc";
+    /*
+    //QFile magfile(":/magic/magicfile");
+    //QString magicpath = wombatvarptr->datapath + "magic.mgc";
     if(!FileExists(magicpath.toStdString()))
     {
         QFile installmagfile(magicpath);
@@ -422,6 +423,7 @@ void WombatForensics::InitializeAppStructure()
            }
         }
     }
+    */
     //magicmimeptr = magic_open(MAGIC_MIME);
     //magicptr = magic_open(MAGIC_NONE);
     //magic_load(magicptr, magicpath.toStdString().c_str());
@@ -2228,6 +2230,8 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     //secprocobj.blockaddress = blockstring;
     //jsonstore.insert("blockaddress", blockstring);
     //
+    //
+    /*
     QVariantMap tmpmap;
     tmpmap.insert("objectid", secprocobj.objectid);
     tmpmap.insert("mimetype", mimetype.name());
@@ -2244,6 +2248,33 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     binfile.open(QFile::Append);
     binfile.write(document.toBinaryData());
     binfile.close();
+
+    */
+
+    QSqlQuery updatequery(fcasedb);
+    updatequery.prepare("UPDATE data SET filemime = ?, filesignature = ?, blockaddress = ? WHERE objectid = ?;");
+    updatequery.bindValue(0, mimetype.name());
+    updatequery.bindValue(1, mimetype.name().split("/").at(0));
+    updatequery.bindValue(2, blockstring);
+    updatequery.bindValue(3, secprocobj.objectid);
+    updatequery.exec();
+    updatequery.next();
+    updatequery.finish();
+
+    /*
+     *
+     *    QSqlQuery mimequery(fcasedb);
+    mimequery.prepare("UPDATE data SET filemime = ?, filesignature = ? WHERE objectid = ?;");
+    if(readlen > 0)
+    {
+        tmpvariant = QVariant(QString::fromStdString(sigp2));
+        mimequery.bindValue(0, QString::fromStdString(sigp1));
+        mimequery.bindValue(1, QString::fromStdString(sigp2));
+
+     *
+     */ 
+
+
     //qDebug() << "current id. filename:" << secprocobj.objectid << "." << secprocobj.name;
 
     /*
