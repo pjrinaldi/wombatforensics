@@ -97,6 +97,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
                 {
                     fquery.bindValue(0, 5);
                     filesprocessed++;
+                    processphase++;
                 }
                 else
                     fquery.bindValue(0, 6);
@@ -116,7 +117,6 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
                 fquery.bindValue(14, filedatavector.at(i).mimetype.split("/").at(0));
                 fquery.bindValue(15, filedatavector.at(i).mftattrid);
                 fquery.exec();
-                processphase++;
                 isignals->ProgUpd();
             }
             fcasedb.commit();
