@@ -116,6 +116,7 @@ struct FileData
     unsigned long long mftattrid;
     QString name;
     QString path;
+    QString mimetype;
 };
 
 extern QVector<FileData> filedatavector;

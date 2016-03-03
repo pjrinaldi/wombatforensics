@@ -603,6 +603,7 @@ void WombatForensics::InitializeQueryModel()
     LogMessage("Evidence Added. Begin File Structure Analysis...");
     StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
     LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
+    /*
     secondprocessvector.clear();
     //jsonstorevector.clear();
     //secondprocessvector.adsprocessvector.clear();
@@ -621,6 +622,7 @@ void WombatForensics::InitializeQueryModel()
             tmpprocessobject.address = filequery.value(3).toULongLong();
             tmpprocessobject.name = filequery.value(4).toString();
             secondprocessvector.append(tmpprocessobject);
+            */
             /*
             QVariantMap tmpmap;
             tmpmap.insert("objectid", filequery.value(0));
@@ -630,7 +632,7 @@ void WombatForensics::InitializeQueryModel()
             tmpmap.insert("name", filequery.value(4));
             jsonstorevector.append(tmpmap);
             */
-        }
+        /*}
     }
     filequery.finish();
     // IMG INFO HERE....
@@ -656,8 +658,9 @@ void WombatForensics::InitializeQueryModel()
     }
     IMG_2ND_PROC = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     free(imagepartspath);
+    */
     //secondwatcher.setFuture(QtConcurrent::map(jsonstorevector, SecondaryProcessing));
-    secondwatcher.setFuture(QtConcurrent::map(secondprocessvector, SecondaryProcessing));
+    //secondwatcher.setFuture(QtConcurrent::map(secondprocessvector, SecondaryProcessing));
 /*
  *    QSqlQuery filequery(fcasedb);
     unsigned long long fsoffset = 0;

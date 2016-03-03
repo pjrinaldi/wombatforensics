@@ -89,7 +89,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         if(fcasedb.transaction())
         {
             QSqlQuery fquery(fcasedb);
-            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5, mftattrid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', '', '', '', ?);");
+            fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5, mftattrid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, '', ?);");
             for(int i=0; i < filedatavector.count(); i++)
             {
                 if(filedatavector.at(i).mftattrid == 0)
@@ -108,7 +108,9 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
                 fquery.bindValue(10, filedatavector.at(i).addr);
                 fquery.bindValue(11, filedatavector.at(i).evid);
                 fquery.bindValue(12, filedatavector.at(i).fsid);
-                fquery.bindValue(13, filedatavector.at(i).mftattrid);
+                fquery.bindValue(13, filedatavector.at(i).mimetype);
+                fquery.bindValue(14, filedatavector.at(i).mimetype.split("/").at(0));
+                fquery.bindValue(15, filedatavector.at(i).mftattrid);
                 fquery.exec();
             }
             fcasedb.commit();

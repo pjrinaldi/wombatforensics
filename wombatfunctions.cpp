@@ -263,6 +263,24 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     tmpdata.evid = currentevidenceid;
     tmpdata.fsid = currentfilesystemid;
     tmpdata.mftattrid = 0;
+    char magicbuffer[1024];
+    tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+    QMimeDatabase mimedb;
+    QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
+    tmpdata.mimetype = mimetype.name();
+    /*
+     *    readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, secprocobj.address);
+    char magicbuffer[1024];
+    tsk_fs_file_read(readfileinfo, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+
+
+    // Begin Mime Type Determination
+    QMimeDatabase mimedb;
+    QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
+    secprocobj.mimetype = mimetype.name();
+
+     *
+     */ 
     filedatavector.append(tmpdata);
 
     FileData adsdata;
@@ -319,6 +337,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 adsdata.fsid = currentfilesystemid;
                                 adsdata.size = (unsigned long long)fsattr->size;
                                 adsdata.addr = adssize - (unsigned long long)fsattr->size + 16;
+                                adsdata.mimetype = mimetype.name();
                                 adsdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
                                 filedatavector.append(adsdata);
                             }
