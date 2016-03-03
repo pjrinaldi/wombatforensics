@@ -2163,10 +2163,11 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     // Begin Mime Type Determination
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
-    //secprocobj.mimetype = mimetype.name();
+    secprocobj.mimetype = mimetype.name();
     //jsonstore.insert("mimetype", mimetype.name());
     // End Mime Type Determination
     //int fstype = jsonstore.value("fstype").toInt();
+    /*
     //Begin Block Address Determination
     if((TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_HFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_ISO9660_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_NTFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_FAT_DETECT)
     {
@@ -2231,6 +2232,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     //jsonstore.insert("blockaddress", blockstring);
     //
     //
+    */
     /*
     QVariantMap tmpmap;
     tmpmap.insert("objectid", secprocobj.objectid);
@@ -2251,6 +2253,8 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
 
     */
 
+    /*
+     * TOO SLOW, SO I WILL STORE IN MEMORY USING SECOBJPROP AND THEN DO A TRANSACT WHEN THIS FINISHES...
     QSqlQuery updatequery(fcasedb);
     updatequery.prepare("UPDATE data SET filemime = ?, filesignature = ?, blockaddress = ? WHERE objectid = ?;");
     updatequery.bindValue(0, mimetype.name());
@@ -2261,6 +2265,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     updatequery.next();
     updatequery.finish();
 
+    */
     /*
      *
      *    QSqlQuery mimequery(fcasedb);
@@ -2336,6 +2341,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     }
     */
     filesprocessed++;
+    processphase++;
     isignals->ProgUpd();
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
