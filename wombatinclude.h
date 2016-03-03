@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QDialog>
 #include <QDir>
+#include <QFile>
 #include <QFileDialog>
 #include <QFrame>
 #include <QFuture>
@@ -28,6 +29,8 @@
 #include <QGridLayout>
 #include <QImage>
 #include <QInputDialog>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QList>
 #include <QMainWindow>
 #include <QMessageBox>

@@ -961,6 +961,7 @@ private:
     QFrame* vline2;
     QVector<FileExportData> exportfilelist;
     QVector<FileDeepData> digfilelist;
+    QVector<QVariantMap> jsonstorevector;
     QVector<SecondaryProcessObject> secondprocessvector;
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
@@ -968,6 +969,7 @@ private:
     QTimer* autosavetimer;
 };
 
-void SecondaryProcessing(SecondaryProcessObject &secprocobj);
+void SecondaryProcessing(QVariantMap &jsonstore);
+//void SecondaryProcessing(SecondaryProcessObject &secprocobj);
 
 #endif // WOMBATFORENSICS_H

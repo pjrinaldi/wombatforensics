@@ -602,6 +602,7 @@ void WombatForensics::InitializeQueryModel()
     StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
     LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
     secondprocessvector.clear();
+    jsonstorevector.clear();
     //adsprocessvector.clear();
     QSqlQuery filequery(fcasedb);
     filequery.prepare("SELECT objectid, parimgid, parfsid, address, name FROM data WHERE objecttype = 5 AND parimgid = ?;");
@@ -610,6 +611,7 @@ void WombatForensics::InitializeQueryModel()
     {
         while(filequery.next())
         {
+            /*
             SecondaryProcessObject tmpprocessobject;
             tmpprocessobject.adsprocessvector.clear();
             tmpprocessobject.objectid = filequery.value(0).toULongLong();
@@ -618,6 +620,14 @@ void WombatForensics::InitializeQueryModel()
             tmpprocessobject.address = filequery.value(3).toULongLong();
             tmpprocessobject.name = filequery.value(4).toString();
             secondprocessvector.append(tmpprocessobject);
+            */
+            QVariantMap tmpmap;
+            tmpmap.insert("objectid", filequery.value(0));
+            tmpmap.insert("parimgid", filequery.value(1));
+            tmpmap.insert("parfsid", filequery.value(2));
+            tmpmap.insert("address", filequery.value(3));
+            tmpmap.insert("name", filequery.value(4));
+            jsonstorevector.append(tmpmap);
         }
     }
     filequery.finish();
@@ -644,7 +654,8 @@ void WombatForensics::InitializeQueryModel()
     }
     IMG_2ND_PROC = tsk_img_open(pathvector.size(), imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     free(imagepartspath);
-    secondwatcher.setFuture(QtConcurrent::map(secondprocessvector, SecondaryProcessing));
+    secondwatcher.setFuture(QtConcurrent::map(jsonstorevector, SecondaryProcessing));
+    //secondwatcher.setFuture(QtConcurrent::map(secondprocessvector, SecondaryProcessing));
 /*
  *    QSqlQuery filequery(fcasedb);
     unsigned long long fsoffset = 0;
@@ -2085,48 +2096,62 @@ void WombatForensics::AutoSaveState()
 }
 
 
-void SecondaryProcessing(SecondaryProcessObject &secprocobj)
+//void SecondaryProcessing(SecondaryProcessObject &secprocobj)
+void SecondaryProcessing(QVariantMap &jsonstore)
 {
     QMutexLocker locker(&mutex);
-    unsigned long long fsoffset = 0;
-    int fstype = 0;
+    //unsigned long long fsoffset = 0;
+    //int fstype = 0;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
     //OpenParentFileSystem
     QSqlQuery fsquery(fcasedb);
     fsquery.prepare("SELECT byteoffset, type FROM data WHERE objectid = ?;");
-    fsquery.bindValue(0, secprocobj.parfsid);
+    fsquery.bindValue(0, jsonstore.value("parfsid").toULongLong());
+    //fsquery.bindValue(0, secprocobj.parfsid);
     fsquery.exec();
     fsquery.next();
-    fsoffset = fsquery.value(0).toULongLong();
-    fstype = fsquery.value(1).toInt();
+    jsonstore.insert("fsoffset", fsquery.value(0));
+    jsonstore.insert("fstype", fsquery.value(1));
+    //fsoffset = fsquery.value(0).toULongLong();
+    //fstype = fsquery.value(1).toInt();
     fsquery.finish();
-    readfsinfo = tsk_fs_open_img(IMG_2ND_PROC, fsoffset, TSK_FS_TYPE_DETECT);
-    if(fstype == 1)
+    readfsinfo = tsk_fs_open_img(IMG_2ND_PROC, jsonstore.value("fsoffset").toULongLong(), TSK_FS_TYPE_DETECT);
+    //readfsinfo = tsk_fs_open_img(IMG_2ND_PROC, fsoffset, TSK_FS_TYPE_DETECT);
+    if(jsonstore.value("fstype").toInt() == 1)
     {
-        if(QString::compare(secprocobj.name, ".") == 0 || QString::compare(secprocobj.name, "..") == 0)
+        //if(QString::compare(secprocobj.name, ".") == 0 || QString::compare(secprocobj.name, "..") == 0)
+        if(QString::compare(jsonstore.value("name").toString(), ".") == 0 || QString::compare(jsonstore.value("name").toString(), "..") == 0)
         {
         }
         else
         {
             QSqlQuery adsquery(fcasedb);
             adsquery.prepare("SELECT objectid, mftattrid FROM data WHERE objecttype = 6 AND parentid = ?;");
-            adsquery.bindValue(0, secprocobj.address);
+            //adsquery.bindValue(0, secprocobj.address);
+            adsquery.bindValue(0, jsonstore.value("address").toULongLong());
             if(adsquery.exec())
             {
                 while(adsquery.next())
                 {
+                    QVariantMap tmpmap;
+                    tmpmap.insert("objectid", adsquery.value(0));
+                    tmpmap.insert("attrid", adsquery.value(1));
+                    jsonstore.insert("adsmapentry", tmpmap);
+                    /*
                     AdsProcessObject adsprocobj;
                     adsprocobj.objectid = adsquery.value(0).toULongLong();
                     adsprocobj.attrid = adsquery.value(1).toULongLong();
                     secprocobj.adsprocessvector.append(adsprocobj);
+                    */
                 }
             }
             adsquery.finish();
         }
     }
     //Open File
-    readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, secprocobj.address);
+    readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, jsonstore.value("address").toULongLong());
+    //readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, secprocobj.address);
     char magicbuffer[1024];
     tsk_fs_file_read(readfileinfo, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
 
@@ -2134,9 +2159,10 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     // Begin Mime Type Determination
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
-    secprocobj.mimetype = mimetype.name();
+    //secprocobj.mimetype = mimetype.name();
+    jsonstore.insert("mimetype", mimetype.name());
     // End Mime Type Determination
-
+    int fstype = jsonstore.value("fstype").toInt();
     //Begin Block Address Determination
     if((TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_HFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_ISO9660_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_NTFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_FAT_DETECT)
     {
@@ -2165,10 +2191,11 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
         else if((TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_NTFS_DETECT)
         {
             unsigned long long minads = 1000;
-            for(int i = 0; i < secprocobj.adsprocessvector.count(); i++)
+            //for(int i = 0; i < secprocobj.adsprocessvector.count(); i++)
+            for(int i = 0; i < jsonstore.count("adsmapentry"); i++)
             {
-                if(secprocobj.adsprocessvector.at(i).attrid < minads)
-                    minads = secprocobj.adsprocessvector.at(i).attrid;
+                //if(secprocobj.adsprocessvector.at(i).attrid < minads)
+                    //minads = secprocobj.adsprocessvector.at(i).attrid;
             }
             if(readfileinfo->meta->addr)
             {
@@ -2196,8 +2223,9 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     {
         tsk_fs_file_walk(readfileinfo, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
     }
-    secprocobj.blockaddress = blockstring;
-    qDebug() << "current id. filename:" << secprocobj.objectid << "." << secprocobj.name;
+    //secprocobj.blockaddress = blockstring;
+    jsonstore.insert("blockaddress", blockstring);
+    //qDebug() << "current id. filename:" << secprocobj.objectid << "." << secprocobj.name;
 
     /*
      * STILL NEED TO DO THE ADS BLOCK ADDRESS ......
