@@ -365,16 +365,29 @@ public:
             {
                 Node* parentnode = NodeFromIndex(index);
                 QSqlQuery childupdatequery(fcasedb);
-                childupdatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
+                childupdatequery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE objectid = ?;");
+                //childupdatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
                 for(int i=0; i < parentnode->children.count(); i++)
                 {
                     childupdatequery.addBindValue(parentnode->children.at(i)->nodevalues.at(0).toULongLong());
                     childupdatequery.exec();
                     childupdatequery.next();
+                    parentnode->children.at(i)->nodevalues[0] = childupdatequery.value(0);
+                    parentnode->children.at(i)->nodevalues[1] = childupdatequery.value(1);
+                    parentnode->children.at(i)->nodevalues[2] = childupdatequery.value(2);
+                    parentnode->children.at(i)->nodevalues[3] = childupdatequery.value(3);
+                    parentnode->children.at(i)->nodevalues[4] = childupdatequery.value(4);
+                    parentnode->children.at(i)->nodevalues[5] = childupdatequery.value(5);
+                    parentnode->children.at(i)->nodevalues[6] = childupdatequery.value(6);
+                    parentnode->children.at(i)->nodevalues[7] = childupdatequery.value(7);
+                    parentnode->children.at(i)->nodevalues[8] = childupdatequery.value(8);
+                    parentnode->children.at(i)->nodevalues[9] = childupdatequery.value(9);
+                    parentnode->children.at(i)->nodevalues[10] = childupdatequery.value(9).toString().split("/").at(0);
+                    /*
                     for(int j=0; j < childupdatequery.record().count(); j++)
                     {
                         parentnode->children.at(i)->nodevalues[j] = childupdatequery.value(j);
-                    }
+                    }*/
                 }
                 childupdatequery.finish();
                 emit dataChanged(index.child(0, 0), index.child(parentnode->children.count() - 1, 0));
@@ -389,10 +402,23 @@ public:
                 updatequery.addBindValue(currentnode->nodevalues.at(0).toULongLong());
                 updatequery.exec();
                 updatequery.next();
+                /*
                 for(int i=0; i < updatequery.record().count(); i++)
                 {
                     currentnode->nodevalues[i] = updatequery.value(i);
                 }
+                */
+                currentnode->nodevalues[0] = updatequery.value(0);
+                currentnode->nodevalues[1] = updatequery.value(1);
+                currentnode->nodevalues[2] = updatequery.value(2);
+                currentnode->nodevalues[3] = updatequery.value(3);
+                currentnode->nodevalues[4] = updatequery.value(4);
+                currentnode->nodevalues[5] = updatequery.value(5);
+                currentnode->nodevalues[6] = updatequery.value(6);
+                currentnode->nodevalues[7] = updatequery.value(7);
+                currentnode->nodevalues[8] = updatequery.value(8);
+                currentnode->nodevalues[9] = updatequery.value(9);
+                currentnode->nodevalues[10] = updatequery.value(9).toString().split("/").at(0);
                 updatequery.finish();
                 emit dataChanged(index, index);
                 return true;
@@ -410,15 +436,16 @@ public:
             Node* startnode = NodeFromIndex(topleftindex);
             Node* endnode = NodeFromIndex(botrightindex);
             QSqlQuery updatequery(fcasedb);
-            updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid == ? OR objectid == ?;");
+            updatequery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE objectid == ? OR objectid == ?;");
+            //updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid == ? OR objectid == ?;");
             updatequery.addBindValue(startnode->nodevalues.at(0).toULongLong());
             updatequery.exec();
             updatequery.next();
-            startnode->nodevalues[10] = updatequery.value(10).toString();
+            startnode->nodevalues[8] = updatequery.value(8).toString();
             updatequery.addBindValue(endnode->nodevalues.at(0).toULongLong());
             updatequery.exec();
             updatequery.next();
-            endnode->nodevalues[10] = updatequery.value(10).toString();
+            endnode->nodevalues[8] = updatequery.value(8).toString();
             updatequery.finish();
         }
         }
@@ -445,19 +472,19 @@ public:
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 3 && (filtervalues.maxsizebool || filtervalues.minsizebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 6 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
+            if(section == 4 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 7 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
+            if(section == 5 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 8 && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
+            if(section == 6 && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 9 && (filtervalues.maxchangebool || filtervalues.minchangebool))
+            if(section == 7 && (filtervalues.maxchangebool || filtervalues.minchangebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 16 && (filtervalues.filecategorybool || filtervalues.filetypebool))
+            if(section == 9 && (filtervalues.filecategorybool || filtervalues.filetypebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 10 && filtervalues.hashbool)
+            if(section == 8 && filtervalues.hashbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 17 && filtervalues.filegroupbool)
+            if(section == 10 && filtervalues.filegroupbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -561,12 +588,12 @@ public:
     
     void GetModelCount(Node* curnode)
     {
-        if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
-        {
+        //if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
+        //{
             totalcount++;
             if(curnode->checkstate == 2)
                 totalchecked++;
-        }
+        //}
         if(curnode->haschildren)
         {
             for(int i=0; i < curnode->children.count(); i++)
