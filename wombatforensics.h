@@ -58,10 +58,12 @@ class TreeModel : public QAbstractItemModel
 public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
-        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Signature" << "File Category";
+        //headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
         rootnode = 0;
         QList<QVariant> emptyset;
-        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+        emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
+        //emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
         rootnode = new Node(emptyset);
         rootnode->parent = 0;
         rootnode->childcount = 0;
@@ -134,6 +136,16 @@ public:
             else
                 return QVariant();
         }
+        QSqlQuery dataquery(fcasedb);
+        dataquery.prepare("SELECT objecttype, type FROM data WHERE objectid = ?;");
+        dataquery.bindValue(0, node->nodevalues.at(0).toULongLong());
+        dataquery.exec();
+        dataquery.next();
+        int nodetype = dataquery.value(0).toInt();
+        int itemtype = dataquery.value(1).toInt();
+        dataquery.finish();
+        //headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
+        // WILL NEED TO REPLACE ALL THESE CALLS TO THE RESPECTIVE SQL QUERY RATHER THAN THE NODE SINCE I'M NOT STORING IT IN THE NODE ANYMORE...
         if(role == Qt::ForegroundRole)
         {
             if(filtervalues.maxidbool && filtervalues.minidbool == false)
@@ -176,86 +188,93 @@ public:
                 if(node->nodevalues.at(3).toULongLong() >= filtervalues.minsize || node->nodevalues.at(3).toULongLong() <= filtervalues.maxsize)
                     return QColor(Qt::lightGray);
             }
-            if(node->nodevalues.at(4).toInt() == 5)
+            //if(node->nodevalues.at(4).toInt() == 5)
+            if(nodetype == 5)
             {
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
                 {
-                    if(node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
+                    //if(node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
+                    if(node->nodevalues.at(4).toInt() <= filtervalues.maxcreate)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxcreatebool == false && filtervalues.mincreatebool)
                 {
-                    if(node->nodevalues.at(6).toInt() >= filtervalues.mincreate)
+                    if(node->nodevalues.at(4).toInt() >= filtervalues.mincreate)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool)
                 {
-                    if(node->nodevalues.at(6).toInt() >= filtervalues.mincreate || node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
+                    if(node->nodevalues.at(4).toInt() >= filtervalues.mincreate || node->nodevalues.at(4).toInt() <= filtervalues.maxcreate)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxaccessbool && filtervalues.minaccessbool == false)
                 {
-                    if(node->nodevalues.at(7).toInt() <= filtervalues.maxaccess)
+                    //if(node->nodevalues.at(7).toInt() <= filtervalues.maxaccess)
+                    if(node->nodevalues.at(5).toInt() <= filtervalues.maxaccess)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxaccessbool == false && filtervalues.minaccessbool)
                 {
-                    if(node->nodevalues.at(7).toInt() >= filtervalues.minaccess)
+                    if(node->nodevalues.at(5).toInt() >= filtervalues.minaccess)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxaccessbool && filtervalues.minaccessbool)
                 {
-                    if(node->nodevalues.at(7).toInt() >= filtervalues.minaccess || node->nodevalues.at(7).toInt() <= filtervalues.maxaccess)
+                    if(node->nodevalues.at(5).toInt() >= filtervalues.minaccess || node->nodevalues.at(5).toInt() <= filtervalues.maxaccess)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxmodifybool && filtervalues.minmodifybool == false)
                 {
-                    if(node->nodevalues.at(8).toInt() <= filtervalues.maxmodify)
+                    //if(node->nodevalues.at(8).toInt() <= filtervalues.maxmodify)
+                    if(node->nodevalues.at(6).toInt() <= filtervalues.maxmodify)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxmodifybool == false && filtervalues.minmodifybool)
                 {
-                    if(node->nodevalues.at(8).toInt() >= filtervalues.minmodify)
+                    if(node->nodevalues.at(6).toInt() >= filtervalues.minmodify)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxmodifybool && filtervalues.minmodifybool)
                 {
-                    if(node->nodevalues.at(8).toInt() >= filtervalues.minmodify || node->nodevalues.at(8).toInt() <= filtervalues.maxmodify)
+                    if(node->nodevalues.at(6).toInt() >= filtervalues.minmodify || node->nodevalues.at(6).toInt() <= filtervalues.maxmodify)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxchangebool && filtervalues.minchangebool == false)
                 {
-                    if(node->nodevalues.at(9).toInt() <= filtervalues.maxchange)
+                    //if(node->nodevalues.at(9).toInt() <= filtervalues.maxchange)
+                    if(node->nodevalues.at(7).toInt() <= filtervalues.maxchange)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxchangebool == false && filtervalues.minchangebool)
                 {
-                    if(node->nodevalues.at(9).toInt() >= filtervalues.minchange)
+                    if(node->nodevalues.at(7).toInt() >= filtervalues.minchange)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxchangebool && filtervalues.minchangebool)
                 {
-                    if(node->nodevalues.at(9).toInt() >= filtervalues.minchange || node->nodevalues.at(9).toInt() <= filtervalues.maxchange)
+                    if(node->nodevalues.at(7).toInt() >= filtervalues.minchange || node->nodevalues.at(7).toInt() <= filtervalues.maxchange)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.filecategorybool && filtervalues.filetypebool == false)
                 {
-                    if(node->nodevalues.at(16).toString().contains(filtervalues.filecategory) == false)
+                    //if(node->nodevalues.at(16).toString().contains(filtervalues.filecategory) == false)
+                    if(node->nodevalues.at(9).toString().contains(filtervalues.filecategory) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.filecategorybool == false && filtervalues.filetypebool)
                 {
-                    if(node->nodevalues.at(16).toString().contains(filtervalues.filetype) == false)
+                    if(node->nodevalues.at(9).toString().contains(filtervalues.filetype) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.filecategorybool && filtervalues.filetypebool)
                 {
-                    if(node->nodevalues.at(16).toString().contains(filtervalues.filecategory) == false || node->nodevalues.at(16).toString().contains(filtervalues.filetype) == false)
+                    if(node->nodevalues.at(9).toString().contains(filtervalues.filecategory) == false || node->nodevalues.at(9).toString().contains(filtervalues.filetype) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.filegroupbool)
                 {
-                    if(node->nodevalues.at(17).toString().contains(filtervalues.filegroup) == false)
+                    //if(node->nodevalues.at(17).toString().contains(filtervalues.filegroup) == false)
+                    if(node->nodevalues.at(10).toString().contains(filtervalues.filegroup) == false)
                             return QColor(Qt::lightGray);
                 }
                 if(filtervalues.hashbool)
@@ -272,7 +291,8 @@ public:
         {
             if(index.column() == 2)
             {
-                if(node->nodevalues.at(4).toInt() == 1)
+                //if(node->nodevalues.at(4).toInt() == 1)
+                if(dataquery.value(0).toInt() == 1)
                     return QString("");
                 else
                     return node->nodevalues.at(index.column());
@@ -288,7 +308,7 @@ public:
         }
         if(role == Qt::DecorationRole)
         {
-            int nodetype = node->nodevalues.at(4).toInt();
+            //int nodetype = node->nodevalues.at(4).toInt();
             QString nodename = node->nodevalues.at(1).toString();
             if(index.column() == 0)
             {
@@ -302,7 +322,7 @@ public:
                     return QIcon(QPixmap(QString(":/basic/treefs")));
                 else if(nodetype == 5)
                 {
-                    int itemtype = node->nodevalues.at(12).toInt();
+                    //int itemtype = node->nodevalues.at(12).toInt();
                     if(itemtype == 5)
                     {
                         if(nodename.compare("AttrDef") == 0 || nodename.compare("$BadClus") == 0 || nodename.compare("$Bitmap") == 0 || nodename.compare("$Boot") == 0 || nodename.compare("$ObjId") == 0 || nodename.compare("$Quota") == 0 || nodename.compare("$Reparse") == 0 || nodename.compare("$LogFile") == 0 || nodename.compare("$MFT") == 0 || nodename.compare("$MFTMirr") == 0 || nodename.compare("$Secure") == 0 || nodename.compare("$UpCase") == 0 || nodename.compare("$Volume") == 0)
@@ -364,7 +384,8 @@ public:
             {
                 Node* currentnode = NodeFromIndex(index);
                 QSqlQuery updatequery(fcasedb);
-                updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
+                updatequery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE objectid = ?;");
+                //updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
                 updatequery.addBindValue(currentnode->nodevalues.at(0).toULongLong());
                 updatequery.exec();
                 updatequery.next();
@@ -568,7 +589,8 @@ public:
     {
         int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
-        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
+        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 6 AND parimgid = ?)");
+        //addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
         addevidquery.addBindValue(curid);
         addevidquery.addBindValue(curid);
         if(addevidquery.exec())
@@ -578,10 +600,22 @@ public:
             {
                 currentnode = 0;
                 colvalues.clear();
-                for(int i=0; i < addevidquery.record().count(); i++)
-                    colvalues.append(addevidquery.value(i));
+                colvalues.append(addevidquery.value(0));
+                colvalues.append(addevidquery.value(1));
+                colvalues.append(addevidquery.value(2));
+                colvalues.append(addevidquery.value(3));
+                colvalues.append(addevidquery.value(6));
+                colvalues.append(addevidquery.value(7));
+                colvalues.append(addevidquery.value(8));
+                colvalues.append(addevidquery.value(9));
+                colvalues.append(addevidquery.value(10));
+                colvalues.append(addevidquery.value(16));
+                colvalues.append(addevidquery.value(16).toString().split("/").at(0));
+                //for(int i=0; i < addevidquery.record().count(); i++)
+                //    colvalues.append(addevidquery.value(i));
                 currentnode = new Node(colvalues);
-                if(currentnode->nodevalues.at(4).toInt() == 1) // image file
+                //if(currentnode->nodevalues.at(4).toInt() == 1) // image file
+                if(addevidquery.value(4).toInt() == 1) // image file
                 {
                     filesystemcount = 0;
                     rootnode->children.append(currentnode);
@@ -592,7 +626,7 @@ public:
                     currentnode->haschildren = currentnode->HasChildren();
                     parentnode = currentnode;
                 }
-                else if(currentnode->nodevalues.at(4).toInt() == 2) // volume
+                else if(addevidquery.value(4).toInt() == 2) // volume //else if(currentnode->nodevalues.at(4).toInt() == 2) // volume
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
@@ -600,16 +634,16 @@ public:
                     currentnode->haschildren = currentnode->HasChildren();
                     parentnode = currentnode;
                 }
-                else if(currentnode->nodevalues.at(4).toInt() == 3) // determine if its an unallocated partition space
+                else if(addevidquery.value(4).toInt() == 3) //else if(currentnode->nodevalues.at(4).toInt() == 3) // determine if its an unallocated partition space
                 {
-                    if(currentnode->nodevalues.at(15).toInt() == 2) // unallocated partition, add to parent as a child.
+                    if(addevidquery.value(15).toInt() == 2) //if(currentnode->nodevalues.at(15).toInt() == 2) // unallocated partition, add to parent as a child.
                     {
                         currentnode->parent = parentnode;
                         parentnode->children.append(currentnode); 
                     }
                 }
                 // THERE SHOULD ONLY BE PARTITION OBJECTS, OBJECTTYPE == 3, FOR UNALLOCATED SPACES....
-                else if(currentnode->nodevalues.at(4).toInt() == 4) // filesystem
+                else if(addevidquery.value(4).toInt() == 4) //else if(currentnode->nodevalues.at(4).toInt() == 4) // filesystem
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
@@ -620,6 +654,43 @@ public:
                     }
                     currentnode->haschildren = currentnode->HasChildren();
                 }
+                else if(addevidquery.value(4).toInt() == 5 || addevidquery.value(4).toInt() == 6) // file at rootinum...
+                {
+                    QSqlQuery filequery(fcasedb);
+                    Node* rootdirectory = 0;
+                    for(int j=0; j < fsobjectlist.count(); j++)
+                    {
+                        filequery.prepare("SELECT parfsid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parimgid = ? AND parentid = ? AND parfsid = ?)");
+                        filequery.addBindValue(curid);
+                        filequery.addBindValue(fsobjectlist.at(j).rootinum);
+                        filequery.addBindValue(fsobjectlist.at(j).id);
+                        if(filequery.exec())
+                        {
+                            while(filequery.next())
+                            {
+                                for(int i=0; i < parentnode->children.count(); i++)
+                                {
+                                    if(filequery.value(0).toULongLong() == parentnode->children.at(i)->nodevalues.at(0).toULongLong())
+                                        rootdirectory = parentnode->children.at(i);
+                                }
+                                currentnode->parent = rootdirectory;
+                                if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
+                                {
+                                    currentnode->childcount = 0;
+                                    currentnode->haschildren = false;
+                                }
+                                else
+                                {
+                                    currentnode->childcount = GetChildCount(5, addevidquery.value(5).toULongLong(), curid, addevidquery.value(15).toULongLong());
+                                    //currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toULongLong(), curid, currentnode->nodevalues.at(14).toULongLong());
+                                    currentnode->haschildren = currentnode->HasChildren();
+                                }       
+                                rootdirectory->children.append(currentnode);
+                            }
+                        }
+                        filequery.finish();
+                    }
+                }
                 if(addevidquery.value(18).toInt() == 0)
                     currentnode->checkstate = 0;
                 else if(addevidquery.value(18).toInt() == 1)
@@ -627,42 +698,10 @@ public:
                 else
                     currentnode->checkstate = 2;
             }
-            QSqlQuery filequery(fcasedb);
-            Node* rootdirectory = 0;
-            for(int j=0; j < fsobjectlist.count(); j++)
-            {
-                filequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parimgid = ? AND parentid = ? AND parfsid = ?)");
-                filequery.addBindValue(curid);
-                filequery.addBindValue(fsobjectlist.at(j).rootinum);
-                filequery.addBindValue(fsobjectlist.at(j).id);
-                if(filequery.exec())
-                {
-                    while(filequery.next())
-                    {
-                        for(int i=0; i < parentnode->children.count(); i++)
-                        {
-                            if(filequery.value(14).toULongLong() == parentnode->children.at(i)->nodevalues.at(0).toULongLong())
-                                rootdirectory = parentnode->children.at(i);
-                        }
-                        currentnode->parent = rootdirectory;
-                        if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
-                        {
-                            currentnode->childcount = 0;
-                            currentnode->haschildren = false;
-                        }
-                        else
-                        {
-                            currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toULongLong(), curid, currentnode->nodevalues.at(14).toULongLong());
-                            currentnode->haschildren = currentnode->HasChildren();
-                        }
-                        rootdirectory->children.append(currentnode);
-                    }
-                }
-                filequery.finish();
-            }
             endInsertRows();
             emit checkedNodesChanged();
         }
+        addevidquery.finish();
     };
 
     Node* NodeFromIndex(const QModelIndex &index) const
@@ -970,6 +1009,6 @@ private:
 };
 
 //void SecondaryProcessing(QVariantMap &jsonstore);
-void SecondaryProcessing(SecondaryProcessObject &secprocobj);
+//void SecondaryProcessing(SecondaryProcessObject &secprocobj);
 
 #endif // WOMBATFORENSICS_H

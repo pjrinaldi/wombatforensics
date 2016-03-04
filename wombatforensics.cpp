@@ -407,28 +407,6 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
-    /*
-    //QFile magfile(":/magic/magicfile");
-    //QString magicpath = wombatvarptr->datapath + "magic.mgc";
-    if(!FileExists(magicpath.toStdString()))
-    {
-        QFile installmagfile(magicpath);
-        if(magfile.open(QIODevice::ReadOnly))
-        {
-            if(installmagfile.open(QIODevice::WriteOnly))
-            {
-                QByteArray tmparray = magfile.readAll();
-                installmagfile.write(tmparray);
-                installmagfile.close();
-                magfile.close();
-           }
-        }
-    }
-    */
-    //magicmimeptr = magic_open(MAGIC_MIME);
-    //magicptr = magic_open(MAGIC_NONE);
-    //magic_load(magicptr, magicpath.toStdString().c_str());
-    //magic_load(magicmimeptr, magicpath.toStdString().c_str());
     SetupHexPage();
 }
 
