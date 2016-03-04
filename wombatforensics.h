@@ -542,8 +542,23 @@ public:
         fetchvalues.clear();
         if(parentnode->haschildren == true)
         {
+            QSqlQuery prequery(fcasedb);
+            prequery.prepare("SELECT address, parimgid, parfsid from data where objectid = ?;");
+            prequery.bindValue(0, parentnode->nodevalues.at(0).toULongLong());
+            prequery.exec();
+            prequery.next();
+            unsigned long long parentaddress = prequery.value(0).toULongLong();
+            unsigned long long parentimgid = prequery.value(1).toULongLong();
+            unsigned long long parentfsid = prequery.value(2).toULongLong();
+            prequery.finish();
+
+
+
+
+            /*
             QSqlQuery morequery(fcasedb);
             morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ? AND parfsid = ?");
+            //morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ? AND parfsid = ?");
             morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
             morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
             if(parentnode->nodevalues.at(4).toInt() == 4)
@@ -582,7 +597,9 @@ public:
                 endInsertRows();
                 emit checkedNodesChanged();
                 setData(parent, QVariant(-15), Qt::DisplayRole);
+
             }
+            */
         }
     };
     
