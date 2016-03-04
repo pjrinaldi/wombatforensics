@@ -84,7 +84,10 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         //LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
+    
+    secondwatcher.setFuture(QtConcurrent::map(filedatavector, SqlMap));
     // THIS FUNCTION I CAN NOW SPAWN OFF INTO A CONCURRENT MAP MAYBE??? NOT SURE IF THERE IS VALUE IN IT... I COULD TRY IT AND COMPARE...
+    /*
     if(fcasedb.isValid() && fcasedb.isOpen())
     {
         if(fcasedb.transaction())
@@ -124,6 +127,42 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
             filedatavector.clear();
         }
     }
+    */
+}
+
+void SqlMap(FileData &filedata)
+{
+    QMutexLocker locker(&mutex);
+    QSqlQuery fquery(fcasedb);
+    fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5, mftattrid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, '', ?);");
+    if(filedata.mftattrid == 0)
+    {
+        fquery.bindValue(0, 5);
+        filesprocessed++;
+        processphase++;
+    }
+    else
+        fquery.bindValue(0, 6);
+    fquery.bindValue(1, filedata.type);
+    fquery.bindValue(2, filedata.name);
+    fquery.bindValue(3, filedata.paraddr);
+    fquery.bindValue(4, filedata.path);
+    fquery.bindValue(5, filedata.atime);
+    fquery.bindValue(6, filedata.ctime);
+    fquery.bindValue(7, filedata.crtime);
+    fquery.bindValue(8, filedata.mtime);
+    fquery.bindValue(9, filedata.size);
+    fquery.bindValue(10, filedata.addr);
+    fquery.bindValue(11, filedata.evid);
+    fquery.bindValue(12, filedata.fsid);
+    fquery.bindValue(13, filedata.mimetype);
+    fquery.bindValue(14, filedata.mimetype.split("/").at(0));
+    fquery.bindValue(15, filedata.mftattrid);
+    fquery.exec();
+    fquery.next();
+    isignals->ProgUpd();
+    emit isignals->FinishSql();
+    fquery.finish();
 }
 
 void WombatFramework::CloseInfoStructures() // close all open info structures

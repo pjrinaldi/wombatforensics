@@ -134,6 +134,7 @@ public:
 
 signals:
     void ProgressUpdate(unsigned long long filecount, unsigned long long processcount);
+    void FinishSql(void);
 
 };
 

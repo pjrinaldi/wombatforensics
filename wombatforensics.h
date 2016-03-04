@@ -934,8 +934,8 @@ private:
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
-    QFuture<void> secondfuture;
-    QFutureWatcher<void> secondwatcher;
+    //QFuture<void> secondfuture;
+    //QFutureWatcher<void> secondwatcher;
     QFuture<void> thumbfuture;
     QFutureWatcher<void> thumbwatcher;
     QFuture<void> exportfuture;

@@ -21,9 +21,11 @@ public:
     void OpenPartitions(void);
     void OpenFiles(void);
     void CloseInfoStructures(void);
-
 private:
     WombatVariable* wombatptr;
+    QFutureWatcher<void> secondwatcher;
 };
+
+void SqlMap(FileData &filedata);
 
 #endif // WOMBATFRAMEWORK_H
