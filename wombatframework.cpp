@@ -135,7 +135,8 @@ void SqlMap(FileData &filedata)
 {
     QMutexLocker locker(&mutex);
     QSqlQuery fquery(fcasedb);
-    fquery.prepare("INSERT INTO data(objecttype, type, name, parentid, fullpath, atime, ctime, crtime, mtime, size, address, parimgid, parfsid, blockaddress, filemime, filesignature, md5, mftattrid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, '', ?);");
+    //wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, address INTEGER, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT NOT NULL DEFAULT "", filemime TEXT, known INTEGER, checked INTEGER NOT NULL DEFAULT 0, mftattrid INTEGER NOT NULL DEFAULT 0);";
+    fquery.prepare("INSERT INTO data(objecttype, type, name, fullpath, address, parentid, parimgid, parfsid, ctime, crtime, atime, mtime, filemime, mftattrid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
     if(filedata.mftattrid == 0)
     {
         fquery.bindValue(0, 5);
@@ -146,19 +147,25 @@ void SqlMap(FileData &filedata)
         fquery.bindValue(0, 6);
     fquery.bindValue(1, filedata.type);
     fquery.bindValue(2, filedata.name);
-    fquery.bindValue(3, filedata.paraddr);
+    fquery.bindValue(3, filedata.path);
+    fquery.bindValue(4, filedata.addr);
+    fquery.bindValue(5, filedata.paraddr);
+    fquery.bindValue(6, filedata.evid);
+    fquery.bindValue(7, filedata.fsid);
+    fquery.bindValue(8, filedata.ctime);
+    fquery.bindValue(9, filedata.crtime);
+    fquery.bindValue(10, filedata.atime);
+    fquery.bindValue(11, filedata.mtime);
+    fquery.bindValue(12, filedata.mimetype);
+    fquery.bindValue(13, filedata.mftattrid);
+    /*
+    fquery.bindValue(4, filedata.paraddr);
     fquery.bindValue(4, filedata.path);
-    fquery.bindValue(5, filedata.atime);
     fquery.bindValue(6, filedata.ctime);
-    fquery.bindValue(7, filedata.crtime);
-    fquery.bindValue(8, filedata.mtime);
     fquery.bindValue(9, filedata.size);
     fquery.bindValue(10, filedata.addr);
-    fquery.bindValue(11, filedata.evid);
-    fquery.bindValue(12, filedata.fsid);
-    fquery.bindValue(13, filedata.mimetype);
-    fquery.bindValue(14, filedata.mimetype.split("/").at(0));
-    fquery.bindValue(15, filedata.mftattrid);
+    //fquery.bindValue(14, filedata.mimetype.split("/").at(0));
+    */
     fquery.exec();
     //fquery.next();
     isignals->ProgUpd();

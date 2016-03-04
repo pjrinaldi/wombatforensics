@@ -382,7 +382,7 @@ public:
                     parentnode->children.at(i)->nodevalues[7] = childupdatequery.value(7);
                     parentnode->children.at(i)->nodevalues[8] = childupdatequery.value(8);
                     parentnode->children.at(i)->nodevalues[9] = childupdatequery.value(9);
-                    parentnode->children.at(i)->nodevalues[10] = childupdatequery.value(9).toString().split("/").at(0);
+                    parentnode->children.at(i)->nodevalues[10] = QVariant(childupdatequery.value(9).toString().split("/").at(0));
                     /*
                     for(int j=0; j < childupdatequery.record().count(); j++)
                     {
@@ -418,7 +418,7 @@ public:
                 currentnode->nodevalues[7] = updatequery.value(7);
                 currentnode->nodevalues[8] = updatequery.value(8);
                 currentnode->nodevalues[9] = updatequery.value(9);
-                currentnode->nodevalues[10] = updatequery.value(9).toString().split("/").at(0);
+                currentnode->nodevalues[10] = QVariant(updatequery.value(9).toString().split("/").at(0));
                 updatequery.finish();
                 emit dataChanged(index, index);
                 return true;
@@ -573,7 +573,7 @@ public:
                     fetchvalues.append(fetchquery.value(7));
                     fetchvalues.append(fetchquery.value(8));
                     fetchvalues.append(fetchquery.value(9));
-                    fetchvalues.append(fetchquery.value(9).toString().split("/").at(0));
+                    fetchvalues.append(QVariant(fetchquery.value(9).toString().split("/").at(0)));
                     Node* curchild = new Node(fetchvalues);
                     curchild->parent = parentnode;
                     if(QString(".").compare(curchild->nodevalues.at(1).toString()) == 0 || QString("..").compare(curchild->nodevalues.at(1).toString()) == 0)
@@ -679,7 +679,7 @@ public:
     {
         int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
-        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 6 AND parimgid = ?)");
+        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, checked FROM data WHERE objectid = ? OR (objecttype < 6 AND parimgid = ?)");
         //addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
         addevidquery.addBindValue(curid);
         addevidquery.addBindValue(curid);
@@ -781,9 +781,9 @@ public:
                         filequery.finish();
                     }
                 }
-                if(addevidquery.value(18).toInt() == 0)
+                if(addevidquery.value(17).toInt() == 0)
                     currentnode->checkstate = 0;
-                else if(addevidquery.value(18).toInt() == 1)
+                else if(addevidquery.value(17).toInt() == 1)
                     currentnode->checkstate = 1;
                 else
                     currentnode->checkstate = 2;

@@ -783,7 +783,7 @@ void WombatForensics::OpenEvidenceStructure()
 void WombatForensics::AddEvidence()
 {
     int isnew = 1;
-    wombatdatabase->GetEvidenceObjects();
+    //wombatdatabase->GetEvidenceObjects();
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
     {
@@ -813,10 +813,11 @@ void WombatForensics::AddEvidence()
     }
 }
 
+/////////////////////////////////////////////////////
 void WombatForensics::UpdateProperties()
 {
-    wombatdatabase->ReturnObjectPropertyList();
-    propertywindow->UpdateTableView();
+    //wombatdatabase->ReturnObjectPropertyList();
+    //propertywindow->UpdateTableView();
 }
 
 void WombatForensics::LoadHexContents()
@@ -1460,10 +1461,12 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
+    /*
     for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
     {
         ui->dirTreeView->resizeColumnToContents(i);
     }
+    */
 }
 
 void WombatForensics::SetupHexPage(void)
