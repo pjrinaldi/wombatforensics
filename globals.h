@@ -12,6 +12,7 @@ extern QSqlDatabase fappdb;
 extern QFile logfile;
 extern QTextEdit* msglog;
 extern QFutureWatcher<void> thumbwatcher;
+extern QFutureWatcher<void> secondwatcher;
 extern unsigned long long filesfound;
 extern unsigned long long filesprocessed;
 extern unsigned long long processphase;

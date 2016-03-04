@@ -23,7 +23,7 @@ public:
     void CloseInfoStructures(void);
 private:
     WombatVariable* wombatptr;
-    QFutureWatcher<void> secondwatcher;
+    //QFutureWatcher<void> secondwatcher;
 };
 
 void SqlMap(FileData &filedata);

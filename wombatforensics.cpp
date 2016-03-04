@@ -100,8 +100,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     propertywindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-    connect(isignals, SIGNAL(FinishSql()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
-    //connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+    //connect(isignals, SIGNAL(FinishSql()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+    connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
@@ -757,7 +757,9 @@ void WombatForensics::UpdateStatus()
 {
 
     //tsk_img_close(IMG_2ND_PROC);
-    //filedatavector.clear();
+    filedatavector.clear();
+    treemodel->RemEvidence(wombatvarptr->currentevidenceid);
+    treemodel->AddEvidence(wombatvarptr->currentevidenceid);
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
@@ -2105,6 +2107,7 @@ void WombatForensics::AutoSaveState()
 
 //void SecondaryProcessing(SecondaryProcessObject &secprocobj)
 //void SecondaryProcessing(QVariantMap &jsonstore)
+/*
 void SecondaryProcessing(SecondaryProcessObject &secprocobj)
 {
     QMutexLocker locker(&mutex);
@@ -2142,13 +2145,13 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
             if(adsquery.exec())
             {
                 while(adsquery.next())
-                {
+                {*/
                     /*
                     QVariantMap tmpmap;
                     tmpmap.insert("objectid", adsquery.value(0));
                     tmpmap.insert("attrid", adsquery.value(1));
                     jsonstore.insert("adsmapentry", tmpmap);
-                    */
+                    *//*
                     AdsProcessObject adsprocobj;
                     adsprocobj.objectid = adsquery.value(0).toULongLong();
                     adsprocobj.attrid = adsquery.value(1).toULongLong();
@@ -2171,7 +2174,7 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
     secprocobj.mimetype = mimetype.name();
     //jsonstore.insert("mimetype", mimetype.name());
     // End Mime Type Determination
-    //int fstype = jsonstore.value("fstype").toInt();
+    //int fstype = jsonstore.value("fstype").toInt();*/
     /*
     //Begin Block Address Determination
     if((TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_HFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_ISO9660_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_NTFS_DETECT || (TSK_FS_TYPE_ENUM)fstype == TSK_FS_TYPE_FAT_DETECT)
@@ -2344,10 +2347,10 @@ void SecondaryProcessing(SecondaryProcessObject &secprocobj)
             //AlternateDataStreamPropertyFile(readfileinfo, adsobjid, adsattrid);
         }
     }
-    */
+    *//*
     filesprocessed++;
     processphase++;
     isignals->ProgUpd();
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
-}
+}*/
