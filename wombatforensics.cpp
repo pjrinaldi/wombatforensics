@@ -757,7 +757,7 @@ void WombatForensics::UpdateStatus()
 {
 
     //tsk_img_close(IMG_2ND_PROC);
-    filedatavector.clear();
+    //filedatavector.clear();
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);

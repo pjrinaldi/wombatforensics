@@ -85,6 +85,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         errorcount++;
     }
     
+    //connect(secondwatcher, SIGNAL(finished()), isignals, SLOT(FinishSql()), Qt::QueuedConnection);
     secondwatcher.setFuture(QtConcurrent::map(filedatavector, SqlMap));
     // THIS FUNCTION I CAN NOW SPAWN OFF INTO A CONCURRENT MAP MAYBE??? NOT SURE IF THERE IS VALUE IN IT... I COULD TRY IT AND COMPARE...
     /*
@@ -159,9 +160,9 @@ void SqlMap(FileData &filedata)
     fquery.bindValue(14, filedata.mimetype.split("/").at(0));
     fquery.bindValue(15, filedata.mftattrid);
     fquery.exec();
-    fquery.next();
+    //fquery.next();
     isignals->ProgUpd();
-    emit isignals->FinishSql();
+    //emit isignals->FinishSql();
     fquery.finish();
 }
 
