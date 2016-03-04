@@ -135,6 +135,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addAction(ui->actionExport);
     treemodel = new TreeModel(this);
     ui->dirTreeView->setModel(treemodel);
+    /*
     ui->dirTreeView->hideColumn(4);
     ui->dirTreeView->hideColumn(5);
     ui->dirTreeView->hideColumn(11);
@@ -144,6 +145,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->dirTreeView->hideColumn(15);
     ui->dirTreeView->hideColumn(18);
     ui->dirTreeView->hideColumn(19);
+    */
     ui->dirTreeView->setSortingEnabled(true); // enables the sorting arrow, but doesn't sort anything.
     ui->dirTreeView->header()->setSortIndicatorShown(false);
     ui->dirTreeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -179,6 +181,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     autosavetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
 }
+//////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
 {
     //OpenParentImage
@@ -263,8 +266,10 @@ void WombatForensics::SetSelectedFromImageViewer(unsigned long long objectid)
        //DisplayError("!", "The Image Path Not Discovered", "The image has not been loaded in the treeview yet, so it cannot be selected."); 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
 void WombatForensics::ShowFile(const QModelIndex &index)
 {
+    /*
     if(index.sibling(index.row(), 16).data().toString().contains("image/"))
     {
         imagewindow->ShowImage(index);
@@ -288,6 +293,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         if(index.sibling(index.row(), 4).data().toInt() == 5 || index.sibling(index.row(), 4).data().toInt() == 6)
             treemenu->exec(QCursor::pos());
     }
+    */
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
@@ -661,6 +667,7 @@ void WombatForensics::InitializeQueryModel()
     LogMessage("Evidence Ready");
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
     if(previtem.indexes().count() > 0)
@@ -676,21 +683,25 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionByteConverter->setEnabled(true);
         wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
         wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
+        /*
         wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
         LoadHexContents();
         if(propertywindow->isVisible())
             UpdateProperties();
+        */
     }
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void WombatForensics::TreeContextMenu(const QPoint &pt)
 {
     QModelIndex index = ui->dirTreeView->indexAt(pt);
     if(index.isValid())
     {
         actionnode = static_cast<Node*>(index.internalPointer());
+        /*
         if(index.sibling(index.row(), 4).data().toInt() == 5 || index.sibling(index.row(), 4).data().toInt() == 6)
             treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
+        */
     }
 }
 
