@@ -552,6 +552,52 @@ public:
             unsigned long long parentfsid = prequery.value(2).toULongLong();
             prequery.finish();
 
+            QSqlQuery fetchquery(fcasedb);
+            fetchquery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, checked, address, parimgid, parfsid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ? AND parfsid = ?;");
+            fetchquery.bindValue(0, parentaddress);
+            fetchquery.bindValue(1, parentimgid);
+            fetchquery.bindValue(2, parentfsid);
+            if(fetchquery.exec())
+            {
+                beginInsertRows(parent, 0, parentnode->childcount - 1);
+                while(fetchquery.next())
+                {
+                    fetchvalues.clear();
+                    fetchvalues.append(fetchquery.value(0));
+                    fetchvalues.append(fetchquery.value(1));
+                    fetchvalues.append(fetchquery.value(2));
+                    fetchvalues.append(fetchquery.value(3));
+                    fetchvalues.append(fetchquery.value(4));
+                    fetchvalues.append(fetchquery.value(5));
+                    fetchvalues.append(fetchquery.value(6));
+                    fetchvalues.append(fetchquery.value(7));
+                    fetchvalues.append(fetchquery.value(8));
+                    fetchvalues.append(fetchquery.value(9));
+                    fetchvalues.append(fetchquery.value(9).toString().split("/").at(0));
+                    Node* curchild = new Node(fetchvalues);
+                    curchild->parent = parentnode;
+                    if(QString(".").compare(curchild->nodevalues.at(1).toString()) == 0 || QString("..").compare(curchild->nodevalues.at(1).toString()) == 0)
+                    {
+                        curchild->childcount = 0;
+                        curchild->haschildren = false;
+                    }
+                    else
+                    {
+                        curchild->childcount = GetChildCount(5, fetchquery.value(11).toULongLong(), fetchquery.value(12).toULongLong(), fetchquery.value(13).toULongLong());
+                        curchild->haschildren = curchild->HasChildren();
+                    }
+                    if(fetchquery.value(10).toInt() == 0)
+                        curchild->checkstate = 0;
+                    else if(fetchquery.value(10).toInt() == 1)
+                        curchild->checkstate = 1;
+                    else
+                        curchild->checkstate = 2;
+                    parentnode->children.append(curchild);
+                }
+                endInsertRows();
+                emit checkedNodesChanged();
+                setData(parent, QVariant(-15), Qt::DisplayRole);
+            }
 
 
 
