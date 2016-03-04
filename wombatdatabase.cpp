@@ -415,6 +415,23 @@ void WombatDatabase::InsertPartitionObjects()
 
 void WombatDatabase::InsertEvidenceObject()
 {
+    QSqlQuery evidquery(fcasedb);
+    evidquery.prepare("INSERT INTO data (objecttype, type, size, name, fullpath) VALUES(1, ?, ?, ?, ?);");
+    evidquery.bindValue(0, wombatptr->evidenceobject.imageinfo->itype);
+    evidquery.bindValue(1, (unsigned long long)wombatptr->evidenceobject.imageinfo->size);
+    evidquery.bindValue(2, wombatptr->currentevidencename);
+    evidquery.bindValue(3, QString::fromStdString(wombatptr->evidenceobject.fullpathvector[0]));
+    evidquery.exec();
+    wombatptr->currentevidenceid = evidquery.lastInsertId().toULongLong();
+    evidquery.finish();
+    qDebug() << wombatptr->currentevidenceid;
+    /*
+    for(unsigned int i=0; i < wombatptr->evidenceobject.itemcount; i++)
+    {
+        
+    }*/
+
+    /*
     QStringList evidpropertylist;
     wombatptr->currentevidenceid = 0;
     evidpropertylist.clear();
@@ -438,7 +455,7 @@ void WombatDatabase::InsertEvidenceObject()
         wombatptr->bindvalues.append(QString::fromStdString(wombatptr->evidenceobject.fullpathvector[i]));
         wombatptr->bindvalues.append(i+1);
         InsertSql("INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", wombatptr->bindvalues);
-    }
+    }*/
 }
 
 void WombatDatabase::GetEvidenceObjects()
