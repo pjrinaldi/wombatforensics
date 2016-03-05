@@ -6,7 +6,7 @@
 
 #include "wombatinclude.h"
 #include "ui_propertieswindow.h"
-#include "wombatdatabase.h"
+//#include "wombatdatabase.h"
 
 class PropertyModel : public QAbstractTableModel
 {
@@ -76,7 +76,8 @@ class PropertiesWindow : public QDialog
     Q_OBJECT
 
 public:
-    PropertiesWindow(WombatDatabase* wdata, QWidget* parent = 0);
+    PropertiesWindow(QWidget* parent = 0);
+    //PropertiesWindow(WombatDatabase* wdata, QWidget* parent = 0);
     void UpdateTableView(void);
     ~PropertiesWindow();
 
@@ -91,7 +92,7 @@ protected:
     void closeEvent(QCloseEvent* event);
 private:
     Ui::PropertiesWindow *ui;
-    WombatDatabase* pdata;
+    //WombatDatabase* pdata;
     PropertyModel* pmodel;
     QModelIndex selectedindex;
     QModelIndex oldselectedindex;

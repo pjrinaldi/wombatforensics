@@ -6,7 +6,7 @@
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
     ui->setupUi(this);
-    wombatvarptr = &wombatvariable;
+    //wombatvarptr = &wombatvariable;
     this->menuBar()->hide();
     this->statusBar()->setSizeGripEnabled(true);
     selectedoffset = new QLabel(this);
@@ -49,7 +49,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tskobjptr->readfileinfo = NULL;
     //wombatdatabase = new WombatDatabase(wombatvarptr);
     //wombatframework = new WombatFramework(wombatvarptr);
-    propertywindow = new PropertiesWindow(wombatdatabase);
+    //propertywindow = new PropertiesWindow(wombatdatabase);
+    //propertywindow = new PropertiesWindow(this);
     fileviewer = new FileViewer(this, tskobjptr);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
@@ -71,7 +72,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
-    propertywindow->setWindowIcon(QIcon(":/bar/propview"));
+    //propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
@@ -92,12 +93,12 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
-    connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
+    //connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
     //wombatvarptr->caseobject.id = 0;
-    connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
-    propertywindow->setModal(false);
+    //connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
+    //propertywindow->setModal(false);
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(FinishSql()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
@@ -1293,6 +1294,7 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
 
 void WombatForensics::DigFiles(FileDeepData* deepdata)
 {
+    /*
     digfilelist.clear();
     curlist.clear();
     errorcount = 0;
@@ -1327,6 +1329,7 @@ void WombatForensics::DigFiles(FileDeepData* deepdata)
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessDig, curlist.at(i), digfilelist.at(i).id, digfilelist.at(i).digoptions);
         digwatcher.setFuture(tmpfuture);
     }
+    */
 }
 
 void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std::string name)
@@ -1634,7 +1637,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         //event->ignore();
     }
     
-    propertywindow->close();
+    //propertywindow->close();
     fileviewer->close();
     imagewindow->close();
     videowindow->close();
@@ -1649,9 +1652,11 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     //magic_close(magicmimeptr);
     msglog->clear();
     msgviewer->close();
+    /*
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();
     wombatdatabase->CloseThumbDB();
+    */
 }
 
 void WombatForensics::RemoveTmpFiles()
@@ -1669,6 +1674,7 @@ void WombatForensics::RemoveTmpFiles()
 void WombatForensics::on_actionNew_Case_triggered()
 {
     // determine if a case is open
+    /*
     if(wombatvarptr->caseobject.id > 0)
     {
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
@@ -1680,6 +1686,7 @@ void WombatForensics::on_actionNew_Case_triggered()
     }
     else
         InitializeCaseStructure();
+    */
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()
@@ -1739,16 +1746,18 @@ void WombatForensics::on_actionDigDeeper_triggered()
 
 void WombatForensics::on_actionView_Properties_triggered(bool checked)
 {
+    /*
     if(!checked)
     {
-        propertywindow->hide();
+        //propertywindow->hide();
     }
     else
     {
-        propertywindow->show();
+        //propertywindow->show();
         if(ui->dirTreeView->selectionModel()->hasSelection())
             UpdateProperties();
     }
+    */
 }
 
 void WombatForensics::on_actionView_File_triggered(bool checked)
@@ -1774,6 +1783,7 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked) // modify t
 
 void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 {
+    /*
     if(!checked) // hide viewer
     {
         imagewindow->hide();
@@ -1798,6 +1808,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             imagewindow->show();
         }
     }
+    */
 }
 
 void WombatForensics::StartThumbnails()
@@ -1811,11 +1822,13 @@ void WombatForensics::StartThumbnails()
 
 void WombatForensics::FinishThumbs()
 {
+    /*
     wombatdatabase->GetThumbnails();
     imagewindow->UpdateGeometries();
     imagewindow->show();
     LogMessage("Evidence ready");
     StatusUpdate("Evidence ready");
+    */
 }
 
 void WombatForensics::on_actionViewerManager_triggered()

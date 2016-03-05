@@ -5,9 +5,9 @@
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include "wombatinclude.h"
-#include "wombatvariable.h"
-#include "wombatdatabase.h"
-#include "wombatframework.h"
+//#include "wombatvariable.h"
+//#include "wombatdatabase.h"
+//#include "wombatframework.h"
 #include "wombatfunctions.h"
 #include "ui_wombatforensics.h"
 #include "propertieswindow.h"
@@ -903,15 +903,15 @@ class WombatForensics : public QMainWindow
 public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
-    WombatDatabase* wombatdatabase;
-    WombatVariable wombatvariable;
-    WombatVariable* wombatvarptr;
+    //WombatDatabase* wombatdatabase;
+    //WombatVariable wombatvariable;
+    //WombatVariable* wombatvarptr;
     TskObject tskobject;
     TskObject* tskobjptr;
     TskObject tskexternalobject;
     TskObject* tskexternalptr;
-    WombatFramework* wombatframework;
-    PropertiesWindow* propertywindow;
+    //WombatFramework* wombatframework;
+    //PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;
     FileViewer* fileviewer;
