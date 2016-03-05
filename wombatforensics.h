@@ -904,7 +904,6 @@ public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
     //WombatDatabase* wombatdatabase;
-    //WombatVariable wombatvariable;
     //WombatVariable* wombatvarptr;
     TskObject tskobject;
     TskObject* tskobjptr;
@@ -1091,11 +1090,13 @@ private:
     QVector<FileExportData> exportfilelist;
     QVector<FileDeepData> digfilelist;
     //QVector<QVariantMap> jsonstorevector;
-    QVector<SecondaryProcessObject> secondprocessvector;
+    //QVector<SecondaryProcessObject> secondprocessvector;
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
+    //unsigned long long currentcaseid;
+    WombatVariable wombatvariable;
 };
 
 //void SecondaryProcessing(QVariantMap &jsonstore);

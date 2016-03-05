@@ -39,8 +39,6 @@ extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
 extern QStringList externallist;
-//extern struct magic_set* magicptr;
-//extern struct magic_set* magicmimeptr;
 extern QMutex mutex;
 extern QMap<unsigned long long, int> checkhash;
 

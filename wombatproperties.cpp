@@ -755,7 +755,7 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     s = NULL;
     yfs = NULL;
 }
-
+/*
 QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curinfo)
 {
     if(curinfo != NULL)
@@ -1916,7 +1916,7 @@ QString WombatProperties::ConvertGmtHours(int gmtvar)
     return tmpstring;
 
 }
-
+*/
 void WombatProperties::yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t* objfirst, uint32_t* objlast, uint32_t* vercnt, uint32_t* verfirst, uint32_t* verlast)
 {
     YaffsCacheObject* obj;
@@ -1953,13 +1953,13 @@ uint32_t WombatProperties::hfs_convert_2_unix_time(uint32_t hfsdate)
         return 0;
     return (uint32_t)(hfsdate - NSEC_BTWN_1904_1970);
 }
-
+/*
 QStringList WombatProperties::PopulateFileProperties()
 {
     proplist.clear();
     return QStringList("");
 }
-
+*/
 
 
 uint8_t WombatProperties::hfs_UTF16toUTF8(TSK_FS_INFO * fs, uint8_t * uni, int ulen, char *asc, int alen, uint32_t flags)
@@ -2323,7 +2323,7 @@ uint8_t WombatProperties::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, H
 
     /* now look up the actual file/folder record */
 
-    /* build key */
+    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     memcpy((char *) key.parent_cnid, (char *) thread.parent_cnid,
         sizeof(key.parent_cnid));

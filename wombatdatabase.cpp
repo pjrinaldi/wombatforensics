@@ -5,10 +5,10 @@
 
 WombatDatabase::WombatDatabase(WombatVariable* wombatvarptr)
 {
-    wombatptr = wombatvarptr;
-    wombatprop = new WombatProperties(wombatptr);
+    //wombatptr = wombatvarptr;
+    //wombatprop = new WombatProperties(wombatptr);
 }
-
+/*
 QList<QSqlRecord> WombatDatabase::GetSqlResults(QString query, QVariantList invalues)
 {
     QList<QSqlRecord> tmplist;
@@ -456,8 +456,8 @@ void WombatDatabase::InsertEvidenceObject()
         wombatptr->bindvalues.append(i+1);
         InsertSql("INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES(?, ?, ?);", wombatptr->bindvalues);
     }*/
-}
-
+//}
+/*
 void WombatDatabase::GetEvidenceObjects()
 {
     wombatptr->evidenceobjectvector.clear();
@@ -764,4 +764,4 @@ unsigned long long WombatDatabase::GetParentSize(unsigned long long fileaddress)
     parentsize = sizequery.value(0).toULongLong();
     sizequery.finish();
     return parentsize;
-}
+}*/

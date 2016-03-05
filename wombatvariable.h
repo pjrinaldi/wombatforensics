@@ -19,21 +19,23 @@ struct EvidenceObject
     unsigned long long id;
     int type;
     int objecttype;
-    unsigned long long itemcount;
+    //unsigned long long itemcount;
     QString name;
     unsigned long long size;
-    int sectsize;
+    //int sectsize;
     unsigned long long parentid;
     unsigned long long parimgid;
-    QStringList namelist;
+    unsigned long long parfsid;
+    //QStringList namelist;
     QString fullpath; 
     std::vector<std::string> fullpathvector;
-    TSK_IMG_INFO* imageinfo; // These may disappear when the image is closed, will have to test this concept
-    TSK_VS_INFO* volinfo;
-    std::vector<const TSK_VS_PART_INFO*> partinfovector;
-    std::vector<TSK_FS_INFO*> fsinfovector;
-    std::vector<unsigned long long> fsidvector;
-    QString dbname;
+    //TSK_IMG_INFO* imageinfo; // These may disappear when the image is closed, will have to test this concept
+    //TSK_VS_INFO* volinfo;
+    //std::vector<const TSK_VS_PART_INFO*> partinfovector;
+    //std::vector<TSK_FS_INFO*> fsinfovector;
+    //std::vector<unsigned long long> fsidvector;
+    //QString dbname;
+    /*
     void Clear()
     {
         fullpath = "";
@@ -52,6 +54,7 @@ struct EvidenceObject
         fsinfovector.clear();
         dbname = "";
     };
+    */
 };
 
 struct FileExportData
@@ -102,6 +105,7 @@ struct FileDeepData
     EvidenceObject evidenceobject;
     unsigned long long digcount;
 };
+/*
 struct AdsProcessObject
 {
     unsigned long long objectid;
@@ -118,41 +122,41 @@ struct SecondaryProcessObject
     QString blockaddress;
     QVector<AdsProcessObject> adsprocessvector;
 };
-
+*/
 struct SelectedObject
 {
     unsigned long long id;
     int objtype;
     QString name;
     QString fullpath;
-    QString blockaddress;
-    QString filesignature;
+    //QString blockaddress;
+    //QString filesignature;
     QString filemime;
     unsigned long long size;
     unsigned long long parimgid;
     unsigned long long parfsid;
-    int sectsize;
-    unsigned long long sectstart;
-    unsigned long long sectlength;
-    int blocksize;
-    unsigned long long blockcount;
-    unsigned long long byteoffset;
+    //int sectsize;
+    //unsigned long long sectstart;
+    //unsigned long long sectlength;
+    //int blocksize;
+    //unsigned long long blockcount;
+    //unsigned long long byteoffset;
     unsigned long long address;
     unsigned long long parentid;
     unsigned long long mftattrid;
     int type;
-    int flags;
+    //int flags;
 };
 
 struct WombatVariable
 {
     // id values
-    int jobtype;
-    unsigned long long jobid;
-    unsigned long long fileid;
-    unsigned long long volid;
-    unsigned long long filecount;
-    unsigned long long processcount;
+    //int jobtype;
+    //unsigned long long jobid;
+    //unsigned long long fileid;
+    //unsigned long long volid;
+    //unsigned long long filecount;
+    //unsigned long long processcount;
     unsigned long long currentevidenceid;
     unsigned long long currentvolumeid;
     unsigned long long currentpartitionid;
@@ -167,22 +171,22 @@ struct WombatVariable
     QString curerrmsg;
     QString wombatdbname;
     QString thumbdbname;
-    QString evidremovestring;
+    //QString evidremovestring;
     unsigned long long evidremoveid;
     unsigned long long evidrowsremoved;
     CaseObject caseobject;
     QStringList casenamelist;
     QStringList evidencenamelist;
     EvidenceObject evidenceobject;
-    QVector<EvidenceObject> evidenceobjectvector;
+    //QVector<EvidenceObject> evidenceobjectvector;
     SelectedObject selectedobject;
-    FileExportData exportdata;
-    QVector<FileExportData> exportdatavector;
-    QString htmlcontent;
-    QSqlDatabase casedb;
-    QSqlDatabase appdb;
-    QList<QSqlRecord> sqlrecords;
-    QList<QVariant> bindvalues;
+    //FileExportData exportdata;
+    //QVector<FileExportData> exportdatavector;
+    //QString htmlcontent;
+    //QSqlDatabase casedb;
+    //QSqlDatabase appdb;
+    //QList<QSqlRecord> sqlrecords;
+    //QList<QVariant> bindvalues;
 };
 
 typedef struct
@@ -200,8 +204,10 @@ typedef struct
 Q_DECLARE_METATYPE(WombatVariable);
 Q_DECLARE_METATYPE(FileExportData);
 Q_DECLARE_METATYPE(FileDeepData);
+/*
 Q_DECLARE_METATYPE(AdsProcessObject);
 Q_DECLARE_METATYPE(SecondaryProcessObject);
+*/
 Q_DECLARE_METATYPE(CaseObject);
 Q_DECLARE_METATYPE(EvidenceObject);
 Q_DECLARE_METATYPE(SelectedObject);

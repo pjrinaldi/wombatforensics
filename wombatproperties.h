@@ -14,6 +14,7 @@ class WombatProperties : public QObject
     Q_OBJECT
 public:
     WombatProperties(WombatVariable* wombatvarptr);
+    /*
     QString GetFileSystemLabel(TSK_FS_INFO* curinfo);
     QStringList PopulateEvidenceImageProperties(void);
     QStringList PopulateVolumeProperties(void);
@@ -21,6 +22,7 @@ public:
     QStringList PopulateFileSystemProperties(TSK_FS_INFO* curfsinfo);
     QStringList PopulateFileProperties(void);
     QString ConvertGmtHours(int gmtvar);
+    */
     void yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t* objfirst, uint32_t* objlast, uint32_t* vercnt, uint32_t* verfirst, uint32_t* verlast);
     uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int alen, uint32_t flags);
     static int hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2);

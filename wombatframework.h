@@ -15,14 +15,16 @@ public:
     WombatFramework(WombatVariable* wombatvariable);
     ~WombatFramework();
 
+    /*
     void OpenEvidenceImage(void);
     void OpenVolumeSystem(void);
     void GetVolumeSystemName(void);
     void OpenPartitions(void);
     void OpenFiles(void);
     void CloseInfoStructures(void);
+    */
 private:
-    WombatVariable* wombatptr;
+    //WombatVariable* wombatptr;
     //QFutureWatcher<void> secondwatcher;
 };
 

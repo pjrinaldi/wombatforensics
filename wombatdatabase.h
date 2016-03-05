@@ -14,6 +14,7 @@ class WombatDatabase : public QObject
     Q_OBJECT
 public:
     WombatDatabase(WombatVariable* wombatvarptr);
+    /*
     void CreateAppDB(void);
     void CreateCaseDB(void);
     void CreateThumbDB(void);
@@ -32,9 +33,9 @@ public:
     void InsertVolumeProperties(void);
     void GetObjectValues(void);
     void GetThumbnails(void);
-
-    ~WombatDatabase();
-
+*/
+    ~WombatDatabase() {};
+/*
     unsigned long long ThumbnailCount(void);
     unsigned long long ReturnCaseCount(void);
     void InsertCase();
@@ -56,11 +57,12 @@ public:
     unsigned long long GetParentSize(unsigned long long fileaddress);
 
     WombatProperties* wombatprop;
+    */
 
 signals:
-    void DisplayError(QString errorNumber, QString errorType, QString errorValue);
+    //void DisplayError(QString errorNumber, QString errorType, QString errorValue);
 private:
-    WombatVariable* wombatptr;
+    //WombatVariable* wombatptr;
 };
 
 #endif // WOMBATDATABASE_H

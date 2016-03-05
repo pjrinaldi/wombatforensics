@@ -5,12 +5,12 @@
 
 WombatFramework::WombatFramework(WombatVariable* wombatvariable)
 {
-    wombatptr = wombatvariable;
+    //wombatptr = wombatvariable;
 }
 WombatFramework::~WombatFramework()
 {
 }
-
+/*
 void WombatFramework::OpenEvidenceImage() // open current evidence image
 {
     const TSK_TCHAR** images;
@@ -84,9 +84,9 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         //LogMessage("Issues with traversing the file structure were encountered");
         errorcount++;
     }
-    
+    */
     //connect(secondwatcher, SIGNAL(finished()), isignals, SLOT(FinishSql()), Qt::QueuedConnection);
-    secondwatcher.setFuture(QtConcurrent::map(filedatavector, SqlMap));
+    //secondwatcher.setFuture(QtConcurrent::map(filedatavector, SqlMap));
     // THIS FUNCTION I CAN NOW SPAWN OFF INTO A CONCURRENT MAP MAYBE??? NOT SURE IF THERE IS VALUE IN IT... I COULD TRY IT AND COMPARE...
     /*
     if(fcasedb.isValid() && fcasedb.isOpen())
@@ -129,7 +129,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
         }
     }
     */
-}
+//}
 
 void SqlMap(FileData &filedata)
 {
@@ -172,7 +172,7 @@ void SqlMap(FileData &filedata)
     //emit isignals->FinishSql();
     fquery.finish();
 }
-
+/*
 void WombatFramework::CloseInfoStructures() // close all open info structures
 {
     for(int j=0; j < wombatptr->evidenceobjectvector.count(); j++)
@@ -202,4 +202,4 @@ void WombatFramework::CloseInfoStructures() // close all open info structures
             wombatptr->evidenceobjectvector[j].imageinfo = NULL;
         }
     }
-}
+}*/

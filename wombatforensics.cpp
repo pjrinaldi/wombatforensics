@@ -96,6 +96,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
+    wombatvariable.caseobject.id = 0;
     //wombatvarptr->caseobject.id = 0;
     //connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     //propertywindow->setModal(false);
@@ -348,8 +349,12 @@ void WombatForensics::HideByteViewer(bool checkstate)
 
 void WombatForensics::InitializeAppStructure()
 {
-    QString homePath = QDir::homePath();
-    homePath += "/WombatForensics/";
+    QString homepath = QDir::homePath();
+    homepath += "/WombatForensics/";
+    wombatvariable.settingspath = homepath + "settings";
+    wombatvariable.datapath = homepath + "data/";
+    wombatvariable.casespath = homepath + "cases/";
+    wombatvariable.tmpfilepath = homepath + "tmpfiles/";
     /*
     wombatvarptr->settingspath = homePath + "settings";
     wombatvarptr->datapath = homePath + "data/";
