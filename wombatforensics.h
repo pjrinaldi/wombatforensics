@@ -1057,6 +1057,11 @@ private:
     void CreateAppDB(void);
     void OpenAppDB(void);
     unsigned long long ReturnCaseCount(void);
+    void InsertCase(void);
+    void CreateThumbDB(void);
+    void OpenThumbDB(void);
+    void CreateCaseDB(void);
+    void OpenCaseDB(void);
 
     void RemoveTmpFiles(void);
 

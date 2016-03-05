@@ -353,8 +353,8 @@ void WombatForensics::CreateAppDB()
     {
         fappdb.transaction();
         QSqlQuery appquery(fappdb);
-        appquery.exec("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
-        appquery.exec("CREATE TABLE external viewers(viewerid INTEGER PRIMARY KEY, path TEXT, deleted INTEGER);");
+        appquery.exec("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER NOT NULL DEFAULT 0);");
+        appquery.exec("CREATE TABLE external viewers(viewerid INTEGER PRIMARY KEY, path TEXT, deleted INTEGER NOT NULL DEFAULT 0);");
         fappdb.commit();
         appquery.finish();
     }
@@ -435,80 +435,103 @@ void WombatForensics::InitializeAppStructure()
     SetupHexPage();
 }
 
+void WombatForensics::InsertCase()
+{
+    QSqlQuery casequery(fappdb);
+    casequery.prepare("INSERT INTO cases (name, creation) VALUES(?, ?);");
+    casequery.bindValue(0, wombatvariable.caseobject.name);
+    casequery.bindValue(1, QString::fromStdString(GetTime()));
+    casequery.exec();
+    wombatvariable.caseobject.id = casequery.lastInsertId().toULongLong();
+    casequery.finish();
+    qDebug() << "caseid:" << wombatvariable.caseobject.id;
+}
+
+void WombatForensics::CreateThumbDB()
+{
+}
+
+void WombatForensics::OpenThumbDB()
+{
+}
+
+void WombatForensics::CreateCaseDB()
+{
+}
+
+void WombatForensics::OpenCaseDB()
+{
+}
+
 void WombatForensics::InitializeCaseStructure()
 {
-    /*
     // create new case here
     bool ok;
-    wombatvarptr->caseobject.name = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
-    if(ok && !wombatvarptr->caseobject.name.isEmpty())
+    wombatvariable.caseobject.name = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
+    if(ok && !wombatvariable.caseobject.name.isEmpty())
     {
-        wombatdatabase->InsertCase();
-        QString tmpTitle = "Wombat Forensics - ";
-        tmpTitle += wombatvarptr->caseobject.name;
-        this->setWindowTitle(tmpTitle); // update application window.
-        // make Cases Folder
-        QString casestring = QString::number(wombatvarptr->caseobject.id) + "-" + wombatvarptr->caseobject.name;
-        wombatvarptr->caseobject.dirpath = wombatvarptr->casespath + casestring + "/";
-        bool mkPath = (new QDir())->mkpath(wombatvarptr->caseobject.dirpath);
-        if(mkPath == false)
-            DisplayError("2.0", "Cases Folder Creation Failed.", "New Case folder was not created.");
-        // CREATE case log file HERE
-        logfile.setFileName(wombatvarptr->caseobject.dirpath + "msglog");
+        InsertCase(); // used to be wombatdatabase
+        this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name); // update application window
+        // make cases folder
+        QString casestring = QString::number(wombatvariable.caseobject.id) + "-" + wombatvariable.caseobject.name;
+        wombatvariable.caseobject.dirpath = wombatvariable.casespath + casestring + "/";
+        if((new QDir())->mkpath(wombatvariable.caseobject.dirpath) == false)
+            DisplayError("2.0", "Cases Folder Creation Failed", "New case folder creation was not created.");
+        // create case log file here
+        logfile.setFileName(wombatvariable.caseobject.dirpath + "msglog");
         msglog->clear();
         LogMessage("Log File Created");
         thumbdb = QSqlDatabase::database("thumbdb");
         if(!thumbdb.isValid())
             thumbdb = QSqlDatabase::addDatabase("QSQLITE", "thumbdb");
-        thumbdb.setDatabaseName(wombatvarptr->caseobject.dirpath + "thumbs.db");
-        if(!FileExists((wombatvarptr->caseobject.dirpath + "thumbs.db").toStdString()))
+        thumbdb.setDatabaseName(wombatvariable.caseobject.dirpath + "thumbs.db");
+        if(!FileExists((wombatvariable.caseobject.dirpath + "thumbs.db").toStdString()))
         {
-            wombatdatabase->CreateThumbDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.01", "Thumb DB Error", wombatvarptr->curerrmsg);
+            CreateThumbDB();
+            if(wombatvariable.curerrmsg.compare("") != 0)
+                DisplayError("2.1", "Thumb DB Error", wombatvariable.curerrmsg);
         }
         else
         {
-            wombatdatabase->OpenThumbDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.02", "Thumb DB Open Error", wombatvarptr->curerrmsg);
+            OpenThumbDB();
+            if(wombatvariable.curerrmsg.compare("") != 0)
+                DisplayError("2.2", "Thumb DB Error", wombatvariable.curerrmsg);
         }
-        // CREATE CASEID-CASENAME.DB RIGHT HERE.
-        errorcount = 0;
+        // Create CaseID-CasenameDB
+        int errorcount = 0;
         LogMessage("Started Creating Case Structure");
-        wombatvarptr->caseobject.dbname = wombatvarptr->caseobject.dirpath + casestring + ".db";
-        wombatvarptr->casedb = QSqlDatabase::database("casedb");
-        if(!wombatvarptr->casedb.isValid())
-            wombatvarptr->casedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
-        wombatvarptr->casedb.setDatabaseName(wombatvarptr->caseobject.dbname);
-        if(!FileExists(wombatvarptr->caseobject.dbname.toStdString()))
+        wombatvariable.caseobject.dbname = wombatvariable.caseobject.dirpath + casestring + ".db";
+        fcasedb = QSqlDatabase::database("casedb"); 
+        if(!fcasedb.isValid())
+            fcasedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
+        fcasedb.setDatabaseName(wombatvariable.caseobject.dbname);
+        if(!FileExists(wombatvariable.caseobject.dbname.toStdString()))
         {
-            wombatdatabase->CreateCaseDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
+            CreateCaseDB();
+            if(wombatvariable.curerrmsg.compare("") != 0)
             {
-                LogMessage("Case DB Creation Error");
+                LogMessage("Case DB Creation Error - " + wombatvariable.curerrmsg);
                 errorcount++;
-                DisplayError("1.2", "Case DB Creation Error", wombatvarptr->curerrmsg);
+                DisplayError("2.3", "Case DB Creation Error", wombatvariable.curerrmsg);
             }
         }
         else
         {
-            wombatdatabase->OpenCaseDB();
-            if(wombatvarptr->curerrmsg.compare("") != 0)
-                DisplayError("1.3", "SQL", wombatvarptr->curerrmsg);
+            OpenCaseDB();
+            if(wombatvariable.curerrmsg.compare("") != 0)
+            {
+                LogMessage("Case DB Creation Error - " + wombatvariable.curerrmsg);
+                errorcount++;
+                DisplayError("2.4", "Case DB Creation Error", wombatvariable.curerrmsg);
+            }
         }
-        fcasedb = wombatvarptr->casedb;
-        if(wombatdatabase->ReturnCaseCount() > 0)
-        {
+        if(ReturnCaseCount() > 0)
             ui->actionOpen_Case->setEnabled(true);
-        }
         ui->actionAdd_Evidence->setEnabled(true);
-        LogMessage("Case was created");
+        LogMessage("Case was Created");
         autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
-        //autosavetimer->start(600000); // 10 minutes in milliseconds
-
+        //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     }
-        */
 }
 
 void WombatForensics::InitializeOpenCase()
@@ -1017,22 +1040,22 @@ void WombatForensics::OpenFileSystemFile()
 
 void WombatForensics::CloseCurrentCase()
 {
-    /*
     autosavetimer->stop();
-    setWindowTitle("WombatForensics");
-    wombatdatabase->GetEvidenceObjects();
-    for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
+    //GetEvidenceObjects(); // was previously wombatdabase
+    /*
+    for(int i=0; i < wombatvarptr->evidenceobjectvecotr.count(); i++)
     {
         treemodel->RemEvidence(wombatvarptr->evidenceobjectvector.at(i).id);
     }
+     */ 
+    setWindowTitle("WombatForensics");
     filesprocessed = 0;
     filesfound = 0;
     filtercountlabel->setText("Filtered: 0");
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    StatusUpdate("Current Case was Closed Successfully"); 
-    wombatdatabase->CloseCaseDB();
-    */
+    StatusUpdate("Current Case was closed successfully");
+    //CloseCaseDB(); // was previously wombatdatabase
 }
 
 void WombatForensics::RemEvidence()
@@ -1691,11 +1714,10 @@ void WombatForensics::RemoveTmpFiles()
 void WombatForensics::on_actionNew_Case_triggered()
 {
     // determine if a case is open
-    /*
-    if(wombatvarptr->caseobject.id > 0)
+    if(wombatvariable.caseobject.id > 0)
     {
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
-        if (ret == QMessageBox::Yes)
+        if(ret == QMessageBox::Yes)
         {
             CloseCurrentCase();
             InitializeCaseStructure();
@@ -1703,7 +1725,6 @@ void WombatForensics::on_actionNew_Case_triggered()
     }
     else
         InitializeCaseStructure();
-    */
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()
