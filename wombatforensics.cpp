@@ -449,18 +449,57 @@ void WombatForensics::InsertCase()
 
 void WombatForensics::CreateThumbDB()
 {
+    if(thumbdb.open())
+    {
+        QSqlQuery thumbquery(thumbdb);
+        thumbquery.exec("CREATE TABLE thumbs(thumbid INTEGER PRIMARY KEY, objectid INTEGER, thumbblob TEXT);");
+        thumbquery.finish();
+    }
+    else
+    {
+        LogMessage(thumbdb.lastError().text());
+    }
 }
 
 void WombatForensics::OpenThumbDB()
 {
+    if(!thumbdb.isOpen())
+        thumbdb.open();
 }
 
 void WombatForensics::CreateCaseDB()
 {
+    #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking
+    #define IMGDB_MAX_RETRY_COUNT 50    // how many times will we retry a SQL statement
+    #define IMGDB_RETRY_WAIT 100   // how long (in milliseconds) are we willing to wait between retries
+    QStringList wombattableschema;
+    wombattableschema.clear();
+    wombattableschema << "CREATE TABLE settings(settingid INTEGER PRIMARY KEY, name TEXT, value TEXT, type INTEGER);";
+    wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
+    wombattableschema << "CREATE TABLE attributes(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
+    wombattableschema << "CREATE TABLE properties(id INTEGER PRIMARY KEY, objectid INTEGER, name TEXT, description TEXT, value BLOB);";
+    wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, address INTEGER, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, checked INTEGER NOT NULL DEFAULT 0, mftattrid INTEGER NOT NULL DEFAULT 0);";
+    if(fcasedb.isOpen())
+    {
+        fcasedb.transaction();
+        QSqlQuery casequery(fcasedb);
+        for(int i=0; i < wombattableschema.count(); i++)
+        {
+            casequery.exec(wombattableschema.at(i));
+        }
+        fcasedb.commit();
+        casequery.finish();
+    }
+    else
+    {
+        LogMessage(fcasedb.lastError().text());
+    }
 }
 
 void WombatForensics::OpenCaseDB()
 {
+    if(!fcasedb.isOpen())
+        fcasedb.open();
 }
 
 void WombatForensics::InitializeCaseStructure()
@@ -1685,13 +1724,21 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     aboutbox->close();
     RemoveTmpFiles();
     event->accept();
-    //magic_close(magicptr);
-    //magic_close(magicmimeptr);
     msglog->clear();
     msgviewer->close();
     if(fappdb.isOpen())
         fappdb.close();
+    fappdb = QSqlDatabase();
     QSqlDatabase::removeDatabase("appdb");
+    if(thumbdb.isOpen())
+        thumbdb.close();
+    thumbdb = QSqlDatabase();
+    QSqlDatabase::removeDatabase("thumbdb");
+    if(fcasedb.isOpen())
+        fcasedb.close();
+    fcasedb = QSqlDatabase();
+    QSqlDatabase::removeDatabase("casedb");
+
     /*
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();
@@ -2156,6 +2203,7 @@ void WombatForensics::CarveFile()
 
 void WombatForensics::SaveState()
 {
+    /*
     fcasedb.transaction();
     QSqlQuery hashquery(fcasedb);
     hashquery.prepare("UPDATE data SET checked = ? WHERE objectid = ?;");
@@ -2172,6 +2220,7 @@ void WombatForensics::SaveState()
     }
     fcasedb.commit();
     hashquery.finish();
+    */
 }
 
 void WombatForensics::AutoSaveState()
