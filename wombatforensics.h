@@ -1054,6 +1054,9 @@ private:
     void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
     void UpdateFilterCount(void);
     void SaveState(void);
+    void CreateAppDB(void);
+    void OpenAppDB(void);
+    unsigned long long ReturnCaseCount(void);
 
     void RemoveTmpFiles(void);
 

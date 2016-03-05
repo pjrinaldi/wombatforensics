@@ -347,6 +347,34 @@ void WombatForensics::HideByteViewer(bool checkstate)
     ui->actionByteConverter->setChecked(checkstate);
 }
 
+void WombatForensics::CreateAppDB()
+{
+    if(fappdb.open())
+    {
+        fappdb.transaction();
+        QSqlQuery appquery(fappdb);
+        appquery.exec("CREATE TABLE cases(caseid INTEGER PRIMARY KEY, name TEXT, creation TEXT, deleted INTEGER);");
+        appquery.exec("CREATE TABLE external viewers(viewerid INTEGER PRIMARY KEY, path TEXT, deleted INTEGER);");
+        fappdb.commit();
+        appquery.finish();
+    }
+    else
+        DisplayError("1.6", "Create App DB Error", fappdb.lastError().text());
+}
+
+void WombatForensics::OpenAppDB()
+{
+    if(!fappdb.isOpen())
+        fappdb.open();
+}
+
+unsigned long long WombatForensics::ReturnCaseCount()
+{
+    QSqlQuery countquery("SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", fappdb);
+    if(countquery.first())
+        return countquery.value(0).toULongLong();
+}
+
 void WombatForensics::InitializeAppStructure()
 {
     QString homepath = QDir::homePath();
@@ -368,13 +396,13 @@ void WombatForensics::InitializeAppStructure()
     fappdb.setDatabaseName(wombatvariable.wombatdbname);
     if(!FileExists(wombatvariable.wombatdbname.toStdString()))
     {
-        //CreateAppDB(); // used to be wombatdatabase
+        CreateAppDB(); // used to be wombatdatabase
         if(wombatvariable.curerrmsg.compare("") != 0)
             DisplayError("1.4", "Create App DB Error", wombatvariable.curerrmsg);
     }
     else
     {
-        //OpenAppDB(); // used to be wombatdatabase
+        OpenAppDB(); // used to be wombatdatabase
         if(wombatvariable.curerrmsg.compare("") != 0)
             DisplayError("1.5", "Open App DB Error", wombatvariable.curerrmsg);
     }
@@ -382,12 +410,10 @@ void WombatForensics::InitializeAppStructure()
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
     ui->actionOpen_Case->setEnabled(false);
-    /*
     if(ReturnCaseCount() > 0) // used to be wombatdatabase
     {
         ui->actionOpen_Case->setEnabled(true);
     }
-    */
     ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
@@ -1640,6 +1666,9 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     //magic_close(magicmimeptr);
     msglog->clear();
     msgviewer->close();
+    if(fappdb.isOpen())
+        fappdb.close();
+    QSqlDatabase::removeDatabase("appdb");
     /*
     wombatdatabase->CloseCaseDB();
     wombatdatabase->CloseAppDB();
