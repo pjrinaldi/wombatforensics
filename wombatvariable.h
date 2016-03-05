@@ -19,7 +19,7 @@ struct EvidenceObject
     unsigned long long id;
     int type;
     int objecttype;
-    //unsigned long long itemcount;
+    unsigned long long itemcount;
     QString name;
     unsigned long long size;
     //int sectsize;

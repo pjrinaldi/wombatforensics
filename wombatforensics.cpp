@@ -802,8 +802,30 @@ void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIn
 }
 */
 
+void WombatForensics::AddNewEvidence()
+{
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(wombatvariable.evidenceobject.fullpathvector.size()*sizeof(char*));
+    for(uint i=0; i < wombatvariable.evidenceobject.fullpathvector.size(); i++)
+    {
+        images[i] = wombatvariable.evidenceobject.fullpathvector[i].c_str();
+    }
+    readimginfo = tsk_img_open(wombatvariable.evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
+    if(readimginfo == NULL)
+    {
+        LogMessage("Evidence Image acess failed");
+        errorcount++;
+    }
+    free(images);
+    //QSqlQuery addevidquery(fcasedb);
+}
+
 void WombatForensics::InitializeEvidenceStructure()
 {
+    readimginfo = NULL;
+    readfsinfo = NULL;
+    readfileinfo = NULL;
+    AddNewEvidence();
     /*
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
@@ -871,6 +893,17 @@ void WombatForensics::OpenEvidenceStructure()
 
 void WombatForensics::AddEvidence()
 {
+    // STILL NEED TO ACCOUNT FOR IF THE SAME EVIDENCE IS ALREADY ADDED TO THE CASE AS SHOWN BELOW, BUT I'LL GET TO THAT LATER...
+    QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
+    if(tmplist.count())
+    {
+        wombatvariable.currentevidencename = tmplist.at(0).split("/").last();
+        for(int i=0; i < tmplist.count(); i++)
+            wombatvariable.evidenceobject.fullpathvector.push_back(tmplist.at(i).toStdString());
+        wombatvariable.evidenceobject.itemcount = tmplist.count();
+        LogMessage("Start Adding Evidence");
+        sqlwatcher.setFuture(QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure));
+    }
     /*
     int isnew = 1;
     //wombatdatabase->GetEvidenceObjects();

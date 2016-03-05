@@ -1062,6 +1062,7 @@ private:
     void OpenThumbDB(void);
     void CreateCaseDB(void);
     void OpenCaseDB(void);
+    void AddNewEvidence(void);
 
     void RemoveTmpFiles(void);
 
@@ -1105,6 +1106,9 @@ private:
     QTimer* autosavetimer;
     //unsigned long long currentcaseid;
     WombatVariable wombatvariable;
+    TSK_IMG_INFO* readimginfo;
+    TSK_FS_INFO* readfsinfo;
+    TSK_FS_FILE* readfileinfo;
 };
 
 //void SecondaryProcessing(QVariantMap &jsonstore);
