@@ -351,59 +351,43 @@ void WombatForensics::InitializeAppStructure()
 {
     QString homepath = QDir::homePath();
     homepath += "/WombatForensics/";
-    wombatvariable.settingspath = homepath + "settings";
+    wombatvariable.settingspath = homepath + "settings/";
     wombatvariable.datapath = homepath + "data/";
     wombatvariable.casespath = homepath + "cases/";
     wombatvariable.tmpfilepath = homepath + "tmpfiles/";
-    /*
-    wombatvarptr->settingspath = homePath + "settings";
-    wombatvarptr->datapath = homePath + "data/";
-    wombatvarptr->casespath = homePath + "cases/";
-    wombatvarptr->tmpfilepath = homePath + "tmpfiles/";
-    bool mkPath = (new QDir())->mkpath(wombatvarptr->settingspath);
-    if(mkPath == false)
-        DisplayError("2.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvarptr->datapath);
-    if(mkPath == false)
-        DisplayError("2.1", "App Data Folder Failed.", "Application Data Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvarptr->casespath);
-    if(mkPath == false)
-        DisplayError("2.2", "App Cases Folder Failed.", "App Cases Folder was not created.");
-    mkPath = (new QDir())->mkpath(wombatvarptr->tmpfilepath);
-    if(mkPath == false)
-        DisplayError("2.2", "App TmpFile Folder Failed.", "App TmpFile Folder was not created.");
-    wombatvarptr->wombatdbname = wombatvarptr->datapath + "WombatApp.db";
-    wombatvarptr->appdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
-    wombatvarptr->appdb.setDatabaseName(wombatvarptr->wombatdbname);
-    bool appFileExist = FileExists(wombatvarptr->wombatdbname.toStdString());
-    if(!appFileExist)
+    if((new QDir())->mkpath(wombatvariable.settingspath) == false)
+        DisplayError("1.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
+    if((new QDir())->mkpath(wombatvariable.datapath) == false)
+        DisplayError("1.1", "App Data Folder Failed", "App Data Folder was not created");
+    if((new QDir())->mkpath(wombatvariable.casespath) == false)
+        DisplayError("1.2", "App Cases Folder Failed", "App Cases Folder was not created");
+    if((new QDir())->mkpath(wombatvariable.tmpfilepath) == false)
+        DisplayError("1.3", "App tmpfile folder failed", "App Tmpfile folder was not created");
+    wombatvariable.wombatdbname = wombatvariable.datapath + "WombatApp.db";
+    fappdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
+    fappdb.setDatabaseName(wombatvariable.wombatdbname);
+    if(!FileExists(wombatvariable.wombatdbname.toStdString()))
     {
-        wombatdatabase->CreateAppDB();
-        if(wombatvarptr->curerrmsg.compare("") != 0)
-            DisplayError("1.0", "App File Error", wombatvarptr->curerrmsg);
+        //CreateAppDB(); // used to be wombatdatabase
+        if(wombatvariable.curerrmsg.compare("") != 0)
+            DisplayError("1.4", "Create App DB Error", wombatvariable.curerrmsg);
     }
     else
     {
-        wombatdatabase->OpenAppDB();
-        if(wombatvarptr->curerrmsg.compare("") != 0)
-            DisplayError("1.1", "SQL", wombatvarptr->curerrmsg);
+        //OpenAppDB(); // used to be wombatdatabase
+        if(wombatvariable.curerrmsg.compare("") != 0)
+            DisplayError("1.5", "Open App DB Error", wombatvariable.curerrmsg);
     }
-    fappdb = wombatvarptr->appdb;
     viewmanage = new ViewerManager(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
-    if(wombatdatabase->ReturnCaseCount() == 0)
-    {
-        ui->actionOpen_Case->setEnabled(false);
-    }
-    else if(wombatdatabase->ReturnCaseCount() > 0)
+    ui->actionOpen_Case->setEnabled(false);
+    /*
+    if(ReturnCaseCount() > 0) // used to be wombatdatabase
     {
         ui->actionOpen_Case->setEnabled(true);
     }
-    else
-    {
-        DisplayError("1.0", "Case Count", "Invalid Case Count returned.");
-    }
+    */
     ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
@@ -423,7 +407,6 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
     SetupHexPage();
-    */
 }
 
 void WombatForensics::InitializeCaseStructure()
