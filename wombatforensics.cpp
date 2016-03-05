@@ -47,8 +47,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tskobjptr->readimginfo = NULL;
     tskobjptr->readfsinfo = NULL;
     tskobjptr->readfileinfo = NULL;
-    wombatdatabase = new WombatDatabase(wombatvarptr);
-    wombatframework = new WombatFramework(wombatvarptr);
+    //wombatdatabase = new WombatDatabase(wombatvarptr);
+    //wombatframework = new WombatFramework(wombatvarptr);
     propertywindow = new PropertiesWindow(wombatdatabase);
     fileviewer = new FileViewer(this, tskobjptr);
     isignals = new InterfaceSignals();
@@ -95,7 +95,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
-    wombatvarptr->caseobject.id = 0;
+    //wombatvarptr->caseobject.id = 0;
     connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     propertywindow->setModal(false);
     InitializeAppStructure();
@@ -184,6 +184,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 //////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
 {
+    /*
     //OpenParentImage
     std::vector<std::string> pathvector;
     unsigned long long imgid = 0;
@@ -255,6 +256,7 @@ void WombatForensics::ShowExternalViewer()
     QStringList arguments;
     arguments << tmpstring;
     process->startDetached(((QAction*)QObject::sender())->text(), arguments);
+    */
 }
 
 void WombatForensics::SetSelectedFromImageViewer(unsigned long long objectid)
@@ -347,6 +349,7 @@ void WombatForensics::InitializeAppStructure()
 {
     QString homePath = QDir::homePath();
     homePath += "/WombatForensics/";
+    /*
     wombatvarptr->settingspath = homePath + "settings";
     wombatvarptr->datapath = homePath + "data/";
     wombatvarptr->casespath = homePath + "cases/";
@@ -414,10 +417,12 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
     SetupHexPage();
+    */
 }
 
 void WombatForensics::InitializeCaseStructure()
 {
+    /*
     // create new case here
     bool ok;
     wombatvarptr->caseobject.name = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
@@ -488,10 +493,12 @@ void WombatForensics::InitializeCaseStructure()
         //autosavetimer->start(600000); // 10 minutes in milliseconds
 
     }
+        */
 }
 
 void WombatForensics::InitializeOpenCase()
 {
+    /*
     // open case here
     wombatvarptr->casenamelist.clear();
     // populate case list here
@@ -574,16 +581,16 @@ void WombatForensics::InitializeOpenCase()
             }
         }
     }
-
+    */
 }
 
 void WombatForensics::InitializeQueryModel()
 {
     StatusUpdate("Building Evidence Tree...");
     LogMessage("Building Evidence Tree...");
-    treemodel->AddEvidence(wombatvarptr->currentevidenceid);
-    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
-    ResizeColumns();
+    //treemodel->AddEvidence(wombatvarptr->currentevidenceid);
+    //ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    //ResizeColumns();
     StatusUpdate("Evidence Added. Begin File Structure Analysis...");
     LogMessage("Evidence Added. Begin File Structure Analysis...");
     StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
@@ -670,6 +677,7 @@ void WombatForensics::InitializeQueryModel()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
+    /*
     if(previtem.indexes().count() > 0)
         oldselectedindex = previtem.indexes().at(0);
     if(curitem.indexes().count() > 0)
@@ -683,13 +691,11 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionByteConverter->setEnabled(true);
         wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
         wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
-        /*
         wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
         LoadHexContents();
         if(propertywindow->isVisible())
             UpdateProperties();
-        */
-    }
+    }*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void WombatForensics::TreeContextMenu(const QPoint &pt)
@@ -721,6 +727,7 @@ void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIn
 
 void WombatForensics::InitializeEvidenceStructure()
 {
+    /*
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
     errorcount = 0;
@@ -733,6 +740,7 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->InsertPartitionObjects();
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
+    */
 }
 
 
@@ -745,6 +753,7 @@ void WombatForensics::UpdateDataTable()
 void WombatForensics::UpdateStatus()
 {
 
+    /*
     //tsk_img_close(IMG_2ND_PROC);
     filedatavector.clear();
     treemodel->RemEvidence(wombatvarptr->currentevidenceid);
@@ -757,17 +766,19 @@ void WombatForensics::UpdateStatus()
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
     wombatframework->CloseInfoStructures();
+    */
 }
 
 void WombatForensics::UpdateDigging()
 {
-    ResizeColumns();
+    //ResizeColumns();
     LogMessage("Digging Complete");
     StatusUpdate("Evidence ready");
 }
 
 void WombatForensics::OpenEvidenceStructure()
 {
+    /*
     filesfound = filesfound + wombatdatabase->GetEvidenceFileCount();
     filesprocessed = filesfound;
     filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
@@ -778,10 +789,12 @@ void WombatForensics::OpenEvidenceStructure()
     StatusUpdate("Opening Case Evidence Completed");
     LogMessage("Case evidence successfully opened");
     StatusUpdate("Evidence ready");
+    */
 }
 
 void WombatForensics::AddEvidence()
 {
+    /*
     int isnew = 1;
     //wombatdatabase->GetEvidenceObjects();
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
@@ -811,6 +824,7 @@ void WombatForensics::AddEvidence()
         else
             DisplayError("1.8", "Evidence already exists in the case.", "Add Evidence cancelled");
     }
+    */
 }
 
 /////////////////////////////////////////////////////
@@ -822,6 +836,7 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
+    /*
     if(tskobjptr->readimginfo != NULL)
         tsk_img_close(tskobjptr->readimginfo);
     if(tskobjptr->readfsinfo != NULL)
@@ -946,10 +961,12 @@ void WombatForensics::LoadHexContents()
             fileviewer->filehexview->SetTopLeft(0);
         }
     }
+    */
 }
 
 void WombatForensics::OpenParentImage(unsigned long long imgid)
 {
+    /*
     wombatdatabase->GetEvidenceObjects();
     int curidx = 0;
     for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
@@ -969,21 +986,23 @@ void WombatForensics::OpenParentImage(unsigned long long imgid)
         LogMessage("Image opening error");
     }
     free(tskobjptr->imagepartspath);
+    */
 }
 
 void WombatForensics::OpenParentFileSystem(unsigned long long fsid)
 {
-    unsigned long long fsoffset = wombatdatabase->ReturnFileSystemOffset(fsid);
-    tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
+    //unsigned long long fsoffset = wombatdatabase->ReturnFileSystemOffset(fsid);
+    //tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
 }
 
 void WombatForensics::OpenFileSystemFile()
 {
-    tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
+    //tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
 }
 
 void WombatForensics::CloseCurrentCase()
 {
+    /*
     autosavetimer->stop();
     setWindowTitle("WombatForensics");
     wombatdatabase->GetEvidenceObjects();
@@ -998,10 +1017,12 @@ void WombatForensics::CloseCurrentCase()
     filecountlabel->setText("Files: " + QString::number(filesfound));
     StatusUpdate("Current Case was Closed Successfully"); 
     wombatdatabase->CloseCaseDB();
+    */
 }
 
 void WombatForensics::RemEvidence()
 {
+    /*
     wombatvarptr->evidencenamelist.clear();
     wombatdatabase->ReturnEvidenceNameList();
     bool ok;
@@ -1019,10 +1040,12 @@ void WombatForensics::RemEvidence()
  
         }
     }
+    */
 }
 
 void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
 {
+    /*
     if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
     {
         QVariant tmpvariant;
@@ -1099,10 +1122,12 @@ void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
         for(int i=0; i < curnode->children.count(); i++)
             GetExportData(curnode->children.at(i), exportdata);
     }
+    */
 }
 
 void WombatForensics::GetDigData(Node* curnode, FileDeepData* deepdata)
 {
+    /*
     if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
     {
         QVariant tmpvariant;
@@ -1155,6 +1180,7 @@ void WombatForensics::GetDigData(Node* curnode, FileDeepData* deepdata)
         for(int i = 0; i < curnode->children.count(); i++)
             GetDigData(curnode->children.at(i), deepdata);
     }
+    */
 }
 
 void WombatForensics::ExportEvidence()
@@ -1183,6 +1209,7 @@ void WombatForensics::FileExport(FileExportData* exportdata)
 
 void WombatForensics::FinishRemoval()
 {
+    /*
     if(ProcessingComplete())
     {
         filesprocessed = filesprocessed - wombatvarptr->evidrowsremoved;
@@ -1197,6 +1224,7 @@ void WombatForensics::FinishRemoval()
     {
         LogMessage("Still Removing Files");
     }
+    */
 }
 
 void WombatForensics::FinishExport()
@@ -1214,6 +1242,7 @@ void WombatForensics::FinishExport()
 
 void WombatForensics::ExportFiles(FileExportData* exportdata)
 {
+    /*
     exportfilelist.clear();
     curlist.clear();
     errorcount = 0;
@@ -1259,6 +1288,7 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, curlist.at(i), exportfilelist[i].fullpath, exportfilelist[i].name);
         exportwatcher.setFuture(tmpfuture);
     }
+    */
 }
 
 void WombatForensics::DigFiles(FileDeepData* deepdata)
@@ -1301,6 +1331,7 @@ void WombatForensics::DigFiles(FileDeepData* deepdata)
 
 void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std::string name)
 {
+    /*
     if(curobj.readimginfo != NULL)
         tsk_img_close(curobj.readimginfo);
     if(curobj.readfsinfo != NULL)
@@ -1372,10 +1403,12 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     exportcount++;
     int curprogress = (int)((((float)exportcount)/(float)curlist.count())*100);
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%"));
+    */
 }
 
 void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, std::vector<FileDeepData::DigOptions> digoptions)
 {
+    /*
     if(curobj.readimginfo != NULL)
         tsk_img_close(curobj.readimginfo);
     if(curobj.readfsinfo != NULL)
@@ -1430,6 +1463,7 @@ void WombatForensics::ProcessDig(TskObject curobj, unsigned long long objectid, 
     digcount++;
     int curprogress = (int)((((float)digcount/(float)curlist.count()))*100);
     StatusUpdate(QString("Dug " + QString::number(digcount) + " of " + QString::number(curlist.count()) + " " + QString::number(curprogress) + "%"));
+    */
 }
 
 void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)
@@ -1650,6 +1684,7 @@ void WombatForensics::on_actionNew_Case_triggered()
 
 void WombatForensics::on_actionOpen_Case_triggered()
 {
+    /*
     // determine if a case is open
     if(wombatvarptr->caseobject.id > 0)
     {
@@ -1663,6 +1698,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
     }
     else
         InitializeOpenCase();
+    */
 }
 
 void WombatForensics::on_actionSaveState_triggered()
