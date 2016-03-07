@@ -813,17 +813,29 @@ void WombatForensics::AddNewEvidence()
     }
     free(images);
     QSqlQuery evidquery(fcasedb);
-    evidquery.prepare("INSERT INTO data (objecttype, type, size, name, fullpath) VALUES(1, ?, ?, ?, ?);");
-    evidquery.addBindValue(readimginfo->itype);
-    evidquery.addBindValue((unsigned long long)readimginfo->size);
-    evidquery.addBindValue(wombatvariable.currentevidencename);
-    evidquery.addBindValue(QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[0]));
-    evidquery.exec();
-    evidquery.next();
-    wombatvariable.currentevidenceid = evidquery.lastInsertId().toULongLong();
-    qDebug() << wombatvariable.currentevidenceid;
+    if(evidquery.prepare("INSERT INTO data (objecttype, type, size, name, fullpath) VALUES (1, ?, ?, ?, ?);"))
+    {
+        evidquery.bindValue(0, (int)readimginfo->itype, QSql::In);
+        evidquery.bindValue(1, (unsigned long long)readimginfo->size, QSql::In);
+        evidquery.bindValue(2, wombatvariable.evidenceobject.name, QSql::In);
+        evidquery.bindValue(3, QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[0]), QSql::In);
+        if(evidquery.exec())
+        {
+            wombatvariable.evidenceobject.id = evidquery.lastInsertId().toULongLong();
+            qDebug() << "eviqueryid:" << evidquery.lastInsertId().toInt();
+        }
+        else
+            qDebug() << "exec error:" << fcasedb.lastError().text();
+    }
+    else
+        qDebug() << "prepare error:" << fcasedb.lastError().text();
     evidquery.finish();
-
+    qDebug() << "evid:" << wombatvariable.evidenceobject.id;
+    /*
+    for(unsigned int i=0; i < wombatptr->evidenceobject.itemcount; i++)
+    {
+        
+    }*/
 }
 
 void WombatForensics::InitializeEvidenceStructure()
@@ -903,7 +915,8 @@ void WombatForensics::AddEvidence()
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
     {
-        wombatvariable.currentevidencename = tmplist.at(0).split("/").last();
+        wombatvariable.evidenceobject.name = tmplist.at(0).split("/").last();
+        //wombatvariable.currentevidencename = tmplist.at(0).split("/").last();
         for(int i=0; i < tmplist.count(); i++)
             wombatvariable.evidenceobject.fullpathvector.push_back(tmplist.at(i).toStdString());
         wombatvariable.evidenceobject.itemcount = tmplist.count();
