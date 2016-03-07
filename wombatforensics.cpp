@@ -1007,6 +1007,73 @@ void WombatForensics::AddNewEvidence()
 
 
     /*
+     *
+     *    if(wombatptr->evidenceobject.volinfo != NULL)
+    {
+        //qDebug() << "Volume is not null.";
+        for(uint32_t i=0; i < wombatptr->evidenceobject.partinfovector.size(); i++)
+        {
+            if(wombatptr->evidenceobject.partinfovector[i]->flags == 0x02) // unallocated partition
+            {
+                wombatptr->currentpartitionid = 0;
+                wombatptr->bindvalues.clear();
+                //wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->flags);
+                //wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->start);
+                //wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->len);
+                wombatptr->bindvalues.append(wombatptr->evidenceobject.partinfovector[i]->desc);
+                //wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->block_size);
+                wombatptr->bindvalues.append(wombatptr->currentvolumeid);
+                wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+                wombatptr->bindvalues.append((unsigned long long)(wombatptr->evidenceobject.partinfovector[i]->len * wombatptr->evidenceobject.volinfo->block_size));
+                wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, name, parentid, parimgid, size) VALUES(3, ?, ?, ?, ?);", wombatptr->bindvalues);
+                //wombatptr->currentpartitionid = InsertSqlGetID("INSERT INTO data (objecttype, flags, sectstart, sectlength, name, sectsize, parentid, parimgid, size) VALUES(3, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+            }
+            else if(wombatptr->evidenceobject.partinfovector[i]->flags == 0x01) // allocated partition
+            {
+                TSK_FS_INFO* tmpfsinfo = tsk_fs_open_vol(wombatptr->evidenceobject.partinfovector[i], TSK_FS_TYPE_DETECT);
+                if(tmpfsinfo != NULL)
+                {
+                    wombatptr->evidenceobject.fsinfovector.push_back(tmpfsinfo);
+                }
+                else
+                {
+                    //LogMessage("Failed to open Partition/FileSystem");
+                    errorcount++;
+                }
+                if(tmpfsinfo != NULL)
+                {
+                    wombatptr->currentfilesystemid = 0;
+                    wombatptr->bindvalues.clear();
+                    wombatptr->bindvalues.append(wombatprop->GetFileSystemLabel(tmpfsinfo));
+                    wombatptr->bindvalues.append(QString("/"));
+                    wombatptr->bindvalues.append(tmpfsinfo->ftype);
+                    //wombatptr->bindvalues.append(tmpfsinfo->flags);
+                    //wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->offset);
+                    wombatptr->bindvalues.append(wombatptr->currentvolumeid);
+                    wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->block_size * (unsigned long long)tmpfsinfo->block_count);
+                    //wombatptr->bindvalues.append(tmpfsinfo->block_size);
+                    //wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->block_count);
+                    //wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->first_inum);
+                    //wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->last_inum);
+                    //wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
+                    wombatptr->bindvalues.append((unsigned long long)tmpfsinfo->root_inum);
+                    //wombatptr->bindvalues.append((int)tmpfsinfo->dev_bsize); // device sector size
+                    //wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->start);
+                    //wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.partinfovector[i]->len);
+                    wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, parentid, parimgid, size, address) VALUES(4, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+                    //wombatptr->currentfilesystemid = InsertSqlGetID("INSERT INTO data (objecttype, name, fullpath, type, flags, byteoffset, parentid, parimgid, size, blocksize, blockcount, firstinum, lastinum, rootinum, address, sectsize, sectstart, sectlength) VALUES(4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+                    wombatptr->evidenceobject.fsidvector.push_back(wombatptr->currentfilesystemid);
+                    //InsertFileSystemProperties(wombatptr->currentfilesystemid, tmpfsinfo);
+                    //QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertFileSystemProperties, wombatptr->currentfilesystemid, tmpfsinfo);
+                }
+            }
+        }
+    }
+
+     *
+     *
+     *
     else
     {
         if(readvsinfo->part_count > 0) // more than 0 partitions
