@@ -830,11 +830,51 @@ void WombatForensics::AddNewEvidence()
         runquery.exec();
         runquery.finish();
     }
+    // finished initial evidence information, now onto the volume information...
+    readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
+    if(readvsinfo == NULL)
+        wombatvariable.currentvolumename = "Dummy Volume";
+    else
+        wombatvariable.currentvolumename = QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype));
+    /*
+     *
+     *    wombatptr->currentvolumeid = 0;
+    if(wombatptr->evidenceobject.volinfo != NULL)
+    {
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->vstype);
+        wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.imageinfo->size);
+        //wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->block_size);
+        //wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->part_count);
+        //wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.volinfo->offset);
+        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+        wombatptr->bindvalues.append(wombatptr->currentvolumename);
+        wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, parentid, parimgid, name) VALUES(2, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+        //wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, childcount, byteoffset, parentid, parimgid, name) VALUES(2, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
+        //InsertVolumeProperties();
+        //QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertVolumeProperties);
+    }
+    else
+    {
+        wombatptr->bindvalues.clear();
+        wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.imageinfo->size);
+        //wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
+        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
+        wombatptr->bindvalues.append(wombatptr->currentvolumename);
+        wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, parentid, parimgid, name) VALUES(2, 240, ?, ?, ?, ?);", wombatptr->bindvalues);
+        //wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, childcount, size, sectsize, byteoffset, parentid, parimgid, name) VALUES(2, 240, 0, ?, ?, 0, ?, ?, ?);", wombatptr->bindvalues);
+    }
+
+     *
+     */ 
 }
 
 void WombatForensics::InitializeEvidenceStructure()
 {
     readimginfo = NULL;
+    readvsinfo = NULL;
     readfsinfo = NULL;
     readfileinfo = NULL;
     AddNewEvidence();
