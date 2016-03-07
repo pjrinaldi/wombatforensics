@@ -157,13 +157,13 @@ struct WombatVariable
     //unsigned long long volid;
     //unsigned long long filecount;
     //unsigned long long processcount;
-    unsigned long long currentevidenceid;
+    //unsigned long long currentevidenceid;
     unsigned long long currentvolumeid;
     unsigned long long currentpartitionid;
     unsigned long long currentfilesystemid;
     unsigned long long currentrootinum;
     QString currentevidencename;
-    QString currentvolumename;
+    //QString currentvolumename;
     QString casespath;
     QString settingspath;
     QString datapath;

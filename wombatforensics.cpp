@@ -478,7 +478,7 @@ void WombatForensics::CreateCaseDB()
     wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
     wombattableschema << "CREATE TABLE attributes(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
     wombattableschema << "CREATE TABLE properties(id INTEGER PRIMARY KEY, objectid INTEGER, name TEXT, description TEXT, value BLOB);";
-    wombattableschema << "CREATE TABLE data(id INTEGER PRIMARY KEY, objtype INTEGER, type INTEGER, name TEXT, fullpath TEXT, addr INTEGER, parid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, mftattrid INTEGER, checked INTEGER NOT NULL DEFAULT 0)";
+    wombattableschema << "CREATE TABLE data(id INTEGER PRIMARY KEY, objtype INTEGER, type INTEGER, size INTEGER, name TEXT, fullpath TEXT, addr INTEGER, parid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, mftattrid INTEGER, checked INTEGER NOT NULL DEFAULT 0)";
     if(!fcasedb.isOpen())
         fcasedb.open();
     fcasedb.transaction();
@@ -797,6 +797,139 @@ void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIn
 }
 */
 
+
+QString WombatForensics::GetFileSystemLabel(TSK_FS_INFO* curinfo)
+{
+    if(curinfo != NULL)
+    {
+        if(curinfo->ftype == TSK_FS_TYPE_EXT2 || curinfo->ftype == TSK_FS_TYPE_EXT3 || curinfo->ftype == TSK_FS_TYPE_EXT4 || curinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
+        {
+            return QString::fromStdString(string(((EXT2FS_INFO*)curinfo)->fs->s_volume_name));
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_FFS1 || curinfo->ftype == TSK_FS_TYPE_FFS1B)
+        {
+            return "UFS1";
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_FFS2 || curinfo->ftype == TSK_FS_TYPE_FFS_DETECT)
+        {
+            return QString::fromUtf8(reinterpret_cast<char*>(((FFS_INFO*)curinfo)->fs.sb2->volname));
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_FAT12 || curinfo->ftype == TSK_FS_TYPE_FAT16)
+        {
+            sprintf(asc, "%c%c%c%c%c%c%c%c%c%c%c", ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[0], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[1], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[2], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[3], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[4], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[5], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[6], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[7], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[8], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[9], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f16.vol_lab[10]);
+            return QString::fromStdString(string(asc));
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_FAT32)
+        {
+            sprintf(asc, "%c%c%c%c%c%c%c%c%c%c%c", ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[0], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[1], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[2], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[3], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[4], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[5], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[6], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[7], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[8], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[9], ((FATXXFS_SB*)((FATFS_INFO*)curinfo)->boot_sector_buffer)->a.f32.vol_lab[10]);
+            return QString::fromStdString(string(asc));
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_NTFS)
+        {
+            TSK_FS_FILE* tmpfile = NULL;
+            const TSK_FS_ATTR* tmpattr;
+            if((tmpfile = tsk_fs_file_open_meta(curinfo, NULL, NTFS_MFT_VOL)) != NULL)
+            {
+                tmpattr = tsk_fs_attrlist_get(tmpfile->meta->attr, TSK_FS_ATTR_TYPE_NTFS_VNAME);
+                if((tmpattr->flags & TSK_FS_ATTR_RES) && (tmpattr->size))
+                {
+                    UTF16* name16 = (UTF16*) tmpattr->rd.buf;
+                    UTF8* name8 = (UTF8*) asc;
+                    int retval;
+                    retval = tsk_UTF16toUTF8(curinfo->endian, (const UTF16**)&name16, (UTF16*) ((uintptr_t)name16 + (int) tmpattr->size), &name8, (UTF8*) ((uintptr_t)name8 + sizeof(asc)), TSKlenientConversion);
+                    if(retval != TSKconversionOK)
+                        *name8 = '\0';
+                    else if((uintptr_t)name8 >= (uintptr_t)asc + sizeof(asc))
+                        asc[sizeof(asc)-1] = '\0';
+                    else
+                        *name8 = '\0';
+                    return QString::fromStdString(string(asc));
+                }
+            }
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_EXFAT)
+        {
+            char* databuffer = NULL;
+            TSK_DADDR_T cursector = 0;
+            TSK_DADDR_T endsector = 0;
+            int8_t isallocsec = 0;
+            TSK_INUM_T curinum = 0;
+            FATFS_DENTRY* dentry = NULL;
+            TSK_FS_FILE* tmpfile = NULL;
+            ssize_t bytesread = 0;
+            if((tmpfile = tsk_fs_file_alloc(curinfo)) != NULL)
+            {
+                if((tmpfile->meta = tsk_fs_meta_alloc(FATFS_FILE_CONTENT_LEN)) != NULL)
+                {
+                    if((databuffer = (char*)tsk_malloc(((FATFS_INFO*)curinfo)->ssize)) != NULL)
+                    {
+                        cursector = ((FATFS_INFO*)curinfo)->rootsect;
+                        endsector = (((FATFS_INFO*)curinfo)->firstdatasect + ((FATFS_INFO*)curinfo)->clustcnt * ((FATFS_INFO*)curinfo)->csize) - 1;
+                        while(cursector < endsector)
+                        {
+                        }
+                        bytesread = tsk_fs_read_block(curinfo, cursector, databuffer, ((FATFS_INFO*)curinfo)->ssize);
+                        if(bytesread == ((FATFS_INFO*)curinfo)->ssize)
+                        {
+                            isallocsec = fatfs_is_sectalloc(((FATFS_INFO*)curinfo), cursector);
+                            if(isallocsec != -1)
+                            {
+                                curinum = FATFS_SECT_2_INODE(((FATFS_INFO*)curinfo), cursector);
+                                for(int i = 0; i < ((FATFS_INFO*)curinfo)->ssize; i+= sizeof(FATFS_DENTRY))
+                                {
+                                    dentry = (FATFS_DENTRY*)&(databuffer[i]);
+                                    if(exfatfs_get_enum_from_type(dentry->data[0]) == EXFATFS_DIR_ENTRY_TYPE_VOLUME_LABEL)
+                                    {
+                                        if(exfatfs_dinode_copy(((FATFS_INFO*)curinfo), curinum, dentry, isallocsec, tmpfile) == TSK_OK)
+                                            return QString::fromStdString(tmpfile->meta->name2->name);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    tsk_fs_file_close(tmpfile);
+                    free(databuffer);
+                }
+            }
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_ISO9660)
+        {
+            for(p = ((ISO_INFO*)curinfo)->pvd; p != NULL; p = p->next)
+            {
+                return QString::fromUtf8(reinterpret_cast<char*>(p->pvd.vol_id));
+            }
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_YAFFS2)
+        {
+            return "YAFFS2";
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_SWAP)
+        {
+            return "SWAP";
+        }
+        else if(curinfo->ftype == TSK_FS_TYPE_HFS)
+        {
+            hfs = (HFS_INFO*)curinfo;
+            char fn[HFS_MAXNAMLEN + 1];
+            HFS_ENTRY entry;
+            if(hfs_cat_file_lookup(hfs, HFS_ROOT_INUM, &entry, FALSE))
+            {
+                // log error here
+            }
+            if(hfs_UTF16toUTF8(curinfo, entry.thread.name.unicode, tsk_getu16(curinfo->endian, entry.thread.name.length), fn, HFS_MAXNAMLEN + 1, HFS_U16U8_FLAG_REPLACE_SLASH))
+            {
+                // log error here
+            }
+            sprintf(asc, "%s", fn);
+            return QString::fromStdString(string(asc));
+        }
+        return "";
+    }
+    return "";
+}
+
+
+
 void WombatForensics::AddNewEvidence()
 {
     const TSK_TCHAR** images;
@@ -813,10 +946,11 @@ void WombatForensics::AddNewEvidence()
     }
     free(images);
     QSqlQuery evidquery(fcasedb);
-    evidquery.prepare("INSERT INTO data (objtype, type, name, fullpath) VALUES (1, ?, ?, ?)");
-    evidquery.bindValue(0, (int)readimginfo->itype, QSql::In);
-    evidquery.bindValue(1, wombatvariable.evidenceobject.name, QSql::In);
-    evidquery.bindValue(2, QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[0]), QSql::In);
+    evidquery.prepare("INSERT INTO data (objtype, type, size, name, fullpath) VALUES (1, ?, ?, ?, ?)");
+    evidquery.bindValue(0, (int)readimginfo->itype);
+    evidquery.bindValue(1, (unsigned long long)readimginfo->size);
+    evidquery.bindValue(2, wombatvariable.evidenceobject.name);
+    evidquery.bindValue(3, QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[0]));
     evidquery.exec();
     wombatvariable.evidenceobject.id = evidquery.lastInsertId().toULongLong();
     evidquery.finish();
@@ -832,42 +966,79 @@ void WombatForensics::AddNewEvidence()
     }
     // finished initial evidence information, now onto the volume information...
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
+    QSqlQuery volquery(fcasedb);
+    volquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name) VALUES (2, ?, ?, ?, ?, ?)");
     if(readvsinfo == NULL)
-        wombatvariable.currentvolumename = "Dummy Volume";
+        volquery.bindValue(0, 240);
     else
-        wombatvariable.currentvolumename = QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype));
-    /*
-     *
-     *    wombatptr->currentvolumeid = 0;
-    if(wombatptr->evidenceobject.volinfo != NULL)
+        volquery.bindValue(0, (int)readvsinfo->vstype);
+    volquery.bindValue(1, (unsigned long long)readimginfo->size);
+    volquery.bindValue(2, wombatvariable.evidenceobject.id);
+    volquery.bindValue(3, wombatvariable.evidenceobject.id);
+    if(readvsinfo == NULL)
+        volquery.bindValue(4, QString("Dummy Volume"));
+    else
+        volquery.bindValue(4, QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype)));
+    volquery.exec();
+    wombatvariable.currentvolumeid = volquery.lastInsertId().toULongLong();
+    volquery.finish();
+    // finished initial volume system information, now onto the file parition information...
+    if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
-        wombatptr->bindvalues.clear();
-        wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->vstype);
-        wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.imageinfo->size);
-        //wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->block_size);
-        //wombatptr->bindvalues.append(wombatptr->evidenceobject.volinfo->part_count);
-        //wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.volinfo->offset);
-        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-        wombatptr->bindvalues.append(wombatptr->currentvolumename);
-        wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, parentid, parimgid, name) VALUES(2, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-        //wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, sectsize, childcount, byteoffset, parentid, parimgid, name) VALUES(2, ?, ?, ?, ?, ?, ?, ?, ?);", wombatptr->bindvalues);
-        //InsertVolumeProperties();
-        //QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatDatabase::InsertVolumeProperties);
+        readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
+        QSqlQuery fsquery(fcasedb);
+        fsquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, fullpath, addr) VALUES (4, ?, ?, ?, ?, ?, '/', ?)");
+        fsquery.bindValue(0, readfsinfo->ftype);
+        fsquery.bindValue(1, (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count);
+        fsquery.bindValue(2, wombatvariable.currentvolumeid);
+        fsquery.bindValue(3, wombatvariable.evidenceobject.id);
+        fsquery.bindValue(4, GetFileSystemLabel(readfsinfo));
+        fsquery.bindValue(5, (unsigned long long)readfsinfo->root_inum);
+        fsquery.exec();
+        wombatvariable.currentfilesystemid = fsquery.lastInsertId().toULongLong();
+        fsquery.finish();
     }
     else
     {
-        wombatptr->bindvalues.clear();
-        wombatptr->bindvalues.append((unsigned long long)wombatptr->evidenceobject.imageinfo->size);
-        //wombatptr->bindvalues.append(wombatptr->evidenceobject.imageinfo->sector_size);
-        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-        wombatptr->bindvalues.append(wombatptr->currentevidenceid);
-        wombatptr->bindvalues.append(wombatptr->currentvolumename);
-        wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, size, parentid, parimgid, name) VALUES(2, 240, ?, ?, ?, ?);", wombatptr->bindvalues);
-        //wombatptr->currentvolumeid = InsertSqlGetID("INSERT INTO data (objecttype, type, childcount, size, sectsize, byteoffset, parentid, parimgid, name) VALUES(2, 240, 0, ?, ?, 0, ?, ?, ?);", wombatptr->bindvalues);
+        if(readvsinfo->part_count > 0)
+        {
+        }
     }
 
-     *
+
+    /*
+    else
+    {
+        if(readvsinfo->part_count > 0) // more than 0 partitions
+        {
+        }
+    }
+    */
+
+    /*
+     *    if(wombatptr->evidenceobject.volinfo == NULL)
+    {
+        wombatptr->evidenceobject.fsinfovector.push_back(tsk_fs_open_img(wombatptr->evidenceobject.imageinfo, 0, TSK_FS_TYPE_DETECT));
+    }
+    else
+    {
+        if(wombatptr->evidenceobject.volinfo->part_count > 0)
+        {
+            //qDebug() << "part count:" << wombatptr->evidenceobject.volinfo->part_count;
+            for(uint32_t i=0; i < wombatptr->evidenceobject.volinfo->part_count; i++)
+            {
+                //if(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i)->flags == 0x02) // if its an unallocated partition
+                //{
+                //}
+                // need to figure out why i had this if unallocated with not values and then add all the partitions anyway...
+                //else
+                //{
+                wombatptr->evidenceobject.partinfovector.push_back(tsk_vs_part_get(wombatptr->evidenceobject.volinfo, i));
+                //}
+            }
+        }
+    }
+
      */ 
 }
 
@@ -2318,6 +2489,579 @@ void WombatForensics::AutoSaveState()
     // change display text
 }
 
+uint8_t WombatForensics::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HFS_ENTRY * entry, unsigned char follow_hard_link)
+{
+    TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
+    hfs_btree_key_cat key;      /* current catalog key */
+    hfs_thread thread;          /* thread record */
+    hfs_file_folder record;     /* file/folder record */
+    TSK_OFF_T off;
+
+    // Test if this is a special file that is not located in the catalog
+    if ((inum == HFS_EXTENTS_FILE_ID) ||
+        (inum == HFS_CATALOG_FILE_ID) ||
+        (inum == HFS_ALLOCATION_FILE_ID) ||
+        (inum == HFS_STARTUP_FILE_ID) ||
+        (inum == HFS_ATTRIBUTES_FILE_ID)) {
+        return 1;
+    }
+
+
+    /* first look up the thread record for the item we're searching for */
+
+    /* set up the thread record key */
+    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
+    cnid_to_array((uint32_t) inum, key.parent_cnid);
+
+    /* look up the thread record */
+    off = hfs_cat_get_record_offset(hfs, &key);
+    if (off == 0)
+    {
+        // put error code here...
+        return 1;
+    }
+
+    /* read the thread record */
+    if (hfs_cat_read_thread_record(hfs, off, &thread))
+    {
+        //tsk_error_set_errstr2(" hfs_cat_file_lookup: file (%" PRIuINUM ")", inum);
+        return 1;
+    }
+
+    /* now look up the actual file/folder record */
+
+    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
+    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
+    memcpy((char *) key.parent_cnid, (char *) thread.parent_cnid,
+        sizeof(key.parent_cnid));
+    memcpy((char *) &key.name, (char *) &thread.name, sizeof(key.name));
+
+    /* look up the record */
+    off = hfs_cat_get_record_offset(hfs, &key);
+    if (off == 0)
+    {
+        // print error here
+        return 1;
+    }
+
+    /* read the record */
+    if (hfs_cat_read_file_folder_record(hfs, off, &record))
+    {
+        //tsk_error_set_errstr2(" hfs_cat_file_lookup: file (%" PRIuINUM ")", inum);
+        return 1;
+    }
+
+    /* these memcpy can be gotten rid of, really */
+    if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FOLDER_RECORD) {
+        memcpy((char *) &entry->cat, (char *) &record, sizeof(hfs_folder));
+    }
+    else if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FILE_RECORD) {
+        memcpy((char *) &entry->cat, (char *) &record, sizeof(hfs_file));
+    }
+    /* other cases already caught by hfs_cat_read_file_folder_record */
+
+    memcpy((char *) &entry->thread, (char *) &thread, sizeof(hfs_thread));
+
+    entry->flags = TSK_FS_META_FLAG_ALLOC | TSK_FS_META_FLAG_USED;
+    entry->inum = inum;
+
+    if (follow_hard_link) {
+        // TEST to see if this is a hard link
+        unsigned char is_err;
+        TSK_INUM_T target_cnid =
+            hfs_follow_hard_link(hfs, &(entry->cat), &is_err);
+        if (is_err > 1) {
+            /*
+            error_returned
+                ("hfs_cat_file_lookup: error occurred while following a possible hard link for "
+                "inum (cnid) =  %" PRIuINUM, inum);
+            */
+            return 1;
+        }
+        if (target_cnid != inum) {
+            // This is a hard link, and we have got the cnid of the target file, so look it up.
+            uint8_t res =
+                hfs_cat_file_lookup(hfs, target_cnid, entry, FALSE);
+            if (res != 0) {
+                /*
+                error_returned
+                    ("hfs_cat_file_lookup: error occurred while looking up the Catalog entry for "
+                    "the target of inum (cnid) = %" PRIuINUM " target",
+                    inum);
+                */
+            }
+            return 1;
+        }
+
+        // Target is NOT a hard link, so fall through to the non-hard link exit.
+    }
+
+    return 0;
+}
+uint8_t WombatForensics::hfs_UTF16toUTF8(TSK_FS_INFO * fs, uint8_t * uni, int ulen, char *asc, int alen, uint32_t flags)
+{
+    UTF8 *ptr8;
+    uint8_t *uniclean;
+    UTF16 *ptr16;
+    int i;
+    TSKConversionResult r;
+
+    // remove nulls from the Unicode string
+    // convert / to :
+    uniclean = (uint8_t *) tsk_malloc(ulen * 2);
+    if (!uniclean)
+        return 1;
+
+    memcpy(uniclean, uni, ulen * 2);
+
+    for (i = 0; i < ulen; ++i) {
+        uint16_t uc = tsk_getu16(fs->endian, uniclean + i * 2);
+
+
+        int changed = 0;
+        if (uc == UTF16_NULL) {
+            uc = UTF16_NULL_REPLACE;
+            changed = 1;
+        }
+        else if ((flags & HFS_U16U8_FLAG_REPLACE_SLASH)
+            && uc == UTF16_SLASH) {
+            uc = UTF16_COLON;
+            changed = 1;
+        }
+
+        else if ((flags & HFS_U16U8_FLAG_REPLACE_CONTROL)
+            && uc < UTF16_LEAST_PRINTABLE) {
+            uc = (uint16_t) UTF16_NULL_REPLACE;
+            changed = 1;
+        }
+
+        if (changed)
+            *((uint16_t *) (uniclean + i * 2)) =
+                tsk_getu16(fs->endian, (uint8_t *) & uc);
+    }
+
+    // convert to UTF-8
+    memset(asc, 0, alen);
+
+    ptr8 = (UTF8 *) asc;
+    ptr16 = (UTF16 *) uniclean;
+    r = tsk_UTF16toUTF8(fs->endian, (const UTF16 **) &ptr16,
+        (const UTF16 *) (&uniclean[ulen * 2]), &ptr8,
+        (UTF8 *) & asc[alen], TSKstrictConversion);
+
+    free(uniclean);
+    if (r != TSKconversionOK) {
+        tsk_error_set_errno(TSK_ERR_FS_UNICODE);
+        tsk_error_set_errstr
+            ("hfs_UTF16toUTF8: unicode conversion failed (%d)", (int) r);
+        return 1;
+    }
+
+    return 0;
+}
+
+uint8_t WombatForensics::hfs_cat_get_record_offset_cb(HFS_INFO * hfs, int8_t level_type, const void *targ_data, const hfs_btree_key_cat * cur_key, TSK_OFF_T key_off, void *ptr)
+{
+    const hfs_btree_key_cat *targ_key = (hfs_btree_key_cat *) targ_data;
+    //if (tsk_verbose)
+    //    tsk_fprintf(stderr,
+    //        "hfs_cat_get_record_offset_cb: %s node want: %" PRIu32
+    //        " vs have: %" PRIu32 "\n",
+    //        (level_type == HFS_BT_NODE_TYPE_IDX) ? "Index" : "Leaf",
+    //        tsk_getu32(hfs->fs_info.endian, targ_key->parent_cnid),
+    //        tsk_getu32(hfs->fs_info.endian, cur_key->parent_cnid));
+
+    if (level_type == HFS_BT_NODE_TYPE_IDX) {
+        int diff = hfs_cat_compare_keys(hfs, cur_key, targ_key);
+        if (diff < 0)
+            return HFS_BTREE_CB_IDX_LT;
+        else
+            return HFS_BTREE_CB_IDX_EQGT;
+    }
+    else {
+        int diff = hfs_cat_compare_keys(hfs, cur_key, targ_key);
+
+        // see if this record is for our file or if we passed the interesting entries
+        if (diff < 0) {
+            return HFS_BTREE_CB_LEAF_GO;
+        }
+        else if (diff == 0) {
+            TSK_OFF_T *off = (TSK_OFF_T *) ptr;
+            *off =
+                key_off + 2 + tsk_getu16(hfs->fs_info.endian,
+                cur_key->key_len);
+        }
+        return HFS_BTREE_CB_LEAF_STOP;
+    }
+}
+
+TSK_OFF_T WombatForensics::hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle)
+{
+    TSK_OFF_T off = 0;
+    if(hfs_cat_traverse(hfs, needle, hfs_cat_get_record_offset_cb, &off))
+    {
+        return 0;
+    }
+    return off;
+}
+
+uint8_t WombatForensics::hfs_cat_read_thread_record(HFS_INFO * hfs, TSK_OFF_T off, hfs_thread * thread)
+{
+    TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
+    uint16_t uni_len;
+    size_t cnt;
+
+    memset(thread, 0, sizeof(hfs_thread));
+    cnt = tsk_fs_attr_read(hfs->catalog_attr, off, (char *) thread, 10, (TSK_FS_FILE_READ_FLAG_ENUM)0);
+    if (cnt != 10) {
+            //tsk_error_reset();
+            //tsk_error_set_errno(TSK_ERR_FS_READ);
+        //tsk_error_set_errstr2("hfs_cat_read_thread_record: Error reading catalog offset %"PRIuOFF " (header)", off);
+        return 1;
+    }
+
+    if ((tsk_getu16(fs->endian, thread->rec_type) != HFS_FOLDER_THREAD)
+        && (tsk_getu16(fs->endian, thread->rec_type) != HFS_FILE_THREAD)) {
+        //tsk_error_set_errno(TSK_ERR_FS_GENFS);
+        //tsk_error_set_errstr("hfs_cat_read_thread_record: unexpected record type %" PRIu16,tsk_getu16(fs->endian, thread->rec_type));
+        return 1;
+    }
+
+    uni_len = tsk_getu16(fs->endian, thread->name.length);
+
+    if (uni_len > 255) {
+        //tsk_error_set_errno(TSK_ERR_FS_INODE_COR);
+        //tsk_error_set_errstr
+            //("hfs_cat_read_thread_record: invalid string length (%" PRIu16
+            //")", uni_len);
+        return 1;
+    }
+
+    cnt =
+        tsk_fs_attr_read(hfs->catalog_attr, off + 10, (char *) thread->name.unicode, uni_len * 2, (TSK_FS_FILE_READ_FLAG_ENUM)0);
+    if (cnt != uni_len * 2) {
+            //tsk_error_reset();
+            //tsk_error_set_errno(TSK_ERR_FS_READ);
+        //tsk_error_set_errstr2
+            //("hfs_cat_read_thread_record: Error reading catalog offset %"
+            //PRIuOFF " (name)", off + 10);
+        return 1;
+    }
+
+    return 0;
+}
+
+uint8_t WombatForensics::hfs_cat_read_file_folder_record(HFS_INFO * hfs, TSK_OFF_T off, hfs_file_folder * record)
+{
+    TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
+    size_t cnt;
+    char rec_type[2];
+
+    memset(record, 0, sizeof(hfs_file_folder));
+
+    cnt = tsk_fs_attr_read(hfs->catalog_attr, off, rec_type, 2, (TSK_FS_FILE_READ_FLAG_ENUM)0);
+    if (cnt != 2) {
+            //tsk_error_reset();
+            //tsk_error_set_errno(TSK_ERR_FS_READ);
+        //tsk_error_set_errstr2
+            //("hfs_cat_read_file_folder_record: Error reading record type from catalog offset %"
+            //PRIuOFF " (header)", off);
+        return 1;
+    }
+
+    if (tsk_getu16(fs->endian, rec_type) == HFS_FOLDER_RECORD) {
+        cnt =
+            tsk_fs_attr_read(hfs->catalog_attr, off, (char *) record, sizeof(hfs_folder), (TSK_FS_FILE_READ_FLAG_ENUM)0);
+        if (cnt != sizeof(hfs_folder)) {
+                //tsk_error_reset();
+                //tsk_error_set_errno(TSK_ERR_FS_READ);
+            //tsk_error_set_errstr2
+            //   ("hfs_cat_read_file_folder_record: Error reading catalog offset %"
+            //    PRIuOFF " (folder)", off);
+            return 1;
+        }
+    }
+    else if (tsk_getu16(fs->endian, rec_type) == HFS_FILE_RECORD) {
+        cnt =
+            tsk_fs_attr_read(hfs->catalog_attr, off, (char *) record, sizeof(hfs_file), (TSK_FS_FILE_READ_FLAG_ENUM)0);
+        if (cnt != sizeof(hfs_file)) {
+                //tsk_error_reset();
+                //tsk_error_set_errno(TSK_ERR_FS_READ);
+            //tsk_error_set_errstr2
+            //    ("hfs_cat_read_file_folder_record: Error reading catalog offset %"
+            //    PRIuOFF " (file)", off);
+            return 1;
+        }
+    }
+    else {
+        //tsk_error_set_errno(TSK_ERR_FS_GENFS);
+        //tsk_error_set_errstr
+        //    ("hfs_cat_read_file_folder_record: unexpected record type %"
+        //    PRIu16, tsk_getu16(fs->endian, rec_type));
+        return 1;
+    }
+
+    return 0;
+}
+
+int WombatForensics::hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2)
+{
+    TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
+    uint32_t cnid1, cnid2;
+
+    cnid1 = tsk_getu32(fs->endian, key1->parent_cnid);
+    cnid2 = tsk_getu32(fs->endian, key2->parent_cnid);
+
+    if (cnid1 < cnid2)
+        return -1;
+    if (cnid1 > cnid2)
+        return 1;
+
+    return hfs_unicode_compare(hfs, &key1->name, &key2->name);
+}
+
+uint8_t WombatForensics::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, TSK_HFS_BTREE_CB a_cb, void* ptr)
+{
+    TSK_FS_INFO *fs = &(hfs->fs_info);
+    uint32_t cur_node;          /* node id of the current node */
+    char *node;
+
+    uint16_t nodesize;
+    uint8_t is_done = 0;
+
+    //tsk_error_reset();
+
+    nodesize = tsk_getu16(fs->endian, hfs->catalog_header.nodesize);
+    if ((node = (char *) tsk_malloc(nodesize)) == NULL)
+        return 1;
+
+    /* start at root node */
+    cur_node = tsk_getu32(fs->endian, hfs->catalog_header.rootNode);
+
+    /* if the root node is zero, then the extents btree is empty */
+    /* if no files have overflow extents, the Extents B-tree still
+       exists on disk, but is an empty B-tree containing only
+       the header node */
+    if (cur_node == 0) {
+        //if (tsk_verbose)
+        //    tsk_fprintf(stderr, "hfs_cat_traverse: "
+        //        "empty extents btree\n");
+        free(node);
+        return 1;
+    }
+
+    //if (tsk_verbose)
+    //    tsk_fprintf(stderr, "hfs_cat_traverse: starting at "
+    //        "root node %" PRIu32 "; nodesize = %"
+    //        PRIu16 "\n", cur_node, nodesize);
+
+    /* Recurse down to the needed leaf nodes and then go forward */
+    is_done = 0;
+    while (is_done == 0) {
+        TSK_OFF_T cur_off;      /* start address of cur_node */
+        uint16_t num_rec;       /* number of records in this node */
+        ssize_t cnt;
+        hfs_btree_node *node_desc;
+
+        // sanity check 
+        if (cur_node > tsk_getu32(fs->endian,
+                hfs->catalog_header.totalNodes)) {
+     //       tsk_error_set_errno(TSK_ERR_FS_GENFS);
+     //       tsk_error_set_errstr
+     //           ("hfs_cat_traverse: Node %d too large for file", cur_node);
+            free(node);
+            return 1;
+        }
+
+        // read the current node
+        cur_off = cur_node * nodesize;
+        cnt = tsk_fs_attr_read(hfs->catalog_attr, cur_off, node, nodesize, (TSK_FS_FILE_READ_FLAG_ENUM)0);
+        if (cnt != nodesize) {
+            if (cnt >= 0) {
+     //           tsk_error_reset();
+     //           tsk_error_set_errno(TSK_ERR_FS_READ);
+            }
+     //       tsk_error_set_errstr2
+     //           ("hfs_cat_traverse: Error reading node %d at offset %"
+     //           PRIuOFF, cur_node, cur_off);
+            free(node);
+            return 1;
+        }
+
+        // process the header / descriptor
+        node_desc = (hfs_btree_node *) node;
+        num_rec = tsk_getu16(fs->endian, node_desc->num_rec);
+
+     //   if (tsk_verbose)
+     //       tsk_fprintf(stderr, "hfs_cat_traverse: node %" PRIu32
+     //           " @ %" PRIu64 " has %" PRIu16 " records\n",
+     //           cur_node, cur_off, num_rec);
+
+        if (num_rec == 0) {
+     //       tsk_error_set_errno(TSK_ERR_FS_GENFS);
+     //       tsk_error_set_errstr("hfs_cat_traverse: zero records in node %"
+     //           PRIu32, cur_node);
+            free(node);
+            return 1;
+        }
+
+        /* With an index node, find the record with the largest key that is smaller
+         * to or equal to cnid */
+        if (node_desc->type == HFS_BT_NODE_TYPE_IDX) {
+            uint32_t next_node = 0;
+            int rec;
+
+            for (rec = 0; rec < num_rec; rec++) {
+                size_t rec_off;
+                hfs_btree_key_cat *key;
+                uint8_t retval;
+
+                // get the record offset in the node
+                rec_off =
+                    tsk_getu16(fs->endian,
+                    &node[nodesize - (rec + 1) * 2]);
+                if (rec_off > nodesize) {
+       //             tsk_error_set_errno(TSK_ERR_FS_GENFS);
+       //             tsk_error_set_errstr
+       //                 ("hfs_cat_traverse: offset of record %d in index node %d too large (%d vs %"
+       //                 PRIu16 ")", rec, cur_node, (int) rec_off,
+       //                 nodesize);
+                    free(node);
+                    return 1;
+                }
+                key = (hfs_btree_key_cat *) & node[rec_off];
+
+                /*
+                   if (tsk_verbose)
+                   tsk_fprintf(stderr,
+                   "hfs_cat_traverse: record %" PRIu16
+                   " ; keylen %" PRIu16 " (%" PRIu32 ")\n", rec,
+                   tsk_getu16(fs->endian, key->key_len),
+                   tsk_getu32(fs->endian, key->parent_cnid));
+                 */
+
+                /* save the info from this record unless it is too big */
+                retval =
+                    a_cb(hfs, HFS_BT_NODE_TYPE_IDX, targ_data, key,
+                    cur_off + rec_off, ptr);
+                if (retval == HFS_BTREE_CB_ERR) {
+     //               tsk_error_set_errno(TSK_ERR_FS_GENFS);
+     //               tsk_error_set_errstr2
+     //                   ("hfs_cat_traverse: Callback returned error");
+                    free(node);
+                    return 1;
+                }
+                // record the closest entry
+                else if ((retval == HFS_BTREE_CB_IDX_LT)
+                    || (next_node == 0)) {
+                    hfs_btree_index_record *idx_rec;
+                    int keylen =
+                        2 + hfs_get_idxkeylen(hfs, tsk_getu16(fs->endian,
+                            key->key_len), &(hfs->catalog_header));
+                    if (rec_off + keylen > nodesize) {
+     //                   tsk_error_set_errno(TSK_ERR_FS_GENFS);
+     //                   tsk_error_set_errstr
+     //                       ("hfs_cat_traverse: offset of record and keylength %d in index node %d too large (%d vs %"
+     //                       PRIu16 ")", rec, cur_node,
+     //                       (int) rec_off + keylen, nodesize);
+                        free(node);
+                        return 1;
+                    }
+                    idx_rec =
+                        (hfs_btree_index_record *) & node[rec_off +
+                        keylen];
+                    next_node = tsk_getu32(fs->endian, idx_rec->childNode);
+                }
+                if (retval == HFS_BTREE_CB_IDX_EQGT) {
+                    // move down to the next node
+                    break;
+                }
+            }
+            // check if we found a relevant node
+            if (next_node == 0) {
+     //           tsk_error_set_errno(TSK_ERR_FS_GENFS);
+     //           tsk_error_set_errstr
+     //               ("hfs_cat_traverse: did not find any keys in index node %d",
+     //               cur_node);
+                is_done = 1;
+                break;
+            }
+            cur_node = next_node;
+        }
+
+        /* With a leaf, we look for the specific record. */
+        else if (node_desc->type == HFS_BT_NODE_TYPE_LEAF) {
+            int rec;
+
+            for (rec = 0; rec < num_rec; rec++) {
+                size_t rec_off;
+                hfs_btree_key_cat *key;
+                uint8_t retval;
+
+                // get the record offset in the node
+                rec_off =
+                    tsk_getu16(fs->endian,
+                    &node[nodesize - (rec + 1) * 2]);
+                if (rec_off > nodesize) {
+      //              tsk_error_set_errno(TSK_ERR_FS_GENFS);
+      //              tsk_error_set_errstr
+      //                  ("hfs_cat_traverse: offset of record %d in leaf node %d too large (%d vs %"
+      //                  PRIu16 ")", rec, cur_node, (int) rec_off,
+      //                  nodesize);
+                    free(node);
+                    return 1;
+                }
+                key = (hfs_btree_key_cat *) & node[rec_off];
+
+                /*
+                   if (tsk_verbose)
+                   tsk_fprintf(stderr,
+                   "hfs_cat_traverse: record %" PRIu16
+                   "; keylen %" PRIu16 " (%" PRIu32 ")\n", rec,
+                   tsk_getu16(fs->endian, key->key_len),
+                   tsk_getu32(fs->endian, key->parent_cnid));
+                 */
+                //                rec_cnid = tsk_getu32(fs->endian, key->file_id);
+
+                retval =
+                    a_cb(hfs, HFS_BT_NODE_TYPE_LEAF, targ_data, key,
+                    cur_off + rec_off, ptr);
+                if (retval == HFS_BTREE_CB_LEAF_STOP) {
+                    is_done = 1;
+                    break;
+                }
+                else if (retval == HFS_BTREE_CB_ERR) {
+      //              tsk_error_set_errno(TSK_ERR_FS_GENFS);
+      //              tsk_error_set_errstr2
+      //                  ("hfs_cat_traverse: Callback returned error");
+                    free(node);
+                    return 1;
+                }
+            }
+
+            // move right to the next node if we got this far
+            if (is_done == 0) {
+                cur_node = tsk_getu32(fs->endian, node_desc->flink);
+                if (cur_node == 0) {
+                    is_done = 1;
+                }
+      //          if (tsk_verbose)
+      //              tsk_fprintf(stderr,
+      //                  "hfs_cat_traverse: moving forward to next leaf");
+            }
+        }
+        else {
+      //      tsk_error_set_errno(TSK_ERR_FS_GENFS);
+      //      tsk_error_set_errstr("hfs_cat_traverse: btree node %" PRIu32
+      //          " (%" PRIu64 ") is neither index nor leaf (%" PRIu8 ")",
+      //          cur_node, cur_off, node_desc->type);
+            free(node);
+            return 1;
+        }
+    }
+    free(node);
+    return 0;
+}
 
 //void SecondaryProcessing(SecondaryProcessObject &secprocobj)
 //void SecondaryProcessing(QVariantMap &jsonstore)
