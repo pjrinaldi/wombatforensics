@@ -813,7 +813,7 @@ void WombatForensics::AddNewEvidence()
     }
     free(images);
     QSqlQuery evidquery(fcasedb);
-    evidquery.prepare("INSERT INTO data(objecttype, type, size, name, fullpath) VALUES(1, ?, ?, ?, ?);");
+    evidquery.prepare("INSERT INTO data (objecttype, type, size, name, fullpath) VALUES(1, ?, ?, ?, ?);");
     evidquery.addBindValue(readimginfo->itype);
     evidquery.addBindValue((unsigned long long)readimginfo->size);
     evidquery.addBindValue(wombatvariable.currentevidencename);
