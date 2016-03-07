@@ -478,7 +478,7 @@ void WombatForensics::CreateCaseDB()
     wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
     wombattableschema << "CREATE TABLE attributes(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
     wombattableschema << "CREATE TABLE properties(id INTEGER PRIMARY KEY, objectid INTEGER, name TEXT, description TEXT, value BLOB);";
-    wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, address INTEGER, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, checked INTEGER NOT NULL DEFAULT 0, mftattrid INTEGER NOT NULL DEFAULT 0);";
+    wombattableschema << "CREATE TABLE data(id INTEGER PRIMARY KEY, objtype INTEGER, type INTEGER, name TEXT, fullpath TEXT, addr INTEGER, parid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, mftattrid INTEGER, checked INTEGER NOT NULL DEFAULT 0)";
     if(!fcasedb.isOpen())
         fcasedb.open();
     fcasedb.transaction();
@@ -813,29 +813,23 @@ void WombatForensics::AddNewEvidence()
     }
     free(images);
     QSqlQuery evidquery(fcasedb);
-    if(evidquery.prepare("INSERT INTO data (objecttype, type, size, name, fullpath) VALUES (1, ?, ?, ?, ?);"))
-    {
-        evidquery.bindValue(0, (int)readimginfo->itype, QSql::In);
-        evidquery.bindValue(1, (unsigned long long)readimginfo->size, QSql::In);
-        evidquery.bindValue(2, wombatvariable.evidenceobject.name, QSql::In);
-        evidquery.bindValue(3, QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[0]), QSql::In);
-        if(evidquery.exec())
-        {
-            wombatvariable.evidenceobject.id = evidquery.lastInsertId().toULongLong();
-            qDebug() << "eviqueryid:" << evidquery.lastInsertId().toInt();
-        }
-        else
-            qDebug() << "exec error:" << fcasedb.lastError().text();
-    }
-    else
-        qDebug() << "prepare error:" << fcasedb.lastError().text();
+    evidquery.prepare("INSERT INTO data (objtype, type, name, fullpath) VALUES (1, ?, ?, ?)");
+    evidquery.bindValue(0, (int)readimginfo->itype, QSql::In);
+    evidquery.bindValue(1, wombatvariable.evidenceobject.name, QSql::In);
+    evidquery.bindValue(2, QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[0]), QSql::In);
+    evidquery.exec();
+    wombatvariable.evidenceobject.id = evidquery.lastInsertId().toULongLong();
     evidquery.finish();
-    qDebug() << "evid:" << wombatvariable.evidenceobject.id;
-    /*
-    for(unsigned int i=0; i < wombatptr->evidenceobject.itemcount; i++)
+    for(unsigned int i=0; i < wombatvariable.evidenceobject.itemcount; i++)
     {
-        
-    }*/
+        QSqlQuery runquery(fcasedb);
+        runquery.prepare("INSERT INTO dataruns (objectid, fullpath, seqnum) VALUES (?, ?, ?)");
+        runquery.bindValue(0, wombatvariable.evidenceobject.id);
+        runquery.bindValue(1, QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]));
+        runquery.bindValue(2, i+1);
+        runquery.exec();
+        runquery.finish();
+    }
 }
 
 void WombatForensics::InitializeEvidenceStructure()
