@@ -479,21 +479,16 @@ void WombatForensics::CreateCaseDB()
     wombattableschema << "CREATE TABLE attributes(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
     wombattableschema << "CREATE TABLE properties(id INTEGER PRIMARY KEY, objectid INTEGER, name TEXT, description TEXT, value BLOB);";
     wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, address INTEGER, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, checked INTEGER NOT NULL DEFAULT 0, mftattrid INTEGER NOT NULL DEFAULT 0);";
-    if(fcasedb.isOpen())
+    if(!fcasedb.isOpen())
+        fcasedb.open();
+    fcasedb.transaction();
+    QSqlQuery casequery(fcasedb);
+    for(int i=0; i < wombattableschema.count(); i++)
     {
-        fcasedb.transaction();
-        QSqlQuery casequery(fcasedb);
-        for(int i=0; i < wombattableschema.count(); i++)
-        {
-            casequery.exec(wombattableschema.at(i));
-        }
-        fcasedb.commit();
-        casequery.finish();
+        casequery.exec(wombattableschema.at(i));
     }
-    else
-    {
-        LogMessage(fcasedb.lastError().text());
-    }
+    fcasedb.commit();
+    casequery.finish();
 }
 
 void WombatForensics::OpenCaseDB()
@@ -509,7 +504,7 @@ void WombatForensics::InitializeCaseStructure()
     wombatvariable.caseobject.name = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
     if(ok && !wombatvariable.caseobject.name.isEmpty())
     {
-        InsertCase(); // used to be wombatdatabase
+        InsertCase();
         this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name); // update application window
         // make cases folder
         QString casestring = QString::number(wombatvariable.caseobject.id) + "-" + wombatvariable.caseobject.name;
@@ -542,7 +537,7 @@ void WombatForensics::InitializeCaseStructure()
         wombatvariable.caseobject.dbname = wombatvariable.caseobject.dirpath + casestring + ".db";
         fcasedb = QSqlDatabase::database("casedb"); 
         if(!fcasedb.isValid())
-            fcasedb = QSqlDatabase::addDatabase("QSQLITE", "casedb"); // may not need this
+            fcasedb = QSqlDatabase::addDatabase("QSQLITE", "casedb");
         fcasedb.setDatabaseName(wombatvariable.caseobject.dbname);
         if(!FileExists(wombatvariable.caseobject.dbname.toStdString()))
         {
@@ -817,7 +812,18 @@ void WombatForensics::AddNewEvidence()
         errorcount++;
     }
     free(images);
-    //QSqlQuery addevidquery(fcasedb);
+    QSqlQuery evidquery(fcasedb);
+    evidquery.prepare("INSERT INTO data (objecttype, type, size, name, fullpath) VALUES(1, ?, ?, ?, ?);");
+    evidquery.addBindValue(0, readimginfo->itype);
+    evidquery.addBindValue((unsigned long long)readimginfo->size);
+    evidquery.addBindValue(wombatvariable.currentevidencename);
+    evidquery.addBindValue(QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[0]));
+    evidquery.exec();
+    evidquery.next();
+    wombatvariable.currentevidenceid = evidquery.lastInsertId().toULongLong();
+    qDebug() << wombatvariable.currentevidenceid;
+    evidquery.finish();
+
 }
 
 void WombatForensics::InitializeEvidenceStructure()
