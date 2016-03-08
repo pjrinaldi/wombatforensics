@@ -137,7 +137,7 @@ public:
                 return QVariant();
         }
         QSqlQuery dataquery(fcasedb);
-        dataquery.prepare("SELECT objecttype, type FROM data WHERE objectid = ?;");
+        dataquery.prepare("SELECT objtype, type FROM data WHERE id = ?;");
         dataquery.bindValue(0, node->nodevalues.at(0).toULongLong());
         dataquery.exec();
         dataquery.next();
@@ -365,7 +365,7 @@ public:
             {
                 Node* parentnode = NodeFromIndex(index);
                 QSqlQuery childupdatequery(fcasedb);
-                childupdatequery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE objectid = ?;");
+                childupdatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ?;");
                 //childupdatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
                 for(int i=0; i < parentnode->children.count(); i++)
                 {
@@ -397,7 +397,7 @@ public:
             {
                 Node* currentnode = NodeFromIndex(index);
                 QSqlQuery updatequery(fcasedb);
-                updatequery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE objectid = ?;");
+                updatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ?;");
                 //updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
                 updatequery.addBindValue(currentnode->nodevalues.at(0).toULongLong());
                 updatequery.exec();
@@ -436,7 +436,7 @@ public:
             Node* startnode = NodeFromIndex(topleftindex);
             Node* endnode = NodeFromIndex(botrightindex);
             QSqlQuery updatequery(fcasedb);
-            updatequery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE objectid == ? OR objectid == ?;");
+            updatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id == ? OR id == ?;");
             //updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid == ? OR objectid == ?;");
             updatequery.addBindValue(startnode->nodevalues.at(0).toULongLong());
             updatequery.exec();
@@ -543,7 +543,7 @@ public:
         if(parentnode->haschildren == true)
         {
             QSqlQuery prequery(fcasedb);
-            prequery.prepare("SELECT address, parimgid, parfsid from data where objectid = ?;");
+            prequery.prepare("SELECT addr, parimgid, parfsid from data where id = ?;");
             prequery.bindValue(0, parentnode->nodevalues.at(0).toULongLong());
             prequery.exec();
             prequery.next();
@@ -553,7 +553,7 @@ public:
             prequery.finish();
 
             QSqlQuery fetchquery(fcasedb);
-            fetchquery.prepare("SELECT objectid, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, checked, address, parimgid, parfsid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ? AND parfsid = ?;");
+            fetchquery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, checked, addr, parimgid, parfsid FROM data WHERE (objtype = 5 OR objtype = 6) AND parid = ? AND parimgid = ? AND parfsid = ?;");
             fetchquery.bindValue(0, parentaddress);
             fetchquery.bindValue(1, parentimgid);
             fetchquery.bindValue(2, parentfsid);
@@ -679,7 +679,7 @@ public:
     {
         int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
-        addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, checked FROM data WHERE objectid = ? OR (objecttype < 6 AND parimgid = ?)");
+        addevidquery.prepare("SELECT id, name, fullpath, size, objtype, addr, crtime, atime, mtime, ctime, md5, parid, type, parimgid, parfsid, filemime, checked FROM data WHERE id = ? OR (objtype < 6 AND parimgid = ?)");
         //addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
         addevidquery.addBindValue(curid);
         addevidquery.addBindValue(curid);
@@ -699,8 +699,8 @@ public:
                 colvalues.append(addevidquery.value(8));
                 colvalues.append(addevidquery.value(9));
                 colvalues.append(addevidquery.value(10));
-                colvalues.append(addevidquery.value(16));
-                colvalues.append(addevidquery.value(16).toString().split("/").at(0));
+                colvalues.append(addevidquery.value(15));
+                colvalues.append(addevidquery.value(15).toString().split("/").at(0));
                 //for(int i=0; i < addevidquery.record().count(); i++)
                 //    colvalues.append(addevidquery.value(i));
                 currentnode = new Node(colvalues);
@@ -726,11 +726,11 @@ public:
                 }
                 else if(addevidquery.value(4).toInt() == 3) //else if(currentnode->nodevalues.at(4).toInt() == 3) // determine if its an unallocated partition space
                 {
-                    if(addevidquery.value(15).toInt() == 2) //if(currentnode->nodevalues.at(15).toInt() == 2) // unallocated partition, add to parent as a child.
-                    {
-                        currentnode->parent = parentnode;
-                        parentnode->children.append(currentnode); 
-                    }
+                    //if(addevidquery.value(15).toInt() == 2) //if(currentnode->nodevalues.at(15).toInt() == 2) // unallocated partition, add to parent as a child.
+                    //{
+                    currentnode->parent = parentnode;
+                    parentnode->children.append(currentnode); 
+                    //}
                 }
                 // THERE SHOULD ONLY BE PARTITION OBJECTS, OBJECTTYPE == 3, FOR UNALLOCATED SPACES....
                 else if(addevidquery.value(4).toInt() == 4) //else if(currentnode->nodevalues.at(4).toInt() == 4) // filesystem
@@ -781,9 +781,9 @@ public:
                         filequery.finish();
                     }
                 }
-                if(addevidquery.value(17).toInt() == 0)
+                if(addevidquery.value(16).toInt() == 0)
                     currentnode->checkstate = 0;
-                else if(addevidquery.value(17).toInt() == 1)
+                else if(addevidquery.value(16).toInt() == 1)
                     currentnode->checkstate = 1;
                 else
                     currentnode->checkstate = 2;

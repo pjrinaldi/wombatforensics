@@ -830,7 +830,7 @@ void SqlMap(FileData &filedata)
     QMutexLocker locker(&mutex);
     QSqlQuery fquery(fcasedb);
     //wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, address INTEGER, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT NOT NULL DEFAULT "", filemime TEXT, known INTEGER, checked INTEGER NOT NULL DEFAULT 0, mftattrid INTEGER NOT NULL DEFAULT 0);";
-    fquery.prepare("INSERT INTO data(objecttype, type, name, fullpath, address, parentid, parimgid, parfsid, ctime, crtime, atime, mtime, filemime, mftattrid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+    fquery.prepare("INSERT INTO data(objtype, type, name, fullpath, addr, parid, parimgid, parfsid, ctime, crtime, atime, mtime, filemime, mftattrid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
     if(filedata.mftattrid == 0)
     {
         fquery.bindValue(0, 5);
