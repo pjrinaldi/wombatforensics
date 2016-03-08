@@ -959,6 +959,7 @@ void WombatForensics::AddNewEvidence()
         errorcount++;
     }
     free(images);
+    fsobjectlist.clear();
     QSqlQuery evidquery(fcasedb);
     evidquery.prepare("INSERT INTO data (objtype, type, size, name, fullpath) VALUES (1, ?, ?, ?, ?)");
     evidquery.bindValue(0, (int)readimginfo->itype);
@@ -1012,6 +1013,11 @@ void WombatForensics::AddNewEvidence()
         fsquery.exec();
         currentfilesystemid = fsquery.lastInsertId().toULongLong();
         fsquery.finish();
+
+        FileSystemObject tmpobject;
+        tmpobject.id = currentfilesystemid;
+        tmpobject.rootinum = readfsinfo->root_inum;
+        fsobjectlist.append(tmpobject);
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
@@ -1050,6 +1056,10 @@ void WombatForensics::AddNewEvidence()
                         fsquery.exec();
                         currentfilesystemid = fsquery.lastInsertId().toULongLong();
                         fsquery.finish();
+                        FileSystemObject tmpobject;
+                        tmpobject.id = currentfilesystemid;
+                        tmpobject.rootinum = readfsinfo->root_inum;
+                        fsobjectlist.append(tmpobject);
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);

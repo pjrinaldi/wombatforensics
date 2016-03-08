@@ -297,7 +297,7 @@ public:
                 else
                     return node->nodevalues.at(index.column());
             }
-            else if(index.column() >= 6 && index.column() <= 9)
+            else if(index.column() >= 4 && index.column() <= 7)
             {
                 char buf[128];
                 QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
@@ -713,7 +713,7 @@ public:
                 //if(currentnode->nodevalues.at(4).toInt() == 1) // image file
                 if(addevidquery.value(4).toInt() == 1) // image file
                 {
-                    //filesystemcount = 0;
+                    filesystemcount = 0;
                     rootnode->children.append(currentnode);
                     rootnode->childcount++;
                     rootnode->haschildren = rootnode->HasChildren();
@@ -743,10 +743,10 @@ public:
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
-                    currentnode->childcount = GetChildCount(4, addevidquery.value(5).toULongLong(), curid, currentnode->nodevalues.at(0).toULongLong());
+                    //currentnode->childcount = GetChildCount(4, addevidquery.value(5).toULongLong(), curid, currentnode->nodevalues.at(0).toULongLong());
                     if(filesystemcount <= fsobjectlist.count())
                     {
-                        //currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid, currentnode->nodevalues.at(0).toULongLong());
+                        currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid, currentnode->nodevalues.at(0).toULongLong());
                         filesystemcount++;
                     }
                     currentnode->haschildren = currentnode->HasChildren();
