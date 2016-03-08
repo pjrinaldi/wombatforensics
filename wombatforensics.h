@@ -551,6 +551,8 @@ public:
             unsigned long long parentaddress = prequery.value(0).toULongLong();
             unsigned long long parentimgid = prequery.value(1).toULongLong();
             unsigned long long parentfsid = prequery.value(2).toULongLong();
+            if(parentfsid == 0)
+                parentfsid = parentnode->nodevalues.at(0).toULongLong();
             prequery.finish();
 
             QSqlQuery fetchquery(fcasedb);
@@ -600,6 +602,7 @@ public:
                 emit checkedNodesChanged();
                 setData(parent, QVariant(-15), Qt::DisplayRole);
             }
+            fetchquery.finish();
 
 
 
@@ -753,7 +756,7 @@ public:
                     Node* rootdirectory = 0;
                     for(int j=0; j < fsobjectlist.count(); j++)
                     {
-                        filequery.prepare("SELECT parfsid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parimgid = ? AND parid = ? AND parfsid = ?)");
+                        filequery.prepare("SELECT parfsid FROM data WHERE (objtype = 5 OR objtype = 6) AND parimgid = ? AND parid = ? AND parfsid = ?)");
                         filequery.addBindValue(curid);
                         filequery.addBindValue(fsobjectlist.at(j).rootinum);
                         filequery.addBindValue(fsobjectlist.at(j).id);
