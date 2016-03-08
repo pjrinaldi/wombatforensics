@@ -764,7 +764,6 @@ void WombatForensics::InitializeQueryModel()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
-    /*
     if(previtem.indexes().count() > 0)
         oldselectedindex = previtem.indexes().at(0);
     if(curitem.indexes().count() > 0)
@@ -776,13 +775,13 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
         ui->actionByteConverter->setEnabled(true);
-        wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
-        wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
-        wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
-        LoadHexContents();
-        if(propertywindow->isVisible())
-            UpdateProperties();
-    }*/
+        //wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
+        //wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
+        //wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
+        //LoadHexContents();
+        //if(propertywindow->isVisible())
+        //    UpdateProperties();
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void WombatForensics::TreeContextMenu(const QPoint &pt)
@@ -1109,7 +1108,7 @@ void WombatForensics::UpdateStatus()
     tsk_img_close(readimginfo);
     readimginfo = NULL;
     treemodel->AddEvidence(wombatvariable.evidenceobject.id);
-    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    //ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     //treemodel->RemEvidence(wombatvarptr->currentevidenceid);
     //treemodel->AddEvidence(wombatvarptr->currentevidenceid);
     ui->actionRemove_Evidence->setEnabled(true);

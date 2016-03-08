@@ -545,6 +545,7 @@ public:
             QSqlQuery prequery(fcasedb);
             prequery.prepare("SELECT addr, parimgid, parfsid from data where id = ?;");
             prequery.bindValue(0, parentnode->nodevalues.at(0).toULongLong());
+            qDebug() << "curid:" << parentnode->nodevalues.at(0).toULongLong();
             prequery.exec();
             prequery.next();
             unsigned long long parentaddress = prequery.value(0).toULongLong();
@@ -554,6 +555,7 @@ public:
 
             QSqlQuery fetchquery(fcasedb);
             fetchquery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, checked, addr, parimgid, parfsid FROM data WHERE (objtype = 5 OR objtype = 6) AND parid = ? AND parimgid = ? AND parfsid = ?;");
+            qDebug() << "parid:" << parentaddress << "parimgid:" << parentimgid << "parfsid:" << parentfsid;
             fetchquery.bindValue(0, parentaddress);
             fetchquery.bindValue(1, parentimgid);
             fetchquery.bindValue(2, parentfsid);
@@ -677,7 +679,7 @@ public:
 
     void AddEvidence(unsigned long long curid)
     {
-        //int filesystemcount;
+        int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
         addevidquery.prepare("SELECT id, name, fullpath, size, objtype, addr, crtime, atime, mtime, ctime, md5, parid, type, parimgid, parfsid, filemime, checked FROM data WHERE id = ? OR (objtype < 6 AND parimgid = ?)");
         //addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
@@ -738,11 +740,11 @@ public:
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
                     currentnode->childcount = GetChildCount(4, addevidquery.value(5).toULongLong(), curid, currentnode->nodevalues.at(0).toULongLong());
-                    //if(filesystemcount <= fsobjectlist.count())
-                    //{
+                    if(filesystemcount <= fsobjectlist.count())
+                    {
                         //currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid, currentnode->nodevalues.at(0).toULongLong());
-                        //filesystemcount++;
-                    //}
+                        filesystemcount++;
+                    }
                     currentnode->haschildren = currentnode->HasChildren();
                 }
                 else if(addevidquery.value(4).toInt() == 5 || addevidquery.value(4).toInt() == 6) // file at rootinum...
@@ -751,7 +753,7 @@ public:
                     Node* rootdirectory = 0;
                     for(int j=0; j < fsobjectlist.count(); j++)
                     {
-                        filequery.prepare("SELECT parfsid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parimgid = ? AND parentid = ? AND parfsid = ?)");
+                        filequery.prepare("SELECT parfsid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parimgid = ? AND parid = ? AND parfsid = ?)");
                         filequery.addBindValue(curid);
                         filequery.addBindValue(fsobjectlist.at(j).rootinum);
                         filequery.addBindValue(fsobjectlist.at(j).id);
