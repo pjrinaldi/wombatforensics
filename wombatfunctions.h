@@ -29,4 +29,5 @@ void cnid_to_array(uint32_t cnid, uint8_t array[4]);
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr);
 QString GetFilePermissions(TSK_FS_META* tmpmeta);
 QImage MakeThumb(const QString &img);
+void SqlMap(FileData &filedata);
 #endif // wombatfunctions.h

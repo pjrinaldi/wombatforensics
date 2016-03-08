@@ -131,6 +131,7 @@ void WombatFramework::OpenFiles() // open the files and add to file info vector
     */
 //}
 
+/*
 void SqlMap(FileData &filedata)
 {
     QMutexLocker locker(&mutex);
@@ -158,20 +159,18 @@ void SqlMap(FileData &filedata)
     fquery.bindValue(11, filedata.mtime);
     fquery.bindValue(12, filedata.mimetype);
     fquery.bindValue(13, filedata.mftattrid);
-    /*
     fquery.bindValue(4, filedata.paraddr);
     fquery.bindValue(4, filedata.path);
     fquery.bindValue(6, filedata.ctime);
     fquery.bindValue(9, filedata.size);
     fquery.bindValue(10, filedata.addr);
     //fquery.bindValue(14, filedata.mimetype.split("/").at(0));
-    */
     fquery.exec();
     //fquery.next();
     isignals->ProgUpd();
     //emit isignals->FinishSql();
     fquery.finish();
-}
+}*/
 /*
 void WombatFramework::CloseInfoStructures() // close all open info structures
 {

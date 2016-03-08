@@ -658,15 +658,32 @@ void WombatForensics::InitializeOpenCase()
 
 void WombatForensics::InitializeQueryModel()
 {
-    StatusUpdate("Building Evidence Tree...");
-    LogMessage("Building Evidence Tree...");
-    //treemodel->AddEvidence(wombatvarptr->currentevidenceid);
-    //ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    StatusUpdate("Building Initial Evidence Tree...");
+    LogMessage("Building Initial Evidence Tree...");
+    treemodel->AddEvidence(currentevidenceid);
+    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    secondwatcher.setFuture(QtConcurrent::map(filedatavector, SqlMap));
+    /*
+     *
+     *
+     *
+     *
+    //connect(secondwatcher, SIGNAL(finished()), isignals, SLOT(FinishSql()), Qt::QueuedConnection);
+    //secondwatcher.setFuture(QtConcurrent::map(filedatavector, SqlMap));
+
+     /*
+     *
+     *
+     *
+     *
+     *
+     *
+     *
     //ResizeColumns();
-    StatusUpdate("Evidence Added. Begin File Structure Analysis...");
-    LogMessage("Evidence Added. Begin File Structure Analysis...");
-    StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
-    LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
+    //StatusUpdate("Evidence Added. Begin File Structure Analysis...");
+    //LogMessage("Evidence Added. Begin File Structure Analysis...");
+    //StatusUpdate("File Structure Analysis Finished. Begin Secondary Processing...");
+    //LogMessage("File Structure Analysis Finished. Begin Secondary Processing...");
     /*
     secondprocessvector.clear();
     //jsonstorevector.clear();
@@ -954,6 +971,7 @@ void WombatForensics::AddNewEvidence()
     evidquery.exec();
     wombatvariable.evidenceobject.id = evidquery.lastInsertId().toULongLong();
     evidquery.finish();
+    currentevidenceid = wombatvariable.evidenceobject.id;
     for(unsigned int i=0; i < wombatvariable.evidenceobject.itemcount; i++)
     {
         QSqlQuery runquery(fcasedb);
@@ -995,8 +1013,11 @@ void WombatForensics::AddNewEvidence()
         fsquery.bindValue(4, GetFileSystemLabel(readfsinfo));
         fsquery.bindValue(5, (unsigned long long)readfsinfo->root_inum);
         fsquery.exec();
-        wombatvariable.currentfilesystemid = fsquery.lastInsertId().toULongLong();
+        currentfilesystemid = fsquery.lastInsertId().toULongLong();
         fsquery.finish();
+        uint8_t walkreturn;
+        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+        walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
     }
     else
     {
@@ -1030,13 +1051,22 @@ void WombatForensics::AddNewEvidence()
                         fsquery.bindValue(4, (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count);
                         fsquery.bindValue(5, (unsigned long long)readfsinfo->root_inum);
                         fsquery.exec();
+                        currentfilesystemid = fsquery.lastInsertId().toULongLong();
                         fsquery.finish();
+                        uint8_t walkreturn;
+                        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+                        walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+                        if(walkreturn == 1)
+                        {
+                            LogMessage("Issues with traversing the file structure were encountered");
+                            errorcount++;
+                        }
                     }
                 }
             }
         }
     }
-    // finished initial partition/file system information, now onto the file information...
+    // finished initial partition/file system information including file info stored into the vector 
 }
 
 void WombatForensics::InitializeEvidenceStructure()
@@ -1071,21 +1101,19 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
-
-    /*
     //tsk_img_close(IMG_2ND_PROC);
     filedatavector.clear();
-    treemodel->RemEvidence(wombatvarptr->currentevidenceid);
-    treemodel->AddEvidence(wombatvarptr->currentevidenceid);
+
+    //treemodel->RemEvidence(wombatvarptr->currentevidenceid);
+    //treemodel->AddEvidence(wombatvarptr->currentevidenceid);
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
-    ResizeColumns();
+    //ResizeColumns();
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
-    wombatframework->CloseInfoStructures();
-    */
+    //wombatframework->CloseInfoStructures();
 }
 
 void WombatForensics::UpdateDigging()

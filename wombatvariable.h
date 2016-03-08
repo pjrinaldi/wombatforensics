@@ -160,7 +160,7 @@ struct WombatVariable
     //unsigned long long currentevidenceid;
     unsigned long long currentvolumeid;
     //unsigned long long currentpartitionid;
-    unsigned long long currentfilesystemid;
+    //unsigned long long currentfilesystemid;
     unsigned long long currentrootinum;
     QString currentevidencename;
     //QString currentvolumename;

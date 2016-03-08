@@ -28,6 +28,6 @@ private:
     //QFutureWatcher<void> secondwatcher;
 };
 
-void SqlMap(FileData &filedata);
+//void SqlMap(FileData &filedata);
 
 #endif // WOMBATFRAMEWORK_H
