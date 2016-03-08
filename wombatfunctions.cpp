@@ -46,12 +46,12 @@ unsigned long long GetChildCount(int type, unsigned long long address, unsigned 
 {
     unsigned long long tmpcount = 0;
     QSqlQuery childquery(fcasedb);
-    QString querystring = "SELECT COUNT(objectid) FROM data WHERE parentid = ?";
+    QString querystring = "SELECT COUNT(id) FROM data WHERE parid = ?";
     if(type < 4)
-        querystring += " AND objecttype < 5";
+        querystring += " AND objtype < 5";
     else
     {
-        querystring += " AND objecttype >= 5 AND parfsid = ?";
+        querystring += " AND objtype >= 5 AND parfsid = ?";
     }
     if(type != 1)
         querystring += " AND parimgid = ?";

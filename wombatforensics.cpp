@@ -660,8 +660,6 @@ void WombatForensics::InitializeQueryModel()
 {
     StatusUpdate("Building Initial Evidence Tree...");
     LogMessage("Building Initial Evidence Tree...");
-    treemodel->AddEvidence(currentevidenceid);
-    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     secondwatcher.setFuture(QtConcurrent::map(filedatavector, SqlMap));
     /*
      *
@@ -1103,14 +1101,22 @@ void WombatForensics::UpdateStatus()
 {
     //tsk_img_close(IMG_2ND_PROC);
     filedatavector.clear();
-
+    readfileinfo = NULL;
+    tsk_fs_close(readfsinfo);
+    readfsinfo = NULL;
+    tsk_vs_close(readvsinfo);
+    readvsinfo = NULL;
+    tsk_img_close(readimginfo);
+    readimginfo = NULL;
+    treemodel->AddEvidence(wombatvariable.evidenceobject.id);
+    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     //treemodel->RemEvidence(wombatvarptr->currentevidenceid);
     //treemodel->AddEvidence(wombatvarptr->currentevidenceid);
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
-    //ResizeColumns();
+    ResizeColumns();
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
     //wombatframework->CloseInfoStructures();
@@ -1856,12 +1862,10 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
-    /*
     for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
     {
         ui->dirTreeView->resizeColumnToContents(i);
     }
-    */
 }
 
 void WombatForensics::SetupHexPage(void)

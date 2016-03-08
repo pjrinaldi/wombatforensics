@@ -677,7 +677,7 @@ public:
 
     void AddEvidence(unsigned long long curid)
     {
-        int filesystemcount;
+        //int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
         addevidquery.prepare("SELECT id, name, fullpath, size, objtype, addr, crtime, atime, mtime, ctime, md5, parid, type, parimgid, parfsid, filemime, checked FROM data WHERE id = ? OR (objtype < 6 AND parimgid = ?)");
         //addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
@@ -707,7 +707,7 @@ public:
                 //if(currentnode->nodevalues.at(4).toInt() == 1) // image file
                 if(addevidquery.value(4).toInt() == 1) // image file
                 {
-                    filesystemcount = 0;
+                    //filesystemcount = 0;
                     rootnode->children.append(currentnode);
                     rootnode->childcount++;
                     rootnode->haschildren = rootnode->HasChildren();
@@ -737,11 +737,12 @@ public:
                 {
                     currentnode->parent = parentnode;
                     parentnode->children.append(currentnode);
-                    if(filesystemcount <= fsobjectlist.count())
-                    {
-                        currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid, currentnode->nodevalues.at(0).toULongLong());
-                        filesystemcount++;
-                    }
+                    currentnode->childcount = GetChildCount(4, addevidquery.value(5).toULongLong(), curid, currentnode->nodevalues.at(0).toULongLong());
+                    //if(filesystemcount <= fsobjectlist.count())
+                    //{
+                        //currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid, currentnode->nodevalues.at(0).toULongLong());
+                        //filesystemcount++;
+                    //}
                     currentnode->haschildren = currentnode->HasChildren();
                 }
                 else if(addevidquery.value(4).toInt() == 5 || addevidquery.value(4).toInt() == 6) // file at rootinum...
