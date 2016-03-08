@@ -292,7 +292,7 @@ public:
             if(index.column() == 2)
             {
                 //if(node->nodevalues.at(4).toInt() == 1)
-                if(dataquery.value(0).toInt() == 1)
+                if(nodetype == 1)
                     return QString("");
                 else
                     return node->nodevalues.at(index.column());
@@ -429,6 +429,7 @@ public:
 
     void dataChanged(const QModelIndex &topleftindex, const QModelIndex &botrightindex, const QVector<int> &roles = QVector<int>())
     {
+        /*
         foreach(int role, roles)
         {
         if(role == Qt::DisplayRole)
@@ -436,7 +437,7 @@ public:
             Node* startnode = NodeFromIndex(topleftindex);
             Node* endnode = NodeFromIndex(botrightindex);
             QSqlQuery updatequery(fcasedb);
-            updatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id == ? OR id == ?;");
+            updatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ? OR id = ?;");
             //updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid == ? OR objectid == ?;");
             updatequery.addBindValue(startnode->nodevalues.at(0).toULongLong());
             updatequery.exec();
@@ -448,7 +449,7 @@ public:
             endnode->nodevalues[8] = updatequery.value(8).toString();
             updatequery.finish();
         }
-        }
+        }*/
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
