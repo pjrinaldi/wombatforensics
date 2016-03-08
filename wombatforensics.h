@@ -1116,7 +1116,7 @@ private:
     WombatVariable wombatvariable;
     TSK_IMG_INFO* readimginfo;
     TSK_VS_INFO* readvsinfo;
-    TSK_VS_PART_INFO* readpartinfo;
+    const TSK_VS_PART_INFO* readpartinfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
     char asc[512];
