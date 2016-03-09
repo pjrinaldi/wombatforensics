@@ -291,15 +291,15 @@ public:
         */
         if(role == Qt::DisplayRole)
         {
-            if(index.column() == 2)
-            {
+            //if(index.column() == 2)
+            //{
                 //if(node->nodevalues.at(4).toInt() == 1)
-                if(nodetype == 1)
-                    return QString("");
-                else
-                    return node->nodevalues.at(index.column());
-            }
-            else if(index.column() >= 4 && index.column() <= 7)
+                //if(nodetype == 1)
+                //    return QString("");
+                //else
+                //    return node->nodevalues.at(index.column());
+            //}
+            if(index.column() >= 4 && index.column() <= 7)
             {
                 char buf[128];
                 QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
@@ -363,6 +363,7 @@ public:
         }
         if(role == Qt::DisplayRole)
         {
+            /*
             if(value.toInt() == -15)
             {
                 Node* parentnode = NodeFromIndex(index);
@@ -385,31 +386,20 @@ public:
                     parentnode->children.at(i)->nodevalues[8] = childupdatequery.value(8);
                     parentnode->children.at(i)->nodevalues[9] = childupdatequery.value(9);
                     parentnode->children.at(i)->nodevalues[10] = QVariant(childupdatequery.value(9).toString().split("/").at(0));
-                    /*
-                    for(int j=0; j < childupdatequery.record().count(); j++)
-                    {
-                        parentnode->children.at(i)->nodevalues[j] = childupdatequery.value(j);
-                    }*/
                 }
                 childupdatequery.finish();
                 emit dataChanged(index.child(0, 0), index.child(parentnode->children.count() - 1, 0));
                 return true;
-            }
-            else
-            {
+            }*/
+            /*else
+            {*/
                 Node* currentnode = NodeFromIndex(index);
                 QSqlQuery updatequery(fcasedb);
                 updatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ?;");
                 //updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
                 updatequery.addBindValue(currentnode->nodevalues.at(0).toULongLong());
                 updatequery.exec();
-                updatequery.next();
-                /*
-                for(int i=0; i < updatequery.record().count(); i++)
-                {
-                    currentnode->nodevalues[i] = updatequery.value(i);
-                }
-                */
+                updatequery.first();
                 currentnode->nodevalues[0] = updatequery.value(0);
                 currentnode->nodevalues[1] = updatequery.value(1);
                 currentnode->nodevalues[2] = updatequery.value(2);
@@ -422,15 +412,16 @@ public:
                 currentnode->nodevalues[9] = updatequery.value(9);
                 currentnode->nodevalues[10] = QVariant(updatequery.value(9).toString().split("/").at(0));
                 updatequery.finish();
-                emit dataChanged(index, index);
+                //emit dataChanged(index, index);
                 return true;
-            }
+            //}
         }
         return false;
     };
 
     void dataChanged(const QModelIndex &topleftindex, const QModelIndex &botrightindex, const QVector<int> &roles = QVector<int>())
     {
+        /*
         foreach(int role, roles)
         {
         if(role == Qt::DisplayRole)
@@ -450,7 +441,7 @@ public:
             endnode->nodevalues[8] = updatequery.value(8).toString();
             updatequery.finish();
         }
-        }
+        }*/
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -601,7 +592,7 @@ public:
                     parentnode->children.append(curchild);
                 }
                 endInsertRows();
-                //emit checkedNodesChanged();
+                emit checkedNodesChanged();
                 //setData(parent, QVariant(-15), Qt::DisplayRole);
             }
             fetchquery.finish();
@@ -849,7 +840,7 @@ private:
             curnode->checkstate = 0;
             checkhash[curnode->nodevalues.at(0).toULongLong()] = 0;
         }
-        emit dataChanged(index, index);
+        //emit dataChanged(index, index);
         emit checkedNodesChanged();
         if(curnode->parent != 0)
             SetParentCheckState(index.parent());
@@ -861,7 +852,7 @@ private:
         for(int i=0; i < curnode->children.count(); i++)
         {
             curnode->children[i]->checkstate = curnode->checkstate;
-            emit dataChanged(index.child(i, 0), index.child(i, 0));
+            //emit dataChanged(index.child(i, 0), index.child(i, 0));
             if(curnode->children[i]->haschildren)
                 SetChildCheckState(index.child(i,0));
         }
@@ -890,7 +881,7 @@ private:
                 SetChildCheckState(index);
             checkhash[curnode->nodevalues.at(0).toULongLong()] = 2;
         }
-        emit dataChanged(index, index);
+        //emit dataChanged(index, index);
         emit checkedNodesChanged();
         if(curnode->parent != 0)
             SetParentCheckState(index.parent());
