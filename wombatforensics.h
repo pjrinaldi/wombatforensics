@@ -137,7 +137,7 @@ public:
                 return QVariant();
         }
         QSqlQuery dataquery(fcasedb);
-        dataquery.prepare("SELECT objtype, type FROM data WHERE id = ?;");
+        dataquery.prepare("SELECT objtype, type FROM data WHERE id = ?");
         dataquery.bindValue(0, node->nodevalues.at(0).toULongLong());
         dataquery.exec();
         dataquery.next();
@@ -146,6 +146,7 @@ public:
         dataquery.finish();
         //headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
         // WILL NEED TO REPLACE ALL THESE CALLS TO THE RESPECTIVE SQL QUERY RATHER THAN THE NODE SINCE I'M NOT STORING IT IN THE NODE ANYMORE...
+        /*
         if(role == Qt::ForegroundRole)
         {
             if(filtervalues.maxidbool && filtervalues.minidbool == false)
@@ -287,6 +288,7 @@ public:
                 }
             }
         }
+        */
         if(role == Qt::DisplayRole)
         {
             if(index.column() == 2)
@@ -365,7 +367,7 @@ public:
             {
                 Node* parentnode = NodeFromIndex(index);
                 QSqlQuery childupdatequery(fcasedb);
-                childupdatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ?;");
+                childupdatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ?");
                 //childupdatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
                 for(int i=0; i < parentnode->children.count(); i++)
                 {
@@ -429,7 +431,6 @@ public:
 
     void dataChanged(const QModelIndex &topleftindex, const QModelIndex &botrightindex, const QVector<int> &roles = QVector<int>())
     {
-        /*
         foreach(int role, roles)
         {
         if(role == Qt::DisplayRole)
@@ -449,7 +450,7 @@ public:
             endnode->nodevalues[8] = updatequery.value(8).toString();
             updatequery.finish();
         }
-        }*/
+        }
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -544,11 +545,11 @@ public:
         if(parentnode->haschildren == true)
         {
             QSqlQuery prequery(fcasedb);
-            prequery.prepare("SELECT addr, parimgid, parfsid from data where id = ?;");
+            prequery.prepare("SELECT addr, parimgid, parfsid FROM data WHERE id = ?");
             prequery.bindValue(0, parentnode->nodevalues.at(0).toULongLong());
             qDebug() << "curid:" << parentnode->nodevalues.at(0).toULongLong();
             prequery.exec();
-            prequery.next();
+            prequery.first();
             unsigned long long parentaddress = prequery.value(0).toULongLong();
             unsigned long long parentimgid = prequery.value(1).toULongLong();
             unsigned long long parentfsid = prequery.value(2).toULongLong();
@@ -601,7 +602,7 @@ public:
                 }
                 endInsertRows();
                 emit checkedNodesChanged();
-                setData(parent, QVariant(-15), Qt::DisplayRole);
+                //setData(parent, QVariant(-15), Qt::DisplayRole);
             }
             fetchquery.finish();
 
