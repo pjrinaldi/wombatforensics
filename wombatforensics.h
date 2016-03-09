@@ -547,7 +547,7 @@ public:
             QSqlQuery prequery(fcasedb);
             prequery.prepare("SELECT addr, parimgid, parfsid FROM data WHERE id = ?");
             prequery.bindValue(0, parentnode->nodevalues.at(0).toULongLong());
-            qDebug() << "curid:" << parentnode->nodevalues.at(0).toULongLong();
+            //qDebug() << "curid:" << parentnode->nodevalues.at(0).toULongLong();
             prequery.exec();
             prequery.first();
             unsigned long long parentaddress = prequery.value(0).toULongLong();
@@ -559,7 +559,7 @@ public:
 
             QSqlQuery fetchquery(fcasedb);
             fetchquery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, checked, addr, parimgid, parfsid FROM data WHERE (objtype = 5 OR objtype = 6) AND parid = ? AND parimgid = ? AND parfsid = ?;");
-            qDebug() << "parid:" << parentaddress << "parimgid:" << parentimgid << "parfsid:" << parentfsid;
+            //qDebug() << "parid:" << parentaddress << "parimgid:" << parentimgid << "parfsid:" << parentfsid;
             fetchquery.bindValue(0, parentaddress);
             fetchquery.bindValue(1, parentimgid);
             fetchquery.bindValue(2, parentfsid);
@@ -601,7 +601,7 @@ public:
                     parentnode->children.append(curchild);
                 }
                 endInsertRows();
-                emit checkedNodesChanged();
+                //emit checkedNodesChanged();
                 //setData(parent, QVariant(-15), Qt::DisplayRole);
             }
             fetchquery.finish();

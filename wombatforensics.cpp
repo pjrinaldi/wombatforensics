@@ -180,8 +180,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
     connect(showitem, SIGNAL(activated()), this, SLOT(ShowItem()));
     checkhash.clear();
-    autosavetimer = new QTimer(this);
-    connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
+    //autosavetimer = new QTimer(this);
+    //connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
 }
 //////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
@@ -563,7 +563,7 @@ void WombatForensics::InitializeCaseStructure()
             ui->actionOpen_Case->setEnabled(true);
         ui->actionAdd_Evidence->setEnabled(true);
         LogMessage("Case was Created");
-        autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+        //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
         //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     }
 }
@@ -757,8 +757,8 @@ void WombatForensics::InitializeQueryModel()
     // ATTEMPT MULTI THREADING WITH SECONDARY PROCESSING FUNCTIONALITY......
     //secondfuture = QtConcurrent::run(this, &WombatForensics::SecondaryProcessing);
     //secondwatcher.setFuture(secondfuture);
-    StatusUpdate("Evidence ready");
-    LogMessage("Evidence Ready");
+    //StatusUpdate("Evidence ready");
+    //LogMessage("Evidence Ready");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1376,7 +1376,7 @@ void WombatForensics::OpenFileSystemFile()
 
 void WombatForensics::CloseCurrentCase()
 {
-    autosavetimer->stop();
+    //autosavetimer->stop();
     //GetEvidenceObjects(); // was previously wombatdabase
     /*
     for(int i=0; i < wombatvarptr->evidenceobjectvecotr.count(); i++)
