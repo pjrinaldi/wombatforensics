@@ -1151,9 +1151,10 @@ void WombatForensics::OpenEvidenceStructure()
     StatusUpdate("Evidence ready");
     */
 }
+
+/*
 void WombatForensics::GetEvidenceObjects()
 {
-    /*
     wombatptr->evidenceobjectvector.clear();
     wombatptr->evidenceobject.Clear();
     wombatptr->bindvalues.clear();
@@ -1183,14 +1184,12 @@ void WombatForensics::GetEvidenceObjects()
             wombatptr->evidenceobjectvector[i].fullpathvector.push_back(wombatptr->sqlrecords[j].value(0).toString().toStdString());
         wombatptr->evidenceobjectvector[i].itemcount = wombatptr->evidenceobjectvector.at(i).fullpathvector.size();
     }
-    */
 }
+*/
 
 void WombatForensics::AddEvidence()
 {
     int isnew = 1;
-    //GetEvidenceObjects();
-    // STILL NEED TO ACCOUNT FOR IF THE SAME EVIDENCE IS ALREADY ADDED TO THE CASE AS SHOWN BELOW, BUT I'LL GET TO THAT LATER...
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
     {
@@ -1206,7 +1205,6 @@ void WombatForensics::AddEvidence()
         evidquery.finish();
         if(isnew == 1)
         {
-            //wombatvariable.currentevidencename = tmplist.at(0).split("/").last();
             for(int i=0; i < tmplist.count(); i++)
                 wombatvariable.evidenceobject.fullpathvector.push_back(tmplist.at(i).toStdString());
             wombatvariable.evidenceobject.itemcount = tmplist.count();
@@ -1424,6 +1422,12 @@ void WombatForensics::OpenFileSystemFile()
 
 void WombatForensics::CloseCurrentCase()
 {
+    QSqlQuery evidquery(fcasedb);
+    evidquery.prepare("SELECT id FROM data where objtype = 1");
+    evidquery.exec();
+    while(evidquery.next())
+        treemodel->RemEvidence(evidquery.value(0).toULongLong());
+    evidquery.finish();
     //autosavetimer->stop();
     //GetEvidenceObjects(); // was previously wombatdabase
     /*
@@ -2119,9 +2123,8 @@ void WombatForensics::on_actionNew_Case_triggered()
 
 void WombatForensics::on_actionOpen_Case_triggered()
 {
-    /*
     // determine if a case is open
-    if(wombatvarptr->caseobject.id > 0)
+    if(wombatvariable.caseobject.id > 0)
     {
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
         if (ret == QMessageBox::Yes)
@@ -2133,7 +2136,6 @@ void WombatForensics::on_actionOpen_Case_triggered()
     }
     else
         InitializeOpenCase();
-    */
 }
 
 void WombatForensics::on_actionSaveState_triggered()

@@ -1064,7 +1064,7 @@ private:
     void AddNewEvidence(void);
     QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
     void RemoveTmpFiles(void);
-    void GetEvidenceObjects(void);
+    //void GetEvidenceObjects(void);
 
     uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, unsigned char follow_hard_link);
     uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int alen, uint32_t flags);
