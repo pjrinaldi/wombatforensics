@@ -175,7 +175,7 @@ struct WombatVariable
     unsigned long long evidremoveid;
     unsigned long long evidrowsremoved;
     CaseObject caseobject;
-    QStringList casenamelist;
+    //QStringList casenamelist;
     QStringList evidencenamelist;
     EvidenceObject evidenceobject;
     //QVector<EvidenceObject> evidenceobjectvector;

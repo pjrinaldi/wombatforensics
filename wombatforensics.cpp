@@ -570,6 +570,116 @@ void WombatForensics::InitializeCaseStructure()
 
 void WombatForensics::InitializeOpenCase()
 {
+    bool ok;
+    QStringList casenamelist;
+    casenamelist.clear();
+    QSqlQuery appquery(fappdb);
+    appquery.exec("SELECT name FROM cases WHERE deleted = 0 ORDER BY caseid");
+    while(appquery.next())
+        casenamelist << appquery.value(0).toString();
+    appquery.finish();
+    wombatvariable.caseobject.name = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), casenamelist, 0, false, &ok);
+    if(ok && !wombatvariable.caseobject.name.isEmpty()) // open selected case
+    {
+        appquery.prepare("SELECT caseid FROM cases WHERE name = ?;");
+        appquery.addBindValue(wombatvariable.caseobject.name);
+        appquery.exec();
+        appquery.first();
+        wombatvariable.caseobject.id = appquery.value(0).toULongLong();
+        appquery.finish();
+        QString tmptitle = "WombatForensics - ";
+        tmptitle += wombatvariable.caseobject.name;
+        this->setWindowTitle(tmptitle);
+        QString casestring = QString::number(wombatvariable.caseobject.id) + "-" + wombatvariable.caseobject.name;
+        wombatvariable.caseobject.dirpath = wombatvariable.casespath + casestring + "/";
+        if((new QDir())->mkpath(wombatvariable.caseobject.dirpath) == false)
+            DisplayError("4.0", "Case Folder Check Failed", "Existing case folder did not exist.");
+        logfile.setFileName(wombatvariable.caseobject.dirpath + "msglog");
+        msglog->clear();
+        thumbdb = QSqlDatabase::database("thumbdb");
+        if(!thumbdb.isValid())
+            thumbdb = QSqlDatabase::addDatabase("QSQLITE", "thumbdb");
+        thumbdb.setDatabaseName(wombatvariable.caseobject.dirpath + "thumbs.db");
+        if(!FileExists((wombatvariable.caseobject.dirpath + "thumbs.db").toStdString()))
+        {
+            CreateThumbDB();
+            if(wombatvariable.curerrmsg.compare("") != 0)
+                DisplayError("4.1", "Thumb DB Error", wombatvariable.curerrmsg);
+        }
+        else
+        {
+            OpenThumbDB();
+            if(wombatvariable.curerrmsg.compare("") != 0)
+                DisplayError("4.2", "Thumb DB Open Error", wombatvariable.curerrmsg);
+        }
+        // CREATE CASEID-CASENAME.DB RIGHT HERE.
+        wombatvariable.caseobject.dbname = wombatvariable.caseobject.dirpath + casestring + ".db";
+        fcasedb = QSqlDatabase::database("casedb");
+        if(!fcasedb.isValid()) // casedb has not been added yet, so add now.
+            fcasedb = QSqlDatabase::addDatabase("QSQLITE", "casedb");
+        fcasedb.setDatabaseName(wombatvariable.caseobject.dbname);
+        //bool caseFileExist = FileExists(wombatvarptr->caseobject.dbname.toStdString());
+        if(!FileExists(wombatvariable.caseobject.dbname.toStdString()))
+        {
+            CreateCaseDB();
+            if(wombatvariable.curerrmsg.compare("") != 0)
+                DisplayError("4.3", "Course DB Creation Error", wombatvariable.curerrmsg);
+        }
+        else
+        {
+            OpenCaseDB();
+            if(wombatvariable.curerrmsg.compare("") != 0)
+                DisplayError("4.4", "SQL", wombatvariable.curerrmsg);
+        }
+        //fcasedb = wombatvarptr->casedb;
+        ui->actionAdd_Evidence->setEnabled(true);
+        processcountlabel->setText("Processed: 0");
+        filecountlabel->setText("Files: 0");
+        QSqlQuery evidquery(fcasedb);
+        evidquery.prepare("SELECT id, name FROM data WHERE objtype = 1");
+        evidquery.exec();
+        while(evidquery.next())
+        {
+
+            treemodel->AddEvidence(evidquery.value(0).toULongLong()); 
+            wombatvariable.currentevidencename = evidquery.value(1).toString();
+            currentevidenceid = evidquery.value(0).toULongLong();
+            wombatvariable.evidenceobject.id = evidquery.value(0).toULongLong();
+            ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+            // POSSIBLY NEED TO GET FILE COUNT HERE AND ADD TO VALUES...
+            // wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(objectid) FROM data WHERE parimgid = ? and objecttype = 5;", wombatptr->bindvalues);
+        }
+        //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+        //autosavetimer->start(600000); // 10 minutes in milliseconds
+        //wombatdatabase->GetEvidenceObjects();
+        if(ui->dirTreeView->model() != NULL)
+        {
+            ui->actionRemove_Evidence->setEnabled(true);
+            ui->actionSaveState->setEnabled(true);
+            ui->actionDigDeeper->setEnabled(true);
+            hexrocker->setEnabled(true);
+        }
+
+        /*
+        for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
+        {
+            wombatvarptr->currentevidencename = QString::fromStdString(wombatvarptr->evidenceobjectvector.at(i).fullpathvector[0]).split("/").last(); 
+            currentevidencename = wombatvarptr->currentevidencename;
+            wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->evidenceobjectvector.at(i).id);
+            wombatvarptr->currentevidenceid = wombatvarptr->evidenceobjectvector.at(i).id;
+            wombatvarptr->evidenceobject = wombatvarptr->evidenceobjectvector.at(i);
+            StatusUpdate("Opening Case Evidence...");
+            OpenEvidenceStructure();
+            if(ui->dirTreeView->model() != NULL)
+            {
+                ui->actionRemove_Evidence->setEnabled(true);
+                ui->actionSaveState->setEnabled(true);
+                ui->actionDigDeeper->setEnabled(true);
+                hexrocker->setEnabled(true);
+            }
+        }
+        */
+    }
     /*
     // open case here
     wombatvarptr->casenamelist.clear();
