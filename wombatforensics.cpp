@@ -1118,9 +1118,7 @@ void WombatForensics::UpdateStatus()
     tsk_img_close(readimginfo);
     readimginfo = NULL;
     treemodel->AddEvidence(wombatvariable.evidenceobject.id);
-    //ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
-    //treemodel->RemEvidence(wombatvarptr->currentevidenceid);
-    //treemodel->AddEvidence(wombatvarptr->currentevidenceid);
+    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
@@ -1153,20 +1151,70 @@ void WombatForensics::OpenEvidenceStructure()
     StatusUpdate("Evidence ready");
     */
 }
+void WombatForensics::GetEvidenceObjects()
+{
+    /*
+    wombatptr->evidenceobjectvector.clear();
+    wombatptr->evidenceobject.Clear();
+    wombatptr->bindvalues.clear();
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT objectid, objecttype, type, size, name, fullpath FROM data WHERE objecttype = 1;", wombatptr->bindvalues);
+    //wombatptr->sqlrecords = GetSqlResults("SELECT objectid, objecttype, type, size, sectsize, name, fullpath FROM data WHERE objecttype = 1;", wombatptr->bindvalues);
+    for(int i=0; i < wombatptr->sqlrecords.count(); i++)
+    {
+        wombatptr->evidenceobject.id = wombatptr->sqlrecords[i].value(0).toULongLong();
+        currentevidenceid = wombatptr->evidenceobject.id;
+        wombatptr->evidenceobject.objecttype = wombatptr->sqlrecords[i].value(1).toInt();
+        wombatptr->evidenceobject.type = wombatptr->sqlrecords[i].value(2).toInt();
+        wombatptr->evidenceobject.size = wombatptr->sqlrecords[i].value(3).toULongLong();
+        //wombatptr->evidenceobject.sectsize = wombatptr->sqlrecords[i].value(4).toInt();
+        wombatptr->evidenceobject.name = wombatptr->sqlrecords[i].value(5).toString();
+        wombatptr->evidenceobject.fullpath = wombatptr->sqlrecords[i].value(6).toString();
+        wombatptr->evidenceobject.parimgid = 0;
+        wombatptr->evidenceobjectvector.append(wombatptr->evidenceobject);
+    }
+    for(int i=0; i < wombatptr->evidenceobjectvector.count(); i++)
+    {
+        wombatptr->bindvalues.clear();
+        wombatptr->sqlrecords.clear();
+        wombatptr->bindvalues.append(wombatptr->evidenceobjectvector[i].id);
+        wombatptr->sqlrecords = GetSqlResults("SELECT fullpath FROM dataruns WHERE objectid = ? ORDER BY seqnum", wombatptr->bindvalues);
+        for(int j=0; j < wombatptr->sqlrecords.count(); j++)
+            wombatptr->evidenceobjectvector[i].fullpathvector.push_back(wombatptr->sqlrecords[j].value(0).toString().toStdString());
+        wombatptr->evidenceobjectvector[i].itemcount = wombatptr->evidenceobjectvector.at(i).fullpathvector.size();
+    }
+    */
+}
 
 void WombatForensics::AddEvidence()
 {
+    int isnew = 1;
+    //GetEvidenceObjects();
     // STILL NEED TO ACCOUNT FOR IF THE SAME EVIDENCE IS ALREADY ADDED TO THE CASE AS SHOWN BELOW, BUT I'LL GET TO THAT LATER...
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
     {
         wombatvariable.evidenceobject.name = tmplist.at(0).split("/").last();
-        //wombatvariable.currentevidencename = tmplist.at(0).split("/").last();
-        for(int i=0; i < tmplist.count(); i++)
-            wombatvariable.evidenceobject.fullpathvector.push_back(tmplist.at(i).toStdString());
-        wombatvariable.evidenceobject.itemcount = tmplist.count();
-        LogMessage("Start Adding Evidence");
-        sqlwatcher.setFuture(QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure));
+        QSqlQuery evidquery(fcasedb);
+        evidquery.prepare("SELECT fullpath FROM data WHERE objtype = 1");
+        evidquery.exec();
+        while(evidquery.next())
+        {
+            if(wombatvariable.evidenceobject.name.compare(evidquery.value(0).toString().split("/").last()) == 0)
+                isnew = 0;
+        }
+        evidquery.finish();
+        if(isnew == 1)
+        {
+            //wombatvariable.currentevidencename = tmplist.at(0).split("/").last();
+            for(int i=0; i < tmplist.count(); i++)
+                wombatvariable.evidenceobject.fullpathvector.push_back(tmplist.at(i).toStdString());
+            wombatvariable.evidenceobject.itemcount = tmplist.count();
+            LogMessage("Start Adding Evidence");
+            sqlwatcher.setFuture(QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure));
+        }
+        else
+            DisplayError("3.0", "Evidence already exists in the case", "Add Evidence Cancelled");
     }
     /*
     int isnew = 1;
