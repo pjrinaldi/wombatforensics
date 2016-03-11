@@ -640,15 +640,37 @@ void WombatForensics::InitializeOpenCase()
         evidquery.exec();
         while(evidquery.next())
         {
-
+            fsobjectlist.clear();
+            FileSystemObject tmpobject;
+            QSqlQuery fsquery(fcasedb);
+            fsquery.prepare("SELECT id, addr FROM data WHERE objtype = 4 AND parimgid = ?");
+            fsquery.bindValue(0, evidquery.value(0).toULongLong());
+            fsquery.exec();
+            while(fsquery.next())
+            {
+                tmpobject.id = fsquery.value(0).toULongLong();
+                tmpobject.rootinum = fsquery.value(1).toULongLong();
+                fsobjectlist.append(tmpobject);
+            }
+            fsquery.finish();
             treemodel->AddEvidence(evidquery.value(0).toULongLong()); 
             wombatvariable.currentevidencename = evidquery.value(1).toString();
             currentevidenceid = evidquery.value(0).toULongLong();
             wombatvariable.evidenceobject.id = evidquery.value(0).toULongLong();
             ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
-            // POSSIBLY NEED TO GET FILE COUNT HERE AND ADD TO VALUES...
-            // wombatptr->sqlrecords = GetSqlResults("SELECT COUNT(objectid) FROM data WHERE parimgid = ? and objecttype = 5;", wombatptr->bindvalues);
+            QSqlQuery countquery(fcasedb);
+            countquery.prepare("SELECT COUNT(id) FROM data WHERE parimgid = ? AND objtype = 5");
+            countquery.bindValue(0, evidquery.value(0).toULongLong());
+            countquery.exec();
+            countquery.first();
+            filesfound = filesfound + countquery.value(0).toULongLong();
+            countquery.finish();
+            filesprocessed = filesfound;
+            filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
+            processcountlabel->setText("Processed: " + QString::number(filesprocessed));
+            filecountlabel->setText("Files: " + QString::number(filesfound));
         }
+        evidquery.finish();
         //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
         //autosavetimer->start(600000); // 10 minutes in milliseconds
         //wombatdatabase->GetEvidenceObjects();
@@ -658,27 +680,8 @@ void WombatForensics::InitializeOpenCase()
             ui->actionSaveState->setEnabled(true);
             ui->actionDigDeeper->setEnabled(true);
             hexrocker->setEnabled(true);
+            //StatusUpdate("Opening Case Evidence...");
         }
-
-        /*
-        for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
-        {
-            wombatvarptr->currentevidencename = QString::fromStdString(wombatvarptr->evidenceobjectvector.at(i).fullpathvector[0]).split("/").last(); 
-            currentevidencename = wombatvarptr->currentevidencename;
-            wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->evidenceobjectvector.at(i).id);
-            wombatvarptr->currentevidenceid = wombatvarptr->evidenceobjectvector.at(i).id;
-            wombatvarptr->evidenceobject = wombatvarptr->evidenceobjectvector.at(i);
-            StatusUpdate("Opening Case Evidence...");
-            OpenEvidenceStructure();
-            if(ui->dirTreeView->model() != NULL)
-            {
-                ui->actionRemove_Evidence->setEnabled(true);
-                ui->actionSaveState->setEnabled(true);
-                ui->actionDigDeeper->setEnabled(true);
-                hexrocker->setEnabled(true);
-            }
-        }
-        */
     }
     /*
     // open case here
@@ -2167,6 +2170,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     // possibly will need to set dirtreeview model to nothing. or the treemodel to nothing to clear values so it'll close properly.
     if(ui->dirTreeView->model() != NULL)
     {
+        CloseCurrentCase();
         //event->ignore();
     }
     
