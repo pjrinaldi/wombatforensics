@@ -146,7 +146,6 @@ public:
         dataquery.finish();
         //headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
         // WILL NEED TO REPLACE ALL THESE CALLS TO THE RESPECTIVE SQL QUERY RATHER THAN THE NODE SINCE I'M NOT STORING IT IN THE NODE ANYMORE...
-        /*
         if(role == Qt::ForegroundRole)
         {
             if(filtervalues.maxidbool && filtervalues.minidbool == false)
@@ -288,7 +287,6 @@ public:
                 }
             }
         }
-        */
         if(role == Qt::DisplayRole)
         {
             //if(index.column() == 2)
