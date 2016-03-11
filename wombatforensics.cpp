@@ -888,6 +888,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
         ui->actionByteConverter->setEnabled(true);
+        LoadHexContents();
         //wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
         //wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
         //wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
@@ -1369,6 +1370,7 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
+    //wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
     /*
     if(tskobjptr->readimginfo != NULL)
         tsk_img_close(tskobjptr->readimginfo);
@@ -1499,6 +1501,18 @@ void WombatForensics::LoadHexContents()
 
 void WombatForensics::OpenParentImage(unsigned long long imgid)
 {
+    QSqlQuery evidquery(fcasedb);
+    evidquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? order by seqnum");
+    evidquery.bindValue(0, imgid);
+    evidquery.exec();
+    tskobjptr->imagepartspath = (const char**)malloc(evidquery.size()*sizeof(char*));
+    for(int i=0; i < evidquery.size(); i++)
+    {
+        evidquery.next();
+        tskobjptr->imagepartspath[i] = evidquery.value(0).toString().toStdString().c_str();
+    }
+    tskobjptr->partcount = evidquery.size();
+    evidquery.finish();
     /*
     wombatdatabase->GetEvidenceObjects();
     int curidx = 0;
@@ -1513,13 +1527,13 @@ void WombatForensics::OpenParentImage(unsigned long long imgid)
     {
         tskobjptr->imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
     }
+    */
     tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     if(tskobjptr->readimginfo == NULL)
     {
         LogMessage("Image opening error");
     }
     free(tskobjptr->imagepartspath);
-    */
 }
 
 void WombatForensics::OpenParentFileSystem(unsigned long long fsid)
