@@ -478,7 +478,7 @@ void WombatForensics::CreateCaseDB()
     wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
     wombattableschema << "CREATE TABLE attributes(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
     wombattableschema << "CREATE TABLE properties(id INTEGER PRIMARY KEY, objectid INTEGER, name TEXT, description TEXT, value BLOB);";
-    wombattableschema << "CREATE TABLE data(id INTEGER PRIMARY KEY, objtype INTEGER, type INTEGER, size INTEGER, name TEXT, fullpath TEXT, addr INTEGER, parid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, mftattrid INTEGER, checked INTEGER NOT NULL DEFAULT 0)";
+    wombattableschema << "CREATE TABLE data(id INTEGER PRIMARY KEY, objtype INTEGER, type INTEGER, size INTEGER, name TEXT, fullpath TEXT, addr INTEGER, parid INTEGER, parimgid INTEGER, parfsid INTEGER, offset INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, mftattrid INTEGER, checked INTEGER NOT NULL DEFAULT 0)";
     if(!fcasedb.isOpen())
         fcasedb.open();
     fcasedb.transaction();
@@ -1117,13 +1117,14 @@ void WombatForensics::AddNewEvidence()
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
         QSqlQuery fsquery(fcasedb);
-        fsquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, fullpath, addr) VALUES (4, ?, ?, ?, ?, ?, '/', ?)");
+        fsquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, fullpath, addr, offset) VALUES (4, ?, ?, ?, ?, ?, '/', ?, ?)");
         fsquery.bindValue(0, readfsinfo->ftype);
         fsquery.bindValue(1, (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count);
         fsquery.bindValue(2, wombatvariable.currentvolumeid);
         fsquery.bindValue(3, wombatvariable.evidenceobject.id);
         fsquery.bindValue(4, GetFileSystemLabel(readfsinfo));
         fsquery.bindValue(5, (unsigned long long)readfsinfo->root_inum);
+        fsquery.bindValue(6, (unsigned long long)readfsinfo->offset);
         fsquery.exec();
         currentfilesystemid = fsquery.lastInsertId().toULongLong();
         fsquery.finish();
@@ -1160,13 +1161,14 @@ void WombatForensics::AddNewEvidence()
                     if(readfsinfo != NULL)
                     {
                         QSqlQuery fsquery(fcasedb);
-                        fsquery.prepare("INSERT INTO data (objtype, name, fullpath, type, parid, parimgid, size, addr) VALUES(4, ?, '/', ?, ?, ?, ?, ?)");
+                        fsquery.prepare("INSERT INTO data (objtype, name, fullpath, type, parid, parimgid, size, addr, offset) VALUES(4, ?, '/', ?, ?, ?, ?, ?, ?)");
                         fsquery.bindValue(0, GetFileSystemLabel(readfsinfo));
                         fsquery.bindValue(1, readfsinfo->ftype);
                         fsquery.bindValue(2, wombatvariable.currentvolumeid);
                         fsquery.bindValue(3, wombatvariable.evidenceobject.id);
                         fsquery.bindValue(4, (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count);
                         fsquery.bindValue(5, (unsigned long long)readfsinfo->root_inum);
+                        fsquery.bindValue(6, (unsigned long long)readfsinfo->offset);
                         fsquery.exec();
                         currentfilesystemid = fsquery.lastInsertId().toULongLong();
                         fsquery.finish();
@@ -1370,6 +1372,26 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
+    if(tskobjptr->readimginfo != NULL)
+        tsk_img_close(tskobjptr->readimginfo);
+    if(tskobjptr->readfsinfo != NULL)
+        tsk_fs_close(tskobjptr->readfsinfo);
+    if(tskobjptr->readfileinfo != NULL)
+        tsk_fs_file_close(tskobjptr->readfileinfo);
+    wombatvariable.selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
+    wombatvariable.selectedobject.size = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
+    OpenParentImage(selectedid);
+    QSqlQuery objquery(fcasedb);
+    objquery.prepare("SELECT objtype FROM data WHERE id = ?");
+    objquery.bindValue(0, selectedid);
+    objquery.exec();
+    objquery.first();
+    wombatvariable.selectedobject.objtype = objquery.value(0).toInt();
+    objquery.finish();
+    if(wombatvariable.selectedobject.objtype == 1) // image file
+    {
+        
+    }
     //wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
     /*
     if(tskobjptr->readimginfo != NULL)
@@ -1538,13 +1560,27 @@ void WombatForensics::OpenParentImage(unsigned long long imgid)
 
 void WombatForensics::OpenParentFileSystem(unsigned long long fsid)
 {
+    QSqlQuery fsquery(fcasedb);
+    fsquery.prepare("SELECT offset FROM data WHERE id = ?");
+    fsquery.bindValue(0, fsid);
+    fsquery.exec();
+    fsquery.first();
+    tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
+    fsquery.finish();
+    /*
+     *    wombatptr->bindvalues.append(fsid);
+    wombatptr->sqlrecords.clear();
+    wombatptr->sqlrecords = GetSqlResults("SELECT byteoffset FROM data WHERE objectid = ?", wombatptr->bindvalues);
+    return wombatptr->sqlrecords.at(0).value(0).toULongLong();
+
+     */ 
     //unsigned long long fsoffset = wombatdatabase->ReturnFileSystemOffset(fsid);
     //tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
 }
 
 void WombatForensics::OpenFileSystemFile()
 {
-    //tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
+    tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
 }
 
 void WombatForensics::CloseCurrentCase()
