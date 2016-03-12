@@ -478,7 +478,8 @@ void WombatForensics::CreateCaseDB()
     wombattableschema << "CREATE TABLE dataruns(id INTEGER PRIMARY KEY, objectid INTEGER, fullpath TEXT, seqnum INTEGER, start INTEGER, length INTEGER, datattype INTEGER, originalsectstart INTEGER, allocationstatus INTEGER);";
     wombattableschema << "CREATE TABLE attributes(id INTEGER PRIMARY KEY, objectid INTEGER, context TEXT, attrtype INTEGER, valuetype INTEGER value BLOB);";
     wombattableschema << "CREATE TABLE properties(id INTEGER PRIMARY KEY, objectid INTEGER, name TEXT, description TEXT, value BLOB);";
-    wombattableschema << "CREATE TABLE data(id INTEGER PRIMARY KEY, objtype INTEGER, type INTEGER, size INTEGER, name TEXT, fullpath TEXT, addr INTEGER, parid INTEGER, parimgid INTEGER, parfsid INTEGER, offset INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, mftattrid INTEGER, checked INTEGER NOT NULL DEFAULT 0)";
+    wombattableschema << "CREATE TABLE data(id INTEGER PRIMARY KEY, objtype INTEGER, type INTEGER, size INTEGER, name TEXT, fullpath TEXT, addr INTEGER, parid INTEGER, parimgid INTEGER, parfsid INTEGER, offset INTEGER, sectsize INTEGER, sectstart INTEGER, sectlength INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT, filemime TEXT, known INTEGER, mftattrid INTEGER, checked INTEGER NOT NULL DEFAULT 0)";
+    //wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, flags INTEGER, childcount INTEGER, address INTEGER, size INTEGER, sectsize INTEGER, sectstart INTEGER, sectlength INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, status INTEGER, md5 TEXT, sha1 TEXT, sha_256 TEXT, sha_512 TEXT, filesignature TEXT, filemime TEXT, known INTEGER, blockaddress TEXT, mftattrid INTEGER, mftattrtype INTEGER, byteoffset INTEGER, blocksize INTEGER, blockcount INTEGER, rootinum INTEGER, firstinum INTEGER, lastinum INTEGER, derivationdetails TEXT, checked INTEGER NOT NULL DEFAULT 0);";
     if(!fcasedb.isOpen())
         fcasedb.open();
     fcasedb.transaction();
@@ -1097,7 +1098,7 @@ void WombatForensics::AddNewEvidence()
     // finished initial evidence information, now onto the volume information...
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
     QSqlQuery volquery(fcasedb);
-    volquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name) VALUES (2, ?, ?, ?, ?, ?)");
+    volquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, offset, sectsize) VALUES (2, ?, ?, ?, ?, ?, ?, ?)");
     if(readvsinfo == NULL)
         volquery.bindValue(0, 240);
     else
@@ -1109,6 +1110,8 @@ void WombatForensics::AddNewEvidence()
         volquery.bindValue(4, QString("Dummy Volume"));
     else
         volquery.bindValue(4, QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype)));
+    volquery.bindValue(5, (unsigned long long)readvsinfo->offset);
+    volquery.bindValue(6, (unsigned long long)readvsinfo->block_size);
     volquery.exec();
     wombatvariable.currentvolumeid = volquery.lastInsertId().toULongLong();
     volquery.finish();
@@ -1117,7 +1120,7 @@ void WombatForensics::AddNewEvidence()
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
         QSqlQuery fsquery(fcasedb);
-        fsquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, fullpath, addr, offset) VALUES (4, ?, ?, ?, ?, ?, '/', ?, ?)");
+        fsquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, fullpath, addr, offset, sectstart, sectlength, sectsize) VALUES (4, ?, ?, ?, ?, ?, '/', ?, ?, ?, ?, ?)");
         fsquery.bindValue(0, readfsinfo->ftype);
         fsquery.bindValue(1, (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count);
         fsquery.bindValue(2, wombatvariable.currentvolumeid);
@@ -1125,6 +1128,9 @@ void WombatForensics::AddNewEvidence()
         fsquery.bindValue(4, GetFileSystemLabel(readfsinfo));
         fsquery.bindValue(5, (unsigned long long)readfsinfo->root_inum);
         fsquery.bindValue(6, (unsigned long long)readfsinfo->offset);
+        fsquery.bindValue(7, (unsigned long long)readpartinfo->start);
+        fsquery.bindValue(8, (unsigned long long)readpartinfo->len);
+        fsquery.bindValue(9, (unsigned long long)readfsinfo->dev_bsize);
         fsquery.exec();
         currentfilesystemid = fsquery.lastInsertId().toULongLong();
         fsquery.finish();
@@ -1147,11 +1153,14 @@ void WombatForensics::AddNewEvidence()
                 if(readpartinfo->flags == 0x02) // unallocated partition
                 {
                     QSqlQuery partquery(fcasedb);
-                    partquery.prepare("INSERT INTO data (objtype, name, parid, parimgid, size) VALUES(3, ?, ?, ?, ?)");
+                    partquery.prepare("INSERT INTO data (objtype, name, parid, parimgid, size, sectstart, sectlength, sectsize) VALUES(3, ?, ?, ?, ?, ?, ?, ?)");
                     partquery.bindValue(0, readpartinfo->desc);
                     partquery.bindValue(1, wombatvariable.currentvolumeid);
                     partquery.bindValue(2, wombatvariable.evidenceobject.id);
                     partquery.bindValue(3, (unsigned long long)readpartinfo->len * readvsinfo->block_size);
+                    partquery.bindValue(4, (unsigned long long)readpartinfo->start);
+                    partquery.bindValue(5, (unsigned long long)readpartinfo->len);
+                    partquery.bindValue(6, (unsigned long long)readvsinfo->block_size);
                     partquery.exec();
                     partquery.finish();
                 }
@@ -1161,7 +1170,7 @@ void WombatForensics::AddNewEvidence()
                     if(readfsinfo != NULL)
                     {
                         QSqlQuery fsquery(fcasedb);
-                        fsquery.prepare("INSERT INTO data (objtype, name, fullpath, type, parid, parimgid, size, addr, offset) VALUES(4, ?, '/', ?, ?, ?, ?, ?, ?)");
+                        fsquery.prepare("INSERT INTO data (objtype, name, fullpath, type, parid, parimgid, size, addr, offset, sectstart, sectlength, sectsize) VALUES(4, ?, '/', ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                         fsquery.bindValue(0, GetFileSystemLabel(readfsinfo));
                         fsquery.bindValue(1, readfsinfo->ftype);
                         fsquery.bindValue(2, wombatvariable.currentvolumeid);
@@ -1169,6 +1178,9 @@ void WombatForensics::AddNewEvidence()
                         fsquery.bindValue(4, (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count);
                         fsquery.bindValue(5, (unsigned long long)readfsinfo->root_inum);
                         fsquery.bindValue(6, (unsigned long long)readfsinfo->offset);
+                        fsquery.bindValue(7, (unsigned long long)readpartinfo->start);
+                        fsquery.bindValue(8, (unsigned long long)readpartinfo->len);
+                        fsquery.bindValue(9, (unsigned long long)readfsinfo->dev_bsize);
                         fsquery.exec();
                         currentfilesystemid = fsquery.lastInsertId().toULongLong();
                         fsquery.finish();
@@ -1380,17 +1392,33 @@ void WombatForensics::LoadHexContents()
         tsk_fs_file_close(tskobjptr->readfileinfo);
     wombatvariable.selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
     wombatvariable.selectedobject.size = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
-    OpenParentImage(selectedid);
+    OpenParentImage(wombatvariable.selectedobject.id);
     QSqlQuery objquery(fcasedb);
-    objquery.prepare("SELECT objtype FROM data WHERE id = ?");
-    objquery.bindValue(0, selectedid);
+    objquery.prepare("SELECT objtype, sectstart, sectsize, sectlength, offset FROM data WHERE id = ?");
+    objquery.bindValue(0, wombatvariable.selectedobject.id);
     objquery.exec();
     objquery.first();
     wombatvariable.selectedobject.objtype = objquery.value(0).toInt();
+    wombatvariable.selectedobject.sectstart = objquery.value(1).toULongLong();
+    wombatvariable.selectedobject.sectsize = objquery.value(2).toULongLong();
+    wombatvariable.selectedobject.sectlength = objquery.value(3).toULongLong();
+    wombatvariable.selectedobject.offset = objquery.value(4).toULongLong();
     objquery.finish();
     if(wombatvariable.selectedobject.objtype == 1) // image file
     {
-        
+        tskobjptr->offset = 0;
+        tskobjptr->objecttype = 1;
+        tskobjptr->length = wombatvariable.selectedobject.size;
+        tskobjptr->imglength = wombatvariable.selectedobject.size;
+        tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
+        tskobjptr->blocksize = wombatvariable.selectedobject.blocksize;
+    }
+    else if(wombatvariable.selectedobject.objtype == 2) // volume object
+    {
+       tskobjptr->offset = wombatvariable.selectedobject.sectstart * wombatvariable.selectedobject.sectsize;
+       tskobjptr->length = wombatvariable.selectedobject.size;
+       tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
+       tskobjptr->blocksize = wombatvariable.selectedobject.sectsize;
     }
     //wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
     /*
