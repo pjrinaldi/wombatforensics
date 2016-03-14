@@ -1076,11 +1076,12 @@ void WombatForensics::AddNewEvidence()
     free(images);
     fsobjectlist.clear();
     QSqlQuery evidquery(fcasedb);
-    evidquery.prepare("INSERT INTO data (objtype, type, size, name, fullpath) VALUES (1, ?, ?, ?, ?)");
+    evidquery.prepare("INSERT INTO data (objtype, type, size, name, fullpath, sectsize) VALUES (1, ?, ?, ?, ?, ?)");
     evidquery.bindValue(0, (int)readimginfo->itype);
     evidquery.bindValue(1, (unsigned long long)readimginfo->size);
     evidquery.bindValue(2, wombatvariable.evidenceobject.name);
     evidquery.bindValue(3, QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[0]));
+    evidquery.bindValue(4, (int)readimginfo->sector_size);
     evidquery.exec();
     wombatvariable.evidenceobject.id = evidquery.lastInsertId().toULongLong();
     evidquery.finish();
@@ -1444,11 +1445,13 @@ void WombatForensics::LoadHexContents()
     else if(wombatvariable.selectedobject.objtype == 4) // fs object
     {
         OpenParentImage(wombatvariable.selectedobject.parimgid);
+        OpenParentFileSystem(wombatvariable.selectedobject.id);
         tskobjptr->offset = wombatvariable.selectedobject.offset;
         tskobjptr->fsoffset = wombatvariable.selectedobject.offset;
         tskobjptr->objecttype = 4;
         tskobjptr->length = wombatvariable.selectedobject.size;
         tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
+        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
         //tskobjptr->blocksize = wombatvariable.selectedobject.blocksize;
     }
     else if(wombatvariable.selectedobject.objtype == 5) // file object
@@ -1479,11 +1482,6 @@ void WombatForensics::LoadHexContents()
     /*
     else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
-        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
-        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
-        tskobjptr->offset = 0;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
         {
             tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
@@ -1498,22 +1496,11 @@ void WombatForensics::LoadHexContents()
             else
                 tskobjptr->offset = tskobjptr->fsoffset;
         }
-        tskobjptr->objecttype = 5;
-        tskobjptr->address = wombatvarptr->selectedobject.address;
-        tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
-        OpenFileSystemFile();
     }
     else if(wombatvarptr->selectedobject.objtype == 6) // ads file object
     {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        OpenParentFileSystem(wombatvarptr->selectedobject.parfsid);
-        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
-        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
-        tskobjptr->offset = 0;
-        tskobjptr->adsoffset = wombatvarptr->selectedobject.address;
-        tskobjptr->mftattrid = wombatvarptr->selectedobject.mftattrid;
         if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
         {
             if(wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
@@ -1536,7 +1523,8 @@ void WombatForensics::LoadHexContents()
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         OpenFileSystemFile();
     }
-    if(wombatvarptr->selectedobject.objtype == 1)
+    */
+    if(wombatvariable.selectedobject.objtype == 1)
     {
         hexwidget->openimage();
         hexwidget->set1BPC();
@@ -1546,7 +1534,7 @@ void WombatForensics::LoadHexContents()
     else
     {
         hexwidget->SetTopLeft(tskobjptr->offset);
-        if(wombatvarptr->selectedobject.objtype == 5 || wombatvarptr->selectedobject.objtype == 6)
+        if(wombatvariable.selectedobject.objtype == 5 || wombatvariable.selectedobject.objtype == 6)
         {
             fileviewer->filehexview->openimage();
             fileviewer->filehexview->set1BPC();
@@ -1554,22 +1542,28 @@ void WombatForensics::LoadHexContents()
             fileviewer->filehexview->SetTopLeft(0);
         }
     }
-    */
 }
 
 void WombatForensics::OpenParentImage(unsigned long long imgid)
 {
+    QSqlQuery cntquery(fcasedb);
+    cntquery.prepare("SELECT count(fullpath) FROM dataruns WHERE objectid = ?");
+    cntquery.bindValue(0, imgid);
+    cntquery.exec();
+    cntquery.first();
+    unsigned long long imgcnt = cntquery.value(0).toULongLong();
+    cntquery.finish();
     QSqlQuery evidquery(fcasedb);
     evidquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? order by seqnum");
     evidquery.bindValue(0, imgid);
     evidquery.exec();
-    tskobjptr->imagepartspath = (const char**)malloc(evidquery.size()*sizeof(char*));
-    for(int i=0; i < evidquery.size(); i++)
+    tskobjptr->imagepartspath = (const char**)malloc(imgcnt*sizeof(char*));
+    for(int i=0; i < imgcnt; i++)
     {
         evidquery.next();
         tskobjptr->imagepartspath[i] = evidquery.value(0).toString().toStdString().c_str();
     }
-    tskobjptr->partcount = evidquery.size();
+    tskobjptr->partcount = imgcnt;
     evidquery.finish();
     /*
     wombatdatabase->GetEvidenceObjects();
