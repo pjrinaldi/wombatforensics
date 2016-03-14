@@ -135,12 +135,12 @@ struct SelectedObject
     unsigned long long size;
     unsigned long long parimgid;
     unsigned long long parfsid;
-    //int sectsize;
-    //unsigned long long sectstart;
-    //unsigned long long sectlength;
-    //int blocksize;
+    int sectsize;
+    unsigned long long sectstart;
+    unsigned long long sectlength;
+    int blocksize;
     //unsigned long long blockcount;
-    //unsigned long long byteoffset;
+    unsigned long long offset;
     unsigned long long address;
     unsigned long long parentid;
     unsigned long long mftattrid;

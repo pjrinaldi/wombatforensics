@@ -1111,7 +1111,7 @@ void WombatForensics::AddNewEvidence()
     else
         volquery.bindValue(4, QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype)));
     volquery.bindValue(5, (unsigned long long)readvsinfo->offset);
-    volquery.bindValue(6, (unsigned long long)readvsinfo->block_size);
+    volquery.bindValue(6, (int)readvsinfo->block_size);
     volquery.exec();
     wombatvariable.currentvolumeid = volquery.lastInsertId().toULongLong();
     volquery.finish();
@@ -1130,7 +1130,7 @@ void WombatForensics::AddNewEvidence()
         fsquery.bindValue(6, (unsigned long long)readfsinfo->offset);
         fsquery.bindValue(7, (unsigned long long)readpartinfo->start);
         fsquery.bindValue(8, (unsigned long long)readpartinfo->len);
-        fsquery.bindValue(9, (unsigned long long)readfsinfo->dev_bsize);
+        fsquery.bindValue(9, (int)readfsinfo->dev_bsize);
         fsquery.exec();
         currentfilesystemid = fsquery.lastInsertId().toULongLong();
         fsquery.finish();
@@ -1160,7 +1160,7 @@ void WombatForensics::AddNewEvidence()
                     partquery.bindValue(3, (unsigned long long)readpartinfo->len * readvsinfo->block_size);
                     partquery.bindValue(4, (unsigned long long)readpartinfo->start);
                     partquery.bindValue(5, (unsigned long long)readpartinfo->len);
-                    partquery.bindValue(6, (unsigned long long)readvsinfo->block_size);
+                    partquery.bindValue(6, (int)readvsinfo->block_size);
                     partquery.exec();
                     partquery.finish();
                 }
@@ -1180,7 +1180,7 @@ void WombatForensics::AddNewEvidence()
                         fsquery.bindValue(6, (unsigned long long)readfsinfo->offset);
                         fsquery.bindValue(7, (unsigned long long)readpartinfo->start);
                         fsquery.bindValue(8, (unsigned long long)readpartinfo->len);
-                        fsquery.bindValue(9, (unsigned long long)readfsinfo->dev_bsize);
+                        fsquery.bindValue(9, (int)readfsinfo->dev_bsize);
                         fsquery.exec();
                         currentfilesystemid = fsquery.lastInsertId().toULongLong();
                         fsquery.finish();
@@ -1392,83 +1392,85 @@ void WombatForensics::LoadHexContents()
         tsk_fs_file_close(tskobjptr->readfileinfo);
     wombatvariable.selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
     wombatvariable.selectedobject.size = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
-    OpenParentImage(wombatvariable.selectedobject.id);
     QSqlQuery objquery(fcasedb);
-    objquery.prepare("SELECT objtype, sectstart, sectsize, sectlength, offset FROM data WHERE id = ?");
+    objquery.prepare("SELECT objtype, sectstart, sectsize, sectlength, offset, parimgid, parfsid, parid, addr, mftattrid FROM data WHERE id = ?");
     objquery.bindValue(0, wombatvariable.selectedobject.id);
     objquery.exec();
     objquery.first();
     wombatvariable.selectedobject.objtype = objquery.value(0).toInt();
     wombatvariable.selectedobject.sectstart = objquery.value(1).toULongLong();
-    wombatvariable.selectedobject.sectsize = objquery.value(2).toULongLong();
+    wombatvariable.selectedobject.sectsize = objquery.value(2).toInt();
     wombatvariable.selectedobject.sectlength = objquery.value(3).toULongLong();
     wombatvariable.selectedobject.offset = objquery.value(4).toULongLong();
+    wombatvariable.selectedobject.parimgid = objquery.value(5).toULongLong();
+    wombatvariable.selectedobject.parfsid = objquery.value(6).toULongLong();
+    wombatvariable.selectedobject.parentid = objquery.value(7).toULongLong();
+    wombatvariable.selectedobject.address = objquery.value(8).toULongLong();
+    wombatvariable.selectedobject.mftattrid = objquery.value(9).toULongLong();
     objquery.finish();
     if(wombatvariable.selectedobject.objtype == 1) // image file
     {
+        OpenParentImage(wombatvariable.selectedobject.id);
         tskobjptr->offset = 0;
         tskobjptr->objecttype = 1;
         tskobjptr->length = wombatvariable.selectedobject.size;
         tskobjptr->imglength = wombatvariable.selectedobject.size;
         tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
-        tskobjptr->blocksize = wombatvariable.selectedobject.blocksize;
+        tskobjptr->blocksize = wombatvariable.selectedobject.sectsize;
     }
     else if(wombatvariable.selectedobject.objtype == 2) // volume object
     {
-       tskobjptr->offset = wombatvariable.selectedobject.sectstart * wombatvariable.selectedobject.sectsize;
-       tskobjptr->length = wombatvariable.selectedobject.size;
-       tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
-       tskobjptr->blocksize = wombatvariable.selectedobject.sectsize;
+        OpenParentImage(wombatvariable.selectedobject.parimgid);
+        tskobjptr->offset = wombatvariable.selectedobject.sectstart * wombatvariable.selectedobject.sectsize;
+        tskobjptr->length = wombatvariable.selectedobject.size;
+        tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
+        tskobjptr->blocksize = wombatvariable.selectedobject.sectsize;
     }
-    //wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
-    /*
-    if(tskobjptr->readimginfo != NULL)
-        tsk_img_close(tskobjptr->readimginfo);
-    if(tskobjptr->readfsinfo != NULL)
-        tsk_fs_close(tskobjptr->readfsinfo);
-    if(tskobjptr->readfileinfo != NULL)
-        tsk_fs_file_close(tskobjptr->readfileinfo);
-
-    OpenParentImage(wombatvarptr->selectedobject.id);
-
-    if(wombatvarptr->selectedobject.objtype == 1) // image file
+    else if(wombatvariable.selectedobject.objtype == 3) // unallocated partition
     {
-        OpenParentImage(wombatvarptr->selectedobject.id);
-        tskobjptr->offset = 0;
-        tskobjptr->objecttype = 1;
-        tskobjptr->length = wombatvarptr->selectedobject.size;
-        tskobjptr->imglength = wombatvarptr->selectedobject.size;
-        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
-        tskobjptr->blocksize = wombatvarptr->selectedobject.sectsize;
-    }
-    else if(wombatvarptr->selectedobject.objtype == 2) // volume object
-    {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        tskobjptr->objecttype = 2;
-        tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
-        tskobjptr->length = wombatvarptr->selectedobject.size;
-        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
-        tskobjptr->blocksize = wombatvarptr->selectedobject.sectsize;
-    }
-    else if(wombatvarptr->selectedobject.objtype == 3) // unallocated partition
-    {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        tskobjptr->offset = wombatvarptr->selectedobject.sectstart * wombatvarptr->selectedobject.sectsize;
-        tskobjptr->length = wombatvarptr->selectedobject.sectlength * wombatvarptr->selectedobject.sectsize;
+        OpenParentImage(wombatvariable.selectedobject.parimgid);
+        tskobjptr->offset = wombatvariable.selectedobject.sectstart * wombatvariable.selectedobject.sectsize;
+        tskobjptr->length = wombatvariable.selectedobject.sectlength * wombatvariable.selectedobject.sectsize;
         tskobjptr->objecttype = 3;
-        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
-        tskobjptr->blocksize = wombatvarptr->selectedobject.sectsize;
+        tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
+        tskobjptr->blocksize = wombatvariable.selectedobject.sectsize;
     }
-    else if(wombatvarptr->selectedobject.objtype == 4) // fs object
+    else if(wombatvariable.selectedobject.objtype == 4) // fs object
     {
-        OpenParentImage(wombatvarptr->selectedobject.parimgid);
-        tskobjptr->offset = wombatvarptr->selectedobject.byteoffset;
-        tskobjptr->fsoffset = wombatvarptr->selectedobject.byteoffset;
+        OpenParentImage(wombatvariable.selectedobject.parimgid);
+        tskobjptr->offset = wombatvariable.selectedobject.offset;
+        tskobjptr->fsoffset = wombatvariable.selectedobject.offset;
         tskobjptr->objecttype = 4;
-        tskobjptr->length = wombatvarptr->selectedobject.size;
-        tskobjptr->sectsize = wombatvarptr->selectedobject.sectsize;
-        tskobjptr->blocksize = wombatvarptr->selectedobject.blocksize;
+        tskobjptr->length = wombatvariable.selectedobject.size;
+        tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
+        //tskobjptr->blocksize = wombatvariable.selectedobject.blocksize;
     }
+    else if(wombatvariable.selectedobject.objtype == 5) // file object
+    {
+        OpenParentImage(wombatvariable.selectedobject.parimgid);
+        OpenParentFileSystem(wombatvariable.selectedobject.parfsid);
+        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
+        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
+        tskobjptr->offset = 0;
+        // DO BLOCK ADDRESS STUFF HERE.....
+        tskobjptr->objecttype = 5;
+        tskobjptr->address = wombatvariable.selectedobject.address;
+        tskobjptr->length = wombatvariable.selectedobject.size;
+        OpenFileSystemFile();
+    }
+    else if(wombatvariable.selectedobject.objtype == 6) // ads file object
+    {
+        OpenParentImage(wombatvariable.selectedobject.parimgid);
+        OpenParentFileSystem(wombatvariable.selectedobject.parfsid);
+        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
+        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
+        tskobjptr->offset = 0;
+        tskobjptr->adsoffset = wombatvariable.selectedobject.address;
+        tskobjptr->mftattrid = wombatvariable.selectedobject.mftattrid;
+        // DO BLOCK ADDRESS STUFF HERE...
+        // DO THE REST HERE AS WELL...
+    }
+    /*
     else if(wombatvarptr->selectedobject.objtype == 5) // file object
     {
         OpenParentImage(wombatvarptr->selectedobject.parimgid);
