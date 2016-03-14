@@ -1452,6 +1452,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = wombatvariable.selectedobject.size;
         tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
         tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
+        // issue with blocksize here and an issue with files below
         //tskobjptr->blocksize = wombatvariable.selectedobject.blocksize;
     }
     else if(wombatvariable.selectedobject.objtype == 5) // file object
