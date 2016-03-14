@@ -1107,11 +1107,17 @@ void WombatForensics::AddNewEvidence()
     volquery.bindValue(2, wombatvariable.evidenceobject.id);
     volquery.bindValue(3, wombatvariable.evidenceobject.id);
     if(readvsinfo == NULL)
+    {
         volquery.bindValue(4, QString("Dummy Volume"));
+        volquery.bindValue(5, 0);
+        volquery.bindValue(6, (int)readimginfo->sector_size);
+    }
     else
+    {
         volquery.bindValue(4, QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype)));
-    volquery.bindValue(5, (unsigned long long)readvsinfo->offset);
-    volquery.bindValue(6, (int)readvsinfo->block_size);
+        volquery.bindValue(5, (unsigned long long)readvsinfo->offset);
+        volquery.bindValue(6, (int)readvsinfo->block_size);
+    }
     volquery.exec();
     wombatvariable.currentvolumeid = volquery.lastInsertId().toULongLong();
     volquery.finish();
@@ -1128,9 +1134,9 @@ void WombatForensics::AddNewEvidence()
         fsquery.bindValue(4, GetFileSystemLabel(readfsinfo));
         fsquery.bindValue(5, (unsigned long long)readfsinfo->root_inum);
         fsquery.bindValue(6, (unsigned long long)readfsinfo->offset);
-        fsquery.bindValue(7, (unsigned long long)readpartinfo->start);
-        fsquery.bindValue(8, (unsigned long long)readpartinfo->len);
-        fsquery.bindValue(9, (int)readfsinfo->dev_bsize);
+        fsquery.bindValue(7, (unsigned long long)readfsinfo->offset);
+        fsquery.bindValue(8, (unsigned long long)readfsinfo->block_count);
+        fsquery.bindValue(9, (int)readfsinfo->block_size);
         fsquery.exec();
         currentfilesystemid = fsquery.lastInsertId().toULongLong();
         fsquery.finish();
