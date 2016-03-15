@@ -1576,6 +1576,7 @@ void WombatForensics::OpenParentImage(unsigned long long imgid)
         if(imgid == wombatvarptr->evidenceobjectvector[i].id)
             curidx = i;
     }
+
     tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
     tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
     for(uint i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
