@@ -1459,6 +1459,7 @@ void WombatForensics::LoadHexContents()
     {
         OpenParentImage(wombatvariable.selectedobject.parimgid);
         OpenParentFileSystem(wombatvariable.selectedobject.parfsid);
+        qDebug() << "fs offset:" << tskobjptr->readfsinfo->offset;
         tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
         tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
         tskobjptr->offset = 0;
@@ -1477,6 +1478,10 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = 0;
         tskobjptr->adsoffset = wombatvariable.selectedobject.address;
         tskobjptr->mftattrid = wombatvariable.selectedobject.mftattrid;
+        tskobjptr->address = wombatvariable.selectedobject.parentid;
+        tskobjptr->objecttype = 6;
+        tskobjptr->length = wombatvariable.selectedobject.size;
+        OpenFileSystemFile();
         // DO BLOCK ADDRESS STUFF HERE...
         // DO THE REST HERE AS WELL...
     }
@@ -1517,9 +1522,6 @@ void WombatForensics::LoadHexContents()
             tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
             tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
         }
-        tskobjptr->objecttype = 6;
-        tskobjptr->address = wombatvarptr->selectedobject.parentid;
-        tskobjptr->length = wombatvarptr->selectedobject.size;
         tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         OpenFileSystemFile();
