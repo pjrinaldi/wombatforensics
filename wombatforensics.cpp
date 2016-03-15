@@ -1391,12 +1391,14 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
+    /*
     if(tskobjptr->readimginfo != NULL)
         tsk_img_close(tskobjptr->readimginfo);
     if(tskobjptr->readfsinfo != NULL)
         tsk_fs_close(tskobjptr->readfsinfo);
     if(tskobjptr->readfileinfo != NULL)
         tsk_fs_file_close(tskobjptr->readfileinfo);
+    */
     wombatvariable.selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
     wombatvariable.selectedobject.size = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
     QSqlQuery objquery(fcasedb);
@@ -1445,13 +1447,11 @@ void WombatForensics::LoadHexContents()
     else if(wombatvariable.selectedobject.objtype == 4) // fs object
     {
         OpenParentImage(wombatvariable.selectedobject.parimgid);
-        OpenParentFileSystem(wombatvariable.selectedobject.id);
         tskobjptr->offset = wombatvariable.selectedobject.offset;
         tskobjptr->fsoffset = wombatvariable.selectedobject.offset;
         tskobjptr->objecttype = 4;
         tskobjptr->length = wombatvariable.selectedobject.size;
         tskobjptr->sectsize = wombatvariable.selectedobject.sectsize;
-        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
         // issue with blocksize here and an issue with files below
         //tskobjptr->blocksize = wombatvariable.selectedobject.blocksize;
     }
@@ -1459,7 +1459,8 @@ void WombatForensics::LoadHexContents()
     {
         OpenParentImage(wombatvariable.selectedobject.parimgid);
         OpenParentFileSystem(wombatvariable.selectedobject.parfsid);
-        qDebug() << "fs offset:" << tskobjptr->readfsinfo->offset;
+        tskobjptr->fsoffset = 0;
+        tskobjptr->blocksize = 512;
         tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
         tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
         tskobjptr->offset = 0;
