@@ -1551,6 +1551,7 @@ void WombatForensics::LoadHexContents()
             tsk_fs_file_walk(tskobjptr->readfileinfo, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
         }
         qDebug() << "blkstring:" << blockstring;
+        tskobjptr->blkaddrlist = blockstring.split("|", QString::SkipEmptyParts);
         if(blockstring.compare("") != 0)
         {
             tskobjptr->offset = blockstring.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
@@ -1565,9 +1566,8 @@ void WombatForensics::LoadHexContents()
             {
                 tskobjptr->offset = tskobjptr->fsoffset;
             }
-            //tskobjptr->blockaddress = blockstring;
-            tskobjptr->blkaddrlist = blockstring.split("|", QString::SkipEmptyParts);
         }
+        //tskobjptr->blockaddress = blockstring; // probably don't need this variable
     }
     else if(wombatvariable.selectedobject.objtype == 6) // ads file object
     {
