@@ -115,7 +115,6 @@ void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpint
 */
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
 {
-    QMutexLocker locker(&mutex2);
     if(off < 0)
     {
         // remove compile warning
