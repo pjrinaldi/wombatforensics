@@ -1193,6 +1193,11 @@ void WombatForensics::AddNewEvidence()
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
+        QFile pfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p1");
+        pfile.open(QIODevice::Append | QIODevice::Text);
+        out.setDevice(&pfile);
+        out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (unsigned long long)readfsinfo->block_size;
+        pfile.close();
         /*
         QSqlQuery fsquery(fcasedb);
         fsquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, fullpath, addr, offset, sectstart, sectlength, sectsize, blocksize, blockcount) VALUES (4, ?, ?, ?, ?, ?, '/', ?, ?, ?, ?, ?, ?, ?)");
@@ -1213,23 +1218,30 @@ void WombatForensics::AddNewEvidence()
         fsquery.finish();
         */
 
+        /*
         FileSystemObject tmpobject;
         tmpobject.id = currentfilesystemid;
         tmpobject.rootinum = readfsinfo->root_inum;
         fsobjectlist.append(tmpobject);
+        */
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
     }
     else
     {
+        QFile pfile;
         if(readvsinfo->part_count > 0)
         {
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
+                pfile.setFileName(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
+                pfile.open(QIODevice::Append | QIODevice::Text);
+                out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02) // unallocated partition
                 {
+                    out << readpartinfo->desc << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << (unsigned long long)readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size;
                     /*
                     QSqlQuery partquery(fcasedb);
                     partquery.prepare("INSERT INTO data (objtype, name, parid, parimgid, size, sectstart, sectlength, sectsize) VALUES(3, ?, ?, ?, ?, ?, ?, ?)");
@@ -1249,6 +1261,7 @@ void WombatForensics::AddNewEvidence()
                     readfsinfo = tsk_fs_open_vol(readpartinfo, TSK_FS_TYPE_DETECT);
                     if(readfsinfo != NULL)
                     {
+                        out << GetFileSystemLabel(readfsinfo) << "," << readpartinfo->flags << "," << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << "," << (int)readfsinfo->block_size << "," << (unsigned long long)readfsinfo->block_count;
                         /*
                         QSqlQuery fsquery(fcasedb);
                         fsquery.prepare("INSERT INTO data (objtype, name, fullpath, type, parid, parimgid, size, addr, offset, sectstart, sectlength, sectsize, blocksize, blockcount) VALUES(4, ?, '/', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -1268,10 +1281,12 @@ void WombatForensics::AddNewEvidence()
                         currentfilesystemid = fsquery.lastInsertId().toULongLong();
                         fsquery.finish();
                         */
+                        /*
                         FileSystemObject tmpobject;
                         tmpobject.id = currentfilesystemid;
                         tmpobject.rootinum = readfsinfo->root_inum;
                         fsobjectlist.append(tmpobject);
+                        */
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
