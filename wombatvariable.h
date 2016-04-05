@@ -10,6 +10,7 @@ struct CaseObject
 {
     unsigned long long id;
     QString name;
+    QString file;
     QString dbname;
     QString dirpath;
 };

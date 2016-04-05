@@ -409,11 +409,12 @@ void WombatForensics::InitializeAppStructure()
     //wombatvariable.settingfilename = wombatvariable.settingspath + "settings";
     //wombatvariable.viewerfilename = wombatvariable.settingspath + "viewers";
     wombatvariable.casesfilename = wombatvariable.datapath + "cases";
-    fappdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
-    fappdb.setDatabaseName(wombatvariable.wombatdbname);
+    //fappdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
+    //fappdb.setDatabaseName(wombatvariable.wombatdbname);
     casesfile.setFileName(wombatvariable.casesfilename);
     //settingsfile.setFileName(wombatvariable.settingfilename);
     //viewerfile.setFileName(wombatvariable.viewerfilename);
+    /*
     if(!FileExists(wombatvariable.wombatdbname.toStdString()))
     {
         CreateAppDB(); // used to be wombatdatabase
@@ -426,6 +427,7 @@ void WombatForensics::InitializeAppStructure()
         if(wombatvariable.curerrmsg.compare("") != 0)
             DisplayError("1.5", "Open App DB Error", wombatvariable.curerrmsg);
     }
+    */
     viewmanage = new ViewerManager(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
@@ -457,6 +459,7 @@ void WombatForensics::InitializeAppStructure()
 
 void WombatForensics::InsertCase()
 {
+    /*
     QSqlQuery casequery(fappdb);
     casequery.prepare("INSERT INTO cases (name, creation) VALUES(?, ?);");
     casequery.bindValue(0, wombatvariable.caseobject.name);
@@ -465,6 +468,7 @@ void WombatForensics::InsertCase()
     wombatvariable.caseobject.id = casequery.lastInsertId().toULongLong();
     casequery.finish();
     qDebug() << "caseid:" << wombatvariable.caseobject.id;
+    */
     if(ReturnCaseCount() > 0)
         wombatvariable.caseobject.id = ReturnCaseCount();
     else
@@ -544,6 +548,7 @@ void WombatForensics::InitializeCaseStructure()
         logfile.setFileName(wombatvariable.caseobject.dirpath + "msglog");
         msglog->clear();
         LogMessage("Log File Created");
+        /*
         thumbdb = QSqlDatabase::database("thumbdb");
         if(!thumbdb.isValid())
             thumbdb = QSqlDatabase::addDatabase("QSQLITE", "thumbdb");
@@ -560,8 +565,12 @@ void WombatForensics::InitializeCaseStructure()
             if(wombatvariable.curerrmsg.compare("") != 0)
                 DisplayError("2.2", "Thumb DB Error", wombatvariable.curerrmsg);
         }
+        */
         // Create CaseID-CasenameDB
         int errorcount = 0;
+        //wombatvariable.caseobject.file = wombatvariable.caseobject.dirpath + casestring;
+        //casedatafile.setFileName(wombatvariable.caseobject.file);
+        /*
         LogMessage("Started Creating Case Structure");
         wombatvariable.caseobject.dbname = wombatvariable.caseobject.dirpath + casestring + ".db";
         fcasedb = QSqlDatabase::database("casedb"); 
@@ -588,6 +597,7 @@ void WombatForensics::InitializeCaseStructure()
                 DisplayError("2.4", "Case DB Creation Error", wombatvariable.curerrmsg);
             }
         }
+        */
         if(ReturnCaseCount() > 0)
             ui->actionOpen_Case->setEnabled(true);
         ui->actionAdd_Evidence->setEnabled(true);
@@ -1103,6 +1113,15 @@ void WombatForensics::AddNewEvidence()
     }
     free(images);
     fsobjectlist.clear();
+    QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name);
+    evidfile.open(QIODevice::Append | QIODevice::Text);
+    QTextStream out(&evidfile);
+    out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
+    for(unsigned int i=0; i < wombatvariable.evidenceobject.itemcount; i++)
+        out << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]) << "," << i+1;
+    evidfile.close();
+
+    /*
     QSqlQuery evidquery(fcasedb);
     evidquery.prepare("INSERT INTO data (objtype, type, size, name, fullpath, sectsize) VALUES (1, ?, ?, ?, ?, ?)");
     evidquery.bindValue(0, (int)readimginfo->itype);
@@ -1125,7 +1144,24 @@ void WombatForensics::AddNewEvidence()
         runquery.finish();
     }
     // finished initial evidence information, now onto the volume information...
+    */
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
+    QString volname = "Dummy Volume";
+    int voltype = 240;
+    int volsectorsize = (int)readimginfo->sector_size;
+    unsigned long long voloffset = 0;
+    if(readvsinfo != NULL)
+    {
+        voltype = (int)readvsinfo->vstype;
+        volname = QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype));
+        volsectorsize(int)readvsinfo->block_size;
+        voloffset = (unsigned long long)readvsinfo->offset;
+
+    QFile volfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".vol");
+    volfile.open(QIODevice::Append | QIODevice::Text);
+    out(&volfile);
+    out << 
+    /*
     QSqlQuery volquery(fcasedb);
     volquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, offset, sectsize) VALUES (2, ?, ?, ?, ?, ?, ?, ?)");
     if(readvsinfo == NULL)
@@ -1240,6 +1276,7 @@ void WombatForensics::AddNewEvidence()
             }
         }
     }
+    */
     // finished initial partition/file system information including file info stored into the vector 
 }
 

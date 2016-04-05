@@ -1090,6 +1090,7 @@ private:
     QFile casesfile;
     QFile settingsfile;
     QFile viewerfile;
+    QFile casedatafile;
     off_t offset() const;
     ImageHexViewer* hexwidget;
     WombatSlider* hexrocker;
