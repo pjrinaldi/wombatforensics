@@ -1160,7 +1160,8 @@ void WombatForensics::AddNewEvidence()
     QFile volfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".vol");
     volfile.open(QIODevice::Append | QIODevice::Text);
     out(&volfile);
-    out << 
+    out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset;
+    volfile.close();
     /*
     QSqlQuery volquery(fcasedb);
     volquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, offset, sectsize) VALUES (2, ?, ?, ?, ?, ?, ?, ?)");
@@ -1186,6 +1187,7 @@ void WombatForensics::AddNewEvidence()
     volquery.exec();
     wombatvariable.currentvolumeid = volquery.lastInsertId().toULongLong();
     volquery.finish();
+    */
     // finished initial volume system information, now onto the file parition information...
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
@@ -1276,7 +1278,6 @@ void WombatForensics::AddNewEvidence()
             }
         }
     }
-    */
     // finished initial partition/file system information including file info stored into the vector 
 }
 
