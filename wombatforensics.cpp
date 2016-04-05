@@ -1154,12 +1154,13 @@ void WombatForensics::AddNewEvidence()
     {
         voltype = (int)readvsinfo->vstype;
         volname = QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype));
-        volsectorsize(int)readvsinfo->block_size;
+        volsectorsize = (int)readvsinfo->block_size;
         voloffset = (unsigned long long)readvsinfo->offset;
+    }
 
     QFile volfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".vol");
     volfile.open(QIODevice::Append | QIODevice::Text);
-    out(&volfile);
+    out.setDevice(&volfile);
     out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset;
     volfile.close();
     /*
@@ -1192,6 +1193,7 @@ void WombatForensics::AddNewEvidence()
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
+        /*
         QSqlQuery fsquery(fcasedb);
         fsquery.prepare("INSERT INTO data (objtype, type, size, parid, parimgid, name, fullpath, addr, offset, sectstart, sectlength, sectsize, blocksize, blockcount) VALUES (4, ?, ?, ?, ?, ?, '/', ?, ?, ?, ?, ?, ?, ?)");
         fsquery.bindValue(0, readfsinfo->ftype);
@@ -1209,6 +1211,7 @@ void WombatForensics::AddNewEvidence()
         fsquery.exec();
         currentfilesystemid = fsquery.lastInsertId().toULongLong();
         fsquery.finish();
+        */
 
         FileSystemObject tmpobject;
         tmpobject.id = currentfilesystemid;
@@ -1227,6 +1230,7 @@ void WombatForensics::AddNewEvidence()
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
                 if(readpartinfo->flags == 0x02) // unallocated partition
                 {
+                    /*
                     QSqlQuery partquery(fcasedb);
                     partquery.prepare("INSERT INTO data (objtype, name, parid, parimgid, size, sectstart, sectlength, sectsize) VALUES(3, ?, ?, ?, ?, ?, ?, ?)");
                     partquery.bindValue(0, readpartinfo->desc);
@@ -1238,12 +1242,14 @@ void WombatForensics::AddNewEvidence()
                     partquery.bindValue(6, (int)readvsinfo->block_size);
                     partquery.exec();
                     partquery.finish();
+                    */
                 }
                 else if(readpartinfo->flags == 0x01) // allocated partition
                 {
                     readfsinfo = tsk_fs_open_vol(readpartinfo, TSK_FS_TYPE_DETECT);
                     if(readfsinfo != NULL)
                     {
+                        /*
                         QSqlQuery fsquery(fcasedb);
                         fsquery.prepare("INSERT INTO data (objtype, name, fullpath, type, parid, parimgid, size, addr, offset, sectstart, sectlength, sectsize, blocksize, blockcount) VALUES(4, ?, '/', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                         fsquery.bindValue(0, GetFileSystemLabel(readfsinfo));
@@ -1261,6 +1267,7 @@ void WombatForensics::AddNewEvidence()
                         fsquery.exec();
                         currentfilesystemid = fsquery.lastInsertId().toULongLong();
                         fsquery.finish();
+                        */
                         FileSystemObject tmpobject;
                         tmpobject.id = currentfilesystemid;
                         tmpobject.rootinum = readfsinfo->root_inum;
