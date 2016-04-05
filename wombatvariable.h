@@ -170,7 +170,11 @@ struct WombatVariable
     QString tmpfilepath;
     QString curerrmsg;
     QString wombatdbname;
+    QString settingfilename;
+    QString viewerfilename;
+    QString casesfilename;
     QString thumbdbname;
+    QString thumbfoldername;
     //QString evidremovestring;
     unsigned long long evidremoveid;
     unsigned long long evidrowsremoved;

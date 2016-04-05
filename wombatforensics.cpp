@@ -370,9 +370,22 @@ void WombatForensics::OpenAppDB()
 
 unsigned long long WombatForensics::ReturnCaseCount()
 {
+    unsigned long long a = 0;
+    casesfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream in(&casesfile);
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        a++;
+    }
+    qDebug() << "a" << a;
+    casesfile.close();
+    return a;
+    /*
     QSqlQuery countquery("SELECT COUNT(caseid) FROM cases WHERE deleted = 0;", fappdb);
     if(countquery.first())
         return countquery.value(0).toULongLong();
+    */
 }
 
 void WombatForensics::InitializeAppStructure()
@@ -392,8 +405,15 @@ void WombatForensics::InitializeAppStructure()
     if((new QDir())->mkpath(wombatvariable.tmpfilepath) == false)
         DisplayError("1.3", "App tmpfile folder failed", "App Tmpfile folder was not created");
     wombatvariable.wombatdbname = wombatvariable.datapath + "WombatApp.db";
+    // SHOULDN'T CALL THESE UNTIL I ACTUALLY USE THEM...
+    //wombatvariable.settingfilename = wombatvariable.settingspath + "settings";
+    //wombatvariable.viewerfilename = wombatvariable.settingspath + "viewers";
+    wombatvariable.casesfilename = wombatvariable.datapath + "cases";
     fappdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
     fappdb.setDatabaseName(wombatvariable.wombatdbname);
+    casesfile.setFileName(wombatvariable.casesfilename);
+    //settingsfile.setFileName(wombatvariable.settingfilename);
+    //viewerfile.setFileName(wombatvariable.viewerfilename);
     if(!FileExists(wombatvariable.wombatdbname.toStdString()))
     {
         CreateAppDB(); // used to be wombatdatabase
@@ -445,6 +465,14 @@ void WombatForensics::InsertCase()
     wombatvariable.caseobject.id = casequery.lastInsertId().toULongLong();
     casequery.finish();
     qDebug() << "caseid:" << wombatvariable.caseobject.id;
+    if(ReturnCaseCount() > 0)
+        wombatvariable.caseobject.id = ReturnCaseCount();
+    else
+        wombatvariable.caseobject.id = 1;
+    casesfile.open(QIODevice::Append | QIODevice::Text);
+    QTextStream out(&casesfile);
+    out << wombatvariable.caseobject.id << "," << wombatvariable.caseobject.name;
+    casesfile.close();
 }
 
 void WombatForensics::CreateThumbDB()

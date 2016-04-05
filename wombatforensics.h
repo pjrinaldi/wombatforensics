@@ -1087,6 +1087,9 @@ private:
     QFuture<void> remfuture;
     QFutureWatcher<void> remwatcher;
 
+    QFile casesfile;
+    QFile settingsfile;
+    QFile viewerfile;
     off_t offset() const;
     ImageHexViewer* hexwidget;
     WombatSlider* hexrocker;
