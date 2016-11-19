@@ -1113,7 +1113,7 @@ void WombatForensics::AddNewEvidence()
     }
     free(images);
     fsobjectlist.clear();
-    QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name);
+    QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".evid");
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
