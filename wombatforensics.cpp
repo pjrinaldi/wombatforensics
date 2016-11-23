@@ -1297,6 +1297,7 @@ void WombatForensics::AddNewEvidence()
                         }
                     }
                 }
+                pfile.close();
             }
         }
     }
