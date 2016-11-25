@@ -52,6 +52,29 @@ protected:
     };
 };
 
+class EvidenceWorker : public QObject {
+    Q_OBJECT
+public:
+    EvidenceWorker() {
+        readimginfo = NULL;
+        readvsinfo = NULL;
+        readfsinfo = NULL;
+        readfileinfo = NULL;
+        //AddNewEvidence();
+    };
+    ~EvidenceWorker() {};
+public slots:
+    void process() {
+        //AddNewEvidence();
+        emit finished();
+    };
+signals:
+    void finished() {};
+    void error(QString err) {};
+private:
+    // add my variables here
+};
+
 class TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -1075,6 +1098,8 @@ private:
     QModelIndex selectedindex;
     QModelIndex oldselectedindex;
 
+    QThread* evidencethread;
+    EvidenceWorker* evidenceworker;
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
     //QFuture<void> secondfuture;

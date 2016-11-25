@@ -1437,7 +1437,17 @@ void WombatForensics::AddEvidence()
                 wombatvariable.evidenceobject.fullpathvector.push_back(tmplist.at(i).toStdString());
             wombatvariable.evidenceobject.itemcount = tmplist.count();
             LogMessage("Start Adding Evidence");
-            sqlwatcher.setFuture(QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure));
+
+            evidencethread = new QThread();
+            evidenceworker = new EvidenceWorker();
+            evidenceworker->moveToThread(evidencethread);
+            connect(evidenceworker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
+            connect(evidencethread, SIGNAL(started()), evidenceworker, SLOT(process()));
+            connect(evidenceworker, SIGNAL(finished()), evidencethread, SLOT(quit()));
+            connect(evidenceworker, SIGNAL(finished()), evidenceworker, SLOT(deleteLater()));
+            connect(evidencethread, SIGNAL(finished()), evidencethread, SLOT(deleteLater()));
+            evidnecethread->start();
+            //sqlwatcher.setFuture(QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure));
         }
         else
             DisplayError("3.0", "Evidence already exists in the case", "Add Evidence Cancelled");
