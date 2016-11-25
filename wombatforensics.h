@@ -66,6 +66,7 @@ public:
 public slots:
     void process() {
         //AddNewEvidence();
+        // place add new evidence code in here...
         emit finished();
     };
 signals:
