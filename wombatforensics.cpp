@@ -101,7 +101,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     //propertywindow->setModal(false);
     InitializeAppStructure();
-    connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+    //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(FinishSql()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
@@ -1439,14 +1439,16 @@ void WombatForensics::AddEvidence()
             LogMessage("Start Adding Evidence");
 
             evidencethread = new QThread();
-            evidenceworker = new EvidenceWorker();
+            evidenceworker = new EvidenceWorker(wombatvariable);
             evidenceworker->moveToThread(evidencethread);
             connect(evidenceworker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
             connect(evidencethread, SIGNAL(started()), evidenceworker, SLOT(process()));
             connect(evidenceworker, SIGNAL(finished()), evidencethread, SLOT(quit()));
+            // need to link to the next step....
+            //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
             connect(evidenceworker, SIGNAL(finished()), evidenceworker, SLOT(deleteLater()));
             connect(evidencethread, SIGNAL(finished()), evidencethread, SLOT(deleteLater()));
-            evidnecethread->start();
+            evidencethread->start();
             //sqlwatcher.setFuture(QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure));
         }
         else
