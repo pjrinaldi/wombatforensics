@@ -72,6 +72,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
+    cancelthread = new CancelThread(this);
     //propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
@@ -79,6 +80,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
+    //cancelthread->setWindowIcon(QIcon(""));
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -1438,12 +1440,13 @@ void WombatForensics::AddEvidence()
             wombatvariable.evidenceobject.itemcount = tmplist.count();
             LogMessage("Start Adding Evidence");
 
-            evidencethread = new QThread();
+            evidencethread = new QThread;
             evidenceworker = new EvidenceWorker(wombatvariable);
             evidenceworker->moveToThread(evidencethread);
             connect(evidenceworker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
             connect(evidencethread, SIGNAL(started()), evidenceworker, SLOT(process()));
             connect(evidenceworker, SIGNAL(finished()), evidencethread, SLOT(quit()));
+            //connect(evidenceworker, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
             // need to link to the next step....
             //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
             connect(evidenceworker, SIGNAL(finished()), evidenceworker, SLOT(deleteLater()));
@@ -2689,6 +2692,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     htmlviewer->close();
     byteviewer->close();
     aboutbox->close();
+    cancelthread->close();
     RemoveTmpFiles();
     event->accept();
     msglog->clear();
@@ -2943,6 +2947,7 @@ void WombatForensics::on_actionCollapseAll_triggered()
 void WombatForensics::on_actionAbout_triggered()
 {
     aboutbox->show();
+    cancelthread->show();
 }
 
 void WombatForensics::UpdateThumbnails(int tsize)
