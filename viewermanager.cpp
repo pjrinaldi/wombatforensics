@@ -11,6 +11,7 @@ ViewerManager::ViewerManager(QWidget* parent) : QDialog(parent), ui(new Ui::View
     connect(ui->browsebutton, SIGNAL(clicked()), this, SLOT(ShowBrowser()));
     connect(ui->addbutton, SIGNAL(clicked()), this, SLOT(AddViewer()));
     connect(ui->removebutton, SIGNAL(clicked()), this, SLOT(RemoveSelected()));
+    /*
     if(!fappdb.isOpen())
         fappdb.open();
     QSqlQuery equery(fappdb);
@@ -21,6 +22,7 @@ ViewerManager::ViewerManager(QWidget* parent) : QDialog(parent), ui(new Ui::View
         externlist.append(equery.value(0).toString());
     }
     equery.finish();
+    */
     externallist = externlist;
     viewmodel = new ViewerModel(externlist);
     ui->listView->setModel(viewmodel);

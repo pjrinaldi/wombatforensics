@@ -16,6 +16,7 @@ IdFilter::~IdFilter()
 
 void IdFilter::DisplayFilter()
 {
+    /*
     QSqlQuery idquery(fcasedb);
     idquery.prepare("SELECT COUNT(objectid) FROM data;");
     idquery.exec();
@@ -27,6 +28,7 @@ void IdFilter::DisplayFilter()
     ui->morespinBox->setValue(filtervalues.maxid);
     ui->lessspinBox->setValue(filtervalues.minid);
     idquery.finish();
+    */
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
@@ -167,6 +169,7 @@ SizeFilter::~SizeFilter()
 
 void SizeFilter::DisplayFilter()
 {
+    /*
     QSqlQuery sizequery(fcasedb);
     sizequery.prepare("SELECT MAX(size) FROM data;");
     sizequery.exec();
@@ -176,6 +179,7 @@ void SizeFilter::DisplayFilter()
     ui->morespinBox->setValue(filtervalues.maxsize);
     ui->lessspinBox->setValue(filtervalues.minsize);
     sizequery.finish();
+    */
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
@@ -347,6 +351,7 @@ void FileTypeFilter::DisplayFilter()
     tmptype.clear();
     ui->categorycomboBox->clear();
     ui->typecomboBox->clear();
+    /*
     QSqlQuery typequery(fcasedb);
     typequery.prepare("SELECT DISTINCT filemime FROM data WHERE objecttype = 5;");
     if(typequery.exec())
@@ -361,6 +366,7 @@ void FileTypeFilter::DisplayFilter()
     else
         qDebug() << fcasedb.lastError().text();
     typequery.finish();
+    */
     tmpcategory.removeDuplicates();
     tmptype.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)
@@ -406,6 +412,7 @@ void FileCategoryFilter::DisplayFilter()
     QStringList tmpcategory;
     tmpcategory.clear();
     ui->categorycomboBox->clear();
+    /*
     QSqlQuery typequery(fcasedb);
     typequery.prepare("SELECT DISTINCT filesignature FROM data WHERE objecttype = 5 OR objecttype = 6;");
     typequery.exec();
@@ -414,6 +421,7 @@ void FileCategoryFilter::DisplayFilter()
         tmpcategory.append(typequery.value(0).toString());
     }
     typequery.finish();
+    */
     tmpcategory.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)
         ui->categorycomboBox->addItem(tmpcategory.at(i));
@@ -463,6 +471,7 @@ void HashFilter::HideClicked()
         filtervalues.hashlist.clear();
         filtervalues.hashcount.clear();
         filtervalues.hashidlist.clear();
+        /*
         QSqlQuery hashquery(fcasedb);
         hashquery.prepare("SELECT md5, COUNT(md5) FROM data GROUP BY md5 HAVING COUNT(md5) > 1 AND md5 != '';");
         if(hashquery.exec())
@@ -491,6 +500,7 @@ void HashFilter::HideClicked()
                 qDebug() << fcasedb.lastError().text();
         }
         hashquery.finish();
+        */
     }
     this->hide();
     emit HeaderChanged();

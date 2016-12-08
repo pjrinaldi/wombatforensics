@@ -38,6 +38,7 @@ public:
 
     void RemoveSelected(QModelIndex index)
     {
+        /*
         QSqlQuery remquery(fappdb);
         remquery.prepare("UPDATE externalviewers SET deleted = 1 WHERE path = ?;");
         remquery.addBindValue(index.sibling(index.row(), 0).data().toString());
@@ -54,6 +55,7 @@ public:
             }
         }
         endRemoveRows();
+        */
         externallist = externalviewers;
     };
 
@@ -61,6 +63,7 @@ public:
     {
         bool viewexists = false;
         int isdeleted = 0;
+        /*
         QSqlQuery existquery(fappdb);
         existquery.prepare("SELECT path, deleted FROM externalviewers;");
         existquery.exec();
@@ -95,6 +98,7 @@ public:
         }
         externalviewers.append(viewpath);
         endInsertRows();
+        */
         externallist = externalviewers;
     };
 private:

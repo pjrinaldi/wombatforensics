@@ -75,6 +75,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdexcept>
@@ -87,7 +88,6 @@
 #include <new>
 #include <unistd.h>
 #include <string.h>
-#include <sys/mount.h>
 
 #include "tskvariable.h"
 #include "cursor.h"

@@ -46,6 +46,7 @@ void ImageWindow::GetImage(unsigned long long objectid)
     unsigned long long fsoffset = 0;
     unsigned long long address = 0;
     pathvector.clear();
+    /*
     QSqlQuery pimgquery(fcasedb);
     pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
     pimgquery.addBindValue(objectid);
@@ -79,6 +80,7 @@ void ImageWindow::GetImage(unsigned long long objectid)
     pimgquery.next();
     fsoffset = pimgquery.value(0).toULongLong();
     pimgquery.finish();
+    */
     tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
     // OpenFile
     tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, address);
@@ -178,6 +180,7 @@ void ImageViewer::ShowImage(const QModelIndex &index)
 
 void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
 {
+    /*
     QSqlQuery pathquery(fcasedb);
     pathquery.prepare("SELECT (fullpath || name) AS fullname FROM data WHERE objectid = ?;");
     pathquery.addBindValue(index.data(Qt::UserRole).toULongLong());
@@ -185,6 +188,7 @@ void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
     pathquery.next();
     thumbpath = pathquery.value(0).toString();
     pathquery.finish();
+    */
 
     emit SendObjectToTreeView(index.data(Qt::UserRole).toULongLong()); 
 }

@@ -3,9 +3,9 @@
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-QSqlDatabase fcasedb;
-QSqlDatabase thumbdb;
-QSqlDatabase fappdb;
+//QSqlDatabase fcasedb;
+//QSqlDatabase thumbdb;
+//QSqlDatabase fappdb;
 QFile logfile;
 QTextEdit* msglog = NULL;
 QVector<FileData> filedatavector;

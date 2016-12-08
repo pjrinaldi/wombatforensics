@@ -45,6 +45,7 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
 unsigned long long GetChildCount(int type, unsigned long long address, unsigned long long parimgid, unsigned long long parfsid)
 {
     unsigned long long tmpcount = 0;
+    /*
     QSqlQuery childquery(fcasedb);
     QString querystring = "SELECT COUNT(id) FROM data WHERE parid = ?";
     if(type < 4)
@@ -67,6 +68,7 @@ unsigned long long GetChildCount(int type, unsigned long long address, unsigned 
         tmpcount = childquery.value(0).toULongLong();
     }
     childquery.finish();
+    */
     return tmpcount;
 }
 
@@ -351,6 +353,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 void GenerateThumbnails()
 {
+    /*
     QSqlQuery filequery(fcasedb);
     filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5 AND filemime LIKE '%image/%';");
     if(filequery.exec())
@@ -360,6 +363,7 @@ void GenerateThumbnails()
             const TSK_TCHAR** imagepartspath;
             unsigned long long objectid = 0;
             objectid = filequery.value(0).toULongLong();
+            /
             QSqlQuery thumbquery(thumbdb);
             thumbquery.prepare("SELECT COUNT(thumbid) FROM thumbs WHERE objectid = ?;");
             thumbquery.addBindValue(objectid);
@@ -410,6 +414,7 @@ void GenerateThumbnails()
         }
     }
     filequery.finish();
+    */
 }
 
 void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long long fsoffset, int blksize, unsigned long long parfsid)
@@ -437,6 +442,7 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
             proplist << "Unspecified";
         proplist << "allocation status for the file.";
 
+        /*
         QSqlQuery objquery(fcasedb);
         objquery.prepare("SELECT blockaddress, filemime, filesignature, address FROM data WHERE objectid = ?;");
         objquery.bindValue(0, objid);
@@ -492,6 +498,7 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
         }
         fcasedb.commit();
         propquery.finish();
+        */
         processphase++;
         isignals->ProgUpd();
     }
@@ -508,6 +515,7 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, QVector<unsigned long
     }
     for(int i = 0; i < adsobjid.count(); i++)
     {
+        /*
         QSqlQuery adsquery(fcasedb);
         adsquery.prepare("SELECT name, parentid, blockaddress FROM data WHERE objectid = ?;");
         adsquery.bindValue(0, adsobjid.at(i));
@@ -533,6 +541,7 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, QVector<unsigned long
         }
         fcasedb.commit();
         propquery.finish();
+        */
    }
 }
 /*
@@ -740,6 +749,7 @@ QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* tmpfile, unsigned long long a
 
 void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
+    /*
     QSqlQuery thumbquery(thumbdb);
     thumbquery.prepare("SELECT COUNT(thumbid) FROM thumbs WHERE objectid = ?;");
     thumbquery.addBindValue(objid);
@@ -772,6 +782,7 @@ void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
             }
         }
     }
+    */
 }
 
 QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
@@ -787,6 +798,7 @@ QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         {
             sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
         }
+        /*
         QSqlQuery hashquery(fcasedb);
         hashquery.prepare("UPDATE data SET md5 = ? where objectid = ?;");
         if(sint > 0)
@@ -803,6 +815,7 @@ QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         hashquery.exec();
         hashquery.next();
         hashquery.finish();
+        */
     }
     return tmpvariant;
 }
@@ -827,6 +840,7 @@ QImage MakeThumb(const QString &img)
 void SqlMap(FileData &filedata)
 {
     QMutexLocker locker(&mutex);
+    /*
     QSqlQuery fquery(fcasedb);
     //wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, address INTEGER, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT NOT NULL DEFAULT "", filemime TEXT, known INTEGER, checked INTEGER NOT NULL DEFAULT 0, mftattrid INTEGER NOT NULL DEFAULT 0);";
     fquery.prepare("INSERT INTO data(objtype, type, name, fullpath, size, addr, parid, parimgid, parfsid, ctime, crtime, atime, mtime, filemime, mftattrid) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
@@ -860,10 +874,11 @@ void SqlMap(FileData &filedata)
     fquery.bindValue(10, filedata.addr);
     //fquery.bindValue(14, filedata.mimetype.split("/").at(0));
     */
+    /*
     fquery.exec();
     //fquery.next();
     isignals->ProgUpd();
     //emit isignals->FinishSql();
     fquery.finish();
+    */
 }
-

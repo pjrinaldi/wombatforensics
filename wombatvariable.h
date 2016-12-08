@@ -163,6 +163,7 @@ struct WombatVariable
     //unsigned long long currentpartitionid;
     //unsigned long long currentfilesystemid;
     unsigned long long currentrootinum;
+    bool iscaseopen;
     QString currentevidencename;
     //QString currentvolumename;
     QString casespath;

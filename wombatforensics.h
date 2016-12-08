@@ -968,6 +968,9 @@ public:
             else
                 return QVariant();
         }
+        int nodetype = 0;
+        int itemtype = 0;
+        /*
         QSqlQuery dataquery(fcasedb);
         dataquery.prepare("SELECT objtype, type FROM data WHERE id = ?");
         dataquery.bindValue(0, node->nodevalues.at(0).toULongLong());
@@ -976,6 +979,7 @@ public:
         int nodetype = dataquery.value(0).toInt();
         int itemtype = dataquery.value(1).toInt();
         dataquery.finish();
+        */
         //headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
         // WILL NEED TO REPLACE ALL THESE CALLS TO THE RESPECTIVE SQL QUERY RATHER THAN THE NODE SINCE I'M NOT STORING IT IN THE NODE ANYMORE...
         if(role == Qt::ForegroundRole)
@@ -1224,6 +1228,7 @@ public:
             /*else
             {*/
                 Node* currentnode = NodeFromIndex(index);
+                /*
                 QSqlQuery updatequery(fcasedb);
                 updatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ?;");
                 //updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
@@ -1242,6 +1247,7 @@ public:
                 currentnode->nodevalues[9] = updatequery.value(9);
                 currentnode->nodevalues[10] = QVariant(updatequery.value(9).toString().split("/").at(0));
                 updatequery.finish();
+                */
                 //emit dataChanged(index, index);
                 return true;
             //}
@@ -1365,6 +1371,7 @@ public:
         fetchvalues.clear();
         if(parentnode->haschildren == true)
         {
+            /*
             QSqlQuery prequery(fcasedb);
             prequery.prepare("SELECT addr, parimgid, parfsid FROM data WHERE id = ?");
             prequery.bindValue(0, parentnode->nodevalues.at(0).toULongLong());
@@ -1426,7 +1433,7 @@ public:
                 //setData(parent, QVariant(-15), Qt::DisplayRole);
             }
             fetchquery.finish();
-
+            */
 
 
             /*
@@ -1505,6 +1512,7 @@ public:
 
     void AddEvidence(unsigned long long curid)
     {
+        /*
         int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
         addevidquery.prepare("SELECT id, name, fullpath, size, objtype, addr, crtime, atime, mtime, ctime, md5, parid, type, parimgid, parfsid, filemime, checked FROM data WHERE id = ? OR (objtype < 6 AND parimgid = ?)");
@@ -1621,6 +1629,7 @@ public:
             emit checkedNodesChanged();
         }
         addevidquery.finish();
+        */
     };
 
     Node* NodeFromIndex(const QModelIndex &index) const

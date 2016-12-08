@@ -63,6 +63,7 @@ void VideoViewer::GetVideo(QString tmpfilepath, unsigned long long objectid)
     unsigned long long fsoffset = 0;
     unsigned long long address = 0;
     pathvector.clear();
+    /*
     QSqlQuery pimgquery(fcasedb);
     pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
     pimgquery.addBindValue(objectid);
@@ -82,6 +83,7 @@ void VideoViewer::GetVideo(QString tmpfilepath, unsigned long long objectid)
         }
     }
     pimgquery.finish();
+    */
     tskptr->imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
     for(uint i=0; i < pathvector.size(); i++)
     {
@@ -90,12 +92,14 @@ void VideoViewer::GetVideo(QString tmpfilepath, unsigned long long objectid)
     tskptr->readimginfo = tsk_img_open(pathvector.size(), tskptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     free(tskptr->imagepartspath);
     // OpenParentFileSystem
+    /*
     pimgquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
     pimgquery.addBindValue(fsid);
     pimgquery.exec();
     pimgquery.next();
     fsoffset = pimgquery.value(0).toULongLong();
     pimgquery.finish();
+    */
     tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
     // OpenFile
     tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, address);

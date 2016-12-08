@@ -38,6 +38,7 @@ public:
             return idlist.at(index.row());
         else if(role == Qt::ToolTipRole)
         {
+            /*
             QSqlQuery pathquery(fcasedb);
             pathquery.prepare("SELECT (fullpath || name) AS fullname FROM data WHERE objectid = ?;");
             pathquery.addBindValue(index.data(Qt::UserRole).toULongLong());
@@ -45,6 +46,7 @@ public:
             pathquery.next();
             thumbpath = pathquery.value(0).toString();
             pathquery.finish();
+            */
             return thumbpath; 
         }
         else

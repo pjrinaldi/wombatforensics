@@ -351,6 +351,7 @@ void WombatForensics::HideByteViewer(bool checkstate)
 
 void WombatForensics::CreateAppDB()
 {
+    /*
     if(fappdb.open())
     {
         fappdb.transaction();
@@ -362,12 +363,15 @@ void WombatForensics::CreateAppDB()
     }
     else
         DisplayError("1.6", "Create App DB Error", fappdb.lastError().text());
+    */
 }
 
 void WombatForensics::OpenAppDB()
 {
+    /*
     if(!fappdb.isOpen())
         fappdb.open();
+    */
 }
 
 unsigned long long WombatForensics::ReturnCaseCount()
@@ -392,6 +396,7 @@ unsigned long long WombatForensics::ReturnCaseCount()
 
 void WombatForensics::InitializeAppStructure()
 {
+    wombatvariable.iscaseopen = false;
     QString homepath = QDir::homePath();
     // changing storing settings and such from /WombatForensics/ to /.wombatforensics/
     //homepath += "/WombatForensics/";
@@ -501,6 +506,7 @@ void WombatForensics::InsertCase()
 
 void WombatForensics::CreateThumbDB()
 {
+    /*
     if(thumbdb.open())
     {
         QSqlQuery thumbquery(thumbdb);
@@ -511,16 +517,20 @@ void WombatForensics::CreateThumbDB()
     {
         LogMessage(thumbdb.lastError().text());
     }
+    */
 }
 
 void WombatForensics::OpenThumbDB()
 {
+    /*
     if(!thumbdb.isOpen())
         thumbdb.open();
+    */
 }
 
 void WombatForensics::CreateCaseDB()
 {
+    /*
     #define IMGDB_CHUNK_SIZE 1024*1024*1 // what size chunks should the database use when growing and shrinking
     #define IMGDB_MAX_RETRY_COUNT 50    // how many times will we retry a SQL statement
     #define IMGDB_RETRY_WAIT 100   // how long (in milliseconds) are we willing to wait between retries
@@ -542,12 +552,15 @@ void WombatForensics::CreateCaseDB()
     }
     fcasedb.commit();
     casequery.finish();
+    */
 }
 
 void WombatForensics::OpenCaseDB()
 {
+    /*
     if(!fcasedb.isOpen())
         fcasedb.open();
+    */
 }
 
 void WombatForensics::InitializeCaseStructure()
@@ -574,81 +587,21 @@ void WombatForensics::InitializeCaseStructure()
         this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name); // update application window
         if(!wombatvariable.caseobject.name.contains(".wfc"))
             wombatvariable.caseobject.name += ".wfc";
-        qDebug() << wombatvariable.caseobject.name;
         QFile casefile(wombatvariable.caseobject.name);
         casefile.open(QIODevice::WriteOnly);
-        casefile.resize(100000000);
+        casefile.resize(1000000000);
         casefile.close();
-        /*
-        QObject* parent;
-        QObject* parent2;
-        QProcess* mkfs = new QProcess(parent);
-        QStringList mkfsargs;
-        mkfsargs << wombatvariable.caseobject.name;
-        mkfs->start("mkfs.btrfs", mkfsargs);
-        mkfs->waitForFinished();
-        QProcess* mount = new QProcess(parent2);
-        QStringList mntargs;
-        mntargs << "-o loop" << wombatvariable.caseobject.name << wombatvariable.tmpmntpath;
-        mount->start("sudo mount", mntargs);
-        mount->waitForFinished();
-        */
-        // NEED TO TRY SOMETHING LIKE THE FOLLOWING
-        /*
-         *
-         *int loopdev_setup_device(const char * file, uint64_t offset, const char * device) {
-  int file_fd = open(file, O_RDWR);
-  int device_fd = -1; 
-
-  struct loop_info64 info;
-
-  if(file_fd < 0) {
-    fprintf(stderr, "Failed to open backing file (%s).\n", file);
-    goto error;
-  }
-
-  if((device_fd = open(device, O_RDWR)) < 0) {
-    fprintf(stderr, "Failed to open device (%s).\n", device);
-    goto error;
-  }
-
-  if(ioctl(device_fd, LOOP_SET_FD, file_fd) < 0) {
-    fprintf(stderr, "Failed to set fd.\n");
-    goto error;
-  }
-
-  close(file_fd);
-  file_fd = -1; 
-
-  memset(&info, 0, sizeof(struct loop_info64)); 
-  info.lo_offset = offset;
-  // info.lo_sizelimit = 0 => max avilable
-  // info.lo_encrypt_type = 0 => none
-
-  if(ioctl(device_fd, LOOP_SET_STATUS64, &info)) {
-    fprintf(stderr, "Failed to set info.\n");
-    goto error;
-  }
-
-  close(device_fd);
-  device_fd = -1; 
-
-  return 0;
-
-  error:
-    if(file_fd >= 0) {
-      close(file_fd);
-    }   
-    if(device_fd >= 0) {
-      ioctl(device_fd, LOOP_CLR_FD, 0); 
-      close(device_fd);
-    }   
-    return 1;
-}
-         *
-         *
-         *
-         */ 
+        QString mkfsstr = "mkfs.btrfs -q ";
+        mkfsstr += wombatvariable.caseobject.name;
+        QString mntstr = "sudo mount -o loop ";
+        mntstr += wombatvariable.caseobject.name;
+        mntstr += " ";
+        mntstr += wombatvariable.tmpmntpath;
+        QProcess::execute(mkfsstr);
+        QProcess::execute(mntstr);
+        wombatvariable.iscaseopen = true;
+        // this works with privilege escalation. only way to mount it though. now requires linux and btrfs.
+        // STILL NEED TO UNMOUNT WHEN CLOSE CASE AND EXIT
     }
     /*
     bool ok;
@@ -731,14 +684,17 @@ void WombatForensics::InitializeOpenCase()
     bool ok;
     QStringList casenamelist;
     casenamelist.clear();
+    /*
     QSqlQuery appquery(fappdb);
     appquery.exec("SELECT name FROM cases WHERE deleted = 0 ORDER BY caseid");
     while(appquery.next())
         casenamelist << appquery.value(0).toString();
     appquery.finish();
+    */
     wombatvariable.caseobject.name = QInputDialog::getItem(this, tr("Open Existing Case"), tr("Select the Case to Open: "), casenamelist, 0, false, &ok);
     if(ok && !wombatvariable.caseobject.name.isEmpty()) // open selected case
     {
+        /*
         appquery.prepare("SELECT caseid FROM cases WHERE name = ?;");
         appquery.addBindValue(wombatvariable.caseobject.name);
         appquery.exec();
@@ -840,6 +796,7 @@ void WombatForensics::InitializeOpenCase()
             hexrocker->setEnabled(true);
             //StatusUpdate("Opening Case Evidence...");
         }
+        */
     }
     /*
     // open case here
@@ -1541,6 +1498,7 @@ void WombatForensics::AddEvidence()
     if(tmplist.count())
     {
         wombatvariable.evidenceobject.name = tmplist.at(0).split("/").last();
+        /*
         QSqlQuery evidquery(fcasedb);
         evidquery.prepare("SELECT fullpath FROM data WHERE objtype = 1");
         evidquery.exec();
@@ -1550,6 +1508,7 @@ void WombatForensics::AddEvidence()
                 isnew = 0;
         }
         evidquery.finish();
+        */
         if(isnew == 1)
         {
             for(int i=0; i < tmplist.count(); i++)
@@ -1625,6 +1584,7 @@ void WombatForensics::LoadHexContents()
     wombatvariable.selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
     wombatvariable.selectedobject.size = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
     wombatvariable.selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
+    /*
     QSqlQuery objquery(fcasedb);
     objquery.prepare("SELECT objtype, sectstart, sectsize, sectlength, offset, parimgid, parfsid, parid, addr, mftattrid, blocksize FROM data WHERE id = ?");
     objquery.bindValue(0, wombatvariable.selectedobject.id);
@@ -1642,6 +1602,7 @@ void WombatForensics::LoadHexContents()
     wombatvariable.selectedobject.mftattrid = objquery.value(9).toULongLong();
     wombatvariable.selectedobject.blocksize = objquery.value(10).toInt();
     objquery.finish();
+    */
     blockstring = "";
     if(wombatvariable.selectedobject.objtype == 1) // image file
     {
@@ -1702,6 +1663,7 @@ void WombatForensics::LoadHexContents()
             }
             else
             {
+                /*
                 QSqlQuery adsquery(fcasedb);
                 adsquery.prepare("SELECT objectid, mftattrid FROM data WHERE objecttype = 6 and parentid = ?;");
                 adsquery.bindValue(0, wombatvariable.selectedobject.address);
@@ -1714,6 +1676,7 @@ void WombatForensics::LoadHexContents()
                     }
                 }
                 adsquery.finish();
+                */
             }
             unsigned long long minads = 1000;
             for(int i = 0; i < adsattrid.count(); i++)
@@ -2091,6 +2054,7 @@ void WombatForensics::LoadHexContents()
 
 void WombatForensics::OpenParentImage(unsigned long long imgid)
 {
+    /*
     QSqlQuery cntquery(fcasedb);
     cntquery.prepare("SELECT count(fullpath) FROM dataruns WHERE objectid = ?");
     cntquery.bindValue(0, imgid);
@@ -2110,6 +2074,7 @@ void WombatForensics::OpenParentImage(unsigned long long imgid)
     }
     tskobjptr->partcount = imgcnt;
     evidquery.finish();
+    */
     /*
     wombatdatabase->GetEvidenceObjects();
     int curidx = 0;
@@ -2136,6 +2101,7 @@ void WombatForensics::OpenParentImage(unsigned long long imgid)
 
 void WombatForensics::OpenParentFileSystem(unsigned long long fsid)
 {
+    /*
     QSqlQuery fsquery(fcasedb);
     fsquery.prepare("SELECT offset FROM data WHERE id = ?");
     fsquery.bindValue(0, fsid);
@@ -2143,6 +2109,7 @@ void WombatForensics::OpenParentFileSystem(unsigned long long fsid)
     fsquery.first();
     tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, fsquery.value(0).toULongLong(), TSK_FS_TYPE_DETECT);
     fsquery.finish();
+    */
     /*
      *    wombatptr->bindvalues.append(fsid);
     wombatptr->sqlrecords.clear();
@@ -2161,12 +2128,14 @@ void WombatForensics::OpenFileSystemFile()
 
 void WombatForensics::CloseCurrentCase()
 {
+    /*
     QSqlQuery evidquery(fcasedb);
     evidquery.prepare("SELECT id FROM data where objtype = 1");
     evidquery.exec();
     while(evidquery.next())
         treemodel->RemEvidence(evidquery.value(0).toULongLong());
     evidquery.finish();
+    */
     //autosavetimer->stop();
     //GetEvidenceObjects(); // was previously wombatdabase
     /*
@@ -2174,13 +2143,16 @@ void WombatForensics::CloseCurrentCase()
     {
         treemodel->RemEvidence(wombatvarptr->evidenceobjectvector.at(i).id);
     }
-     */ 
+     */
     setWindowTitle("WombatForensics");
     filesprocessed = 0;
     filesfound = 0;
     filtercountlabel->setText("Filtered: 0");
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
+    QString umntstr = "sudo umount ";
+    umntstr += wombatvariable.tmpmntpath;
+    QProcess::execute(umntstr);
     StatusUpdate("Current Case was closed successfully");
     //CloseCaseDB(); // was previously wombatdatabase
 }
@@ -2814,6 +2786,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     event->accept();
     msglog->clear();
     msgviewer->close();
+    /*
     if(fappdb.isOpen())
         fappdb.close();
     fappdb = QSqlDatabase();
@@ -2826,6 +2799,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         fcasedb.close();
     fcasedb = QSqlDatabase();
     QSqlDatabase::removeDatabase("casedb");
+    */
 
     /*
     wombatdatabase->CloseCaseDB();
@@ -2837,7 +2811,8 @@ void WombatForensics::closeEvent(QCloseEvent* event)
 void WombatForensics::RemoveTmpFiles()
 {
     QString homePath = QDir::homePath();
-    homePath += "/WombatForensics/";
+    homePath += "./wombatforensics/";
+    //homePath += "/WombatForensics/";
     homePath += "tmpfiles/";
     QDir tmpdir(homePath);
     if(!tmpdir.removeRecursively())
@@ -2850,7 +2825,18 @@ void WombatForensics::on_actionNew_Case_triggered()
 {
     // determine if a case is open
     // NEED A NEW WAY TO CHECK IF A CASE IS OPEN...
-    /*
+    if(wombatvariable.iscaseopen)
+    {
+        int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
+        if(ret == QMessageBox::Yes)
+        {
+            CloseCurrentCase();
+            InitializeCaseStructure();
+        }
+    }
+    else
+        InitializeCaseStructure();
+   /*
     if(wombatvariable.caseobject.id > 0)
     {
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
@@ -2863,13 +2849,14 @@ void WombatForensics::on_actionNew_Case_triggered()
     else
         InitializeCaseStructure();
     */
-    InitializeCaseStructure();
+    //InitializeCaseStructure();
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()
 {
     // determine if a case is open
-    if(wombatvariable.caseobject.id > 0)
+    //if(wombatvariable.caseobject.id > 0)
+    if(wombatvariable.iscaseopen)
     {
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
         if (ret == QMessageBox::Yes)
