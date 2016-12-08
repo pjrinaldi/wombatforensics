@@ -1950,7 +1950,7 @@ private:
     QShortcut* showitem;
     QTimer* autosavetimer;
     //unsigned long long currentcaseid;
-    WombatVariable wombatvariable;
+    WombatVariable wombatvariable; // possibly need to make this global...
     TSK_IMG_INFO* readimginfo;
     TSK_VS_INFO* readvsinfo;
     const TSK_VS_PART_INFO* readpartinfo;

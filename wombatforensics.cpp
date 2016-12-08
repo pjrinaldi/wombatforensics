@@ -98,7 +98,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
-    wombatvariable.caseobject.id = 0;
+    //wombatvariable.caseobject.id = 0;
     //wombatvarptr->caseobject.id = 0;
     //connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     //propertywindow->setModal(false);
@@ -393,27 +393,41 @@ unsigned long long WombatForensics::ReturnCaseCount()
 void WombatForensics::InitializeAppStructure()
 {
     QString homepath = QDir::homePath();
-    homepath += "/WombatForensics/";
-    wombatvariable.settingspath = homepath + "settings/";
-    wombatvariable.datapath = homepath + "data/";
-    wombatvariable.casespath = homepath + "cases/";
+    // changing storing settings and such from /WombatForensics/ to /.wombatforensics/
+    //homepath += "/WombatForensics/";
+    homepath += "/.wombatforensics/";
+    // settings are now just stored in .wombatforensics
+    //wombatvariable.settingspath = homepath + "settings/";
+    // there would be no data now.
+    //wombatvariable.datapath = homepath + "data/";
+    // there would be no cases now
+    //wombatvariable.casespath = homepath + "cases/";
+    // tmp files would still exist.
     wombatvariable.tmpfilepath = homepath + "tmpfiles/";
+    wombatvariable.tmpmntpath = homepath + "mntpt/";
+    /*
     if((new QDir())->mkpath(wombatvariable.settingspath) == false)
         DisplayError("1.0", "App Settings Folder Failed.", "App Settings Folder was not created.");
     if((new QDir())->mkpath(wombatvariable.datapath) == false)
         DisplayError("1.1", "App Data Folder Failed", "App Data Folder was not created");
     if((new QDir())->mkpath(wombatvariable.casespath) == false)
         DisplayError("1.2", "App Cases Folder Failed", "App Cases Folder was not created");
+    */
     if((new QDir())->mkpath(wombatvariable.tmpfilepath) == false)
         DisplayError("1.3", "App tmpfile folder failed", "App Tmpfile folder was not created");
-    wombatvariable.wombatdbname = wombatvariable.datapath + "WombatApp.db";
+    if((new QDir())->mkpath(wombatvariable.tmpmntpath) == false)
+        DisplayError("1.2", "App tmpmnt folder failed", "App tmpmnt folder was not created");
+    // there would be no WombatApp.db anymore
+    //wombatvariable.wombatdbname = wombatvariable.datapath + "WombatApp.db";
     // SHOULDN'T CALL THESE UNTIL I ACTUALLY USE THEM...
     //wombatvariable.settingfilename = wombatvariable.settingspath + "settings";
     //wombatvariable.viewerfilename = wombatvariable.settingspath + "viewers";
-    wombatvariable.casesfilename = wombatvariable.datapath + "cases";
+    // shouldn't need this anymore.
+    //wombatvariable.casesfilename = wombatvariable.datapath + "cases";
     //fappdb = QSqlDatabase::addDatabase("QSQLITE", "appdb");
     //fappdb.setDatabaseName(wombatvariable.wombatdbname);
-    casesfile.setFileName(wombatvariable.casesfilename);
+    // shouldn't need this anymore
+    //casesfile.setFileName(wombatvariable.casesfilename);
     //settingsfile.setFileName(wombatvariable.settingfilename);
     //viewerfile.setFileName(wombatvariable.viewerfilename);
     /*
@@ -433,11 +447,15 @@ void WombatForensics::InitializeAppStructure()
     viewmanage = new ViewerManager(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
-    ui->actionOpen_Case->setEnabled(false);
+    // shouldn't need open to be disabled cause i'm not managing that anymore.
+    //ui->actionOpen_Case->setEnabled(false);
+    // shouldn't need the case count information...
+    /*
     if(ReturnCaseCount() > 0) // used to be wombatdatabase
     {
         ui->actionOpen_Case->setEnabled(true);
     }
+    */
     ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
@@ -535,6 +553,46 @@ void WombatForensics::OpenCaseDB()
 void WombatForensics::InitializeCaseStructure()
 {
     // create new case here
+    // NEED TO CHANGE TO A SAVE FILE DIALOG WHERE THEY SAVE THE FILENAME OF THE 
+    /*
+     *
+     *const QFileDialog::Options options = QFlag(fileDialogOptionsWidget->value());
+    QString selectedFilter;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                tr("QFileDialog::getSaveFileName()"),
+                                saveFileNameLabel->text(),
+                                tr("All Files (*);;Text Files (*.txt)"),
+                                &selectedFilter,
+                                options);
+    if (!fileName.isEmpty())
+        saveFileNameLabel->setText(fileName);
+     *
+     */ 
+    wombatvariable.caseobject.name = QFileDialog::getSaveFileName(this, tr("Create New Case File"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
+    if(!wombatvariable.caseobject.name.isEmpty())
+    {
+        this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name); // update application window
+        if(!wombatvariable.caseobject.name.contains(".wfc"))
+            wombatvariable.caseobject.name += ".wfc";
+        qDebug() << wombatvariable.caseobject.name;
+        QFile casefile(wombatvariable.caseobject.name);
+        casefile.open(QIODevice::WriteOnly);
+        casefile.resize(10000000);
+        casefile.close();
+        QObject* parent;
+        QObject* parent2;
+        QProcess* mkfs = new QProcess(parent);
+        QStringList mkfsargs;
+        mkfsargs << wombatvariable.caseobject.name;
+        mkfs->start("mkfs.btrfs", mkfsargs);
+        mkfs->waitForFinished();
+        QProcess* mount = new QProcess(parent2);
+        QStringList mntargs;
+        mntargs << "-o loop" << wombatvariable.caseobject.name << wombatvariable.tmpmntpath;
+        mount->start("sudo mount", mntargs);
+        mount->waitForFinished();
+    }
+    /*
     bool ok;
     wombatvariable.caseobject.name = QInputDialog::getText(this, tr("New Case Creation"), "Enter Case Name: ", QLineEdit::Normal, "", &ok);
     if(ok && !wombatvariable.caseobject.name.isEmpty())
@@ -550,7 +608,6 @@ void WombatForensics::InitializeCaseStructure()
         logfile.setFileName(wombatvariable.caseobject.dirpath + "msglog");
         msglog->clear();
         LogMessage("Log File Created");
-        /*
         thumbdb = QSqlDatabase::database("thumbdb");
         if(!thumbdb.isValid())
             thumbdb = QSqlDatabase::addDatabase("QSQLITE", "thumbdb");
@@ -569,7 +626,7 @@ void WombatForensics::InitializeCaseStructure()
         }
         */
         // Create CaseID-CasenameDB
-        int errorcount = 0;
+        //int errorcount = 0;
         //wombatvariable.caseobject.file = wombatvariable.caseobject.dirpath + casestring;
         //casedatafile.setFileName(wombatvariable.caseobject.file);
         /*
@@ -600,13 +657,15 @@ void WombatForensics::InitializeCaseStructure()
             }
         }
         */
+        /*
         if(ReturnCaseCount() > 0)
             ui->actionOpen_Case->setEnabled(true);
-        ui->actionAdd_Evidence->setEnabled(true);
-        LogMessage("Case was Created");
+        */
+        //ui->actionAdd_Evidence->setEnabled(true);
+        //LogMessage("Case was Created");
         //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
         //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
-    }
+    //}
 }
 
 void WombatForensics::InitializeOpenCase()
@@ -2732,6 +2791,8 @@ void WombatForensics::RemoveTmpFiles()
 void WombatForensics::on_actionNew_Case_triggered()
 {
     // determine if a case is open
+    // NEED A NEW WAY TO CHECK IF A CASE IS OPEN...
+    /*
     if(wombatvariable.caseobject.id > 0)
     {
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
@@ -2743,6 +2804,8 @@ void WombatForensics::on_actionNew_Case_triggered()
     }
     else
         InitializeCaseStructure();
+    */
+    InitializeCaseStructure();
 }
 
 void WombatForensics::on_actionOpen_Case_triggered()

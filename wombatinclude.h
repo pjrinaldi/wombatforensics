@@ -70,6 +70,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QPixmap>
+#include <QProcess>
 
 #include <sstream>
 #include <stdio.h>
@@ -87,6 +88,7 @@
 #include <new>
 #include <unistd.h>
 #include <string.h>
+#include <sys/mount.h>
 
 #include "tskvariable.h"
 #include "cursor.h"
