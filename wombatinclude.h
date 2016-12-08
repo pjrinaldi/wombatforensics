@@ -70,7 +70,6 @@
 #include <QWidget>
 #include <QPainter>
 #include <QPixmap>
-#include <QProcess>
 
 #include <sstream>
 #include <stdio.h>
