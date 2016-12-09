@@ -584,9 +584,24 @@ void WombatForensics::InitializeCaseStructure()
     wombatvariable.caseobject.name = QFileDialog::getSaveFileName(this, tr("Create New Case File"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
     if(!wombatvariable.caseobject.name.isEmpty())
     {
+        QStringList tmplist = wombatvariable.caseobject.name.split("/");
+        tmplist.removeLast();
+        wombatvariable.caseobject.dirpath = tmplist.join("/");
+        qDebug() << wombatvariable.caseobject.dirpath;
+        // create log file here
+        logfile.setFileName(wombatvariable.caseobject.dirpath + "/msglog");
+        msglog->clear();
+        LogMessage("Log File Created");
         this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name); // update application window
         if(!wombatvariable.caseobject.name.contains(".wfc"))
+        {
+            this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name.split("/").last());
             wombatvariable.caseobject.name += ".wfc";
+        }
+        else
+        {
+            this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name.split("/").last().split(".").first());
+        }
         QFile casefile(wombatvariable.caseobject.name);
         casefile.open(QIODevice::WriteOnly);
         casefile.resize(1000000000);
@@ -600,8 +615,12 @@ void WombatForensics::InitializeCaseStructure()
         QProcess::execute(mkfsstr);
         QProcess::execute(mntstr);
         wombatvariable.iscaseopen = true;
+        //ui->actionAdd_Evidence->setEnabled(true);
+        LogMessage("Case was Created");
+        //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+        //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
+
         // this works with privilege escalation. only way to mount it though. now requires linux and btrfs.
-        // STILL NEED TO UNMOUNT WHEN CLOSE CASE AND EXIT
     }
     /*
     bool ok;
