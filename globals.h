@@ -121,6 +121,7 @@ struct FileData
 };
 
 extern QVector<FileData> filedatavector;
+extern QList<WombatVariable> wombatvarvector;
 
 extern FilterValues filtervalues;
 
@@ -201,5 +202,13 @@ extern Node* actionnode;
 //extern TSK_IMG_INFO* IMG_2ND_PROC;
 extern QMutex mutex;
 extern QMutex mutex2;
+extern TSK_IMG_INFO* readimginfo;
+extern TSK_VS_INFO* readvsinfo;
+extern const TSK_VS_PART_INFO* readpartinfo;
+extern TSK_FS_INFO* readfsinfo;
+extern TSK_FS_FILE* readfileinfo;
+extern char asc[512];
+extern iso9660_pvd_node* p;
+extern HFS_INFO* hfs;
 
 #endif

@@ -52,7 +52,7 @@ protected:
         }
     };
 };
-
+/*
 class EvidenceWorker : public QObject {
     Q_OBJECT
 public:
@@ -191,9 +191,9 @@ private:
     {
         TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
         hfs_btree_key_cat key;      /* current catalog key */
-        hfs_thread thread;          /* thread record */
-        hfs_file_folder record;     /* file/folder record */
-        TSK_OFF_T off;
+/*        hfs_thread thread;          /* thread record */
+/*        hfs_file_folder record;     /* file/folder record */
+/*        TSK_OFF_T off;
 
         // Test if this is a special file that is not located in the catalog
         if ((inum == HFS_EXTENTS_FILE_ID) ||
@@ -208,26 +208,26 @@ private:
         /* first look up the thread record for the item we're searching for */
 
         /* set up the thread record key */
-        memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
-        cnid_to_array((uint32_t) inum, key.parent_cnid);
+//        memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
+//        cnid_to_array((uint32_t) inum, key.parent_cnid);
 
         /* look up the thread record */
-        off = hfs_cat_get_record_offset(hfs, &key);
-        if (off == 0)
+//        off = hfs_cat_get_record_offset(hfs, &key);
+/*        if (off == 0)
         {
             // put error code here...
             return 1;
         }
 
         /* read the thread record */
-        if (hfs_cat_read_thread_record(hfs, off, &thread))
+/*        if (hfs_cat_read_thread_record(hfs, off, &thread))
         {
             //tsk_error_set_errstr2(" hfs_cat_file_lookup: file (%" PRIuINUM ")", inum);
             return 1;
         }
 
         /* now look up the actual file/folder record */
-
+/*
         memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
         memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
         memcpy((char *) key.parent_cnid, (char *) thread.parent_cnid,
@@ -235,7 +235,7 @@ private:
         memcpy((char *) &key.name, (char *) &thread.name, sizeof(key.name));
 
         /* look up the record */
-        off = hfs_cat_get_record_offset(hfs, &key);
+/*        off = hfs_cat_get_record_offset(hfs, &key);
         if (off == 0)
         {
             // print error here
@@ -243,14 +243,14 @@ private:
         }
 
         /* read the record */
-        if (hfs_cat_read_file_folder_record(hfs, off, &record))
+/*        if (hfs_cat_read_file_folder_record(hfs, off, &record))
         {
             //tsk_error_set_errstr2(" hfs_cat_file_lookup: file (%" PRIuINUM ")", inum);
             return 1;
         }
 
         /* these memcpy can be gotten rid of, really */
-        if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FOLDER_RECORD) {
+/*        if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FOLDER_RECORD) {
             memcpy((char *) &entry->cat, (char *) &record, sizeof(hfs_folder));
         }
         else if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FILE_RECORD) {
@@ -258,7 +258,7 @@ private:
         }
         /* other cases already caught by hfs_cat_read_file_folder_record */
 
-        memcpy((char *) &entry->thread, (char *) &thread, sizeof(hfs_thread));
+/*        memcpy((char *) &entry->thread, (char *) &thread, sizeof(hfs_thread));
 
         entry->flags = TSK_FS_META_FLAG_ALLOC | TSK_FS_META_FLAG_USED;
         entry->inum = inum;
@@ -274,7 +274,7 @@ private:
                 ("hfs_cat_file_lookup: error occurred while following a possible hard link for "
                 "inum (cnid) =  %" PRIuINUM, inum);
                 */
-                return 1;
+/*                return 1;
             }
             if (target_cnid != inum) {
                 // This is a hard link, and we have got the cnid of the target file, so look it up.
@@ -287,7 +287,7 @@ private:
                     "the target of inum (cnid) = %" PRIuINUM " target",
                     inum);
                     */
-                }
+/*                }
                 return 1;
             }
 
@@ -517,7 +517,7 @@ private:
     {
         TSK_FS_INFO *fs = &(hfs->fs_info);
         uint32_t cur_node;          /* node id of the current node */
-        char *node;
+/*        char *node;
 
         uint16_t nodesize;
         uint8_t is_done = 0;
@@ -529,13 +529,13 @@ private:
             return 1;
 
         /* start at root node */
-        cur_node = tsk_getu32(fs->endian, hfs->catalog_header.rootNode);
+//        cur_node = tsk_getu32(fs->endian, hfs->catalog_header.rootNode);
 
         /* if the root node is zero, then the extents btree is empty */
         /* if no files have overflow extents, the Extents B-tree still
            exists on disk, but is an empty B-tree containing only
            the header node */
-        if (cur_node == 0) {
+/*        if (cur_node == 0) {
             //if (tsk_verbose)
             //    tsk_fprintf(stderr, "hfs_cat_traverse: "
             //        "empty extents btree\n");
@@ -549,11 +549,11 @@ private:
         //        PRIu16 "\n", cur_node, nodesize);
 
         /* Recurse down to the needed leaf nodes and then go forward */
-        is_done = 0;
+/*        is_done = 0;
         while (is_done == 0) {
             TSK_OFF_T cur_off;      /* start address of cur_node */
-            uint16_t num_rec;       /* number of records in this node */
-            ssize_t cnt;
+/*            uint16_t num_rec;       /* number of records in this node */
+/*            ssize_t cnt;
             hfs_btree_node *node_desc;
 
             // sanity check 
@@ -600,7 +600,7 @@ private:
 
             /* With an index node, find the record with the largest key that is smaller
              * to or equal to cnid */
-            if (node_desc->type == HFS_BT_NODE_TYPE_IDX) {
+/*            if (node_desc->type == HFS_BT_NODE_TYPE_IDX) {
                 uint32_t next_node = 0;
                 int rec;
 
@@ -634,7 +634,7 @@ private:
                      */
 
                     /* save the info from this record unless it is too big */
-                    retval =
+/*                    retval =
                         a_cb(hfs, HFS_BT_NODE_TYPE_IDX, targ_data, key,
                         cur_off + rec_off, ptr);
                     if (retval == HFS_BTREE_CB_ERR) {
@@ -683,7 +683,7 @@ private:
             }
 
             /* With a leaf, we look for the specific record. */
-            else if (node_desc->type == HFS_BT_NODE_TYPE_LEAF) {
+/*            else if (node_desc->type == HFS_BT_NODE_TYPE_LEAF) {
                 int rec;
 
             for (rec = 0; rec < num_rec; rec++) {
@@ -716,7 +716,7 @@ private:
                  */
                 //                rec_cnid = tsk_getu32(fs->endian, key->file_id);
 
-                retval =
+/*                retval =
                     a_cb(hfs, HFS_BT_NODE_TYPE_LEAF, targ_data, key,
                     cur_off + rec_off, ptr);
                 if (retval == HFS_BTREE_CB_LEAF_STOP) {
@@ -756,7 +756,7 @@ private:
         return 0;
     };
  
-
+/*
     QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
     {
         if(curinfo != NULL)
@@ -885,9 +885,9 @@ private:
             return "";
         }
         return "";
-    };
+    };*/
 
-};
+//};
 
 class TreeModel : public QAbstractItemModel
 {
@@ -1908,10 +1908,10 @@ private:
     void CreateCaseDB(void);
     void OpenCaseDB(void);
     void AddNewEvidence(void);
-    QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
+    //QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
     void RemoveTmpFiles(void);
     //void GetEvidenceObjects(void);
-
+/*
     uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, unsigned char follow_hard_link);
     uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int alen, uint32_t flags);
     static uint8_t hfs_cat_get_record_offset_cb(HFS_INFO* hfs, int8_t level_type, const void* targ_data, const hfs_btree_key_cat* cur_key, TSK_OFF_T key_off, void* ptr);
@@ -1920,11 +1920,12 @@ private:
     uint8_t hfs_cat_read_file_folder_record(HFS_INFO* hfs, TSK_OFF_T off, hfs_file_folder* record);
     static int hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2);
     static uint8_t hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, TSK_HFS_BTREE_CB a_cb, void* ptr);
+*/
     QModelIndex selectedindex;
     QModelIndex oldselectedindex;
 
-    QThread* evidencethread;
-    EvidenceWorker* evidenceworker;
+    //QThread* evidencethread;
+    //EvidenceWorker* evidenceworker;
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
     //QFuture<void> secondfuture;
@@ -1965,6 +1966,7 @@ private:
     QShortcut* showitem;
     QTimer* autosavetimer;
     //unsigned long long currentcaseid;
+    /*
     WombatVariable wombatvariable; // possibly need to make this global...
     TSK_IMG_INFO* readimginfo;
     TSK_VS_INFO* readvsinfo;
@@ -1974,6 +1976,7 @@ private:
     char asc[512];
     iso9660_pvd_node* p;
     HFS_INFO* hfs;
+    */
 };
 
 //void SecondaryProcessing(QVariantMap &jsonstore);

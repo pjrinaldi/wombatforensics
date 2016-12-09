@@ -885,7 +885,7 @@ void WombatForensics::CurrentChanged(const QModelIndex &curindex, const QModelIn
 }
 */
 
-
+/*
 QString WombatForensics::GetFileSystemLabel(TSK_FS_INFO* curinfo)
 {
     if(curinfo != NULL)
@@ -1015,6 +1015,7 @@ QString WombatForensics::GetFileSystemLabel(TSK_FS_INFO* curinfo)
     }
     return "";
 }
+*/
 
 
 
@@ -1436,7 +1437,7 @@ void WombatForensics::GetEvidenceObjects()
 
 void WombatForensics::AddEvidence()
 {
-    QList<WombatVariable> wombatvarvector;
+    //QList<WombatVariable> wombatvarvector;
     int isnew = 1;
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
@@ -1463,7 +1464,7 @@ void WombatForensics::AddEvidence()
             connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
             wombatvarvector.append(wombatvariable);
             qDebug() << wombatvarvector.at(0).evidenceobject.name;
-            //sqlwatcher.setFuture(QtConcurrent::map(wombatvarvector, InitializeEvidenceStructure));
+            sqlwatcher.setFuture(QtConcurrent::map(wombatvarvector, InitializeEvidenceStructure));
             /*
             evidencethread = new QThread;
             evidenceworker = new EvidenceWorker();
@@ -3259,14 +3260,14 @@ void WombatForensics::AutoSaveState()
     StatusUpdate("Evidence ready");
     // change display text
 }
-
+/*
 uint8_t WombatForensics::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HFS_ENTRY * entry, unsigned char follow_hard_link)
 {
     TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
     hfs_btree_key_cat key;      /* current catalog key */
-    hfs_thread thread;          /* thread record */
-    hfs_file_folder record;     /* file/folder record */
-    TSK_OFF_T off;
+/*    hfs_thread thread;          /* thread record */
+/*    hfs_file_folder record;     /* file/folder record */
+/*    TSK_OFF_T off;
 
     // Test if this is a special file that is not located in the catalog
     if ((inum == HFS_EXTENTS_FILE_ID) ||
@@ -3281,11 +3282,11 @@ uint8_t WombatForensics::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HF
     /* first look up the thread record for the item we're searching for */
 
     /* set up the thread record key */
-    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
+/*    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     cnid_to_array((uint32_t) inum, key.parent_cnid);
 
     /* look up the thread record */
-    off = hfs_cat_get_record_offset(hfs, &key);
+/*    off = hfs_cat_get_record_offset(hfs, &key);
     if (off == 0)
     {
         // put error code here...
@@ -3293,7 +3294,7 @@ uint8_t WombatForensics::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HF
     }
 
     /* read the thread record */
-    if (hfs_cat_read_thread_record(hfs, off, &thread))
+/*    if (hfs_cat_read_thread_record(hfs, off, &thread))
     {
         //tsk_error_set_errstr2(" hfs_cat_file_lookup: file (%" PRIuINUM ")", inum);
         return 1;
@@ -3301,14 +3302,14 @@ uint8_t WombatForensics::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HF
 
     /* now look up the actual file/folder record */
 
-    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
+/*    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     memcpy((char *) key.parent_cnid, (char *) thread.parent_cnid,
         sizeof(key.parent_cnid));
     memcpy((char *) &key.name, (char *) &thread.name, sizeof(key.name));
 
     /* look up the record */
-    off = hfs_cat_get_record_offset(hfs, &key);
+/*    off = hfs_cat_get_record_offset(hfs, &key);
     if (off == 0)
     {
         // print error here
@@ -3316,14 +3317,14 @@ uint8_t WombatForensics::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HF
     }
 
     /* read the record */
-    if (hfs_cat_read_file_folder_record(hfs, off, &record))
+/*    if (hfs_cat_read_file_folder_record(hfs, off, &record))
     {
         //tsk_error_set_errstr2(" hfs_cat_file_lookup: file (%" PRIuINUM ")", inum);
         return 1;
     }
 
     /* these memcpy can be gotten rid of, really */
-    if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FOLDER_RECORD) {
+/*    if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FOLDER_RECORD) {
         memcpy((char *) &entry->cat, (char *) &record, sizeof(hfs_folder));
     }
     else if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FILE_RECORD) {
@@ -3331,7 +3332,7 @@ uint8_t WombatForensics::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HF
     }
     /* other cases already caught by hfs_cat_read_file_folder_record */
 
-    memcpy((char *) &entry->thread, (char *) &thread, sizeof(hfs_thread));
+/*    memcpy((char *) &entry->thread, (char *) &thread, sizeof(hfs_thread));
 
     entry->flags = TSK_FS_META_FLAG_ALLOC | TSK_FS_META_FLAG_USED;
     entry->inum = inum;
@@ -3347,7 +3348,7 @@ uint8_t WombatForensics::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HF
                 ("hfs_cat_file_lookup: error occurred while following a possible hard link for "
                 "inum (cnid) =  %" PRIuINUM, inum);
             */
-            return 1;
+/*            return 1;
         }
         if (target_cnid != inum) {
             // This is a hard link, and we have got the cnid of the target file, so look it up.
@@ -3360,7 +3361,7 @@ uint8_t WombatForensics::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HF
                     "the target of inum (cnid) = %" PRIuINUM " target",
                     inum);
                 */
-            }
+/*            }
             return 1;
         }
 
@@ -3595,7 +3596,7 @@ uint8_t WombatForensics::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, 
 {
     TSK_FS_INFO *fs = &(hfs->fs_info);
     uint32_t cur_node;          /* node id of the current node */
-    char *node;
+/*    char *node;
 
     uint16_t nodesize;
     uint8_t is_done = 0;
@@ -3607,13 +3608,13 @@ uint8_t WombatForensics::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, 
         return 1;
 
     /* start at root node */
-    cur_node = tsk_getu32(fs->endian, hfs->catalog_header.rootNode);
+/*    cur_node = tsk_getu32(fs->endian, hfs->catalog_header.rootNode);
 
     /* if the root node is zero, then the extents btree is empty */
     /* if no files have overflow extents, the Extents B-tree still
        exists on disk, but is an empty B-tree containing only
        the header node */
-    if (cur_node == 0) {
+/*    if (cur_node == 0) {
         //if (tsk_verbose)
         //    tsk_fprintf(stderr, "hfs_cat_traverse: "
         //        "empty extents btree\n");
@@ -3627,11 +3628,11 @@ uint8_t WombatForensics::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, 
     //        PRIu16 "\n", cur_node, nodesize);
 
     /* Recurse down to the needed leaf nodes and then go forward */
-    is_done = 0;
+/*    is_done = 0;
     while (is_done == 0) {
         TSK_OFF_T cur_off;      /* start address of cur_node */
-        uint16_t num_rec;       /* number of records in this node */
-        ssize_t cnt;
+/*        uint16_t num_rec;       /* number of records in this node */
+/*        ssize_t cnt;
         hfs_btree_node *node_desc;
 
         // sanity check 
@@ -3678,7 +3679,7 @@ uint8_t WombatForensics::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, 
 
         /* With an index node, find the record with the largest key that is smaller
          * to or equal to cnid */
-        if (node_desc->type == HFS_BT_NODE_TYPE_IDX) {
+/*        if (node_desc->type == HFS_BT_NODE_TYPE_IDX) {
             uint32_t next_node = 0;
             int rec;
 
@@ -3712,7 +3713,7 @@ uint8_t WombatForensics::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, 
                  */
 
                 /* save the info from this record unless it is too big */
-                retval =
+/*                retval =
                     a_cb(hfs, HFS_BT_NODE_TYPE_IDX, targ_data, key,
                     cur_off + rec_off, ptr);
                 if (retval == HFS_BTREE_CB_ERR) {
@@ -3761,7 +3762,7 @@ uint8_t WombatForensics::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, 
         }
 
         /* With a leaf, we look for the specific record. */
-        else if (node_desc->type == HFS_BT_NODE_TYPE_LEAF) {
+/*        else if (node_desc->type == HFS_BT_NODE_TYPE_LEAF) {
             int rec;
 
             for (rec = 0; rec < num_rec; rec++) {
@@ -3794,7 +3795,7 @@ uint8_t WombatForensics::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, 
                  */
                 //                rec_cnid = tsk_getu32(fs->endian, key->file_id);
 
-                retval =
+/*                retval =
                     a_cb(hfs, HFS_BT_NODE_TYPE_LEAF, targ_data, key,
                     cur_off + rec_off, ptr);
                 if (retval == HFS_BTREE_CB_LEAF_STOP) {
@@ -3833,7 +3834,7 @@ uint8_t WombatForensics::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, 
     free(node);
     return 0;
 }
-
+*/
 //void SecondaryProcessing(SecondaryProcessObject &secprocobj)
 //void SecondaryProcessing(QVariantMap &jsonstore)
 /*
