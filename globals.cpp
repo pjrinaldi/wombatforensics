@@ -6,6 +6,7 @@
 //QSqlDatabase fcasedb;
 //QSqlDatabase thumbdb;
 //QSqlDatabase fappdb;
+WombatVariable wombatvariable;
 QFile logfile;
 QTextEdit* msglog = NULL;
 QVector<FileData> filedatavector;

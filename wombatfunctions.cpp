@@ -219,8 +219,35 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
     return tmpstring;
 }
 
+void FileMap(FileData &filedata)
+{
+    QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + filedata.addr);
+    filefile.open(QIODevice::Append | QIODevice::Text);
+    QTextStream out(&filefile);
+    out << filedata.name << "," << filedata.path << "," << filedata.type << "," << filedata.paraddr << "," << filedata.atime << "," << filedata.ctime << "," << filedata.crtime << "," << filedata.mtime << "," << filedata.size << "," << filedata.addr << "," << filedata.evid << "," << filedata.fsid << "," << filedata.mftattrid << "," << filedata.mimetype;
+    filefile.close();
+    isignals->ProgUpd();
+    //emit isignals->FinishSql();
+
+}
+
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    /*
+     *
+     *            // PUT FILES IN THE SPARSE FILE NOW.
+            QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
+            //QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".evid");
+            evidfile.open(QIODevice::Append | QIODevice::Text);
+            QTextStream out(&evidfile);
+            out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
+            for(unsigned int i=0; i < wombatvariable.evidenceobject.itemcount; i++)
+                out << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]) << "," << i+1;
+            evidfile.close();
+
+     *
+     *
+     */ 
     FileData tmpdata;
     filesfound++;
     isignals->ProgUpd();
@@ -839,7 +866,7 @@ QImage MakeThumb(const QString &img)
 
 void SqlMap(FileData &filedata)
 {
-    QMutexLocker locker(&mutex);
+    //QMutexLocker locker(&mutex);
     /*
     QSqlQuery fquery(fcasedb);
     //wombattableschema << "CREATE TABLE data(objectid INTEGER PRIMARY KEY, objecttype INTEGER, type INTEGER, name TEXT, fullpath TEXT, address INTEGER, parentid INTEGER, parimgid INTEGER, parfsid INTEGER, ctime INTEGER, crtime INTEGER, atime INTEGER, mtime INTEGER, md5 TEXT NOT NULL DEFAULT "", filemime TEXT, known INTEGER, checked INTEGER NOT NULL DEFAULT 0, mftattrid INTEGER NOT NULL DEFAULT 0);";

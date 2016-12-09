@@ -5,7 +5,7 @@
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include "wombatinclude.h"
-//#include "wombatvariable.h"
+#include "wombatvariable.h"
 //#include "wombatdatabase.h"
 //#include "wombatframework.h"
 #include "wombatfunctions.h"
@@ -56,13 +56,13 @@ protected:
 class EvidenceWorker : public QObject {
     Q_OBJECT
 public:
-    EvidenceWorker(WombatVariable wombatvariable) {
+    EvidenceWorker() {
         readimginfo = NULL;
         readvsinfo = NULL;
         readfsinfo = NULL;
         readfileinfo = NULL;
         //isrunning = true;
-        wombatvariable = wombatvariable;
+        //wombatvariable = wombatvariable;
         //AddNewEvidence();
     };
     ~EvidenceWorker() {};
@@ -86,7 +86,9 @@ public slots:
             }
             free(images);
             fsobjectlist.clear();
-            QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".evid");
+            // PUT FILES IN THE SPARSE FILE NOW.
+            QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
+            //QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".evid");
             evidfile.open(QIODevice::Append | QIODevice::Text);
             QTextStream out(&evidfile);
             out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
@@ -106,7 +108,8 @@ public slots:
                 voloffset = (unsigned long long)readvsinfo->offset;
             }
 
-            QFile volfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".vol");
+            QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".vol");
+            //QFile volfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".vol");
             volfile.open(QIODevice::Append | QIODevice::Text);
             out.setDevice(&volfile);
             out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset;
@@ -114,7 +117,8 @@ public slots:
             if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
             {
                 readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-                QFile pfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p1");
+                QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + "p1");
+                //QFile pfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p1");
                 pfile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
                 out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (unsigned long long)readfsinfo->block_size;
@@ -131,7 +135,8 @@ public slots:
                     for(uint32_t i=0; i < readvsinfo->part_count; i++)
                     {
                         readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                        pfile.setFileName(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
+                        pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
+                        //pfile.setFileName(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
                         pfile.open(QIODevice::Append | QIODevice::Text);
                         out.setDevice(&pfile);
                         if(readpartinfo->flags == 0x02) // unallocated partition
@@ -180,7 +185,7 @@ private:
     iso9660_pvd_node* p;
     HFS_INFO* hfs;
     //bool isrunning;
-    WombatVariable wombatvariable;
+    //WombatVariable wombatvariable;
 
     uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, unsigned char follow_hard_link)
     {

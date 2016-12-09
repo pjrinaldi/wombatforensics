@@ -2,6 +2,7 @@
 #define GLOBALS_H
 
 #include "wombatinclude.h"
+#include "wombatvariable.h"
 
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -9,6 +10,7 @@
 //extern QSqlDatabase fcasedb;
 //extern QSqlDatabase thumbdb;
 //extern QSqlDatabase fappdb;
+extern WombatVariable wombatvariable;
 extern QFile logfile;
 extern QTextEdit* msglog;
 extern QFutureWatcher<void> thumbwatcher;

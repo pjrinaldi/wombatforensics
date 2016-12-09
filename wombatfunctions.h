@@ -5,7 +5,7 @@
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include "wombatinclude.h"
-#include "wombatvariable.h"
+//#include "wombatvariable.h"
 #include "globals.h"
 
 std::string GetTime(void);
@@ -30,4 +30,5 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
 QString GetFilePermissions(TSK_FS_META* tmpmeta);
 QImage MakeThumb(const QString &img);
 void SqlMap(FileData &filedata);
+void FileMap(FileData &filedata);
 #endif // wombatfunctions.h

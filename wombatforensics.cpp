@@ -730,7 +730,9 @@ void WombatForensics::InitializeQueryModel()
 {
     StatusUpdate("Building Initial Evidence Tree...");
     LogMessage("Building Initial Evidence Tree...");
-    secondwatcher.setFuture(QtConcurrent::map(filedatavector, SqlMap));
+    secondwatcher.setFuture(QtConcurrent::map(filedatavector, FileMap));
+    //connect(secondwatcher, SIGNAL(finished()), isignals, SLOT(FinishSql()), Qt::QueuedConnection);
+    //secondwatcher.setFuture(QtConcurrent::map(filedatavector, SqlMap));
     /*
      *
      *
@@ -1228,7 +1230,7 @@ void WombatForensics::InitializeEvidenceStructure()
     readvsinfo = NULL;
     readfsinfo = NULL;
     readfileinfo = NULL;
-    AddNewEvidence();
+    //AddNewEvidence();
     /*
     wombatframework->OpenEvidenceImage();
     wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
@@ -1263,13 +1265,15 @@ void WombatForensics::UpdateStatus()
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
+    /*
     treemodel->AddEvidence(wombatvariable.evidenceobject.id);
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    */
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
-    ResizeColumns();
+    //ResizeColumns();
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
     //wombatframework->CloseInfoStructures();
@@ -1359,9 +1363,9 @@ void WombatForensics::AddEvidence()
             LogMessage("Start Adding Evidence");
 
             evidencethread = new QThread;
-            evidenceworker = new EvidenceWorker(wombatvariable);
+            evidenceworker = new EvidenceWorker();
             evidenceworker->moveToThread(evidencethread);
-            connect(evidenceworker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
+            //connect(evidenceworker, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
             connect(evidencethread, SIGNAL(started()), evidenceworker, SLOT(process()));
             connect(evidenceworker, SIGNAL(finished()), evidencethread, SLOT(quit()));
             //connect(evidenceworker, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
