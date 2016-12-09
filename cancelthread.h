@@ -24,6 +24,10 @@ public:
 private slots:
     void HideClicked();
     void ShowCancelThread();
+    void StopThread();
+
+signals:
+    void CancelCurrentThread();
 private:
     Ui::CancelThread* ui;
 protected:

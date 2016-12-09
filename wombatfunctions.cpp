@@ -221,6 +221,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 void FileMap(FileData &filedata)
 {
+    /*
     QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(filedata.addr));
     filefile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&filefile);
@@ -228,26 +229,115 @@ void FileMap(FileData &filedata)
     filefile.close();
     isignals->ProgUpd();
     //emit isignals->FinishSql();
+    */
 
 }
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-    /*
-     *
-     *            // PUT FILES IN THE SPARSE FILE NOW.
-            QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
-            //QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".evid");
-            evidfile.open(QIODevice::Append | QIODevice::Text);
-            QTextStream out(&evidfile);
-            out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
-            for(unsigned int i=0; i < wombatvariable.evidenceobject.itemcount; i++)
-                out << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]) << "," << i+1;
-            evidfile.close();
+    QFile filefile;
+    if(tmpfile->meta != NULL)
+    {
+        qDebug() << "file addr: " << tmpfile->meta->addr;
+        filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(tmpfile->meta->addr));
+    }
+    else
+    {
+        qDebug() << "file addr: meta is null: " << tmpfile->name->meta_addr;
+        filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(tmpfile->name->meta_addr));
+    }
+    filefile.open(QIODevice::Append | QIODevice::Text);
+    QTextStream out(&filefile);
+    if(tmpfile->name != NULL)
+        out << tmpfile->name->name << "," << tmpfile->name->type << "," << tmpfile->name->par_addr << ",";
+    else
+        out << "unknown.dat,0,0,";
+    out << "/" << QString(tmppath) << ",";
+    if(tmpfile->meta != NULL)
+        out << tmpfile->meta->atime << "," << tmpfile->meta->ctime << "," << tmpfile->meta->crtime << "," << tmpfile->meta->mtime << "," << tmpfile->meta->size << "," << tmpfile->meta->addr;
+    else
+        out << "0,0,0,0,0,0,";
+    char magicbuffer[1024];
+    tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+    QMimeDatabase mimedb;
+    QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
+    out << mimetype.name() << ",0";
+    filefile.close();
+    filesfound++;
+    isignals->ProgUpd();
 
-     *
-     *
-     */ 
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    {
+        int tmpattrid = 0;
+        unsigned long long adssize = 0;
+        TSK_OFF_T curmftentrystart = 0;
+        NTFS_INFO* ntfsinfo = (NTFS_INFO*)tmpfile->fs_info;
+        int recordsize = 0;
+        if(ntfsinfo->fs->mft_rsize_c > 0)
+        {
+            recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize);
+        }
+        else
+            recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
+        if(tmpfile->meta != NULL)
+            curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * tmpfile->meta->addr + 20;
+        else
+            curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
+        char startoffset[2];
+        tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
+        uint16_t teststart = startoffset[1] * 256 + startoffset[0];
+        adssize = (unsigned long long)teststart;
+    //}
+    //if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    //{
+        if(strcmp(tmpfile->name->name, ".") != 0)
+        {
+            if(strcmp(tmpfile->name->name, "..") != 0)
+            {
+                int cnt, i;
+                cnt = tsk_fs_file_attr_getsize(tmpfile);
+                for(i = 0; i < cnt; i++)
+                {
+                    char type[512];
+                    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                    adssize += 24;
+                    adssize += (unsigned long long)fsattr->size;
+                    if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
+                    {
+                        if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                        {
+                            if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
+                            {
+                                QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(tmpfile->meta->addr) + ".f" + QString::number(adssize - (unsigned long long)fsattr->size + 16));
+                                adsfile.open(QIODevice::Append | QIODevice::Text);
+                                QTextStream adsout(&adsfile);
+                                adsout << QString(":") + QString(fsattr->name) << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << fsattr->id;
+                                /*
+                                adsdata.type = (unsigned long long)tmpfile->name->type;
+                                adsdata.paraddr = (unsigned long long)tmpfile->meta->addr;
+                                adsdata.name = QString(":") + QString(fsattr->name);
+                                adsdata.path = QString("/") + QString(tmppath);
+                                adsdata.atime = 0;
+                                adsdata.ctime = 0;
+                                adsdata.crtime = 0;
+                                adsdata.mtime = 0;
+                                adsdata.evid = currentevidenceid;
+                                adsdata.fsid = currentfilesystemid;
+                                adsdata.size = (unsigned long long)fsattr->size;
+                                adsdata.addr = adssize - (unsigned long long)fsattr->size + 16;
+                                adsdata.mimetype = mimetype.name();
+                                adsdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
+                                filedatavector.append(adsdata);
+                                */
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /*
     FileData tmpdata;
     filesfound++;
     isignals->ProgUpd();
@@ -296,6 +386,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
     tmpdata.mimetype = mimetype.name();
+    */
     /*
      *    readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, secprocobj.address);
     char magicbuffer[1024];
@@ -309,6 +400,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
      *
      */ 
+    /*
     filedatavector.append(tmpdata);
 
     FileData adsdata;
@@ -374,7 +466,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 }
             }
         }
-    }
+    }*/
     return TSK_WALK_CONT;
 }
 
@@ -985,6 +1077,11 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+        if(walkreturn == 1)
+        {
+            LogMessage("Issues with traversing the file structure were encountered");
+            errorcount++;
+        }
     }
     else
     {

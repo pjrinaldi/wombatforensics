@@ -6,6 +6,7 @@
 CancelThread::CancelThread(QWidget* parent) : QDialog(parent), ui(new Ui::CancelThread)
 {
     ui->setupUi(this);
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(StopThread()));
     /*
     QString abouttext = "<h3>About WombatForensics v1.0</h3>";
     abouttext += "<h5>License: GPLv2</h5>";
@@ -31,6 +32,15 @@ void CancelThread::HideClicked()
 void CancelThread::ShowCancelThread()
 {
     this->show();
+}
+void CancelThread::StopThread()
+{
+    int ret = QMessageBox::question(this, tr("Cancel Current Processing"), tr("You currently processing evidence. Are you sure you want to cancel it?"), QMessageBox::Yes | QMessageBox::No);
+    if(ret == QMessageBox::Yes)
+    {
+        emit CancelCurrentThread();
+        this->hide();
+    }
 }
 /*
 void CancelThread::mousePressEvent(QMouseEvent* e)
