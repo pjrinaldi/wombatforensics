@@ -221,7 +221,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 void FileMap(FileData &filedata)
 {
-    QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + filedata.addr);
+    QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(filedata.addr));
     filefile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&filefile);
     out << filedata.name << "," << filedata.path << "," << filedata.type << "," << filedata.paraddr << "," << filedata.atime << "," << filedata.ctime << "," << filedata.crtime << "," << filedata.mtime << "," << filedata.size << "," << filedata.addr << "," << filedata.evid << "," << filedata.fsid << "," << filedata.mftattrid << "," << filedata.mimetype;
@@ -952,7 +952,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
     for(unsigned int i=0; i < wombatvariable.evidenceobject.itemcount; i++)
-        out << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]) << "," << i+1;
+        out << "," << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]) << "," << i+1;
     evidfile.close();
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
     QString volname = "Dummy Volume";
@@ -976,7 +976,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-        QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + "p1");
+        QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p1");
         //QFile pfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p1");
         pfile.open(QIODevice::Append | QIODevice::Text);
         out.setDevice(&pfile);

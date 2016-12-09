@@ -594,12 +594,18 @@ void WombatForensics::InitializeCaseStructure()
         casefile.close();
         QString mkfsstr = "mkfs.btrfs -q ";
         mkfsstr += wombatvariable.caseobject.name;
+        QString name = qgetenv("USER");
+        if(name.isEmpty())
+            name = qgetenv("USERNAME");
+        qDebug() << name;
         QString mntstr = "sudo mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
+        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mkfsstr);
         QProcess::execute(mntstr);
+        QProcess::execute(chownstr);
         wombatvariable.iscaseopen = true;
         ui->actionAdd_Evidence->setEnabled(true);
         LogMessage("Case was Created");
@@ -647,11 +653,17 @@ void WombatForensics::InitializeOpenCase()
             this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name.split("/").last().split(".").first());
         }
         QFile casefile(wombatvariable.caseobject.name);
+        QString name = qgetenv("USER");
+        if(name.isEmpty())
+            name = qgetenv("USERNAME");
+        qDebug() << name;
         QString mntstr = "sudo mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
+        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
+        QProcess::execute(chownstr);
         wombatvariable.iscaseopen = true;
         ui->actionAdd_Evidence->setEnabled(true);
         LogMessage("Case was Opened");
