@@ -1882,7 +1882,8 @@ private:
     void SetupHexPage(void);
     void InitializeAppStructure(void);
     void InitializeCaseStructure(void);
-    void InitializeEvidenceStructure(void);
+    //void InitializeEvidenceStructure(QVector<WombatVariable> wombatvarvector);
+    //void InitializeEvidenceStructure(void);
     void InitializeOpenCase(void);
     void CloseCurrentCase(void);
     void UpdateProperties(void);

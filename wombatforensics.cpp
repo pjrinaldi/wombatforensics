@@ -90,6 +90,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     qRegisterMetaType<QVector<int> >();
+    //qRegisterMetaType<QVector<WombatVariable> >();
     connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
@@ -1223,9 +1224,10 @@ void WombatForensics::AddNewEvidence()
     }
     // finished initial partition/file system information including file info stored into the vector 
 }
-
+/*
 void WombatForensics::InitializeEvidenceStructure()
 {
+    //WombatVariable wombatvariable = wombatvarvector.at(0);
     readimginfo = NULL;
     readvsinfo = NULL;
     readfsinfo = NULL;
@@ -1245,8 +1247,103 @@ void WombatForensics::InitializeEvidenceStructure()
     wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
     wombatframework->OpenFiles();
     */
-}
+/*
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(wombatvariable.evidenceobject.fullpathvector.size()*sizeof(char*));
+    for(uint i=0; i < wombatvariable.evidenceobject.fullpathvector.size(); i++)
+    {
+        images[i] = wombatvariable.evidenceobject.fullpathvector[i].c_str();
+    }
+    readimginfo = tsk_img_open(wombatvariable.evidenceobject.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
+    if(readimginfo == NULL)
+    {
+        LogMessage("Evidence Image acess failed");
+        errorcount++;
+    }
+    free(images);
+    fsobjectlist.clear();
+    // PUT FILES IN THE SPARSE FILE NOW.
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
+    //QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".evid");
+    evidfile.open(QIODevice::Append | QIODevice::Text);
+    QTextStream out(&evidfile);
+    out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
+    for(unsigned int i=0; i < wombatvariable.evidenceobject.itemcount; i++)
+        out << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]) << "," << i+1;
+    evidfile.close();
+    readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
+    QString volname = "Dummy Volume";
+    int voltype = 240;
+    int volsectorsize = (int)readimginfo->sector_size;
+    unsigned long long voloffset = 0;
+    if(readvsinfo != NULL)
+    {
+        voltype = (int)readvsinfo->vstype;
+        volname = QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype));
+        volsectorsize = (int)readvsinfo->block_size;
+        voloffset = (unsigned long long)readvsinfo->offset;
+    }
 
+    QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".vol");
+    //QFile volfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".vol");
+    volfile.open(QIODevice::Append | QIODevice::Text);
+    out.setDevice(&volfile);
+    out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset;
+    volfile.close();
+    if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
+    {
+        readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
+        QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + "p1");
+        //QFile pfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p1");
+        pfile.open(QIODevice::Append | QIODevice::Text);
+        out.setDevice(&pfile);
+        out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (unsigned long long)readfsinfo->block_size;
+        pfile.close();
+        uint8_t walkreturn;
+        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+        walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+    }
+    else
+    {
+        QFile pfile;
+        if(readvsinfo->part_count > 0)
+        {
+            for(uint32_t i=0; i < readvsinfo->part_count; i++)
+            {
+                readpartinfo = tsk_vs_part_get(readvsinfo, i);
+                pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
+                //pfile.setFileName(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
+                pfile.open(QIODevice::Append | QIODevice::Text);
+                out.setDevice(&pfile);
+                if(readpartinfo->flags == 0x02) // unallocated partition
+                {
+                    out << readpartinfo->desc << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << (unsigned long long)readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size;
+                }
+                else if(readpartinfo->flags == 0x01) // allocated partition
+                {
+                    readfsinfo = tsk_fs_open_vol(readpartinfo, TSK_FS_TYPE_DETECT);
+                    if(readfsinfo != NULL)
+                    {
+                        out << GetFileSystemLabel(readfsinfo) << "," << readpartinfo->flags << "," << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << "," << (int)readfsinfo->block_size << "," << (unsigned long long)readfsinfo->block_count;
+                        uint8_t walkreturn;
+                        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+                        walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+                        if(walkreturn == 1)
+                        {
+                            LogMessage("Issues with traversing the file structure were encountered");
+                            errorcount++;
+                        }
+                    }
+                }
+                pfile.close();
+            }
+        }
+    }
+            // finished initial partition/file system information including file info stored into the vector 
+            // place InitializeQueryModel(); in here...
+
+}
+*/
 
 void WombatForensics::UpdateDataTable()
 {
@@ -1339,6 +1436,7 @@ void WombatForensics::GetEvidenceObjects()
 
 void WombatForensics::AddEvidence()
 {
+    QList<WombatVariable> wombatvarvector;
     int isnew = 1;
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
     if(tmplist.count())
@@ -1361,7 +1459,12 @@ void WombatForensics::AddEvidence()
                 wombatvariable.evidenceobject.fullpathvector.push_back(tmplist.at(i).toStdString());
             wombatvariable.evidenceobject.itemcount = tmplist.count();
             LogMessage("Start Adding Evidence");
-
+            // TRY A QTCONCURRENT::MAP() WITH A 1 ITEM VECTOR SO I CAN CANCEL IT...
+            connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+            wombatvarvector.append(wombatvariable);
+            qDebug() << wombatvarvector.at(0).evidenceobject.name;
+            //sqlwatcher.setFuture(QtConcurrent::map(wombatvarvector, InitializeEvidenceStructure));
+            /*
             evidencethread = new QThread;
             evidenceworker = new EvidenceWorker();
             evidenceworker->moveToThread(evidencethread);
@@ -1375,6 +1478,7 @@ void WombatForensics::AddEvidence()
             connect(evidencethread, SIGNAL(finished()), evidencethread, SLOT(deleteLater()));
             evidencethread->start();
             //sqlwatcher.setFuture(QtConcurrent::run(this, &WombatForensics::InitializeEvidenceStructure));
+            */
         }
         else
             DisplayError("3.0", "Evidence already exists in the case", "Add Evidence Cancelled");

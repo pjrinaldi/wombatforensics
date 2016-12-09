@@ -31,4 +31,5 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta);
 QImage MakeThumb(const QString &img);
 void SqlMap(FileData &filedata);
 void FileMap(FileData &filedata);
+void InitializeEvidenceStructure(QList<WombatVariable> wombatvarvector);
 #endif // wombatfunctions.h
