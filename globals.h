@@ -27,6 +27,7 @@ extern unsigned long long currentfilesystemid;
 extern unsigned long long errorcount;
 extern unsigned long long jumpoffset;
 extern unsigned long long filejumpoffset;
+extern int partint;
 extern int linefactor;
 extern int filelinefactor;
 extern int thumbsize;

@@ -235,35 +235,73 @@ void FileMap(FileData &filedata)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-    QFile filefile;
+    QString outstring = "";
+    /*
+    //QFile filefile;
     if(tmpfile->meta != NULL)
     {
         qDebug() << "file addr: " << tmpfile->meta->addr;
-        filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(tmpfile->meta->addr));
+        //filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(tmpfile->meta->addr));
     }
     else
     {
         qDebug() << "file addr: meta is null: " << tmpfile->name->meta_addr;
-        filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(tmpfile->name->meta_addr));
+        //filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(tmpfile->name->meta_addr));
     }
-    filefile.open(QIODevice::Append | QIODevice::Text);
-    QTextStream out(&filefile);
+    //filefile.open(QIODevice::Append | QIODevice::Text);
+    //QTextStream out(&filefile);
+    */
     if(tmpfile->name != NULL)
-        out << tmpfile->name->name << "," << tmpfile->name->type << "," << tmpfile->name->par_addr << ",";
+    {
+        outstring += QString(tmpfile->name->name) + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
+        //out << tmpfile->name->name << "," << tmpfile->name->type << "," << tmpfile->name->par_addr << ",";
+    }
     else
-        out << "unknown.dat,0,0,";
-    out << "/" << QString(tmppath) << ",";
+    {
+        outstring += "unknown," + QString::number(tmpfile->meta->type) + ",0,";
+        //out << "unknown," + tmpfile->meta->type + ",0,";
+    }
+    outstring += "/" + QString(tmppath) + ",";
+    //out << "/" << QString(tmppath) << ",";
     if(tmpfile->meta != NULL)
-        out << tmpfile->meta->atime << "," << tmpfile->meta->ctime << "," << tmpfile->meta->crtime << "," << tmpfile->meta->mtime << "," << tmpfile->meta->size << "," << tmpfile->meta->addr;
+    {
+        outstring += QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->addr) + ",";
+        //out << tmpfile->meta->atime << "," << tmpfile->meta->ctime << "," << tmpfile->meta->crtime << "," << tmpfile->meta->mtime << "," << tmpfile->meta->size << "," << tmpfile->meta->addr;
+    }
     else
-        out << "0,0,0,0,0,0,";
+    {
+        outstring += "0,0,0,0,0," + QString::number(tmpfile->name->meta_addr) + ",";
+        //out << "0,0,0,0,0," + tmpfile->name->meta_addr + ",";
+    }
     char magicbuffer[1024];
     tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
-    out << mimetype.name() << ",0";
+    outstring += mimetype.name() + ",0";
+    //out << mimetype.name() << ",0";
+    QFile filefile;
+    QTextStream out(&filefile);
+    if(tmpfile->name != NULL)
+    {
+        if(strcmp(tmpfile->name->name, ".") != 0)
+        {
+            if(strcmp(tmpfile->name->name, "..") != 0)
+            {
+                filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr));
+                filefile.open(QIODevice::Append | QIODevice::Text);
+                out << outstring;
+                filesfound++;
+            }
+        }
+    }
+    else
+    {
+        filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->name->meta_addr));
+        filefile.open(QIODevice::Append | QIODevice::Text);
+        out << outstring;
+        filesfound++;
+    }
     filefile.close();
-    filesfound++;
     isignals->ProgUpd();
 
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -287,9 +325,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
         uint16_t teststart = startoffset[1] * 256 + startoffset[0];
         adssize = (unsigned long long)teststart;
-    //}
-    //if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
-    //{
         if(strcmp(tmpfile->name->name, ".") != 0)
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
@@ -308,27 +343,11 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                         {
                             if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                             {
-                                QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(tmpfile->meta->addr) + ".f" + QString::number(adssize - (unsigned long long)fsattr->size + 16));
+                                QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".f" + QString::number(adssize - (unsigned long long)fsattr->size + 16));
                                 adsfile.open(QIODevice::Append | QIODevice::Text);
                                 QTextStream adsout(&adsfile);
                                 adsout << QString(":") + QString(fsattr->name) << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << fsattr->id;
-                                /*
-                                adsdata.type = (unsigned long long)tmpfile->name->type;
-                                adsdata.paraddr = (unsigned long long)tmpfile->meta->addr;
-                                adsdata.name = QString(":") + QString(fsattr->name);
-                                adsdata.path = QString("/") + QString(tmppath);
-                                adsdata.atime = 0;
-                                adsdata.ctime = 0;
-                                adsdata.crtime = 0;
-                                adsdata.mtime = 0;
-                                adsdata.evid = currentevidenceid;
-                                adsdata.fsid = currentfilesystemid;
-                                adsdata.size = (unsigned long long)fsattr->size;
-                                adsdata.addr = adssize - (unsigned long long)fsattr->size + 16;
-                                adsdata.mimetype = mimetype.name();
-                                adsdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
-                                filedatavector.append(adsdata);
-                                */
+                                adsfile.close();
                             }
                         }
                     }
@@ -1068,7 +1087,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-        QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p1");
+        QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p0");
         //QFile pfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p1");
         pfile.open(QIODevice::Append | QIODevice::Text);
         out.setDevice(&pfile);
@@ -1092,12 +1111,14 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
             {
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
                 pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
+                partint = i;
                 //pfile.setFileName(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
                 pfile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02) // unallocated partition
                 {
                     out << readpartinfo->desc << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << (unsigned long long)readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size;
+                    pfile.close();
                 }
                 else if(readpartinfo->flags == 0x01) // allocated partition
                 {
@@ -1105,6 +1126,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                     if(readfsinfo != NULL)
                     {
                         out << GetFileSystemLabel(readfsinfo) << "," << readpartinfo->flags << "," << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << "," << (int)readfsinfo->block_size << "," << (unsigned long long)readfsinfo->block_count;
+                        pfile.close();
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
@@ -1115,7 +1137,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                         }
                     }
                 }
-                pfile.close();
+                //pfile.close();
             }
         }
     }
