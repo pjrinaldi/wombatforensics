@@ -42,9 +42,13 @@ char* TskTimeToStringUTC(time_t time, char buf[128])
     return buf;
 }
 
-unsigned long long GetChildCount(int type, unsigned long long address, unsigned long long parimgid, unsigned long long parfsid)
+//unsigned long long GetChildCount(int type, unsigned long long address, unsigned long long parimgid, unsigned long long parfsid)
+unsigned long long GetChildCount(QString filefilter)
 {
     unsigned long long tmpcount = 0;
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList files = eviddir.entryList(QStringList(filefilter), QDir::Files | QDir::NoSymLinks);
+    tmpcount = files.count();
     /*
     QSqlQuery childquery(fcasedb);
     QString querystring = "SELECT COUNT(id) FROM data WHERE parid = ?";

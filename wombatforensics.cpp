@@ -398,7 +398,7 @@ unsigned long long WombatForensics::ReturnCaseCount()
 
 void WombatForensics::InitializeAppStructure()
 {
-    wombatid = 0;
+    wombatid = 1;
     wombatvariable.iscaseopen = false;
     QString homepath = QDir::homePath();
     // changing storing settings and such from /WombatForensics/ to /.wombatforensics/
@@ -671,6 +671,10 @@ void WombatForensics::InitializeOpenCase()
         LogMessage("Case was Opened");
         //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
         //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList files = eviddir.entryList(QStringList(QString("*.evid")), QDir::Files | QDir::NoSymLinks);
+        wombatvariable.evidenceobject.name = QFile(files.at(0)).fileName().split(".").at(0) + QString(".") + QFile(files.at(0)).fileName().split(".").at(1);
+        treemodel->AddEvidence();
     }
     /*
         thumbdb = QSqlDatabase::database("thumbdb");

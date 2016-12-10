@@ -708,24 +708,48 @@ public:
         currentnode = new Node(colvalues);
         rootnode->children.append(currentnode);
         rootnode->childcount++;
+        currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".vol");
         rootnode->haschildren = rootnode->HasChildren();
         parentnode = currentnode;
         evidfile.close();
-        wombatid++;
         endInsertRows();
-        //emit CheckedNodesChanged();
+        wombatid++;
+        tmpstr = "";
+        currentnode = 0;
+        tmplist.clear();
+        colvalues.clear();
+        beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
+        QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".vol");
+        volfile.open(QIODevice::ReadOnly);
+        tmpstr = volfile.readLine();
+        volfile.close();
+        tmplist = tmpstr.split(",");
+        colvalues.append(wombatid);                             // ID
+        colvalues.append(tmplist.at(2));                        // Name
+        colvalues.append("");                                   // Full Path
+        colvalues.append(tmplist.at(1));                        // Size
+        colvalues.append(0);                                    // Created
+        colvalues.append(0);                                    // Accessed
+        colvalues.append(0);                                    // Modified
+        colvalues.append(0);                                    // Status Changed
+        colvalues.append("");                                   // MD5
+        colvalues.append("");                                   // File Signature
+        colvalues.append("");                                   // File Category
+        currentnode = new Node(colvalues);
+        currentnode->parent = parentnode;
+        parentnode->children.append(currentnode);
+        currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p?");
+        qDebug() << "currentnode->childcount:" << currentnode->childcount;
+        currentnode->haschildren = currentnode->HasChildren();
+        parentnode = currentnode;
+        endInsertRows();
+        //emit checkedNodesChanged();
         /*
         int filesystemcount;
         QSqlQuery addevidquery(fcasedb);
         addevidquery.prepare("SELECT id, name, fullpath, size, objtype, addr, crtime, atime, mtime, ctime, md5, parid, type, parimgid, parfsid, filemime, checked FROM data WHERE id = ? OR (objtype < 6 AND parimgid = ?)");
         //addevidquery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ? OR (objecttype < 5 AND parimgid = ?)");
-        addevidquery.addBindValue(curid);
-        addevidquery.addBindValue(curid);
-        if(addevidquery.exec())
-        {
             beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
-            while(addevidquery.next())
-            {
                 currentnode = 0;
                 colvalues.clear();
                 colvalues.append(addevidquery.value(0));
