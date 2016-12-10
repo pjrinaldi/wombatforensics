@@ -398,6 +398,7 @@ unsigned long long WombatForensics::ReturnCaseCount()
 
 void WombatForensics::InitializeAppStructure()
 {
+    wombatid = 0;
     wombatvariable.iscaseopen = false;
     QString homepath = QDir::homePath();
     // changing storing settings and such from /WombatForensics/ to /.wombatforensics/
@@ -1245,6 +1246,7 @@ void WombatForensics::UpdateStatus()
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
+    treemodel->AddEvidence();
     /*
     treemodel->AddEvidence(wombatvariable.evidenceobject.id);
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));

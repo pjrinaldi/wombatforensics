@@ -25,6 +25,7 @@ unsigned long long digcount = 0;
 unsigned long long errorcount = 0;
 unsigned long long jumpoffset = 0;
 unsigned long long filejumpoffset = 0;
+unsigned long long wombatid = 0;
 int partint = 0;
 int linefactor = 0;
 int filelinefactor = 0;
