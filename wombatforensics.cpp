@@ -1234,6 +1234,8 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
+    StatusUpdate("Building Initial Evidence Tree...");
+    LogMessage("Building Initial Evidence Tree...");
     //tsk_img_close(IMG_2ND_PROC);
     filedatavector.clear();
     readfileinfo = NULL;
@@ -1341,7 +1343,8 @@ void WombatForensics::AddEvidence()
             wombatvariable.evidenceobject.itemcount = tmplist.count();
             LogMessage("Start Adding Evidence");
             // TRY A QTCONCURRENT::MAP() WITH A 1 ITEM VECTOR SO I CAN CANCEL IT...
-            connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
+            connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+            //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
             connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()), Qt::QueuedConnection);
             wombatvarvector.append(wombatvariable);
             //qDebug() << wombatvarvector.at(0).evidenceobject.name;
