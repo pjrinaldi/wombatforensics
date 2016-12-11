@@ -715,6 +715,7 @@ public:
         parentnode = currentnode;
         evidfile.close();
         wombatid++;
+        // APPEND VOLUME TO NODE TREE
         tmpstr = "";
         currentnode = 0;
         tmplist.clear();
@@ -741,6 +742,16 @@ public:
         currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p?");
         currentnode->haschildren = currentnode->HasChildren();
         parentnode = currentnode;
+        // APPEND PARTITION(S) TO THE VOLUME
+        int partcount = currentnode->childcount;
+        for(int i = 0; i < partcount; i++)
+        {
+            tmpstr = "";
+            currentnode = 0;
+            tmplist.clear();
+            colvalues.clear();
+
+        }
         endInsertRows();
         //emit checkedNodesChanged();
         /*
