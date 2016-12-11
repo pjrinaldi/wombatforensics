@@ -771,6 +771,7 @@ public:
             currentnode = new Node(colvalues);
             currentnode->parent = parentnode;
             parentnode->children.append(currentnode);
+            // THIS GETCHILDCOUNT IS ALL FILES AND NOT JUST THE CHILDREN OF P0, SO I'LL HAVE TO REWORK THE FILE NAME TO INCLUDE PARENT
             currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + ".f*");
             currentnode->haschildren = currentnode->HasChildren();
             parentnode = currentnode;
