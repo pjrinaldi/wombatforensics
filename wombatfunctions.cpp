@@ -1121,7 +1121,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                 out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02) // unallocated partition
                 {
-                    out << readpartinfo->desc << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << (unsigned long long)readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size;
+                    out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << readpartinfo->desc << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size;
                     pfile.close();
                 }
                 else if(readpartinfo->flags == 0x01) // allocated partition
