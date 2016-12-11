@@ -708,17 +708,17 @@ public:
         currentnode = new Node(colvalues);
         rootnode->children.append(currentnode);
         rootnode->childcount++;
-        currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".vol");
         rootnode->haschildren = rootnode->HasChildren();
+        currentnode->parent = rootnode;
+        currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".vol");
+        currentnode->haschildren = currentnode->HasChildren();
         parentnode = currentnode;
         evidfile.close();
-        endInsertRows();
         wombatid++;
         tmpstr = "";
         currentnode = 0;
         tmplist.clear();
         colvalues.clear();
-        beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
         QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".vol");
         volfile.open(QIODevice::ReadOnly);
         tmpstr = volfile.readLine();
@@ -739,7 +739,6 @@ public:
         currentnode->parent = parentnode;
         parentnode->children.append(currentnode);
         currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p?");
-        qDebug() << "currentnode->childcount:" << currentnode->childcount;
         currentnode->haschildren = currentnode->HasChildren();
         parentnode = currentnode;
         endInsertRows();
