@@ -742,15 +742,32 @@ public:
         currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p?");
         currentnode->haschildren = currentnode->HasChildren();
         parentnode = currentnode;
+        wombatid++;
         // APPEND PARTITION(S) TO THE VOLUME
         int partcount = currentnode->childcount;
+        QFile partfile;
         for(int i = 0; i < partcount; i++)
         {
             tmpstr = "";
             currentnode = 0;
             tmplist.clear();
             colvalues.clear();
-
+            partfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
+            partfile.open(QIODevice::ReadOnly);
+            tmpstr = partfile.readLine();
+            partfile.close();
+            tmplist = tmpstr.split(",");
+            colvalues.append(wombatid);                             // ID
+            colvalues.append(tmplist.at(2));                        // Name
+            colvalues.append("");                                   // Full Path
+            colvalues.append(tmplist.at(1));                        // Size
+            colvalues.append(0);                                    // Created
+            colvalues.append(0);                                    // Accessed
+            colvalues.append(0);                                    // Modified
+            colvalues.append(0);                                    // Status Changed
+            colvalues.append("");                                   // MD5
+            colvalues.append("");                                   // File Signature
+            colvalues.append("");                                   // File Category
         }
         endInsertRows();
         //emit checkedNodesChanged();
