@@ -772,7 +772,6 @@ public:
             currentnode = new Node(colvalues);
             currentnode->parent = parentnode;
             parentnode->children.append(currentnode);
-            // THIS GETCHILDCOUNT IS ALL FILES AND NOT JUST THE CHILDREN OF P0, SO I'LL HAVE TO REWORK THE FILE NAME TO INCLUDE PARENT
             currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
             //qDebug() << currentnode->childcount;
             currentnode->haschildren = currentnode->HasChildren();
@@ -805,84 +804,22 @@ public:
                 currentnode = new Node(colvalues);
                 currentnode->parent = parentnode;
                 parentnode->children.append(currentnode);
-                currentnode->childcount = GetChildCount(curfiles.at(j));
+                currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
                 currentnode->haschildren = currentnode->HasChildren();
                 wombatid++;
             }
         }
         endInsertRows();
+        // STILL NEED TO ACCOUNT FOR THE FILE CHECKS AND UPDATE ACCORDINGLY
+
         //emit checkedNodesChanged();
         /*
-        int filesystemcount;
-                else if(addevidquery.value(4).toInt() == 3) //else if(currentnode->nodevalues.at(4).toInt() == 3) // determine if its an unallocated partition space
-                {
-                    //if(addevidquery.value(15).toInt() == 2) //if(currentnode->nodevalues.at(15).toInt() == 2) // unallocated partition, add to parent as a child.
-                    //{
-                    currentnode->parent = parentnode;
-                    parentnode->children.append(currentnode); 
-                    //}
-                }
-                // THERE SHOULD ONLY BE PARTITION OBJECTS, OBJECTTYPE == 3, FOR UNALLOCATED SPACES....
-                else if(addevidquery.value(4).toInt() == 4) //else if(currentnode->nodevalues.at(4).toInt() == 4) // filesystem
-                {
-                    currentnode->parent = parentnode;
-                    parentnode->children.append(currentnode);
-                    //currentnode->childcount = GetChildCount(4, addevidquery.value(5).toULongLong(), curid, currentnode->nodevalues.at(0).toULongLong());
-                    if(filesystemcount <= fsobjectlist.count())
-                    {
-                        currentnode->childcount = GetChildCount(4, fsobjectlist.at(filesystemcount).rootinum, curid, currentnode->nodevalues.at(0).toULongLong());
-                        filesystemcount++;
-                    }
-                    currentnode->haschildren = currentnode->HasChildren();
-                }
-                else if(addevidquery.value(4).toInt() == 5 || addevidquery.value(4).toInt() == 6) // file at rootinum...
-                {
-                    QSqlQuery filequery(fcasedb);
-                    Node* rootdirectory = 0;
-                    for(int j=0; j < fsobjectlist.count(); j++)
-                    {
-                        filequery.prepare("SELECT parfsid FROM data WHERE (objtype = 5 OR objtype = 6) AND parimgid = ? AND parid = ? AND parfsid = ?)");
-                        filequery.addBindValue(curid);
-                        filequery.addBindValue(fsobjectlist.at(j).rootinum);
-                        filequery.addBindValue(fsobjectlist.at(j).id);
-                        if(filequery.exec())
-                        {
-                            while(filequery.next())
-                            {
-                                for(int i=0; i < parentnode->children.count(); i++)
-                                {
-                                    if(filequery.value(0).toULongLong() == parentnode->children.at(i)->nodevalues.at(0).toULongLong())
-                                        rootdirectory = parentnode->children.at(i);
-                                }
-                                currentnode->parent = rootdirectory;
-                                if(QString(".").compare(currentnode->nodevalues.at(1).toString()) == 0 || QString("..").compare(currentnode->nodevalues.at(1).toString()) == 0)
-                                {
-                                    currentnode->childcount = 0;
-                                    currentnode->haschildren = false;
-                                }
-                                else
-                                {
-                                    currentnode->childcount = GetChildCount(5, addevidquery.value(5).toULongLong(), curid, addevidquery.value(15).toULongLong());
-                                    //currentnode->childcount = GetChildCount(5, currentnode->nodevalues.at(5).toULongLong(), curid, currentnode->nodevalues.at(14).toULongLong());
-                                    currentnode->haschildren = currentnode->HasChildren();
-                                }       
-                                rootdirectory->children.append(currentnode);
-                            }
-                        }
-                        filequery.finish();
-                    }
-                }
-                if(addevidquery.value(16).toInt() == 0)
-                    currentnode->checkstate = 0;
-                else if(addevidquery.value(16).toInt() == 1)
-                    currentnode->checkstate = 1;
-                else
-                    currentnode->checkstate = 2;
-            }
-            endInsertRows();
-            emit checkedNodesChanged();
-        }
-        addevidquery.finish();
+        if(addevidquery.value(16).toInt() == 0)
+            currentnode->checkstate = 0;
+        else if(addevidquery.value(16).toInt() == 1)
+            currentnode->checkstate = 1;
+        else
+            currentnode->checkstate = 2;
         */
     };
 
