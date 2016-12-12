@@ -535,11 +535,14 @@ public:
 
     void fetchMore(const QModelIndex &parent = QModelIndex())
     {
-        Node* parentnode = NodeFromIndex(parent);
-        QList<QVariant> fetchvalues;
-        fetchvalues.clear();
+        //Node* parentnode = NodeFromIndex(parent);
+        //QList<QVariant> fetchvalues;
+        //fetchvalues.clear();
         if(parentnode->haschildren == true)
         {
+            // NEED TO KNOW THE CURRENT PARTITION NUMBER AND THE ADDR NUMBER TO OPEN THE CURRENT PARENT FILE
+            //QFile parentfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + 
+            //IF I USE THE EVID-VOL-PART-INODE NUMBERS AS THE UNIQUEID, THEN I CAN KEEP IT REAL AND I CAN SPLIT IT OUT AND DETERMINE WHAT I NEED TO FIGURE OUT WHAT TO OPEN... I MAY WANT TO ADD A UNIQUE EVIDENCE ID SO I CAN GET THE IMAGE FILE NAME, OR I NEED TO GET THE ROOTINDEX SO I CAN GET ITS FILENAME OR SET A GLOBAL VARIABLE TO HOLD THAT INFORMATION.
             /*
             QSqlQuery prequery(fcasedb);
             prequery.prepare("SELECT addr, parimgid, parfsid FROM data WHERE id = ?");

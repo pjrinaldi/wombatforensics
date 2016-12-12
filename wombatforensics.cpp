@@ -675,6 +675,7 @@ void WombatForensics::InitializeOpenCase()
         QStringList files = eviddir.entryList(QStringList(QString("*.evid")), QDir::Files | QDir::NoSymLinks);
         wombatvariable.evidenceobject.name = QFile(files.at(0)).fileName().split(".").at(0) + QString(".") + QFile(files.at(0)).fileName().split(".").at(1);
         treemodel->AddEvidence();
+        ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     }
     /*
         thumbdb = QSqlDatabase::database("thumbdb");
@@ -1986,6 +1987,7 @@ void WombatForensics::CloseCurrentCase()
         treemodel->RemEvidence(wombatvarptr->evidenceobjectvector.at(i).id);
     }
      */
+    // DETERMINE IF THERE IS A WAY TO REMOVE ALL ELEMENTS FROM A TREENODE AT ONCE...
     setWindowTitle("WombatForensics");
     filesprocessed = 0;
     filesfound = 0;
