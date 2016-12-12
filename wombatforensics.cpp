@@ -577,9 +577,6 @@ void WombatForensics::InitializeCaseStructure()
         wombatvariable.caseobject.dirpath = tmplist.join("/");
         //qDebug() << wombatvariable.caseobject.dirpath;
         // create log file here
-        logfile.setFileName(wombatvariable.caseobject.dirpath + "/msglog");
-        msglog->clear();
-        LogMessage("Log File Created");
         //this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name); // update application window
         if(!wombatvariable.caseobject.name.contains(".wfc"))
         {
@@ -609,6 +606,9 @@ void WombatForensics::InitializeCaseStructure()
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
         wombatvariable.iscaseopen = true;
+        logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
+        msglog->clear();
+        LogMessage("Log File Created");
         ui->actionAdd_Evidence->setEnabled(true);
         LogMessage("Case was Created");
         //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes

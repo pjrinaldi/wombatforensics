@@ -757,6 +757,7 @@ public:
             tmpstr = partfile.readLine();
             partfile.close();
             tmplist = tmpstr.split(",");
+            rootinum = tmplist.at(3);
             colvalues.append(wombatid);                             // ID
             colvalues.append(tmplist.at(2));                        // Name
             colvalues.append("");                                   // Full Path
@@ -772,13 +773,43 @@ public:
             currentnode->parent = parentnode;
             parentnode->children.append(currentnode);
             // THIS GETCHILDCOUNT IS ALL FILES AND NOT JUST THE CHILDREN OF P0, SO I'LL HAVE TO REWORK THE FILE NAME TO INCLUDE PARENT
-            currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + ".f*");
+            currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
+            //qDebug() << currentnode->childcount;
             currentnode->haschildren = currentnode->HasChildren();
             parentnode = currentnode;
             wombatid++;
+            QFile filefile;
+            QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
+            for(int j = 0; j < curfiles.count(); j++)
+            {
+                tmpstr = "";
+                currentnode = 0;
+                tmplist.clear();
+                colvalues.clear();
+                filefile.setFileName(wombatvariable.tmpmntpath + curfiles.at(j));
+                filefile.open(QIODevice::ReadOnly);
+                tmpstr = filefile.readLine();
+                filefile.close();
+                tmplist = tmpstr.split(",");
+                colvalues.append(wombatid);                             // ID
+                colvalues.append(tmplist.at(0));                        // Name
+                colvalues.append(tmplist.at(3));                        // Full Path
+                colvalues.append(tmplist.at(8));                        // Size
+                colvalues.append(tmplist.at(4));                        // Created
+                colvalues.append(tmplist.at(5));                        // Accessed
+                colvalues.append(tmplist.at(6));                        // Modified
+                colvalues.append(tmplist.at(7));                        // Status Changed
+                colvalues.append("");                                   // MD5
+                colvalues.append(tmplist.at(10));                       // File Signature
+                colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
+                currentnode = new Node(colvalues);
+                currentnode->parent = parentnode;
+                parentnode->children.append(currentnode);
+                currentnode->childcount = GetChildCount(curfiles.at(j));
+                currentnode->haschildren = currentnode->HasChildren();
+                wombatid++;
+            }
         }
-        //QFile filefile;
-
         endInsertRows();
         //emit checkedNodesChanged();
         /*

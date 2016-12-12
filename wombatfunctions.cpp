@@ -47,7 +47,7 @@ unsigned long long GetChildCount(QString filefilter)
 {
     unsigned long long tmpcount = 0;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList files = eviddir.entryList(QStringList(filefilter), QDir::Files | QDir::NoSymLinks);
+    QStringList files = eviddir.entryList(QStringList(filefilter), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
     tmpcount = files.count();
     /*
     QSqlQuery childquery(fcasedb);
@@ -74,6 +74,12 @@ unsigned long long GetChildCount(QString filefilter)
     childquery.finish();
     */
     return tmpcount;
+}
+
+QStringList GetChildFiles(QString filefilter)
+{
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    return eviddir.entryList(QStringList(filefilter), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 }
 
 bool FileExists(const std::string& filename)
@@ -291,7 +297,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
             {
-                filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr));
+                filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".a" + QString::number(tmpfile->name->par_addr));
                 filefile.open(QIODevice::Append | QIODevice::Text);
                 out << outstring;
                 filesfound++;
@@ -300,7 +306,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     else
     {
-        filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->name->meta_addr));
+        filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".a" + QString::number(tmpfile->name->par_addr));
         filefile.open(QIODevice::Append | QIODevice::Text);
         out << outstring;
         filesfound++;

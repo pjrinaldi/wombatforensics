@@ -12,6 +12,7 @@
 std::string GetTime(void);
 char* TskTimeToStringUTC(time_t time, char buf[128]);
 unsigned long long GetChildCount(QString filefilter);
+QStringList GetChildFiles(QString filefilter);
 //unsigned long long GetChildCount(int type, unsigned long long address, unsigned long long parimgid = 0, unsigned long long parfsid = 0);
 bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
