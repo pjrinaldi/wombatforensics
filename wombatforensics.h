@@ -535,10 +535,88 @@ public:
 
     void fetchMore(const QModelIndex &parent = QModelIndex())
     {
+        QStringList tmplist;
+        QString tmpstr = "";
         unsigned long long parentaddr = parent.sibling(parent.row(), 0).data().toString().split("-").last().mid(1).toULongLong();
-        qDebug() << parentaddr;
-        qDebug() << parent.sibling(parent.row(), 0).data().toString(); // unique id
-        //Node* parentnode = NodeFromIndex(parent);
+        int curpart = parent.sibling(parent.row(), 0).data().toString().split("-").at(2).mid(1).toInt();
+        //qDebug() << parentaddr;
+        //qDebug() << parent.sibling(parent.row(), 0).data().toString(); // unique id
+        Node* parentnode = NodeFromIndex(parent);
+        QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name + ".p" + QString::number(curpart) + "*.a" + parentaddr);
+        QFile childfile;
+        beginInsertRows(parent, 0, parentnode->childcount - 1);
+        for(int i = 0; i < curfiles.count(); i++)
+        {
+            tmpstr = "";
+            currentnode = 0;
+            tmplist.clear();
+            colvalues.clear();
+            childfile.setFileName(wombatvariable.tmpmntpath + curfiles.at(i));
+            childfile.open(QIODevice::ReadOnly);
+            tmpstr = childfile.readLine();
+            childfile.close();
+            tmplist = tmpstr.split(",");
+            //colvalues.append(wombatid);                             // ID
+            colvalues.append(tmplist.at(12));                       // ID
+            colvalues.append(tmplist.at(0));                        // Name
+            colvalues.append(tmplist.at(3));                        // Full Path
+            colvalues.append(tmplist.at(8));                        // Size
+            colvalues.append(tmplist.at(4));                        // Created
+            colvalues.append(tmplist.at(5));                        // Accessed
+            colvalues.append(tmplist.at(6));                        // Modified
+            colvalues.append(tmplist.at(7));                        // Status Changed
+            colvalues.append("");                                   // MD5
+            colvalues.append(tmplist.at(10));                       // File Signature
+            colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
+            currentnode = new Node(colvalues);
+            currentnode->parent = parentnode;
+            parentnode->children.append(currentnode);
+            currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(curpart) + "*.a" + tmplist.at(9));
+            currentnode->haschildren = currentnode->HasChildren();
+        }
+        endInsertRows();
+        //qDebug() << parentnode->childcount;
+        /*
+         *
+         * currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
+            //qDebug() << currentnode->childcount;
+            currentnode->haschildren = currentnode->HasChildren();
+            parentnode = currentnode;
+            wombatid++;
+            QFile filefile;
+            QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
+            for(int j = 0; j < curfiles.count(); j++)
+            {
+                tmpstr = "";
+                currentnode = 0;
+                tmplist.clear();
+                colvalues.clear();
+                filefile.setFileName(wombatvariable.tmpmntpath + curfiles.at(j));
+                filefile.open(QIODevice::ReadOnly);
+                tmpstr = filefile.readLine();
+                filefile.close();
+                tmplist = tmpstr.split(",");
+                //colvalues.append(wombatid);                             // ID
+                colvalues.append(tmplist.at(12));                       // ID
+                colvalues.append(tmplist.at(0));                        // Name
+                colvalues.append(tmplist.at(3));                        // Full Path
+                colvalues.append(tmplist.at(8));                        // Size
+                colvalues.append(tmplist.at(4));                        // Created
+                colvalues.append(tmplist.at(5));                        // Accessed
+                colvalues.append(tmplist.at(6));                        // Modified
+                colvalues.append(tmplist.at(7));                        // Status Changed
+                colvalues.append("");                                   // MD5
+                colvalues.append(tmplist.at(10));                       // File Signature
+                colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
+                currentnode = new Node(colvalues);
+                currentnode->parent = parentnode;
+                parentnode->children.append(currentnode);
+                currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
+                currentnode->haschildren = currentnode->HasChildren();
+                wombatid++;
+
+         *
+         */ 
         //QList<QVariant> fetchvalues;
         //fetchvalues.clear();
         /*
