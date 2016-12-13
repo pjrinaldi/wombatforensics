@@ -535,6 +535,9 @@ public:
 
     void fetchMore(const QModelIndex &parent = QModelIndex())
     {
+        qDebug() << parent.sibling(parent.row(), 0).data().toString(); // unique id
+
+//wombatvariable.selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
         //Node* parentnode = NodeFromIndex(parent);
         //QList<QVariant> fetchvalues;
         //fetchvalues.clear();
@@ -697,7 +700,8 @@ public:
         beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
         currentnode = 0;
         colvalues.clear();
-        colvalues.append(wombatid);                             // ID
+        //colvalues.append(wombatid);                             // ID
+        colvalues.append(tmplist.at(5));                        // ID
         colvalues.append(wombatvariable.evidenceobject.name);   // Name
         colvalues.append(tmplist.at(3));                        // Full Path
         colvalues.append(tmplist.at(1));                        // Size
@@ -728,7 +732,8 @@ public:
         tmpstr = volfile.readLine();
         volfile.close();
         tmplist = tmpstr.split(",");
-        colvalues.append(wombatid);                             // ID
+        //colvalues.append(wombatid);                             // ID
+        colvalues.append(tmplist.at(5));                        // ID
         colvalues.append(tmplist.at(2));                        // Name
         colvalues.append("");                                   // Full Path
         colvalues.append(tmplist.at(1));                        // Size
@@ -761,7 +766,8 @@ public:
             partfile.close();
             tmplist = tmpstr.split(",");
             rootinum = tmplist.at(3);
-            colvalues.append(wombatid);                             // ID
+            //colvalues.append(wombatid);                             // ID
+            colvalues.append(tmplist.at(10));                       // ID
             colvalues.append(tmplist.at(2));                        // Name
             colvalues.append("");                                   // Full Path
             colvalues.append(tmplist.at(1));                        // Size
@@ -793,7 +799,8 @@ public:
                 tmpstr = filefile.readLine();
                 filefile.close();
                 tmplist = tmpstr.split(",");
-                colvalues.append(wombatid);                             // ID
+                //colvalues.append(wombatid);                             // ID
+                colvalues.append(tmplist.at(12));                       // ID
                 colvalues.append(tmplist.at(0));                        // Name
                 colvalues.append(tmplist.at(3));                        // Full Path
                 colvalues.append(tmplist.at(8));                        // Size

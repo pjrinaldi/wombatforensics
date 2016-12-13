@@ -287,7 +287,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
-    outstring += mimetype.name() + ",0";
+    outstring += mimetype.name() + ",0,e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr);
     //out << mimetype.name() << ",0";
     QFile filefile;
     QTextStream out(&filefile);
@@ -356,7 +356,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".f" + QString::number(adssize - (unsigned long long)fsattr->size + 16));
                                 adsfile.open(QIODevice::Append | QIODevice::Text);
                                 QTextStream adsout(&adsfile);
-                                adsout << QString(":") + QString(fsattr->name) << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << fsattr->id;
+                                adsout << QString(":") + QString(fsattr->name) << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << fsattr->id << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16);
                                 adsfile.close();
                             }
                         }
@@ -1032,26 +1032,11 @@ void SqlMap(FileData &filedata)
 }
 void InitializeEvidenceStructure(WombatVariable &wombatvariable)
 {
-    //WombatVariable wombatvariable = wombatvarvector.at(0);
     readimginfo = NULL;
     readvsinfo = NULL;
     readfsinfo = NULL;
     readfileinfo = NULL;
     //AddNewEvidence();
-    /*
-    wombatframework->OpenEvidenceImage();
-    wombatdatabase->InsertEvidenceObject(); // add evidence to data and image parts to dataruns
-    errorcount = 0;
-    StatusUpdate("Processing...");
-    //LogMessage(tr("Started Adding Evidence"));
-    wombatframework->OpenVolumeSystem();
-    wombatframework->GetVolumeSystemName();
-    wombatdatabase->InsertVolumeObject(); // add volume to data
-    wombatframework->OpenPartitions();
-    wombatdatabase->InsertPartitionObjects();
-    wombatdatabase->ReturnFileSystemObjectList(wombatvarptr->currentevidenceid);
-    wombatframework->OpenFiles();
-    */
     const TSK_TCHAR** images;
     images = (const char**)malloc(wombatvariable.evidenceobject.fullpathvector.size()*sizeof(char*));
     for(uint i=0; i < wombatvariable.evidenceobject.fullpathvector.size(); i++)
@@ -1068,12 +1053,11 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
     fsobjectlist.clear();
     // PUT FILES IN THE SPARSE FILE NOW.
     QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
-    //QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".evid");
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
     for(unsigned int i=0; i < wombatvariable.evidenceobject.itemcount; i++)
-        out << "," << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]) << "," << i+1;
+        out << "," << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]) << "," << i+1 << ",e" + QString::number(evidcnt);
     evidfile.close();
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
     QString volname = "Dummy Volume";
@@ -1087,21 +1071,18 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
         volsectorsize = (int)readvsinfo->block_size;
         voloffset = (unsigned long long)readvsinfo->offset;
     }
-
     QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".vol");
-    //QFile volfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".vol");
     volfile.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&volfile);
-    out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset;
+    out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt);
     volfile.close();
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
         QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p0");
-        //QFile pfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p1");
         pfile.open(QIODevice::Append | QIODevice::Text);
         out.setDevice(&pfile);
-        out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0";
+        out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
         pfile.close();
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
@@ -1122,12 +1103,11 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
                 pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
                 partint = i;
-                //pfile.setFileName(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
                 pfile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02) // unallocated partition
                 {
-                    out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << readpartinfo->desc << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size;
+                    out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << readpartinfo->desc << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                     pfile.close();
                 }
                 else if(readpartinfo->flags == 0x01) // allocated partition
@@ -1135,7 +1115,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                     readfsinfo = tsk_fs_open_vol(readpartinfo, TSK_FS_TYPE_DETECT);
                     if(readfsinfo != NULL)
                     {
-                        out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize;
+                        out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                         pfile.close();
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;

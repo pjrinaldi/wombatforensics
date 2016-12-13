@@ -106,7 +106,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     InitializeAppStructure();
     //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(FinishSql()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
-    connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+    //connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
@@ -1252,6 +1252,10 @@ void WombatForensics::UpdateStatus()
     tsk_img_close(readimginfo);
     readimginfo = NULL;
     treemodel->AddEvidence();
+    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    evidcnt++;
+    volcnt = 0;
+    partint = 0;
     /*
     treemodel->AddEvidence(wombatvariable.evidenceobject.id);
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
