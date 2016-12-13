@@ -535,14 +535,16 @@ public:
 
     void fetchMore(const QModelIndex &parent = QModelIndex())
     {
+        unsigned long long parentaddr = parent.sibling(parent.row(), 0).data().toString().split("-").last().mid(1).toULongLong();
+        qDebug() << parentaddr;
         qDebug() << parent.sibling(parent.row(), 0).data().toString(); // unique id
-
-//wombatvariable.selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
         //Node* parentnode = NodeFromIndex(parent);
         //QList<QVariant> fetchvalues;
         //fetchvalues.clear();
+        /*
         if(parentnode->haschildren == true)
-        {
+        {*/
+
             // NEED TO KNOW THE CURRENT PARTITION NUMBER AND THE ADDR NUMBER TO OPEN THE CURRENT PARENT FILE
             //QFile parentfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + 
             //IF I USE THE EVID-VOL-PART-INODE NUMBERS AS THE UNIQUEID, THEN I CAN KEEP IT REAL AND I CAN SPLIT IT OUT AND DETERMINE WHAT I NEED TO FIGURE OUT WHAT TO OPEN... I MAY WANT TO ADD A UNIQUE EVIDENCE ID SO I CAN GET THE IMAGE FILE NAME, OR I NEED TO GET THE ROOTINDEX SO I CAN GET ITS FILENAME OR SET A GLOBAL VARIABLE TO HOLD THAT INFORMATION.
@@ -656,7 +658,7 @@ public:
 
             }
             */
-        }
+        //}
     };
     
     void GetModelCount(Node* curnode)
