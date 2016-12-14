@@ -539,10 +539,9 @@ public:
         QString tmpstr = "";
         unsigned long long parentaddr = parent.sibling(parent.row(), 0).data().toString().split("-").last().mid(1).toULongLong();
         int curpart = parent.sibling(parent.row(), 0).data().toString().split("-").at(2).mid(1).toInt();
-        //qDebug() << parentaddr;
         //qDebug() << parent.sibling(parent.row(), 0).data().toString(); // unique id
-        Node* parentnode = NodeFromIndex(parent);
-        QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name + ".p" + QString::number(curpart) + "*.a" + parentaddr);
+        parentnode = NodeFromIndex(parent);
+        QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name + ".p" + QString::number(curpart) + "*.a" + QString::number(parentaddr));
         QFile childfile;
         beginInsertRows(parent, 0, parentnode->childcount - 1);
         for(int i = 0; i < curfiles.count(); i++)
