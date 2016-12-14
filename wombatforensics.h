@@ -890,7 +890,10 @@ public:
                 tmplist = tmpstr.split(",");
                 //colvalues.append(wombatid);                             // ID
                 colvalues.append(tmplist.at(12));                       // ID
-                colvalues.append(tmplist.at(0));                        // Name
+                QByteArray ba;
+                ba.append(tmplist.at(0));
+                colvalues.append(QByteArray::fromBase64(ba));           // Name
+                //colvalues.append(tmplist.at(0));                        // Name
                 colvalues.append(tmplist.at(3));                        // Full Path
                 colvalues.append(tmplist.at(8));                        // Size
                 colvalues.append(tmplist.at(4));                        // Created
