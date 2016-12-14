@@ -297,10 +297,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
             {
-                filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".a" + QString::number(tmpfile->name->par_addr));
-                filefile.open(QIODevice::Append | QIODevice::Text);
-                out << outstring;
-                filesfound++;
+                    filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->name->meta_addr) + ".a" + QString::number(tmpfile->name->par_addr));
+                    filefile.open(QIODevice::Append | QIODevice::Text);
+                    out << outstring;
+                    filesfound++;
             }
         }
     }
@@ -1100,14 +1100,18 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
         {
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
-                readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
-                partint = i;
-                pfile.open(QIODevice::Append | QIODevice::Text);
-                out.setDevice(&pfile);
+                if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x01)
+                {
+                    readpartinfo = tsk_vs_part_get(readvsinfo, i);
+                    pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint));
+                    partint++;
+                    pfile.open(QIODevice::Append | QIODevice::Text);
+                    out.setDevice(&pfile);
+                    //qDebug() << readpartinfo->flags;
+                }
                 if(readpartinfo->flags == 0x02) // unallocated partition
                 {
-                    out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << readpartinfo->desc << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                    out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                     pfile.close();
                 }
                 else if(readpartinfo->flags == 0x01) // allocated partition
@@ -1127,6 +1131,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                         }
                     }
                 }
+                //else if(readpartinfo->flags == 0x04) // meta partition
                 //pfile.close();
             }
         }
