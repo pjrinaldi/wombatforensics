@@ -44,6 +44,7 @@ Node* dummynode = 0;
 Node* parentnode = 0;
 Node* toplevelnode = 0;
 Node* actionnode = 0;
+Node* volnode = 0;
 QList<QVariant> colvalues;
 QList<TskObject> curlist;
 QList<FileSystemObject> fsobjectlist;

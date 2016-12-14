@@ -824,6 +824,7 @@ public:
         colvalues.append("");                                   // File Signature
         colvalues.append("");                                   // File Category
         currentnode = new Node(colvalues);
+        volnode = currentnode;
         currentnode->parent = parentnode;
         parentnode->children.append(currentnode);
         currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p?");
@@ -832,9 +833,11 @@ public:
         wombatid++;
         // APPEND PARTITION(S) TO THE VOLUME
         int partcount = currentnode->childcount;
+        //qDebug() << "partcount:" << partcount;
         QFile partfile;
         for(int i = 0; i < partcount; i++)
         {
+            parentnode = volnode;
             tmpstr = "";
             currentnode = 0;
             tmplist.clear();
@@ -867,6 +870,7 @@ public:
             wombatid++;
             QFile filefile;
             QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
+            //qDebug() << "curfiles count:" << curfiles.count();
             for(int j = 0; j < curfiles.count(); j++)
             {
                 tmpstr = "";

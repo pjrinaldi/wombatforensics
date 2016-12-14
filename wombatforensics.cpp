@@ -1332,7 +1332,7 @@ void WombatForensics::AddEvidence()
 {
     //QList<WombatVariable> wombatvarvector;
     int isnew = 1;
-    QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), tr("./"));
+    QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
     if(tmplist.count())
     {
         wombatvariable.evidenceobject.name = tmplist.at(0).split("/").last();

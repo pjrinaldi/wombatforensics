@@ -206,6 +206,7 @@ extern Node* parentnode;
 extern Node* currentnode;
 extern Node* toplevelnode;
 extern Node* actionnode;
+extern Node* volnode;
 //extern TSK_IMG_INFO* IMG_2ND_PROC;
 extern QMutex mutex;
 extern QMutex mutex2;

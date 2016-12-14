@@ -1100,16 +1100,12 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
         {
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
-                if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x01)
-                {
-                    readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                    pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint));
-                    partint++;
-                    pfile.open(QIODevice::Append | QIODevice::Text);
-                    out.setDevice(&pfile);
-                    //qDebug() << readpartinfo->flags;
-                }
-                if(readpartinfo->flags == 0x02) // unallocated partition
+                readpartinfo = tsk_vs_part_get(readvsinfo, i);
+                pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint));
+                pfile.open(QIODevice::Append | QIODevice::Text);
+                out.setDevice(&pfile);
+                //qDebug() << readpartinfo->flags;
+                if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
                 {
                     out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                     pfile.close();
@@ -1131,6 +1127,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                         }
                     }
                 }
+                partint++;
                 //else if(readpartinfo->flags == 0x04) // meta partition
                 //pfile.close();
             }
