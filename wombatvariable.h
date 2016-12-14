@@ -127,6 +127,7 @@ struct SecondaryProcessObject
 struct SelectedObject
 {
     unsigned long long id;
+    QString modid;
     int objtype;
     QString name;
     QString fullpath;
