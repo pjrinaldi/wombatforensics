@@ -674,7 +674,10 @@ void WombatForensics::InitializeOpenCase()
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList files = eviddir.entryList(QStringList(QString("*.evid")), QDir::Files | QDir::NoSymLinks);
         wombatvariable.evidenceobject.name = QFile(files.at(0)).fileName().split(".").at(0) + QString(".") + QFile(files.at(0)).fileName().split(".").at(1);
+
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         treemodel->AddEvidence();
+        QApplication::restoreOverrideCursor();
         ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     }
     /*
@@ -1251,7 +1254,9 @@ void WombatForensics::UpdateStatus()
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     treemodel->AddEvidence();
+    QApplication::restoreOverrideCursor();
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     evidcnt++;
     volcnt = 0;
@@ -1431,25 +1436,6 @@ void WombatForensics::LoadHexContents()
     wombatvariable.selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
     wombatvariable.selectedobject.size = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
     wombatvariable.selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
-    /*
-    QSqlQuery objquery(fcasedb);
-    objquery.prepare("SELECT objtype, sectstart, sectsize, sectlength, offset, parimgid, parfsid, parid, addr, mftattrid, blocksize FROM data WHERE id = ?");
-    objquery.bindValue(0, wombatvariable.selectedobject.id);
-    objquery.exec();
-    objquery.first();
-    wombatvariable.selectedobject.objtype = objquery.value(0).toInt();
-    wombatvariable.selectedobject.sectstart = objquery.value(1).toULongLong();
-    wombatvariable.selectedobject.sectsize = objquery.value(2).toInt();
-    wombatvariable.selectedobject.sectlength = objquery.value(3).toULongLong();
-    wombatvariable.selectedobject.offset = objquery.value(4).toULongLong();
-    wombatvariable.selectedobject.parimgid = objquery.value(5).toULongLong();
-    wombatvariable.selectedobject.parfsid = objquery.value(6).toULongLong();
-    wombatvariable.selectedobject.parentid = objquery.value(7).toULongLong();
-    wombatvariable.selectedobject.address = objquery.value(8).toULongLong();
-    wombatvariable.selectedobject.mftattrid = objquery.value(9).toULongLong();
-    wombatvariable.selectedobject.blocksize = objquery.value(10).toInt();
-    objquery.finish();
-    */
     blockstring = "";
     if(wombatvariable.selectedobject.objtype == 1) // image file
     {

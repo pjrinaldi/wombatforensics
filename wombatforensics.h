@@ -125,6 +125,7 @@ public:
 
     QVariant data(const QModelIndex &index, int role) const
     {
+        // MIGHT BE ABLE TO GET AWAY WITH USING THE INDEX ROW,COLUMN ENTRIES RATHER THAN THE NODE
         if(index == QModelIndex())
             return QVariant();
         Node* node = rootnode; 
@@ -1118,11 +1119,13 @@ private slots:
     };
     void ExpandCollapseResize(const QModelIndex &index)
     {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
         {
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
         }
         ResizeViewColumns(index);
+        QApplication::restoreOverrideCursor();
     };
     void FileExport(FileExportData* exportdata);
     void FileDig(FileDeepData* deeperdata);

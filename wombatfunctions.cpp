@@ -1100,9 +1100,14 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
     QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);
-    out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
+    out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
     for(unsigned int i=0; i < wombatvariable.evidenceobject.itemcount; i++)
-        out << "," << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]) << "," << i+1 << ",e" + QString::number(evidcnt);
+    {
+        if(i > 0 && i < wombatvariable.evidenceobject.itemcount - 2)
+            out << "|";
+        out << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]);
+    }
+    out << "," << wombatvariable.evidenceobject.itemcount << ",e" + QString::number(evidcnt);
     evidfile.close();
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
     QString volname = "Dummy Volume";
