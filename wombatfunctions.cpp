@@ -261,9 +261,36 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     //filefile.open(QIODevice::Append | QIODevice::Text);
     //QTextStream out(&filefile);
     */
+
+
+
+/* BASE 64 ENCODE/DECODE FOR THE FILE NAME TO AVOID COMMA'S IN THE FILE NAME.
+ *
+ *QString base64_encode(QString string){
+    QByteArray ba;
+    ba.append(string);
+    return ba.toBase64();
+}
+ 
+QString base64_decode(QString string){
+    QByteArray ba;
+    ba.append(string);
+    return QByteArray::fromBase64(ba);
+}
+ * =
+ *
+ *
+ *
+ */ 
+
+
+
     if(tmpfile->name != NULL)
     {
-        outstring += QString(tmpfile->name->name) + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
+        QByteArray ba;
+        ba.append(QString(tmpfile->name->name));
+        outstring += ba.toBase64() + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
+        //outstring += QString(tmpfile->name->name) + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
         //out << tmpfile->name->name << "," << tmpfile->name->type << "," << tmpfile->name->par_addr << ",";
     }
     else
@@ -288,6 +315,24 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
     outstring += mimetype.name() + ",0,e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr);
+
+    TSK_FS_HASH_RESULTS hashresults;
+    uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
+    if(retval == 0)
+    {
+        char sbuf[17];
+        int sint = 0;
+        for(int i=0; i < 16; i++)
+        {
+            sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
+        }
+        outstring +=  "," + QString(sbuf);
+    }
+    else
+        outstring += ",0";
+
+
+
     //out << mimetype.name() << ",0";
     QFile filefile;
     QTextStream out(&filefile);

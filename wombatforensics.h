@@ -557,14 +557,20 @@ public:
             tmplist = tmpstr.split(",");
             //colvalues.append(wombatid);                             // ID
             colvalues.append(tmplist.at(12));                       // ID
-            colvalues.append(tmplist.at(0));                        // Name
+            QByteArray ba;
+            ba.append(tmplist.at(0));
+            colvalues.append(QByteArray::fromBase64(ba));                        // Name
+            //colvalues.append(tmplist.at(0));                        // Name
             colvalues.append(tmplist.at(3));                        // Full Path
             colvalues.append(tmplist.at(8));                        // Size
             colvalues.append(tmplist.at(4));                        // Created
             colvalues.append(tmplist.at(5));                        // Accessed
             colvalues.append(tmplist.at(6));                        // Modified
             colvalues.append(tmplist.at(7));                        // Status Changed
-            colvalues.append("");                                   // MD5
+            if(tmplist.at(13).compare("0") == 0)
+                colvalues.append("");                               // MD5
+            else
+                colvalues.append(tmplist.at(13));                   // MD5
             colvalues.append(tmplist.at(10));                       // File Signature
             colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
             currentnode = new Node(colvalues);
@@ -891,7 +897,10 @@ public:
                 colvalues.append(tmplist.at(5));                        // Accessed
                 colvalues.append(tmplist.at(6));                        // Modified
                 colvalues.append(tmplist.at(7));                        // Status Changed
-                colvalues.append("");                                   // MD5
+                if(tmplist.at(13).toInt() == 0)
+                    colvalues.append("");                               // MD5
+                else
+                    colvalues.append(tmplist.at(13));                   // MD5
                 colvalues.append(tmplist.at(10));                       // File Signature
                 colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
                 currentnode = new Node(colvalues);
