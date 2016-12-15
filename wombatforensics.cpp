@@ -679,6 +679,14 @@ void WombatForensics::InitializeOpenCase()
         treemodel->AddEvidence();
         QApplication::restoreOverrideCursor();
         ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+        if(ui->dirTreeView->model() != NULL)
+        {
+            ui->actionRemove_Evidence->setEnabled(true);
+            ui->actionSaveState->setEnabled(true);
+            ui->actionDigDeeper->setEnabled(true);
+            hexrocker->setEnabled(true);
+            //StatusUpdate("Opening Case Evidence...");
+        }
     }
     /*
         thumbdb = QSqlDatabase::database("thumbdb");
@@ -1450,10 +1458,14 @@ void WombatForensics::LoadHexContents()
         tmplist = tmpstr.split(",");
         evidfile.close();
         tskobjptr->offset = 0;
+        tskobjptr->objecttype = 1;
         tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
+        //qDebug() << tskobjptr->length;
         tskobjptr->imglength = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // image size
+        //qDebug() << tskobjptr->imglength;
         tskobjptr->sectsize = tmplist.at(2).toInt();
         tskobjptr->blocksize = tmplist.at(2).toInt();
+        //qDebug() << tmplist.at(2).toInt();
         tskobjptr->partcount = tmplist.at(3).split("|").count();
         //QString imgparts = tmplist.at(3);
         //unsigned long long imgcnt = imgparts.split("|").count();
@@ -1461,59 +1473,22 @@ void WombatForensics::LoadHexContents()
         for(int i = 0; i < tmplist.at(3).split("|").count(); i++)
         {
             tskobjptr->imagepartspath[i] = tmplist.at(3).split("|").at(i).toStdString().c_str();
+            //qDebug() << tmplist.at(3).split("|").at(i);
+            //qDebug() << tskobjptr->partcount;
         }
-        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, tskobjptr->sectsize);
         if(tskobjptr->readimginfo == NULL)
         {
             LogMessage("Image opening error");
         }
         free(tskobjptr->imagepartspath);
-        //OpenParentImage(
-            /*
-    QSqlQuery cntquery(fcasedb);
-    cntquery.prepare("SELECT count(fullpath) FROM dataruns WHERE objectid = ?");
-    cntquery.bindValue(0, imgid);
-    cntquery.exec();
-    cntquery.first();
-    unsigned long long imgcnt = cntquery.value(0).toULongLong();
-    cntquery.finish();
-    QSqlQuery evidquery(fcasedb);
-    evidquery.prepare("SELECT fullpath FROM dataruns WHERE objectid = ? order by seqnum");
-    evidquery.bindValue(0, imgid);
-    evidquery.exec();
-    tskobjptr->imagepartspath = (const char**)malloc(imgcnt*sizeof(char*));
-    for(int i=0; i < imgcnt; i++)
-    {
-        evidquery.next();
-        tskobjptr->imagepartspath[i] = evidquery.value(0).toString().toStdString().c_str();
-    }
-    tskobjptr->partcount = imgcnt;
-    evidquery.finish();
-    */
-    /*
-    wombatdatabase->GetEvidenceObjects();
-    int curidx = 0;
-    for(int i=0; i < wombatvarptr->evidenceobjectvector.count(); i++)
-    {
-        if(imgid == wombatvarptr->evidenceobjectvector[i].id)
-            curidx = i;
-    }
-
-    tskobjptr->imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
-    tskobjptr->partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
-    for(uint i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
-    {
-        tskobjptr->imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
-    }
-    tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    if(tskobjptr->readimginfo == NULL)
-    {
-        LogMessage("Image opening error");
-    }
-    free(tskobjptr->imagepartspath);*/
     }
     else if(wombatvariable.selectedobject.modid.split("-").count() == 2) // volume file
     {
+        QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".vol");
+        volfile.open(QIODevice::ReadOnly);
+        volfile.close();
+
     }
     else if(wombatvariable.selectedobject.modid.split("-").count() == 3) // partition file
     {
@@ -1521,7 +1496,7 @@ void WombatForensics::LoadHexContents()
     else if(wombatvariable.selectedobject.modid.split("-").count() == 4) // file file
     {
     }
-    qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count();
+    //qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count();
 /*    
     if(wombatvariable.selectedobject.objtype == 1) // image file
     {
@@ -1738,10 +1713,11 @@ void WombatForensics::LoadHexContents()
         hexwidget->openimage();
         hexwidget->set1BPC();
         hexwidget->setBaseHex();
-        hexwidget->SetTopLeft(0);
+        //hexwidget->SetTopLeft(0);
     }
     else
     {
+        /*
         hexwidget->SetTopLeft(tskobjptr->offset);
         if(wombatvariable.selectedobject.objtype == 5 || wombatvariable.selectedobject.objtype == 6)
         {
@@ -1750,6 +1726,7 @@ void WombatForensics::LoadHexContents()
             fileviewer->filehexview->setBaseHex();
             fileviewer->filehexview->SetTopLeft(0);
         }
+        */
     }
 }
 
