@@ -1460,28 +1460,21 @@ void WombatForensics::LoadHexContents()
         tskobjptr->offset = 0;
         tskobjptr->objecttype = 1;
         tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
-        //qDebug() << tskobjptr->length;
         tskobjptr->imglength = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // image size
-        //qDebug() << tskobjptr->imglength;
         tskobjptr->sectsize = tmplist.at(2).toInt();
         tskobjptr->blocksize = tmplist.at(2).toInt();
-        //qDebug() << tmplist.at(2).toInt();
         tskobjptr->partcount = tmplist.at(3).split("|").count();
-        //QString imgparts = tmplist.at(3);
-        //unsigned long long imgcnt = imgparts.split("|").count();
-        tskobjptr->imagepartspath = (const char**)malloc(tmplist.at(3).split("|").count()*sizeof(char*));
+        tskobjptr->imagepartspath = (const char**)malloc(tskobjptr->partcount*sizeof(char*));
         for(int i = 0; i < tmplist.at(3).split("|").count(); i++)
         {
             std::string stdstr = tmplist.at(3).split("|").at(i).toStdString();
             qDebug() << "stdstr:" << QString::fromStdString(stdstr);
             tskobjptr->imagepartspath[i] = stdstr.c_str();
-            //qDebug() << tmplist.at(3).split("|").at(i);
         }
-        //qDebug() << "imagepartspath" << tmplist.at(3).split("|").at(0).toStdString().c_str();
         tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
         if(tskobjptr->readimginfo == NULL)
         {
-            qDebug() << tsk_error_get_errstr();
+            qDebug() << "loadhex error:" << tsk_error_get_errstr();
             LogMessage("Image opening error");
         }
         free(tskobjptr->imagepartspath);
@@ -1716,7 +1709,7 @@ void WombatForensics::LoadHexContents()
         hexwidget->openimage();
         hexwidget->set1BPC();
         hexwidget->setBaseHex();
-        //hexwidget->SetTopLeft(0);
+        hexwidget->SetTopLeft(0);
     }
     else
     {
