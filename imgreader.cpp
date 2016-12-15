@@ -66,22 +66,17 @@ bool ImageReader::openimage(TskObject* tskpointer)
     if(is_open())
         close();
     _size = tskptr->imglength; // length in bytes for selected file
-    qDebug() << _size;
     _pageSize = tskptr->blocksize;
-    qDebug() << _pageSize;
     off_t npages = _size/_pageSize;
-    qDebug() << npages;
     if((_size - 1) % _pageSize != 0)
         npages++;
     _numpages = npages;
-    qDebug() << _numpages;
     _data.resize(npages);
     fill(_data.begin(), _data.begin()+npages, (uchar*)0);
     _is_open = true;
     _firstPage = _lastPage = 0;
 
-    return true;
-    //return loadimagepage(0);
+    return loadimagepage(0);
 }
 
 bool ImageReader::close()
@@ -211,8 +206,7 @@ bool ImageReader::loadimagepage(off_t pageIdx)
     --nFreePages();
     if(tskptr->objecttype <= 6)
     {
-        retval = tsk_img_read(tskptr->readimginfo, 0, (char*)_data[pageIdx], _pageSize);
-        //retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
+        retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
     }
     if(retval > 0)
     {
@@ -221,6 +215,8 @@ bool ImageReader::loadimagepage(off_t pageIdx)
         if(pageIdx > _lastPage)
             _lastPage = pageIdx;
     }
+    else
+        qDebug() << "tsk error string:" << QString(tsk_error_get_errstr());
 
     return 1;
 }
