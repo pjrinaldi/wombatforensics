@@ -1467,10 +1467,13 @@ void WombatForensics::LoadHexContents()
         tskobjptr->imagepartspath = (const char**)malloc(tskobjptr->partcount*sizeof(char*));
         for(int i = 0; i < tmplist.at(3).split("|").count(); i++)
         {
-            std::string stdstr = tmplist.at(3).split("|").at(i).toStdString();
-            qDebug() << "stdstr:" << QString::fromStdString(stdstr);
-            tskobjptr->imagepartspath[i] = stdstr.c_str();
+            //std::string stdstr = tmplist.at(3).split("|").at(i).toStdString();
+            //qDebug() << "stdstr:" << QString::fromStdString(stdstr);
+            //tskobjptr->imagepartspath[i] = stdstr.c_str();
+            tskobjptr->imagepartspath[i] = tmplist.at(3).split("|").at(i).toStdString().c_str();
         }
+        qDebug() << "split0:" << tmplist.at(3).split("|").at(0);
+        qDebug() << "noslit:" << tmplist.at(3);
         tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
         if(tskobjptr->readimginfo == NULL)
         {
