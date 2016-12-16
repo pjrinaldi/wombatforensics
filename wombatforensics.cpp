@@ -1436,6 +1436,7 @@ void WombatForensics::LoadHexContents()
 {
     if(tskobjptr->readimginfo != NULL)
         tsk_img_close(tskobjptr->readimginfo);
+        tskobjptr->readimginfo = NULL;
     if(tskobjptr->readfsinfo != NULL)
         tsk_fs_close(tskobjptr->readfsinfo);
     if(tskobjptr->readfileinfo != NULL)
