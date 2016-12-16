@@ -1109,7 +1109,8 @@ private slots:
     void ShowExternalViewer();
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
-    void OpenParentImage(unsigned long long imgid);
+    void OpenParentImage(void);
+    //void OpenParentImage(unsigned long long imgid);
     void OpenParentFileSystem(unsigned long long fsid);
     void OpenFileSystemFile(void);
     void ResizeViewColumns(const QModelIndex &index)
