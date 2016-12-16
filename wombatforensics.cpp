@@ -1446,13 +1446,12 @@ void WombatForensics::LoadHexContents()
     //wombatvariable.selectedobject.size = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
     //wombatvariable.selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
     blockstring = "";
-    //QString tmpstr = "";
-    //QStringList tmplist;
-    //tmplist.clear();
+    QString tmpstr = "";
+    QStringList tmplist;
+    tmplist.clear();
     if(wombatvariable.selectedobject.modid.split("-").count() == 1) // image file
     {
-        OpenParentImage();
-        /*
+        //OpenParentImage();
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
@@ -1483,11 +1482,10 @@ void WombatForensics::LoadHexContents()
             LogMessage("Image opening error");
         }
         free(tskobjptr->imagepartspath);
-        */
     }
     else if(wombatvariable.selectedobject.modid.split("-").count() == 2) // volume file
     {
-        OpenParentImage();
+        //OpenParentImage();
         QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".vol");
         volfile.open(QIODevice::ReadOnly);
         volfile.close();
@@ -1495,11 +1493,11 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedobject.modid.split("-").count() == 3) // partition file
     {
-        OpenParentImage();
+        //OpenParentImage();
     }
     else if(wombatvariable.selectedobject.modid.split("-").count() == 4) // file file
     {
-        OpenParentImage();
+        //OpenParentImage();
     }
     //qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count();
 /*    
