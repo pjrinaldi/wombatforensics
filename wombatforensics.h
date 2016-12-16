@@ -779,7 +779,7 @@ public:
         tmplist.clear();
         // NEED TO ADD THE EVID, VOLUME, PARTITIONS, THEN THE FILES...
         // APPEND EVIDENCE TO NODE TREE
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + QString::number(evidcnt));
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
         tmplist = tmpstr.split(",");
@@ -834,7 +834,7 @@ public:
         volnode = currentnode;
         currentnode->parent = parentnode;
         parentnode->children.append(currentnode);
-        currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p?");
+        currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".part.*");
         currentnode->haschildren = currentnode->HasChildren();
         parentnode = currentnode;
         wombatid++;
@@ -849,7 +849,7 @@ public:
             currentnode = 0;
             tmplist.clear();
             colvalues.clear();
-            partfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
+            partfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".part." + QString::number(i));
             partfile.open(QIODevice::ReadOnly);
             tmpstr = partfile.readLine();
             partfile.close();

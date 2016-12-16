@@ -672,12 +672,16 @@ void WombatForensics::InitializeOpenCase()
         //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
         //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QStringList files = eviddir.entryList(QStringList(QString("*.evid")), QDir::Files | QDir::NoSymLinks);
-        wombatvariable.evidenceobject.name = QFile(files.at(0)).fileName().split(".").at(0) + QString(".") + QFile(files.at(0)).fileName().split(".").at(1);
+        QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
+        for(int i=0; i < files.count(); i++)
+        {
+            wombatvariable.evidenceobject.name = QFile(files.at(i)).fileName().split(".").at(0) + QString(".") + QFile(files.at(i)).fileName().split(".").at(1);
 
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        treemodel->AddEvidence();
-        QApplication::restoreOverrideCursor();
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            treemodel->AddEvidence();
+            QApplication::restoreOverrideCursor();
+            evidcnt++;
+        }
         ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
         if(ui->dirTreeView->model() != NULL)
         {
@@ -933,7 +937,7 @@ void WombatForensics::AddNewEvidence()
     }
     free(images);
     fsobjectlist.clear();
-    QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".evid");
+    QFile evidfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".evid." + QString::number(evidcnt));
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size;
@@ -1013,7 +1017,7 @@ void WombatForensics::AddNewEvidence()
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-        QFile pfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p1");
+        QFile pfile(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".part.0");
         pfile.open(QIODevice::Append | QIODevice::Text);
         out.setDevice(&pfile);
         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (unsigned long long)readfsinfo->block_size;
@@ -1056,7 +1060,7 @@ void WombatForensics::AddNewEvidence()
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                pfile.setFileName(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".p" + QString::number(i));
+                pfile.setFileName(wombatvariable.caseobject.dirpath + wombatvariable.evidenceobject.name + ".part." + QString::number(i));
                 pfile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02) // unallocated partition
@@ -1453,7 +1457,7 @@ void WombatForensics::LoadHexContents()
     if(wombatvariable.selectedobject.modid.split("-").count() == 1) // image file
     {
         //OpenParentImage();
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + wombatvariable.selectedobject.modid.mid(1));
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
         tmplist = tmpstr.split(",");
@@ -1961,7 +1965,7 @@ void WombatForensics::OpenParentImage(void)
     QString tmpstr = "";
     QStringList tmplist;
     tmplist.clear();
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + QString::number(evidcnt));
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
     tmplist = tmpstr.split(",");

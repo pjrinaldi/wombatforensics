@@ -1097,7 +1097,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
     free(images);
     fsobjectlist.clear();
     // PUT FILES IN THE SPARSE FILE NOW.
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid");
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + QString::number(evidcnt));
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
@@ -1129,7 +1129,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-        QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p0");
+        QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".part.0");
         pfile.open(QIODevice::Append | QIODevice::Text);
         out.setDevice(&pfile);
         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
@@ -1151,7 +1151,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint));
+                pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".part." + QString::number(partint));
                 pfile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
                 //qDebug() << readpartinfo->flags;
