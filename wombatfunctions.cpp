@@ -354,6 +354,7 @@ QString base64_decode(QString string){
         filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".a" + QString::number(tmpfile->name->par_addr));
         filefile.open(QIODevice::Append | QIODevice::Text);
         out << outstring;
+        out.flush();
         filesfound++;
     }
     filefile.close();
@@ -361,6 +362,7 @@ QString base64_decode(QString string){
 
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
+        QByteArray adsba;
         int tmpattrid = 0;
         unsigned long long adssize = 0;
         TSK_OFF_T curmftentrystart = 0;
@@ -398,10 +400,30 @@ QString base64_decode(QString string){
                         {
                             if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                             {
-                                QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".f" + QString::number(adssize - (unsigned long long)fsattr->size + 16));
+                                QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + ".a" + QString::number(tmpfile->name->par_addr));
+                                //QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".f" + QString::number(adssize - (unsigned long long)fsattr->size + 16));
                                 adsfile.open(QIODevice::Append | QIODevice::Text);
                                 QTextStream adsout(&adsfile);
-                                adsout << QString(":") + QString(fsattr->name) << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << fsattr->id << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16);
+                                adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
+                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->name->par_addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << fsattr->id << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) << ",0";
+                                //adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << fsattr->id << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) << ",0";
+                                adsout.flush();
+                                /*
+                                TSK_FS_HASH_RESULTS hashresults;
+                                uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
+                                if(retval == 0)
+                                {
+                                    char sbuf[17];
+                                    int sint = 0;
+                                    for(int i=0; i < 16; i++)
+                                    {
+                                        sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
+                                    }
+                                        adsout <<  "," << QString(sbuf);
+                                }
+                                else
+                                    adsout << ",0";
+                                */
                                 adsfile.close();
                             }
                         }

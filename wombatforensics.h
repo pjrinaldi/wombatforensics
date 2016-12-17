@@ -542,7 +542,7 @@ public:
         int curpart = parent.sibling(parent.row(), 0).data().toString().split("-").at(2).mid(1).toInt();
         //qDebug() << parent.sibling(parent.row(), 0).data().toString(); // unique id
         parentnode = NodeFromIndex(parent);
-        QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name + ".p" + QString::number(curpart) + "*.a" + QString::number(parentaddr));
+        QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + QString::number(parentaddr));
         QFile childfile;
         beginInsertRows(parent, 0, parentnode->childcount - 1);
         for(int i = 0; i < curfiles.count(); i++)
@@ -556,11 +556,11 @@ public:
             tmpstr = childfile.readLine();
             childfile.close();
             tmplist = tmpstr.split(",");
-            //colvalues.append(wombatid);                             // ID
+            //colvalues.append(wombatid);                           // ID
             colvalues.append(tmplist.at(12));                       // ID
             QByteArray ba;
             ba.append(tmplist.at(0));
-            colvalues.append(QByteArray::fromBase64(ba));                        // Name
+            colvalues.append(QByteArray::fromBase64(ba));           // Name
             //colvalues.append(tmplist.at(0));                        // Name
             colvalues.append(tmplist.at(3));                        // Full Path
             colvalues.append(tmplist.at(8));                        // Size
@@ -577,7 +577,7 @@ public:
             currentnode = new Node(colvalues);
             currentnode->parent = parentnode;
             parentnode->children.append(currentnode);
-            currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(curpart) + "*.a" + tmplist.at(9));
+            currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + tmplist.at(9));
             currentnode->haschildren = currentnode->HasChildren();
         }
         endInsertRows();
@@ -901,7 +901,7 @@ public:
                 colvalues.append(tmplist.at(5));                        // Accessed
                 colvalues.append(tmplist.at(6));                        // Modified
                 colvalues.append(tmplist.at(7));                        // Status Changed
-                if(tmplist.at(13).toInt() == 0)
+                if(tmplist.at(13).compare("0") == 0)
                     colvalues.append("");                               // MD5
                 else
                     colvalues.append(tmplist.at(13));                   // MD5

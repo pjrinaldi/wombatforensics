@@ -644,7 +644,8 @@ void WombatForensics::InitializeOpenCase()
         QStringList tmplist = wombatvariable.caseobject.name.split("/");
         tmplist.removeLast();
         wombatvariable.caseobject.dirpath = tmplist.join("/");
-        logfile.setFileName(wombatvariable.caseobject.dirpath + "/msglog");
+        //logfile.setFileName(wombatvariable.caseobject.dirpath + "/msglog");
+        logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         if(!wombatvariable.caseobject.name.contains(".wfc"))
         {
             this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name.split("/").last());
@@ -1627,8 +1628,10 @@ void WombatForensics::LoadHexContents()
         //OpenParentImage();
         QStringList filelist;
         filelist.clear();
-        QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + wombatvariable.selectedobject.modid.split("-").at(2).mid(1) + ".f" + wombatvariable.selectedobject.modid.split("-").at(3).mid(1)), QDir::NoSymLinks | QDir::Files);
+        QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + wombatvariable.selectedobject.modid.split("-").at(2).mid(1) + ".f" + wombatvariable.selectedobject.modid.split("-").at(3).mid(1) + ".a*"), QDir::NoSymLinks | QDir::Files);
+        qDebug() << filefiles;
         QFile filefile(wombatvariable.tmpmntpath + filefiles.at(0));
+        filefile.open(QIODevice::ReadOnly);
         tmpstr = filefile.readLine();
         filefile.close();
         filelist = tmpstr.split(",");
@@ -1638,6 +1641,168 @@ void WombatForensics::LoadHexContents()
         tskobjptr->objecttype = 5;
         tskobjptr->address = wombatvariable.selectedobject.modid.split("-").at(3).mid(1).toInt();
         tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
+        tskobjptr->offset = 0;
+
+        //QVector<unsigned long long> adsobjid;
+        //QVector<unsigned long long> adsattrid;
+        //adsobjid.clear();
+        //adsattrid.clear();
+        if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+        {
+        }
+            /*
+                QSqlQuery adsquery(fcasedb);
+                adsquery.prepare("SELECT objectid, mftattrid FROM data WHERE objecttype = 6 and parentid = ?;");
+                adsquery.bindValue(0, wombatvariable.selectedobject.address);
+                if(adsquery.exec())
+                {
+                    while(adsquery.next())
+                    {
+                        adsobjid.append(adsquery.value(0).toULongLong());
+                        adsattrid.append(adsquery.value(1).toULongLong());
+                    }
+                }
+                adsquery.finish();
+                */
+/*
+            }
+            unsigned long long minads = 1000;
+            for(int i = 0; i < adsattrid.count(); i++)
+            {
+                if(adsattrid.at(i) < minads)
+                    minads = adsattrid.at(i);
+            }
+            if(tskobjptr->readfileinfo->meta != NULL)
+            {
+                if(tskobjptr->readfileinfo->meta->attr)
+                {
+                    int cnt, i;
+                    cnt = tsk_fs_file_attr_getsize(tskobjptr->readfileinfo);
+                    for(i = 0; i < cnt; i++)
+                    {
+                        const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tskobjptr->readfileinfo, i);
+                        if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
+                        {
+                            if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id < (int)minads)
+                            {
+                                tsk_fs_file_walk_type(tskobjptr->readfileinfo, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_HFS_DETECT)
+        {
+            tsk_fs_file_walk_type(tskobjptr->readfileinfo, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+        }
+        else if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_FAT_DETECT)
+        {
+            tsk_fs_file_walk(tskobjptr->readfileinfo, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+        }
+        else if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_ISO9660_DETECT)
+        {
+            iso9660_inode* dinode;
+            dinode = (iso9660_inode*)tsk_malloc(sizeof(iso9660_inode));
+            iso9660_inode_node* n;
+            n = ((ISO_INFO*)tskobjptr->readfileinfo->fs_info)->in_list;
+            while(n && (n->inum != tskobjptr->readfileinfo->meta->addr))
+                n = n->next;
+            if(n)
+                memcpy(dinode, &n->inode, sizeof(iso9660_inode));
+            int block = tsk_getu32(tskobjptr->readfileinfo->fs_info->endian, dinode->dr.ext_loc_m);
+            TSK_OFF_T size = tskobjptr->readfileinfo->meta->size;
+            while((int64_t)size > 0)
+            {
+                blockstring += QString::number(block++) + "|";
+                size -= tskobjptr->readfileinfo->fs_info->block_size;
+            }
+        }
+        else
+        {
+            tsk_fs_file_walk(tskobjptr->readfileinfo, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+        }
+        qDebug() << "blkstring:" << blockstring;
+        tskobjptr->blkaddrlist = blockstring.split("|", QString::SkipEmptyParts);
+        if(blockstring.compare("") != 0)
+        {
+            tskobjptr->offset = blockstring.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
+        }
+        else
+        {
+            if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+                //tskobjptr->resoffset = GetResidentOffset(wombatvariable.selectedobject.address);
+            }
+            else
+            {
+                tskobjptr->offset = tskobjptr->fsoffset;
+            }
+        }
+        //tskobjptr->blockaddress = blockstring; // probably don't need this variable
+    }
+    else if(wombatvariable.selectedobject.objtype == 6) // ads file object
+    {
+        OpenParentImage(wombatvariable.selectedobject.parimgid);
+        OpenParentFileSystem(wombatvariable.selectedobject.parfsid);
+        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
+        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
+        tskobjptr->offset = 0;
+        tskobjptr->adsoffset = wombatvariable.selectedobject.address;
+        tskobjptr->mftattrid = wombatvariable.selectedobject.mftattrid;
+        tskobjptr->address = wombatvariable.selectedobject.parentid;
+        tskobjptr->objecttype = 6;
+        tskobjptr->length = wombatvariable.selectedobject.size;
+        OpenFileSystemFile();
+        // DO BLOCK ADDRESS STUFF HERE...
+        // DO THE REST HERE AS WELL...
+    }
+*/
+    /*
+    else if(wombatvarptr->selectedobject.objtype == 5) // file object
+    {
+        if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
+        {
+            tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
+        }
+        else
+        {
+            if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+                tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.address);
+                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
+            }
+            else
+                tskobjptr->offset = tskobjptr->fsoffset;
+        }
+        tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
+        tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
+    }
+    else if(wombatvarptr->selectedobject.objtype == 6) // ads file object
+    {
+        if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
+        {
+            if(wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
+            {
+                tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
+                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
+            }
+            else
+                tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
+        }
+        else
+        {
+            tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
+            tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
+        }
+        tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
+        tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
+        OpenFileSystemFile();
+ 
+         *
+         *
+         */ 
+        tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
     }
     //qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count();
 /*    
@@ -1695,11 +1860,6 @@ void WombatForensics::LoadHexContents()
         adsattrid.clear();
         if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
-            if(QString::compare(wombatvariable.selectedobject.name, ".") == 0 || QString::compare(wombatvariable.selectedobject.name, "..") == 0)
-            {
-            }
-            else
-            {
 */                /*
                 QSqlQuery adsquery(fcasedb);
                 adsquery.prepare("SELECT objectid, mftattrid FROM data WHERE objecttype = 6 and parentid = ?;");
@@ -1851,7 +2011,7 @@ void WombatForensics::LoadHexContents()
     }
     */
     //if(wombatvariable.selectedobject.objtype == 1)
-    if(wombatvariable.selectedobject.modid.split("-").count() == 1) // image file
+    if(wombatvariable.selectedobject.modid.split("-").count() < 4) // image file
     {
         hexwidget->openimage();
         hexwidget->set1BPC();
@@ -1860,16 +2020,15 @@ void WombatForensics::LoadHexContents()
     }
     else
     {
-        /*
         hexwidget->SetTopLeft(tskobjptr->offset);
-        if(wombatvariable.selectedobject.objtype == 5 || wombatvariable.selectedobject.objtype == 6)
+        //if(wombatvariable.selectedobject.objtype == 5 || wombatvariable.selectedobject.objtype == 6)
+        if(wombatvariable.selectedobject.modid.split("-").count() == 4)
         {
             fileviewer->filehexview->openimage();
             fileviewer->filehexview->set1BPC();
             fileviewer->filehexview->setBaseHex();
             fileviewer->filehexview->SetTopLeft(0);
         }
-        */
     }
 }
 
