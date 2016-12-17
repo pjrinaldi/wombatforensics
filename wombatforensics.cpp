@@ -595,8 +595,8 @@ void WombatForensics::InitializeCaseStructure()
         mkfsstr += wombatvariable.caseobject.name;
         QString name = qgetenv("USER");
         if(name.isEmpty())
-            //name = qgetenv("USERNAME");
-        qDebug() << name;
+            name = qgetenv("USERNAME");
+        //qDebug() << name;
         QString mntstr = "sudo mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
@@ -658,7 +658,7 @@ void WombatForensics::InitializeOpenCase()
         QString name = qgetenv("USER");
         if(name.isEmpty())
             name = qgetenv("USERNAME");
-        qDebug() << name;
+        //qDebug() << name;
         QString mntstr = "sudo mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
@@ -1452,8 +1452,7 @@ void WombatForensics::LoadHexContents()
         tsk_fs_file_close(tskobjptr->readfileinfo);
     }
     wombatvariable.selectedobject.modid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
-    wombatvariable.evidenceobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // current evidence name
-    qDebug() << "- count:" << wombatvariable.selectedobject.modid.split("-").count();
+    //qDebug() << "- count:" << wombatvariable.selectedobject.modid.split("-").count();
     //wombatvariable.selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
     //wombatvariable.selectedobject.size = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
     //wombatvariable.selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
@@ -1463,6 +1462,7 @@ void WombatForensics::LoadHexContents()
     evidlist.clear();
     if(wombatvariable.selectedobject.modid.split("-").count() == 1) // image file
     {
+        wombatvariable.evidenceobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // current evidence name
         //OpenParentImage();
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + wombatvariable.selectedobject.modid.mid(1));
         evidfile.open(QIODevice::ReadOnly);
@@ -1497,11 +1497,16 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedobject.modid.split("-").count() == 2) // volume file
     {
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + wombatvariable.selectedobject.modid.split("-").at(0).mid(1));
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedobject.modid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
+        wombatvariable.evidenceobject.name = evidfiles.at(0);
+        //qDebug() << evidfiles.at(0);
+
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name.split(".evid").at(0) + ".evid." + wombatvariable.selectedobject.modid.split("-").at(0).mid(1));
         evidfile.open(QIODevice::ReadOnly);
-        tmpstr = evidfile.ReadLine();
-        evidfile.close();
+        tmpstr = evidfile.readLine();
         evidlist = tmpstr.split(",");
+        evidfile.close();
         std::vector<std::string> tmpvec;
         tmpvec.clear();
         for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
@@ -1524,24 +1529,115 @@ void WombatForensics::LoadHexContents()
         tmpstr = "";
         QStringList vollist;
         vollist.clear();
-        QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".vol");
+        QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name.split(".evid").at(0) + ".vol");
         volfile.open(QIODevice::ReadOnly);
         tmpstr = volfile.readLine();
         volfile.close();
         vollist = tmpstr.split(",");
-        tskobjptr->offset = 0;
+        tskobjptr->offset = vollist.at(4).toInt();
         tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tskobjptr->imglength = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
-
-
+        tskobjptr->sectsize = vollist.at(3).toInt();
+        tskobjptr->blocksize = vollist.at(3).toInt();
     }
     else if(wombatvariable.selectedobject.modid.split("-").count() == 3) // partition file
     {
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedobject.modid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
+        wombatvariable.evidenceobject.name = evidfiles.at(0);
+        //qDebug() << evidfiles.at(0);
+
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name.split(".evid").at(0) + ".evid." + wombatvariable.selectedobject.modid.split("-").at(0).mid(1));
+        evidfile.open(QIODevice::ReadOnly);
+        tmpstr = evidfile.readLine();
+        evidlist = tmpstr.split(",");
+        evidfile.close();
+        std::vector<std::string> tmpvec;
+        tmpvec.clear();
+        for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
+        {
+            tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
+        }
+        tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
+        for(int i =0; i < tmpvec.size(); i++)
+        {
+            tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
+        }
+        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+        if(tskobjptr->readimginfo == NULL)
+        {
+            qDebug() << tsk_error_get_errstr();
+            LogMessage("Image opening error");
+        }
+        free(tskobjptr->imagepartspath);
+        tmpstr = "";
+        QStringList partlist = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".part." + wombatvariable.selectedobject.modid.split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
+        QFile partfile(wombatvariable.tmpmntpath + partlist.at(0));
+        partfile.open(QIODevice::ReadOnly);
+        tmpstr = partfile.readLine();
+        partfile.close();
+        partlist = tmpstr.split(",");
+        tskobjptr->offset = partlist.at(4).toULongLong();
+        tskobjptr->fsoffset = partlist.at(4).toULongLong();
+        tskobjptr->objecttype = 4;
+        tskobjptr->length = partlist.at(1).toULongLong();
+        tskobjptr->sectsize = evidlist.at(2).toInt();
+        tskobjptr->blocksize = partlist.at(6).toInt();
         //OpenParentImage();
     }
     else if(wombatvariable.selectedobject.modid.split("-").count() == 4) // file file
     {
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedobject.modid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
+        wombatvariable.evidenceobject.name = evidfiles.at(0);
+        //qDebug() << evidfiles.at(0);
+
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name.split(".evid").at(0) + ".evid." + wombatvariable.selectedobject.modid.split("-").at(0).mid(1));
+        evidfile.open(QIODevice::ReadOnly);
+        tmpstr = evidfile.readLine();
+        evidlist = tmpstr.split(",");
+        evidfile.close();
+        std::vector<std::string> tmpvec;
+        tmpvec.clear();
+        for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
+        {
+            tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
+        }
+        tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
+        for(int i =0; i < tmpvec.size(); i++)
+        {
+            tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
+        }
+        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+        if(tskobjptr->readimginfo == NULL)
+        {
+            qDebug() << tsk_error_get_errstr();
+            LogMessage("Image opening error");
+        }
+        free(tskobjptr->imagepartspath);
+        tmpstr = "";
+        QStringList partlist;
+        partlist.clear();
+        QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".part." + wombatvariable.selectedobject.modid.split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
+        QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
+        partfile.open(QIODevice::ReadOnly);
+        tmpstr = partfile.readLine();
+        partfile.close();
+        partlist = tmpstr.split(",");
         //OpenParentImage();
+        QStringList filelist;
+        filelist.clear();
+        QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + wombatvariable.selectedobject.modid.split("-").at(2).mid(1) + ".f" + wombatvariable.selectedobject.modid.split("-").at(3).mid(1)), QDir::NoSymLinks | QDir::Files);
+        QFile filefile(wombatvariable.tmpmntpath + filefiles.at(0));
+        tmpstr = filefile.readLine();
+        filefile.close();
+        filelist = tmpstr.split(",");
+        tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
+        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
+        tskobjptr->objecttype = 5;
+        tskobjptr->address = wombatvariable.selectedobject.modid.split("-").at(3).mid(1).toInt();
+        tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
     }
     //qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count();
 /*    
