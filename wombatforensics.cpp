@@ -1630,7 +1630,20 @@ void WombatForensics::LoadHexContents()
         filelist.clear();
         QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + wombatvariable.selectedobject.modid.split("-").at(2).mid(1) + ".f" + wombatvariable.selectedobject.modid.split("-").at(3).mid(1) + ".a*"), QDir::NoSymLinks | QDir::Files);
         qDebug() << filefiles;
-        QFile filefile(wombatvariable.tmpmntpath + filefiles.at(0));
+        QFile filefile;
+        if(filefiles.count() == 1)
+            filefile.setFileName(wombatvariable.tmpmntpath + filefiles.at(0));
+        else
+        {
+            for(int i = 0; i < filefiles.count(); i++)
+            {
+                if(filefiles.at(i).split(".a").at(1).toInt() == selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-f").at(1).toInt())
+                {
+                    qDebug() << filefiles.at(i);
+                    filefile.setFileName(wombatvariable.tmpmntpath + filefiles.at(i));
+                }
+            }
+        }
         filefile.open(QIODevice::ReadOnly);
         tmpstr = filefile.readLine();
         filefile.close();
