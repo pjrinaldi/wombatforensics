@@ -1655,36 +1655,38 @@ void WombatForensics::LoadHexContents()
         tskobjptr->address = wombatvariable.selectedobject.modid.split("-").at(3).mid(1).toInt();
         tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tskobjptr->offset = 0;
+        if(filelist.at(11).toULongLong() == 0)
+            tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
 
+        QStringList tmpchildren = GetChildFiles("*.a" + wombatvariable.selectedobject.modid.split("-").at(3).mid(1));
         //QVector<unsigned long long> adsobjid;
         //QVector<unsigned long long> adsattrid;
         //adsobjid.clear();
         //adsattrid.clear();
         if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
-        }
-            /*
-                QSqlQuery adsquery(fcasedb);
-                adsquery.prepare("SELECT objectid, mftattrid FROM data WHERE objecttype = 6 and parentid = ?;");
-                adsquery.bindValue(0, wombatvariable.selectedobject.address);
-                if(adsquery.exec())
-                {
-                    while(adsquery.next())
-                    {
-                        adsobjid.append(adsquery.value(0).toULongLong());
-                        adsattrid.append(adsquery.value(1).toULongLong());
-                    }
-                }
-                adsquery.finish();
-                */
-/*
-            }
             unsigned long long minads = 1000;
-            for(int i = 0; i < adsattrid.count(); i++)
+            for(int i = 0; i < tmpchildren.count(); i++)
             {
-                if(adsattrid.at(i) < minads)
-                    minads = adsattrid.at(i);
+                QString childstr = "";
+                QStringList childlist;
+                childlist.clear();
+                QFile childfile(wombatvariable.tmpmntpath + tmpchildren.at(i));
+                childfile.open(QIODevice::ReadOnly);
+                childstr = childfile.readLine();
+                childfile.close();
+                childlist = childstr.split(",");
+                if(childlist.at(11).toULongLong() > 0)
+                {
+                    if(childlist.at(11).toULongLong() < minads)
+                        minads = childlist.at(11).toULongLong();
+                }
             }
+            //unsigned long long adsattrid = filelist.at(11).toULongLong();
+            /*
+            if(adsattrid < minads)
+                minads = adsattrid;
+            */
             if(tskobjptr->readfileinfo->meta != NULL)
             {
                 if(tskobjptr->readfileinfo->meta->attr)
@@ -1694,7 +1696,7 @@ void WombatForensics::LoadHexContents()
                     for(i = 0; i < cnt; i++)
                     {
                         const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tskobjptr->readfileinfo, i);
-                        if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
+                        if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non-resident attribute
                         {
                             if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id < (int)minads)
                             {
@@ -1735,7 +1737,7 @@ void WombatForensics::LoadHexContents()
         {
             tsk_fs_file_walk(tskobjptr->readfileinfo, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
         }
-        qDebug() << "blkstring:" << blockstring;
+        //qDebug() << "blkstring:" << blockstring;
         tskobjptr->blkaddrlist = blockstring.split("|", QString::SkipEmptyParts);
         if(blockstring.compare("") != 0)
         {
@@ -1745,7 +1747,9 @@ void WombatForensics::LoadHexContents()
         {
             if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
             {
+                // NEED TO IMPLEMENT PROPERTIES BEFORE I CAN TEST OUT GETTING THE RESOFFSET PROPERLY
                 //tskobjptr->resoffset = GetResidentOffset(wombatvariable.selectedobject.address);
+                //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
             }
             else
             {
@@ -1754,6 +1758,7 @@ void WombatForensics::LoadHexContents()
         }
         //tskobjptr->blockaddress = blockstring; // probably don't need this variable
     }
+    /*
     else if(wombatvariable.selectedobject.objtype == 6) // ads file object
     {
         OpenParentImage(wombatvariable.selectedobject.parimgid);
@@ -1815,8 +1820,6 @@ void WombatForensics::LoadHexContents()
          *
          *
          */ 
-        tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
-    }
     //qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count();
 /*    
     if(wombatvariable.selectedobject.objtype == 1) // image file

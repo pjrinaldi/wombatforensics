@@ -939,7 +939,6 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
             unsigned long long curoffset = globalOffset(widx);
             paint.setPen(QColor(0, 0, 0, 255)); // BLACK
             paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
-            /*
             if(tskptr->blkaddrlist.count() > 0)
             {
                 if(tskptr->blkaddrlist.at(0).toInt() == 0) // resident attribute
@@ -1006,7 +1005,6 @@ void ImageHexViewer::drawAsciiRegion(QPainter& paint, const QString& text, int r
                     }
                 }
             }
-            */
         }
     }
 }
@@ -1021,7 +1019,6 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
             unsigned long long curoffset = globalOffset(widx);
             paint.setPen(QColor(0, 0, 0, 255)); // BLACK
             paint.drawText(_wordBBox[widx].left() + wordSpacing()/2, _wordBBox[widx].bottom(), text.mid(widx*charsPerWord(), charsPerWord()));
-            /*
             if(tskptr->blkaddrlist.count() > 0)
             {
                 if(tskptr->blkaddrlist.at(0).toInt() == 0) // resident attribute
@@ -1088,7 +1085,6 @@ void ImageHexViewer::drawTextRegion(QPainter& paint, const QString& text, int ro
                     }
                 }
             }
-            */
         }
     }
 }
