@@ -485,14 +485,6 @@ int hfs_unicode_compare(HFS_INFO * hfs, const hfs_uni_str * uni1, const hfs_uni_
         return hfs_unicode_compare_int(hfs->fs_info.endian, uni1, uni2);
 }
 
-uint32_t
-hfs_convert_2_unix_time(uint32_t hfsdate)
-{
-    if (hfsdate < NSEC_BTWN_1904_1970)
-        return 0;
-    return (uint32_t) (hfsdate - NSEC_BTWN_1904_1970);
-}
-
 static TSK_INUM_T
 hfs_lookup_hard_link(HFS_INFO * hfs, TSK_INUM_T linknum,
     unsigned char is_directory)
@@ -723,7 +715,7 @@ TSK_INUM_T hfs_follow_hard_link(HFS_INFO * hfs, hfs_file * cat, unsigned char *i
     // It cannot be a hard link (file or directory)
     return cnid;
 }
-
+/*
 WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
 {
     wombatptr = wombatvarptr;
@@ -755,8 +747,8 @@ WombatProperties::WombatProperties(WombatVariable* wombatvarptr)
     s = NULL;
     yfs = NULL;
 }
-/*
-QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curinfo)
+*/
+QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
 {
     if(curinfo != NULL)
     {
@@ -885,7 +877,7 @@ QString WombatProperties::GetFileSystemLabel(TSK_FS_INFO* curinfo)
     }
     return "";
 }
-QStringList WombatProperties::PopulateEvidenceImageProperties()
+QStringList PopulateEvidenceImageProperties()
 {
     proplist.clear();
     proplist << QString("File Format") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)wombatptr->evidenceobject.imageinfo->itype)) << QString("File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
@@ -1091,12 +1083,12 @@ QStringList WombatProperties::PopulateEvidenceImageProperties()
     return proplist;
 }
 
-QStringList WombatProperties::PopulatePartitionProperties()
+QStringList PopulatePartitionProperties()
 {
     return QStringList("");
 }
 
-QStringList WombatProperties::PopulateVolumeProperties()
+QStringList PopulateVolumeProperties()
 {
     proplist.clear();
     if(wombatptr->evidenceobject.volinfo != NULL) // valid volume object
@@ -1254,7 +1246,7 @@ QStringList WombatProperties::PopulateVolumeProperties()
     return proplist;
 }
 
-QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinfo)
+QStringList PopulateFileSystemProperties(TSK_FS_INFO* curfsinfo)
 {
     proplist.clear();
     if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || curfsinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
@@ -1901,7 +1893,7 @@ QStringList WombatProperties::PopulateFileSystemProperties(TSK_FS_INFO* curfsinf
     return proplist;
 }
 
-QString WombatProperties::ConvertGmtHours(int gmtvar)
+QString ConvertGmtHours(int gmtvar)
 {
     int tmpmin = gmtvar - 48;
     int gmthr = tmpmin / 4;
@@ -1916,8 +1908,7 @@ QString WombatProperties::ConvertGmtHours(int gmtvar)
     return tmpstring;
 
 }
-*/
-void WombatProperties::yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t* objfirst, uint32_t* objlast, uint32_t* vercnt, uint32_t* verfirst, uint32_t* verlast)
+void yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t* objfirst, uint32_t* objlast, uint32_t* vercnt, uint32_t* verfirst, uint32_t* verlast)
 {
     YaffsCacheObject* obj;
     YaffsCacheVersion* ver;
@@ -1947,7 +1938,7 @@ void WombatProperties::yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int*
     }
 }
 
-uint32_t WombatProperties::hfs_convert_2_unix_time(uint32_t hfsdate)
+uint32_t hfs_convert_2_unix_time(uint32_t hfsdate)
 {
     if(hfsdate < NSEC_BTWN_1904_1970)
         return 0;
@@ -1962,7 +1953,7 @@ QStringList WombatProperties::PopulateFileProperties()
 */
 
 
-uint8_t WombatProperties::hfs_UTF16toUTF8(TSK_FS_INFO * fs, uint8_t * uni, int ulen, char *asc, int alen, uint32_t flags)
+uint8_t hfs_UTF16toUTF8(TSK_FS_INFO * fs, uint8_t * uni, int ulen, char *asc, int alen, uint32_t flags)
 {
     UTF8 *ptr8;
     uint8_t *uniclean;
@@ -2023,7 +2014,7 @@ uint8_t WombatProperties::hfs_UTF16toUTF8(TSK_FS_INFO * fs, uint8_t * uni, int u
 
     return 0;
 }
-int WombatProperties::hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2)
+int hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2)
 {
     TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
     uint32_t cnid1, cnid2;
@@ -2039,7 +2030,7 @@ int WombatProperties::hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_ca
     return hfs_unicode_compare(hfs, &key1->name, &key2->name);
 }
 
-uint8_t WombatProperties::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, TSK_HFS_BTREE_CB a_cb, void* ptr)
+uint8_t hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, TSK_HFS_BTREE_CB a_cb, void* ptr)
 {
     TSK_FS_INFO *fs = &(hfs->fs_info);
     uint32_t cur_node;          /* node id of the current node */
@@ -2282,7 +2273,7 @@ uint8_t WombatProperties::hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data,
     return 0;
 }
 
-uint8_t WombatProperties::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HFS_ENTRY * entry, unsigned char follow_hard_link)
+uint8_t hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, HFS_ENTRY * entry, unsigned char follow_hard_link)
 {
     TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
     hfs_btree_key_cat key;      /* current catalog key */
@@ -2392,7 +2383,7 @@ uint8_t WombatProperties::hfs_cat_file_lookup(HFS_INFO * hfs, TSK_INUM_T inum, H
     return 0;
 }
 
-uint8_t WombatProperties::hfs_cat_get_record_offset_cb(HFS_INFO * hfs, int8_t level_type, const void *targ_data, const hfs_btree_key_cat * cur_key, TSK_OFF_T key_off, void *ptr)
+uint8_t hfs_cat_get_record_offset_cb(HFS_INFO * hfs, int8_t level_type, const void *targ_data, const hfs_btree_key_cat * cur_key, TSK_OFF_T key_off, void *ptr)
 {
     const hfs_btree_key_cat *targ_key = (hfs_btree_key_cat *) targ_data;
     //if (tsk_verbose)
@@ -2427,7 +2418,7 @@ uint8_t WombatProperties::hfs_cat_get_record_offset_cb(HFS_INFO * hfs, int8_t le
     }
 }
 
-TSK_OFF_T WombatProperties::hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle)
+TSK_OFF_T hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle)
 {
     TSK_OFF_T off = 0;
     if(hfs_cat_traverse(hfs, needle, hfs_cat_get_record_offset_cb, &off))
@@ -2437,7 +2428,7 @@ TSK_OFF_T WombatProperties::hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_b
     return off;
 }
 
-uint8_t WombatProperties::hfs_cat_read_thread_record(HFS_INFO * hfs, TSK_OFF_T off, hfs_thread * thread)
+uint8_t hfs_cat_read_thread_record(HFS_INFO * hfs, TSK_OFF_T off, hfs_thread * thread)
 {
     TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
     uint16_t uni_len;
@@ -2483,7 +2474,7 @@ uint8_t WombatProperties::hfs_cat_read_thread_record(HFS_INFO * hfs, TSK_OFF_T o
     return 0;
 }
 
-uint8_t WombatProperties::hfs_cat_read_file_folder_record(HFS_INFO * hfs, TSK_OFF_T off, hfs_file_folder * record)
+uint8_t hfs_cat_read_file_folder_record(HFS_INFO * hfs, TSK_OFF_T off, hfs_file_folder * record)
 {
     TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
     size_t cnt;
