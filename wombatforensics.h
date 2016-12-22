@@ -1045,7 +1045,7 @@ public:
     TskObject tskexternalobject;
     TskObject* tskexternalptr;
     //WombatFramework* wombatframework;
-    //PropertiesWindow* propertywindow;
+    PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;
     FileViewer* fileviewer;

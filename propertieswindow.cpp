@@ -29,7 +29,6 @@ void PropertiesWindow::closeEvent(QCloseEvent* event)
 
 void PropertiesWindow::UpdateTableView()
 {
-    /*
     pmodel = new PropertyModel(propertylist);
     ui->tableView->setModel(pmodel);
     ui->tableView->hideColumn(2);
@@ -39,7 +38,6 @@ void PropertiesWindow::UpdateTableView()
             ui->tableView->resizeRowToContents(i);
     }
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
-    */
 }
 
 void PropertiesWindow::SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem)

@@ -6,6 +6,7 @@
 
 #include "wombatinclude.h"
 #include "ui_propertieswindow.h"
+#include "globals.h"
 //#include "wombatdatabase.h"
 
 class PropertyModel : public QAbstractTableModel

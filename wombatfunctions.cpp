@@ -1210,10 +1210,10 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
     uint64_t value64bit = 0;
     size64_t size64bit = 0;
     libewf_error_t* ewferror = NULL;
-    proplist << QString("File Format,") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)curimginfo->itype)) << QString(,"File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.");
-    proplist << QString("Sector Size") << QString(QString::number(curimginfo->sector_size) + " bytes") << QString("Sector size of the device. A Sector is a subdivision of a disk where data is stored. It is the smallest value used to divide the disk.");
-    proplist << QString("Sector Count") << QString(QString::number((int)((float)curimginfo->size/(float)curimginfo->sector_size)) + " sectors") << QString("The number of sectors in the disk.");
-    proplist << QString("Image Path") << QString::fromStdString(string(wombatvariable.evidenceobject.fullpathvector[0])) << QString("Location where the evidence image is stored and read from.");
+    proplist << QString("File Format||") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)curimginfo->itype)) << QString("||File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.") << endl;
+    proplist << QString("Sector Size||") << QString(QString::number(curimginfo->sector_size) + " bytes||") << QString("Sector size of the device. A Sector is a subdivision of a disk where data is stored. It is the smallest value used to divide the disk.") << endl;
+    proplist << QString("Sector Count||") << QString(QString::number((int)((float)curimginfo->size/(float)curimginfo->sector_size)) + " sectors||") << QString("The number of sectors in the disk.") << endl;
+    proplist << QString("Image Path||") << QString::fromStdString(string(wombatvariable.evidenceobject.fullpathvector[0])) << QString("||Location where the evidence image is stored and read from.") << endl;
     if(TSK_IMG_TYPE_ISAFF(curimginfo->itype)) // its AFF
     {
     }
@@ -1221,119 +1221,119 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
     {
         ewfinfo = (IMG_EWF_INFO*)curimginfo;
         if(libewf_handle_get_utf8_header_value_case_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Case Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "The case number the image is associated";
+            proplist << "Case Number||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||The case number the image is associated" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_description(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Description" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Description of the acquisition and or evidence item";
+            proplist << "Description||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Description of the acquisition and or evidence item" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_examiner_name(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Examiner Name" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Name of the examiner who acquired the image";
+            proplist << "Examiner Name||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Name of the examiner who acquired the image" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_evidence_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Evidence Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Unique number identifying the evidence item";
+            proplist << "Evidence Number||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Unique number identifying the evidence item" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_notes(ewfinfo->handle, ewfvalue, 255, &ewferror) == 1)
-            proplist << "Notes" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Any notes related to the acquisition";
+            proplist << "Notes||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Any notes related to the acquisition" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_acquiry_date(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Acquisition Date" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Date the acquisition was made";
+            proplist << "Acquisition Date||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Date the acquisition was made" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_system_date(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "System Date" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Date for the system acquiring the image";
+            proplist << "System Date||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Date for the system acquiring the image" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_acquiry_operating_system(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Aquisition OS" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Operating System acquiring the image";
+            proplist << "Aquisition OS||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Operating System acquiring the image" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_acquiry_software_version(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Software Version Used" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Version of the software used to acquire the image";
+            proplist << "Software Version Used||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Version of the software used to acquire the image" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_password(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Password" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Password to protect the image";
+            proplist << "Password||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Password to protect the image" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_model(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Model" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Model of the drive acquired";
+            proplist << "Model||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Model of the drive acquired" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_header_value_serial_number(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "Serial Number" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "Serial number of the drive acquired";
+            proplist << "Serial Number||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||Serial number of the drive acquired" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_sectors_per_chunk(ewfinfo->handle, &value32bit, &ewferror) == 1)
-            proplist << QString("Sectors Per Chunk") << QString::number(value32bit) << "Number of sectors in a image evidence chunk";
+            proplist << QString("Sectors Per Chunk||") << QString::number(value32bit) << "||Number of sectors in a image evidence chunk" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_format(ewfinfo->handle, &uvalue8bit, &ewferror) == 1)
         {
-            proplist << QString("File Format");
+            proplist << QString("File Format||");
             switch(uvalue8bit)
             {
                 case LIBEWF_FORMAT_EWF:
-                    proplist << QString("Original EWF") << "Format used to store the evidence image";
+                    proplist << QString("Original EWF") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_SMART:
-                    proplist << QString("SMART") << "Format used to store the evidence image";
+                    proplist << QString("SMART") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_FTK:
-                    proplist << QString("FTK Imager") << "Format used to store the evidence image";
+                    proplist << QString("FTK Imager") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_ENCASE1:
-                    proplist << QString("EnCase 1") << "Format used to store the evidence image";
+                    proplist << QString("EnCase 1") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_ENCASE2:
-                    proplist << QString("EnCase 2") << "Format used to store the evidence image";
+                    proplist << QString("EnCase 2") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_ENCASE3:
-                    proplist << QString("EnCase 3") << "Format used to store the evidence image";
+                    proplist << QString("EnCase 3") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_ENCASE4:
-                    proplist << QString("EnCase 4") << "Format used to store the evidence image";
+                    proplist << QString("EnCase 4") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_ENCASE5:
-                    proplist << QString("EnCase 5") << "Format used to store the evidence image";
+                    proplist << QString("EnCase 5") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_ENCASE6:
-                    proplist << QString("EnCase 6") << "Format used to store the evidence image";
+                    proplist << QString("EnCase 6") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_LINEN5:
-                    proplist << QString("Linen 5") << "Format used to store the evidence image";
+                    proplist << QString("Linen 5") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_LINEN6:
-                    proplist << QString("Linen 6") << "Format used to store the evidence image";
+                    proplist << QString("Linen 6") << "||Format used to store the evidence image" << endl;
                     break;
                 case LIBEWF_FORMAT_EWFX:
-                    proplist << QString("EWFX (extended ewf)") << QString("Extended EWF Format used to store the evidence image");
+                    proplist << QString("EWFX (extended ewf)") << QString("||Extended EWF Format used to store the evidence image") << endl;
                     break;
                 case LIBEWF_FORMAT_LOGICAL_ENCASE5:
-                    proplist << QString("LEF EnCase 5") << QString("Logical Evidence File EnCase 5 Format used to store the evidence image");
+                    proplist << QString("LEF EnCase 5") << QString("||Logical Evidence File EnCase 5 Format used to store the evidence image") << endl;
                     break;
                 case LIBEWF_FORMAT_LOGICAL_ENCASE6:
-                    proplist << QString("LEF EnCase 6") << QString("Logical Evidence File EnCase 6 Format used to store the evidence image");
+                    proplist << QString("LEF EnCase 6") << QString("||Logical Evidence File EnCase 6 Format used to store the evidence image") << endl;
                     break;
                 case LIBEWF_FORMAT_UNKNOWN:
-                    proplist << QString("Unknown Format") << "Format used to store the evidence image";
+                    proplist << QString("Unknown Format") << "||Format used to store the evidence image" << endl;
                     break;
             }
         }
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_error_granularity(ewfinfo->handle, &value32bit, &ewferror) == 1)
-            proplist << QString("Error Granularity") << QString::number(value32bit) << "Error block size";
+            proplist << QString("Error Granularity||") << QString::number(value32bit) << "||Error block size" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
-        proplist << "Compression Method" << "Deflate" << "Method used to compress the image";
+        proplist << "Compression Method||" << "Deflate" << "||Method used to compress the image" << endl;
         if(libewf_handle_get_compression_values(ewfinfo->handle, &value8bit, &uvalue8bit, &ewferror) == 1)
         {
-            proplist << "Compression Level";
+            proplist << "Compression Level||";
             if(value8bit == LIBEWF_COMPRESSION_NONE)
                 proplist << "No Compression";
             else if(value8bit == LIBEWF_COMPRESSION_FAST)
@@ -1342,13 +1342,13 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
                 proplist << "Best Compression";
             else
                 proplist << "Unknown Compression";
-            proplist << "The more compression, the slower the acquisition but the smaller the file size";
+            proplist << "||The more compression, the slower the acquisition but the smaller the file size" << endl;
         }
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_media_type(ewfinfo->handle, &uvalue8bit, &ewferror) == 1)
         {
-            proplist << "Media Type";
+            proplist << "Media Type||";
             if(uvalue8bit == LIBEWF_MEDIA_TYPE_REMOVABLE)
                 proplist << "Removable Disk";
             else if(uvalue8bit == LIBEWF_MEDIA_TYPE_FIXED)
@@ -1361,43 +1361,43 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
                 proplist << "Memory (RAM)";
             else
                 proplist << "Unknown";
-            proplist << "Media type of the original evidence";
+            proplist << "||Media type of the original evidence" << endl;
         }
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_media_flags(ewfinfo->handle, &uvalue8bit, &ewferror) == 1)
         {
             if(uvalue8bit == LIBEWF_MEDIA_FLAG_PHYSICAL)
-                proplist << "Media Flag" << "Physical" << "Directly connected disk";
+                proplist << "Media Flag||" << "Physical" << "||Directly connected disk" << endl;
             if(uvalue8bit == LIBEWF_MEDIA_FLAG_FASTBLOC)
-                proplist << "Media Flag" << "Fastbloc Write Blocked" << "Write blocked disk using Fastbloc";
+                proplist << "Media Flag||" << "Fastbloc Write Blocked" << "||Write blocked disk using Fastbloc" << endl;
             if(uvalue8bit == LIBEWF_MEDIA_FLAG_TABLEAU)
-                proplist << "Media Flag" << "Tableau Write Blocked" << "Write blocked disk using Tableau";
+                proplist << "Media Flag||" << "Tableau Write Blocked" << "||Write blocked disk using Tableau" << endl;
         }
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_bytes_per_sector(ewfinfo->handle, &value32bit, &ewferror) == 1)
-            proplist << "Bytes Per Sector" << QString::number(value32bit) << "Number of bytes in a sector";
+            proplist << "Bytes Per Sector||" << QString::number(value32bit) << "||Number of bytes in a sector" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_number_of_sectors(ewfinfo->handle, &value64bit, &ewferror) == 1)
-            proplist << "Number of Sectors" << QString::number(value64bit) << "Number of total sectors in the original media";
+            proplist << "Number of Sectors||" << QString::number(value64bit) << "||Number of total sectors in the original media" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_chunk_size(ewfinfo->handle, &value32bit, &ewferror) == 1)
-            proplist << "Chunk Size" << QString::number(value32bit) << "The size of an image chunk";
+            proplist << "Chunk Size||" << QString::number(value32bit) << "||The size of an image chunk" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_media_size(ewfinfo->handle, &size64bit, &ewferror) == 1)
-            proplist << "Media Size" << QString::number(size64bit) << "The size of the media";
+            proplist << "Media Size||" << QString::number(size64bit) << "||The size of the media" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_hash_value_md5(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "MD5" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "The MD5 hash algorithm of the uncompressed image stored as a 128-bit value";
+            proplist << "MD5||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||The MD5 hash algorithm of the uncompressed image stored as a 128-bit value" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         if(libewf_handle_get_utf8_hash_value_sha1(ewfinfo->handle, ewfvalue, 64, &ewferror) == 1)
-            proplist << "SHA1" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "The SHA1 hash algorithm of the uncompressed image stored as a 160-bit value";
+            proplist << "SHA1||" << QString::fromUtf8(reinterpret_cast<char*>(ewfvalue)) << "||The SHA1 hash algorithm of the uncompressed image stored as a 160-bit value" << endl;
         else
             libewf_error_fprint(ewferror, stdout);
         free(ewfvalue);

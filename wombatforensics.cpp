@@ -50,7 +50,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //wombatdatabase = new WombatDatabase(wombatvarptr);
     //wombatframework = new WombatFramework(wombatvarptr);
     //propertywindow = new PropertiesWindow(wombatdatabase);
-    //propertywindow = new PropertiesWindow(this);
+    propertywindow = new PropertiesWindow(this);
     fileviewer = new FileViewer(this, tskobjptr);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
@@ -73,7 +73,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
     cancelthread = new CancelThread(this);
-    //propertywindow->setWindowIcon(QIcon(":/bar/propview"));
+    propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
@@ -96,13 +96,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
-    //connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
+    connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
     //wombatvariable.caseobject.id = 0;
     //wombatvarptr->caseobject.id = 0;
     //connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
-    //propertywindow->setModal(false);
+    propertywindow->setModal(false);
     InitializeAppStructure();
     //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(FinishSql()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
@@ -886,6 +886,8 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionByteConverter->setEnabled(true);
         //wombatvariable.selectedobject.modid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod id
         LoadHexContents();
+        if(propertywindow->isVisible())
+            UpdateProperties();
         //wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
         //wombatvarptr->selectedobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // object name
         //wombatdatabase->GetObjectValues(); // now i have selectedobject.values.
@@ -1433,8 +1435,24 @@ void WombatForensics::AddEvidence()
 /////////////////////////////////////////////////////
 void WombatForensics::UpdateProperties()
 {
+    //wombatvariable.selectedobject.modid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod id
     //wombatdatabase->ReturnObjectPropertyList();
-    //propertywindow->UpdateTableView();
+    QFile propfile;
+    propertylist.clear();
+    if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 1)
+    {
+        propfile.setFileName(wombatvariable.tmpmntpath + selectedindex.sibling(selectedindex.row(), 1).data().toString().split("evid").at(0) + ".eprop." + selectedindex.sibling(selectedindex.row(), 0).data().toString().mid(1));
+    }
+    //qDebug() << propfile.fileName();
+    propfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream in(&propfile);
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        propertylist << line.split("||").at(0) << line.split("||").at(1) << line.split("||").at(2);
+    }
+    propfile.close();
+    propertywindow->UpdateTableView();
 }
 
 void WombatForensics::LoadHexContents()
@@ -3025,7 +3043,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         //event->ignore();
     }
     
-    //propertywindow->close();
+    propertywindow->close();
     fileviewer->close();
     imagewindow->close();
     videowindow->close();
@@ -3148,18 +3166,16 @@ void WombatForensics::on_actionDigDeeper_triggered()
 
 void WombatForensics::on_actionView_Properties_triggered(bool checked)
 {
-    /*
     if(!checked)
     {
-        //propertywindow->hide();
+        propertywindow->hide();
     }
     else
     {
-        //propertywindow->show();
+        propertywindow->show();
         if(ui->dirTreeView->selectionModel()->hasSelection())
             UpdateProperties();
     }
-    */
 }
 
 void WombatForensics::on_actionView_File_triggered(bool checked)
