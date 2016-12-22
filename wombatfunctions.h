@@ -26,6 +26,7 @@ void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 //void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsattrid);
 //void AlternateDataStreamBlockFile(TSK_FS_FILE* tmpfile, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid);
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo);
+void WriteVolumeProperties(TSK_VS_INFO* curvolinfo);
 void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long long fsoffset, int blksize, unsigned long long parfsid);
 void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid);
 void LogMessage(QString message);
