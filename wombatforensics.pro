@@ -1,4 +1,4 @@
-QT += widgets core concurrent webkitwidgets sql av avwidgets
+QT += widgets core concurrent sql
 QT -= opengl gui quick network qml
 mac:CONFIG += debug app_bundle
 linux:CONFIG += debug qt #c++11

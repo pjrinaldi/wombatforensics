@@ -9,8 +9,6 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <QtAV/QtAV.h>
-#include <QtAVWidgets>
 #include <QAbstractItemModel>
 #include <QAbstractListModel>
 #include <QApplication>
@@ -55,12 +53,8 @@
 #include <QThreadPool>
 #include <QTreeWidgetItem>
 #include <QVector>
-#include <QWebElement>
-#include <QWebFrame>
-#include <QWebView>
 #include <QtConcurrent>
 #include <QtPlugin>
-#include <QtWebKitWidgets>
 #include <QtWidgets>
 #include <QMouseEvent>
 #include <QFocusEvent>
