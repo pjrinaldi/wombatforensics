@@ -16,15 +16,17 @@ namespace Ui
 class Thread : public QThread
 {
 public:
+    /*
     Thread(QtAV::AVPlayer* player) : QThread(0), mplayer(player)
     {
     };
+    */
 protected:
     virtual void run()
     {
         exec();
     }
-    QtAV::AVPlayer* mplayer;
+    //QtAV::AVPlayer* mplayer;
 };
 
 class VideoViewer : public QDialog
@@ -44,8 +46,8 @@ public slots:
     
 private:
     Ui::VideoViewer* ui;
-    QtAV::VideoOutput* vout;
-    QtAV::AVPlayer* vplayer;
+    //QtAV::VideoOutput* vout;
+    //QtAV::AVPlayer* vplayer;
     TskObject tskobj;
     TskObject* tskptr;
 protected:

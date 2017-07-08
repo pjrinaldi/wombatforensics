@@ -31,6 +31,7 @@
 #include <QJsonObject>
 #include <QList>
 #include <QMainWindow>
+#include <QMediaPlayer>
 #include <QMessageBox>
 #include <QObject>
 #include <QSizePolicy>
@@ -64,6 +65,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QPixmap>
+#include <QVideoWidget>
 
 #include <sstream>
 #include <stdio.h>

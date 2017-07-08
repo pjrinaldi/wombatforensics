@@ -6,16 +6,16 @@
 VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoViewer)
 {
     ui->setupUi(this);
-    QtAV::Widgets::registerRenderers();
-    vplayer = new QtAV::AVPlayer(this);
-    vout = new QtAV::VideoOutput(this);
-    vplayer->setRenderer(vout);
-    ui->horizontalLayout->addWidget(vout->widget());
-    connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
-    connect(vplayer, SIGNAL(positionChanged(qint64)), this, SLOT(UpdateSlider()));
-    connect(vplayer, SIGNAL(started()), this, SLOT(UpdateSlider()));
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
-    ui->pushButton->setText("Pause");
+    //QtAV::Widgets::registerRenderers();
+    //vplayer = new QtAV::AVPlayer(this);
+    //vout = new QtAV::VideoOutput(this);
+    //vplayer->setRenderer(vout);
+    //ui->horizontalLayout->addWidget(vout->widget());
+    //connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
+    //connect(vplayer, SIGNAL(positionChanged(qint64)), this, SLOT(UpdateSlider()));
+    //connect(vplayer, SIGNAL(started()), this, SLOT(UpdateSlider()));
+    //connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
+    //ui->pushButton->setText("Pause");
     tskptr = &tskobj;
     tskptr->readimginfo = NULL;
     tskptr->readfsinfo = NULL;
@@ -29,13 +29,16 @@ VideoViewer::~VideoViewer()
 
 void VideoViewer::Seek(int pos)
 {
+    /*
     if(!vplayer->isPlaying())
         return;
     vplayer->seek(pos*1000LL);
+    */
 }
 
 void VideoViewer::PlayPause()
 {
+    /*
     if(!vplayer->isPlaying())
     {
         ui->pushButton->setText("Pause");
@@ -43,15 +46,17 @@ void VideoViewer::PlayPause()
         return;
     }
     ui->pushButton->setText("Play");
-    vplayer->pause(!vplayer->isPaused());
+    vplayer->pause(!vplayer->isPaused());*/
 }
 
 void VideoViewer::UpdateSlider()
 {
+    /*
     ui->label3->setText(QTime(0, 0, 0).addMSecs(vplayer->mediaStopPosition()).toString("HH:mm:ss"));
     ui->horizontalSlider->setRange(0, int(vplayer->duration()/1000LL));
     ui->horizontalSlider->setValue(int(vplayer->position()/1000LL));
     ui->label->setText(QTime(0, 0, 0).addMSecs(vplayer->position()).toString("HH:mm:ss"));
+    */
 }
 
 void VideoViewer::GetVideo(QString tmpfilepath, unsigned long long objectid)
@@ -116,7 +121,7 @@ void VideoViewer::GetVideo(QString tmpfilepath, unsigned long long objectid)
             outbuffer.writeRawData(ibuffer, imglen);
             tmpfile.close();
         }
-        vplayer->setFile(tmppath);
+        //vplayer->setFile(tmppath);
     }
 }
 
@@ -125,7 +130,7 @@ void VideoViewer::ShowVideo(QString tmpfilepath, const QModelIndex &index)
     this->show();
     ui->label_2->setVisible(true);
     QtConcurrent::run(this, &VideoViewer::GetVideo, tmpfilepath, index.sibling(index.row(), 0).data().toULongLong());
-    vplayer->play();
+    //vplayer->play();
     ui->label_2->setVisible(false);
 }
 void VideoViewer::mousePressEvent(QMouseEvent* e)
