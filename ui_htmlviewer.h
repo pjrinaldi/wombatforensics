@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'htmlviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,7 +10,7 @@
 #define UI_HTMLVIEWER_H
 
 #include <QtCore/QVariant>
-#include <QtWebKitWidgets/QWebView>
+#include <QtWebEngineWidgets/QWebEngineView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
@@ -24,7 +24,7 @@ class Ui_HtmlViewer
 {
 public:
     QHBoxLayout *horizontalLayout;
-    QWebView *webView;
+    QWebEngineView *webView;
 
     void setupUi(QDialog *HtmlViewer)
     {
@@ -36,7 +36,7 @@ public:
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        webView = new QWebView(HtmlViewer);
+        webView = new QWebEngineView(HtmlViewer);
         webView->setObjectName(QStringLiteral("webView"));
         webView->setUrl(QUrl(QStringLiteral("about:blank")));
 
@@ -50,7 +50,7 @@ public:
 
     void retranslateUi(QDialog *HtmlViewer)
     {
-        HtmlViewer->setWindowTitle(QApplication::translate("HtmlViewer", "Html Viewer", 0));
+        HtmlViewer->setWindowTitle(QApplication::translate("HtmlViewer", "Html Viewer", Q_NULLPTR));
     } // retranslateUi
 
 };

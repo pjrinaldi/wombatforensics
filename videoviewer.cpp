@@ -137,8 +137,8 @@ void VideoViewer::mousePressEvent(QMouseEvent* e)
 {
     if(e->type() == QEvent::MouseButtonPress)
     {
-        vplayer->stop();
-        vplayer->unload();
+        //vplayer->stop();
+        //vplayer->unload();
         this->hide();
     }
 }

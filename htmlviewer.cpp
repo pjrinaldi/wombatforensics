@@ -94,7 +94,7 @@ void HtmlViewer::GetHtmlContent()
         char tbuffer[tskptr->readfileinfo->meta->size];
         ssize_t htmllen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         htmldata = QByteArray::fromRawData(tbuffer, htmllen);
-        ui->webView->setContent(htmldata, "text/html", QUrl(""));
+        //ui->webView->setContent(htmldata, "text/html", QUrl(""));
     }
 }
 
