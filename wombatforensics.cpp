@@ -1443,16 +1443,18 @@ void WombatForensics::UpdateProperties()
     {
         propfile.setFileName(wombatvariable.tmpmntpath + selectedindex.sibling(selectedindex.row(), 1).data().toString().split("evid").at(0) + ".eprop." + selectedindex.sibling(selectedindex.row(), 0).data().toString().mid(1));
     }
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
+    QString evidfilename = evidfiles.at(0).split(".evid").at(0);
+    //qDebug() << evidfiles.at(0);
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name.split(".evid").at(0) + ".evid." + wombatvariable.selectedobject.modid.split("-").at(0).mid(1));
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 2) // volume
     {
-        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
-        QString evidfilename = evidfiles.at(0).split(".evid").at(0);
-        //qDebug() << evidfiles.at(0);
-
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name.split(".evid").at(0) + ".evid." + wombatvariable.selectedobject.modid.split("-").at(0).mid(1));
-
         propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + ".volprop");
+    }
+    if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 3) // file system
+    {
+        propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + ".partprop." + QString::number(partint));
     }
     qDebug() << propfile.fileName();
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
