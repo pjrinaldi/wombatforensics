@@ -597,11 +597,12 @@ void WombatForensics::InitializeCaseStructure()
         if(name.isEmpty())
             name = qgetenv("USERNAME");
         //qDebug() << name;
-        QString mntstr = "sudo mount -o loop ";
+        //pkexec calls the required gui prompt for sudo or a terminal if gui not available.
+        QString mntstr = "pkexec mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
-        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
+        QString chownstr = "pkexec chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mkfsstr);
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
@@ -660,11 +661,11 @@ void WombatForensics::InitializeOpenCase()
         if(name.isEmpty())
             name = qgetenv("USERNAME");
         //qDebug() << name;
-        QString mntstr = "sudo mount -o loop ";
+        QString mntstr = "pkexec mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
-        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
+        QString chownstr = "pkexec chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
         wombatvariable.iscaseopen = true;
@@ -2438,7 +2439,7 @@ void WombatForensics::CloseCurrentCase()
     filtercountlabel->setText("Filtered: 0");
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    QString umntstr = "sudo umount ";
+    QString umntstr = "pkexec umount ";
     umntstr += wombatvariable.tmpmntpath;
     QProcess::execute(umntstr);
     StatusUpdate("Current Case was closed successfully");
