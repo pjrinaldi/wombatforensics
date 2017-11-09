@@ -1153,6 +1153,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
             LogMessage("Issues with traversing the file structure were encountered");
             errorcount++;
         }
+        WriteFileSystemProperties(readfsinfo);
     }
     else
     {
@@ -1186,6 +1187,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                             LogMessage("Issues with traversing the file structure were encountered");
                             errorcount++;
                         }
+                        WriteFileSystemProperties(readfsinfo);
                     }
                 }
                 partint++;
@@ -1218,7 +1220,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
     char asc[512];
     char asc128[129];
     char timebuf[128];
-    QFile fspropfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + partint + "prop");
+    QFile fspropfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".partprop.p" + partint);
     fspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream proplist(&fspropfile);
     if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || curfsinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
