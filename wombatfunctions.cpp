@@ -1203,6 +1203,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
 
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
 {
+    //qDebug() << partint
     FFS_INFO* ffs = NULL;
     ffs_sb1* sb1 = NULL;
     ffs_sb2* sb2 = NULL;
@@ -1220,7 +1221,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
     char asc[512];
     char asc128[129];
     char timebuf[128];
-    QFile fspropfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".partprop.p" + partint);
+    QFile fspropfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".partprop.p" + QString::number(partint));
     fspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream proplist(&fspropfile);
     if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || curfsinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
@@ -1235,25 +1236,25 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
             proplist << "ext4";
         else
             proplist << "ext2";
-        proplist << "";
-        proplist << "Inode Count" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_count)) << "Number of Inodes in the file system (0x00-0x03)";
-        proplist << "Block Count" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_count)) << "Number of Blocks in the file system (0x04-0x07)";
-        proplist << "Reserved Blocks" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_r_blocks_count)) << "Number of blocks reserved to prevent the file system from filling up (0x08-0x0B)";
-        proplist << "Unallocated Blocks" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_free_blocks_count)) << "Number of unallocated blocks (0x0C-0x0F)";
-        proplist << "Unallocated Inodes" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_free_inode_count)) << "Number of unnalocated inodes (0x10-0x13)";
-        proplist << "First Data Block" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_first_data_block)) << "Block where block group 0 starts (0x14-0x17)";
-        proplist << "Log Block Size" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_log_block_size)) << "Block size saved as the number of places to shift 1,024 to the left (0x18-0x1B)";
-        proplist << "Log Fragment Size" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_log_frag_size)) << "Fragment size saved as the number of bits to shift 1,024 to the left (0x1C-0x1F)";
-        proplist << "Blocks per Group" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_blocks_per_group)) << "Number of blocks in each block group (0x20-0x23)";
-        proplist << "Fragments per Group" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_frags_per_group)) << "Number of fragments in each block group (0x24-0x27)";
-        proplist << "Inodes per Group" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_per_group)) << "Number of inodes in each block group (0x28-0x2B)";
+        proplist << "" << endl;
+        proplist << "Inode Count" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_count)) << "Number of Inodes in the file system (0x00-0x03)" << endl;
+        proplist << "Block Count" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_count)) << "Number of Blocks in the file system (0x04-0x07)" << endl;
+        proplist << "Reserved Blocks" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_r_blocks_count)) << "Number of blocks reserved to prevent the file system from filling up (0x08-0x0B)" << endl;
+        proplist << "Unallocated Blocks" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_free_blocks_count)) << "Number of unallocated blocks (0x0C-0x0F)" << endl;
+        proplist << "Unallocated Inodes" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_free_inode_count)) << "Number of unnalocated inodes (0x10-0x13)" << endl;
+        proplist << "First Data Block" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_first_data_block)) << "Block where block group 0 starts (0x14-0x17)" << endl;
+        proplist << "Log Block Size" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_log_block_size)) << "Block size saved as the number of places to shift 1,024 to the left (0x18-0x1B)" << endl;
+        proplist << "Log Fragment Size" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_log_frag_size)) << "Fragment size saved as the number of bits to shift 1,024 to the left (0x1C-0x1F)" << endl;
+        proplist << "Blocks per Group" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_blocks_per_group)) << "Number of blocks in each block group (0x20-0x23)" << endl;
+        proplist << "Fragments per Group" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_frags_per_group)) << "Number of fragments in each block group (0x24-0x27)" << endl;
+        proplist << "Inodes per Group" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_inodes_per_group)) << "Number of inodes in each block group (0x28-0x2B)" << endl;
         sprintf(asc, "%s", (tsk_getu32(curfsinfo->endian, ext2fs->fs->s_mtime) > 0) ? tsk_fs_time_to_str(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_mtime), timebuf) : "empty");
-        proplist << "Last Mount Time" << QString::fromStdString(string(asc)) << "Last time the file system was mounted (0x2C-0x2F)";
+        proplist << "Last Mount Time" << QString::fromStdString(string(asc)) << "Last time the file system was mounted (0x2C-0x2F)" << endl;
         sprintf(asc, "%s", (tsk_getu32(curfsinfo->endian, ext2fs->fs->s_wtime) > 0) ? tsk_fs_time_to_str(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_wtime), timebuf) : "empty");
-        proplist << "Last Written Time" << QString::fromStdString(string(asc)) << "Last time data was written to the file system (0x30-0x33)";
-        proplist << "Current Mount Count" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_mnt_count)) << "Number of times the file system has been mounted (0x34-0x35)";
-        proplist << "Maximum Mount Count" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_max_mnt_count)) << "Maximum number of times the file system can be mounted (0x36-0x37)";
-        proplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_magic)) << "File system signature value should be 0xef53 (0x38-0x39)";
+        proplist << "Last Written Time" << QString::fromStdString(string(asc)) << "Last time data was written to the file system (0x30-0x33)" << endl;
+        proplist << "Current Mount Count" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_mnt_count)) << "Number of times the file system has been mounted (0x34-0x35)" << endl;
+        proplist << "Maximum Mount Count" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_max_mnt_count)) << "Maximum number of times the file system can be mounted (0x36-0x37)" << endl;
+        proplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_magic)) << "File system signature value should be 0xef53 (0x38-0x39)" << endl;
         proplist << "File System State";
         if(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_state) & EXT2FS_STATE_VALID)
             proplist << "Unmounted properly";
@@ -1261,7 +1262,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
             proplist << "Errors Detected";
         else
             proplist << "Orphan inodes were being recovered";
-        proplist << "State of the file system when it was last shut down (0x3A-0x3B)";
+        proplist << "State of the file system when it was last shut down (0x3A-0x3B)" << endl;
         proplist << "Error Handling Method";
         if(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_errors) == 1)
             proplist << "Continue";
@@ -1269,11 +1270,11 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
             proplist << "Remount as Read-Only";
         else
             proplist << "Panic";
-        proplist << "Identifies what the OS should do when it encounters a file system error (0x3C-0x3D)";
-        proplist << "Minor Version" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_minor_rev_level)) << "Minor Revision Level (0x3E-0x3F)";
+        proplist << "Identifies what the OS should do when it encounters a file system error (0x3C-0x3D)" << endl;
+        proplist << "Minor Version" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_minor_rev_level)) << "Minor Revision Level (0x3E-0x3F)" << endl;
         sprintf(asc, "%s", (tsk_getu32(curfsinfo->endian, ext2fs->fs->s_lastcheck) > 0) ? tsk_fs_time_to_str(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_lastcheck), timebuf) : "empty");
-        proplist << "Last Checked" << QString::fromStdString(string(asc)) << "Last time the consistency of the file system was checked (0x40-0x43)";
-        proplist << "Interval b/w Checks" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_checkinterval)) << "Interval between forced consistency checks (0x44-0x47)";
+        proplist << "Last Checked" << QString::fromStdString(string(asc)) << "Last time the consistency of the file system was checked (0x40-0x43)" << endl;
+        proplist << "Interval b/w Checks" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_checkinterval)) << "Interval between forced consistency checks (0x44-0x47)" << endl;
         proplist << "Creator OS";
         switch(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_creator_os))
         {
@@ -1296,76 +1297,76 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
                 proplist << "Unknown";
                 break;
         }
-        proplist << "OS that might have created the file system (0x48-0x4B)";
+        proplist << "OS that might have created the file system (0x48-0x4B)" << endl;
         proplist << "Major Version";
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_rev_level) == EXT2FS_REV_ORIG)
             proplist << "Static Structure";
         else
             proplist << "Dynamic Structure";
-        proplist << "If the version is not set to dynamic, the values from bytes 84 and up might not be accurate (0x4C-0x4F)";
-        proplist << "UID to Use Reserved Blocks" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_def_resuid)) << "User ID that can use reserved blocks (0x50-0x51)";
-        proplist << "GID to Use Reserved Blocks" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_def_resgid)) << "Group ID that can use reserved blocks (0x52-0x53)";
-        proplist << "First Non-Reserved Inode" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_first_ino)) << "First non-reserved inode in the file system (0x54-0x57)";
-        proplist << "Inode Structure Size" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_inode_size)) << "Size of each inode structure (0x58-0x59)";
-        proplist << "Block Group for SuperBlock" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_block_group_nr)) << "Superblock is part of the block group (if backup copy) (0x5A-0x5B)";
+        proplist << "If the version is not set to dynamic, the values from bytes 84 and up might not be accurate (0x4C-0x4F)" << endl;
+        proplist << "UID to Use Reserved Blocks" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_def_resuid)) << "User ID that can use reserved blocks (0x50-0x51)" << endl;
+        proplist << "GID to Use Reserved Blocks" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_def_resgid)) << "Group ID that can use reserved blocks (0x52-0x53)" << endl;
+        proplist << "First Non-Reserved Inode" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_first_ino)) << "First non-reserved inode in the file system (0x54-0x57)" << endl;
+        proplist << "Inode Structure Size" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_inode_size)) << "Size of each inode structure (0x58-0x59)" << endl;
+        proplist << "Block Group for SuperBlock" << QString::number(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_block_group_nr)) << "Superblock is part of the block group (if backup copy) (0x5A-0x5B)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_DIR_PREALLOC)
-            proplist << "Compatible Feature" << "Directory Pre-allocation" << "Pre-allocate directory blocks to reduce fragmentation. The OS can mount the file system as normal if it does not support a compatible feature (0x5C-0x5F)";
+            proplist << "Compatible Feature" << "Directory Pre-allocation" << "Pre-allocate directory blocks to reduce fragmentation. The OS can mount the file system as normal if it does not support a compatible feature (0x5C-0x5F)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_IMAGIC_INODES)
-            proplist << "Compatible Feature" << "IMagic Inodes" << "AFS server inodes exist (0x5C-0x5F)";
+            proplist << "Compatible Feature" << "IMagic Inodes" << "AFS server inodes exist (0x5C-0x5F)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_HAS_JOURNAL)
-            proplist << "Compatible Feature" << "Journal" << "File System has a journal (0x5C-0x5F)";
+            proplist << "Compatible Feature" << "Journal" << "File System has a journal (0x5C-0x5F)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_EXT_ATTR)
-            proplist << "Compatible Feature" << "Extended Attributes" << "Inodes have extended attributes (0x5C-0x5F)";
+            proplist << "Compatible Feature" << "Extended Attributes" << "Inodes have extended attributes (0x5C-0x5F)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_RESIZE_INO)
-            proplist << "Compatible Feature" << "Resizable File System" << "File system can resize itself for larger aptitions (0x5C-0x5F)";
+            proplist << "Compatible Feature" << "Resizable File System" << "File system can resize itself for larger aptitions (0x5C-0x5F)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_compat) & EXT2FS_FEATURE_COMPAT_DIR_INDEX)
-            proplist << "Compatible Feature" << "Directory Index" << "Directories use hash index (0x5C-0x5F)";
+            proplist << "Compatible Feature" << "Directory Index" << "Directories use hash index (0x5C-0x5F)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_COMPRESSION)
-            proplist << "Incompatible Feature" << "Compression" << " The OS should not mount the file system if it does not support this incompatible feature (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Compression" << " The OS should not mount the file system if it does not support this incompatible feature (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_FILETYPE)
-            proplist << "Incompatible Feature" << "Filetype" << "Directory entries contain a file type field (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Filetype" << "Directory entries contain a file type field (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_RECOVER)
-            proplist << "Incompatible Feature" << "Needs Recovery" << "The file systems needs to be recovered (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Needs Recovery" << "The file systems needs to be recovered (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_JOURNAL_DEV)
-            proplist << "Incompatible Feature" << "Journal Device" << "The file system uses a journal device (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Journal Device" << "The file system uses a journal device (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_META_BG)
-            proplist << "Incompatible Feature" << "Meta Block Groups" << "The file system has meta block groups (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Meta Block Groups" << "The file system has meta block groups (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_EXTENTS)
-            proplist << "Incompatible Feature" << "Extents" << "The file system uses extents (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Extents" << "The file system uses extents (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_64BIT)
-            proplist << "Incompatible Feature" << "64-bit" << "The file system is 64-bit capable (0x60-0x63)";
+            proplist << "Incompatible Feature" << "64-bit" << "The file system is 64-bit capable (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_MMP)
-            proplist << "Incompatible Feature" << "Multiple Mount Protection" << "The OS should not mount the file system if it does not support this incompatible feature (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Multiple Mount Protection" << "The OS should not mount the file system if it does not support this incompatible feature (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_FLEX_BG)
-            proplist << "Incompatible Feature" << "Flexible Block Groups" << "The OS should not mount the file system if it does not support this incompatible feature (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Flexible Block Groups" << "The OS should not mount the file system if it does not support this incompatible feature (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_EA_INODE)
-            proplist << "Incompatible Feature" << "Extended Attributes" << "The file system supports extended attributes (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Extended Attributes" << "The file system supports extended attributes (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_incompat) & EXT2FS_FEATURE_INCOMPAT_DIRDATA)
-            proplist << "Incompatible Feature" << "Directory Entry Data" << "The OS should not mount the file system if it does not support this incompatible feature (0x60-0x63)";
+            proplist << "Incompatible Feature" << "Directory Entry Data" << "The OS should not mount the file system if it does not support this incompatible feature (0x60-0x63)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_ro_compat) & EXT2FS_FEATURE_RO_COMPAT_SPARSE_SUPER)
-            proplist << "Read only Feature" << "Sparse Super" << "Sparse superblocks and goup descriptor tables. The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)";
+            proplist << "Read only Feature" << "Sparse Super" << "Sparse superblocks and goup descriptor tables. The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_ro_compat) & EXT2FS_FEATURE_RO_COMPAT_LARGE_FILE)
-            proplist << "Read only Feature" << "Large File" << "The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)";
+            proplist << "Read only Feature" << "Large File" << "The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_ro_compat) & EXT2FS_FEATURE_RO_COMPAT_HUGE_FILE)
-            proplist << "Read only Feature" << "Huge File" << "The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)";
+            proplist << "Read only Feature" << "Huge File" << "The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_ro_compat) & EXT2FS_FEATURE_RO_COMPAT_BTREE_DIR)
-            proplist << "Read only Feature" << "BTree Directory" << "The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)";
+            proplist << "Read only Feature" << "BTree Directory" << "The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)" << endl;
         if(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_feature_ro_compat) & EXT2FS_FEATURE_RO_COMPAT_EXTRA_ISIZE)
-            proplist << "Read only Feature" << "Extra Inode Size" << "The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)";
+            proplist << "Read only Feature" << "Extra Inode Size" << "The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)" << endl;
         sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[8]), tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[0]));
-        proplist << "File System ID" << QString::fromStdString(string(asc)) << "File system ID. Found in the superblock at bytes (0x68-0x77)"; 
-        proplist << "File System Label" << QString::fromStdString(string(ext2fs->fs->s_volume_name)) << "File System Label. (0x78-0x87)"; 
-        proplist << "Last Mounted Path" << QString::fromStdString(string(ext2fs->fs->s_last_mounted)) << "Path where the file system was last mounted (0x88-0xC7)";
-        proplist << "Algorithm Usage Bitmap" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_algorithm_usage_bitmap)) << "(0xC8-0xCB)";
-        proplist << "Blocks Preallocated for Files" << QString::number(ext2fs->fs->s_prealloc_blocks) << "Number of blocks to preallocate for files (0xCC-0xCC)";
-        proplist << "Blocks Preallocated for Directories" << QString::number(ext2fs->fs->s_prealloc_dir_blocks) << "Number of blocks to preallocate for directories (0xCD-0xCD)";
-        proplist << "Unused" << "Unused" << "Unused bytes (0xCE-0xCF)";
+        proplist << "File System ID" << QString::fromStdString(string(asc)) << "File system ID. Found in the superblock at bytes (0x68-0x77)" << endl;
+        proplist << "File System Label" << QString::fromStdString(string(ext2fs->fs->s_volume_name)) << "File System Label. (0x78-0x87)";
+        proplist << "Last Mounted Path" << QString::fromStdString(string(ext2fs->fs->s_last_mounted)) << "Path where the file system was last mounted (0x88-0xC7)" << endl;
+        proplist << "Algorithm Usage Bitmap" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_algorithm_usage_bitmap)) << "(0xC8-0xCB)" << endl;
+        proplist << "Blocks Preallocated for Files" << QString::number(ext2fs->fs->s_prealloc_blocks) << "Number of blocks to preallocate for files (0xCC-0xCC)" << endl;
+        proplist << "Blocks Preallocated for Directories" << QString::number(ext2fs->fs->s_prealloc_dir_blocks) << "Number of blocks to preallocate for directories (0xCD-0xCD)" << endl;
+        proplist << "Unused" << "Unused" << "Unused bytes (0xCE-0xCF)" << endl;
         sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_journal_uuid[8]), tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_journal_uuid[0]));
-        proplist << "Journal ID" << QString::fromStdString(string(asc)) << "Journal ID (0xD0-0xDF)";
-        proplist << "Journal Inode" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_journal_inum)) << "Journal Inode (0xE0-0xE3)";
-        proplist << "Journal Device" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_journal_dev)) << "Journal device (0xE4-0xE7)";
-        proplist << "Head of Oprhan Inode List" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_last_orphan)) << "Head of orphan inode list. (0xE8-0xEB)";
-        proplist << "Unused" << "Unused" << "Unused (0xEC-0x03FF)";
+        proplist << "Journal ID" << QString::fromStdString(string(asc)) << "Journal ID (0xD0-0xDF)" << endl;
+        proplist << "Journal Inode" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_journal_inum)) << "Journal Inode (0xE0-0xE3)" << endl;
+        proplist << "Journal Device" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_journal_dev)) << "Journal device (0xE4-0xE7)" << endl;
+        proplist << "Head of Oprhan Inode List" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_last_orphan)) << "Head of orphan inode list. (0xE8-0xEB)" << endl;
+        proplist << "Unused" << "Unused" << "Unused (0xEC-0x03FF)" << endl;
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B || curfsinfo->ftype == TSK_FS_TYPE_FFS2 || curfsinfo->ftype == TSK_FS_TYPE_FFS_DETECT)
     {
@@ -1379,61 +1380,61 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
             proplist << "UFS 2";
         if(curfsinfo->ftype == TSK_FS_TYPE_FFS1 || curfsinfo->ftype == TSK_FS_TYPE_FFS1B)
         {
-            proplist << "";
-            proplist << "Unused" << "Unused" << "Unused (0x00-0x07)";
-            proplist << "Backup Superblock Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->sb_off)) << "Offset to backup superblock in cylinder group relative to a \"base\" (0x08-0x0B)";
-            proplist << "Group Descriptor Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->gd_off)) << "Offset to group descriptor in cylinder group relative to a \"base\" (0x0C-0x0F)";
-            proplist << "Inode Table Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->ino_off)) << "Offset to inode table in cylinder group relative to a \"base\" (0x10-0x13)";
-            proplist << "Data Block Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->dat_off)) << "Offset to data blocks in cylinder group relative to a \"base\" (0x14-0x17)";
-            proplist << "Delta Value for Staggering Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_delta)) << "Delta value for caluclating the staggering offset in cylinder group (0x18-0x1B)";
-            proplist << "Mask for Staggering Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_cyc_mask)) << "Mask for calculating the staggering offset (cycle value) in cylinder group (0x1C-0x1F)";
+            proplist << "" << endl;
+            proplist << "Unused" << "Unused" << "Unused (0x00-0x07)" << endl;
+            proplist << "Backup Superblock Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->sb_off)) << "Offset to backup superblock in cylinder group relative to a \"base\" (0x08-0x0B)" << endl;
+            proplist << "Group Descriptor Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->gd_off)) << "Offset to group descriptor in cylinder group relative to a \"base\" (0x0C-0x0F)" << endl;
+            proplist << "Inode Table Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->ino_off)) << "Offset to inode table in cylinder group relative to a \"base\" (0x10-0x13)" << endl;
+            proplist << "Data Block Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->dat_off)) << "Offset to data blocks in cylinder group relative to a \"base\" (0x14-0x17)" << endl;
+            proplist << "Delta Value for Staggering Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_delta)) << "Delta value for caluclating the staggering offset in cylinder group (0x18-0x1B)" << endl;
+            proplist << "Mask for Staggering Offset" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_cyc_mask)) << "Mask for calculating the staggering offset (cycle value) in cylinder group (0x1C-0x1F)" << endl;
             sprintf(asc, "%s", (tsk_getu32(curfsinfo->endian, sb1->wtime) > 0) ? tsk_fs_time_to_str(tsk_getu32(curfsinfo->endian, sb1->wtime), timebuf) : "empty");
-            proplist << "Last Written Time" << QString::fromStdString(string(asc)) << "Last time data was written to the file system (0x20-0x23)";
-            proplist << "Number of Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->frag_num)) << "Number of fragments in the file system (0x24-0x27)";
-            proplist << "Number of Data Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->data_frag_num)) << "Number of fragments in the file system that can store file data (0x28-0x2B)";
-            proplist << "Number of Cylinder Groups" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_num)) << "Number of cylinder groups in the file system (0x2C-0x2F)";
-            proplist << "Block Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_b)) << "Size of a block in bytes (0x30-0x33)";
-            proplist << "Fragment Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fsize_b)) << "Size of a fragment in bytes (0x34-0x37)";
-            proplist << "Block Framgent Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_frag)) << "Size of a block in fragments (0x38-0x3B)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x3C-0x5F)";
-            proplist << "Number of Bits Convert Block to Fragment" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_fragshift)) << "Number of bits to convert between a block address and a fragment address (0x60-0x63)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x64-0x77)";
-            proplist << "Inodes Per Block" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_inopb)) << "Number of inodes per block in the inode table (0x78-0x7B)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x7C-0x8F)";
+            proplist << "Last Written Time" << QString::fromStdString(string(asc)) << "Last time data was written to the file system (0x20-0x23)" << endl;
+            proplist << "Number of Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->frag_num)) << "Number of fragments in the file system (0x24-0x27)" << endl;
+            proplist << "Number of Data Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->data_frag_num)) << "Number of fragments in the file system that can store file data (0x28-0x2B)" << endl;
+            proplist << "Number of Cylinder Groups" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_num)) << "Number of cylinder groups in the file system (0x2C-0x2F)" << endl;
+            proplist << "Block Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_b)) << "Size of a block in bytes (0x30-0x33)" << endl;
+            proplist << "Fragment Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fsize_b)) << "Size of a fragment in bytes (0x34-0x37)" << endl;
+            proplist << "Block Framgent Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->bsize_frag)) << "Size of a block in fragments (0x38-0x3B)" << endl;
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x3C-0x5F)" << endl;
+            proplist << "Number of Bits Convert Block to Fragment" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_fragshift)) << "Number of bits to convert between a block address and a fragment address (0x60-0x63)" << endl;
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x64-0x77)" << endl;
+            proplist << "Inodes Per Block" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_inopb)) << "Number of inodes per block in the inode table (0x78-0x7B)" << endl;
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x7C-0x8F)" << endl;
             sprintf(asc, "%" PRIx32 "%" PRIx32 "", tsk_getu32(curfsinfo->endian, &sb1->fs_id[4]), tsk_getu32(curfsinfo->endian, &sb1->fs_id[0]));
-            proplist << "File System ID" << QString::fromStdString(string(asc)) << "File system ID (0x90-0x97)";
-            proplist << "Cylinder Group Fragment Address" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_saddr)) << "Fragment address of the cylinder group summary area (0x98-0x9B)";
-            proplist << "Cylinder Group Summary Area Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_ssize_b)) << "Size of the cylinder group summary area in bytes (0x9C-0x9F)";
-            proplist << "Cylinder Group Descriptor Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_cgsize)) << "Size of the cylinder group descriptor in bytes (0xA0-0xA3)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0xA4-0xA5)";
-            proplist << "Cylinders in File System" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_ncyl)) << "Number of cylinders in the file system (0xA6-0xB3)";
-            proplist << "Cylinders per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_cpg)) << "Number of cylinders in a cylinder group (0xB4-0xB7)";
-            proplist << "Inodes per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_inode_num)) << "Number of inodes in a cylinder group (0xB8-0xBB)";
-            proplist << "Fragments per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_frag_num)) << "Number of fragments in a cylinder group (0xBC-0xBF)";
-            proplist << "Number of Directories" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.dir_num)) << "Number of directories (0xC0-0xC3)";
-            proplist << "Number of Free Blocks" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.blk_free)) << "Number of free blocks (0xC4-0xC7)";
-            proplist << "Number of Free Inodes" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.ino_free)) << "Number of free inodes (0xC8-0xCB)";
-            proplist << "Number of Free Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.frag_free)) << "Number of free fragments (0xCC-0xCF)";
-            proplist << "Super Block Modified Flag" << QString::number(sb1->fs_fmod) << "Super Block Modified Flag (0xD0-0xD0)";
-            proplist << "Clean File System Flag" << QString::number(sb1->fs_clean) << "File system was clean when it was mounted (0xD1-0xD1)";
-            proplist << "Read Only File System Flag" << QString::number(sb1->fs_ronly) << "File system was mounted read only (0xD2-0xD2)";
+            proplist << "File System ID" << QString::fromStdString(string(asc)) << "File system ID (0x90-0x97)" << endl;
+            proplist << "Cylinder Group Fragment Address" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_saddr)) << "Fragment address of the cylinder group summary area (0x98-0x9B)" << endl;
+            proplist << "Cylinder Group Summary Area Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_ssize_b)) << "Size of the cylinder group summary area in bytes (0x9C-0x9F)" << endl;
+            proplist << "Cylinder Group Descriptor Byte Size" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_cgsize)) << "Size of the cylinder group descriptor in bytes (0xA0-0xA3)" << endl;
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0xA4-0xA5)" << endl;
+            proplist << "Cylinders in File System" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_ncyl)) << "Number of cylinders in the file system (0xA6-0xB3)" << endl;
+            proplist << "Cylinders per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->fs_cpg)) << "Number of cylinders in a cylinder group (0xB4-0xB7)" << endl;
+            proplist << "Inodes per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_inode_num)) << "Number of inodes in a cylinder group (0xB8-0xBB)" << endl;
+            proplist << "Fragments per Cylinder Group" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cg_frag_num)) << "Number of fragments in a cylinder group (0xBC-0xBF)" << endl;
+            proplist << "Number of Directories" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.dir_num)) << "Number of directories (0xC0-0xC3)" << endl;
+            proplist << "Number of Free Blocks" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.blk_free)) << "Number of free blocks (0xC4-0xC7)" << endl;
+            proplist << "Number of Free Inodes" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.ino_free)) << "Number of free inodes (0xC8-0xCB)" << endl;
+            proplist << "Number of Free Fragments" << QString::number(tsk_gets32(curfsinfo->endian, sb1->cstotal.frag_free)) << "Number of free fragments (0xCC-0xCF)" << endl;
+            proplist << "Super Block Modified Flag" << QString::number(sb1->fs_fmod) << "Super Block Modified Flag (0xD0-0xD0)" << endl;
+            proplist << "Clean File System Flag" << QString::number(sb1->fs_clean) << "File system was clean when it was mounted (0xD1-0xD1)" << endl;
+            proplist << "Read Only File System Flag" << QString::number(sb1->fs_ronly) << "File system was mounted read only (0xD2-0xD2)" << endl;
             if(sb1->fs_flags & FFS_SB_FLAG_UNCLEAN)
-                proplist << "General Flags" << "Unclean" << "Set when the file system is mounted (0xD3-0xD3)";
+                proplist << "General Flags" << "Unclean" << "Set when the file system is mounted (0xD3-0xD3)" << endl;
             if(sb1->fs_flags & FFS_SB_FLAG_SOFTDEP)
-                proplist << "General Flags" << "Soft Dependencies" << "Soft dependencies are being used (0xD3-0xD3)";
+                proplist << "General Flags" << "Soft Dependencies" << "Soft dependencies are being used (0xD3-0xD3)" << endl;
             if(sb1->fs_flags & FFS_SB_FLAG_NEEDFSCK)
-                proplist << "General Flags" << "Needs Check" << "Needs consistency check next time the file system is mounted (0xD3-0xD3)";
+                proplist << "General Flags" << "Needs Check" << "Needs consistency check next time the file system is mounted (0xD3-0xD3)" << endl;
             if(sb1->fs_flags & FFS_SB_FLAG_INDEXDIR)
-                proplist << "General Flags" << "Index Directories" << "Directories are indexed using a hashtree or B-Tree (0xD3-0xD3)";
+                proplist << "General Flags" << "Index Directories" << "Directories are indexed using a hashtree or B-Tree (0xD3-0xD3)" << endl;
             if(sb1->fs_flags & FFS_SB_FLAG_ACL)
-                proplist << "General Flags" << "Access Control Lists" << "Access control lists are being used (0xD3-0xD3)";
+                proplist << "General Flags" << "Access Control Lists" << "Access control lists are being used (0xD3-0xD3)" << endl;
             if(sb1->fs_flags & FFS_SB_FLAG_MULTILABEL)
-                proplist << "General Flags" << "TrustedBSD MAC Multi-Label" << "TrustedBSD Mandatory Access Control multi-labels are being used (0xD3-0xD3)";
+                proplist << "General Flags" << "TrustedBSD MAC Multi-Label" << "TrustedBSD Mandatory Access Control multi-labels are being used (0xD3-0xD3)" << endl;
             if(sb1->fs_flags & FFS_SB_FLAG_UPDATED)
-                proplist << "General Flags" << "Updated Flag Location" << "Flags have been moved (0xD3-0xD3)";
-            proplist << "Last Mount Point" << QString::fromStdString(string(reinterpret_cast<char*>(sb1->last_mnt))) << "Last mount point (0xD4-0x02D3)";
-            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x02D4-0x055B)";
-            proplist << "Signature" << QString::number(tsk_gets32(curfsinfo->endian, sb1->magic)) << "File System signature value should be 0x011954 (0x055C-0x055F)";
+                proplist << "General Flags" << "Updated Flag Location" << "Flags have been moved (0xD3-0xD3)" << endl;
+            proplist << "Last Mount Point" << QString::fromStdString(string(reinterpret_cast<char*>(sb1->last_mnt))) << "Last mount point (0xD4-0x02D3)" << endl;
+            proplist << "Non-Essential Values" << "Non-Essential Values" << "Non-Essential Values (0x02D4-0x055B)" << endl;
+            proplist << "Signature" << QString::number(tsk_gets32(curfsinfo->endian, sb1->magic)) << "File System signature value should be 0x011954 (0x055C-0x055F)" << endl;
         }
         else // FFS2
         {
@@ -1863,7 +1864,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
         proplist << "Data is in Big Endian";
     else
         proplist << "Endianness is unknown";
-    proplist << "Identifies the endian ordering of the data being read.";
+    proplist << "Identifies the endian ordering of the data being read." << endl;
     fspropfile.close();
 }
 
