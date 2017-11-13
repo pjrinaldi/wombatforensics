@@ -1355,8 +1355,8 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
             proplist << "Read only Feature||" << "Extra Inode Size" << "||The OS should mount the file system as read only if it does not support this read only feature (0x64-0x67)" << endl;
         sprintf(asc, "%" PRIx64 "%" PRIx64 "", tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[8]), tsk_getu64(curfsinfo->endian, &(ext2fs->fs)->s_uuid[0]));
         proplist << "File System ID||" << QString::fromStdString(string(asc)) << "||File system ID. Found in the superblock at bytes (0x68-0x77)" << endl;
-        proplist << "File System Label||" << QString::fromStdString(string(ext2fs->fs->s_volume_name)) << "||File System Label. (0x78-0x87)";
-        proplist << "Last Mounted Path||" << QString::fromStdString(string(ext2fs->fs->s_last_mounted)) << "||Path where the file system was last mounted (0x88-0xC7)" << endl;
+        proplist << "File System Label||" << QString::fromStdString(string(ext2fs->fs->s_volume_name)) << "||File System Label. (0x78-0x87)" << endl;
+        proplist << "Last Mounted Path||" << QString::fromStdString(string(ext2fs->fs->s_last_mounted)) << " ||Path where the file system was last mounted (0x88-0xC7)" << endl;
         proplist << "Algorithm Usage Bitmap||" << QString::number(tsk_getu32(curfsinfo->endian, ext2fs->fs->s_algorithm_usage_bitmap)) << "||(0xC8-0xCB)" << endl;
         proplist << "Blocks Preallocated for Files||" << QString::number(ext2fs->fs->s_prealloc_blocks) << "||Number of blocks to preallocate for files (0xCC-0xCC)" << endl;
         proplist << "Blocks Preallocated for Directories||" << QString::number(ext2fs->fs->s_prealloc_dir_blocks) << "||Number of blocks to preallocate for directories (0xCD-0xCD)" << endl;
@@ -1855,7 +1855,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
         proplist << "Fork Data Attributes File" << "" << "Location and size of attributes file (0x0160-0x01AF)";
         proplist << "Fork Data Startup File" << "" << "Location and size of startup file (0x01B0-0x01FF)";
     }
-    proplist << "Endian Ordering";
+    proplist << "Endian Ordering||";
     if(curfsinfo->endian == TSK_UNKNOWN_ENDIAN)
         proplist << "Endianness is unknown";
     else if(curfsinfo->endian == TSK_LIT_ENDIAN)
@@ -1864,7 +1864,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
         proplist << "Data is in Big Endian";
     else
         proplist << "Endianness is unknown";
-    proplist << "Identifies the endian ordering of the data being read." << endl;
+    proplist << "||Identifies the endian ordering of the data being read." << endl;
     fspropfile.close();
 }
 
