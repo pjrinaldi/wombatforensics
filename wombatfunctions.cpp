@@ -1471,32 +1471,32 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
             proplist << "Number of Directories||" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.dir_num)) << "||Number of directories (0x03F0-0x03F7)";
             proplist << "Number of Free Blocks||" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.blk_free)) << "||Number of free blocks (0x03F8-0x03FF)";
             proplist << "Number of Free Inodes||" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.ino_free)) << "||Number of free inodes (0x0400-0x0407)";
-            proplist << "Number of Free Fragments" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.frag_free)) << "Number of free fragments (0x0408-0x040F)";
-            proplist << "Number of Free Clusters" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.clust_free)) << "Number of free clusters (0x0410-0x0417)";
-            proplist << "Unused" << "Unused" << "Unused (0x0418-0x042F)";
+            proplist << "Number of Free Fragments||" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.frag_free)) << "||Number of free fragments (0x0408-0x040F)";
+            proplist << "Number of Free Clusters||" << QString::number(tsk_getu64(curfsinfo->endian, sb2->cstotal.clust_free)) << "||Number of free clusters (0x0410-0x0417)";
+            proplist << "Unused||" << "Unused" << "||Unused (0x0418-0x042F)";
             sprintf(asc, "%s", (tsk_getu64(curfsinfo->endian, sb1->wtime) > 0) ? tsk_fs_time_to_str(tsk_getu64(curfsinfo->endian, sb1->wtime), timebuf) : "empty");
-            proplist << "Last Written Time" << QString::fromStdString(string(asc)) << "Last time data was written to the file system (0x0430-0x0437)";
-            proplist << "Fragment Numbers" << QString::number(tsk_gets64(curfsinfo->endian, sb2->frag_num)) << "Number of fragments in the file system (0x0438-0x043F)";
-            proplist << "Usable Fragment Numbers" << QString::number(tsk_gets64(curfsinfo->endian, sb2->blk_num)) << "Number of fragments that can store file data (0x0440-0x0447)";
-            proplist << "Cylinder Group Fragment Address" << QString::number(tsk_gets64(curfsinfo->endian, sb2->cg_saddr)) << "Fragment address of cylinder group summary area (0x0448-0x044F)";
-            proplist << "Unused" << "Unused" << "Unused (0x0450-0x051F)";
+            proplist << "Last Written Time||" << QString::fromStdString(string(asc)) << "||Last time data was written to the file system (0x0430-0x0437)";
+            proplist << "Fragment Numbers||" << QString::number(tsk_gets64(curfsinfo->endian, sb2->frag_num)) << "||Number of fragments in the file system (0x0438-0x043F)";
+            proplist << "Usable Fragment Numbers||" << QString::number(tsk_gets64(curfsinfo->endian, sb2->blk_num)) << "||Number of fragments that can store file data (0x0440-0x0447)";
+            proplist << "Cylinder Group Fragment Address||" << QString::number(tsk_gets64(curfsinfo->endian, sb2->cg_saddr)) << "||Fragment address of cylinder group summary area (0x0448-0x044F)";
+            proplist << "Unused||" << "Unused" << "||Unused (0x0450-0x051F)";
             int flags = tsk_getu32(curfsinfo->endian, sb2->fs_flags);
             if(flags & FFS_SB_FLAG_UNCLEAN)
-                proplist << "General Flags" << "Unclean" << "Set when the file system is mounted (0x0520-0x0523)";
+                proplist << "General Flags||" << "Unclean" << "||Set when the file system is mounted (0x0520-0x0523)";
             if(flags & FFS_SB_FLAG_SOFTDEP)
-                proplist << "General Flags" << "Soft Dependencies" << "Soft dependencies are being used (0x0520-0x0523)";
+                proplist << "General Flags||" << "Soft Dependencies" << "||Soft dependencies are being used (0x0520-0x0523)";
             if(flags & FFS_SB_FLAG_NEEDFSCK)
-                proplist << "General Flags" << "Needs Check" << "Needs consistency check next time the file system is mounted (0x0520-0x0523)";
+                proplist << "General Flags||" << "Needs Check" << "||Needs consistency check next time the file system is mounted (0x0520-0x0523)";
             if(flags & FFS_SB_FLAG_INDEXDIR)
-                proplist << "General Flags" << "Index Directories" << "Directories are indexed using a hashtree or B-Tree (0x0520-0x0523)";
+                proplist << "General Flags||" << "Index Directories" << "||Directories are indexed using a hashtree or B-Tree (0x0520-0x0523)";
             if(flags & FFS_SB_FLAG_ACL)
-                proplist << "General Flags" << "Access Control Lists" << "Access control lists are being used (0x0520-0x0523)";
+                proplist << "General Flags||" << "Access Control Lists" << "||Access control lists are being used (0x0520-0x0523)";
             if(flags & FFS_SB_FLAG_MULTILABEL)
-                proplist << "General Flags" << "TrustedBSD MAC Multi-Label" << "TrustedBSD Mandatory Access Control multi-labels are being used (0x0520-0x0523)";
+                proplist << "General Flags||" << "TrustedBSD MAC Multi-Label" << "||TrustedBSD Mandatory Access Control multi-labels are being used (0x0520-0x0523)";
             if(flags & FFS_SB_FLAG_UPDATED)
-                proplist << "General Flags" << "Updated Flag Location" << "Flags have been moved (0x0520-0x0523)";
-            proplist << "Unused" << "Unused" << "Unused (0x0524-0x055B)";
-            proplist << "Signature" << QString::number(tsk_gets32(curfsinfo->endian, sb2->magic)) << "File system signature value should be 0x19540119 (0x055C-0x055F)";
+                proplist << "General Flags||" << "Updated Flag Location" << "||Flags have been moved (0x0520-0x0523)";
+            proplist << "Unused" << "Unused||" << "||Unused (0x0524-0x055B)";
+            proplist << "Signature||" << QString::number(tsk_gets32(curfsinfo->endian, sb2->magic)) << "||File system signature value should be 0x19540119 (0x055C-0x055F)";
         }
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_FAT12 || curfsinfo->ftype == TSK_FS_TYPE_FAT16 || curfsinfo->ftype == TSK_FS_TYPE_FAT32)
@@ -1544,35 +1544,35 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
             proplist << "Root Directory Cluster||" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->a.f32.rootclust)) << "||Cluster where the root directory can be found (0x2C-0x2F)";
             proplist << "FSINFO Structure Sector||" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->a.f32.fsinfo)) << "||Sector where FSINFO structure can be found (0x30-0x31)";
             proplist << "Boot Sector Backup Copy||" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->a.f32.bs_backup)) << "||Sector where the backup copy of the boot sector is located, default is 6 (0x32-0x33)";
-            proplist << "Reserved" << "Reserved" << "Reserved (0x34-0x3F)";
-            proplist << "BIOS Drive Number" << QString::number(fatsb->a.f32.drvnum) << "BIOS INT32h drive number (0x40-0x40)";
-            proplist << "Not used" << "Not used" << "Not used (0x41-0x42)";
-            proplist << "Volume Serial Number" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->a.f32.vol_id)) << "Volume serial number, which some versions of Windows will calculate based on the creation date and time (0x43-0x46)";
-            proplist << "Volume Label" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f32.vol_lab)) << "Volume label in ASCII. The user chooses this value when creating the file system (0x47-0x51)";
-            proplist << "File System Type" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f32.fs_type)) << "File system type label in ASCII. Standard values include \"FAT32\", but nothing is required (0x52-0x59)";
-            proplist << "Not Used" << "Not Used" << "Not Used (0x005A-0x01FD)";
+            proplist << "Reserved||" << "Reserved" << "||Reserved (0x34-0x3F)";
+            proplist << "BIOS Drive Number||" << QString::number(fatsb->a.f32.drvnum) << "||BIOS INT32h drive number (0x40-0x40)";
+            proplist << "Not used||" << "Not used" << "||Not used (0x41-0x42)";
+            proplist << "Volume Serial Number||" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->a.f32.vol_id)) << "||Volume serial number, which some versions of Windows will calculate based on the creation date and time (0x43-0x46)";
+            proplist << "Volume Label||" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f32.vol_lab)) << "||Volume label in ASCII. The user chooses this value when creating the file system (0x47-0x51)";
+            proplist << "File System Type||" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f32.fs_type)) << "||File system type label in ASCII. Standard values include \"FAT32\", but nothing is required (0x52-0x59)";
+            proplist << "Not Used||" << "Not Used" << "||Not Used (0x005A-0x01FD)";
         }
         else
         {
-            proplist << "Reserved" << "Reserved" << "Reserved (0x24-0x26)";
-            proplist << "Volume Serial Number" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->a.f16.vol_id)) << "Volume serial number, which some versions of Windows will calculate based on the creation date and time (0x27-0x2A)";
-            proplist << "Volume Label" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f16.vol_lab)) << "Volume label in ASCII. The user chooses this value when creating the file system (0x2B-0x35)";
-            proplist << "File System Type" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f16.fs_type)) << "File system type in ASCII. Standard values include \"FAT\", \"FAT12\", \"FAT16\", but nothing is required (0x36->0x3D)";
-            proplist << "Reserved" << "Reserved" << "Reserved (0x3E-0x01FD)";
+            proplist << "Reserved||" << "Reserved" << "||Reserved (0x24-0x26)";
+            proplist << "Volume Serial Number||" << QString::number(tsk_getu32(curfsinfo->endian, fatsb->a.f16.vol_id)) << "||Volume serial number, which some versions of Windows will calculate based on the creation date and time (0x27-0x2A)";
+            proplist << "Volume Label||" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f16.vol_lab)) << "||Volume label in ASCII. The user chooses this value when creating the file system (0x2B-0x35)";
+            proplist << "File System Type||" << QString::fromUtf8(reinterpret_cast<char*>(fatsb->a.f16.fs_type)) << "||File system type in ASCII. Standard values include \"FAT\", \"FAT12\", \"FAT16\", but nothing is required (0x36->0x3D)";
+            proplist << "Reserved||" << "Reserved" << "||Reserved (0x3E-0x01FD)";
         }
-        proplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->magic)) << "Signature value should be 0xAA55 (0x01FE-0x01FF)";
+        proplist << "Signature||" << QString::number(tsk_getu16(curfsinfo->endian, fatsb->magic)) << "||Signature value should be 0xAA55 (0x01FE-0x01FF)";
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_NTFS)
     {
         ntfsinfo = (NTFS_INFO*)curfsinfo;
-        proplist << "Assembly Boot Code" << "Assembly Boot Code" << "Assembly instruction to jump to boot code (0x00-0x02)";
-        proplist << "OEM Name" << QString::fromUtf8(ntfsinfo->fs->oemname) << "OEM Name (0x03-0x0A)";
-        proplist << "Bytes per Sector" << QString::number(tsk_getu16(curfsinfo->endian, ntfsinfo->fs->ssize)) << "Bytes per sector (0x0B-0x0C)";
-        proplist << "Sectors per Cluster" << QString::number(ntfsinfo->fs->csize) << "Sectors per cluster (0x0D-0x0D)";
-        proplist << "Reserved Sectors" << "Reserved Sectors" << "Reserved and Unused Sectors (0x0E-0x27)";
-        proplist << "Volume Size (sectors)" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->vol_size_s)) << "Total Sectors in the file system (0x28-0x2F)";
-        proplist << "MFT Starting Cluster Address" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->mft_clust)) << "Starting cluster address of the Master File Table (MFT) (0x30-0x37)";
-        proplist << "MFT Mirror Starting Cluster Address" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->mftm_clust)) << "Starting cluster address of the MFT Mirror (0x38-0x3F)";
+        proplist << "Assembly Boot Code||" << "Assembly Boot Code" << "||Assembly instruction to jump to boot code (0x00-0x02)";
+        proplist << "OEM Name||" << QString::fromUtf8(ntfsinfo->fs->oemname) << "||OEM Name (0x03-0x0A)";
+        proplist << "Bytes per Sector||" << QString::number(tsk_getu16(curfsinfo->endian, ntfsinfo->fs->ssize)) << "||Bytes per sector (0x0B-0x0C)";
+        proplist << "Sectors per Cluster||" << QString::number(ntfsinfo->fs->csize) << "||Sectors per cluster (0x0D-0x0D)";
+        proplist << "Reserved Sectors||" << "Reserved Sectors" << "||Reserved and Unused Sectors (0x0E-0x27)";
+        proplist << "Volume Size (sectors)||" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->vol_size_s)) << "||Total Sectors in the file system (0x28-0x2F)";
+        proplist << "MFT Starting Cluster Address||" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->mft_clust)) << "||Starting cluster address of the Master File Table (MFT) (0x30-0x37)";
+        proplist << "MFT Mirror Starting Cluster Address||" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->mftm_clust)) << "||Starting cluster address of the MFT Mirror (0x38-0x3F)";
         int recordsize = 0;
         if(ntfsinfo->fs->mft_rsize_c > 0)
         {
@@ -1580,13 +1580,13 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
         }
         else
             recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
-        proplist << "MFT Record Size (bytes)" << QString::number(recordsize) << "Size of file record in bytes (MFT Entry) (0x40-0x40)";
-        proplist << "Unused" << "Unused" << "Unused (0x41-0x43)";
-        proplist << "Size of Index Record" << QString::number(ntfsinfo->fs->idx_rsize_c) << "Number of clusters per index record (0x44-0x44)";
-        proplist << "Unused" << "Unused" << "Unused (0x45-0x47)";
-        proplist << "Serial Number" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->serial)) << "Serial Number (0x48-0x4F)";
-        proplist << "Boot Code" << "Boot Code" << "Boot Code (0x0050-0x00FD)";
-        proplist << "Signature" << QString::number(tsk_getu16(curfsinfo->endian, ntfsinfo->fs->magic)) << "Signature value should be 0xAA55 (0x00FE-0x00FF)";
+        proplist << "MFT Record Size (bytes)||" << QString::number(recordsize) << "||Size of file record in bytes (MFT Entry) (0x40-0x40)";
+        proplist << "Unused||" << "Unused" << "||Unused (0x41-0x43)";
+        proplist << "Size of Index Record||" << QString::number(ntfsinfo->fs->idx_rsize_c) << "||Number of clusters per index record (0x44-0x44)";
+        proplist << "Unused||" << "Unused" << "||Unused (0x45-0x47)";
+        proplist << "Serial Number||" << QString::number(tsk_getu64(curfsinfo->endian, ntfsinfo->fs->serial)) << "||Serial Number (0x48-0x4F)";
+        proplist << "Boot Code||" << "Boot Code" << "||Boot Code (0x0050-0x00FD)";
+        proplist << "Signature||" << QString::number(tsk_getu16(curfsinfo->endian, ntfsinfo->fs->magic)) << "||Signature value should be 0xAA55 (0x00FE-0x00FF)";
         TSK_FS_FILE* tmpfile = NULL;
         const TSK_FS_ATTR* tmpattr;
         if((tmpfile = tsk_fs_file_open_meta(curfsinfo, NULL, NTFS_MFT_VOL)) == NULL)
@@ -1609,8 +1609,8 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
                 asc[sizeof(asc)-1] = '\0';
             else
                 *name8 = '\0';
-            proplist << "Volume Name" << QString::fromStdString(string(asc)) << "Volume Name from $VOLUME_NAME attribute";
-            proplist << "Version";
+            proplist << "Volume Name||" << QString::fromStdString(string(asc)) << "||Volume Name from $VOLUME_NAME attribute";
+            proplist << "Version||";
             if(ntfsinfo->ver == NTFS_VINFO_NT)
                 proplist << "Windows NT";
             else if(ntfsinfo->ver == NTFS_VINFO_2K)
@@ -1619,7 +1619,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
                 proplist << "Windows XP";
             else
                 proplist << "Newer than Windows XP";
-            proplist << "Version Information";
+            proplist << "||Version Information";
         }
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_EXFAT)
