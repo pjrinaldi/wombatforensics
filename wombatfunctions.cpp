@@ -358,6 +358,7 @@ QString base64_decode(QString string){
         filesfound++;
     }
     filefile.close();
+    WriteFileProperties(tmpfile);
     isignals->ProgUpd();
 
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -1209,9 +1210,9 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
 {
     QFile filepropfile;
     if(curfileinfo->meta != NULL)
-        filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(curfileinfo->meta->addr) + ".prop");
+        filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(curfileinfo->meta->addr) + ".prop");
     else if(curfileinfo->name != NULL)
-        filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(curfileinfo->name->meta_addr) + ".prop");
+        filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + QString::number(curfileinfo->name->meta_addr) + ".prop");
     filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream proplist(&filepropfile);
     if(curfileinfo->name != NULL) proplist << "Short Name||" << curfileinfo->name->shrt_name << "||Short Name for a file" << endl;
@@ -1235,65 +1236,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Unspecified";
         proplist << "||allocation status for the file." << endl;
     }
-
-        /*
-        QSqlQuery objquery(fcasedb);
-        objquery.prepare("SELECT blockaddress, filemime, filesignature, address FROM data WHERE objectid = ?;");
-        objquery.bindValue(0, objid);
-        objquery.exec();
-        objquery.next();
-        proplist << "Block Address" << objquery.value(0).toString() << "List of block addresses which contain the contents of the file";
-        unsigned long long tmpoffset = 0;
-        unsigned long long resoffset = 0;
-        unsigned long long fileaddress = 0;
-        fileaddress = objquery.value(3).toULongLong();
-        proplist << "Byte Offset";
-        if(objquery.value(0).toString().compare("") != 0)
-            tmpoffset = objquery.value(0).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong()*blksize + fsoffset;
-        else
-        {
-            if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
-            {
-                QSqlQuery resquery(fcasedb);
-                QStringList inputs;
-                QList<unsigned long long> outputs;
-                inputs << "%0x0B%" << "%0x0D%" << "%0x30%" << "%0x40%";
-                for(int i=0; i < inputs.count(); i++)
-                {
-                    resquery.prepare("SELECT value from properties where objectid = ? and description like(?);");
-                    resquery.addBindValue(parfsid);
-                    resquery.addBindValue(inputs.at(i));
-                    resquery.exec();
-                    resquery.next();
-                    outputs.append(resquery.value(0).toULongLong());
-                }
-                resquery.finish();
-                mftrecordsize = outputs.at(3);
-                resoffset = ((outputs.at(0) * outputs.at(1) * outputs.at(2)) + (outputs.at(3)*fileaddress));
-                tmpoffset = resoffset + fsoffset;
-            }
-            else
-                tmpoffset = fsoffset;
-        }
-        proplist << QString::number(tmpoffset) << "Byte offset for the start of the file in a block or in the MFT";
-        proplist << "File Signature" << objquery.value(1).toString() << objquery.value(2).toString();
-        objquery.finish();
-
-        fcasedb.transaction();
-        QSqlQuery propquery(fcasedb);
-        propquery.prepare("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);");
-        for(int i=0; i < proplist.count()/3; i++)
-        {
-            propquery.bindValue(0, objid);
-            propquery.bindValue(1, proplist.at(3*i));
-            propquery.bindValue(2, proplist.at(3*i+1));
-            propquery.bindValue(3, proplist.at(3*i+2));
-            propquery.exec();
-        }
-        fcasedb.commit();
-        propquery.finish();
-    */
-
+    filepropfile.close();
 }
 
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)

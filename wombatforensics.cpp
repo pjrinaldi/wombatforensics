@@ -1459,7 +1459,7 @@ void WombatForensics::UpdateProperties()
     }
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 4) // file
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last() + ".prop");
+        propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last() + ".prop");
     }
     qDebug() << propfile.fileName();
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
