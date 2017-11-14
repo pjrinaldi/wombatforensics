@@ -1207,35 +1207,36 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
 
 void WriteFileProperties(TSK_FS_FILE* curfileinfo)
 {
-    //QFile filepropfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ;
-
-    // OLD CODE
-    //propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last() + ".prop");
-    //QFile fspropfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".partprop.p" + QString::number(partint));
-    //fspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
-    //QTextStream proplist(&fspropfile);
-    /*
-    if(tmpfile->name != NULL) proplist << "Short Name" << tmpfile->name->shrt_name << "Short Name for a file";
-    if(tmpfile->meta != NULL)
+    QFile filepropfile;
+    if(curfileinfo->meta != NULL)
+        filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(curfileinfo->meta->addr) + ".prop");
+    else if(curfileinfo->name != NULL)
+        filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".f" + QString::number(curfileinfo->name->meta_addr) + ".prop");
+    filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream proplist(&filepropfile);
+    if(curfileinfo->name != NULL) proplist << "Short Name||" << curfileinfo->name->shrt_name << "||Short Name for a file" << endl;
+    if(curfileinfo->meta != NULL)
     {
-        proplist << "File Permissions" << GetFilePermissions(tmpfile->meta) << "Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbpv]|rw[sSx]|rw[sSx]|rw[tTx]";
-        proplist << "User ID" << QString::number(tmpfile->meta->uid) << "User ID";
-        proplist << "Group ID" << QString::number(tmpfile->meta->gid) << "Group ID";
-        proplist << "Allocation Status";
-        if(tmpfile->meta->flags == TSK_FS_META_FLAG_ALLOC)
+        proplist << "File Permissions||" << GetFilePermissions(curfileinfo->meta) << "||Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbpv]|rw[sSx]|rw[sSx]|rw[tTx]" << endl;
+        proplist << "User ID||" << QString::number(curfileinfo->meta->uid) << "||User ID";
+        proplist << "Group ID||" << QString::number(curfileinfo->meta->gid) << "||Group ID";
+        proplist << "Allocation Status||";
+        if(curfileinfo->meta->flags == TSK_FS_META_FLAG_ALLOC)
             proplist << "Currently Allocated";
-        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNALLOC)
+        else if(curfileinfo->meta->flags == TSK_FS_META_FLAG_UNALLOC)
             proplist << "Currently Unallocated";
-        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_USED)
+        else if(curfileinfo->meta->flags == TSK_FS_META_FLAG_USED)
             proplist << "Allocated at least once";
-        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_UNUSED)
+        else if(curfileinfo->meta->flags == TSK_FS_META_FLAG_UNUSED)
             proplist << "Never allocated";
-        else if(tmpfile->meta->flags == TSK_FS_META_FLAG_COMP)
+        else if(curfileinfo->meta->flags == TSK_FS_META_FLAG_COMP)
             proplist << "Contents are compressed";
         else
             proplist << "Unspecified";
-        proplist << "allocation status for the file.";
+        proplist << "||allocation status for the file." << endl;
+    }
 
+        /*
         QSqlQuery objquery(fcasedb);
         objquery.prepare("SELECT blockaddress, filemime, filesignature, address FROM data WHERE objectid = ?;");
         objquery.bindValue(0, objid);
