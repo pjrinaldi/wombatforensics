@@ -616,7 +616,7 @@ void GenerateThumbnails()
     filequery.finish();
     */
 }
-
+/*
 void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long long fsoffset, int blksize, unsigned long long parfsid)
 {
     QStringList proplist;
@@ -699,6 +699,7 @@ void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long 
         fcasedb.commit();
         propquery.finish();
         */
+/*
         processphase++;
         isignals->ProgUpd();
     }
@@ -742,8 +743,11 @@ void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, QVector<unsigned long
         fcasedb.commit();
         propquery.finish();
         */
+/*
    }
 }
+*/
+
 /*
 void BlockFile(TSK_FS_FILE* tmpfile, unsigned long long objid, QVector<unsigned long long> adsattrid)
 {
