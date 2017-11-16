@@ -1113,6 +1113,7 @@ private slots:
     //void OpenParentImage(unsigned long long imgid);
     void OpenParentFileSystem(unsigned long long fsid);
     void OpenFileSystemFile(void);
+    //unsigned long long GetResidentOffset(unsigned long long fileaddress, unsigned long long fsaddress);
     void ResizeViewColumns(const QModelIndex &index)
     {
         if(index.isValid())

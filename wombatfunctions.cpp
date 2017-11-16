@@ -379,6 +379,7 @@ QString base64_decode(QString string){
             curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * tmpfile->meta->addr + 20;
         else
             curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
+        qDebug() << curmftentrystart;
         char startoffset[2];
         tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
         uint16_t teststart = startoffset[1] * 256 + startoffset[0];
@@ -1236,8 +1237,14 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Unspecified";
         proplist << "||allocation status for the file." << endl;
     }
+    // CALCULATE BLOCK ADDRESS LISTING HERE USING ^^ AS SEPARATOR
+    proplist << "Block Offset||" << "" << "||" << endl;
+    proplist << "Resident Offset||" << "" << "||" << endl;
+    proplist << "Block Address||" << "" << "||List of block addresses which contain the contents of the file" << endl;
     filepropfile.close();
 
+    // NEED TO FIND THE BLOCKADDRESS LIST AND STORE IN THE PROPERTY FILE. USE THE FIRST BLOCK ADDRESS AS THE BLOCK OFFSET
+    // IF NTFS, CALCULATE THE RESIDENT OFFSET IF IT APPLIES AND STORE HERE AS WELL. THEN I CAN JUST CALL THESE WHEN NEEDED RATHER THAN CALCULATING EVERY TIME IN EVERY PLACE...
         /*
         QSqlQuery objquery(fcasedb);
         objquery.prepare("SELECT blockaddress, filemime, filesignature, address FROM data WHERE objectid = ?;");

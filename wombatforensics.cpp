@@ -1784,13 +1784,11 @@ void WombatForensics::LoadHexContents()
             if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
             {
                 // NEED TO IMPLEMENT PROPERTIES BEFORE I CAN TEST OUT GETTING THE RESOFFSET PROPERLY
-                //tskobjptr->resoffset = GetResidentOffset(wombatvariable.selectedobject.address);
+                //tskobjptr->resoffset = GetResidentOffset(tskobjptr->address, partlist.at(4).toULongLong());
                 //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
             }
             else
-            {
                 tskobjptr->offset = tskobjptr->fsoffset;
-            }
         }
         //tskobjptr->blockaddress = blockstring; // probably don't need this variable
     }
@@ -2413,6 +2411,29 @@ void WombatForensics::OpenFileSystemFile()
 {
     tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
 }
+
+/*
+unsigned long long WombatForensics::GetResidentOffset(unsigned long long fileaddress, unsigned long long fsaddress)
+{
+    QSqlQuery resquery(fcasedb);
+    QStringList inputs;
+    QList<unsigned long long> outputs;
+    inputs << "%0x0B%" << "%0x0D%" << "%0x30%" << "%0x40%";
+    for(int i=0; i < inputs.count(); i++)
+    {
+        resquery.prepare("SELECT value from properties where objectid = ? and description like(?);");
+        resquery.addBindValue(wombatptr->selectedobject.parfsid);
+        resquery.addBindValue(inputs.at(i));
+        resquery.exec();
+        resquery.next();
+        outputs.append(resquery.value(0).toULongLong());
+    }
+    resquery.finish();
+    mftrecordsize = outputs.at(3);
+    return ((outputs.at(0) * outputs.at(1) * outputs.at(2)) + (outputs.at(3)*fileaddress));
+    return 1;
+}
+*/
 
 void WombatForensics::CloseCurrentCase()
 {
