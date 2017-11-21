@@ -142,7 +142,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
 
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
     {
-        blockstring += QString::number(addr) + "|";
+        blockstring += QString::number(addr) + "^^";
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
     {
@@ -150,20 +150,20 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
-        blockstring += QString::number(addr) + "|";
+        blockstring += QString::number(addr) + "^^";
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
     {
         if(flags & TSK_FS_BLOCK_FLAG_CONT)
         {
-            blockstring += QString::number(addr) + "|";
+            blockstring += QString::number(addr) + "^^";
         }
     }
     else if(tmpfile->name != NULL)
     {
         if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0) || (strcmp(tmpfile->name->name, "$OprhanFiles") == 0))
         {
-            blockstring += QString::number(addr) + "|";
+            blockstring += QString::number(addr) + "^^";
         }
     }
     else
@@ -175,7 +175,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
             {
                 if(addr)
                 {
-                    blockstring += QString::number(addr + i) + "|";
+                    blockstring += QString::number(addr + i) + "^^";
                 }
             }
         }
@@ -1206,6 +1206,73 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
             // place InitializeQueryModel(); in here...
 
 }
+QString GetBlockList(TSK_FS_FILE* tmpfile)
+{
+    blockstring = "";
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
+    {
+        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
+        {
+            tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+        }
+        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
+        {
+            iso9660_inode* dinode;
+            dinode = (iso9660_inode*)tsk_malloc(sizeof(iso9660_inode));
+            iso9660_inode_node* n;
+            n = ((ISO_INFO*)tmpfile->fs_info)->in_list;
+            while(n && (n->inum != tmpfile->meta->addr))
+                n = n->next;
+            if(n)
+                memcpy(dinode, &n->inode, sizeof(iso9660_inode));
+            int block = tsk_getu32(tmpfile->fs_info->endian, dinode->dr.ext_loc_m);
+            TSK_OFF_T size = tmpfile->meta->size;
+            while((int64_t)size > 0)
+            {
+                blockstring += QString::number(block++) + "^^";
+                size -= tmpfile->fs_info->block_size;
+            }
+        }
+        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+        {
+            unsigned long long minads = 1000;
+            /*
+            for(int i = 0; i < adsattrid.count(); i++)
+            {
+                if(adsattrid.at(i) < minads)
+                    minads = adsattrid.at(i);
+            }
+            */
+            if(tmpfile->meta != NULL)
+            {
+                if(tmpfile->meta->attr)
+                {
+                    int cnt, i;
+                    cnt = tsk_fs_file_attr_getsize(tmpfile);
+                    for(i = 0; i < cnt; i++)
+                    {
+                        const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                        if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
+                        {
+                            if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id < (int)minads)
+                            {
+                                tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
+        {
+            tsk_fs_file_walk(tmpfile, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+        }
+    }
+    else
+        tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
+    
+    return blockstring;
+}
 
 void WriteFileProperties(TSK_FS_FILE* curfileinfo)
 {
@@ -1237,77 +1304,32 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Unspecified";
         proplist << "||allocation status for the file." << endl;
     }
-    // CALCULATE BLOCK ADDRESS LISTING HERE USING ^^ AS SEPARATOR
-    proplist << "Block Offset||" << "" << "||" << endl;
-    proplist << "Resident Offset||" << "" << "||" << endl;
-    proplist << "Block Address||" << "" << "||List of block addresses which contain the contents of the file" << endl;
-    filepropfile.close();
-
-    // NEED TO FIND THE BLOCKADDRESS LIST AND STORE IN THE PROPERTY FILE. USE THE FIRST BLOCK ADDRESS AS THE BLOCK OFFSET
-    // IF NTFS, CALCULATE THE RESIDENT OFFSET IF IT APPLIES AND STORE HERE AS WELL. THEN I CAN JUST CALL THESE WHEN NEEDED RATHER THAN CALCULATING EVERY TIME IN EVERY PLACE...
-        /*
-        QSqlQuery objquery(fcasedb);
-        objquery.prepare("SELECT blockaddress, filemime, filesignature, address FROM data WHERE objectid = ?;");
-        objquery.bindValue(0, objid);
-        objquery.exec();
-        objquery.next();
-        proplist << "Block Address" << objquery.value(0).toString() << "List of block addresses which contain the contents of the file";
-        unsigned long long tmpoffset = 0;
-        unsigned long long resoffset = 0;
-        unsigned long long fileaddress = 0;
-        fileaddress = objquery.value(3).toULongLong();
-        proplist << "Byte Offset";
-        if(objquery.value(0).toString().compare("") != 0)
-            tmpoffset = objquery.value(0).toString().split("|", QString::SkipEmptyParts).at(0).toULongLong()*blksize + fsoffset;
-        else
+    proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block address which contain the contents of the file" << endl;
+    if(GetBlockList(curfileinfo).compare("") != 0)
+        proplist << "Block Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+    else
+    {
+        if(curfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
-            if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            NTFS_INFO* ntfsinfo = (NTFS_INFO*)curfileinfo->fs_info;
+
+            int recordsize = 0;
+            if(ntfsinfo->fs->mft_rsize_c > 0)
             {
-                QSqlQuery resquery(fcasedb);
-                QStringList inputs;
-                QList<unsigned long long> outputs;
-                inputs << "%0x0B%" << "%0x0D%" << "%0x30%" << "%0x40%";
-                for(int i=0; i < inputs.count(); i++)
-                {
-                    resquery.prepare("SELECT value from properties where objectid = ? and description like(?);");
-                    resquery.addBindValue(parfsid);
-                    resquery.addBindValue(inputs.at(i));
-                    resquery.exec();
-                    resquery.next();
-                    outputs.append(resquery.value(0).toULongLong());
-                }
-                resquery.finish();
-                mftrecordsize = outputs.at(3);
-                resoffset = ((outputs.at(0) * outputs.at(1) * outputs.at(2)) + (outputs.at(3)*fileaddress));
-                tmpoffset = resoffset + fsoffset;
+                recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize);
             }
             else
-                tmpoffset = fsoffset;
+                recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
+            proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset) << "||" << endl;
         }
-        proplist << QString::number(tmpoffset) << "Byte offset for the start of the file in a block or in the MFT";
-        proplist << "File Signature" << objquery.value(1).toString() << objquery.value(2).toString();
-        objquery.finish();
-
-        fcasedb.transaction();
-        QSqlQuery propquery(fcasedb);
-        propquery.prepare("INSERT INTO properties (objectid, name, value, description) VALUES(?, ?, ?, ?);");
-        for(int i=0; i < proplist.count()/3; i++)
-        {
-            propquery.bindValue(0, objid);
-            propquery.bindValue(1, proplist.at(3*i));
-            propquery.bindValue(2, proplist.at(3*i+1));
-            propquery.bindValue(3, proplist.at(3*i+2));
-            propquery.exec();
-        }
-        fcasedb.commit();
-        propquery.finish();
-    */
-
+        else
+            proplist << "Block Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file" << endl;
+    }
+    filepropfile.close();
 }
 
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
 {
-    //qDebug() << partint
     FFS_INFO* ffs = NULL;
     ffs_sb1* sb1 = NULL;
     ffs_sb2* sb2 = NULL;

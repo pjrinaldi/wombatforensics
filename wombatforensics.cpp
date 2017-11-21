@@ -1699,6 +1699,11 @@ void WombatForensics::LoadHexContents()
         //QVector<unsigned long long> adsattrid;
         //adsobjid.clear();
         //adsattrid.clear();
+
+        // REWORK THIS SECTION TO PULL THE FILE'S PROPERTIES TO GET THIS INFORMATION
+        // BLOCKLIST, FILE BYTE OFFSET, RESIDENT OFFSET
+        //
+        // ALSO NEED TO FIGURE OUT ADS STUFF
         if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
             unsigned long long minads = 1000;
@@ -1765,7 +1770,7 @@ void WombatForensics::LoadHexContents()
             TSK_OFF_T size = tskobjptr->readfileinfo->meta->size;
             while((int64_t)size > 0)
             {
-                blockstring += QString::number(block++) + "|";
+                blockstring += QString::number(block++) + "^^";
                 size -= tskobjptr->readfileinfo->fs_info->block_size;
             }
         }
@@ -1774,10 +1779,10 @@ void WombatForensics::LoadHexContents()
             tsk_fs_file_walk(tskobjptr->readfileinfo, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
         }
         //qDebug() << "blkstring:" << blockstring;
-        tskobjptr->blkaddrlist = blockstring.split("|", QString::SkipEmptyParts);
+        tskobjptr->blkaddrlist = blockstring.split("^^", QString::SkipEmptyParts);
         if(blockstring.compare("") != 0)
         {
-            tskobjptr->offset = blockstring.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
+            tskobjptr->offset = blockstring.split("^^", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
         }
         else
         {
