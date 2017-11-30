@@ -596,6 +596,7 @@ void WombatForensics::InitializeCaseStructure()
         QString name = qgetenv("USER");
         if(name.isEmpty())
             name = qgetenv("USERNAME");
+        /*
         //pkexec calls the required gui prompt for sudo or a terminal if gui not available.
         QString mntstr = "pkexec mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
@@ -606,6 +607,11 @@ void WombatForensics::InitializeCaseStructure()
         QProcess::execute(mkfsstr);
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
+        */
+        // POSSIBLE PKEXEC WORKAROUND
+        QProcess::execute(mkfsstr);
+        QString mntstr = "guestmount -a " + wombatvariable.caseobject.name + " -m /dev/sda " + wombatvariable.tmpmntpath;
+        QProcess::execute(mntstr);
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
@@ -2535,8 +2541,10 @@ void WombatForensics::CloseCurrentCase()
     filtercountlabel->setText("Filtered: 0");
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    QString umntstr = "pkexec umount ";
-    umntstr += wombatvariable.tmpmntpath;
+    
+    //QString umntstr = "pkexec umount ";
+    //umntstr += wombatvariable.tmpmntpath;
+    QString umntstr = "guestunmount " + wombatvariable.tmpmntpath;
     QProcess::execute(umntstr);
     StatusUpdate("Current Case was closed successfully");
     //CloseCaseDB(); // was previously wombatdatabase
