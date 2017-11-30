@@ -597,18 +597,13 @@ void WombatForensics::InitializeCaseStructure()
         if(name.isEmpty())
             name = qgetenv("USERNAME");
         //pkexec calls the required gui prompt for sudo or a terminal if gui not available.
-        /*
         QString mntstr = "pkexec mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
         QString chownstr = "pkexec chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
-        */
-        QProcess::execute(mkfsstr);
-        QString pkstr = "\"mount -o loop " + wombatvariable.caseobject.name + " " + wombatvariable.tmpmntpath + " && chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath + "\"";
-        QProcess::execute("pkexec bash", QStringList() << "-c" << pkstr);
-        //QProcess::execute(mntstr);
-        //QProcess::execute(chownstr);
+        QProcess::execute(mntstr);
+        QProcess::execute(chownstr);
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
@@ -1686,7 +1681,10 @@ void WombatForensics::LoadHexContents()
         filefile.open(QIODevice::ReadOnly);
         tmpstr = filefile.readLine();
         QFile filefileprop(filefile.fileName().split(".a").at(0) + ".prop");
-        qDebug() << "File Proprety File Name:" << filefileprop.fileName();
+        QString blockstring;
+        QString residentstring;
+        QString bytestring;
+        //qDebug() << "File Proprety File Name:" << filefileprop.fileName();
         filefile.close();
         filelist = tmpstr.split(",");
         tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
@@ -1696,6 +1694,38 @@ void WombatForensics::LoadHexContents()
         tskobjptr->address = wombatvariable.selectedobject.modid.split("-").at(3).mid(1).toInt();
         tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tskobjptr->offset = 0;
+        filefileprop.open(QIODevice::ReadOnly);
+        while(!filefileprop.atEnd())
+        {
+            QString tmpstring = filefileprop.readLine();
+            if(tmpstring.contains("Block Address"))
+            {
+                blockstring = tmpstring.split("||").at(1);
+            }
+            else if(tmpstring.contains("Resident Offset"))
+            {
+                residentstring = tmpstring.split("||").at(1);
+            }
+            else if(tmpstring.contains("Byte Offset"))
+            {
+                bytestring = tmpstring.split("||").at(1);
+            }
+        }
+        filefileprop.close();
+        if(blockstring.compare("") != 0)
+        {
+            tskobjptr->offset = bytestring.toULongLong();
+        }
+        else
+        {
+            if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+                tskobjptr->resoffset = residentstring.toULongLong();
+                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
+            }
+            else
+                tskobjptr->offset = tskobjptr->fsoffset;
+        }
         /*
         if(blockstring.compare("") != 0)
         {
