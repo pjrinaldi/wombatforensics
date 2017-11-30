@@ -667,6 +667,7 @@ void WombatForensics::InitializeOpenCase()
         if(name.isEmpty())
             name = qgetenv("USERNAME");
         //qDebug() << name;
+        /*
         QString mntstr = "pkexec mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
@@ -674,6 +675,10 @@ void WombatForensics::InitializeOpenCase()
         QString chownstr = "pkexec chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
+        */
+        QProcess::execute(mkfsstr);
+        QString mntstr = "guestmount -a " + wombatvariable.caseobject.name + " -m /dev/sda " + wombatvariable.tmpmntpath;
+        QProcess::execute(mntstr);
         wombatvariable.iscaseopen = true;
         ui->actionAdd_Evidence->setEnabled(true);
         LogMessage("Case was Opened");
@@ -1734,6 +1739,10 @@ void WombatForensics::LoadHexContents()
             else
                 tskobjptr->offset = tskobjptr->fsoffset;
         }
+        tskobjptr->blockaddress = blockstring;
+        tskobjptr->blkaddrlist = blockstring.split("^^", QString::SkipEmptyParts);
+        //tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
+        //tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         /*
         if(blockstring.compare("") != 0)
         {
@@ -1767,6 +1776,8 @@ void WombatForensics::LoadHexContents()
 
         QStringList tmpchildren = GetChildFiles("*.a" + wombatvariable.selectedobject.modid.split("-").at(3).mid(1));
 
+        //tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
+        //tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         //QVector<unsigned long long> adsobjid;
         //QVector<unsigned long long> adsattrid;
         //adsobjid.clear();
