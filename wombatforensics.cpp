@@ -596,16 +596,19 @@ void WombatForensics::InitializeCaseStructure()
         QString name = qgetenv("USER");
         if(name.isEmpty())
             name = qgetenv("USERNAME");
-        //qDebug() << name;
         //pkexec calls the required gui prompt for sudo or a terminal if gui not available.
+        /*
         QString mntstr = "pkexec mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
         QString chownstr = "pkexec chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
+        */
         QProcess::execute(mkfsstr);
-        QProcess::execute(mntstr);
-        QProcess::execute(chownstr);
+        QString pkstr = "\"mount -o loop " + wombatvariable.caseobject.name + " " + wombatvariable.tmpmntpath + " && chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath + "\"";
+        QProcess::execute("pkexec bash", QStringList() << "-c" << pkstr);
+        //QProcess::execute(mntstr);
+        //QProcess::execute(chownstr);
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
@@ -1682,6 +1685,8 @@ void WombatForensics::LoadHexContents()
         }
         filefile.open(QIODevice::ReadOnly);
         tmpstr = filefile.readLine();
+        QFile filefileprop(filefile.fileName().split(".a").at(0) + ".prop");
+        qDebug() << "File Proprety File Name:" << filefileprop.fileName();
         filefile.close();
         filelist = tmpstr.split(",");
         tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
@@ -1691,10 +1696,39 @@ void WombatForensics::LoadHexContents()
         tskobjptr->address = wombatvariable.selectedobject.modid.split("-").at(3).mid(1).toInt();
         tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tskobjptr->offset = 0;
+        /*
+        if(blockstring.compare("") != 0)
+        {
+            tskobjptr->offset = blockstring.split("^^", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
+        }
+        else
+        {
+            if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+            }
+            else
+                tskobjptr->offset = tskobjptr->fsoffset;
+        }
+        */
+        /*
+         *
+            if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+                // NEED TO IMPLEMENT PROPERTIES BEFORE I CAN TEST OUT GETTING THE RESOFFSET PROPERLY
+                //tskobjptr->resoffset = GetResidentOffset(tskobjptr->address, partlist.at(4).toULongLong());
+                //tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
+            }
+            else
+                tskobjptr->offset = tskobjptr->fsoffset;
+        }
+        //tskobjptr->blockaddress = blockstring; // probably don't need this variable
+         *
+         */ 
         if(filelist.at(11).toULongLong() == 0)
             tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
 
         QStringList tmpchildren = GetChildFiles("*.a" + wombatvariable.selectedobject.modid.split("-").at(3).mid(1));
+
         //QVector<unsigned long long> adsobjid;
         //QVector<unsigned long long> adsattrid;
         //adsobjid.clear();
@@ -1704,6 +1738,8 @@ void WombatForensics::LoadHexContents()
         // BLOCKLIST, FILE BYTE OFFSET, RESIDENT OFFSET
         //
         // ALSO NEED TO FIGURE OUT ADS STUFF
+        
+        /*
         if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
             unsigned long long minads = 1000;
@@ -1728,6 +1764,7 @@ void WombatForensics::LoadHexContents()
             if(adsattrid < minads)
                 minads = adsattrid;
             */
+        /*
             if(tskobjptr->readfileinfo->meta != NULL)
             {
                 if(tskobjptr->readfileinfo->meta->attr)
@@ -1796,6 +1833,7 @@ void WombatForensics::LoadHexContents()
                 tskobjptr->offset = tskobjptr->fsoffset;
         }
         //tskobjptr->blockaddress = blockstring; // probably don't need this variable
+    */
     }
     /*
     else if(wombatvariable.selectedobject.objtype == 6) // ads file object

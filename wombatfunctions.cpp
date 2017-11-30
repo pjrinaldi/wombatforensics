@@ -1304,9 +1304,9 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Unspecified";
         proplist << "||allocation status for the file." << endl;
     }
-    proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block address which contain the contents of the file" << endl;
+    proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;
     if(GetBlockList(curfileinfo).compare("") != 0)
-        proplist << "Block Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+        proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
     else
     {
         if(curfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -1323,7 +1323,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset) << "||" << endl;
         }
         else
-            proplist << "Block Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file" << endl;
+            proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file" << endl;
     }
     filepropfile.close();
 }
