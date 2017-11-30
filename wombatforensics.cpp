@@ -601,6 +601,7 @@ void WombatForensics::InitializeCaseStructure()
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
+        qDebug() << mntstr;
         QString chownstr = "pkexec chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
