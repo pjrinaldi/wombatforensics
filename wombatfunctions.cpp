@@ -1121,6 +1121,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
         out << QString::fromStdString(wombatvariable.evidenceobject.fullpathvector[i]);
     }
     out << "," << wombatvariable.evidenceobject.itemcount << ",e" + QString::number(evidcnt);
+    out.flush();
     evidfile.close();
     // Write Evidence Properties Here...
     WriteEvidenceProperties(readimginfo);
@@ -1140,6 +1141,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
     volfile.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&volfile);
     out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt);
+    out.flush();
     volfile.close();
     if(readvsinfo != NULL)
         WriteVolumeProperties(readvsinfo);
@@ -1150,6 +1152,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
         pfile.open(QIODevice::Append | QIODevice::Text);
         out.setDevice(&pfile);
         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+        out.flush();
         pfile.close();
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
@@ -1176,6 +1179,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                 if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
                 {
                     out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                    out.flush();
                     pfile.close();
                 }
                 else if(readpartinfo->flags == 0x01) // allocated partition
@@ -1184,6 +1188,7 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
                     if(readfsinfo != NULL)
                     {
                         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                        out.flush();
                         pfile.close();
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
@@ -1325,6 +1330,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
         else
             proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file" << endl;
     }
+    proplist.flush();
     filepropfile.close();
 }
 
@@ -1992,6 +1998,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
     else
         proplist << "Endianness is unknown";
     proplist << "||Identifies the endian ordering of the data being read." << endl;
+    proplist.flush();
     fspropfile.close();
 }
 
@@ -2155,6 +2162,7 @@ void WriteVolumeProperties(TSK_VS_INFO* curvolinfo)
         proplist << "Partition Table Checksum||" << QString::number(tsk_getu32(endian, gptpart->tab_crc)) << "||CRC32 checksum of the partition table (0x58-0x5B)" << endl;
         proplist << "Reserved||" << "Reserved" << "||Reserved (0x5C-0x01FF)" << endl;
     }
+    proplist.flush();
     vpropfile.close();
 }
 
@@ -2371,6 +2379,7 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
     {
         // log error about unsupported image type.
     } 
+    proplist.flush();
     epropfile.close();
 }
 
