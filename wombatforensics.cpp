@@ -1776,6 +1776,10 @@ void WombatForensics::LoadHexContents()
 
         QStringList tmpchildren = GetChildFiles("*.a" + wombatvariable.selectedobject.modid.split("-").at(3).mid(1));
 
+        if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
+        {
+        }
+
         //tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         //tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         //QVector<unsigned long long> adsobjid;
