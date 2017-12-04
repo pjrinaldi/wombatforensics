@@ -1279,6 +1279,34 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
     return blockstring;
 }
 
+viod WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo)
+{
+    QFile adspropfile;
+    /*
+     *    if(tmpfile->name != NULL)
+    {
+        QString adsinfo = "Alternate Data Stream for " + QString::fromStdString(std::string(tmpfile->name->name));
+        proplist << "Alternate Data Stream (ADS)" << adsinfo << "Alternate data stream which contains different content from what the file's standard content is.";
+    }
+    for(int i = 0; i < adsobjid.count(); i++)
+    {
+        /*
+        QSqlQuery adsquery(fcasedb);
+        adsquery.prepare("SELECT name, parentid, blockaddress FROM data WHERE objectid = ?;");
+        adsquery.bindValue(0, adsobjid.at(i));
+        adsquery.exec();
+        adsquery.next();
+        proplist << "Name" << adsquery.value(0).toString() << "Name for the NTFS parent file additional $Data attribute";
+        proplist << "Parent Address" << adsquery.value(1).toString() << "NTFS address ID for the parent file";
+        if(tmpfile->name != NULL)
+            proplist << "Parent File Name" << QString(tmpfile->name->name) << "File name of the parent file";
+        proplist << "Block Address" << adsquery.value(2).toString() << "List of block addresses which contain the contents of the ADS";
+        proplist << "Attribute ID" << QString::number(adsattrid.at(i)) << "ID for the file's ADS attribute";
+ 
+     *
+     */ 
+}
+
 void WriteFileProperties(TSK_FS_FILE* curfileinfo)
 {
     QFile filepropfile;
