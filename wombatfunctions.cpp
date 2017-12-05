@@ -412,6 +412,7 @@ QString base64_decode(QString string){
                                 adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << fsattr->id << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 adsout.flush();
                                 adsfile.close();
+                                WriteAlternateDataStreamProperties(tmpfile, )
                             }
                         }
                     }
@@ -1290,7 +1291,6 @@ viod WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo)
     }
     for(int i = 0; i < adsobjid.count(); i++)
     {
-        /*
         QSqlQuery adsquery(fcasedb);
         adsquery.prepare("SELECT name, parentid, blockaddress FROM data WHERE objectid = ?;");
         adsquery.bindValue(0, adsobjid.at(i));
@@ -1302,7 +1302,21 @@ viod WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Parent File Name" << QString(tmpfile->name->name) << "File name of the parent file";
         proplist << "Block Address" << adsquery.value(2).toString() << "List of block addresses which contain the contents of the ADS";
         proplist << "Attribute ID" << QString::number(adsattrid.at(i)) << "ID for the file's ADS attribute";
- 
+        adsdata.type = (unsigned long long)tmpfile->name->type;
+        adsdata.paraddr = (unsigned long long)tmpfile->meta->addr;
+        adsdata.name = QString(":") + QString(fsattr->name);
+        adsdata.path = QString("/") + QString(tmppath);
+        adsdata.atime = 0;
+        adsdata.ctime = 0;
+        adsdata.crtime = 0;
+        adsdata.mtime = 0;
+        adsdata.evid = currentevidenceid;
+        adsdata.fsid = currentfilesystemid;
+        adsdata.size = (unsigned long long)fsattr->size;
+        adsdata.addr = adssize - (unsigned long long)fsattr->size + 16;
+        adsdata.mimetype = mimetype.name();
+        adsdata.mftattrid = (unsigned long long)fsattr->id; // STORE attr id in this variable in the db.
+        filedatavector.append(adsdata);
      *
      */ 
 }
