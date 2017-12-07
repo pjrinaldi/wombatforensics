@@ -409,10 +409,10 @@ QString base64_decode(QString string){
                                 QTextStream adsout(&adsfile);
                                 adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
                                 //adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->name->par_addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << fsattr->id << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(fsattr->id) << ",0";
-                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << fsattr->id << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
+                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 adsout.flush();
                                 adsfile.close();
-                                WriteAlternateDataStreamProperties(tmpfile, )
+                                WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), QString::number(adssize - fsattr->size + 16), QString::number(fsattr->id));
                             }
                         }
                     }
@@ -1212,6 +1212,17 @@ void InitializeEvidenceStructure(WombatVariable &wombatvariable)
             // place InitializeQueryModel(); in here...
 
 }
+
+QString GetAdsBlockList(TSK_FS_FILE* tmpfile, unsigned long long attrid)
+{
+    blockstring = "";
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    {
+        tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+    }
+    return blockstring;
+}
+
 QString GetBlockList(TSK_FS_FILE* tmpfile)
 {
     blockstring = "";
@@ -1280,9 +1291,23 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
     return blockstring;
 }
 
-viod WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo)
+void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString fvalue, QString attrid)
 {
     QFile adspropfile;
+    if(curfileinfo->name != NULL)
+    {
+        adspropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + QString::number(partint) + ".f" + fvalue + ".prop");
+        adspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream proplist(&adspropfile);
+        proplist << "Alternate Data Stream (ADS)||" << QString::fromStdString(std::string(curfileinfo->name->name)) << "||Alternate data stream which contains different content from what the file's standard content is." << endl;
+        proplist << "Name||" << adsname << "||Name for the NTFS parent file additional $Data attribute" << endl;
+        proplist << "Parent Address||" << QString::number(curfileinfo->meta->addr) << "||NTFS address ID for the parent file" << endl;
+        proplist << "Parent File Name||" << QString(curfileinfo->name->name) << "||File name of the parent file" << endl;
+        proplist << "Block Address||" << GetAdsBlockList(curfileinfo, attrid.toULongLong()) << "||List of block addresses which contain the contents of the alternate data stream" << endl;
+        proplist << "Attribute ID||" << attrid << "||ID for the file's ADS attribute" << endl;
+        proplist.flush();
+        adspropfile.close();
+    }
     /*
      *    if(tmpfile->name != NULL)
     {

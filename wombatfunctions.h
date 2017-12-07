@@ -30,7 +30,7 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo);
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo);
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo);
 void WriteFileProperties(TSK_FS_FILE* curfileinfo);
-void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo);
+void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString fvalue, QString attrid);
 //void PropertyFile(TSK_FS_FILE* tmpfile, unsigned long long objid, unsigned long long fsoffset, int blksize, unsigned long long parfsid);
 //void AlternateDataStreamPropertyFile(TSK_FS_FILE* tmpfile, QVector<unsigned long long> adsobjid, QVector<unsigned long long> adsattrid);
 void LogMessage(QString message);

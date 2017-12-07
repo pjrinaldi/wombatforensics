@@ -676,7 +676,7 @@ void WombatForensics::InitializeOpenCase()
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
         */
-        QProcess::execute(mkfsstr);
+        //QProcess::execute(mkfsstr); // don't need since i'm opening an existing case, not creating a new case.
         QString mntstr = "guestmount -a " + wombatvariable.caseobject.name + " -m /dev/sda " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
         wombatvariable.iscaseopen = true;
