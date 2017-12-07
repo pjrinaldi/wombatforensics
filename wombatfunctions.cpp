@@ -379,7 +379,7 @@ QString base64_decode(QString string){
             curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * tmpfile->meta->addr + 20;
         else
             curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
-        qDebug() << curmftentrystart;
+        //qDebug() << curmftentrystart;
         char startoffset[2];
         tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
         uint16_t teststart = startoffset[1] * 256 + startoffset[0];
@@ -1220,6 +1220,7 @@ QString GetAdsBlockList(TSK_FS_FILE* tmpfile, unsigned long long attrid)
     {
         tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
     }
+    //qDebug() << "ads blockstring:" << blockstring;
     return blockstring;
 }
 
@@ -1293,6 +1294,9 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
 
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString fvalue, QString attrid)
 {
+    QString curblockstring = GetAdsBlockList(curfileinfo, attrid.toULongLong());
+    if(curblockstring.compare("0^^") == 0)
+        curblockstring = "";
     QFile adspropfile;
     if(curfileinfo->name != NULL)
     {
@@ -1303,8 +1307,29 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
         proplist << "Name||" << adsname << "||Name for the NTFS parent file additional $Data attribute" << endl;
         proplist << "Parent Address||" << QString::number(curfileinfo->meta->addr) << "||NTFS address ID for the parent file" << endl;
         proplist << "Parent File Name||" << QString(curfileinfo->name->name) << "||File name of the parent file" << endl;
-        proplist << "Block Address||" << GetAdsBlockList(curfileinfo, attrid.toULongLong()) << "||List of block addresses which contain the contents of the alternate data stream" << endl;
+        proplist << "Block Address||" << curblockstring << "||List of block addresses which contain the contents of the alternate data stream" << endl;
         proplist << "Attribute ID||" << attrid << "||ID for the file's ADS attribute" << endl;
+        //QString curblockstring = GetAdsBlockList(curfileinfo, attrid.toULongLong());
+        //qDebug() << "curblockstring:" << curblockstring << "attrid" << attrid << endl;
+        //if(curblockstring.compare("0^^") == 0)
+        //    curblockstring = "";
+        //else
+        //    qDebug() << "i did something wrong";
+        if(curblockstring.compare("") != 0)
+            proplist << "Byte Offset||" << QString::number(curblockstring.split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+        else
+        {
+            if(curfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+            {
+                NTFS_INFO* ntfsinfo = (NTFS_INFO*)curfileinfo->fs_info;
+                int recordsize = 0;
+                if(ntfsinfo->fs->mft_rsize_c > 0)
+                    recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize);
+                else
+                    recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
+                proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset + fvalue.toULongLong()) << "||Resident offset within the MFT for the file's contents" << endl;
+            }
+        }
         proplist.flush();
         adspropfile.close();
     }
@@ -1359,8 +1384,8 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
     if(curfileinfo->meta != NULL)
     {
         proplist << "File Permissions||" << GetFilePermissions(curfileinfo->meta) << "||Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbpv]|rw[sSx]|rw[sSx]|rw[tTx]" << endl;
-        proplist << "User ID||" << QString::number(curfileinfo->meta->uid) << "||User ID";
-        proplist << "Group ID||" << QString::number(curfileinfo->meta->gid) << "||Group ID";
+        proplist << "User ID||" << QString::number(curfileinfo->meta->uid) << "||User ID" << endl;
+        proplist << "Group ID||" << QString::number(curfileinfo->meta->gid) << "||Group ID" << endl;
         proplist << "Allocation Status||";
         if(curfileinfo->meta->flags == TSK_FS_META_FLAG_ALLOC)
             proplist << "Currently Allocated";

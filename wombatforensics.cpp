@@ -386,7 +386,7 @@ unsigned long long WombatForensics::ReturnCaseCount()
         QString line = in.readLine();
         a++;
     }
-    qDebug() << "a" << a;
+    //qDebug() << "a" << a;
     casesfile.close();
     return a;
     /*
@@ -1676,7 +1676,7 @@ void WombatForensics::LoadHexContents()
         QStringList filelist;
         filelist.clear();
         QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + wombatvariable.selectedobject.modid.split("-").at(2).mid(1) + ".f" + wombatvariable.selectedobject.modid.split("-").at(3).mid(1) + ".a*"), QDir::NoSymLinks | QDir::Files);
-        qDebug() << filefiles;
+        //qDebug() << filefiles;
         QFile filefile;
         if(filefiles.count() == 1)
             filefile.setFileName(wombatvariable.tmpmntpath + filefiles.at(0));
@@ -1741,6 +1741,36 @@ void WombatForensics::LoadHexContents()
         }
         tskobjptr->blockaddress = blockstring;
         tskobjptr->blkaddrlist = blockstring.split("^^", QString::SkipEmptyParts);
+
+        /* BEGIN old ads code
+         *
+         *
+         *
+         *  if(wombatvarptr->selectedobject.blockaddress.compare("") != 0)
+            {
+                if(wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong() == 0)
+                {
+                    tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
+                    tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
+                }
+                else
+                    tskobjptr->offset = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts).at(0).toULongLong()*tskobjptr->blocksize + tskobjptr->fsoffset;
+            }
+            else
+            {
+                tskobjptr->resoffset = wombatdatabase->GetResidentOffset(wombatvarptr->selectedobject.parentid);
+                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset + wombatvarptr->selectedobject.address;
+            }
+            tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
+            tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
+            OpenFileSystemFile(); 
+         *
+         * END old ads code
+         */
+
+
+
+
         //tskobjptr->blockaddress = wombatvarptr->selectedobject.blockaddress;
         //tskobjptr->blkaddrlist = wombatvarptr->selectedobject.blockaddress.split("|", QString::SkipEmptyParts);
         /*
