@@ -1296,6 +1296,7 @@ void WombatForensics::UpdateStatus()
     ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
     //ResizeColumns();
+    cancelthread->close();
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
     //wombatframework->CloseInfoStructures();
@@ -1392,6 +1393,7 @@ void WombatForensics::AddEvidence()
             //qDebug() << wombatvarvector.at(0).evidenceobject.name;
             //InitializeEvidenceStructure(wombatvariable);
             sqlwatcher.setFuture(QtConcurrent::map(wombatvarvector, InitializeEvidenceStructure));
+            cancelthread->show();
             /*
             evidencethread = new QThread;
             evidenceworker = new EvidenceWorker();
@@ -3478,7 +3480,7 @@ void WombatForensics::on_actionCollapseAll_triggered()
 void WombatForensics::on_actionAbout_triggered()
 {
     aboutbox->show();
-    cancelthread->show();
+    //cancelthread->show();
 }
 
 void WombatForensics::UpdateThumbnails(int tsize)
