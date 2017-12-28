@@ -66,6 +66,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QVideoWidget>
+#include <QWebEngineView>
 
 #include <sstream>
 #include <stdio.h>
