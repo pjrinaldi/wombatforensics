@@ -247,6 +247,7 @@ void FileMap(FileData &filedata)
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     QString outstring = "";
+
     /*
     //QFile filefile;
     if(tmpfile->meta != NULL)
@@ -265,25 +266,24 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 
 
-/* BASE 64 ENCODE/DECODE FOR THE FILE NAME TO AVOID COMMA'S IN THE FILE NAME.
- *
- *QString base64_encode(QString string){
-    QByteArray ba;
-    ba.append(string);
-    return ba.toBase64();
-}
+    /* BASE 64 ENCODE/DECODE FOR THE FILE NAME TO AVOID COMMA'S IN THE FILE NAME.
+     *
+     *QString base64_encode(QString string){
+        QByteArray ba;
+        ba.append(string);
+        return ba.toBase64();
+    }
  
-QString base64_decode(QString string){
-    QByteArray ba;
-    ba.append(string);
-    return QByteArray::fromBase64(ba);
-}
- * =
- *
- *
- *
- */ 
-
+    QString base64_decode(QString string){
+        QByteArray ba;
+        ba.append(string);
+        return QByteArray::fromBase64(ba);
+    }
+     * =
+     *
+     *
+     *
+     */ 
 
 
     if(tmpfile->name != NULL)
@@ -317,6 +317,8 @@ QString base64_decode(QString string){
     QMimeType mimetype = mimedb.mimeTypeForData(QByteArray((char*)magicbuffer));
     outstring += mimetype.name() + ",0,e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
 
+    /* hash method using TSK */
+    /*
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     if(retval == 0)
@@ -328,9 +330,25 @@ QString base64_decode(QString string){
             sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
         }
         outstring +=  "," + QString(sbuf);
+        //qDebug() << "tsk hash method:" << QString(sbuf);
     }
     else
         outstring += ",0";
+    */
+
+    /* alternative method using qt5 */
+    char fbuf[tmpfile->meta->size];
+    ssize_t flen = tsk_fs_file_read(tmpfile, 0, fbuf, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+    QByteArray filedata = QByteArray::fromRawData(fbuf, flen);
+    QBuffer filebuf(&filedata);
+    filebuf.open(QIODevice::ReadOnly);
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    if(hash.addData(&filebuf))
+        outstring += "," + QString(hash.result().toHex()).toUpper();
+    else
+        outstring += ",0";
+    /* end alternative method */
+ 
 
 
 
@@ -995,6 +1013,16 @@ void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 
 QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
+    /* alternative method using qt5 */
+    char fbuf[tmpfile->meta->size];
+    ssize_t flen = tsk_fs_file_read(tmpfile, 0, fbuf, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+    //QByteArray filedata = QByteArray::fromRawData(fbuf, flen);
+    //QBuffer filebuf(&filedata);
+    //filebuf.open(QIODevice::ReadOnly);
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    hash.addData(fbuf, flen);
+    qDebug() << "alternate hash method:" << hash.result().toHex();
+    /* end alternative method */
     QVariant tmpvariant;
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
@@ -1006,6 +1034,10 @@ QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         {
             sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
         }
+        if(sint > 0)
+            tmpvariant = QVariant(QString(sbuf));
+        else
+            tmpvariant = QVariant(QString(""));
         /*
         QSqlQuery hashquery(fcasedb);
         hashquery.prepare("UPDATE data SET md5 = ? where objectid = ?;");
@@ -1025,6 +1057,7 @@ QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
         hashquery.finish();
         */
     }
+    qDebug() << "tsk hash function:" << tmpvariant;
     return tmpvariant;
 }
 
