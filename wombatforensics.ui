@@ -95,8 +95,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>22</height>
+     <width>1366</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -237,6 +237,8 @@
    <addaction name="actionView_Properties"/>
    <addaction name="actionView_File"/>
    <addaction name="actionTextViewer"/>
+   <addaction name="actionHtmlViewer"/>
+   <addaction name="actionMediaViewer"/>
    <addaction name="actionView_Image_Gallery"/>
    <addaction name="actionByteConverter"/>
    <addaction name="separator"/>
@@ -598,6 +600,36 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionHtmlViewer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/htmlviewer</normaloff>:/bar/htmlviewer</iconset>
+   </property>
+   <property name="text">
+    <string>Html Viewer</string>
+   </property>
+   <property name="toolTip">
+    <string>HTML Viewer</string>
+   </property>
+  </action>
+  <action name="actionMediaViewer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/mediaviewer</normaloff>:/bar/mediaviewer</iconset>
+   </property>
+   <property name="text">
+    <string>Media Viewer</string>
+   </property>
+   <property name="toolTip">
+    <string>Audio and Video Media Viewer</string>
    </property>
   </action>
  </widget>

@@ -18,6 +18,8 @@
     <file alias="pagedown">./Resources/bottom.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="htmlviewer">Resources/htmlviewer.png</file>
+    <file alias="mediaviewer">Resources/mediaviewer.png</file>
     <file alias="checkbox">Resources/checkbox.png</file>
     <file alias="savestate">Resources/savestate.png</file>
     <file alias="byteconverter">Resources/calc.png</file>
