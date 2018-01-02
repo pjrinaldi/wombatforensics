@@ -477,7 +477,9 @@ void WombatForensics::InitializeAppStructure()
     ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
     ui->actionByteConverter->setEnabled(false);
-    //ui->actionTextViewer->setVisible(false);
+    ui->actionTextViewer->setVisible(false);
+    ui->actionHtmlViewer->setVisible(false);
+    ui->actionMediaViewer->setVisible(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
