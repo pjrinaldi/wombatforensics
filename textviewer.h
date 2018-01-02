@@ -26,7 +26,7 @@ public:
 private slots:
     void HideClicked();
     void UpdateEncoding();
-    void GetTextContent();
+    void GetTextContent(const QModelIndex &index);
 signals:
     void HideTextViewerWindow(bool checkstate);
 
@@ -39,7 +39,7 @@ private:
     TskObject* tskptr;
     QByteArray txtdata;
     QString decodedstring;
-    unsigned long long curobjid;
+    unsigned long long curobjaddr;
     QList<QTextCodec*> codecs;
     void FindCodecs();
 };

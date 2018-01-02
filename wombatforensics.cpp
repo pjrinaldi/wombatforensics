@@ -277,31 +277,31 @@ void WombatForensics::SetSelectedFromImageViewer(unsigned long long objectid)
 ////////////////////////////////////////////////////////////////////////////////////////
 void WombatForensics::ShowFile(const QModelIndex &index)
 {
-    /*
-    if(index.sibling(index.row(), 16).data().toString().contains("image/"))
+    if(index.sibling(index.row(), 9).data().toString().contains("image/"))
     {
         imagewindow->ShowImage(index);
     }
-    else if(index.sibling(index.row(), 16).data().toString().contains("video/"))
+    else if(index.sibling(index.row(), 9).data().toString().contains("video/"))
     {
-        videowindow->ShowVideo(wombatvarptr->tmpfilepath, index);
+        //videowindow->ShowVideo(wombatvarptr->tmpfilepath, index);
     }
-    else if(index.sibling(index.row(), 16).data().toString().contains("text/plain"))
+    else if(index.sibling(index.row(), 9).data().toString().contains("text/plain"))
     {
         // toggle the button...
         ui->actionTextViewer->setChecked(true);
         textviewer->ShowText(index);
     }
-    else if(index.sibling(index.row(), 16).data().toString().contains("text/html"))
+    else if(index.sibling(index.row(), 9).data().toString().contains("text/html"))
     {
         htmlviewer->ShowHtml(index);
     }
     else
     {
-        if(index.sibling(index.row(), 4).data().toInt() == 5 || index.sibling(index.row(), 4).data().toInt() == 6)
+        //else if(wombatvariable.selectedobject.modid.split("-").count() == 4) // file file
+        //if(index.sibling(index.row(), 4).data().toInt() == 5 || index.sibling(index.row(), 4).data().toInt() == 6)
+        if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(QCursor::pos());
     }
-    */
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
@@ -477,7 +477,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
     ui->actionByteConverter->setEnabled(false);
-    ui->actionTextViewer->setVisible(false);
+    //ui->actionTextViewer->setVisible(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -915,10 +915,9 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     if(index.isValid())
     {
         actionnode = static_cast<Node*>(index.internalPointer());
-        /*
-        if(index.sibling(index.row(), 4).data().toInt() == 5 || index.sibling(index.row(), 4).data().toInt() == 6)
+        //if(index.sibling(index.row(), 4).data().toInt() == 5 || index.sibling(index.row(), 4).data().toInt() == 6)
+        if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
-        */
     }
 }
 
@@ -1646,6 +1645,7 @@ void WombatForensics::LoadHexContents()
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
         evidlist = tmpstr.split(",");
+        tskobjptr->partcount = evidlist.at(3).split("|").size();
         evidfile.close();
         std::vector<std::string> tmpvec;
         tmpvec.clear();
@@ -3429,7 +3429,7 @@ void WombatForensics::on_actionTextViewer_triggered(bool checked)
         textviewer->hide();
     else
     {
-        if(selectedindex.sibling(selectedindex.row(), 16).data().toString().contains("text/"))
+        if(selectedindex.sibling(selectedindex.row(), 9).data().toString().contains("text/"))
         {
             textviewer->ShowText(selectedindex);
             textviewer->show();

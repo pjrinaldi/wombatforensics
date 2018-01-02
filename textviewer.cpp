@@ -32,8 +32,9 @@ void TextViewer::HideClicked()
 
 void TextViewer::ShowText(const QModelIndex &index)
 {
-    curobjid = index.sibling(index.row(), 0).data().toULongLong();
-    GetTextContent();
+    //curobjid = index.sibling(index.row(), 0).data().toULongLong();
+    curobjaddr = index.sibling(index.row(), 0).data().toString().split("-f").at(1).toULongLong();
+    GetTextContent(index);
     this->show();
 }
 
@@ -74,15 +75,51 @@ void TextViewer::FindCodecs()
     codecs = codecmap.values();
 }
 
-void TextViewer::GetTextContent()
+void TextViewer::GetTextContent(const QModelIndex &index)
 {
     // OpenParentImage
+    QString tmpstr = "";
+    QStringList evidlist;
+    evidlist.clear();
     std::vector<std::string> pathvector;
-    unsigned long long imgid = 0;
-    unsigned long long fsid = 0;
-    unsigned long long fsoffset = 0;
-    unsigned long long address = 0;
+    //unsigned long long imgid = 0;
+    //unsigned long long fsid = 0;
+    //unsigned long long fsoffset = 0;
+    //unsigned long long address = 0;
     pathvector.clear();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
+    wombatvariable.evidenceobject.name = evidfiles.at(0);
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name.split(".evid").at(0) + ".evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1));
+    evidfile.open(QIODevice::ReadOnly);
+    tmpstr = evidfile.readLine();
+    evidlist = tmpstr.split(",");
+    tskptr->partcount = evidlist.at(3).split("|").size();
+    evidfile.close();
+    for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
+        pathvector.push_back(evidlist.at(3).split("|").at(i).toStdString());
+    tskptr->imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+    for(int i = 0; i < pathvector.size(); i++)
+        tskptr->imagepartspath[i] = pathvector[i].c_str();
+    tskptr->readimginfo = tsk_img_open(tskptr->partcount, tskptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    if(tskptr->readimginfo == NULL)
+    {
+        qDebug() << tsk_error_get_errstr();
+        LogMessage("Image opening error");
+    }
+    free(tskptr->imagepartspath);
+    tmpstr = "";
+    QStringList partlist;
+    partlist.clear();
+    QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".part." + index.sibling(index.row(), 0).data().toString().split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
+    QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
+    partfile.open(QIODevice::ReadOnly);
+    tmpstr = partfile.readLine();
+    partfile.close();
+    partlist = tmpstr.split(",");
+    tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+    tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, curobjaddr);
+
     /*
     QSqlQuery pimgquery(fcasedb);
     pimgquery.prepare("SELECT parimgid, parfsid, address FROM Data WHERE objectid = ?;");
@@ -104,6 +141,7 @@ void TextViewer::GetTextContent()
     }
     pimgquery.finish();
     */
+    /*
     tskptr->imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
     for(uint i=0; i < pathvector.size(); i++)
     {
@@ -111,6 +149,7 @@ void TextViewer::GetTextContent()
     }
     tskptr->readimginfo = tsk_img_open(pathvector.size(), tskptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     free(tskptr->imagepartspath);
+    */
     // OpenParentFileSystem
     /*
     pimgquery.prepare("SELECT byteoffset FROM data where objectid = ?;");
@@ -120,15 +159,17 @@ void TextViewer::GetTextContent()
     fsoffset = pimgquery.value(0).toULongLong();
     pimgquery.finish();
     */
-    tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
+    //tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, fsoffset, TSK_FS_TYPE_DETECT);
     // OpenFile
-    tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, address);
+    //tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, address);
     // ReadFileToEncodedTextUsingByteArray
+    
     if(tskptr->readfileinfo->meta != NULL)
     {
         if(tskptr->readfileinfo->meta->size > 2000000000) // 2 GB
         {
             qDebug() << "File is larger than 2GB. Export the file or use an external viewer. Otherwise showing 1st 2GB of text only.";
+            // should show an alert, then display 1st 2gb of text and display right click menu???
         }
         char tbuffer[tskptr->readfileinfo->meta->size];
         ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
