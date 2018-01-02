@@ -38,16 +38,21 @@ public:
     ~VideoViewer();
 
 public slots:
-    void ShowVideo(QString tmpfilepath, const QModelIndex &index);
+    //void ShowVideo(QString tmpfilepath, const QModelIndex &index);
+    void ShowVideo(const QModelIndex &index);
     void Seek(int);
     void PlayPause();
     void UpdateSlider();
-    void GetVideo(QString tmpfilepath, unsigned long long objid);
+    //void GetVideo(QString tmpfilepath, unsigned long long objid);
+    void GetVideo(const QModelIndex &index);
     
 private:
     Ui::VideoViewer* ui;
+    QMediaPlayer* vplayer;
+    QVideoWidget* videowidget;
     //QtAV::VideoOutput* vout;
     //QtAV::AVPlayer* vplayer;
+    unsigned long long curobjaddr;
     TskObject tskobj;
     TskObject* tskptr;
 protected:

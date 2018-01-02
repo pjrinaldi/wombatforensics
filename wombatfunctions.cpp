@@ -318,7 +318,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     outstring += mimetype.name() + ",0,e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
 
     /* hash method using TSK */
-    /*
+    ///*
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     if(retval == 0)
@@ -334,9 +334,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     else
         outstring += ",0";
-    */
+    //*/
 
     /* alternative method using qt5 */
+    /*
     char fbuf[tmpfile->meta->size];
     ssize_t flen = tsk_fs_file_read(tmpfile, 0, fbuf, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
     QByteArray filedata = QByteArray::fromRawData(fbuf, flen);
@@ -347,6 +348,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         outstring += "," + QString(hash.result().toHex()).toUpper();
     else
         outstring += ",0";
+    */
     /* end alternative method */
  
 

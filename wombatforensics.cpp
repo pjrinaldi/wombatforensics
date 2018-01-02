@@ -574,6 +574,8 @@ void WombatForensics::InitializeCaseStructure()
     wombatvariable.caseobject.name = QFileDialog::getSaveFileName(this, tr("Create New Case File"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
     if(!wombatvariable.caseobject.name.isEmpty())
     {
+        StatusUpdate("Generating Case Structure...");
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         QStringList tmplist = wombatvariable.caseobject.name.split("/");
         tmplist.removeLast();
         wombatvariable.caseobject.dirpath = tmplist.join("/");
@@ -620,6 +622,7 @@ void WombatForensics::InitializeCaseStructure()
         LogMessage("Log File Created");
         ui->actionAdd_Evidence->setEnabled(true);
         LogMessage("Case was Created");
+        QApplication::restoreOverrideCursor();
         //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
         //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
 
