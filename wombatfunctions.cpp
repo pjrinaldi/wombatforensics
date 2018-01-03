@@ -311,12 +311,12 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         outstring += "0,0,0,0,0," + QString::number(tmpfile->name->meta_addr) + ",";
         //out << "0,0,0,0,0," + tmpfile->name->meta_addr + ",";
     }
-    char magicbuffer[1024];
-    magicbuffer[0] = '\0';
+    char magicbuffer[1024] = {0};
     QByteArray tmparray;
+    tmparray.clear();
     tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     tmparray = QByteArray::fromRawData(magicbuffer, 1024);
-    //qDebug() << tmparray.toHex();
+    qDebug() << tmparray.toHex();
     QMimeDatabase mimedb;
     //qDebug() << mimedb.allMimeTypes();
     QMimeType mimetype = mimedb.mimeTypeForData(tmparray);

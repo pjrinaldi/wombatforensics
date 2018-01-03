@@ -16,7 +16,7 @@ TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer
         ui->comboBox->addItem(codec->name(), codec->mibEnum());
     this->hide();
     //connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(GetTextContent(const QModelIndex&)));
-    connect(ui->comboBox, SIGNAL(activiated()), this, SLOT(UpdateEncoding()));
+    connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding(int)));
 }
 
 TextViewer::~TextViewer()
@@ -175,11 +175,11 @@ void TextViewer::GetTextContent(const QModelIndex &index)
         char tbuffer[tskptr->readfileinfo->meta->size];
         ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         txtdata = QByteArray::fromRawData(tbuffer, textlen);
-        UpdateEncoding();
+        UpdateEncoding(0);
     }
 }
 
-void TextViewer::UpdateEncoding()
+void TextViewer::UpdateEncoding(int unused)
 {
     int mib = ui->comboBox->itemData(ui->comboBox->currentIndex()).toInt();
     QTextCodec* codec = QTextCodec::codecForMib(mib);

@@ -25,7 +25,7 @@ public:
     
 private slots:
     void HideClicked();
-    void UpdateEncoding();
+    void UpdateEncoding(int unused);
     void GetTextContent(const QModelIndex &index);
 signals:
     void HideTextViewerWindow(bool checkstate);
