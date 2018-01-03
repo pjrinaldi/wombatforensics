@@ -316,11 +316,11 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     tmparray.clear();
     tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     tmparray = QByteArray::fromRawData(magicbuffer, 1024);
-    qDebug() << tmparray.toHex();
+    //qDebug() << tmparray.toHex();
     QMimeDatabase mimedb;
     //qDebug() << mimedb.allMimeTypes();
     QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-    qDebug() << tmpfile->name->name << mimetype.name() << sizeof(magicbuffer) << mimetype.parentMimeTypes();
+    //qDebug() << tmpfile->name->name << mimetype.name() << sizeof(magicbuffer) << mimetype.parentMimeTypes();
     outstring += mimetype.name() + ",0,e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
 
     /* hash method using TSK */
