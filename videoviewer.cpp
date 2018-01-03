@@ -83,10 +83,10 @@ void VideoViewer::GetVideo(const QModelIndex &index)
     QStringList evidlist;
     evidlist.clear();
     std::vector<std::string> pathvector;
-    unsigned long long imgid = 0;
-    unsigned long long fsid = 0;
-    unsigned long long fsoffset = 0;
-    unsigned long long address = 0;
+    //unsigned long long imgid = 0;
+    //unsigned long long fsid = 0;
+    //unsigned long long fsoffset = 0;
+    //unsigned long long address = 0;
     pathvector.clear();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
@@ -125,9 +125,10 @@ void VideoViewer::GetVideo(const QModelIndex &index)
         char* ibuffer = new char[tskptr->readfileinfo->meta->size];
         ssize_t imglen = tsk_fs_file_read(tskptr->readfileinfo, 0, ibuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         QByteArray filedata = QByteArray::fromRawData(ibuffer, imglen);
-        QBuffer filebuf(&filedata);
-        filebuf.open(QIODevice::ReadOnly);
-        vplayer->setMedia(QMediaContent(), &filebuf);
+        QBuffer* filebuf = new QBuffer(vplayer);
+        filebuf->setData(filedata);
+        filebuf->open(QIODevice::ReadOnly);
+        vplayer->setMedia(QMediaContent(), filebuf);
     }
     /*
     QSqlQuery pimgquery(fcasedb);
@@ -196,7 +197,8 @@ void VideoViewer::ShowVideo(const QModelIndex &index)
     this->show();
     ui->label_2->setVisible(true);
     curobjaddr = index.sibling(index.row(), 0).data().toString().split("-f").at(1).toULongLong();
-    QtConcurrent::run(this, &VideoViewer::GetVideo, index);
+    GetVideo(index);
+    //QtConcurrent::run(this, &VideoViewer::GetVideo, index);
     vplayer->play();
     //vplayer->play();
     //QtConcurrent::run(this, &VideoViewer::GetVideo, tmpfilepath, index.sibling(index.row(), 0).data().toULongLong());

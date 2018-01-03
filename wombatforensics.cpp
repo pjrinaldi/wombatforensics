@@ -283,6 +283,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("video/"))
     {
+        videowindow->ShowVideo(index);
         //videowindow->ShowVideo(wombatvarptr->tmpfilepath, index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("text/plain"))

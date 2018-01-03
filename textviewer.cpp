@@ -15,7 +15,8 @@ TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer
     foreach(QTextCodec* codec, codecs)
         ui->comboBox->addItem(codec->name(), codec->mibEnum());
     this->hide();
-    connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(GetTextContent()));
+    //connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(GetTextContent(const QModelIndex&)));
+    connect(ui->comboBox, SIGNAL(activiated()), this, SLOT(UpdateEncoding()));
 }
 
 TextViewer::~TextViewer()
