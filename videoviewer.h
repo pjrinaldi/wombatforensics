@@ -42,7 +42,8 @@ public slots:
     void ShowVideo(const QModelIndex &index);
     void Seek(int);
     void PlayPause();
-    void UpdateSlider();
+    void UpdateSlider(qint64);
+    void SetDuration(qint64);
     //void GetVideo(QString tmpfilepath, unsigned long long objid);
     void GetVideo(const QModelIndex &index);
     

@@ -10,10 +10,13 @@ VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoVie
     videowidget = new QVideoWidget;
     vplayer->setVideoOutput(videowidget);
     ui->horizontalLayout->addWidget(videowidget);
+    ui->pushButton->setText("Pause");
+    ui->horizontalSlider->setEnabled(false);
     //videowidget->show();
     connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
-    connect(vplayer, SIGNAL(positionChanged(qint64)), this, SLOT(UpdateSlider()));
+    connect(vplayer, SIGNAL(positionChanged(qint64)), this, SLOT(UpdateSlider(qint64)));
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
+    connect(vplayer, SIGNAL(durationChanged(qint64)), this, SLOT(SetDuration(qint64)));
     //QtAV::Widgets::registerRenderers();
     //vplayer = new QtAV::AVPlayer(this);
     //vout = new QtAV::VideoOutput(this);
@@ -37,6 +40,7 @@ VideoViewer::~VideoViewer()
 
 void VideoViewer::Seek(int pos)
 {
+    vplayer->setPosition(pos*1000LL);
     /*
     if(!vplayer->isPlaying())
         return;
@@ -46,14 +50,18 @@ void VideoViewer::Seek(int pos)
 
 void VideoViewer::PlayPause()
 {
+    //qDebug() << vplayer->state();
     if(vplayer->state() == QMediaPlayer::PlayingState)
+    {
+        ui->pushButton->setText("Play");
+        vplayer->pause();
+        //return;
+    }
+    else
     {
         ui->pushButton->setText("Pause");
         vplayer->play();
-        //return;
     }
-    ui->pushButton->setText("Play");
-    vplayer->pause();
     /*
     if(!vplayer->isPlaying())
     {
@@ -65,14 +73,22 @@ void VideoViewer::PlayPause()
     vplayer->pause(!vplayer->isPaused());*/
 }
 
-void VideoViewer::UpdateSlider()
+void VideoViewer::UpdateSlider(qint64 pos)
 {
+    ui->horizontalSlider->setValue(int(pos/1000LL));
+    ui->label->setText(QTime(0, 0, 0).addMSecs(pos).toString("HH:mm:ss"));
     /*
     ui->label3->setText(QTime(0, 0, 0).addMSecs(vplayer->mediaStopPosition()).toString("HH:mm:ss"));
     ui->horizontalSlider->setRange(0, int(vplayer->duration()/1000LL));
     ui->horizontalSlider->setValue(int(vplayer->position()/1000LL));
     ui->label->setText(QTime(0, 0, 0).addMSecs(vplayer->position()).toString("HH:mm:ss"));
     */
+}
+
+void VideoViewer::SetDuration(qint64 pos)
+{
+    ui->horizontalSlider->setRange(0, int(pos/1000LL));
+    ui->label3->setText(QTime(0, 0, 0).addMSecs(pos).toString("HH:mm:ss"));
 }
 
 //void VideoViewer::GetVideo(QString tmpfilepath, unsigned long long objectid)
@@ -129,6 +145,8 @@ void VideoViewer::GetVideo(const QModelIndex &index)
         filebuf->setData(filedata);
         filebuf->open(QIODevice::ReadOnly);
         vplayer->setMedia(QMediaContent(), filebuf);
+        //ui->horizontalSlider->setRange(0, int(vplayer->duration()/1000LL));
+        //ui->label3->setText(QTime(0, 0, 0).addMSecs(vplayer->duration()).toString("HH:mm:ss"));
     }
     /*
     QSqlQuery pimgquery(fcasedb);
