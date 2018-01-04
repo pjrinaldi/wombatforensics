@@ -12,6 +12,7 @@
 //extern QSqlDatabase fappdb;
 extern WombatVariable wombatvariable;
 extern QFile logfile;
+extern QFile viewerfile;
 extern QTextEdit* msglog;
 extern QFutureWatcher<void> thumbwatcher;
 extern QFutureWatcher<void> secondwatcher;

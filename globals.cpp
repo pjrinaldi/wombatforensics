@@ -8,6 +8,7 @@
 //QSqlDatabase fappdb;
 WombatVariable wombatvariable;
 QFile logfile;
+QFile viewerfile;
 QTextEdit* msglog = NULL;
 QVector<FileData> filedatavector;
 QList<WombatVariable> wombatvarvector;

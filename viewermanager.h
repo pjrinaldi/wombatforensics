@@ -7,7 +7,7 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "ui_viewermanager.h"
-
+/*
 class ViewerModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -38,6 +38,23 @@ public:
 
     void RemoveSelected(QModelIndex index)
     {
+        QStringList tmplist;
+        tmplist.clear();
+        beginRemoveRows(QModelIndex(), index.row(), index.row());
+        for(int i=0; i < externalviewers.count(); i++)
+        {
+            if(index.sibling(index.row(), 0).data().toString().compare(externalviewers.at(i)) == 0)
+            {
+                externalviewers.removeAt(i);
+                break;
+            }
+        }
+        //viewerfile.open(QIODevice::ReadWrite | QIODevice::Text);
+        //while(!viewerfile.atEnd())
+        //{
+        //    if(viewerfile.readLine().contains(index.sibling(index.row(), 0).data().toString())
+        endRemoveRows();
+        qDebug() << "Remove:" << externalviewers;
         /*
         QSqlQuery remquery(fappdb);
         remquery.prepare("UPDATE externalviewers SET deleted = 1 WHERE path = ?;");
@@ -56,13 +73,51 @@ public:
         }
         endRemoveRows();
         */
+/*
         externallist = externalviewers;
+        UpdateViewerFile();
     };
 
     void AddViewer(QString viewpath)
     {
-        bool viewexists = false;
-        int isdeleted = 0;
+        //qDebug() << viewerfile.fileName();
+        //qDebug() << viewerfile.openMode();
+        /*
+        viewerfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        while(!viewerfile.atEnd())
+        {
+            QString tmpstr = viewerfile.readLine();
+            if(tmpstr.contains(viewpath))
+            {
+                QMessageBox msgbox;
+                msgbox.setText("The viewer exists. Not Added");
+                msgbox.exec();
+                //QMessageBox::information(viewermanager, tr("Not Added"), tr("The viewer has already been added"), QMessageBox::Ok, QMessageBox::Ok);
+                viewerfile.close();
+                return;
+            }
+        }
+        qDebug() << viewerfile.openMode();
+        viewerfile.close();
+        qDebug() << viewerfile.openMode();
+        */
+/*
+        for(int i = 0; i < externalviewers.count(); i++)
+        {
+            if(externalviewers.at(i).contains(viewpath))
+                qDebug() << "Viewer already exists";
+            else
+            {
+                beginInsertRows(QModelIndex(), 0, 1);
+                externalviewers.append(viewpath);
+                endInsertRows();
+            }
+        }
+        externallist = externalviewers;
+        qDebug() << "Add:" << externalviewers;
+        UpdateViewerFile();
+        //bool viewexists = false;
+        //int isdeleted = 0;
         /*
         QSqlQuery existquery(fappdb);
         existquery.prepare("SELECT path, deleted FROM externalviewers;");
@@ -99,11 +154,17 @@ public:
         externalviewers.append(viewpath);
         endInsertRows();
         */
-        externallist = externalviewers;
+/*
+        //externallist = externalviewers;
+        qDebug() << externalviewers;
+    };
+    void UpdateViewerFile()
+    {
+        qDebug() << "update:" << viewerfile.fileName();
     };
 private:
     QStringList externalviewers;
-};
+};*/
 
 namespace Ui
 {
@@ -123,7 +184,9 @@ private slots:
     void ShowBrowser();
     void AddViewer();
     void RemoveSelected();
-    void SelectionChanged(const QItemSelection &newitem, const QItemSelection &previtem);
+    void UpdateList();
+    void SelectionChanged();
+    //void SelectionChanged(const QItemSelection &newitem, const QItemSelection &previtem);
 signals:
     void HideManagerWindow();
 
@@ -132,8 +195,8 @@ protected:
 private:
     Ui::ViewerManager* ui;
     QString fileviewerpath;
-    ViewerModel* viewmodel; 
-    QStringList externlist;
+    //ViewerModel* viewmodel;
+    //QStringList externlist;
     QModelIndex selectedindex;
 };
 

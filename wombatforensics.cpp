@@ -405,6 +405,7 @@ void WombatForensics::InitializeAppStructure()
     // changing storing settings and such from /WombatForensics/ to /.wombatforensics/
     //homepath += "/WombatForensics/";
     homepath += "/.wombatforensics/";
+    //wombatvariable.homepath = homepath; // may not need
     // settings are now just stored in .wombatforensics
     //wombatvariable.settingspath = homepath + "settings/";
     // there would be no data now.
@@ -453,6 +454,13 @@ void WombatForensics::InitializeAppStructure()
             DisplayError("1.5", "Open App DB Error", wombatvariable.curerrmsg);
     }
     */
+    viewerfile.setFileName(homepath + "viewers");
+    if(!FileExists(QString(homepath + "viewers").toStdString()))
+    {
+        viewerfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        viewerfile.close();
+    }
+    //qDebug() << "initialize filename:" << viewerfile.fileName();
     viewmanage = new ViewerManager(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
@@ -613,7 +621,8 @@ void WombatForensics::InitializeCaseStructure()
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
         */
-        // POSSIBLE PKEXEC WORKAROUND
+        // POSSIBLE PKEXEC WORKAROUND - works without privilege escalation, just a little slower...
+        // now requires guestmount which is a part of libguestfs
         QProcess::execute(mkfsstr);
         QString mntstr = "guestmount -a " + wombatvariable.caseobject.name + " -m /dev/sda " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
@@ -621,6 +630,10 @@ void WombatForensics::InitializeCaseStructure()
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
         LogMessage("Log File Created");
+        //viewerfile.setFileName(wombatvariable.tmpmntpath + "viewers");
+        //viewerfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        //viewerfile.close();
+        //LogMessage("External Viewer File Created");
         ui->actionAdd_Evidence->setEnabled(true);
         LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
@@ -660,6 +673,7 @@ void WombatForensics::InitializeOpenCase()
         wombatvariable.caseobject.dirpath = tmplist.join("/");
         //logfile.setFileName(wombatvariable.caseobject.dirpath + "/msglog");
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
+        //viewerfile.setFileName(wombatvariable.tmpmntpath + "viewers");
         if(!wombatvariable.caseobject.name.contains(".wfc"))
         {
             this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.caseobject.name.split("/").last());
@@ -2598,9 +2612,12 @@ void WombatForensics::CloseCurrentCase()
     
     //QString umntstr = "pkexec umount ";
     //umntstr += wombatvariable.tmpmntpath;
-    QString umntstr = "guestunmount " + wombatvariable.tmpmntpath;
-    QProcess::execute(umntstr);
-    StatusUpdate("Current Case was closed successfully");
+    if(wombatvariable.iscaseopen)
+    {
+        QString umntstr = "guestunmount " + wombatvariable.tmpmntpath;
+        QProcess::execute(umntstr);
+        StatusUpdate("Current Case was closed successfully");
+    }
     //CloseCaseDB(); // was previously wombatdatabase
 }
 

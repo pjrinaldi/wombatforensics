@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'viewermanager.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -19,7 +19,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QListView>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
@@ -37,7 +37,7 @@ public:
     QPushButton *browsebutton;
     QPushButton *addbutton;
     QLabel *label_2;
-    QListView *listView;
+    QListWidget *listWidget;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer;
     QPushButton *removebutton;
@@ -95,10 +95,11 @@ public:
 
         verticalLayout->addWidget(label_2);
 
-        listView = new QListView(ViewerManager);
-        listView->setObjectName(QStringLiteral("listView"));
+        listWidget = new QListWidget(ViewerManager);
+        listWidget->setObjectName(QStringLiteral("listWidget"));
+        listWidget->setEditTriggers(QAbstractItemView::SelectedClicked);
 
-        verticalLayout->addWidget(listView);
+        verticalLayout->addWidget(listWidget);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
@@ -123,12 +124,12 @@ public:
 
     void retranslateUi(QDialog *ViewerManager)
     {
-        ViewerManager->setWindowTitle(QApplication::translate("ViewerManager", "Viewer Manager", 0));
-        label->setText(QApplication::translate("ViewerManager", "Path To Viewer:", 0));
-        browsebutton->setText(QApplication::translate("ViewerManager", "Browse", 0));
-        addbutton->setText(QApplication::translate("ViewerManager", "Add", 0));
-        label_2->setText(QApplication::translate("ViewerManager", "Existing Viewers", 0));
-        removebutton->setText(QApplication::translate("ViewerManager", "Remove Selected", 0));
+        ViewerManager->setWindowTitle(QApplication::translate("ViewerManager", "Viewer Manager", Q_NULLPTR));
+        label->setText(QApplication::translate("ViewerManager", "Path To Viewer:", Q_NULLPTR));
+        browsebutton->setText(QApplication::translate("ViewerManager", "Browse", Q_NULLPTR));
+        addbutton->setText(QApplication::translate("ViewerManager", "Add", Q_NULLPTR));
+        label_2->setText(QApplication::translate("ViewerManager", "Existing Viewers", Q_NULLPTR));
+        removebutton->setText(QApplication::translate("ViewerManager", "Remove Selected", Q_NULLPTR));
     } // retranslateUi
 
 };
