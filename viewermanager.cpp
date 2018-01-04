@@ -98,6 +98,7 @@ void ViewerManager::RemoveSelected()
         //if(!line.contains(selectedindex.sibling(selectedindex.row(), 0).data().toString()))
             //tmpstring.append(line + "\n");
     }
+    qDebug() << "tmpstring" << tmpstring;
     viewerfile.write(tmpstring.toStdString().c_str());
     viewerfile.flush();
     //qDebug() << "viewer file remove:" << viewerfile.readAll();
