@@ -2760,8 +2760,15 @@ void WombatForensics::CloseCurrentCase()
 void WombatForensics::RemEvidence()
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    qDebug() << "root node child count:" << ((TreeModel*)ui->dirTreeView->model())->NodeFromIndex(QModelIndex())->childcount;
-    qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString() << selectedindex.sibling(selectedindex.row(), 1).data().toString();
+    QStringList evidfiles = eviddir.entryList(QStringList(QString(selectedindex.sibling(selectedindex.row(), 1).data().toString() + ".*")), QDir::NoSymLinks | QDir::Files);
+    for(int i = 0; i < evidfiles.count(); i++)
+    {
+        bool eres = eviddir.remove(evidfiles.at(i));
+    }
+    treemodel->RemEvidence(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+    //qDebug() << evidfiles.count() << evidfiles;
+    evidcnt--;
+    StatusUpdate("Evidence Item Successfully Removed");
     // QDIR::REMOVEFILES(MATCH COLUMN 1 .*)
     // THEN TREEMODEL->REMEVIDENCE(COLUMN 0)
     /*
