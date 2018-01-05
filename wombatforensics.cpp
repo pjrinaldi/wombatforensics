@@ -1658,6 +1658,8 @@ void WombatForensics::LoadHexContents()
         wombatvariable.evidenceobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // current evidence name
         //OpenParentImage();
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + wombatvariable.selectedobject.modid.mid(1));
+        qDebug() << wombatvariable.selectedobject.modid;
+        //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString());
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
         evidlist = tmpstr.split(",");
@@ -3793,19 +3795,19 @@ void WombatForensics::SetFilter(int headercolumn)
         pathfilterview->DisplayFilter();
     if(headercolumn == 3)
         sizefilterview->DisplayFilter();
-    if(headercolumn == 6)
+    if(headercolumn == 4)
         createfilterview->DisplayFilter();
-    if(headercolumn == 7)
+    if(headercolumn == 5)
         accessfilterview->DisplayFilter();
-    if(headercolumn == 8)
+    if(headercolumn == 6)
         modifyfilterview->DisplayFilter();
-    if(headercolumn == 9)
+    if(headercolumn == 7)
         changefilterview->DisplayFilter();
-    if(headercolumn == 16)
+    if(headercolumn == 9)
         filetypefilterview->DisplayFilter();
-    if(headercolumn == 17)
-        filecategoryfilterview->DisplayFilter();
     if(headercolumn == 10)
+        filecategoryfilterview->DisplayFilter();
+    if(headercolumn == 8)
         hashfilterview->DisplayFilter();
     ResizeColumns();
 }

@@ -140,6 +140,7 @@ public:
         }
         int nodetype = 0;
         int itemtype = 0;
+        nodetype = node->nodevalues.at(0).toString().split("-").count();
         /*
         QSqlQuery dataquery(fcasedb);
         dataquery.prepare("SELECT objtype, type FROM data WHERE id = ?");
@@ -195,7 +196,9 @@ public:
                     return QColor(Qt::lightGray);
             }
             //if(node->nodevalues.at(4).toInt() == 5)
-            if(nodetype == 5)
+            //if(nodetype == 5)
+            //if(node->nodevalues.at(0).toString().split("-").count() == 4)
+            if(nodetype == 4)
             {
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
                 {
@@ -287,7 +290,7 @@ public:
                 {
                     for(int i=0; i < filtervalues.hashidlist.count(); i++)
                     {
-                        if(node->nodevalues.at(0).toULongLong() == filtervalues.hashidlist.at(i))
+                        if(node->nodevalues.at(8).toULongLong() == filtervalues.hashidlist.at(i))
                             return QColor(Qt::lightGray);
                     }
                 }
@@ -322,11 +325,11 @@ public:
                     return QIcon(QPixmap(QString(":/basic/treeimg")));
                 else if(nodetype == 2)
                     return QIcon(QPixmap(QString(":/basic/treevol")));
-                else if(nodetype == 3)
+                else if(nodetype == 7)
                     return QIcon(QPixmap(QString(":/basic/treepart")));
-                else if(nodetype == 4)
+                else if(nodetype == 3)
                     return QIcon(QPixmap(QString(":/basic/treefs")));
-                else if(nodetype == 5)
+                else if(nodetype == 4)
                 {
                     //int itemtype = node->nodevalues.at(12).toInt();
                     if(itemtype == 5)
