@@ -246,6 +246,7 @@ void WombatForensics::ShowExternalViewer()
         //else
         //    filelen = tsk_fs_file_read_type(tskexternalptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, mftattrid, 0, ibuffer, filelength, TSK_FS_FILE_READ_FLAG_NONE);
     //QString tmpstring = wombatvarptr->tmpfilepath + QString::number(wombatvarptr->selectedobject.id) + "-tmp";
+        (new QDir())->mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-tmp";
         QFile tmpfile(tmpstring);
         if(tmpfile.open(QIODevice::WriteOnly))
@@ -886,11 +887,9 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
-    qDebug() << "file list:" << files;
     for(int i=0; i < files.count(); i++)
     {
         wombatvariable.evidenceobject.name = QFile(files.at(i)).fileName().split(".").at(0) + QString(".") + QFile(files.at(i)).fileName().split(".").at(1);
-        qDebug() << "evidencename:" << wombatvariable.evidenceobject.name;
         treemodel->AddEvidence();
         evidcnt++;
     }
