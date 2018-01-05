@@ -195,6 +195,73 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 //////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
 {
+    unsigned long long filelength = 0;
+    unsigned long long curobjaddr = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-f").at(1).toULongLong();
+    QString tmpstr = "";
+    QStringList evidlist;
+    evidlist.clear();
+    std::vector<std::string> pathvector;
+    pathvector.clear();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
+    wombatvariable.evidenceobject.name = evidfiles.at(0);
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name.split(".evid").at(0) + ".evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0).mid(1));
+    evidfile.open(QIODevice::ReadOnly);
+    tmpstr = evidfile.readLine();
+    evidlist = tmpstr.split(",");
+    tskexternalptr->partcount = evidlist.at(3).split("|").size();
+    evidfile.close();
+    for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
+        pathvector.push_back(evidlist.at(3).split("|").at(i).toStdString());
+    tskexternalptr->imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+    for(int i = 0; i < pathvector.size(); i++)
+        tskexternalptr->imagepartspath[i] = pathvector[i].c_str();
+    tskexternalptr->readimginfo = tsk_img_open(tskexternalptr->partcount, tskexternalptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    if(tskexternalptr->readimginfo == NULL)
+    {
+        qDebug() << tsk_error_get_errstr();
+        LogMessage("Image opening error");
+    }
+    free(tskexternalptr->imagepartspath);
+    tmpstr = "";
+    QStringList partlist;
+    partlist.clear();
+    QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".part." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
+    QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
+    partfile.open(QIODevice::ReadOnly);
+    tmpstr = partfile.readLine();
+    partfile.close();
+    partlist = tmpstr.split(",");
+    tskexternalptr->readfsinfo = tsk_fs_open_img(tskexternalptr->readimginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+    tskexternalptr->readfileinfo = tsk_fs_file_open_meta(tskexternalptr->readfsinfo, NULL, curobjaddr);
+    // ReadFileToImageUsingByteArray
+    ssize_t filelen = 0;
+    //char tbuffer[tskptr->readfileinfo->meta->size];
+    if(tskexternalptr->readfileinfo->meta != NULL)
+    {
+        char* ibuffer = new char[tskexternalptr->readfileinfo->meta->size];
+        // WILL NEED TO FIGURE OUT IF ITS AN ATTRIBUTE OR NOT AND HANDLE THE IF BELOW...
+        //if(objtype == 5)
+        filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        //else
+        //    filelen = tsk_fs_file_read_type(tskexternalptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, mftattrid, 0, ibuffer, filelength, TSK_FS_FILE_READ_FLAG_NONE);
+    //QString tmpstring = wombatvarptr->tmpfilepath + QString::number(wombatvarptr->selectedobject.id) + "-tmp";
+        QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-tmp";
+        QFile tmpfile(tmpstring);
+        if(tmpfile.open(QIODevice::WriteOnly))
+        {
+            QDataStream outbuffer(&tmpfile);
+            outbuffer.writeRawData(ibuffer, filelen);
+            tmpfile.close();
+        }
+        QProcess* process = new QProcess(this);
+        QStringList arguments;
+        arguments << tmpstring;
+        process->startDetached(((QAction*)QObject::sender())->text(), arguments);
+    }
+    else
+        qDebug() << "no file meta for file size";
+
     /*
     //OpenParentImage
     std::vector<std::string> pathvector;
