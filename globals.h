@@ -48,7 +48,6 @@ extern QStringList thumblist;
 extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
-extern QStringList externallist;
 extern QMutex mutex;
 extern QMap<unsigned long long, int> checkhash;
 

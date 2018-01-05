@@ -129,9 +129,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->actionCopy_Selection_To->setMenu(selectionmenu);
 
     treemenu = new QMenu(ui->dirTreeView);
-    for(int i=0; i < externallist.count(); i++)
+    //for(int i=0; i < externallist.count(); i++)
+    viewerfile.open(QIODevice::ReadOnly);
+    QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
+    itemlist.removeDuplicates();
+    viewerfile.close();
+    for(int i=0; i < itemlist.count(); i++)
     {
-        QAction* tmpaction = new QAction(externallist.at(i), this);
+        QAction* tmpaction = new QAction(itemlist.at(i), this);
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
         ui->menuView_With->addAction(tmpaction);
     }
@@ -324,9 +329,13 @@ void WombatForensics::HideViewerManager()
 {
     treemenu->clear();
     ui->menuView_With->clear();
-    for(int i=0; i < externallist.count(); i++)
+    viewerfile.open(QIODevice::ReadOnly);
+    QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
+    itemlist.removeDuplicates();
+    viewerfile.close();
+    for(int i=0; i < itemlist.count(); i++)
     {
-        QAction* tmpaction = new QAction(externallist.at(i), this);
+        QAction* tmpaction = new QAction(itemlist.at(i), this);
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
         ui->menuView_With->addAction(tmpaction);
     }

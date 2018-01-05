@@ -54,7 +54,6 @@ QStringList thumblist;
 QString blockstring = "";
 QString thumbpath = "";
 QString hexselection = "";
-QStringList externallist;
 QMutex mutex;
 QMutex mutex2;
 QMap<unsigned long long, int> checkhash;
