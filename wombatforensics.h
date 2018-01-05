@@ -762,7 +762,8 @@ public:
         }
     };
 
-    void RemEvidence(unsigned long long curid)
+    //void RemEvidence(unsigned long long curid)
+    void RemEvidence(QString curid)
     {
         int rownumber = rootnode->GetChildRow(curid);
         beginRemoveRows(QModelIndex(), rownumber, rownumber);
@@ -1168,6 +1169,7 @@ private slots:
     void AddTextSection(void);
     void CarveFile(void);
     void AutoSaveState(void);
+    void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
 
 protected:
     void closeEvent(QCloseEvent* event);

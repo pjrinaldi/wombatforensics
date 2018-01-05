@@ -744,6 +744,8 @@ void WombatForensics::InitializeOpenCase()
     wombatvariable.caseobject.name = QFileDialog::getOpenFileName(this, tr("Open Existing Case"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
     if(!wombatvariable.caseobject.name.isEmpty())
     {
+        StatusUpdate("Case Opening...");
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         QStringList tmplist = wombatvariable.caseobject.name.split("/");
         tmplist.removeLast();
         wombatvariable.caseobject.dirpath = tmplist.join("/");
@@ -775,7 +777,11 @@ void WombatForensics::InitializeOpenCase()
         */
         //QProcess::execute(mkfsstr); // don't need since i'm opening an existing case, not creating a new case.
         QString mntstr = "guestmount -a " + wombatvariable.caseobject.name + " -m /dev/sda " + wombatvariable.tmpmntpath;
-        QProcess::execute(mntstr);
+        QProcess* openprocess = new QProcess(this);
+        connect(openprocess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(OpenCaseMountFinished(int, QProcess::ExitStatus)));
+        openprocess->start(mntstr);
+        //QProcess::execute(mntstr);
+        /*
         wombatvariable.iscaseopen = true;
         ui->actionAdd_Evidence->setEnabled(true);
         LogMessage("Case was Opened");
@@ -787,9 +793,7 @@ void WombatForensics::InitializeOpenCase()
         {
             wombatvariable.evidenceobject.name = QFile(files.at(i)).fileName().split(".").at(0) + QString(".") + QFile(files.at(i)).fileName().split(".").at(1);
 
-            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             treemodel->AddEvidence();
-            QApplication::restoreOverrideCursor();
             evidcnt++;
         }
         ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
@@ -801,6 +805,8 @@ void WombatForensics::InitializeOpenCase()
             hexrocker->setEnabled(true);
             //StatusUpdate("Opening Case Evidence...");
         }
+        QApplication::restoreOverrideCursor();
+        */
     }
     /*
         thumbdb = QSqlDatabase::database("thumbdb");
@@ -869,6 +875,37 @@ void WombatForensics::InitializeOpenCase()
             //StatusUpdate("Opening Case Evidence...");
         }
         */
+}
+
+void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus)
+{
+    wombatvariable.iscaseopen = true;
+    ui->actionAdd_Evidence->setEnabled(true);
+    LogMessage("Case was Opened");
+    //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+    //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
+    qDebug() << "file list:" << files;
+    for(int i=0; i < files.count(); i++)
+    {
+        wombatvariable.evidenceobject.name = QFile(files.at(i)).fileName().split(".").at(0) + QString(".") + QFile(files.at(i)).fileName().split(".").at(1);
+        qDebug() << "evidencename:" << wombatvariable.evidenceobject.name;
+        treemodel->AddEvidence();
+        evidcnt++;
+    }
+    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    if(ui->dirTreeView->model() != NULL)
+    {
+        ui->actionRemove_Evidence->setEnabled(true);
+        ui->actionSaveState->setEnabled(true);
+        ui->actionDigDeeper->setEnabled(true);
+        hexrocker->setEnabled(true);
+        //StatusUpdate("Opening Case Evidence...");
+    }
+    QApplication::restoreOverrideCursor();
+    LogMessage("Case was Opened Successfully");
+    StatusUpdate("Ready");
 }
 
 void WombatForensics::InitializeQueryModel()
@@ -2662,6 +2699,18 @@ unsigned long long WombatForensics::GetResidentOffset(unsigned long long fileadd
 
 void WombatForensics::CloseCurrentCase()
 {
+
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*"), QDir::NoSymLinks | QDir::Files);
+    //qDebug() << "evid files:" << evidfiles;
+    for(int i=0; i < evidfiles.count(); i++)
+    {
+        //qDebug() << "remove item:" << QString("e" + evidfiles.at(i).split(".", QString::SkipEmptyParts).last());
+        treemodel->RemEvidence(QString("e" + evidfiles.at(i).split(".", QString::SkipEmptyParts).last()));
+        evidcnt--;
+    }
+    //autosavetimer->stop();
+    
     /*
     QSqlQuery evidquery(fcasedb);
     evidquery.prepare("SELECT id FROM data where objtype = 1");
@@ -2694,11 +2743,14 @@ void WombatForensics::CloseCurrentCase()
         QProcess::execute(umntstr);
         StatusUpdate("Current Case was closed successfully");
     }
+    RemoveTmpFiles();
+    wombatvariable.iscaseopen = false;
     //CloseCaseDB(); // was previously wombatdatabase
 }
 
 void WombatForensics::RemEvidence()
 {
+
     /*
     wombatvarptr->evidencenamelist.clear();
     wombatdatabase->ReturnEvidenceNameList();
@@ -2712,6 +2764,7 @@ void WombatForensics::RemEvidence()
             errorcount = 0;
             LogMessage("Evidence Removal Started");
             treemodel->RemEvidence(wombatvarptr->evidremoveid);
+            evidcnt--;
             remfuture = QtConcurrent::run(wombatdatabase, &WombatDatabase::RemoveEvidence);
             remwatcher.setFuture(remfuture);
  
@@ -3350,11 +3403,11 @@ void WombatForensics::closeEvent(QCloseEvent* event)
 
 void WombatForensics::RemoveTmpFiles()
 {
-    QString homePath = QDir::homePath();
-    homePath += "./wombatforensics/";
+    //qDebug() << "remove tmp files start:" << wombatvariable.tmpfilepath;
+    //QString homePath = QDir::homePath();
+    //homePath += ".wombatforensics/tmpfiles/";
     //homePath += "/WombatForensics/";
-    homePath += "tmpfiles/";
-    QDir tmpdir(homePath);
+    QDir tmpdir(wombatvariable.tmpfilepath);
     if(!tmpdir.removeRecursively())
     {
         DisplayError("2.7", "Tmp File Removal", "All tmp files may not have been removed. Please manually remove them to avoid evidence contamination.");
@@ -3369,8 +3422,10 @@ void WombatForensics::on_actionNew_Case_triggered()
     if(wombatvariable.iscaseopen)
     {
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
+        qDebug() << "msgbox return:" << ret << "msgbox yes:" << QMessageBox::Yes;
         if(ret == QMessageBox::Yes)
         {
+            qDebug() << "detected an open case";
             CloseCurrentCase();
             InitializeCaseStructure();
         }
@@ -3806,6 +3861,7 @@ void WombatForensics::CarveFile()
 
 void WombatForensics::SaveState()
 {
+    RemoveTmpFiles();
     /*
     fcasedb.transaction();
     QSqlQuery hashquery(fcasedb);

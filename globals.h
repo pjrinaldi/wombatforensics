@@ -189,11 +189,13 @@ public:
     {
         children.removeAt(idx);
     };
-    int GetChildRow(unsigned long long curid)
+    //int GetChildRow(unsigned long long curid)
+    int GetChildRow(QString curid)
     {
         for(int i=0; i < children.count(); i++)
         {
-            if(curid == children.at(i)->nodevalues.at(0).toULongLong())
+            //if(curid == children.at(i)->nodevalues.at(0).toULongLong())
+            if(children.at(i)->nodevalues.at(0).toString().contains(curid))
                 return i;
         }
         return -1;

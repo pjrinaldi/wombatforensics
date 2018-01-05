@@ -70,7 +70,7 @@ void ViewerManager::RemoveSelected()
         tmpstring.append(tmplist.at(i));
         tmpstring.append(",");
     }
-    qDebug() << "remove:" << tmpstring;
+    //qDebug() << "remove:" << tmpstring;
     viewerfile.open(QIODevice::WriteOnly);
     viewerfile.write(tmpstring.toStdString().c_str());
     viewerfile.close();
@@ -94,5 +94,5 @@ void ViewerManager::UpdateList()
     {
         new QListWidgetItem(itemlist.at(i), ui->listWidget);
     }
-    qDebug() << "update:" << itemlist;
+    //qDebug() << "update:" << itemlist;
 }
