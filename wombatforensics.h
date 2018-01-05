@@ -773,14 +773,16 @@ public:
     };
 
     //void AddEvidence(unsigned long long curid)
-    void AddEvidence()
+    void AddEvidence(int evidcount)
     {
+        qDebug() << "treemodel evidcnt:" << evidcnt;
+        qDebug() << "evidencecount:" << evidcount;
         QStringList tmplist;
         QString tmpstr = "";
         tmplist.clear();
         // NEED TO ADD THE EVID, VOLUME, PARTITIONS, THEN THE FILES...
         // APPEND EVIDENCE TO NODE TREE
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + QString::number(evidcnt));
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + QString::number(evidcount));
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
         tmplist = tmpstr.split(",");

@@ -42,7 +42,8 @@ void yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t*
 QImage MakeThumb(const QString &img);
 void SqlMap(FileData &filedata);
 void FileMap(FileData &filedata);
-void InitializeEvidenceStructure(WombatVariable &wombatvarvector);
+//void InitializeEvidenceStructure(WombatVariable &wombatvarvector);
+void InitializeEvidenceStructure(void);
 QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
 static TSK_OFF_T hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle);
 uint8_t hfs_cat_read_thread_record(HFS_INFO* hfs, TSK_OFF_T off, hfs_thread* thread);

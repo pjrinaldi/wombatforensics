@@ -889,8 +889,9 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
     for(int i=0; i < files.count(); i++)
     {
+        qDebug() << "filename:" << QFile(files.at(i)).fileName();
         wombatvariable.evidenceobject.name = QFile(files.at(i)).fileName().split(".").at(0) + QString(".") + QFile(files.at(i)).fileName().split(".").at(1);
-        treemodel->AddEvidence();
+        treemodel->AddEvidence(QFile(files.at(i)).fileName().split(".").last().toInt());
         evidcnt++;
     }
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
@@ -1416,7 +1417,7 @@ void WombatForensics::UpdateStatus()
     tsk_img_close(readimginfo);
     readimginfo = NULL;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    treemodel->AddEvidence();
+    treemodel->AddEvidence(evidcnt);
     QApplication::restoreOverrideCursor();
     ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     evidcnt++;
@@ -1497,6 +1498,9 @@ void WombatForensics::GetEvidenceObjects()
 void WombatForensics::AddEvidence()
 {
     wombatvarvector.clear();
+    wombatvariable.evidenceobject.fullpathvector.clear();
+    wombatvariable.evidenceobject.itemcount = 0;
+    qDebug() << "wombatvarvector initial count:" << wombatvarvector.count();
     //QList<WombatVariable> wombatvarvector;
     int isnew = 1;
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
@@ -1523,13 +1527,16 @@ void WombatForensics::AddEvidence()
             // TRY A QTCONCURRENT::MAP() WITH A 1 ITEM VECTOR SO I CAN CANCEL IT...
             connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
             //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
-            connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()), Qt::QueuedConnection);
+            //connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()), Qt::QueuedConnection);
             wombatvarvector.append(wombatvariable);
             qDebug() << "wombatvarvector:" << wombatvarvector.count();
             //qDebug() << wombatvarvector.at(0).evidenceobject.name;
             //InitializeEvidenceStructure(wombatvariable);
-            sqlwatcher.setFuture(QtConcurrent::map(wombatvarvector, InitializeEvidenceStructure));
-            cancelthread->show();
+            //sqlwatcher.setFuture(QtConcurrent::run(InitializeEvidenceStructure));
+            //sqlwatcher.setFuture(QtConcurrent::map(wombatvarvector, InitializeEvidenceStructure));
+            InitializeEvidenceStructure();
+            //cancelthread->show();
+            UpdateStatus();
             /*
             evidencethread = new QThread;
             evidenceworker = new EvidenceWorker();
@@ -2754,6 +2761,9 @@ void WombatForensics::RemEvidence()
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     qDebug() << "root node child count:" << ((TreeModel*)ui->dirTreeView->model())->NodeFromIndex(QModelIndex())->childcount;
+    qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString() << selectedindex.sibling(selectedindex.row(), 1).data().toString();
+    // QDIR::REMOVEFILES(MATCH COLUMN 1 .*)
+    // THEN TREEMODEL->REMEVIDENCE(COLUMN 0)
     /*
     wombatvarptr->evidencenamelist.clear();
     wombatdatabase->ReturnEvidenceNameList();
