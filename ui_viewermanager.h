@@ -97,7 +97,10 @@ public:
 
         listWidget = new QListWidget(ViewerManager);
         listWidget->setObjectName(QStringLiteral("listWidget"));
+        listWidget->setAutoFillBackground(false);
         listWidget->setEditTriggers(QAbstractItemView::SelectedClicked);
+        listWidget->setProperty("showDropIndicator", QVariant(false));
+        listWidget->setAlternatingRowColors(true);
 
         verticalLayout->addWidget(listWidget);
 

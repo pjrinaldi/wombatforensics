@@ -73,12 +73,9 @@ void ViewerManager::ShowBrowser()
 
 void ViewerManager::AddViewer()
 {
-    viewerfile.open(QIODevice::Append | QIODevice::ReadOnly | QIODevice::Text);
-    viewerfile.write(QString(fileviewerpath + "\n").toStdString().c_str());
-    viewerfile.flush();
-    //qDebug() << "viewer file add:" << viewerfile.readAll();
+    viewerfile.open(QIODevice::Append);
+    viewerfile.write(QString(fileviewerpath + ",").toStdString().c_str());
     viewerfile.close();
-    //viewmodel->AddViewer(fileviewerpath);
     ui->lineEdit->setText("");
     ui->addbutton->setEnabled(false);
     UpdateList();
@@ -88,19 +85,26 @@ void ViewerManager::RemoveSelected()
 {
     QString selectedviewer = ui->listWidget->currentItem()->text();
     QString tmpstring;
-    //viewmodel->RemoveSelected(selectedindex);
-    viewerfile.open(QIODevice::ReadWrite | QIODevice::Text);
-    while(!viewerfile.atEnd())
+    viewerfile.open(QIODevice::ReadOnly);
+    QStringList tmplist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
+    viewerfile.close();
+    for(int i=0; i < tmplist.count(); i++)
     {
-        QString line = viewerfile.readLine();
-        if(!line.contains(selectedviewer))
-            tmpstring.append(line + "\n");
+        if(tmplist.at(i).contains(selectedviewer))
+            tmplist.removeAt(i);
+    }
+    //tmpstring.append(line);
         //if(!line.contains(selectedindex.sibling(selectedindex.row(), 0).data().toString()))
             //tmpstring.append(line + "\n");
+    tmplist.removeDuplicates();
+    for(int i=0; i < tmplist.count(); i++)
+    {
+        tmpstring.append(tmplist.at(i));
+        tmpstring.append(",");
     }
-    qDebug() << "tmpstring" << tmpstring;
+    qDebug() << "remove:" << tmpstring;
+    viewerfile.open(QIODevice::WriteOnly);
     viewerfile.write(tmpstring.toStdString().c_str());
-    viewerfile.flush();
     //qDebug() << "viewer file remove:" << viewerfile.readAll();
     viewerfile.close();
     ui->removebutton->setEnabled(false);
@@ -124,13 +128,15 @@ void ViewerManager::SelectionChanged()
 }
 void ViewerManager::UpdateList()
 {
+    QString debugstr;
     ui->listWidget->clear();
-    viewerfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    while(!viewerfile.atEnd())
-    {
-        QString line = viewerfile.readLine();
-        new QListWidgetItem(line, ui->listWidget);
-        //externallist.append(line);
-    }
+    viewerfile.open(QIODevice::ReadOnly);
+    QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
+    itemlist.removeDuplicates();
     viewerfile.close();
+    for(int i=0; i < itemlist.count(); i++)
+    {
+        new QListWidgetItem(itemlist.at(i), ui->listWidget);
+    }
+    qDebug() << "update:" << itemlist;
 }
