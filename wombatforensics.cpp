@@ -1403,6 +1403,7 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
+    qDebug() << "evidcnt before:" << evidcnt;
     StatusUpdate("Building Initial Evidence Tree...");
     LogMessage("Building Initial Evidence Tree...");
     //tsk_img_close(IMG_2ND_PROC);
@@ -1431,6 +1432,7 @@ void WombatForensics::UpdateStatus()
     cancelthread->close();
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
+    qDebug() << "evidcnt after:" << evidcnt;
     //wombatframework->CloseInfoStructures();
 }
 
@@ -1494,6 +1496,7 @@ void WombatForensics::GetEvidenceObjects()
 
 void WombatForensics::AddEvidence()
 {
+    wombatvarvector.clear();
     //QList<WombatVariable> wombatvarvector;
     int isnew = 1;
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
@@ -1522,6 +1525,7 @@ void WombatForensics::AddEvidence()
             //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
             connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()), Qt::QueuedConnection);
             wombatvarvector.append(wombatvariable);
+            qDebug() << "wombatvarvector:" << wombatvarvector.count();
             //qDebug() << wombatvarvector.at(0).evidenceobject.name;
             //InitializeEvidenceStructure(wombatvariable);
             sqlwatcher.setFuture(QtConcurrent::map(wombatvarvector, InitializeEvidenceStructure));
@@ -2698,7 +2702,6 @@ unsigned long long WombatForensics::GetResidentOffset(unsigned long long fileadd
 
 void WombatForensics::CloseCurrentCase()
 {
-
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*"), QDir::NoSymLinks | QDir::Files);
     //qDebug() << "evid files:" << evidfiles;
@@ -2749,7 +2752,8 @@ void WombatForensics::CloseCurrentCase()
 
 void WombatForensics::RemEvidence()
 {
-
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    qDebug() << "root node child count:" << ((TreeModel*)ui->dirTreeView->model())->NodeFromIndex(QModelIndex())->childcount;
     /*
     wombatvarptr->evidencenamelist.clear();
     wombatdatabase->ReturnEvidenceNameList();
