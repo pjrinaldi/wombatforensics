@@ -155,6 +155,9 @@ public:
         // WILL NEED TO REPLACE ALL THESE CALLS TO THE RESPECTIVE SQL QUERY RATHER THAN THE NODE SINCE I'M NOT STORING IT IN THE NODE ANYMORE...
         if(role == Qt::ForegroundRole)
         {
+            if(node->nodevalues.at(0).toString().contains(filtervalues.idfilter) == false)
+                return QColor(Qt::lightGray);
+            /*
             if(filtervalues.maxidbool && filtervalues.minidbool == false)
             {
                 if(node->nodevalues.at(0).toULongLong() <= filtervalues.maxid)
@@ -169,7 +172,7 @@ public:
             {
                 if(node->nodevalues.at(0).toULongLong() >= filtervalues.minid || node->nodevalues.at(0).toULongLong() <= filtervalues.maxid)
                     return QColor(Qt::lightGray);
-            }
+            }*/
             if(filtervalues.namebool)
             {
                 if(node->nodevalues.at(1).toString().contains(filtervalues.namefilter) == false)
@@ -462,7 +465,7 @@ public:
         }
         if(role == Qt::DecorationRole)
         {
-            if(section == 0 && (filtervalues.maxidbool || filtervalues.minidbool))
+            if(section == 0 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull())) //(filtervalues.maxidbool || filtervalues.minidbool))
             {
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             }
@@ -546,6 +549,7 @@ public:
         //qDebug() << parent.sibling(parent.row(), 0).data().toString(); // unique id
         parentnode = NodeFromIndex(parent);
         QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + QString::number(parentaddr));
+        qDebug() << curfiles;
         QFile childfile;
         beginInsertRows(parent, 0, parentnode->childcount - 1);
         for(int i = 0; i < curfiles.count(); i++)
@@ -752,10 +756,12 @@ public:
     {
         //if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
         //{
+        if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
+        {
             totalcount++;
             if(curnode->checkstate == 2)
                 totalchecked++;
-        //}
+        }
         if(curnode->haschildren)
         {
             for(int i=0; i < curnode->children.count(); i++)

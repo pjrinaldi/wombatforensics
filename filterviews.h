@@ -50,9 +50,16 @@ signals:
 
 private slots:
     void HideClicked();
+    void BuildId(QString curstring);
+    void Rebuild();
 
 private:
     Ui::IdFilter* ui;
+    QString builtstring;
+    QString estring;
+    QString vstring;
+    QString pstring;
+    QString fstring;
 };
 
 class JumpFilter : public QFrame

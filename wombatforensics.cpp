@@ -889,7 +889,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
     for(int i=0; i < files.count(); i++)
     {
-        qDebug() << "filename:" << QFile(files.at(i)).fileName();
+        //qDebug() << "filename:" << QFile(files.at(i)).fileName();
         wombatvariable.evidenceobject.name = QFile(files.at(i)).fileName().split(".").at(0) + QString(".") + QFile(files.at(i)).fileName().split(".").at(1);
         treemodel->AddEvidence(QFile(files.at(i)).fileName().split(".").last().toInt());
         evidcnt++;

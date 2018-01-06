@@ -7,7 +7,16 @@ IdFilter::IdFilter(QWidget* parent) : QFrame(parent), ui(new Ui::IdFilter)
 {
     ui->setupUi(this);
     this->hide();
+    ui->idlabel->setText("");
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->espinBox, SIGNAL(valueChanged(QString)), this, SLOT(BuildId(QString)));
+    connect(ui->vspinBox, SIGNAL(valueChanged(QString)), this, SLOT(BuildId(QString)));
+    connect(ui->pspinBox, SIGNAL(valueChanged(QString)), this, SLOT(BuildId(QString)));
+    connect(ui->fspinBox, SIGNAL(valueChanged(QString)), this, SLOT(BuildId(QString)));
+    connect(ui->echeckBox, SIGNAL(clicked()), this, SLOT(Rebuild()));
+    connect(ui->vcheckBox, SIGNAL(clicked()), this, SLOT(Rebuild()));
+    connect(ui->pcheckBox, SIGNAL(clicked()), this, SLOT(Rebuild()));
+    connect(ui->fcheckBox, SIGNAL(clicked()), this, SLOT(Rebuild()));
 }
 
 IdFilter::~IdFilter()
@@ -16,6 +25,8 @@ IdFilter::~IdFilter()
 
 void IdFilter::DisplayFilter()
 {
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    //QStringList eviddir
     /*
     QSqlQuery idquery(fcasedb);
     idquery.prepare("SELECT COUNT(objectid) FROM data;");
@@ -29,6 +40,38 @@ void IdFilter::DisplayFilter()
     ui->lessspinBox->setValue(filtervalues.minid);
     idquery.finish();
     */
+    ui->idlabel->setText(filtervalues.idfilter);
+    QStringList tmplist = filtervalues.idfilter.split("-", QString::SkipEmptyParts);
+    if(tmplist.count() > 0)
+    {
+        for(int i = 0; i < tmplist.count(); i++)
+        {
+            if(tmplist.at(i).contains("e"))
+            {
+                ui->echeckBox->setChecked(true);
+                ui->espinBox->setEnabled(true);
+                ui->espinBox->setValue(tmplist.at(i).mid(1).toInt());
+            }
+            else if(tmplist.at(i).contains("v"))
+            {
+                ui->vcheckBox->setChecked(true);
+                ui->vspinBox->setEnabled(true);
+                ui->vspinBox->setValue(tmplist.at(i).mid(1).toInt());
+            }
+            else if(tmplist.at(i).contains("p"))
+            {
+                ui->pcheckBox->setChecked(true);
+                ui->pspinBox->setEnabled(true);
+                ui->pspinBox->setValue(tmplist.at(i).mid(1).toInt());
+            }
+            else if(tmplist.at(i).contains("f"))
+            {
+                ui->fcheckBox->setChecked(true);
+                ui->fspinBox->setEnabled(true);
+                ui->fspinBox->setValue(tmplist.at(i).mid(1).toInt());
+            }
+        }
+    }
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
@@ -36,14 +79,69 @@ void IdFilter::DisplayFilter()
 
 void IdFilter::HideClicked()
 {
+    filtervalues.idfilter = ui->idlabel->text();
+    /*
     filtervalues.maxidbool = ui->morecheckBox->isChecked();
     filtervalues.minidbool = ui->lesscheckBox->isChecked();
     if(filtervalues.maxidbool)
         filtervalues.maxid = ui->morespinBox->value();
     if(filtervalues.minidbool)
         filtervalues.minid = ui->lessspinBox->value();
+    */
     this->hide();
     emit HeaderChanged();
+}
+
+void IdFilter::BuildId(QString curstring)
+{
+    int a = 0;
+    builtstring = "";
+    if(sender()->objectName().contains("espinBox"))
+        estring = curstring;
+    else if(sender()->objectName().contains("vspinBox"))
+        vstring = curstring;
+    else if(sender()->objectName().contains("pspinBox"))
+        pstring = curstring;
+    else if(sender()->objectName().contains("fspinBox"))
+        fstring = curstring;
+    if(ui->espinBox->isEnabled())
+    {
+        builtstring += estring;
+        a++;
+    }
+    if(ui->vspinBox->isEnabled())
+    {
+        if(a > 0)
+            builtstring += "-";
+        builtstring += vstring;
+        a++;
+    }
+    if(ui->pspinBox->isEnabled())
+    {
+        if(a > 0)
+            builtstring += "-";
+        builtstring += pstring;
+        a++;
+    }
+    if(ui->fspinBox->isEnabled())
+    {
+        if(a > 0)
+            builtstring += "-";
+        builtstring += fstring;
+    }
+    ui->idlabel->setText(builtstring);
+}
+
+void IdFilter::Rebuild()
+{
+    if(sender()->objectName().contains("echeckBox"))
+        emit ui->espinBox->valueChanged(ui->espinBox->text());
+    else if(sender()->objectName().contains("vcheckBox"))
+        emit ui->vspinBox->valueChanged(ui->vspinBox->text());
+    else if(sender()->objectName().contains("pcheckBox"))
+        emit ui->pspinBox->valueChanged(ui->pspinBox->text());
+    else if(sender()->objectName().contains("fcheckBox"))
+        emit ui->fspinBox->valueChanged(ui->fspinBox->text());
 }
 
 JumpFilter::JumpFilter(QWidget* parent) : QFrame(parent), ui(new Ui::JumpFilter)

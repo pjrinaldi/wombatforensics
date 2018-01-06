@@ -68,8 +68,9 @@ struct dostime
 
 struct FilterValues
 {
-    bool maxidbool;
-    bool minidbool;
+    //bool maxidbool;
+    //bool minidbool;
+    QString idfilter;
     unsigned long long maxid;
     unsigned long long minid;
     bool namebool;
