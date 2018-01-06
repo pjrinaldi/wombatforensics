@@ -63,7 +63,7 @@ public:
         espinBox->setObjectName(QStringLiteral("espinBox"));
         espinBox->setEnabled(false);
         espinBox->setFont(font);
-        espinBox->setMaximum(100000);
+        espinBox->setMaximum(1000000000);
         espinBox->setValue(0);
 
         gridLayout->addWidget(espinBox, 2, 1, 1, 1);
@@ -78,7 +78,7 @@ public:
         vspinBox->setObjectName(QStringLiteral("vspinBox"));
         vspinBox->setEnabled(false);
         vspinBox->setFont(font);
-        vspinBox->setMaximum(100000);
+        vspinBox->setMaximum(1000000000);
 
         gridLayout->addWidget(vspinBox, 5, 1, 1, 1);
 
@@ -91,7 +91,7 @@ public:
         pspinBox->setObjectName(QStringLiteral("pspinBox"));
         pspinBox->setEnabled(false);
         pspinBox->setFont(font);
-        pspinBox->setMaximum(100000);
+        pspinBox->setMaximum(1000000000);
 
         gridLayout->addWidget(pspinBox, 6, 1, 1, 1);
 
@@ -104,7 +104,7 @@ public:
         fspinBox->setObjectName(QStringLiteral("fspinBox"));
         fspinBox->setEnabled(false);
         fspinBox->setFont(font);
-        fspinBox->setMaximum(100000);
+        fspinBox->setMaximum(1000000000);
 
         gridLayout->addWidget(fspinBox, 7, 1, 1, 1);
 

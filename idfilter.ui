@@ -58,7 +58,7 @@
       <string>e</string>
      </property>
      <property name="maximum">
-      <number>100000</number>
+      <number>1000000000</number>
      </property>
      <property name="value">
       <number>0</number>
@@ -91,7 +91,7 @@
       <string>v</string>
      </property>
      <property name="maximum">
-      <number>100000</number>
+      <number>1000000000</number>
      </property>
     </widget>
    </item>
@@ -116,7 +116,7 @@
       <string>p</string>
      </property>
      <property name="maximum">
-      <number>100000</number>
+      <number>1000000000</number>
      </property>
     </widget>
    </item>
@@ -141,7 +141,7 @@
       <string>f</string>
      </property>
      <property name="maximum">
-      <number>100000</number>
+      <number>1000000000</number>
      </property>
     </widget>
    </item>
