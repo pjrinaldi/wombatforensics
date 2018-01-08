@@ -104,9 +104,13 @@ struct FilterValues
     QString filegroup;
     bool filegroupbool;
     bool hashbool;
+    bool hashbool2;
+    int hashdupcnt;
+    QString hashfilter;
     QStringList hashlist;
-    QVector<unsigned long long> hashcount;
-    QVector<unsigned long long> hashidlist;
+    //QStringList hashfilteredlist;
+    //QVector<unsigned long long> hashcount;
+    //QVector<unsigned long long> hashidlist;
 };
 
 struct FileData

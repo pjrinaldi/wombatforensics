@@ -37,6 +37,9 @@
    </item>
    <item row="2" column="1">
     <widget class="QDateTimeEdit" name="lessdateTimeEdit">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="displayFormat">
       <string>MM/dd/yyyy HH:mm:ss</string>
      </property>
@@ -50,6 +53,9 @@
    </item>
    <item row="0" column="1">
     <widget class="QDateTimeEdit" name="moredateTimeEdit">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="displayFormat">
       <string>MM/dd/yyyy HH:mm:ss</string>
      </property>

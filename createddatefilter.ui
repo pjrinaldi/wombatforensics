@@ -47,6 +47,9 @@
    </item>
    <item row="0" column="1">
     <widget class="QDateTimeEdit" name="moredateTimeEdit">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="displayFormat">
       <string>MM/dd/yyyy HH:mm:ss</string>
      </property>
@@ -60,6 +63,9 @@
    </item>
    <item row="2" column="1">
     <widget class="QDateTimeEdit" name="lessdateTimeEdit">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="displayFormat">
       <string>MM/dd/yyyy HH:mm:ss</string>
      </property>
@@ -87,5 +93,38 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>morecheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>moredateTimeEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>51</x>
+     <y>14</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>241</x>
+     <y>26</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lesscheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lessdateTimeEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>76</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>231</x>
+     <y>55</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -563,12 +563,51 @@ void HashFilter::DisplayFilter()
 
 void HashFilter::HideClicked()
 {
+    QFile tmpfile;
+    QString tmpstr = "";
+    filtervalues.hashdupcnt = 0;
     filtervalues.hashbool = ui->checkBox->isChecked();
+    filtervalues.hashbool2 = ui->checkBox_2->isChecked();
+    filtervalues.hashlist.clear();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList filefiles = eviddir.entryList(QStringList("*.p*.f*.a*"), QDir::NoSymLinks | QDir::Files);
+    for(int i=0; i < filefiles.count(); i++)
+    {
+        tmpstr = "";
+        tmpfile.setFileName(wombatvariable.tmpmntpath + filefiles.at(i));
+        tmpfile.open(QIODevice::ReadOnly);
+        tmpstr = tmpfile.readLine();
+        tmpfile.close();
+        filtervalues.hashlist.append(tmpstr.split(",", QString::SkipEmptyParts).at(13));
+        //qDebug() << tmpstr.split(",", QString::SkipEmptyParts).at(13);
+    }
     if(filtervalues.hashbool)
     {
-        filtervalues.hashlist.clear();
-        filtervalues.hashcount.clear();
-        filtervalues.hashidlist.clear();
+        QStringList tmplist;
+        tmplist.clear();
+        filtervalues.hashlist.sort();
+        //qDebug() << "hashlist count before:" << filtervalues.hashlist.count();
+        for(int i = 1; i < filtervalues.hashlist.count(); i++)
+        {
+            //qDebug() << "i" << filtervalues.hashlist.at(i) << "i-1:" << filtervalues.hashlist.at(i-1);
+            if(filtervalues.hashlist.at(i).contains(filtervalues.hashlist.at(i-1)))
+                tmplist.append(filtervalues.hashlist.at(i));
+        }
+        filtervalues.hashlist = tmplist;
+        filtervalues.hashlist.removeDuplicates();
+        filtervalues.hashlist.removeOne("0");
+        //qDebug() << "hashlist count after:" << filtervalues.hashlist.count();
+        //qDebug() << filtervalues.hashlist;
+            /*
+            for(int j = 0; j < filtervalues.hashlist.count(); j++)
+            {
+                if(
+            }
+            */
+        //filtervalues.hashdupcnt = filtervalues.hashlist.removeDuplicates();
+        //filtervalues.hashlist.clear();
+        //filtervalues.hashcount.clear();
+        //filtervalues.hashidlist.clear();
         /*
         QSqlQuery hashquery(fcasedb);
         hashquery.prepare("SELECT md5, COUNT(md5) FROM data GROUP BY md5 HAVING COUNT(md5) > 1 AND md5 != '';");
@@ -599,6 +638,10 @@ void HashFilter::HideClicked()
         }
         hashquery.finish();
         */
+    }
+    if(filtervalues.hashbool2)
+    {
+        filtervalues.hashfilter = ui->lineEdit->text();
     }
     this->hide();
     emit HeaderChanged();

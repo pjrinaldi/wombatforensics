@@ -291,11 +291,17 @@ public:
                 }
                 if(filtervalues.hashbool)
                 {
-                    for(int i=0; i < filtervalues.hashidlist.count(); i++)
+                    for(int i = 0; i < filtervalues.hashlist.count(); i++)
                     {
-                        if(node->nodevalues.at(8).toULongLong() == filtervalues.hashidlist.at(i))
+                        //if(node->nodevalues.at(8).toULongLong() == filtervalues.hashidlist.at(i))
+                        if(node->nodevalues.at(8).toString().compare(filtervalues.hashlist.at(i)) == 0)
                             return QColor(Qt::lightGray);
                     }
+                }
+                if(filtervalues.hashbool2)
+                {
+                    if(node->nodevalues.at(8).toString().contains(filtervalues.hashfilter, Qt::CaseInsensitive) == false)
+                        return QColor(Qt::lightGray);
                 }
             }
         }
@@ -475,7 +481,9 @@ public:
             }
             if(section == 2 && filtervalues.pathbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 3 && (filtervalues.maxsizebool || filtervalues.minsizebool))
+            if(section == 3 && filtervalues.maxsizebool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 3 && filtervalues.minsizebool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 4 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
@@ -487,7 +495,7 @@ public:
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 9 && (filtervalues.filecategorybool || filtervalues.filetypebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 8 && filtervalues.hashbool)
+            if(section == 8 && (filtervalues.hashbool || filtervalues.hashbool2))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 10 && filtervalues.filegroupbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
