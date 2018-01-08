@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'sizefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -47,6 +47,8 @@ public:
         gridLayout->setHorizontalSpacing(0);
         lessspinBox = new QSpinBox(SizeFilter);
         lessspinBox->setObjectName(QStringLiteral("lessspinBox"));
+        lessspinBox->setEnabled(false);
+        lessspinBox->setMaximum(1000000000);
 
         gridLayout->addWidget(lessspinBox, 2, 1, 1, 1);
 
@@ -57,6 +59,8 @@ public:
 
         morespinBox = new QSpinBox(SizeFilter);
         morespinBox->setObjectName(QStringLiteral("morespinBox"));
+        morespinBox->setEnabled(false);
+        morespinBox->setMaximum(1000000000);
 
         gridLayout->addWidget(morespinBox, 0, 1, 1, 1);
 
@@ -67,23 +71,27 @@ public:
 
         pushButton = new QPushButton(SizeFilter);
         pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setDefault(true);
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 3, 1, 1, 1);
 
 
         retranslateUi(SizeFilter);
+        QObject::connect(morecheckBox, SIGNAL(toggled(bool)), morespinBox, SLOT(setEnabled(bool)));
+        QObject::connect(lesscheckBox, SIGNAL(toggled(bool)), lessspinBox, SLOT(setEnabled(bool)));
+
+        pushButton->setDefault(true);
+
 
         QMetaObject::connectSlotsByName(SizeFilter);
     } // setupUi
 
     void retranslateUi(QWidget *SizeFilter)
     {
-        SizeFilter->setWindowTitle(QApplication::translate("SizeFilter", "Filter", 0));
-        morecheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size >", 0));
-        lesscheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size < ", 0));
-        pushButton->setText(QApplication::translate("SizeFilter", "Apply", 0));
+        SizeFilter->setWindowTitle(QApplication::translate("SizeFilter", "Filter", Q_NULLPTR));
+        morecheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size >", Q_NULLPTR));
+        lesscheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size < ", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("SizeFilter", "Apply", Q_NULLPTR));
     } // retranslateUi
 
 };

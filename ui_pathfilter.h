@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'pathfilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -50,28 +50,32 @@ public:
 
         lineEdit = new QLineEdit(PathFilter);
         lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        lineEdit->setEnabled(false);
 
         gridLayout->addWidget(lineEdit, 0, 1, 1, 1);
 
         pushButton = new QPushButton(PathFilter);
         pushButton->setObjectName(QStringLiteral("pushButton"));
         pushButton->setAutoFillBackground(false);
-        pushButton->setDefault(true);
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 1, 1, 1, 1);
 
 
         retranslateUi(PathFilter);
+        QObject::connect(checkBox, SIGNAL(toggled(bool)), lineEdit, SLOT(setEnabled(bool)));
+
+        pushButton->setDefault(true);
+
 
         QMetaObject::connectSlotsByName(PathFilter);
     } // setupUi
 
     void retranslateUi(QWidget *PathFilter)
     {
-        PathFilter->setWindowTitle(QApplication::translate("PathFilter", "Filter", 0));
-        checkBox->setText(QApplication::translate("PathFilter", "Show Items where path contains", 0));
-        pushButton->setText(QApplication::translate("PathFilter", "Apply", 0));
+        PathFilter->setWindowTitle(QApplication::translate("PathFilter", "Filter", Q_NULLPTR));
+        checkBox->setText(QApplication::translate("PathFilter", "Show Items where path contains", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("PathFilter", "Apply", Q_NULLPTR));
     } // retranslateUi
 
 };

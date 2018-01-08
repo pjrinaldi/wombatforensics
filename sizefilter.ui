@@ -29,7 +29,14 @@
     <number>0</number>
    </property>
    <item row="2" column="1">
-    <widget class="QSpinBox" name="lessspinBox"/>
+    <widget class="QSpinBox" name="lessspinBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="maximum">
+      <number>1000000000</number>
+     </property>
+    </widget>
    </item>
    <item row="0" column="0">
     <widget class="QCheckBox" name="morecheckBox">
@@ -39,7 +46,14 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QSpinBox" name="morespinBox"/>
+    <widget class="QSpinBox" name="morespinBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="maximum">
+      <number>1000000000</number>
+     </property>
+    </widget>
    </item>
    <item row="2" column="0">
     <widget class="QCheckBox" name="lesscheckBox">
@@ -64,5 +78,38 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>morecheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>morespinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>55</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>179</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lesscheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lessspinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>89</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>182</x>
+     <y>53</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
