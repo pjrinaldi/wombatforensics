@@ -37,7 +37,7 @@ public:
         if (SizeFilter->objectName().isEmpty())
             SizeFilter->setObjectName(QStringLiteral("SizeFilter"));
         SizeFilter->setWindowModality(Qt::ApplicationModal);
-        SizeFilter->resize(261, 105);
+        SizeFilter->resize(276, 105);
         QFont font;
         font.setPointSize(8);
         SizeFilter->setFont(font);
@@ -71,6 +71,7 @@ public:
 
         pushButton = new QPushButton(SizeFilter);
         pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setStyleSheet(QStringLiteral("border: 1px solid black; padding: 5px 10px 5px 10px;"));
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 3, 1, 1, 1);

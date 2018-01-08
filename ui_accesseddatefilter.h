@@ -73,6 +73,7 @@ public:
 
         pushButton = new QPushButton(AccessedDateFilter);
         pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setStyleSheet(QStringLiteral("border: 1px solid black; padding: 5px 10px 5px 10px;"));
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 3, 1, 1, 1);

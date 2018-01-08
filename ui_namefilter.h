@@ -56,6 +56,7 @@ public:
 
         pushButton = new QPushButton(NameFilter);
         pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setStyleSheet(QStringLiteral("border: 1px solid black; padding: 5px 10px 5px 10px;"));
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 1, 1, 1, 1);

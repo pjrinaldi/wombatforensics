@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'filetypefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.5.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -70,12 +70,15 @@ public:
 
         pushButton = new QPushButton(FileTypeFilter);
         pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setStyleSheet(QStringLiteral("border: 1px solid black; padding: 5px 10px 5px 10px;"));
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 2, 1, 1, 1);
 
 
         retranslateUi(FileTypeFilter);
+        QObject::connect(categorycheckBox, SIGNAL(toggled(bool)), categorycomboBox, SLOT(setEnabled(bool)));
+        QObject::connect(typecheckBox, SIGNAL(toggled(bool)), typecomboBox, SLOT(setEnabled(bool)));
 
         pushButton->setDefault(true);
 
@@ -85,11 +88,11 @@ public:
 
     void retranslateUi(QWidget *FileTypeFilter)
     {
-        FileTypeFilter->setWindowTitle(QApplication::translate("FileTypeFilter", "Filter", 0));
+        FileTypeFilter->setWindowTitle(QApplication::translate("FileTypeFilter", "Filter", Q_NULLPTR));
         categorycomboBox->setCurrentText(QString());
-        categorycheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where group matches", 0));
-        typecheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where type matches", 0));
-        pushButton->setText(QApplication::translate("FileTypeFilter", "Apply", 0));
+        categorycheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where group matches", Q_NULLPTR));
+        typecheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where type matches", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("FileTypeFilter", "Apply", Q_NULLPTR));
     } // retranslateUi
 
 };

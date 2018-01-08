@@ -47,6 +47,9 @@
      <property name="autoFillBackground">
       <bool>false</bool>
      </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid black; padding: 5px 10px 5px 10px;</string>
+     </property>
      <property name="text">
       <string>Apply</string>
      </property>
