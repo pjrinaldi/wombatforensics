@@ -50,6 +50,9 @@
    </item>
    <item row="0" column="1">
     <widget class="QComboBox" name="categorycomboBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="editable">
       <bool>false</bool>
      </property>
@@ -64,5 +67,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>categorycheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>categorycomboBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>67</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>285</x>
+     <y>28</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

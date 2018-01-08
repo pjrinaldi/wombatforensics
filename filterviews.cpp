@@ -449,6 +449,21 @@ void FileTypeFilter::DisplayFilter()
     tmptype.clear();
     ui->categorycomboBox->clear();
     ui->typecomboBox->clear();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QFile tmpfile;
+    QString tmpstr = "";
+    QStringList filefiles = eviddir.entryList(QStringList("*.p*.f*.a*"), QDir::NoSymLinks | QDir::Files);
+    for(int i = 0; i < filefiles.count(); i++)
+    {
+        tmpstr = "";
+        tmpfile.setFileName(wombatvariable.tmpmntpath + filefiles.at(i));
+        tmpfile.open(QIODevice::ReadOnly);
+        tmpstr = tmpfile.readLine();
+        tmpfile.close();
+        tmpcategory.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).at(0));
+        if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).count() >= 2)
+            tmptype.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).at(1));
+    }
     /*
     QSqlQuery typequery(fcasedb);
     typequery.prepare("SELECT DISTINCT filemime FROM data WHERE objecttype = 5;");
@@ -508,8 +523,21 @@ FileCategoryFilter::~FileCategoryFilter()
 void FileCategoryFilter::DisplayFilter()
 {
     QStringList tmpcategory;
+    QString tmpstr = "";
     tmpcategory.clear();
     ui->categorycomboBox->clear();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QFile tmpfile;
+    QStringList filefiles = eviddir.entryList(QStringList("*.p*.f*.a*"), QDir::NoSymLinks | QDir::Files);
+    for(int i = 0; i < filefiles.count(); i++)
+    {
+        tmpstr = "";
+        tmpfile.setFileName(wombatvariable.tmpmntpath + filefiles.at(i));
+        tmpfile.open(QIODevice::ReadOnly);
+        tmpstr = tmpfile.readLine();
+        tmpfile.close();
+        tmpcategory.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).at(0));
+    }
     /*
     QSqlQuery typequery(fcasedb);
     typequery.prepare("SELECT DISTINCT filesignature FROM data WHERE objecttype = 5 OR objecttype = 6;");
