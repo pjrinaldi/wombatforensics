@@ -3560,11 +3560,9 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
-                StartThumbnails();
-                /*
+                //StartThumbnails();
                 thumbfuture = QtConcurrent::run(this, &WombatForensics::StartThumbnails);
                 thumbwatcher.setFuture(thumbfuture);
-                */
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
@@ -3619,28 +3617,26 @@ void WombatForensics::StartThumbnails()
         tmpfile.close();
         if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
         {
-            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
-            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0));
+            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12));
+            //thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0));
         }
     }
-    qDebug() << thumblist.count()/2;
-    qDebug() << thumblist;
+    //qDebug() << thumblist.count();
+    //qDebug() << thumblist;
     //thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
     //thumbwatcher.setFuture(thumbfuture);
-    //GenerateThumbnails();
+    GenerateThumbnails();
     StatusUpdate("Thumbnail generation finished.");
     LogMessage("Thumbnail generation finished.");
 }
 
 void WombatForensics::FinishThumbs()
 {
-    /*
-    wombatdatabase->GetThumbnails();
-    imagewindow->UpdateGeometries();
+    //wombatdatabase->GetThumbnails();
+    //imagewindow->UpdateGeometries();
     imagewindow->show();
     LogMessage("Evidence ready");
     StatusUpdate("Evidence ready");
-    */
 }
 
 void WombatForensics::on_actionViewerManager_triggered()

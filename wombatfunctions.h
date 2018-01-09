@@ -18,8 +18,8 @@ bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
 //void ProcessFile(QVector<QString> tmpstrings, QVector<unsigned long long> tmpints, FileData tmpdata, bool adsbool); 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
-//void GenerateThumbnails(void);
-void GenerateThumbnails(ThumbObject tobj);
+void GenerateThumbnails(void); // run function
+//void GenerateThumbnails(ThumbObject tobj); // map function
 QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 //QVariant MagicFile(TSK_FS_FILE* tmpfile, unsigned long long objid);
 //QVariant AlternateDataStreamMagicFile(TSK_FS_FILE* readfileinfo, unsigned long long adsobjid);

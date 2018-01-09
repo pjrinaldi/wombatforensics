@@ -583,6 +583,69 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 void GenerateThumbnails()
 {
+    TSK_IMG_INFO* readimginfo;
+    TSK_FS_INFO* readfsinfo;
+    TSK_FS_FILE* readfileinfo;
+    QString tmpstr = "";
+    //QStringList evidlist;
+    //evidlist.clear();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    std::vector<std::string> pathvector;
+    const TSK_TCHAR** imagepartspath;
+    for(int i=0; i < thumblist.count(); i++)
+    {
+        pathvector.clear();
+        QString estring = thumblist.at(i).split("-", QString::SkipEmptyParts).at(0);
+        QString pstring = thumblist.at(i).split("-", QString::SkipEmptyParts).at(2);
+        //QString fstring = thumblist.at(i).split("-", QString::SkipEmptyParts).at(3);
+        unsigned long long curaddress = thumblist.at(i).split("-f").at(1).split("-a").at(0).toULongLong(); 
+        //qDebug() << "e p adr" << estring << pstring << curaddress;
+        QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
+        wombatvariable.evidenceobject.name = evidfiles.at(0);
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name.split(".evid").at(0) + ".evid." + estring.mid(1));
+        evidfile.open(QIODevice::ReadOnly);
+        tmpstr = evidfile.readLine();
+        int partcount = tmpstr.split(",").at(3).split("|").size();
+        evidfile.close();
+        for(int i=0; i < partcount; i++)
+            pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
+        imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+        for(int i=0; i < pathvector.size(); i++)
+            imagepartspath[i] = pathvector[i].c_str();
+        readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+        if(readimginfo == NULL)
+        {
+            qDebug() << tsk_error_get_errstr();
+            LogMessage("Image opening error");
+        }
+        free(imagepartspath);
+        tmpstr = "";
+        QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".part." + pstring.mid(1)), QDir::NoSymLinks | QDir::Files);
+        //qDebug() << wombatvariable.evidenceobject.name.split(".evid").at(0) << ".part." << pstring.mid(1);
+        QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
+        partfile.open(QIODevice::ReadOnly);
+        tmpstr = partfile.readLine();
+        readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+        readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
+        QImage fileimage;
+        QImage thumbimage;
+        QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumblist.at(i) + ".jpg");
+        qDebug() << QString(wombatvariable.tmpmntpath + "thumbs/" + thumblist.at(i) + ".jpg");
+        char imgbuf[readfileinfo->meta->size];
+        ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        if(readfileinfo->meta != NULL)
+        {
+            bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
+            if(imageloaded)
+            {
+                thumbimage = fileimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
+                writer.write(thumbimage);
+            }
+        }
+        tsk_fs_file_close(readfileinfo);
+        tsk_fs_close(readfsinfo);
+        tsk_img_close(readimginfo);
+    }
     /*
     QSqlQuery filequery(fcasedb);
     filequery.prepare("SELECT objectid, parimgid, parfsid, address FROM data WHERE objecttype = 5 AND filemime LIKE '%image/%';");
