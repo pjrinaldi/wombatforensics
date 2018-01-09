@@ -9,6 +9,7 @@
 WombatVariable wombatvariable;
 QFile logfile;
 QFile viewerfile;
+QDir thumbdir;
 QTextEdit* msglog = NULL;
 QVector<FileData> filedatavector;
 QList<WombatVariable> wombatvarvector;

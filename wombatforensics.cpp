@@ -707,6 +707,7 @@ void WombatForensics::InitializeCaseStructure()
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
         LogMessage("Log File Created");
+        thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         //viewerfile.setFileName(wombatvariable.tmpmntpath + "viewers");
         //viewerfile.open(QIODevice::WriteOnly | QIODevice::Text);
         //viewerfile.close();
@@ -3547,13 +3548,35 @@ void WombatForensics::on_actionView_Progress_triggered(bool checked) // modify t
 
 void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 {
-    /*
     if(!checked) // hide viewer
     {
         imagewindow->hide();
     }
     else
     {
+        thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
+        if(!thumbdir.isEmpty())
+        {
+            int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
+            if(ret == QMessageBox::Yes)
+            {
+                StartThumbnails();
+                /*
+                thumbfuture = QtConcurrent::run(this, &WombatForensics::StartThumbnails);
+                thumbwatcher.setFuture(thumbfuture);
+                */
+            }
+            else
+                ui->actionView_Image_Gallery->setChecked(false);
+        }
+        else
+        {
+            // GetThumbnails(); // using the match() function from dirTreeView->model()->match() to generate thumbnails;
+            // apparently get thumbnails simply got the thumbnail id,blobs from db. i can just get items in thumbs/ dir and be done with it.
+            imagewindow->UpdateGeometries();
+            imagewindow->show();
+        }
+        /*
         if(wombatdatabase->ThumbnailCount() == 0)
         {
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
@@ -3571,15 +3594,40 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             imagewindow->UpdateGeometries();
             imagewindow->show();
         }
+        */
     }
-    */
 }
 
 void WombatForensics::StartThumbnails()
 {
     LogMessage("Generating Thumbnails...");
     StatusUpdate("Generating Thumbnails...");
-    GenerateThumbnails();
+    // THIS COULD WORK, BUT IT WON'T GET ALL THE VALUES, CAUSE FETCHMORE HASN'T BEEN CALLED. I WOULD NEED TO CALL EXPANDALL()/COLLAPSEALL() TO GET ALL INDEX ITEMS..., SO MAYBE FILE ACCESS WILL BE FASTER...
+    //QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(QString("-f")), -1, Qt::MatchFlags(Qt::MatchWrap | Qt::MatchContains | Qt::MatchRecursive));
+    // FILE ACCESS CAN BE PLACED IN WOMBATFUNCTIONS...
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QFile tmpfile;
+    QString tmpstr = "";
+    thumblist.clear();
+    QStringList filefiles = eviddir.entryList(QStringList("*.p*.f*.a*"), QDir::NoSymLinks | QDir::Files);
+    for(int i = 0; i < filefiles.count(); i++)
+    {
+        tmpstr = "";
+        tmpfile.setFileName(wombatvariable.tmpmntpath + filefiles.at(i));
+        tmpfile.open(QIODevice::ReadOnly);
+        tmpstr = tmpfile.readLine();
+        tmpfile.close();
+        if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
+        {
+            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
+            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0));
+        }
+    }
+    qDebug() << thumblist.count()/2;
+    qDebug() << thumblist;
+    //thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
+    //thumbwatcher.setFuture(thumbfuture);
+    //GenerateThumbnails();
     StatusUpdate("Thumbnail generation finished.");
     LogMessage("Thumbnail generation finished.");
 }
