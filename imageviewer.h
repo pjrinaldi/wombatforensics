@@ -112,6 +112,7 @@ private:
     ImageWindow* imagedialog;
     QList<QPixmap> pixmaps;
     QStringList idlist;
+    QFileSystemModel* filemodel;
 protected:
     void closeEvent(QCloseEvent* event);
 };

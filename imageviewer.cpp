@@ -103,6 +103,8 @@ void ImageWindow::GetImage(unsigned long long objectid)
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
     ui->setupUi(this);
+    filemodel = new QFileSystemModel(this);
+    filemodel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
     lw = ui->listView;
     ui->listView->setViewMode(QListView::IconMode);
     ui->listView->setUniformItemSizes(false);
@@ -145,12 +147,14 @@ void ImageViewer::UpdateGeometries()
 {
     pixmaps.clear();
     ui->label_2->setText("Loading...");
-    GetPixmaps();
-    imagemodel = new ImageModel(pixmaps, idlist);
+    //GetPixmaps();
+    //imagemodel = new ImageModel(pixmaps, idlist);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
     ui->label_2->setText(QString::number(pixmaps.count()) + " Image(s)");
-    ui->listView->setModel(imagemodel);
+    filemodel->setRootPath(wombatvariable.tmpmntpath + "thumbs/");
+    ui->listView->setModel(filemodel);
+    //ui->listView->setModel(imagemodel);
 }
 
 void ImageViewer::SetModel()
