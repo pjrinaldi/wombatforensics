@@ -3630,6 +3630,11 @@ void WombatForensics::StartThumbnails()
         if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
         {
             thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12));
+            QByteArray ba;
+            ba.append(tmpstr.split(",").at(0));
+            //QByteArray::fromBase64(ba);
+            // MAKE THUMBPATHLIST GLOBAL OR WHEVER THUMBLIST IS...
+            thumbpathlist.append(tmpstr.split(",", QString::SkipEmptyParts).at(3) + QString(QByteArray::fromBase64(ba)));
             //thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0));
         }
     }
