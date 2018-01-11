@@ -30,7 +30,7 @@ public:
     {
         if(!index.isValid())
             return QVariant();
-        if(index.row() >= thumblist.count()/2)
+        if(index.row() >= pixmaplist.count())
             return QVariant();
         if(role == Qt::DecorationRole)
             return pixmaplist.at(index.row());
@@ -47,7 +47,8 @@ public:
             thumbpath = pathquery.value(0).toString();
             pathquery.finish();
             */
-            return thumbpath; 
+            //return thumbpath; 
+            return QString(wombatvariable.tmpmntpath + "thumbs/" + idlist.at(index.row()) + ".jpg");
         }
         else
             return QVariant();
@@ -72,7 +73,8 @@ class ImageWindow : public QDialog
 public:
     ImageWindow(QWidget* parent = 0);
     ~ImageWindow();
-    void GetImage(unsigned long long objid);
+    //void GetImage(unsigned long long objid);
+    void GetImage(QString objid);
 private slots:
     void HideClicked();
     void ShowImage();

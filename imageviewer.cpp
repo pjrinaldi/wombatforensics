@@ -36,7 +36,8 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
     }
 }
 
-void ImageWindow::GetImage(unsigned long long objectid)
+//void ImageWindow::GetImage(unsigned long long objectid)
+void ImageWindow::GetImage(QString objectid)
 {
     this->setWindowTitle("View Image - " + thumbpath);
     // OpenParentImage
@@ -103,12 +104,13 @@ void ImageWindow::GetImage(unsigned long long objectid)
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
     ui->setupUi(this);
-    filemodel = new QFileSystemModel(this);
-    filemodel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
+    //filemodel = new QFileSystemModel(this);
+    //filemodel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
     lw = ui->listView;
     ui->listView->setViewMode(QListView::IconMode);
     ui->listView->setUniformItemSizes(false);
     ui->listView->setResizeMode(QListView::Adjust);
+    //filemodel->setRootPath(QString("/home/pasquale/.wombatforensics/mntpt"));
     sb = ui->spinBox;
     ui->spinBox->setValue(thumbsize);
     imagedialog = new ImageWindow();
@@ -136,27 +138,41 @@ ImageViewer::~ImageViewer()
 void ImageViewer::GetPixmaps()
 {
     pixmaps.clear();
+    QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
+    QStringList jpgfiles = tdir.entryList(QStringList("*.jpg"), QDir::NoSymLinks | QDir::Files);
+    qDebug() << thumbsize;
+    for(int i = 0; i < jpgfiles.count(); i++)
+    {
+        QPixmap tmppixmap = QPixmap(QString(wombatvariable.tmpmntpath + "thumbs/" + jpgfiles.at(i)));
+        tmppixmap = tmppixmap.scaled(thumbsize, thumbsize, Qt::KeepAspectRatio, Qt::FastTransformation);
+        //qDebug() << jpgfiles.at(i);
+        pixmaps.append(tmppixmap);
+        idlist.append(jpgfiles.at(i).split(".").at(0));
+    }
+    /*
     for(int i=0; i < thumblist.count()/2; i++)
     {
         pixmaps.append(QPixmap::fromImage(MakeThumb(thumblist.at(2*i+1))));
         idlist.append(thumblist.at(2*i));
     }
+    */
 }
 
 void ImageViewer::UpdateGeometries()
 {
     pixmaps.clear();
     ui->label_2->setText("Loading...");
-    //GetPixmaps();
-    //imagemodel = new ImageModel(pixmaps, idlist);
+    GetPixmaps();
+    imagemodel = new ImageModel(pixmaps, idlist);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
     ui->label_2->setText(QString::number(pixmaps.count()) + " Image(s)");
-    filemodel->setRootPath(wombatvariable.tmpmntpath + "thumbs/");
-    ui->listView->setModel(filemodel);
-    //ui->listView->setModel(imagemodel);
+    //filemodel->setRootPath(QString(wombatvariable.tmpmntpath + "thumbs/"));
+    //ui->listView->setModel(filemodel);
+    ui->listView->setModel(imagemodel);
 }
 
+/* not needed anymore */
 void ImageViewer::SetModel()
 {
     imagemodel = new ImageModel(pixmaps, idlist);
@@ -169,7 +185,8 @@ void ImageViewer::SetModel()
 void ImageViewer::OpenImageWindow(const QModelIndex &index)
 {
     ui->label->setText("Loading...");
-    imagedialog->GetImage(index.data(Qt::UserRole).toULongLong());
+    qDebug() << index.data(Qt::UserRole).toString();
+    imagedialog->GetImage(index.data(Qt::UserRole).toString());
     imagedialog->show();
     ui->label->setText("");
 }

@@ -686,23 +686,23 @@ void WombatForensics::InitializeCaseStructure()
         QString name = qgetenv("USER");
         if(name.isEmpty())
             name = qgetenv("USERNAME");
-        /*
         //pkexec calls the required gui prompt for sudo or a terminal if gui not available.
-        QString mntstr = "pkexec mount -o loop ";
+        QString mntstr = "sudo mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
         qDebug() << mntstr;
-        QString chownstr = "pkexec chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
+        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mkfsstr);
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
-        */
-        // POSSIBLE PKEXEC WORKAROUND - works without privilege escalation, just a little slower...
-        // now requires guestmount which is a part of libguestfs
+        /*
+        // PKEXEC WORKAROUND - works without privilege escalation, just a little slower...
+        // now requires guestmount which is a part of libguestfs-tools
         QProcess::execute(mkfsstr);
         QString mntstr = "guestmount -a " + wombatvariable.caseobject.name + " -m /dev/sda " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
+        */
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
@@ -768,20 +768,24 @@ void WombatForensics::InitializeOpenCase()
         if(name.isEmpty())
             name = qgetenv("USERNAME");
         //qDebug() << name;
-        /*
-        QString mntstr = "pkexec mount -o loop ";
+        /* TEMP FIX UNTIL UBUNTU 18.04 LTS */
+
+        QString mntstr = "sudo mount -o loop ";
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
-        QString chownstr = "pkexec chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
+        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
-        */
+        OpenCaseMountFinished(0, QProcess::NormalExit);
+        /* END TEMP CODE */
         //QProcess::execute(mkfsstr); // don't need since i'm opening an existing case, not creating a new case.
+        /*
         QString mntstr = "guestmount -a " + wombatvariable.caseobject.name + " -m /dev/sda " + wombatvariable.tmpmntpath;
         QProcess* openprocess = new QProcess(this);
         connect(openprocess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(OpenCaseMountFinished(int, QProcess::ExitStatus)));
         openprocess->start(mntstr);
+        */
         //QProcess::execute(mntstr);
         /*
         wombatvariable.iscaseopen = true;
@@ -2751,8 +2755,12 @@ void WombatForensics::CloseCurrentCase()
     //umntstr += wombatvariable.tmpmntpath;
     if(wombatvariable.iscaseopen)
     {
+        QString umntstr = "sudo umount " + wombatvariable.tmpmntpath;
+        QProcess::execute(umntstr);
+        /*
         QString umntstr = "guestunmount " + wombatvariable.tmpmntpath;
         QProcess::execute(umntstr);
+        */
         StatusUpdate("Current Case was closed successfully");
     }
     RemoveTmpFiles();
@@ -3555,7 +3563,9 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     else
     {
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
-        if(!thumbdir.isEmpty())
+        QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
+        qDebug() << tdir.absolutePath() << tdir.isEmpty();
+        if(tdir.isEmpty())
         {
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
@@ -3633,7 +3643,7 @@ void WombatForensics::StartThumbnails()
 void WombatForensics::FinishThumbs()
 {
     //wombatdatabase->GetThumbnails();
-    //imagewindow->UpdateGeometries();
+    imagewindow->UpdateGeometries();
     imagewindow->show();
     LogMessage("Evidence ready");
     StatusUpdate("Evidence ready");
