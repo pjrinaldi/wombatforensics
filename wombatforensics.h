@@ -1191,7 +1191,8 @@ private slots:
     void PreviousItem();
     void ShowItem();
     void UpdateThumbnails(int tsize);
-    void SetSelectedFromImageViewer(unsigned long long selectedid);
+    void SetSelectedFromImageViewer(QString selectedid);
+    //void SetSelectedFromImageViewer(unsigned long long selectedid);
     void ShowFile(const QModelIndex &index);
     void AddSection(void);
     void AddTextSection(void);

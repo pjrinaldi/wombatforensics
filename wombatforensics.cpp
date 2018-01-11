@@ -167,7 +167,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
     connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
-    connect(imagewindow, SIGNAL(SendObjectToTreeView(unsigned long long)), this, SLOT(SetSelectedFromImageViewer(unsigned long long)));
+    connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
+    //connect(imagewindow, SIGNAL(SendObjectToTreeView(unsigned long long)), this, SLOT(SetSelectedFromImageViewer(unsigned long long)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(namefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(pathfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -338,7 +339,8 @@ void WombatForensics::ShowExternalViewer()
     */
 }
 
-void WombatForensics::SetSelectedFromImageViewer(unsigned long long objectid)
+//void WombatForensics::SetSelectedFromImageViewer(unsigned long long objectid)
+void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 {
     QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)

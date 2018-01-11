@@ -48,7 +48,8 @@ public:
             pathquery.finish();
             */
             //return thumbpath; 
-            return QString(wombatvariable.tmpmntpath + "thumbs/" + idlist.at(index.row()) + ".jpg");
+            // SHOULD REALLY BE THE ACTUAL FILE PATH FROM THE TSK...
+            return QString(idlist.at(index.row()));
         }
         else
             return QVariant();
@@ -107,7 +108,8 @@ private slots:
 
 signals:
     void HideImageWindow(bool checkstate);
-    void SendObjectToTreeView(unsigned long long selectedid);
+    void SendObjectToTreeView(QString selectedid);
+    //void SendObjectToTreeView(unsigned long long selectedid);
 private:
     Ui::ImageViewer* ui;
     ImageModel* imagemodel;
