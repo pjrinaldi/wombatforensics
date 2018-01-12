@@ -20,7 +20,8 @@ public:
     ~ExportDialog();
 
 signals:
-    void FileExport(FileExportData* exportdata);
+    //void FileExport(FileExportData* exportdata);
+    void StartExport(int exporttype, bool originalpath, QString exportpath);
 
 private slots:
     void SelectDirectory(void);
@@ -30,6 +31,9 @@ private:
     Ui::ExportDialog *ui;
     unsigned long long checkcount;
     unsigned long long listcount;
+    int exporttype = 0;
+    bool originalpath = true;
+    QString exportpath = "";
     QWidget* parentwidget;
 };
 

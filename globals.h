@@ -42,7 +42,7 @@ extern int mftrecordsize;
 extern QString rootinum;
 extern QString currentevidencename;
 extern QList<QVariant> colvalues;
-extern QList<TskObject> curlist;
+//extern QList<TskObject> curlist;
 extern QList<FileSystemObject> fsobjectlist;
 extern QStringList propertylist;
 extern QStringList thumblist;

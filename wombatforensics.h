@@ -1158,7 +1158,7 @@ private slots:
         ResizeViewColumns(index);
         QApplication::restoreOverrideCursor();
     };
-    void FileExport(FileExportData* exportdata);
+    //void FileExport(FileExportData* exportdata);
     void FileDig(FileDeepData* deeperdata);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
@@ -1218,7 +1218,8 @@ private:
     //void SecondaryProcessing(void);
     void OpenEvidenceStructure(void);
     void StartThumbnails(void);
-    void ExportFiles(FileExportData* exportdata);
+    //void ExportFiles(FileExportData* exportdata);
+    void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void DigFiles(FileDeepData* deepdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
     void GetDigData(Node* curnode, FileDeepData* deepdata);
@@ -1281,7 +1282,7 @@ private:
     QLabel* statuslabel;
     QFrame* vline1;
     QFrame* vline2;
-    QVector<FileExportData> exportfilelist;
+    //QVector<FileExportData> exportfilelist;
     QVector<FileDeepData> digfilelist;
     //QVector<QVariantMap> jsonstorevector;
     //QVector<SecondaryProcessObject> secondprocessvector;

@@ -48,7 +48,7 @@ Node* toplevelnode = 0;
 Node* actionnode = 0;
 Node* volnode = 0;
 QList<QVariant> colvalues;
-QList<TskObject> curlist;
+//QList<TskObject> curlist;
 QList<FileSystemObject> fsobjectlist;
 QStringList propertylist;
 QStringList thumblist;
