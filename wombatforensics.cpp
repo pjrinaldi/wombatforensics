@@ -3005,7 +3005,6 @@ void WombatForensics::FinishExport()
 
 void WombatForensics::ExportFiles(FileExportData* exportdata)
 {
-    /*
     exportfilelist.clear();
     curlist.clear();
     errorcount = 0;
@@ -3013,7 +3012,20 @@ void WombatForensics::ExportFiles(FileExportData* exportdata)
     if(exportdata->filestatus == FileExportData::selected)
     {
         exportdata->exportcount = 1;
-        exportdata->id = wombatvarptr->selectedobject.id;
+        exportdata->id = selectedindex.sibling(selectedindex.row(), 0).data().toString().toStdString();
+        exportdata->name = selectedindex.sibling(selectedindex.row(), 1).data().toString().toStdString();
+        exportdata->fullpath = exportdata->exportpath;
+        exportdata->fullpath += "/";
+        // should i put the image filename before it???
+        if(exportdata->pathstatus == FileExportData::include)
+            exportdata->fullpath += selectedindex.sibling(selectedindex.row(), 2).data().toString().toStdString();
+        exportfilelist.push_back(*exportdata);
+    }
+    else
+        GetExportData(rootnode, exportdata);
+
+    /*
+    {
         if(wombatvarptr->selectedobject.objtype == 6)
             exportdata->name = QString::number(wombatvarptr->selectedobject.id).toStdString() + wombatvarptr->selectedobject.name.toStdString() + string(".ads.dat");
         else

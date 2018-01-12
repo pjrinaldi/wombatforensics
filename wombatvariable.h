@@ -74,7 +74,7 @@ struct FileExportData
     };
 
     std::string exportpath;
-    unsigned long long id;
+    std::string id;
     FileStatus filestatus;
     PathStatus pathstatus;
     std::string name;
