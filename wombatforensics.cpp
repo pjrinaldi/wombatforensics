@@ -3617,8 +3617,11 @@ void WombatForensics::StartThumbnails()
     // FILE ACCESS CAN BE PLACED IN WOMBATFUNCTIONS...
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QFile tmpfile;
+    QFile thumbfile;
+    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/" + "thumbpathlist");
     QString tmpstr = "";
     thumblist.clear();
+    thumbpathlist.clear();
     QStringList filefiles = eviddir.entryList(QStringList("*.p*.f*.a*"), QDir::NoSymLinks | QDir::Files);
     for(int i = 0; i < filefiles.count(); i++)
     {
@@ -3632,10 +3635,18 @@ void WombatForensics::StartThumbnails()
             thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12));
             QByteArray ba;
             ba.append(tmpstr.split(",").at(0));
+            QString fullpath = tmpstr.split(",", QString::SkipEmptyParts).at(3) + QString(QByteArray::fromBase64(ba));
+            ba.clear();
+            ba.append(fullpath);
             //QByteArray::fromBase64(ba);
             // MAKE THUMBPATHLIST GLOBAL OR WHEVER THUMBLIST IS...
-            thumbpathlist.append(tmpstr.split(",", QString::SkipEmptyParts).at(3) + QString(QByteArray::fromBase64(ba)));
+            //thumbpathlist.append(tmpstr.split(",", QString::SkipEmptyParts).at(3) + QString(QByteArray::fromBase64(ba)));
             //thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0));
+            thumbfile.open(QIODevice::Append);
+            thumbfile.write(ba.toBase64());
+            thumbfile.write(",");
+            //thumbfile.write(QString(tmpstr.split(",", QString::SkipEmptyParts).at(3) + QString(QByteArray::fromBase64(ba)) + ",").toStdString().c_str());
+            thumbfile.close();
         }
     }
     //qDebug() << thumblist.count();

@@ -15,7 +15,7 @@ class ImageModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ImageModel(const QList<QPixmap> pixlist, QStringList ids, QObject* parent = 0) : QAbstractListModel(parent), pixmaplist(pixlist), idlist(ids)
+    ImageModel(const QList<QPixmap> pixlist, QStringList ids, QStringList paths, QObject* parent = 0) : QAbstractListModel(parent), pixmaplist(pixlist), idlist(ids), pathlist(paths)
     {
     };
 
@@ -49,7 +49,7 @@ public:
             */
             //return thumbpath; 
             // SHOULD REALLY BE THE ACTUAL FILE PATH FROM THE TSK...
-            return QString(idlist.at(index.row()));
+            return QString(pathlist.at(index.row()));
         }
         else
             return QVariant();
@@ -59,6 +59,7 @@ public:
 private:
     QList<QPixmap> pixmaplist;
     QStringList idlist;
+    QStringList pathlist;
 };
 
 namespace Ui

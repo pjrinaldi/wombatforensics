@@ -256,21 +256,33 @@ void ImageViewer::GetPixmaps()
 void ImageViewer::UpdateGeometries()
 {
     pixmaps.clear();
+    thumbpathlist.clear();
+    QString tmpstr = "";
+    QFile thumbfile;
+    QByteArray ba;
+    ba.clear();
+    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
+    thumbfile.open(QIODevice::ReadOnly);
+    tmpstr = thumbfile.readLine();
+    for(int i = 0; i < tmpstr.split(",", QString::SkipEmptyParts).count(); i++)
+    {
+        ba.clear();
+        ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(i));
+        thumbpathlist.append(QString(QByteArray::fromBase64(ba)));
+    }
     ui->label_2->setText("Loading...");
     GetPixmaps();
-    imagemodel = new ImageModel(pixmaps, idlist);
+    imagemodel = new ImageModel(pixmaps, idlist, thumbpathlist);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
     ui->label_2->setText(QString::number(pixmaps.count()) + " Image(s)");
-    //filemodel->setRootPath(QString(wombatvariable.tmpmntpath + "thumbs/"));
-    //ui->listView->setModel(filemodel);
     ui->listView->setModel(imagemodel);
 }
 
 /* not needed anymore */
 void ImageViewer::SetModel()
 {
-    imagemodel = new ImageModel(pixmaps, idlist);
+    imagemodel = new ImageModel(pixmaps, idlist, thumbpathlist);
     ui->listView->setModel(imagemodel);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));

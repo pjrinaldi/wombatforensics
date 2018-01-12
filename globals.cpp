@@ -52,6 +52,7 @@ QList<TskObject> curlist;
 QList<FileSystemObject> fsobjectlist;
 QStringList propertylist;
 QStringList thumblist;
+QStringList thumbpathlist;
 QString blockstring = "";
 QString thumbpath = "";
 QString hexselection = "";

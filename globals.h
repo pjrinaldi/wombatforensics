@@ -46,6 +46,7 @@ extern QList<TskObject> curlist;
 extern QList<FileSystemObject> fsobjectlist;
 extern QStringList propertylist;
 extern QStringList thumblist;
+extern QStringList thumbpathlist;
 extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
