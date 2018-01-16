@@ -171,6 +171,7 @@ public:
         childcount = 0;
         checkstate = 0;
         parentid = 0;
+        nodetype = 0;
     };
 
     ~Node()
@@ -185,6 +186,7 @@ public:
     bool haschildren;
     unsigned long long parentid;
     unsigned long long childcount;
+    int nodetype;
     int checkstate;
     bool HasChildren(void)
     {

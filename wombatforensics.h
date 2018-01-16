@@ -141,6 +141,7 @@ public:
         int nodetype = 0;
         int itemtype = 0;
         nodetype = node->nodevalues.at(0).toString().split("-").count();
+        itemtype = node->nodetype;
         /*
         QSqlQuery dataquery(fcasedb);
         dataquery.prepare("SELECT objtype, type FROM data WHERE id = ?");
@@ -598,6 +599,7 @@ public:
                     colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
                     currentnode = new Node(colvalues);
                     currentnode->parent = parentnode;
+                    currentnode->nodetype = tmplist.at(1).toInt();          // node type 5=file, 3=dir, 10=vir file, 11=vir dir
                     parentnode->children.append(currentnode);
                     currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + tmplist.at(9));
                     currentnode->haschildren = currentnode->HasChildren();
@@ -938,6 +940,7 @@ public:
                 colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
                 currentnode = new Node(colvalues);
                 currentnode->parent = parentnode;
+                currentnode->nodetype = tmplist.at(1).toInt();
                 parentnode->children.append(currentnode);
                 currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
                 currentnode->haschildren = currentnode->HasChildren();
@@ -1222,9 +1225,11 @@ private:
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void DigFiles(FileDeepData* deepdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
+    void GetExportList(Node* curnode, int exporttype);
     void GetDigData(Node* curnode, FileDeepData* deepdata);
     void ProcessDig(TskObject curobject, unsigned long long objectid, std::vector<FileDeepData::DigOptions> digoptions);
-    void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
+    void ProcessExport(QString curid);
+    //void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
     void UpdateFilterCount(void);
     void SaveState(void);
     void CreateAppDB(void);
@@ -1283,6 +1288,10 @@ private:
     QFrame* vline1;
     QFrame* vline2;
     //QVector<FileExportData> exportfilelist;
+    QString exportpath;
+    int exporttype;
+    bool originalpath;
+    QStringList exportlist;
     QVector<FileDeepData> digfilelist;
     //QVector<QVariantMap> jsonstorevector;
     //QVector<SecondaryProcessObject> secondprocessvector;

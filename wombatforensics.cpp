@@ -2806,11 +2806,43 @@ void WombatForensics::RemEvidence()
     */
 }
 
-void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
+void WombatForensics::GetExportList(Node* curnode, int exporttype)
 {
     if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
     {
+        if(exporttype == 1) // checked
+        {
+            if(curnode->checkstate == 2)
+                exportlist.append(curnode->nodevalues.at(0).toString());
+        }
+        else if(exporttype == 2) // all listed
+            exportlist.append(curnode->nodevalues.at(0).toString());
     }
+    if(curnode->haschildren)
+    {
+        for(int i = 0; i < curnode->children.count(); i++)
+            GetExportList(curnode->children.at(i), exporttype);
+    }
+}
+void WombatForensics::GetExportData(Node* curnode, FileExportData* exportdata)
+{
+    /*
+    if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
+    {
+        if(etype == 1) // checked
+        {
+            if(curnode->checkstate == 2)
+                exportlist.append(curnode->nodevalues.at(0).toString());
+        }
+        else if(etype == 2) // all listed
+            exportlist.append(curnode->nodevalues.at(0).toString().toStdString());
+    }
+    if(curnode->haschildren)
+    {
+        for(int i = 0; i < curnode->children.count(); i++)
+            GetExportList(curnode->children.at(i), etype);
+    }
+    */
     /*
     if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
     {
@@ -2968,12 +3000,13 @@ void WombatForensics::FileDig(FileDeepData* deeperdata)
         //qDebug() << "launch in a new thread the dig deeper functionality...";
     //qDebug() << "update message and status text";
 }
-
+/*
+ * DO NOT NEED
 void WombatForensics::FileExport(FileExportData* exportdata)
 {
     ExportFiles(exportdata);
 }
-
+*/
 void WombatForensics::FinishRemoval()
 {
     /*
@@ -3008,8 +3041,29 @@ void WombatForensics::FinishExport()
 }
 
 //void WombatForensics::ExportFiles(FileExportData* exportdata)
-void WombatForensics::ExportFiles(int etype, bool opath, QString epath);
+void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
 {
+    exporttype = etype;
+    exportpath = epath;
+    originalpath = opath;
+    exportlist.clear();
+    errorcount = 0;
+    exportcount = 0;
+    LogMessage("Started Exporting Evidence");
+    if(etype == 0) // selected
+    {
+        exportlist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+    }
+    else // checked or all listed
+        GetExportList(rootnode, etype);
+    int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
+    LogMessage("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
+    StatusUpdate("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
+    for(int i=0; i < exportlist.count(); i++)
+    {
+        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, exportlist.at(i));
+        exportwatcher.setFuture(tmpfuture);
+    }
     /*
     exportfilelist.clear();
     curlist.clear();
@@ -3194,10 +3248,8 @@ void WombatForensics::DigFiles(FileDeepData* deepdata)
     */
 }
 
-void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std::string name)
+void WombatForensics::ProcessExport(QString objectid)
 {
-    /* NEW PROCESS METHODOLOGY
-     *
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
@@ -3210,7 +3262,7 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     pathvector.clear();
     QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
     QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
-    //QString fstring = thumblist.at(i).split("-", QString::SkipEmptyParts).at(3);
+    QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
     unsigned long long curaddress = objectid.split("-f").at(1).split("-a").at(0).toULongLong(); 
     //qDebug() << "e p adr" << estring << pstring << curaddress;
     QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
@@ -3238,37 +3290,69 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
     QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();
+    partfile.close();
     readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
-    QImage fileimage;
-    //QImage thumbimage;
-    //QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumblist.at(i) + ".jpg");
-    //qDebug() << QString(wombatvariable.tmpmntpath + "thumbs/" + thumblist.at(i) + ".jpg");
     char imgbuf[readfileinfo->meta->size];
     ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
     if(readfileinfo->meta != NULL)
     {
-        bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
+        QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + "." + pstring + "." + fstring + ".a*"), QDir::NoSymLinks | QDir::Files);
+        QFile filefile(wombatvariable.tmpmntpath + filefiles.at(0));
+        filefile.open(QIODevice::ReadOnly);
+        tmpstr = filefile.readLine();
+        filefile.close();
+        QString tmppath = "";
+        QByteArray ba;
+        ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
+        //return QByteArray::fromBase64(ba);
+        if(originalpath == true)
+            tmppath = exportpath + tmpstr.split(",", QString::SkipEmptyParts).at(3) + QString(QByteArray::fromBase64(ba));
+        else
+            tmppath = exportpath + "/" + QString(QByteArray::fromBase64(ba));
+        if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
+        {
+            bool tmpdir = (new QDir())->mkpath(tmppath);
+            if(!tmpdir)
+            {
+                LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
+                errorcount++;
+            }
+        }
+        else
+        {
+            bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(tmppath));
+            if(tmpdir == true)
+            {
+                QFile tmpfile(tmppath);
+                if(tmpfile.open(QIODevice::WriteOnly))
+                {
+                    QDataStream outbuffer(&tmpfile);
+                    outbuffer.writeRawData(imgbuf, imglen);
+                    tmpfile.close();
+                }
+            }
+        }
+        //bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
+        /*
         if(imageloaded)
         {
-            ui->label->setPixmap(QPixmap::fromImage(fileimage));
+            //ui->label->setPixmap(QPixmap::fromImage(fileimage));
             //thumbimage = fileimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
             //writer.write(thumbimage);
         }
         else
         {
-            ui->label->setPixmap(QPixmap::fromImage(QImage(":/bar/missingthumb")));
+            //ui->label->setPixmap(QPixmap::fromImage(QImage(":/bar/missingthumb")));
         }
+        */
     }
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);
-
-     *
-     *
-     */
-
-
+    exportcount++;
+    int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
+    StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
     /*
     if(curobj.readimginfo != NULL)
         tsk_img_close(curobj.readimginfo);
@@ -3283,23 +3367,6 @@ void WombatForensics::ProcessExport(TskObject curobj, std::string fullpath, std:
         if(wombatvarptr->currentevidenceid == wombatvarptr->evidenceobjectvector[i].id)
             curidx = i;
     }
-    curobj.imagepartspath = (const char**)malloc(wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size()*sizeof(char*));
-    curobj.partcount = wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size();
-    for(uint i=0; i < wombatvarptr->evidenceobjectvector[curidx].fullpathvector.size(); i++)
-    {
-        curobj.imagepartspath[i] = wombatvarptr->evidenceobjectvector[curidx].fullpathvector[i].c_str();
-    }
-    curobj.readimginfo = tsk_img_open(curobj.partcount, curobj.imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    if(curobj.readimginfo == NULL)
-    {
-        LogMessage("Image was not loaded properly");
-        errorcount++;
-    }
-    free(curobj.imagepartspath);
-
-
-    curobj.readfsinfo = tsk_fs_open_img(curobj.readimginfo, 0, TSK_FS_TYPE_DETECT);
-    curobj.readfileinfo = tsk_fs_file_open_meta(curobj.readfsinfo, NULL, curobj.address);
     if(curobj.type == 3) // directory
     {
         bool tmpdir = (new QDir())->mkpath(QString::fromStdString(fullpath));
@@ -3679,7 +3746,7 @@ void WombatForensics::on_actionExport_triggered()
     totalchecked = 0;
     exportcount = 0;
     exportdialog = new ExportDialog(this, totalchecked, totalcount);
-    connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
+    //connect(exportdialog, SIGNAL(FileExport(FileExportData*)), this, SLOT(FileExport(FileExportData*)), Qt::DirectConnection);
     exportdialog->show();
 }
 
