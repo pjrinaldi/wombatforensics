@@ -3305,14 +3305,15 @@ void WombatForensics::ProcessExport(QString objectid)
         QString tmppath = "";
         QByteArray ba;
         ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
+        QString tmpname = QByteArray::fromBase64(ba);
         //return QByteArray::fromBase64(ba);
         if(originalpath == true)
-            tmppath = exportpath + tmpstr.split(",", QString::SkipEmptyParts).at(3) + QString(QByteArray::fromBase64(ba));
+            tmppath = exportpath + tmpstr.split(",", QString::SkipEmptyParts).at(3);
         else
-            tmppath = exportpath + "/" + QString(QByteArray::fromBase64(ba));
+            tmppath = exportpath + "/";
         if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
         {
-            bool tmpdir = (new QDir())->mkpath(tmppath);
+            bool tmpdir = (new QDir())->mkpath(QString(tmppath + tmpname));
             if(!tmpdir)
             {
                 LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
@@ -3324,7 +3325,7 @@ void WombatForensics::ProcessExport(QString objectid)
             bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(tmppath));
             if(tmpdir == true)
             {
-                QFile tmpfile(tmppath);
+                QFile tmpfile(tmppath + tmpname);
                 if(tmpfile.open(QIODevice::WriteOnly))
                 {
                     QDataStream outbuffer(&tmpfile);

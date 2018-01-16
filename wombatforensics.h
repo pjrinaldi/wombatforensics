@@ -1162,6 +1162,7 @@ private slots:
         QApplication::restoreOverrideCursor();
     };
     //void FileExport(FileExportData* exportdata);
+    void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void FileDig(FileDeepData* deeperdata);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
@@ -1222,7 +1223,6 @@ private:
     void OpenEvidenceStructure(void);
     void StartThumbnails(void);
     //void ExportFiles(FileExportData* exportdata);
-    void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void DigFiles(FileDeepData* deepdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
     void GetExportList(Node* curnode, int exporttype);
