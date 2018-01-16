@@ -51,7 +51,7 @@ extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
 extern QMutex mutex;
-extern QMap<unsigned long long, int> checkhash;
+extern QMap<QString, int> checkhash;
 
 struct dosdate
 {

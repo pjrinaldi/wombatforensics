@@ -710,6 +710,7 @@ void WombatForensics::InitializeCaseStructure()
         msglog->clear();
         LogMessage("Log File Created");
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
+        InitializeCheckState();
         //viewerfile.setFileName(wombatvariable.tmpmntpath + "viewers");
         //viewerfile.open(QIODevice::WriteOnly | QIODevice::Text);
         //viewerfile.close();
@@ -888,6 +889,7 @@ void WombatForensics::InitializeOpenCase()
 void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus)
 {
     wombatvariable.iscaseopen = true;
+    InitializeCheckState();
     ui->actionAdd_Evidence->setEnabled(true);
     LogMessage("Case was Opened");
     //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
@@ -4197,6 +4199,7 @@ void WombatForensics::CarveFile()
 void WombatForensics::SaveState()
 {
     RemoveTmpFiles();
+    UpdateCheckState();
     /*
     fcasedb.transaction();
     QSqlQuery hashquery(fcasedb);
@@ -4215,6 +4218,33 @@ void WombatForensics::SaveState()
     fcasedb.commit();
     hashquery.finish();
     */
+}
+
+void WombatForensics::InitializeCheckState()
+{
+    QFile hashfile(wombatvariable.tmpmntpath + "checkstate");
+    hashfile.open(QIODevice::ReadOnly);
+    QString tmpstr = hashfile.readLine();
+    hashfile.close();
+    QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+    for(int i=0; i < tmplist.count(); i++)
+        checkhash[tmplist.at(i).split("|", QString::SkipEmptyParts).at(0)] = tmplist.at(i).split("|", QString::SkipEmptyParts).at(1).toInt();
+}
+
+void WombatForensics::UpdateCheckState()
+{
+    QFile hashfile(wombatvariable.tmpmntpath + "checkstate");
+    hashfile.open(QIODevice::WriteOnly);
+    QMapIterator<QString, int> i(checkhash);
+    while(i.hasNext())
+    {
+        i.next();
+        if(checkhash.contains(i.key()))
+        {
+            hashfile.write(QString(i.key() + "|" + QString::number(i.value()) + ",").toStdString().c_str());
+        }
+    }
+    hashfile.close();
 }
 
 void WombatForensics::AutoSaveState()

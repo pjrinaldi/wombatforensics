@@ -949,8 +949,10 @@ public:
         }
         endInsertRows();
         // STILL NEED TO ACCOUNT FOR THE FILE CHECKS AND UPDATE ACCORDINGLY
-
-        //emit checkedNodesChanged();
+        if(checkhash.contains(tmplist.at(12).split("-a").at(0)))
+            currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
+        else
+            currentnode->checkstate = 0;
         /*
         if(addevidquery.value(16).toInt() == 0)
             currentnode->checkstate = 0;
@@ -959,6 +961,7 @@ public:
         else
             currentnode->checkstate = 2;
         */
+        emit checkedNodesChanged();
     };
 
     Node* NodeFromIndex(const QModelIndex &index) const
@@ -996,17 +999,17 @@ private:
         if(curnode->childcount > checkcount && checkcount > 0)
         {
             curnode->checkstate = 1;
-            checkhash[curnode->nodevalues.at(0).toULongLong()] = 1;
+            checkhash[curnode->nodevalues.at(0).toString()] = 1;
         }
         else if(curnode->childcount == checkcount)
         {
             curnode->checkstate = 1;
-            checkhash[curnode->nodevalues.at(0).toULongLong()] = 1;
+            checkhash[curnode->nodevalues.at(0).toString()] = 1;
         }
         else if(checkcount == 0)
         {
             curnode->checkstate = 0;
-            checkhash[curnode->nodevalues.at(0).toULongLong()] = 0;
+            checkhash[curnode->nodevalues.at(0).toString()] = 0;
         }
         //emit dataChanged(index, index);
         emit checkedNodesChanged();
@@ -1019,9 +1022,9 @@ private:
         Node* curnode = NodeFromIndex(index);
         for(int i=0; i < curnode->children.count(); i++)
         {
-            curnode->children[i]->checkstate = curnode->checkstate;
+            curnode->children.at(i)->checkstate = curnode->checkstate;
             //emit dataChanged(index.child(i, 0), index.child(i, 0));
-            if(curnode->children[i]->haschildren)
+            if(curnode->children.at(i)->haschildren)
                 SetChildCheckState(index.child(i,0));
         }
         emit checkedNodesChanged();
@@ -1035,19 +1038,19 @@ private:
             curnode->checkstate = 0;
             if(curnode->haschildren)
                 SetChildCheckState(index);
-            checkhash[curnode->nodevalues.at(0).toULongLong()] = 0;
+            checkhash[curnode->nodevalues.at(0).toString()] = 0;
         }
         else if(state == Qt::PartiallyChecked) // curnode is now partially checked
         {
             curnode->checkstate = 1;
-            checkhash[curnode->nodevalues.at(0).toULongLong()] = 1;
+            checkhash[curnode->nodevalues.at(0).toString()] = 1;
         }
         else if(state == Qt::Checked) // currentnode is now checked
         {
             curnode->checkstate = 2;
             if(curnode->haschildren)
                 SetChildCheckState(index);
-            checkhash[curnode->nodevalues.at(0).toULongLong()] = 2;
+            checkhash[curnode->nodevalues.at(0).toString()] = 2;
         }
         //emit dataChanged(index, index);
         emit checkedNodesChanged();
@@ -1243,6 +1246,8 @@ private:
     void AddNewEvidence(void);
     //QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
     void RemoveTmpFiles(void);
+    void UpdateCheckState(void);
+    void InitializeCheckState(void);
     //void GetEvidenceObjects(void);
 /*
     uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, unsigned char follow_hard_link);

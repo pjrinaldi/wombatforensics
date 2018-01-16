@@ -58,7 +58,7 @@ QString thumbpath = "";
 QString hexselection = "";
 QMutex mutex;
 QMutex mutex2;
-QMap<unsigned long long, int> checkhash;
+QMap<QString, int> checkhash;
 FilterValues filtervalues;
 //TSK_IMG_INFO* IMG_2ND_PROC = NULL;
 TSK_IMG_INFO* readimginfo = NULL;
