@@ -951,8 +951,6 @@ public:
         // STILL NEED TO ACCOUNT FOR THE FILE CHECKS AND UPDATE ACCORDINGLY
         if(checkhash.contains(tmplist.at(12).split("-a").at(0)))
             currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
-        else
-            currentnode->checkstate = 0;
         /*
         if(addevidquery.value(16).toInt() == 0)
             currentnode->checkstate = 0;
