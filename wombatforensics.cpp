@@ -190,8 +190,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(jumpbackward, SIGNAL(activated()), this, SLOT(PreviousItem()));
     connect(showitem, SIGNAL(activated()), this, SLOT(ShowItem()));
     checkhash.clear();
-    autosavetimer = new QTimer(this);
-    connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
+    //autosavetimer = new QTimer(this);
+    //UpdateCheckState();
+    //connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
 }
 //////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
@@ -719,7 +720,7 @@ void WombatForensics::InitializeCaseStructure()
         LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
-        autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+        //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
         //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
 
         // this works with privilege escalation. only way to mount it though. now requires linux and btrfs.
@@ -892,7 +893,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     InitializeCheckState();
     ui->actionAdd_Evidence->setEnabled(true);
     LogMessage("Case was Opened");
-    autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+    //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
@@ -2729,7 +2730,7 @@ void WombatForensics::CloseCurrentCase()
         treemodel->RemEvidence(QString("e" + evidfiles.at(i).split(".", QString::SkipEmptyParts).last()));
         evidcnt--;
     }
-    autosavetimer->stop();
+    //autosavetimer->stop();
     
     /*
     QSqlQuery evidquery(fcasedb);
@@ -3652,6 +3653,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     aboutbox->close();
     cancelthread->close();
     RemoveTmpFiles();
+    UpdateCheckState();
     event->accept();
     msglog->clear();
     msgviewer->close();
@@ -4228,9 +4230,10 @@ void WombatForensics::InitializeCheckState()
         hashfile.open(QIODevice::ReadOnly);
         QString tmpstr = hashfile.readLine();
         hashfile.close();
-        QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
-        for(int i=0; i < tmplist.count(); i++)
-            checkhash[tmplist.at(i).split("|", QString::SkipEmptyParts).at(0)] = tmplist.at(i).split("|", QString::SkipEmptyParts).at(1).toInt();
+        QStringList hashlist = tmpstr.split(",", QString::SkipEmptyParts);
+        qDebug() << hashlist.count() << hashlist;
+        for(int i=0; i < hashlist.count(); i++)
+            checkhash[hashlist.at(i).split("|", QString::SkipEmptyParts).at(0)] = hashlist.at(i).split("|", QString::SkipEmptyParts).at(1).toInt();
     }
 }
 
@@ -4239,12 +4242,16 @@ void WombatForensics::UpdateCheckState()
     QFile hashfile(wombatvariable.tmpmntpath + "checkstate");
     hashfile.open(QIODevice::WriteOnly);
     QMapIterator<QString, int> i(checkhash);
+    QByteArray hasharray;
     while(i.hasNext())
     {
         i.next();
         if(checkhash.contains(i.key()))
         {
-            hashfile.write(QString(i.key() + "|" + QString::number(i.value()) + ",").toStdString().c_str());
+            hasharray.clear();
+            hasharray.append(QString(i.key() + "|" + QString::number(i.value()) + ","));
+            hashfile.write(hasharray);
+            //hashfile.write(QString(i.key() + "|" + QString::number(i.value()) + ",").toStdString().c_str());
         }
     }
     hashfile.close();

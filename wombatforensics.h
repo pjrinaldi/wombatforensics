@@ -515,8 +515,10 @@ public:
         if(index.column() == 0)
         {
             flags |= Qt::ItemIsUserCheckable;
+            /*
             if(index.model()->hasChildren(index))
                 flags |= Qt::ItemIsTristate;
+            */
         }
         
         return flags;
@@ -778,7 +780,8 @@ public:
         if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
         {
             totalcount++;
-            if(curnode->checkstate == 2)
+            //if(curnode->checkstate == 2)
+            if(curnode->checkstate == true)
                 totalchecked++;
         }
         if(curnode->haschildren)
@@ -836,6 +839,10 @@ public:
         currentnode->parent = rootnode;
         currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".vol");
         currentnode->haschildren = currentnode->HasChildren();
+        if(checkhash.contains(tmplist.at(5)))
+            currentnode->checkstate = checkhash.value(tmplist.at(5));
+        else
+            currentnode->checkstate = false;
         parentnode = currentnode;
         evidfile.close();
         wombatid++;
@@ -867,6 +874,10 @@ public:
         parentnode->children.append(currentnode);
         currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".part.*");
         currentnode->haschildren = currentnode->HasChildren();
+        if(checkhash.contains(tmplist.at(5)))
+            currentnode->checkstate = checkhash.value(tmplist.at(5));
+        else
+            currentnode->checkstate = false;
         parentnode = currentnode;
         wombatid++;
         // APPEND PARTITION(S) TO THE VOLUME
@@ -904,6 +915,10 @@ public:
             currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
             //qDebug() << currentnode->childcount;
             currentnode->haschildren = currentnode->HasChildren();
+            if(checkhash.contains(tmplist.at(10)))
+                currentnode->checkstate = checkhash.value(tmplist.at(10));
+            else
+                currentnode->checkstate = false;
             parentnode = currentnode;
             wombatid++;
             QFile filefile;
@@ -944,13 +959,15 @@ public:
                 parentnode->children.append(currentnode);
                 currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
                 currentnode->haschildren = currentnode->HasChildren();
+                if(checkhash.contains(tmplist.at(12).split("-a").at(0)))
+                    currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
+                else
+                    currentnode->checkstate = 0;
                 wombatid++;
             }
         }
         endInsertRows();
         // STILL NEED TO ACCOUNT FOR THE FILE CHECKS AND UPDATE ACCORDINGLY
-        if(checkhash.contains(tmplist.at(12).split("-a").at(0)))
-            currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
         /*
         if(addevidquery.value(16).toInt() == 0)
             currentnode->checkstate = 0;
@@ -976,6 +993,12 @@ signals:
 private:
     Qt::CheckState GetCheckState(Node* curnode) const
     {
+        if(curnode->checkstate == false) // unchecked
+            return Qt::Unchecked;
+        else
+            return Qt::Checked;
+        return Qt::Unchecked;
+        /*
         if(curnode->checkstate == 0) // unchecked
             return Qt::Unchecked;
         else if(curnode->checkstate == 1) // partially checked
@@ -983,6 +1006,7 @@ private:
         else if(curnode->checkstate == 2) // checked
             return Qt::Checked;
         return Qt::Unchecked;
+        */
     };
 
     void SetParentCheckState(const QModelIndex &index)
@@ -1034,26 +1058,28 @@ private:
         if(state == Qt::Unchecked) // curnode is now unchecked...
         {
             curnode->checkstate = 0;
-            if(curnode->haschildren)
-                SetChildCheckState(index);
+            //if(curnode->haschildren)
+            //    SetChildCheckState(index);
             checkhash[curnode->nodevalues.at(0).toString()] = 0;
         }
+        /*
         else if(state == Qt::PartiallyChecked) // curnode is now partially checked
         {
             curnode->checkstate = 1;
             checkhash[curnode->nodevalues.at(0).toString()] = 1;
         }
+        */
         else if(state == Qt::Checked) // currentnode is now checked
         {
             curnode->checkstate = 2;
-            if(curnode->haschildren)
-                SetChildCheckState(index);
+            //if(curnode->haschildren)
+            //    SetChildCheckState(index);
             checkhash[curnode->nodevalues.at(0).toString()] = 2;
         }
         //emit dataChanged(index, index);
         emit checkedNodesChanged();
-        if(curnode->parent != 0)
-            SetParentCheckState(index.parent());
+        //if(curnode->parent != 0)
+        //    SetParentCheckState(index.parent());
         return true;
     };
 

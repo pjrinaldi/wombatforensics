@@ -169,7 +169,8 @@ public:
         parent = 0;
         haschildren = false;
         childcount = 0;
-        checkstate = 0;
+        //checkstate = 0;
+        checkstate = false;
         parentid = 0;
         nodetype = 0;
     };
@@ -187,7 +188,8 @@ public:
     unsigned long long parentid;
     unsigned long long childcount;
     int nodetype;
-    int checkstate;
+    //int checkstate;
+    bool checkstate;
     bool HasChildren(void)
     {
         if(childcount > 0)
