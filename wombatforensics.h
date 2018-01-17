@@ -1068,7 +1068,8 @@ private:
             curnode->checkstate = false;
             //if(curnode->haschildren)
             //    SetChildCheckState(index);
-            checkhash[curnode->nodevalues.at(0).toString()] = false;
+            checkhash.insert(curnode->nodevalues.at(0).toString(), false);
+
         }
         /*
         else if(state == Qt::PartiallyChecked) // curnode is now partially checked
@@ -1082,7 +1083,7 @@ private:
             curnode->checkstate = true;
             //if(curnode->haschildren)
             //    SetChildCheckState(index);
-            checkhash[curnode->nodevalues.at(0).toString()] = true;
+            checkhash.insert(curnode->nodevalues.at(0).toString(), true);
         }
         emit dataChanged(index, index);
         //emit checkedNodesChanged();

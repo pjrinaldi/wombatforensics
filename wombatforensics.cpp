@@ -2749,6 +2749,7 @@ void WombatForensics::CloseCurrentCase()
     }
      */
     // DETERMINE IF THERE IS A WAY TO REMOVE ALL ELEMENTS FROM A TREENODE AT ONCE...
+    UpdateCheckState();
     setWindowTitle("WombatForensics");
     filesprocessed = 0;
     filesfound = 0;
@@ -3653,7 +3654,6 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     aboutbox->close();
     cancelthread->close();
     RemoveTmpFiles();
-    UpdateCheckState();
     event->accept();
     msglog->clear();
     msgviewer->close();
