@@ -376,7 +376,9 @@ public:
         if(index.column() == 0 && role == Qt::CheckStateRole)
         {
             Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
-            return SetCheckState(index, state);
+            SetCheckState(index, state);
+            emit dataChanged(index, index);
+            return true;
         }
         if(role == Qt::DisplayRole)
         {
@@ -976,7 +978,7 @@ public:
         else
             currentnode->checkstate = 2;
         */
-        emit checkedNodesChanged();
+        //emit checkedNodesChanged();
     };
 
     Node* NodeFromIndex(const QModelIndex &index) const
@@ -997,7 +999,7 @@ private:
             return Qt::Unchecked;
         else
             return Qt::Checked;
-        return Qt::Unchecked;
+        //return Qt::Unchecked;
         /*
         if(curnode->checkstate == 0) // unchecked
             return Qt::Unchecked;
@@ -1008,9 +1010,11 @@ private:
         return Qt::Unchecked;
         */
     };
-
+    
+    // shouldn't need
     void SetParentCheckState(const QModelIndex &index)
     {
+        /*
         Node* curnode = NodeFromIndex(index);
         unsigned long long checkcount = 0;
         for(int i=0; i < curnode->children.count(); i++)
@@ -1037,10 +1041,13 @@ private:
         emit checkedNodesChanged();
         if(curnode->parent != 0)
             SetParentCheckState(index.parent());
+        */
     };
 
+    // shouldn't need
     void SetChildCheckState(const QModelIndex &index)
     {
+        /*
         Node* curnode = NodeFromIndex(index);
         for(int i=0; i < curnode->children.count(); i++)
         {
@@ -1050,6 +1057,7 @@ private:
                 SetChildCheckState(index.child(i,0));
         }
         emit checkedNodesChanged();
+        */
     };
 
     bool SetCheckState(const QModelIndex &index, Qt::CheckState state)
@@ -1057,10 +1065,10 @@ private:
         Node* curnode = NodeFromIndex(index);
         if(state == Qt::Unchecked) // curnode is now unchecked...
         {
-            curnode->checkstate = 0;
+            curnode->checkstate = false;
             //if(curnode->haschildren)
             //    SetChildCheckState(index);
-            checkhash[curnode->nodevalues.at(0).toString()] = 0;
+            checkhash[curnode->nodevalues.at(0).toString()] = false;
         }
         /*
         else if(state == Qt::PartiallyChecked) // curnode is now partially checked
@@ -1071,13 +1079,13 @@ private:
         */
         else if(state == Qt::Checked) // currentnode is now checked
         {
-            curnode->checkstate = 2;
+            curnode->checkstate = true;
             //if(curnode->haschildren)
             //    SetChildCheckState(index);
-            checkhash[curnode->nodevalues.at(0).toString()] = 2;
+            checkhash[curnode->nodevalues.at(0).toString()] = true;
         }
-        //emit dataChanged(index, index);
-        emit checkedNodesChanged();
+        emit dataChanged(index, index);
+        //emit checkedNodesChanged();
         //if(curnode->parent != 0)
         //    SetParentCheckState(index.parent());
         return true;

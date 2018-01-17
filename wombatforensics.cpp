@@ -4241,7 +4241,7 @@ void WombatForensics::UpdateCheckState()
 {
     QFile hashfile(wombatvariable.tmpmntpath + "checkstate");
     hashfile.open(QIODevice::WriteOnly);
-    QMapIterator<QString, int> i(checkhash);
+    QMapIterator<QString, bool> i(checkhash);
     QByteArray hasharray;
     while(i.hasNext())
     {
