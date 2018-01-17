@@ -311,7 +311,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         outstring += "0,0,0,0,0," + QString::number(tmpfile->name->meta_addr) + ",";
         //out << "0,0,0,0,0," + tmpfile->name->meta_addr + ",";
     }
-    char magicbuffer[1024] = {0};
+    char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
+    //char magicbuffer[1024] = {0};
     QByteArray tmparray;
     tmparray.clear();
     tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
@@ -340,6 +341,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     else
         outstring += ",0";
+    free(magicbuffer);
     //*/
 
     /* alternative method using qt5 */
@@ -625,13 +627,14 @@ void GenerateThumbnails()
         QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
         partfile.open(QIODevice::ReadOnly);
         tmpstr = partfile.readLine();
+        partfile.close();
         readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
         readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         QImage fileimage;
         QImage thumbimage;
         QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumblist.at(i) + ".jpg");
-        qDebug() << QString(wombatvariable.tmpmntpath + "thumbs/" + thumblist.at(i) + ".jpg");
-        char imgbuf[readfileinfo->meta->size];
+        //qDebug() << QString(wombatvariable.tmpmntpath + "thumbs/" + thumblist.at(i) + ".jpg");
+        char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
         ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         if(readfileinfo->meta != NULL)
         {
@@ -642,6 +645,7 @@ void GenerateThumbnails()
                 writer.write(thumbimage);
             }
         }
+        free(imgbuf);
         tsk_fs_file_close(readfileinfo);
         tsk_fs_close(readfsinfo);
         tsk_img_close(readimginfo);
@@ -1085,7 +1089,8 @@ void ThumbFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
 {
     /* alternative method using qt5 */
-    char fbuf[tmpfile->meta->size];
+    char* fbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+    //char fbuf[tmpfile->meta->size];
     ssize_t flen = tsk_fs_file_read(tmpfile, 0, fbuf, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
     //QByteArray filedata = QByteArray::fromRawData(fbuf, flen);
     //QBuffer filebuf(&filedata);
@@ -1094,6 +1099,7 @@ QVariant HashFile(TSK_FS_FILE* tmpfile, unsigned long long objid)
     hash.addData(fbuf, flen);
     qDebug() << "alternate hash method:" << hash.result().toHex();
     /* end alternative method */
+    free(fbuf);
     QVariant tmpvariant;
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);

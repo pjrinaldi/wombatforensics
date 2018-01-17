@@ -257,6 +257,7 @@ void WombatForensics::ShowExternalViewer()
             outbuffer.writeRawData(ibuffer, filelen);
             tmpfile.close();
         }
+        delete[] ibuffer;
         QProcess* process = new QProcess(this);
         QStringList arguments;
         arguments << tmpstring;
@@ -1047,7 +1048,9 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         //selectedstate = selectedindex.sibling(selectedindex.row(), 0).data().toString
         //UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
         //wombatvariable.selectedobject.modid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod id
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         LoadHexContents();
+        QApplication::restoreOverrideCursor();
         if(propertywindow->isVisible())
             UpdateProperties();
         //wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
