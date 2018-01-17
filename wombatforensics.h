@@ -808,8 +808,8 @@ public:
     //void AddEvidence(unsigned long long curid)
     void AddEvidence(int evidcount)
     {
-        qDebug() << "treemodel evidcnt:" << evidcnt;
-        qDebug() << "evidencecount:" << evidcount;
+        //qDebug() << "treemodel evidcnt:" << evidcnt;
+        //qDebug() << "evidencecount:" << evidcount;
         QStringList tmplist;
         QString tmpstr = "";
         tmplist.clear();

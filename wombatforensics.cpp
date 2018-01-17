@@ -694,7 +694,7 @@ void WombatForensics::InitializeCaseStructure()
         mntstr += wombatvariable.caseobject.name;
         mntstr += " ";
         mntstr += wombatvariable.tmpmntpath;
-        qDebug() << mntstr;
+        //qDebug() << mntstr;
         QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mkfsstr);
         QProcess::execute(mntstr);
@@ -1420,7 +1420,7 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
-    qDebug() << "evidcnt before:" << evidcnt;
+    //qDebug() << "evidcnt before:" << evidcnt;
     StatusUpdate("Building Initial Evidence Tree...");
     LogMessage("Building Initial Evidence Tree...");
     //tsk_img_close(IMG_2ND_PROC);
@@ -1452,7 +1452,7 @@ void WombatForensics::UpdateStatus()
     cancelthread->close();
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
-    qDebug() << "evidcnt after:" << evidcnt;
+    //qDebug() << "evidcnt after:" << evidcnt;
     //wombatframework->CloseInfoStructures();
 }
 
@@ -1519,7 +1519,7 @@ void WombatForensics::AddEvidence()
     wombatvarvector.clear();
     wombatvariable.evidenceobject.fullpathvector.clear();
     wombatvariable.evidenceobject.itemcount = 0;
-    qDebug() << "wombatvarvector initial count:" << wombatvarvector.count();
+    //qDebug() << "wombatvarvector initial count:" << wombatvarvector.count();
     //QList<WombatVariable> wombatvarvector;
     int isnew = 1;
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
@@ -1548,7 +1548,7 @@ void WombatForensics::AddEvidence()
             //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
             //connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()), Qt::QueuedConnection);
             wombatvarvector.append(wombatvariable);
-            qDebug() << "wombatvarvector:" << wombatvarvector.count();
+            //qDebug() << "wombatvarvector:" << wombatvarvector.count();
             //qDebug() << wombatvarvector.at(0).evidenceobject.name;
             //InitializeEvidenceStructure(wombatvariable);
             //sqlwatcher.setFuture(QtConcurrent::run(InitializeEvidenceStructure));
@@ -1636,7 +1636,7 @@ void WombatForensics::UpdateProperties()
     {
         propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last() + ".prop");
     }
-    qDebug() << propfile.fileName();
+    //qDebug() << propfile.fileName();
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream in(&propfile);
     while(!in.atEnd())
@@ -1677,7 +1677,7 @@ void WombatForensics::LoadHexContents()
         wombatvariable.evidenceobject.name = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // current evidence name
         //OpenParentImage();
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + wombatvariable.selectedobject.modid.mid(1));
-        qDebug() << wombatvariable.selectedobject.modid;
+        //qDebug() << wombatvariable.selectedobject.modid;
         //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString());
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
@@ -1853,7 +1853,7 @@ void WombatForensics::LoadHexContents()
             {
                 if(filefiles.at(i).split(".a").at(1).toInt() == selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-f").at(1).toInt())
                 {
-                    qDebug() << filefiles.at(i);
+                    //qDebug() << filefiles.at(i);
                     filefile.setFileName(wombatvariable.tmpmntpath + filefiles.at(i));
                 }
             }
@@ -2826,7 +2826,7 @@ void WombatForensics::GetExportList(Node* curnode, int exporttype)
     {
         if(exporttype == 1) // checked
         {
-            if(curnode->checkstate == 2)
+            if(curnode->checkstate == true)
                 exportlist.append(curnode->nodevalues.at(0).toString());
         }
         else if(exporttype == 2) // all listed
@@ -3075,6 +3075,7 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     StatusUpdate("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
     for(int i=0; i < exportlist.count(); i++)
     {
+        //ProcessExport(exportlist.at(i));
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, exportlist.at(i));
         exportwatcher.setFuture(tmpfuture);
     }
@@ -3307,10 +3308,11 @@ void WombatForensics::ProcessExport(QString objectid)
     partfile.close();
     readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
-    char imgbuf[readfileinfo->meta->size];
-    ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
     if(readfileinfo->meta != NULL)
     {
+        char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+        //qDebug() << "imgbuf size:" << sizeof(imgbuf);
+        ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidenceobject.name.split(".evid").at(0) + "." + pstring + "." + fstring + ".a*"), QDir::NoSymLinks | QDir::Files);
         QFile filefile(wombatvariable.tmpmntpath + filefiles.at(0));
         filefile.open(QIODevice::ReadOnly);
@@ -3348,6 +3350,7 @@ void WombatForensics::ProcessExport(QString objectid)
                 }
             }
         }
+        free(imgbuf);
         //bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
         /*
         if(imageloaded)
@@ -3710,10 +3713,10 @@ void WombatForensics::on_actionNew_Case_triggered()
     if(wombatvariable.iscaseopen)
     {
         int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
-        qDebug() << "msgbox return:" << ret << "msgbox yes:" << QMessageBox::Yes;
+        //qDebug() << "msgbox return:" << ret << "msgbox yes:" << QMessageBox::Yes;
         if(ret == QMessageBox::Yes)
         {
-            qDebug() << "detected an open case";
+            //qDebug() << "detected an open case";
             CloseCurrentCase();
             InitializeCaseStructure();
         }
@@ -3749,10 +3752,10 @@ void WombatForensics::on_actionSaveState_triggered()
 
 void WombatForensics::on_actionCheck_triggered()
 {
-    if(actionnode->checkstate < 2)
-        actionnode->checkstate = 2;
+    if(actionnode->checkstate == false)
+        actionnode->checkstate = true;
     else
-        actionnode->checkstate = 0;
+        actionnode->checkstate = false;
 }
 
 void WombatForensics::on_actionExport_triggered()
@@ -3821,7 +3824,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     {
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
-        qDebug() << tdir.absolutePath() << tdir.isEmpty();
+        //qDebug() << tdir.absolutePath() << tdir.isEmpty();
         if(tdir.isEmpty())
         {
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
@@ -4241,7 +4244,7 @@ void WombatForensics::InitializeCheckState()
         QString tmpstr = hashfile.readLine();
         hashfile.close();
         QStringList hashlist = tmpstr.split(",", QString::SkipEmptyParts);
-        qDebug() << hashlist.count() << hashlist;
+        //qDebug() << hashlist.count() << hashlist;
         for(int i=0; i < hashlist.count(); i++)
             checkhash[hashlist.at(i).split("|", QString::SkipEmptyParts).at(0)] = hashlist.at(i).split("|", QString::SkipEmptyParts).at(1).toInt();
     }
