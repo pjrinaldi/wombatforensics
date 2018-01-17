@@ -104,6 +104,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(wombatdatabase, SIGNAL(DisplayError(QString, QString, QString)), this, SLOT(DisplayError(QString, QString, QString)), Qt::DirectConnection);
     propertywindow->setModal(false);
     InitializeAppStructure();
+    connect(&hexwatcher, SIGNAL(finished()), this, SLOT(FinishHex()), Qt::QueuedConnection);
     //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(InitializeQueryModel()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(FinishSql()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     //connect(&secondwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
@@ -905,7 +906,11 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         treemodel->AddEvidence(QFile(files.at(i)).fileName().split(".").last().toInt());
         evidcnt++;
     }
-    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    if(indexlist.count() > 0)
+        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    else
+        ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     if(ui->dirTreeView->model() != NULL)
     {
         ui->actionRemove_Evidence->setEnabled(true);
@@ -914,9 +919,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         hexrocker->setEnabled(true);
         //StatusUpdate("Opening Case Evidence...");
     }
-    QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    if(indexlist.count() > 0)
-        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     //ui->dirTreeView->setCurrentIndex(treemodel->index
     QApplication::restoreOverrideCursor();
     LogMessage("Case was Opened Successfully");
@@ -1048,9 +1050,14 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         //selectedstate = selectedindex.sibling(selectedindex.row(), 0).data().toString
         //UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
         //wombatvariable.selectedobject.modid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod id
+        StatusUpdate("Loading Hex Contents...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        // WILL ATTEMPT TO QTCONCURRENT THIS FUNCTION... THIS DID NOT WORK AS INTENDED...
         LoadHexContents();
+        //hexfuture = QtConcurrent::run(this, &WombatForensics::LoadHexContents);
+        //hexwatcher.setFuture(hexfuture);
         QApplication::restoreOverrideCursor();
+        StatusUpdate("Ready");
         if(propertywindow->isVisible())
             UpdateProperties();
         //wombatvarptr->selectedobject.id = selectedindex.sibling(selectedindex.row(), 0).data().toULongLong(); // object id
@@ -1438,13 +1445,14 @@ void WombatForensics::UpdateStatus()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     treemodel->AddEvidence(evidcnt);
     QApplication::restoreOverrideCursor();
-    ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     evidcnt++;
     volcnt = 0;
     partint = 0;
     QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    else
+        ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     //treemodel->AddEvidence(wombatvariable.evidenceobject.id);
     //ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     ui->actionRemove_Evidence->setEnabled(true);
@@ -2357,6 +2365,8 @@ void WombatForensics::LoadHexContents()
     }
     */
     //if(wombatvariable.selectedobject.objtype == 1)
+
+/* MOVED TO FINISHHEX() --- DIDN'T WORK VERY WELL AS CONCURRENT THREAD */
     if(wombatvariable.selectedobject.modid.split("-").count() < 4) // image file
     {
         hexwidget->openimage();
@@ -2598,6 +2608,33 @@ void WombatForensics::LoadHexContents()
         }
     }
     */
+
+    /*
+void WombatForensics::FinishHex(void)
+{
+    if(wombatvariable.selectedobject.modid.split("-").count() < 4) // image file
+    {
+        hexwidget->openimage();
+        hexwidget->set1BPC();
+        hexwidget->setBaseHex();
+        hexwidget->SetTopLeft(0);
+    }
+    else
+    {
+        hexwidget->SetTopLeft(tskobjptr->offset);
+        //if(wombatvariable.selectedobject.objtype == 5 || wombatvariable.selectedobject.objtype == 6)
+        if(wombatvariable.selectedobject.modid.split("-").count() == 4)
+        {
+            fileviewer->filehexview->openimage();
+            fileviewer->filehexview->set1BPC();
+            fileviewer->filehexview->setBaseHex();
+            fileviewer->filehexview->SetTopLeft(0);
+        }
+    }
+    QApplication::restoreOverrideCursor();
+    StatusUpdate("Ready");
+}
+*/
 
 //void WombatForensics::OpenParentImage(unsigned long long imgid)
 void WombatForensics::OpenParentImage(void)

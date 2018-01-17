@@ -1215,6 +1215,7 @@ private slots:
     void FinishExport(void);
     void FinishRemoval(void);
     void FinishThumbs(void);
+    //void FinishHex(void);
     void StatusUpdate(QString tmptext)
     {
         statuslabel->setText(tmptext);
@@ -1300,6 +1301,8 @@ private:
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
     //QFuture<void> secondfuture;
+    QFuture<void> hexfuture;
+    QFutureWatcher<void> hexwatcher;
     //QFutureWatcher<void> secondwatcher;
     QFuture<void> thumbfuture;
     QFutureWatcher<void> thumbwatcher;
