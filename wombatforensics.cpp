@@ -913,6 +913,10 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         hexrocker->setEnabled(true);
         //StatusUpdate("Opening Case Evidence...");
     }
+    QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    if(indexlist.count() > 0)
+        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    //ui->dirTreeView->setCurrentIndex(treemodel->index
     QApplication::restoreOverrideCursor();
     LogMessage("Case was Opened Successfully");
     StatusUpdate("Ready");
@@ -1040,6 +1044,8 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
         ui->actionByteConverter->setEnabled(true);
+        //selectedstate = selectedindex.sibling(selectedindex.row(), 0).data().toString
+        //UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
         //wombatvariable.selectedobject.modid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod id
         LoadHexContents();
         if(propertywindow->isVisible())
@@ -1433,6 +1439,9 @@ void WombatForensics::UpdateStatus()
     evidcnt++;
     volcnt = 0;
     partint = 0;
+    QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    if(indexlist.count() > 0)
+        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     //treemodel->AddEvidence(wombatvariable.evidenceobject.id);
     //ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
     ui->actionRemove_Evidence->setEnabled(true);
@@ -2721,6 +2730,7 @@ unsigned long long WombatForensics::GetResidentOffset(unsigned long long fileadd
 
 void WombatForensics::CloseCurrentCase()
 {
+    UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*"), QDir::NoSymLinks | QDir::Files);
     //qDebug() << "evid files:" << evidfiles;
@@ -4251,10 +4261,28 @@ void WombatForensics::UpdateCheckState()
             hasharray.clear();
             hasharray.append(QString(i.key() + "|" + QString::number(i.value()) + ","));
             hashfile.write(hasharray);
-            //hashfile.write(QString(i.key() + "|" + QString::number(i.value()) + ",").toStdString().c_str());
         }
     }
     hashfile.close();
+}
+
+QString WombatForensics::InitializeSelectedState()
+{
+    QFile selectfile(wombatvariable.tmpmntpath + "selectedstate");
+    selectfile.open(QIODevice::ReadOnly);
+    QString tmpstr = selectfile.readLine();
+    selectfile.close();
+    return tmpstr;
+}
+
+void WombatForensics::UpdateSelectedState(QString id)
+{
+    QFile selectfile(wombatvariable.tmpmntpath + "selectedstate");
+    selectfile.open(QIODevice::WriteOnly);
+    QByteArray selectarray;
+    selectarray.append(id);
+    selectfile.write(selectarray);
+    selectfile.close();
 }
 
 void WombatForensics::AutoSaveState()

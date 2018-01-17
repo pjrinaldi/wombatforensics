@@ -1281,6 +1281,8 @@ private:
     void RemoveTmpFiles(void);
     void UpdateCheckState(void);
     void InitializeCheckState(void);
+    void UpdateSelectedState(QString id);
+    QString InitializeSelectedState(void);
     //void GetEvidenceObjects(void);
 /*
     uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, unsigned char follow_hard_link);
@@ -1337,6 +1339,7 @@ private:
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
+    //QString selectedstate;
     //unsigned long long currentcaseid;
     /*
     WombatVariable wombatvariable; // possibly need to make this global...
