@@ -58,6 +58,7 @@ struct EvidenceObject
     */
 };
 
+// SHOULDN'T NEED
 struct FileExportData
 {
     enum PathStatus
@@ -83,6 +84,7 @@ struct FileExportData
     unsigned long long exportcount;
 };
 
+// SHOULDN'T NEED
 struct FileDeepData
 {
     enum FileStatus

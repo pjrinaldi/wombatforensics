@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'digdeeperdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.5.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -38,7 +38,6 @@ public:
     QRadioButton *listedFileRadioButton;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_4;
-    QCheckBox *md5checkBox;
     QCheckBox *thumbnailcheckBox;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout;
@@ -46,7 +45,6 @@ public:
     QPushButton *cancelButton;
     QPushButton *processButton;
     QButtonGroup *exportButtonGroup;
-    QButtonGroup *pathButtonGroup;
 
     void setupUi(QDialog *DigDeeperDialog)
     {
@@ -98,11 +96,6 @@ public:
         groupBox->setObjectName(QStringLiteral("groupBox"));
         verticalLayout_4 = new QVBoxLayout(groupBox);
         verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
-        md5checkBox = new QCheckBox(groupBox);
-        md5checkBox->setObjectName(QStringLiteral("md5checkBox"));
-
-        verticalLayout_4->addWidget(md5checkBox);
-
         thumbnailcheckBox = new QCheckBox(groupBox);
         thumbnailcheckBox->setObjectName(QStringLiteral("thumbnailcheckBox"));
 
@@ -147,16 +140,15 @@ public:
 
     void retranslateUi(QDialog *DigDeeperDialog)
     {
-        DigDeeperDialog->setWindowTitle(QApplication::translate("DigDeeperDialog", "Dig Deeper", 0));
-        groupBox_2->setTitle(QApplication::translate("DigDeeperDialog", "Process the Following File(s)", 0));
-        selectedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Selected", 0));
-        checkedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Checked (#)", 0));
-        listedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Currently Listed (#)", 0));
-        groupBox->setTitle(QApplication::translate("DigDeeperDialog", "For the Following Options", 0));
-        md5checkBox->setText(QApplication::translate("DigDeeperDialog", "Calculate the MD5 Hash Value", 0));
-        thumbnailcheckBox->setText(QApplication::translate("DigDeeperDialog", "Generate Thumbnails for Image Files", 0));
-        cancelButton->setText(QApplication::translate("DigDeeperDialog", "Cancel", 0));
-        processButton->setText(QApplication::translate("DigDeeperDialog", "Process", 0));
+        DigDeeperDialog->setWindowTitle(QApplication::translate("DigDeeperDialog", "Dig Deeper", Q_NULLPTR));
+        groupBox_2->setTitle(QApplication::translate("DigDeeperDialog", "Process the Following File(s)", Q_NULLPTR));
+        selectedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Selected", Q_NULLPTR));
+        checkedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Checked (#)", Q_NULLPTR));
+        listedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Currently Listed (#)", Q_NULLPTR));
+        groupBox->setTitle(QApplication::translate("DigDeeperDialog", "For the Following Options", Q_NULLPTR));
+        thumbnailcheckBox->setText(QApplication::translate("DigDeeperDialog", "Generate Thumbnails for Image Files", Q_NULLPTR));
+        cancelButton->setText(QApplication::translate("DigDeeperDialog", "Cancel", Q_NULLPTR));
+        processButton->setText(QApplication::translate("DigDeeperDialog", "Process", Q_NULLPTR));
     } // retranslateUi
 
 };

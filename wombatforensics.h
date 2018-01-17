@@ -1335,7 +1335,7 @@ private:
     int exporttype;
     bool originalpath;
     QStringList exportlist;
-    QVector<FileDeepData> digfilelist;
+    //QVector<FileDeepData> digfilelist;
     //QVector<QVariantMap> jsonstorevector;
     //QVector<SecondaryProcessObject> secondprocessvector;
     QShortcut* jumpforward;
