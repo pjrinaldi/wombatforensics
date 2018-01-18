@@ -20,7 +20,8 @@ public:
     ~DigDeeperDialog();
 
 signals:
-    void FileDig(FileDeepData* deeperdata);
+    //void FileDig(FileDeepData* deeperdata);
+    void StartDig(int digtype, QVector<int> digoptions);
 
 private slots:
     void EnableProcess(bool checked);
@@ -30,6 +31,8 @@ private:
     Ui::DigDeeperDialog *ui;
     unsigned long long checkcount;
     unsigned long long listcount;
+    int digtype = 0;
+    QVector<int> digoptions;
     QWidget* parentwidget;
 };
 

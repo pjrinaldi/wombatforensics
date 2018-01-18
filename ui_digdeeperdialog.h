@@ -146,7 +146,7 @@ public:
         checkedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Checked (#)", Q_NULLPTR));
         listedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Currently Listed (#)", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("DigDeeperDialog", "For the Following Options", Q_NULLPTR));
-        thumbnailcheckBox->setText(QApplication::translate("DigDeeperDialog", "Generate Thumbnails for Image Files", Q_NULLPTR));
+        thumbnailcheckBox->setText(QApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Image Files", Q_NULLPTR));
         cancelButton->setText(QApplication::translate("DigDeeperDialog", "Cancel", Q_NULLPTR));
         processButton->setText(QApplication::translate("DigDeeperDialog", "Process", Q_NULLPTR));
     } // retranslateUi

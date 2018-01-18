@@ -101,7 +101,7 @@
         <item>
          <widget class="QCheckBox" name="thumbnailcheckBox">
           <property name="text">
-           <string>Generate Thumbnails for Image Files</string>
+           <string>Generate Thumbnails for All Image Files</string>
           </property>
          </widget>
         </item>

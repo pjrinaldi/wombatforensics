@@ -1199,7 +1199,8 @@ private slots:
     };
     //void FileExport(FileExportData* exportdata);
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
-    void FileDig(FileDeepData* deeperdata);
+    void DigFiles(int digtype, QVector<int> digoptions);
+    //void FileDig(FileDeepData* deeperdata);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
     void ShowRockerToolTip(int moved);
@@ -1263,9 +1264,11 @@ private:
     void DigFiles(FileDeepData* deepdata);
     void GetExportData(Node* curnode, FileExportData* exportdata);
     void GetExportList(Node* curnode, int exporttype);
+    void GetDigList(Node* curnode, int digtype);
     void GetDigData(Node* curnode, FileDeepData* deepdata);
-    void ProcessDig(TskObject curobject, unsigned long long objectid, std::vector<FileDeepData::DigOptions> digoptions);
+    //void ProcessDig(TskObject curobject, unsigned long long objectid, std::vector<FileDeepData::DigOptions> digoptions);
     void ProcessExport(QString curid);
+    void ProcessDig(QString curid);
     //void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
     void UpdateFilterCount(void);
     void SaveState(void);
@@ -1335,6 +1338,9 @@ private:
     int exporttype;
     bool originalpath;
     QStringList exportlist;
+    int digtype;
+    QVector<int> digoptions;
+    QStringList digfilelist;
     //QVector<FileDeepData> digfilelist;
     //QVector<QVariantMap> jsonstorevector;
     //QVector<SecondaryProcessObject> secondprocessvector;
