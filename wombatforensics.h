@@ -870,8 +870,6 @@ private:
     QFuture<void> exportfuture;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;
-    QFuture<void> remfuture;
-    QFutureWatcher<void> remwatcher;
 
     QFile casesfile;
     QFile settingsfile;

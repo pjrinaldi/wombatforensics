@@ -99,7 +99,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
-    connect(&remwatcher, SIGNAL(finished()), this, SLOT(FinishRemoval()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
@@ -440,6 +439,7 @@ void WombatForensics::InitializeOpenCase()
         tmplist.removeLast();
         wombatvariable.casepath = tmplist.join("/");
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
+        msglog->clear();
         if(!wombatvariable.casename.contains(".wfc"))
         {
             this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last());
@@ -485,7 +485,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     wombatvariable.iscaseopen = true;
     InitializeCheckState();
     ui->actionAdd_Evidence->setEnabled(true);
-    LogMessage("Case was Opened");
     //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -986,7 +985,7 @@ void WombatForensics::CloseCurrentCase()
     filtercountlabel->setText("Filtered: 0");
     processcountlabel->setText("Processed: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    
+    // WRITE MSGLOG TO FILE HERE...
     //QString umntstr = "pkexec umount ";
     //umntstr += wombatvariable.tmpmntpath;
     if(wombatvariable.iscaseopen)
@@ -1952,6 +1951,7 @@ void WombatForensics::SaveState()
 {
     RemoveTmpFiles();
     UpdateCheckState();
+    UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
 }
 
 void WombatForensics::InitializeCheckState()
@@ -1990,10 +1990,14 @@ void WombatForensics::UpdateCheckState()
 QString WombatForensics::InitializeSelectedState()
 {
     QFile selectfile(wombatvariable.tmpmntpath + "selectedstate");
-    selectfile.open(QIODevice::ReadOnly);
-    QString tmpstr = selectfile.readLine();
-    selectfile.close();
-    return tmpstr;
+    if(selectfile.exists())
+    {
+        selectfile.open(QIODevice::ReadOnly);
+        QString tmpstr = selectfile.readLine();
+        selectfile.close();
+        return tmpstr;
+    }
+    else return "";
 }
 
 void WombatForensics::UpdateSelectedState(QString id)

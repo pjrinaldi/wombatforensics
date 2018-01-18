@@ -20,9 +20,13 @@ std::string GetTime()
 
 void LogMessage(QString logmsg)
 {
+    QByteArray ba;
+    ba.clear();
     QString tmpstring = QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t"));
-    //msglog->append(QString(tmpstring + " " + logmsg));
+    ba.append(tmpstring + "\t" + logmsg  +"\n");
+    msglog->append(QString(tmpstring + ": " + logmsg));
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
+    logfile.write(ba);
     logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
     logfile.close();
 }
