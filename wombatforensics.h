@@ -867,7 +867,6 @@ private:
     QFutureWatcher<void> hexwatcher;
     QFuture<void> thumbfuture;
     QFutureWatcher<void> thumbwatcher;
-    QFuture<void> exportfuture;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;
 

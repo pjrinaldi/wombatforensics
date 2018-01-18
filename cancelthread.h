@@ -31,7 +31,6 @@ signals:
 private:
     Ui::CancelThread* ui;
 protected:
-    //void mousePressEvent(QMouseEvent* event);
 };
 
 Q_DECLARE_METATYPE(CancelThread*)

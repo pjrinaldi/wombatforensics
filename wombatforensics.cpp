@@ -96,8 +96,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
     propertywindow->setModal(false);
     InitializeAppStructure();
-    connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
+    //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
+    connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
@@ -601,7 +602,7 @@ void WombatForensics::UpdateDigging()
 
 void WombatForensics::AddEvidence()
 {
-    wombatvarvector.clear();
+    //wombatvarvector.clear();
     wombatvariable.fullpathvector.clear();
     wombatvariable.itemcount = 0;
     int isnew = 1;
@@ -617,16 +618,20 @@ void WombatForensics::AddEvidence()
             LogMessage("Start Adding Evidence");
             // TRY A QTCONCURRENT::MAP() WITH A 1 ITEM VECTOR SO I CAN CANCEL IT...
             connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
-            //connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()), Qt::QueuedConnection);
-            wombatvarvector.append(wombatvariable);
+            connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()), Qt::QueuedConnection);
+            QList<int> dumint;
+            dumint.clear();
+            dumint.append(0);
+            //wombatvarvector.append(wombatvariable);
             //qDebug() << "wombatvarvector:" << wombatvarvector.count();
             //qDebug() << wombatvarvector.at(0).evidenceobject.name;
             //InitializeEvidenceStructure(wombatvariable);
             //sqlwatcher.setFuture(QtConcurrent::run(InitializeEvidenceStructure));
-            //sqlwatcher.setFuture(QtConcurrent::map(wombatvarvector, InitializeEvidenceStructure));
-            InitializeEvidenceStructure();
-            //cancelthread->show();
-            UpdateStatus();
+            QFuture<void> tmpfuture = QtConcurrent::map(dumint, InitializeEvidenceStructure);
+            sqlwatcher.setFuture(tmpfuture);
+            //InitializeEvidenceStructure();
+            cancelthread->show();
+            //UpdateStatus();
         }
         else
             DisplayError("3.0", "Evidence already exists in the case", "Add Evidence Cancelled");
@@ -1213,6 +1218,7 @@ void WombatForensics::ProcessExport(QString objectid)
     tsk_img_close(readimginfo);
     exportcount++;
     int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
+    LogMessage(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
 }
 
@@ -1723,7 +1729,6 @@ void WombatForensics::on_actionCollapseAll_triggered()
 void WombatForensics::on_actionAbout_triggered()
 {
     aboutbox->show();
-    //cancelthread->show();
 }
 
 void WombatForensics::UpdateThumbnails(int tsize)

@@ -28,7 +28,8 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
 QString GetFilePermissions(TSK_FS_META* tmpmeta);
 QString ConvertGmtHours(int gmtvar);
 void yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t* objfirst, uint32_t* objlast, uint32_t* vercnt, uint32_t* verfirst, uint32_t* verlast);
-void InitializeEvidenceStructure(void);
+void InitializeEvidenceStructure(int dumint);
+//void InitializeEvidenceStructure(void);
 QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
 TSK_OFF_T hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle);
 uint8_t hfs_cat_read_thread_record(HFS_INFO* hfs, TSK_OFF_T off, hfs_thread* thread);

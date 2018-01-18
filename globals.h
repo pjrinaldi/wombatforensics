@@ -100,7 +100,7 @@ struct FilterValues
     QStringList hashlist;
 };
 
-extern QList<WombatVariable> wombatvarvector;
+//extern QList<WombatVariable> wombatvarvector;
 
 extern FilterValues filtervalues;
 /*

@@ -8,7 +8,7 @@ QFile logfile;
 QFile viewerfile;
 QDir thumbdir;
 QTextEdit* msglog = NULL;
-QList<WombatVariable> wombatvarvector;
+//QList<WombatVariable> wombatvarvector;
 QFutureWatcher<void> thumbwatcher;
 QFutureWatcher<void> secondwatcher;
 unsigned long long filesfound = 0;
