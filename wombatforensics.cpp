@@ -3423,8 +3423,8 @@ void WombatForensics::ProcessDig(QString objectid)
     {
         if(digoptions.at(0) == 0) // Generate Thumbnails
         {
-            thumbfuture = QtConcurrent::run(this, &WombatForensics::StartThumbnails);
-            thumbwatcher.setFuture(thumbfuture);
+            StartThumbnails();
+            GenerateThumbnails();
             /*
             QModelIndexList indexlist = ui->dirTreeView->model()->match(ui->dirTreeView->model()->index(0, 0), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchRecursive));
             if(indexlist.count() > 0)
