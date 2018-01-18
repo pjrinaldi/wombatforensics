@@ -849,7 +849,7 @@ private:
     void StartThumbnails(void);
     void GetExportList(Node* curnode, int exporttype);
     void GetDigList(Node* curnode, int digtype);
-    void ProcessExport(QString curid);
+    //void ProcessExport(QString curid);
     void ProcessDig(QString curid);
     void UpdateFilterCount(void);
     void SaveState(void);
@@ -888,10 +888,10 @@ private:
     QLabel* statuslabel;
     QFrame* vline1;
     QFrame* vline2;
-    QString exportpath;
+    //QString exportpath;
     int exporttype;
-    bool originalpath;
-    QStringList exportlist;
+    //bool originalpath;
+    //QStringList exportlist;
     int digtype;
     QVector<int> digoptions;
     QStringList digfilelist;

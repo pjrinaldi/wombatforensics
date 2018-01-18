@@ -48,7 +48,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tskobjptr->readfileinfo = NULL;
     propertywindow = new PropertiesWindow(this);
     fileviewer = new FileViewer(this, tskobjptr);
-    //isignals = new InterfaceSignals();
+    isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
     jumpfilterview = new JumpFilter(this);
     namefilterview = new NameFilter(this);
@@ -93,12 +93,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
-    //connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
     propertywindow->setModal(false);
     InitializeAppStructure();
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
+    connect(cancelthread, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
@@ -602,7 +603,6 @@ void WombatForensics::UpdateDigging()
 
 void WombatForensics::AddEvidence()
 {
-    //wombatvarvector.clear();
     wombatvariable.fullpathvector.clear();
     wombatvariable.itemcount = 0;
     int isnew = 1;
@@ -617,20 +617,16 @@ void WombatForensics::AddEvidence()
             wombatvariable.itemcount = tmplist.count();
             LogMessage("Start Adding Evidence");
             // TRY A QTCONCURRENT::MAP() WITH A 1 ITEM VECTOR SO I CAN CANCEL IT...
+            // if its a 1 item vector, the 1 item will be spawned and cancel will stop future items, which tehre are none.
             connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
-            connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()), Qt::QueuedConnection);
+            //connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()));
             QList<int> dumint;
             dumint.clear();
             dumint.append(0);
-            //wombatvarvector.append(wombatvariable);
-            //qDebug() << "wombatvarvector:" << wombatvarvector.count();
-            //qDebug() << wombatvarvector.at(0).evidenceobject.name;
-            //InitializeEvidenceStructure(wombatvariable);
-            //sqlwatcher.setFuture(QtConcurrent::run(InitializeEvidenceStructure));
             QFuture<void> tmpfuture = QtConcurrent::map(dumint, InitializeEvidenceStructure);
             sqlwatcher.setFuture(tmpfuture);
             //InitializeEvidenceStructure();
-            cancelthread->show();
+            //cancelthread->show();
             //UpdateStatus();
         }
         else
@@ -1082,54 +1078,7 @@ void WombatForensics::FinishExport()
     }
 }
 
-void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
-{
-    exporttype = etype;
-    exportpath = epath;
-    originalpath = opath;
-    exportlist.clear();
-    errorcount = 0;
-    exportcount = 0;
-    LogMessage("Started Exporting Evidence");
-    if(etype == 0) // selected
-    {
-        exportlist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
-    }
-    else // checked or all listed
-        GetExportList(rootnode, etype);
-    int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
-    LogMessage("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
-    StatusUpdate("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
-    for(int i=0; i < exportlist.count(); i++)
-    {
-        //ProcessExport(exportlist.at(i));
-        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, exportlist.at(i));
-        exportwatcher.setFuture(tmpfuture);
-    }
-}
-
-void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
-{
-    digtype = dtype;
-    digoptions = doptions;
-    digfilelist.clear();
-    LogMessage("Digging Deeper into Evidence");
-    if(dtype == 0) // selected
-    {
-        digfilelist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
-    }
-    else // checked or all listed
-        GetDigList(rootnode, dtype);
-    int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
-    LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
-    StatusUpdate("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
-    for(int i = 0; i < digfilelist.count(); i++)
-    {
-        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessDig, digfilelist.at(i));
-        digwatcher.setFuture(tmpfuture);
-    }
-}
-
+/*
 void WombatForensics::ProcessExport(QString objectid)
 {
     TSK_IMG_INFO* readimginfo;
@@ -1220,6 +1169,61 @@ void WombatForensics::ProcessExport(QString objectid)
     int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
     LogMessage(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
+}
+*/
+
+void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
+{
+    exporttype = etype;
+    exportpath = epath;
+    originalpath = opath;
+    exportlist.clear();
+    errorcount = 0;
+    exportcount = 0;
+    LogMessage("Started Exporting Evidence");
+    if(etype == 0) // selected
+    {
+        exportlist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+    }
+    else // checked or all listed
+        GetExportList(rootnode, etype);
+    int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
+    LogMessage("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
+    StatusUpdate("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
+    // cancellable map
+    QFuture<void> tmpfuture = QtConcurrent::map(exportlist, ProcessExport);
+    exportwatcher.setFuture(tmpfuture);
+    // non-cancel run loop
+    /*
+    for(int i=0; i < exportlist.count(); i++)
+    {
+        //ProcessExport(exportlist.at(i));
+        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, exportlist.at(i));
+        exportwatcher.setFuture(tmpfuture);
+    }
+    */
+}
+
+void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
+{
+    digtype = dtype;
+    digoptions = doptions;
+    digfilelist.clear();
+    LogMessage("Digging Deeper into Evidence");
+    if(dtype == 0) // selected
+    {
+        digfilelist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+    }
+    else // checked or all listed
+        GetDigList(rootnode, dtype);
+    int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
+    LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
+    StatusUpdate("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
+    for(int i = 0; i < digfilelist.count(); i++)
+    {
+        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessDig, digfilelist.at(i));
+        digwatcher.setFuture(tmpfuture);
+    }
 }
 
 void WombatForensics::ProcessDig(QString objectid)
@@ -1315,12 +1319,12 @@ void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long
     if(processcount > 0)
     {
     }
-    double curprogress = (((double)processphase)/(((double)filesfound)*3.0))*100;
-    if(curprogress > 100)
-        curprogress = 100;
-    processcountlabel->setText("Processed: " + QString::number(filesprocessed));
+    //double curprogress = (((double)processphase)/(((double)filesfound)*3.0))*100;
+    //if(curprogress > 100)
+    //    curprogress = 100;
+    processcountlabel->setText("Dug: " + QString::number(filesprocessed));
     filecountlabel->setText("Files: " + QString::number(filesfound));
-    StatusUpdate("Processing: " + QString::number(curprogress, 'f', 2) + "%");
+    //StatusUpdate("Processing: " + QString::number(curprogress, 'f', 2) + "%");
     filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
 }
 

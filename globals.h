@@ -38,6 +38,9 @@ extern QList<QVariant> colvalues;
 extern QStringList propertylist;
 extern QStringList thumblist;
 extern QStringList thumbpathlist;
+extern QStringList exportlist;
+extern QString exportpath;
+extern bool originalpath;
 extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
@@ -100,10 +103,7 @@ struct FilterValues
     QStringList hashlist;
 };
 
-//extern QList<WombatVariable> wombatvarvector;
-
 extern FilterValues filtervalues;
-/*
 class InterfaceSignals : public QObject
 {
     Q_OBJECT
@@ -118,7 +118,7 @@ signals:
 
 };
 
-extern InterfaceSignals* isignals;*/
+extern InterfaceSignals* isignals;
 
 class Node
 {
