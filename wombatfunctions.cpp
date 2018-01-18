@@ -424,12 +424,11 @@ void ProcessExport(QString objectid)
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);
     exportcount++;
-    //int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
-    //LogMessage(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
-    //StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
+    isignals->ExportUpd();
 }
 
-void GenerateThumbnails()
+//void GenerateThumbnails()
+void GenerateThumbnails(QString thumbid)
 {
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
@@ -438,12 +437,15 @@ void GenerateThumbnails()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     std::vector<std::string> pathvector;
     const TSK_TCHAR** imagepartspath;
-    for(int i=0; i < thumblist.count(); i++)
-    {
+    //for(int i=0; i < thumblist.count(); i++)
+    //{
         pathvector.clear();
-        QString estring = thumblist.at(i).split("-", QString::SkipEmptyParts).at(0);
-        QString pstring = thumblist.at(i).split("-", QString::SkipEmptyParts).at(2);
-        unsigned long long curaddress = thumblist.at(i).split("-f").at(1).split("-a").at(0).toULongLong(); 
+        QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
+        //QString estring = thumblist.at(i).split("-", QString::SkipEmptyParts).at(0);
+        //QString pstring = thumblist.at(i).split("-", QString::SkipEmptyParts).at(2);
+        QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
+        unsigned long long curaddress = thumbid.split("-f").at(1).split("-a").at(0).toULongLong(); 
+        //unsigned long long curaddress = thumblist.at(i).split("-f").at(1).split("-a").at(0).toULongLong(); 
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + estring.mid(1));
@@ -473,7 +475,8 @@ void GenerateThumbnails()
         readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         QImage fileimage;
         QImage thumbimage;
-        QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumblist.at(i) + ".jpg");
+        QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
+        //QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumblist.at(i) + ".jpg");
         char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
         ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         if(readfileinfo->meta != NULL)
@@ -489,7 +492,8 @@ void GenerateThumbnails()
         tsk_fs_file_close(readfileinfo);
         tsk_fs_close(readfsinfo);
         tsk_img_close(readimginfo);
-    }
+        isignals->DigUpd();
+    //}
 }
 
 void cnid_to_array(uint32_t cnid, uint8_t array[4])

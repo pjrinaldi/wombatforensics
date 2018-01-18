@@ -767,6 +767,8 @@ private slots:
     void on_actionCollapseAll_triggered();
     void on_actionAbout_triggered();
     void UpdateProgress(unsigned long long count, unsigned long long processcount);
+    void UpdateExport(void);
+    void UpdateDig(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HidePropertyWindow(bool checkstate);
     void HideFileViewer(bool checkstate);
@@ -894,7 +896,7 @@ private:
     //QStringList exportlist;
     int digtype;
     QVector<int> digoptions;
-    QStringList digfilelist;
+    //QStringList digfilelist;
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
     QShortcut* showitem;

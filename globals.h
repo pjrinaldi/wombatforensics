@@ -39,6 +39,7 @@ extern QStringList propertylist;
 extern QStringList thumblist;
 extern QStringList thumbpathlist;
 extern QStringList exportlist;
+extern QStringList digfilelist;
 extern QString exportpath;
 extern bool originalpath;
 extern QString blockstring;
@@ -112,9 +113,13 @@ public:
     ~InterfaceSignals() { };
 
     void ProgUpd(void) { emit(ProgressUpdate(filesfound, filesprocessed)); }
+    void ExportUpd(void) { emit(ExportUpdate()); }
+    void DigUpd(void) { emit(DigUpdate()); }
 
 signals:
     void ProgressUpdate(unsigned long long filecount, unsigned long long processcount);
+    void ExportUpdate(void);
+    void DigUpdate(void);
 
 };
 

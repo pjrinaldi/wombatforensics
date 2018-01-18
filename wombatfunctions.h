@@ -15,7 +15,8 @@ QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
 bool ProcessingComplete(void);
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
-void GenerateThumbnails(void); // run function
+void GenerateThumbnails(QString thumbid); // run function
+//void GenerateThumbnails(void); // run function
 QString GetBlockList(TSK_FS_FILE* tmpfile);
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo);
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo);

@@ -94,10 +94,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     propertywindow->setModal(false);
     InitializeAppStructure();
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
+    connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
     connect(cancelthread, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
@@ -1067,15 +1070,9 @@ void WombatForensics::ExportEvidence()
 
 void WombatForensics::FinishExport()
 {
-    if(ProcessingComplete())
-    {
-        LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
-        StatusUpdate("Exporting completed with " + QString::number(errorcount) + "error(s)");
-    }
-    else
-    {
-        LogMessage("Still Removing Files");
-    }
+    cancelthread->close();
+    LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
+    StatusUpdate("Exporting completed with " + QString::number(errorcount) + "error(s)");
 }
 
 /*
@@ -1193,6 +1190,7 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     // cancellable map
     QFuture<void> tmpfuture = QtConcurrent::map(exportlist, ProcessExport);
     exportwatcher.setFuture(tmpfuture);
+    cancelthread->show();
     // non-cancel run loop
     /*
     for(int i=0; i < exportlist.count(); i++)
@@ -1216,6 +1214,20 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     }
     else // checked or all listed
         GetDigList(rootnode, dtype);
+    for(int i = 0; i < digoptions.count(); i++)
+    {
+        if(digoptions.at(0) == 0) // Generate Thumbnails
+        {
+            StartThumbnails();
+            //GenerateThumbnails();
+        }
+    }
+    /*
+    QFuture<void> tmpfuture = QtConcurrent::map(digfilelist, ProcessDig);
+    digwatcher.setFuture(tmpfuture);
+    cancelthread->show();
+    */
+    /*
     int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
     LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
     StatusUpdate("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
@@ -1224,6 +1236,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessDig, digfilelist.at(i));
         digwatcher.setFuture(tmpfuture);
     }
+    */
 }
 
 void WombatForensics::ProcessDig(QString objectid)
@@ -1284,7 +1297,7 @@ void WombatForensics::ProcessDig(QString objectid)
         if(digoptions.at(0) == 0) // Generate Thumbnails
         {
             StartThumbnails();
-            GenerateThumbnails();
+            //GenerateThumbnails();
         }
     }
     /*
@@ -1311,6 +1324,18 @@ void WombatForensics::ProcessDig(QString objectid)
     StatusUpdate(QString("Dug " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%"));
 }
 
+void WombatForensics::UpdateDig()
+{
+    int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
+    LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
+    StatusUpdate("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
+}
+void WombatForensics::UpdateExport()
+{
+    int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
+    LogMessage(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
+    StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
+}
 void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)
 {
     if(filecount > 0)
@@ -1611,8 +1636,9 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
-                thumbfuture = QtConcurrent::run(this, &WombatForensics::StartThumbnails);
-                thumbwatcher.setFuture(thumbfuture);
+                StartThumbnails();
+                //thumbfuture = QtConcurrent::run(this, &WombatForensics::StartThumbnails);
+                //thumbwatcher.setFuture(thumbfuture);
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
@@ -1658,7 +1684,11 @@ void WombatForensics::StartThumbnails()
             thumbfile.close();
         }
     }
-    GenerateThumbnails();
+
+    thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
+    thumbwatcher.setFuture(thumbfuture);
+    cancelthread->show();
+    //GenerateThumbnails();
     StatusUpdate("Thumbnail generation finished.");
     LogMessage("Thumbnail generation finished.");
 }
@@ -1666,7 +1696,10 @@ void WombatForensics::StartThumbnails()
 void WombatForensics::FinishThumbs()
 {
     imagewindow->UpdateGeometries();
-    imagewindow->show();
+    cancelthread->close();
+    if(digoptions.isEmpty() || digoptions.contains(0))
+        imagewindow->show();
+    LogMessage("Digging Complete");
     LogMessage("Evidence ready");
     StatusUpdate("Evidence ready");
 }
