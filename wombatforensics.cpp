@@ -172,7 +172,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 //////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
 {
-    unsigned long long filelength = 0;
     unsigned long long curobjaddr = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-f").at(1).toULongLong();
     QString tmpstr = "";
     QStringList evidlist;
@@ -191,7 +190,7 @@ void WombatForensics::ShowExternalViewer()
     for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
         pathvector.push_back(evidlist.at(3).split("|").at(i).toStdString());
     tskexternalptr->imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(int i = 0; i < pathvector.size(); i++)
+    for(uint i = 0; i < pathvector.size(); i++)
         tskexternalptr->imagepartspath[i] = pathvector[i].c_str();
     tskexternalptr->readimginfo = tsk_img_open(tskexternalptr->partcount, tskexternalptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     if(tskexternalptr->readimginfo == NULL)
@@ -219,7 +218,6 @@ void WombatForensics::ShowExternalViewer()
         //if(objtype == 5)
         filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         //else
-        //    filelen = tsk_fs_file_read_type(tskexternalptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, mftattrid, 0, ibuffer, filelength, TSK_FS_FILE_READ_FLAG_NONE);
         (new QDir())->mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-tmp";
         QFile tmpfile(tmpstring);
@@ -478,6 +476,12 @@ void WombatForensics::InitializeOpenCase()
 
 void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus)
 {
+    if(exitcode)
+    {
+    }
+    if(exitstatus)
+    {
+    }
     wombatvariable.iscaseopen = true;
     InitializeCheckState();
     ui->actionAdd_Evidence->setEnabled(true);
@@ -707,7 +711,7 @@ void WombatForensics::LoadHexContents()
             tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
         }
         tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
-        for(int i =0; i < tmpvec.size(); i++)
+        for(uint i =0; i < tmpvec.size(); i++)
         {
             tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
         }
@@ -736,7 +740,7 @@ void WombatForensics::LoadHexContents()
             tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
         }
         tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
-        for(int i =0; i < tmpvec.size(); i++)
+        for(uint i =0; i < tmpvec.size(); i++)
         {
             tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
         }
@@ -778,7 +782,7 @@ void WombatForensics::LoadHexContents()
             tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
         }
         tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
-        for(int i =0; i < tmpvec.size(); i++)
+        for(uint i =0; i < tmpvec.size(); i++)
         {
             tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
         }
@@ -821,7 +825,7 @@ void WombatForensics::LoadHexContents()
             tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
         }
         tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
-        for(int i =0; i < tmpvec.size(); i++)
+        for(uint i =0; i < tmpvec.size(); i++)
         {
             tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
         }
@@ -1005,7 +1009,7 @@ void WombatForensics::RemEvidence()
     QStringList evidfiles = eviddir.entryList(QStringList(QString(selectedindex.sibling(selectedindex.row(), 1).data().toString() + ".*")), QDir::NoSymLinks | QDir::Files);
     for(int i = 0; i < evidfiles.count(); i++)
     {
-        bool eres = eviddir.remove(evidfiles.at(i));
+        eviddir.remove(evidfiles.at(i));
     }
     treemodel->RemEvidence(selectedindex.sibling(selectedindex.row(), 0).data().toString());
     evidcnt--;
@@ -1146,7 +1150,7 @@ void WombatForensics::ProcessExport(QString objectid)
     for(int i=0; i < partcount; i++)
         pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
     imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(int i=0; i < pathvector.size(); i++)
+    for(uint i=0; i < pathvector.size(); i++)
         imagepartspath[i] = pathvector[i].c_str();
     readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     if(readimginfo == NULL)
@@ -1261,6 +1265,10 @@ void WombatForensics::ProcessDig(QString objectid)
     readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
     */
+
+    if(objectid.contains("cheese"))
+    {
+    }
 
     for(int i = 0; i < digoptions.count(); i++)
     {

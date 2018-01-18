@@ -60,7 +60,7 @@ void ImageWindow::GetImage(QString objectid)
     for(int i=0; i < partcount; i++)
         pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
     imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(int i=0; i < pathvector.size(); i++)
+    for(uint i=0; i < pathvector.size(); i++)
         imagepartspath[i] = pathvector[i].c_str();
     readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     if(readimginfo == NULL)

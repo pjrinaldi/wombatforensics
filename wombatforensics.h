@@ -329,7 +329,7 @@ public:
         }
         if(role == Qt::DisplayRole)
         {
-            Node* currentnode = NodeFromIndex(index);
+            //Node* currentnode = NodeFromIndex(index);
             return true;
         }
         return false;
@@ -337,6 +337,12 @@ public:
 
     void dataChanged(const QModelIndex &topleftindex, const QModelIndex &botrightindex, const QVector<int> &roles = QVector<int>())
     {
+        if(topleftindex == botrightindex)
+        {
+        }
+        if(roles.count() < 0)
+        {
+        }
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const

@@ -77,7 +77,7 @@ void VideoViewer::GetVideo(const QModelIndex &index)
     for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
         pathvector.push_back(evidlist.at(3).split("|").at(i).toStdString());
     tskptr->imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(int i = 0; i < pathvector.size(); i++)
+    for(uint i = 0; i < pathvector.size(); i++)
         tskptr->imagepartspath[i] = pathvector[i].c_str();
     tskptr->readimginfo = tsk_img_open(tskptr->partcount, tskptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     if(tskptr->readimginfo == NULL)

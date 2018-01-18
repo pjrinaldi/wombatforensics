@@ -182,6 +182,9 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    if(tmpptr)
+    {
+    }
     QString outstring = "";
     if(tmpfile->name != NULL)
     {
@@ -217,10 +220,14 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     if(retval == 0)
     {
         char sbuf[17];
-        int sint = 0;
+        int hashint;
+        hashint = 0;
+        if(hashint < 0)
+        {
+        }
         for(int i=0; i < 16; i++)
         {
-            sint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
+            hashint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
         }
         outstring +=  "," + QString(sbuf);
     }
@@ -273,7 +280,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
         QByteArray adsba;
-        int tmpattrid = 0;
         unsigned long long adssize = 0;
         TSK_OFF_T curmftentrystart = 0;
         NTFS_INFO* ntfsinfo = (NTFS_INFO*)tmpfile->fs_info;
@@ -353,7 +359,7 @@ void GenerateThumbnails()
         for(int i=0; i < partcount; i++)
             pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
         imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-        for(int i=0; i < pathvector.size(); i++)
+        for(uint i=0; i < pathvector.size(); i++)
             imagepartspath[i] = pathvector[i].c_str();
         readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
         if(readimginfo == NULL)
@@ -2123,7 +2129,7 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
             return HFS_BTREE_CB_LEAF_STOP;
         }   
     }
-    static TSK_OFF_T hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle)
+    TSK_OFF_T hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle)
     {
         TSK_OFF_T off = 0;
         if(hfs_cat_traverse(hfs, needle, hfs_cat_get_record_offset_cb, &off))
@@ -2229,7 +2235,7 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
 
         return 0;
     }
-    static int hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2)
+    int hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2)
     {
         TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
         uint32_t cnid1, cnid2;
