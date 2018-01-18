@@ -20,7 +20,6 @@ public:
     ~DigDeeperDialog();
 
 signals:
-    //void FileDig(FileDeepData* deeperdata);
     void StartDig(int digtype, QVector<int> digoptions);
 
 private slots:

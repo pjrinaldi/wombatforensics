@@ -38,17 +38,6 @@ public:
             return idlist.at(index.row());
         else if(role == Qt::ToolTipRole)
         {
-            /*
-            QSqlQuery pathquery(fcasedb);
-            pathquery.prepare("SELECT (fullpath || name) AS fullname FROM data WHERE objectid = ?;");
-            pathquery.addBindValue(index.data(Qt::UserRole).toULongLong());
-            pathquery.exec();
-            pathquery.next();
-            thumbpath = pathquery.value(0).toString();
-            pathquery.finish();
-            */
-            //return thumbpath; 
-            // SHOULD REALLY BE THE ACTUAL FILE PATH FROM THE TSK...
             return QString(pathlist.at(index.row()));
         }
         else
@@ -75,7 +64,6 @@ class ImageWindow : public QDialog
 public:
     ImageWindow(QWidget* parent = 0);
     ~ImageWindow();
-    //void GetImage(unsigned long long objid);
     void GetImage(QString objid);
 private slots:
     void HideClicked();
@@ -105,12 +93,11 @@ public slots:
 private slots:
     void HighlightTreeViewItem(const QModelIndex &index);
     void HideClicked();
-    void SetModel();
+    //void SetModel();
 
 signals:
     void HideImageWindow(bool checkstate);
     void SendObjectToTreeView(QString selectedid);
-    //void SendObjectToTreeView(unsigned long long selectedid);
 private:
     Ui::ImageViewer* ui;
     ImageModel* imagemodel;

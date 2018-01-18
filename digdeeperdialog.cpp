@@ -51,17 +51,5 @@ void DigDeeperDialog::DigDeeperFiles()
     if(ui->thumbnailcheckBox->isChecked())
         digoptions.append(0);
     emit StartDig(digtype, digoptions);
-    /*
-    //FileDeepData exportdata;
-    if(ui->selectedFileRadioButton->isChecked())
-        exportdata.filestatus = FileDeepData::selected;
-    if(ui->checkedFileRadioButton->isChecked())
-        exportdata.filestatus = FileDeepData::checked;
-    if(ui->listedFileRadioButton->isChecked())
-        exportdata.filestatus = FileDeepData::listed;
-    if(ui->thumbnailcheckBox->isChecked())
-        exportdata.digoptions.push_back(FileDeepData::thumb);
-    */
-    //emit FileDig(&exportdata);
     this->close();
 }

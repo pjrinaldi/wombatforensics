@@ -78,7 +78,6 @@ class PropertiesWindow : public QDialog
 
 public:
     PropertiesWindow(QWidget* parent = 0);
-    //PropertiesWindow(WombatDatabase* wdata, QWidget* parent = 0);
     void UpdateTableView(void);
     ~PropertiesWindow();
 
@@ -93,7 +92,6 @@ protected:
     void closeEvent(QCloseEvent* event);
 private:
     Ui::PropertiesWindow *ui;
-    //WombatDatabase* pdata;
     PropertyModel* pmodel;
     QModelIndex selectedindex;
     QModelIndex oldselectedindex;

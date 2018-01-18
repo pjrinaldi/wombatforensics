@@ -7,9 +7,6 @@
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-//extern QSqlDatabase fcasedb;
-//extern QSqlDatabase thumbdb;
-//extern QSqlDatabase fappdb;
 extern WombatVariable wombatvariable;
 extern QFile logfile;
 extern QFile viewerfile;
@@ -22,10 +19,8 @@ extern unsigned long long filesprocessed;
 extern unsigned long long processphase;
 extern unsigned long long totalcount;
 extern unsigned long long totalchecked;
-extern unsigned long long currentevidenceid;
 extern unsigned long long exportcount;
 extern unsigned long long digcount;
-extern unsigned long long currentfilesystemid;
 extern unsigned long long errorcount;
 extern unsigned long long jumpoffset;
 extern unsigned long long filejumpoffset;
@@ -33,24 +28,19 @@ extern unsigned long long wombatid;
 extern int partint;
 extern int evidcnt;
 extern int volcnt;
-//extern int partcnt;
 extern int childcount;
 extern int linefactor;
 extern int filelinefactor;
 extern int thumbsize;
 extern int mftrecordsize;
 extern QString rootinum;
-extern QString currentevidencename;
 extern QList<QVariant> colvalues;
-//extern QList<TskObject> curlist;
-extern QList<FileSystemObject> fsobjectlist;
 extern QStringList propertylist;
 extern QStringList thumblist;
 extern QStringList thumbpathlist;
 extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
-extern QMutex mutex;
 extern QMap<QString, bool> checkhash;
 
 struct dosdate
@@ -70,8 +60,6 @@ struct dostime
 
 struct FilterValues
 {
-    //bool maxidbool;
-    //bool minidbool;
     QString idfilter;
     unsigned long long maxid;
     unsigned long long minid;
@@ -110,35 +98,12 @@ struct FilterValues
     int hashdupcnt;
     QString hashfilter;
     QStringList hashlist;
-    //QStringList hashfilteredlist;
-    //QVector<unsigned long long> hashcount;
-    //QVector<unsigned long long> hashidlist;
 };
 
-struct FileData
-{
-    unsigned long long type;
-    unsigned long long paraddr;
-    unsigned long long atime;
-    unsigned long long ctime;
-    unsigned long long crtime;
-    unsigned long long mtime;
-    unsigned long long size;
-    unsigned long long offset;
-    unsigned long long addr;
-    unsigned long long fsid;
-    unsigned long long evid;
-    unsigned long long mftattrid;
-    QString name;
-    QString path;
-    QString mimetype;
-};
-
-extern QVector<FileData> filedatavector;
 extern QList<WombatVariable> wombatvarvector;
 
 extern FilterValues filtervalues;
-
+/*
 class InterfaceSignals : public QObject
 {
     Q_OBJECT
@@ -150,11 +115,10 @@ public:
 
 signals:
     void ProgressUpdate(unsigned long long filecount, unsigned long long processcount);
-    //void FinishSql(void);
 
 };
 
-extern InterfaceSignals* isignals;
+extern InterfaceSignals* isignals;*/
 
 class Node
 {
@@ -169,7 +133,6 @@ public:
         parent = 0;
         haschildren = false;
         childcount = 0;
-        //checkstate = 0;
         checkstate = false;
         parentid = 0;
         nodetype = 0;
@@ -188,7 +151,6 @@ public:
     unsigned long long parentid;
     unsigned long long childcount;
     int nodetype;
-    //int checkstate;
     bool checkstate;
     bool HasChildren(void)
     {
@@ -200,12 +162,10 @@ public:
     {
         children.removeAt(idx);
     };
-    //int GetChildRow(unsigned long long curid)
     int GetChildRow(QString curid)
     {
         for(int i=0; i < children.count(); i++)
         {
-            //if(curid == children.at(i)->nodevalues.at(0).toULongLong())
             if(children.at(i)->nodevalues.at(0).toString().contains(curid))
                 return i;
         }
@@ -220,9 +180,6 @@ extern Node* currentnode;
 extern Node* toplevelnode;
 extern Node* actionnode;
 extern Node* volnode;
-//extern TSK_IMG_INFO* IMG_2ND_PROC;
-extern QMutex mutex;
-extern QMutex mutex2;
 extern TSK_IMG_INFO* readimginfo;
 extern TSK_VS_INFO* readvsinfo;
 extern const TSK_VS_PART_INFO* readpartinfo;

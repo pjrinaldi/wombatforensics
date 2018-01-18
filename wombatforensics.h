@@ -6,8 +6,6 @@
 
 #include "wombatinclude.h"
 #include "wombatvariable.h"
-//#include "wombatdatabase.h"
-//#include "wombatframework.h"
 #include "wombatfunctions.h"
 #include "ui_wombatforensics.h"
 #include "propertieswindow.h"
@@ -60,11 +58,9 @@ public:
     TreeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Signature" << "File Category";
-        //headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
         rootnode = 0;
         QList<QVariant> emptyset;
         emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
-        //emptyset << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
         rootnode = new Node(emptyset);
         rootnode->parent = 0;
         rootnode->childcount = 0;
@@ -125,7 +121,6 @@ public:
 
     QVariant data(const QModelIndex &index, int role) const
     {
-        // MIGHT BE ABLE TO GET AWAY WITH USING THE INDEX ROW,COLUMN ENTRIES RATHER THAN THE NODE
         if(index == QModelIndex())
             return QVariant();
         Node* node = rootnode; 
@@ -142,38 +137,10 @@ public:
         int itemtype = 0;
         nodetype = node->nodevalues.at(0).toString().split("-").count();
         itemtype = node->nodetype;
-        /*
-        QSqlQuery dataquery(fcasedb);
-        dataquery.prepare("SELECT objtype, type FROM data WHERE id = ?");
-        dataquery.bindValue(0, node->nodevalues.at(0).toULongLong());
-        dataquery.exec();
-        dataquery.next();
-        int nodetype = dataquery.value(0).toInt();
-        int itemtype = dataquery.value(1).toInt();
-        dataquery.finish();
-        */
-        //headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Object Type" << "Address" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "Parent ID" << "Item Type" << "Parent Image ID" << "Parent FS ID" << "Flags" << "File Signature" << "File Category" << "Checked" << "MFT Attribute ID";
-        // WILL NEED TO REPLACE ALL THESE CALLS TO THE RESPECTIVE SQL QUERY RATHER THAN THE NODE SINCE I'M NOT STORING IT IN THE NODE ANYMORE...
         if(role == Qt::ForegroundRole)
         {
             if(node->nodevalues.at(0).toString().contains(filtervalues.idfilter) == false)
                 return QColor(Qt::lightGray);
-            /*
-            if(filtervalues.maxidbool && filtervalues.minidbool == false)
-            {
-                if(node->nodevalues.at(0).toULongLong() <= filtervalues.maxid)
-                    return QColor(Qt::lightGray);
-            }
-            if(filtervalues.minidbool && filtervalues.maxidbool == false)
-            {
-                if(node->nodevalues.at(0).toULongLong() >= filtervalues.minid)
-                    return QColor(Qt::lightGray);
-            }
-            if(filtervalues.maxidbool && filtervalues.minidbool)
-            {
-                if(node->nodevalues.at(0).toULongLong() >= filtervalues.minid || node->nodevalues.at(0).toULongLong() <= filtervalues.maxid)
-                    return QColor(Qt::lightGray);
-            }*/
             if(filtervalues.namebool)
             {
                 if(node->nodevalues.at(1).toString().contains(filtervalues.namefilter) == false)
@@ -199,14 +166,10 @@ public:
                 if(node->nodevalues.at(3).toULongLong() >= filtervalues.minsize || node->nodevalues.at(3).toULongLong() <= filtervalues.maxsize)
                     return QColor(Qt::lightGray);
             }
-            //if(node->nodevalues.at(4).toInt() == 5)
-            //if(nodetype == 5)
-            //if(node->nodevalues.at(0).toString().split("-").count() == 4)
             if(nodetype == 4)
             {
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
                 {
-                    //if(node->nodevalues.at(6).toInt() <= filtervalues.maxcreate)
                     if(node->nodevalues.at(4).toInt() <= filtervalues.maxcreate)
                         return QColor(Qt::lightGray);
                 }
@@ -222,7 +185,6 @@ public:
                 }
                 if(filtervalues.maxaccessbool && filtervalues.minaccessbool == false)
                 {
-                    //if(node->nodevalues.at(7).toInt() <= filtervalues.maxaccess)
                     if(node->nodevalues.at(5).toInt() <= filtervalues.maxaccess)
                         return QColor(Qt::lightGray);
                 }
@@ -238,7 +200,6 @@ public:
                 }
                 if(filtervalues.maxmodifybool && filtervalues.minmodifybool == false)
                 {
-                    //if(node->nodevalues.at(8).toInt() <= filtervalues.maxmodify)
                     if(node->nodevalues.at(6).toInt() <= filtervalues.maxmodify)
                         return QColor(Qt::lightGray);
                 }
@@ -254,7 +215,6 @@ public:
                 }
                 if(filtervalues.maxchangebool && filtervalues.minchangebool == false)
                 {
-                    //if(node->nodevalues.at(9).toInt() <= filtervalues.maxchange)
                     if(node->nodevalues.at(7).toInt() <= filtervalues.maxchange)
                         return QColor(Qt::lightGray);
                 }
@@ -270,7 +230,6 @@ public:
                 }
                 if(filtervalues.filecategorybool && filtervalues.filetypebool == false)
                 {
-                    //if(node->nodevalues.at(16).toString().contains(filtervalues.filecategory) == false)
                     if(node->nodevalues.at(9).toString().contains(filtervalues.filecategory) == false)
                         return QColor(Qt::lightGray);
                 }
@@ -286,7 +245,6 @@ public:
                 }
                 if(filtervalues.filegroupbool)
                 {
-                    //if(node->nodevalues.at(17).toString().contains(filtervalues.filegroup) == false)
                     if(node->nodevalues.at(10).toString().contains(filtervalues.filegroup) == false)
                             return QColor(Qt::lightGray);
                 }
@@ -294,7 +252,6 @@ public:
                 {
                     for(int i = 0; i < filtervalues.hashlist.count(); i++)
                     {
-                        //if(node->nodevalues.at(8).toULongLong() == filtervalues.hashidlist.at(i))
                         if(node->nodevalues.at(8).toString().compare(filtervalues.hashlist.at(i)) == 0)
                             return QColor(Qt::lightGray);
                     }
@@ -308,14 +265,6 @@ public:
         }
         if(role == Qt::DisplayRole)
         {
-            //if(index.column() == 2)
-            //{
-                //if(node->nodevalues.at(4).toInt() == 1)
-                //if(nodetype == 1)
-                //    return QString("");
-                //else
-                //    return node->nodevalues.at(index.column());
-            //}
             if(index.column() >= 4 && index.column() <= 7)
             {
                 char buf[128];
@@ -327,7 +276,6 @@ public:
         }
         if(role == Qt::DecorationRole)
         {
-            //int nodetype = node->nodevalues.at(4).toInt();
             QString nodename = node->nodevalues.at(1).toString();
             if(index.column() == 0)
             {
@@ -341,7 +289,6 @@ public:
                     return QIcon(QPixmap(QString(":/basic/treefs")));
                 else if(nodetype == 4)
                 {
-                    //int itemtype = node->nodevalues.at(12).toInt();
                     if(itemtype == 5)
                     {
                         if(nodename.compare("AttrDef") == 0 || nodename.compare("$BadClus") == 0 || nodename.compare("$Bitmap") == 0 || nodename.compare("$Boot") == 0 || nodename.compare("$ObjId") == 0 || nodename.compare("$Quota") == 0 || nodename.compare("$Reparse") == 0 || nodename.compare("$LogFile") == 0 || nodename.compare("$MFT") == 0 || nodename.compare("$MFTMirr") == 0 || nodename.compare("$Secure") == 0 || nodename.compare("$UpCase") == 0 || nodename.compare("$Volume") == 0)
@@ -382,87 +329,14 @@ public:
         }
         if(role == Qt::DisplayRole)
         {
-            /*
-            if(value.toInt() == -15)
-            {
-                Node* parentnode = NodeFromIndex(index);
-                QSqlQuery childupdatequery(fcasedb);
-                childupdatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ?");
-                //childupdatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
-                for(int i=0; i < parentnode->children.count(); i++)
-                {
-                    childupdatequery.addBindValue(parentnode->children.at(i)->nodevalues.at(0).toULongLong());
-                    childupdatequery.exec();
-                    childupdatequery.next();
-                    parentnode->children.at(i)->nodevalues[0] = childupdatequery.value(0);
-                    parentnode->children.at(i)->nodevalues[1] = childupdatequery.value(1);
-                    parentnode->children.at(i)->nodevalues[2] = childupdatequery.value(2);
-                    parentnode->children.at(i)->nodevalues[3] = childupdatequery.value(3);
-                    parentnode->children.at(i)->nodevalues[4] = childupdatequery.value(4);
-                    parentnode->children.at(i)->nodevalues[5] = childupdatequery.value(5);
-                    parentnode->children.at(i)->nodevalues[6] = childupdatequery.value(6);
-                    parentnode->children.at(i)->nodevalues[7] = childupdatequery.value(7);
-                    parentnode->children.at(i)->nodevalues[8] = childupdatequery.value(8);
-                    parentnode->children.at(i)->nodevalues[9] = childupdatequery.value(9);
-                    parentnode->children.at(i)->nodevalues[10] = QVariant(childupdatequery.value(9).toString().split("/").at(0));
-                }
-                childupdatequery.finish();
-                emit dataChanged(index.child(0, 0), index.child(parentnode->children.count() - 1, 0));
-                return true;
-            }*/
-            /*else
-            {*/
-                Node* currentnode = NodeFromIndex(index);
-                /*
-                QSqlQuery updatequery(fcasedb);
-                updatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ?;");
-                //updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid = ?;");
-                updatequery.addBindValue(currentnode->nodevalues.at(0).toULongLong());
-                updatequery.exec();
-                updatequery.first();
-                currentnode->nodevalues[0] = updatequery.value(0);
-                currentnode->nodevalues[1] = updatequery.value(1);
-                currentnode->nodevalues[2] = updatequery.value(2);
-                currentnode->nodevalues[3] = updatequery.value(3);
-                currentnode->nodevalues[4] = updatequery.value(4);
-                currentnode->nodevalues[5] = updatequery.value(5);
-                currentnode->nodevalues[6] = updatequery.value(6);
-                currentnode->nodevalues[7] = updatequery.value(7);
-                currentnode->nodevalues[8] = updatequery.value(8);
-                currentnode->nodevalues[9] = updatequery.value(9);
-                currentnode->nodevalues[10] = QVariant(updatequery.value(9).toString().split("/").at(0));
-                updatequery.finish();
-                */
-                //emit dataChanged(index, index);
-                return true;
-            //}
+            Node* currentnode = NodeFromIndex(index);
+            return true;
         }
         return false;
     };
 
     void dataChanged(const QModelIndex &topleftindex, const QModelIndex &botrightindex, const QVector<int> &roles = QVector<int>())
     {
-        /*
-        foreach(int role, roles)
-        {
-        if(role == Qt::DisplayRole)
-        {
-            Node* startnode = NodeFromIndex(topleftindex);
-            Node* endnode = NodeFromIndex(botrightindex);
-            QSqlQuery updatequery(fcasedb);
-            updatequery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, FROM data WHERE id = ? OR id = ?;");
-            //updatequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE objectid == ? OR objectid == ?;");
-            updatequery.addBindValue(startnode->nodevalues.at(0).toULongLong());
-            updatequery.exec();
-            updatequery.next();
-            startnode->nodevalues[8] = updatequery.value(8).toString();
-            updatequery.addBindValue(endnode->nodevalues.at(0).toULongLong());
-            updatequery.exec();
-            updatequery.next();
-            endnode->nodevalues[8] = updatequery.value(8).toString();
-            updatequery.finish();
-        }
-        }*/
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const
@@ -474,14 +348,10 @@ public:
         }
         if(role == Qt::DecorationRole)
         {
-            if(section == 0 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull())) //(filtervalues.maxidbool || filtervalues.minidbool))
-            {
+            if(section == 0 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            }
             if(section == 1 && filtervalues.namebool)
-            {
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            }
             if(section == 2 && filtervalues.pathbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 3 && filtervalues.maxsizebool)
@@ -517,10 +387,6 @@ public:
         if(index.column() == 0)
         {
             flags |= Qt::ItemIsUserCheckable;
-            /*
-            if(index.model()->hasChildren(index))
-                flags |= Qt::ItemIsTristate;
-            */
         }
         
         return flags;
@@ -559,15 +425,12 @@ public:
         QString tmpstr = "";
         unsigned long long parentaddr = parent.sibling(parent.row(), 0).data().toString().split("-").last().mid(1).toULongLong();
         int curpart = parent.sibling(parent.row(), 0).data().toString().split("-").at(2).mid(1).toInt();
-        //qDebug() << parent.sibling(parent.row(), 0).data().toString(); // unique id
         parentnode = NodeFromIndex(parent);
-        // NEED TO SEARCH OVER ALL EVIDENCE ITEMS...
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*"), QDir::NoSymLinks | QDir::Files);
         for(int j = 0; j < evidfiles.count(); j++)
         {
             QStringList curfiles = GetChildFiles(evidfiles.at(j).split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + QString::number(parentaddr));
-            //QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + QString::number(parentaddr));
             if(curfiles.count() > 0)
             {
                 QFile childfile;
@@ -583,12 +446,10 @@ public:
                     tmpstr = childfile.readLine();
                     childfile.close();
                     tmplist = tmpstr.split(",");
-                    //colvalues.append(wombatid);                           // ID
-                    colvalues.append(tmplist.at(12).split("-a").at(0));                       // ID
+                    colvalues.append(tmplist.at(12).split("-a").at(0));     // ID
                     QByteArray ba;
                     ba.append(tmplist.at(0));
                     colvalues.append(QByteArray::fromBase64(ba));           // Name
-                    //colvalues.append(tmplist.at(0));                        // Name
                     colvalues.append(tmplist.at(3));                        // Full Path
                     colvalues.append(tmplist.at(8));                        // Size
                     colvalues.append(tmplist.at(4));                        // Created
@@ -605,184 +466,19 @@ public:
                     currentnode->parent = parentnode;
                     currentnode->nodetype = tmplist.at(1).toInt();          // node type 5=file, 3=dir, 10=vir file, 11=vir dir
                     parentnode->children.append(currentnode);
-                    currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name.split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + tmplist.at(9));
+                    currentnode->childcount = GetChildCount(wombatvariable.evidencename.split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + tmplist.at(9));
                     currentnode->haschildren = currentnode->HasChildren();
                 }
                 endInsertRows();
             }
         }
-        //qDebug() << parentnode->childcount;
-        /*
-         *
-         * currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
-            //qDebug() << currentnode->childcount;
-            currentnode->haschildren = currentnode->HasChildren();
-            parentnode = currentnode;
-            wombatid++;
-            QFile filefile;
-            QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
-            for(int j = 0; j < curfiles.count(); j++)
-            {
-                tmpstr = "";
-                currentnode = 0;
-                tmplist.clear();
-                colvalues.clear();
-                filefile.setFileName(wombatvariable.tmpmntpath + curfiles.at(j));
-                filefile.open(QIODevice::ReadOnly);
-                tmpstr = filefile.readLine();
-                filefile.close();
-                tmplist = tmpstr.split(",");
-                //colvalues.append(wombatid);                             // ID
-                colvalues.append(tmplist.at(12));                       // ID
-                colvalues.append(tmplist.at(0));                        // Name
-                colvalues.append(tmplist.at(3));                        // Full Path
-                colvalues.append(tmplist.at(8));                        // Size
-                colvalues.append(tmplist.at(4));                        // Created
-                colvalues.append(tmplist.at(5));                        // Accessed
-                colvalues.append(tmplist.at(6));                        // Modified
-                colvalues.append(tmplist.at(7));                        // Status Changed
-                colvalues.append("");                                   // MD5
-                colvalues.append(tmplist.at(10));                       // File Signature
-                colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
-                currentnode = new Node(colvalues);
-                currentnode->parent = parentnode;
-                parentnode->children.append(currentnode);
-                currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
-                currentnode->haschildren = currentnode->HasChildren();
-                wombatid++;
-
-         *
-         */ 
-        //QList<QVariant> fetchvalues;
-        //fetchvalues.clear();
-        /*
-        if(parentnode->haschildren == true)
-        {*/
-
-            // NEED TO KNOW THE CURRENT PARTITION NUMBER AND THE ADDR NUMBER TO OPEN THE CURRENT PARENT FILE
-            //QFile parentfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".p" + 
-            //IF I USE THE EVID-VOL-PART-INODE NUMBERS AS THE UNIQUEID, THEN I CAN KEEP IT REAL AND I CAN SPLIT IT OUT AND DETERMINE WHAT I NEED TO FIGURE OUT WHAT TO OPEN... I MAY WANT TO ADD A UNIQUE EVIDENCE ID SO I CAN GET THE IMAGE FILE NAME, OR I NEED TO GET THE ROOTINDEX SO I CAN GET ITS FILENAME OR SET A GLOBAL VARIABLE TO HOLD THAT INFORMATION.
-            /*
-            QSqlQuery prequery(fcasedb);
-            prequery.prepare("SELECT addr, parimgid, parfsid FROM data WHERE id = ?");
-            prequery.bindValue(0, parentnode->nodevalues.at(0).toULongLong());
-            //qDebug() << "curid:" << parentnode->nodevalues.at(0).toULongLong();
-            prequery.exec();
-            prequery.first();
-            unsigned long long parentaddress = prequery.value(0).toULongLong();
-            unsigned long long parentimgid = prequery.value(1).toULongLong();
-            unsigned long long parentfsid = prequery.value(2).toULongLong();
-            if(parentfsid == 0)
-                parentfsid = parentnode->nodevalues.at(0).toULongLong();
-            prequery.finish();
-
-            QSqlQuery fetchquery(fcasedb);
-            fetchquery.prepare("SELECT id, name, fullpath, size, crtime, atime, mtime, ctime, md5, filemime, checked, addr, parimgid, parfsid FROM data WHERE (objtype = 5 OR objtype = 6) AND parid = ? AND parimgid = ? AND parfsid = ?;");
-            //qDebug() << "parid:" << parentaddress << "parimgid:" << parentimgid << "parfsid:" << parentfsid;
-            fetchquery.bindValue(0, parentaddress);
-            fetchquery.bindValue(1, parentimgid);
-            fetchquery.bindValue(2, parentfsid);
-            if(fetchquery.exec())
-            {
-                beginInsertRows(parent, 0, parentnode->childcount - 1);
-                while(fetchquery.next())
-                {
-                    fetchvalues.clear();
-                    fetchvalues.append(fetchquery.value(0));
-                    fetchvalues.append(fetchquery.value(1));
-                    fetchvalues.append(fetchquery.value(2));
-                    fetchvalues.append(fetchquery.value(3));
-                    fetchvalues.append(fetchquery.value(4));
-                    fetchvalues.append(fetchquery.value(5));
-                    fetchvalues.append(fetchquery.value(6));
-                    fetchvalues.append(fetchquery.value(7));
-                    fetchvalues.append(fetchquery.value(8));
-                    fetchvalues.append(fetchquery.value(9));
-                    fetchvalues.append(QVariant(fetchquery.value(9).toString().split("/").at(0)));
-                    Node* curchild = new Node(fetchvalues);
-                    curchild->parent = parentnode;
-                    if(QString(".").compare(curchild->nodevalues.at(1).toString()) == 0 || QString("..").compare(curchild->nodevalues.at(1).toString()) == 0)
-                    {
-                        curchild->childcount = 0;
-                        curchild->haschildren = false;
-                    }
-                    else
-                    {
-                        curchild->childcount = GetChildCount(5, fetchquery.value(11).toULongLong(), fetchquery.value(12).toULongLong(), fetchquery.value(13).toULongLong());
-                        curchild->haschildren = curchild->HasChildren();
-                    }
-                    if(fetchquery.value(10).toInt() == 0)
-                        curchild->checkstate = 0;
-                    else if(fetchquery.value(10).toInt() == 1)
-                        curchild->checkstate = 1;
-                    else
-                        curchild->checkstate = 2;
-                    parentnode->children.append(curchild);
-                }
-                endInsertRows();
-                emit checkedNodesChanged();
-                //setData(parent, QVariant(-15), Qt::DisplayRole);
-            }
-            fetchquery.finish();
-            */
-
-
-            /*
-            QSqlQuery morequery(fcasedb);
-            morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ? AND parfsid = ?");
-            //morequery.prepare("SELECT objectid, name, fullpath, size, objecttype, address, crtime, atime, mtime, ctime, md5, parentid, type, parimgid, parfsid, flags, filemime, filesignature, checked, mftattrid FROM data WHERE (objecttype = 5 OR objecttype = 6) AND parentid = ? AND parimgid = ? AND parfsid = ?");
-            morequery.addBindValue(parentnode->nodevalues.at(5).toULongLong());
-            morequery.addBindValue(parentnode->nodevalues.at(13).toULongLong());
-            if(parentnode->nodevalues.at(4).toInt() == 4)
-                morequery.addBindValue(parentnode->nodevalues.at(0).toULongLong());
-            else
-                morequery.addBindValue(parentnode->nodevalues.at(14).toULongLong());
-            //morequery.addBindValue(parentnode->nodevalues.at(0).toULongLong());
-            if(morequery.exec())
-            {
-                beginInsertRows(parent, 0, parentnode->childcount - 1);
-                while(morequery.next())
-                {
-                    fetchvalues.clear();
-                    for(int i=0; i < morequery.record().count(); i++)
-                        fetchvalues.append(morequery.value(i));
-                    Node* curchild = new Node(fetchvalues);
-                    curchild->parent = parentnode;
-                    if(QString(".").compare(curchild->nodevalues.at(1).toString()) == 0 || QString("..").compare(curchild->nodevalues.at(1).toString()) == 0)
-                    {
-                        curchild->childcount = 0;
-                        curchild->haschildren = false;
-                    }
-                    else
-                    {
-                        curchild->childcount = GetChildCount(5, curchild->nodevalues.at(5).toULongLong(), curchild->nodevalues.at(13).toULongLong(), curchild->nodevalues.at(14).toULongLong());
-                        curchild->haschildren = curchild->HasChildren();
-                    }
-                    if(morequery.value(18).toInt() == 0)
-                        curchild->checkstate = 0;
-                    else if(morequery.value(18).toInt() == 1)
-                        curchild->checkstate = 1;
-                    else
-                        curchild->checkstate = 2;
-                    parentnode->children.append(curchild);
-                }
-                endInsertRows();
-                emit checkedNodesChanged();
-                setData(parent, QVariant(-15), Qt::DisplayRole);
-
-            }
-            */
-        //}
     };
     
     void GetModelCount(Node* curnode)
     {
-        //if(curnode->nodevalues.at(4).toInt() == 5 || curnode->nodevalues.at(4).toInt() == 6)
-        //{
         if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
         {
             totalcount++;
-            //if(curnode->checkstate == 2)
             if(curnode->checkstate == true)
                 totalchecked++;
         }
@@ -795,7 +491,6 @@ public:
         }
     };
 
-    //void RemEvidence(unsigned long long curid)
     void RemEvidence(QString curid)
     {
         int rownumber = rootnode->GetChildRow(curid);
@@ -805,26 +500,20 @@ public:
         endRemoveRows();
     };
 
-    //void AddEvidence(unsigned long long curid)
     void AddEvidence(int evidcount)
     {
-        //qDebug() << "treemodel evidcnt:" << evidcnt;
-        //qDebug() << "evidencecount:" << evidcount;
         QStringList tmplist;
         QString tmpstr = "";
         tmplist.clear();
-        // NEED TO ADD THE EVID, VOLUME, PARTITIONS, THEN THE FILES...
-        // APPEND EVIDENCE TO NODE TREE
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".evid." + QString::number(evidcount));
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + QString::number(evidcount));
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
         tmplist = tmpstr.split(",");
         beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
         currentnode = 0;
         colvalues.clear();
-        //colvalues.append(wombatid);                             // ID
         colvalues.append(tmplist.at(5));                        // ID
-        colvalues.append(wombatvariable.evidenceobject.name);   // Name
+        colvalues.append(wombatvariable.evidencename);   // Name
         colvalues.append(tmplist.at(3));                        // Full Path
         colvalues.append(tmplist.at(1));                        // Size
         colvalues.append(0);                                    // Created
@@ -839,7 +528,7 @@ public:
         rootnode->childcount++;
         rootnode->haschildren = rootnode->HasChildren();
         currentnode->parent = rootnode;
-        currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".vol");
+        currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".vol");
         currentnode->haschildren = currentnode->HasChildren();
         if(checkhash.contains(tmplist.at(5)))
             currentnode->checkstate = checkhash.value(tmplist.at(5));
@@ -853,12 +542,11 @@ public:
         currentnode = 0;
         tmplist.clear();
         colvalues.clear();
-        QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".vol");
+        QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".vol");
         volfile.open(QIODevice::ReadOnly);
         tmpstr = volfile.readLine();
         volfile.close();
         tmplist = tmpstr.split(",");
-        //colvalues.append(wombatid);                             // ID
         colvalues.append(tmplist.at(5));                        // ID
         colvalues.append(tmplist.at(2));                        // Name
         colvalues.append("");                                   // Full Path
@@ -874,7 +562,7 @@ public:
         volnode = currentnode;
         currentnode->parent = parentnode;
         parentnode->children.append(currentnode);
-        currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".part.*");
+        currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".part.*");
         currentnode->haschildren = currentnode->HasChildren();
         if(checkhash.contains(tmplist.at(5)))
             currentnode->checkstate = checkhash.value(tmplist.at(5));
@@ -882,9 +570,7 @@ public:
             currentnode->checkstate = false;
         parentnode = currentnode;
         wombatid++;
-        // APPEND PARTITION(S) TO THE VOLUME
         int partcount = currentnode->childcount;
-        //qDebug() << "partcount:" << partcount;
         QFile partfile;
         for(int i = 0; i < partcount; i++)
         {
@@ -893,13 +579,12 @@ public:
             currentnode = 0;
             tmplist.clear();
             colvalues.clear();
-            partfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidenceobject.name + ".part." + QString::number(i));
+            partfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + QString::number(i));
             partfile.open(QIODevice::ReadOnly);
             tmpstr = partfile.readLine();
             partfile.close();
             tmplist = tmpstr.split(",");
             rootinum = tmplist.at(3);
-            //colvalues.append(wombatid);                             // ID
             colvalues.append(tmplist.at(10));                       // ID
             colvalues.append(tmplist.at(2));                        // Name
             colvalues.append("");                                   // Full Path
@@ -914,8 +599,7 @@ public:
             currentnode = new Node(colvalues);
             currentnode->parent = parentnode;
             parentnode->children.append(currentnode);
-            currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
-            //qDebug() << currentnode->childcount;
+            currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + rootinum);
             currentnode->haschildren = currentnode->HasChildren();
             if(checkhash.contains(tmplist.at(10)))
                 currentnode->checkstate = checkhash.value(tmplist.at(10));
@@ -924,8 +608,7 @@ public:
             parentnode = currentnode;
             wombatid++;
             QFile filefile;
-            QStringList curfiles = GetChildFiles(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + rootinum);
-            //qDebug() << "curfiles count:" << curfiles.count();
+            QStringList curfiles = GetChildFiles(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + rootinum);
             for(int j = 0; j < curfiles.count(); j++)
             {
                 tmpstr = "";
@@ -937,12 +620,10 @@ public:
                 tmpstr = filefile.readLine();
                 filefile.close();
                 tmplist = tmpstr.split(",");
-                //colvalues.append(wombatid);                             // ID
-                colvalues.append(tmplist.at(12).split("-a").at(0));                       // ID
+                colvalues.append(tmplist.at(12).split("-a").at(0));     // ID
                 QByteArray ba;
                 ba.append(tmplist.at(0));
                 colvalues.append(QByteArray::fromBase64(ba));           // Name
-                //colvalues.append(tmplist.at(0));                        // Name
                 colvalues.append(tmplist.at(3));                        // Full Path
                 colvalues.append(tmplist.at(8));                        // Size
                 colvalues.append(tmplist.at(4));                        // Created
@@ -959,7 +640,7 @@ public:
                 currentnode->parent = parentnode;
                 currentnode->nodetype = tmplist.at(1).toInt();
                 parentnode->children.append(currentnode);
-                currentnode->childcount = GetChildCount(wombatvariable.evidenceobject.name + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
+                currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
                 currentnode->haschildren = currentnode->HasChildren();
                 if(checkhash.contains(tmplist.at(12).split("-a").at(0)))
                     currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
@@ -969,16 +650,6 @@ public:
             }
         }
         endInsertRows();
-        // STILL NEED TO ACCOUNT FOR THE FILE CHECKS AND UPDATE ACCORDINGLY
-        /*
-        if(addevidquery.value(16).toInt() == 0)
-            currentnode->checkstate = 0;
-        else if(addevidquery.value(16).toInt() == 1)
-            currentnode->checkstate = 1;
-        else
-            currentnode->checkstate = 2;
-        */
-        //emit checkedNodesChanged();
     };
 
     Node* NodeFromIndex(const QModelIndex &index) const
@@ -999,96 +670,23 @@ private:
             return Qt::Unchecked;
         else
             return Qt::Checked;
-        //return Qt::Unchecked;
-        /*
-        if(curnode->checkstate == 0) // unchecked
-            return Qt::Unchecked;
-        else if(curnode->checkstate == 1) // partially checked
-            return Qt::PartiallyChecked;
-        else if(curnode->checkstate == 2) // checked
-            return Qt::Checked;
-        return Qt::Unchecked;
-        */
     };
     
-    // shouldn't need
-    void SetParentCheckState(const QModelIndex &index)
-    {
-        /*
-        Node* curnode = NodeFromIndex(index);
-        unsigned long long checkcount = 0;
-        for(int i=0; i < curnode->children.count(); i++)
-        {
-            if(curnode->children[i]->checkstate == 2 || curnode->children[i]->checkstate == 1)
-                checkcount++;
-        }
-        if(curnode->childcount > checkcount && checkcount > 0)
-        {
-            curnode->checkstate = 1;
-            checkhash[curnode->nodevalues.at(0).toString()] = 1;
-        }
-        else if(curnode->childcount == checkcount)
-        {
-            curnode->checkstate = 1;
-            checkhash[curnode->nodevalues.at(0).toString()] = 1;
-        }
-        else if(checkcount == 0)
-        {
-            curnode->checkstate = 0;
-            checkhash[curnode->nodevalues.at(0).toString()] = 0;
-        }
-        //emit dataChanged(index, index);
-        emit checkedNodesChanged();
-        if(curnode->parent != 0)
-            SetParentCheckState(index.parent());
-        */
-    };
-
-    // shouldn't need
-    void SetChildCheckState(const QModelIndex &index)
-    {
-        /*
-        Node* curnode = NodeFromIndex(index);
-        for(int i=0; i < curnode->children.count(); i++)
-        {
-            curnode->children.at(i)->checkstate = curnode->checkstate;
-            //emit dataChanged(index.child(i, 0), index.child(i, 0));
-            if(curnode->children.at(i)->haschildren)
-                SetChildCheckState(index.child(i,0));
-        }
-        emit checkedNodesChanged();
-        */
-    };
-
     bool SetCheckState(const QModelIndex &index, Qt::CheckState state)
     {
         Node* curnode = NodeFromIndex(index);
         if(state == Qt::Unchecked) // curnode is now unchecked...
         {
             curnode->checkstate = false;
-            //if(curnode->haschildren)
-            //    SetChildCheckState(index);
             checkhash.insert(curnode->nodevalues.at(0).toString(), false);
 
         }
-        /*
-        else if(state == Qt::PartiallyChecked) // curnode is now partially checked
-        {
-            curnode->checkstate = 1;
-            checkhash[curnode->nodevalues.at(0).toString()] = 1;
-        }
-        */
         else if(state == Qt::Checked) // currentnode is now checked
         {
             curnode->checkstate = true;
-            //if(curnode->haschildren)
-            //    SetChildCheckState(index);
             checkhash.insert(curnode->nodevalues.at(0).toString(), true);
         }
         emit dataChanged(index, index);
-        //emit checkedNodesChanged();
-        //if(curnode->parent != 0)
-        //    SetParentCheckState(index.parent());
         return true;
     };
 
@@ -1106,13 +704,10 @@ class WombatForensics : public QMainWindow
 public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
-    //WombatDatabase* wombatdatabase;
-    //WombatVariable* wombatvarptr;
     TskObject tskobject;
     TskObject* tskobjptr;
     TskObject tskexternalobject;
     TskObject* tskexternalptr;
-    //WombatFramework* wombatframework;
     PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;
@@ -1177,11 +772,6 @@ private slots:
     void ShowExternalViewer();
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
-    void OpenParentImage(void);
-    //void OpenParentImage(unsigned long long imgid);
-    void OpenParentFileSystem(unsigned long long fsid);
-    void OpenFileSystemFile(void);
-    //unsigned long long GetResidentOffset(unsigned long long fileaddress, unsigned long long fsaddress);
     void ResizeViewColumns(const QModelIndex &index)
     {
         if(index.isValid())
@@ -1197,10 +787,8 @@ private slots:
         ResizeViewColumns(index);
         QApplication::restoreOverrideCursor();
     };
-    //void FileExport(FileExportData* exportdata);
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void DigFiles(int digtype, QVector<int> digoptions);
-    //void FileDig(FileDeepData* deeperdata);
     void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
     void ShowRockerToolTip(int moved);
@@ -1209,12 +797,10 @@ private slots:
     void PageUp(void);
     void PageDown(void);
     void UpdateSelectValue(const QString &txt);
-    void InitializeQueryModel(void);
     void UpdateDataTable(void);
     void UpdateStatus(void);
     void UpdateDigging(void);
     void FinishExport(void);
-    void FinishRemoval(void);
     void FinishThumbs(void);
     //void FinishHex(void);
     void StatusUpdate(QString tmptext)
@@ -1234,7 +820,6 @@ private slots:
     void ShowItem();
     void UpdateThumbnails(int tsize);
     void SetSelectedFromImageViewer(QString selectedid);
-    //void SetSelectedFromImageViewer(unsigned long long selectedid);
     void ShowFile(const QModelIndex &index);
     void AddSection(void);
     void AddTextSection(void);
@@ -1251,62 +836,29 @@ private:
     void SetupHexPage(void);
     void InitializeAppStructure(void);
     void InitializeCaseStructure(void);
-    //void InitializeEvidenceStructure(QVector<WombatVariable> wombatvarvector);
-    //void InitializeEvidenceStructure(void);
     void InitializeOpenCase(void);
     void CloseCurrentCase(void);
     void UpdateProperties(void);
     void LoadHexContents(void);
-    //void SecondaryProcessing(void);
-    void OpenEvidenceStructure(void);
     void StartThumbnails(void);
-    //void ExportFiles(FileExportData* exportdata);
-    void DigFiles(FileDeepData* deepdata);
-    void GetExportData(Node* curnode, FileExportData* exportdata);
     void GetExportList(Node* curnode, int exporttype);
     void GetDigList(Node* curnode, int digtype);
-    void GetDigData(Node* curnode, FileDeepData* deepdata);
-    //void ProcessDig(TskObject curobject, unsigned long long objectid, std::vector<FileDeepData::DigOptions> digoptions);
     void ProcessExport(QString curid);
     void ProcessDig(QString curid);
-    //void ProcessExport(TskObject curobject, std::string fullpath, std::string name);
     void UpdateFilterCount(void);
     void SaveState(void);
-    void CreateAppDB(void);
-    void OpenAppDB(void);
-    unsigned long long ReturnCaseCount(void);
-    void InsertCase(void);
-    void CreateThumbDB(void);
-    void OpenThumbDB(void);
-    void CreateCaseDB(void);
-    void OpenCaseDB(void);
-    void AddNewEvidence(void);
-    //QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
     void RemoveTmpFiles(void);
     void UpdateCheckState(void);
     void InitializeCheckState(void);
     void UpdateSelectedState(QString id);
     QString InitializeSelectedState(void);
-    //void GetEvidenceObjects(void);
-/*
-    uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, unsigned char follow_hard_link);
-    uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int alen, uint32_t flags);
-    static uint8_t hfs_cat_get_record_offset_cb(HFS_INFO* hfs, int8_t level_type, const void* targ_data, const hfs_btree_key_cat* cur_key, TSK_OFF_T key_off, void* ptr);
-    static TSK_OFF_T hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle);
-    uint8_t hfs_cat_read_thread_record(HFS_INFO* hfs, TSK_OFF_T off, hfs_thread* thread);
-    uint8_t hfs_cat_read_file_folder_record(HFS_INFO* hfs, TSK_OFF_T off, hfs_file_folder* record);
-    static int hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2);
-    static uint8_t hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, TSK_HFS_BTREE_CB a_cb, void* ptr);
-*/
     QModelIndex selectedindex;
     QModelIndex oldselectedindex;
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
-    //QFuture<void> secondfuture;
     QFuture<void> hexfuture;
     QFutureWatcher<void> hexwatcher;
-    //QFutureWatcher<void> secondwatcher;
     QFuture<void> thumbfuture;
     QFutureWatcher<void> thumbwatcher;
     QFuture<void> exportfuture;
@@ -1333,7 +885,6 @@ private:
     QLabel* statuslabel;
     QFrame* vline1;
     QFrame* vline2;
-    //QVector<FileExportData> exportfilelist;
     QString exportpath;
     int exporttype;
     bool originalpath;
@@ -1341,29 +892,10 @@ private:
     int digtype;
     QVector<int> digoptions;
     QStringList digfilelist;
-    //QVector<FileDeepData> digfilelist;
-    //QVector<QVariantMap> jsonstorevector;
-    //QVector<SecondaryProcessObject> secondprocessvector;
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
-    //QString selectedstate;
-    //unsigned long long currentcaseid;
-    /*
-    WombatVariable wombatvariable; // possibly need to make this global...
-    TSK_IMG_INFO* readimginfo;
-    TSK_VS_INFO* readvsinfo;
-    const TSK_VS_PART_INFO* readpartinfo;
-    TSK_FS_INFO* readfsinfo;
-    TSK_FS_FILE* readfileinfo;
-    char asc[512];
-    iso9660_pvd_node* p;
-    HFS_INFO* hfs;
-    */
 };
-
-//void SecondaryProcessing(QVariantMap &jsonstore);
-//void SecondaryProcessing(SecondaryProcessObject &secprocobj);
 
 #endif // WOMBATFORENSICS_H

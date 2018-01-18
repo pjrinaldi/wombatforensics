@@ -26,20 +26,6 @@ IdFilter::~IdFilter()
 void IdFilter::DisplayFilter()
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    //QStringList eviddir
-    /*
-    QSqlQuery idquery(fcasedb);
-    idquery.prepare("SELECT COUNT(objectid) FROM data;");
-    idquery.exec();
-    idquery.next();
-    ui->morespinBox->setMaximum(idquery.value(0).toULongLong());
-    ui->morespinBox->setMinimum(1);
-    ui->lessspinBox->setMaximum(idquery.value(0).toULongLong());
-    ui->lessspinBox->setMinimum(1);
-    ui->morespinBox->setValue(filtervalues.maxid);
-    ui->lessspinBox->setValue(filtervalues.minid);
-    idquery.finish();
-    */
     ui->idlabel->setText(filtervalues.idfilter);
     QStringList tmplist = filtervalues.idfilter.split("-", QString::SkipEmptyParts);
     if(tmplist.count() > 0)
@@ -80,14 +66,6 @@ void IdFilter::DisplayFilter()
 void IdFilter::HideClicked()
 {
     filtervalues.idfilter = ui->idlabel->text();
-    /*
-    filtervalues.maxidbool = ui->morecheckBox->isChecked();
-    filtervalues.minidbool = ui->lesscheckBox->isChecked();
-    if(filtervalues.maxidbool)
-        filtervalues.maxid = ui->morespinBox->value();
-    if(filtervalues.minidbool)
-        filtervalues.minid = ui->lessspinBox->value();
-    */
     this->hide();
     emit HeaderChanged();
 }
@@ -267,17 +245,6 @@ SizeFilter::~SizeFilter()
 
 void SizeFilter::DisplayFilter()
 {
-    /*
-    QSqlQuery sizequery(fcasedb);
-    sizequery.prepare("SELECT MAX(size) FROM data;");
-    sizequery.exec();
-    sizequery.next();
-    ui->morespinBox->setMaximum(sizequery.value(0).toULongLong());
-    ui->lessspinBox->setMaximum(sizequery.value(0).toULongLong());
-    ui->morespinBox->setValue(filtervalues.maxsize);
-    ui->lessspinBox->setValue(filtervalues.minsize);
-    sizequery.finish();
-    */
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
@@ -464,22 +431,6 @@ void FileTypeFilter::DisplayFilter()
         if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).count() >= 2)
             tmptype.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).at(1));
     }
-    /*
-    QSqlQuery typequery(fcasedb);
-    typequery.prepare("SELECT DISTINCT filemime FROM data WHERE objecttype = 5;");
-    if(typequery.exec())
-    {
-        while(typequery.next())
-        {
-            tmpcategory.append(typequery.value(0).toString().split("/", QString::SkipEmptyParts).at(0));
-            if(typequery.value(0).toString().split("/", QString::SkipEmptyParts).count() == 2)
-                tmptype.append(typequery.value(0).toString().split("/", QString::SkipEmptyParts).at(1));
-        }
-    }
-    else
-        qDebug() << fcasedb.lastError().text();
-    typequery.finish();
-    */
     tmpcategory.removeDuplicates();
     tmptype.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)
@@ -538,16 +489,6 @@ void FileCategoryFilter::DisplayFilter()
         tmpfile.close();
         tmpcategory.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).at(0));
     }
-    /*
-    QSqlQuery typequery(fcasedb);
-    typequery.prepare("SELECT DISTINCT filesignature FROM data WHERE objecttype = 5 OR objecttype = 6;");
-    typequery.exec();
-    while(typequery.next())
-    {
-        tmpcategory.append(typequery.value(0).toString());
-    }
-    typequery.finish();
-    */
     tmpcategory.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)
         ui->categorycomboBox->addItem(tmpcategory.at(i));
@@ -607,65 +548,20 @@ void HashFilter::HideClicked()
         tmpstr = tmpfile.readLine();
         tmpfile.close();
         filtervalues.hashlist.append(tmpstr.split(",", QString::SkipEmptyParts).at(13));
-        //qDebug() << tmpstr.split(",", QString::SkipEmptyParts).at(13);
     }
     if(filtervalues.hashbool)
     {
         QStringList tmplist;
         tmplist.clear();
         filtervalues.hashlist.sort();
-        //qDebug() << "hashlist count before:" << filtervalues.hashlist.count();
         for(int i = 1; i < filtervalues.hashlist.count(); i++)
         {
-            //qDebug() << "i" << filtervalues.hashlist.at(i) << "i-1:" << filtervalues.hashlist.at(i-1);
             if(filtervalues.hashlist.at(i).contains(filtervalues.hashlist.at(i-1)))
                 tmplist.append(filtervalues.hashlist.at(i));
         }
         filtervalues.hashlist = tmplist;
         filtervalues.hashlist.removeDuplicates();
         filtervalues.hashlist.removeOne("0");
-        //qDebug() << "hashlist count after:" << filtervalues.hashlist.count();
-        //qDebug() << filtervalues.hashlist;
-            /*
-            for(int j = 0; j < filtervalues.hashlist.count(); j++)
-            {
-                if(
-            }
-            */
-        //filtervalues.hashdupcnt = filtervalues.hashlist.removeDuplicates();
-        //filtervalues.hashlist.clear();
-        //filtervalues.hashcount.clear();
-        //filtervalues.hashidlist.clear();
-        /*
-        QSqlQuery hashquery(fcasedb);
-        hashquery.prepare("SELECT md5, COUNT(md5) FROM data GROUP BY md5 HAVING COUNT(md5) > 1 AND md5 != '';");
-        if(hashquery.exec())
-        {
-            while(hashquery.next())
-            {
-                filtervalues.hashlist.append(hashquery.value(0).toString());
-                filtervalues.hashcount.append(hashquery.value(1).toULongLong());
-            }
-        }
-        else
-            qDebug() << fcasedb.lastError().text();
-        for(int i=0; i < filtervalues.hashlist.count(); i++)
-        {
-            hashquery.prepare("SELECT objectid FROM data WHERE md5 = ? ORDER BY objectid DESC limit ?;");
-            hashquery.addBindValue(filtervalues.hashlist.at(i));
-            hashquery.addBindValue(filtervalues.hashcount.at(i) - 1);
-            if(hashquery.exec())
-            {
-                while(hashquery.next())
-                {
-                    filtervalues.hashidlist.append(hashquery.value(0).toULongLong());
-                }
-            }
-            else
-                qDebug() << fcasedb.lastError().text();
-        }
-        hashquery.finish();
-        */
     }
     if(filtervalues.hashbool2)
     {

@@ -20,7 +20,6 @@ public:
     ~ExportDialog();
 
 signals:
-    //void FileExport(FileExportData* exportdata);
     void StartExport(int exporttype, bool originalpath, QString exportpath);
 
 private slots:

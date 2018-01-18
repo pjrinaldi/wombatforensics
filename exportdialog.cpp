@@ -60,21 +60,5 @@ void ExportDialog::ExportFiles()
     if(ui->excludePathRadioButton->isChecked())
         originalpath = false;
     emit StartExport(exporttype, originalpath, exportpath);
-    /*
-    FileExportData exportdata;
-    exportdata.exportpath = ui->exportDirectoryLineEdit->text().toStdString();
-    if(ui->selectedFileRadioButton->isChecked())
-    //if(ui->selectedFileRadioButton->isChecked())
-        exportdata.filestatus = FileExportData::selected;
-    if(ui->checkedFileRadioButton->isChecked())
-        exportdata.filestatus = FileExportData::checked;
-    if(ui->listedFileRadioButton->isChecked())
-        exportdata.filestatus = FileExportData::listed;
-    if(ui->includePathRadioButton->isChecked())
-        exportdata.pathstatus = FileExportData::include;
-    if(ui->excludePathRadioButton->isChecked())
-        exportdata.pathstatus = FileExportData::exclude;
-    //emit FileExport(&exportdata);
-    */
     this->close();
 }
