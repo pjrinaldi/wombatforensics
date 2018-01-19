@@ -392,10 +392,8 @@ public:
             return Qt::NoItemFlags;
         if(index == QModelIndex())
             return Qt::NoItemFlags;
-        if(index.column() == 0)
-        {
+        if(index.column() == 0 && index.sibling(index.row(), 0).data().toString().split("-").count() == 4)
             flags |= Qt::ItemIsUserCheckable;
-        }
         
         return flags;
     };
@@ -695,6 +693,7 @@ private:
             checkhash.insert(curnode->nodevalues.at(0).toString(), true);
         }
         emit dataChanged(index, index);
+        emit checkedNodesChanged();
         return true;
     };
 
@@ -771,6 +770,7 @@ private slots:
     void UpdateProgress(unsigned long long count);
     void UpdateExport(void);
     void UpdateDig(void);
+    void UpdateCheckCount(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HidePropertyWindow(bool checkstate);
     void HideFileViewer(bool checkstate);
@@ -892,6 +892,7 @@ private:
     QLabel* filecountlabel;
     QLabel* filtercountlabel;
     QLabel* processcountlabel;
+    QLabel* checkedcountlabel;
     QLabel* statuslabel;
     QFrame* vline1;
     QFrame* vline2;

@@ -18,6 +18,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filecountlabel->setText("Found: 0");
     processcountlabel = new QLabel(this);
     processcountlabel->setText("Listed: 0");
+    checkedcountlabel = new QLabel(this);
+    checkedcountlabel->setText("Checked: 0");
     statuslabel = new QLabel(this);
     StatusUpdate("");
     vline1 = new QFrame(this);
@@ -33,6 +35,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addWidget(vline1, 0);
     this->statusBar()->addWidget(filecountlabel, 0);
     this->statusBar()->addWidget(processcountlabel, 0);
+    this->statusBar()->addWidget(checkedcountlabel, 0);
     this->statusBar()->addWidget(filtercountlabel, 0);
     this->statusBar()->addPermanentWidget(vline2, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
@@ -150,6 +153,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
     connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
+    connect(treemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(namefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -608,19 +612,15 @@ void WombatForensics::UpdateListed(const QModelIndex &index)
     {
     }
     filesprocessed = 0;
-    //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
     ReturnListedCount(rootnode);
     processcountlabel->setText("Listed: " + QString::number(filesprocessed));
-    //qDebug() << "should index work:" << totalcount;
 }
 
 void WombatForensics::UpdateListed()
 {
     filesprocessed = 0;
     ReturnListedCount(rootnode);
-    //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
     processcountlabel->setText("Listed: " + QString::number(filesprocessed));
-    //qDebug() << "should finished work:" << totalcount;
 }
 void WombatForensics::UpdateDigging()
 {
@@ -1011,9 +1011,11 @@ void WombatForensics::CloseCurrentCase()
     setWindowTitle("WombatForensics");
     filesprocessed = 0;
     filesfound = 0;
+    fileschecked = 0;
     filtercountlabel->setText("Filtered: 0");
     processcountlabel->setText("Listed: " + QString::number(filesprocessed));
     filecountlabel->setText("Found: " + QString::number(filesfound));
+    checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
     // WRITE MSGLOG TO FILE HERE...
     //QString umntstr = "pkexec umount ";
     //umntstr += wombatvariable.tmpmntpath;
@@ -2032,6 +2034,19 @@ void WombatForensics::SaveState()
     RemoveTmpFiles();
     UpdateCheckState();
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+}
+
+void WombatForensics::UpdateCheckCount()
+{
+    fileschecked = 0;
+    QMapIterator<QString, bool> i(checkhash);
+    while(i.hasNext())
+    {
+        i.next();
+        if(i.value())
+            fileschecked++;
+    }
+    checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
 }
 
 void WombatForensics::InitializeCheckState()
