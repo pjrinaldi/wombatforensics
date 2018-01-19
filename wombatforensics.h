@@ -333,7 +333,37 @@ public:
                     }
                     else if(itemtype == 10)
                         return QIcon(QPixmap(QString(":/basic/virtualfile")));
-                    return QIcon(QPixmap(QString(":/basic/treefile")));
+                    else if(itemtype == 0 && node->nodevalues.at(2).toString().contains("/$OrphanFiles/"))
+                    {
+                        QString estring = node->nodevalues.at(0).toString().split("-", QString::SkipEmptyParts).at(0);
+                        QString pstring = node->nodevalues.at(0).toString().split("-", QString::SkipEmptyParts).at(2);
+                        QString fstring = node->nodevalues.at(0).toString().split("-", QString::SkipEmptyParts).at(3);
+                        QString tmpstr = "";
+                        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+                        QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
+                        QFile propfile(wombatvariable.tmpmntpath + evidfiles.at(0).split(".evid").at(0) + "." + pstring + "." + fstring + ".prop");
+                        propfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                        QTextStream in(&propfile);
+                        QString line = "";
+                        while(!in.atEnd())
+                        {
+                            line = in.readLine();
+                            if(line.contains("Allocation Status||"))
+                            {
+                                tmpstr = line.split("||").at(1);
+                                //qDebug() << line << line.split("||").at(1);
+                                break;
+                            }
+                        }
+                        propfile.close();
+                        QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+                        if(tmplist.at(0).contains("Unallocated") && tmplist.at(1).contains("Used"))
+                            return QIcon(QPixmap(QString(":/basic/deletedfile")));
+                        else
+                            return QIcon(QPixmap(QString(":/basic/treefile")));
+                    }
+                    else
+                        return QIcon(QPixmap(QString(":/basic/treefile")));
                 }
                 else if(nodetype == 6)
                     return QIcon(QPixmap(QString(":/basic/virtualfile")));
