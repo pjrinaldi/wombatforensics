@@ -239,11 +239,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     else
         outstring += ",0";
-    /*
-    // maybe store info for an orphan
-    if(tmpfile->meta != NULL)
-        outstring += "," + QString::number(tmpfile->meta->flags);
-    */
     free(magicbuffer);
 
     /* alternative method using qt5 */
@@ -260,7 +255,13 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         outstring += ",0";
     */
     /* end alternative method */
- 
+
+    /*
+    // maybe store info for an orphan
+    if(tmpfile->meta != NULL)
+        outstring += "," + QString::number(tmpfile->meta->flags);
+    */
+
     QFile filefile;
     QTextStream out(&filefile);
     if(tmpfile->name != NULL)
