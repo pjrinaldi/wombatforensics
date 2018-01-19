@@ -495,6 +495,9 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList foundlist = eviddir.entryList(QStringList(QString("*.p*.f*.a*")), QDir::Files | QDir::NoSymLinks);
+    filesfound = foundlist.count();
+    filecountlabel->setText("Found: " + QString::number(filesfound));
     QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
     for(int i=0; i < files.count(); i++)
     {
@@ -617,7 +620,7 @@ void WombatForensics::UpdateListed()
     ReturnListedCount(rootnode);
     //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
     processcountlabel->setText("Listed: " + QString::number(filesprocessed));
-    qDebug() << "should finished work:" << totalcount;
+    //qDebug() << "should finished work:" << totalcount;
 }
 void WombatForensics::UpdateDigging()
 {
@@ -1069,7 +1072,6 @@ void WombatForensics::ReturnListedCount(Node* curnode)
         for(int i = 0; i < curnode->children.count(); i++)
             ReturnListedCount(curnode->children.at(i));
     }
-    qDebug() << "filesprocessed:" << filesprocessed;
 }
 
 void WombatForensics::GetDigList(Node* curnode, int digtype)
@@ -1997,6 +1999,8 @@ void WombatForensics::UpdateFilterCount()
         if(tmplist.at(i).sibling(tmplist.at(i).row(), 0).data().toString().split("-").count() == 4)
             filtercount++;
     }
+    if(filtercount == filesprocessed)
+        filtercount = 0;
     filtercountlabel->setText("Filtered: " + QString::number(filtercount));
 }
 
