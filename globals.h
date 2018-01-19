@@ -112,12 +112,12 @@ public:
     InterfaceSignals() { };
     ~InterfaceSignals() { };
 
-    void ProgUpd(void) { emit(ProgressUpdate(filesfound, filesprocessed)); }
+    void ProgUpd(void) { emit(ProgressUpdate(filesfound)); }
     void ExportUpd(void) { emit(ExportUpdate()); }
     void DigUpd(void) { emit(DigUpdate()); }
 
 signals:
-    void ProgressUpdate(unsigned long long filecount, unsigned long long processcount);
+    void ProgressUpdate(unsigned long long filecount);
     void ExportUpdate(void);
     void DigUpdate(void);
 

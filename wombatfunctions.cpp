@@ -71,6 +71,7 @@ bool FileExists(const std::string& filename)
     return false;
 }
 
+/*
 bool ProcessingComplete()
 {
     if(filesfound == filesprocessed && filesfound > 0)
@@ -78,6 +79,7 @@ bool ProcessingComplete()
     
     return false;
 }
+*/
 
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
 {
@@ -326,6 +328,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 adsout.flush();
                                 adsfile.close();
+                                filesfound++;
+                                isignals->ProgUpd();
                                 WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), QString::number(adssize - fsattr->size + 16), QString::number(fsattr->id));
                             }
                         }

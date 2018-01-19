@@ -766,7 +766,7 @@ private slots:
     void on_actionExpandAll_triggered();
     void on_actionCollapseAll_triggered();
     void on_actionAbout_triggered();
-    void UpdateProgress(unsigned long long count, unsigned long long processcount);
+    void UpdateProgress(unsigned long long count);
     void UpdateExport(void);
     void UpdateDig(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
@@ -850,6 +850,7 @@ private:
     void LoadHexContents(void);
     void StartThumbnails(void);
     void GetExportList(Node* curnode, int exporttype);
+    void ReturnListedCount(Node* curnode);
     void GetDigList(Node* curnode, int digtype);
     //void ProcessExport(QString curid);
     void ProcessDig(QString curid);

@@ -15,9 +15,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtercountlabel = new QLabel(this);
     filtercountlabel->setText("Filtered: 0");
     filecountlabel = new QLabel(this);
-    filecountlabel->setText("Files: 0");
+    filecountlabel->setText("Found: 0");
     processcountlabel = new QLabel(this);
-    processcountlabel->setText("Processed: 0");
+    processcountlabel->setText("Listed: 0");
     statuslabel = new QLabel(this);
     StatusUpdate("");
     vline1 = new QFrame(this);
@@ -31,9 +31,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addWidget(selectedoffset, 0);
     this->statusBar()->addWidget(selectedhex, 0);
     this->statusBar()->addWidget(vline1, 0);
-    this->statusBar()->addWidget(filtercountlabel, 0);
     this->statusBar()->addWidget(filecountlabel, 0);
     this->statusBar()->addWidget(processcountlabel, 0);
+    this->statusBar()->addWidget(filtercountlabel, 0);
     this->statusBar()->addPermanentWidget(vline2, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
@@ -93,7 +93,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
-    connect(isignals, SIGNAL(ProgressUpdate(unsigned long long, unsigned long long)), this, SLOT(UpdateProgress(unsigned long long, unsigned long long)), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(ProgressUpdate(unsigned long long)), this, SLOT(UpdateProgress(unsigned long long)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     propertywindow->setModal(false);
@@ -570,7 +570,6 @@ void WombatForensics::UpdateStatus()
 {
     StatusUpdate("Building Initial Evidence Tree...");
     LogMessage("Building Initial Evidence Tree...");
-    //filedatavector.clear();
     readfileinfo = NULL;
     tsk_fs_close(readfsinfo);
     readfsinfo = NULL;
@@ -594,6 +593,9 @@ void WombatForensics::UpdateStatus()
     ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
     cancelthread->close();
+    filesprocessed = 0;
+    ReturnListedCount(rootnode);
+    processcountlabel->setText("Listed: " + QString::number(filesprocessed));
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
 }
@@ -987,8 +989,8 @@ void WombatForensics::CloseCurrentCase()
     filesprocessed = 0;
     filesfound = 0;
     filtercountlabel->setText("Filtered: 0");
-    processcountlabel->setText("Processed: " + QString::number(filesprocessed));
-    filecountlabel->setText("Files: " + QString::number(filesfound));
+    processcountlabel->setText("Listed: " + QString::number(filesprocessed));
+    filecountlabel->setText("Found: " + QString::number(filesfound));
     // WRITE MSGLOG TO FILE HERE...
     //QString umntstr = "pkexec umount ";
     //umntstr += wombatvariable.tmpmntpath;
@@ -1035,6 +1037,19 @@ void WombatForensics::GetExportList(Node* curnode, int exporttype)
     {
         for(int i = 0; i < curnode->children.count(); i++)
             GetExportList(curnode->children.at(i), exporttype);
+    }
+}
+
+void WombatForensics::ReturnListedCount(Node* curnode)
+{
+    if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
+    {
+        filesprocessed++;
+        if(curnode->haschildren)
+        {
+            for(int i = 0; i < curnode->children.count(); i++)
+                ReturnListedCount(curnode->children.at(i));
+        }
     }
 }
 
@@ -1336,21 +1351,15 @@ void WombatForensics::UpdateExport()
     LogMessage(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
 }
-void WombatForensics::UpdateProgress(unsigned long long filecount, unsigned long long processcount)
+void WombatForensics::UpdateProgress(unsigned long long filecount)
 {
-    if(filecount > 0)
-    {
-    }
-    if(processcount > 0)
-    {
-    }
     //double curprogress = (((double)processphase)/(((double)filesfound)*3.0))*100;
     //if(curprogress > 100)
     //    curprogress = 100;
-    processcountlabel->setText("Dug: " + QString::number(filesprocessed));
-    filecountlabel->setText("Files: " + QString::number(filesfound));
+    //processcountlabel->setText("Listed: " + QString::number(filesprocessed));
+    filecountlabel->setText("Found: " + QString::number(filecount));
     //StatusUpdate("Processing: " + QString::number(curprogress, 'f', 2) + "%");
-    filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
+    //filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
 }
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)
@@ -1962,8 +1971,14 @@ void WombatForensics::ShowItem()
 
 void WombatForensics::UpdateFilterCount()
 {
+    unsigned long long filtercount = 0;
     QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
-    filtercountlabel->setText("Filtered: " + QString::number(tmplist.count()));
+    for(int i=0; i < tmplist.count(); i++)
+    {
+        if(tmplist.at(i).sibling(tmplist.at(i).row(), 0).data().toString().split("-").count() == 4)
+            filtercount++;
+    }
+    filtercountlabel->setText("Filtered: " + QString::number(filtercount));
 }
 
 void WombatForensics::AddSection()
