@@ -139,35 +139,35 @@ public:
         itemtype = node->nodetype;
         if(role == Qt::ForegroundRole)
         {
-            if(node->nodevalues.at(0).toString().contains(filtervalues.idfilter) == false)
-                return QColor(Qt::lightGray);
-            if(filtervalues.namebool)
-            {
-                if(node->nodevalues.at(1).toString().contains(filtervalues.namefilter) == false)
-                    return QColor(Qt::lightGray);
-            }
-            if(filtervalues.pathbool)
-            {
-                if(node->nodevalues.at(2).toString().contains(filtervalues.pathfilter) == false)
-                    return QColor(Qt::lightGray);
-            }
-            if(filtervalues.maxsizebool && filtervalues.minsizebool == false)
-            {
-                if(node->nodevalues.at(3).toULongLong() <= filtervalues.maxsize)
-                    return QColor(Qt::lightGray);
-            }
-            if(filtervalues.minsizebool && filtervalues.maxsizebool == false)
-            {
-                if(node->nodevalues.at(3).toULongLong() >= filtervalues.minsize)
-                    return QColor(Qt::lightGray);
-            }
-            if(filtervalues.maxsizebool && filtervalues.minsizebool)
-            {
-                if(node->nodevalues.at(3).toULongLong() >= filtervalues.minsize || node->nodevalues.at(3).toULongLong() <= filtervalues.maxsize)
-                    return QColor(Qt::lightGray);
-            }
             if(nodetype == 4)
             {
+                if(node->nodevalues.at(0).toString().contains(filtervalues.idfilter) == false)
+                    return QColor(Qt::lightGray);
+                if(filtervalues.namebool)
+                {
+                    if(node->nodevalues.at(1).toString().contains(filtervalues.namefilter) == false)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.pathbool)
+                {
+                    if(node->nodevalues.at(2).toString().contains(filtervalues.pathfilter) == false)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxsizebool && filtervalues.minsizebool == false)
+                {
+                    if(node->nodevalues.at(3).toULongLong() <= filtervalues.maxsize)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.minsizebool && filtervalues.maxsizebool == false)
+                {
+                    if(node->nodevalues.at(3).toULongLong() >= filtervalues.minsize)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.maxsizebool && filtervalues.minsizebool)
+                {
+                    if(node->nodevalues.at(3).toULongLong() >= filtervalues.minsize || node->nodevalues.at(3).toULongLong() <= filtervalues.maxsize)
+                        return QColor(Qt::lightGray);
+                }
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
                 {
                     if(node->nodevalues.at(4).toInt() <= filtervalues.maxcreate)
@@ -262,6 +262,8 @@ public:
                         return QColor(Qt::lightGray);
                 }
             }
+            else if(nodetype < 4)
+                return QColor(Qt::darkBlue);
         }
         if(role == Qt::DisplayRole)
         {
@@ -807,6 +809,8 @@ private slots:
     void UpdateSelectValue(const QString &txt);
     void UpdateDataTable(void);
     void UpdateStatus(void);
+    void UpdateListed(void);
+    void UpdateListed(const QModelIndex &index);
     void UpdateDigging(void);
     void FinishExport(void);
     void FinishThumbs(void);

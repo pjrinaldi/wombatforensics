@@ -278,7 +278,11 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         out.flush();
     }
     filefile.close();
-    filesfound++;
+    if(tmpfile->name != NULL)
+    {
+        if(!TSK_FS_ISDOT(tmpfile->name->name))
+            filesfound++;
+    }
     WriteFileProperties(tmpfile);
     isignals->ProgUpd();
 

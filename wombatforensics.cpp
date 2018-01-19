@@ -143,7 +143,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->dirTreeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->dirTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+    connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(UpdateListed(const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
+    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(UpdateListed(const QModelIndex &)));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
@@ -593,13 +595,30 @@ void WombatForensics::UpdateStatus()
     ui->actionDigDeeper->setEnabled(true);
     hexrocker->setEnabled(true);
     cancelthread->close();
-    filesprocessed = 0;
-    ReturnListedCount(rootnode);
-    processcountlabel->setText("Listed: " + QString::number(filesprocessed));
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
 }
 
+void WombatForensics::UpdateListed(const QModelIndex &index)
+{
+    if(index.isValid())
+    {
+    }
+    filesprocessed = 0;
+    //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
+    ReturnListedCount(rootnode);
+    processcountlabel->setText("Listed: " + QString::number(filesprocessed));
+    //qDebug() << "should index work:" << totalcount;
+}
+
+void WombatForensics::UpdateListed()
+{
+    filesprocessed = 0;
+    ReturnListedCount(rootnode);
+    //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
+    processcountlabel->setText("Listed: " + QString::number(filesprocessed));
+    qDebug() << "should finished work:" << totalcount;
+}
 void WombatForensics::UpdateDigging()
 {
     LogMessage("Digging Complete");
@@ -624,6 +643,7 @@ void WombatForensics::AddEvidence()
             // TRY A QTCONCURRENT::MAP() WITH A 1 ITEM VECTOR SO I CAN CANCEL IT...
             // if its a 1 item vector, the 1 item will be spawned and cancel will stop future items, which tehre are none.
             connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+            connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateListed()), Qt::QueuedConnection);
             //connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()));
             QList<int> dumint;
             dumint.clear();
@@ -1043,14 +1063,13 @@ void WombatForensics::GetExportList(Node* curnode, int exporttype)
 void WombatForensics::ReturnListedCount(Node* curnode)
 {
     if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
-    {
         filesprocessed++;
-        if(curnode->haschildren)
-        {
-            for(int i = 0; i < curnode->children.count(); i++)
-                ReturnListedCount(curnode->children.at(i));
-        }
+    if(curnode->haschildren)
+    {
+        for(int i = 0; i < curnode->children.count(); i++)
+            ReturnListedCount(curnode->children.at(i));
     }
+    qDebug() << "filesprocessed:" << filesprocessed;
 }
 
 void WombatForensics::GetDigList(Node* curnode, int digtype)
