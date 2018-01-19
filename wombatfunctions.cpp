@@ -239,6 +239,11 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     else
         outstring += ",0";
+    /*
+    // maybe store info for an orphan
+    if(tmpfile->meta != NULL)
+        outstring += "," + QString::number(tmpfile->meta->flags);
+    */
     free(magicbuffer);
 
     /* alternative method using qt5 */
@@ -773,18 +778,18 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
         proplist << "User ID||" << QString::number(curfileinfo->meta->uid) << "||User ID" << endl;
         proplist << "Group ID||" << QString::number(curfileinfo->meta->gid) << "||Group ID" << endl;
         proplist << "Allocation Status||";
-        if(curfileinfo->meta->flags == TSK_FS_META_FLAG_ALLOC)
-            proplist << "Currently Allocated";
-        else if(curfileinfo->meta->flags == TSK_FS_META_FLAG_UNALLOC)
-            proplist << "Currently Unallocated";
-        else if(curfileinfo->meta->flags == TSK_FS_META_FLAG_USED)
-            proplist << "Allocated at least once";
-        else if(curfileinfo->meta->flags == TSK_FS_META_FLAG_UNUSED)
-            proplist << "Never allocated";
-        else if(curfileinfo->meta->flags == TSK_FS_META_FLAG_COMP)
-            proplist << "Contents are compressed";
-        else
-            proplist << "Unspecified";
+        if((curfileinfo->meta->flags & TSK_FS_META_FLAG_ALLOC) == 1)
+            proplist << "Allocated,";
+        if((curfileinfo->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2)
+            proplist << "Unallocated,";
+        if((curfileinfo->meta->flags & TSK_FS_META_FLAG_USED) == 4)
+            proplist << "Used,";
+        if((curfileinfo->meta->flags & TSK_FS_META_FLAG_UNUSED) == 8)
+            proplist << "Unused,";
+        if((curfileinfo->meta->flags & TSK_FS_META_FLAG_COMP) == 16)
+            proplist << "Compressed,";
+        if((curfileinfo->meta->flags & TSK_FS_META_FLAG_ORPHAN) == 32)
+            proplist << "Orphan,";
         proplist << "||allocation status for the file." << endl;
     }
     proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;

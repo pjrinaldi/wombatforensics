@@ -3,6 +3,7 @@
     <file alias="appicon">./Resources/wombat_32.ico</file>
   </qresource>
   <qresource prefix="/basic">
+    <file alias="deletedfile">Resources/deletedfile.png</file>
     <file alias="treefolder">./Resources/folder.png</file>
     <file alias="treefile">./Resources/text-x-generic.png</file>
     <file alias="treeimg">./Resources/emblem-package-2.png</file>
