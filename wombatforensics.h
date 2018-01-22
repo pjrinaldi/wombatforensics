@@ -319,8 +319,11 @@ public:
                         QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
                         if(nodename.compare("AttrDef") == 0 || nodename.compare("$BadClus") == 0 || nodename.compare("$Bitmap") == 0 || nodename.compare("$Boot") == 0 || nodename.compare("$ObjId") == 0 || nodename.compare("$Quota") == 0 || nodename.compare("$Reparse") == 0 || nodename.compare("$LogFile") == 0 || nodename.compare("$MFT") == 0 || nodename.compare("$MFTMirr") == 0 || nodename.compare("$Secure") == 0 || nodename.compare("$UpCase") == 0 || nodename.compare("$Volume") == 0)
                             return QIcon(QPixmap(QString(":/basic/virtualfile")));
-                        else if(tmplist.at(0).contains("Unallocated") && tmplist.at(1).contains("Used"))
-                            return QIcon(QPixmap(QString(":/basic/deletedfile")));
+                        else if(tmplist.count() > 1)
+                        {
+                            if(tmplist.at(0).contains("Unallocated") && tmplist.at(1).contains("Used"))
+                                return QIcon(QPixmap(QString(":/basic/deletedfile")));
+                        }
                         else
                             return QIcon(QPixmap(QString(":/basic/treefile")));
                     }
@@ -563,6 +566,7 @@ public:
 
     void AddEvidence(int evidcount)
     {
+        qDebug() << "evidcount during:" << evidcount;
         QStringList tmplist;
         QString tmpstr = "";
         tmplist.clear();
@@ -575,7 +579,7 @@ public:
         currentnode = 0;
         colvalues.clear();
         colvalues.append(tmplist.at(5));                        // ID
-        colvalues.append(wombatvariable.evidencename);   // Name
+        colvalues.append(wombatvariable.evidencename);          // Name
         colvalues.append(tmplist.at(3));                        // Full Path
         colvalues.append(tmplist.at(1));                        // Size
         colvalues.append(0);                                    // Created
@@ -709,9 +713,11 @@ public:
                     currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
                 else
                     currentnode->checkstate = 0;
+                /*
                 if(currentnode->HasChildren())
                 {
                     PopulateChildren(currentnode, i, tmplist.at(9));
+                */
                     /*
                 QFile subfile;
                 QStringList subfiles = GetChildFiles(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
@@ -759,7 +765,7 @@ public:
                     }
                 }
                 */
-                }
+                //}
                 //wombatid++;
             }
         }

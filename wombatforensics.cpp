@@ -588,10 +588,14 @@ void WombatForensics::UpdateStatus()
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
+    qDebug() << "evidcnt before:" << evidcnt;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     treemodel->AddEvidence(evidcnt);
+    ui->dirTreeView->expandAll();
+    ui->dirTreeView->collapseAll();
     QApplication::restoreOverrideCursor();
     evidcnt++;
+    qDebug() << "evidcnt after:" << evidcnt;
     volcnt = 0;
     partint = 0;
     QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -653,11 +657,12 @@ void WombatForensics::AddEvidence()
             QList<int> dumint;
             dumint.clear();
             dumint.append(0);
-            QFuture<void> tmpfuture = QtConcurrent::map(dumint, InitializeEvidenceStructure);
-            sqlwatcher.setFuture(tmpfuture);
-            //InitializeEvidenceStructure();
+            //QFuture<void> tmpfuture = QtConcurrent::map(dumint, InitializeEvidenceStructure);
+            //sqlwatcher.setFuture(tmpfuture);
+            InitializeEvidenceStructure(0);
             //cancelthread->show();
-            //UpdateStatus();
+            UpdateStatus();
+            UpdateListed();
         }
         else
             DisplayError("3.0", "Evidence already exists in the case", "Add Evidence Cancelled");
