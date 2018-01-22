@@ -593,14 +593,20 @@ void WombatForensics::UpdateStatus()
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
-    qDebug() << "evidcnt before:" << evidcnt;
+    //qDebug() << "evidcnt before:" << evidcnt;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     treemodel->AddEvidence(evidcnt);
-    ui->dirTreeView->expandAll();
-    ui->dirTreeView->collapseAll();
+    QModelIndexList parentlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant("f"), -1, Qt::MatchFlags(Qt::MatchContains | Qt::MatchRecursive));
+    qDebug() << "parentlist:" << parentlist.count();
+    for(int i = 0; i < parentlist.count(); i++)
+    {
+        qDebug() << parentlist.at(i).sibling(parentlist.at(i).row(), 0).data().toString();
+    }
+    //PopulateModel();
+    //ui->dirTreeView->expandAll();
     QApplication::restoreOverrideCursor();
     evidcnt++;
-    qDebug() << "evidcnt after:" << evidcnt;
+    //qDebug() << "evidcnt after:" << evidcnt;
     volcnt = 0;
     partint = 0;
     QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
