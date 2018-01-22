@@ -775,6 +775,7 @@ public:
         for(int k = 0; k < subfiles.count(); k++)
         {
             parentnode = curnode;
+            beginInsertRows(QModelIndex(), 0, parentnode->childcount - 1);
             tmpstr = "";
             currentnode = 0;
             tmplist.clear();
@@ -810,6 +811,7 @@ public:
                 currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
             else
                 currentnode->checkstate = 0;
+            endInsertRows();
             if(currentnode->HasChildren())
                 PopulateChildren(currentnode, i, tmplist.at(9));
         }
