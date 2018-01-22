@@ -102,6 +102,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     propertywindow->setModal(false);
     InitializeAppStructure();
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
+    connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+    connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateListed()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
@@ -651,18 +653,16 @@ void WombatForensics::AddEvidence()
             LogMessage("Start Adding Evidence");
             // TRY A QTCONCURRENT::MAP() WITH A 1 ITEM VECTOR SO I CAN CANCEL IT...
             // if its a 1 item vector, the 1 item will be spawned and cancel will stop future items, which tehre are none.
-            connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
-            connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateListed()), Qt::QueuedConnection);
             //connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()));
             QList<int> dumint;
             dumint.clear();
             dumint.append(0);
-            //QFuture<void> tmpfuture = QtConcurrent::map(dumint, InitializeEvidenceStructure);
-            //sqlwatcher.setFuture(tmpfuture);
-            InitializeEvidenceStructure(0);
+            QFuture<void> tmpfuture = QtConcurrent::map(dumint, InitializeEvidenceStructure);
+            sqlwatcher.setFuture(tmpfuture);
+            //InitializeEvidenceStructure(0);
             //cancelthread->show();
-            UpdateStatus();
-            UpdateListed();
+            //UpdateStatus();
+            //UpdateListed();
         }
         else
             DisplayError("3.0", "Evidence already exists in the case", "Add Evidence Cancelled");
