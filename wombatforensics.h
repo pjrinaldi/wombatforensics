@@ -351,7 +351,6 @@ public:
                             if(line.contains("Allocation Status||"))
                             {
                                 tmpstr = line.split("||").at(1);
-                                //qDebug() << line << line.split("||").at(1);
                                 break;
                             }
                         }
@@ -536,32 +535,6 @@ public:
         }
     };
 
-    /*
-    QString FindProperty(QString search, QString id)
-    {
-        QString estring = id.split("-", QString::SkipEmptyParts).at(0);
-        QString pstring = id.split("-", QString::SkipEmptyParts).at(2);
-        QString fstring = id.split("-", QString::SkipEmptyParts).at(3);
-        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
-        QFile propfile(wombatvariable.tmpmntpath + evidfiles.at(0).split(".evid").at(0) + "." + pstring + "." + fstring + ".prop");
-        propfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        QTextStream in(&propfile);
-        QString line = "";
-        while(!in.atEnd())
-        {
-            line = in.readLine();
-            if(line.contains(search))
-            {
-                qDebug() << line << line.split("||").at(1);
-                break;
-            }
-        }
-        propfile.close();
-        return line.split("||").at(1);
-    };
-    */
-    
     void GetModelCount(Node* curnode)
     {
         if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
@@ -872,10 +845,12 @@ private slots:
     void ExpandCollapseResize(const QModelIndex &index)
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        /*
         if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
         {
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
         }
+        */
         ResizeViewColumns(index);
         QApplication::restoreOverrideCursor();
     };
