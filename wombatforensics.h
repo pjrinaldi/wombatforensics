@@ -570,6 +570,7 @@ public:
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
         tmplist = tmpstr.split(",");
+        evidfile.close();
         beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
         currentnode = 0;
         colvalues.clear();
@@ -596,8 +597,7 @@ public:
         else
             currentnode->checkstate = false;
         parentnode = currentnode;
-        evidfile.close();
-        wombatid++;
+        //wombatid++;
         // APPEND VOLUME TO NODE TREE
         tmpstr = "";
         currentnode = 0;
@@ -630,7 +630,7 @@ public:
         else
             currentnode->checkstate = false;
         parentnode = currentnode;
-        wombatid++;
+        //wombatid++;
         int partcount = currentnode->childcount;
         QFile partfile;
         for(int i = 0; i < partcount; i++)
@@ -658,6 +658,7 @@ public:
             colvalues.append("");                                   // File Signature
             colvalues.append("");                                   // File Category
             currentnode = new Node(colvalues);
+            partnode = currentnode;
             currentnode->parent = parentnode;
             parentnode->children.append(currentnode);
             currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + rootinum);
@@ -667,11 +668,12 @@ public:
             else
                 currentnode->checkstate = false;
             parentnode = currentnode;
-            wombatid++;
+            //wombatid++;
             QFile filefile;
             QStringList curfiles = GetChildFiles(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + rootinum);
             for(int j = 0; j < curfiles.count(); j++)
             {
+                parentnode = partnode;
                 tmpstr = "";
                 currentnode = 0;
                 tmplist.clear();
@@ -707,10 +709,110 @@ public:
                     currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
                 else
                     currentnode->checkstate = 0;
-                wombatid++;
+                if(currentnode->HasChildren())
+                {
+                    PopulateChildren(currentnode, i, tmplist.at(9));
+                    /*
+                QFile subfile;
+                QStringList subfiles = GetChildFiles(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
+                for(k = 0; k < subfiles.count(); k++)
+                {
+                    parentnode = currentnode;
+                    tmpstr = "";
+                    currentnode = 0;
+                    tmplist.clear();
+                    colvalues.clear();
+                    subfile.setFileName(wombatvariable.tmpmntpath + subfiles.at(k));
+                    subfile.open(QIODevice::ReadOnly);
+                    tmpstr = subfile.readLine();
+                    subfile.close();
+                    tmplist = tmpstr.split(",");
+                    colvalues.append(tmplist.at(12).split("-a").at(0));     // ID
+                    QByteArray ba;
+                    ba.append(tmplist.at(0));
+                    colvalues.append(QByteArray::fromBase64(ba));           // Name
+                    colvalues.append(tmplist.at(3));                        // Full Path
+                    colvalues.append(tmplist.at(8));                        // Size
+                    colvalues.append(tmplist.at(4));                        // Created
+                    colvalues.append(tmplist.at(5));                        // Accessed
+                    colvalues.append(tmplist.at(6));                        // Modified
+                    colvalues.append(tmplist.at(7));                        // Status Changed
+                    if(tmplist.at(13).compare("0") == 0)
+                        colvalues.append("");                               // MD5
+                    else
+                        colvalues.append(tmplist.at(13));                   // MD5
+                    colvalues.append(tmplist.at(10));                       // File Signature
+                    colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
+                    currentnode = new Node(colvalues);
+                    currentnode->parent = parentnode;
+                    currentnode->nodetype = tmplist.at(1).toInt();
+                    parentnode->children.append(currentnode);
+                    currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
+                    currentnode->haschildren = currentnode->HasChildren();
+                    if(checkhash.contains(tmplist.at(12).split("-a").at(0)))
+                        currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
+                    else
+                        currentnode->checkstate = 0;
+                    if(currentnode->haschildren())
+                    {
+                        PopulateChildren(currentnode);
+                    }
+                }
+                */
+                }
+                //wombatid++;
             }
         }
         endInsertRows();
+    };
+
+    void PopulateChildren(Node* curnode, int i, QString parentaddr)
+    {
+        QString tmpstr = "";
+        QStringList tmplist;
+        QFile subfile;
+        QStringList subfiles = GetChildFiles(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + parentaddr);
+        for(int k = 0; k < subfiles.count(); k++)
+        {
+            parentnode = curnode;
+            tmpstr = "";
+            currentnode = 0;
+            tmplist.clear();
+            colvalues.clear();
+            subfile.setFileName(wombatvariable.tmpmntpath + subfiles.at(k));
+            subfile.open(QIODevice::ReadOnly);
+            tmpstr = subfile.readLine();
+            subfile.close();
+            tmplist = tmpstr.split(",");
+            colvalues.append(tmplist.at(12).split("-a").at(0));     // ID
+            QByteArray ba;
+            ba.append(tmplist.at(0));
+            colvalues.append(QByteArray::fromBase64(ba));           // Name
+            colvalues.append(tmplist.at(3));                        // Full Path
+            colvalues.append(tmplist.at(8));                        // Size
+            colvalues.append(tmplist.at(4));                        // Created
+            colvalues.append(tmplist.at(5));                        // Accessed
+            colvalues.append(tmplist.at(6));                        // Modified
+            colvalues.append(tmplist.at(7));                        // Status Changed
+            if(tmplist.at(13).compare("0") == 0)
+                colvalues.append("");                               // MD5
+            else
+                colvalues.append(tmplist.at(13));                   // MD5
+            colvalues.append(tmplist.at(10));                       // File Signature
+            colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
+            currentnode = new Node(colvalues);
+            currentnode->parent = parentnode;
+            currentnode->nodetype = tmplist.at(1).toInt();
+            parentnode->children.append(currentnode);
+            currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
+            currentnode->haschildren = currentnode->HasChildren();
+            if(checkhash.contains(tmplist.at(12).split("-a").at(0)))
+                currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
+            else
+                currentnode->checkstate = 0;
+            if(currentnode->HasChildren())
+                PopulateChildren(currentnode, i, tmplist.at(9));
+        }
     };
 
     Node* NodeFromIndex(const QModelIndex &index) const
@@ -842,6 +944,7 @@ private slots:
         if(index.isValid())
             ResizeColumns();
     };
+    // WILL PROBABLY NOT NEED
     void ExpandCollapseResize(const QModelIndex &index)
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
