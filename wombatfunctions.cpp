@@ -192,24 +192,30 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     {
     }
     QString outstring = "";
+    QString treestring = "";
+    treestring += "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
     if(tmpfile->name != NULL)
     {
         QByteArray ba;
         ba.append(QString(tmpfile->name->name));
         outstring += ba.toBase64() + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
+        treestring += "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr) + "," + QString(tmpfile->name->name) + "," + "/" + QString(tmppath) + ",";
     }
     else
     {
         outstring += "unknown," + QString::number(tmpfile->meta->type) + ",0,";
+        treestring += "-f" + QString::number(tmpfile->meta->addr) + "-a0,unknown,0,";
     }
     outstring += "/" + QString(tmppath) + ",";
     if(tmpfile->meta != NULL)
     {
         outstring += QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->addr) + ",";
+        treestring += QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime);
     }
     else
     {
         outstring += "0,0,0,0,0," + QString::number(tmpfile->name->meta_addr) + ",";
+        treestring += "0,0,0,0,0,";
     }
     char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
     QByteArray tmparray;
@@ -236,9 +242,14 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             hashint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
         }
         outstring +=  "," + QString(sbuf);
+        treestring += QString(sbuf) + ",";
     }
     else
+    {
         outstring += ",0";
+        treestring += "0,";
+    }
+    treestring += mimetype.name().split("/").at(0) + "," + mimetype.name().split("/").at(1);
     free(magicbuffer);
 
     /* alternative method using qt5 */
@@ -264,6 +275,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
     QFile filefile;
     QTextStream out(&filefile);
+    QTextStream treeout(&treefile);
     if(tmpfile->name != NULL)
     {
         if(strcmp(tmpfile->name->name, ".") != 0)
@@ -273,6 +285,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->name->meta_addr) + ".a" + QString::number(tmpfile->name->par_addr));
                     filefile.open(QIODevice::Append | QIODevice::Text);
                     out << outstring;
+                    treeout << treestring << endl;
             }
         }
     }
@@ -282,6 +295,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         filefile.open(QIODevice::Append | QIODevice::Text);
         out << outstring;
         out.flush();
+        treeout << treestring << endl;
     }
     filefile.close();
     if(tmpfile->name != NULL)
@@ -338,6 +352,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 adsout.flush();
                                 adsfile.close();
+                                treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << QString(tmpfile->name->name) + ":" + QString(fsattr->name) << "," << QString("/") + QString(tmppath) <<  "," << fsattr->size << ",0,0,0,0,0,0,0" << endl; 
                                 filesfound++;
                                 isignals->ProgUpd();
                                 WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), QString::number(adssize - fsattr->size + 16), QString::number(fsattr->id));
@@ -558,6 +573,9 @@ void InitializeEvidenceStructure(int dumint)
     out << "," << wombatvariable.itemcount << ",e" + QString::number(evidcnt);
     out.flush();
     evidfile.close();
+    treefile.open(QIODevice::Append | QIODevice::Text);
+    QTextStream treeout(&treefile);
+    treeout << "e" + QString::number(evidcnt) << "," << wombatvariable.evidencename << "," + QString::number(readimginfo->size) << ",0,0,0,0,0,0,0,0" << endl;
     // Write Evidence Properties Here...
     WriteEvidenceProperties(readimginfo);
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
@@ -578,6 +596,7 @@ void InitializeEvidenceStructure(int dumint)
     out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt);
     out.flush();
     volfile.close();
+    treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) << "," << volname << "," << ",0," << QString::number(readimginfo->size) << ",0,0,0,0,0,0,0" << endl;
     if(readvsinfo != NULL)
         WriteVolumeProperties(readvsinfo);
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
@@ -589,6 +608,7 @@ void InitializeEvidenceStructure(int dumint)
         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
         out.flush();
         pfile.close();
+        treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + tsk_fs_type_toname(readfsinfo->ftype) + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
@@ -615,6 +635,7 @@ void InitializeEvidenceStructure(int dumint)
                     out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                     out.flush();
                     pfile.close();
+                    treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << QString(readpartinfo->desc) << ",0," << QString::number(readpartinfo->len * readvsinfo->block_size) << ",0,0,0,0,0,0,0" << endl;
                 }
                 else if(readpartinfo->flags == 0x01) // allocated partition
                 {
@@ -624,6 +645,7 @@ void InitializeEvidenceStructure(int dumint)
                         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                         out.flush();
                         pfile.close();
+                        treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + tsk_fs_type_toname(readfsinfo->ftype) + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);

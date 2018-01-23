@@ -432,6 +432,7 @@ void WombatForensics::InitializeCaseStructure()
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
         LogMessage("Log File Created");
+        treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
@@ -455,8 +456,6 @@ void WombatForensics::InitializeOpenCase()
         QStringList tmplist = wombatvariable.casename.split("/");
         tmplist.removeLast();
         wombatvariable.casepath = tmplist.join("/");
-        logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
-        msglog->clear();
         if(!wombatvariable.casename.contains(".wfc"))
         {
             this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last());
@@ -500,7 +499,10 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     {
     }
     wombatvariable.iscaseopen = true;
+    logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
+    msglog->clear();
     InitializeCheckState();
+    treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
     ui->actionAdd_Evidence->setEnabled(true);
     //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
@@ -586,6 +588,7 @@ void WombatForensics::UpdateDataTable()
 }
 void WombatForensics::UpdateStatus()
 {
+    treefile.close();
     StatusUpdate("Building Initial Evidence Tree...");
     LogMessage("Building Initial Evidence Tree...");
     readfileinfo = NULL;
