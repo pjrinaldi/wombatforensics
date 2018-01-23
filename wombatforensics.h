@@ -483,6 +483,7 @@ public:
         return false;
     };
 
+    /*
     void PopulateModel(void)
     {
         QModelIndexList parents;
@@ -495,21 +496,25 @@ public:
         }
         //QtConcurrent::map(parents, &TreeModel::SideLoad);
     };
+    */
 
+    /*
     void SideLoad(const QModelIndex &parent)
     {
         fetchMore(parent);
     }
+    */
 
     void fetchMore(const QModelIndex &parent = QModelIndex())
     {
-        QStringList tmplist;
-        QString tmpstr = "";
         unsigned long long parentaddr = parent.sibling(parent.row(), 0).data().toString().split("-").last().mid(1).toULongLong();
         int curpart = parent.sibling(parent.row(), 0).data().toString().split("-").at(2).mid(1).toInt();
         parentnode = NodeFromIndex(parent);
+        QStringList tmplist;
+        QString tmpstr = "";
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*"), QDir::NoSymLinks | QDir::Files);
+        // could get rid fo the evidfile loop if i simply use the evid # from the parentaddr split...
         for(int j = 0; j < evidfiles.count(); j++)
         {
             QStringList curfiles = GetChildFiles(evidfiles.at(j).split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + QString::number(parentaddr));
