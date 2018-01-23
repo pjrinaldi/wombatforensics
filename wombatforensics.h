@@ -483,6 +483,24 @@ public:
         return false;
     };
 
+    void PopulateModel(void)
+    {
+        QModelIndexList parents;
+        parents.clear();
+        QModelIndexList parentlist = match(index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant("f"), -1, Qt::MatchFlags(Qt::MatchContains | Qt::MatchRecursive));
+        for(int i = 0; i < parentlist.count(); i++)
+        {
+            if(hasChildren(parentlist.at(i)))
+                parents.append(parentlist.at(i));
+        }
+        //QtConcurrent::map(parents, &TreeModel::SideLoad);
+    };
+
+    void SideLoad(const QModelIndex &parent)
+    {
+        fetchMore(parent);
+    }
+
     void fetchMore(const QModelIndex &parent = QModelIndex())
     {
         QStringList tmplist;
@@ -925,6 +943,7 @@ private slots:
     void UpdateListed(const QModelIndex &index);
     void UpdateDigging(void);
     void FinishExport(void);
+    //void FinishModel(void);
     void FinishThumbs(void);
     //void FinishHex(void);
     void StatusUpdate(QString tmptext)
@@ -976,6 +995,7 @@ private:
     void UpdateCheckState(void);
     void InitializeCheckState(void);
     void UpdateSelectedState(QString id);
+    static void PopulateModel(const QModelIndex index);
     QString InitializeSelectedState(void);
     QModelIndex selectedindex;
     QModelIndex oldselectedindex;
@@ -988,6 +1008,8 @@ private:
     QFutureWatcher<void> thumbwatcher;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;
+    //QFuture<void> modelfuture;
+    //QFutureWatcher<void>modelwatcher;
 
     QFile casesfile;
     QFile settingsfile;

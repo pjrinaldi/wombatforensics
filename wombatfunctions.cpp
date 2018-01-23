@@ -517,6 +517,15 @@ void cnid_to_array(uint32_t cnid, uint8_t array[4])
     array[1] = (cnid >> 16) & 0xff;
     array[0] = (cnid >> 24) & 0xff;
 }
+/*
+Node* NodeFromIndex(const QModelIndex &index)
+{
+    if(index.isValid())
+        return static_cast<Node*>(index.internalPointer());
+    else
+        return rootnode;
+}
+*/
 
 //void InitializeEvidenceStructure()
 void InitializeEvidenceStructure(int dumint)

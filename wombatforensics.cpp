@@ -107,6 +107,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
+    //connect(&modelwatcher, SIGNAL(finished()), this, SLOT(FinishModel()), Qt::QueuedConnection);
     connect(cancelthread, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
@@ -596,12 +597,17 @@ void WombatForensics::UpdateStatus()
     //qDebug() << "evidcnt before:" << evidcnt;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     treemodel->AddEvidence(evidcnt);
+    //treemodel->PopulateModel();
+    /*
     QModelIndexList parentlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant("f"), -1, Qt::MatchFlags(Qt::MatchContains | Qt::MatchRecursive));
     qDebug() << "parentlist:" << parentlist.count();
     for(int i = 0; i < parentlist.count(); i++)
     {
         qDebug() << parentlist.at(i).sibling(parentlist.at(i).row(), 0).data().toString();
     }
+    */
+    //modelfuture = QtConcurrent::map(parentlist, &WombatForensics::PopulateModel);
+    //modelwatcher.setFuture(modelfuture);
     //PopulateModel();
     //ui->dirTreeView->expandAll();
     QApplication::restoreOverrideCursor();
@@ -622,6 +628,62 @@ void WombatForensics::UpdateStatus()
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
 }
+/*
+void WombatForensics::PopulateModel(const QModelIndex parent)
+{
+    QStringList tmplist;
+    QString tmpstr = "";
+    unsigned long long parentaddr = parent.sibling(parent.row(), 0).data().toString().split("-").last().mid(1).toULongLong();
+    int curpart = parent.sibling(parent.row(), 0).data().toString().split("-").at(2).mid(1).toInt();
+    parentnode = NodeFromIndex(parent);
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*"), QDir::NoSymLinks | QDir::Files);
+    for(int j = 0; j < evidfiles.count(); j++)
+    {
+        QStringList curfiles = GetChildFiles(evidfiles.at(j).split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + QString::number(parentaddr));
+        if(curfiles.count() > 0)
+        {
+            QFile childfile;
+            //beginInsertRows(parent, 0, parentnode->childcount - 1);
+            for(int i = 0; i < curfiles.count(); i++)
+            {
+                tmpstr = "";
+                currentnode = 0;
+                tmplist.clear();
+                colvalues.clear();
+                childfile.setFileName(wombatvariable.tmpmntpath + curfiles.at(i));
+                childfile.open(QIODevice::ReadOnly);
+                tmpstr = childfile.readLine();
+                childfile.close();
+                tmplist = tmpstr.split(",");
+                colvalues.append(tmplist.at(12).split("-a").at(0));     // ID
+                QByteArray ba;
+                ba.append(tmplist.at(0));
+                colvalues.append(QByteArray::fromBase64(ba));           // Name
+                colvalues.append(tmplist.at(3));                        // Full Path
+                colvalues.append(tmplist.at(8));                        // Size
+                colvalues.append(tmplist.at(4));                        // Created
+                colvalues.append(tmplist.at(5));                        // Accessed
+                colvalues.append(tmplist.at(6));                        // Modified
+                colvalues.append(tmplist.at(7));                        // Status Changed
+                if(tmplist.at(13).compare("0") == 0)
+                    colvalues.append("");                               // MD5
+                else
+                    colvalues.append(tmplist.at(13));                   // MD5
+                colvalues.append(tmplist.at(10));                       // File Signature
+                colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
+                currentnode = new Node(colvalues);
+                currentnode->parent = parentnode;
+                currentnode->nodetype = tmplist.at(1).toInt();          // node type 5=file, 3=dir, 10=vir file, 11=vir dir
+                parentnode->children.append(currentnode);
+                currentnode->childcount = GetChildCount(wombatvariable.evidencename.split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + tmplist.at(9));
+                currentnode->haschildren = currentnode->HasChildren();
+            }
+            //endInsertRows();
+        }
+    }
+}
+*/
 
 void WombatForensics::UpdateListed(const QModelIndex &index)
 {
@@ -1128,6 +1190,14 @@ void WombatForensics::FinishExport()
     LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
     StatusUpdate("Exporting completed with " + QString::number(errorcount) + "error(s)");
 }
+
+/*
+void WombatForensics::FinishModel()
+{
+    LogMessage(QString("Model successfully loaded"));
+    StatusUpdate("Model Loaded");
+}
+*/
 
 /*
 void WombatForensics::ProcessExport(QString objectid)
