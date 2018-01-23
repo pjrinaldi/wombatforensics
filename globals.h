@@ -127,6 +127,67 @@ signals:
 
 extern InterfaceSignals* isignals;
 
+
+class TreeNode
+{
+public:
+    explicit TreeNode(const QList<QVariant> &data, TreeNode* parent = 0)
+    {
+        parentitem = parent;
+        itemdata = data;
+    };
+
+    ~TreeNode()
+    {
+        qDeleteAll(childitems);
+    }
+
+    void AppendChild(TreeNode* child)
+    {
+        childitems.append(child);
+    };
+
+    TreeNode* child(int row)
+    {
+        return childitems.value(row);
+    };
+
+    int ChildCount(void) const
+    {
+        return childitems.count();
+    };
+
+    int ColumnCount(void) const
+    {
+        return itemdata.count();
+    };
+
+    QVariant Data(int column) const
+    {
+        return itemdata.value(column);
+    };
+
+    int Row(void) const
+    {
+        if(parentitem)
+            return parentitem->childitems.indexOf(const_cast<TreeNode*>(this));
+
+        return 0;
+    };
+
+    TreeNode* ParentItem(void)
+    {
+        return parentitem;
+    };
+
+private:
+    QList<TreeNode*> childitems;
+    QList<QVariant> itemdata;
+    TreeNode* parentitem;
+};
+
+
+
 class Node
 {
 public:

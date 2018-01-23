@@ -51,7 +51,63 @@ protected:
     };
 };
 
+class TreeNodeModel : public QAbstractItemModel
+{
+    Q_OBJECT
 
+public:
+    explicit TreeNodeModel(QObject* parent = 0) : QAbstractItemModel(parent)
+    {
+        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Signature" << "File Category";
+    };
+
+    ~TreeNodeModel()
+    {
+    };
+
+    QVariant data(const QModelIndex &index, int role) const override
+    {
+    };
+
+    Qt::ItemFlags flags(const QModelIndex &index) const override
+    {
+    };
+
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override
+    {
+        if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
+        {
+            if(section >= 0)
+                return headerdata.at(section);
+        }
+        return QVariant();
+    };
+
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override
+    {
+    };
+
+    QModelIndex parent(const QModelIndex &index) const override
+    {
+    };
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override
+    {
+    };
+
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override
+    {
+    };
+
+private:
+    void AddEvidence()
+    {
+    };
+
+    QStringList headerdata;
+    TreeNode* zeronode;
+    //rootitem...
+};
 
 class TreeModel : public QAbstractItemModel
 {
