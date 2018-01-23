@@ -66,14 +66,27 @@ public:
 
     ~TreeNodeModel()
     {
+        delete zeronode;
     };
 
     QVariant data(const QModelIndex &index, int role) const override
     {
+        if(!index.isValid())
+            return QVariant();
+        if(role != Qt::DisplayRole)
+            return QVariant();
+        
+        TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
+
+        return itemnode->Data(index.column());
     };
 
     Qt::ItemFlags flags(const QModelIndex &index) const override
     {
+        if(!index.isValid())
+            return 0;
+
+        return QAbstractItemModel::flags(index);
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override
@@ -88,18 +101,56 @@ public:
 
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override
     {
+        if(!hasIndex(row, column, parent))
+            return QModelIndex();
+
+        TreeNode* parentnode;
+        if(!parent.isValid())
+            parentnode = zeronode;
+        else
+            parentnode = static_cast<TreeNode*>(parent.internalPointer());
+
+        TreeNode* childnode = parentnode->child(row);
+        if(childnode)
+            return createIndex(row, column, childnode);
+        else
+            return QModelIndex();
     };
 
     QModelIndex parent(const QModelIndex &index) const override
     {
+        if(!index.isValid())
+            return QModelIndex();
+
+        TreeNode* childnode = static_cast<TreeNode*>(index.internalPointer());
+        TreeNode* parentnode = childnode->ParentItem();
+
+        if(parentnode == zeronode)
+            return QModelIndex();
+
+        return createIndex(parentnode->Row(), 0, parentnode);
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override
     {
+        TreeNode* parentnode;
+        if(parent.column() > 0)
+            return 0;
+
+        if(!parent.isValid())
+            parentnode = zeronode;
+        else
+            parentnode = static_cast<TreeNode*>(parent.internalPointer());
+
+        return parentnode->ChildCount();
     };
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const override
     {
+        if(parent.isValid())
+            return static_cast<TreeNode*>(parent.internalPointer())->ColumnCount();
+        else
+            return zeronode->ColumnCount();
     };
 
 private:
