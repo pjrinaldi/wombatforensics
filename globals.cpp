@@ -6,6 +6,7 @@
 WombatVariable wombatvariable;
 QFile logfile;
 QFile viewerfile;
+QFile treefile;
 QDir thumbdir;
 QTextEdit* msglog = NULL;
 QFutureWatcher<void> thumbwatcher;

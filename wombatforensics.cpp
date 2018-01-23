@@ -516,7 +516,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         treemodel->AddEvidence(files.at(i).split(".").last().toInt());
         evidcnt++;
     }
-    ui->dirTreeView->expandAll();
+    //ui->dirTreeView->expandAll();
     //ui->dirTreeView->collapseAll();
     QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)

@@ -10,6 +10,7 @@
 extern WombatVariable wombatvariable;
 extern QFile logfile;
 extern QFile viewerfile;
+extern QFile treefile;
 extern QDir thumbdir;
 extern QTextEdit* msglog;
 extern QFutureWatcher<void> thumbwatcher;
