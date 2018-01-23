@@ -671,6 +671,62 @@ void InitialSideLoad(QStringList tmplist)
         }
 }
 
+void SideLoad(Node* parentnode)
+{
+    unsigned long long parentaddr = parentnode->nodevalues.at(0).toString().split("-").last().mid(1).toULongLong();
+    int curpart = parentnode->nodevalues.at(0).toString().split("-").at(2).mid(1).toInt();
+    //unsigned long long parentaddr = parent.sibling(parent.row(), 0).data().toString().split("-").last().mid(1).toULongLong();
+    //int curpart = parent.sibling(parent.row(), 0).data().toString().split("-").at(2).mid(1).toInt();
+    QStringList tmplist;
+    QString tmpstr = "";
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*" + parentnode->nodevalues.at(0).toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
+        // could get rid fo the evidfile loop if i simply use the evid # from the parentaddr split...
+        //for(int j = 0; j < evidfiles.count(); j++)
+        //{
+            QStringList curfiles = GetChildFiles(evidfiles.at(0).split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + QString::number(parentaddr));
+            if(curfiles.count() > 0)
+            {
+                QFile childfile;
+                for(int i = 0; i < curfiles.count(); i++)
+                {
+                    tmpstr = "";
+                    currentnode = 0;
+                    tmplist.clear();
+                    colvalues.clear();
+                    childfile.setFileName(wombatvariable.tmpmntpath + curfiles.at(i));
+                    childfile.open(QIODevice::ReadOnly);
+                    tmpstr = childfile.readLine();
+                    childfile.close();
+                    tmplist = tmpstr.split(",");
+                    colvalues.append(tmplist.at(12).split("-a").at(0));     // ID
+                    QByteArray ba;
+                    ba.append(tmplist.at(0));
+                    colvalues.append(QByteArray::fromBase64(ba));           // Name
+                    colvalues.append(tmplist.at(3));                        // Full Path
+                    colvalues.append(tmplist.at(8));                        // Size
+                    colvalues.append(tmplist.at(4));                        // Created
+                    colvalues.append(tmplist.at(5));                        // Accessed
+                    colvalues.append(tmplist.at(6));                        // Modified
+                    colvalues.append(tmplist.at(7));                        // Status Changed
+                    if(tmplist.at(13).compare("0") == 0)
+                        colvalues.append("");                               // MD5
+                    else
+                        colvalues.append(tmplist.at(13));                   // MD5
+                    colvalues.append(tmplist.at(10));                       // File Signature
+                    colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
+                    currentnode = new Node(colvalues);
+                    currentnode->parent = parentnode;
+                    currentnode->nodetype = tmplist.at(1).toInt();          // node type 5=file, 3=dir, 10=vir file, 11=vir dir
+                    parentnode->children.append(currentnode);
+                    currentnode->childcount = GetChildCount(wombatvariable.evidencename.split(".evid").at(0) + ".p" + QString::number(curpart) + "*.a" + tmplist.at(9));
+                    currentnode->haschildren = currentnode->HasChildren();
+                }
+            }
+        //}
+
+}
+
 //void InitializeEvidenceStructure()
 void InitializeEvidenceStructure(int dumint)
 {

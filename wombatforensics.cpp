@@ -145,6 +145,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemodel = new TreeModel(this);
     ui->dirTreeView->setModel(treemodel);
     ui->dirTreeView->setSortingEnabled(true); // enables the sorting arrow, but doesn't sort anything.
+    ui->dirTreeView->setUniformRowHeights(true);
     ui->dirTreeView->header()->setSortIndicatorShown(false);
     ui->dirTreeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->dirTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -957,7 +958,7 @@ void WombatForensics::LoadHexContents()
         QFile filefile;
         if(filefiles.count() == 1)
             filefile.setFileName(wombatvariable.tmpmntpath + filefiles.at(0));
-        else
+        else if(filefiles.count() > 1)
         {
             for(int i = 0; i < filefiles.count(); i++)
             {

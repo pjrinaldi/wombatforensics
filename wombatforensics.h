@@ -599,8 +599,7 @@ public:
         tmplist = tmpstr.split(",");
         evidfile.close();
         beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
-        QtConcurrent::run(InitialSideLoad, tmplist);
-        /* move to another thread
+        //QtConcurrent::run(InitialSideLoad, tmplist);
         currentnode = 0;
         colvalues.clear();
         colvalues.append(tmplist.at(5));                        // ID
@@ -740,7 +739,6 @@ public:
                     currentnode->checkstate = 0;
             }
         }
-        */
         endInsertRows();
     };
 
