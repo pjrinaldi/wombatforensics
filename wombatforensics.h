@@ -56,9 +56,12 @@ class TreeNodeModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    explicit TreeNodeModel(QObject* parent = 0) : QAbstractItemModel(parent)
+    explicit TreeNodeModel(const QString &data, QObject* parent = 0) : QAbstractItemModel(parent)
     {
-        headerdata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Signature" << "File Category";
+        QList<QVariant> zerodata;
+        zerodata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Signature" << "File Category";
+        zeronode = new TreeNode(zerodata);
+        AddEvidence(data.split((QString("\n"))), zeronode);
     };
 
     ~TreeNodeModel()
@@ -78,7 +81,7 @@ public:
         if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
         {
             if(section >= 0)
-                return headerdata.at(section);
+                return zeronode->Data(section);
         }
         return QVariant();
     };
@@ -100,11 +103,30 @@ public:
     };
 
 private:
-    void AddEvidence()
+    void AddEvidence(const QStringList &nodes, TreeNode* parent)
     {
+        QList<TreeNode*> parents;
+        parents << parent;
+        int nodecount = 0;
+        int position = 0;
+        int address = 0;
+        while(nodecount < nodes.count())
+        {
+            QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
+            QList<QVariant> columndata;
+            for(int i = 0; i < columnstrings.count(); i++)
+                columndata << columnstrings.at(i);
+
+            /*
+            if(columnstrings.at(0).split("-").count() == 1)
+                parents.last()->appendChild(new TreeNode(columndata, parents.last()));
+            else if(columnstrings.at(0).split("-").count() == 2)
+                parents.last()->child(parents
+            */
+        }
     };
 
-    QStringList headerdata;
+    //QStringList headerdata;
     TreeNode* zeronode;
     //rootitem...
 };
