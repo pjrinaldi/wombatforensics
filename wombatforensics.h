@@ -986,6 +986,7 @@ public:
     DigDeeperDialog* digdeeperdialog;
     FileViewer* fileviewer;
     TreeModel* treemodel;
+    TreeNodeModel* treenodemodel;
     QMenu* treemenu;
     QMenu* selectionmenu;
     IdFilter* idfilterview;
