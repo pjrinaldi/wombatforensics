@@ -527,6 +527,150 @@ Node* NodeFromIndex(const QModelIndex &index)
 }
 */
 
+void InitialSideLoad(QStringList tmplist)
+{
+        QString tmpstr = "";
+        currentnode = 0;
+        colvalues.clear();
+        colvalues.append(tmplist.at(5));                        // ID
+        colvalues.append(wombatvariable.evidencename);          // Name
+        colvalues.append(tmplist.at(3));                        // Full Path
+        colvalues.append(tmplist.at(1));                        // Size
+        colvalues.append(0);                                    // Created
+        colvalues.append(0);                                    // Accessed
+        colvalues.append(0);                                    // Modified
+        colvalues.append(0);                                    // Status Changed
+        colvalues.append("");                                   // MD5
+        colvalues.append("");                                   // File Signature
+        colvalues.append("");                                   // File Category
+        currentnode = new Node(colvalues);
+        rootnode->children.append(currentnode);
+        rootnode->childcount++;
+        rootnode->haschildren = rootnode->HasChildren();
+        currentnode->parent = rootnode;
+        currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".vol");
+        currentnode->haschildren = currentnode->HasChildren();
+        if(checkhash.contains(tmplist.at(5)))
+            currentnode->checkstate = checkhash.value(tmplist.at(5));
+        else
+            currentnode->checkstate = false;
+        parentnode = currentnode;
+        //wombatid++;
+        // APPEND VOLUME TO NODE TREE
+        tmpstr = "";
+        currentnode = 0;
+        tmplist.clear();
+        colvalues.clear();
+        QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".vol");
+        volfile.open(QIODevice::ReadOnly);
+        tmpstr = volfile.readLine();
+        volfile.close();
+        tmplist = tmpstr.split(",");
+        colvalues.append(tmplist.at(5));                        // ID
+        colvalues.append(tmplist.at(2));                        // Name
+        colvalues.append("");                                   // Full Path
+        colvalues.append(tmplist.at(1));                        // Size
+        colvalues.append(0);                                    // Created
+        colvalues.append(0);                                    // Accessed
+        colvalues.append(0);                                    // Modified
+        colvalues.append(0);                                    // Status Changed
+        colvalues.append("");                                   // MD5
+        colvalues.append("");                                   // File Signature
+        colvalues.append("");                                   // File Category
+        currentnode = new Node(colvalues);
+        volnode = currentnode;
+        currentnode->parent = parentnode;
+        parentnode->children.append(currentnode);
+        currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".part.*");
+        currentnode->haschildren = currentnode->HasChildren();
+        if(checkhash.contains(tmplist.at(5)))
+            currentnode->checkstate = checkhash.value(tmplist.at(5));
+        else
+            currentnode->checkstate = false;
+        parentnode = currentnode;
+        //wombatid++;
+        int partcount = currentnode->childcount;
+        QFile partfile;
+        for(int i = 0; i < partcount; i++)
+        {
+            parentnode = volnode;
+            tmpstr = "";
+            currentnode = 0;
+            tmplist.clear();
+            colvalues.clear();
+            partfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + QString::number(i));
+            partfile.open(QIODevice::ReadOnly);
+            tmpstr = partfile.readLine();
+            partfile.close();
+            tmplist = tmpstr.split(",");
+            rootinum = tmplist.at(3);
+            colvalues.append(tmplist.at(10));                       // ID
+            colvalues.append(tmplist.at(2));                        // Name
+            colvalues.append("");                                   // Full Path
+            colvalues.append(tmplist.at(1));                        // Size
+            colvalues.append(0);                                    // Created
+            colvalues.append(0);                                    // Accessed
+            colvalues.append(0);                                    // Modified
+            colvalues.append(0);                                    // Status Changed
+            colvalues.append("");                                   // MD5
+            colvalues.append("");                                   // File Signature
+            colvalues.append("");                                   // File Category
+            currentnode = new Node(colvalues);
+            partnode = currentnode;
+            currentnode->parent = parentnode;
+            parentnode->children.append(currentnode);
+            currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + rootinum);
+            currentnode->haschildren = currentnode->HasChildren();
+            if(checkhash.contains(tmplist.at(10)))
+                currentnode->checkstate = checkhash.value(tmplist.at(10));
+            else
+                currentnode->checkstate = false;
+            parentnode = currentnode;
+            //wombatid++;
+            QFile filefile;
+            QStringList curfiles = GetChildFiles(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + rootinum);
+            for(int j = 0; j < curfiles.count(); j++)
+            {
+                parentnode = partnode;
+                tmpstr = "";
+                currentnode = 0;
+                tmplist.clear();
+                colvalues.clear();
+                filefile.setFileName(wombatvariable.tmpmntpath + curfiles.at(j));
+                filefile.open(QIODevice::ReadOnly);
+                tmpstr = filefile.readLine();
+                filefile.close();
+                tmplist = tmpstr.split(",");
+                colvalues.append(tmplist.at(12).split("-a").at(0));     // ID
+                QByteArray ba;
+                ba.append(tmplist.at(0));
+                colvalues.append(QByteArray::fromBase64(ba));           // Name
+                colvalues.append(tmplist.at(3));                        // Full Path
+                colvalues.append(tmplist.at(8));                        // Size
+                colvalues.append(tmplist.at(4));                        // Created
+                colvalues.append(tmplist.at(5));                        // Accessed
+                colvalues.append(tmplist.at(6));                        // Modified
+                colvalues.append(tmplist.at(7));                        // Status Changed
+                if(tmplist.at(13).compare("0") == 0)
+                    colvalues.append("");                               // MD5
+                else
+                    colvalues.append(tmplist.at(13));                   // MD5
+                colvalues.append(tmplist.at(10));                       // File Signature
+                colvalues.append(tmplist.at(10).split("/").at(0));      // File Category
+                currentnode = new Node(colvalues);
+                currentnode->parent = parentnode;
+                currentnode->nodetype = tmplist.at(1).toInt();
+                parentnode->children.append(currentnode);
+                currentnode->childcount = GetChildCount(wombatvariable.evidencename + ".p" + QString::number(i) + "*.a" + tmplist.at(9));
+                currentnode->haschildren = currentnode->HasChildren();
+                if(checkhash.contains(tmplist.at(12).split("-a").at(0)))
+                    currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
+                else
+                    currentnode->checkstate = 0;
+            }
+        }
+}
+
 //void InitializeEvidenceStructure()
 void InitializeEvidenceStructure(int dumint)
 {

@@ -584,7 +584,7 @@ public:
 
     void AddEvidence(int evidcount)
     {
-        qDebug() << "evidcount during:" << evidcount;
+        //qDebug() << "evidcount during:" << evidcount;
         QStringList tmplist;
         QString tmpstr = "";
         tmplist.clear();
@@ -594,6 +594,8 @@ public:
         tmplist = tmpstr.split(",");
         evidfile.close();
         beginInsertRows(QModelIndex(), rootnode->childcount, rootnode->childcount);
+        QtConcurrent::run(InitialSideLoad, tmplist);
+        /* move to another thread
         currentnode = 0;
         colvalues.clear();
         colvalues.append(tmplist.at(5));                        // ID
@@ -733,6 +735,7 @@ public:
                     currentnode->checkstate = 0;
             }
         }
+        */
         endInsertRows();
     };
 
@@ -745,7 +748,7 @@ public:
         for(int k = 0; k < subfiles.count(); k++)
         {
             parentnode = curnode;
-            beginInsertRows(QModelIndex(), 0, parentnode->childcount - 1);
+            //beginInsertRows(QModelIndex(), 0, parentnode->childcount - 1);
             tmpstr = "";
             currentnode = 0;
             tmplist.clear();
@@ -781,7 +784,7 @@ public:
                 currentnode->checkstate = checkhash.value(tmplist.at(12).split("-a").at(0));
             else
                 currentnode->checkstate = 0;
-            endInsertRows();
+            //endInsertRows();
             if(currentnode->HasChildren())
                 PopulateChildren(currentnode, i, tmplist.at(9));
         }
