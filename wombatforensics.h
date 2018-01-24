@@ -158,20 +158,9 @@ private:
     {
         // parent is the zero item...
         QMap<QString, TreeNode*> parents;
-        //QList<TreeNode*> eviditems;
-        //QList<TreeNode*> volitems;
-        //QList<TreeNode*> partitems;
-        //QList<TreeNode*> fileitems;
-        //QMap<unsigned long long, TreeNode*> fileitems;
-        //QList<TreeNode*> parents;
-        //eviditems << parent; // zero item which has evidence as children
-        //parents[0] = parent; // zero item which has evidence as children
-        //parents << parent;
-        //unsigned long long position;
         QString parid;
         QString curid;
         unsigned long long fpar;
-        unsigned long long fid;
         int nodecount = 0;
         while(nodecount < nodes.count() - 1)
         {
@@ -184,10 +173,6 @@ private:
                 curid = columnstrings.at(0).split("-").at(0);
                 parent->AppendChild(new TreeNode(columndata, parent));
                 parents[curid] = parent->child(parent->ChildCount() - 1);
-                //eviditems.first()->AppendChild(new TreeNode(columndata, eviditems.first()));
-                //eviditems << eviditems.first()->child(eviditems.first()->ChildCount() - 1);
-                //parents.last()->AppendChild(new TreeNode(columndata, parents.last()));
-                //parents << parents.last()->child(parents.last()->ChildCount() - 1);
             }
             nodecount++;
         }
@@ -204,12 +189,6 @@ private:
                 curid = columnstrings.at(0);
                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-                //position = columnstrings.at(0).split("-").at(0).mid(1).toULongLong() + 1;
-                //eviditems.at(position)->AppendChild(new TreeNode(columndata, eviditems.at(position)));
-                //volitems << eviditems.at(position)->child(eviditems.at(position)->ChildCount() - 1);
-                //parents.at(position)->AppendChild(new TreeNode(columndata, parents.at(position)));
-                //if(parents.at(position)->ChildCount() > 0)
-                    //parents << parents.last
             }
             nodecount++;
         }
@@ -226,9 +205,6 @@ private:
                 curid = columnstrings.at(0);
                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-                //position = columnstrings.at(0).split("-").at(1).mid(1).toULongLong();
-                //volitems.at(position)->AppendChild(new TreeNode(columndata, volitems.at(position)));
-                //partitems << volitems.at(position)->child(volitems.at(position)->ChildCount() - 1);
             }
             nodecount++;
         }
@@ -241,8 +217,6 @@ private:
                 columndata << columnstrings.at(i);
             if(columnstrings.at(0).split("-").count() == 5) // files
             {
-                //position = columnstrings.at(0).split("-").at(2).mid(1).toULongLong();
-                fid = columnstrings.at(0).split("-").at(3).mid(1).toULongLong();
                 fpar = columnstrings.at(0).split("-").at(4).mid(1).toULongLong();
                 curid = columnstrings.at(0);
                 parid = columnstrings.at(0).split("-f").at(0);
@@ -260,97 +234,18 @@ private:
                         if(i.key().contains(parkey))
                             parid = i.key();
                     }
-                    // figure out how to find the parent...
                 }
-                /*
-                if(fpar == rootinum) // root node - so a child of the partition/file system
-                {
-                    //partitems.at(position)->AppendChild(new TreeNode(columndata, partitems.at(position)));
-                    //fileitems << partitems.at(position)->child(partitems.at(position)->ChildCount() -1 );
-                    //fileitems[faddress] = partitems.at(position)->child(partitems.at(position)->ChildCount() - 1);
-                }
-                else
-                {
-                    //parid += "-f" + QString::number(fpar);
-                    QString parkey = wombatvariable.evidencename + "." + columnstrings.at(0).split("-").at(2) + ".f" + QString::number(fpar) + ".a*";
-                    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-                    // THIS IS PROBABLY THE SLOWDOWN...
-                    QStringList foundlist = eviddir.entryList(QStringList(QString(parkey)), QDir::Files | QDir::NoSymLinks);
-                    if(foundlist.count() == 1)
-                    {
-                        QFile parentfile(wombatvariable.tmpmntpath + foundlist.at(0));
-                        parentfile.open(QIODevice::ReadOnly);
-                        parid = QString(parentfile.readLine()).split(",").at(12);
-                        parentfile.close();
-                    }
-                    else
-                    {
-                        qDebug() << "i think this is the slowdown...";
-                        QString tmpstr = "";
-                        for(int i = 0; i < foundlist.count(); i++)
-                        {
-                            QFile parentfile(wombatvariable.tmpmntpath + foundlist.at(0));
-                            parentfile.open(QIODevice::ReadOnly);
-                            tmpstr = QString(parentfile.readLine()).split(",").at(12);
-                            parentfile.close();
-                            if(parents.contains(tmpstr))
-                                parid = tmpstr;
-                        }
-                    }
-                    //foundlist.at(0).split(columstrings.at(0).split("-").at(2)).at(1);
-                    //QMap<QString,TreeNode*>::iterator i = parents.find("*-f" + QString::number(fpar) + "*");
-                    //parid = i.key();
-                    //qDebug() << "file parent:" << parid;
-                    //fileitems.value(fparent)->AppendChild(new TreeNode(columndata, fileitems.value(fparent)));
-                    //fileitems[faddress] = fileitems.value(fparent)->child(fileitems.value(fparent)->ChildCount() - 1);
-                }
-                */
                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
             }
             nodecount++;
         }
-        /*
-            else if(columnstrings.at(0).split("-").count() == 2) // volume
-            {
-                ulonglong eitem = columnstrings.at(0).split("-").at(0).mid(1).toULongLong();
-                eviditems.at(eitem)->AppendChild(new TreeNode(columndata, eviditems.at(eitem))); 
-                //if(volitems.count() == 0)
-                //volitems << 
-                /*
-                parents.last()->AppendChild(new TreeNode(columndata, parents.last()));
-                if(parents.last()->ChildCount() > 0)
-                    parents << parents.last()->child(parents.last()->ChildCount() - 1);
-                */
-            /*}
-            else if(columnstrings.at(0).split("-").count() == 3) // partition
-            {
-                /*
-                parents.last()->AppendChild(new TreeNode(columndata, parents.last()));
-                if(parents.last()->ChildCount() > 0)
-                    parents << parents.last()->child(parents.last()->ChildCount() - 1);
-                */
-            /*}
-            else if(columnstrings.at(0).split("-").count() == 4) // file
-            {
-                //parents.last()->AppendChild(new TreeNode(columndata, parents.last()));
-            }
-            nodecount++;
-
-            /*
-            if(columnstrings.at(0).split("-").count() == 1)
-                parents.last()->appendChild(new TreeNode(columndata, parents.last()));
-            else if(columnstrings.at(0).split("-").count() == 2)
-                parents.last()->child(parents
-            */
-        /*}*/
     };
 
-    //QStringList headerdata;
-    TreeNode* zeronode;
-    //rootitem...
+    TreeNode* zeronode; //rootitem
 };
 
+/*
 class TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -805,7 +700,7 @@ public:
         fetchMore(parent);
     }
     */
-
+/*
     void fetchMore(const QModelIndex &parent = QModelIndex())
     {
         unsigned long long parentaddr = parent.sibling(parent.row(), 0).data().toString().split("-").last().mid(1).toULongLong();
@@ -1136,6 +1031,7 @@ private:
 
     QStringList headerdata;
 };
+*/
 
 namespace Ui {
 class WombatForensics;
@@ -1156,7 +1052,7 @@ public:
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;
     FileViewer* fileviewer;
-    TreeModel* treemodel;
+    //TreeModel* treemodel;
     TreeNodeModel* treenodemodel;
     QMenu* treemenu;
     QMenu* selectionmenu;
@@ -1229,10 +1125,12 @@ private slots:
     void ExpandCollapseResize(const QModelIndex &index)
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        /*
         if(((TreeModel*)ui->dirTreeView->model())->canFetchMore(index))
         {
             ((TreeModel*)ui->dirTreeView->model())->fetchMore(index);
         }
+        */
         ResizeViewColumns(index);
         QApplication::restoreOverrideCursor();
     };

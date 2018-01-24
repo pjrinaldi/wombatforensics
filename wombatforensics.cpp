@@ -142,7 +142,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addAction(ui->actionCheck);
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
-    treemodel = new TreeModel(this);
+    //treemodel = new TreeModel(this);
     //ui->dirTreeView->setModel(treemodel);
     ui->dirTreeView->setSortingEnabled(true); // enables the sorting arrow, but doesn't sort anything.
     ui->dirTreeView->setUniformRowHeights(true);
@@ -255,9 +255,11 @@ void WombatForensics::ShowExternalViewer()
 
 void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 {
+    /*
     QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    */
 }
 
 void WombatForensics::ShowFile(const QModelIndex &index)
@@ -1097,7 +1099,7 @@ void WombatForensics::CloseCurrentCase()
     QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*"), QDir::NoSymLinks | QDir::Files);
     for(int i=0; i < evidfiles.count(); i++)
     {
-        treemodel->RemEvidence(QString("e" + evidfiles.at(i).split(".", QString::SkipEmptyParts).last()));
+        //treemodel->RemEvidence(QString("e" + evidfiles.at(i).split(".", QString::SkipEmptyParts).last()));
         evidcnt--;
     }
     //autosavetimer->stop();
@@ -1135,7 +1137,7 @@ void WombatForensics::RemEvidence()
     {
         eviddir.remove(evidfiles.at(i));
     }
-    treemodel->RemEvidence(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+    //treemodel->RemEvidence(selectedindex.sibling(selectedindex.row(), 0).data().toString());
     evidcnt--;
     StatusUpdate("Evidence Item Successfully Removed");
 }
@@ -1194,7 +1196,7 @@ void WombatForensics::ExportEvidence()
     totalcount = 0;
     totalchecked = 0;
     exportcount = 0;
-    ((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
+    //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
     exportdialog = new ExportDialog(this, totalchecked, totalcount);
     connect(exportdialog, SIGNAL(StartExport(int, bool, QString)), this, SLOT(ExportFiles(int, bool, QString)), Qt::DirectConnection);
     exportdialog->show();
@@ -1499,10 +1501,12 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
+    /*
     for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
     {
         ui->dirTreeView->resizeColumnToContents(i);
     }
+    */
 }
 
 void WombatForensics::SetupHexPage(void)
@@ -1722,7 +1726,7 @@ void WombatForensics::on_actionDigDeeper_triggered()
 {
     totalcount = 0;
     totalchecked = 0;
-    ((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
+    //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
     digcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
     connect(digdeeperdialog, SIGNAL(StartDig(int, QVector<int>)), this, SLOT(DigFiles(int, QVector<int>)), Qt::DirectConnection);
@@ -2059,6 +2063,7 @@ void WombatForensics::SetFilter(int headercolumn)
 void WombatForensics::NextItem()
 {
     QModelIndex curindex = ui->dirTreeView->currentIndex();
+    /*
     QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(tmplist.isEmpty() == false)
     {
@@ -2071,11 +2076,13 @@ void WombatForensics::NextItem()
             }
         }
     }
+    */
 }
 
 void WombatForensics::PreviousItem()
 {
     QModelIndex curindex = ui->dirTreeView->currentIndex();
+    /*
     QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     if(tmplist.isEmpty() == false)
     {
@@ -2088,6 +2095,7 @@ void WombatForensics::PreviousItem()
             }
         }
     }
+    */
 }
 
 void WombatForensics::ShowItem()
@@ -2099,12 +2107,14 @@ void WombatForensics::ShowItem()
 void WombatForensics::UpdateFilterCount()
 {
     unsigned long long filtercount = 0;
+    /*
     QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     for(int i=0; i < tmplist.count(); i++)
     {
         if(tmplist.at(i).sibling(tmplist.at(i).row(), 0).data().toString().split("-").count() == 4)
             filtercount++;
     }
+    */
     if(filtercount == filesprocessed)
         filtercount = 0;
     filtercountlabel->setText("Filtered: " + QString::number(filtercount));
