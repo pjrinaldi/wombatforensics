@@ -199,7 +199,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         QByteArray ba;
         ba.append(QString(tmpfile->name->name));
         outstring += ba.toBase64() + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
-        treestring += "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr) + "," + QString(tmpfile->name->name) + "," + "/" + QString(tmppath) + ",";
+        treestring += "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr) + "," + QString(tmpfile->name->name) + ",/" + QString(tmppath) + ",";
     }
     else
     {
@@ -210,7 +210,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     if(tmpfile->meta != NULL)
     {
         outstring += QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->addr) + ",";
-        treestring += QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime);
+        treestring += QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime) + ",";
     }
     else
     {
@@ -575,7 +575,7 @@ void InitializeEvidenceStructure(int dumint)
     evidfile.close();
     treefile.open(QIODevice::Append | QIODevice::Text);
     QTextStream treeout(&treefile);
-    treeout << "e" + QString::number(evidcnt) << "," << wombatvariable.evidencename << "," + QString::number(readimginfo->size) << ",0,0,0,0,0,0,0,0" << endl;
+    treeout << "e" + QString::number(evidcnt) << "," << wombatvariable.evidencename << ",0," + QString::number(readimginfo->size) << ",0,0,0,0,0,0,0,0" << endl;
     // Write Evidence Properties Here...
     WriteEvidenceProperties(readimginfo);
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
@@ -596,7 +596,7 @@ void InitializeEvidenceStructure(int dumint)
     out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt);
     out.flush();
     volfile.close();
-    treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) << "," << volname << "," << ",0," << QString::number(readimginfo->size) << ",0,0,0,0,0,0,0" << endl;
+    treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) << "," << volname << "," << "0," << QString::number(readimginfo->size) << ",0,0,0,0,0,0,0" << endl;
     if(readvsinfo != NULL)
         WriteVolumeProperties(readvsinfo);
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.

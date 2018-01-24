@@ -515,7 +515,11 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     for(int i=0; i < files.count(); i++)
     {
         wombatvariable.evidencename = files.at(i).split(".").at(0) + QString(".") + files.at(i).split(".").at(1);
-        treemodel->AddEvidence(files.at(i).split(".").last().toInt());
+        treefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        treenodemodel = new TreeNodeModel(treefile.readAll());
+        treefile.close();
+        ui->dirTreeView->setModel(treenodemodel);
+        //treemodel->AddEvidence(files.at(i).split(".").last().toInt());
         evidcnt++;
     }
     //ui->dirTreeView->expandAll();
@@ -604,7 +608,7 @@ void WombatForensics::UpdateStatus()
     readimginfo = NULL;
     //qDebug() << "evidcnt before:" << evidcnt;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    treemodel->AddEvidence(evidcnt);
+    //treemodel->AddEvidence(evidcnt);
     //treemodel->PopulateModel();
     /*
     QModelIndexList parentlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant("f"), -1, Qt::MatchFlags(Qt::MatchContains | Qt::MatchRecursive));
@@ -623,11 +627,13 @@ void WombatForensics::UpdateStatus()
     //qDebug() << "evidcnt after:" << evidcnt;
     volcnt = 0;
     partint = 0;
+    /*
     QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     else
         ui->dirTreeView->setCurrentIndex(treemodel->index(0, 0, QModelIndex()));
+    */
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);

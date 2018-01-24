@@ -156,17 +156,54 @@ public:
 private:
     void AddEvidence(const QStringList &nodes, TreeNode* parent)
     {
+        QList<TreeNode*> eviditems;
+        QList<TreeNode*> volitems;
+        QList<TreeNode*> partitems;
+        QList<TreeNode*> fileitems;
         QList<TreeNode*> parents;
-        parents << parent;
+        eviditems << parent;
+        //parents << parent;
         int nodecount = 0;
-        int position = 0;
-        int address = 0;
-        while(nodecount < nodes.count())
+        while(nodecount < nodes.count() - 1)
         {
             QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
             QList<QVariant> columndata;
             for(int i = 0; i < columnstrings.count(); i++)
                 columndata << columnstrings.at(i);
+            if(columnstrings.at(0).split("-").count() == 1) // evidence image
+            {
+                eviditems.last()->AppendChild(new TreeNode(columndata, eviditems.last()));
+                eviditems << eviditems.last()->child(eviditems.last()->ChildCount() - 1);
+                //parents.last()->AppendChild(new TreeNode(columndata, parents.last()));
+                //parents << parents.last()->child(parents.last()->ChildCount() - 1);
+            }
+            nodecount++;
+        }
+        /*
+            else if(columnstrings.at(0).split("-").count() == 2) // volume
+            {
+                ulonglong eitem = columnstrings.at(0).split("-").at(0).mid(1).toULongLong();
+                eviditems.at(eitem)->AppendChild(new TreeNode(columndata, eviditems.at(eitem))); 
+                //if(volitems.count() == 0)
+                //volitems << 
+                /*
+                parents.last()->AppendChild(new TreeNode(columndata, parents.last()));
+                if(parents.last()->ChildCount() > 0)
+                    parents << parents.last()->child(parents.last()->ChildCount() - 1);
+                */
+            /*}
+            else if(columnstrings.at(0).split("-").count() == 3) // partition
+            {
+                /*
+                parents.last()->AppendChild(new TreeNode(columndata, parents.last()));
+                if(parents.last()->ChildCount() > 0)
+                    parents << parents.last()->child(parents.last()->ChildCount() - 1);
+                */
+            /*}
+            else if(columnstrings.at(0).split("-").count() == 4) // file
+            {
+                //parents.last()->AppendChild(new TreeNode(columndata, parents.last()));
+            }
             nodecount++;
 
             /*
@@ -175,7 +212,7 @@ private:
             else if(columnstrings.at(0).split("-").count() == 2)
                 parents.last()->child(parents
             */
-        }
+        /*}*/
     };
 
     //QStringList headerdata;
