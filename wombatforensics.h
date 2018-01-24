@@ -167,6 +167,7 @@ private:
             QList<QVariant> columndata;
             for(int i = 0; i < columnstrings.count(); i++)
                 columndata << columnstrings.at(i);
+            nodecount++;
 
             /*
             if(columnstrings.at(0).split("-").count() == 1)

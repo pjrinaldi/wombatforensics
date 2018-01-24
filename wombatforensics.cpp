@@ -142,7 +142,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addAction(ui->actionCheck);
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
-    //treemodel = new TreeModel(this);
+    treemodel = new TreeModel(this);
     //ui->dirTreeView->setModel(treemodel);
     ui->dirTreeView->setSortingEnabled(true); // enables the sorting arrow, but doesn't sort anything.
     ui->dirTreeView->setUniformRowHeights(true);
