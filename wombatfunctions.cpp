@@ -193,20 +193,25 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     QString outstring = "";
     QString treestring = "";
+    QByteArray ba2;
+    ba2.append(QString("/" + QString(tmppath)));
     treestring += "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
     if(tmpfile->name != NULL)
     {
         QByteArray ba;
         ba.append(QString(tmpfile->name->name));
         outstring += ba.toBase64() + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
-        treestring += "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr) + "," + QString(tmpfile->name->name) + ",/" + QString(tmppath) + ",";
+        treestring += "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr) + "," + ba.toBase64() + ",";
     }
     else
     {
-        outstring += "unknown," + QString::number(tmpfile->meta->type) + ",0,";
-        treestring += "-f" + QString::number(tmpfile->meta->addr) + "-a0,unknown,0,";
+        QByteArray ba;
+        ba.append("unknown");
+        outstring += ba.toBase64() + "," + QString::number(tmpfile->meta->type) + ",0,";
+        treestring += "-f" + QString::number(tmpfile->meta->addr) + "-a0," + ba.toBase64() + ",0,";
     }
-    outstring += "/" + QString(tmppath) + ",";
+    outstring += ba2.toBase64() + ",";
+    treestring += ba2.toBase64() + ",";
     if(tmpfile->meta != NULL)
     {
         outstring += QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->addr) + ",";
@@ -349,10 +354,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 adsfile.open(QIODevice::Append | QIODevice::Text);
                                 QTextStream adsout(&adsfile);
                                 adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
-                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << QString("/") + QString(tmppath) << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
+                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 adsout.flush();
                                 adsfile.close();
-                                treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << QString(tmpfile->name->name) + ":" + QString(fsattr->name) << "," << QString("/") + QString(tmppath) <<  "," << fsattr->size << ",0,0,0,0,0,0,0" << endl; 
+                                treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << adsba.toBase64() << "," << ba2.toBase64() <<  "," << fsattr->size << ",0,0,0,0,0,0,0" << endl; 
                                 filesfound++;
                                 isignals->ProgUpd();
                                 WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), QString::number(adssize - fsattr->size + 16), QString::number(fsattr->id));
@@ -418,10 +423,12 @@ void ProcessExport(QString objectid)
         filefile.close();
         QString tmppath = "";
         QByteArray ba;
+        QByteArray ba2;
         ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
+        ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(3));
         QString tmpname = QByteArray::fromBase64(ba);
         if(originalpath == true)
-            tmppath = exportpath + tmpstr.split(",", QString::SkipEmptyParts).at(3);
+            tmppath = exportpath + QByteArray::fromBase64(ba2);
         else
             tmppath = exportpath + "/";
         if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
@@ -609,6 +616,7 @@ void InitializeEvidenceStructure(int dumint)
         out.flush();
         pfile.close();
         treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + tsk_fs_type_toname(readfsinfo->ftype) + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
+        //rootinum = (unsigned long long)readfsinfo->root_inum;
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
@@ -646,6 +654,7 @@ void InitializeEvidenceStructure(int dumint)
                         out.flush();
                         pfile.close();
                         treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + tsk_fs_type_toname(readfsinfo->ftype) + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
+                        //rootinum = (unsigned long long)readfsinfo->root_inum;
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);

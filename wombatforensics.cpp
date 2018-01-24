@@ -1808,8 +1808,10 @@ void WombatForensics::StartThumbnails()
         {
             thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12));
             QByteArray ba;
+            QByteArray ba2;
             ba.append(tmpstr.split(",").at(0));
-            QString fullpath = tmpstr.split(",", QString::SkipEmptyParts).at(3) + QString(QByteArray::fromBase64(ba));
+            ba2.append(tmpstr.split(",").at(3));
+            QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
             ba.clear();
             ba.append(fullpath);
             thumbfile.open(QIODevice::Append);

@@ -246,7 +246,24 @@ private:
                 fpar = columnstrings.at(0).split("-").at(4).mid(1).toULongLong();
                 curid = columnstrings.at(0);
                 parid = columnstrings.at(0).split("-f").at(0);
-                if(fpar == 2) // root node - so a child of the partition/file system
+                QFile rootinumfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + columnstrings.at(0).split("-").at(2).mid(1));
+                rootinumfile.open(QIODevice::ReadOnly);
+                unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
+                rootinumfile.close();
+                if(fpar != rootinum)
+                {
+                    QString parkey = parid + "-f" + QString::number(fpar) + "-a";
+                    QMapIterator<QString, TreeNode*> i(parents);
+                    while(i.hasNext())
+                    {
+                        i.next();
+                        if(i.key().contains(parkey))
+                            parid = i.key();
+                    }
+                    // figure out how to find the parent...
+                }
+                /*
+                if(fpar == rootinum) // root node - so a child of the partition/file system
                 {
                     //partitems.at(position)->AppendChild(new TreeNode(columndata, partitems.at(position)));
                     //fileitems << partitems.at(position)->child(partitems.at(position)->ChildCount() -1 );
@@ -255,13 +272,39 @@ private:
                 else
                 {
                     //parid += "-f" + QString::number(fpar);
-                    QMap<QString,TreeNode*>::iterator i  =parents.find("-f" + QString::number(fpar));
-                    if(i != parents.end())
-                        parid = i.key();
+                    QString parkey = wombatvariable.evidencename + "." + columnstrings.at(0).split("-").at(2) + ".f" + QString::number(fpar) + ".a*";
+                    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+                    // THIS IS PROBABLY THE SLOWDOWN...
+                    QStringList foundlist = eviddir.entryList(QStringList(QString(parkey)), QDir::Files | QDir::NoSymLinks);
+                    if(foundlist.count() == 1)
+                    {
+                        QFile parentfile(wombatvariable.tmpmntpath + foundlist.at(0));
+                        parentfile.open(QIODevice::ReadOnly);
+                        parid = QString(parentfile.readLine()).split(",").at(12);
+                        parentfile.close();
+                    }
+                    else
+                    {
+                        qDebug() << "i think this is the slowdown...";
+                        QString tmpstr = "";
+                        for(int i = 0; i < foundlist.count(); i++)
+                        {
+                            QFile parentfile(wombatvariable.tmpmntpath + foundlist.at(0));
+                            parentfile.open(QIODevice::ReadOnly);
+                            tmpstr = QString(parentfile.readLine()).split(",").at(12);
+                            parentfile.close();
+                            if(parents.contains(tmpstr))
+                                parid = tmpstr;
+                        }
+                    }
+                    //foundlist.at(0).split(columstrings.at(0).split("-").at(2)).at(1);
+                    //QMap<QString,TreeNode*>::iterator i = parents.find("*-f" + QString::number(fpar) + "*");
+                    //parid = i.key();
+                    //qDebug() << "file parent:" << parid;
                     //fileitems.value(fparent)->AppendChild(new TreeNode(columndata, fileitems.value(fparent)));
                     //fileitems[faddress] = fileitems.value(fparent)->child(fileitems.value(fparent)->ChildCount() - 1);
                 }
-                qDebug() << "parent id:" << parid;
+                */
                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
             }
@@ -524,6 +567,7 @@ public:
         }
         if(role == Qt::DisplayRole)
         {
+            // include the displayrole to convert name and path back from base64;
             if(index.column() >= 4 && index.column() <= 7)
             {
                 char buf[128];
@@ -930,6 +974,7 @@ public:
             tmpstr = partfile.readLine();
             partfile.close();
             tmplist = tmpstr.split(",");
+            QString rootinum;
             rootinum = tmplist.at(3);
             colvalues.append(tmplist.at(10));                       // ID
             colvalues.append(tmplist.at(2));                        // Name
