@@ -188,7 +188,7 @@ private:
 };
 
 
-
+/*
 class Node
 {
 public:
@@ -241,7 +241,8 @@ public:
         return -1;
     };
 };
-
+*/
+/*
 extern Node* rootnode;
 extern Node* dummynode;
 extern Node* parentnode;
@@ -250,6 +251,7 @@ extern Node* toplevelnode;
 extern Node* actionnode;
 extern Node* volnode;
 extern Node* partnode;
+*/
 extern TSK_IMG_INFO* readimginfo;
 extern TSK_VS_INFO* readvsinfo;
 extern const TSK_VS_PART_INFO* readpartinfo;

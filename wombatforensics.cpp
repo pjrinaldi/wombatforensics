@@ -576,7 +576,7 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     QModelIndex index = ui->dirTreeView->indexAt(pt);
     if(index.isValid())
     {
-        actionnode = static_cast<Node*>(index.internalPointer());
+        //actionnode = static_cast<Node*>(index.internalPointer());
         if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
@@ -709,14 +709,14 @@ void WombatForensics::UpdateListed(const QModelIndex &index)
     {
     }
     filesprocessed = 0;
-    ReturnListedCount(rootnode);
+    //ReturnListedCount(rootnode);
     processcountlabel->setText("Listed: " + QString::number(filesprocessed));
 }
 
 void WombatForensics::UpdateListed()
 {
     filesprocessed = 0;
-    ReturnListedCount(rootnode);
+    //ReturnListedCount(rootnode);
     processcountlabel->setText("Listed: " + QString::number(filesprocessed));
 }
 void WombatForensics::UpdateDigging()
@@ -1141,7 +1141,7 @@ void WombatForensics::RemEvidence()
     evidcnt--;
     StatusUpdate("Evidence Item Successfully Removed");
 }
-
+/*
 void WombatForensics::GetExportList(Node* curnode, int exporttype)
 {
     if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
@@ -1160,7 +1160,9 @@ void WombatForensics::GetExportList(Node* curnode, int exporttype)
             GetExportList(curnode->children.at(i), exporttype);
     }
 }
+*/
 
+/*
 void WombatForensics::ReturnListedCount(Node* curnode)
 {
     if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
@@ -1171,7 +1173,9 @@ void WombatForensics::ReturnListedCount(Node* curnode)
             ReturnListedCount(curnode->children.at(i));
     }
 }
+*/
 
+/*
 void WombatForensics::GetDigList(Node* curnode, int digtype)
 {
     if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
@@ -1190,6 +1194,7 @@ void WombatForensics::GetDigList(Node* curnode, int digtype)
         }   
     }
 }
+*/
 
 void WombatForensics::ExportEvidence()
 {
@@ -1324,8 +1329,8 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     {
         exportlist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
     }
-    else // checked or all listed
-        GetExportList(rootnode, etype);
+    //else // checked or all listed
+        //GetExportList(rootnode, etype);
     int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
     LogMessage("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
     StatusUpdate("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
@@ -1354,8 +1359,8 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     {
         digfilelist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
     }
-    else // checked or all listed
-        GetDigList(rootnode, dtype);
+    //else // checked or all listed
+        //GetDigList(rootnode, dtype);
     for(int i = 0; i < digoptions.count(); i++)
     {
         if(digoptions.at(0) == 0) // Generate Thumbnails
@@ -1706,10 +1711,12 @@ void WombatForensics::on_actionSaveState_triggered()
 
 void WombatForensics::on_actionCheck_triggered()
 {
+    /*
     if(actionnode->checkstate == false)
         actionnode->checkstate = true;
     else
         actionnode->checkstate = false;
+    */
 }
 
 void WombatForensics::on_actionExport_triggered()

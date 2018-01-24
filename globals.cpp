@@ -34,6 +34,7 @@ int filelinefactor = 0;
 int thumbsize = 64;
 int mftrecordsize = 1024;
 InterfaceSignals* isignals = new InterfaceSignals();
+/*
 Node* currentnode = 0;
 Node* rootnode = 0;
 Node* dummynode = 0;
@@ -42,6 +43,7 @@ Node* toplevelnode = 0;
 Node* actionnode = 0;
 Node* volnode = 0;
 Node* partnode = 0;
+*/
 QList<QVariant> colvalues;
 QStringList propertylist;
 QStringList thumblist;

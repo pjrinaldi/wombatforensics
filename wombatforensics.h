@@ -157,7 +157,6 @@ private:
     void AddEvidence(const QStringList &nodes, TreeNode* parent)
     {
         // parent is the zero item...
-        QMap<QString, TreeNode*> parents;
         QString parid;
         QString curid;
         unsigned long long fpar;
@@ -242,7 +241,26 @@ private:
         }
     };
 
+    void RemEvidence(QString evidid)
+    {
+        // this would need to remove all instances of the e# from the file and then save the file and then reload the evidence...
+        // have to think on this and figure out a quick way to do this...
+        /*
+        beginRemoveRows(QModelIndex(), evid, evid);
+        parents.remove(evid);
+        endRemoveRows();
+        */
+    };
+
+    void Clear()
+    {
+        beginResetModel();
+        parents.clear();
+        endResetModel();
+    };
+
     TreeNode* zeronode; //rootitem
+    QMap<QString, TreeNode*> parents;
 };
 
 /*
@@ -1191,9 +1209,9 @@ private:
     void UpdateProperties(void);
     void LoadHexContents(void);
     void StartThumbnails(void);
-    void GetExportList(Node* curnode, int exporttype);
-    void ReturnListedCount(Node* curnode);
-    void GetDigList(Node* curnode, int digtype);
+    //void GetExportList(Node* curnode, int exporttype);
+    //void ReturnListedCount(Node* curnode);
+    //void GetDigList(Node* curnode, int digtype);
     //void ProcessExport(QString curid);
     void ProcessDig(QString curid);
     void UpdateFilterCount(void);
