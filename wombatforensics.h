@@ -156,13 +156,22 @@ public:
 private:
     void AddEvidence(const QStringList &nodes, TreeNode* parent)
     {
-        QList<TreeNode*> eviditems;
-        QList<TreeNode*> volitems;
-        QList<TreeNode*> partitems;
-        QList<TreeNode*> fileitems;
-        QList<TreeNode*> parents;
-        eviditems << parent;
+        // parent is the zero item...
+        QMap<QString, TreeNode*> parents;
+        //QList<TreeNode*> eviditems;
+        //QList<TreeNode*> volitems;
+        //QList<TreeNode*> partitems;
+        //QList<TreeNode*> fileitems;
+        //QMap<unsigned long long, TreeNode*> fileitems;
+        //QList<TreeNode*> parents;
+        //eviditems << parent; // zero item which has evidence as children
+        //parents[0] = parent; // zero item which has evidence as children
         //parents << parent;
+        //unsigned long long position;
+        QString parid;
+        QString curid;
+        unsigned long long fpar;
+        unsigned long long fid;
         int nodecount = 0;
         while(nodecount < nodes.count() - 1)
         {
@@ -172,10 +181,89 @@ private:
                 columndata << columnstrings.at(i);
             if(columnstrings.at(0).split("-").count() == 1) // evidence image
             {
-                eviditems.last()->AppendChild(new TreeNode(columndata, eviditems.last()));
-                eviditems << eviditems.last()->child(eviditems.last()->ChildCount() - 1);
+                curid = columnstrings.at(0).split("-").at(0);
+                parent->AppendChild(new TreeNode(columndata, parent));
+                parents[curid] = parent->child(parent->ChildCount() - 1);
+                //eviditems.first()->AppendChild(new TreeNode(columndata, eviditems.first()));
+                //eviditems << eviditems.first()->child(eviditems.first()->ChildCount() - 1);
                 //parents.last()->AppendChild(new TreeNode(columndata, parents.last()));
                 //parents << parents.last()->child(parents.last()->ChildCount() - 1);
+            }
+            nodecount++;
+        }
+        nodecount = 0;
+        while(nodecount < nodes.count() - 1)
+        {
+            QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
+            QList<QVariant> columndata;
+            for(int i = 0; i < columnstrings.count(); i++)
+                columndata << columnstrings.at(i);
+            if(columnstrings.at(0).split("-").count() == 2) // volume
+            {
+                parid = columnstrings.at(0).split("-").at(0);
+                curid = columnstrings.at(0);
+                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
+                parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+                //position = columnstrings.at(0).split("-").at(0).mid(1).toULongLong() + 1;
+                //eviditems.at(position)->AppendChild(new TreeNode(columndata, eviditems.at(position)));
+                //volitems << eviditems.at(position)->child(eviditems.at(position)->ChildCount() - 1);
+                //parents.at(position)->AppendChild(new TreeNode(columndata, parents.at(position)));
+                //if(parents.at(position)->ChildCount() > 0)
+                    //parents << parents.last
+            }
+            nodecount++;
+        }
+        nodecount = 0;
+        while(nodecount < nodes.count() - 1)
+        {
+            QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
+            QList<QVariant> columndata;
+            for(int i = 0; i < columnstrings.count(); i++)
+                columndata << columnstrings.at(i);
+            if(columnstrings.at(0).split("-").count() == 3) // partition
+            {
+                parid = columnstrings.at(0).split("-p").at(0);
+                curid = columnstrings.at(0);
+                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
+                parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+                //position = columnstrings.at(0).split("-").at(1).mid(1).toULongLong();
+                //volitems.at(position)->AppendChild(new TreeNode(columndata, volitems.at(position)));
+                //partitems << volitems.at(position)->child(volitems.at(position)->ChildCount() - 1);
+            }
+            nodecount++;
+        }
+        nodecount = 0;
+        while(nodecount < nodes.count() - 1)
+        {
+            QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
+            QList<QVariant> columndata;
+            for(int i = 0; i < columnstrings.count(); i++)
+                columndata << columnstrings.at(i);
+            if(columnstrings.at(0).split("-").count() == 5) // files
+            {
+                //position = columnstrings.at(0).split("-").at(2).mid(1).toULongLong();
+                fid = columnstrings.at(0).split("-").at(3).mid(1).toULongLong();
+                fpar = columnstrings.at(0).split("-").at(4).mid(1).toULongLong();
+                curid = columnstrings.at(0);
+                parid = columnstrings.at(0).split("-f").at(0);
+                if(fpar == 2) // root node - so a child of the partition/file system
+                {
+                    //partitems.at(position)->AppendChild(new TreeNode(columndata, partitems.at(position)));
+                    //fileitems << partitems.at(position)->child(partitems.at(position)->ChildCount() -1 );
+                    //fileitems[faddress] = partitems.at(position)->child(partitems.at(position)->ChildCount() - 1);
+                }
+                else
+                {
+                    //parid += "-f" + QString::number(fpar);
+                    QMap<QString,TreeNode*>::iterator i  =parents.find("-f" + QString::number(fpar));
+                    if(i != parents.end())
+                        parid = i.key();
+                    //fileitems.value(fparent)->AppendChild(new TreeNode(columndata, fileitems.value(fparent)));
+                    //fileitems[faddress] = fileitems.value(fparent)->child(fileitems.value(fparent)->ChildCount() - 1);
+                }
+                qDebug() << "parent id:" << parid;
+                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
+                parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
             }
             nodecount++;
         }

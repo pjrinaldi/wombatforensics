@@ -511,7 +511,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     filesfound = foundlist.count();
     filecountlabel->setText("Found: " + QString::number(filesfound));
     QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
-    qDebug() << "evid files:" << files;
+    //qDebug() << "evid files:" << files;
     for(int i=0; i < files.count(); i++)
     {
         wombatvariable.evidencename = files.at(i).split(".").at(0) + QString(".") + files.at(i).split(".").at(1);
@@ -524,6 +524,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     //ui->dirTreeView->expandAll();
     //ui->dirTreeView->collapseAll();
+    /*
     QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
@@ -536,6 +537,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         ui->actionDigDeeper->setEnabled(true);
         hexrocker->setEnabled(true);
     }
+    */
     QApplication::restoreOverrideCursor();
     LogMessage("Case was Opened Successfully");
     StatusUpdate("Ready");
