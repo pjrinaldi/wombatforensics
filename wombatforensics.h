@@ -83,19 +83,10 @@ public:
         int itemtype = 0;
         QByteArray ba;
         nodetype = itemnode->Data(0).toString().split("-a").first().split("-").count();
-        itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs)
+        itemtype = itemnode->itemtype; // node type 1=file, 2=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs)
 
         if(role == Qt::CheckStateRole && index.column() == 0)
-        {
             return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
-            //return QVariant();
-            /*
-            if(index.column() == 0)
-                return QVariant(GetCheckState(itemnode));
-            else
-                return QVariant();
-            */
-        }
         else if(role == Qt::ForegroundRole)
         {
             if(nodetype < 4)
@@ -320,7 +311,7 @@ public:
                         if(nodename.compare("$OrphanFiles") == 0 || nodename.compare("$Extend") == 0)
                             return QIcon(QPixmap(QString(":/basic/virtualfolder")));
                         else
-                            return QIcon(QPixmap(QString(":/basic/treefile")));
+                            return QIcon(QPixmap(QString(":/basic/treefolder")));
                     }
                     else if(itemtype == 10)
                         return QIcon(QPixmap(QString(":/basic/virtualfile")));
@@ -380,6 +371,33 @@ public:
         {
             if(section >= 0)
                 return zeronode->Data(section);
+        }
+        if(role == Qt::DecorationRole)
+        {
+            if(section == 0 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 1 && filtervalues.namebool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 2 && filtervalues.pathbool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 3 && filtervalues.maxsizebool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 3 && filtervalues.minsizebool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 4 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 5 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 6 && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 7 && (filtervalues.maxchangebool || filtervalues.minchangebool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 9 && (filtervalues.filecategorybool || filtervalues.filetypebool))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 8 && (filtervalues.hashbool || filtervalues.hashbool2))
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 10 && filtervalues.filegroupbool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
     };

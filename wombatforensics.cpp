@@ -1095,6 +1095,9 @@ void WombatForensics::FinishHex(void)
 void WombatForensics::CloseCurrentCase()
 {
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+    delete treenodemodel;
+    evidcnt = 0;
+    /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*"), QDir::NoSymLinks | QDir::Files);
     for(int i=0; i < evidfiles.count(); i++)
@@ -1102,6 +1105,7 @@ void WombatForensics::CloseCurrentCase()
         //treemodel->RemEvidence(QString("e" + evidfiles.at(i).split(".", QString::SkipEmptyParts).last()));
         evidcnt--;
     }
+    */
     //autosavetimer->stop();
     UpdateCheckState();
     setWindowTitle("WombatForensics");
