@@ -181,7 +181,19 @@ public:
     {
         return parentitem;
     };
+    
+    bool IsChecked() const
+    {
+        return checked;
+    };
+
+    void SetChecked(bool set)
+    {
+        checked = set;
+    };
+
     int itemtype;
+    bool checked = false;
 
 private:
     QList<TreeNode*> childitems;

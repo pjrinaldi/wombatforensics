@@ -257,8 +257,6 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     treestring += mimetype.name().split("/").at(0) + "," + mimetype.name().split("/").at(1) + ",";
     if(tmpfile->meta != NULL)
         treestring += QString::number(tmpfile->meta->type);
-    else if(tmpfile->name != NULL)
-        treestring += QString::number(tmpfile->name->type);
     else
         treestring += "0";
     free(magicbuffer);

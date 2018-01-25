@@ -81,12 +81,14 @@ public:
         TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
         int nodetype = 0;
         int itemtype = 0;
-        nodetype = itemnode->Data(0).toString().split("-").count();
+        QByteArray ba;
+        nodetype = itemnode->Data(0).toString().split("-a").first().split("-").count();
         itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs)
 
-        if(role == Qt::CheckStateRole)
+        if(role == Qt::CheckStateRole && index.column() == 0)
         {
-            return QVariant();
+            return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
+            //return QVariant();
             /*
             if(index.column() == 0)
                 return QVariant(GetCheckState(itemnode));
@@ -224,148 +226,152 @@ public:
         }
         else if(role == Qt::DisplayRole)
         {
-            return itemnode->Data(index.column());
+            if(index.column() == 0)
+            {
+                return itemnode->Data(index.column()).toString().split("-a").at(0);
+            }
+            else if(index.column() == 1 || index.column() == 2)
+            {
+                if(nodetype == 4)
+                {
+                    ba.clear();
+                    ba.append(itemnode->Data(index.column()).toString());
+                    return QByteArray::fromBase64(ba);
+                }
+                else return itemnode->Data(index.column()).toString();
+            }
+            else if(index.column() >= 4 && index.column() <= 7)
+            {
+                if(itemnode->Data(index.column()).toInt() != 0)
+                {
+                    char* ibuffer = new char[128];
+                    QString tmpstr = QString(TskTimeToStringUTC(itemnode->Data(index.column()).toInt(), ibuffer));
+                    delete[] ibuffer;
+                    return tmpstr;
+                }
+                else
+                    return "";
+            }
+            else if(index.column() >= 8 && index.column() <= 10)
+            {
+                if(itemnode->Data(index.column()).toString().compare("0") != 0)
+                    return itemnode->Data(index.column());
+                else
+                    return "";
+            }
+            else
+                return itemnode->Data(index.column());
         }
         else if(role == Qt::DecorationRole)
         {
-        }
-        else
-            return QVariant();
-        //return itemnode->Data(index.column());
-        /*
-        if(role == Qt::DisplayRole)
-        {
-            // include the displayrole to convert name and path back from base64;
-            if(index.column() >= 4 && index.column() <= 7)
-            {
-                char buf[128];
-                QString tmpstr = QString(TskTimeToStringUTC(node->nodevalues.at(index.column()).toInt(), buf));
-                return tmpstr;
-            }
-            else
-                return node->nodevalues.at(index.column());
-        }
-        if(role == Qt::DecorationRole)
-        {
-            QString nodename = node->nodevalues.at(1).toString();
+            ba.clear();
+            ba.append(itemnode->Data(1).toString());
+            QString nodename = QByteArray::fromBase64(ba);
             if(index.column() == 0)
             {
                 if(nodetype == 1)
                     return QIcon(QPixmap(QString(":/basic/treeimg")));
                 else if(nodetype == 2)
                     return QIcon(QPixmap(QString(":/basic/treevol")));
-                else if(nodetype == 7)
-                    return QIcon(QPixmap(QString(":/basic/treepart")));
                 else if(nodetype == 3)
                     return QIcon(QPixmap(QString(":/basic/treefs")));
                 else if(nodetype == 4)
                 {
-                    if(itemtype == 5)
+                    if((itemtype == 0 && itemnode->Data(2).toString().contains("/$OrphanFiles/")) || itemtype == 1)
                     {
-                        QString estring = node->nodevalues.at(0).toString().split("-", QString::SkipEmptyParts).at(0);
-                        QString pstring = node->nodevalues.at(0).toString().split("-", QString::SkipEmptyParts).at(2);
-                        QString fstring = node->nodevalues.at(0).toString().split("-", QString::SkipEmptyParts).at(3);
-                        QString tmpstr = "";
-                        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-                        QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
-                        QFile propfile(wombatvariable.tmpmntpath + evidfiles.at(0).split(".evid").at(0) + "." + pstring + "." + fstring + ".prop");
-                        propfile.open(QIODevice::ReadOnly | QIODevice::Text);
-                        QTextStream in(&propfile);
-                        QString line = "";
-                        while(!in.atEnd())
-                        {
-                            line = in.readLine();
-                            if(line.contains("Allocation Status||"))
-                            {
-                                tmpstr = line.split("||").at(1);
-                                //qDebug() << line << line.split("||").at(1);
-                                break;
-                            }
-                        }
-                        propfile.close();
-                        //return line.split("||").at(1);
-                        //QString tmpstr = FindProperty("Allocation Status", node->nodevalues.at(0).toString());
-                        QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
                         if(nodename.compare("AttrDef") == 0 || nodename.compare("$BadClus") == 0 || nodename.compare("$Bitmap") == 0 || nodename.compare("$Boot") == 0 || nodename.compare("$ObjId") == 0 || nodename.compare("$Quota") == 0 || nodename.compare("$Reparse") == 0 || nodename.compare("$LogFile") == 0 || nodename.compare("$MFT") == 0 || nodename.compare("$MFTMirr") == 0 || nodename.compare("$Secure") == 0 || nodename.compare("$UpCase") == 0 || nodename.compare("$Volume") == 0)
                             return QIcon(QPixmap(QString(":/basic/virtualfile")));
-                        else if(tmplist.count() > 1)
-                        {
-                            if(tmplist.at(0).contains("Unallocated") && tmplist.at(1).contains("Used"))
-                                return QIcon(QPixmap(QString(":/basic/deletedfile")));
-                        }
                         else
-                            return QIcon(QPixmap(QString(":/basic/treefile")));
+                        {
+                            QString estring = itemnode->Data(0).toString().split("-").first();
+                            QString pstring = itemnode->Data(0).toString().split("-").at(2);
+                            QString fstring = itemnode->Data(0).toString().split("-").at(3);
+                            QString tmpstr = "";
+                            QDir eviddir = QDir(wombatvariable.tmpmntpath);
+                            QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
+                            QFile propfile(wombatvariable.tmpmntpath + evidfiles.first().split(".evid").first() + "." + pstring + "." + fstring + ".prop");
+                            propfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                            QTextStream in(&propfile);
+                            QString line = "";
+                            while(!in.atEnd())
+                            {
+                                line = in.readLine();
+                                if(line.contains("Allocation Status||"))
+                                {
+                                    tmpstr = line.split("||").at(1);
+                                    break;
+                                }
+                            }
+                            propfile.close();
+                            QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+                            if(tmplist.count() > 1)
+                            {
+                                if(tmplist.first().contains("Unallocated") && tmplist.at(1).contains("Used"))
+                                    return QIcon(QPixmap(QString(":/basic/deletedfile")));
+                                else
+                                    return QIcon(QPixmap(QString(":/basic/treefile")));
+                            }
+                            else
+                                return QIcon(QPixmap(QString(":/basic/treefile")));
+                        }
                     }
-                    else if(itemtype == 3)
+                    else if(itemtype == 2)
                     {
                         if(nodename.compare("$OrphanFiles") == 0 || nodename.compare("$Extend") == 0)
                             return QIcon(QPixmap(QString(":/basic/virtualfolder")));
                         else
-                            return QIcon(QPixmap(QString(":/basic/treefolder")));
+                            return QIcon(QPixmap(QString(":/basic/treefile")));
                     }
                     else if(itemtype == 10)
                         return QIcon(QPixmap(QString(":/basic/virtualfile")));
-                    else if(itemtype == 0 && node->nodevalues.at(2).toString().contains("/$OrphanFiles/"))
-                    {
-                        QString estring = node->nodevalues.at(0).toString().split("-", QString::SkipEmptyParts).at(0);
-                        QString pstring = node->nodevalues.at(0).toString().split("-", QString::SkipEmptyParts).at(2);
-                        QString fstring = node->nodevalues.at(0).toString().split("-", QString::SkipEmptyParts).at(3);
-                        QString tmpstr = "";
-                        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-                        QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
-                        QFile propfile(wombatvariable.tmpmntpath + evidfiles.at(0).split(".evid").at(0) + "." + pstring + "." + fstring + ".prop");
-                        propfile.open(QIODevice::ReadOnly | QIODevice::Text);
-                        QTextStream in(&propfile);
-                        QString line = "";
-                        while(!in.atEnd())
-                        {
-                            line = in.readLine();
-                            if(line.contains("Allocation Status||"))
-                            {
-                                tmpstr = line.split("||").at(1);
-                                break;
-                            }
-                        }
-                        propfile.close();
-                        QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
-                        if(tmplist.at(0).contains("Unallocated") && tmplist.at(1).contains("Used"))
-                            return QIcon(QPixmap(QString(":/basic/deletedfile")));
-                        else
-                            return QIcon(QPixmap(QString(":/basic/treefile")));
-                    }
+                    else if(itemtype == 11)
+                        return QIcon(QPixmap(QString(":/basic/virtualdir")));
                     else
                         return QIcon(QPixmap(QString(":/basic/treefile")));
                 }
-                else if(nodetype == 6)
-                    return QIcon(QPixmap(QString(":/basic/virtualfile")));
-                return QVariant();
+                else
+                    return QIcon(QPixmap(QString(":/basic/treefile")));
             }
-            
-            return QVariant();
         }
-        * 
-         */ 
+        else
+            return QVariant();
+    };
+
+    bool setData(const QModelIndex &index, const QVariant &value, int role)
+    {
+        TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
+        if(role == Qt::CheckStateRole)
+        {
+            if(itemnode->IsChecked())
+                itemnode->SetChecked(false);
+            else
+                itemnode->SetChecked(true);
+            emit dataChanged(index, index);
+            return true;
+        }
+
+        if(role != Qt::EditRole)
+            return false;
+        // if i have other SetData() items for the treenode's, use code similar to below.
+        //bool result = item->SetData(index, value);
+        //if(result)
+        //    emit dataChanged(index, index);
+        //return result;
     };
 
     Qt::ItemFlags flags(const QModelIndex &index) const override
     {
         Qt::ItemFlags flags = QAbstractItemModel::flags(index);
+        TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
 
         if(!index.isValid())
             return Qt::NoItemFlags;
         if(index == QModelIndex())
             return Qt::NoItemFlags;
-        if(index.column() == 0 && index.sibling(index.row(), 0).data().toString().split("-").count() == 4)
-            flags |= Qt::ItemIsUserCheckable;
+        if(index.column() == 0 && itemnode->Data(index.column()).toString().split("-a").first().split("-").count() == 4)
+            flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
         
         return flags;
-
-        /*
-        if(!index.isValid())
-            return 0;
-
-        return QAbstractItemModel::flags(index);
-        */
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override
