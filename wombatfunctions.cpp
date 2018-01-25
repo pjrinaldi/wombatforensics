@@ -419,7 +419,7 @@ void ProcessExport(QString objectid)
         QByteArray ba;
         QByteArray ba2;
         ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
-        ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(3));
+        ba2.append(tmpstr.split(",", QString::SkipEmptyParts).at(3));
         QString tmpname = QByteArray::fromBase64(ba);
         if(originalpath == true)
             tmppath = exportpath + QByteArray::fromBase64(ba2);

@@ -509,7 +509,10 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     treenodemodel = new TreeNodeModel(treefile.readAll());
     treefile.close();
     for(int i=0; i < tmplist.count(); i++)
-        listeditems.append(tmplist.at(i).split(",").first());
+    {
+        if(tmplist.at(i).split(",").first().split("-").count() == 5)
+            listeditems.append(tmplist.at(i).split(",").first());
+    }
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
@@ -589,7 +592,10 @@ void WombatForensics::UpdateStatus()
     treenodemodel = new TreeNodeModel(treefile.readAll());
     treefile.close();
     for(int i=0; i < tmplist.count(); i++)
-        listeditems.append(tmplist.at(i).split(",").first());
+    {
+        if(tmplist.at(i).split(",").first().split("-").count() == 5)
+            listeditems.append(tmplist.at(i).split(",").first());
+    }
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
@@ -1017,21 +1023,24 @@ void WombatForensics::GetExportList(Node* curnode, int exporttype)
 }
 */
 
-void WombatForensics::GetExportList(int exporttype)
+QStringList WombatForensics::GetFileLists(int filelisttype)
 {
-    if(exporttype == 1) // checked
+    QStringList tmplist;
+    tmplist.clear();
+    if(filelisttype == 1) // checked
     {
         QHashIterator<QString, bool> i(checkhash);
         while(i.hasNext())
         {
             i.next();
             if(i.value())
-                exportlist.append(i.key());
+                tmplist.append(i.key());
         }
+        return tmplist;
     }
-    else if(exporttype == 2) // all listed
-    {
-    }
+    else if(filelisttype == 2) // all listed
+        return listeditems;
+    return tmplist;
 
 }
 
@@ -1087,9 +1096,7 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
         exportlist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
     }
     else
-        GetExportList(etype);
-    //else // checked or all listed
-        //GetExportList(rootnode, etype);
+        exportlist = GetFileLists(etype);
     int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
     LogMessage("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
     StatusUpdate("Exported: " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%");
@@ -1109,8 +1116,8 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     {
         digfilelist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
     }
-    //else // checked or all listed
-        //GetDigList(rootnode, dtype);
+    else
+        digfilelist = GetFileLists(dtype);
     for(int i = 0; i < digoptions.count(); i++)
     {
         if(digoptions.at(0) == 0) // Generate Thumbnails

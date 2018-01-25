@@ -732,7 +732,7 @@ private:
     void UpdateProperties(void);
     void LoadHexContents(void);
     void StartThumbnails(void);
-    void GetExportList(int exporttype);
+    QStringList GetFileLists(int filelisttype);
     //void GetExportList(Node* curnode, int exporttype);
     //void ReturnListedCount(Node* curnode);
     //void GetDigList(Node* curnode, int digtype);
