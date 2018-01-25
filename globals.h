@@ -16,7 +16,6 @@ extern QTextEdit* msglog;
 extern QFutureWatcher<void> thumbwatcher;
 extern QFutureWatcher<void> secondwatcher;
 extern unsigned long long filesfound;
-//extern unsigned long long filesprocessed;
 extern unsigned long long fileschecked;
 extern unsigned long long processphase;
 extern unsigned long long totalcount;
@@ -45,7 +44,7 @@ extern bool originalpath;
 extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
-extern QMap<QString, bool> checkhash;
+extern QHash<QString, bool> checkhash;
 
 struct dosdate
 {

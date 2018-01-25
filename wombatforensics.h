@@ -229,7 +229,14 @@ public:
                     ba.append(itemnode->Data(index.column()).toString());
                     return QByteArray::fromBase64(ba);
                 }
-                else return itemnode->Data(index.column()).toString();
+                else return itemnode->Data(index.column());
+            }
+            else if(index.column() == 3)
+            {
+                if(nodetype < 4)
+                    return "";
+                else
+                    return itemnode->Data(index.column());
             }
             else if(index.column() >= 4 && index.column() <= 7)
             {
@@ -543,7 +550,7 @@ private:
                 if(fpar != rootinum)
                 {
                     QString parkey = parid + "-f" + QString::number(fpar) + "-a";
-                    QMapIterator<QString, TreeNode*> i(parents);
+                    QHashIterator<QString, TreeNode*> i(parents);
                     while(i.hasNext())
                     {
                         i.next();
@@ -582,7 +589,7 @@ private:
     };
 
     TreeNode* zeronode; //rootitem
-    QMap<QString, TreeNode*> parents;
+    QHash<QString, TreeNode*> parents;
 };
 
 namespace Ui {
@@ -672,15 +679,6 @@ private slots:
         if(index.isValid())
             ResizeColumns();
     };
-    // WILL PROBABLY NOT NEED
-    /*
-    void ExpandCollapseResize(const QModelIndex &index)
-    {
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        ResizeViewColumns(index);
-        QApplication::restoreOverrideCursor();
-    };
-    */
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void DigFiles(int digtype, QVector<int> digoptions);
     void SetOffsetLabel(off_t pos);
@@ -734,6 +732,7 @@ private:
     void UpdateProperties(void);
     void LoadHexContents(void);
     void StartThumbnails(void);
+    void GetExportList(int exporttype);
     //void GetExportList(Node* curnode, int exporttype);
     //void ReturnListedCount(Node* curnode);
     //void GetDigList(Node* curnode, int digtype);
@@ -787,6 +786,7 @@ private:
     QShortcut* showitem;
     QTimer* autosavetimer;
     TreeNode* actionitem;
+    QStringList listeditems;
 };
 
 #endif // WOMBATFORENSICS_H
