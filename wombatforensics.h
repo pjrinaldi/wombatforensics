@@ -326,17 +326,27 @@ public:
         }
         else
             return QVariant();
+        return QVariant();
     };
 
     bool setData(const QModelIndex &index, const QVariant &value, int role)
     {
+        if(value.isValid())
+        {
+        }
         TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
         if(role == Qt::CheckStateRole)
         {
             if(itemnode->IsChecked())
+            {
                 itemnode->SetChecked(false);
+                checkhash.insert(itemnode->Data(0).toString().split("-a").first(), false);
+            }
             else
+            {
                 itemnode->SetChecked(true);
+                checkhash.insert(itemnode->Data(0).toString().split("-a").first(), true);
+            }
             emit dataChanged(index, index);
             emit checkedNodesChanged();
             return true;
@@ -349,6 +359,7 @@ public:
         //if(result)
         //    emit dataChanged(index, index);
         //return result;
+        return false;
     };
 
     Qt::ItemFlags flags(const QModelIndex &index) const override
@@ -542,6 +553,8 @@ private:
                 }
                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), columnstrings.at(11).toInt()));
                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+                if(checkhash.contains(columnstrings.at(0).split("-a").first()))
+                    parents.value(curid)->SetChecked(true);
             }
             nodecount++;
         }
@@ -549,6 +562,9 @@ private:
 
     void RemEvidence(QString evidid)
     {
+        if(evidid.compare("") == 0)
+        {
+        }
         // this would need to remove all instances of the e# from the file and then save the file and then reload the evidence...
         // have to think on this and figure out a quick way to do this...
         /*
@@ -677,13 +693,9 @@ private slots:
     void UpdateSelectValue(const QString &txt);
     void UpdateDataTable(void);
     void UpdateStatus(void);
-    void UpdateListed(void);
-    void UpdateListed(const QModelIndex &index);
     void UpdateDigging(void);
     void FinishExport(void);
-    //void FinishModel(void);
     void FinishThumbs(void);
-    //void FinishHex(void);
     void StatusUpdate(QString tmptext)
     {
         statuslabel->setText(tmptext);
@@ -740,8 +752,6 @@ private:
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
-    QFuture<void> hexfuture;
-    QFutureWatcher<void> hexwatcher;
     QFuture<void> thumbfuture;
     QFutureWatcher<void> thumbwatcher;
     QFutureWatcher<void> exportwatcher;
@@ -761,7 +771,6 @@ private:
     QLabel* selectedhex;
     QLabel* filecountlabel;
     QLabel* filtercountlabel;
-    //QLabel* processcountlabel;
     QLabel* checkedcountlabel;
     QLabel* statuslabel;
     QFrame* vline1;
@@ -777,6 +786,7 @@ private:
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
+    TreeNode* actionitem;
 };
 
 #endif // WOMBATFORENSICS_H

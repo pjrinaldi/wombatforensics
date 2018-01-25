@@ -103,7 +103,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     InitializeAppStructure();
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
-    connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateListed()), Qt::QueuedConnection);
+    //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateListed()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
@@ -148,11 +148,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->dirTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
     //connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
-    connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(UpdateListed(const QModelIndex &)));
+    //connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(UpdateListed(const QModelIndex &)));
     //connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ExpandCollapseResize(const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
-    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(UpdateListed(const QModelIndex &)));
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+    //connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(UpdateListed(const QModelIndex &)));
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
     connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
@@ -251,11 +250,9 @@ void WombatForensics::ShowExternalViewer()
 
 void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 {
-    /*
-    QModelIndexList indexlist = ((TreeModel*)ui->dirTreeView->model())->match(((TreeModel*)ui->dirTreeView->model())->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
-    */
 }
 
 void WombatForensics::ShowFile(const QModelIndex &index)
@@ -499,7 +496,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
     msglog->clear();
     InitializeCheckState();
-    treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
     ui->actionAdd_Evidence->setEnabled(true);
     //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
@@ -513,10 +509,12 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         wombatvariable.evidencename = files.at(i).split(".").at(0) + QString(".") + files.at(i).split(".").at(1);
         evidcnt++;
     }
+    treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     treenodemodel = new TreeNodeModel(treefile.readAll());
     treefile.close();
-    //connect(treemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    connect(treenodemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     ui->dirTreeView->setModel(treenodemodel);
 
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -567,7 +565,7 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     QModelIndex index = ui->dirTreeView->indexAt(pt);
     if(index.isValid())
     {
-        //actionnode = static_cast<Node*>(index.internalPointer());
+        actionitem = static_cast<TreeNode*>(index.internalPointer());
         qDebug() << index.sibling(index.row(), 0).data().toString().split("-").count();
         if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
@@ -594,7 +592,8 @@ void WombatForensics::UpdateStatus()
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     treenodemodel = new TreeNodeModel(treefile.readAll());
     treefile.close();
-    //connect(treemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    connect(treenodemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     ui->dirTreeView->setModel(treenodemodel);
     readfileinfo = NULL;
     tsk_fs_close(readfsinfo);
@@ -604,7 +603,7 @@ void WombatForensics::UpdateStatus()
     tsk_img_close(readimginfo);
     readimginfo = NULL;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QModelIndexList parentlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant("f"), -1, Qt::MatchFlags(Qt::MatchContains | Qt::MatchRecursive));
+    //QModelIndexList parentlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant("f"), -1, Qt::MatchFlags(Qt::MatchContains | Qt::MatchRecursive));
     /*
     for(int i = 0; i < parentlist.count(); i++)
     {
@@ -629,6 +628,7 @@ void WombatForensics::UpdateStatus()
     StatusUpdate("Evidence ready");
 }
 
+/*
 void WombatForensics::UpdateListed(const QModelIndex &index)
 {
     if(index.isValid())
@@ -645,6 +645,8 @@ void WombatForensics::UpdateListed()
     //ReturnListedCount(rootnode);
     //processcountlabel->setText("Listed: " + QString::number(filesprocessed));
 }
+*/
+
 void WombatForensics::UpdateDigging()
 {
     LogMessage("Digging Complete");
@@ -666,18 +668,8 @@ void WombatForensics::AddEvidence()
                 wombatvariable.fullpathvector.push_back(tmplist.at(i).toStdString());
             wombatvariable.itemcount = tmplist.count();
             LogMessage("Start Adding Evidence");
-            // TRY A QTCONCURRENT::MAP() WITH A 1 ITEM VECTOR SO I CAN CANCEL IT...
-            // if its a 1 item vector, the 1 item will be spawned and cancel will stop future items, which tehre are none.
-            //connect(cancelthread, SIGNAL(CancelCurrentThread()), &sqlwatcher, SLOT(cancel()));
-            QList<int> dumint;
-            dumint.clear();
-            dumint.append(0);
-            QFuture<void> tmpfuture = QtConcurrent::map(dumint, InitializeEvidenceStructure);
+            QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
             sqlwatcher.setFuture(tmpfuture);
-            //InitializeEvidenceStructure(0);
-            //cancelthread->show();
-            //UpdateStatus();
-            //UpdateListed();
         }
         else
             DisplayError("3.0", "Evidence already exists in the case", "Add Evidence Cancelled");
@@ -971,7 +963,6 @@ void WombatForensics::LoadHexContents()
         }
 
     }
-/* MOVED TO FINISHHEX() --- DIDN'T WORK VERY WELL AS CONCURRENT THREAD */
     if(wombatvariable.selectedid.split("-").count() < 4) // image file
     {
         hexwidget->openimage();
@@ -991,55 +982,18 @@ void WombatForensics::LoadHexContents()
         }
     }
 }
-
-/*
-void WombatForensics::FinishHex(void)
-{
-    if(wombatvariable.selectedid.split("-").count() < 4) // image file
-    {
-        hexwidget->openimage();
-        hexwidget->set1BPC();
-        hexwidget->setBaseHex();
-        hexwidget->SetTopLeft(0);
-    }
-    else
-    {
-        hexwidget->SetTopLeft(tskobjptr->offset);
-        if(wombatvariable.selectedid.split("-").count() == 4)
-        {
-            fileviewer->filehexview->openimage();
-            fileviewer->filehexview->set1BPC();
-            fileviewer->filehexview->setBaseHex();
-            fileviewer->filehexview->SetTopLeft(0);
-        }
-    }
-    QApplication::restoreOverrideCursor();
-    StatusUpdate("Ready");
-}
-*/
 
 void WombatForensics::CloseCurrentCase()
 {
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
     delete treenodemodel;
     evidcnt = 0;
-    /*
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*.evid.*"), QDir::NoSymLinks | QDir::Files);
-    for(int i=0; i < evidfiles.count(); i++)
-    {
-        //treemodel->RemEvidence(QString("e" + evidfiles.at(i).split(".", QString::SkipEmptyParts).last()));
-        evidcnt--;
-    }
-    */
     //autosavetimer->stop();
     UpdateCheckState();
     setWindowTitle("WombatForensics");
-    //filesprocessed = 0;
     filesfound = 0;
     fileschecked = 0;
     filtercountlabel->setText("Filtered: 0");
-    //processcountlabel->setText("Listed: " + QString::number(filesprocessed));
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
     // WRITE MSGLOG TO FILE HERE...
@@ -1093,19 +1047,6 @@ void WombatForensics::GetExportList(Node* curnode, int exporttype)
 */
 
 /*
-void WombatForensics::ReturnListedCount(Node* curnode)
-{
-    if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
-        filesprocessed++;
-    if(curnode->haschildren)
-    {
-        for(int i = 0; i < curnode->children.count(); i++)
-            ReturnListedCount(curnode->children.at(i));
-    }
-}
-*/
-
-/*
 void WombatForensics::GetDigList(Node* curnode, int digtype)
 {
     if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
@@ -1128,10 +1069,9 @@ void WombatForensics::GetDigList(Node* curnode, int digtype)
 
 void WombatForensics::ExportEvidence()
 {
-    totalcount = 0;
+    totalcount = filesfound;
     totalchecked = 0;
     exportcount = 0;
-    //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
     exportdialog = new ExportDialog(this, totalchecked, totalcount);
     connect(exportdialog, SIGNAL(StartExport(int, bool, QString)), this, SLOT(ExportFiles(int, bool, QString)), Qt::DirectConnection);
     exportdialog->show();
@@ -1143,108 +1083,6 @@ void WombatForensics::FinishExport()
     LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
     StatusUpdate("Exporting completed with " + QString::number(errorcount) + "error(s)");
 }
-
-/*
-void WombatForensics::FinishModel()
-{
-    LogMessage(QString("Model successfully loaded"));
-    StatusUpdate("Model Loaded");
-}
-*/
-
-/*
-void WombatForensics::ProcessExport(QString objectid)
-{
-    TSK_IMG_INFO* readimginfo;
-    TSK_FS_INFO* readfsinfo;
-    TSK_FS_FILE* readfileinfo;
-    QString tmpstr = "";
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    std::vector<std::string> pathvector;
-    const TSK_TCHAR** imagepartspath;
-    pathvector.clear();
-    QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
-    QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
-    unsigned long long curaddress = objectid.split("-f").at(1).toULongLong();
-    QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
-    wombatvariable.evidencename = evidfiles.at(0);
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + estring.mid(1));
-    evidfile.open(QIODevice::ReadOnly);
-    tmpstr = evidfile.readLine();
-    int partcount = tmpstr.split(",").at(3).split("|").size();
-    evidfile.close();
-    for(int i=0; i < partcount; i++)
-        pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
-    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(uint i=0; i < pathvector.size(); i++)
-        imagepartspath[i] = pathvector[i].c_str();
-    readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    if(readimginfo == NULL)
-    {
-        qDebug() << tsk_error_get_errstr();
-        LogMessage("Image opening error");
-    }
-    free(imagepartspath);
-    tmpstr = "";
-    QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + pstring.mid(1)), QDir::NoSymLinks | QDir::Files);
-    QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
-    partfile.open(QIODevice::ReadOnly);
-    tmpstr = partfile.readLine();
-    partfile.close();
-    readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
-    readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
-    if(readfileinfo->meta != NULL)
-    {
-        char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
-        ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-        QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + "." + pstring + "." + fstring + ".a*"), QDir::NoSymLinks | QDir::Files);
-        QFile filefile(wombatvariable.tmpmntpath + filefiles.at(0));
-        filefile.open(QIODevice::ReadOnly);
-        tmpstr = filefile.readLine();
-        filefile.close();
-        QString tmppath = "";
-        QByteArray ba;
-        ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
-        QString tmpname = QByteArray::fromBase64(ba);
-        if(originalpath == true)
-            tmppath = exportpath + tmpstr.split(",", QString::SkipEmptyParts).at(3);
-        else
-            tmppath = exportpath + "/";
-        if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
-        {
-            bool tmpdir = (new QDir())->mkpath(QString(tmppath + tmpname));
-            if(!tmpdir)
-            {
-                LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
-                errorcount++;
-            }
-        }
-        else
-        {
-            bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(tmppath));
-            if(tmpdir == true)
-            {
-                QFile tmpfile(tmppath + tmpname);
-                if(tmpfile.open(QIODevice::WriteOnly))
-                {
-                    QDataStream outbuffer(&tmpfile);
-                    outbuffer.writeRawData(imgbuf, imglen);
-                    tmpfile.close();
-                }
-            }
-        }
-        free(imgbuf);
-    }
-    tsk_fs_file_close(readfileinfo);
-    tsk_fs_close(readfsinfo);
-    tsk_img_close(readimginfo);
-    exportcount++;
-    int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
-    LogMessage(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
-    StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
-}
-*/
 
 void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
 {
@@ -1268,15 +1106,6 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     QFuture<void> tmpfuture = QtConcurrent::map(exportlist, ProcessExport);
     exportwatcher.setFuture(tmpfuture);
     cancelthread->show();
-    // non-cancel run loop
-    /*
-    for(int i=0; i < exportlist.count(); i++)
-    {
-        //ProcessExport(exportlist.at(i));
-        QFuture<void> tmpfuture = QtConcurrent::run(this, &WombatForensics::ProcessExport, exportlist.at(i));
-        exportwatcher.setFuture(tmpfuture);
-    }
-    */
 }
 
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
@@ -1415,13 +1244,7 @@ void WombatForensics::UpdateExport()
 }
 void WombatForensics::UpdateProgress(unsigned long long filecount)
 {
-    //double curprogress = (((double)processphase)/(((double)filesfound)*3.0))*100;
-    //if(curprogress > 100)
-    //    curprogress = 100;
-    //processcountlabel->setText("Listed: " + QString::number(filesprocessed));
     filecountlabel->setText("Found: " + QString::number(filecount));
-    //StatusUpdate("Processing: " + QString::number(curprogress, 'f', 2) + "%");
-    //filtercountlabel->setText("Filtered: " + QString::number(filesprocessed));
 }
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)
@@ -1436,12 +1259,8 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 
 void WombatForensics::ResizeColumns(void)
 {
-    /*
-    for(int i=0; i < ((TreeModel*)ui->dirTreeView->model())->columnCount(QModelIndex()); i++)
-    {
+    for(int i=0; i < treenodemodel->columnCount(QModelIndex()); i++)
         ui->dirTreeView->resizeColumnToContents(i);
-    }
-    */
 }
 
 void WombatForensics::SetupHexPage(void)
@@ -1641,12 +1460,11 @@ void WombatForensics::on_actionSaveState_triggered()
 
 void WombatForensics::on_actionCheck_triggered()
 {
-    /*
-    if(actionnode->checkstate == false)
-        actionnode->checkstate = true;
+    if(!actionitem->IsChecked())
+        actionitem->SetChecked(true);
     else
-        actionnode->checkstate = false;
-    */
+        actionitem->SetChecked(false);
+    emit treenodemodel->checkedNodesChanged();
 }
 
 void WombatForensics::on_actionExport_triggered()
@@ -1663,7 +1481,6 @@ void WombatForensics::on_actionDigDeeper_triggered()
 {
     totalcount = 0;
     totalchecked = 0;
-    //((TreeModel*)ui->dirTreeView->model())->GetModelCount(rootnode);
     digcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
     connect(digdeeperdialog, SIGNAL(StartDig(int, QVector<int>)), this, SLOT(DigFiles(int, QVector<int>)), Qt::DirectConnection);
@@ -1712,8 +1529,6 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             if(ret == QMessageBox::Yes)
             {
                 StartThumbnails();
-                //thumbfuture = QtConcurrent::run(this, &WombatForensics::StartThumbnails);
-                //thumbwatcher.setFuture(thumbfuture);
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
@@ -1765,7 +1580,6 @@ void WombatForensics::StartThumbnails()
     thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
     thumbwatcher.setFuture(thumbfuture);
     cancelthread->show();
-    //GenerateThumbnails();
     StatusUpdate("Thumbnail generation finished.");
     LogMessage("Thumbnail generation finished.");
 }
@@ -2000,8 +1814,8 @@ void WombatForensics::SetFilter(int headercolumn)
 void WombatForensics::NextItem()
 {
     QModelIndex curindex = ui->dirTreeView->currentIndex();
-    /*
-    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    //QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList tmplist = treenodemodel->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(tmplist.isEmpty() == false)
     {
         for(int i=0; i < tmplist.count(); i++)
@@ -2013,14 +1827,12 @@ void WombatForensics::NextItem()
             }
         }
     }
-    */
 }
 
 void WombatForensics::PreviousItem()
 {
     QModelIndex curindex = ui->dirTreeView->currentIndex();
-    /*
-    QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
+    QModelIndexList tmplist = treenodemodel->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     if(tmplist.isEmpty() == false)
     {
         for(int i=0; i < tmplist.count(); i++)
@@ -2032,7 +1844,6 @@ void WombatForensics::PreviousItem()
             }
         }
     }
-    */
 }
 
 void WombatForensics::ShowItem()
