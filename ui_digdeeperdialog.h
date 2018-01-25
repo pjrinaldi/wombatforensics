@@ -51,7 +51,7 @@ public:
         if (DigDeeperDialog->objectName().isEmpty())
             DigDeeperDialog->setObjectName(QStringLiteral("DigDeeperDialog"));
         DigDeeperDialog->setWindowModality(Qt::ApplicationModal);
-        DigDeeperDialog->resize(400, 300);
+        DigDeeperDialog->resize(308, 300);
         DigDeeperDialog->setModal(true);
         verticalLayout_2 = new QVBoxLayout(DigDeeperDialog);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
@@ -144,7 +144,7 @@ public:
         groupBox_2->setTitle(QApplication::translate("DigDeeperDialog", "Process the Following File(s)", Q_NULLPTR));
         selectedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Selected", Q_NULLPTR));
         checkedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Checked (#)", Q_NULLPTR));
-        listedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Currently Listed (#)", Q_NULLPTR));
+        listedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "All (#)", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("DigDeeperDialog", "For the Following Options", Q_NULLPTR));
         thumbnailcheckBox->setText(QApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Image Files", Q_NULLPTR));
         cancelButton->setText(QApplication::translate("DigDeeperDialog", "Cancel", Q_NULLPTR));

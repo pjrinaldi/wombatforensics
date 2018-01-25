@@ -1002,26 +1002,6 @@ void WombatForensics::RemEvidence()
     evidcnt--;
     StatusUpdate("Evidence Item Successfully Removed");
 }
-/*
-void WombatForensics::GetExportList(Node* curnode, int exporttype)
-{
-    if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
-    {
-        if(exporttype == 1) // checked
-        {
-            if(curnode->checkstate == true)
-                exportlist.append(curnode->nodevalues.at(0).toString());
-        }
-        else if(exporttype == 2) // all listed
-            exportlist.append(curnode->nodevalues.at(0).toString());
-    }
-    if(curnode->haschildren)
-    {
-        for(int i = 0; i < curnode->children.count(); i++)
-            GetExportList(curnode->children.at(i), exporttype);
-    }
-}
-*/
 
 QStringList WombatForensics::GetFileLists(int filelisttype)
 {
@@ -1477,8 +1457,8 @@ void WombatForensics::on_actionExport_triggered()
 
 void WombatForensics::on_actionDigDeeper_triggered()
 {
-    totalcount = 0;
-    totalchecked = 0;
+    totalcount = filesfound;
+    totalchecked = fileschecked;
     digcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
     connect(digdeeperdialog, SIGNAL(StartDig(int, QVector<int>)), this, SLOT(DigFiles(int, QVector<int>)), Qt::DirectConnection);

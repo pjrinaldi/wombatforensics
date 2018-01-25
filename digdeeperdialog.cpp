@@ -13,7 +13,7 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, unsigned long long curcheckcou
     checkcount = curcheckcount;
     QString checktext = QString("Checked (") + QString::number(checkcount) + QString(")");
     listcount = curlistcount;
-    QString listtext = QString("Currently Listed (") + QString::number(listcount) + QString(")");
+    QString listtext = QString("All (") + QString::number(listcount) + QString(")");
     ui->checkedFileRadioButton->setText(checktext);
     ui->listedFileRadioButton->setText(listtext);
     ui->processButton->setEnabled(false);

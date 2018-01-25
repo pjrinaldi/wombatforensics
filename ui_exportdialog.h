@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'exportdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.1.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -51,15 +51,15 @@ public:
     QSpacerItem *horizontalSpacer;
     QPushButton *cancelButton;
     QPushButton *exportButton;
-    QButtonGroup *exportButtonGroup;
     QButtonGroup *pathButtonGroup;
+    QButtonGroup *exportButtonGroup;
 
     void setupUi(QDialog *ExportDialog)
     {
         if (ExportDialog->objectName().isEmpty())
             ExportDialog->setObjectName(QStringLiteral("ExportDialog"));
         ExportDialog->setWindowModality(Qt::ApplicationModal);
-        ExportDialog->resize(400, 300);
+        ExportDialog->resize(298, 300);
         ExportDialog->setModal(true);
         verticalLayout_2 = new QVBoxLayout(ExportDialog);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
@@ -182,19 +182,19 @@ public:
 
     void retranslateUi(QDialog *ExportDialog)
     {
-        ExportDialog->setWindowTitle(QApplication::translate("ExportDialog", "Export Dialog", 0));
-        groupBox_2->setTitle(QApplication::translate("ExportDialog", "Export File(s)", 0));
-        selectedFileRadioButton->setText(QApplication::translate("ExportDialog", "Selected", 0));
-        checkedFileRadioButton->setText(QApplication::translate("ExportDialog", "Checked (#)", 0));
-        listedFileRadioButton->setText(QApplication::translate("ExportDialog", "Currently Listed (#)", 0));
-        exportDirectoryLineEdit->setPlaceholderText(QApplication::translate("ExportDialog", "Export Directory", 0));
-        browseButton->setText(QApplication::translate("ExportDialog", "Browse", 0));
-        groupBox->setTitle(QApplication::translate("ExportDialog", "Path", 0));
-        label->setText(QApplication::translate("ExportDialog", "Include Original Path:", 0));
-        includePathRadioButton->setText(QApplication::translate("ExportDialog", "Yes", 0));
-        excludePathRadioButton->setText(QApplication::translate("ExportDialog", "No", 0));
-        cancelButton->setText(QApplication::translate("ExportDialog", "Cancel", 0));
-        exportButton->setText(QApplication::translate("ExportDialog", "Export", 0));
+        ExportDialog->setWindowTitle(QApplication::translate("ExportDialog", "Export Dialog", Q_NULLPTR));
+        groupBox_2->setTitle(QApplication::translate("ExportDialog", "Export File(s)", Q_NULLPTR));
+        selectedFileRadioButton->setText(QApplication::translate("ExportDialog", "Selected", Q_NULLPTR));
+        checkedFileRadioButton->setText(QApplication::translate("ExportDialog", "Checked (#)", Q_NULLPTR));
+        listedFileRadioButton->setText(QApplication::translate("ExportDialog", "All (#)", Q_NULLPTR));
+        exportDirectoryLineEdit->setPlaceholderText(QApplication::translate("ExportDialog", "Export Directory", Q_NULLPTR));
+        browseButton->setText(QApplication::translate("ExportDialog", "Browse", Q_NULLPTR));
+        groupBox->setTitle(QApplication::translate("ExportDialog", "Path", Q_NULLPTR));
+        label->setText(QApplication::translate("ExportDialog", "Include Original Path:", Q_NULLPTR));
+        includePathRadioButton->setText(QApplication::translate("ExportDialog", "Yes", Q_NULLPTR));
+        excludePathRadioButton->setText(QApplication::translate("ExportDialog", "No", Q_NULLPTR));
+        cancelButton->setText(QApplication::translate("ExportDialog", "Cancel", Q_NULLPTR));
+        exportButton->setText(QApplication::translate("ExportDialog", "Export", Q_NULLPTR));
     } // retranslateUi
 
 };

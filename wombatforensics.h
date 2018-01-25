@@ -733,8 +733,6 @@ private:
     void LoadHexContents(void);
     void StartThumbnails(void);
     QStringList GetFileLists(int filelisttype);
-    //void GetExportList(Node* curnode, int exporttype);
-    //void ReturnListedCount(Node* curnode);
     //void GetDigList(Node* curnode, int digtype);
     //void ProcessExport(QString curid);
     void ProcessDig(QString curid);
