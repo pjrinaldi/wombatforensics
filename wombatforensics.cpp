@@ -342,7 +342,6 @@ void WombatForensics::HideByteViewer(bool checkstate)
 
 void WombatForensics::InitializeAppStructure()
 {
-    //wombatid = 1;
     wombatvariable.iscaseopen = false;
     QString homepath = QDir::homePath();
     homepath += "/.wombatforensics/";

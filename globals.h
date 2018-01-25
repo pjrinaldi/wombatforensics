@@ -26,7 +26,6 @@ extern unsigned long long digcount;
 extern unsigned long long errorcount;
 extern unsigned long long jumpoffset;
 extern unsigned long long filejumpoffset;
-//extern unsigned long long wombatid;
 extern int partint;
 extern int evidcnt;
 extern int volcnt;
@@ -35,8 +34,6 @@ extern int linefactor;
 extern int filelinefactor;
 extern int thumbsize;
 extern int mftrecordsize;
-//extern QString rootinum;
-//extern unsigned long long rootinum;
 extern QList<QVariant> colvalues;
 extern QStringList propertylist;
 extern QStringList thumblist;
@@ -201,71 +198,6 @@ private:
     TreeNode* parentitem;
 };
 
-
-/*
-class Node
-{
-public:
-    Node(QList<QVariant> celldata)
-    {
-        nodevalues.clear();
-        for(int i=0; i < celldata.count(); i++)
-        {
-            nodevalues.append(celldata.at(i));
-        }
-        parent = 0;
-        haschildren = false;
-        childcount = 0;
-        checkstate = false;
-        parentid = 0;
-        nodetype = 0;
-    };
-
-    ~Node()
-    {
-        if(children.count() > 0)
-            qDeleteAll(children);
-    };
-
-    QList<QVariant> nodevalues;
-    Node* parent;
-    QList<Node*> children;
-    bool haschildren;
-    unsigned long long parentid;
-    unsigned long long childcount;
-    int nodetype;
-    bool checkstate;
-    bool HasChildren(void)
-    {
-        if(childcount > 0)
-            return true;
-        return false;
-    };
-    void RemoveChild(int idx)
-    {
-        children.removeAt(idx);
-    };
-    int GetChildRow(QString curid)
-    {
-        for(int i=0; i < children.count(); i++)
-        {
-            if(children.at(i)->nodevalues.at(0).toString().contains(curid))
-                return i;
-        }
-        return -1;
-    };
-};
-*/
-/*
-extern Node* rootnode;
-extern Node* dummynode;
-extern Node* parentnode;
-extern Node* currentnode;
-extern Node* toplevelnode;
-extern Node* actionnode;
-extern Node* volnode;
-extern Node* partnode;
-*/
 extern TSK_IMG_INFO* readimginfo;
 extern TSK_VS_INFO* readvsinfo;
 extern const TSK_VS_PART_INFO* readpartinfo;

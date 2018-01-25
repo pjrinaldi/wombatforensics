@@ -22,28 +22,15 @@ unsigned long long digcount = 0;
 unsigned long long errorcount = 0;
 unsigned long long jumpoffset = 0;
 unsigned long long filejumpoffset = 0;
-//unsigned long long wombatid = 1;
 int partint = 0;
 int volcnt = 0;
 int evidcnt = 0;
 int childcount = 0;
-//QString rootinum = 0;
-//unsigned long long rootinum = 0;
 int linefactor = 0;
 int filelinefactor = 0;
 int thumbsize = 64;
 int mftrecordsize = 1024;
 InterfaceSignals* isignals = new InterfaceSignals();
-/*
-Node* currentnode = 0;
-Node* rootnode = 0;
-Node* dummynode = 0;
-Node* parentnode = 0;
-Node* toplevelnode = 0;
-Node* actionnode = 0;
-Node* volnode = 0;
-Node* partnode = 0;
-*/
 QList<QVariant> colvalues;
 QStringList propertylist;
 QStringList thumblist;
