@@ -514,9 +514,8 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     treenodemodel = new TreeNodeModel(treefile.readAll());
     treefile.close();
     connect(treenodemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     ui->dirTreeView->setModel(treenodemodel);
-
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
@@ -593,8 +592,8 @@ void WombatForensics::UpdateStatus()
     treenodemodel = new TreeNodeModel(treefile.readAll());
     treefile.close();
     connect(treenodemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     ui->dirTreeView->setModel(treenodemodel);
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     readfileinfo = NULL;
     tsk_fs_close(readfsinfo);
     readfsinfo = NULL;
