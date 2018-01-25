@@ -12,7 +12,7 @@ QTextEdit* msglog = NULL;
 QFutureWatcher<void> thumbwatcher;
 QFutureWatcher<void> secondwatcher;
 unsigned long long filesfound = 0;
-unsigned long long filesprocessed = 0;
+//unsigned long long filesprocessed = 0;
 unsigned long long fileschecked = 0;
 unsigned long long processphase = 0;
 unsigned long long totalchecked = 0;

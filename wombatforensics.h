@@ -338,6 +338,7 @@ public:
             else
                 itemnode->SetChecked(true);
             emit dataChanged(index, index);
+            emit checkedNodesChanged();
             return true;
         }
 
@@ -456,6 +457,8 @@ public:
             return zeronode->ColumnCount();
     };
 
+signals:
+    void checkedNodesChanged();
 private:
     void AddEvidence(const QStringList &nodes, TreeNode* parent)
     {
@@ -654,12 +657,14 @@ private slots:
             ResizeColumns();
     };
     // WILL PROBABLY NOT NEED
+    /*
     void ExpandCollapseResize(const QModelIndex &index)
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         ResizeViewColumns(index);
         QApplication::restoreOverrideCursor();
     };
+    */
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void DigFiles(int digtype, QVector<int> digoptions);
     void SetOffsetLabel(off_t pos);
@@ -741,8 +746,6 @@ private:
     QFutureWatcher<void> thumbwatcher;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;
-    //QFuture<void> modelfuture;
-    //QFutureWatcher<void>modelwatcher;
 
     QFile casesfile;
     QFile settingsfile;
@@ -758,7 +761,7 @@ private:
     QLabel* selectedhex;
     QLabel* filecountlabel;
     QLabel* filtercountlabel;
-    QLabel* processcountlabel;
+    //QLabel* processcountlabel;
     QLabel* checkedcountlabel;
     QLabel* statuslabel;
     QFrame* vline1;
