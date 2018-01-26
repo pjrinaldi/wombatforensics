@@ -700,7 +700,7 @@ private slots:
     {
         UpdateFilterCount();
         emit ui->dirTreeView->header()->geometriesChanged();
-        //emit treenodemodel->layoutChanged(); // this messes with the rowheight...
+        emit treenodemodel->layoutChanged(); // this messes with the row height and cuts off icons...
     };
     void NextItem();
     void PreviousItem();

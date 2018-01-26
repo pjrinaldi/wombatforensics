@@ -515,6 +515,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    //connect(treenodemodel, SIGNAL(layoutChanged()), this, SLOT(ResizeColumns()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
@@ -1775,7 +1776,6 @@ void WombatForensics::SetFilter(int headercolumn)
 void WombatForensics::NextItem()
 {
     QModelIndex curindex = ui->dirTreeView->currentIndex();
-    //QModelIndexList tmplist = ((TreeModel*)ui->dirTreeView->model())->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QModelIndexList tmplist = treenodemodel->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(tmplist.isEmpty() == false)
     {
