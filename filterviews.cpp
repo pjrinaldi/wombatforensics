@@ -411,10 +411,8 @@ FileTypeFilter::~FileTypeFilter()
 
 void FileTypeFilter::DisplayFilter()
 {
-    QStringList tmpcategory, tmptype;
-    tmpcategory.clear();
+    QStringList tmptype;
     tmptype.clear();
-    ui->categorycomboBox->clear();
     ui->typecomboBox->clear();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QFile tmpfile;
@@ -427,18 +425,12 @@ void FileTypeFilter::DisplayFilter()
         tmpfile.open(QIODevice::ReadOnly);
         tmpstr = tmpfile.readLine();
         tmpfile.close();
-        tmpcategory.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).at(0));
         if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).count() >= 2)
-            tmptype.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).at(1));
+            tmptype.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).last());
     }
-    tmpcategory.removeDuplicates();
     tmptype.removeDuplicates();
-    for(int i=0; i < tmpcategory.count(); i++)
-        ui->categorycomboBox->addItem(tmpcategory.at(i));
     for(int i=0; i < tmptype.count(); i++)
         ui->typecomboBox->addItem(tmptype.at(i));
-    if(filtervalues.filecategory.compare("") != 0)
-        ui->categorycomboBox->setCurrentText(filtervalues.filecategory);
     if(filtervalues.filetype.compare("") != 0)
         ui->typecomboBox->setCurrentText(filtervalues.filetype);
     QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
@@ -450,9 +442,6 @@ void FileTypeFilter::DisplayFilter()
 
 void FileTypeFilter::HideClicked()
 {
-    filtervalues.filecategorybool = ui->categorycheckBox->isChecked();
-    if(filtervalues.filecategorybool)
-        filtervalues.filecategory = ui->categorycomboBox->currentText();
     filtervalues.filetypebool = ui->typecheckBox->isChecked();
     if(filtervalues.filetypebool)
         filtervalues.filetype = ui->typecomboBox->currentText();
@@ -487,7 +476,7 @@ void FileCategoryFilter::DisplayFilter()
         tmpfile.open(QIODevice::ReadOnly);
         tmpstr = tmpfile.readLine();
         tmpfile.close();
-        tmpcategory.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).at(0));
+        tmpcategory.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).first());
     }
     tmpcategory.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)

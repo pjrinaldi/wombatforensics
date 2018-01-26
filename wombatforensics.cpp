@@ -514,7 +514,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             listeditems.append(tmplist.at(i).split(",").first());
     }
     ui->dirTreeView->setModel(treenodemodel);
-    connect(treenodemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
@@ -597,7 +597,7 @@ void WombatForensics::UpdateStatus()
             listeditems.append(tmplist.at(i).split(",").first());
     }
     ui->dirTreeView->setModel(treenodemodel);
-    connect(treenodemodel, SIGNAL(checkedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     UpdateCheckCount();
     readfileinfo = NULL;
@@ -1028,27 +1028,6 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
 
 }
 
-/*
-void WombatForensics::GetDigList(Node* curnode, int digtype)
-{
-    if(curnode->nodevalues.at(0).toString().split("-").count() == 4)
-    {
-        if(digtype == 1) // checked
-        {
-            if(curnode->checkstate == true)
-                digfilelist.append(curnode->nodevalues.at(0).toString());
-        }
-        else if(digtype == 2) // all listed
-            digfilelist.append(curnode->nodevalues.at(0).toString());
-        if(curnode->haschildren)
-        {
-            for(int i = 0; i < curnode->children.count(); i++)
-                GetDigList(curnode->children.at(i), digtype);
-        }   
-    }
-}
-*/
-
 void WombatForensics::ExportEvidence()
 {
     totalcount = filesfound;
@@ -1446,7 +1425,7 @@ void WombatForensics::on_actionCheck_triggered()
         actionitem->SetChecked(true);
     else
         actionitem->SetChecked(false);
-    emit treenodemodel->checkedNodesChanged();
+    emit treenodemodel->CheckedNodesChanged();
 }
 
 void WombatForensics::on_actionExport_triggered()
@@ -1784,12 +1763,12 @@ void WombatForensics::SetFilter(int headercolumn)
         modifyfilterview->DisplayFilter();
     if(headercolumn == 7)
         changefilterview->DisplayFilter();
-    if(headercolumn == 9)
-        filetypefilterview->DisplayFilter();
-    if(headercolumn == 10)
-        filecategoryfilterview->DisplayFilter();
     if(headercolumn == 8)
         hashfilterview->DisplayFilter();
+    if(headercolumn == 9)
+        filecategoryfilterview->DisplayFilter();
+    if(headercolumn == 10)
+        filetypefilterview->DisplayFilter();
     ResizeColumns();
 }
 

@@ -277,6 +277,7 @@ public:
         dirTreeView->setAlternatingRowColors(true);
         dirTreeView->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
         dirTreeView->setUniformRowHeights(true);
+        dirTreeView->setAllColumnsShowFocus(true);
         dirTreeView->setExpandsOnDoubleClick(false);
         splitter->addWidget(dirTreeView);
 

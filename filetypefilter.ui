@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>429</width>
-    <height>105</height>
+    <height>80</height>
    </rect>
   </property>
   <property name="font">
@@ -28,41 +28,7 @@
    <property name="horizontalSpacing">
     <number>0</number>
    </property>
-   <item row="0" column="1">
-    <widget class="QComboBox" name="categorycomboBox">
-     <property name="editable">
-      <bool>false</bool>
-     </property>
-     <property name="currentText">
-      <string/>
-     </property>
-     <property name="insertPolicy">
-      <enum>QComboBox::NoInsert</enum>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
-    <widget class="QComboBox" name="typecomboBox">
-     <property name="insertPolicy">
-      <enum>QComboBox::NoInsert</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QCheckBox" name="categorycheckBox">
-     <property name="text">
-      <string>Show Items where group matches</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QCheckBox" name="typecheckBox">
-     <property name="text">
-      <string>Show Items where type matches</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
     <widget class="QPushButton" name="pushButton">
      <property name="styleSheet">
       <string notr="true">border: 1px solid black; padding: 5px 10px 5px 10px;</string>
@@ -78,26 +44,24 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="0">
+    <widget class="QCheckBox" name="typecheckBox">
+     <property name="text">
+      <string>Show Items where type matches</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="typecomboBox">
+     <property name="insertPolicy">
+      <enum>QComboBox::NoInsert</enum>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>categorycheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>categorycomboBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>75</x>
-     <y>14</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>225</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>typecheckBox</sender>
    <signal>toggled(bool)</signal>

@@ -197,24 +197,14 @@ public:
                     if(itemnode->Data(8).toString().contains(filtervalues.hashfilter, Qt::CaseInsensitive) == false)
                         return QColor(Qt::lightGray);
                 }
-                if(filtervalues.filecategorybool && filtervalues.filetypebool == false)
-                {
-                    if(itemnode->Data(9).toString().contains(filtervalues.filecategory) == false)
-                        return QColor(Qt::lightGray);
-                }
-                if(filtervalues.filecategorybool == false && filtervalues.filetypebool)
-                {
-                    if(itemnode->Data(9).toString().contains(filtervalues.filetype) == false)
-                        return QColor(Qt::lightGray);
-                }
-                if(filtervalues.filecategorybool && filtervalues.filetypebool)
-                {
-                    if(itemnode->Data(9).toString().contains(filtervalues.filecategory) == false || itemnode->Data(9).toString().contains(filtervalues.filetype) == false)
-                        return QColor(Qt::lightGray);
-                }
                 if(filtervalues.filegroupbool)
                 {
-                    if(itemnode->Data(10).toString().contains(filtervalues.filegroup) == false)
+                    if(itemnode->Data(9).toString().contains(filtervalues.filegroup) == false)
+                        return QColor(Qt::lightGray);
+                }
+                if(filtervalues.filetypebool)
+                {
+                    if(itemnode->Data(10).toString().contains(filtervalues.filetype) == false)
                             return QColor(Qt::lightGray);
                 }
             }
@@ -360,7 +350,7 @@ public:
                 checkhash.insert(itemnode->Data(0).toString().split("-a").first(), true);
             }
             emit dataChanged(index, index);
-            emit checkedNodesChanged();
+            emit CheckedNodesChanged();
             return true;
         }
 
@@ -416,11 +406,11 @@ public:
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 7 && (filtervalues.maxchangebool || filtervalues.minchangebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 9 && (filtervalues.filecategorybool || filtervalues.filetypebool))
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 8 && (filtervalues.hashbool || filtervalues.hashbool2))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 10 && filtervalues.filegroupbool)
+            if(section == 9 && filtervalues.filegroupbool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 10 && filtervalues.filetypebool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();
@@ -481,7 +471,7 @@ public:
     };
 
 signals:
-    void checkedNodesChanged();
+    void CheckedNodesChanged();
 private:
     void AddEvidence(const QStringList &nodes, TreeNode* parent)
     {
@@ -710,6 +700,7 @@ private slots:
     {
         UpdateFilterCount();
         emit ui->dirTreeView->header()->geometriesChanged();
+        //emit treenodemodel->layoutChanged(); // this messes with the rowheight...
     };
     void NextItem();
     void PreviousItem();
@@ -738,8 +729,6 @@ private:
     void LoadHexContents(void);
     void StartThumbnails(void);
     QStringList GetFileLists(int filelisttype);
-    //void GetDigList(Node* curnode, int digtype);
-    //void ProcessExport(QString curid);
     void ProcessDig(QString curid);
     void UpdateFilterCount(void);
     void SaveState(void);
