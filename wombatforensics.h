@@ -567,6 +567,9 @@ private:
         if(evidid.compare("") == 0)
         {
         }
+        // READALL THE MODEL DATA INTO A STRINGLIST...
+        // LOOP OVER STRING ITEMS AND IF MATCH EVIDID, REMOVE FROM LIST
+        // WRITE THE STRINGLIST TO THE TREEFILE.
         // this would need to remove all instances of the e# from the file and then save the file and then reload the evidence...
         // have to think on this and figure out a quick way to do this...
         /*
