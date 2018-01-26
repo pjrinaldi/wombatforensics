@@ -97,12 +97,16 @@ public:
                     return QColor(Qt::lightGray);
                 if(filtervalues.namebool)
                 {
-                    if(itemnode->Data(1).toString().contains(filtervalues.namefilter) == false)
+                    ba.clear();
+                    ba.append(itemnode->Data(1).toString());
+                    if(QString(QByteArray::fromBase64(ba)).contains(filtervalues.namefilter) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.pathbool)
                 {
-                    if(itemnode->Data(2).toString().contains(filtervalues.pathfilter) == false)
+                    ba.clear();
+                    ba.append(itemnode->Data(2).toString());
+                    if(QString(QByteArray::fromBase64(ba)).contains(filtervalues.pathfilter) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxsizebool && filtervalues.minsizebool == false)
@@ -229,26 +233,27 @@ public:
                     ba.append(itemnode->Data(index.column()).toString());
                     return QByteArray::fromBase64(ba);
                 }
-                else return itemnode->Data(index.column());
+                else
+                {
+                    if(itemnode->Data(index.column()).toString().compare("0") == 0)
+                        return "";
+                    else
+                        return itemnode->Data(index.column());
+                }
             }
             else if(index.column() == 3)
-            {
-                if(nodetype < 4)
-                    return "";
-                else
-                    return itemnode->Data(index.column());
-            }
+                return itemnode->Data(index.column());
             else if(index.column() >= 4 && index.column() <= 7)
             {
-                if(itemnode->Data(index.column()).toInt() != 0)
+                if(itemnode->Data(index.column()).toString().compare("0") == 0)
+                    return "";
+                else
                 {
                     char* ibuffer = new char[128];
                     QString tmpstr = QString(TskTimeToStringUTC(itemnode->Data(index.column()).toInt(), ibuffer));
                     delete[] ibuffer;
                     return tmpstr;
                 }
-                else
-                    return "";
             }
             else if(index.column() >= 8 && index.column() <= 10)
             {

@@ -549,7 +549,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionByteConverter->setEnabled(true);
         StatusUpdate("Loading Hex Contents...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        LoadHexContents();
+        //LoadHexContents();
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
         if(propertywindow->isVisible())
@@ -940,15 +940,18 @@ void WombatForensics::LoadHexContents()
         }
 
     }
-    if(wombatvariable.selectedid.split("-").count() < 4) // image file
+    if(wombatvariable.selectedid.split("-").count() <= 4) // image file
     {
+        /*
         hexwidget->openimage();
         hexwidget->set1BPC();
         hexwidget->setBaseHex();
         hexwidget->SetTopLeft(0);
+        */
     }
     else
     {
+        /*
         hexwidget->SetTopLeft(tskobjptr->offset);
         if(wombatvariable.selectedid.split("-").count() == 4)
         {
@@ -957,6 +960,7 @@ void WombatForensics::LoadHexContents()
             fileviewer->filehexview->setBaseHex();
             fileviewer->filehexview->SetTopLeft(0);
         }
+        */
     }
 }
 

@@ -564,7 +564,7 @@ void InitializeEvidenceStructure()
     // Write Evidence Properties Here...
     WriteEvidenceProperties(readimginfo);
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
-    QString volname = "Dummy Volume";
+    QString volname = "Dummy Volume (NO FS)";
     int voltype = 240;
     int volsectorsize = (int)readimginfo->sector_size;
     unsigned long long voloffset = 0;
@@ -593,7 +593,7 @@ void InitializeEvidenceStructure()
         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
         out.flush();
         pfile.close();
-        treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + tsk_fs_type_toname(readfsinfo->ftype) + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
+        treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
@@ -630,7 +630,7 @@ void InitializeEvidenceStructure()
                         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                         out.flush();
                         pfile.close();
-                        treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + tsk_fs_type_toname(readfsinfo->ftype) + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
+                        treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
