@@ -504,25 +504,30 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     listeditems.clear();
     treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QStringList tmplist = QString(treefile.readAll()).split("\n");
-    treefile.reset();
-    treenodemodel = new TreeNodeModel(treefile.readAll());
-    treefile.close();
-    for(int i=0; i < tmplist.count(); i++)
+    QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
+    if(tmplist.count() > 0)
     {
-        if(tmplist.at(i).split(",").first().split("-").count() == 5)
-            listeditems.append(tmplist.at(i).split(",").first());
+        treefile.reset();
+        treenodemodel = new TreeNodeModel(treefile.readAll());
+        treefile.close();
+        for(int i=0; i < tmplist.count(); i++)
+        {
+            if(tmplist.at(i).split(",").first().split("-").count() == 5)
+                listeditems.append(tmplist.at(i).split(",").first());
+        }
+        ui->dirTreeView->setModel(treenodemodel);
+        connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
+        //connect(treenodemodel, SIGNAL(layoutChanged()), this, SLOT(ResizeColumns()));
+        connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        UpdateCheckCount();
+        if(indexlist.count() > 0)
+            ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+        else
+            ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
     }
-    ui->dirTreeView->setModel(treenodemodel);
-    connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
-    //connect(treenodemodel, SIGNAL(layoutChanged()), this, SLOT(ResizeColumns()));
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    UpdateCheckCount();
-    if(indexlist.count() > 0)
-        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     else
-        ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+        treefile.close();
     if(ui->dirTreeView->model() != NULL)
     {
         ui->actionRemove_Evidence->setEnabled(true);
@@ -590,6 +595,8 @@ void WombatForensics::UpdateStatus()
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     QStringList tmplist = QString(treefile.readAll()).split("\n");
     treefile.reset();
+    if(ui->dirTreeView->model() != NULL)
+        delete treenodemodel;
     treenodemodel = new TreeNodeModel(treefile.readAll());
     treefile.close();
     for(int i=0; i < tmplist.count(); i++)
@@ -967,11 +974,14 @@ void WombatForensics::LoadHexContents()
 
 void WombatForensics::CloseCurrentCase()
 {
-    UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
-    delete treenodemodel;
-    evidcnt = 0;
-    //autosavetimer->stop();
-    UpdateCheckState();
+    if(ui->dirTreeView->model() != NULL)
+    {
+        UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+        delete treenodemodel;
+        evidcnt = 0;
+        //autosavetimer->stop();
+        UpdateCheckState();
+    }
     setWindowTitle("WombatForensics");
     filesfound = 0;
     fileschecked = 0;
@@ -981,29 +991,75 @@ void WombatForensics::CloseCurrentCase()
     // WRITE MSGLOG TO FILE HERE...
     //QString umntstr = "pkexec umount ";
     //umntstr += wombatvariable.tmpmntpath;
-    if(wombatvariable.iscaseopen)
-    {
-        QString umntstr = "sudo umount " + wombatvariable.tmpmntpath;
-        QProcess::execute(umntstr);
-        /*
-        QString umntstr = "guestunmount " + wombatvariable.tmpmntpath;
-        QProcess::execute(umntstr);
-        */
-        StatusUpdate("Current Case was closed successfully");
-    }
+    QString umntstr = "sudo umount " + wombatvariable.tmpmntpath;
+    QProcess::execute(umntstr);
+    /*
+    QString umntstr = "guestunmount " + wombatvariable.tmpmntpath;
+    QProcess::execute(umntstr);
+    */
+    StatusUpdate("Current Case was closed successfully");
     RemoveTmpFiles();
     wombatvariable.iscaseopen = false;
 }
 
 void WombatForensics::RemEvidence()
 {
+    // if an evidence item is not selected, then move selection to it and remove then it...
+    // also need to remove any thumbnails in the thumbs.db associated with it...
+    QModelIndexList indexlist;
+    QModelIndex curindex = selectedindex;
+    if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() > 1)
+    {
+        indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        curindex = indexlist.at(0);
+    }
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString(selectedindex.sibling(selectedindex.row(), 1).data().toString() + ".*")), QDir::NoSymLinks | QDir::Files);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString(curindex.sibling(curindex.row(), 1).data().toString() + ".*")), QDir::NoSymLinks | QDir::Files);
     for(int i = 0; i < evidfiles.count(); i++)
     {
         eviddir.remove(evidfiles.at(i));
     }
-    //treemodel->RemEvidence(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+    listeditems.clear();
+    treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
+    treefile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
+    treefile.close();
+    treefile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream treeout(&treefile);
+    for(int i=0; i < tmplist.count(); i++)
+    {
+        if(!tmplist.at(i).split(",").first().contains(curindex.sibling(curindex.row(), 0).data().toString().split("-").first()))
+        {
+            listeditems.append(tmplist.at(i).split(",").first());
+            treeout << tmplist.at(i) << endl;
+        }
+    }
+    treefile.close();
+    qDebug() << "listeditems count:" << listeditems.count();
+    QStringList foundlist = eviddir.entryList(QStringList(QString("*.p*.f*.a*")), QDir::Files | QDir::NoSymLinks);
+    filesfound = foundlist.count();
+    filecountlabel->setText("Found: " + QString::number(filesfound));
+    qDebug() << "filesfound count:" << filesfound;
+    QHashIterator<QString, bool> i(checkhash);
+    while(i.hasNext())
+    {
+        i.next();
+        if(i.key().contains(curindex.sibling(curindex.row(), 0).data().toString().split("-").first()))
+            checkhash.remove(i.key());
+    }
+    UpdateCheckState();
+    QFile selectfile(wombatvariable.tmpmntpath + "selectedstate");
+    selectfile.open(QIODevice::WriteOnly);
+    selectfile.write("");
+    selectfile.close();
+    delete treenodemodel;
+    treefile.open(QIODevice::ReadOnly | QIODevice::Text);
+    treenodemodel = new TreeNodeModel(treefile.readAll());
+    treefile.close();
+    ui->dirTreeView->setModel(treenodemodel);
+    connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    //connect(treenodemodel, SIGNAL(layoutChanged()), this, SLOT(ResizeColumns()));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     evidcnt--;
     StatusUpdate("Evidence Item Successfully Removed");
 }
@@ -1350,10 +1406,8 @@ void WombatForensics::mouseDoubleClickEvent(QMouseEvent* event)
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
-    if(ui->dirTreeView->model() != NULL)
-    {
+    if(wombatvariable.iscaseopen)
         CloseCurrentCase();
-    }
     
     propertywindow->close();
     fileviewer->close();
