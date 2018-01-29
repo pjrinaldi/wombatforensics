@@ -276,7 +276,7 @@ public:
                             return QIcon(QPixmap(QString(":/basic/virtualfile")));
                         else
                         {
-                            if(itemnode->IsDeleted())
+                            if(itemnode->IsDeleted()) // Unallocated and Used
                                 return QIcon(QPixmap(QString(":/basic/deletedfile")));
                             else
                                 return QIcon(QPixmap(QString(":/basic/treefile")));
@@ -527,10 +527,12 @@ private:
                             parid = i.key();
                     }
                 }
-                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), columnstrings.at(11).toInt(), columnstrings.at(12).toInt()));
+                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), columnstrings.at(11).toInt()));
                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
                 if(checkhash.contains(columnstrings.at(0).split("-a").first()))
                     parents.value(curid)->SetChecked(true);
+                if(columnstrings.at(12).toInt() == true)
+                    parents.value(curid)->SetDeleted(true);
             }
             nodecount++;
         }

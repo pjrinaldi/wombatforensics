@@ -128,12 +128,11 @@ extern InterfaceSignals* isignals;
 class TreeNode
 {
 public:
-    explicit TreeNode(const QList<QVariant> &data, TreeNode* parent = 0, int itype = -1, bool del = false)
+    explicit TreeNode(const QList<QVariant> &data, TreeNode* parent = 0, int itype = -1)
     {
         parentitem = parent;
         itemdata = data;
         itemtype = itype;
-        deleted = del;
     };
 
     ~TreeNode()
