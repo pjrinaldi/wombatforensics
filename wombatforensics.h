@@ -276,34 +276,8 @@ public:
                             return QIcon(QPixmap(QString(":/basic/virtualfile")));
                         else
                         {
-                            QString estring = itemnode->Data(0).toString().split("-").first();
-                            QString pstring = itemnode->Data(0).toString().split("-").at(2);
-                            QString fstring = itemnode->Data(0).toString().split("-").at(3);
-                            QString tmpstr = "";
-                            QDir eviddir = QDir(wombatvariable.tmpmntpath);
-                            QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
-                            QFile propfile(wombatvariable.tmpmntpath + evidfiles.first().split(".evid").first() + "." + pstring + "." + fstring + ".prop");
-                            propfile.open(QIODevice::ReadOnly | QIODevice::Text);
-                            QTextStream in(&propfile);
-                            QString line = "";
-                            while(!in.atEnd())
-                            {
-                                line = in.readLine();
-                                if(line.contains("Allocation Status||"))
-                                {
-                                    tmpstr = line.split("||").at(1);
-                                    break;
-                                }
-                            }
-                            propfile.close();
-                            QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
-                            if(tmplist.count() > 1)
-                            {
-                                if(tmplist.first().contains("Unallocated") && tmplist.at(1).contains("Used"))
-                                    return QIcon(QPixmap(QString(":/basic/deletedfile")));
-                                else
-                                    return QIcon(QPixmap(QString(":/basic/treefile")));
-                            }
+                            if(itemnode->IsDeleted())
+                                return QIcon(QPixmap(QString(":/basic/deletedfile")));
                             else
                                 return QIcon(QPixmap(QString(":/basic/treefile")));
                         }
@@ -553,7 +527,7 @@ private:
                             parid = i.key();
                     }
                 }
-                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), columnstrings.at(11).toInt()));
+                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), columnstrings.at(11).toInt(), columnstrings.at(12).toInt()));
                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
                 if(checkhash.contains(columnstrings.at(0).split("-a").first()))
                     parents.value(curid)->SetChecked(true);

@@ -246,9 +246,15 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     treestring += mimetype.name().split("/").at(0) + "," + mimetype.name().split("/").at(1) + ",";
     if(tmpfile->meta != NULL)
+    {
         treestring += QString::number(tmpfile->meta->type);
+        if(((tmpfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((tmpfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
+            treestring += ",1";
+        else
+            treestring += ",0";
+    }
     else
-        treestring += "0";
+        treestring += "0,0";
     free(magicbuffer);
 
     /* alternative method using qt5 */
@@ -351,7 +357,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 adsout.flush();
                                 adsfile.close();
-                                treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << adsba.toBase64() << "," << ba2.toBase64() <<  "," << fsattr->size << ",0,0,0,0,0,0,0,10" << endl; 
+                                treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << adsba.toBase64() << "," << ba2.toBase64() <<  "," << fsattr->size << ",0,0,0,0,0,0,0,10,0" << endl; 
                                 filesfound++;
                                 isignals->ProgUpd();
                                 WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), QString::number(adssize - fsattr->size + 16), QString::number(fsattr->id));
@@ -564,7 +570,7 @@ void InitializeEvidenceStructure()
     // Write Evidence Properties Here...
     WriteEvidenceProperties(readimginfo);
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
-    QString volname = "Dummy Volume (NO FS)";
+    QString volname = "Dummy Volume (NO PART)";
     int voltype = 240;
     int volsectorsize = (int)readimginfo->sector_size;
     unsigned long long voloffset = 0;
