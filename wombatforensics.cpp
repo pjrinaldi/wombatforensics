@@ -1034,6 +1034,7 @@ void WombatForensics::RemEvidence()
             treeout << tmplist.at(i) << endl;
         }
     }
+    treefile.flush();
     treefile.close();
     qDebug() << "listeditems count:" << listeditems.count();
     QStringList foundlist = eviddir.entryList(QStringList(QString("*.p*.f*.a*")), QDir::Files | QDir::NoSymLinks);
