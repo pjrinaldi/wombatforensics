@@ -1006,6 +1006,9 @@ void WombatForensics::RemEvidence()
 {
     // if an evidence item is not selected, then move selection to it and remove then it...
     // also need to remove any thumbnails in the thumbs.db associated with it...
+    // DELETE TREEFILE AS WELL AS THE SINGLE FILeS *.p0.f*.a*
+    // treefile.remove()
+    // THEN I BUILD A NEW TREEFILE BASED OFF OF THE SINGLE FILES.
     QModelIndexList indexlist;
     QModelIndex curindex = selectedindex;
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() > 1)
@@ -1021,6 +1024,23 @@ void WombatForensics::RemEvidence()
     }
     listeditems.clear();
     treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
+    treefile.remove(); // delete treefile.
+    // find evidence files
+    // find volume files
+    // find partition files
+    // find files files
+    evidfiles.clear();
+    evidfiles = eviddir.entryList(QStringList(QString("*.p*.f*.a*")), QDir::Files | QDir::NoSymLinks);
+    treefile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream treeout(&treefile);
+    for(int i=0; i < evidfiles.count(); i++)
+    {
+        QFile tmpfile(evidfiles.at(i));
+        tmpfile.open(QIODevice::ReadOnly);
+        QString tmpstr = tmpfile.readLine();
+        QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+    }
+    /*
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
     treefile.close();
@@ -1062,6 +1082,7 @@ void WombatForensics::RemEvidence()
     //connect(treenodemodel, SIGNAL(layoutChanged()), this, SLOT(ResizeColumns()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     evidcnt--;
+    */
     StatusUpdate("Evidence Item Successfully Removed");
 }
 
