@@ -44,28 +44,6 @@
       <property name="childrenCollapsible">
        <bool>false</bool>
       </property>
-      <widget class="QStackedWidget" name="viewerstack">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Sunken</enum>
-       </property>
-       <widget class="QWidget" name="hexPage">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </widget>
       <widget class="QTreeView" name="dirTreeView">
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
@@ -88,6 +66,16 @@
        <property name="expandsOnDoubleClick">
         <bool>false</bool>
        </property>
+      </widget>
+      <widget class="QWidget" name="horizontalLayoutWidget">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QPlainTextEdit" name="plainTextEdit"/>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
