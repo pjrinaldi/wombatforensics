@@ -555,7 +555,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionByteConverter->setEnabled(true);
         StatusUpdate("Loading Hex Contents...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        //LoadHexContents();
+        LoadHexContents();
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
         if(propertywindow->isVisible())
@@ -576,8 +576,10 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
 
 void WombatForensics::ImgHexMenu(const QPoint &pt)
 {
+    /*
     if(hexselection.compare("") != 0)
         selectionmenu->exec(hexwidget->mapToGlobal(pt));
+    */
 }
 
 void WombatForensics::UpdateDataTable()
@@ -950,6 +952,15 @@ void WombatForensics::LoadHexContents()
     }
     if(wombatvariable.selectedid.split("-").count() <= 4) // image file
     {
+        off_t retval = 0;
+        char* imgbuffer = new char[tskobjptr->imglength];
+        //retval = tsk_img_read(tskobjptr->readimginfo, 0, imgbuffer, tskobjptr->imglength);
+        //QByteArray imgarr = QByteArray::fromRawData(imgbuffer, tskobjptr->imglength);
+        //hexview->clear();
+        //hexview->setData(new QHexView::DataStorageArray(imgarr));
+        //delete []imgbuffer;
+        //QByteArray filedata = QByteArray::fromRawData(ibuffer, imglen);
+        //retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         /*
         hexwidget->openimage();
         hexwidget->set1BPC();
@@ -1308,12 +1319,14 @@ void WombatForensics::SetupHexPage(void)
     // hex editor page
     QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
     QHBoxLayout* hexLayout = new QHBoxLayout();
-    hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
+    //hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
+    //QHexView* hexview = new QHexView;
+    //hexviewwidget->clear();
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
-    hexwidget->setObjectName("bt-hexview");
-    hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    //hexwidget->setObjectName("bt-hexview");
+    //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
     lineup = new QPushButton(QIcon(":/basic/lineup"), "", ui->hexPage);
     linedown = new QPushButton(QIcon(":/basic/linedown"), "", ui->hexPage);
     pageup = new QPushButton(QIcon(":/basic/pageup"), "", ui->hexPage);
@@ -1326,7 +1339,9 @@ void WombatForensics::SetupHexPage(void)
     lineup->setVisible(false);
     pageup->setVisible(false);
     pagedown->setVisible(false);
-    hexLayout->addWidget(hexwidget);
+    //hexLayout->addWidget(hexwidget);
+    //hexLayout->addWidget(hexview);
+    //hexviewwidget = dynamic_cast<QHexView*>(centralWidget());
     hexrocker = new WombatSlider(ui->hexPage);
     hexrocker->setRange(-100, 100);
     hexrocker->setValue(0);
@@ -1334,22 +1349,22 @@ void WombatForensics::SetupHexPage(void)
     hexrocker->setEnabled(false);
     hexLayout->addWidget(hexrocker);
     mainlayout->addLayout(hexLayout);
-    connect(linedown, SIGNAL(clicked()), hexwidget, SLOT(nextLine()));
-    connect(lineup, SIGNAL(clicked()), hexwidget, SLOT(prevLine()));
-    connect(pagedown, SIGNAL(clicked()), hexwidget, SLOT(nextPage()));
-    connect(pageup, SIGNAL(clicked()), hexwidget, SLOT(prevPage()));
+    //connect(linedown, SIGNAL(clicked()), hexwidget, SLOT(nextLine()));
+    //connect(lineup, SIGNAL(clicked()), hexwidget, SLOT(prevLine()));
+    //connect(pagedown, SIGNAL(clicked()), hexwidget, SLOT(nextPage()));
+    //connect(pageup, SIGNAL(clicked()), hexwidget, SLOT(prevPage()));
     connect(hexrocker, SIGNAL(ShowJumpFilter()), jumpfilterview, SLOT(DisplayFilter()));
-    connect(jumpfilterview, SIGNAL(SetOffset()), hexwidget, SLOT(SetOffset()));
-    connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    connect(hexrocker, SIGNAL(sliderMoved(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
+    //connect(jumpfilterview, SIGNAL(SetOffset()), hexwidget, SLOT(SetOffset()));
+    //connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
+    //connect(hexrocker, SIGNAL(sliderMoved(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
     connect(hexrocker, SIGNAL(sliderMoved(int)), this, SLOT(ShowRockerToolTip(int)));
     connect(hexrocker, SIGNAL(sliderReleased()), this, SLOT(ResetSlider()));
-    connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
-    connect(hexwidget, SIGNAL(SkipDown()), this, SLOT(SkipDown()));
-    connect(hexwidget, SIGNAL(SkipUp()), this, SLOT(SkipUp()));
-    connect(hexwidget, SIGNAL(PageUp()), this, SLOT(PageUp()));
-    connect(hexwidget, SIGNAL(PageDown()), this, SLOT(PageDown()));
-    connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
+    //connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
+    //connect(hexwidget, SIGNAL(SkipDown()), this, SLOT(SkipDown()));
+    //connect(hexwidget, SIGNAL(SkipUp()), this, SLOT(SkipUp()));
+    //connect(hexwidget, SIGNAL(PageUp()), this, SLOT(PageUp()));
+    //connect(hexwidget, SIGNAL(PageDown()), this, SLOT(PageDown()));
+    //connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
 }
 
 void WombatForensics::ShowRockerToolTip(int moved)

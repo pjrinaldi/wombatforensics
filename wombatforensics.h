@@ -25,6 +25,7 @@
 #include "digdeeperdialog.h"
 #include "aboutbox.h"
 #include "cancelthread.h"
+#include "QHexView.h"
 
 class WombatSlider : public QSlider
 {
@@ -736,7 +737,9 @@ private:
     QFile settingsfile;
     QFile casedatafile;
     off_t offset() const;
-    ImageHexViewer* hexwidget;
+    //ImageHexViewer* hexwidget;
+    //QHexView* hexview;
+    //QHexView* hexviewwidget;
     WombatSlider* hexrocker;
     QPushButton* lineup;
     QPushButton* linedown;
