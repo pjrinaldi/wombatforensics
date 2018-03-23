@@ -954,11 +954,11 @@ void WombatForensics::LoadHexContents()
     {
         off_t retval = 0;
         char* imgbuffer = new char[tskobjptr->imglength];
-        //retval = tsk_img_read(tskobjptr->readimginfo, 0, imgbuffer, tskobjptr->imglength);
-        //QByteArray imgarr = QByteArray::fromRawData(imgbuffer, tskobjptr->imglength);
+        retval = tsk_img_read(tskobjptr->readimginfo, 0, imgbuffer, tskobjptr->imglength);
+        QByteArray imgarr = QByteArray::fromRawData(imgbuffer, tskobjptr->imglength);
         //hexview->clear();
-        //hexview->setData(new QHexView::DataStorageArray(imgarr));
-        //delete []imgbuffer;
+        hexview->setData(imgarr);
+        delete []imgbuffer;
         //QByteArray filedata = QByteArray::fromRawData(ibuffer, imglen);
         //retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
         /*
@@ -1322,6 +1322,7 @@ void WombatForensics::SetupHexPage(void)
     //hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
     //QHexView* hexview = new QHexView;
     //hexviewwidget->clear();
+    hexview = new QHexEdit(this);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     //hexwidget->setObjectName("bt-hexview");
@@ -1341,6 +1342,7 @@ void WombatForensics::SetupHexPage(void)
     pagedown->setVisible(false);
     //hexLayout->addWidget(hexwidget);
     //hexLayout->addWidget(hexview);
+    hexLayout->addWidget(hexview);
     //hexviewwidget = dynamic_cast<QHexView*>(centralWidget());
     hexrocker = new WombatSlider(ui->hexPage);
     hexrocker->setRange(-100, 100);

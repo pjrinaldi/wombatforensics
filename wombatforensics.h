@@ -26,6 +26,7 @@
 #include "aboutbox.h"
 #include "cancelthread.h"
 #include "QHexView.h"
+#include "qhexedit.h"
 
 class WombatSlider : public QSlider
 {
@@ -740,6 +741,7 @@ private:
     //ImageHexViewer* hexwidget;
     //QHexView* hexview;
     //QHexView* hexviewwidget;
+    QHexEdit* hexview;
     WombatSlider* hexrocker;
     QPushButton* lineup;
     QPushButton* linedown;
