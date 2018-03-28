@@ -19,11 +19,11 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QSplitter>
-#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidget>
+#include "qhexedit.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -66,9 +66,8 @@ public:
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
-    QStackedWidget *viewerstack;
-    QWidget *hexPage;
     QTreeView *dirTreeView;
+    QHexEdit *hexview;
     QMenuBar *mainMenubar;
     QMenu *menuFile;
     QMenu *menuEvidence;
@@ -258,18 +257,6 @@ public:
         splitter->setSizePolicy(sizePolicy);
         splitter->setOrientation(Qt::Vertical);
         splitter->setChildrenCollapsible(false);
-        viewerstack = new QStackedWidget(splitter);
-        viewerstack->setObjectName(QStringLiteral("viewerstack"));
-        sizePolicy.setHeightForWidth(viewerstack->sizePolicy().hasHeightForWidth());
-        viewerstack->setSizePolicy(sizePolicy);
-        viewerstack->setFrameShape(QFrame::StyledPanel);
-        viewerstack->setFrameShadow(QFrame::Sunken);
-        hexPage = new QWidget();
-        hexPage->setObjectName(QStringLiteral("hexPage"));
-        sizePolicy.setHeightForWidth(hexPage->sizePolicy().hasHeightForWidth());
-        hexPage->setSizePolicy(sizePolicy);
-        viewerstack->addWidget(hexPage);
-        splitter->addWidget(viewerstack);
         dirTreeView = new QTreeView(splitter);
         dirTreeView->setObjectName(QStringLiteral("dirTreeView"));
         dirTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -280,6 +267,13 @@ public:
         dirTreeView->setAllColumnsShowFocus(true);
         dirTreeView->setExpandsOnDoubleClick(false);
         splitter->addWidget(dirTreeView);
+        hexview = new QHexEdit(splitter);
+        hexview->setObjectName(QStringLiteral("hexview"));
+        hexview->setBytesPerLine(41);
+        hexview->setHexCaps(true);
+        hexview->setDynamicBytesPerLine(true);
+        hexview->setReadOnly(true);
+        splitter->addWidget(hexview);
 
         horizontalLayout->addWidget(splitter);
 
@@ -492,6 +486,12 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionMediaViewer->setToolTip(QApplication::translate("WombatForensics", "Audio and Video Media Viewer", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
+#ifndef QT_NO_TOOLTIP
+        hexview->setToolTip(QApplication::translate("WombatForensics", "QHexEditWidget", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+#ifndef QT_NO_WHATSTHIS
+        hexview->setWhatsThis(QApplication::translate("WombatForensics", "QHexEdit widget allow to edit the data in hex view.", Q_NULLPTR));
+#endif // QT_NO_WHATSTHIS
         menuFile->setTitle(QApplication::translate("WombatForensics", "File", Q_NULLPTR));
         menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", Q_NULLPTR));
         menuAction->setTitle(QApplication::translate("WombatForensics", "Action", Q_NULLPTR));

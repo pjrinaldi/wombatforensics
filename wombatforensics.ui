@@ -67,15 +67,25 @@
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QWidget" name="horizontalLayoutWidget">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPlainTextEdit" name="plainTextEdit"/>
-        </item>
-        <item>
-         <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
-        </item>
-       </layout>
+      <widget class="QHexEdit" name="hexview">
+       <property name="toolTip">
+        <string>QHexEditWidget</string>
+       </property>
+       <property name="whatsThis">
+        <string>QHexEdit widget allow to edit the data in hex view.</string>
+       </property>
+       <property name="bytesPerLine">
+        <number>41</number>
+       </property>
+       <property name="hexCaps">
+        <bool>true</bool>
+       </property>
+       <property name="dynamicBytesPerLine">
+        <bool>true</bool>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
       </widget>
      </widget>
     </item>
@@ -624,6 +634,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QHexEdit</class>
+   <extends>QFrame</extends>
+   <header>qhexedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="wombatforensics.qrc"/>
  </resources>
