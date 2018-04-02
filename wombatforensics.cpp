@@ -576,6 +576,8 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
 
 void WombatForensics::ImgHexMenu(const QPoint &pt)
 {
+    if(ui->hexview->toReadableString().compare("") != 0)
+        selectionmenu->exec(ui->hexview->mapToGlobal(pt));
     /*
     if(hexselection.compare("") != 0)
         selectionmenu->exec(hexwidget->mapToGlobal(pt));
@@ -1326,6 +1328,11 @@ void WombatForensics::SetupHexPage(void)
     //hexview = new QHexEdit(this);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
+    ui->hexview->setContextMenuPolicy(Qt::CustomContextMenu);
+    //connect(ui->hexview, SIGNAL(dataChanged()), this, SLOT(DataChanged()));
+    //connect(ui->hexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetAddress(qint64)));
+    connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
+
     //hexwidget->setObjectName("bt-hexview");
     //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     //hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
