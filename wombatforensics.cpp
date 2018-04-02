@@ -576,7 +576,7 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
 
 void WombatForensics::ImgHexMenu(const QPoint &pt)
 {
-    if(ui->hexview->toReadableString().compare("") != 0)
+    if(ui->hexview->selectionToReadableString().size() > 0)
         selectionmenu->exec(ui->hexview->mapToGlobal(pt));
     /*
     if(hexselection.compare("") != 0)
@@ -955,17 +955,20 @@ void WombatForensics::LoadHexContents()
     if(wombatvariable.selectedid.split("-").count() <= 4) // image file
     {
         off_t retval = 0;
-        char* imgbuffer = new char[tskobjptr->imglength];
-        retval = tsk_img_read(tskobjptr->readimginfo, 0, imgbuffer, tskobjptr->imglength);
-        QByteArray imgarr = QByteArray::fromRawData(imgbuffer, tskobjptr->imglength);
-        QBuffer imgbuf;
+        char* imgbuffer = new char[tskobjptr->readimginfo->size];
+        retval = tsk_img_read(tskobjptr->readimginfo, 0, imgbuffer, tskobjptr->readimginfo->size);
+        QByteArray imgarr = QByteArray::fromRawData(imgbuffer, tskobjptr->readimginfo->size);
+        //QBuffer imgbuf;
         //QBuffer imgbuf(&imgarr);
-        imgbuf.open(QIODevice::ReadOnly);
-        imgbuf.read(imgbuffer, tskobjptr->imglength);
+        //imgbuf.open(QIODevice::ReadOnly);
+        //imgbuf.read(imgbuffer, tskobjptr->imglength);
         //hexview->clear();
-        ui->hexview->setData(imgbuf);
+        //ui->hexview->setData(imgbuf);
         //imgbuf.close();
-        //ui->hexview->setData(imgarr);
+        // this works, but using a bytearray loads whole thing into memory...
+        // will either have to build my own chunck load from a bytearray or mount e01 to dd, so then i can
+        // load it like a file and make use of QIODevice...
+        ui->hexview->setData(imgarr);
         //delete []imgbuffer;
         
         //QByteArray filedata = QByteArray::fromRawData(ibuffer, imglen);
@@ -1744,6 +1747,7 @@ void WombatForensics::UpdateThumbnails(int tsize)
 
 void WombatForensics::UpdateSelectValue(const QString &txt)
 {
+    /*
     if(txt.compare("") != 0)
     {
         ui->actionCopy_Selection_To->setEnabled(true);
@@ -1845,6 +1849,7 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     bytetext += "</td></tr>";
     bytetext += "</table>";
     byteviewer->SetText(bytetext);
+    */
 }
 
 void WombatForensics::SetOffsetLabel(off_t pos)
