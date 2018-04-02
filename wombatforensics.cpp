@@ -1339,7 +1339,7 @@ void WombatForensics::SetupHexPage(void)
     setAutoFillBackground(true);
     ui->hexview->setContextMenuPolicy(Qt::CustomContextMenu);
     //connect(ui->hexview, SIGNAL(dataChanged()), this, SLOT(DataChanged()));
-    //connect(ui->hexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetAddress(qint64)));
+    connect(ui->hexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetOffsetLabel(qint64)));
     connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
 
     //hexwidget->setObjectName("bt-hexview");
@@ -1852,7 +1852,8 @@ void WombatForensics::UpdateSelectValue(const QString &txt)
     */
 }
 
-void WombatForensics::SetOffsetLabel(off_t pos)
+//void WombatForensics::SetOffsetLabel(off_t pos)
+void WombatForensics::SetOffsetLabel(qint64 pos)
 {
     QString label;
     label = "Offset: ";
