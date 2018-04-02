@@ -670,6 +670,7 @@ private slots:
     void SkipUp(void);
     void PageUp(void);
     void PageDown(void);
+    void HexSelectionChanged(void);
     void UpdateSelectValue(const QString &txt);
     void UpdateDataTable(void);
     void UpdateStatus(void);

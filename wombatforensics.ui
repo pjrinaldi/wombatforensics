@@ -69,7 +69,10 @@
       </widget>
       <widget class="QHexEdit" name="hexview">
        <property name="toolTip">
-        <string>QHexEditWidget</string>
+        <string/>
+       </property>
+       <property name="toolTipDuration">
+        <number>0</number>
        </property>
        <property name="whatsThis">
         <string>QHexEdit widget allow to edit the data in hex view.</string>

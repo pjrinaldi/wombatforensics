@@ -269,6 +269,7 @@ public:
         splitter->addWidget(dirTreeView);
         hexview = new QHexEdit(splitter);
         hexview->setObjectName(QStringLiteral("hexview"));
+        hexview->setToolTipDuration(0);
         hexview->setBytesPerLine(41);
         hexview->setHexCaps(true);
         hexview->setDynamicBytesPerLine(true);
@@ -487,7 +488,7 @@ public:
         actionMediaViewer->setToolTip(QApplication::translate("WombatForensics", "Audio and Video Media Viewer", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_TOOLTIP
-        hexview->setToolTip(QApplication::translate("WombatForensics", "QHexEditWidget", Q_NULLPTR));
+        hexview->setToolTip(QString());
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_WHATSTHIS
         hexview->setWhatsThis(QApplication::translate("WombatForensics", "QHexEdit widget allow to edit the data in hex view.", Q_NULLPTR));

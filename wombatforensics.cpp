@@ -1341,6 +1341,7 @@ void WombatForensics::SetupHexPage(void)
     //connect(ui->hexview, SIGNAL(dataChanged()), this, SLOT(DataChanged()));
     connect(ui->hexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetOffsetLabel(qint64)));
     connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
+    connect(ui->hexview, SIGNAL(selectionChanged()), this, SLOT(HexSelectionChanged()));
 
     //hexwidget->setObjectName("bt-hexview");
     //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -1743,6 +1744,12 @@ void WombatForensics::UpdateThumbnails(int tsize)
 {
     thumbsize = tsize;
     imagewindow->UpdateGeometries();
+}
+
+void WombatForensics::HexSelectionChanged()
+{
+    QString tmptext = "Length: " + QString::number(ui->hexview->GetSelectionLength());
+    selectedhex->setText(tmptext);
 }
 
 void WombatForensics::UpdateSelectValue(const QString &txt)

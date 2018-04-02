@@ -807,7 +807,8 @@ void QHexEdit::mouseMoveEvent(QMouseEvent * event)
 
 void QHexEdit::mousePressEvent(QMouseEvent * event)
 {
-    if(event->buttons() == Qt::LeftButton)
+    // Added by Pasquale J. Rinaldi, Jr. Apr. 2018
+    if(event->buttons() == Qt::LeftButton) // ensures a right click context menu will open and the below only occurs for left mouse click
     {
         _blink = false;
         viewport()->update();
@@ -998,6 +999,8 @@ void QHexEdit::resetSelection()
 {
     _bSelectionBegin = _bSelectionInit;
     _bSelectionEnd = _bSelectionInit;
+
+    emit selectionChanged();
 }
 
 void QHexEdit::resetSelection(qint64 pos)
@@ -1011,6 +1014,8 @@ void QHexEdit::resetSelection(qint64 pos)
     _bSelectionInit = pos;
     _bSelectionBegin = pos;
     _bSelectionEnd = pos;
+    
+    emit selectionChanged();
 }
 
 void QHexEdit::setSelection(qint64 pos)
@@ -1031,6 +1036,8 @@ void QHexEdit::setSelection(qint64 pos)
         _bSelectionBegin = pos;
         _bSelectionEnd = _bSelectionInit;
     }
+    
+    emit selectionChanged();
 }
 
 int QHexEdit::getSelectionBegin()

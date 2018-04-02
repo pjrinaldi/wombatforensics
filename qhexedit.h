@@ -278,6 +278,10 @@ signals:
     /*! The signal is emitted every time, the overwrite mode is changed. */
     void overwriteModeChanged(bool state);
 
+    /*! The signal is emitted every time, the selection is changed. */
+    // Added by Pasquale J. Rinaldi, Jr. Apr. 2018 to enable displaying the selection length.
+    void selectionChanged(); 
+
 
 /*! \cond docNever */
 public:
@@ -328,6 +332,11 @@ public:
 
     QColor selectionColor();
     void setSelectionColor(const QColor &color);
+
+    unsigned long long GetSelectionLength()
+    {
+        return (getSelectionEnd() - getSelectionBegin());
+    };
 
 protected:
     // Handle events
