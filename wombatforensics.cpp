@@ -958,8 +958,14 @@ void WombatForensics::LoadHexContents()
         char* imgbuffer = new char[tskobjptr->imglength];
         retval = tsk_img_read(tskobjptr->readimginfo, 0, imgbuffer, tskobjptr->imglength);
         QByteArray imgarr = QByteArray::fromRawData(imgbuffer, tskobjptr->imglength);
+        QBuffer imgbuf;
+        //QBuffer imgbuf(&imgarr);
+        imgbuf.open(QIODevice::ReadOnly);
+        imgbuf.read(imgbuffer, tskobjptr->imglength);
         //hexview->clear();
-        ui->hexview->setData(imgarr);
+        ui->hexview->setData(imgbuf);
+        //imgbuf.close();
+        //ui->hexview->setData(imgarr);
         //delete []imgbuffer;
         
         //QByteArray filedata = QByteArray::fromRawData(ibuffer, imglen);
