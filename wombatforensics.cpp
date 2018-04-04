@@ -746,12 +746,17 @@ void WombatForensics::LoadHexContents()
         {
             tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
         }
+        testfile.setFileName(tskobjptr->imagepartspath[0]);
+        //testdevice = new EvidenceDevice(tskobjptr->partcount, tskobjptr->imagepartspath);
+
+        /*
         tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
         if(tskobjptr->readimginfo == NULL)
         {
             qDebug() << tsk_error_get_errstr();
             LogMessage("Image opening error");
         }
+        */
         free(tskobjptr->imagepartspath);
     }
     else if(wombatvariable.selectedid.split("-").count() == 2) // volume file
@@ -954,10 +959,24 @@ void WombatForensics::LoadHexContents()
     }
     if(wombatvariable.selectedid.split("-").count() <= 4) // image file
     {
+
+        ui->hexview->setData(testfile);
+        //qint64 bytesread = 0;
+        //qDebug() << "e01 size:" << tskobjptr->readimginfo->size;
+        //char* imgbuffer = new char[tskobjptr->readimginfo->size];
+        //bytesread = testdevice->readData(imgbuffer, tskobjptr->readimginfo->size);
+        //char* imgbuffer = new char[testdevice->ImageSize()];
+        //bytesread = testdevice->readData(imgbuffer, testdevice->ImageSize());
+        //qDebug() << "imgbuffer size:" << strlen(imgbuffer);
+        //qDebug() << "bytes read:" << bytesread;
+        //if(bytesread > 0)
+        //ui->hexview->setData(*testdevice);
+        /*
         off_t retval = 0;
         char* imgbuffer = new char[tskobjptr->readimginfo->size];
         retval = tsk_img_read(tskobjptr->readimginfo, 0, imgbuffer, tskobjptr->readimginfo->size);
         QByteArray imgarr = QByteArray::fromRawData(imgbuffer, tskobjptr->readimginfo->size);
+        */
         //QBuffer imgbuf;
         //QBuffer imgbuf(&imgarr);
         //imgbuf.open(QIODevice::ReadOnly);
@@ -968,7 +987,11 @@ void WombatForensics::LoadHexContents()
         // this works, but using a bytearray loads whole thing into memory...
         // will either have to build my own chunck load from a bytearray or mount e01 to dd, so then i can
         // load it like a file and make use of QIODevice...
+
+        /*
         ui->hexview->setData(imgarr);
+        */
+
         //delete []imgbuffer;
         
         //QByteArray filedata = QByteArray::fromRawData(ibuffer, imglen);

@@ -28,6 +28,7 @@
 //#include "QHexView.h"
 //#include "qhexedit.h"
 
+/*
 class WombatSlider : public QSlider
 {
     Q_OBJECT
@@ -51,6 +52,59 @@ protected:
             QSlider::mousePressEvent(event);
         }
     };
+};
+*/
+
+class EvidenceDevice : public QIODevice
+{
+public:
+    //const TSK_TCHAR** imagepartspath;
+    EvidenceDevice(int partcount, const TSK_TCHAR** imgpartspath)
+    {
+        length = 0;
+        position = 0;
+        // load tsk img_info data here...
+        readimginfo = tsk_img_open(partcount, imgpartspath, TSK_IMG_TYPE_DETECT, 0);
+        if(readimginfo == NULL)
+        {
+            qDebug() << tsk_error_get_errstr();
+        }
+        QIODevice::open(QIODevice::ReadOnly);
+        emit readyRead();
+    };
+
+    qint64 readData(char* data, qint64 maxlen)
+    {
+        qint64 retval = -1;
+        retval = tsk_img_read(readimginfo, 0, data, maxlen);
+        qDebug() << "data length:" << strlen(data);
+        // call tsk_read for all the img data here...
+        // return bytes read from tsk_read
+        return retval;
+    };
+
+    qint64 writeData(const char* data, qint64 len)
+    {
+        return -1;
+    };
+
+    qint64 ImageSize(void)
+    {
+        return readimginfo->size;
+    };
+
+    /*
+    qint64 BytesAvailable() const
+    {
+        return readimginfo->
+    };
+    */
+
+private:
+    qint64 length;
+    qint64 position;
+    char* bufferref;
+    TSK_IMG_INFO* readimginfo;
 };
 
 class TreeNodeModel : public QAbstractItemModel
@@ -745,6 +799,8 @@ private:
     //QHexView* hexviewwidget;
     //QHexEdit* hexview;
     //WombatSlider* hexrocker;
+    EvidenceDevice* testdevice;
+    QFile testfile;
     QPushButton* lineup;
     QPushButton* linedown;
     QPushButton* pageup;
