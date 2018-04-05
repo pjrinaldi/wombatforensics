@@ -8,6 +8,7 @@ QFile logfile;
 QFile viewerfile;
 QFile treefile;
 QDir thumbdir;
+QDir currentrawimagedir;
 QTextEdit* msglog = NULL;
 QFutureWatcher<void> thumbwatcher;
 QFutureWatcher<void> secondwatcher;

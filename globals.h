@@ -12,6 +12,7 @@ extern QFile logfile;
 extern QFile viewerfile;
 extern QFile treefile;
 extern QDir thumbdir;
+extern QDir currentrawimagedir;
 extern QTextEdit* msglog;
 extern QFutureWatcher<void> thumbwatcher;
 extern QFutureWatcher<void> secondwatcher;

@@ -590,8 +590,19 @@ void WombatForensics::UpdateDataTable()
     LogMessage("Evidence has been successfully added");
     StatusUpdate("Evidence ready");
 }
+
+void WombatForensics::PrepareEvidenceImage()
+{
+    qDebug() << "evidnecename:" << wombatvariable.evidencename;
+}
+
 void WombatForensics::UpdateStatus()
 {
+    StatusUpdate("Preparing Evidence Image...");
+    LogMessage("Preparing Evidence Image...");
+    PrepareEvidenceImage();
+    StatusUpdate("Evidence Image Ready...");
+    LogMessage("Evidence Image Ready...");
     StatusUpdate("Building Initial Evidence Tree...");
     LogMessage("Building Initial Evidence Tree...");
     treefile.close();

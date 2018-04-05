@@ -755,6 +755,7 @@ private slots:
     void CarveFile(void);
     void AutoSaveState(void);
     void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
+    void PrepareEvidenceImage(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
