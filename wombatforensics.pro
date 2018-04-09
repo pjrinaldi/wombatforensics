@@ -14,7 +14,7 @@ SOURCES = main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp curs
 RESOURCES += wombatforensics.qrc
 DESTDIR = ./
 mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk 
-linux:LIBS = -lewf -ltsk
+linux:LIBS = -lewf -ltsk -lguestfs
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 win32:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)d
 }

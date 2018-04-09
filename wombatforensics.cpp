@@ -401,14 +401,24 @@ void WombatForensics::InitializeCaseStructure()
         casefile.close();
         QString mkfsstr = "mkfs.btrfs -q ";
         mkfsstr += wombatvariable.casename;
+        /*
         QString name = qgetenv("USER");
         if(name.isEmpty())
             name = qgetenv("USERNAME");
+        */
+        QProcess::execute(mkfsstr);
+        // call guestfs using code
+        guestfs_h* g = guestfs_create();
+        guestfs_add_drive(g, wombatvariable.casename.toStdString().c_str());
+        guestfs_launch(g);
+        guestfs_mount(g, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
+        /*
         QString lnstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
         QString mntstr = "mount " + wombatvariable.tmpmntpath;
         QProcess::execute(mkfsstr);
         QProcess::execute(lnstr);
         QProcess::execute(mntstr);
+        */
         /*
         //pkexec calls the required gui prompt for sudo or a terminal if gui not available.
         QString mntstr = "sudo mount -o loop ";

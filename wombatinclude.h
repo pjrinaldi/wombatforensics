@@ -87,6 +87,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <guestfs.h>
+
 #include "tskvariable.h"
 #include "cursor.h"
 
