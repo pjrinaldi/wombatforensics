@@ -329,14 +329,20 @@ void WombatForensics::HideByteViewer(bool checkstate)
 void WombatForensics::InitializeAppStructure()
 {
     wombatvariable.iscaseopen = false;
+    QString tmppath = QDir::tempPath();
+    tmppath += "/wombatforensics/";
     QString homepath = QDir::homePath();
     homepath += "/.wombatforensics/";
-    wombatvariable.tmpfilepath = homepath + "tmpfiles/";
-    wombatvariable.tmpmntpath = homepath + "mntpt/";
+    wombatvariable.tmpfilepath = tmppath + "tmpfiles/";
+    wombatvariable.tmpmntpath = tmppath + "mntpt/";
+    //wombatvariable.tmpfilepath = homepath + "tmpfiles/"; // old one
+    //wombatvariable.tmpmntpath = homepath + "mntpt/"; // old one
     if((new QDir())->mkpath(wombatvariable.tmpfilepath) == false)
         DisplayError("1.3", "App tmpfile folder failed", "App Tmpfile folder was not created");
     if((new QDir())->mkpath(wombatvariable.tmpmntpath) == false)
         DisplayError("1.2", "App tmpmnt folder failed", "App tmpmnt folder was not created");
+    if((new QDir())->mkpath(homepath) == false)
+        DisplayError("1.4", "App homepath folder failed", "App homepath folder was not created");
     viewerfile.setFileName(homepath + "viewers");
     if(!FileExists(QString(homepath + "viewers").toStdString()))
     {
@@ -398,6 +404,12 @@ void WombatForensics::InitializeCaseStructure()
         QString name = qgetenv("USER");
         if(name.isEmpty())
             name = qgetenv("USERNAME");
+        QString lnstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
+        QString mntstr = "mount " + wombatvariable.tmpmntpath;
+        QProcess::execute(mkfsstr);
+        QProcess::execute(lnstr);
+        QProcess::execute(mntstr);
+        /*
         //pkexec calls the required gui prompt for sudo or a terminal if gui not available.
         QString mntstr = "sudo mount -o loop ";
         mntstr += wombatvariable.casename;
@@ -407,6 +419,7 @@ void WombatForensics::InitializeCaseStructure()
         QProcess::execute(mkfsstr);
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
+        */
         /*
         // PKEXEC WORKAROUND - works without privilege escalation, just a little slower...
         // now requires guestmount which is a part of libguestfs-tools
@@ -1060,8 +1073,15 @@ void WombatForensics::CloseCurrentCase()
     // WRITE MSGLOG TO FILE HERE...
     //QString umntstr = "pkexec umount ";
     //umntstr += wombatvariable.tmpmntpath;
+
+    QString unmntstr = "umount " + wombatvariable.tmpmntpath;
+    QString rmlnstr = "rm /tmp/wombatforensics/currentwfc";
+    QProcess::execute(unmntstr);
+    QProcess::execute(rmlnstr);
+    /*
     QString umntstr = "sudo umount " + wombatvariable.tmpmntpath;
     QProcess::execute(umntstr);
+    */
     /*
     QString umntstr = "guestunmount " + wombatvariable.tmpmntpath;
     QProcess::execute(umntstr);
