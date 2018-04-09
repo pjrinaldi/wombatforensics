@@ -408,10 +408,10 @@ void WombatForensics::InitializeCaseStructure()
         */
         QProcess::execute(mkfsstr);
         // call guestfs using code
-        guestfs_h* g = guestfs_create();
-        guestfs_add_drive(g, wombatvariable.casename.toStdString().c_str());
-        guestfs_launch(g);
-        guestfs_mount(g, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
+        guestg = guestfs_create();
+        guestfs_add_drive(guestg, wombatvariable.casename.toStdString().c_str());
+        guestfs_launch(guestg);
+        guestfs_mount(guestg, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
         /*
         QString lnstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
         QString mntstr = "mount " + wombatvariable.tmpmntpath;
@@ -1084,10 +1084,15 @@ void WombatForensics::CloseCurrentCase()
     //QString umntstr = "pkexec umount ";
     //umntstr += wombatvariable.tmpmntpath;
 
+    /*
     QString unmntstr = "umount " + wombatvariable.tmpmntpath;
     QString rmlnstr = "rm /tmp/wombatforensics/currentwfc";
     QProcess::execute(unmntstr);
     QProcess::execute(rmlnstr);
+    */
+    guestfs_umount(guestg, wombatvariable.tmpmntpath.toStdString().c_str());
+    guestfs_shutdown(guestg);
+    guestfs_close(guestg);
     /*
     QString umntstr = "sudo umount " + wombatvariable.tmpmntpath;
     QProcess::execute(umntstr);
