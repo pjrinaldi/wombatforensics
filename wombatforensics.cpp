@@ -407,36 +407,20 @@ void WombatForensics::InitializeCaseStructure()
             name = qgetenv("USERNAME");
         */
         QProcess::execute(mkfsstr);
+
+        /*
         // call guestfs using code
         guestg = guestfs_create();
         guestfs_add_drive(guestg, wombatvariable.casename.toStdString().c_str());
         guestfs_launch(guestg);
         guestfs_mount(guestg, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
-        /*
+        */
+
         QString lnstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
         QString mntstr = "mount " + wombatvariable.tmpmntpath;
-        QProcess::execute(mkfsstr);
         QProcess::execute(lnstr);
         QProcess::execute(mntstr);
-        */
-        /*
-        //pkexec calls the required gui prompt for sudo or a terminal if gui not available.
-        QString mntstr = "sudo mount -o loop ";
-        mntstr += wombatvariable.casename;
-        mntstr += " ";
-        mntstr += wombatvariable.tmpmntpath;
-        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
-        QProcess::execute(mkfsstr);
-        QProcess::execute(mntstr);
-        QProcess::execute(chownstr);
-        */
-        /*
-        // PKEXEC WORKAROUND - works without privilege escalation, just a little slower...
-        // now requires guestmount which is a part of libguestfs-tools
-        QProcess::execute(mkfsstr);
-        QString mntstr = "guestmount -a " + wombatvariable.casename + " -m /dev/sda " + wombatvariable.tmpmntpath;
-        QProcess::execute(mntstr);
-        */
+
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
@@ -1081,26 +1065,18 @@ void WombatForensics::CloseCurrentCase()
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
     // WRITE MSGLOG TO FILE HERE...
-    //QString umntstr = "pkexec umount ";
-    //umntstr += wombatvariable.tmpmntpath;
 
-    /*
     QString unmntstr = "umount " + wombatvariable.tmpmntpath;
     QString rmlnstr = "rm /tmp/wombatforensics/currentwfc";
     QProcess::execute(unmntstr);
     QProcess::execute(rmlnstr);
-    */
+
+    /*
     guestfs_umount(guestg, wombatvariable.tmpmntpath.toStdString().c_str());
     guestfs_shutdown(guestg);
     guestfs_close(guestg);
-    /*
-    QString umntstr = "sudo umount " + wombatvariable.tmpmntpath;
-    QProcess::execute(umntstr);
     */
-    /*
-    QString umntstr = "guestunmount " + wombatvariable.tmpmntpath;
-    QProcess::execute(umntstr);
-    */
+
     StatusUpdate("Current Case was closed successfully");
     RemoveTmpFiles();
     wombatvariable.iscaseopen = false;
