@@ -399,14 +399,14 @@ void WombatForensics::InitializeCaseStructure()
         casefile.open(QIODevice::ReadWrite);
         casefile.resize(1000000000);
         casefile.close();
+        // make btrfs partition
         QString mkfsstr = "mkfs.btrfs -q ";
         mkfsstr += wombatvariable.casename;
-        /*
+        QProcess::execute(mkfsstr);
+        // determine the current username for chown
         QString name = qgetenv("USER");
         if(name.isEmpty())
             name = qgetenv("USERNAME");
-        */
-        QProcess::execute(mkfsstr);
 
         /*
         // call guestfs using code
@@ -416,11 +416,10 @@ void WombatForensics::InitializeCaseStructure()
         guestfs_mount(guestg, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
         */
 
-        QString lnstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
-        QString mntstr = "mount " + wombatvariable.tmpmntpath;
-        QProcess::execute(lnstr);
+        QString mntstr = "sudo mount -o loop " + wombatvariable.casename + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
-
+        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
+        QProcess::execute(chownstr);
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
@@ -472,14 +471,13 @@ void WombatForensics::InitializeOpenCase()
         QProcess::execute(chownstr);
         OpenCaseMountFinished(0, QProcess::NormalExit);
         /* END TEMP CODE */
-        //QProcess::execute(mkfsstr); // don't need since i'm opening an existing case, not creating a new case.
         /*
-        QString mntstr = "guestmount -a " + wombatvariable.casename + " -m /dev/sda " + wombatvariable.tmpmntpath;
-        QProcess* openprocess = new QProcess(this);
-        connect(openprocess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(OpenCaseMountFinished(int, QProcess::ExitStatus)));
-        openprocess->start(mntstr);
+        // call guestfs using code
+        guestg = guestfs_create();
+        guestfs_add_drive(guestg, wombatvariable.casename.toStdString().c_str());
+        guestfs_launch(guestg);
+        guestfs_mount(guestg, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
         */
-        //QProcess::execute(mntstr);
     }
 }
 
@@ -1066,10 +1064,8 @@ void WombatForensics::CloseCurrentCase()
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
     // WRITE MSGLOG TO FILE HERE...
 
-    QString unmntstr = "umount " + wombatvariable.tmpmntpath;
-    QString rmlnstr = "rm /tmp/wombatforensics/currentwfc";
+    QString unmntstr = "sudo umount " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);
-    QProcess::execute(rmlnstr);
 
     /*
     guestfs_umount(guestg, wombatvariable.tmpmntpath.toStdString().c_str());
