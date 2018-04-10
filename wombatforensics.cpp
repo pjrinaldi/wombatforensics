@@ -469,7 +469,6 @@ void WombatForensics::InitializeOpenCase()
         QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
-        OpenCaseMountFinished(0, QProcess::NormalExit);
         /* END TEMP CODE */
         /*
         // call guestfs using code
@@ -478,6 +477,7 @@ void WombatForensics::InitializeOpenCase()
         guestfs_launch(guestg);
         guestfs_mount(guestg, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
         */
+        OpenCaseMountFinished(0, QProcess::NormalExit);
     }
 }
 
