@@ -532,6 +532,19 @@ void cnid_to_array(uint32_t cnid, uint8_t array[4])
     array[0] = (cnid >> 24) & 0xff;
 }
 
+int SegmentDigits(int number)
+{
+    if(number < 10)
+        return 1;
+    int count = 0;
+    while(number > 0)
+    {
+        number /= 10;
+        count++;
+    }
+    return count;
+}
+
 void InitializeEvidenceStructure()
 {
     readimginfo = NULL;
@@ -551,6 +564,9 @@ void InitializeEvidenceStructure()
         errorcount++;
     }
     free(images);
+    wombatvariable.imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
+    //wombatvariable.segmentcount = readimginfo->num_img; // number of segments for xmount call (TSK 4.3)
+    wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
     QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + QString::number(evidcnt));
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);

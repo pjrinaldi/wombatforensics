@@ -18,6 +18,8 @@ struct WombatVariable
     QString casename;
     QString casepath;
     QString selectedid;
+    int segmentcount;
+    TSK_IMG_TYPE_ENUM imgtype;
 };
 
 typedef struct

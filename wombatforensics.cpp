@@ -718,6 +718,31 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
+    int digitcount = SegmentDigits(wombatvariable.segmentcount);
+
+    if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
+    {
+        qDebug() << "launch xmount with imgname.A and" << digitcount << "?'s.";
+    }
+    else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
+    {
+        qDebug() << "launch xmount with imgname.E and" << digitcount << "?'s.";
+    }
+    else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
+    {
+        if(wombatvariable.segmentcount > 1) // multi segment
+        {
+            qDebug() << "open with xmount with imgname. and" << digitcount << "?'s.";
+        }
+        else
+        {
+            qDebug() << "just load the image in the editor, no modifications needed";
+        }
+    }
+    else
+    {
+        qDebug() << "image format:" << tsk_img_type_toname(wombatvariable.imgtype) << "not supported";
+    }
     /*
      *
      * NEED TO REIMPLEMENT THIS WHOLE FUCNTIONALITY WITH THE NEW EDITOR. WILL LEVERAGE EWFMOUNT TO MOUNT AN E01 AS VIRTUAL DD
