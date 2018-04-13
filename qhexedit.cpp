@@ -855,6 +855,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         }
 
         // paint hex and ascii area
+        // Added by Pasquale J. Rinaldi Jr. Apr. 2018
+        // ATTEMPT TO ADD COLOR HIGHLIGHTING FOR WHETHER IT IS SLACK, OR CONTENT FOR FILE...
         QPen colStandard = QPen(viewport()->palette().color(QPalette::WindowText));
 
         painter.setBackgroundMode(Qt::TransparentMode);
