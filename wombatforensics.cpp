@@ -730,6 +730,17 @@ void WombatForensics::LoadHexContents()
      * THEN I NEED TO COLOR CODING IN THE HEXEDITOR, PROBABLY... CAN GET IT TO WORK...
      *
      */ 
+
+    // FIXING THIS CODE SHOULD ENABLE REMOVAL OF THE TSKOBJPTR AND TSKOBJ AND TSKVARIABLE.H. I SHOULDN'T NEED TO PASS ANYTHING
+    // COMPLEX OTHER THAN THE VARIABLES MENTIONED BELOW
+
+    // PROCESS TO OPEN A FILE...
+    // 1. GET THE OFFSET, FILE SIZE, AND BLOCKS/MFT ENTRY/ADS ATTRIBUTE FOR THE FILE...
+    // 2. SET HEX EDITOR TO THE NECESSARY OFFSET FOR START OF THE FILE
+    // 3. USE BLOCKS TO COLOR CODE THE FILE CONTENT BLUE, (BLOCK TOTAL * BLOCK SIZE) - FILE SIZE TO COLOR SLACK RED
+    // 3A. IF I CAN'T COLOR CODE THE CONTENT DISPLAY, MIGHT WANT TO POPUP INFORMATION IN EDITOR WHICH SHOWS INFO FOR FILE...
+    // 4. FOR FILEHEXVIEWER, JUST WRITE THE FILE TO TMP FILE AND THEN LOAD IN EDITOR. COLOR CODE THE SLACK USING ABOVE FORMULA SLACK.
+    
     if(tskobjptr->readimginfo != NULL)
     {
         tsk_img_close(tskobjptr->readimginfo);
@@ -789,6 +800,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedid.split("-").count() == 2) // volume file
     {
+        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
@@ -828,9 +840,11 @@ void WombatForensics::LoadHexContents()
         tskobjptr->imglength = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tskobjptr->sectsize = vollist.at(3).toInt();
         tskobjptr->blocksize = vollist.at(3).toInt();
+        */
     }
     else if(wombatvariable.selectedid.split("-").count() == 3) // partition file
     {
+        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
@@ -870,6 +884,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->length = partlist.at(1).toULongLong();
         tskobjptr->sectsize = evidlist.at(2).toInt();
         tskobjptr->blocksize = partlist.at(6).toInt();
+        */
     }
     else if(wombatvariable.selectedid.split("-").count() == 4) // file file
     {
