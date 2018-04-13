@@ -335,6 +335,7 @@ void WombatForensics::InitializeAppStructure()
     homepath += "/.wombatforensics/";
     wombatvariable.tmpfilepath = tmppath + "tmpfiles/";
     wombatvariable.tmpmntpath = tmppath + "mntpt/";
+    wombatvariable.imgdatapath = tmppath + "datamnt/";
     //wombatvariable.tmpfilepath = homepath + "tmpfiles/"; // old one
     //wombatvariable.tmpmntpath = homepath + "mntpt/"; // old one
     if((new QDir())->mkpath(wombatvariable.tmpfilepath) == false)
@@ -343,6 +344,8 @@ void WombatForensics::InitializeAppStructure()
         DisplayError("1.2", "App tmpmnt folder failed", "App tmpmnt folder was not created");
     if((new QDir())->mkpath(homepath) == false)
         DisplayError("1.4", "App homepath folder failed", "App homepath folder was not created");
+    if((new QDir())->mkpath(wombatvariable.imgdatapath) == false)
+        DisplayError("1.5", "App imgdatapath folder failed", "App imgdatapath folder was not created");
     viewerfile.setFileName(homepath + "viewers");
     if(!FileExists(QString(homepath + "viewers").toStdString()))
     {
@@ -598,7 +601,92 @@ void WombatForensics::UpdateDataTable()
 
 void WombatForensics::PrepareEvidenceImage()
 {
-    qDebug() << "evidnecename:" << wombatvariable.evidencename;
+    qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
+    QString xmntstr = "";
+    if(wombatvariable.segmentcount > 1)
+    {
+        int digitcount = SegmentDigits(wombatvariable.segmentcount);
+
+        xmntstr = "xmount --in ";
+
+        if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
+        {
+            xmntstr += "aff ";
+            xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".A";
+            qDebug() << "launch xmount with imgname.A and" << digitcount << "?'s.";
+        }
+        else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
+        {
+            xmntstr += "ewf ";
+            xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".E";
+            qDebug() << "launch xmount with imgname.E and" << digitcount << "?'s.";
+        }
+        else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
+        {
+            xmntstr += "raw ";
+            xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".";
+            qDebug() << "open with xmount with imgname. and" << digitcount << "?'s.";
+        }
+        else
+        {
+            qDebug() << "image format:" << tsk_img_type_toname(wombatvariable.imgtype) << "not supported";
+        }
+        if(wombatvariable.segmentcount > 1)
+        {
+            for(int i=0; i < digitcount; i++)
+                xmntstr += "?";
+        }
+        else
+            xmntstr += "??";
+        xmntstr += " --out raw " + wombatvariable.imgdatapath;
+    }
+    else
+    {
+        xmntstr = "xmount --in ";
+        if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
+        {
+            xmntstr += "aff ";
+        }
+        else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
+        {
+            xmntstr += "ewf ";
+        }
+        else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
+        {
+            xmntstr += "raw ";
+        }
+        else
+        {
+            qDebug() << "unsupported format:" << tsk_img_type_toname(wombatvariable.imgtype);
+        }
+        xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " --out raw " + wombatvariable.imgdatapath;
+
+    }
+    qDebug() << "xmntstr:" << xmntstr;
+    QProcess::execute(xmntstr);
+    /*
+     *
+     * NEED TO REIMPLEMENT THIS WHOLE FUCNTIONALITY WITH THE NEW EDITOR. WILL LEVERAGE EWFMOUNT TO MOUNT AN E01 AS VIRTUAL DD
+     * THEN I'LL SIMPLY LOAD THAT FILE IN THE IMAGE HEX VIEWER. FOR FILES, PARTITIONS, ETC, I WILL SIMPLY GO TO THE OFFSET THE
+     * SLEUTHKIT PROVIDES.
+     *
+     * ALSO CALL AFFMOUNT FOR THEIR IMAGES... USE TSK TO DETERMINE THE IMAGE TYPE...
+     * THEN FOR THE FILEHEXVIEWER, IT WILL SIMPLY LOAD THE FILE HEX FOR FILES ONLY... THOSE GET WRITTEN TO TMP FILE PROBABLY
+     *
+     * THEN I NEED TO COLOR CODING IN THE HEXEDITOR, PROBABLY... CAN GET IT TO WORK...
+     *
+     */ 
+
+    // FIXING THIS CODE SHOULD ENABLE REMOVAL OF THE TSKOBJPTR AND TSKOBJ AND TSKVARIABLE.H. I SHOULDN'T NEED TO PASS ANYTHING
+    // COMPLEX OTHER THAN THE VARIABLES MENTIONED BELOW
+
+    // PROCESS TO OPEN A FILE...
+    // 1. GET THE OFFSET, FILE SIZE, AND BLOCKS/MFT ENTRY/ADS ATTRIBUTE FOR THE FILE...
+    // 2. SET HEX EDITOR TO THE NECESSARY OFFSET FOR START OF THE FILE
+    // 3. USE BLOCKS TO COLOR CODE THE FILE CONTENT BLUE, (BLOCK TOTAL * BLOCK SIZE) - FILE SIZE TO COLOR SLACK RED
+    // 3A. IF I CAN'T COLOR CODE THE CONTENT DISPLAY, MIGHT WANT TO POPUP INFORMATION IN EDITOR WHICH SHOWS INFO FOR FILE...
+    // 4. FOR FILEHEXVIEWER, JUST WRITE THE FILE TO TMP FILE AND THEN LOAD IN EDITOR. COLOR CODE THE SLACK USING ABOVE FORMULA SLACK.
+ 
 }
 
 void WombatForensics::UpdateStatus()
@@ -718,6 +806,7 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
+    /*
     int digitcount = SegmentDigits(wombatvariable.segmentcount);
 
     if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
@@ -743,6 +832,8 @@ void WombatForensics::LoadHexContents()
     {
         qDebug() << "image format:" << tsk_img_type_toname(wombatvariable.imgtype) << "not supported";
     }
+    */
+
     /*
      *
      * NEED TO REIMPLEMENT THIS WHOLE FUCNTIONALITY WITH THE NEW EDITOR. WILL LEVERAGE EWFMOUNT TO MOUNT AN E01 AS VIRTUAL DD
@@ -765,7 +856,7 @@ void WombatForensics::LoadHexContents()
     // 3. USE BLOCKS TO COLOR CODE THE FILE CONTENT BLUE, (BLOCK TOTAL * BLOCK SIZE) - FILE SIZE TO COLOR SLACK RED
     // 3A. IF I CAN'T COLOR CODE THE CONTENT DISPLAY, MIGHT WANT TO POPUP INFORMATION IN EDITOR WHICH SHOWS INFO FOR FILE...
     // 4. FOR FILEHEXVIEWER, JUST WRITE THE FILE TO TMP FILE AND THEN LOAD IN EDITOR. COLOR CODE THE SLACK USING ABOVE FORMULA SLACK.
-    
+
     if(tskobjptr->readimginfo != NULL)
     {
         tsk_img_close(tskobjptr->readimginfo);
@@ -784,8 +875,16 @@ void WombatForensics::LoadHexContents()
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
+
+    QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
+    qDebug() << "datastring:" << datastring;
+    casedatafile.setFileName(datastring);
+    ui->hexview->setData(casedatafile);
+
+
     if(wombatvariable.selectedid.split("-").count() == 1) // image file
     {
+        /*
         wombatvariable.evidencename = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // current evidence name
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + wombatvariable.selectedid.mid(1));
         evidfile.open(QIODevice::ReadOnly);
@@ -810,7 +909,11 @@ void WombatForensics::LoadHexContents()
         {
             tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
         }
+        
+
         testfile.setFileName(tskobjptr->imagepartspath[0]);
+        
+
         //testdevice = new EvidenceDevice(tskobjptr->partcount, tskobjptr->imagepartspath);
 
         /*
@@ -821,7 +924,7 @@ void WombatForensics::LoadHexContents()
             LogMessage("Image opening error");
         }
         */
-        free(tskobjptr->imagepartspath);
+        //free(tskobjptr->imagepartspath);
     }
     else if(wombatvariable.selectedid.split("-").count() == 2) // volume file
     {
@@ -913,6 +1016,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedid.split("-").count() == 4) // file file
     {
+        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
@@ -1023,12 +1127,15 @@ void WombatForensics::LoadHexContents()
         if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
         }
-
+        */
     }
     if(wombatvariable.selectedid.split("-").count() <= 4) // image file
     {
 
-        ui->hexview->setData(testfile);
+        //ui->hexview->setData(testfile);
+
+
+
         //qint64 bytesread = 0;
         //qDebug() << "e01 size:" << tskobjptr->readimginfo->size;
         //char* imgbuffer = new char[tskobjptr->readimginfo->size];
@@ -1103,6 +1210,10 @@ void WombatForensics::CloseCurrentCase()
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
     // WRITE MSGLOG TO FILE HERE...
+
+    // UNMOUNT XMOUNT EVIDENCEIMAGEDATAFILE
+    QString xunmntstr = "sudo umount " + wombatvariable.imgdatapath;
+    QProcess::execute(xunmntstr);
 
     QString unmntstr = "sudo umount " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);

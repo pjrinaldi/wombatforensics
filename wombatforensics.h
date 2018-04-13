@@ -54,7 +54,7 @@ protected:
     };
 };
 */
-
+/*
 class EvidenceDevice : public QIODevice
 {
 public:
@@ -99,13 +99,13 @@ public:
         return readimginfo->
     };
     */
-
+/*
 private:
     qint64 length;
     qint64 position;
     char* bufferref;
     TSK_IMG_INFO* readimginfo;
-};
+};*/
 
 class TreeNodeModel : public QAbstractItemModel
 {
@@ -800,7 +800,7 @@ private:
     //QHexView* hexviewwidget;
     //QHexEdit* hexview;
     //WombatSlider* hexrocker;
-    EvidenceDevice* testdevice;
+    //EvidenceDevice* testdevice;
     QFile testfile;
     QPushButton* lineup;
     QPushButton* linedown;

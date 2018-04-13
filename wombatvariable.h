@@ -11,6 +11,7 @@ struct WombatVariable
     bool iscaseopen;
     QString tmpfilepath;
     QString tmpmntpath;
+    QString imgdatapath;
     QString curerrmsg;
     QString evidencename;
     std::vector<std::string> fullpathvector;
