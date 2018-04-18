@@ -12,3 +12,4 @@ if [ $fstabbool -eq 0 ]; then
 fi
 # check for the existence of the root:root mntpt directory. create it if it doesn't exist.
 mkdir -p /tmp/wombatforensics/mntpt
+chown pasquale:pasquale /tmp/wombatforensics
