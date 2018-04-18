@@ -1,0 +1,9 @@
+[Unit]
+Description=Configure wombatforensics tmp mnt directories and fstab entry
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/wombatprep
+
+[Install]
+WantedBy=multi-user.target

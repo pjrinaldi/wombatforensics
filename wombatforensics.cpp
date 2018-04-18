@@ -338,7 +338,6 @@ void WombatForensics::CheckWombatConfiguration()
         while(!fstabin.atEnd())
         {
             QString line = fstabin.readLine();
-            qDebug() << line;
             if(line.compare("/tmp/wombatforensics/currentwfc /tmp/wombatforensics/mntpt auto defaults,rw,user,noauto 0 0", Qt::CaseSensitive) == 0)
                 fstabbool = 1;
         }

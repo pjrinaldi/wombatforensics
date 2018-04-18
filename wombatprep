@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# check the fstab for the required wombatforenics entry.
+fstabbool=0
+while IFS='' read -r line; do
+    if [ "$line" = "/tmp/wombatforensics/currentwfc /tmp/wombatforensics/mntpt auto defaults,rw,user,noauto 0 0" ]; then
+        fstabbool=1
+    fi
+done <"/etc/fstab"
+if [ $fstabbool -eq 0 ]; then
+    echo "/tmp/wombatforensics/currentwfc /tmp/wombatforensics/mntpt auto defaults,rw,user,noauto 0 0" >> /etc/fstab
+fi
+# check for the existence of the root:root mntpt directory. create it if it doesn't exist.
+mkdir -p /tmp/wombatforensics/mntpt
