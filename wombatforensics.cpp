@@ -933,9 +933,7 @@ void WombatForensics::LoadHexContents()
     // determine offset location in the editor
     if(wombatvariable.selectedid.split("-").count() == 1) // image file
     {
-        ui->hexview->setCursorPosition(10*2);
-        //ui->hexview->setAddressOffset(10);
-
+        ui->hexview->setCursorPosition(0);
         /*
         wombatvariable.evidencename = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // current evidence name
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + wombatvariable.selectedid.mid(1));
@@ -980,34 +978,9 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedid.split("-").count() == 2) // volume file
     {
-        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + wombatvariable.selectedid.split("-").at(0).mid(1));
-        evidfile.open(QIODevice::ReadOnly);
-        tmpstr = evidfile.readLine();
-        evidlist = tmpstr.split(",");
-        evidfile.close();
-        std::vector<std::string> tmpvec;
-        tmpvec.clear();
-        for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
-        {
-            tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
-        }
-        tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
-        for(uint i =0; i < tmpvec.size(); i++)
-        {
-            tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
-        }
-        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-        if(tskobjptr->readimginfo == NULL)
-        {
-            qDebug() << tsk_error_get_errstr();
-            LogMessage("Image opening error");
-        }
-        free(tskobjptr->imagepartspath); 
-        tmpstr = "";
         QStringList vollist;
         vollist.clear();
         QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".vol");
@@ -1015,6 +988,8 @@ void WombatForensics::LoadHexContents()
         tmpstr = volfile.readLine();
         volfile.close();
         vollist = tmpstr.split(",");
+        ui->hexview->setCursorPosition(vollist.at(4).toInt()*2);
+        /*
         tskobjptr->offset = vollist.at(4).toInt();
         tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tskobjptr->imglength = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
@@ -1024,10 +999,10 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedid.split("-").count() == 3) // partition file
     {
-        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
+        /*
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + wombatvariable.selectedid.split("-").at(0).mid(1));
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
@@ -1052,12 +1027,15 @@ void WombatForensics::LoadHexContents()
         }
         free(tskobjptr->imagepartspath);
         tmpstr = "";
+        */
         QStringList partlist = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + wombatvariable.selectedid.split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
         QFile partfile(wombatvariable.tmpmntpath + partlist.at(0));
         partfile.open(QIODevice::ReadOnly);
         tmpstr = partfile.readLine();
         partfile.close();
         partlist = tmpstr.split(",");
+        ui->hexview->setCursorPosition(partlist.at(4).toULongLong()*2);
+        /*
         tskobjptr->offset = partlist.at(4).toULongLong();
         tskobjptr->fsoffset = partlist.at(4).toULongLong();
         tskobjptr->objecttype = 4;
