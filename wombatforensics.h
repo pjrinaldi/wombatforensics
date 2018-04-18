@@ -764,6 +764,7 @@ private:
     Ui::WombatForensics *ui;
 
     void SetupHexPage(void);
+    void CheckWombatConfiguration(void);
     void InitializeAppStructure(void);
     void InitializeCaseStructure(void);
     void InitializeOpenCase(void);

@@ -97,6 +97,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     propertywindow->setModal(false);
+    CheckWombatConfiguration();
     InitializeAppStructure();
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
@@ -324,6 +325,44 @@ void WombatForensics::HideMessageViewer(bool checkstate)
 void WombatForensics::HideByteViewer(bool checkstate)
 {
     ui->actionByteConverter->setChecked(checkstate);
+}
+
+void WombatForensics::CheckWombatConfiguration()
+{
+    // check fstab entry
+    int fstabbool = 0;
+    QFile fstabfile("/etc/fstab");
+    if(fstabfile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream fstabin(&fstabfile);
+        while(!fstabin.atEnd())
+        {
+            QString line = fstabin.readLine();
+            qDebug() << line;
+            if(line.compare("/tmp/wombatforensics/currentwfc /tmp/wombatforensics/mntpt auto defaults,rw,user,noauto 0 0", Qt::CaseSensitive) == 0)
+                fstabbool = 1;
+        }
+        fstabfile.close();
+        if(fstabbool == 1)
+            qDebug() << "fstab is correct";
+        else
+            qDebug() << "fstab is wrong";
+    }
+    // check mntpt directory exists and has root ownership
+    if(QFileInfo::exists("/tmp/wombatforensics/mntpt"))
+    {
+        QFileInfo mntptfile("/tmp/wombatforensics/mntpt");
+        if(mntptfile.groupId() == 0 && mntptfile.ownerId() == 0)
+            qDebug() << "it is set correctly:" << mntptfile.ownerId() << ":" << mntptfile.groupId();
+        else
+            qDebug() << "error, mntpt dir isn't owned by root:" << mntptfile.ownerId() << ":" << mntptfile.groupId();
+    }
+    else
+        qDebug() << "error, the mntpt doesn't exist and needs to be created as root...";
+
+    // check if link exists, if it does, remove it
+    if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
+        QFile::remove("/tmp/wombatforensics/currentwfc");
 }
 
 void WombatForensics::InitializeAppStructure()
