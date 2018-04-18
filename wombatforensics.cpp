@@ -1046,10 +1046,10 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedid.split("-").count() == 4) // file file
     {
-        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
+        /*
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + wombatvariable.selectedid.split("-").at(0).mid(1));
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
@@ -1074,6 +1074,7 @@ void WombatForensics::LoadHexContents()
             LogMessage("Image opening error");
         }
         free(tskobjptr->imagepartspath);
+        */
         tmpstr = "";
         QStringList partlist;
         partlist.clear();
@@ -1107,6 +1108,7 @@ void WombatForensics::LoadHexContents()
         QString bytestring;
         filefile.close();
         filelist = tmpstr.split(",");
+        /*
         tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
         tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
         tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
@@ -1114,6 +1116,7 @@ void WombatForensics::LoadHexContents()
         tskobjptr->address = wombatvariable.selectedid.split("-").at(3).mid(1).toInt();
         tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         tskobjptr->offset = 0;
+        */
         filefileprop.open(QIODevice::ReadOnly);
         while(!filefileprop.atEnd())
         {
@@ -1132,6 +1135,13 @@ void WombatForensics::LoadHexContents()
             }
         }
         filefileprop.close();
+        if(blockstring.compare("") != 0)
+            ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+        else
+        {
+
+        }
+        /*
         if(blockstring.compare("") != 0)
         {
             tskobjptr->offset = bytestring.toULongLong();
