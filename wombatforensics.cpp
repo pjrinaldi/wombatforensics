@@ -461,6 +461,12 @@ void WombatForensics::InitializeCaseStructure()
         QProcess::execute(mntstr);
         QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(chownstr);
+
+        /*
+        QString lnkstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
+        QProcess::execute(lnkstr);
+        QProcess::execute("mount /tmp/wombatforensics/mntpt");
+        */
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
@@ -913,15 +919,23 @@ void WombatForensics::LoadHexContents()
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
+    // get offset and blockaddress list from properties file...
+    // epropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".eprop." + QString::number(evidcnt));
+    // vpropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".volprop");
+    // fspropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".partprop.p" + QString::number(partint));
+    // filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(curfileinfo->meta->addr) + ".prop");
 
     QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
     qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
     ui->hexview->setData(casedatafile);
 
-
+    // determine offset location in the editor
     if(wombatvariable.selectedid.split("-").count() == 1) // image file
     {
+        ui->hexview->setCursorPosition(10*2);
+        //ui->hexview->setAddressOffset(10);
+
         /*
         wombatvariable.evidencename = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // current evidence name
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + wombatvariable.selectedid.mid(1));
