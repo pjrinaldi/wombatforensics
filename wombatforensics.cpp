@@ -934,6 +934,7 @@ void WombatForensics::LoadHexContents()
     if(wombatvariable.selectedid.split("-").count() == 1) // image file
     {
         ui->hexview->setCursorPosition(0);
+        //emit ui->hexview->currentAddressChanged(0);
         /*
         wombatvariable.evidencename = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // current evidence name
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + wombatvariable.selectedid.mid(1));
@@ -1169,6 +1170,8 @@ void WombatForensics::LoadHexContents()
         }
         */
     }
+    ui->hexview->ensureVisible();
+
     if(wombatvariable.selectedid.split("-").count() <= 4) // image file
     {
 
