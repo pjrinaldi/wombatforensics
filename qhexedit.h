@@ -7,6 +7,7 @@
 
 #include "chunks.h"
 #include "commands.h"
+#include "globals.h"
 
 #ifdef QHEXEDIT_EXPORTS
 #define QHEXEDIT_API Q_DECL_EXPORT
@@ -404,6 +405,12 @@ private:
     bool _readOnly;
     bool _hexCaps;
     bool _dynamicBytesPerLine;
+
+    // Added by Pasquale J. Rinaldi, Jr. Apr 2018 to enable content and slack highlighting
+    QBrush contentbrush;
+    QPen contentpen;
+    QBrush slackbrush;
+    QPen slackpen;
 
     // other variables
     bool _editAreaIsAscii;                      // flag about the ascii mode edited
