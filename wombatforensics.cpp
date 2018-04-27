@@ -363,7 +363,7 @@ void WombatForensics::CheckWombatConfiguration()
     // check if mntpt link exists, if it does, remove it
     // check if case link exists, if it does, remove it
     if(QFileInfo::exists("/tmp/wombatforensics/mntpt"))
-        QFile::remove("/tmp/wombatforensics/mntmpt");
+        QFile::remove("/tmp/wombatforensics/mntpt");
     if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
         QFile::remove("/tmp/wombatforensics/currentwfc");
 }
@@ -380,6 +380,8 @@ void WombatForensics::InitializeAppStructure()
     wombatvariable.imgdatapath = tmppath + "datamnt/";
     //wombatvariable.tmpfilepath = homepath + "tmpfiles/"; // old one
     //wombatvariable.tmpmntpath = homepath + "mntpt/"; // old one
+    if((new QDir())->mkpath(tmppath) == false)
+        DisplayError("1.6", "App tmppath folder failed", "App tmppath folder was not created");
     if((new QDir())->mkpath(wombatvariable.tmpfilepath) == false)
         DisplayError("1.3", "App tmpfile folder failed", "App Tmpfile folder was not created");
     if((new QDir())->mkpath(wombatvariable.tmpmntpath) == false)
@@ -445,8 +447,9 @@ void WombatForensics::InitializeCaseStructure()
         casefile.resize(1000000000);
         casefile.close();
         // make btrfs partition
-        QString mkfsstr = "mkfs.btrfs -q ";
+        QString mkfsstr = "mkfs.ext4 -q -E root_owner=" + QString::number(getuid()) + ":" + QString::number(getgid()) + " ";
         mkfsstr += wombatvariable.casename;
+        qDebug() << mkfsstr;
         QProcess::execute(mkfsstr);
         // determine the current username for chown
         QString name = qgetenv("USER");
@@ -461,17 +464,18 @@ void WombatForensics::InitializeCaseStructure()
         guestfs_mount(guestg, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
         */
 
+        /*
         QString mntstr = "sudo mount -o loop " + wombatvariable.casename + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
         QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(chownstr);
+        */
 
-        /*
         QString lnkstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
         QProcess::execute(lnkstr);
         QString lnkmnt = "ln -s " + wombatvariable.tmpmntpath + " /tmp/wombatforensics/mntpt";
+        QProcess::execute(lnkmnt);
         QProcess::execute("mount /tmp/wombatforensics/mntpt");
-        */
 
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
@@ -1266,6 +1270,12 @@ void WombatForensics::CloseCurrentCase()
 
     QString unmntstr = "sudo umount " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);
+
+    // delete two link files
+    if(QFileInfo::exists("/tmp/wombatforensics/mntpt"))
+        QFile::remove("/tmp/wombatforensics/mntpt");
+    if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
+        QFile::remove("/tmp/wombatforensics/currentwfc");
 
     /*
     guestfs_umount(guestg, wombatvariable.tmpmntpath.toStdString().c_str());
