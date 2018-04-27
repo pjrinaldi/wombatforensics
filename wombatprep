@@ -10,7 +10,9 @@ done <"/etc/fstab"
 if [ $fstabbool -eq 0 ]; then
     echo "/tmp/wombatforensics/currentwfc /tmp/wombatforensics/mntpt auto defaults,rw,user,noauto 0 0" >> /etc/fstab
 fi
+
+# pretty sure i just create these as the user... since it's links.
 # check for the existence of the mntpt directory. create it if it doesn't exist.
-mkdir -p /tmp/wombatforensics/mntpt
+#mkdir -p /tmp/wombatforensics/mntpt
 # allow non root modify for the currentwfc bit.
-chmod o+rw /tmp/wombatforensics
+#chmod o+rw /tmp/wombatforensics

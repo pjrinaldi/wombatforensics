@@ -348,6 +348,7 @@ void WombatForensics::CheckWombatConfiguration()
             qDebug() << "fstab is wrong";
     }
     // check mntpt directory exists and has root ownership
+    /*
     if(QFileInfo::exists("/tmp/wombatforensics/mntpt"))
     {
         QFileInfo mntptfile("/tmp/wombatforensics/mntpt");
@@ -358,8 +359,11 @@ void WombatForensics::CheckWombatConfiguration()
     }
     else
         qDebug() << "error, the mntpt doesn't exist and needs to be created as root...";
-
-    // check if link exists, if it does, remove it
+    */
+    // check if mntpt link exists, if it does, remove it
+    // check if case link exists, if it does, remove it
+    if(QFileInfo::exists("/tmp/wombatforensics/mntpt"))
+        QFile::remove("/tmp/wombatforensics/mntmpt");
     if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
         QFile::remove("/tmp/wombatforensics/currentwfc");
 }
@@ -372,7 +376,7 @@ void WombatForensics::InitializeAppStructure()
     QString homepath = QDir::homePath();
     homepath += "/.wombatforensics/";
     wombatvariable.tmpfilepath = tmppath + "tmpfiles/";
-    wombatvariable.tmpmntpath = tmppath + "mntpt/";
+    wombatvariable.tmpmntpath = homepath + "mntpt/";
     wombatvariable.imgdatapath = tmppath + "datamnt/";
     //wombatvariable.tmpfilepath = homepath + "tmpfiles/"; // old one
     //wombatvariable.tmpmntpath = homepath + "mntpt/"; // old one
@@ -465,8 +469,10 @@ void WombatForensics::InitializeCaseStructure()
         /*
         QString lnkstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
         QProcess::execute(lnkstr);
+        QString lnkmnt = "ln -s " + wombatvariable.tmpmntpath + " /tmp/wombatforensics/mntpt";
         QProcess::execute("mount /tmp/wombatforensics/mntpt");
         */
+
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         msglog->clear();
