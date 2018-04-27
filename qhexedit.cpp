@@ -872,7 +872,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 QColor c = viewport()->palette().color(QPalette::Base);
                 painter.setPen(colStandard);
                 qint64 posBa = _bPosFirst + bPosLine + colIdx;
-                //qDebug << posBa;
+                //qDebug() << posBa;
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
                 {
                     c = _brushSelection.color();
