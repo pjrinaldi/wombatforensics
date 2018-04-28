@@ -857,6 +857,87 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         // paint hex and ascii area
         // Added by Pasquale J. Rinaldi Jr. Apr. 2018
         // ATTEMPT TO ADD COLOR HIGHLIGHTING FOR WHETHER IT IS SLACK, OR CONTENT FOR FILE...
+    	//_brushSelection = QBrush(color);
+	//_penSelection = QPen(Qt::white);
+	/*
+            if(tskptr->blkaddrlist.count() > 0)
+            {
+                if(tskptr->blkaddrlist.at(0).toInt() == 0) // resident attribute
+                {
+                    unsigned long long curblkstart = 0;
+                    if(tskptr->objecttype == 6)
+                        curblkstart = tskptr->resoffset + tskptr->fsoffset + tskptr->adsoffset;
+                    else
+                        curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                    unsigned long long curblkend = curblkstart + mftrecordsize;
+                    if(curoffset >= curblkstart && curoffset < curblkend)
+                    {
+                        paint.setPen(QColor(0, 0, 255, 255));
+                        paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bo
+ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                        if((curoffset > (curblkstart + tskptr->length)) && curoffset <= curblkend)
+                        {
+                            paint.setPen(QColor(255, 0, 0, 255)); // RED
+                            paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx
+].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                        }
+                    }
+                }
+                else
+                {
+                    for(int i = 0; i < tskptr->blkaddrlist.count(); i++)
+                    {
+                        unsigned long long curblkstart = tskptr->fsoffset + tskptr->blkaddrlist.at(
+i).toULongLong()*tskptr->blocksize - 1;
+                        unsigned long long curblkend = curblkstart + tskptr->blocksize;
+                        if(curoffset > curblkstart && curoffset <= curblkend)
+                        {
+                            paint.setPen(QColor(0, 0, 255, 255)); // BLUE
+                            paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx
+].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                            if(i == (tskptr->blkaddrlist.count() - 1))
+                            {
+                                if((curoffset > (curblkstart + tskptr->length - tskptr->blocksize*i
+)) && curoffset <= curblkend)
+                                {
+                                    paint.setPen(QColor(255, 0, 0, 255)); // RED
+                                    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiB
+Box[widx].bottom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else // resident attribute
+            {
+                unsigned long long curblkstart = 0;
+                if(tskptr->objecttype == 6)
+                {
+                    curblkstart = tskptr->resoffset + tskptr->fsoffset + tskptr->adsoffset;
+                }
+                else
+                {
+                    curblkstart = tskptr->resoffset + tskptr->fsoffset;
+                }
+                unsigned long long curblkend = curblkstart + mftrecordsize;
+                if(curoffset >= curblkstart && curoffset < curblkend)
+                {
+                    paint.setPen(QColor(0, 0, 255, 255));
+                    paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bottom
+(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                    if((curoffset > (curblkstart + tskptr->length)) && curoffset <= curblkend)
+                    {
+                        paint.setPen(QColor(255, 0, 0, 255)); // RED
+                        paint.drawText(_asciiBBox[widx].left() + wordSpacing(), _asciiBBox[widx].bo
+ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
+                    }
+                }
+            }
+        }
+    }
+	*/
+
         QPen colStandard = QPen(viewport()->palette().color(QPalette::WindowText));
 
         painter.setBackgroundMode(Qt::TransparentMode);
