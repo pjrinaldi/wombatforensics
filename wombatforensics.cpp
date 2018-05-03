@@ -936,8 +936,9 @@ void WombatForensics::LoadHexContents()
     // filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(curfileinfo->meta->addr) + ".prop");
 
     QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
-    qDebug() << "datastring:" << datastring;
+    //qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
+    //ui->hexview->SetColorInformation();
     ui->hexview->setData(casedatafile);
 
     // determine offset location in the editor
