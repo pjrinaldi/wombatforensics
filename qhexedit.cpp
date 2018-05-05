@@ -952,16 +952,16 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                 QColor c = viewport()->palette().color(QPalette::Base);
                 painter.setPen(colStandard);
                 qint64 posBa = _bPosFirst + bPosLine + colIdx; // curoffset
-                //unsigned long long curoffset = posBa;
-                //qDebug() << posBa;
+                //qDebug() << "pxPosX:" << pxPosX << "pxPosY:" << pxPosY << "posBa:" << posBa;
                 if(blocklist.count() > 0)
                 {
                     if(blocklist.at(0).toInt() == 0) // resident attribute
                     {
+                        //qDebug() << "resident attribute";
                         unsigned long long curblkstart = 0;
                         curblkstart = residentoffset + fsoffset;
-                        unsigned long long curblkend = curblkstart + mftrecordsize; // temporary mftrecordsize
-                        //unsigned long long curblkend = curblkstart + mftrecordsize;
+                        unsigned long long curblkend = curblkstart + mftrecordsize;
+                        qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
                         if(posBa >= curblkstart && posBa < curblkend)
                         {
                             painter.setPen(QColor(0, 0, 255, 255)); // BLUE
@@ -974,10 +974,13 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                     }
                     else // non-resident attribute
                     {
+                        //qDebug() << "non-resident attribute";
                         for(int i=0; i < blocklist.count(); i++)
                         {
+                            qDebug() << "blocklist.at(i):" << blocklist.at(i) << "blocksize:" << blocksize;
                             unsigned long long curblkstart = fsoffset + blocklist.at(i).toULongLong() * blocksize - 1;
                             unsigned long long curblkend = curblkstart + blocksize;
+                            qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
                             if(posBa > curblkstart && posBa <= curblkend)
                             {
                                 painter.setPen(QColor(0, 0, 255, 255)); // BLUE
@@ -992,6 +995,7 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                 }
                 else // resident attribute
                 {
+                    //qDebug() << "resident attribute 2";
                     unsigned long long curblkstart = 0;
                     curblkstart = residentoffset + fsoffset;
                     unsigned long long curblkend = curblkstart + mftrecordsize;
@@ -1283,13 +1287,15 @@ void QHexEdit::updateCursor()
 // Added by Pasquale J. Rinaldi, Jr. May 2018
 // Passing required information for syntax highlighting
 // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
-void QHexEdit::SetColorInformation(unsigned long long fsoffset, unsigned long long blocksize, QString blockstring, QString residentstring, QString bytestring, QString filelength)
+void QHexEdit::SetColorInformation(unsigned long long fsoffset, unsigned long long blksize, QString blockstring, QString residentstring, QString bytestring, unsigned long long filelength)
 {
     blocklist.clear();
     blocklist = blockstring.split("^^", QString::SkipEmptyParts);
     fsoffset = fsoffset;
-    blocksize = blocksize;
+    blocksize = blksize;
     residentoffset = residentstring.toULongLong();
     byteoffset = bytestring.toULongLong();
-    filelength = filelength.toULongLong();
+    filelength = filelength;
+    qDebug() << "initial variables";
+    qDebug() << "blockstring:" << blockstring << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentstring << "byteoffset:" << bytestring << "filelength:" << filelength;
 }

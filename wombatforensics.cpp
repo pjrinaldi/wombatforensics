@@ -1149,8 +1149,8 @@ void WombatForensics::LoadHexContents()
         filefileprop.close();
         if(blockstring.compare("") != 0)
         {
-            // fsoffset, blocksize, blockstring, residentoffset, byteoffset
-            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toString());
+            // fsoffset, blocksize, blockstring, residentoffset, byteoffset, file length
+            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong());
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
         }
         else
@@ -1273,7 +1273,8 @@ void WombatForensics::CloseCurrentCase()
     QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
     QProcess::execute(xunmntstr);
 
-    QString unmntstr = "sudo umount " + wombatvariable.tmpmntpath;
+    QString unmntstr = "umount " + wombatvariable.tmpmntpath;
+    //QString unmntstr = "sudo umount " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);
 
     // delete two link files
