@@ -339,6 +339,12 @@ public:
         return (getSelectionEnd() - getSelectionBegin());
     };
 
+    // Added by Pasquale J. Rinaldi, Jr.
+    // May 5, 2018
+    // Enables information to be passed which is required for coloring hex/ascii
+    // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
+    void SetColorInformation(unsigned long long fsoffset, unsigned long long blocksize, QString blockstring, QString residentstring, QString bytestring, QString filelength);
+
 protected:
     // Handle events
     void keyPressEvent(QKeyEvent *event);
@@ -411,6 +417,12 @@ private:
     QPen contentpen;
     QBrush slackbrush;
     QPen slackpen;
+    QStringList blocklist;
+    unsigned long long residentoffset;
+    unsigned long long fsoffset;
+    unsigned long long byteoffset;
+    unsigned long long blocksize;
+    unsigned long long filelength;
 
     // other variables
     bool _editAreaIsAscii;                      // flag about the ascii mode edited

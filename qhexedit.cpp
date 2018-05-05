@@ -853,7 +853,6 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 painter.drawText(_pxPosAdrX - pxOfsX, pxPosY, address);
             }
         }
-
         // paint hex and ascii area
         // Added by Pasquale J. Rinaldi Jr. Apr. 2018
         // ATTEMPT TO ADD COLOR HIGHLIGHTING FOR WHETHER IT IS SLACK, OR CONTENT FOR FILE...
@@ -952,8 +951,57 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
             {
                 QColor c = viewport()->palette().color(QPalette::Base);
                 painter.setPen(colStandard);
-                qint64 posBa = _bPosFirst + bPosLine + colIdx;
+                qint64 posBa = _bPosFirst + bPosLine + colIdx; // curoffset
+                //unsigned long long curoffset = posBa;
                 //qDebug() << posBa;
+                if(blocklist.count() > 0)
+                {
+                    if(blocklist.at(0).toInt() == 0) // resident attribute
+                    {
+                        unsigned long long curblkstart = 0;
+                        curblkstart = residentoffset + fsoffset;
+                        unsigned long long curblkend = curblkstart + mftrecordsize; // temporary mftrecordsize
+                        //unsigned long long curblkend = curblkstart + mftrecordsize;
+                        if(posBa >= curblkstart && posBa < curblkend)
+                        {
+                            painter.setPen(QColor(0, 0, 255, 255)); // BLUE
+                            if((posBa > (curblkstart + filelength)) && posBa <= curblkend)
+                            {
+                                painter.setPen(QColor(255, 0, 0, 255)); // RED
+                            }
+                        }
+
+                    }
+                    else // non-resident attribute
+                    {
+                        for(int i=0; i < blocklist.count(); i++)
+                        {
+                            unsigned long long curblkstart = fsoffset + blocklist.at(i).toULongLong() * blocksize - 1;
+                            unsigned long long curblkend = curblkstart + blocksize;
+                            if(posBa > curblkstart && posBa <= curblkend)
+                            {
+                                painter.setPen(QColor(0, 0, 255, 255)); // BLUE
+                                if(i == (blocklist.count() - 1))
+                                {
+                                    if((posBa > (curblkstart + filelength - blocksize*i)) && posBa <= curblkend)
+                                        painter.setPen(QColor(255, 0, 0, 255)); // RED
+                                }
+                            }
+                        }
+                    }
+                }
+                else // resident attribute
+                {
+                    unsigned long long curblkstart = 0;
+                    curblkstart = residentoffset + fsoffset;
+                    unsigned long long curblkend = curblkstart + mftrecordsize;
+                    if(posBa >= curblkstart && posBa < curblkend)
+                    {
+                        painter.setPen(QColor(0, 0, 255, 255)); // BLUE
+                        if((posBa > (curblkstart + filelength)) && posBa <= curblkend)
+                            painter.setPen(QColor(255, 0, 0, 255)); // RED
+                    }
+                }
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
                 {
                     c = _brushSelection.color();
@@ -1230,4 +1278,18 @@ void QHexEdit::updateCursor()
     else
         _blink = true;
     viewport()->update(_cursorRect);
+}
+
+// Added by Pasquale J. Rinaldi, Jr. May 2018
+// Passing required information for syntax highlighting
+// (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
+void QHexEdit::SetColorInformation(unsigned long long fsoffset, unsigned long long blocksize, QString blockstring, QString residentstring, QString bytestring, QString filelength)
+{
+    blocklist.clear();
+    blocklist = blockstring.split("^^", QString::SkipEmptyParts);
+    fsoffset = fsoffset;
+    blocksize = blocksize;
+    residentoffset = residentstring.toULongLong();
+    byteoffset = bytestring.toULongLong();
+    filelength = filelength.toULongLong();
 }

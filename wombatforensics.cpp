@@ -1148,7 +1148,11 @@ void WombatForensics::LoadHexContents()
         }
         filefileprop.close();
         if(blockstring.compare("") != 0)
+        {
+            // fsoffset, blocksize, blockstring, residentoffset, byteoffset
+            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toString());
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+        }
         else
         {
 
