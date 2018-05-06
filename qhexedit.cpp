@@ -983,11 +983,11 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                             qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
                             if(posBa > curblkstart && posBa <= curblkend)
                             {
-                                painter.setPen(QColor(0, 0, 255, 255)); // BLUE
+                                painter.setPen(QColor(192, 214, 228, 255)); // BLUE
                                 if(i == (blocklist.count() - 1))
                                 {
                                     if((posBa > (curblkstart + filelength - blocksize*i)) && posBa <= curblkend)
-                                        painter.setPen(QColor(255, 0, 0, 255)); // RED
+                                        painter.setPen(QColor(214, 153, 153, 255)); // RED
                                 }
                             }
                         }
