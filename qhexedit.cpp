@@ -26,6 +26,11 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
     _hexCaps = false;
     _dynamicBytesPerLine = false;
 
+    // Added by Pasquale J. Rinaldi, Jr. May 2018
+    // set brush colors for content/slack
+    contentbrush = QBrush(QColor(194, 214, 228, 255));
+    slackbrush = QBrush(QColor(214, 153, 153, 255));
+
     _chunks = new Chunks(this);
     _undoStack = new UndoStack(_chunks, this);
 #ifdef Q_OS_WIN32
@@ -964,7 +969,7 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
 			curblkend = 0;
                         curblkstart = residentoffset + fsoffset;
                         curblkend = curblkstart + mftrecordsize;
-                        qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
+                        //qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
                         if(posBa >= curblkstart && posBa < curblkend)
                         {
                             painter.setPen(QColor(0, 0, 255, 255)); // BLUE
@@ -980,19 +985,25 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                         //qDebug() << "non-resident attribute";
                         for(int i=0; i < blocklist.count(); i++)
                         {
-                            qDebug() << "blocklist.at(i):" << blocklist.at(i) << "blocksize:" << blocksize;
+                            //qDebug() << "blocklist.at(i):" << blocklist.at(i) << "blocksize:" << blocksize;
 			    curblkstart = 0;
 			    curblkend = 0;
                             curblkstart = fsoffset + blocklist.at(i).toULongLong() * blocksize - 1;
                             curblkend = curblkstart + blocksize;
-                            qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
-                            if(posBa > curblkstart && posBa <= curblkend)
+                            //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
+			    unsigned long long curfilelength = curblkstart + filelength + fsoffset;
+			    qDebug() << "curblkstart:" << curblkstart << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa;
+                            if(posBa >= curblkstart && posBa <= (curblkstart + filelength))
                             {
-                                painter.setPen(QColor(192, 214, 228, 255)); // BLUE
+				c = contentbrush.color(); // BLUE
+                                //painter.setPen(QColor(192, 214, 228, 255)); // BLUE
                                 if(i == (blocklist.count() - 1))
                                 {
                                     if((posBa > (curblkstart + filelength - blocksize*i)) && posBa <= curblkend)
-                                        painter.setPen(QColor(214, 153, 153, 255)); // RED
+				    {
+					//c = slackbrush.color(); // RED
+                                        //painter.setPen(QColor(214, 153, 153, 255)); // RED
+				    }
                                 }
                             }
                         }
@@ -1303,5 +1314,5 @@ void QHexEdit::SetColorInformation(unsigned long long fsoffset, unsigned long lo
     byteoffset = bytestring.toULongLong();
     filelength = filelength;
     qDebug() << "initial variables";
-    qDebug() << "blockstring:" << blockstring << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentstring << "byteoffset:" << bytestring << "filelength:" << filelength;
+    qDebug() << "blockstring:" << blocklist << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength;
 }
