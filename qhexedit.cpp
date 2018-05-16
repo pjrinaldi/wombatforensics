@@ -947,6 +947,7 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
         painter.setBackgroundMode(Qt::TransparentMode);
 	unsigned long long curblkstart = 0;
 	unsigned long long curblkend = 0;
+	unsigned long long curfilelength = 0;
 
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
         {
@@ -991,8 +992,8 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                             curblkstart = fsoffset + blocklist.at(i).toULongLong() * blocksize - 1;
                             curblkend = curblkstart + blocksize;
                             //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
-			    unsigned long long curfilelength = curblkstart + filelength + fsoffset;
-			    qDebug() << "curblkstart:" << curblkstart << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa;
+			    curfilelength = curblkstart + filelength;
+			    //qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
                             if(posBa >= curblkstart && posBa <= (curblkstart + filelength))
                             {
 				c = contentbrush.color(); // BLUE
@@ -1001,7 +1002,9 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                                 {
                                     if((posBa > (curblkstart + filelength - blocksize*i)) && posBa <= curblkend)
 				    {
-					//c = slackbrush.color(); // RED
+					qDebug() << "red";
+					qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
+					c = slackbrush.color(); // RED
                                         //painter.setPen(QColor(214, 153, 153, 255)); // RED
 				    }
                                 }
@@ -1304,15 +1307,15 @@ void QHexEdit::updateCursor()
 // Added by Pasquale J. Rinaldi, Jr. May 2018
 // Passing required information for syntax highlighting
 // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
-void QHexEdit::SetColorInformation(unsigned long long fsoffset, unsigned long long blksize, QString blockstring, QString residentstring, QString bytestring, unsigned long long filelength)
+void QHexEdit::SetColorInformation(unsigned long long fsoff, unsigned long long blksize, QString blockstring, QString residentstring, QString bytestring, unsigned long long flength)
 {
     blocklist.clear();
     blocklist = blockstring.split("^^", QString::SkipEmptyParts);
-    fsoffset = fsoffset;
+    fsoffset = fsoff;
     blocksize = blksize;
     residentoffset = residentstring.toULongLong();
     byteoffset = bytestring.toULongLong();
-    filelength = filelength;
+    filelength = flength;
     qDebug() << "initial variables";
     qDebug() << "blockstring:" << blocklist << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength;
 }

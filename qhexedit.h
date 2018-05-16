@@ -343,7 +343,7 @@ public:
     // May 5, 2018
     // Enables information to be passed which is required for coloring hex/ascii
     // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
-    void SetColorInformation(unsigned long long fsoffset, unsigned long long blocksize, QString blockstring, QString residentstring, QString bytestring, unsigned long long filelength);
+    void SetColorInformation(unsigned long long fsoffset, unsigned long long blocksize, QString blockstring, QString residentstring, QString bytestring, unsigned long long flength);
 
 protected:
     // Handle events
