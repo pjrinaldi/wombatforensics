@@ -940,6 +940,8 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
         QPen colStandard = QPen(viewport()->palette().color(QPalette::WindowText));
 
         painter.setBackgroundMode(Qt::TransparentMode);
+	unsigned long long curblkstart = 0;
+	unsigned long long curblkend = 0;
 
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
         {
@@ -958,9 +960,10 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                     if(blocklist.at(0).toInt() == 0) // resident attribute
                     {
                         //qDebug() << "resident attribute";
-                        unsigned long long curblkstart = 0;
+                        curblkstart = 0;
+			curblkend = 0;
                         curblkstart = residentoffset + fsoffset;
-                        unsigned long long curblkend = curblkstart + mftrecordsize;
+                        curblkend = curblkstart + mftrecordsize;
                         qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
                         if(posBa >= curblkstart && posBa < curblkend)
                         {
@@ -978,8 +981,10 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                         for(int i=0; i < blocklist.count(); i++)
                         {
                             qDebug() << "blocklist.at(i):" << blocklist.at(i) << "blocksize:" << blocksize;
-                            unsigned long long curblkstart = fsoffset + blocklist.at(i).toULongLong() * blocksize - 1;
-                            unsigned long long curblkend = curblkstart + blocksize;
+			    curblkstart = 0;
+			    curblkend = 0;
+                            curblkstart = fsoffset + blocklist.at(i).toULongLong() * blocksize - 1;
+                            curblkend = curblkstart + blocksize;
                             qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
                             if(posBa > curblkstart && posBa <= curblkend)
                             {
@@ -996,9 +1001,10 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                 else // resident attribute
                 {
                     //qDebug() << "resident attribute 2";
-                    unsigned long long curblkstart = 0;
+                    curblkstart = 0;
+		    curblkend = 0;
                     curblkstart = residentoffset + fsoffset;
-                    unsigned long long curblkend = curblkstart + mftrecordsize;
+                    curblkend = curblkstart + mftrecordsize;
                     if(posBa >= curblkstart && posBa < curblkend)
                     {
                         painter.setPen(QColor(0, 0, 255, 255)); // BLUE
