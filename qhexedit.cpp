@@ -998,16 +998,16 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                             {
 				c = contentbrush.color(); // BLUE
                                 //painter.setPen(QColor(192, 214, 228, 255)); // BLUE
-                                if(i == (blocklist.count() - 1))
-                                {
-                                    if((posBa > (curblkstart + filelength - blocksize*i)) && posBa <= curblkend)
-				    {
-					qDebug() << "red";
-					qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
-					c = slackbrush.color(); // RED
-                                        //painter.setPen(QColor(214, 153, 153, 255)); // RED
-				    }
-                                }
+                            }
+                            if(i == (blocklist.count() - 1))
+                            {
+                                if((posBa > (curblkstart + filelength - blocksize*i)) && posBa <= curblkend)
+				{
+				    qDebug() << "red";
+				    qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
+				    c = slackbrush.color(); // RED
+                                    //painter.setPen(QColor(214, 153, 153, 255)); // RED
+				}
                             }
                         }
                     }
