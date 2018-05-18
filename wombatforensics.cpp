@@ -446,16 +446,18 @@ void WombatForensics::InitializeCaseStructure()
         casefile.open(QIODevice::ReadWrite);
         casefile.resize(1000000000);
         casefile.close();
-        // make btrfs partition
+        // make ext4 partition
         QString mkfsstr = "mkfs.ext4 -q -E root_owner=" + QString::number(getuid()) + ":" + QString::number(getgid()) + " ";
         mkfsstr += wombatvariable.casename;
         qDebug() << mkfsstr;
         QProcess::execute(mkfsstr);
+        /*
         // determine the current username for chown
         QString name = qgetenv("USER");
         if(name.isEmpty())
             name = qgetenv("USERNAME");
 
+        */
         /*
         // call guestfs using code
         guestg = guestfs_create();
@@ -515,10 +517,18 @@ void WombatForensics::InitializeOpenCase()
             this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last().split(".").first());
         }
         QFile casefile(wombatvariable.casename);
+        QString lnkstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
+        QProcess::execute(lnkstr);
+        QString lnkmnt = "ln -s " + wombatvariable.tmpmntpath + " /tmp/wombatforensics/mntpt";
+        QProcess::execute(lnkmnt);
+        QProcess::execute("mount /tmp/wombatforensics/mntpt");
+        /*
         QString name = qgetenv("USER");
         if(name.isEmpty())
             name = qgetenv("USERNAME");
+        */
         /* TEMP FIX UNTIL UBUNTU 18.04 LTS */
+        /*
         QString mntstr = "sudo mount -o loop ";
         mntstr += wombatvariable.casename;
         mntstr += " ";
@@ -526,6 +536,7 @@ void WombatForensics::InitializeOpenCase()
         QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
         QProcess::execute(mntstr);
         QProcess::execute(chownstr);
+        */
         /* END TEMP CODE */
         /*
         // call guestfs using code
@@ -554,13 +565,26 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QString tmpstr = "";
     QStringList foundlist = eviddir.entryList(QStringList(QString("*.p*.f*.a*")), QDir::Files | QDir::NoSymLinks);
     filesfound = foundlist.count();
     filecountlabel->setText("Found: " + QString::number(filesfound));
     QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
     for(int i=0; i < files.count(); i++)
     {
+        tmpstr = "";
+        wombatvariable.fullpathvector.clear();
         wombatvariable.evidencename = files.at(i).split(".").at(0) + QString(".") + files.at(i).split(".").at(1);
+        QFile evidfile(QString(wombatvariable.tmpmntpath + files.at(i)));
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        tmpstr = evidfile.readLine();
+        evidfile.close();
+        int partcount = tmpstr.split(",").at(3).split("|").size();
+        wombatvariable.segmentcount = partcount;
+        wombatvariable.imgtype = (TSK_IMG_TYPE_ENUM)(tmpstr.split(",").first().toInt());
+        for(int j=0; j < partcount; j++)
+            wombatvariable.fullpathvector.push_back(tmpstr.split(",").at(3).split("|").at(j).toStdString());
+        PrepareEvidenceImage();
         evidcnt++;
     }
     listeditems.clear();

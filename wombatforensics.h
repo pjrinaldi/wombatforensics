@@ -828,7 +828,7 @@ private:
     QTimer* autosavetimer;
     TreeNode* actionitem;
     QStringList listeditems;
-    guestfs_h* guestg;
+    //guestfs_h* guestg;
 };
 
 #endif // WOMBATFORENSICS_H
