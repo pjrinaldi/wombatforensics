@@ -994,7 +994,7 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                             //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
 			    curfilelength = curblkstart + filelength;
 			    //qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
-                            if(posBa >= curblkstart && posBa <= (curblkstart + filelength))
+                            if(posBa >= curblkstart && posBa <= qMin((curblkstart + filelength - blocksize*i), (curblkstart + blocksize)))
                             {
 				c = contentbrush.color(); // BLUE
                                 //painter.setPen(QColor(192, 214, 228, 255)); // BLUE
