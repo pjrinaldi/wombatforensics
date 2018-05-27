@@ -965,7 +965,7 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                 {
                     if(blocklist.at(0).toInt() == 0) // resident attribute
                     {
-                        //qDebug() << "resident attribute";
+                        qDebug() << "resident attribute";
                         curblkstart = 0;
 			curblkend = 0;
                         curblkstart = residentoffset + fsoffset;
@@ -973,10 +973,12 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                         //qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
                         if(posBa >= curblkstart && posBa < curblkend)
                         {
-                            painter.setPen(QColor(0, 0, 255, 255)); // BLUE
+			    c = contentbrush.color(); // BLUE
+                            //painter.setPen(QColor(0, 0, 255, 255)); // BLUE
                             if((posBa > (curblkstart + filelength)) && posBa <= curblkend)
                             {
-                                painter.setPen(QColor(255, 0, 0, 255)); // RED
+				c = slackbrush.color(); // RED
+                                //painter.setPen(QColor(255, 0, 0, 255)); // RED
                             }
                         }
 
@@ -1014,16 +1016,22 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                 }
                 else // resident attribute
                 {
-                    //qDebug() << "resident attribute 2";
+                    qDebug() << "resident attribute 2";
                     curblkstart = 0;
 		    curblkend = 0;
                     curblkstart = residentoffset + fsoffset;
                     curblkend = curblkstart + mftrecordsize;
                     if(posBa >= curblkstart && posBa < curblkend)
                     {
-                        painter.setPen(QColor(0, 0, 255, 255)); // BLUE
+			qDebug() << "should be blue.";
+			c = contentbrush.color(); // BLUE
+                        //painter.setPen(QColor(0, 0, 255, 255)); // BLUE
                         if((posBa > (curblkstart + filelength)) && posBa <= curblkend)
-                            painter.setPen(QColor(255, 0, 0, 255)); // RED
+			{
+			    qDebug() << "should be red.";
+			    c = slackbrush.color(); // RED
+                            //painter.setPen(QColor(255, 0, 0, 255)); // RED
+			}
                     }
                 }
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
