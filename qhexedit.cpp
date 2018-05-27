@@ -1027,13 +1027,13 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
 			qDebug() << "should be blue.";
 			c = contentbrush.color(); // BLUE
                         //painter.setPen(QColor(0, 0, 255, 255)); // BLUE
-                        if((posBa > (curblkstart + filelength)) && posBa <= curblkend)
-			{
-			    qDebug() << "should be red.";
-			    c = slackbrush.color(); // RED
-                            //painter.setPen(QColor(255, 0, 0, 255)); // RED
-			}
-                    }
+		    }
+                    if((posBa > (curblkstart + filelength)) && posBa <= curblkend)
+		    {
+			qDebug() << "should be red.";
+			c = slackbrush.color(); // RED
+                        //painter.setPen(QColor(255, 0, 0, 255)); // RED
+		    }
                 }
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
                 {
