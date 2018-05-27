@@ -1180,7 +1180,7 @@ void WombatForensics::LoadHexContents()
         else
         {
 	    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong());
-	    ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+	    ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
         }
         /*
         if(blockstring.compare("") != 0)

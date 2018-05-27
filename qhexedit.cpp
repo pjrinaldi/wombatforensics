@@ -969,9 +969,9 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                         curblkstart = 0;
 			curblkend = 0;
                         curblkstart = residentoffset + fsoffset;
-                        curblkend = curblkstart + mftrecordsize;
+                        curblkend = curblkstart + mftrecordsize - 1;
                         //qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
-                        if(posBa >= curblkstart && posBa < curblkend)
+                        if(posBa >= curblkstart && posBa < qMin((curblkstart + filelength), curblkend))
                         {
 			    c = contentbrush.color(); // BLUE
                             //painter.setPen(QColor(0, 0, 255, 255)); // BLUE
@@ -1016,12 +1016,13 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                 }
                 else // resident attribute
                 {
-                    qDebug() << "resident attribute 2";
+                    //qDebug() << "resident attribute 2";
                     curblkstart = 0;
 		    curblkend = 0;
                     curblkstart = residentoffset + fsoffset;
-                    curblkend = curblkstart + mftrecordsize;
-                    if(posBa >= curblkstart && posBa < curblkend)
+                    curblkend = curblkstart + mftrecordsize - 1;
+		    qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
+                    if(posBa >= curblkstart && posBa <= qMin((curblkstart + filelength), curblkend))
                     {
 			qDebug() << "should be blue.";
 			c = contentbrush.color(); // BLUE
