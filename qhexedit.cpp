@@ -1067,13 +1067,12 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                 {
 		    QChar qch = QChar((uchar)_dataShown.at(bPosLine + colIdx));
                     int ch = (uchar)_dataShown.at(bPosLine + colIdx);
-		    if(!qch.isLetterOrNumber())
+		    if(qch.isLetterOrNumber())
 		    {
-			qDebug() << "qch should be .";
-			qch = '.';
+			qDebug() << "qch is:" << qch;
 		    }
 		    else
-			qDebug() << "qch is:" << qch;
+			qch = QChar('.');
                     if ( ch < 0x20 )
                         ch = '.';
                     r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
