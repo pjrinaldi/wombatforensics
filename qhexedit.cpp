@@ -965,7 +965,7 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                 {
                     if(blocklist.at(0).toInt() == 0) // resident attribute
                     {
-                        qDebug() << "resident attribute";
+                        //qDebug() << "resident attribute";
                         curblkstart = 0;
 			curblkend = 0;
                         curblkstart = residentoffset + fsoffset;
@@ -1005,8 +1005,8 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                             {
                                 if((posBa > (curblkstart + filelength - blocksize*i)) && posBa <= curblkend)
 				{
-				    qDebug() << "red";
-				    qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
+				    //qDebug() << "red";
+				    //qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
 				    c = slackbrush.color(); // RED
                                     //painter.setPen(QColor(214, 153, 153, 255)); // RED
 				}
@@ -1021,16 +1021,16 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
 		    curblkend = 0;
                     curblkstart = residentoffset + fsoffset;
                     curblkend = curblkstart + mftrecordsize - 1;
-		    qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
+		    //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
                     if(posBa >= curblkstart && posBa <= qMin((curblkstart + filelength), curblkend))
                     {
-			qDebug() << "should be blue.";
+			//qDebug() << "should be blue.";
 			c = contentbrush.color(); // BLUE
                         //painter.setPen(QColor(0, 0, 255, 255)); // BLUE
 		    }
                     if((posBa > (curblkstart + filelength)) && posBa <= curblkend)
 		    {
-			qDebug() << "should be red.";
+			//qDebug() << "should be red.";
 			c = slackbrush.color(); // RED
                         //painter.setPen(QColor(255, 0, 0, 255)); // RED
 		    }
