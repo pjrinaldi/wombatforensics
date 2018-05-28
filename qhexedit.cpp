@@ -1061,15 +1061,25 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                 painter.drawText(pxPosX, pxPosY, hexCaps()?hex.toUpper():hex);
                 pxPosX += 3*_pxCharWidth;
 
+		// Edits by Pasquale J. Rinaldi, Jr. to make the hexeditor display ascii correctly.
                 // render ascii value
                 if (_asciiArea)
                 {
+		    QChar qch = QChar((uchar)_dataShown.at(bPosLine + colIdx));
                     int ch = (uchar)_dataShown.at(bPosLine + colIdx);
+		    if(!qch.isLetterOrNumber())
+		    {
+			qDebug() << "qch should be .";
+			qch = '.';
+		    }
+		    else
+			qDebug() << "qch is:" << qch;
                     if ( ch < 0x20 )
                         ch = '.';
                     r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
                     painter.fillRect(r, c);
-                    painter.drawText(pxPosAsciiX2, pxPosY, QChar(ch));
+                    //painter.drawText(pxPosAsciiX2, pxPosY, QChar(ch));
+		    painter.drawText(pxPosAsciiX2, pxPosY, qch);
                     pxPosAsciiX2 += _pxCharWidth;
                 }
             }
