@@ -1078,7 +1078,7 @@ ttom(), text.mid(widx*charsPerWord()/2, charsPerWord()/2));
                     r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
                     painter.fillRect(r, c);
                     //painter.drawText(pxPosAsciiX2, pxPosY, QChar(ch));
-		    painter.drawText(pxPosAsciiX2, pxPosY, qch);
+		    painter.drawText(pxPosAsciiX2, pxPosY, QChar(qch.toLatin1()));
                     pxPosAsciiX2 += _pxCharWidth;
                 }
             }
