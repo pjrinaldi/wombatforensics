@@ -869,7 +869,12 @@ void WombatForensics::UpdateProperties()
     }
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 4) // file
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last() + ".prop");
+        QString tmpfvalue = "";
+        if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last().contains(":"))
+            tmpfvalue = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last().split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last().split(":").at(1);
+        else
+            tmpfvalue = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last();
+        propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "." + tmpfvalue + ".prop");
     }
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream in(&propfile);
@@ -1123,10 +1128,11 @@ void WombatForensics::LoadHexContents()
         QStringList filelist;
         filelist.clear();
         QString tmpfilename = "";
-        if(tmpfilename.contains(":"))
+        if(wombatvariable.selectedid.split("-").at(3).mid(1).contains(":"))
             tmpfilename = wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0) + QString("-") + wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(1);
         else
             tmpfilename = wombatvariable.selectedid.split("-").at(3).mid(1);
+        qDebug() << "f value:" << tmpfilename;
         QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".p" + wombatvariable.selectedid.split("-").at(2).mid(1) + ".f" + tmpfilename + ".a*"), QDir::NoSymLinks | QDir::Files);
         QFile filefile;
         if(filefiles.count() == 1)
