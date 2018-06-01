@@ -1122,7 +1122,12 @@ void WombatForensics::LoadHexContents()
         partlist = tmpstr.split(",");
         QStringList filelist;
         filelist.clear();
-        QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".p" + wombatvariable.selectedid.split("-").at(2).mid(1) + ".f" + wombatvariable.selectedid.split("-").at(3).mid(1) + ".a*"), QDir::NoSymLinks | QDir::Files);
+        QString tmpfilename = "";
+        if(tmpfilename.contains(":"))
+            tmpfilename = wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0) + QString("-") + wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(1);
+        else
+            tmpfilename = wombatvariable.selectedid.split("-").at(3).mid(1);
+        QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".p" + wombatvariable.selectedid.split("-").at(2).mid(1) + ".f" + tmpfilename + ".a*"), QDir::NoSymLinks | QDir::Files);
         QFile filefile;
         if(filefiles.count() == 1)
             filefile.setFileName(wombatvariable.tmpmntpath + filefiles.at(0));
