@@ -824,6 +824,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Orphan,";
         proplist << "||allocation status for the file." << endl;
     }
+    qDebug() << "Get Block List:" << GetBlockList(curfileinfo);
     proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;
     if(GetBlockList(curfileinfo).compare("") != 0)
         proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
