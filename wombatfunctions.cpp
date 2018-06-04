@@ -96,6 +96,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
+        qDebug() << "ntfs address:" << QString::number(addr);
         if(tmpfile->name != NULL)
         {
             if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0) || (strcmp(tmpfile->name->name, "$OrphanFiles") == 0))
@@ -127,6 +128,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
             }
         }
     }
+    qDebug() << "getblockaddr blockstring:" << blockstring;
     return TSK_WALK_CONT;
 }
 
@@ -685,7 +687,7 @@ QString GetAdsBlockList(TSK_FS_FILE* tmpfile, unsigned long long attrid)
 
 QString GetBlockList(TSK_FS_FILE* tmpfile)
 {
-    blockstring = "";
+    //blockstring = "";
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
     {
         if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
@@ -739,6 +741,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
                     }
                 }
             }
+            //qDebug() << "ntfs blockstring:" << blockstring;
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
         {
@@ -824,7 +827,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Orphan,";
         proplist << "||allocation status for the file." << endl;
     }
-    qDebug() << "Get Block List:" << GetBlockList(curfileinfo);
+    //qDebug() << "Get Block List:" << GetBlockList(curfileinfo);
     proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;
     if(GetBlockList(curfileinfo).compare("") != 0)
         proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
