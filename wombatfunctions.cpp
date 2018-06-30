@@ -73,6 +73,7 @@ bool FileExists(const std::string& filename)
 
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
 {
+    QString tmpblkstr = "";
     if(off < 0)
     {
         // remove compile warning
@@ -97,11 +98,13 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
         qDebug() << "ntfs address:" << QString::number(addr);
+	tmpblkstr += QString::number(addr) + "^^";
         if(tmpfile->name != NULL)
         {
             if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0) || (strcmp(tmpfile->name->name, "$OrphanFiles") == 0))
             {
                 blockstring += QString::number(addr) + "^^";
+		qDebug() << "ntfs blockstring:" << blockstring;
             }
         }
         else
@@ -129,6 +132,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
         }
     }
     qDebug() << "getblockaddr blockstring:" << blockstring;
+    qDebug() << "tmpblkstr:" << tmpblkstr;
     return TSK_WALK_CONT;
 }
 
@@ -741,7 +745,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
                     }
                 }
             }
-            //qDebug() << "ntfs blockstring:" << blockstring;
+            qDebug() << "ntfs blockstring:" << blockstring;
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
         {
