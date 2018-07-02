@@ -73,7 +73,7 @@ bool FileExists(const std::string& filename)
 
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
 {
-    QString tmpblkstr = "";
+    //QString tmpblkstr = "";
     if(off < 0)
     {
         // remove compile warning
@@ -97,25 +97,25 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
-        qDebug() << "ntfs address:" << QString::number(addr);
-	tmpblkstr += QString::number(addr) + "^^";
+        //qDebug() << "ntfs address:" << QString::number(addr);
+	// tmpblkstr += QString::number(addr) + "^^";
         if(tmpfile->name != NULL)
         {
             if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0) || (strcmp(tmpfile->name->name, "$OrphanFiles") == 0))
             {
                 blockstring += QString::number(addr) + "^^";
-		qDebug() << tmpfile->name->name << "blockstring:" << blockstring;
+		//qDebug() << tmpfile->name->name << "blockstring:" << blockstring;
             }
             else
             {
                 blockstring += QString::number(addr) + "^^";
-                qDebug() << "ntfs name blockstring:" << blockstring;
+                //qDebug() << "ntfs name blockstring:" << blockstring;
             }
         }
         else
         {
             blockstring += QString::number(addr) + "^^";
-            qDebug() << "ntfs file blockstring:" << blockstring;
+            //qDebug() << "ntfs file blockstring:" << blockstring;
         }
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
@@ -139,8 +139,8 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
             }
         }
     }
-    qDebug() << "getblockaddr blockstring:" << blockstring;
-    qDebug() << "tmpblkstr:" << tmpblkstr;
+    //qDebug() << "getblockaddr blockstring:" << blockstring;
+    //qDebug() << "tmpblkstr:" << tmpblkstr;
     return TSK_WALK_CONT;
 }
 
@@ -752,7 +752,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
                     }
                 }
             }
-            qDebug() << "ntfs blockstring:" << blockstring;
+            //qDebug() << "ntfs blockstring:" << blockstring;
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
         {
@@ -840,9 +840,9 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
     }
     qDebug() << "Get Block List:" << GetBlockList(curfileinfo);
     proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;
-    if(GetBlockList(curfileinfo).compare("") != 0)
-        proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
-    else
+    //if(GetBlockList(curfileinfo).compare("") != 0)
+        //proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+    if(GetBlockList(curfileinfo).compare("") == 0 || GetBlockList(curfileinfo).compare("0^^") == 0)
     {
         if(curfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
@@ -861,6 +861,8 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
         else
             proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file" << endl;
     }
+    else
+        proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
     proplist.flush();
     filepropfile.close();
 }
