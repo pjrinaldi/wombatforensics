@@ -718,7 +718,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
-            unsigned long long minads = 1000;
+            int minads = 1000;
             /*
             for(int i = 0; i < adsattrid.count(); i++)
             {
@@ -732,6 +732,12 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
                 {
                     int cnt, i;
                     cnt = tsk_fs_file_attr_getsize(tmpfile);
+                    for(i = 0; i < cnt; i++)
+                    {
+                        const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                        if(tmpattr->id < minads)
+                            minads = tmpattr->id;
+                    }
                     for(i = 0; i < cnt; i++)
                     {
                         const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
@@ -831,7 +837,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Orphan,";
         proplist << "||allocation status for the file." << endl;
     }
-    //qDebug() << "Get Block List:" << GetBlockList(curfileinfo);
+    qDebug() << "Get Block List:" << GetBlockList(curfileinfo);
     proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;
     if(GetBlockList(curfileinfo).compare("") != 0)
         proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
