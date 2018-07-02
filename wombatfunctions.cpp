@@ -104,11 +104,19 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
             if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0) || (strcmp(tmpfile->name->name, "$OrphanFiles") == 0))
             {
                 blockstring += QString::number(addr) + "^^";
-		qDebug() << "ntfs blockstring:" << blockstring;
+		qDebug() << tmpfile->name->name << "blockstring:" << blockstring;
+            }
+            else
+            {
+                blockstring += QString::number(addr) + "^^";
+                qDebug() << "ntfs name blockstring:" << blockstring;
             }
         }
         else
+        {
             blockstring += QString::number(addr) + "^^";
+            qDebug() << "ntfs file blockstring:" << blockstring;
+        }
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
     {
@@ -719,13 +727,6 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
             int minads = 1000;
-            /*
-            for(int i = 0; i < adsattrid.count(); i++)
-            {
-                if(adsattrid.at(i) < minads)
-                    minads = adsattrid.at(i);
-            }
-            */
             if(tmpfile->meta != NULL)
             {
                 if(tmpfile->meta->attr)
@@ -743,7 +744,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
                         const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
                         if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
                         {
-                            if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id < (int)minads)
+                            if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id < minads)
                             {
                                 tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
                             }
