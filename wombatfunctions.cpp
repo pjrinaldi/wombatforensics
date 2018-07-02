@@ -699,7 +699,7 @@ QString GetAdsBlockList(TSK_FS_FILE* tmpfile, unsigned long long attrid)
 
 QString GetBlockList(TSK_FS_FILE* tmpfile)
 {
-    //blockstring = "";
+    blockstring = "";
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
     {
         if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
@@ -736,15 +736,23 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
                     for(i = 0; i < cnt; i++)
                     {
                         const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                        if(tmpattr->id < minads)
-                            minads = tmpattr->id;
+                        if(tmpattr->flags & TSK_FS_ATTR_NONRES)
+                        {
+                            if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA)
+                            {
+                                //qDebug() << "tmpattr id:" << tmpattr->id;
+                                if(tmpattr->id < minads)
+                                    minads = tmpattr->id;
+                            }
+                        }
                     }
+                    //qDebug() << "minads:" << minads;
                     for(i = 0; i < cnt; i++)
                     {
                         const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
                         if(tmpattr->flags & TSK_FS_ATTR_NONRES) // non resident attribute
                         {
-                            if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id < minads)
+                            if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id == minads)
                             {
                                 tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
                             }
@@ -838,7 +846,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
             proplist << "Orphan,";
         proplist << "||allocation status for the file." << endl;
     }
-    qDebug() << "Get Block List:" << GetBlockList(curfileinfo);
+    //qDebug() << "Get Block List:" << GetBlockList(curfileinfo);
     proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;
     //if(GetBlockList(curfileinfo).compare("") != 0)
         //proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
