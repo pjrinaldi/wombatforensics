@@ -736,6 +736,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
                     for(i = 0; i < cnt; i++)
                     {
                         const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                        qDebug() << tmpattr->fs_file->meta->name2 << tmpattr->id << tmpattr->type << tmpattr->nrd.skiplen << tmpattr->size << tmpattr->rd.offset;
                         if(tmpattr->flags & TSK_FS_ATTR_NONRES)
                         {
                             if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA)
