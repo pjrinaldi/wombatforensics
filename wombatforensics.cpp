@@ -1211,7 +1211,7 @@ void WombatForensics::LoadHexContents()
         else // NTFS
         {
 	    QByteArray rbuf = ui->hexview->dataAt(residentstring.toULongLong(), 1024);
-	    qDebug() << QString::fromStdString(rbuf.toStdString());
+	    qDebug() << rbuf.at(0) << rbuf.mid(0, 4) << tsk_getu16(TSK_LIT_ENDIAN, rbuf.mid(20, 2).toHex());
 	    /*
 	    char* rbuf = new char[1024]; // buffer to store resident attribute information to determine the offset for the content.
 	    tsk_img_read(
