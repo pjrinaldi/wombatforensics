@@ -1182,14 +1182,42 @@ void WombatForensics::LoadHexContents()
             }
         }
         filefileprop.close();
+	/*
+
+        char* ibuffer = new char[tskexternalptr->readfileinfo->meta->size];
+        // WILL NEED TO FIGURE OUT IF ITS AN ATTRIBUTE OR NOT AND HANDLE THE IF BELOW...
+        //if(objtype == 5)
+        filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        //else
+        (new QDir())->mkpath(wombatvariable.tmpfilepath);
+        QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-tmp";
+        QFile tmpfile(tmpstring);
+        if(tmpfile.open(QIODevice::WriteOnly))
+        {
+            QDataStream outbuffer(&tmpfile);
+            outbuffer.writeRawData(ibuffer, filelen);
+            tmpfile.close();
+        }
+        delete[] ibuffer;
+
+
+	*/
         if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
         {
             // fsoffset, blocksize, blockstring, residentoffset, byteoffset, file length
             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong());
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
         }
-        else
+        else // NTFS
         {
+	    QByteArray rbuf = ui->hexview->dataAt(residentstring.toULongLong(), 1024);
+	    qDebug() << QString::fromStdString(rbuf.toStdString());
+	    /*
+	    char* rbuf = new char[1024]; // buffer to store resident attribute information to determine the offset for the content.
+	    tsk_img_read(
+
+	    delete[] rbuf;
+	    */
 	    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong());
 	    ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
         }
