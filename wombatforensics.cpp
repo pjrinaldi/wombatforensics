@@ -1205,20 +1205,40 @@ void WombatForensics::LoadHexContents()
         if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
         {
             // fsoffset, blocksize, blockstring, residentoffset, byteoffset, file length
-            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong());
+            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
         }
         else // NTFS
         {
+            unsigned int off1 = 0;
+            unsigned int attrtype = 0;
 	    QByteArray rbuf = ui->hexview->dataAt(residentstring.toULongLong(), 1024);
-	    qDebug() << rbuf.at(0) << rbuf.mid(0, 4) << tsk_getu16(TSK_LIT_ENDIAN, rbuf.mid(20, 2).toHex());
-	    /*
-	    char* rbuf = new char[1024]; // buffer to store resident attribute information to determine the offset for the content.
-	    tsk_img_read(
-
-	    delete[] rbuf;
-	    */
-	    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong());
+            uint8_t* mftoff[2];
+            uint8_t* mftlen[4];
+            uint8_t attype = 0;
+            mftoff[0] = (unsigned char*)rbuf.at(20);
+            mftoff[1] = (unsigned char*)rbuf.at(21);
+            off1 = tsk_getu16(TSK_LIT_ENDIAN, mftoff);
+	    qDebug() << rbuf.at(0) << rbuf.mid(0, 4) << off1;
+            while(attype < 127)
+            {
+                attype = (unsigned char)rbuf.at(off1);
+                if(attype == 128)
+                    break;
+                mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
+                mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
+                mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
+                mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
+                off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+            }
+            mftoff[0] = (unsigned char*)rbuf.at(off1 + 20);
+            mftoff[1] = (unsigned char*)rbuf.at(off1 + 21);
+            off1 = off1 + tsk_getu16(TSK_LIT_ENDIAN, mftoff);
+            qDebug() << "final offset value:" << off1;
+            unsigned long long resval = residentstring.toULongLong() + off1;
+            qDebug() << "resident data offset:" << resval;
+	    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(resval), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), off1);
+	    //ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong());
 	    ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
         }
         /*
