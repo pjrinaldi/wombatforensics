@@ -1256,10 +1256,13 @@ void WombatForensics::LoadHexContents()
             }
             else if(filelist.at(1).toInt() == 3) // directory
             {
+                qDebug() << "off1:" << off1;
+                qDebug() << "residentstring:" << residentstring;
+                /*
                 while(attype < 143)
                 {
                     attype = (unsigned char)rbuf.at(off1);
-                    qDebug() << "attype:" << attype;
+                    //qDebug() << "attype:" << attype;
                     if(attype == 144)
                         break;
                     mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
@@ -1270,6 +1273,8 @@ void WombatForensics::LoadHexContents()
                 }
                 resval = residentstring.toULongLong() + off1;
                 qDebug() << "resident data offset:" << resval;
+                */
+                resval = residentstring.toULongLong() + off1;
             }
             else
                 resval = residentstring.toULongLong();
