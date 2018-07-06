@@ -1212,6 +1212,8 @@ void WombatForensics::LoadHexContents()
             }
             else if(filelist.at(1).toInt() == 3) // directory
             {
+                ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+                ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
                 // this will screw up other fs, i will need to determine if it's ntfs or not to process accordingly...
             }
             else
@@ -1256,8 +1258,8 @@ void WombatForensics::LoadHexContents()
             {
                 while(attype < 143)
                 {
-                    qDebug() << "attype:" << attype;
                     attype = (unsigned char)rbuf.at(off1);
+                    qDebug() << "attype:" << attype;
                     if(attype == 144)
                         break;
                     mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
