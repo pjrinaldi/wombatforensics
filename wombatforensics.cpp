@@ -1258,6 +1258,15 @@ void WombatForensics::LoadHexContents()
             {
                 qDebug() << "off1:" << off1;
                 qDebug() << "residentstring:" << residentstring;
+                qDebug() << "attype:" << (unsigned char)rbuf.at(off1);
+                attype = (unsigned char)rbuf.at(off1);
+                mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
+                mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
+                mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
+                mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
+                qDebug() << "attr len:" << tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                qDebug() << "new off1:" << off1;
                 /*
                 while(attype < 143)
                 {
