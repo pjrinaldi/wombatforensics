@@ -1202,6 +1202,11 @@ void WombatForensics::LoadHexContents()
 
 
 	*/
+        qDebug() << "partfile fstype:" << partlist.at(0);
+        if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT)
+            qDebug() << "it's ntfs!";
+        else
+            qDebug() << "it's not ntfs?";
         if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
         {
             if(filelist.at(1).toInt() == 5) // regular file
