@@ -1212,6 +1212,7 @@ void WombatForensics::LoadHexContents()
             }
             else if(filelist.at(1).toInt() == 3) // directory
             {
+                // NEED TO DETERMINE IF IT IS NTFS.. IF IT IS, THEN DON'T USE THE BELOW AND RATHER USE THE NTFS ELSE DOUBLE BELOW...
                 ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
                 ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
                 // this will screw up other fs, i will need to determine if it's ntfs or not to process accordingly...
@@ -1256,34 +1257,54 @@ void WombatForensics::LoadHexContents()
             }
             else if(filelist.at(1).toInt() == 3) // directory
             {
-                qDebug() << "off1:" << off1;
-                qDebug() << "residentstring:" << residentstring;
-                qDebug() << "attype:" << (unsigned char)rbuf.at(off1);
-                attype = (unsigned char)rbuf.at(off1);
-                mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
-                mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
-                mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
-                mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
-                qDebug() << "attr len:" << tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                qDebug() << "new off1:" << off1;
-                /*
-                while(attype < 143)
+                while(attype < 127)
                 {
+                    qDebug() << "off1:" << off1;
+                    qDebug() << "residentstring:" << residentstring;
+                    qDebug() << "attype:" << (unsigned char)rbuf.at(off1);
                     attype = (unsigned char)rbuf.at(off1);
-                    //qDebug() << "attype:" << attype;
-                    if(attype == 144)
+                    if(attype == 128 || attype == 144)
                         break;
                     mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
                     mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
                     mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
                     mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
+                    qDebug() << "attr len:" << tsk_getu32(TSK_LIT_ENDIAN, mftlen);
                     off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                    qDebug() << "new off1:" << off1;
                 }
+                qDebug() << "final countdown";
+                qDebug() << "final off1 start:" << off1;
+                qDebug() << "off1+4" << (unsigned char)rbuf.at(off1 + 4);
+                if(attype == 128)
+                {
+                    // manual way...
+                    uint8_t val0 = (unsigned char)rbuf.at(off1 + 4);
+                    uint8_t val1 = (unsigned char)rbuf.at(off1 + 5);
+                    uint8_t val2 = (unsigned char)rbuf.at(off1 + 6);
+                    uint8_t val3 = (unsigned char)rbuf.at(off1 + 7);
+                    qDebug() << val0 << val1 << val2 << val3;
+                    int manuel = (val3 << 24) | (val2 << 16) | (val1 << 8) | val0;
+                    qDebug() << "manuel:" << manuel;
+                    off1 = off1 + manuel;
+                    qDebug() << "new off1:" << off1;
+                    qDebug() << "get data length to jump to 144";
+                    attype = (unsigned char)rbuf.at(off1);
+                    if(attype == 144)
+                    {
+                        qDebug() << "yeah it's right!";
+                        off1 = off1 + 32;
+                    }
+                }
+                else if(attype == 144)
+                {
+                    qDebug() << "off1 is our man.";
+                    off1 = off1 + 32;
+                }
+                else
+                    qDebug() << "what happened?";
                 resval = residentstring.toULongLong() + off1;
                 qDebug() << "resident data offset:" << resval;
-                */
-                resval = residentstring.toULongLong() + off1;
             }
             else
                 resval = residentstring.toULongLong();
