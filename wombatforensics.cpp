@@ -1202,7 +1202,7 @@ void WombatForensics::LoadHexContents()
 
 
 	*/
-        qDebug() << "partfile fstype:" << partlist.at(0);
+        //qDebug() << "partfile fstype:" << partlist.at(0);
         // IN IT'S CURRENT LAYOUT:
         // RESIDENT NTFS FILE WORKS, RESIDENT NTFS FILE ADS FAILS
         // RESIDENT DIR WORKS, RESIDENT DIR ADS FAILS
@@ -1213,9 +1213,16 @@ void WombatForensics::LoadHexContents()
         // THE PIECES ARE THERE, I JUST NEED TO IF/ELSE IT CORRECTLY TO CAPTURE THE RIGHT CONDITIONS
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT)
         {
+	    if(filelist.at(1).toInt() == 5) // regular file
+	    {
+	    }
+	    else if(filelist.at(1).toInt() == 3) // directory
+	    {
+	    }
+	    else
+		qDebug() << "display/log error here.";
             // NOW DO THE IS A FILE OR DIRECTORY AND ACT ACCORDINGLY...
             // THEN DO DOES IT HAVE BLOCKS OR NOT FOR FILES, JUST DO THE RESIDENT FOR DIRECTORIES.
-            qDebug() << "it's ntfs!";
         }
         else
         {
