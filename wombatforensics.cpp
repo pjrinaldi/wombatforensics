@@ -1213,24 +1213,111 @@ void WombatForensics::LoadHexContents()
         // THE PIECES ARE THERE, I JUST NEED TO IF/ELSE IT CORRECTLY TO CAPTURE THE RIGHT CONDITIONS
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // NTFS (resident/non-resident)
         {
+	    unsigned long long resval = 0;
+	    unsigned int off1 = 0;
+            unsigned int attrtype = 0;
+	    QByteArray rbuf = ui->hexview->dataAt(residentstring.toULongLong(), 1024);
+    	    uint8_t* mftoff[2];
+            uint8_t* mftlen[4];
+	    uint8_t attype = 0;
+
 	    if(filelist.at(1).toInt() == 5) // regular file
 	    {
-		if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
+		if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // non-resident
 		{
+		    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+		    ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+		}
+		else // resident
+		{
+		    mftoff[0] = (unsigned char*)rbuf.at(20);
+		    mftoff[1] = (unsigned char*)rbuf.at(21);
+		    off1 = tsk_getu16(TSK_LIT_ENDIAN, mftoff);
+		    qDebug() << rbuf.at(0) << rbuf.mid(0, 4) << off1;
+		    while(attype < 127)
+		    {
+			attype = (unsigned char)rbuf.at(off1);
+    	                if(attype == 128)
+	    	        break;
+		        mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
+			mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
+			mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
+			mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
+			off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+		    }
+		    mftoff[0] = (unsigned char*)rbuf.at(off1 + 20);
+		    mftoff[1] = (unsigned char*)rbuf.at(off1 + 21);
+		    off1 = off1 + tsk_getu16(TSK_LIT_ENDIAN, mftoff);
+	            qDebug() << "final offset value:" << off1;
+		    resval = residentstring.toULongLong() + off1;
+		    qDebug() << "resident data offset:" << resval;
 		}
 	    }
 	    else if(filelist.at(1).toInt() == 3) // directory
 	    {
+		while(attype < 127)
+                {
+                    qDebug() << "off1:" << off1;
+                    qDebug() << "residentstring:" << residentstring;
+                    qDebug() << "attype:" << (unsigned char)rbuf.at(off1);
+                    attype = (unsigned char)rbuf.at(off1);
+                    if(attype == 128 || attype == 144)
+                        break;
+                    mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
+                    mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
+                    mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
+                    mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
+                    qDebug() << "attr len:" << tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                    off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                    qDebug() << "new off1:" << off1;
+                }
+                qDebug() << "final countdown";
+                qDebug() << "final off1 start:" << off1;
+                qDebug() << "off1+4" << (unsigned char)rbuf.at(off1 + 4);
+                if(attype == 128)
+                {
+                    // manual way...
+                    uint8_t val0 = (unsigned char)rbuf.at(off1 + 4);
+                    uint8_t val1 = (unsigned char)rbuf.at(off1 + 5);
+                    uint8_t val2 = (unsigned char)rbuf.at(off1 + 6);
+                    uint8_t val3 = (unsigned char)rbuf.at(off1 + 7);
+                    qDebug() << val0 << val1 << val2 << val3;
+                    int manuel = (val3 << 24) | (val2 << 16) | (val1 << 8) | val0;
+                    qDebug() << "manuel:" << manuel;
+                    off1 = off1 + manuel;
+                    qDebug() << "new off1:" << off1;
+                    qDebug() << "get data length to jump to 144";
+                    attype = (unsigned char)rbuf.at(off1);
+                    if(attype == 144)
+                    {
+                        qDebug() << "yeah it's right!";
+                        off1 = off1 + 32;
+                    }
+                }
+                else if(attype == 144)
+                {
+                    qDebug() << "off1 is our man.";
+                    off1 = off1 + 32;
+                }
+                else
+                    qDebug() << "what happened?";
+                resval = residentstring.toULongLong() + off1;
+                qDebug() << "resident data offset:" << resval;
+            }
+            else
+	    {
+		qDebug() << "some other option i haven't accounted for.";
+                resval = residentstring.toULongLong();
 	    }
-	    else
-		qDebug() << "display/log error here.";
+            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(resval), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), off1);
+    	    ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
             // NOW DO THE IS A FILE OR DIRECTORY AND ACT ACCORDINGLY...
             // THEN DO DOES IT HAVE BLOCKS OR NOT FOR FILES, JUST DO THE RESIDENT FOR DIRECTORIES.
         }
-        else
+        else // other file systems
         {
-                ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
-                ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+            ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
             // NOW DO THE IS IT BLOCKS OR NOT, THEN ACT ACCORDINGLY WITH 
             qDebug() << "it's not ntfs?";
         }
