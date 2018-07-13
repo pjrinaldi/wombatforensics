@@ -1211,6 +1211,10 @@ void WombatForensics::LoadHexContents()
         // RESIDENT DIR FAILS, NO ADS ASSOCIATED DATA
         //
         // THE PIECES ARE THERE, I JUST NEED TO IF/ELSE IT CORRECTLY TO CAPTURE THE RIGHT CONDITIONS
+        if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // ads
+            qDebug() << "it is an ads";
+        else
+            qDebug() << "it isn't ads";
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // NTFS (resident/non-resident)
         {
 	    unsigned long long resval = 0;
