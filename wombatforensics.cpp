@@ -1213,11 +1213,20 @@ void WombatForensics::LoadHexContents()
         // THE PIECES ARE THERE, I JUST NEED TO IF/ELSE IT CORRECTLY TO CAPTURE THE RIGHT CONDITIONS
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
         {
+            unsigned long long resval = 0;
+            unsigned int curoffset = 0;
+            uint8_t* mftoff[2];
+            uint8_t* mftlen[4];
+            uint8_t atrtype = 0;
+	    //QByteArray rbuf = ui->hexview->dataAt(residentstring.toULongLong(), 1024);
+
             if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
             {
                 if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                 {
                     qDebug() << "non-resident ads";
+                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+                    ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
                 }
                 else // IF RESIDENT
                 {
@@ -1235,6 +1244,8 @@ void WombatForensics::LoadHexContents()
                     if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                     {
                         qDebug() << "non-resident file";
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+                        ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
                     }
                     else // IF RESIDENT
                     {
@@ -1251,19 +1262,8 @@ void WombatForensics::LoadHexContents()
 
 
         /*
-        if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // ads
-            qDebug() << "it is an ads";
-        else
-            qDebug() << "it isn't ads";
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // NTFS (resident/non-resident)
         {
-	    unsigned long long resval = 0;
-	    unsigned int off1 = 0;
-            unsigned int attrtype = 0;
-	    QByteArray rbuf = ui->hexview->dataAt(residentstring.toULongLong(), 1024);
-    	    uint8_t* mftoff[2];
-            uint8_t* mftlen[4];
-	    uint8_t attype = 0;
 
 	    if(filelist.at(1).toInt() == 5) // regular file
 	    {
