@@ -1211,6 +1211,46 @@ void WombatForensics::LoadHexContents()
         // RESIDENT DIR FAILS, NO ADS ASSOCIATED DATA
         //
         // THE PIECES ARE THERE, I JUST NEED TO IF/ELSE IT CORRECTLY TO CAPTURE THE RIGHT CONDITIONS
+        if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
+        {
+            if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
+            {
+                if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
+                {
+                    qDebug() << "non-resident ads";
+                }
+                else // IF RESIDENT
+                {
+                    qDebug() << "resident ads";
+                }
+            }
+            else // IF NOT ADS
+            {
+                if(filelist.at(1).toInt() == 3) // IF DIR
+                {
+                    qDebug() << "it's a dir - get 144 attribute offset";
+                }
+                else // IF FILE AND OTHER STUFF
+                {
+                    if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
+                    {
+                        qDebug() << "non-resident file";
+                    }
+                    else // IF RESIDENT
+                    {
+                        qDebug() << "resident file";
+                    }
+                }
+            }
+        }
+        else // OTHER FILE SYSTEM
+        {
+            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+            ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+        }
+
+
+        /*
         if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // ads
             qDebug() << "it is an ads";
         else
@@ -1325,6 +1365,7 @@ void WombatForensics::LoadHexContents()
             // NOW DO THE IS IT BLOCKS OR NOT, THEN ACT ACCORDINGLY WITH 
             qDebug() << "it's not ntfs?";
         }
+        */
 	/*
         if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
         {
