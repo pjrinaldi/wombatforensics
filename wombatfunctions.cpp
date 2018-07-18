@@ -332,6 +332,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         TSK_OFF_T curmftentrystart = 0;
         NTFS_INFO* ntfsinfo = (NTFS_INFO*)tmpfile->fs_info;
         int recordsize = 0;
+        // NEED TO REVIEW HOW I GOT TO HERE...
         if(ntfsinfo->fs->mft_rsize_c > 0)
         {
             recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize);
