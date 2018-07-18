@@ -1215,10 +1215,12 @@ void WombatForensics::LoadHexContents()
         {
             unsigned long long resval = 0;
             unsigned int curoffset = 0;
-            uint8_t* mftoff[2];
+            uint8_t* mftoffset[2];
+            uint8_t* nextattrid[2];
+            uint8_t* contentoffset[2];
             uint8_t* mftlen[4];
             uint8_t atrtype = 0;
-	    //QByteArray rbuf = ui->hexview->dataAt(residentstring.toULongLong(), 1024);
+            uint8_t namelength = 0;
 
             if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
             {
@@ -1231,6 +1233,21 @@ void WombatForensics::LoadHexContents()
                 else // IF RESIDENT
                 {
                     qDebug() << "resident ads";
+                    /*
+                    QByteArray resbuffer = ui->hexview->dataAt(residentstring.toULongLong(), 1024); // MFT Entry
+                    curoffset = 0;
+                    qDebug() << "residentstring:" << residentstring.toULongLong();
+                    qDebug() << resbuffer.at(0) << resbuffer.mid(0, 4) << curoffset;
+                    mftoffset[0] = (unsigned char*)resbuffer.at(20);
+                    mftoffset[1] = (unsigned char*)resbuffer.at(21);
+                    nextattrid[0] = (unsigned char*)resbuffer.at(40);
+                    nextattrid[1] = (unsigned char*)resbuffer.at(41);
+                    curoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                    qDebug() << "initial curoffset:" << curoffset;
+                    qDebug() << "next attribute id:" << tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                    */
+                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+                    ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
                 }
             }
             else // IF NOT ADS
