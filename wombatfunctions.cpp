@@ -351,6 +351,9 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
             {
+                // I THINK I CAN REDO THIS TO ACCOUNT FOR THE PROPER RESIDENT OFFSET FOR THE ALTERNATE DATA STREAM.
+                // SHOULD BE ABLE TO USE FSATTR->TYPE == TSK_FS_ATTR_TYPE_NTFS_DATA OR TSK_FS_ATTR_TYPE_NTFS_IDXROOT
+                // TO NARROW DOWN THE ATTRIBUTE. THEN I'LL HAVE TO PARSE THE MFT TO PULL OUT THE DATA I NEED FOR THE ATTRIBUTE.
                 int cnt, i;
                 cnt = tsk_fs_file_attr_getsize(tmpfile);
                 for(i = 0; i < cnt; i++)
