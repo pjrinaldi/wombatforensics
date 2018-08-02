@@ -354,6 +354,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 // I THINK I CAN REDO THIS TO ACCOUNT FOR THE PROPER RESIDENT OFFSET FOR THE ALTERNATE DATA STREAM.
                 // SHOULD BE ABLE TO USE FSATTR->TYPE == TSK_FS_ATTR_TYPE_NTFS_DATA OR TSK_FS_ATTR_TYPE_NTFS_IDXROOT
                 // TO NARROW DOWN THE ATTRIBUTE. THEN I'LL HAVE TO PARSE THE MFT TO PULL OUT THE DATA I NEED FOR THE ATTRIBUTE.
+                // USE TSK_FS_ATTR_FLAG_ENUM FSATTR->FLAGS == TSK_FS_ATTR_RES OR TSK_FS_ATTR_NONRES TO DETERMINE IF IT'S
+                // RESIDENT OR NON-RESIDENT AND WILL REQUIRE BLOCK STRING OR RESIDENTSTRING...
                 int cnt, i;
                 cnt = tsk_fs_file_attr_getsize(tmpfile);
                 qDebug() << "ntfs file/dir:" << QString(tmpfile->name->name);
@@ -364,6 +366,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     qDebug() << "attr:" << fsattr->id << "name:" << QString(fsattr->name) << "type:" << fsattr->type;
                     if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && QString(fsattr->name).size() > 0 && (tmpfile->name->type == TSK_FS_NAME_TYPE_REG || tmpfile->name->type == TSK_FS_NAME_TYPE_DIR))
                         qDebug() << "ads file:" << QString(fsattr->name);
+                    if(fsattr->flags & TSK_FS_ATTR_RES)
+                        qDebug() << "resident";
+                    else if(fsattr->flags & TSK_FS_ATTR_NONRES)
+                        qDebug() << "non-resident";
                     //else if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_IDXROOT && tmpfile->name->type == TSK_FS_NAME_TYPE_DIR)
                     //    qDebug() << "dir:" << QString(fsattr->name);
                     adssize += 24;
