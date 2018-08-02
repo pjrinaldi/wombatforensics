@@ -360,6 +360,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 {
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                    if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA)
+                        qDebug() << QString(fsattr->name);
+                    else if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_IDXROOT)
+                        qDebug() << QString(fsattr->name);
                     adssize += 24;
                     adssize += (unsigned long long)fsattr->size;
                     if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
