@@ -356,14 +356,16 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 // TO NARROW DOWN THE ATTRIBUTE. THEN I'LL HAVE TO PARSE THE MFT TO PULL OUT THE DATA I NEED FOR THE ATTRIBUTE.
                 int cnt, i;
                 cnt = tsk_fs_file_attr_getsize(tmpfile);
+                qDebug() << "ntfs file/dir:" << QString(tmpfile->name->name);
                 for(i = 0; i < cnt; i++)
                 {
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                    if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && QString(fsattr->name).size() > 0)
-                        qDebug() << "file:" << QString(fsattr->name);
-                    else if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_IDXROOT)
-                        qDebug() << "dir:" << QString(fsattr->name);
+                    qDebug() << "attr:" << fsattr->id << "name:" << QString(fsattr->name) << "type:" << fsattr->type;
+                    if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && QString(fsattr->name).size() > 0 && (tmpfile->name->type == TSK_FS_NAME_TYPE_REG || tmpfile->name->type == TSK_FS_NAME_TYPE_DIR))
+                        qDebug() << "ads file:" << QString(fsattr->name);
+                    //else if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_IDXROOT && tmpfile->name->type == TSK_FS_NAME_TYPE_DIR)
+                    //    qDebug() << "dir:" << QString(fsattr->name);
                     adssize += 24;
                     adssize += (unsigned long long)fsattr->size;
                     if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
