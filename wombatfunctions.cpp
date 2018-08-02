@@ -358,11 +358,12 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 // RESIDENT OR NON-RESIDENT AND WILL REQUIRE BLOCK STRING OR RESIDENTSTRING...
                 int cnt, i;
                 cnt = tsk_fs_file_attr_getsize(tmpfile);
-                qDebug() << "ntfs file/dir:" << QString(tmpfile->name->name);
+                //qDebug() << "ntfs file/dir:" << QString(tmpfile->name->name);
                 for(i = 0; i < cnt; i++)
                 {
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                    /*
                     qDebug() << "attr:" << fsattr->id << "name:" << QString(fsattr->name) << "type:" << fsattr->type;
                     if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && QString(fsattr->name).size() > 0 && (tmpfile->name->type == TSK_FS_NAME_TYPE_REG || tmpfile->name->type == TSK_FS_NAME_TYPE_DIR))
                         qDebug() << "ads file:" << QString(fsattr->name);
@@ -372,6 +373,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                         qDebug() << "non-resident";
                     //else if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_IDXROOT && tmpfile->name->type == TSK_FS_NAME_TYPE_DIR)
                     //    qDebug() << "dir:" << QString(fsattr->name);
+                    */
                     adssize += 24;
                     adssize += (unsigned long long)fsattr->size;
                     if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
@@ -792,6 +794,16 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
 
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString fvalue, unsigned long long adssize, QString attrid)
 {
+    /*
+    const TSK_FS_ATTR* adsattr = tsk_fs_file_attr_get_idx(curfileinfo, attrid.toInt());
+    if(adsattr != NULL)
+    {
+        if(adsattr->flags & TSK_FS_ATTR_NONRES)
+            qDebug() << attrid << QString(curfileinfo->name->name) << QString(adsattr->name) << "non-resident";
+        else if(adsattr->flags & TSK_FS_ATTR_RES)
+            qDebug() << attrid << QString(curfileinfo->name->name) << QString(adsattr->name) << "resident";
+    }
+    */
     QString curblockstring = GetAdsBlockList(curfileinfo, attrid.toULongLong());
     if(curblockstring.compare("0^^") == 0)
         curblockstring = "";
