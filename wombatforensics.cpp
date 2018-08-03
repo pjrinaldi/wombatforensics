@@ -1120,11 +1120,22 @@ void WombatForensics::LoadHexContents()
         QStringList partlist;
         partlist.clear();
         QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + wombatvariable.selectedid.split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
+        QStringList partpropfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".partprop.p" + wombatvariable.selectedid.split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
         QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
         partfile.open(QIODevice::ReadOnly);
         tmpstr = partfile.readLine();
         partfile.close();
         partlist = tmpstr.split(",");
+        QFile partpropfile(wombatvariable.tmpmntpath + partpropfiles.at(0));
+        partpropfile.open(QIODevice::ReadOnly);
+        QString mftentryoffset;
+        while(!partpropfile.atEnd())
+        {
+            QString tmpstring = partpropfile.readLine();
+            if(tmpstring.contains("MFT Starting Byte Address"))
+                mftentryoffset = tmpstring.split("||").at(1);
+        }
+        partpropfile.close();
         QStringList filelist;
         filelist.clear();
         QString tmpfilename = "";
@@ -1214,6 +1225,7 @@ void WombatForensics::LoadHexContents()
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
         {
             unsigned long long resval = 0;
+            unsigned long long mftoffval = 0;
             unsigned int curoffset = 0;
             uint8_t* mftoffset[2];
             uint8_t* nextattrid[2];
@@ -1232,9 +1244,10 @@ void WombatForensics::LoadHexContents()
                 }
                 else // IF RESIDENT
                 {
+                    // ADS RESIDENTSTRING IS NOT THE START OF THE MFT ENTRY, ITS THE START OF THE ADS CONTENT (BUT ITS CURRENTLY WRONG)
                     qDebug() << "resident ads";
-                    /*
-                    QByteArray resbuffer = ui->hexview->dataAt(residentstring.toULongLong(), 1024); // MFT Entry
+                    unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt());
+                    QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                     curoffset = 0;
                     qDebug() << "residentstring:" << residentstring.toULongLong();
                     qDebug() << resbuffer.at(0) << resbuffer.mid(0, 4) << curoffset;
@@ -1242,13 +1255,25 @@ void WombatForensics::LoadHexContents()
                     mftoffset[1] = (unsigned char*)resbuffer.at(21);
                     nextattrid[0] = (unsigned char*)resbuffer.at(40);
                     nextattrid[1] = (unsigned char*)resbuffer.at(41);
-                    curoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                    curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                     qDebug() << "initial curoffset:" << curoffset;
-                    qDebug() << "next attribute id:" << tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                    */
+                    int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                    qDebug() << "next attribute id:" << attrcnt;
+                    for(int i = 0; i < attrcnt; i++)
+                    {
+                        atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
+                        curoffset += (resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4);
+                        qDebug() << "curoffset:" << curoffset << "attrtype:" << atrtype;
+                        if(atrtype == 128)
+                            break;
+                    }
+                    qDebug() << "final curoffset:" << curoffset << "final attrtype:" << atrtype;
+
+
+
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
                     ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
-                    qDebug() << "resident string:" << residentstring.toULongLong();
+                    //qDebug() << "resident string:" << residentstring.toULongLong();
                     qDebug() << "1024 x id:" << 1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt();
                     // SLACK SPACE IS TOO LARGE, NEED TO GET THE ADS CONTENT START OFFSET AND THEN TAKE 1024 - THAT OFFSET
                     // RATHER THAN 1024 - THE SIZE. OR WE CAN GET THE $MFT RESIDENT OFFSET VALUE THEN ADD THE 1024*NODEID
