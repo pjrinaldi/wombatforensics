@@ -1233,6 +1233,8 @@ void WombatForensics::LoadHexContents()
             uint8_t* mftlen[4];
             uint8_t atrtype = 0;
             uint8_t namelength = 0;
+            int contentlength = 0;
+            int nameoffset = 0;
 
             if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
             {
@@ -1262,17 +1264,23 @@ void WombatForensics::LoadHexContents()
                     for(int i = 0; i < attrcnt; i++)
                     {
                         atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
-                        curoffset += (resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4);
-                        qDebug() << "curoffset:" << curoffset << "attrtype:" << atrtype;
-                        if(atrtype == 128)
+                        namelength = resbuffer.at(curoffset + 9);
+                        nameoffset = (resbuffer.at(curoffset + 11) << 8) + resbuffer.at(curoffset + 10);
+                        qDebug() << "namelength:" << namelength << "nameoffset:" << nameoffset;
+                        contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
+                        if(namelength > 0 && atrtype == 128)
                             break;
+                        curoffset += contentlength;
+                        qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
                     }
-                    qDebug() << "final curoffset:" << curoffset << "final attrtype:" << atrtype;
+                    qDebug() << "final curoffset:" << curoffset + nameoffset + namelength << "final attrtype:" << atrtype;
+                    qDebug() << "actual ads offset:" << curoffset + nameoffset + namelength + residentoffset;
 
 
 
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
-                    ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
+                    ui->hexview->setCursorPosition((residentoffset + curoffset + nameoffset + namelength)*2);
+                    //ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
                     //qDebug() << "resident string:" << residentstring.toULongLong();
                     qDebug() << "1024 x id:" << 1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt();
                     // SLACK SPACE IS TOO LARGE, NEED TO GET THE ADS CONTENT START OFFSET AND THEN TAKE 1024 - THAT OFFSET
