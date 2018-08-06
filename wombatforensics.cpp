@@ -1252,8 +1252,8 @@ void WombatForensics::LoadHexContents()
                     unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt());
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                     curoffset = 0;
-                    qDebug() << "residentstring:" << residentstring.toULongLong();
-                    qDebug() << resbuffer.at(0) << resbuffer.mid(0, 4) << curoffset;
+                    //qDebug() << "residentstring:" << residentstring.toULongLong();
+                    //qDebug() << resbuffer.at(0) << resbuffer.mid(0, 4) << curoffset;
                     mftoffset[0] = (unsigned char*)resbuffer.at(20);
                     mftoffset[1] = (unsigned char*)resbuffer.at(21);
                     nextattrid[0] = (unsigned char*)resbuffer.at(40);
@@ -1266,7 +1266,7 @@ void WombatForensics::LoadHexContents()
                     {
                         atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
                         namelength = resbuffer.at(curoffset + 9);
-                        nameoffset = (resbuffer.at(curoffset + 11) << 8) + resbuffer.at(curoffset + 10);
+                        //nameoffset = (resbuffer.at(curoffset + 11) << 8) + resbuffer.at(curoffset + 10);
                         //qDebug() << "namelength:" << namelength << "nameoffset:" << nameoffset;
                         contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
                         if(namelength > 0 && atrtype == 128)
@@ -1313,6 +1313,33 @@ void WombatForensics::LoadHexContents()
                     else // IF RESIDENT
                     {
                         qDebug() << "resident file";
+                        unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt());
+                        QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
+                        curoffset = 0;
+                        mftoffset[0] = (unsigned char*)resbuffer.at(20);
+                        mftoffset[1] = (unsigned char*)resbuffer.at(21);
+                        nextattrid[0] = (unsigned char*)resbuffer.at(40);
+                        nextattrid[1] = (unsigned char*)resbuffer.at(41);
+                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        //qDebug() << "initial curoffset:" << curoffset;
+                        int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                        //qDebug() << "next attribute id:" << attrcnt;
+                        for(int i = 0; i < attrcnt; i++)
+                        {
+                            atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
+                            namelength = resbuffer.at(curoffset + 9);
+                            contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
+                            if(namelength == 0 && atrtype == 128)
+                            {
+                                resoffset = (resbuffer.at(curoffset + 21) << 8) + resbuffer.at(curoffset + 20);
+                                break;
+                            }
+                            curoffset += contentlength;
+                            //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
+                        }
+                        //qDebug() << "test final offset:" << curoffset + resoffset + residentoffset;
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
+                        ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                     }
                 }
             }
