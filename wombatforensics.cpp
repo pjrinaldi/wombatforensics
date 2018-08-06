@@ -1301,6 +1301,60 @@ void WombatForensics::LoadHexContents()
                 if(filelist.at(1).toInt() == 3) // IF DIR
                 {
                     qDebug() << "it's a dir - get 144 attribute offset";
+                    unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt());
+                    qDebug() << "residentoffset;" << residentoffset;
+                    QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
+                    curoffset = 0;
+                    resoffset = 0;
+                    unsigned int contentsize = 0;
+                    mftoffset[0] = (unsigned char*)resbuffer.at(20);
+                    mftoffset[1] = (unsigned char*)resbuffer.at(21);
+                    nextattrid[0] = (unsigned char*)resbuffer.at(40);
+                    nextattrid[1] = (unsigned char*)resbuffer.at(41);
+                    curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                    qDebug() << "initial curoffset:" << curoffset;
+                    int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                    qDebug() << "next attribute id:" << attrcnt;
+                    for(int i = 0; i < attrcnt; i++)
+                    {
+                        atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
+                        qDebug() << "atrtype:" << atrtype;
+                        //namelength = resbuffer.at(curoffset + 9);
+                        QString tmpstring = "";
+                        bool ok;
+                        qDebug() << "attribute length (4):" << QString::number(resbuffer.at(curoffset + 4)).toInt(&ok, 16);
+                        tmpstring = QString::number(resbuffer.at(curoffset + 7)) + QString::number(resbuffer.at(curoffset + 6)) + QString::number(resbuffer.at(curoffset + 5)) + QString::number(resbuffer.at(curoffset + 4));
+                        qDebug() << tmpstring.toInt() << tmpstring.toInt(NULL, 16);
+                        mftlen[0] = (unsigned char*)resbuffer.at(curoffset + 4);
+                        mftlen[1] = (unsigned char*)resbuffer.at(curoffset + 5);
+                        mftlen[2] = (unsigned char*)resbuffer.at(curoffset + 6);
+                        mftlen[3] = (unsigned char*)resbuffer.at(curoffset + 7);
+                        contentlength = tmpstring.toInt();
+                        //contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                        //contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
+                        qDebug() << "content length (4-7):" << contentlength;
+                        /*
+                        if(namelength > 0 && atrtype == 128)
+                        {
+                            resoffset = (resbuffer.at(curoffset + 21) << 8) + resbuffer.at(curoffset + 20);
+                            contentsize = (resbuffer.at(curoffset + 19) << 24) + (resbuffer.at(curoffset + 18) << 16) + (resbuffer.at(curoffset + 17) << 8) + resbuffer.at(curoffset + 16);
+                            contentlength = contentsize;
+                        }
+                        else
+                        {
+                            resoffset = 0;
+                            contentsize = 0;
+                        }
+                        if(namelength > 0 && atrtype == 144)
+                            break;
+                        */
+                        //qDebug() << "resoffset:" << resoffset << "contentsize:" << contentsize;
+                        curoffset += contentlength;
+                        qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype;
+                        //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
+                    }
+                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
+                    ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
                 }
                 else // IF FILE AND OTHER STUFF
                 {
