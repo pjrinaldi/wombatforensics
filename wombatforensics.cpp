@@ -1284,12 +1284,12 @@ void WombatForensics::LoadHexContents()
 
 
 
-                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                     ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                     //ui->hexview->setCursorPosition((residentoffset + curoffset + nameoffset + namelength)*2);
                     //ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
                     //qDebug() << "resident string:" << residentstring.toULongLong();
-                    qDebug() << "1024 x id:" << 1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt();
+                    //qDebug() << "1024 x id:" << 1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt();
                     // SLACK SPACE IS TOO LARGE, NEED TO GET THE ADS CONTENT START OFFSET AND THEN TAKE 1024 - THAT OFFSET
                     // RATHER THAN 1024 - THE SIZE. OR WE CAN GET THE $MFT RESIDENT OFFSET VALUE THEN ADD THE 1024*NODEID
                     // THEN ADD 1024 TO GET TO THE END OF THE ENTRY. THEN TAKE RESIDENTSTRING + ADS SIZE AND SUBTRACT THE TWO

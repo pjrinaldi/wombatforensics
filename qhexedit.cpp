@@ -888,6 +888,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 			curblkend = 0;
                         curblkstart = residentoffset + fsoffset;
                         curblkend = curblkstart + mftrecordsize - dataoffset - 1;
+                        //qDebug() << "curblkend:" << curblkend;
                         //qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
                         if((unsigned)posBa >= curblkstart && (unsigned)posBa < qMin((curblkstart + filelength - 1), curblkend))
                         {
@@ -934,6 +935,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 		    curblkend = 0;
                     curblkstart = residentoffset + fsoffset;
                     curblkend = curblkstart + mftrecordsize - dataoffset - 1;
+                    //curblkend = curblkstart + mftrecordsize - dataoffset - 1;
+                    //qDebug() << "curblkend:" << curblkend;
 		    //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
                     if((unsigned)posBa >= curblkstart && (unsigned)posBa <= qMin((curblkstart + filelength - 1), curblkend))
                     {
