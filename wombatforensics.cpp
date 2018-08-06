@@ -1259,32 +1259,32 @@ void WombatForensics::LoadHexContents()
                     nextattrid[0] = (unsigned char*)resbuffer.at(40);
                     nextattrid[1] = (unsigned char*)resbuffer.at(41);
                     curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                    qDebug() << "initial curoffset:" << curoffset;
+                    //qDebug() << "initial curoffset:" << curoffset;
                     int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                    qDebug() << "next attribute id:" << attrcnt;
+                    //qDebug() << "next attribute id:" << attrcnt;
                     for(int i = 0; i < attrcnt; i++)
                     {
                         atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
                         namelength = resbuffer.at(curoffset + 9);
                         nameoffset = (resbuffer.at(curoffset + 11) << 8) + resbuffer.at(curoffset + 10);
-                        qDebug() << "namelength:" << namelength << "nameoffset:" << nameoffset;
+                        //qDebug() << "namelength:" << namelength << "nameoffset:" << nameoffset;
                         contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
                         if(namelength > 0 && atrtype == 128)
                         {
                             resoffset = (resbuffer.at(curoffset + 21) << 8) + resbuffer.at(curoffset + 20);
-                            qDebug() << "resident data offset:" << resoffset;
+                            //qDebug() << "resident data offset:" << resoffset;
                             break;
                         }
                         curoffset += contentlength;
-                        qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
+                        //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
                     }
-                    qDebug() << "final curoffset:" << curoffset + nameoffset + namelength << "final attrtype:" << atrtype;
-                    qDebug() << "actual ads offset:" << curoffset + nameoffset + namelength + residentoffset;
-                    qDebug() << "test final offset:" << curoffset + resoffset + residentoffset;
+                    //qDebug() << "final curoffset:" << curoffset + nameoffset + namelength << "final attrtype:" << atrtype;
+                    //qDebug() << "actual ads offset:" << curoffset + nameoffset + namelength + residentoffset;
+                    //qDebug() << "test final offset:" << curoffset + resoffset + residentoffset;
 
 
 
-                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
                     ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                     //ui->hexview->setCursorPosition((residentoffset + curoffset + nameoffset + namelength)*2);
                     //ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
