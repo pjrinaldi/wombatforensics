@@ -1236,6 +1236,7 @@ void WombatForensics::LoadHexContents()
             int contentlength = 0;
             int nameoffset = 0;
             unsigned int resoffset = 0;
+            unsigned int clength = 0;
 
             if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
             {
@@ -1325,12 +1326,14 @@ void WombatForensics::LoadHexContents()
                         mftlen[1] = (unsigned char*)resbuffer.at(curoffset + 5);
                         mftlen[2] = (unsigned char*)resbuffer.at(curoffset + 6);
                         mftlen[3] = (unsigned char*)resbuffer.at(curoffset + 7);
-                        contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                        qDebug() << "mftlen[0]:" << mftlen[0];
+                        //contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
                         //uint32_t clength;
                         //std::copy(mftlen, mftlen + sizeof(clength), reinterpret_cast<unsigned char*>(&clength));
                         //qDebug() << "clength:" << clength;
-                        //contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
-                        qDebug() << "content length (4-7):" << contentlength;
+                        contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
+                        clength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
+                        qDebug() << "content length (4-7):" << contentlength << clength;
                         /*
                         if(namelength > 0 && atrtype == 128)
                         {
