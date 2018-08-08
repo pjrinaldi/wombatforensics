@@ -1318,19 +1318,17 @@ void WombatForensics::LoadHexContents()
                     for(int i = 0; i < attrcnt; i++)
                     {
                         atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
+                        qDebug() << "curoffset:" << curoffset;
                         qDebug() << "atrtype:" << atrtype;
                         //namelength = resbuffer.at(curoffset + 9);
-                        QString tmpstring = "";
-                        bool ok;
-                        qDebug() << "attribute length (4):" << QString::number(resbuffer.at(curoffset + 4)).toInt(&ok, 16);
-                        tmpstring = QString::number(resbuffer.at(curoffset + 7)) + QString::number(resbuffer.at(curoffset + 6)) + QString::number(resbuffer.at(curoffset + 5)) + QString::number(resbuffer.at(curoffset + 4));
-                        qDebug() << tmpstring.toInt() << tmpstring.toInt(NULL, 16);
                         mftlen[0] = (unsigned char*)resbuffer.at(curoffset + 4);
                         mftlen[1] = (unsigned char*)resbuffer.at(curoffset + 5);
                         mftlen[2] = (unsigned char*)resbuffer.at(curoffset + 6);
                         mftlen[3] = (unsigned char*)resbuffer.at(curoffset + 7);
-                        contentlength = tmpstring.toInt();
-                        //contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                        contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                        //uint32_t clength;
+                        //std::copy(mftlen, mftlen + sizeof(clength), reinterpret_cast<unsigned char*>(&clength));
+                        //qDebug() << "clength:" << clength;
                         //contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
                         qDebug() << "content length (4-7):" << contentlength;
                         /*
