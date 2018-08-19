@@ -1306,7 +1306,6 @@ void WombatForensics::LoadHexContents()
                     unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt());
                     qDebug() << "residentoffset;" << residentoffset;
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
-                    //const uint8_t* pint = reinterpret_cast<const uint8_t*>(resbuffer);
                     curoffset = 0;
                     resoffset = 0;
                     unsigned int contentsize = 0;
@@ -1315,55 +1314,32 @@ void WombatForensics::LoadHexContents()
                     nextattrid[0] = (unsigned char*)resbuffer.at(40);
                     nextattrid[1] = (unsigned char*)resbuffer.at(41);
                     curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                    qDebug() << "initial curoffset:" << curoffset;
+                    //qDebug() << "initial curoffset:" << curoffset;
                     int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                    qDebug() << "next attribute id:" << attrcnt;
+                    //qDebug() << "next attribute id:" << attrcnt;
                     for(int i = 0; i < attrcnt; i++)
                     {
-                        //attrtype[0] = (unsigned char*)resbuffer.at(curoffset);
-                        //attrtype[1] = (unsigned char*)resbuffer.at(curoffset + 1);
-                        //attrtype[2] = (unsigned char*)resbuffer.at(curoffset + 2);
-                        //attrtype[3] = (unsigned char*)resbuffer.at(curoffset + 3);
-                        //qDebug() << "attrtype 2:" << tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                        //qDebug() << "attrtype[0]:" << attrtype;
-                        atrtype = (((unsigned char)resbuffer.at(curoffset + 3)) << 24) | (((unsigned char)resbuffer.at(curoffset + 2)) << 16) | (((unsigned char)resbuffer.at(curoffset + 1)) << 8) | ((unsigned char)resbuffer.at(curoffset));
-                        qDebug() << "curoffset:" << curoffset;
-                        qDebug() << "atrtype:" << atrtype;
-                        //namelength = resbuffer.at(curoffset + 9);
+                        atrtype = (((uint8_t)resbuffer.at(curoffset + 3)) << 24) | (((uint8_t)resbuffer.at(curoffset + 2)) << 16) | (((uint8_t)resbuffer.at(curoffset + 1)) << 8) | ((uint8_t)resbuffer.at(curoffset));
+                        //qDebug() << "curoffset:" << curoffset;
+                        //qDebug() << "atrtype:" << atrtype;
                         mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
                         mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
                         mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
                         mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                        qDebug() << "mftlen[0]:" << mftlen[0];
-                        qDebug() << "resbuffer.at(curoffset + 4):" << (uint8_t)resbuffer.at(curoffset + 4);
                         contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                        //qDebug() << "content length:" << contentlength;
-                        //uint32_t clength;
-                        //std::copy(mftlen, mftlen + sizeof(clength), reinterpret_cast<unsigned char*>(&clength));
-                        //qDebug() << "clength:" << clength;
-                        //contentlength = abs((resbuffer.at(curoffset + 7) << 24) | (resbuffer.at(curoffset + 6) << 16) | (resbuffer.at(curoffset + 5) << 8) | resbuffer.at(curoffset + 4));
-                        //clength = abs((resbuffer.at(curoffset + 7) << 24) | (resbuffer.at(curoffset + 6) << 16) | (resbuffer.at(curoffset + 5) << 8) | resbuffer.at(curoffset + 4));
-                        //qDebug() << "content length (4-7):" << contentlength << clength;
-                        /*
-                        if(namelength > 0 && atrtype == 128)
-                        {
-                            resoffset = (resbuffer.at(curoffset + 21) << 8) + resbuffer.at(curoffset + 20);
-                            contentsize = (resbuffer.at(curoffset + 19) << 24) + (resbuffer.at(curoffset + 18) << 16) + (resbuffer.at(curoffset + 17) << 8) + resbuffer.at(curoffset + 16);
-                            contentlength = contentsize;
-                        }
-                        else
-                        {
-                            resoffset = 0;
-                            contentsize = 0;
-                        }
-                        if(namelength > 0 && atrtype == 144)
-                            break;
-                        */
+                        qDebug() << "content length:" << contentlength;
                         //qDebug() << "resoffset:" << resoffset << "contentsize:" << contentsize;
+                        if(atrtype == 144)
+                            break;
                         curoffset += contentlength;
-                        qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype;
                         //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
                     }
+                    // offset to type 144 resident attribute content
+                    mftoffset[0] = (unsigned char*)resbuffer.at(curoffset + 20);
+                    mftoffset[1] = (unsigned char*)resbuffer.at(curoffset + 21);
+                    qDebug() << "offset to attr content:" << tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                    curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                    qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype;
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
                     ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
                 }
