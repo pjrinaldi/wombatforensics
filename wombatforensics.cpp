@@ -1231,6 +1231,7 @@ void WombatForensics::LoadHexContents()
             uint8_t* nextattrid[2];
             uint8_t* contentoffset[2];
             uint8_t* mftlen[4];
+            uint8_t* attrtype[4];
             uint8_t atrtype = 0;
             uint8_t namelength = 0;
             int contentlength = 0;
@@ -1318,7 +1319,13 @@ void WombatForensics::LoadHexContents()
                     qDebug() << "next attribute id:" << attrcnt;
                     for(int i = 0; i < attrcnt; i++)
                     {
-                        atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
+                        attrtype[0] = (unsigned char*)resbuffer.at(curoffset);
+                        attrtype[1] = (unsigned char*)resbuffer.at(curoffset + 1);
+                        attrtype[2] = (unsigned char*)resbuffer.at(curoffset + 2);
+                        attrtype[3] = (unsigned char*)resbuffer.at(curoffset + 3);
+                        qDebug() << "attrtype 2:" << tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                        qDebug() << "attrtype[0]:" << attrtype;
+                        atrtype = (resbuffer.at(curoffset + 3) << 24) | (resbuffer.at(curoffset + 2) << 16) | (resbuffer.at(curoffset + 1) << 8) | resbuffer.at(curoffset);
                         qDebug() << "curoffset:" << curoffset;
                         qDebug() << "atrtype:" << atrtype;
                         //namelength = resbuffer.at(curoffset + 9);
@@ -1331,8 +1338,8 @@ void WombatForensics::LoadHexContents()
                         //uint32_t clength;
                         //std::copy(mftlen, mftlen + sizeof(clength), reinterpret_cast<unsigned char*>(&clength));
                         //qDebug() << "clength:" << clength;
-                        contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
-                        clength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
+                        contentlength = abs((resbuffer.at(curoffset + 7) << 24) | (resbuffer.at(curoffset + 6) << 16) | (resbuffer.at(curoffset + 5) << 8) | resbuffer.at(curoffset + 4));
+                        clength = abs((resbuffer.at(curoffset + 7) << 24) | (resbuffer.at(curoffset + 6) << 16) | (resbuffer.at(curoffset + 5) << 8) | resbuffer.at(curoffset + 4));
                         qDebug() << "content length (4-7):" << contentlength << clength;
                         /*
                         if(namelength > 0 && atrtype == 128)
