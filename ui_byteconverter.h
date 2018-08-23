@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'byteconverter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -55,9 +55,9 @@ public:
 
     void retranslateUi(QDialog *ByteConverter)
     {
-        ByteConverter->setWindowTitle(QApplication::translate("ByteConverter", "Dialog", 0));
-        label->setText(QApplication::translate("ByteConverter", "one<br/>two<br/>three", 0));
-        checkBox->setText(QApplication::translate("ByteConverter", "Big Endian", 0));
+        ByteConverter->setWindowTitle(QApplication::translate("ByteConverter", "Byte Converter", Q_NULLPTR));
+        label->setText(QApplication::translate("ByteConverter", "one<br/>two<br/>three", Q_NULLPTR));
+        checkBox->setText(QApplication::translate("ByteConverter", "Big Endian", Q_NULLPTR));
     } // retranslateUi
 
 };
