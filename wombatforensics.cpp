@@ -42,12 +42,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
     tskexternalptr = &tskexternalobject;
-    tskobjptr = &tskobject;
-    tskobjptr->readimginfo = NULL;
-    tskobjptr->readfsinfo = NULL;
-    tskobjptr->readfileinfo = NULL;
     propertywindow = new PropertiesWindow(this);
-    fileviewer = new FileViewer(this, tskobjptr);
+    //fileviewer = new FileViewer(this, tskobjptr);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
     jumpfilterview = new JumpFilter(this);
@@ -70,7 +66,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     aboutbox = new AboutBox(this);
     cancelthread = new CancelThread(this);
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
-    fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
+    //fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
@@ -92,7 +88,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
-    connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
+    //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long)), this, SLOT(UpdateProgress(unsigned long long)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
@@ -889,33 +885,6 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
-    /*
-    int digitcount = SegmentDigits(wombatvariable.segmentcount);
-
-    if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
-    {
-        qDebug() << "launch xmount with imgname.A and" << digitcount << "?'s.";
-    }
-    else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
-    {
-        qDebug() << "launch xmount with imgname.E and" << digitcount << "?'s.";
-    }
-    else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
-    {
-        if(wombatvariable.segmentcount > 1) // multi segment
-        {
-            qDebug() << "open with xmount with imgname. and" << digitcount << "?'s.";
-        }
-        else
-        {
-            qDebug() << "just load the image in the editor, no modifications needed";
-        }
-    }
-    else
-    {
-        qDebug() << "image format:" << tsk_img_type_toname(wombatvariable.imgtype) << "not supported";
-    }
-    */
 
     /*
      *
@@ -940,19 +909,6 @@ void WombatForensics::LoadHexContents()
     // 3A. IF I CAN'T COLOR CODE THE CONTENT DISPLAY, MIGHT WANT TO POPUP INFORMATION IN EDITOR WHICH SHOWS INFO FOR FILE...
     // 4. FOR FILEHEXVIEWER, JUST WRITE THE FILE TO TMP FILE AND THEN LOAD IN EDITOR. COLOR CODE THE SLACK USING ABOVE FORMULA SLACK.
 
-    if(tskobjptr->readimginfo != NULL)
-    {
-        tsk_img_close(tskobjptr->readimginfo);
-        tskobjptr->readimginfo = NULL;
-    }
-    if(tskobjptr->readfsinfo != NULL)
-    {
-        tsk_fs_close(tskobjptr->readfsinfo);
-    }
-    if(tskobjptr->readfileinfo != NULL)
-    {
-        tsk_fs_file_close(tskobjptr->readfileinfo);
-    }
     wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
     blockstring = "";
     QString tmpstr = "";
@@ -975,47 +931,6 @@ void WombatForensics::LoadHexContents()
     {
         ui->hexview->setCursorPosition(0);
         //emit ui->hexview->currentAddressChanged(0);
-        /*
-        wombatvariable.evidencename = selectedindex.sibling(selectedindex.row(), 1).data().toString(); // current evidence name
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + wombatvariable.selectedid.mid(1));
-        evidfile.open(QIODevice::ReadOnly);
-        tmpstr = evidfile.readLine();
-        evidlist = tmpstr.split(",");
-        std::vector<std::string> tmpvec;
-        tmpvec.clear();
-        evidfile.close();
-        tskobjptr->offset = 0;
-        tskobjptr->objecttype = 1;
-        tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // object size
-        tskobjptr->imglength = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // image size
-        tskobjptr->sectsize = evidlist.at(2).toInt();
-        tskobjptr->blocksize = evidlist.at(2).toInt();
-        tskobjptr->partcount = evidlist.at(3).split("|").size();
-        for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
-        {
-            tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
-        }
-        tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
-        for(uint i =0; i < tmpvec.size(); i++)
-        {
-            tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
-        }
-        
-
-        testfile.setFileName(tskobjptr->imagepartspath[0]);
-        
-
-        //testdevice = new EvidenceDevice(tskobjptr->partcount, tskobjptr->imagepartspath);
-
-        /*
-        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-        if(tskobjptr->readimginfo == NULL)
-        {
-            qDebug() << tsk_error_get_errstr();
-            LogMessage("Image opening error");
-        }
-        */
-        //free(tskobjptr->imagepartspath);
     }
     else if(wombatvariable.selectedid.split("-").count() == 2) // volume file
     {
@@ -1030,45 +945,12 @@ void WombatForensics::LoadHexContents()
         volfile.close();
         vollist = tmpstr.split(",");
         ui->hexview->setCursorPosition(vollist.at(4).toInt()*2);
-        /*
-        tskobjptr->offset = vollist.at(4).toInt();
-        tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
-        tskobjptr->imglength = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
-        tskobjptr->sectsize = vollist.at(3).toInt();
-        tskobjptr->blocksize = vollist.at(3).toInt();
-        */
     }
     else if(wombatvariable.selectedid.split("-").count() == 3) // partition file
     {
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
-        /*
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + wombatvariable.selectedid.split("-").at(0).mid(1));
-        evidfile.open(QIODevice::ReadOnly);
-        tmpstr = evidfile.readLine();
-        evidlist = tmpstr.split(",");
-        evidfile.close();
-        std::vector<std::string> tmpvec;
-        tmpvec.clear();
-        for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
-        {
-            tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
-        }
-        tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
-        for(uint i =0; i < tmpvec.size(); i++)
-        {
-            tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
-        }
-        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-        if(tskobjptr->readimginfo == NULL)
-        {
-            qDebug() << tsk_error_get_errstr();
-            LogMessage("Image opening error");
-        }
-        free(tskobjptr->imagepartspath);
-        tmpstr = "";
-        */
         QStringList partlist = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + wombatvariable.selectedid.split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
         QFile partfile(wombatvariable.tmpmntpath + partlist.at(0));
         partfile.open(QIODevice::ReadOnly);
@@ -1076,46 +958,12 @@ void WombatForensics::LoadHexContents()
         partfile.close();
         partlist = tmpstr.split(",");
         ui->hexview->setCursorPosition(partlist.at(4).toULongLong()*2);
-        /*
-        tskobjptr->offset = partlist.at(4).toULongLong();
-        tskobjptr->fsoffset = partlist.at(4).toULongLong();
-        tskobjptr->objecttype = 4;
-        tskobjptr->length = partlist.at(1).toULongLong();
-        tskobjptr->sectsize = evidlist.at(2).toInt();
-        tskobjptr->blocksize = partlist.at(6).toInt();
-        */
     }
     else if(wombatvariable.selectedid.split("-").count() == 4) // file file
     {
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
-        /*
-        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + wombatvariable.selectedid.split("-").at(0).mid(1));
-        evidfile.open(QIODevice::ReadOnly);
-        tmpstr = evidfile.readLine();
-        evidlist = tmpstr.split(",");
-        tskobjptr->partcount = evidlist.at(3).split("|").size();
-        evidfile.close();
-        std::vector<std::string> tmpvec;
-        tmpvec.clear();
-        for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
-        {
-            tmpvec.push_back(evidlist.at(3).split("|").at(i).toStdString());
-        }
-        tskobjptr->imagepartspath = (const char**)malloc(tmpvec.size()*sizeof(char*));
-        for(uint i =0; i < tmpvec.size(); i++)
-        {
-            tskobjptr->imagepartspath[i] = tmpvec[i].c_str();
-        }
-        tskobjptr->readimginfo = tsk_img_open(tskobjptr->partcount, tskobjptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-        if(tskobjptr->readimginfo == NULL)
-        {
-            qDebug() << tsk_error_get_errstr();
-            LogMessage("Image opening error");
-        }
-        free(tskobjptr->imagepartspath);
-        */
         tmpstr = "";
         QStringList partlist;
         partlist.clear();
@@ -1166,15 +1014,6 @@ void WombatForensics::LoadHexContents()
         QString bytestring;
         filefile.close();
         filelist = tmpstr.split(",");
-        /*
-        tskobjptr->readfsinfo = tsk_fs_open_img(tskobjptr->readimginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
-        tskobjptr->fsoffset = tskobjptr->readfsinfo->offset;
-        tskobjptr->blocksize = tskobjptr->readfsinfo->block_size;
-        tskobjptr->objecttype = 5;
-        tskobjptr->address = wombatvariable.selectedid.split("-").at(3).mid(1).toInt();
-        tskobjptr->length = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
-        tskobjptr->offset = 0;
-        */
         filefileprop.open(QIODevice::ReadOnly);
         while(!filefileprop.atEnd())
         {
@@ -1193,49 +1032,17 @@ void WombatForensics::LoadHexContents()
             }
         }
         filefileprop.close();
-	/*
-
-        char* ibuffer = new char[tskexternalptr->readfileinfo->meta->size];
-        // WILL NEED TO FIGURE OUT IF ITS AN ATTRIBUTE OR NOT AND HANDLE THE IF BELOW...
-        //if(objtype == 5)
-        filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-        //else
-        (new QDir())->mkpath(wombatvariable.tmpfilepath);
-        QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-tmp";
-        QFile tmpfile(tmpstring);
-        if(tmpfile.open(QIODevice::WriteOnly))
-        {
-            QDataStream outbuffer(&tmpfile);
-            outbuffer.writeRawData(ibuffer, filelen);
-            tmpfile.close();
-        }
-        delete[] ibuffer;
-
-
-	*/
         //qDebug() << "partfile fstype:" << partlist.at(0);
-        // IN IT'S CURRENT LAYOUT:
-        // RESIDENT NTFS FILE WORKS, RESIDENT NTFS FILE ADS FAILS
-        // RESIDENT DIR WORKS, RESIDENT DIR ADS FAILS
-        // RESIDENT DIR FAILS, NON-RESIDENT DIR ADS WORKS
-        // NON-RESIDENT FILE WORKS, NON-RESIDENT FILE ADS WORKS
-        // RESIDENT DIR FAILS, NO ADS ASSOCIATED DATA
-        //
-        // THE PIECES ARE THERE, I JUST NEED TO IF/ELSE IT CORRECTLY TO CAPTURE THE RIGHT CONDITIONS
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
         {
-            //unsigned long long resval = 0;
-            //unsigned long long mftoffval = 0;
             unsigned int curoffset = 0;
             uint8_t mftoffset[2];
             uint8_t nextattrid[2];
-            //uint8_t contentoffset[2];
             uint8_t mftlen[4];
             uint8_t attrtype[4];
             uint32_t atrtype = 0;
             uint8_t namelength = 0;
             uint32_t contentlength = 0;
-            //uint8_t nameoffset = 0;
             uint16_t resoffset = 0;
 
             if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
@@ -1270,7 +1077,6 @@ void WombatForensics::LoadHexContents()
                         attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
                         attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
                         atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                        //atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
                         namelength = (uint8_t)resbuffer.at(curoffset + 9);
                         //qDebug() << "namelength:" << namelength << "nameoffset:" << nameoffset;
                         mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
@@ -1278,13 +1084,8 @@ void WombatForensics::LoadHexContents()
                         mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
                         mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
                         contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                        //contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
                         if(namelength > 0 && atrtype == 128)
-                        {
-                            //resoffset = (resbuffer.at(curoffset + 21) << 8) + resbuffer.at(curoffset + 20);
-                            //qDebug() << "resident data offset:" << resoffset;
                             break;
-                        }
                         curoffset += contentlength;
                         //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
                     }
@@ -1297,27 +1098,18 @@ void WombatForensics::LoadHexContents()
 
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                     ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                    //ui->hexview->setCursorPosition((residentoffset + curoffset + nameoffset + namelength)*2);
-                    //ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
-                    //qDebug() << "resident string:" << residentstring.toULongLong();
-                    //qDebug() << "1024 x id:" << 1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt();
-                    // SLACK SPACE IS TOO LARGE, NEED TO GET THE ADS CONTENT START OFFSET AND THEN TAKE 1024 - THAT OFFSET
-                    // RATHER THAN 1024 - THE SIZE. OR WE CAN GET THE $MFT RESIDENT OFFSET VALUE THEN ADD THE 1024*NODEID
-                    // THEN ADD 1024 TO GET TO THE END OF THE ENTRY. THEN TAKE RESIDENTSTRING + ADS SIZE AND SUBTRACT THE TWO
-                    // THIS GIVES ME THE SLACK SIZE.
                 }
             }
             else // IF NOT ADS
             {
                 if(filelist.at(1).toInt() == 3) // IF DIR
                 {
-                    qDebug() << "it's a dir - get 144 attribute offset";
+                    //qDebug() << "it's a dir - get 144 attribute offset";
                     unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt());
-                    qDebug() << "residentoffset;" << residentoffset;
+                    //qDebug() << "residentoffset;" << residentoffset;
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                     curoffset = 0;
                     resoffset = 0;
-                    //unsigned int contentsize = 0;
                     mftoffset[0] = (uint8_t)resbuffer.at(20);
                     mftoffset[1] = (uint8_t)resbuffer.at(21);
                     nextattrid[0] = (uint8_t)resbuffer.at(40);
@@ -1333,7 +1125,6 @@ void WombatForensics::LoadHexContents()
                         attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
                         attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
                         atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                        //atrtype = (((uint8_t)resbuffer.at(curoffset + 3)) << 24) | (((uint8_t)resbuffer.at(curoffset + 2)) << 16) | (((uint8_t)resbuffer.at(curoffset + 1)) << 8) | ((uint8_t)resbuffer.at(curoffset));
                         //qDebug() << "curoffset:" << curoffset;
                         //qDebug() << "atrtype:" << atrtype;
                         mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
@@ -1341,19 +1132,18 @@ void WombatForensics::LoadHexContents()
                         mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
                         mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
                         contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                        qDebug() << "content length:" << contentlength;
+                        //qDebug() << "content length:" << contentlength;
                         //qDebug() << "resoffset:" << resoffset << "contentsize:" << contentsize;
                         if(atrtype == 144)
                             break;
                         curoffset += contentlength;
-                        //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
                     }
                     // offset to type 144 resident attribute content
                     mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
                     mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-                    qDebug() << "offset to attr content:" << tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                    //qDebug() << "offset to attr content:" << tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                     curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                    qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype;
+                    //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype;
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
                     ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
                 }
@@ -1361,13 +1151,13 @@ void WombatForensics::LoadHexContents()
                 {
                     if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                     {
-                        qDebug() << "non-resident file";
+                        //qDebug() << "non-resident file";
                         ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
                         ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
                     }
                     else // IF RESIDENT
                     {
-                        qDebug() << "resident file";
+                        //qDebug() << "resident file";
                         unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt());
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                         curoffset = 0;
@@ -1386,19 +1176,14 @@ void WombatForensics::LoadHexContents()
                             attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
                             attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
                             atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                            //atrtype = (resbuffer.at(curoffset + 3) << 24) + (resbuffer.at(curoffset + 2) << 16) + (resbuffer.at(curoffset + 1) << 8) + resbuffer.at(curoffset);
                             namelength = (uint8_t)resbuffer.at(curoffset + 9);
                             mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
                             mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
                             mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
                             mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
                             contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                            //contentlength = abs((resbuffer.at(curoffset + 7) << 24) + (resbuffer.at(curoffset + 6) << 16) + (resbuffer.at(curoffset + 5) << 8) + resbuffer.at(curoffset + 4));
                             if(namelength == 0 && atrtype == 128)
-                            {
-                                //resoffset = (resbuffer.at(curoffset + 21) << 8) + resbuffer.at(curoffset + 20);
                                 break;
-                            }
                             curoffset += contentlength;
                             //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
                         }
@@ -1417,329 +1202,8 @@ void WombatForensics::LoadHexContents()
             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
         }
-
-
-        /*
-        if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // NTFS (resident/non-resident)
-        {
-
-	    if(filelist.at(1).toInt() == 5) // regular file
-	    {
-		if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // non-resident
-		{
-		    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
-		    ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
-		}
-		else // resident
-		{
-		    mftoff[0] = (unsigned char*)rbuf.at(20);
-		    mftoff[1] = (unsigned char*)rbuf.at(21);
-		    off1 = tsk_getu16(TSK_LIT_ENDIAN, mftoff);
-		    qDebug() << rbuf.at(0) << rbuf.mid(0, 4) << off1;
-		    while(attype < 127)
-		    {
-			attype = (unsigned char)rbuf.at(off1);
-    	                if(attype == 128)
-	    	        break;
-		        mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
-			mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
-			mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
-			mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
-			off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-		    }
-		    mftoff[0] = (unsigned char*)rbuf.at(off1 + 20);
-		    mftoff[1] = (unsigned char*)rbuf.at(off1 + 21);
-		    off1 = off1 + tsk_getu16(TSK_LIT_ENDIAN, mftoff);
-	            qDebug() << "final offset value:" << off1;
-		    resval = residentstring.toULongLong() + off1;
-		    qDebug() << "resident data offset:" << resval;
-		}
-	    }
-	    else if(filelist.at(1).toInt() == 3) // directory
-	    {
-		while(attype < 127)
-                {
-                    qDebug() << "off1:" << off1;
-                    qDebug() << "residentstring:" << residentstring;
-                    qDebug() << "attype:" << (unsigned char)rbuf.at(off1);
-                    attype = (unsigned char)rbuf.at(off1);
-                    if(attype == 128 || attype == 144)
-                        break;
-                    mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
-                    mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
-                    mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
-                    mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
-                    qDebug() << "attr len:" << tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                    off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                    qDebug() << "new off1:" << off1;
-                }
-                qDebug() << "final countdown";
-                qDebug() << "final off1 start:" << off1;
-                qDebug() << "off1+4" << (unsigned char)rbuf.at(off1 + 4);
-                if(attype == 128)
-                {
-                    // manual way...
-                    uint8_t val0 = (unsigned char)rbuf.at(off1 + 4);
-                    uint8_t val1 = (unsigned char)rbuf.at(off1 + 5);
-                    uint8_t val2 = (unsigned char)rbuf.at(off1 + 6);
-                    uint8_t val3 = (unsigned char)rbuf.at(off1 + 7);
-                    qDebug() << val0 << val1 << val2 << val3;
-                    int manuel = (val3 << 24) | (val2 << 16) | (val1 << 8) | val0;
-                    qDebug() << "manuel:" << manuel;
-                    off1 = off1 + manuel;
-                    qDebug() << "new off1:" << off1;
-                    qDebug() << "get data length to jump to 144";
-                    attype = (unsigned char)rbuf.at(off1);
-                    if(attype == 144)
-                    {
-                        qDebug() << "yeah it's right!";
-                        off1 = off1 + 32;
-                    }
-                }
-                else if(attype == 144)
-                {
-                    qDebug() << "off1 is our man.";
-                    off1 = off1 + 32;
-                }
-                else
-                    qDebug() << "what happened?";
-                resval = residentstring.toULongLong() + off1;
-                qDebug() << "resident data offset:" << resval;
-            }
-            else
-	    {
-		qDebug() << "some other option i haven't accounted for.";
-                resval = residentstring.toULongLong();
-	    }
-            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(resval), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), off1);
-    	    ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
-            // NOW DO THE IS A FILE OR DIRECTORY AND ACT ACCORDINGLY...
-            // THEN DO DOES IT HAVE BLOCKS OR NOT FOR FILES, JUST DO THE RESIDENT FOR DIRECTORIES.
-        }
-        else // other file systems
-        {
-            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
-            ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
-            // NOW DO THE IS IT BLOCKS OR NOT, THEN ACT ACCORDINGLY WITH 
-            qDebug() << "it's not ntfs?";
-        }
-        */
-	/*
-        if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
-        {
-            if(filelist.at(1).toInt() == 5) // regular file
-            {
-            // fsoffset, blocksize, blockstring, residentoffset, byteoffset, file length
-                ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
-                ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
-            }
-            else if(filelist.at(1).toInt() == 3) // directory
-            {
-                // NEED TO DETERMINE IF IT IS NTFS.. IF IT IS, THEN DON'T USE THE BELOW AND RATHER USE THE NTFS ELSE DOUBLE BELOW...
-                ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
-                ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
-                // this will screw up other fs, i will need to determine if it's ntfs or not to process accordingly...
-            }
-            else
-                qDebug() << "its an other:" << filelist.at(1).toInt();
-        }
-        else // NTFS
-        {
-            //if(filelist.at(1).toInt() == 5) // regular file
-            //{
-            unsigned long long resval = 0;
-            unsigned int off1 = 0;
-            unsigned int attrtype = 0;
-	    QByteArray rbuf = ui->hexview->dataAt(residentstring.toULongLong(), 1024);
-            uint8_t* mftoff[2];
-            uint8_t* mftlen[4];
-            uint8_t attype = 0;
-            mftoff[0] = (unsigned char*)rbuf.at(20);
-            mftoff[1] = (unsigned char*)rbuf.at(21);
-            off1 = tsk_getu16(TSK_LIT_ENDIAN, mftoff);
-            qDebug() << rbuf.at(0) << rbuf.mid(0, 4) << off1;
-            if(filelist.at(1).toInt() == 5) // regular file
-            {
-                while(attype < 127)
-                {
-                    attype = (unsigned char)rbuf.at(off1);
-                    if(attype == 128)
-                        break;
-                    mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
-                    mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
-                    mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
-                    mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
-                    off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                }
-                mftoff[0] = (unsigned char*)rbuf.at(off1 + 20);
-                mftoff[1] = (unsigned char*)rbuf.at(off1 + 21);
-                off1 = off1 + tsk_getu16(TSK_LIT_ENDIAN, mftoff);
-                qDebug() << "final offset value:" << off1;
-                resval = residentstring.toULongLong() + off1;
-                qDebug() << "resident data offset:" << resval;
-            }
-            else if(filelist.at(1).toInt() == 3) // directory
-            {
-                while(attype < 127)
-                {
-                    qDebug() << "off1:" << off1;
-                    qDebug() << "residentstring:" << residentstring;
-                    qDebug() << "attype:" << (unsigned char)rbuf.at(off1);
-                    attype = (unsigned char)rbuf.at(off1);
-                    if(attype == 128 || attype == 144)
-                        break;
-                    mftlen[0] = (unsigned char*)rbuf.at(off1 + 4);
-                    mftlen[1] = (unsigned char*)rbuf.at(off1 + 5);
-                    mftlen[2] = (unsigned char*)rbuf.at(off1 + 6);
-                    mftlen[3] = (unsigned char*)rbuf.at(off1 + 7);
-                    qDebug() << "attr len:" << tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                    off1 = off1 + tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                    qDebug() << "new off1:" << off1;
-                }
-                qDebug() << "final countdown";
-                qDebug() << "final off1 start:" << off1;
-                qDebug() << "off1+4" << (unsigned char)rbuf.at(off1 + 4);
-                if(attype == 128)
-                {
-                    // manual way...
-                    uint8_t val0 = (unsigned char)rbuf.at(off1 + 4);
-                    uint8_t val1 = (unsigned char)rbuf.at(off1 + 5);
-                    uint8_t val2 = (unsigned char)rbuf.at(off1 + 6);
-                    uint8_t val3 = (unsigned char)rbuf.at(off1 + 7);
-                    qDebug() << val0 << val1 << val2 << val3;
-                    int manuel = (val3 << 24) | (val2 << 16) | (val1 << 8) | val0;
-                    qDebug() << "manuel:" << manuel;
-                    off1 = off1 + manuel;
-                    qDebug() << "new off1:" << off1;
-                    qDebug() << "get data length to jump to 144";
-                    attype = (unsigned char)rbuf.at(off1);
-                    if(attype == 144)
-                    {
-                        qDebug() << "yeah it's right!";
-                        off1 = off1 + 32;
-                    }
-                }
-                else if(attype == 144)
-                {
-                    qDebug() << "off1 is our man.";
-                    off1 = off1 + 32;
-                }
-                else
-                    qDebug() << "what happened?";
-                resval = residentstring.toULongLong() + off1;
-                qDebug() << "resident data offset:" << resval;
-            }
-            else
-                resval = residentstring.toULongLong();
-
-            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(resval), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), off1);
-    	    ui->hexview->setCursorPosition(residentstring.toULongLong()*2);
-            //qDebug() << "its a file";
-            //}
-            //else if(filelist.at(1).toInt() == 3) // directory
-            //{
-            //    qDebug() << "its a dir";
-            //}
-            //else
-            //{
-            //    qDebug() << "its an other:" << filelist.at(1).toInt();
-            //}
-        }
-	*/
-
-
-        /*
-        if(blockstring.compare("") != 0)
-        {
-            tskobjptr->offset = bytestring.toULongLong();
-        }
-        else
-        {
-            if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
-            {
-                tskobjptr->resoffset = residentstring.toULongLong();
-                tskobjptr->offset = tskobjptr->resoffset + tskobjptr->fsoffset;
-            }
-            else
-                tskobjptr->offset = tskobjptr->fsoffset;
-        }
-        tskobjptr->blockaddress = blockstring;
-        tskobjptr->blkaddrlist = blockstring.split("^^", QString::SkipEmptyParts);
-
-       if(filelist.at(11).toULongLong() == 0)
-            tskobjptr->readfileinfo = tsk_fs_file_open_meta(tskobjptr->readfsinfo, NULL, tskobjptr->address);
-
-        QStringList tmpchildren = GetChildFiles("*.a" + wombatvariable.selectedid.split("-").at(3).mid(1));
-
-        if(tskobjptr->readfsinfo->ftype == TSK_FS_TYPE_NTFS_DETECT)
-        {
-        }
-        */
     }
     ui->hexview->ensureVisible();
-
-    if(wombatvariable.selectedid.split("-").count() <= 4) // image file
-    {
-
-        //ui->hexview->setData(testfile);
-
-
-
-        //qint64 bytesread = 0;
-        //qDebug() << "e01 size:" << tskobjptr->readimginfo->size;
-        //char* imgbuffer = new char[tskobjptr->readimginfo->size];
-        //bytesread = testdevice->readData(imgbuffer, tskobjptr->readimginfo->size);
-        //char* imgbuffer = new char[testdevice->ImageSize()];
-        //bytesread = testdevice->readData(imgbuffer, testdevice->ImageSize());
-        //qDebug() << "imgbuffer size:" << strlen(imgbuffer);
-        //qDebug() << "bytes read:" << bytesread;
-        //if(bytesread > 0)
-        //ui->hexview->setData(*testdevice);
-        /*
-        off_t retval = 0;
-        char* imgbuffer = new char[tskobjptr->readimginfo->size];
-        retval = tsk_img_read(tskobjptr->readimginfo, 0, imgbuffer, tskobjptr->readimginfo->size);
-        QByteArray imgarr = QByteArray::fromRawData(imgbuffer, tskobjptr->readimginfo->size);
-        */
-        //QBuffer imgbuf;
-        //QBuffer imgbuf(&imgarr);
-        //imgbuf.open(QIODevice::ReadOnly);
-        //imgbuf.read(imgbuffer, tskobjptr->imglength);
-        //hexview->clear();
-        //ui->hexview->setData(imgbuf);
-        //imgbuf.close();
-        // this works, but using a bytearray loads whole thing into memory...
-        // will either have to build my own chunck load from a bytearray or mount e01 to dd, so then i can
-        // load it like a file and make use of QIODevice...
-
-        /*
-        ui->hexview->setData(imgarr);
-        */
-
-        //delete []imgbuffer;
-        
-        //QByteArray filedata = QByteArray::fromRawData(ibuffer, imglen);
-        //retval = tsk_img_read(tskptr->readimginfo, pageIdx*_pageSize, (char*)_data[pageIdx], _pageSize);
-        /*
-        hexwidget->openimage();
-        hexwidget->set1BPC();
-        hexwidget->setBaseHex();
-        hexwidget->SetTopLeft(0);
-        */
-    }
-    else
-    {
-        /*
-        hexwidget->SetTopLeft(tskobjptr->offset);
-        if(wombatvariable.selectedid.split("-").count() == 4)
-        {
-            fileviewer->filehexview->openimage();
-            fileviewer->filehexview->set1BPC();
-            fileviewer->filehexview->setBaseHex();
-            fileviewer->filehexview->SetTopLeft(0);
-        }
-        */
-    }
 }
 
 void WombatForensics::CloseCurrentCase()
@@ -2235,7 +1699,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         CloseCurrentCase();
     
     propertywindow->close();
-    fileviewer->close();
+    //fileviewer->close();
     imagewindow->close();
     videowindow->close();
     viewmanage->close();
@@ -2346,11 +1810,11 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
 {
     if(!checked)
     {
-        fileviewer->hide();
+        //fileviewer->hide();
     }
     else
     {
-        fileviewer->show();
+        //fileviewer->show();
     }
 }
 

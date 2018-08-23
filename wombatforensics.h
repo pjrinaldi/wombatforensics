@@ -638,14 +638,12 @@ class WombatForensics : public QMainWindow
 public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
-    TskObject tskobject;
-    TskObject* tskobjptr;
     TskObject tskexternalobject;
     TskObject* tskexternalptr;
     PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;
-    FileViewer* fileviewer;
+    //FileViewer* fileviewer;
     TreeNodeModel* treenodemodel;
     QMenu* treemenu;
     QMenu* selectionmenu;
