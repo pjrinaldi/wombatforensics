@@ -1982,6 +1982,57 @@ void WombatForensics::HexSelectionChanged()
 void WombatForensics::UpdateSelectValue()
 {
     QByteArray selectionbytes = ui->hexview->selectionToByteArray();
+    if(selectionbytes.isEmpty())
+        ui->actionCopy_Selection_To->setEnabled(true);
+    else
+        ui->actionCopy_Selection_To->setEnabled(false);
+    QString tmptext = "Length: " + QString::number(selectionbytes.size());
+    QString bytetext = "";
+    selectedhex->setText(tmptext);
+    bool ok;
+    bytetext += "<table border=0 width='100%' cellpadding=5>";
+    bytetext += "<tr><td>Ascii:</td><td align=right>" + QString::fromStdString(selectionbytes.toStdString()) + "</td></tr>";
+    bytetext += "<tr><td>Integer:</td><td align=right>" + QString::number(selectionbytes.mid(0, sizeof(int)).toInt(&ok, 10)) + "</td></tr>";
+    bytetext += "<tr><td>Float:</td><td align=right>" + QString::number(selectionbytes.mid(0, sizeof(float)).toFloat()) + "</td></tr>";
+    bytetext += "<tr><td>Double:</td><td align=right>" + QString::number(selectionbytes.mid(0, sizeof(double)).toDouble()) + "</td></tr>";
+    bytetext += "</table>";
+    byteviewer->SetText(bytetext);
+    /*
+    bytetext += "<tr><td>DOS Date:</td><td align=right>";
+    if(selectionbytes.size() == 2)
+        bytetext += QString::fromStdString(
+    */
+
+    /*
+     *
+    bytetext += "<tr><td>DOS Date:</td><td align=right>";
+    if(bytes.size() == 2)
+    {
+        bytetext += QString::fromStdString(std::string(tsk_fs_time_to_str(fatfs_dos_2_unix_time(intvalue, intvalue, bytes[0]), buf)).substr(0, 10));
+    }
+    bytetext += "</td></tr>";
+    bytetext += "<tr><td>DOS Time:</td><td align=right>";
+    if(bytes.size() == 2)
+    {
+        bytetext += QString::fromStdString(std::string(tsk_fs_time_to_str(fatfs_dos_2_unix_time(intvalue, intvalue, bytes[0]), buf)).substr(11, 14));
+    }
+    bytetext += "</td></tr>";
+    bytetext += "<tr><td>FILETIME:</td><td align=right>";
+    if(bytes.size() == 8)
+    {
+        bytetext += tsk_fs_time_to_str(nt2unixtime(intvalue), buf);
+    }
+    bytetext += "</td></tr>";
+    bytetext += "<tr><td>UNIX Time:</td><td align=right>";
+    if(bytes.size() == 4)
+    {
+        bytetext += tsk_fs_time_to_str(intvalue, buf);
+    }
+    bytetext += "</td></tr>";
+    bytetext += "</table>";
+    byteviewer->SetText(bytetext);
+
+     */ 
     // NEED TO RE-IMPLEMENT
     /*
     if(txt.compare("") != 0)
