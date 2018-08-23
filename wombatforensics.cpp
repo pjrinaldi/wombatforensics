@@ -1563,7 +1563,6 @@ void WombatForensics::SetupHexPage(void)
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     ui->hexview->setContextMenuPolicy(Qt::CustomContextMenu);
-    //connect(ui->hexview, SIGNAL(dataChanged()), this, SLOT(DataChanged()));
     connect(ui->hexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetOffsetLabel(qint64)));
     connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
     connect(ui->hexview, SIGNAL(selectionChanged()), this, SLOT(HexSelectionChanged()));
