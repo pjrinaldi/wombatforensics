@@ -1978,7 +1978,6 @@ void WombatForensics::HexSelectionChanged()
     selectedhex->setText(tmptext);
 }
 
-//void WombatForensics::UpdateSelectValue(const QString &txt)
 void WombatForensics::UpdateSelectValue()
 {
     QByteArray selectionbytes = ui->hexview->selectionToByteArray();
@@ -2003,18 +2002,11 @@ void WombatForensics::UpdateSelectValue()
     selectedhex->setText(tmptext);
     bool ok;
     bytetext += "<table border=0 width='100%' cellpadding=5>";
-    //bytetext += "<tr><td>Ascii:</td><td align=right width=600px>" + QString::fromStdString(selectionbytes.toStdString()) + "</td></tr>";
     bytetext += "<tr><td>8-bit Signed Integer:</td><td align=right>" + QString::number(asint8) + "</td></tr>";
     bytetext += "<tr><td>16-bit Signed Integer:</td><td align=right>" + QString::number(asint16) + "</td></tr>";
     bytetext += "<tr><td>32-bit Signed Integer:</td><td align=right>" + QString::number(asint32) + "</td></tr>";
-    //bytetext += "<tr><td>Double:</td><td align=right>" + QString::number(asdouble) + "</td></tr>";
     bytetext += "</table>";
     byteviewer->SetText(bytetext);
-    /*
-    bytetext += "<tr><td>DOS Date:</td><td align=right>";
-    if(selectionbytes.size() == 2)
-        bytetext += QString::fromStdString(
-    */
 
     /*
      *
@@ -2046,113 +2038,8 @@ void WombatForensics::UpdateSelectValue()
     byteviewer->SetText(bytetext);
 
      */ 
-    // NEED TO RE-IMPLEMENT
-    /*
-    if(txt.compare("") != 0)
-    {
-        ui->actionCopy_Selection_To->setEnabled(true);
-    }
-    else
-    {
-        ui->actionCopy_Selection_To->setEnabled(false);
-    }
-    hexselection = txt;
-    char buf[128];
-    int sellength = txt.size()/2;
-    QString tmptext = "Length: " + QString::number(sellength);
-    QString bytetext = "";
-    selectedhex->setText(tmptext);
-    // get initial bytes value and then update ascii
-    std::vector<uchar> bytes;
-    Translate::HexToByte(bytes, txt);
-    QString ascii;
-    Translate::ByteToChar(ascii, bytes);
-    bytetext += "<table border=0 width='100%' cellpadding=5><tr><td>Ascii:</td><td align=right>" + ascii + "</td></tr>";
-    QString strvalue;
-    uchar * ucharPtr;
-    // update the int entry:
-    // pad right with 0x00
-    int intvalue = 0;
-    ucharPtr = (uchar*) &intvalue;
-    memcpy(&intvalue,&bytes.begin()[0], min(sizeof(int),bytes.size()));
-    strvalue.setNum(intvalue);
-    bytetext += "<tr><td>Integer:</td><td align=right>" + strvalue + "</td></tr>";
-    // update float entry;
-    float fvalue;
-    ucharPtr = (uchar*)(&fvalue);
-    if(bytes.size() < sizeof(float) )
-    {
-        for(unsigned int i= 0; i < sizeof(float); ++i)
-        {
-            if( i < bytes.size() )
-            {
-                *ucharPtr++ = bytes[i];
-            }
-            else
-            {
-                *ucharPtr++ = 0x00;
-            }
-        }
-    }
-    else
-    {
-        memcpy(&fvalue,&bytes.begin()[0],sizeof(float));
-    }
-    strvalue.setNum( fvalue );
-    bytetext += "<tr><td>Float:</td><td align=right>" + strvalue + "</td></tr>";
-    // update double
-    double dvalue;
-    ucharPtr = (uchar*)&dvalue;
-    if(bytes.size() < sizeof(double) )
-    {
-        for(unsigned int i= 0; i < sizeof(double); ++i)
-        {
-            if( i < bytes.size() )
-            {
-                *ucharPtr++ = bytes[i];
-            }
-            else
-            {
-                *ucharPtr++ = 0x00;
-            }
-        }
-    }
-    else
-    {
-        memcpy(&dvalue,&bytes.begin()[0],sizeof(double));
-    }
-    strvalue.setNum( dvalue );
-    bytetext += "<tr><td>Double: </td><td align=right>" + strvalue + "</td></tr>";
-    bytetext += "<tr><td>DOS Date:</td><td align=right>";
-    if(bytes.size() == 2)
-    {
-        bytetext += QString::fromStdString(std::string(tsk_fs_time_to_str(fatfs_dos_2_unix_time(intvalue, intvalue, bytes[0]), buf)).substr(0, 10));
-    }
-    bytetext += "</td></tr>";
-    bytetext += "<tr><td>DOS Time:</td><td align=right>";
-    if(bytes.size() == 2)
-    {
-        bytetext += QString::fromStdString(std::string(tsk_fs_time_to_str(fatfs_dos_2_unix_time(intvalue, intvalue, bytes[0]), buf)).substr(11, 14));
-    }
-    bytetext += "</td></tr>";
-    bytetext += "<tr><td>FILETIME:</td><td align=right>";
-    if(bytes.size() == 8)
-    {
-        bytetext += tsk_fs_time_to_str(nt2unixtime(intvalue), buf);
-    }
-    bytetext += "</td></tr>";
-    bytetext += "<tr><td>UNIX Time:</td><td align=right>";
-    if(bytes.size() == 4)
-    {
-        bytetext += tsk_fs_time_to_str(intvalue, buf);
-    }
-    bytetext += "</td></tr>";
-    bytetext += "</table>";
-    byteviewer->SetText(bytetext);
-    */
 }
 
-//void WombatForensics::SetOffsetLabel(off_t pos)
 void WombatForensics::SetOffsetLabel(qint64 pos)
 {
     QString label;

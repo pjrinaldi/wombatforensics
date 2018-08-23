@@ -715,7 +715,6 @@ private slots:
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void DigFiles(int digtype, QVector<int> digoptions);
     void SetOffsetLabel(qint64 pos);
-    //void SetOffsetLabel(off_t pos);
     void ResetSlider(void);
     void ShowRockerToolTip(int moved);
     void SkipDown(void);
@@ -723,7 +722,6 @@ private slots:
     void PageUp(void);
     void PageDown(void);
     void HexSelectionChanged(void);
-    //void UpdateSelectValue(const QString &txt);
     void UpdateSelectValue(void);
     void UpdateDataTable(void);
     void UpdateStatus(void);
