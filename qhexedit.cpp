@@ -428,6 +428,15 @@ QString QHexEdit::selectionToReadableString()
     return toReadable(ba);
 }
 
+// Added by Pasquale J. Rinaldi, Jr.
+// August 23, 2018
+// Enables selection to be carved to a binary file for further review.
+QByteArray QHexEdit::selectionToByteArray()
+{
+    QByteArray ba = _chunks->data(getSelectionBegin(), getSelectionEnd() - getSelectionBegin());
+    return ba;
+}
+
 void QHexEdit::setFont(const QFont &font)
 {
     QWidget::setFont(font);

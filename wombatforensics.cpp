@@ -1286,6 +1286,7 @@ void WombatForensics::RemEvidence()
         tmpfile.open(QIODevice::ReadOnly);
         QString tmpstr = tmpfile.readLine();
         QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+        tmpfile.close();
     }
     /*
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -2194,10 +2195,10 @@ void WombatForensics::CarveFile()
     QString carvefilename = QFileDialog::getSaveFileName(this, tr("Carve to a File"), QDir::homePath()); 
     if(carvefilename.compare("") != 0)
     {
-        std::vector<uchar> tmpbytes;
-        Translate::HexToByte(tmpbytes, hexselection);
-        ofstream tmpfile(carvefilename.toStdString().c_str(), ios::out | ios::binary);
-        tmpfile.write((const char*)&tmpbytes[0], tmpbytes.size());
+        QByteArray tmparray = ui->hexview->selectionToByteArray();
+        QFile tmpfile(carvefilename);
+        tmpfile.open(QIODevice::WriteOnly);
+        tmpfile.write(tmparray);
         tmpfile.close();
     }
 }

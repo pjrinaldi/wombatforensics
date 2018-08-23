@@ -244,6 +244,11 @@ public:
     */
     QString selectionToReadableString();
 
+    // Added by Pasquale J. Rinaldi, Jr.
+    // August 23, 2018
+    // Enables the selected content to be exported as binary to a file for further review.
+    QByteArray selectionToByteArray();
+
     /*! Set Font of QHexEdit
      * \param font
      */
