@@ -1982,14 +1982,18 @@ void WombatForensics::HexSelectionChanged()
 void WombatForensics::UpdateSelectValue()
 {
     QByteArray selectionbytes = ui->hexview->selectionToByteArray();
-    QDataStream ds(selectionbytes);
-    ds.setByteOrder(QDataStream::LittleEndian);
-    int16_t asint;
+    QDataStream ds8(selectionbytes);
+    ds8.setByteOrder(QDataStream::LittleEndian);
+    int8_t asint8;
+    ds8 >> asint8;
+    QDataStream ds16(selectionbytes);
+    ds16.setByteOrder(QDataStream::LittleEndian);
+    int16_t asint16;
+    ds16 >> asint16;
+    QDataStream ds32(selectionbytes);
+    ds32.setByteOrder(QDataStream::LittleEndian);
     int32_t asint32;
-    double asdouble;
-    ds >> asint;
-    ds >> asint32;
-    ds >> asdouble;
+    ds32 >> asint32;
     if(selectionbytes.isEmpty())
         ui->actionCopy_Selection_To->setEnabled(true);
     else
@@ -1999,10 +2003,11 @@ void WombatForensics::UpdateSelectValue()
     selectedhex->setText(tmptext);
     bool ok;
     bytetext += "<table border=0 width='100%' cellpadding=5>";
-    bytetext += "<tr><td>Ascii:</td><td align=right>" + QString::fromStdString(selectionbytes.toStdString()) + "</td></tr>";
-    bytetext += "<tr><td>Short Int (2-byte):</td><td align=right>" + QString::number(asint) + "</td></tr>";
-    bytetext += "<tr><td>Integer (4-byte):</td><td align=right>" + QString::number(asint32) + "</td></tr>";
-    bytetext += "<tr><td>Double:</td><td align=right>" + QString::number(asdouble) + "</td></tr>";
+    //bytetext += "<tr><td>Ascii:</td><td align=right width=600px>" + QString::fromStdString(selectionbytes.toStdString()) + "</td></tr>";
+    bytetext += "<tr><td>8-bit Signed Integer:</td><td align=right>" + QString::number(asint8) + "</td></tr>";
+    bytetext += "<tr><td>16-bit Signed Integer:</td><td align=right>" + QString::number(asint16) + "</td></tr>";
+    bytetext += "<tr><td>32-bit Signed Integer:</td><td align=right>" + QString::number(asint32) + "</td></tr>";
+    //bytetext += "<tr><td>Double:</td><td align=right>" + QString::number(asdouble) + "</td></tr>";
     bytetext += "</table>";
     byteviewer->SetText(bytetext);
     /*
