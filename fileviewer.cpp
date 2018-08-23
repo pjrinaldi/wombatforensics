@@ -15,13 +15,16 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     this->statusBar()->addWidget(selectedoffset, 0);
     this->statusBar()->addWidget(selectedhex, 0);
 
+    /*
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     filehexview = new FileHexViewer(ui->centralwidget, tskptr);
     filehexview->setObjectName("filehexview");
     filehexview->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     ui->horizontalLayout->addWidget(filehexview);
+    */
     jumpfilterview = new FileJumpFilter(this);
+    /*
     lineup = new QPushButton(QIcon(":/basic/lineup"), "", ui->centralwidget);
     linedown = new QPushButton(QIcon(":/basic/linedown"), "", ui->centralwidget);
     pageup = new QPushButton(QIcon(":/basic/pageup"), "", ui->centralwidget);
@@ -43,7 +46,13 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     connect(pagedown, SIGNAL(clicked()), filehexview, SLOT(nextPage()));
     connect(pageup, SIGNAL(clicked()), filehexview, SLOT(prevPage()));
     connect(hexrocker, SIGNAL(ShowJumpFilter()), jumpfilterview, SLOT(DisplayFilter()));
-    connect(jumpfilterview, SIGNAL(SetOffset()), filehexview, SLOT(SetOffset()));
+    */
+
+
+    //connect(jumpfilterview, SIGNAL(SetOffset()), filehexview, SLOT(SetOffset()));
+    
+    
+    /*
     connect(hexrocker, SIGNAL(sliderMoved(int)), filehexview, SLOT(setTopLeftToPercent(int)));
     connect(hexrocker, SIGNAL(sliderMoved(int)), this, SLOT(ShowRockerToolTip(int)));
     connect(hexrocker, SIGNAL(sliderReleased()), this, SLOT(ResetSlider()));
@@ -53,8 +62,10 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     connect(filehexview, SIGNAL(PageDown()), this, SLOT(PageDown()));
     connect(filehexview, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
     connect(filehexview, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
+    */
 }
 
+/*
 void FileViewer::ShowRockerToolTip(int moved)
 {
     QToolTip::showText(QCursor::pos(), QString::number(abs(moved)), hexrocker);
@@ -116,7 +127,7 @@ void FileViewer::PageDown()
         pageup->setDown(false);
     pagedown->setDown(true);
 }
-
+*/
 FileViewer::~FileViewer()
 {
     this->close();
@@ -133,16 +144,17 @@ void FileViewer::closeEvent(QCloseEvent* event)
     emit HideFileViewer(false);
     event->accept();
 }
-
+/*
 void FileViewer::SetScrollBarRange(off_t low, off_t high)
 {
     (void)low; (void)high;
 }
-
+*/
 void FileViewer::SetOffsetLabel(off_t pos)
 {
     QString label;
     label = "Offset: ";
+    /*
     char    buffer[64];
     #if _LARGEFILE_SOURCE
     sprintf(buffer,"0x%lx",pos);
@@ -150,6 +162,7 @@ void FileViewer::SetOffsetLabel(off_t pos)
     sprintf(buffer,"0x%x",pos);
     #endif
     label += buffer;
+    */
     selectedoffset->setText(label);
 }
 
@@ -159,3 +172,43 @@ void FileViewer::UpdateSelectValue(const QString &txt)
     QString tmptext = "Length: " + QString::number(sellength);
     selectedhex->setText(tmptext);
 }
+
+/***** OLD TSK CODE TO GET CONTENT *****/
+/*
+ *
+ *    if(tskptr->objecttype == 5 || tskptr->objecttype == 6)
+    {
+        if(tskptr->blkaddrlist.count() > 0)
+        {
+            if(tskptr->blkaddrlist.at(0).toInt() == 0)
+            {
+                if(tskptr->objecttype == 6)
+                {
+                    retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, tskptr->mftattrid, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+                }
+                else
+                {
+                    retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+                }
+            }
+            else
+            {
+                if(pageIdx < tskptr->blkaddrlist.count())
+                {
+                    retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageIdx).toInt(), (char*)_data[pageIdx], _pageSize);
+                }
+            }
+        }
+        else
+        {
+            if(tskptr->objecttype == 6)
+            {
+                retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, tskptr->mftattrid, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+            }
+            else
+            {
+                retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+            }
+        }
+    }
+    */

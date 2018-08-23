@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'fileviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -18,6 +18,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QWidget>
+#include "qhexedit.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -29,6 +30,7 @@ public:
     QAction *actionOmni;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
+    QHexEdit *filehexview;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *FileViewer)
@@ -54,6 +56,15 @@ public:
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        filehexview = new QHexEdit(centralwidget);
+        filehexview->setObjectName(QStringLiteral("filehexview"));
+        filehexview->setHexCaps(true);
+        filehexview->setDynamicBytesPerLine(true);
+        filehexview->setOverwriteMode(false);
+        filehexview->setReadOnly(true);
+
+        horizontalLayout->addWidget(filehexview);
+
         FileViewer->setCentralWidget(centralwidget);
         statusBar = new QStatusBar(FileViewer);
         statusBar->setObjectName(QStringLiteral("statusBar"));
@@ -66,10 +77,16 @@ public:
 
     void retranslateUi(QMainWindow *FileViewer)
     {
-        FileViewer->setWindowTitle(QApplication::translate("FileViewer", "File Viewer", 0));
-        actionHex->setText(QApplication::translate("FileViewer", "Hex", 0));
-        actionText->setText(QApplication::translate("FileViewer", "Text", 0));
-        actionOmni->setText(QApplication::translate("FileViewer", "Omni", 0));
+        FileViewer->setWindowTitle(QApplication::translate("FileViewer", "File Viewer", Q_NULLPTR));
+        actionHex->setText(QApplication::translate("FileViewer", "Hex", Q_NULLPTR));
+        actionText->setText(QApplication::translate("FileViewer", "Text", Q_NULLPTR));
+        actionOmni->setText(QApplication::translate("FileViewer", "Omni", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        filehexview->setToolTip(QApplication::translate("FileViewer", "QHexEditWidget", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+#ifndef QT_NO_WHATSTHIS
+        filehexview->setWhatsThis(QApplication::translate("FileViewer", "QHexEdit widget allow to edit the data in hex view.", Q_NULLPTR));
+#endif // QT_NO_WHATSTHIS
     } // retranslateUi
 
 };

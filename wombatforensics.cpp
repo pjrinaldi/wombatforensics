@@ -5,6 +5,7 @@
 
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
+    tskobjptr = &tskobj;
     ui->setupUi(this);
     this->menuBar()->hide();
     this->statusBar()->setSizeGripEnabled(true);
@@ -43,7 +44,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addAction(ui->actionAbout);
     tskexternalptr = &tskexternalobject;
     propertywindow = new PropertiesWindow(this);
-    //fileviewer = new FileViewer(this, tskobjptr);
+    fileviewer = new FileViewer(this, tskobjptr);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
     jumpfilterview = new JumpFilter(this);
@@ -66,7 +67,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     aboutbox = new AboutBox(this);
     cancelthread = new CancelThread(this);
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
-    //fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
+    fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
@@ -88,7 +89,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
-    //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
+    connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long)), this, SLOT(UpdateProgress(unsigned long long)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
@@ -1701,7 +1702,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         CloseCurrentCase();
     
     propertywindow->close();
-    //fileviewer->close();
+    fileviewer->close();
     imagewindow->close();
     videowindow->close();
     viewmanage->close();
@@ -1812,11 +1813,11 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
 {
     if(!checked)
     {
-        //fileviewer->hide();
+        fileviewer->hide();
     }
     else
     {
-        //fileviewer->show();
+        fileviewer->show();
     }
 }
 

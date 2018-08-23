@@ -12,8 +12,8 @@
 #include "exportdialog.h"
 #include "fileviewer.h"
 #include "globals.h"
-#include "imgreader.h"
-#include "imghexviewer.h"
+//#include "imgreader.h"
+//#include "imghexviewer.h"
 #include "filterviews.h"
 #include "imageviewer.h"
 #include "videoviewer.h"
@@ -643,7 +643,7 @@ public:
     PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;
-    //FileViewer* fileviewer;
+    FileViewer* fileviewer;
     TreeNodeModel* treenodemodel;
     QMenu* treemenu;
     QMenu* selectionmenu;
@@ -826,6 +826,8 @@ private:
     TreeNode* actionitem;
     QStringList listeditems;
     //guestfs_h* guestg;
+    TskObject tskobj;
+    TskObject* tskobjptr;
 };
 
 #endif // WOMBATFORENSICS_H

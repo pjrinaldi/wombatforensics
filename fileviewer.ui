@@ -39,6 +39,28 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item>
+     <widget class="QHexEdit" name="filehexview">
+      <property name="toolTip">
+       <string>QHexEditWidget</string>
+      </property>
+      <property name="whatsThis">
+       <string>QHexEdit widget allow to edit the data in hex view.</string>
+      </property>
+      <property name="hexCaps">
+       <bool>true</bool>
+      </property>
+      <property name="dynamicBytesPerLine">
+       <bool>true</bool>
+      </property>
+      <property name="overwriteMode">
+       <bool>false</bool>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -58,6 +80,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QHexEdit</class>
+   <extends>QFrame</extends>
+   <header>qhexedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
