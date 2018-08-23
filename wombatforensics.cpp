@@ -1982,6 +1982,14 @@ void WombatForensics::HexSelectionChanged()
 void WombatForensics::UpdateSelectValue()
 {
     QByteArray selectionbytes = ui->hexview->selectionToByteArray();
+    QDataStream ds(selectionbytes);
+    ds.setByteOrder(QDataStream::LittleEndian);
+    int16_t asint;
+    int32_t asint32;
+    double asdouble;
+    ds >> asint;
+    ds >> asint32;
+    ds >> asdouble;
     if(selectionbytes.isEmpty())
         ui->actionCopy_Selection_To->setEnabled(true);
     else
@@ -1992,9 +2000,9 @@ void WombatForensics::UpdateSelectValue()
     bool ok;
     bytetext += "<table border=0 width='100%' cellpadding=5>";
     bytetext += "<tr><td>Ascii:</td><td align=right>" + QString::fromStdString(selectionbytes.toStdString()) + "</td></tr>";
-    bytetext += "<tr><td>Integer:</td><td align=right>" + QString::number(selectionbytes.mid(0, sizeof(int)).toInt(&ok, 10)) + "</td></tr>";
-    bytetext += "<tr><td>Float:</td><td align=right>" + QString::number(selectionbytes.mid(0, sizeof(float)).toFloat()) + "</td></tr>";
-    bytetext += "<tr><td>Double:</td><td align=right>" + QString::number(selectionbytes.mid(0, sizeof(double)).toDouble()) + "</td></tr>";
+    bytetext += "<tr><td>Short Int (2-byte):</td><td align=right>" + QString::number(asint) + "</td></tr>";
+    bytetext += "<tr><td>Integer (4-byte):</td><td align=right>" + QString::number(asint32) + "</td></tr>";
+    bytetext += "<tr><td>Double:</td><td align=right>" + QString::number(asdouble) + "</td></tr>";
     bytetext += "</table>";
     byteviewer->SetText(bytetext);
     /*
