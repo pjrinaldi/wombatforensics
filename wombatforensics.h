@@ -723,7 +723,8 @@ private slots:
     void PageUp(void);
     void PageDown(void);
     void HexSelectionChanged(void);
-    void UpdateSelectValue(const QString &txt);
+    //void UpdateSelectValue(const QString &txt);
+    void UpdateSelectValue(void);
     void UpdateDataTable(void);
     void UpdateStatus(void);
     void UpdateDigging(void);
