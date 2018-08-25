@@ -644,12 +644,6 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         StatusUpdate("Ready");
         if(propertywindow->isVisible())
             UpdateProperties();
-        // PROBABLY MOVE TO LOADHEXCONTENTS AND GET WHAT I NEED TO SEND TO THE FILEVIEWER FROM IT...
-        // THEN I CAN USE QHEXEDIT DATAAT() TO WRITE THOSE CONTENTS TO A FILE AND THEN LOAD FILEVIEWER
-        // POSSIBLE DO IT W/IN ISVISIBLE IF AND NOT HAVE TO WRITE ANYTHING TO FILEVIEWER OTHER THAN CALLING
-        // TO LOAD THE TMPFILE WITH THE CONTENT...
-        if(fileviewer->isVisible())
-            UpdateFileViewer();
     }
 }
 
@@ -1040,6 +1034,8 @@ void WombatForensics::LoadHexContents()
             }
         }
         filefileprop.close();
+        unsigned long long fileoffset = 0;
+        unsigned long long filesize = 0;
         //qDebug() << "partfile fstype:" << partlist.at(0);
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
         {
@@ -1060,6 +1056,8 @@ void WombatForensics::LoadHexContents()
                     qDebug() << "non-resident ads";
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
                     ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+                    fileoffset = bytestring.toULongLong()*2; // file offset
+                    filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // file size
                 }
                 else // IF RESIDENT
                 {
@@ -1212,6 +1210,15 @@ void WombatForensics::LoadHexContents()
         }
     }
     ui->hexview->ensureVisible();
+    // GET WHAT I NEED TO SEND TO THE FILEVIEWER FROM IT...
+    // THEN I CAN USE QHEXEDIT DATAAT() TO WRITE THOSE CONTENTS TO A FILE AND THEN LOAD FILEVIEWER
+    // POSSIBLE DO IT W/IN ISVISIBLE IF AND NOT HAVE TO WRITE ANYTHING TO FILEVIEWER OTHER THAN CALLING
+    // TO LOAD THE TMPFILE WITH THE CONTENT...
+    if(fileviewer->isVisible())
+    {
+        //
+        UpdateFileViewer();
+    }
 }
 
 void WombatForensics::CloseCurrentCase()
