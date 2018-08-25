@@ -7,8 +7,9 @@
 #include "wombatinclude.h"
 //#include "filehexviewer.h"
 #include "ui_fileviewer.h"
-#include "filterviews.h"
+//#include "filterviews.h"
 
+/*
 class FileSlider : public QSlider
 {
     Q_OBJECT
@@ -33,6 +34,7 @@ protected:
         }
     };
 };
+*/
 
 namespace Ui {
     class FileViewer;
@@ -43,12 +45,14 @@ class FileViewer : public QMainWindow
     Q_OBJECT
     
 public:
-    FileViewer(QWidget* parent = 0, TskObject* tskobject = NULL);
+    //FileViewer(QWidget* parent = 0, TskObject* tskobject = NULL);
+    FileViewer(QWidget* parent = 0);
     ~FileViewer();
+    UpdateHexView(void);
     //FileHexViewer* filehexview;
     //FileReader* filereader;
     //vector<uchar*> filedata;
-    FileJumpFilter* jumpfilterview;
+    //FileJumpFilter* jumpfilterview;
 
 public slots:
 
@@ -84,7 +88,7 @@ private:
     //QPushButton* linedown;
     //QPushButton* pageup;
     //QPushButton* pagedown;
-    TskObject* tskptr;
+    //TskObject* tskptr;
 };
 
 Q_DECLARE_METATYPE(FileViewer*);

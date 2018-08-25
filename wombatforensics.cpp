@@ -44,7 +44,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addAction(ui->actionAbout);
     tskexternalptr = &tskexternalobject;
     propertywindow = new PropertiesWindow(this);
-    fileviewer = new FileViewer(this, tskobjptr);
+    //fileviewer = new FileViewer(this, tskobjptr);
+    fileviewer = new FileViewer(this);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
     jumpfilterview = new JumpFilter(this);
@@ -643,6 +644,12 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         StatusUpdate("Ready");
         if(propertywindow->isVisible())
             UpdateProperties();
+        // PROBABLY MOVE TO LOADHEXCONTENTS AND GET WHAT I NEED TO SEND TO THE FILEVIEWER FROM IT...
+        // THEN I CAN USE QHEXEDIT DATAAT() TO WRITE THOSE CONTENTS TO A FILE AND THEN LOAD FILEVIEWER
+        // POSSIBLE DO IT W/IN ISVISIBLE IF AND NOT HAVE TO WRITE ANYTHING TO FILEVIEWER OTHER THAN CALLING
+        // TO LOAD THE TMPFILE WITH THE CONTENT...
+        if(fileviewer->isVisible())
+            UpdateFileViewer();
     }
 }
 

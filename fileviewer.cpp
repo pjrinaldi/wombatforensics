@@ -3,9 +3,10 @@
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(parent), ui(new Ui::FileViewer)
+//FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(parent), ui(new Ui::FileViewer)
+FileViewer::FileViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::FileViewer)
 {
-    tskptr = tskobjptr;
+    //tskptr = tskobjptr;
     ui->setupUi(this);
     this->statusBar()->setSizeGripEnabled(true);
     selectedoffset = new QLabel(this);
@@ -23,7 +24,7 @@ FileViewer::FileViewer(QWidget* parent, TskObject* tskobjptr) : QMainWindow(pare
     filehexview->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     ui->horizontalLayout->addWidget(filehexview);
     */
-    jumpfilterview = new FileJumpFilter(this);
+    //jumpfilterview = new FileJumpFilter(this);
     /*
     lineup = new QPushButton(QIcon(":/basic/lineup"), "", ui->centralwidget);
     linedown = new QPushButton(QIcon(":/basic/linedown"), "", ui->centralwidget);
