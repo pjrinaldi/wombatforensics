@@ -1224,11 +1224,9 @@ void WombatForensics::LoadHexContents()
             (new QDir())->mkpath(wombatvariable.tmpfilepath);
             QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
             QFile tmpfile(tmpstring);
-            //QFile tmpfile(carvefilename);
             tmpfile.open(QIODevice::WriteOnly);
             tmpfile.write(filecontent);
             tmpfile.close();
-            //fileviewer->ui->filehexview->setData(tmpfile);
             UpdateFileViewer(tmpstring);
         }
     }
