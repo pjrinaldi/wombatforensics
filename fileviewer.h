@@ -48,7 +48,8 @@ public:
     //FileViewer(QWidget* parent = 0, TskObject* tskobject = NULL);
     FileViewer(QWidget* parent = 0);
     ~FileViewer();
-    void UpdateHexView(QString hexstring);
+    void UpdateHexView(void);
+    //void UpdateHexView(QString hexstring);
     //FileHexViewer* filehexview;
     //FileReader* filereader;
     //vector<uchar*> filedata;

@@ -45,6 +45,7 @@ extern bool originalpath;
 extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
+extern QString hexstring;
 extern QHash<QString, bool> checkhash;
 
 struct dosdate

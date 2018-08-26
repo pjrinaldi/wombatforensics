@@ -767,7 +767,7 @@ private:
     void InitializeOpenCase(void);
     void CloseCurrentCase(void);
     void UpdateProperties(void);
-    void UpdateFileViewer(QString);
+    //void UpdateFileViewer(QString);
     void LoadHexContents(void);
     void StartThumbnails(void);
     QStringList GetFileLists(int filelisttype);

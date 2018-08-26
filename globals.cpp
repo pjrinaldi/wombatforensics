@@ -42,6 +42,7 @@ bool originalpath = true;
 QString blockstring = "";
 QString thumbpath = "";
 QString hexselection = "";
+QString hexstring = "";
 QHash<QString, bool> checkhash;
 FilterValues filtervalues;
 TSK_IMG_INFO* readimginfo = NULL;

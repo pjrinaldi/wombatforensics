@@ -1218,17 +1218,18 @@ void WombatForensics::LoadHexContents()
             fileoffset = bytestring.toULongLong();
             filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         }
-        if(fileviewer->isVisible())
-        {
+        //if(fileviewer->isVisible())
+        //{
             QByteArray filecontent = ui->hexview->dataAt(fileoffset, filesize);
             (new QDir())->mkpath(wombatvariable.tmpfilepath);
-            QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
-            QFile tmpfile(tmpstring);
+            hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
+            QFile tmpfile(hexstring);
             tmpfile.open(QIODevice::WriteOnly);
             tmpfile.write(filecontent);
             tmpfile.close();
-            UpdateFileViewer(tmpstring);
-        }
+            fileviewer->UpdateHexView();
+            //UpdateFileViewer(tmpstring);
+        //}
     }
     ui->hexview->ensureVisible();
     // GET WHAT I NEED TO SEND TO THE FILEVIEWER FROM IT...
@@ -1237,10 +1238,12 @@ void WombatForensics::LoadHexContents()
     // TO LOAD THE TMPFILE WITH THE CONTENT...
 }
 
+/*
 void WombatForensics::UpdateFileViewer(QString hexstring)
 {
     fileviewer->UpdateHexView(hexstring);
 }
+*/
 
 void WombatForensics::CloseCurrentCase()
 {
@@ -1852,6 +1855,7 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
     }
     else
     {
+        //fileviewer->UpdateHexView();
         fileviewer->show();
     }
 }
