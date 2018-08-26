@@ -1056,7 +1056,7 @@ void WombatForensics::LoadHexContents()
                     qDebug() << "non-resident ads";
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
                     ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
-                    fileoffset = bytestring.toULongLong()*2; // file offset
+                    fileoffset = bytestring.toULongLong(); // file offset
                     filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // file size
                 }
                 else // IF RESIDENT
@@ -1104,7 +1104,7 @@ void WombatForensics::LoadHexContents()
 
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                     ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                    fileoffset = (residentoffset + curoffset + resoffset) * 2;
+                    fileoffset = (residentoffset + curoffset + resoffset);
                     filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                 }
             }
@@ -1154,7 +1154,7 @@ void WombatForensics::LoadHexContents()
                     //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype;
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
                     ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
-                    fileoffset = (residentoffset + curoffset)*2;
+                    fileoffset = (residentoffset + curoffset);
                     filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                 }
                 else // IF FILE AND OTHER STUFF
@@ -1203,7 +1203,7 @@ void WombatForensics::LoadHexContents()
                         //qDebug() << "test final offset:" << curoffset + resoffset + residentoffset;
                         ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                         ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                        fileoffset = (residentoffset + curoffset + resoffset)*2;
+                        fileoffset = (residentoffset + curoffset + resoffset);
                         filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                     }
                 }
@@ -1213,8 +1213,21 @@ void WombatForensics::LoadHexContents()
         {
             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
-            fileoffset = bytestring.toULongLong()*2;
+            fileoffset = bytestring.toULongLong();
             filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
+        }
+        if(fileviewer->isVisible())
+        {
+            QByteArray filecontent = ui->hexview->dataAt(fileoffset, filesize);
+            (new QDir())->mkpath(wombatvariable.tmpfilepath);
+            QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
+            QFile tmpfile(tmpstring);
+            //QFile tmpfile(carvefilename);
+            tmpfile.open(QIODevice::WriteOnly);
+            tmpfile.write(filecontent);
+            tmpfile.close();
+            //fileviewer->ui->filehexview->setData(tmpfile);
+            UpdateFileViewer(tmpstring);
         }
     }
     ui->hexview->ensureVisible();
@@ -1222,15 +1235,11 @@ void WombatForensics::LoadHexContents()
     // THEN I CAN USE QHEXEDIT DATAAT() TO WRITE THOSE CONTENTS TO A FILE AND THEN LOAD FILEVIEWER
     // POSSIBLE DO IT W/IN ISVISIBLE IF AND NOT HAVE TO WRITE ANYTHING TO FILEVIEWER OTHER THAN CALLING
     // TO LOAD THE TMPFILE WITH THE CONTENT...
-    if(fileviewer->isVisible())
-    {
-        //
-        UpdateFileViewer();
-    }
 }
 
-void WombatForensics::UpdateFileViewer()
+void WombatForensics::UpdateFileViewer(QString hexstring)
 {
+    fileviewer->UpdateHexView(hexstring);
 }
 
 void WombatForensics::CloseCurrentCase()

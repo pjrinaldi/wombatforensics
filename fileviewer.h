@@ -48,7 +48,7 @@ public:
     //FileViewer(QWidget* parent = 0, TskObject* tskobject = NULL);
     FileViewer(QWidget* parent = 0);
     ~FileViewer();
-    void UpdateHexView(void);
+    void UpdateHexView(QString hexstring);
     //FileHexViewer* filehexview;
     //FileReader* filereader;
     //vector<uchar*> filedata;
@@ -83,6 +83,7 @@ private:
 
     QLabel* selectedoffset;
     QLabel* selectedhex;
+    QFile hexfile;
     //FileSlider* hexrocker;
     //QPushButton* lineup;
     //QPushButton* linedown;

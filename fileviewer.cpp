@@ -174,6 +174,12 @@ void FileViewer::UpdateSelectValue(const QString &txt)
     selectedhex->setText(tmptext);
 }
 
+void FileViewer::UpdateHexView(QString hexstring)
+{
+    hexfile.setFileName(hexstring);
+    ui->filehexview->setData(hexfile);
+}
+
 /***** OLD TSK CODE TO GET CONTENT *****/
 /*
  *
