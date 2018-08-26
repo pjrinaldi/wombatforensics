@@ -1164,6 +1164,8 @@ void WombatForensics::LoadHexContents()
                         //qDebug() << "non-resident file";
                         ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
                         ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+                        fileoffset = bytestring.toULongLong();
+                        filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                     }
                     else // IF RESIDENT
                     {
