@@ -28,7 +28,7 @@ int evidcnt = 0;
 int childcount = 0;
 int linefactor = 0;
 int filelinefactor = 0;
-int thumbsize = 64;
+int thumbsize = 312;
 int mftrecordsize = 1024;
 InterfaceSignals* isignals = new InterfaceSignals();
 QList<QVariant> colvalues;

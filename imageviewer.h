@@ -85,8 +85,9 @@ public:
     ~ImageViewer();
     QListView* lw;
     QSpinBox* sb;
-    void UpdateGeometries();
-    void GetPixmaps();
+    void UpdateGeometries(void);
+    void UpdateThumbSize(void);
+    void GetPixmaps(void);
     void ShowImage(const QModelIndex &index);
 public slots:
     void OpenImageWindow(const QModelIndex &index);

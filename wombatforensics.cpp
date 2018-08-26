@@ -1750,7 +1750,8 @@ void WombatForensics::on_actionAbout_triggered()
 void WombatForensics::UpdateThumbnails(int tsize)
 {
     thumbsize = tsize;
-    imagewindow->UpdateGeometries();
+    imagewindow->UpdateThumbSize();
+    //imagewindow->UpdateGeometries();
 }
 
 void WombatForensics::HexSelectionChanged()

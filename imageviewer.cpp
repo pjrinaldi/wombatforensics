@@ -36,6 +36,13 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
     }
 }
 
+void ImageViewer::UpdateThumbSize()
+{
+    qDebug() << "thumbsize:" << thumbsize;
+    //ui->listView->setMovement(QListView::Static);
+    ui->listView->setGridSize(QSize(thumbsize, thumbsize));
+}
+
 void ImageWindow::GetImage(QString objectid)
 {
     this->setWindowTitle("View Image - " + objectid);
