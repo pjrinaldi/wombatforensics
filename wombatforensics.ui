@@ -77,16 +77,16 @@
        <property name="whatsThis">
         <string>QHexEdit widget allow to edit the data in hex view.</string>
        </property>
-       <property name="bytesPerLine">
+       <property name="bytesPerLine" stdset="0">
         <number>41</number>
        </property>
-       <property name="hexCaps">
+       <property name="hexCaps" stdset="0">
         <bool>true</bool>
        </property>
-       <property name="dynamicBytesPerLine">
+       <property name="dynamicBytesPerLine" stdset="0">
         <bool>true</bool>
        </property>
-       <property name="readOnly">
+       <property name="readOnly" stdset="0">
         <bool>true</bool>
        </property>
       </widget>
@@ -533,6 +533,9 @@
    <property name="toolTip">
     <string>Expand All</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionCollapseAll">
    <property name="icon">
@@ -544,6 +547,9 @@
    </property>
    <property name="toolTip">
     <string>Collapse All</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionDigDeeper">
@@ -642,6 +648,7 @@
    <class>QHexEdit</class>
    <extends>QFrame</extends>
    <header>qhexedit.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
