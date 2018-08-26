@@ -12,8 +12,6 @@
 #include "exportdialog.h"
 #include "fileviewer.h"
 #include "globals.h"
-//#include "imgreader.h"
-//#include "imghexviewer.h"
 #include "filterviews.h"
 #include "imageviewer.h"
 #include "videoviewer.h"
@@ -25,87 +23,6 @@
 #include "digdeeperdialog.h"
 #include "aboutbox.h"
 #include "cancelthread.h"
-//#include "QHexView.h"
-//#include "qhexedit.h"
-
-/*
-class WombatSlider : public QSlider
-{
-    Q_OBJECT
-
-public:
-    WombatSlider(QWidget* parent = 0) : QSlider(parent) {};
-signals:
-    void ShowJumpFilter(void);
-
-protected:
-    void mousePressEvent(QMouseEvent* event)
-    {
-        if(event->button() == Qt::RightButton)
-        {
-            emit ShowJumpFilter();
-            event->accept();
-        }
-        else
-        {
-            event->accept();
-            QSlider::mousePressEvent(event);
-        }
-    };
-};
-*/
-/*
-class EvidenceDevice : public QIODevice
-{
-public:
-    //const TSK_TCHAR** imagepartspath;
-    EvidenceDevice(int partcount, const TSK_TCHAR** imgpartspath)
-    {
-        length = 0;
-        position = 0;
-        // load tsk img_info data here...
-        readimginfo = tsk_img_open(partcount, imgpartspath, TSK_IMG_TYPE_DETECT, 0);
-        if(readimginfo == NULL)
-        {
-            qDebug() << tsk_error_get_errstr();
-        }
-        QIODevice::open(QIODevice::ReadOnly);
-        emit readyRead();
-    };
-
-    qint64 readData(char* data, qint64 maxlen)
-    {
-        qint64 retval = -1;
-        retval = tsk_img_read(readimginfo, 0, data, maxlen);
-        qDebug() << "data length:" << strlen(data);
-        // call tsk_read for all the img data here...
-        // return bytes read from tsk_read
-        return retval;
-    };
-
-    qint64 writeData(const char* data, qint64 len)
-    {
-        return -1;
-    };
-
-    qint64 ImageSize(void)
-    {
-        return readimginfo->size;
-    };
-
-    /*
-    qint64 BytesAvailable() const
-    {
-        return readimginfo->
-    };
-    */
-/*
-private:
-    qint64 length;
-    qint64 position;
-    char* bufferref;
-    TSK_IMG_INFO* readimginfo;
-};*/
 
 class TreeNodeModel : public QAbstractItemModel
 {
@@ -715,12 +632,6 @@ private slots:
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void DigFiles(int digtype, QVector<int> digoptions);
     void SetOffsetLabel(qint64 pos);
-    void ResetSlider(void);
-    void ShowRockerToolTip(int moved);
-    void SkipDown(void);
-    void SkipUp(void);
-    void PageUp(void);
-    void PageDown(void);
     void HexSelectionChanged(void);
     void UpdateSelectValue(void);
     void UpdateDataTable(void);
@@ -767,7 +678,6 @@ private:
     void InitializeOpenCase(void);
     void CloseCurrentCase(void);
     void UpdateProperties(void);
-    //void UpdateFileViewer(QString);
     void LoadHexContents(void);
     void StartThumbnails(void);
     QStringList GetFileLists(int filelisttype);
@@ -794,12 +704,6 @@ private:
     QFile settingsfile;
     QFile casedatafile;
     off_t offset() const;
-    //ImageHexViewer* hexwidget;
-    //QHexView* hexview;
-    //QHexView* hexviewwidget;
-    //QHexEdit* hexview;
-    //WombatSlider* hexrocker;
-    //EvidenceDevice* testdevice;
     QFile testfile;
     QPushButton* lineup;
     QPushButton* linedown;
@@ -826,9 +730,6 @@ private:
     QTimer* autosavetimer;
     TreeNode* actionitem;
     QStringList listeditems;
-    //guestfs_h* guestg;
-    TskObject tskobj;
-    TskObject* tskobjptr;
 };
 
 #endif // WOMBATFORENSICS_H

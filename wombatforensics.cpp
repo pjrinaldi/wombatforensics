@@ -5,7 +5,6 @@
 
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
-    tskobjptr = &tskobj;
     ui->setupUi(this);
     this->menuBar()->hide();
     this->statusBar()->setSizeGripEnabled(true);
@@ -44,7 +43,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addAction(ui->actionAbout);
     tskexternalptr = &tskexternalobject;
     propertywindow = new PropertiesWindow(this);
-    //fileviewer = new FileViewer(this, tskobjptr);
     fileviewer = new FileViewer(this);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
@@ -449,28 +447,6 @@ void WombatForensics::InitializeCaseStructure()
         mkfsstr += wombatvariable.casename;
         qDebug() << mkfsstr;
         QProcess::execute(mkfsstr);
-        /*
-        // determine the current username for chown
-        QString name = qgetenv("USER");
-        if(name.isEmpty())
-            name = qgetenv("USERNAME");
-
-        */
-        /*
-        // call guestfs using code
-        guestg = guestfs_create();
-        guestfs_add_drive(guestg, wombatvariable.casename.toStdString().c_str());
-        guestfs_launch(guestg);
-        guestfs_mount(guestg, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
-        */
-
-        /*
-        QString mntstr = "sudo mount -o loop " + wombatvariable.casename + " " + wombatvariable.tmpmntpath;
-        QProcess::execute(mntstr);
-        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
-        QProcess::execute(chownstr);
-        */
-
         QString lnkstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
         QProcess::execute(lnkstr);
         QString lnkmnt = "ln -s " + wombatvariable.tmpmntpath + " /tmp/wombatforensics/mntpt";
@@ -490,8 +466,6 @@ void WombatForensics::InitializeCaseStructure()
         StatusUpdate("Ready");
         //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
         //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
-
-        // this works with privilege escalation. only way to mount it though. now requires linux and btrfs.
     }
 }
 
@@ -520,29 +494,6 @@ void WombatForensics::InitializeOpenCase()
         QString lnkmnt = "ln -s " + wombatvariable.tmpmntpath + " /tmp/wombatforensics/mntpt";
         QProcess::execute(lnkmnt);
         QProcess::execute("mount /tmp/wombatforensics/mntpt");
-        /*
-        QString name = qgetenv("USER");
-        if(name.isEmpty())
-            name = qgetenv("USERNAME");
-        */
-        /* TEMP FIX UNTIL UBUNTU 18.04 LTS */
-        /*
-        QString mntstr = "sudo mount -o loop ";
-        mntstr += wombatvariable.casename;
-        mntstr += " ";
-        mntstr += wombatvariable.tmpmntpath;
-        QString chownstr = "sudo chown -R " + name + ":" + name + " " + wombatvariable.tmpmntpath;
-        QProcess::execute(mntstr);
-        QProcess::execute(chownstr);
-        */
-        /* END TEMP CODE */
-        /*
-        // call guestfs using code
-        guestg = guestfs_create();
-        guestfs_add_drive(guestg, wombatvariable.casename.toStdString().c_str());
-        guestfs_launch(guestg);
-        guestfs_mount(guestg, "dev/sda1", wombatvariable.tmpmntpath.toStdString().c_str());
-        */
         OpenCaseMountFinished(0, QProcess::NormalExit);
     }
 }
@@ -617,7 +568,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         ui->actionRemove_Evidence->setEnabled(true);
         ui->actionSaveState->setEnabled(true);
         ui->actionDigDeeper->setEnabled(true);
-        //hexrocker->setEnabled(true);
     }
     QApplication::restoreOverrideCursor();
     LogMessage("Case was Opened Successfully");
@@ -662,10 +612,6 @@ void WombatForensics::ImgHexMenu(const QPoint &pt)
 {
     if(ui->hexview->selectionToReadableString().size() > 0)
         selectionmenu->exec(ui->hexview->mapToGlobal(pt));
-    /*
-    if(hexselection.compare("") != 0)
-        selectionmenu->exec(hexwidget->mapToGlobal(pt));
-    */
 }
 
 void WombatForensics::UpdateDataTable()
@@ -740,29 +686,6 @@ void WombatForensics::PrepareEvidenceImage()
     }
     qDebug() << "xmntstr:" << xmntstr;
     QProcess::execute(xmntstr);
-    /*
-     *
-     * NEED TO REIMPLEMENT THIS WHOLE FUCNTIONALITY WITH THE NEW EDITOR. WILL LEVERAGE EWFMOUNT TO MOUNT AN E01 AS VIRTUAL DD
-     * THEN I'LL SIMPLY LOAD THAT FILE IN THE IMAGE HEX VIEWER. FOR FILES, PARTITIONS, ETC, I WILL SIMPLY GO TO THE OFFSET THE
-     * SLEUTHKIT PROVIDES.
-     *
-     * ALSO CALL AFFMOUNT FOR THEIR IMAGES... USE TSK TO DETERMINE THE IMAGE TYPE...
-     * THEN FOR THE FILEHEXVIEWER, IT WILL SIMPLY LOAD THE FILE HEX FOR FILES ONLY... THOSE GET WRITTEN TO TMP FILE PROBABLY
-     *
-     * THEN I NEED TO COLOR CODING IN THE HEXEDITOR, PROBABLY... CAN GET IT TO WORK...
-     *
-     */ 
-
-    // FIXING THIS CODE SHOULD ENABLE REMOVAL OF THE TSKOBJPTR AND TSKOBJ AND TSKVARIABLE.H. I SHOULDN'T NEED TO PASS ANYTHING
-    // COMPLEX OTHER THAN THE VARIABLES MENTIONED BELOW
-
-    // PROCESS TO OPEN A FILE...
-    // 1. GET THE OFFSET, FILE SIZE, AND BLOCKS/MFT ENTRY/ADS ATTRIBUTE FOR THE FILE...
-    // 2. SET HEX EDITOR TO THE NECESSARY OFFSET FOR START OF THE FILE
-    // 3. USE BLOCKS TO COLOR CODE THE FILE CONTENT BLUE, (BLOCK TOTAL * BLOCK SIZE) - FILE SIZE TO COLOR SLACK RED
-    // 3A. IF I CAN'T COLOR CODE THE CONTENT DISPLAY, MIGHT WANT TO POPUP INFORMATION IN EDITOR WHICH SHOWS INFO FOR FILE...
-    // 4. FOR FILEHEXVIEWER, JUST WRITE THE FILE TO TMP FILE AND THEN LOAD IN EDITOR. COLOR CODE THE SLACK USING ABOVE FORMULA SLACK.
- 
 }
 
 void WombatForensics::UpdateStatus()
@@ -810,7 +733,6 @@ void WombatForensics::UpdateStatus()
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
-    //hexrocker->setEnabled(true);
     //cancelthread->close();
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
@@ -887,53 +809,20 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
-
-    /*
-     *
-     * NEED TO REIMPLEMENT THIS WHOLE FUCNTIONALITY WITH THE NEW EDITOR. WILL LEVERAGE EWFMOUNT TO MOUNT AN E01 AS VIRTUAL DD
-     * THEN I'LL SIMPLY LOAD THAT FILE IN THE IMAGE HEX VIEWER. FOR FILES, PARTITIONS, ETC, I WILL SIMPLY GO TO THE OFFSET THE
-     * SLEUTHKIT PROVIDES.
-     *
-     * ALSO CALL AFFMOUNT FOR THEIR IMAGES... USE TSK TO DETERMINE THE IMAGE TYPE...
-     * THEN FOR THE FILEHEXVIEWER, IT WILL SIMPLY LOAD THE FILE HEX FOR FILES ONLY... THOSE GET WRITTEN TO TMP FILE PROBABLY
-     *
-     * THEN I NEED TO COLOR CODING IN THE HEXEDITOR, PROBABLY... CAN GET IT TO WORK...
-     *
-     */ 
-
-    // FIXING THIS CODE SHOULD ENABLE REMOVAL OF THE TSKOBJPTR AND TSKOBJ AND TSKVARIABLE.H. I SHOULDN'T NEED TO PASS ANYTHING
-    // COMPLEX OTHER THAN THE VARIABLES MENTIONED BELOW
-
-    // PROCESS TO OPEN A FILE...
-    // 1. GET THE OFFSET, FILE SIZE, AND BLOCKS/MFT ENTRY/ADS ATTRIBUTE FOR THE FILE...
-    // 2. SET HEX EDITOR TO THE NECESSARY OFFSET FOR START OF THE FILE
-    // 3. USE BLOCKS TO COLOR CODE THE FILE CONTENT BLUE, (BLOCK TOTAL * BLOCK SIZE) - FILE SIZE TO COLOR SLACK RED
-    // 3A. IF I CAN'T COLOR CODE THE CONTENT DISPLAY, MIGHT WANT TO POPUP INFORMATION IN EDITOR WHICH SHOWS INFO FOR FILE...
-    // 4. FOR FILEHEXVIEWER, JUST WRITE THE FILE TO TMP FILE AND THEN LOAD IN EDITOR. COLOR CODE THE SLACK USING ABOVE FORMULA SLACK.
-
     wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
     blockstring = "";
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
-    // get offset and blockaddress list from properties file...
-    // epropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".eprop." + QString::number(evidcnt));
-    // vpropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".volprop");
-    // fspropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".partprop.p" + QString::number(partint));
-    // filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(curfileinfo->meta->addr) + ".prop");
 
     QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
     //qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
-    //ui->hexview->SetColorInformation();
     ui->hexview->setData(casedatafile);
 
     // determine offset location in the editor
     if(wombatvariable.selectedid.split("-").count() == 1) // image file
-    {
         ui->hexview->setCursorPosition(0);
-        //emit ui->hexview->currentAddressChanged(0);
-    }
     else if(wombatvariable.selectedid.split("-").count() == 2) // volume file
     {
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -1061,7 +950,6 @@ void WombatForensics::LoadHexContents()
                 }
                 else // IF RESIDENT
                 {
-                    // ADS RESIDENTSTRING IS NOT THE START OF THE MFT ENTRY, ITS THE START OF THE ADS CONTENT (BUT ITS CURRENTLY WRONG)
                     qDebug() << "resident ads";
                     unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt());
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
@@ -1218,32 +1106,17 @@ void WombatForensics::LoadHexContents()
             fileoffset = bytestring.toULongLong();
             filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         }
-        //if(fileviewer->isVisible())
-        //{
-            QByteArray filecontent = ui->hexview->dataAt(fileoffset, filesize);
-            (new QDir())->mkpath(wombatvariable.tmpfilepath);
-            hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
-            QFile tmpfile(hexstring);
-            tmpfile.open(QIODevice::WriteOnly);
-            tmpfile.write(filecontent);
-            tmpfile.close();
-            fileviewer->UpdateHexView();
-            //UpdateFileViewer(tmpstring);
-        //}
+        QByteArray filecontent = ui->hexview->dataAt(fileoffset, filesize);
+        (new QDir())->mkpath(wombatvariable.tmpfilepath);
+        hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
+        QFile tmpfile(hexstring);
+        tmpfile.open(QIODevice::WriteOnly);
+        tmpfile.write(filecontent);
+        tmpfile.close();
+        fileviewer->UpdateHexView();
     }
     ui->hexview->ensureVisible();
-    // GET WHAT I NEED TO SEND TO THE FILEVIEWER FROM IT...
-    // THEN I CAN USE QHEXEDIT DATAAT() TO WRITE THOSE CONTENTS TO A FILE AND THEN LOAD FILEVIEWER
-    // POSSIBLE DO IT W/IN ISVISIBLE IF AND NOT HAVE TO WRITE ANYTHING TO FILEVIEWER OTHER THAN CALLING
-    // TO LOAD THE TMPFILE WITH THE CONTENT...
 }
-
-/*
-void WombatForensics::UpdateFileViewer(QString hexstring)
-{
-    fileviewer->UpdateHexView(hexstring);
-}
-*/
 
 void WombatForensics::CloseCurrentCase()
 {
@@ -1276,12 +1149,6 @@ void WombatForensics::CloseCurrentCase()
         QFile::remove("/tmp/wombatforensics/mntpt");
     if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
         QFile::remove("/tmp/wombatforensics/currentwfc");
-
-    /*
-    guestfs_umount(guestg, wombatvariable.tmpmntpath.toStdString().c_str());
-    guestfs_shutdown(guestg);
-    guestfs_close(guestg);
-    */
 
     StatusUpdate("Current Case was closed successfully");
     RemoveTmpFiles();
@@ -1592,13 +1459,6 @@ void WombatForensics::ResizeColumns(void)
 
 void WombatForensics::SetupHexPage(void)
 {
-    // hex editor page
-    //QBoxLayout* mainlayout = new QBoxLayout(QBoxLayout::TopToBottom, ui->hexPage);
-    //QHBoxLayout* hexLayout = new QHBoxLayout();
-    //hexwidget = new ImageHexViewer(ui->hexPage, tskobjptr);
-    //QHexView* hexview = new QHexView;
-    //hexviewwidget->clear();
-    //hexview = new QHexEdit(this);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     ui->hexview->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -1606,120 +1466,6 @@ void WombatForensics::SetupHexPage(void)
     connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
     connect(ui->hexview, SIGNAL(selectionChanged()), this, SLOT(HexSelectionChanged()));
     connect(ui->hexview, SIGNAL(selectionChanged()), this, SLOT(UpdateSelectValue()));
-    // ADD CONNECT() FOR UPDATESELECTVALUE()
-
-    //hexwidget->setObjectName("bt-hexview");
-    //hexwidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-    //hexwidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    /*
-    lineup = new QPushButton(QIcon(":/basic/lineup"), "", ui->hexPage);
-    linedown = new QPushButton(QIcon(":/basic/linedown"), "", ui->hexPage);
-    pageup = new QPushButton(QIcon(":/basic/pageup"), "", ui->hexPage);
-    pagedown = new QPushButton(QIcon(":/basic/pagedown"), "", ui->hexPage);
-    linedown->setAutoRepeat(true);
-    lineup->setAutoRepeat(true);
-    pagedown->setAutoRepeat(true);
-    pageup->setAutoRepeat(true);
-    linedown->setVisible(false);
-    lineup->setVisible(false);
-    pageup->setVisible(false);
-    pagedown->setVisible(false);
-    */
-    //hexLayout->addWidget(hexwidget);
-    //hexLayout->addWidget(hexview);
-    //hexLayout->addWidget(hexview);
-    //hexviewwidget = dynamic_cast<QHexView*>(centralWidget());
-    /*
-    hexrocker = new WombatSlider(ui->hexPage);
-    hexrocker->setRange(-100, 100);
-    hexrocker->setValue(0);
-    hexrocker->setSingleStep(1);
-    hexrocker->setEnabled(false);
-    */
-    //hexLayout->addWidget(hexrocker);
-    //mainlayout->addLayout(hexLayout);
-    //connect(hexview, SIGNAL(overwriteModeChanged(bool)), this, SLOT(setOverWriteMode(bool)));
-    //connect(hexview, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
-    //connect(linedown, SIGNAL(clicked()), hexwidget, SLOT(nextLine()));
-    //connect(lineup, SIGNAL(clicked()), hexwidget, SLOT(prevLine()));
-    //connect(pagedown, SIGNAL(clicked()), hexwidget, SLOT(nextPage()));
-    //connect(pageup, SIGNAL(clicked()), hexwidget, SLOT(prevPage()));
-    //connect(hexrocker, SIGNAL(ShowJumpFilter()), jumpfilterview, SLOT(DisplayFilter()));
-    //connect(jumpfilterview, SIGNAL(SetOffset()), hexwidget, SLOT(SetOffset()));
-    //connect(hexwidget, SIGNAL(offsetChanged(off_t)), this, SLOT(SetOffsetLabel(off_t)));
-    //connect(hexrocker, SIGNAL(sliderMoved(int)), hexwidget, SLOT(setTopLeftToPercent(int)));
-    //connect(hexrocker, SIGNAL(sliderMoved(int)), this, SLOT(ShowRockerToolTip(int)));
-    //connect(hexrocker, SIGNAL(sliderReleased()), this, SLOT(ResetSlider()));
-    //connect(hexwidget, SIGNAL(selectionChanged(const QString &)), this, SLOT(UpdateSelectValue(const QString&)));
-    //connect(hexwidget, SIGNAL(SkipDown()), this, SLOT(SkipDown()));
-    //connect(hexwidget, SIGNAL(SkipUp()), this, SLOT(SkipUp()));
-    //connect(hexwidget, SIGNAL(PageUp()), this, SLOT(PageUp()));
-    //connect(hexwidget, SIGNAL(PageDown()), this, SLOT(PageDown()));
-    //connect(hexwidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
-}
-
-void WombatForensics::ShowRockerToolTip(int moved)
-{
-    //QToolTip::showText(QCursor::pos(), QString::number(abs(moved)), hexrocker);
-}
-
-void WombatForensics::ResetSlider()
-{
-    /*
-    if(linedown->isDown())
-        linedown->setDown(false);
-    if(lineup->isDown())
-        lineup->setDown(false);
-    if(pagedown->isDown())
-        pagedown->setDown(false);
-    if(pageup->isDown())
-        pageup->setDown(false);
-    hexrocker->setValue(0);
-    */
-}
-
-void WombatForensics::SkipDown()
-{
-    if(pagedown->isDown())
-        pagedown->setDown(false);
-    if(lineup->isDown())
-        lineup->setDown(false);
-    if(pageup->isDown())
-        pageup->setDown(false);
-    linedown->setDown(true);
-}
-
-void WombatForensics::SkipUp()
-{
-    if(pageup->isDown())
-        pageup->setDown(false);
-    if(linedown->isDown())
-        linedown->setDown(false);
-    if(pagedown->isDown())
-        pagedown->setDown(false);
-    lineup->setDown(true);
-}
-
-void WombatForensics::PageUp()
-{
-    if(lineup->isDown())
-        lineup->setDown(false);
-    if(linedown->isDown())
-        linedown->setDown(false);
-    if(pagedown->isDown())
-        pagedown->setDown(false);
-    pageup->setDown(true);
-}
-
-void WombatForensics::PageDown()
-{
-    if(linedown->isDown())
-        linedown->setDown(false);
-    if(lineup->isDown())
-        lineup->setDown(false);
-    if(pageup->isDown())
-        pageup->setDown(false);
-    pagedown->setDown(true);
 }
 
 WombatForensics::~WombatForensics()
@@ -1850,14 +1596,9 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
 void WombatForensics::on_actionView_File_triggered(bool checked)
 {
     if(!checked)
-    {
         fileviewer->hide();
-    }
     else
-    {
-        //fileviewer->UpdateHexView();
         fileviewer->show();
-    }
 }
 
 void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
@@ -2040,7 +1781,6 @@ void WombatForensics::UpdateSelectValue()
     QString tmptext = "Length: " + QString::number(selectionbytes.size());
     QString bytetext = "";
     selectedhex->setText(tmptext);
-    bool ok;
     bytetext += "<table border=0 width='100%' cellpadding=5>";
     bytetext += "<tr><td>8-bit Signed Integer:</td><td align=right>" + QString::number(asint8) + "</td></tr>";
     bytetext += "<tr><td>16-bit Signed Integer:</td><td align=right>" + QString::number(asint16) + "</td></tr>";
@@ -2086,7 +1826,7 @@ void WombatForensics::SetOffsetLabel(qint64 pos)
     label = "Offset: ";
     char    buffer[64];
     #if _LARGEFILE_SOURCE
-    sprintf(buffer,"0x%lx",pos);
+    sprintf(buffer,"0x%llx",pos);
     #else
     sprintf(buffer,"0x%x",pos);
     #endif
