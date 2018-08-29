@@ -1106,6 +1106,9 @@ void WombatForensics::LoadHexContents()
             fileoffset = bytestring.toULongLong();
             filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         }
+        // do tsk stuff here to get the individual TSK_FS_FILE* value, then i can call the open_meta(), read(), close().
+        // then i can write that buffer to a file below and then call the same hexstring bit.
+        //TSK_FS_FILE* tmpfileinfo = tsk_fs_file_open_meta(tmpfsinfo, 
         QByteArray filecontent = ui->hexview->dataAt(fileoffset, filesize);
         (new QDir())->mkpath(wombatvariable.tmpfilepath);
         hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
