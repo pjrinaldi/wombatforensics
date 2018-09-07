@@ -852,9 +852,41 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedid.split("-").count() == 4) // file file
     {
+        // INITIAL PIECE OF FILE HEX CONTENT CODE
+        TSK_IMG_INFO* fileheximginfo;
+        TSK_FS_INFO* filehexfsinfo;
+        TSK_FS_FILE* filehexfileinfo;
+        std::vector<std::string> pathvector;
+        const TSK_TCHAR** imagepartspath;
+        pathvector.clear();
+        QString estring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(0);
+        QString pstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(2);
+        QString fstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(3);
+
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
+         // EVIDENCE IMAGE PIECE OF FILE HEX CONTENT CODE
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + estring.mid(1));
+        evidfile.open(QIODevice::ReadOnly);
+        tmpstr = evidfile.readLine();
+        int partcount = tmpstr.split(",").at(3).split("|").size();
+        evidfile.close();
+        for(int i=0; i < partcount; i++)
+            pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
+        imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+        for(uint i=0; i < pathvector.size(); i++)
+            imagepartspath[i] = pathvector[i].c_str();
+        fileheximginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+        if(fileheximginfo == NULL)
+        {
+            qDebug() << tsk_error_get_errstr();
+            LogMessage("Image opening error");
+        }
+        free(imagepartspath);
+
+
+
         tmpstr = "";
         QStringList partlist;
         partlist.clear();
@@ -865,9 +897,12 @@ void WombatForensics::LoadHexContents()
         tmpstr = partfile.readLine();
         partfile.close();
         partlist = tmpstr.split(",");
+        // FILE SYSTEM PIECE OF FILE HEX CONTENT CODE
+        filehexfsinfo = tsk_fs_open_img(fileheximginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+
         QFile partpropfile(wombatvariable.tmpmntpath + partpropfiles.at(0));
         partpropfile.open(QIODevice::ReadOnly);
-        QString mftentryoffset;
+        QString mftentryoffset = "";
         while(!partpropfile.atEnd())
         {
             QString tmpstring = partpropfile.readLine();
@@ -883,6 +918,11 @@ void WombatForensics::LoadHexContents()
         else
             tmpfilename = wombatvariable.selectedid.split("-").at(3).mid(1);
         qDebug() << "f value:" << tmpfilename;
+        // INITIAL FILE SYSTEM FILE PIECE OF FILE HEX CONTENT CODE
+        filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.toULongLong());
+        char* fhexbuf;
+        ssize_t fhexlen = 0;
+
         QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".p" + wombatvariable.selectedid.split("-").at(2).mid(1) + ".f" + tmpfilename + ".a*"), QDir::NoSymLinks | QDir::Files);
         QFile filefile;
         if(filefiles.count() == 1)
@@ -923,8 +963,11 @@ void WombatForensics::LoadHexContents()
             }
         }
         filefileprop.close();
+
+        //old file hex code
         unsigned long long fileoffset = 0;
         unsigned long long filesize = 0;
+
         //qDebug() << "partfile fstype:" << partlist.at(0);
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
         {
@@ -1101,6 +1144,11 @@ void WombatForensics::LoadHexContents()
         }
         else // OTHER FILE SYSTEM
         {
+            if(filehexfileinfo->meta != NULL)
+            {
+                fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
+                fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+            }
             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
             fileoffset = bytestring.toULongLong();
@@ -1108,57 +1156,24 @@ void WombatForensics::LoadHexContents()
         }
         // do tsk stuff here to get the individual TSK_FS_FILE* value, then i can call the open_meta(), read(), close().
         // then i can write that buffer to a file below and then call the same hexstring bit.
-        //TSK_FS_FILE* tmpfileinfo = tsk_fs_file_open_meta(tmpfsinfo, 
-        QByteArray filecontent = ui->hexview->dataAt(fileoffset, filesize);
+        //QByteArray filecontent = ui->hexview->dataAt(fileoffset, filesize);
         (new QDir())->mkpath(wombatvariable.tmpfilepath);
         hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
         QFile tmpfile(hexstring);
         tmpfile.open(QIODevice::WriteOnly);
-        tmpfile.write(filecontent);
+        //tmpfile.write(filecontent);
+        QDataStream outbuffer(&tmpfile);
+        outbuffer.writeRawData(fhexbuf, fhexlen);
         tmpfile.close();
+        free(fhexbuf);
+        tsk_fs_file_close(filehexfileinfo);
+        tsk_fs_close(filehexfsinfo);
+        tsk_img_close(fileheximginfo);
         fileviewer->UpdateHexView();
+        
         /*
          *
          *
-    TSK_IMG_INFO* readimginfo;
-    TSK_FS_INFO* readfsinfo;
-    TSK_FS_FILE* readfileinfo;
-    QString tmpstr = "";
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    std::vector<std::string> pathvector;
-    const TSK_TCHAR** imagepartspath;
-    pathvector.clear();
-    QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
-    QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
-    unsigned long long curaddress = objectid.split("-f").at(1).toULongLong();
-    QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
-    wombatvariable.evidencename = evidfiles.at(0);
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + estring.mid(1));
-    evidfile.open(QIODevice::ReadOnly);
-    tmpstr = evidfile.readLine();
-    int partcount = tmpstr.split(",").at(3).split("|").size();
-    evidfile.close();
-    for(int i=0; i < partcount; i++)
-        pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
-    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(uint i=0; i < pathvector.size(); i++)
-        imagepartspath[i] = pathvector[i].c_str();
-    readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    if(readimginfo == NULL)
-    {
-        qDebug() << tsk_error_get_errstr();
-        LogMessage("Image opening error");
-    }
-    free(imagepartspath);
-    tmpstr = "";
-    QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + pstring.mid(1)), QDir::NoSymLinks | QDir::Files);
-    QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
-    partfile.open(QIODevice::ReadOnly);
-    tmpstr = partfile.readLine();
-    partfile.close();
-    readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
-    readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
     if(readfileinfo->meta != NULL)
     {
         char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
@@ -1209,6 +1224,47 @@ void WombatForensics::LoadHexContents()
 
          *
          */ 
+
+
+/***** OLD TSK CODE TO GET CONTENT *****/
+/*
+ *
+ *    if(tskptr->objecttype == 5 || tskptr->objecttype == 6)
+    {
+        if(tskptr->blkaddrlist.count() > 0)
+        {
+            if(tskptr->blkaddrlist.at(0).toInt() == 0)
+            {
+                if(tskptr->objecttype == 6)
+                {
+                    retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, tskptr->mftattrid, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+                }
+                else
+                {
+                    retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+                }
+            }
+            else
+            {
+                if(pageIdx < tskptr->blkaddrlist.count())
+                {
+                    retval = tsk_fs_read_block(tskptr->readfsinfo, tskptr->blkaddrlist.at(pageIdx).toInt(), (char*)_data[pageIdx], _pageSize);
+                }
+            }
+        }
+        else
+        {
+            if(tskptr->objecttype == 6)
+            {
+                retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, tskptr->mftattrid, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_SLACK);
+            }
+            else
+            {
+                retval = tsk_fs_file_read_type(tskptr->readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, 0, 0, (char*)_data[pageIdx], _pageSize, TSK_FS_FILE_READ_FLAG_NOID);
+            }
+        }
+    }
+    */
     }
     ui->hexview->ensureVisible();
 }
