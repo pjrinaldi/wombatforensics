@@ -23,6 +23,7 @@
 #include "digdeeperdialog.h"
 #include "aboutbox.h"
 #include "cancelthread.h"
+#include <new>
 
 class TreeNodeModel : public QAbstractItemModel
 {

@@ -984,13 +984,12 @@ void WombatForensics::LoadHexContents()
             if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
             {
                 qDebug() << "should be file node and attrid:" << wombatvariable.selectedid.split("-").at(3).split(":").at(0) << wombatvariable.selectedid.split("-").at(3).split(":").at(1);
-                /*
                 if(filehexfileinfo->meta != NULL)
                 {
-                    fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
-                    fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, wombatvariable.selectedid.split("-").at(3).split(":").at(0), 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                    char* fhexbuf = new char[filehexfileinfo->meta->size];
+                    //fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
+                    fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, wombatvariable.selectedid.split("-").at(3).split(":").at(1).toUInt(), 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
                 }
-                */
                 if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                 {
                     qDebug() << "non-resident ads";
@@ -1051,7 +1050,8 @@ void WombatForensics::LoadHexContents()
             {
                 if(filehexfileinfo->meta != NULL)
                 {
-                    fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
+                    char* fhexbuf = new char[filehexfileinfo->meta->size];
+                    //fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
                     fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
                 }
                 if(filelist.at(1).toInt() == 3) // IF DIR
@@ -1159,7 +1159,8 @@ void WombatForensics::LoadHexContents()
         {
             if(filehexfileinfo->meta != NULL)
             {
-                fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
+                char* fhexbuf = new char[filehexfileinfo->meta->size];
+                //fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
                 fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
             }
             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
@@ -1178,7 +1179,8 @@ void WombatForensics::LoadHexContents()
         QDataStream outbuffer(&tmpfile);
         outbuffer.writeRawData(fhexbuf, fhexlen);
         tmpfile.close();
-        free(fhexbuf);
+        delete[] fhexbuf;
+        //free(fhexbuf);
         tsk_fs_file_close(filehexfileinfo);
         tsk_fs_close(filehexfsinfo);
         tsk_img_close(fileheximginfo);
