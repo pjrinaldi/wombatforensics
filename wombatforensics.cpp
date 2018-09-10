@@ -986,9 +986,13 @@ void WombatForensics::LoadHexContents()
                 qDebug() << "should be file node and attrid:" << wombatvariable.selectedid.split("-").at(3).split(":").at(0) << wombatvariable.selectedid.split("-").at(3).split(":").at(1);
                 if(filehexfileinfo->meta != NULL)
                 {
-                    fhexbuf = new char[filehexfileinfo->meta->size];
+                    qDebug() << "should be the ads attr size:" << filelist.at(8);
+                    fhexbuf = new char[filelist.at(8).toULongLong()];
                     //fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
-                    fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, wombatvariable.selectedid.split("-").at(3).split(":").at(1).toUInt(), 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                    fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, wombatvariable.selectedid.split("-").at(3).split(":").at(1).toUInt(), 0, fhexbuf, filelist.at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_NONE);
+                    qDebug() << "fhexlen:" << fhexlen;
+                    if(fhexlen == -1)
+                        qDebug() << tsk_error_get_errstr();
                 }
                 if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                 {
