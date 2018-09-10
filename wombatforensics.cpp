@@ -983,6 +983,14 @@ void WombatForensics::LoadHexContents()
 
             if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
             {
+                qDebug() << "should be file node and attrid:" << wombatvariable.selectedid.split("-").at(3).split(":").at(0) << wombatvariable.selectedid.split("-").at(3).split(":").at(1);
+                /*
+                if(filehexfileinfo->meta != NULL)
+                {
+                    fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
+                    fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, wombatvariable.selectedid.split("-").at(3).split(":").at(0), 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                }
+                */
                 if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                 {
                     qDebug() << "non-resident ads";
@@ -1041,6 +1049,11 @@ void WombatForensics::LoadHexContents()
             }
             else // IF NOT ADS
             {
+                if(filehexfileinfo->meta != NULL)
+                {
+                    fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
+                    fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                }
                 if(filelist.at(1).toInt() == 3) // IF DIR
                 {
                     //qDebug() << "it's a dir - get 144 attribute offset";

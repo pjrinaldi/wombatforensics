@@ -374,7 +374,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     //else if(fsattr->type == TSK_FS_ATTR_TYPE_NTFS_IDXROOT && tmpfile->name->type == TSK_FS_NAME_TYPE_DIR)
                     //    qDebug() << "dir:" << QString(fsattr->name);
                     */
-                    adssize += 24; // NOT VALID VALUE
+                    adssize += 24;
                     adssize += (unsigned long long)fsattr->size;
                     if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
                     {
