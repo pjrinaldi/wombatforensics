@@ -986,7 +986,7 @@ void WombatForensics::LoadHexContents()
                 qDebug() << "should be file node and attrid:" << wombatvariable.selectedid.split("-").at(3).split(":").at(0) << wombatvariable.selectedid.split("-").at(3).split(":").at(1);
                 if(filehexfileinfo->meta != NULL)
                 {
-                    char* fhexbuf = new char[filehexfileinfo->meta->size];
+                    fhexbuf = new char[filehexfileinfo->meta->size];
                     //fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
                     fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, wombatvariable.selectedid.split("-").at(3).split(":").at(1).toUInt(), 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
                 }
@@ -1050,7 +1050,7 @@ void WombatForensics::LoadHexContents()
             {
                 if(filehexfileinfo->meta != NULL)
                 {
-                    char* fhexbuf = new char[filehexfileinfo->meta->size];
+                    fhexbuf = new char[filehexfileinfo->meta->size];
                     //fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
                     fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
                 }
@@ -1159,7 +1159,7 @@ void WombatForensics::LoadHexContents()
         {
             if(filehexfileinfo->meta != NULL)
             {
-                char* fhexbuf = new char[filehexfileinfo->meta->size];
+                fhexbuf = new char[filehexfileinfo->meta->size];
                 //fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
                 fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
             }
