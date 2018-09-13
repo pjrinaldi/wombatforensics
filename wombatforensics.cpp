@@ -919,7 +919,10 @@ void WombatForensics::LoadHexContents()
             tmpfilename = wombatvariable.selectedid.split("-").at(3).mid(1);
         qDebug() << "f value:" << tmpfilename;
         // INITIAL FILE SYSTEM FILE PIECE OF FILE HEX CONTENT CODE
-        filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.toULongLong());
+        if(tmpfilename.contains("-"))
+            filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.split("-").at(0).toInt());
+        else
+            filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.toInt());
         char* fhexbuf;
         ssize_t fhexlen = 0;
 
@@ -983,13 +986,18 @@ void WombatForensics::LoadHexContents()
 
             if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
             {
-                qDebug() << "should be file node and attrid:" << wombatvariable.selectedid.split("-").at(3).split(":").at(0) << wombatvariable.selectedid.split("-").at(3).split(":").at(1);
+                qDebug() << "should be file node and attrid:" << wombatvariable.selectedid.split("-").at(3).split(":").at(0).mid(1) << wombatvariable.selectedid.split("-").at(3).split(":").at(1).toUInt();
+                qDebug() << "tmpfilename split:" << tmpfilename.split("-").at(0).toInt() << tmpfilename.split("-").at(1).toInt();
                 if(filehexfileinfo->meta != NULL)
                 {
-                    qDebug() << "should be the ads attr size:" << filelist.at(8);
+                    qDebug() << "filehexinfo->addr:" << filehexfileinfo->meta->addr;
+                    qDebug() << "should be the ads attr size:" << filelist.at(8).toULongLong();
                     fhexbuf = new char[filelist.at(8).toULongLong()];
                     //fhexbuf = reinterpret_cast<char*>(malloc(filehexfileinfo->meta->size));
+                    //fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, tmpfilename.split("-").at(1).toInt(), 0, fhexbuf, filelist.at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_NONE);
                     fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, wombatvariable.selectedid.split("-").at(3).split(":").at(1).toUInt(), 0, fhexbuf, filelist.at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_NONE);
+                    //const TSK_FS_ATTR* curattr = tsk_fs_file_attr_get_id(filehexfileinfo, wombatvariable.selectedid.split("-").at(3).split(":").at(1).toUInt());
+                    //fhexlen = tsk_fs_attr_read(curattr, 0, fhexbuf, filelist.at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_NONE);
                     qDebug() << "fhexlen:" << fhexlen;
                     if(fhexlen == -1)
                         qDebug() << tsk_error_get_errstr();
