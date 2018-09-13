@@ -63,6 +63,7 @@ public:
     QAction *actionSaveState;
     QAction *actionHtmlViewer;
     QAction *actionMediaViewer;
+    QAction *actionSettings;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -244,6 +245,11 @@ public:
         QIcon icon23;
         icon23.addFile(QStringLiteral(":/bar/mediaviewer"), QSize(), QIcon::Normal, QIcon::Off);
         actionMediaViewer->setIcon(icon23);
+        actionSettings = new QAction(WombatForensics);
+        actionSettings->setObjectName(QStringLiteral("actionSettings"));
+        QIcon icon24;
+        icon24.addFile(QStringLiteral(":/bar/settings"), QSize(), QIcon::Normal, QIcon::Off);
+        actionSettings->setIcon(icon24);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -298,14 +304,14 @@ public:
         menuAbout->setIcon(icon7);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon24;
-        icon24.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon24);
+        QIcon icon25;
+        icon25.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon25);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon25;
-        icon25.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon25);
+        QIcon icon26;
+        icon26.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon26);
         menuView = new QMenu(mainMenubar);
         menuView->setObjectName(QStringLiteral("menuView"));
         menuView_With = new QMenu(menuView);
@@ -376,6 +382,7 @@ public:
         analysisToolBar->addAction(actionView_Image_Gallery);
         analysisToolBar->addAction(actionByteConverter);
         analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionSettings);
         analysisToolBar->addAction(actionViewerManager);
         analysisToolBar->addAction(actionViewMessageLog);
         analysisToolBar->addAction(actionView_Progress);
@@ -488,6 +495,10 @@ public:
         actionMediaViewer->setText(QApplication::translate("WombatForensics", "Media Viewer", nullptr));
 #ifndef QT_NO_TOOLTIP
         actionMediaViewer->setToolTip(QApplication::translate("WombatForensics", "Audio and Video Media Viewer", nullptr));
+#endif // QT_NO_TOOLTIP
+        actionSettings->setText(QApplication::translate("WombatForensics", "Settings", nullptr));
+#ifndef QT_NO_TOOLTIP
+        actionSettings->setToolTip(QApplication::translate("WombatForensics", "Settings", nullptr));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_TOOLTIP
         hexview->setToolTip(QString());
