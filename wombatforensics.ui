@@ -246,6 +246,7 @@
    <addaction name="actionView_Image_Gallery"/>
    <addaction name="actionByteConverter"/>
    <addaction name="separator"/>
+   <addaction name="actionSettings"/>
    <addaction name="actionViewerManager"/>
    <addaction name="actionViewMessageLog"/>
    <addaction name="actionView_Progress"/>
@@ -640,6 +641,18 @@
    </property>
    <property name="toolTip">
     <string>Audio and Video Media Viewer</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/settings</normaloff>:/bar/settings</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Settings</string>
    </property>
   </action>
  </widget>
