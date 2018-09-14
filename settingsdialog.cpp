@@ -6,6 +6,7 @@
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+    /*
     QString abouttext = "<h3>About WombatForensics v1.0</h3>";
     abouttext += "<h5>License: GPLv2</h5>";
     abouttext += "<4>Copyright 2015 Pasquale J. Rinaldi, Jr.</h4>";
@@ -14,6 +15,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Se
     abouttext += "lfhex is provided under the gplv2. I also used Qt5.5, the sleuthkit c/c++ functions, and the treepata icons.";
     abouttext += "The wombat icon was designed by Lindsey Pargman and a lot of the design implementation ideas were brainstormed with Mark Smith.</p>";
     ui->label->setText(abouttext);
+    */
     this->hide();
 }
 
