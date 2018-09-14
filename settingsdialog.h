@@ -1,7 +1,7 @@
 #ifndef SETTINGSDIALOG_H 
 #define SETTINGSDIALOG_H
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2018 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include "wombatinclude.h"
@@ -22,12 +22,12 @@ public:
     SettingsDialog(QWidget* parent = 0);
     ~SettingsDialog();
 private slots:
-    void HideClicked();
-    void ShowAbout();
+    //void HideClicked();
+    //void ShowAbout();
 private:
     Ui::SettingsDialog* ui;
 protected:
-    void mousePressEvent(QMouseEvent* event);
+    //void mousePressEvent(QMouseEvent* event);
 };
 
 Q_DECLARE_METATYPE(SettingsDialog*)

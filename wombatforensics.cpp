@@ -65,6 +65,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
     cancelthread = new CancelThread(this);
+    settingsdialog = new SettingsDialog(this);
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
@@ -72,6 +73,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
+    settingsdialog->setWindowIcon(QIcon(":/bar/settings"));
     //cancelthread->setWindowIcon(QIcon(""));
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
@@ -1568,6 +1570,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     byteviewer->close();
     aboutbox->close();
     cancelthread->close();
+    settingsdialog->close();
     RemoveTmpFiles();
     event->accept();
     msglog->clear();
@@ -1818,6 +1821,11 @@ void WombatForensics::on_actionCollapseAll_triggered()
 void WombatForensics::on_actionAbout_triggered()
 {
     aboutbox->show();
+}
+
+void WombatForensics::on_actionSettings_triggered()
+{
+    settingsdialog->show();
 }
 
 void WombatForensics::UpdateThumbnails(int tsize)

@@ -1,6 +1,6 @@
 #include "settingsdialog.h"
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2018 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::SettingsDialog)
@@ -23,6 +23,7 @@ SettingsDialog::~SettingsDialog()
 {
 }
 
+/*
 void SettingsDialog::HideClicked()
 {
     this->hide();
@@ -32,7 +33,9 @@ void SettingsDialog::ShowAbout()
 {
     this->show();
 }
+*/
 
+/*
 void SettingsDialog::mousePressEvent(QMouseEvent* e)
 {
     if(e->type() == QEvent::MouseButtonPress)
@@ -40,4 +43,5 @@ void SettingsDialog::mousePressEvent(QMouseEvent* e)
         this->hide();
     }
 }
+*/
 

@@ -23,7 +23,7 @@
 #include "digdeeperdialog.h"
 #include "aboutbox.h"
 #include "cancelthread.h"
-#include <new>
+#include "settingsdialog.h"
 
 class TreeNodeModel : public QAbstractItemModel
 {
@@ -586,6 +586,7 @@ public:
     ByteConverter* byteviewer;
     AboutBox* aboutbox;
     CancelThread* cancelthread;
+    SettingsDialog* settingsdialog;
 
 signals:
 
@@ -610,6 +611,7 @@ private slots:
     void on_actionExpandAll_triggered();
     void on_actionCollapseAll_triggered();
     void on_actionAbout_triggered();
+    void on_actionSettings_triggered();
     void UpdateProgress(unsigned long long count);
     void UpdateExport(void);
     void UpdateDig(void);
