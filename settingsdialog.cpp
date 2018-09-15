@@ -6,6 +6,16 @@
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+    connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(CancelChanges()));
+    connect(ui->savebutton, SIGNAL(clicked()), this, SLOT(SaveChanges()));
+    settingsfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QStringList tmplist = QString(settingsfile.readLine()).split(",", QString::SkipEmptyParts);
+    settingsfile.close();
+    for(int i = 0; i < tmplist.count(); i++)
+    {
+        if(tmplist.at(i).split(":").at(0) == "thumb")
+            ui->thumbnailspinbox->setValue(tmplist.at(i).split(":").at(1).toInt());
+    }
     /*
     QString abouttext = "<h3>About WombatForensics v1.0</h3>";
     abouttext += "<h5>License: GPLv2</h5>";
@@ -21,6 +31,16 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Se
 
 SettingsDialog::~SettingsDialog()
 {
+}
+
+void SettingsDialog::SaveChanges()
+{
+    // write data here
+    this->hide();
+}
+void SettingsDialog::CancelChanges()
+{
+    this->hide();
 }
 
 /*

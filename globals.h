@@ -10,6 +10,7 @@
 extern WombatVariable wombatvariable;
 extern QFile logfile;
 extern QFile viewerfile;
+extern QFile settingsfile;
 extern QFile treefile;
 extern QDir thumbdir;
 extern QDir currentrawimagedir;

@@ -22,8 +22,13 @@ public:
     SettingsDialog(QWidget* parent = 0);
     ~SettingsDialog();
 private slots:
+    void CancelChanges();
+    void SaveChanges();
     //void HideClicked();
     //void ShowAbout();
+
+signals:
+    void HideSettingsWindow();
 private:
     Ui::SettingsDialog* ui;
 protected:

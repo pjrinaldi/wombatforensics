@@ -621,6 +621,7 @@ private slots:
     void HideFileViewer(bool checkstate);
     void HideImageWindow(bool checkstate);
     void HideViewerManager(void);
+    void HideSettingsWindow(void);
     void HideTextViewer(bool checkstate);
     void HideMessageViewer(bool checkstate);
     void HideByteViewer(bool checkstate);
@@ -691,6 +692,7 @@ private:
     void UpdateCheckState(void);
     void InitializeCheckState(void);
     void UpdateSelectedState(QString id);
+    void ReadSettings(void);
     static void PopulateModel(const QModelIndex index);
     QString InitializeSelectedState(void);
     QModelIndex selectedindex;

@@ -310,6 +310,26 @@ void WombatForensics::HideViewerManager()
 
 }
 
+void WombatForensics::HideSettingsWindow()
+{
+    ReadSettings();
+}
+
+void WombatForensics::ReadSettings()
+{
+    settingsfile.open(QIODevice::ReadOnly);
+    QStringList tmplist = QString(settingsfile.readLine()).split(",", QString::SkipEmptyParts);
+    settingsfile.close();
+    // split settings and implement them...
+    for(int i = 0; i < tmplist.count(); i++)
+    {
+        if(tmplist.at(i).split(":").at(0) == "thumb")
+            thumbsize = tmplist.at(i).split(":").at(1).toInt();
+        //else if(tmplist.at(i).split(":").at(0) == "save")
+        // etc...
+    }
+}
+
 void WombatForensics::HideTextViewer(bool checkstate)
 {
     ui->actionTextViewer->setChecked(checkstate);
@@ -394,9 +414,18 @@ void WombatForensics::InitializeAppStructure()
         viewerfile.open(QIODevice::WriteOnly | QIODevice::Text);
         viewerfile.close();
     }
+    settingsfile.setFileName(homepath + "settings");
+    if(!FileExists(QString(homepath + "settings").toStdString()))
+    {
+        settingsfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        settingsfile.close();
+    }
+    else
+        ReadSettings();
     viewmanage = new ViewerManager(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
+    connect(settingsdialog, SIGNAL(HideSettingsWindow()), this, SLOT(HideSettingsWindow()), Qt::DirectConnection);
     ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);

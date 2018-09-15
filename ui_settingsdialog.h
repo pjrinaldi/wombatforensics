@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'settingsdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.11.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,14 +10,11 @@
 #define UI_SETTINGSDIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSpinBox>
 
@@ -28,17 +25,17 @@ class Ui_SettingsDialog
 public:
     QGridLayout *gridLayout;
     QSpinBox *thumbnailspinbox;
-    QSpacerItem *horizontalSpacer;
     QLabel *thumbnaillabel;
-    QDialogButtonBox *buttonBox;
     QSpacerItem *verticalSpacer;
+    QPushButton *cancelbutton;
+    QPushButton *savebutton;
 
     void setupUi(QDialog *SettingsDialog)
     {
         if (SettingsDialog->objectName().isEmpty())
             SettingsDialog->setObjectName(QStringLiteral("SettingsDialog"));
         SettingsDialog->setWindowModality(Qt::ApplicationModal);
-        SettingsDialog->resize(385, 113);
+        SettingsDialog->resize(367, 113);
         SettingsDialog->setModal(true);
         gridLayout = new QGridLayout(SettingsDialog);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
@@ -53,10 +50,6 @@ public:
 
         gridLayout->addWidget(thumbnailspinbox, 0, 1, 1, 1);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        gridLayout->addItem(horizontalSpacer, 0, 2, 1, 1);
-
         thumbnaillabel = new QLabel(SettingsDialog);
         thumbnaillabel->setObjectName(QStringLiteral("thumbnaillabel"));
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -68,27 +61,36 @@ public:
 
         gridLayout->addWidget(thumbnaillabel, 0, 0, 1, 1);
 
-        buttonBox = new QDialogButtonBox(SettingsDialog);
-        buttonBox->setObjectName(QStringLiteral("buttonBox"));
-        buttonBox->setStandardButtons(QDialogButtonBox::Discard|QDialogButtonBox::Save);
-
-        gridLayout->addWidget(buttonBox, 2, 2, 1, 1);
-
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         gridLayout->addItem(verticalSpacer, 1, 1, 1, 1);
 
+        cancelbutton = new QPushButton(SettingsDialog);
+        cancelbutton->setObjectName(QStringLiteral("cancelbutton"));
+
+        gridLayout->addWidget(cancelbutton, 2, 3, 1, 1);
+
+        savebutton = new QPushButton(SettingsDialog);
+        savebutton->setObjectName(QStringLiteral("savebutton"));
+
+        gridLayout->addWidget(savebutton, 2, 4, 1, 1);
+
 
         retranslateUi(SettingsDialog);
+
+        savebutton->setDefault(true);
+
 
         QMetaObject::connectSlotsByName(SettingsDialog);
     } // setupUi
 
     void retranslateUi(QDialog *SettingsDialog)
     {
-        SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", Q_NULLPTR));
-        thumbnailspinbox->setSuffix(QApplication::translate("SettingsDialog", " pixels", Q_NULLPTR));
-        thumbnaillabel->setText(QApplication::translate("SettingsDialog", "Thumbnail Size:", Q_NULLPTR));
+        SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", nullptr));
+        thumbnailspinbox->setSuffix(QApplication::translate("SettingsDialog", " pixels", nullptr));
+        thumbnaillabel->setText(QApplication::translate("SettingsDialog", "Thumbnail Size:", nullptr));
+        cancelbutton->setText(QApplication::translate("SettingsDialog", "Cancel", nullptr));
+        savebutton->setText(QApplication::translate("SettingsDialog", "Save", nullptr));
     } // retranslateUi
 
 };

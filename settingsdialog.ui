@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>385</width>
+    <width>367</width>
     <height>113</height>
    </rect>
   </property>
@@ -45,19 +45,6 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="thumbnaillabel">
      <property name="sizePolicy">
@@ -74,13 +61,6 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="2">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Discard|QDialogButtonBox::Save</set>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -93,6 +73,23 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="2" column="3">
+    <widget class="QPushButton" name="cancelbutton">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="4">
+    <widget class="QPushButton" name="savebutton">
+     <property name="text">
+      <string>Save</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
