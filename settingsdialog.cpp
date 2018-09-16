@@ -35,7 +35,12 @@ SettingsDialog::~SettingsDialog()
 
 void SettingsDialog::SaveChanges()
 {
-    // write data here
+    thumbsize = ui->thumbnailspinbox->value();
+    // repeat this process for other variables..
+    settingsfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&settingsfile);
+    out << "thumb:" << QString::number(ui->thumbnailspinbox->value()) << ",";
+    settingsfile.close();
     this->hide();
 }
 void SettingsDialog::CancelChanges()
