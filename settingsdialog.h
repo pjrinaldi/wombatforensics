@@ -21,18 +21,16 @@ class SettingsDialog : public QDialog
 public:
     SettingsDialog(QWidget* parent = 0);
     ~SettingsDialog();
+    void LoadSettings();
 private slots:
     void CancelChanges();
     void SaveChanges();
-    //void HideClicked();
-    //void ShowAbout();
 
 signals:
     void HideSettingsWindow();
 private:
     Ui::SettingsDialog* ui;
 protected:
-    //void mousePressEvent(QMouseEvent* event);
 };
 
 Q_DECLARE_METATYPE(SettingsDialog*)

@@ -36,12 +36,14 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
     }
 }
 
+/*
 void ImageViewer::UpdateThumbSize()
 {
     qDebug() << "thumbsize:" << thumbsize;
     //ui->listView->setMovement(QListView::Static);
     ui->listView->setGridSize(QSize(thumbsize, thumbsize));
 }
+*/
 
 void ImageWindow::GetImage(QString objectid)
 {
@@ -110,8 +112,8 @@ ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageVie
     ui->listView->setViewMode(QListView::IconMode);
     ui->listView->setUniformItemSizes(false);
     ui->listView->setResizeMode(QListView::Adjust);
-    sb = ui->spinBox;
-    ui->spinBox->setValue(thumbsize);
+    //sb = ui->spinBox;
+    //ui->spinBox->setValue(thumbsize);
     imagedialog = new ImageWindow();
     imagedialog->setModal(false);
     imagedialog->hide();

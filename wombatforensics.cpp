@@ -65,7 +65,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
     cancelthread = new CancelThread(this);
-    settingsdialog = new SettingsDialog(this);
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
@@ -73,7 +72,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
-    settingsdialog->setWindowIcon(QIcon(":/bar/settings"));
     //cancelthread->setWindowIcon(QIcon(""));
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
@@ -84,7 +82,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     qRegisterMetaType<QVector<int> >();
-    connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
+    //connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
@@ -317,7 +315,9 @@ void WombatForensics::HideSettingsWindow()
 
 void WombatForensics::ReadSettings()
 {
+    qDebug() << "readsettings settingsfile:" << settingsfile.fileName();
     settingsfile.open(QIODevice::ReadOnly);
+    qDebug() << "is file at end:" << settingsfile.atEnd();
     QStringList tmplist = QString(settingsfile.readLine()).split(",", QString::SkipEmptyParts);
     settingsfile.close();
     // split settings and implement them...
@@ -415,6 +415,7 @@ void WombatForensics::InitializeAppStructure()
         viewerfile.close();
     }
     settingsfile.setFileName(homepath + "settings");
+    qDebug() << "settingsfile:" << settingsfile.fileName();
     if(!FileExists(QString(homepath + "settings").toStdString()))
     {
         settingsfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -423,7 +424,9 @@ void WombatForensics::InitializeAppStructure()
     else
         ReadSettings();
     viewmanage = new ViewerManager(this);
+    settingsdialog = new SettingsDialog(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
+    settingsdialog->setWindowIcon(QIcon(":/bar/settings"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
     connect(settingsdialog, SIGNAL(HideSettingsWindow()), this, SLOT(HideSettingsWindow()), Qt::DirectConnection);
     ui->actionSaveState->setEnabled(false);
@@ -1854,15 +1857,18 @@ void WombatForensics::on_actionAbout_triggered()
 
 void WombatForensics::on_actionSettings_triggered()
 {
+    settingsdialog->LoadSettings();
     settingsdialog->show();
 }
 
+/*
 void WombatForensics::UpdateThumbnails(int tsize)
 {
     thumbsize = tsize;
     imagewindow->UpdateThumbSize();
     //imagewindow->UpdateGeometries();
 }
+*/
 
 void WombatForensics::HexSelectionChanged()
 {

@@ -86,7 +86,7 @@ public:
     QListView* lw;
     QSpinBox* sb;
     void UpdateGeometries(void);
-    void UpdateThumbSize(void);
+    //void UpdateThumbSize(void);
     void GetPixmaps(void);
     void ShowImage(const QModelIndex &index);
 public slots:

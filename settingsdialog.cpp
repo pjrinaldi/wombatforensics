@@ -8,24 +8,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Se
     ui->setupUi(this);
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(CancelChanges()));
     connect(ui->savebutton, SIGNAL(clicked()), this, SLOT(SaveChanges()));
-    settingsfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QStringList tmplist = QString(settingsfile.readLine()).split(",", QString::SkipEmptyParts);
-    settingsfile.close();
-    for(int i = 0; i < tmplist.count(); i++)
-    {
-        if(tmplist.at(i).split(":").at(0) == "thumb")
-            ui->thumbnailspinbox->setValue(tmplist.at(i).split(":").at(1).toInt());
-    }
-    /*
-    QString abouttext = "<h3>About WombatForensics v1.0</h3>";
-    abouttext += "<h5>License: GPLv2</h5>";
-    abouttext += "<4>Copyright 2015 Pasquale J. Rinaldi, Jr.</h4>";
-    abouttext += "<h5>Email: pjrinaldi@gmail.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Phone: (865) 206-8130</h5>";
-    abouttext += "<p>This program incorporates modified code from the lfhex project to implement the hexviewers.";
-    abouttext += "lfhex is provided under the gplv2. I also used Qt5.5, the sleuthkit c/c++ functions, and the treepata icons.";
-    abouttext += "The wombat icon was designed by Lindsey Pargman and a lot of the design implementation ideas were brainstormed with Mark Smith.</p>";
-    ui->label->setText(abouttext);
-    */
+    LoadSettings();
     this->hide();
 }
 
@@ -48,25 +31,14 @@ void SettingsDialog::CancelChanges()
     this->hide();
 }
 
-/*
-void SettingsDialog::HideClicked()
+void SettingsDialog::LoadSettings()
 {
-    this->hide();
-}
-
-void SettingsDialog::ShowAbout()
-{
-    this->show();
-}
-*/
-
-/*
-void SettingsDialog::mousePressEvent(QMouseEvent* e)
-{
-    if(e->type() == QEvent::MouseButtonPress)
+    settingsfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QStringList tmplist = QString(settingsfile.readLine()).split(",", QString::SkipEmptyParts);
+    settingsfile.close();
+    for(int i = 0; i < tmplist.count(); i++)
     {
-        this->hide();
+        if(tmplist.at(i).split(":").at(0) == "thumb")
+            ui->thumbnailspinbox->setValue(tmplist.at(i).split(":").at(1).toInt());
     }
 }
-*/
-

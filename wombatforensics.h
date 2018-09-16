@@ -659,7 +659,7 @@ private slots:
     void NextItem();
     void PreviousItem();
     void ShowItem();
-    void UpdateThumbnails(int tsize);
+    //void UpdateThumbnails(int tsize);
     void SetSelectedFromImageViewer(QString selectedid);
     void ShowFile(const QModelIndex &index);
     void AddSection(void);
@@ -706,7 +706,6 @@ private:
     QFutureWatcher<void> digwatcher;
 
     QFile casesfile;
-    QFile settingsfile;
     QFile casedatafile;
     off_t offset() const;
     QFile testfile;
