@@ -10,16 +10,17 @@ ImageWindow::ImageWindow(QWidget* parent) : QDialog(parent), ui(new Ui::ImageWin
     tskptr->readimginfo = NULL;
     tskptr->readfsinfo = NULL;
     tskptr->readfileinfo = NULL;
-    this->hide();
+    //this->hide();
 }
 
 ImageWindow::~ImageWindow()
 {
+    this->close();
 }
 
 void ImageWindow::HideClicked()
 {
-    this->hide();
+    //this->hide();
 }
 
 void ImageWindow::ShowImage()
@@ -32,7 +33,8 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
     if(e->type() == QEvent::MouseButtonPress)
     {
         ui->label->clear();
-        this->hide();
+        this->close();
+        //this->hide();
     }
 }
 

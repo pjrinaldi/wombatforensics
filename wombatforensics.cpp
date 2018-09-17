@@ -57,7 +57,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filetypefilterview = new FileTypeFilter(this);
     filecategoryfilterview = new FileCategoryFilter(this);
     hashfilterview = new HashFilter(this);
-    imagewindow = new ImageViewer();
+    //imagewindow = new ImageViewer();
     //videowindow = new VideoViewer();
     //textviewer = new TextViewer();
     //htmlviewer = new HtmlViewer();
@@ -144,7 +144,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
     connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
-    connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
+    //connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(namefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(pathfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -249,6 +249,9 @@ void WombatForensics::ShowFile(const QModelIndex &index)
 {
     if(index.sibling(index.row(), 9).data().toString().contains("image"))
     {
+        imagewindow = new ImageViewer();
+        imagewindow->setAttribute(Qt::WA_DeleteOnClose);
+        //connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
         imagewindow->ShowImage(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("video"))
@@ -257,7 +260,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         videowindow->setAttribute(Qt::WA_DeleteOnClose);
         videowindow->ShowVideo(index);
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("text/plain"))
+    else if(index.sibling(index.row(), 9).data().toString().contains("text"))
     {
         // toggle the button...
         textviewer = new TextViewer();
