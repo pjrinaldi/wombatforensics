@@ -113,6 +113,7 @@ void VideoViewer::ShowVideo(const QModelIndex &index)
 {
     this->show();
     ui->label_2->setVisible(true);
+    this->setWindowTitle(QString("Video Viewer - ") + QString(index.sibling(index.row(), 1).data().toString()));
     curobjaddr = index.sibling(index.row(), 0).data().toString().split("-f").at(1).toULongLong();
     GetVideo(index);
     //QtConcurrent::run(this, &VideoViewer::GetVideo, index);
