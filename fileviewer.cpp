@@ -50,4 +50,5 @@ void FileViewer::UpdateHexView()
 {
     hexfile.setFileName(hexstring);
     ui->filehexview->setData(hexfile);
+    this->show();
 }

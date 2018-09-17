@@ -250,8 +250,9 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     if(index.sibling(index.row(), 9).data().toString().contains("image"))
     {
         imagewindow = new ImageViewer();
+        imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
         imagewindow->setAttribute(Qt::WA_DeleteOnClose);
-        //connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
+        connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
         imagewindow->ShowImage(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("video"))
@@ -264,6 +265,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         // toggle the button...
         textviewer = new TextViewer();
+        textviewer->setWindowIcon(QIcon(":/bar/textencode"));
         textviewer->setAttribute(Qt::WA_DeleteOnClose);
         //ui->actionTextViewer->setChecked(true);
         textviewer->ShowText(index);
@@ -279,6 +281,12 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(QCursor::pos());
     }
+    fileviewer = new FileViewer();
+    fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
+    fileviewer->setAttribute(Qt::WA_DeleteOnClose);
+    //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
+    fileviewer->UpdateHexView();
+    //fileviewer->show();
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
