@@ -20,7 +20,7 @@ VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoVie
     tskptr->readimginfo = NULL;
     tskptr->readfsinfo = NULL;
     tskptr->readfileinfo = NULL;
-    this->hide();
+    //this->hide(); // this would go away under new methodology
 }
 
 VideoViewer::~VideoViewer()
@@ -124,6 +124,7 @@ void VideoViewer::mousePressEvent(QMouseEvent* e)
     if(e->type() == QEvent::MouseButtonPress)
     {
         vplayer->stop();
-        this->hide();
+        //this->hide();
+        this->close();
     }
 }

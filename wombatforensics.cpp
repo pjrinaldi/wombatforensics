@@ -58,7 +58,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filecategoryfilterview = new FileCategoryFilter(this);
     hashfilterview = new HashFilter(this);
     imagewindow = new ImageViewer();
-    videowindow = new VideoViewer();
+    //videowindow = new VideoViewer();
     textviewer = new TextViewer();
     htmlviewer = new HtmlViewer();
     msgviewer = new MessageViewer();
@@ -247,12 +247,14 @@ void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 
 void WombatForensics::ShowFile(const QModelIndex &index)
 {
-    if(index.sibling(index.row(), 9).data().toString().contains("image/"))
+    if(index.sibling(index.row(), 9).data().toString().contains("image"))
     {
         imagewindow->ShowImage(index);
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("video/"))
+    else if(index.sibling(index.row(), 9).data().toString().contains("video"))
     {
+        videowindow = new VideoViewer();
+        videowindow->setAttribute(Qt::WA_DeleteOnClose);
         videowindow->ShowVideo(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("text/plain"))
@@ -1595,7 +1597,10 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     propertywindow->close();
     fileviewer->close();
     imagewindow->close();
-    videowindow->close();
+    /*
+    if(videowindow->isVisible())
+        videowindow->close();
+    */
     viewmanage->close();
     textviewer->close();
     htmlviewer->close();
