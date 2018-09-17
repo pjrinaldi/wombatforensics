@@ -14,7 +14,7 @@ TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer
     ui->comboBox->clear();
     foreach(QTextCodec* codec, codecs)
         ui->comboBox->addItem(codec->name(), codec->mibEnum());
-    this->hide();
+    //this->hide();
     connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding(int)));
 }
 
@@ -26,14 +26,15 @@ TextViewer::~TextViewer()
 
 void TextViewer::HideClicked()
 {
-    this->hide();
-    emit HideTextViewerWindow(false);
+    //this->hide();
+    //emit HideTextViewerWindow(false);
 }
 
 void TextViewer::ShowText(const QModelIndex &index)
 {
     curobjaddr = index.sibling(index.row(), 0).data().toString().split("-f").at(1).toULongLong();
     GetTextContent(index);
+    this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 1).data().toString()));
     this->show();
 }
 

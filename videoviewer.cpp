@@ -25,6 +25,8 @@ VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoVie
 
 VideoViewer::~VideoViewer()
 {
+    delete ui;
+    this->close();
 }
 
 void VideoViewer::Seek(int pos)

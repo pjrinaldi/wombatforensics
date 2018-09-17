@@ -43,7 +43,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addAction(ui->actionAbout);
     tskexternalptr = &tskexternalobject;
     propertywindow = new PropertiesWindow(this);
-    fileviewer = new FileViewer(this);
+    //fileviewer = new FileViewer(this);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
     jumpfilterview = new JumpFilter(this);
@@ -59,16 +59,16 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     hashfilterview = new HashFilter(this);
     imagewindow = new ImageViewer();
     //videowindow = new VideoViewer();
-    textviewer = new TextViewer();
-    htmlviewer = new HtmlViewer();
+    //textviewer = new TextViewer();
+    //htmlviewer = new HtmlViewer();
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
     cancelthread = new CancelThread(this);
     propertywindow->setWindowIcon(QIcon(":/bar/propview"));
-    fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
-    imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
-    textviewer->setWindowIcon(QIcon(":/bar/textencode"));
+    //fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
+    //imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
+    //textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
@@ -82,13 +82,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     qRegisterMetaType<QVector<int> >();
-    //connect(imagewindow->sb, SIGNAL(valueChanged(int)), this, SLOT(UpdateThumbnails(int)), Qt::QueuedConnection);
-    connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
-    connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
+
+    //connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
+    //connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
-    connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
+    //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long)), this, SLOT(UpdateProgress(unsigned long long)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
@@ -260,7 +260,9 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     else if(index.sibling(index.row(), 9).data().toString().contains("text/plain"))
     {
         // toggle the button...
-        ui->actionTextViewer->setChecked(true);
+        textviewer = new TextViewer();
+        textviewer->setAttribute(Qt::WA_DeleteOnClose);
+        //ui->actionTextViewer->setChecked(true);
         textviewer->ShowText(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("text/html"))
@@ -334,7 +336,7 @@ void WombatForensics::ReadSettings()
 
 void WombatForensics::HideTextViewer(bool checkstate)
 {
-    ui->actionTextViewer->setChecked(checkstate);
+    //ui->actionTextViewer->setChecked(checkstate);
 }
 
 void WombatForensics::HideMessageViewer(bool checkstate)
@@ -1595,15 +1597,15 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         CloseCurrentCase();
     
     propertywindow->close();
-    fileviewer->close();
-    imagewindow->close();
+    //fileviewer->close();
+    //imagewindow->close();
     /*
     if(videowindow->isVisible())
         videowindow->close();
     */
     viewmanage->close();
-    textviewer->close();
-    htmlviewer->close();
+    //textviewer->close();
+    //htmlviewer->close();
     byteviewer->close();
     aboutbox->close();
     cancelthread->close();
@@ -1803,16 +1805,17 @@ void WombatForensics::on_actionViewerManager_triggered()
 
 void WombatForensics::on_actionTextViewer_triggered(bool checked)
 {
+    /*
     if(!checked) // hide viewer
         textviewer->hide();
     else
-    {
+    {*/
         if(selectedindex.sibling(selectedindex.row(), 9).data().toString().contains("text/"))
         {
             textviewer->ShowText(selectedindex);
             textviewer->show();
         }
-    }
+    //}
 }
 
 void WombatForensics::on_actionViewMessageLog_triggered(bool checked)
