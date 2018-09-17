@@ -24,6 +24,7 @@
 #include "aboutbox.h"
 #include "cancelthread.h"
 #include "settingsdialog.h"
+#include "sccex.h"
 
 class TreeNodeModel : public QAbstractItemModel
 {

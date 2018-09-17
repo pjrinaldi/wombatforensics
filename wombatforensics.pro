@@ -6,6 +6,7 @@ mac:TEMPLATE = app
 #INCLUDEPATH += ../sleuthkit/
 #INCLUDEPATH += ../sleuthkit/tsk/
 #INCLUDEPATH += ../libewf_64bit/include/
+INCLUDEPATH += ./common/
 #VPATH += ../sleuthkit/
 #VPATH += ../sleuthkit/tsk/
 #VPATH += ../libewf_64bit/include/
@@ -14,7 +15,7 @@ SOURCES = main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp glob
 RESOURCES += wombatforensics.qrc
 DESTDIR = ./
 mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk 
-linux:LIBS = -lewf -ltsk 
+linux:LIBS = -lewf -ltsk -L/home/pasquale/Projects/wombatforensics/lib -lsc_ex -lsc_da
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 win32:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)d
 }
