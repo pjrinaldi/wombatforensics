@@ -267,6 +267,8 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("text/html"))
     {
+        htmlviewer = new HtmlViewer();
+        htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->ShowHtml(index);
     }
     else
@@ -1223,7 +1225,7 @@ void WombatForensics::LoadHexContents()
         tsk_fs_file_close(filehexfileinfo);
         tsk_fs_close(filehexfsinfo);
         tsk_img_close(fileheximginfo);
-        fileviewer->UpdateHexView();
+        //fileviewer->UpdateHexView();
 
     }
     ui->hexview->ensureVisible();
@@ -1710,10 +1712,12 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
 
 void WombatForensics::on_actionView_File_triggered(bool checked)
 {
+    /*
     if(!checked)
         fileviewer->hide();
     else
         fileviewer->show();
+    */
 }
 
 void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)

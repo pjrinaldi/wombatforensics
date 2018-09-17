@@ -10,7 +10,7 @@ HtmlViewer::HtmlViewer(QWidget* parent) : QDialog(parent), ui(new Ui::HtmlViewer
     tskptr->readimginfo = NULL;
     tskptr->readfsinfo = NULL;
     tskptr->readfileinfo = NULL;
-    this->hide();
+    //this->hide();
 }
 
 HtmlViewer::~HtmlViewer()
@@ -21,8 +21,9 @@ HtmlViewer::~HtmlViewer()
 
 void HtmlViewer::HideClicked()
 {
-    this->hide();
-    emit HideHtmlViewerWindow(false);
+    this->close();
+    //this->hide();
+    //emit HideHtmlViewerWindow(false);
 }
 
 void HtmlViewer::ShowHtml(const QModelIndex &index)
@@ -34,7 +35,7 @@ void HtmlViewer::ShowHtml(const QModelIndex &index)
 
 void HtmlViewer::closeEvent(QCloseEvent* e)
 {
-    emit HideHtmlViewerWindow(false);
+    //emit HideHtmlViewerWindow(false);
     e->accept();
 }
 
