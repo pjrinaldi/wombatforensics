@@ -281,7 +281,21 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         // TRY OUTSIDE IN VIEWER EXPORT HERE.. if it fails, popup right menu...
         // STARTING ON STEP 2
+        qDebug() << "Starting Document Export Conversion.";
+        qDebug() << "hexstring:" << hexstring;
         oierr = DAOpenDocument(&oidoc, IOTYPE_UNIXPATH, (VTLPVOID)(hexstring.toStdString().c_str()), 0);
+        qDebug() << "open document error:" << oierr;
+        // EXPORT CALLBACK IS SET TO NULL, BUT MAY WANT TO IMPLEMENT SOMETHING LAER ON.
+        oierr = EXOpenExport(oidoc, FI_HTML5, IOTYPE_UNIXPATH, (VTLPVOID)(QString(QDir::homePath() + "oiex.html").toStdString().c_str()), 0, 0, NULL, 0, &oiexport);
+        qDebug() << "export path:" << QDir::homePath() + "/oiex.html";
+        qDebug() << "open export error:" << oierr;
+        oierr = EXRunExport(oiexport);
+        qDebug() << "run export error:" << oierr;
+        oierr = EXCloseExport(oiexport);
+        qDebug() << "close export error;" << oierr;
+        oierr = DACloseDocument(oidoc);
+        qDebug() << "close document error:" << oierr;
+        qDebug() << "Finished Document Export Conversion.";
         /*
         if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(QCursor::pos());
