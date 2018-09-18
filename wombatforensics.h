@@ -739,7 +739,9 @@ private:
     QStringList listeditems;
 
     // outside in variables
-    DAERR oiiniterr;
+    SCCERR oiiniterr;
+    VTHDOC oidoc;
+    VTHEXPORT oiexport;
 };
 
 #endif // WOMBATFORENSICS_H

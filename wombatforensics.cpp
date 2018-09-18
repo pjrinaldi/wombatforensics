@@ -279,8 +279,12 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else
     {
+        // TRY OUTSIDE IN VIEWER EXPORT HERE.. if it fails, popup right menu...
+
+        /*
         if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(QCursor::pos());
+        */
     }
     fileviewer = new FileViewer();
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
