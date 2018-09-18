@@ -737,6 +737,9 @@ private:
     QTimer* autosavetimer;
     TreeNode* actionitem;
     QStringList listeditems;
+
+    // outside in variables
+    DAERR oiiniterr;
 };
 
 #endif // WOMBATFORENSICS_H
