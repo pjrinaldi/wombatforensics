@@ -280,7 +280,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     else
     {
         // TRY OUTSIDE IN VIEWER EXPORT HERE.. if it fails, popup right menu...
-
+        // STARTING ON STEP 2
         /*
         if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(QCursor::pos());
