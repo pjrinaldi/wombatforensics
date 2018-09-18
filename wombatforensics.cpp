@@ -293,10 +293,16 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         fprintf(stderr, "open export error: %s\n", szError);
         //qDebug() << "open export error:" << DAGetErrorString(oierr, szError, sizeof(szError));
         oierr = EXRunExport(oiexport);
-        qDebug() << "run export error:" << oierr;
+        DAGetErrorString(oierr, szError, sizeof(szError));
+        fprintf(stderr, "run export error: %s\n", szError);
+        //qDebug() << "run export error:" << oierr;
         oierr = EXCloseExport(oiexport);
-        qDebug() << "close export error;" << oierr;
+        DAGetErrorString(oierr, szError, sizeof(szError));
+        fprintf(stderr, "close export error: %s\n", szError);
+        //qDebug() << "close export error;" << oierr;
         oierr = DACloseDocument(oidoc);
+        DAGetErrorString(oierr, szError, sizeof(szError));
+        fprintf(stderr, "close document error: %s\n", szError);
         qDebug() << "close document error:" << oierr;
         qDebug() << "Finished Document Export Conversion.";
         /*
