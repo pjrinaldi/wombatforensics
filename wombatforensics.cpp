@@ -82,7 +82,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     qRegisterMetaType<QVector<int> >();
-    //DAERR oierr = DAInitEx(DATHREAD_INIT_PTHREADS, OI_INIT_DEFAULT); // Initialize Data Access at Application Start
+    DAERR oierr = DAInitEx(DATHREAD_INIT_PTHREADS, OI_INIT_DEFAULT); // Initialize Data Access at Application Start
 
     //connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     //connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
