@@ -740,6 +740,7 @@ private:
 
     // outside in variables
     SCCERR oiiniterr;
+    SCCERR oierr;
     VTHDOC oidoc;
     VTHEXPORT oiexport;
 };
