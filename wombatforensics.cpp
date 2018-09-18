@@ -287,8 +287,11 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         qDebug() << "open document error:" << oierr;
         // EXPORT CALLBACK IS SET TO NULL, BUT MAY WANT TO IMPLEMENT SOMETHING LAER ON.
         oierr = EXOpenExport(oidoc, FI_HTML5, IOTYPE_UNIXPATH, (VTLPVOID)(QString(QDir::homePath() + "oiex.html").toStdString().c_str()), 0, 0, NULL, 0, &oiexport);
+        VTCHAR szError[256];
         qDebug() << "export path:" << QDir::homePath() + "/oiex.html";
-        qDebug() << "open export error:" << oierr;
+        DAGetErrorString(oierr, szError, sizeof(szError));
+        fprintf(stderr, "open export error: %s\n", szError);
+        //qDebug() << "open export error:" << DAGetErrorString(oierr, szError, sizeof(szError));
         oierr = EXRunExport(oiexport);
         qDebug() << "run export error:" << oierr;
         oierr = EXCloseExport(oiexport);
