@@ -281,7 +281,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         // TRY OUTSIDE IN VIEWER EXPORT HERE.. if it fails, popup right menu...
         // STARTING ON STEP 2
-        //oierr = DAOpenDocument
+        oierr = DAOpenDocument(&oidoc, IOTYPE_UNIXPATH, (VTLPVOID)(hexstring.toStdString().c_str()), 0);
         /*
         if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(QCursor::pos());
