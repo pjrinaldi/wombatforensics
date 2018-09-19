@@ -293,7 +293,11 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         // IT WORKS IF I DON'T SET THE FULL PATH, JUST HTE FILE NAME AND THEN IT PLACES ITSELF IN THE EXE WORKING DIR.
         // THIS IS A PROBLEM. I CAN SET THE ASSET DIRECTORY CORRECTLY, AS WELL AS THE SCRIPT LOCATIONS PROPERLY, JUST NEED TO BE
         // ABLE TO FIGURE OUT HOW TO SET THE FILE NAME WITH PATH CORRECTLY
-        oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, (VTLPVOID)(QString("/home/pasquale/.wombatforensics/oiwv/oiex.html").toStdString().c_str()), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport);
+        std::string oiout = "/home/pasquale/.wombatforensics/oiwv/oiex.html";
+        fprintf(stdout, "std::string export file path: %s\n", oiout.c_str());
+        oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, ((VTLPVOID)(oiout.c_str())), 0, 0, NULL, 0, &oiexport);
+        //oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, ((VTLPVOID)(oiout.c_str())), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport); // THIS ONE WORKS
+        //oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, (QString("/home/pasquale/.wombatforensics/oiwv/oiex.html").toStdString().c_str()), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport);
         VTCHAR szError[256];
         qDebug() << "export path:" << QDir::homePath() + "/oiex.html";
         DAGetErrorString(oierr, szError, sizeof(szError));
