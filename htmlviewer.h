@@ -22,6 +22,7 @@ public:
     HtmlViewer(QWidget* parent = 0);
     ~HtmlViewer();
     void ShowHtml(const QModelIndex &index);
+    void LoadHtml(QString filepath);
 
 private slots:
     void HideClicked();

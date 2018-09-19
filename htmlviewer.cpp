@@ -33,6 +33,13 @@ void HtmlViewer::ShowHtml(const QModelIndex &index)
     this->show();
 }
 
+void HtmlViewer::LoadHtml(QString filepath)
+{
+    // populate html here
+    ui->webView->setUrl(QUrl::fromLocalFile(filepath));
+    this->show();
+}
+
 void HtmlViewer::closeEvent(QCloseEvent* e)
 {
     //emit HideHtmlViewerWindow(false);

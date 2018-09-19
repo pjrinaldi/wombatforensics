@@ -87,7 +87,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     SetOptionBOOL((VTHDOC)NULL, SCCOPT_EX_UNICODECALLBACKSTR, FALSE);
     SetOptionDWORD((VTHDOC)NULL, SCCOPT_FONT_REFERENCE_METHOD, SCCFONTS_REFERENCE_EXPORTED);
 
-    SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_OUTPUT, QString("/home/pasquale/.wombatforensics/oiwv/").toStdString().c_str());
+    //SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_OUTPUT, QString("/home/pasquale/.wombatforensics/oiwv/").toStdString().c_str());
     SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_RESOURCES, QString("/home/pasquale/.wombatforensics/oiwv/assets/").toStdString().c_str());
     //connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     //connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
@@ -293,13 +293,13 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         // IT WORKS IF I DON'T SET THE FULL PATH, JUST HTE FILE NAME AND THEN IT PLACES ITSELF IN THE EXE WORKING DIR.
         // THIS IS A PROBLEM. I CAN SET THE ASSET DIRECTORY CORRECTLY, AS WELL AS THE SCRIPT LOCATIONS PROPERLY, JUST NEED TO BE
         // ABLE TO FIGURE OUT HOW TO SET THE FILE NAME WITH PATH CORRECTLY
-        std::string oiout = "/home/pasquale/.wombatforensics/oiwv/oiex.html";
+        //std::string oiout = "/home/pasquale/.wombatforensics/oiwv/oiex.html";
+        std::string oiout = hexstring.toStdString() + ".html";
         fprintf(stdout, "std::string export file path: %s\n", oiout.c_str());
         oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, ((VTLPVOID)(oiout.c_str())), 0, 0, NULL, 0, &oiexport);
         //oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, ((VTLPVOID)(oiout.c_str())), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport); // THIS ONE WORKS
-        //oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, (QString("/home/pasquale/.wombatforensics/oiwv/oiex.html").toStdString().c_str()), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport);
         VTCHAR szError[256];
-        qDebug() << "export path:" << QDir::homePath() + "/oiex.html";
+        //qDebug() << "export path:" << QDir::homePath() + "/oiex.html";
         DAGetErrorString(oierr, szError, sizeof(szError));
         fprintf(stderr, "open export error: %s\n", szError);
         //qDebug() << "open export error:" << DAGetErrorString(oierr, szError, sizeof(szError));
@@ -316,6 +316,17 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         fprintf(stderr, "close document error: %s\n", szError);
         qDebug() << "close document error:" << oierr;
         qDebug() << "Finished Document Export Conversion.";
+        if(oierr == 0)
+        {
+            htmlviewer = new HtmlViewer();
+            htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
+            htmlviewer->LoadHtml(QString::fromStdString(oiout));
+        }
+        else
+        {
+            if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
+                treemenu->exec(QCursor::pos());
+        }
         /*
         if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
             treemenu->exec(QCursor::pos());
