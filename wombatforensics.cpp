@@ -286,7 +286,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         oierr = DAOpenDocument(&oidoc, IOTYPE_UNIXPATH, (VTLPVOID)(hexstring.toStdString().c_str()), 0);
         qDebug() << "open document error:" << oierr;
         // EXPORT CALLBACK IS SET TO NULL, BUT MAY WANT TO IMPLEMENT SOMETHING LAER ON.
-        oierr = EXOpenExport(oidoc, FI_HTML5, IOTYPE_UNIXPATH, (VTLPVOID)(QString(QDir::homePath() + "oiex.html").toStdString().c_str()), 0, 0, NULL, 0, &oiexport);
+        oierr = EXOpenExport(oidoc, FI_HTML5, IOTYPE_UNIXPATH, (VTLPVOID)(QString(QDir::homePath() + "oiex.html").toStdString().c_str()), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport);
         VTCHAR szError[256];
         qDebug() << "export path:" << QDir::homePath() + "/oiex.html";
         DAGetErrorString(oierr, szError, sizeof(szError));
@@ -2192,4 +2192,45 @@ void WombatForensics::AutoSaveState()
     SaveState();
     StatusUpdate("Evidence ready");
     // change display text
+}
+
+SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCommandID, VTLPVOID pCommandData)
+{
+    SCCERR seResult = SCCERR_NOTHANDLED;
+    EXFILEIOCALLBACKDATA *pNewFileInfo;
+    EXURLFILEIOCALLBACKDATA *pExportData;
+    //UNUSED(hExport);
+    //UNUSED(dwCallbackData);
+
+    /* This is a simple callback handler just to show how they are
+     * coded.  The callback routine should always return
+     * SCCERR_NOTHANDLED unless the user is returning data to the
+     * conversion.
+     */
+
+    switch (dwCommandID)
+    {
+      case EX_CALLBACK_ID_NEWFILEINFO:
+
+        /* Count files that are created by the conversion. */
+        //gdwFileCount++;
+
+        /* Print the name of each output file generated. */
+        pNewFileInfo = (EXFILEIOCALLBACKDATA *)pCommandData;
+        pExportData  = (EXURLFILEIOCALLBACKDATA *)pNewFileInfo->pExportData;
+
+        if( pNewFileInfo->dwSpecType == IOTYPE_UNICODEPATH )
+          printf("Creating file: %ls\n", pNewFileInfo->pSpec );
+        else
+          printf("Creating file: %s\n", pNewFileInfo->pSpec );
+
+				//if (pNewFileInfo->dwAssociation == CU_ROOT && g_monitorPort)
+					//SendReadyMessage();
+        break;
+
+      default:
+        break;
+    }
+    
+    return seResult;
 }

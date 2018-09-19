@@ -745,4 +745,6 @@ private:
     VTHEXPORT oiexport;
 };
 
+SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCommandID, VTLPVOID pCommandData);
+
 #endif // WOMBATFORENSICS_H
