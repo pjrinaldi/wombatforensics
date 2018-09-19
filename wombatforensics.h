@@ -761,9 +761,8 @@ private:
 };
 
 SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCommandID, VTLPVOID pCommandData);
-
 void SetOptionDWORD(VTHDOC target, VTDWORD optionId, VTDWORD val);
-
 void SetOptionBOOL(VTHDOC target, VTDWORD optionId, VTBOOL val);
+void SetOptionString(VTHDOC target, VTDWORD optionId, const char* val);
 
 #endif // WOMBATFORENSICS_H

@@ -1,0 +1,1274 @@
+/* Copyright (c) 2012, 2016, Oracle. All rights reserved. */
+
+/* Document structure */
+.oit-view-root {
+	overflow: hidden;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+.oit-view-embedded {
+	position: relative !important; /* Allows absolute positioning relative to the view root */
+}
+.oit-view {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	overflow: auto;
+	color: #000;
+	-webkit-overflow-scrolling: touch; /* Enables inertial scrolling on mobile devices */
+}
+.oit-uiwindow {
+	background: #FFF;
+}
+.oit-overlay {
+	display: none;
+	overflow: visible; /* Using 'hidden' results in missing scrollbars in ss/db view */
+}
+.oit-screen {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #000;
+	opacity: 0.0;
+	z-index: 70;
+	display: none;
+	}
+.oit-drawingpanel	{
+	position: absolute;
+	left: 0;
+	top: 0;
+	/* This prevents text selection:
+	right: 0;
+	bottom: 0;
+	*/
+}
+.oit-drawinglayer-resize,
+.oit-drawinglayer-flags {
+	z-index: 40;
+}
+.oit-drawinglayer-selection,
+.oit-drawinglayer-highlights,
+.oit-drawinglayer-chighlights {
+	z-index: 30;
+}
+.oit-note-layer-edit {
+	z-index: 80;
+}
+.oit-drawingpanel div {
+	position: absolute;
+}
+.oit-masksvg {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index:-100;
+}
+.oit-svg-layer {
+	pointer-events: none; /* Allow mouse events to pass through */
+}
+.oit-pagestream {
+	position: absolute; /* Remove the overlay from the flow so the view scrollbars will be correct when zoomed */
+	background:	#666;
+}
+.oit-pagestream.oit-nochrome,
+.oit-nochrome .oit-pagestream {
+	background:#FFF;
+}
+.oit-pending, .oit-loading {
+	background-image:url('oit.loading.gif') !important;
+	background-color:#fff !important;
+	background-repeat:no-repeat !important;
+	background-position:center !important;
+	min-width: 54px;
+	min-height: 55px;
+}
+.oit-page, .oit-html, .oit-email, .oit-bitmap, .oit-drawing, .oit-slide, .oit-chart, .oit-worksheet, .oit-database, .oit-archive, .oit-emailarchive, .oit-multimedia {
+	position: relative;
+}
+.oit-single .oit-page, .oit-single .oit-html, .oit-single .oit-bitmap, .oit-single .oit-drawing, .oit-single .oit-slide, .oit-single .oit-chart, .oit-single .oit-archive, .oit-single .oit-emailarchive, .oit-single .oit-multimedia {
+	position: absolute;
+}
+.oit-page, .oit-html, .oit-email, .oit-bitmap, .oit-drawing, .oit-slide, .oit-chart, .oit-archive, .oit-emailarchive, .oit-multimedia {
+	background: #FFF;
+}
+.oit-page, .oit-bitmap, .oit-drawing, .oit-slide, .oit-chart {
+	display: block;
+	margin: 20px;
+	box-shadow: 2px 2px 20px 1px #111;
+	overflow: hidden;
+	transform-origin:left top;
+	-moz-transform-origin:left top;
+	-o-transform-origin:left top;
+	-ms-transform-origin:left top;
+	-webkit-transform-origin:left top;
+}
+.oit-page.oit-noshadow, 
+.oit-bitmap.oit-noshadow, 
+.oit-drawing.oit-noshadow, 
+.oit-slide.oit-noshadow, 
+.oit-chart.oit-noshadow {
+	box-shadow: none;
+}
+.oit-nochrome .oit-page, 
+.oit-nochrome .oit-bitmap, 
+.oit-nochrome .oit-drawing, 
+.oit-nochrome .oit-slide, 
+.oit-nochrome .oit-chart {
+	margin: 0;
+	box-shadow: none;
+}
+.oit-rotate90 {
+	box-shadow: -2px 2px 20px 1px #111 !important;
+}
+.oit-rotate180 {
+	box-shadow: -2px -2px 20px 1px #111 !important;
+}
+.oit-rotate270 {
+	box-shadow: 2px -2px 20px 1px #111  !important;
+}
+
+.oit-email {
+	/* min-height: 100%; */
+	min-width: 100%;
+}
+.oit-worksheet, .oit-database {
+	min-height: 100%;
+	min-width: 100%;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.oit-archive, .oit-emailarchive {
+	font-size:9pt;
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
+}
+.oit-page div, .oit-html div, .oit-drawing div, .oit-slide div, .oit-chart div {
+	position: absolute;
+}
+.oit-page div, .oit-html div, .oit-email_page div {
+	white-space:pre;
+}
+.oit-page>div, .oit-html>div {
+	width: 100%;
+	left: 0px;
+	top: 0px;
+}
+.oit-email>div {
+	width:100%;
+}
+.oit-area-hyperlinks>div {
+	cursor: pointer;
+}
+.oit-hyperlink {
+	cursor: pointer;
+}
+.oit-cellpopup {
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size: 10pt;
+	font-weight: normal;
+	background: #FFFAE6;
+	box-shadow: 2px 2px 10px 1px #444;
+	border-radius: 2px;
+	padding: 3px;
+	position: absolute;
+	z-index: 60;
+	opacity: 0.0;
+	margin-top: 3px;
+	max-width: 90%;
+	overflow: hidden;
+	cursor: default;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.oit-ssoverlay {
+	position: absolute;
+	left: 0;
+	top: 0;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.oit-ssgrid {
+	background: #fff;
+	pointer-events: none; /* Allow mouse events to pass through */
+	position: absolute;
+	left: 40px;
+	top: 22px;
+	right: 0;
+	bottom: 0;
+	}
+.oit-ssrowheader, .oit-sscolheader {
+	background: #d0d0d0;
+	z-index: 50;
+	position: absolute;
+	}
+.oit-ssrowheader {
+	left: 0;
+	top: 22px;
+	width: 40px;
+	bottom: 0;
+	}
+.oit-sscolheader {
+	left: 0;
+	top: 0;
+	right: 0;
+	height: 22px;
+	}
+.oit-ssgrid canvas, .oit-ssrowheader canvas, .oit-sscolheader canvas {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+.oit-sheet-embedpane {
+	position: absolute;
+	overflow: hidden;
+	pointer-events: none; /* Allow mouse events to pass through */
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	z-index: 20;
+}
+.oit-sheet-embedlist {
+	position: absolute;
+}
+.oit-sheet-embedpane object, .oit-sheet-embedpane img {
+	position: absolute;
+}
+.oit-svg-embed, .oit-image-embed {
+	position: absolute;
+}
+.oit-svg-embed, .oit-svg-inline {
+	pointer-events:none; /* So vector embeddings that draw outside their frames won't obscure text */
+	-moz-user-select: -moz-none; /* Don't allow text selection inside embeddings */
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.oit-svg {
+	position: relative;
+}
+.oit-svg svg, .oit-svg-embed svg {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+.oit-svg-text {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	margin: 0;
+	white-space: nowrap;
+}
+.oit-svg-text div {
+	position: absolute;
+}
+.oit-sel-text {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -50;
+	color:#FFF;
+	-moz-user-select: -moz-all;
+	-khtml-user-select: all;
+	-webkit-user-select: all;
+	-ms-user-select: all;
+	user-select: all;
+}
+.oit-sel-text pre {
+	width: 0;
+	height: 0;
+}
+.oit-selection div, .oit-rect-highlights>div {
+	position: absolute;
+	z-index: 30;
+}
+.oit-sel-rect {
+	border: 2px solid rgba(255,202,0,0.6);
+	background-color:rgba(255,202,0,0.1);
+}
+.oit-cur-highlight {
+	border-bottom: 2px solid rgba(51,153,238,0.5);	
+}
+.oit-rect-highlights .oit-cur-highlight {
+	border: none;
+}
+.oit-note-pinned,
+.oit-note-hover,
+.oit-note-shown,
+.oit-note-active,
+.oit-note-editing {
+	background-color: #FFF;
+	box-shadow: 2px 2px 8px #444;
+}
+.oit-highlight-style {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+.oit-note .oit-highlight-style {
+	position: absolute;
+	left: 0;
+	top: 20px;
+	right: 0;
+	bottom: 0;
+}
+.oit-highlight-label {
+	position: absolute;
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size: 10pt;
+	font-weight: bold;
+	padding: 2px;
+	z-index: 10;
+	white-space: nowrap;
+	-webkit-transform-origin: left top;
+	-moz-transform-origin: left top;
+	-o-transform-origin: left top;
+	-ms-transform-origin: left top;
+	transform-origin: left top;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+}
+.oit-resize, .oit-moveable, .oit-activation {
+	position: absolute;
+	}
+.oit-highlight-active .oit-activation {
+	opacity: 0.5;
+	border: 2px solid rgb(51,153,238);
+	}
+.oit-highlight-embed {
+	opacity: 0.5;
+	border: 1px solid rgb(51,153,238);
+	}
+.oit-moveable {
+	cursor: move;
+	}
+.oit-highlight-active .oit-resize div {
+	width: 9px;
+	height: 9px;
+	padding: 0;
+	background-color: rgb(51,153,238);
+	position: absolute;
+	border: 6px solid rgba(255,255,255,0); /* To increase size of handle without making it larger visually */
+	-moz-background-clip: padding;     /* Firefox 3.6 */
+	-webkit-background-clip: padding;  /* Safari 4? Chrome 6? */
+	background-clip: padding-box;      /* Firefox 4, Safari 5, Opera 10, IE 9 */	
+}
+.oit-resize .oit-resize-n  { cursor: n-resize;  top:    -12px; left:  50%;  margin-left: -12px; }
+.oit-resize .oit-resize-s  { cursor: s-resize;  bottom: -12px; left:  50%;  margin-left: -12px; }
+.oit-resize .oit-resize-e  { cursor: e-resize;  top:    50%;  right: -12px; margin-top:  -12px; }
+.oit-resize .oit-resize-w  { cursor: w-resize;  top:    50%;  left:  -12px; margin-top:  -12px; }
+.oit-resize .oit-resize-ne { cursor: ne-resize; top:    -12px; right: -12px; }
+.oit-resize .oit-resize-nw { cursor: nw-resize; top:    -12px; left:  -12px; }
+.oit-resize .oit-resize-se { cursor: se-resize; bottom: -12px; right: -12px; }
+.oit-resize .oit-resize-sw { cursor: sw-resize; bottom: -12px; left:  -12px; }
+
+.oit-text-handle {
+	width: 32px;
+	height: 32px;
+	position: absolute;
+	display: block;
+	cursor: move;
+}
+.oit-text-handle div:nth-child(2) {
+	width: 10px;
+	height: 14px;
+	background-color: rgb(51,153,238);
+	position: absolute;
+	top: 9px;
+	left: 11px;
+}
+.oit-text-handle div:first-child {
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 7px solid rgb(51,153,238);
+	position: absolute;
+	top: 3px;
+	left: 11px;
+}
+
+.oit-comment-flag, 
+.oit-note-pin,
+.oit-note-ok,
+.oit-note-cancel {
+	background-image: url('icon-comment-flag.png');
+	background-size: 100px 20px;
+	background-repeat: no-repeat;
+	position: static !important;
+	cursor: default;
+	float: right;
+	z-index: 20;
+	width: 20px;
+	height: 20px;
+	opacity: 0.8;
+	transition: transform 0.2s ease;
+	-moz-transition: -moz-transform 0.2s ease;
+	-webkit-transition: -webkit-transform 0.2s ease;
+	-o-transition: -o-transform 0.2s ease;
+	transform-origin: 50% 50%;
+	-webkit-transform-origin: 50% 50%;
+	-moz-transform-origin: 50% 50%;
+	-o-transform-origin: 50% 50%;
+	-ms-transform-origin: 50% 50%;
+}
+.oit-note-pin:hover, 
+.oit-note-ok:hover, 
+.oit-note-cancel:hover {
+	transform: scale(1.3,1.3);
+	-webkit-transform: scale(1.3,1.3);
+	-moz-transform: scale(1.3,1.3);
+	-o-transform: scale(1.3,1.3);
+	-ms-transform: scale(1.3,1.3);
+}
+.oit-note-pinned .oit-note-pin,
+.oit-note-active .oit-note-pin {
+	transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	-moz-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	-ms-transform: rotate(-90deg);
+}
+.oit-note-pinned .oit-note-pin:hover,
+.oit-note-active .oit-note-pin:hover {
+	transform: rotate(-90deg) scale(1.3,1.3);
+	-webkit-transform: rotate(-90deg) scale(1.3,1.3);
+	-moz-transform: rotate(-90deg) scale(1.3,1.3);
+	-o-transform: rotate(-90deg) scale(1.3,1.3);
+	-ms-transform: rotate(-90deg) scale(1.3,1.3);
+}
+
+.oit-comment-flag     { background-position: 0px 0px; }
+.oit-note-pin         { background-position: -40px 0px; }
+.oit-note-ok          { background-position: -60px 0px; display: none; }
+.oit-note-cancel      { background-position: -80px 0px; display: none; }
+
+.oit-note-iconic .oit-note-pin { background-position: -20px 0px; }
+.oit-note-hover .oit-note-pin { background-position: -40px 0px; }
+
+
+.oit-note-icons {
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	height: 20px;
+	background-color: #FFF;
+	border-bottom: 1px solid rgba(127,127,127,0.5);
+}
+.oit-note-iconic .oit-note-icons,
+.oit-note-iconic form,
+.oit-note-iconic .oit-highlight-style {
+	display:none;
+}
+.oit-note-editing .oit-note-ok,
+.oit-note-editing .oit-note-cancel {
+	display: block;
+}
+.oit-note-editing .oit-note-pin {
+	display: none;
+}
+.oit-note-hover .oit-highlight-style {
+	display: block;
+}
+.oit-note form {
+	position: absolute;
+	z-index: 20;
+	left: 0;
+	top: 20px;
+	right: 0;
+	bottom: 0;
+}
+.oit-note textarea {
+	width: 100%;
+	height: 100%;
+	resize: none;
+	margin: 0;
+	padding: 4px 8px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box; 
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size: 10pt;
+	color: inherit;
+	background: transparent;
+	border: none;
+}
+
+.oit-textmeasure {
+	display: none;
+	white-space: nowrap;
+}
+.oit-textmeasure span {
+	display: inline-block;
+	width: 1px;
+	height: 1px;
+}
+.oit-fontpreloader {
+	position: absolute;
+	font-size: 100px;
+	z-index: -100;
+	top: -1000px;
+	left: -10000px;
+}
+.oit-unselectable, .oit-noacc, .oit-button {
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+}
+.oit-control 
+	{
+	cursor: pointer;
+	}
+.oit-row-resize 
+	{
+	cursor: row-resize !important;
+	}
+.oit-col-resize 
+	{
+	cursor: col-resize !important;
+	}
+
+/* Archives */
+.oit-tree-head {
+	border-top: 1px solid #f0f0f0;
+	border-bottom: 1px solid #aaa;
+
+	font-size:8pt;
+	line-height: 8pt;
+	padding:0;
+	height: 18px;
+
+	white-space:nowrap;
+	overflow:hidden;
+	z-index:50;
+}
+.oit-col-header, .oit-col-dragger { 
+	border-width:0;
+	display: inline-block;
+	overflow:hidden;
+	vertical-align:middle;
+}
+.oit-col-header { 
+	padding: 4px 0px 3px 3px;
+}
+.oit-col-dragger {
+	cursor:e-resize;
+	width:1px;
+	z-index:50;
+	background-color:transparent;
+	padding: 0px 3px;
+}
+.oit-col-dragger div {
+	width: 0;
+	height:18px;
+	border-right: 1px solid #ccc;
+}
+
+.oit-tree-nodes {
+	position: absolute;
+	top: 20px;
+	left:0px;
+	right: 0px;
+	bottom: 0px;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.oit-doc-icon {
+  width:14px;
+
+}
+
+.oit-tree-container, .oit-tree-node {
+	display:block;
+	white-space:nowrap;
+	padding:0;
+	text-align:left;
+}
+.oit-tree-node,
+.oit-tree-node div {
+	vertical-align:middle;
+}
+.oit-tree-node:hover {
+	background-color: rgba(51,153,238,0.2);
+}
+.oit-tree-overlay {
+	background-color: rgba(51,153,238,0.2);
+	position: absolute;
+	z-index: 60;
+}
+
+.oit-tree-field { 
+	display: inline-block;
+	padding: 0px 3px 0px 3px;
+	margin-right: 4px;
+	overflow-x:hidden;
+	height:18px;
+}
+.oit-tree-nroot {
+	display:inline-block;
+}
+.oit-tree-nname {	
+	display:inline-block;
+  margin: 0;
+  padding: 0;
+	cursor:pointer;
+}
+.oit-tree-nname:hover {
+	text-decoration:underline;
+}
+.oit-tree-leaf {
+  padding-left:14px;
+}
+.oit-tree-contents {
+	margin:0
+}
+.oit-tree-ctrl-icon {
+	font-size:8pt;
+	background-repeat:no-repeat;
+	display:inline-block;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;	
+}
+
+/* Email */
+#oit-emailheader {
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size: 8pt;
+	background-color: #f0f4fa;
+	border-bottom: 1px solid #ccc;
+	background: #eff9f9; /* Old browsers */
+	background: -moz-linear-gradient(top, #eff9f9 0%, #eff8f9 51%, #ebf4f4 74%, #deedf2 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eff9f9), color-stop(51%,#eff8f9), color-stop(74%,#ebf4f4), color-stop(100%,#deedf2)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #eff9f9 0%,#eff8f9 51%,#ebf4f4 74%,#deedf2 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #eff9f9 0%,#eff8f9 51%,#ebf4f4 74%,#deedf2 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #eff9f9 0%,#eff8f9 51%,#ebf4f4 74%,#deedf2 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #eff9f9 0%,#eff8f9 51%,#ebf4f4 74%,#deedf2 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eff9f9', endColorstr='#deedf2',GradientType=0 ); /* IE6-9 */
+	padding: 8px 0px 5px;
+	overflow: hidden; 
+}
+
+#oit-emailheader div {
+	position: static;
+	white-space:nowrap; /* Otherwise wrapping can change when the span map is built */
+}
+.oit-email_page {
+	position:relative;
+}
+
+.oit-email_page div[style^="left:"] {
+	position:absolute;
+}
+
+.oit-expandable {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+td.oit-expander {
+  width: 1.4em;
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+td.oit-expander>div {
+  width: 1.4em;
+  float: right;
+}
+td.oit-expander>div div {
+  margin-left: 0 !important;
+}
+
+.oit-open-close, 
+.oit-contract_icon {
+	width: 0; 
+	height: 0; 
+	border-left: .5em solid transparent;
+	border-right: .5em solid transparent;
+	border-top: .5em solid #666; /* #446faf; */
+	margin-left:.2em;
+	margin-top: 0.2em;
+	display:inline-block;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	 user-select: none; 
+}
+.oit-open-close {
+  margin-left:2px;
+  margin-right:2px;
+}
+
+
+.oit-contract_icon:hover {
+  border-top: .5em solid rgb(51,153,238);
+}
+.oit-open-close.oit-closed,
+.oit-expand_icon {
+	width: 0; 
+	height: 0; 
+	display:inline-block;
+  margin-top: 0.1em;
+
+	border-top: .5em solid transparent;
+	border-bottom: .5em solid transparent;
+	border-left: .5em solid #666; /* #446faf; */
+
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none; 
+}
+
+.oit-open-close.oit-closed {
+  margin-left:4px;
+  margin-right:0px;
+}
+
+.oit-expand_icon:hover {
+  border-left: .5em solid rgb(51,153,238);
+}
+
+
+#oit-emextra > div {
+	display:none;
+}
+
+.oit-attachedFile {
+  color:#446faf;
+  margin-right:1em;
+  display:inline-block;
+  cursor: pointer;
+  float: left;
+}
+
+#oit-email_to, #oit-email_cc {
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none; 
+}  
+
+.oit-headerpadding {
+	padding-right: 26px;
+}
+table#oit-maildata {
+	width:100%;
+	border-collapse:collapse;
+}
+table#oit-maildata td {
+	padding-left:5px;
+	padding-right:0px;
+	padding-bottom:.2em;
+	margin-bottom:0;
+	padding-top:2px;
+  vertical-align:top;
+}
+
+#oit-emdate { white-space:nowrap; }
+
+.oit-emhdrlabel {
+	white-space:nowrap;
+	vertical-align:top;
+	font-weight:bold;
+	width:1px;
+}
+.oit-emhdrvalue {
+	padding-right: 20px;
+}
+div.oit-emhdrlabel {
+  display:inline;
+  margin-right:.75em;
+}
+div.oit-eminlinediv {
+  display:inline;
+  white-space:nowrap;
+}
+td.oit-emsent {
+  text-align:right;
+  white-space:nowrap;
+}
+table.oit-emheadervalues tr td:nth-child(1) {
+	white-space:nowrap;
+	vertical-align:top;
+  font-weight:bold; 
+}
+table.oit-emheadervalues tr td:nth-child(2) {
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+div#oit-em_allheaders {
+  margin:.5em;
+  border:1px solid #ccc;
+  overflow:auto;
+}
+div#oit-em_allheaders  table.oit-emheadervalues td {
+  background-color:white;
+}
+table.oit-emheadervalues {
+  border-spacing:1px;
+  min-width:100%;
+}
+
+div.oit-email_gear_icon
+{
+width: 18px;
+height: 18px;
+display:inline-block;
+opacity:.2;
+background-repeat: no-repeat;
+background-image: url(icons18px.png);
+}
+
+div.oit-email_gear_icon:hover {
+  opacity:.8;
+  background-position:-18px 0px;
+}
+
+div#oit-emailheader .oit-activetab {
+  opacity:1.0;
+  background-position:-18px 0px;
+}
+div#oit-emailheader .oit-activetab:hover {
+  opacity:.8;
+}
+
+/* Tool bars */
+.oit-toolframe {
+	position:absolute;
+	margin:0px;
+	padding:0px;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+}
+
+.oit-toolbar, .oit-toolframe>div {
+	/*overflow: hidden;  This prevents popup menus from displaying outside the toolbar */
+	position:absolute;
+	margin:0px;
+	padding:0px;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+}
+
+.oit-toolbar {
+	display: none;
+}
+.oit-toolframe>div {
+	margin:0px;
+	padding:0px;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+}
+
+
+/* Dialog */
+.oit-dialog {
+	display: none;
+	position: absolute;
+	background-color: #FFF;
+	box-shadow: 2px 2px 20px 1px #111;
+	border-radius: 2px;
+	z-index: 80;
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size: 10pt;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+	overflow: hidden;
+}
+.oit-dialog-resizable {
+	resize: both;
+}
+.oit-dialog header {
+	color: #fff;
+	padding: 3px 5px;
+	width: 100%;
+	height: 20px;
+	border-bottom: 1px solid #666;
+}
+.oit-dialog-header-shaded {
+	background-color: rgba(60,60,60,0.8);
+}
+.oit-dialog header div {
+	display: inline-block;
+	float: left;
+	font-size: 12px;
+}
+.oit-dialog header input {
+	display: inline-block;
+	float: right;
+	color: #fff;
+	background-color: transparent;
+	border: none;
+	font-size: 12px;
+	margin: 0;
+	padding: 0;
+}
+.oit-dialog form {
+	display: block;
+	padding: 10px;
+	margin: 0;
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size: 10pt;
+}
+.oit-dialog footer {
+	padding: 10px 0 10px 10px;
+	margin-right: 10px; /* To allow access to the dialog resize handle */
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+.oit-dialog footer input {
+	display: inline-block;
+	float: right;
+	color: #fff;
+	background-color: rgba(51,153,238,0.6);
+	text-transform: uppercase;
+	border: none;
+	font-size: 12px;
+	padding: 4px 6px;
+	min-width: 60px;
+	margin-left: 5px;
+}
+.oit-dialog footer input:hover {
+	background-color: rgba(51,153,238,0.8);
+}
+.oit-dialog footer input:active {
+	background-color: rgba(160,160,160,0.5);
+}
+.oit-dialog-text {
+	margin: 20px auto 10px;
+	text-align: center;
+}
+.oit-comment-edit {
+	z-index: 90;
+}
+
+/* Progress dialog */
+.oit-progress-dialog {
+	width:250px;
+	height:100px;
+	position:absolute;
+	font-weight: bold;
+	left:50%;
+	top:50%;
+	margin:-50px 0 0 -125px;
+	padding: 20px 10px;
+}
+.oit-progress-dialog-ticks {
+	text-align: center;
+	display: none;
+}
+.oit-progress-dialog-ticks div {
+	display: inline-block;
+	width: 4px;
+	height: 4px;
+	border: 2px solid #bbb;
+	margin: 30px 1px 25px;
+}
+.oit-progress-dialog-ticks div.filled {
+	border: 2px solid rgb(51,153,238);
+	background-color: rgb(51,153,238);
+}
+
+/* Comment dialog */
+.oit-dialog-comment {
+	padding: 0;
+	box-shadow: 2px 2px 8px #444;
+	overflow: auto;
+	color: #000;
+}
+.oit-dialog-comment form {
+	border-bottom: 1px solid #ddd;
+	padding: 0 !important;
+}
+.oit-dialog-comment.oit-animating form {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.oit-dialog-comment form, .oit-dialog-comment label {
+	cursor: text;
+}
+.oit-dialog-comment textarea, .oit-dialog-comment label {
+	resize: none;
+	display: block;
+	margin: 0;
+	padding: 4px 8px;
+	height: 100%;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box; 
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size: 10pt;
+	color: inherit;
+	background: transparent;
+	border: none;
+}
+
+/* Background process message */
+.oit-background-message {
+	display: none;
+	position: absolute;
+	bottom: 10px;
+	right: 30px;
+	opacity: 0.6;
+	color: #FFF;
+	background-color: rgb(51,153,238);
+	border: none;
+	box-shadow: 2px 2px 10px 1px #444;
+	padding: 8px;
+	max-width: 85%;
+	z-index: 80;
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size: 10pt;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+}
+
+/* Tab bar */
+.oit-tab-bar {
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+	height: 26px;
+	width:100%;
+	overflow:hidden;
+	white-space:nowrap;
+	border-top: 1px solid #ddd;
+	background: #fff;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.oit-tab {
+	display:inline-block;
+	border-right: 1px solid #ddd;
+	padding: 4px 8px 2px;
+	color: #555;
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size:9pt;
+	position:relative;
+	cursor:default;
+}
+.oit-tab div {
+	border-bottom: 4px solid #FFF;
+	margin-bottom: 4px;
+}
+.oit-tab div:hover {
+	color: rgb(51,153,238);
+}
+.oit-tab-selected div {
+	border-bottom: 4px solid rgb(51,153,238);
+}
+.oit-tab-selected div:hover {
+	color: #555;
+}
+.oit-tab-list {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	right: 56px;
+	bottom: 0px;
+	overflow: hidden;
+}
+.oit-tab-nextprev {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	border-left: 1px solid #ddd;
+  font-size:20px;
+}
+.oit-tab-nextprev input {
+	font-size: 14px;
+	color: #666;
+	cursor:default;
+	text-align: center;
+	border: none;
+	background: none;
+	margin: 0;
+	padding: 0px 4px;
+	display: inline-block;
+	vertical-align: middle;
+}
+.oit-tab-nextprev input:hover {
+	color: rgb(51,153,238);
+}
+.oit-tab-nextprev input:disabled {
+	color: #ddd;
+}
+
+/* Message styles */
+.oit-error {
+	color: #000 !important;
+	background: #FFCCCC !important;
+}
+.oit-warning {
+	color: #000 !important;
+	background: #FFFFCC !important;
+}
+.oit-success {
+	color: #000 !important;
+	background: #CCFFCC !important;
+}
+/* Don't show outline when input elements have the focus */
+.oit-view-root *:focus {
+	outline: 0;
+}
+@page {
+  size:auto;
+  margin:0mm;
+  }
+
+div.oit-slidenotesbar {
+	height:120px;
+	position:absolute;
+	border-top:1px solid #aaa;
+	width:100%;
+	overflow:auto;
+}
+
+div.oit-vertical-sizebar {
+	margin:0;
+	height:5px;
+	z-index:2;
+	cursor: ns-resize;
+	background: -webkit-linear-gradient(#aaaab6, #445); 
+	background: -o-linear-gradient(#aaaab6, #445); 
+	background: -moz-linear-gradient(#aaaab6, #445); 
+	background: linear-gradient(#aaaab6, #445); 
+}
+
+div.oit-slidenotes {
+	padding:1em;
+	font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	font-size: 10pt;
+}
+
+/* Overrides for printing */
+@media print {
+
+
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  header {
+    display: none;
+  }
+
+  .oit-view-root {
+    background: transparent none no-repeat fixed 0 0;
+  }
+
+  .oit-toolframe {
+  }
+
+  .oit-toolbar {
+    display: none !important;
+    height: 0in;
+    width: 0in;
+  }
+
+  .oit-view {
+    top:0; 
+    overflow: visible;
+  }
+
+  #oit-emailheader {
+	  font-family: Geneva,Tahoma,Verdana,Helvetica,Arial,sans-serif;
+	  font-size: 8pt;
+	  padding: 2px 0 0 0;
+    margin-left:.4in;
+    margin-top:.4in;
+    margin-right:.4in;
+    margin-bottom:.3in;
+	  width:7in;
+  }
+
+  .oit-contract_icon, .oit-expand_icon {
+    display: none;
+  }
+
+
+  .oit-page, .oit-html, .oit-email, .oit-bitmap, .oit-drawing,
+  .oit-slide, .oit-chart, .oit-worksheet, .oit-table,
+  .oit-archive, .oit-emailarchive, .oit-multimedia {
+    page-break-after: always;
+    box-shadow: none;
+    margin: 0;
+  }
+
+  .popup, .oit-sel-text {
+    display: none;
+  }
+
+  .oit-tree-head {
+    background: #ffffff;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+  }
+}
