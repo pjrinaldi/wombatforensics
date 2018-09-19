@@ -82,7 +82,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     qRegisterMetaType<QVector<int> >();
-    oiiniterr = DAInitEx(DATHREAD_INIT_PTHREADS, OI_INIT_DEFAULT); // Initialize Data Access at Application Start
+    oiiniterr = DAInitEx(DATHREAD_INIT_PTHREADS, OI_INIT_NOLOADOPTIONS|OI_INIT_NOSAVEOPTIONS); // Initialize Data Access at Application Start
+    SetOptionDWORD((VTHDOC)NULL, SCCOPT_FIFLAGS, SCCUT_FI_NORMAL);
+    SetOptionBOOL((VTHDOC)NULL, SCCOPT_EX_UNICODECALLBACKSTR, FALSE);
+    SetOptionDWORD((VTHDOC)NULL, SCCOPT_FONT_REFERENCE_METHOD, SCCFONTS_REFERENCE_EXPORTED);
+    /*
+    DASetOption((VTHDOC)NULL, SCCOPT_FIFLAGS, (VTLPVOID)SCCUT_FI_NORMAL, sizeof(VTDWORD));
+    DASetOption((VTHDOC)NULL, SCCOPT_EX_UNICODECALLBACKSTR, (VTLPVOID)FALSE, sizeof(VTBOOL));
+    DASetOption((VTHDOC)NULL, SCCOPT_FONT_REFERENCE_METHOD, (VTLPVOID)SCCFONTS_REFERENCE_EXPORTED, sizeof(VTDWORD));
+    */
 
     //connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     //connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
@@ -283,10 +291,10 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         // STARTING ON STEP 2
         qDebug() << "Starting Document Export Conversion.";
         qDebug() << "hexstring:" << hexstring;
-        oierr = DAOpenDocument(&oidoc, IOTYPE_UNIXPATH, (VTLPVOID)(hexstring.toStdString().c_str()), 0);
+        oierr = DAOpenDocument(&oidoc, PATH_TYPE, (VTLPVOID)(hexstring.toStdString().c_str()), 0);
         qDebug() << "open document error:" << oierr;
         // EXPORT CALLBACK IS SET TO NULL, BUT MAY WANT TO IMPLEMENT SOMETHING LAER ON.
-        oierr = EXOpenExport(oidoc, FI_HTML5, IOTYPE_UNIXPATH, (VTLPVOID)(QString(QDir::homePath() + "oiex.html").toStdString().c_str()), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport);
+        oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, (VTLPVOID)(QString(QDir::homePath() + "oiex.html").toStdString().c_str()), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport);
         VTCHAR szError[256];
         qDebug() << "export path:" << QDir::homePath() + "/oiex.html";
         DAGetErrorString(oierr, szError, sizeof(szError));
@@ -2199,8 +2207,8 @@ SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCo
     SCCERR seResult = SCCERR_NOTHANDLED;
     EXFILEIOCALLBACKDATA *pNewFileInfo;
     EXURLFILEIOCALLBACKDATA *pExportData;
-    //UNUSED(hExport);
-    //UNUSED(dwCallbackData);
+    UNUSED(hExport);
+    UNUSED(dwCallbackData);
 
     /* This is a simple callback handler just to show how they are
      * coded.  The callback routine should always return
@@ -2219,7 +2227,7 @@ SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCo
         pNewFileInfo = (EXFILEIOCALLBACKDATA *)pCommandData;
         pExportData  = (EXURLFILEIOCALLBACKDATA *)pNewFileInfo->pExportData;
 
-        if( pNewFileInfo->dwSpecType == IOTYPE_UNICODEPATH )
+        if( pNewFileInfo->dwSpecType == PATH_TYPE )
           printf("Creating file: %ls\n", pNewFileInfo->pSpec );
         else
           printf("Creating file: %s\n", pNewFileInfo->pSpec );
@@ -2234,3 +2242,14 @@ SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCo
     
     return seResult;
 }
+
+void SetOptionDWORD(VTHDOC target, VTDWORD optionId, VTDWORD val)
+{
+    DASetOption(target, optionId, (VTLPVOID)&val, sizeof(VTDWORD));
+}
+
+void SetOptionBOOL(VTHDOC target, VTDWORD optionId, VTBOOL val)
+{
+    DASetOption(target, optionId, (VTLPVOID)&val, sizeof(VTBOOL));
+}
+

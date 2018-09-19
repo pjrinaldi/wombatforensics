@@ -27,6 +27,21 @@
 #define UNIX
 #define UNIX_64
 #include "sccex.h"
+#ifdef UNIX
+#define PATH_TYPE   IOTYPE_UNIXPATH
+#define STRLEN      strlen
+#endif
+
+#ifndef UNUSED
+#define UNUSED(x) ((x) = (x))
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 class TreeNodeModel : public QAbstractItemModel
 {
@@ -746,5 +761,9 @@ private:
 };
 
 SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCommandID, VTLPVOID pCommandData);
+
+void SetOptionDWORD(VTHDOC target, VTDWORD optionId, VTDWORD val);
+
+void SetOptionBOOL(VTHDOC target, VTDWORD optionId, VTBOOL val);
 
 #endif // WOMBATFORENSICS_H
