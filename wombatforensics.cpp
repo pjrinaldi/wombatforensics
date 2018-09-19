@@ -87,6 +87,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     SetOptionBOOL((VTHDOC)NULL, SCCOPT_EX_UNICODECALLBACKSTR, FALSE);
     SetOptionDWORD((VTHDOC)NULL, SCCOPT_FONT_REFERENCE_METHOD, SCCFONTS_REFERENCE_EXPORTED);
 
+    // THIS ONE IS NOT NEEDED AS THE OUTPUT FILES DEFAULT TO THE MAIN HTML OUTPUT PATH.
     //SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_OUTPUT, QString("/home/pasquale/.wombatforensics/oiwv/").toStdString().c_str());
     SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_RESOURCES, QString("/home/pasquale/.wombatforensics/oiwv/assets/").toStdString().c_str());
     //connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
