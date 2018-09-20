@@ -124,6 +124,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
         char tbuffer[tskptr->readfileinfo->meta->size];
         ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         txtdata = QByteArray::fromRawData(tbuffer, textlen);
+        tmpdata = txtdata;
         UpdateEncoding(0);
     }
 }
@@ -136,10 +137,14 @@ void TextViewer::UpdateEncoding(int unused)
     }
     int mib = ui->comboBox->itemData(ui->comboBox->currentIndex()).toInt();
     QTextCodec* codec = QTextCodec::codecForMib(mib);
-
+    tmpdata = txtdata;
+    /*
     QTextStream in(&txtdata);
     in.setAutoDetectUnicode(false);
     in.setCodec(codec);
     decodedstring = in.readAll();
+    */
+    QTextCodec::ConverterState state;
+    decodedstring = codec->toUnicode(tmpdata.constData(), tmpdata.size(), &state);
     ui->textEdit->setPlainText(decodedstring);
 }

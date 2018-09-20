@@ -38,6 +38,7 @@ private:
     TskObject tskobj;
     TskObject* tskptr;
     QByteArray txtdata;
+    QByteArray tmpdata;
     QString decodedstring;
     unsigned long long curobjaddr;
     QList<QTextCodec*> codecs;
