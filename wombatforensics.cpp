@@ -5,6 +5,7 @@
 
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
 {
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);  
     ui->setupUi(this);
     this->menuBar()->hide();
     this->statusBar()->setSizeGripEnabled(true);
