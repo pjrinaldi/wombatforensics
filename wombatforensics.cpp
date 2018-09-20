@@ -268,7 +268,6 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         videowindow->setAttribute(Qt::WA_DeleteOnClose);
         videowindow->ShowVideo(index);
     }
-    /*
     else if(index.sibling(index.row(), 9).data().toString().contains("text"))
     {
         // toggle the button...
@@ -277,7 +276,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         textviewer->setAttribute(Qt::WA_DeleteOnClose);
         //ui->actionTextViewer->setChecked(true);
         textviewer->ShowText(index);
-    }*/
+    }
     else if(index.sibling(index.row(), 9).data().toString().contains("text/html"))
     {
         htmlviewer = new HtmlViewer();

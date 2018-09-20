@@ -32,8 +32,10 @@ void TextViewer::HideClicked()
 
 void TextViewer::ShowText(const QModelIndex &index)
 {
+    curindex = index;
     curobjaddr = index.sibling(index.row(), 0).data().toString().split("-f").at(1).toULongLong();
-    GetTextContent(index);
+    //GetTextContent(index);
+    UpdateEncoding(0);
     this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 1).data().toString()));
     this->show();
 }
@@ -124,8 +126,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
         char tbuffer[tskptr->readfileinfo->meta->size];
         ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         txtdata = QByteArray::fromRawData(tbuffer, textlen);
-        tmpdata = txtdata;
-        UpdateEncoding(0);
+        //UpdateEncoding(0);
     }
 }
 
@@ -135,9 +136,10 @@ void TextViewer::UpdateEncoding(int unused)
     {
         // remove warning
     }
+    GetTextContent(curindex);
     int mib = ui->comboBox->itemData(ui->comboBox->currentIndex()).toInt();
+    qDebug() << "combobox number:" << ui->comboBox->currentIndex();
     QTextCodec* codec = QTextCodec::codecForMib(mib);
-    tmpdata = txtdata;
     /*
     QTextStream in(&txtdata);
     in.setAutoDetectUnicode(false);
@@ -145,6 +147,6 @@ void TextViewer::UpdateEncoding(int unused)
     decodedstring = in.readAll();
     */
     QTextCodec::ConverterState state;
-    decodedstring = codec->toUnicode(tmpdata.constData(), tmpdata.size(), &state);
+    decodedstring = codec->toUnicode(txtdata.constData(), txtdata.size(), &state);
     ui->textEdit->setPlainText(decodedstring);
 }

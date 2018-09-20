@@ -43,6 +43,7 @@ private:
     unsigned long long curobjaddr;
     QList<QTextCodec*> codecs;
     void FindCodecs();
+    QModelIndex curindex;
 };
 
 Q_DECLARE_METATYPE(TextViewer*);
