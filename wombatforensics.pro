@@ -1,5 +1,5 @@
-QT += widgets core concurrent sql multimedia multimediawidgets webenginewidgets
-QT -= opengl gui quick network qml
+QT += widgets core concurrent sql multimedia multimediawidgets webenginewidgets gui
+QT -= opengl quick network qml
 mac:CONFIG += debug app_bundle
 linux:CONFIG += debug qt #c++11
 mac:TEMPLATE = app

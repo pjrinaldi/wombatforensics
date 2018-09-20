@@ -106,6 +106,7 @@ private:
     QList<QPixmap> pixmaps;
     QStringList idlist;
     QFileSystemModel* filemodel;
+    int pixcount;
 protected:
     void closeEvent(QCloseEvent* event);
 };

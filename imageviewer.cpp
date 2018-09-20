@@ -155,7 +155,7 @@ void ImageViewer::GetPixmaps()
 
 void ImageViewer::UpdateGeometries()
 {
-    pixmaps.clear();
+    //pixmaps.clear();
     thumbpathlist.clear();
     QString tmpstr = "";
     QFile thumbfile;
@@ -170,7 +170,7 @@ void ImageViewer::UpdateGeometries()
         ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(i));
         thumbpathlist.append(QString(QByteArray::fromBase64(ba)));
     }
-    ui->label_2->setText("Loading...");
+    //ui->label_2->setText("Loading...");
     GetPixmaps();
     imagemodel = new ImageModel(pixmaps, idlist, thumbpathlist);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
