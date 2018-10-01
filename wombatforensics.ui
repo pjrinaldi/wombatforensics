@@ -77,16 +77,16 @@
        <property name="whatsThis">
         <string>QHexEdit widget allow to edit the data in hex view.</string>
        </property>
-       <property name="bytesPerLine">
+       <property name="bytesPerLine" stdset="0">
         <number>49</number>
        </property>
-       <property name="hexCaps">
+       <property name="hexCaps" stdset="0">
         <bool>true</bool>
        </property>
-       <property name="dynamicBytesPerLine">
+       <property name="dynamicBytesPerLine" stdset="0">
         <bool>true</bool>
        </property>
-       <property name="readOnly">
+       <property name="readOnly" stdset="0">
         <bool>true</bool>
        </property>
       </widget>
