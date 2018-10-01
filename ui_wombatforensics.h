@@ -154,8 +154,9 @@ public:
         actionView_File->setObjectName(QStringLiteral("actionView_File"));
         actionView_File->setCheckable(true);
         QIcon icon10;
-        icon10.addFile(QStringLiteral(":/bar/filehexview"), QSize(), QIcon::Normal, QIcon::Off);
+        icon10.addFile(QStringLiteral(":/ehex"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_File->setIcon(icon10);
+        actionView_File->setIconVisibleInMenu(true);
         actionView_Image_Gallery = new QAction(WombatForensics);
         actionView_Image_Gallery->setObjectName(QStringLiteral("actionView_Image_Gallery"));
         actionView_Image_Gallery->setCheckable(true);
