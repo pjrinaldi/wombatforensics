@@ -154,7 +154,7 @@ public:
         actionView_File->setObjectName(QStringLiteral("actionView_File"));
         actionView_File->setCheckable(true);
         QIcon icon10;
-        icon10.addFile(QStringLiteral(":/bar/fileview"), QSize(), QIcon::Normal, QIcon::Off);
+        icon10.addFile(QStringLiteral(":/bar/filehexview"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_File->setIcon(icon10);
         actionView_Image_Gallery = new QAction(WombatForensics);
         actionView_Image_Gallery->setObjectName(QStringLiteral("actionView_Image_Gallery"));
@@ -324,7 +324,7 @@ public:
         analysisToolBar->setLayoutDirection(Qt::LeftToRight);
         analysisToolBar->setMovable(false);
         analysisToolBar->setAllowedAreas(Qt::NoToolBarArea);
-        analysisToolBar->setIconSize(QSize(16, 16));
+        analysisToolBar->setIconSize(QSize(24, 24));
         analysisToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
         analysisToolBar->setFloatable(false);
         WombatForensics->addToolBar(Qt::TopToolBarArea, analysisToolBar);
