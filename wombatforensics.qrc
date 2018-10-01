@@ -1,5 +1,18 @@
 <RCC>
   <qresource prefix="/">
+    <file alias="eexport">Resources/document-export.svg</file>
+    <file alias="echeck">Resources/process-completed.svg</file>
+    <file alias="ecopy">Resources/edit-copy.svg</file>
+    <file alias="eset">Resources/open-menu.svg</file>
+    <file alias="archive">Resources/archive-manager.svg</file>
+    <file alias="info">Resources/dialog-information.svg</file>
+    <file alias="help">Resources/help-contents.svg</file>
+    <file alias="img">Resources/image-x-generic.svg</file>
+    <file alias="web">Resources/internet-web-browser.svg</file>
+    <file alias="thumb">Resources/multimedia-photo-manager.svg</file>
+    <file alias="vid">Resources/multimedia-video-player.svg</file>
+    <file alias="search">Resources/system-search.png</file>
+    <file alias="log">Resources/utilities-terminal.svg</file>
     <file alias="appicon">./Resources/wombat_32.ico</file>
   </qresource>
   <qresource prefix="/basic">
@@ -19,6 +32,12 @@
     <file alias="pagedown">./Resources/bottom.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="ispade">Resources/icons8-spade-40.png</file>
+    <file alias="spade">Resources/spade.png</file>
+    <file alias="add">Resources/list-add.svg</file>
+    <file alias="rem">Resources/list-remove.svg</file>
+    <file alias="docopen">Resources/folder-open.svg</file>
+    <file alias="docsave">Resources/text-x-install.svg</file>
     <file alias="setview">Resources/extension.svg</file>
     <file alias="docnew">Resources/document-new.svg</file>
     <file alias="byteview">Resources/accessories-calculator.svg</file>

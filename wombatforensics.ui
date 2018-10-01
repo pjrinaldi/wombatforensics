@@ -269,7 +269,7 @@
   <action name="actionNew_Case">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/casenew</normaloff>:/bar/casenew</iconset>
+     <normaloff>:/bar/docnew</normaloff>:/bar/docnew</iconset>
    </property>
    <property name="text">
     <string>New Case</string>
@@ -281,7 +281,7 @@
   <action name="actionOpen_Case">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/caseopen</normaloff>:/bar/caseopen</iconset>
+     <normaloff>:/bar/docopen</normaloff>:/bar/docopen</iconset>
    </property>
    <property name="text">
     <string>Open Case</string>
@@ -316,7 +316,7 @@
   <action name="actionAdd_Evidence">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/evidadd</normaloff>:/bar/evidadd</iconset>
+     <normaloff>:/bar/add</normaloff>:/bar/add</iconset>
    </property>
    <property name="text">
     <string>Add Evidence</string>
@@ -328,7 +328,7 @@
   <action name="actionRemove_Evidence">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/evidrem</normaloff>:/bar/evidrem</iconset>
+     <normaloff>:/bar/rem</normaloff>:/bar/rem</iconset>
    </property>
    <property name="text">
     <string>Remove Evidence</string>
@@ -340,7 +340,7 @@
   <action name="actionExport_Evidence">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/export</normaloff>:/bar/export</iconset>
+     <normaloff>:/eexport</normaloff>:/eexport</iconset>
    </property>
    <property name="text">
     <string>Export Evidence</string>
@@ -360,7 +360,7 @@
    </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/propview</normaloff>:/bar/propview</iconset>
+     <normaloff>:/info</normaloff>:/info</iconset>
    </property>
    <property name="text">
     <string>View Properties</string>
@@ -375,7 +375,7 @@
   <action name="actionActionAbout">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/about</normaloff>:/bar/about</iconset>
+     <normaloff>:/help</normaloff>:/help</iconset>
    </property>
    <property name="text">
     <string>actionAbout</string>
@@ -390,7 +390,7 @@
   <action name="actionAbout">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/about</normaloff>:/bar/about</iconset>
+     <normaloff>:/help</normaloff>:/help</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -437,7 +437,7 @@
    </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/bwimageview</normaloff>:/bar/bwimageview</iconset>
+     <normaloff>:/thumb</normaloff>:/thumb</iconset>
    </property>
    <property name="text">
     <string>View Image Gallery</string>
@@ -449,7 +449,7 @@
   <action name="actionViewerManager">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/viewermanager</normaloff>:/bar/viewermanager</iconset>
+     <normaloff>:/bar/setview</normaloff>:/bar/setview</iconset>
    </property>
    <property name="text">
     <string>Viewer Manager</string>
@@ -469,7 +469,7 @@
   <action name="actionCopy_Selection_To">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/copyselect</normaloff>:/bar/copyselect</iconset>
+     <normaloff>:/ecopy</normaloff>:/ecopy</iconset>
    </property>
    <property name="text">
     <string>Copy Selection To</string>
@@ -517,7 +517,7 @@
    </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/logview</normaloff>:/bar/logview</iconset>
+     <normaloff>:/log</normaloff>:/log</iconset>
    </property>
    <property name="text">
     <string>View Message Log</string>
@@ -559,7 +559,7 @@
   <action name="actionDigDeeper">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/dig</normaloff>:/bar/dig</iconset>
+     <normaloff>:/bar/ispade</normaloff>:/bar/ispade</iconset>
    </property>
    <property name="text">
     <string>Dig Deeper</string>
@@ -586,7 +586,7 @@
   <action name="actionCheck">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/checkbox</normaloff>:/bar/checkbox</iconset>
+     <normaloff>:/echeck</normaloff>:/echeck</iconset>
    </property>
    <property name="text">
     <string>(Un)Check</string>
@@ -595,7 +595,7 @@
   <action name="actionExport">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/export</normaloff>:/bar/export</iconset>
+     <normaloff>:/eexport</normaloff>:/eexport</iconset>
    </property>
    <property name="text">
     <string>Export...</string>
@@ -604,7 +604,7 @@
   <action name="actionSaveState">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/casesave</normaloff>:/bar/casesave</iconset>
+     <normaloff>:/bar/docsave</normaloff>:/bar/docsave</iconset>
    </property>
    <property name="text">
     <string>SaveState</string>
@@ -622,7 +622,7 @@
    </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/htmlviewer</normaloff>:/bar/htmlviewer</iconset>
+     <normaloff>:/web</normaloff>:/web</iconset>
    </property>
    <property name="text">
     <string>Html Viewer</string>
@@ -637,7 +637,7 @@
    </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/mediaviewer</normaloff>:/bar/mediaviewer</iconset>
+     <normaloff>:/vid</normaloff>:/vid</iconset>
    </property>
    <property name="text">
     <string>Media Viewer</string>
@@ -649,7 +649,7 @@
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/settingsview</normaloff>:/bar/settingsview</iconset>
+     <normaloff>:/eset</normaloff>:/eset</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
