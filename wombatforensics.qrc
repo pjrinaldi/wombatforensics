@@ -19,6 +19,12 @@
     <file alias="pagedown">./Resources/bottom.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="htmlview">Resources/applications-internet.png</file>
+    <file alias="vidview">Resources/applications-multimedia.png</file>
+    <file alias="settingsview">Resources/applications-system.png</file>
+    <file alias="audioview">Resources/audio-x-generic.png</file>
+    <file alias="helpview">Resources/help-browser.png</file>
+    <file alias="thumbview">Resources/image-x-generic.png</file>
     <file alias="settings">Resources/PossibleGraphics/settings1.png</file>
     <file alias="casenew">Resources/document-new.png</file>
     <file alias="caseopen">Resources/document-open.png</file>
