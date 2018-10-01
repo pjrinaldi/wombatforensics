@@ -269,7 +269,7 @@
   <action name="actionNew_Case">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/newcase</normaloff>:/bar/newcase</iconset>
+     <normaloff>:/bar/casenew</normaloff>:/bar/casenew</iconset>
    </property>
    <property name="text">
     <string>New Case</string>
@@ -281,7 +281,7 @@
   <action name="actionOpen_Case">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/opencase</normaloff>:/bar/opencase</iconset>
+     <normaloff>:/bar/caseopen</normaloff>:/bar/caseopen</iconset>
    </property>
    <property name="text">
     <string>Open Case</string>
@@ -316,7 +316,7 @@
   <action name="actionAdd_Evidence">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/bwadd</normaloff>:/bar/bwadd</iconset>
+     <normaloff>:/bar/evidadd</normaloff>:/bar/evidadd</iconset>
    </property>
    <property name="text">
     <string>Add Evidence</string>
@@ -328,7 +328,7 @@
   <action name="actionRemove_Evidence">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/bwrem</normaloff>:/bar/bwrem</iconset>
+     <normaloff>:/bar/evidrem</normaloff>:/bar/evidrem</iconset>
    </property>
    <property name="text">
     <string>Remove Evidence</string>
@@ -424,7 +424,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="wombatforensics.qrc">
+    <iconset>
      <normaloff>:/bar/filehexview</normaloff>:/bar/filehexview</iconset>
    </property>
    <property name="text">
@@ -604,7 +604,7 @@
   <action name="actionSaveState">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/savestate</normaloff>:/bar/savestate</iconset>
+     <normaloff>:/bar/casesave</normaloff>:/bar/casesave</iconset>
    </property>
    <property name="text">
     <string>SaveState</string>
@@ -648,7 +648,7 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset resource="wombatforensics.qrc">
+    <iconset>
      <normaloff>:/bar/newsettings</normaloff>:/bar/newsettings</iconset>
    </property>
    <property name="text">

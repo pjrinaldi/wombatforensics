@@ -19,9 +19,12 @@
     <file alias="pagedown">./Resources/bottom.png</file>
   </qresource>
   <qresource prefix="/bar">
-    <file alias="newsettings">Resources/application-x-executable.svg</file>
-    <file alias="filehexview">Resources/multipart-encrypted.svg</file>
     <file alias="settings">Resources/PossibleGraphics/settings1.png</file>
+    <file alias="casenew">Resources/document-new.png</file>
+    <file alias="caseopen">Resources/document-open.png</file>
+    <file alias="casesave">Resources/document-save.png</file>
+    <file alias="evidadd">Resources/list-add.png</file>
+    <file alias="evidrem">Resources/list-remove.png</file>
     <file alias="htmlviewer">Resources/htmlviewer.png</file>
     <file alias="mediaviewer">Resources/mediaviewer.png</file>
     <file alias="checkbox">Resources/checkbox.png</file>
