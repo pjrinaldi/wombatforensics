@@ -649,7 +649,7 @@
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/settings</normaloff>:/bar/settings</iconset>
+     <normaloff>:/bar/newsettings</normaloff>:/bar/newsettings</iconset>
    </property>
    <property name="text">
     <string>Settings</string>

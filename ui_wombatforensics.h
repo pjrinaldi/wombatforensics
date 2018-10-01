@@ -248,7 +248,7 @@ public:
         actionSettings = new QAction(WombatForensics);
         actionSettings->setObjectName(QStringLiteral("actionSettings"));
         QIcon icon24;
-        icon24.addFile(QStringLiteral(":/bar/settings"), QSize(), QIcon::Normal, QIcon::Off);
+        icon24.addFile(QStringLiteral(":/bar/newsettings"), QSize(), QIcon::Normal, QIcon::Off);
         actionSettings->setIcon(icon24);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
