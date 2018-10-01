@@ -325,7 +325,7 @@ public:
         analysisToolBar->setMovable(false);
         analysisToolBar->setAllowedAreas(Qt::NoToolBarArea);
         analysisToolBar->setIconSize(QSize(16, 16));
-        analysisToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        analysisToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
         analysisToolBar->setFloatable(false);
         WombatForensics->addToolBar(Qt::TopToolBarArea, analysisToolBar);
         mainStatusBar = new QStatusBar(WombatForensics);

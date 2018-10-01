@@ -221,7 +221,7 @@
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextBesideIcon</enum>
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <property name="floatable">
     <bool>false</bool>
