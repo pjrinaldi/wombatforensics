@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/">
+    <file alias="ehex">Resources/text-x-makefile.svg</file>
+    <file alias="esearch">Resources/edit-find.svg</file>
     <file alias="eexport">Resources/document-export.svg</file>
     <file alias="echeck">Resources/process-completed.svg</file>
     <file alias="ecopy">Resources/edit-copy.svg</file>
