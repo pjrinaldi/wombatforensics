@@ -19,6 +19,7 @@
     <file alias="pagedown">./Resources/bottom.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="byteview">Resources/accessories-calculator.svg</file>
     <file alias="htmlview">Resources/applications-internet.png</file>
     <file alias="vidview">Resources/applications-multimedia.png</file>
     <file alias="settingsview">Resources/applications-system.png</file>

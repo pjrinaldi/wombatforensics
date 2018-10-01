@@ -574,7 +574,7 @@
    </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/byteconverter</normaloff>:/bar/byteconverter</iconset>
+     <normaloff>:/bar/byteview</normaloff>:/bar/byteview</iconset>
    </property>
    <property name="text">
     <string>Byte Converter</string>
@@ -648,8 +648,8 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset>
-     <normaloff>:/bar/newsettings</normaloff>:/bar/newsettings</iconset>
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/settingsview</normaloff>:/bar/settingsview</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
