@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'videoviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -109,11 +109,11 @@ public:
 
     void retranslateUi(QDialog *VideoViewer)
     {
-        VideoViewer->setWindowTitle(QApplication::translate("VideoViewer", "View Video", 0));
-        label_2->setText(QApplication::translate("VideoViewer", "Loading...", 0));
-        label->setText(QApplication::translate("VideoViewer", "00:00:00", 0));
-        label2->setText(QApplication::translate("VideoViewer", "/", 0));
-        label3->setText(QApplication::translate("VideoViewer", "00:00:00", 0));
+        VideoViewer->setWindowTitle(QApplication::translate("VideoViewer", "View Video", Q_NULLPTR));
+        label_2->setText(QApplication::translate("VideoViewer", "Loading...", Q_NULLPTR));
+        label->setText(QApplication::translate("VideoViewer", "00:00:00", Q_NULLPTR));
+        label2->setText(QApplication::translate("VideoViewer", "/", Q_NULLPTR));
+        label3->setText(QApplication::translate("VideoViewer", "00:00:00", Q_NULLPTR));
         pushButton->setText(QString());
     } // retranslateUi
 
