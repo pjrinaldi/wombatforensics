@@ -116,9 +116,9 @@ ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageVie
     ui->listView->setResizeMode(QListView::Adjust);
     //sb = ui->spinBox;
     //ui->spinBox->setValue(thumbsize);
-    imagedialog = new ImageWindow();
-    imagedialog->setModal(false);
-    imagedialog->hide();
+    //imagedialog = new ImageWindow();
+    //imagedialog->setModal(false);
+    //imagedialog->hide();
     this->hide();
 }
 
@@ -141,6 +141,7 @@ ImageViewer::~ImageViewer()
 void ImageViewer::GetPixmaps()
 {
     pixmaps.clear();
+    qDebug() << "GetPixmaps thumbsize:" << thumbsize;
     QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
     QStringList jpgfiles = tdir.entryList(QStringList("*.jpg"), QDir::NoSymLinks | QDir::Files);
     qDebug() << thumbsize;
@@ -155,7 +156,7 @@ void ImageViewer::GetPixmaps()
 
 void ImageViewer::UpdateGeometries()
 {
-    //pixmaps.clear();
+    pixmaps.clear();
     thumbpathlist.clear();
     QString tmpstr = "";
     QFile thumbfile;
@@ -194,6 +195,9 @@ void ImageViewer::OpenImageWindow(const QModelIndex &index)
 {
     ui->label->setText("Loading...");
     qDebug() << index.data(Qt::UserRole).toString();
+    imagedialog = new ImageWindow();
+    imagedialog->setModal(false);
+    imagedialog->setAttribute(Qt::WA_DeleteOnClose);
     imagedialog->GetImage(index.data(Qt::UserRole).toString());
     imagedialog->show();
     ui->label->setText("");
