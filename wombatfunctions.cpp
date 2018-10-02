@@ -547,7 +547,7 @@ void GenerateThumbnails(QString thumbid)
         bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
         if(imageloaded)
         {
-            thumbimage = fileimage.scaled(QSize(320, 320), Qt::KeepAspectRatio, Qt::FastTransformation);
+            thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
             writer.write(thumbimage);
         }
     }

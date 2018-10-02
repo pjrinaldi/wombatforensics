@@ -1860,7 +1860,8 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
         }
         else
         {
-            imagewindow->UpdateGeometries();
+            //imagewindow->LoadImages(); // need to implement this function
+            //imagewindow->UpdateGeometries();
             imagewindow->show();
         }
     }
@@ -1911,7 +1912,7 @@ void WombatForensics::StartThumbnails()
 
 void WombatForensics::FinishThumbs()
 {
-    imagewindow->UpdateGeometries();
+    //imagewindow->UpdateGeometries();
     cancelthread->close();
     if(digoptions.isEmpty() || digoptions.contains(0))
         imagewindow->show();
