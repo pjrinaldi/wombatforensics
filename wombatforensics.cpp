@@ -267,7 +267,8 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     if(index.sibling(index.row(), 9).data().toString().contains("image"))
     {
         imagewindow = new ImageViewer();
-        imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
+        imagewindow->setWindowIcon(QIcon(":/img"));
+        imagewindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Image Viewer");
         imagewindow->setAttribute(Qt::WA_DeleteOnClose);
         connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
         imagewindow->ShowImage(index);
@@ -276,13 +277,16 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         videowindow = new VideoViewer();
         videowindow->setAttribute(Qt::WA_DeleteOnClose);
+        videowindow->setWindowIcon(QIcon(":/vid"));
+        videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Video Viewer");
         videowindow->ShowVideo(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("text"))
     {
         // toggle the button...
         textviewer = new TextViewer();
-        textviewer->setWindowIcon(QIcon(":/bar/textencode"));
+        textviewer->setWindowIcon(QIcon(":/textencode"));
+        textviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Text Viewer");
         textviewer->setAttribute(Qt::WA_DeleteOnClose);
         //ui->actionTextViewer->setChecked(true);
         textviewer->ShowText(index);
@@ -291,6 +295,8 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
+        htmlviewer->setWindowIcon(QIcon(":/web"));
+        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " HTML Viewer");
         htmlviewer->ShowHtml(index);
     }
     else
@@ -331,6 +337,8 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         {
             htmlviewer = new HtmlViewer();
             htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
+            htmlviewer->setWindowIcon(QIcon(":/outsidein"));
+            htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " OutsideIn Viewer");
             htmlviewer->LoadHtml(QString::fromStdString(oiout));
         }
         else
@@ -1786,6 +1794,7 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
 {
     propertywindow = new PropertiesWindow(this);
     propertywindow->setWindowIcon(QIcon(":/info"));
+    propertywindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Properties");
     propertywindow->setAttribute(Qt::WA_DeleteOnClose);
     propertywindow->setModal(false);
     UpdateProperties();
@@ -1807,6 +1816,7 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
 {
     fileviewer = new FileViewer();
     fileviewer->setWindowIcon(QIcon(":/ehex"));
+    fileviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Hex");
     fileviewer->setAttribute(Qt::WA_DeleteOnClose);
     //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     fileviewer->UpdateHexView();
