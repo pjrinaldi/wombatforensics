@@ -266,12 +266,21 @@ void WombatForensics::ShowFile(const QModelIndex &index)
 {
     if(index.sibling(index.row(), 9).data().toString().contains("image"))
     {
+        imageviewer = new ImageWindow();
+        imageviewer->setWindowIcon(QIcon(":/img"));
+        imageviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Image Viewer");
+        imageviewer->setAttribute(Qt::WA_DeleteOnClose);
+        imageviewer->GetImage(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+        imageviewer->show();
+
+        /* // image window is the thumbnailer ImageViewer
         imagewindow = new ImageViewer();
         imagewindow->setWindowIcon(QIcon(":/img"));
         imagewindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Image Viewer");
         imagewindow->setAttribute(Qt::WA_DeleteOnClose);
-        connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
+        //connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
         imagewindow->ShowImage(index);
+        */
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("video"))
     {

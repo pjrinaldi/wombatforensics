@@ -49,7 +49,7 @@ void ImageViewer::UpdateThumbSize()
 
 void ImageWindow::GetImage(QString objectid)
 {
-    this->setWindowTitle("View Image - " + objectid);
+    //this->setWindowTitle("View Image - " + objectid);
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;

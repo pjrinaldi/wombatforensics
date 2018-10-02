@@ -597,6 +597,7 @@ public:
     FileCategoryFilter* filecategoryfilterview;
     HashFilter* hashfilterview;
     ImageViewer* imagewindow;
+    ImageWindow* imageviewer;
     VideoViewer* videowindow;
     ViewerManager* viewmanage;
     TextViewer* textviewer;
