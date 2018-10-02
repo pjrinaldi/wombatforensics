@@ -127,7 +127,7 @@ public:
         actionManage_OmniViewer->setObjectName(QStringLiteral("actionManage_OmniViewer"));
         actionView_Properties = new QAction(WombatForensics);
         actionView_Properties->setObjectName(QStringLiteral("actionView_Properties"));
-        actionView_Properties->setCheckable(true);
+        actionView_Properties->setCheckable(false);
         QIcon icon6;
         icon6.addFile(QStringLiteral(":/info"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_Properties->setIcon(icon6);
@@ -153,7 +153,7 @@ public:
         actionExisting_Bookmarks->setIcon(icon9);
         actionView_File = new QAction(WombatForensics);
         actionView_File->setObjectName(QStringLiteral("actionView_File"));
-        actionView_File->setCheckable(true);
+        actionView_File->setCheckable(false);
         QIcon icon10;
         icon10.addFile(QStringLiteral(":/ehex"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_File->setIcon(icon10);
@@ -380,7 +380,6 @@ public:
         analysisToolBar->addAction(actionAdd_Evidence);
         analysisToolBar->addAction(actionRemove_Evidence);
         analysisToolBar->addSeparator();
-        analysisToolBar->addAction(actionView_Properties);
         analysisToolBar->addAction(actionHtmlViewer);
         analysisToolBar->addAction(actionMediaViewer);
         analysisToolBar->addAction(actionView_Image_Gallery);
@@ -435,7 +434,7 @@ public:
         actionExport_Evidence->setShortcut(QApplication::translate("WombatForensics", "Ctrl+E", nullptr));
 #endif // QT_NO_SHORTCUT
         actionManage_OmniViewer->setText(QApplication::translate("WombatForensics", "Manage OmniViewer", nullptr));
-        actionView_Properties->setText(QApplication::translate("WombatForensics", "View Properties", nullptr));
+        actionView_Properties->setText(QApplication::translate("WombatForensics", "View File Properties", nullptr));
 #ifndef QT_NO_TOOLTIP
         actionView_Properties->setToolTip(QApplication::translate("WombatForensics", "Properties Window", nullptr));
 #endif // QT_NO_TOOLTIP
@@ -453,7 +452,7 @@ public:
         actionHelp->setText(QApplication::translate("WombatForensics", "Help", nullptr));
         actionNew_Bookmark->setText(QApplication::translate("WombatForensics", "New Bookmark", nullptr));
         actionExisting_Bookmarks->setText(QApplication::translate("WombatForensics", "Existing Bookmarks", nullptr));
-        actionView_File->setText(QApplication::translate("WombatForensics", "View File", nullptr));
+        actionView_File->setText(QApplication::translate("WombatForensics", "View File Hex", nullptr));
         actionView_Image_Gallery->setText(QApplication::translate("WombatForensics", "View Image Gallery", nullptr));
 #ifndef QT_NO_TOOLTIP
         actionView_Image_Gallery->setToolTip(QApplication::translate("WombatForensics", "View Image Gallery", nullptr));

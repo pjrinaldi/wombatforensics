@@ -50,7 +50,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
     tskexternalptr = &tskexternalobject;
-    propertywindow = new PropertiesWindow(this);
+    //propertywindow = new PropertiesWindow(this);
     //fileviewer = new FileViewer(this);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
@@ -73,7 +73,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
     cancelthread = new CancelThread(this);
-    propertywindow->setWindowIcon(QIcon(":/bar/propview"));
+    //propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     //fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     //imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
     //textviewer->setWindowIcon(QIcon(":/bar/textencode"));
@@ -102,12 +102,12 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
-    connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
+    //connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
     //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long)), this, SLOT(UpdateProgress(unsigned long long)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
-    propertywindow->setModal(false);
+    //propertywindow->setModal(false);
     CheckWombatConfiguration();
     InitializeAppStructure();
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
@@ -136,6 +136,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 
     treemenu = new QMenu(ui->dirTreeView);
     treemenu->addAction(ui->actionView_File);
+    treemenu->addAction(ui->actionView_Properties);
     viewerfile.open(QIODevice::ReadOnly);
     QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
     itemlist.removeDuplicates();
@@ -354,7 +355,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
 {
-    ui->actionView_Properties->setChecked(checkedstate);
+    //ui->actionView_Properties->setChecked(checkedstate);
 }
 
 void WombatForensics::HideFileViewer(bool checkedstate)
@@ -372,6 +373,7 @@ void WombatForensics::HideViewerManager()
     treemenu->clear();
     ui->menuView_With->clear();
     treemenu->addAction(ui->actionView_File);
+    treemenu->addAction(ui->actionView_Properties);
     viewerfile.open(QIODevice::ReadOnly);
     QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
     itemlist.removeDuplicates();
@@ -514,7 +516,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
     ui->actionView_Progress->setEnabled(false);
-    ui->actionView_Properties->setEnabled(false);
+    //ui->actionView_Properties->setEnabled(false);
     //ui->actionView_File->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     ui->actionDigDeeper->setEnabled(false);
@@ -699,7 +701,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     if(curitem.indexes().count() > 0)
     {
         selectedindex = curitem.indexes().at(0);
-        ui->actionView_Properties->setEnabled(true);
+        //ui->actionView_Properties->setEnabled(true);
         //ui->actionView_File->setEnabled(true);
         ui->actionView_Image_Gallery->setEnabled(true);
         ui->actionTextViewer->setEnabled(true);
@@ -710,8 +712,10 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         LoadHexContents();
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
+        /*
         if(propertywindow->isVisible())
             UpdateProperties();
+        */
     }
 }
 
@@ -924,6 +928,7 @@ void WombatForensics::UpdateProperties()
     }
     propfile.close();
     propertywindow->UpdateTableView();
+    propertywindow->show();
 }
 
 void WombatForensics::LoadHexContents()
@@ -1677,7 +1682,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     if(wombatvariable.iscaseopen)
         CloseCurrentCase();
     
-    propertywindow->close();
+    //propertywindow->close();
     //fileviewer->close();
     //imagewindow->close();
     /*
@@ -1779,6 +1784,12 @@ void WombatForensics::on_actionDigDeeper_triggered()
 
 void WombatForensics::on_actionView_Properties_triggered(bool checked)
 {
+    propertywindow = new PropertiesWindow(this);
+    propertywindow->setWindowIcon(QIcon(":/info"));
+    propertywindow->setAttribute(Qt::WA_DeleteOnClose);
+    propertywindow->setModal(false);
+    UpdateProperties();
+    /*
     if(!checked)
     {
         propertywindow->hide();
@@ -1789,12 +1800,13 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
         if(ui->dirTreeView->selectionModel()->hasSelection())
             UpdateProperties();
     }
+    */
 }
 
 void WombatForensics::on_actionView_File_triggered(bool checked)
 {
     fileviewer = new FileViewer();
-    fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
+    fileviewer->setWindowIcon(QIcon(":/ehex"));
     fileviewer->setAttribute(Qt::WA_DeleteOnClose);
     //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     fileviewer->UpdateHexView();

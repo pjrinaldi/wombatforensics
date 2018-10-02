@@ -239,7 +239,6 @@
    <addaction name="actionAdd_Evidence"/>
    <addaction name="actionRemove_Evidence"/>
    <addaction name="separator"/>
-   <addaction name="actionView_Properties"/>
    <addaction name="actionHtmlViewer"/>
    <addaction name="actionMediaViewer"/>
    <addaction name="actionView_Image_Gallery"/>
@@ -354,14 +353,14 @@
   </action>
   <action name="actionView_Properties">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
      <normaloff>:/info</normaloff>:/info</iconset>
    </property>
    <property name="text">
-    <string>View Properties</string>
+    <string>View File Properties</string>
    </property>
    <property name="toolTip">
     <string>Properties Window</string>
@@ -419,14 +418,14 @@
   </action>
   <action name="actionView_File">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
      <normaloff>:/ehex</normaloff>:/ehex</iconset>
    </property>
    <property name="text">
-    <string>View File</string>
+    <string>View File Hex</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
