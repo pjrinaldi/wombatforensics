@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wombatforensics.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,9 @@
 #define UI_WOMBATFORENSICS_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
@@ -155,7 +155,7 @@ public:
         actionView_File->setObjectName(QStringLiteral("actionView_File"));
         actionView_File->setCheckable(false);
         QIcon icon10;
-        icon10.addFile(QStringLiteral(":/ehex"), QSize(), QIcon::Normal, QIcon::Off);
+        icon10.addFile(QStringLiteral(":/bar/xhex"), QSize(), QIcon::Normal, QIcon::Off);
         actionView_File->setIcon(icon10);
         actionView_File->setIconVisibleInMenu(true);
         actionView_Image_Gallery = new QAction(WombatForensics);
@@ -285,10 +285,10 @@ public:
         hexview = new QHexEdit(splitter);
         hexview->setObjectName(QStringLiteral("hexview"));
         hexview->setToolTipDuration(0);
-        hexview->setProperty("bytesPerLine", QVariant(49));
-        hexview->setProperty("hexCaps", QVariant(true));
-        hexview->setProperty("dynamicBytesPerLine", QVariant(true));
-        hexview->setProperty("readOnly", QVariant(true));
+        hexview->setBytesPerLine(49);
+        hexview->setHexCaps(true);
+        hexview->setDynamicBytesPerLine(true);
+        hexview->setReadOnly(true);
         splitter->addWidget(hexview);
 
         horizontalLayout->addWidget(splitter);
@@ -407,125 +407,125 @@ public:
 
     void retranslateUi(QMainWindow *WombatForensics)
     {
-        WombatForensics->setWindowTitle(QApplication::translate("WombatForensics", "WombatForensics", nullptr));
-        actionNew_Case->setText(QApplication::translate("WombatForensics", "New Case", nullptr));
+        WombatForensics->setWindowTitle(QApplication::translate("WombatForensics", "WombatForensics", Q_NULLPTR));
+        actionNew_Case->setText(QApplication::translate("WombatForensics", "New Case", Q_NULLPTR));
 #ifndef QT_NO_SHORTCUT
-        actionNew_Case->setShortcut(QApplication::translate("WombatForensics", "Ctrl+N", nullptr));
+        actionNew_Case->setShortcut(QApplication::translate("WombatForensics", "Ctrl+N", Q_NULLPTR));
 #endif // QT_NO_SHORTCUT
-        actionOpen_Case->setText(QApplication::translate("WombatForensics", "Open Case", nullptr));
+        actionOpen_Case->setText(QApplication::translate("WombatForensics", "Open Case", Q_NULLPTR));
 #ifndef QT_NO_SHORTCUT
-        actionOpen_Case->setShortcut(QApplication::translate("WombatForensics", "Ctrl+O", nullptr));
+        actionOpen_Case->setShortcut(QApplication::translate("WombatForensics", "Ctrl+O", Q_NULLPTR));
 #endif // QT_NO_SHORTCUT
-        actionView_Progress->setText(QApplication::translate("WombatForensics", "View Log...", nullptr));
+        actionView_Progress->setText(QApplication::translate("WombatForensics", "View Log...", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-        actionView_Progress->setToolTip(QApplication::translate("WombatForensics", "Log Viewer", nullptr));
+        actionView_Progress->setToolTip(QApplication::translate("WombatForensics", "Log Viewer", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
-        actionExit->setText(QApplication::translate("WombatForensics", "Exit", nullptr));
-        actionAdd_Evidence->setText(QApplication::translate("WombatForensics", "Add Evidence", nullptr));
+        actionExit->setText(QApplication::translate("WombatForensics", "Exit", Q_NULLPTR));
+        actionAdd_Evidence->setText(QApplication::translate("WombatForensics", "Add Evidence", Q_NULLPTR));
 #ifndef QT_NO_SHORTCUT
-        actionAdd_Evidence->setShortcut(QApplication::translate("WombatForensics", "Ctrl+A", nullptr));
+        actionAdd_Evidence->setShortcut(QApplication::translate("WombatForensics", "Ctrl+A", Q_NULLPTR));
 #endif // QT_NO_SHORTCUT
-        actionRemove_Evidence->setText(QApplication::translate("WombatForensics", "Remove Evidence", nullptr));
+        actionRemove_Evidence->setText(QApplication::translate("WombatForensics", "Remove Evidence", Q_NULLPTR));
 #ifndef QT_NO_SHORTCUT
-        actionRemove_Evidence->setShortcut(QApplication::translate("WombatForensics", "Ctrl+D", nullptr));
+        actionRemove_Evidence->setShortcut(QApplication::translate("WombatForensics", "Ctrl+D", Q_NULLPTR));
 #endif // QT_NO_SHORTCUT
-        actionExport_Evidence->setText(QApplication::translate("WombatForensics", "Export Evidence", nullptr));
+        actionExport_Evidence->setText(QApplication::translate("WombatForensics", "Export Evidence", Q_NULLPTR));
 #ifndef QT_NO_SHORTCUT
-        actionExport_Evidence->setShortcut(QApplication::translate("WombatForensics", "Ctrl+E", nullptr));
+        actionExport_Evidence->setShortcut(QApplication::translate("WombatForensics", "Ctrl+E", Q_NULLPTR));
 #endif // QT_NO_SHORTCUT
-        actionManage_OmniViewer->setText(QApplication::translate("WombatForensics", "Manage OmniViewer", nullptr));
-        actionView_Properties->setText(QApplication::translate("WombatForensics", "View File Properties", nullptr));
+        actionManage_OmniViewer->setText(QApplication::translate("WombatForensics", "Manage OmniViewer", Q_NULLPTR));
+        actionView_Properties->setText(QApplication::translate("WombatForensics", "View File Properties", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-        actionView_Properties->setToolTip(QApplication::translate("WombatForensics", "Properties Window", nullptr));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_SHORTCUT
-        actionView_Properties->setShortcut(QApplication::translate("WombatForensics", "Ctrl+P", nullptr));
-#endif // QT_NO_SHORTCUT
-        actionActionAbout->setText(QApplication::translate("WombatForensics", "actionAbout", nullptr));
-#ifndef QT_NO_TOOLTIP
-        actionActionAbout->setToolTip(QApplication::translate("WombatForensics", "About", nullptr));
+        actionView_Properties->setToolTip(QApplication::translate("WombatForensics", "Properties Window", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_SHORTCUT
-        actionActionAbout->setShortcut(QApplication::translate("WombatForensics", "F1", nullptr));
+        actionView_Properties->setShortcut(QApplication::translate("WombatForensics", "Ctrl+P", Q_NULLPTR));
 #endif // QT_NO_SHORTCUT
-        actionAbout->setText(QApplication::translate("WombatForensics", "About", nullptr));
-        actionHelp->setText(QApplication::translate("WombatForensics", "Help", nullptr));
-        actionNew_Bookmark->setText(QApplication::translate("WombatForensics", "New Bookmark", nullptr));
-        actionExisting_Bookmarks->setText(QApplication::translate("WombatForensics", "Existing Bookmarks", nullptr));
-        actionView_File->setText(QApplication::translate("WombatForensics", "View File Hex", nullptr));
-        actionView_Image_Gallery->setText(QApplication::translate("WombatForensics", "View Image Gallery", nullptr));
+        actionActionAbout->setText(QApplication::translate("WombatForensics", "actionAbout", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-        actionView_Image_Gallery->setToolTip(QApplication::translate("WombatForensics", "View Image Gallery", nullptr));
-#endif // QT_NO_TOOLTIP
-        actionViewerManager->setText(QApplication::translate("WombatForensics", "Viewer Manager", nullptr));
-        actionPlaceHolder->setText(QApplication::translate("WombatForensics", "PlaceHolder", nullptr));
-        actionCopy_Selection_To->setText(QApplication::translate("WombatForensics", "Copy Selection To", nullptr));
-        actionSection->setText(QApplication::translate("WombatForensics", "Copy Hex to a Section", nullptr));
-        actionFile->setText(QApplication::translate("WombatForensics", "Carve to a File", nullptr));
-        actionTextSection->setText(QApplication::translate("WombatForensics", "Copy Ascii to a Section", nullptr));
-        actionTextViewer->setText(QApplication::translate("WombatForensics", "Text Viewer", nullptr));
-        actionViewMessageLog->setText(QApplication::translate("WombatForensics", "View Message Log", nullptr));
-#ifndef QT_NO_TOOLTIP
-        actionViewMessageLog->setToolTip(QApplication::translate("WombatForensics", "View Message Log", nullptr));
-#endif // QT_NO_TOOLTIP
-        actionExpandAll->setText(QApplication::translate("WombatForensics", "Expand All", nullptr));
-#ifndef QT_NO_TOOLTIP
-        actionExpandAll->setToolTip(QApplication::translate("WombatForensics", "Expand All", nullptr));
-#endif // QT_NO_TOOLTIP
-        actionCollapseAll->setText(QApplication::translate("WombatForensics", "Collapse All", nullptr));
-#ifndef QT_NO_TOOLTIP
-        actionCollapseAll->setToolTip(QApplication::translate("WombatForensics", "Collapse All", nullptr));
-#endif // QT_NO_TOOLTIP
-        actionDigDeeper->setText(QApplication::translate("WombatForensics", "Dig Deeper", nullptr));
-#ifndef QT_NO_TOOLTIP
-        actionDigDeeper->setToolTip(QApplication::translate("WombatForensics", "Dig Deeper", nullptr));
-#endif // QT_NO_TOOLTIP
-        actionByteConverter->setText(QApplication::translate("WombatForensics", "Byte Converter", nullptr));
-#ifndef QT_NO_TOOLTIP
-        actionByteConverter->setToolTip(QApplication::translate("WombatForensics", "Byte Converter", nullptr));
-#endif // QT_NO_TOOLTIP
-        actionCheck->setText(QApplication::translate("WombatForensics", "(Un)Check", nullptr));
-        actionExport->setText(QApplication::translate("WombatForensics", "Export...", nullptr));
-        actionSaveState->setText(QApplication::translate("WombatForensics", "SaveState", nullptr));
-#ifndef QT_NO_TOOLTIP
-        actionSaveState->setToolTip(QApplication::translate("WombatForensics", "Save State", nullptr));
+        actionActionAbout->setToolTip(QApplication::translate("WombatForensics", "About", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_SHORTCUT
-        actionSaveState->setShortcut(QApplication::translate("WombatForensics", "Ctrl+S", nullptr));
+        actionActionAbout->setShortcut(QApplication::translate("WombatForensics", "F1", Q_NULLPTR));
 #endif // QT_NO_SHORTCUT
-        actionHtmlViewer->setText(QApplication::translate("WombatForensics", "Html Viewer", nullptr));
+        actionAbout->setText(QApplication::translate("WombatForensics", "About", Q_NULLPTR));
+        actionHelp->setText(QApplication::translate("WombatForensics", "Help", Q_NULLPTR));
+        actionNew_Bookmark->setText(QApplication::translate("WombatForensics", "New Bookmark", Q_NULLPTR));
+        actionExisting_Bookmarks->setText(QApplication::translate("WombatForensics", "Existing Bookmarks", Q_NULLPTR));
+        actionView_File->setText(QApplication::translate("WombatForensics", "View File Hex", Q_NULLPTR));
+        actionView_Image_Gallery->setText(QApplication::translate("WombatForensics", "View Image Gallery", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-        actionHtmlViewer->setToolTip(QApplication::translate("WombatForensics", "HTML Viewer", nullptr));
+        actionView_Image_Gallery->setToolTip(QApplication::translate("WombatForensics", "View Image Gallery", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
-        actionMediaViewer->setText(QApplication::translate("WombatForensics", "Media Viewer", nullptr));
+        actionViewerManager->setText(QApplication::translate("WombatForensics", "Viewer Manager", Q_NULLPTR));
+        actionPlaceHolder->setText(QApplication::translate("WombatForensics", "PlaceHolder", Q_NULLPTR));
+        actionCopy_Selection_To->setText(QApplication::translate("WombatForensics", "Copy Selection To", Q_NULLPTR));
+        actionSection->setText(QApplication::translate("WombatForensics", "Copy Hex to a Section", Q_NULLPTR));
+        actionFile->setText(QApplication::translate("WombatForensics", "Carve to a File", Q_NULLPTR));
+        actionTextSection->setText(QApplication::translate("WombatForensics", "Copy Ascii to a Section", Q_NULLPTR));
+        actionTextViewer->setText(QApplication::translate("WombatForensics", "Text Viewer", Q_NULLPTR));
+        actionViewMessageLog->setText(QApplication::translate("WombatForensics", "View Message Log", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-        actionMediaViewer->setToolTip(QApplication::translate("WombatForensics", "Audio and Video Media Viewer", nullptr));
+        actionViewMessageLog->setToolTip(QApplication::translate("WombatForensics", "View Message Log", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
-        actionSettings->setText(QApplication::translate("WombatForensics", "Settings", nullptr));
+        actionExpandAll->setText(QApplication::translate("WombatForensics", "Expand All", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-        actionSettings->setToolTip(QApplication::translate("WombatForensics", "Settings", nullptr));
+        actionExpandAll->setToolTip(QApplication::translate("WombatForensics", "Expand All", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
-        actionBookmark_Manager->setText(QApplication::translate("WombatForensics", "Bookmark Manager", nullptr));
+        actionCollapseAll->setText(QApplication::translate("WombatForensics", "Collapse All", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-        actionBookmark_Manager->setToolTip(QApplication::translate("WombatForensics", "Bookmark Manager", nullptr));
+        actionCollapseAll->setToolTip(QApplication::translate("WombatForensics", "Collapse All", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionDigDeeper->setText(QApplication::translate("WombatForensics", "Dig Deeper", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionDigDeeper->setToolTip(QApplication::translate("WombatForensics", "Dig Deeper", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionByteConverter->setText(QApplication::translate("WombatForensics", "Byte Converter", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionByteConverter->setToolTip(QApplication::translate("WombatForensics", "Byte Converter", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionCheck->setText(QApplication::translate("WombatForensics", "(Un)Check", Q_NULLPTR));
+        actionExport->setText(QApplication::translate("WombatForensics", "Export...", Q_NULLPTR));
+        actionSaveState->setText(QApplication::translate("WombatForensics", "SaveState", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionSaveState->setToolTip(QApplication::translate("WombatForensics", "Save State", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+#ifndef QT_NO_SHORTCUT
+        actionSaveState->setShortcut(QApplication::translate("WombatForensics", "Ctrl+S", Q_NULLPTR));
+#endif // QT_NO_SHORTCUT
+        actionHtmlViewer->setText(QApplication::translate("WombatForensics", "Html Viewer", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionHtmlViewer->setToolTip(QApplication::translate("WombatForensics", "HTML Viewer", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionMediaViewer->setText(QApplication::translate("WombatForensics", "Media Viewer", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionMediaViewer->setToolTip(QApplication::translate("WombatForensics", "Audio and Video Media Viewer", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionSettings->setText(QApplication::translate("WombatForensics", "Settings", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionSettings->setToolTip(QApplication::translate("WombatForensics", "Settings", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionBookmark_Manager->setText(QApplication::translate("WombatForensics", "Bookmark Manager", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionBookmark_Manager->setToolTip(QApplication::translate("WombatForensics", "Bookmark Manager", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_TOOLTIP
         hexview->setToolTip(QString());
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_WHATSTHIS
-        hexview->setWhatsThis(QApplication::translate("WombatForensics", "QHexEdit widget allow to edit the data in hex view.", nullptr));
+        hexview->setWhatsThis(QApplication::translate("WombatForensics", "QHexEdit widget allow to edit the data in hex view.", Q_NULLPTR));
 #endif // QT_NO_WHATSTHIS
-        menuFile->setTitle(QApplication::translate("WombatForensics", "File", nullptr));
-        menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", nullptr));
-        menuAction->setTitle(QApplication::translate("WombatForensics", "Action", nullptr));
-        menuSettings->setTitle(QApplication::translate("WombatForensics", "Settings", nullptr));
-        menuAbout->setTitle(QApplication::translate("WombatForensics", "About", nullptr));
-        menuBookmark_Manager->setTitle(QApplication::translate("WombatForensics", "Bookmark Manager", nullptr));
-        menuAdd_File_to->setTitle(QApplication::translate("WombatForensics", "Add Selected File to...", nullptr));
-        menuView->setTitle(QApplication::translate("WombatForensics", "View", nullptr));
-        menuView_With->setTitle(QApplication::translate("WombatForensics", "View With", nullptr));
-        menuCopy_To->setTitle(QApplication::translate("WombatForensics", "Copy to", nullptr));
-        analysisToolBar->setWindowTitle(QApplication::translate("WombatForensics", "toolBar", nullptr));
+        menuFile->setTitle(QApplication::translate("WombatForensics", "File", Q_NULLPTR));
+        menuEvidence->setTitle(QApplication::translate("WombatForensics", "Evidence", Q_NULLPTR));
+        menuAction->setTitle(QApplication::translate("WombatForensics", "Action", Q_NULLPTR));
+        menuSettings->setTitle(QApplication::translate("WombatForensics", "Settings", Q_NULLPTR));
+        menuAbout->setTitle(QApplication::translate("WombatForensics", "About", Q_NULLPTR));
+        menuBookmark_Manager->setTitle(QApplication::translate("WombatForensics", "Bookmark Manager", Q_NULLPTR));
+        menuAdd_File_to->setTitle(QApplication::translate("WombatForensics", "Add Selected File to...", Q_NULLPTR));
+        menuView->setTitle(QApplication::translate("WombatForensics", "View", Q_NULLPTR));
+        menuView_With->setTitle(QApplication::translate("WombatForensics", "View With", Q_NULLPTR));
+        menuCopy_To->setTitle(QApplication::translate("WombatForensics", "Copy to", Q_NULLPTR));
+        analysisToolBar->setWindowTitle(QApplication::translate("WombatForensics", "toolBar", Q_NULLPTR));
     } // retranslateUi
 
 };

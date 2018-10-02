@@ -77,16 +77,16 @@
        <property name="whatsThis">
         <string>QHexEdit widget allow to edit the data in hex view.</string>
        </property>
-       <property name="bytesPerLine" stdset="0">
+       <property name="bytesPerLine">
         <number>49</number>
        </property>
-       <property name="hexCaps" stdset="0">
+       <property name="hexCaps">
         <bool>true</bool>
        </property>
-       <property name="dynamicBytesPerLine" stdset="0">
+       <property name="dynamicBytesPerLine">
         <bool>true</bool>
        </property>
-       <property name="readOnly" stdset="0">
+       <property name="readOnly">
         <bool>true</bool>
        </property>
       </widget>
@@ -422,7 +422,7 @@
    </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/ehex</normaloff>:/ehex</iconset>
+     <normaloff>:/bar/xhex</normaloff>:/bar/xhex</iconset>
    </property>
    <property name="text">
     <string>View File Hex</string>
