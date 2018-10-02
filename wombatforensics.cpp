@@ -37,7 +37,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addPermanentWidget(vline2, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
-    ui->analysisToolBar->addAction(ui->menuBookmark_Manager->menuAction());
+    //ui->analysisToolBar->addAction(ui->menuBookmark_Manager->menuAction());
+    bookmarkmenu = new QMenu();
+    bookmarkmenu->addAction(ui->actionNew_Bookmark);
+    bookmarkmenu->addAction(ui->actionExisting_Bookmarks);
+    QWidget* bookwidget = ui->analysisToolBar->widgetForAction(ui->actionBookmark_Manager);
+    QToolButton* bookbutton = qobject_cast<QToolButton*>(bookwidget);
+    if(bookbutton)
+        connect(ui->actionBookmark_Manager, SIGNAL(triggered(bool)), bookbutton, SLOT(showMenu()));
+    ui->actionBookmark_Manager->setMenu(bookmarkmenu);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
@@ -510,7 +518,8 @@ void WombatForensics::InitializeAppStructure()
     //ui->actionView_File->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     ui->actionDigDeeper->setEnabled(false);
-    ui->menuBookmark_Manager->setEnabled(false);
+    //ui->menuBookmark_Manager->setEnabled(false);
+    ui->actionBookmark_Manager->setEnabled(false);
     ui->actionView_Image_Gallery->setEnabled(false);
     ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
@@ -676,6 +685,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         ui->actionRemove_Evidence->setEnabled(true);
         ui->actionSaveState->setEnabled(true);
         ui->actionDigDeeper->setEnabled(true);
+        //ui->actionBookmark_Manager->setEnabled(true);
     }
     QApplication::restoreOverrideCursor();
     LogMessage("Case was Opened Successfully");
@@ -841,6 +851,7 @@ void WombatForensics::UpdateStatus()
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
+    //ui->actionBookmark_Manager->setEnabled(true);
     //cancelthread->close();
     LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");

@@ -64,6 +64,7 @@ public:
     QAction *actionHtmlViewer;
     QAction *actionMediaViewer;
     QAction *actionSettings;
+    QAction *actionBookmark_Manager;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -203,13 +204,13 @@ public:
         QIcon icon16;
         icon16.addFile(QStringLiteral(":/bar/expandall"), QSize(), QIcon::Normal, QIcon::Off);
         actionExpandAll->setIcon(icon16);
-        actionExpandAll->setVisible(false);
+        actionExpandAll->setVisible(true);
         actionCollapseAll = new QAction(WombatForensics);
         actionCollapseAll->setObjectName(QStringLiteral("actionCollapseAll"));
         QIcon icon17;
         icon17.addFile(QStringLiteral(":/bar/collapseall"), QSize(), QIcon::Normal, QIcon::Off);
         actionCollapseAll->setIcon(icon17);
-        actionCollapseAll->setVisible(false);
+        actionCollapseAll->setVisible(true);
         actionDigDeeper = new QAction(WombatForensics);
         actionDigDeeper->setObjectName(QStringLiteral("actionDigDeeper"));
         QIcon icon18;
@@ -251,6 +252,11 @@ public:
         QIcon icon24;
         icon24.addFile(QStringLiteral(":/bar/settingsview"), QSize(), QIcon::Normal, QIcon::Off);
         actionSettings->setIcon(icon24);
+        actionBookmark_Manager = new QAction(WombatForensics);
+        actionBookmark_Manager->setObjectName(QStringLiteral("actionBookmark_Manager"));
+        QIcon icon25;
+        icon25.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        actionBookmark_Manager->setIcon(icon25);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -302,14 +308,12 @@ public:
         menuSettings->setObjectName(QStringLiteral("menuSettings"));
         menuAbout = new QMenu(mainMenubar);
         menuAbout->setObjectName(QStringLiteral("menuAbout"));
-        QIcon icon25;
-        icon25.addFile(QStringLiteral(":/bar/about"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAbout->setIcon(icon25);
+        QIcon icon26;
+        icon26.addFile(QStringLiteral(":/bar/about"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAbout->setIcon(icon26);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon26;
-        icon26.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon26);
+        menuBookmark_Manager->setIcon(icon25);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
         QIcon icon27;
@@ -375,8 +379,6 @@ public:
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionAdd_Evidence);
         analysisToolBar->addAction(actionRemove_Evidence);
-        analysisToolBar->addAction(actionCollapseAll);
-        analysisToolBar->addAction(actionExpandAll);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionView_Properties);
         analysisToolBar->addAction(actionHtmlViewer);
@@ -392,6 +394,8 @@ public:
         analysisToolBar->addAction(actionDigDeeper);
         analysisToolBar->addAction(actionCopy_Selection_To);
         analysisToolBar->addAction(actionExport_Evidence);
+        analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionBookmark_Manager);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
@@ -501,6 +505,10 @@ public:
         actionSettings->setText(QApplication::translate("WombatForensics", "Settings", nullptr));
 #ifndef QT_NO_TOOLTIP
         actionSettings->setToolTip(QApplication::translate("WombatForensics", "Settings", nullptr));
+#endif // QT_NO_TOOLTIP
+        actionBookmark_Manager->setText(QApplication::translate("WombatForensics", "Bookmark Manager", nullptr));
+#ifndef QT_NO_TOOLTIP
+        actionBookmark_Manager->setToolTip(QApplication::translate("WombatForensics", "Bookmark Manager", nullptr));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_TOOLTIP
         hexview->setToolTip(QString());

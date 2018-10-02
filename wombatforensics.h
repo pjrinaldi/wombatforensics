@@ -583,6 +583,7 @@ public:
     TreeNodeModel* treenodemodel;
     QMenu* treemenu;
     QMenu* selectionmenu;
+    QMenu* bookmarkmenu;
     IdFilter* idfilterview;
     JumpFilter* jumpfilterview;
     NameFilter* namefilterview;

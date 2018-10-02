@@ -142,7 +142,7 @@
      <string>About</string>
     </property>
     <property name="icon">
-     <iconset resource="wombatforensics.qrc">
+     <iconset>
       <normaloff>:/bar/about</normaloff>:/bar/about</iconset>
     </property>
     <addaction name="actionAbout"/>
@@ -238,8 +238,6 @@
    <addaction name="separator"/>
    <addaction name="actionAdd_Evidence"/>
    <addaction name="actionRemove_Evidence"/>
-   <addaction name="actionCollapseAll"/>
-   <addaction name="actionExpandAll"/>
    <addaction name="separator"/>
    <addaction name="actionView_Properties"/>
    <addaction name="actionHtmlViewer"/>
@@ -255,6 +253,8 @@
    <addaction name="actionDigDeeper"/>
    <addaction name="actionCopy_Selection_To"/>
    <addaction name="actionExport_Evidence"/>
+   <addaction name="separator"/>
+   <addaction name="actionBookmark_Manager"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
    <property name="styleSheet">
@@ -505,7 +505,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="wombatforensics.qrc">
+    <iconset>
      <normaloff>:/bar/textencode</normaloff>:/bar/textencode</iconset>
    </property>
    <property name="text">
@@ -529,7 +529,7 @@
   </action>
   <action name="actionExpandAll">
    <property name="icon">
-    <iconset resource="wombatforensics.qrc">
+    <iconset>
      <normaloff>:/bar/expandall</normaloff>:/bar/expandall</iconset>
    </property>
    <property name="text">
@@ -539,12 +539,12 @@
     <string>Expand All</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionCollapseAll">
    <property name="icon">
-    <iconset resource="wombatforensics.qrc">
+    <iconset>
      <normaloff>:/bar/collapseall</normaloff>:/bar/collapseall</iconset>
    </property>
    <property name="text">
@@ -554,7 +554,7 @@
     <string>Collapse All</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionDigDeeper">
@@ -657,6 +657,18 @@
    </property>
    <property name="toolTip">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionBookmark_Manager">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/bookmarkmgr</normaloff>:/bar/bookmarkmgr</iconset>
+   </property>
+   <property name="text">
+    <string>Bookmark Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>Bookmark Manager</string>
    </property>
   </action>
  </widget>
