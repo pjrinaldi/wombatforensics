@@ -242,8 +242,6 @@
    <addaction name="actionExpandAll"/>
    <addaction name="separator"/>
    <addaction name="actionView_Properties"/>
-   <addaction name="actionView_File"/>
-   <addaction name="actionTextViewer"/>
    <addaction name="actionHtmlViewer"/>
    <addaction name="actionMediaViewer"/>
    <addaction name="actionView_Image_Gallery"/>
@@ -652,7 +650,7 @@
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/eset</normaloff>:/eset</iconset>
+     <normaloff>:/bar/settingsview</normaloff>:/bar/settingsview</iconset>
    </property>
    <property name="text">
     <string>Settings</string>

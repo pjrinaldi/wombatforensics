@@ -249,7 +249,7 @@ public:
         actionSettings = new QAction(WombatForensics);
         actionSettings->setObjectName(QStringLiteral("actionSettings"));
         QIcon icon24;
-        icon24.addFile(QStringLiteral(":/eset"), QSize(), QIcon::Normal, QIcon::Off);
+        icon24.addFile(QStringLiteral(":/bar/settingsview"), QSize(), QIcon::Normal, QIcon::Off);
         actionSettings->setIcon(icon24);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
@@ -379,8 +379,6 @@ public:
         analysisToolBar->addAction(actionExpandAll);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionView_Properties);
-        analysisToolBar->addAction(actionView_File);
-        analysisToolBar->addAction(actionTextViewer);
         analysisToolBar->addAction(actionHtmlViewer);
         analysisToolBar->addAction(actionMediaViewer);
         analysisToolBar->addAction(actionView_Image_Gallery);

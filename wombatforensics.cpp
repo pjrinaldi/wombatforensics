@@ -127,6 +127,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->actionCopy_Selection_To->setMenu(selectionmenu);
 
     treemenu = new QMenu(ui->dirTreeView);
+    treemenu->addAction(ui->actionView_File);
     viewerfile.open(QIODevice::ReadOnly);
     QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
     itemlist.removeDuplicates();
@@ -333,12 +334,14 @@ void WombatForensics::ShowFile(const QModelIndex &index)
             treemenu->exec(QCursor::pos());
         */
     }
+    /*
     fileviewer = new FileViewer();
     fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     fileviewer->setAttribute(Qt::WA_DeleteOnClose);
     //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     fileviewer->UpdateHexView();
     //fileviewer->show();
+    */
 }
 
 void WombatForensics::HidePropertyWindow(bool checkedstate)
@@ -348,7 +351,7 @@ void WombatForensics::HidePropertyWindow(bool checkedstate)
 
 void WombatForensics::HideFileViewer(bool checkedstate)
 {
-    ui->actionView_File->setChecked(checkedstate);
+    //ui->actionView_File->setChecked(checkedstate);
 }
 
 void WombatForensics::HideImageWindow(bool checkstate)
@@ -360,6 +363,7 @@ void WombatForensics::HideViewerManager()
 {
     treemenu->clear();
     ui->menuView_With->clear();
+    treemenu->addAction(ui->actionView_File);
     viewerfile.open(QIODevice::ReadOnly);
     QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
     itemlist.removeDuplicates();
@@ -503,7 +507,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionRemove_Evidence->setEnabled(false);
     ui->actionView_Progress->setEnabled(false);
     ui->actionView_Properties->setEnabled(false);
-    ui->actionView_File->setEnabled(false);
+    //ui->actionView_File->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     ui->actionDigDeeper->setEnabled(false);
     ui->menuBookmark_Manager->setEnabled(false);
@@ -514,6 +518,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionTextViewer->setVisible(false);
     ui->actionHtmlViewer->setVisible(false);
     ui->actionMediaViewer->setVisible(false);
+    //ui->actionView_File->setVisible(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -685,7 +690,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     {
         selectedindex = curitem.indexes().at(0);
         ui->actionView_Properties->setEnabled(true);
-        ui->actionView_File->setEnabled(true);
+        //ui->actionView_File->setEnabled(true);
         ui->actionView_Image_Gallery->setEnabled(true);
         ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
@@ -1777,6 +1782,12 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
 
 void WombatForensics::on_actionView_File_triggered(bool checked)
 {
+    fileviewer = new FileViewer();
+    fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
+    fileviewer->setAttribute(Qt::WA_DeleteOnClose);
+    //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
+    fileviewer->UpdateHexView();
+    //fileviewer->show();
     /*
     if(!checked)
         fileviewer->hide();
