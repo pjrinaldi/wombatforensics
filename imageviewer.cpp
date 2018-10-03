@@ -10,17 +10,11 @@ ImageWindow::ImageWindow(QWidget* parent) : QDialog(parent), ui(new Ui::ImageWin
     tskptr->readimginfo = NULL;
     tskptr->readfsinfo = NULL;
     tskptr->readfileinfo = NULL;
-    //this->hide();
 }
 
 ImageWindow::~ImageWindow()
 {
     this->close();
-}
-
-void ImageWindow::HideClicked()
-{
-    //this->hide();
 }
 
 void ImageWindow::ShowImage()
@@ -34,22 +28,11 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
     {
         ui->label->clear();
         this->close();
-        //this->hide();
     }
 }
 
-/*
-void ImageViewer::UpdateThumbSize()
-{
-    qDebug() << "thumbsize:" << thumbsize;
-    //ui->listView->setMovement(QListView::Static);
-    ui->listView->setGridSize(QSize(thumbsize, thumbsize));
-}
-*/
-
 void ImageWindow::GetImage(QString objectid)
 {
-    //this->setWindowTitle("View Image - " + objectid);
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
@@ -110,15 +93,7 @@ void ImageWindow::GetImage(QString objectid)
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
     ui->setupUi(this);
-    //lw = ui->listView;
-    //ui->listView->setViewMode(QListView::IconMode);
-    //ui->listView->setUniformItemSizes(false);
-    //ui->listView->setResizeMode(QListView::Adjust);
-    //sb = ui->spinBox;
-    //ui->spinBox->setValue(thumbsize);
-    //imagedialog = new ImageWindow();
-    //imagedialog->setModal(false);
-    //imagedialog->hide();
+    setWindowTitle("Thumbnail Viewer");
     connect(ui->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(OpenImageWindow(QListWidgetItem*)));
     connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(HighlightTreeViewItem(QListWidgetItem*)));
     this->hide();
@@ -142,6 +117,7 @@ ImageViewer::~ImageViewer()
 
 void ImageViewer::LoadThumbnails()
 {
+    QHash<QString, QString> imageshash;
     ui->listWidget->clear();
     ui->listWidget->setIconSize(QSize(thumbsize, thumbsize+20));
     QFile thumbfile;
@@ -152,111 +128,38 @@ void ImageViewer::LoadThumbnails()
     thumbfile.open(QIODevice::ReadOnly);
     tmpstr = thumbfile.readLine();
     thumbfile.close();
+    // MOVE THIS CODE SOMEWHERE ELSE (PROBABLY CASE LOAD OR A DIFFERENT THREAD....
+    qDebug() << "load images hash started";
+    for(int i = 0; i < tmpstr.split(",", QString::SkipEmptyParts).count(); i++)
+        imageshash.insert(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
+    qDebug() << "load images hash finished";
     QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
     QStringList jpgfiles = tdir.entryList(QStringList("*.jpg"), QDir::NoSymLinks | QDir::Files);
-    for(int j = 0; j < jpgfiles.count(); j++)
-    {
-        for(int i = 0; i < tmpstr.split(",", QString::SkipEmptyParts).count(); i++)
-        {
-            if(QString::compare(jpgfiles.at(j).split(".").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), Qt::CaseInsensitive) == 0)
-            {
-                QListWidgetItem* tmpitem = new QListWidgetItem(QIcon(wombatvariable.tmpmntpath + "thumbs/" + jpgfiles.at(j)), jpgfiles.at(j).split(".").at(0), ui->listWidget);
-                ba.clear();
-                ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
-                tmpitem->setToolTip(QString(QByteArray::fromBase64(ba)));
-                qDebug() << i << ":" << tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0) << QString(QByteArray::fromBase64(ba));
-                break;
-            }
-        }
-    }
-    ui->label->setText("Thumbnail Count: " + jpgfiles.count());
-}
-
-void ImageViewer::GetPixmaps()
-{
-    /*
-    pixmaps.clear();
-    qDebug() << "GetPixmaps thumbsize:" << thumbsize;
-    QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
-    QStringList jpgfiles = tdir.entryList(QStringList("*.jpg"), QDir::NoSymLinks | QDir::Files);
-    qDebug() << thumbsize;
     for(int i = 0; i < jpgfiles.count(); i++)
     {
-        QPixmap tmppixmap = QPixmap(QString(wombatvariable.tmpmntpath + "thumbs/" + jpgfiles.at(i)));
-        tmppixmap = tmppixmap.scaled(thumbsize, thumbsize, Qt::KeepAspectRatio, Qt::FastTransformation);
-        pixmaps.append(tmppixmap);
-        idlist.append(jpgfiles.at(i).split(".").at(0));
-    }
-    */
-}
-
-void ImageViewer::UpdateGeometries()
-{
-    /*
-    pixmaps.clear();
-    thumbpathlist.clear();
-    QString tmpstr = "";
-    QFile thumbfile;
-    QByteArray ba;
-    ba.clear();
-    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
-    thumbfile.open(QIODevice::ReadOnly);
-    tmpstr = thumbfile.readLine();
-    for(int i = 0; i < tmpstr.split(",", QString::SkipEmptyParts).count(); i++)
-    {
+        QListWidgetItem* tmpitem = new QListWidgetItem(QIcon(wombatvariable.tmpmntpath + "thumbs/" + jpgfiles.at(i)), jpgfiles.at(i).split(".").at(0), ui->listWidget);
         ba.clear();
-        ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(i));
-        thumbpathlist.append(QString(QByteArray::fromBase64(ba)));
+        ba.append(imageshash.value(jpgfiles.at(i).split(".").at(0)));
+        tmpitem->setToolTip(QString(QByteArray::fromBase64(ba)));
     }
-    //ui->label_2->setText("Loading...");
-    GetPixmaps();
-    imagemodel = new ImageModel(pixmaps, idlist, thumbpathlist);
-    connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
-    connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
-    ui->label->setText(QString::number(pixmaps.count()) + " Image(s)");
-    ui->listView->setModel(imagemodel);
-    */
+    ui->label->setText("Thumbnail Count: " + QString::number(jpgfiles.count()));
 }
 
-/*
-void ImageViewer::SetModel()
-{
-    imagemodel = new ImageModel(pixmaps, idlist, thumbpathlist);
-    ui->listView->setModel(imagemodel);
-    connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
-    connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
-    ui->label_2->setText(QString::number(pixmaps.count()) + " Image(s)");
-}
-*/
-
-//void ImageViewer::OpenImageWindow(const QModelIndex &index)
 void ImageViewer::OpenImageWindow(QListWidgetItem* item)
 {
-    qDebug() << "item double clicked";
+    //qDebug() << "item double clicked";
     ui->label->setText("Loading...");
-    //qDebug() << index.data(Qt::UserRole).toString();
     imagedialog = new ImageWindow();
     imagedialog->setModal(false);
     imagedialog->setAttribute(Qt::WA_DeleteOnClose);
+    imagedialog->setWindowTitle(item->text() + " Image Viewer");
     imagedialog->GetImage(item->text());
-    //imagedialog->GetImage(index.data(Qt::UserRole).toString());
     imagedialog->show();
     ui->label->setText("");
 }
 
-void ImageViewer::ShowImage(const QModelIndex &index)
-{/*
-    ui->label->setText("Loading...");
-    QtConcurrent::run(imagedialog, &ImageWindow::GetImage, index.sibling(index.row(), 0).data().toString());
-    imagedialog->show();
-    ui->label->setText("");
-    */
-}
-
-//void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
 void ImageViewer::HighlightTreeViewItem(QListWidgetItem* item)
 {
-    qDebug() << "item clicked";
-    emit SendObjectToTreeView(item->text());
-    //emit SendObjectToTreeView(index.data(Qt::UserRole).toString().split("-a").at(0)); 
+    //qDebug() << "item clicked";
+    emit SendObjectToTreeView(item->text().split("-a").at(0));
 }

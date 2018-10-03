@@ -37,7 +37,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addPermanentWidget(vline2, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
-    //ui->analysisToolBar->addAction(ui->menuBookmark_Manager->menuAction());
     bookmarkmenu = new QMenu();
     bookmarkmenu->addAction(ui->actionNew_Bookmark);
     bookmarkmenu->addAction(ui->actionExisting_Bookmarks);
@@ -50,8 +49,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
     tskexternalptr = &tskexternalobject;
-    //propertywindow = new PropertiesWindow(this);
-    //fileviewer = new FileViewer(this);
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
     jumpfilterview = new JumpFilter(this);
@@ -66,17 +63,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filecategoryfilterview = new FileCategoryFilter(this);
     hashfilterview = new HashFilter(this);
     imagewindow = new ImageViewer();
-    //videowindow = new VideoViewer();
-    //textviewer = new TextViewer();
-    //htmlviewer = new HtmlViewer();
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
     cancelthread = new CancelThread(this);
-    //propertywindow->setWindowIcon(QIcon(":/bar/propview"));
-    //fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
     imagewindow->setWindowIcon(QIcon(":/thumb"));
-    //textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
@@ -100,15 +91,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_OUTPUT, QString("/home/pasquale/.wombatforensics/oiwv/").toStdString().c_str());
     SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_RESOURCES, QString("/home/pasquale/.wombatforensics/oiwv/assets/").toStdString().c_str());
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
-    //connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
-    //connect(propertywindow, SIGNAL(HidePropertyWindow(bool)), this, SLOT(HidePropertyWindow(bool)), Qt::DirectConnection);
-    //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long)), this, SLOT(UpdateProgress(unsigned long long)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
-    //propertywindow->setModal(false);
     CheckWombatConfiguration();
     InitializeAppStructure();
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
@@ -273,15 +260,6 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         imageviewer->setAttribute(Qt::WA_DeleteOnClose);
         imageviewer->GetImage(selectedindex.sibling(selectedindex.row(), 0).data().toString());
         imageviewer->show();
-
-        /* // image window is the thumbnailer ImageViewer
-        imagewindow = new ImageViewer();
-        imagewindow->setWindowIcon(QIcon(":/img"));
-        imagewindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Image Viewer");
-        imagewindow->setAttribute(Qt::WA_DeleteOnClose);
-        //connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
-        imagewindow->ShowImage(index);
-        */
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("video"))
     {
@@ -298,7 +276,6 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         textviewer->setWindowIcon(QIcon(":/textencode"));
         textviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Text Viewer");
         textviewer->setAttribute(Qt::WA_DeleteOnClose);
-        //ui->actionTextViewer->setChecked(true);
         textviewer->ShowText(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("text/html"))
@@ -356,29 +333,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
             if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
                 treemenu->exec(QCursor::pos());
         }
-        /*
-        if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
-            treemenu->exec(QCursor::pos());
-        */
     }
-    /*
-    fileviewer = new FileViewer();
-    fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
-    fileviewer->setAttribute(Qt::WA_DeleteOnClose);
-    //connect(fileviewer, SIGNAL(HideFileViewer(bool)), this, SLOT(HideFileViewer(bool)), Qt::DirectConnection);
-    fileviewer->UpdateHexView();
-    //fileviewer->show();
-    */
-}
-
-void WombatForensics::HidePropertyWindow(bool checkedstate)
-{
-    //ui->actionView_Properties->setChecked(checkedstate);
-}
-
-void WombatForensics::HideFileViewer(bool checkedstate)
-{
-    //ui->actionView_File->setChecked(checkedstate);
 }
 
 void WombatForensics::HideImageWindow(bool checkstate)
@@ -429,11 +384,6 @@ void WombatForensics::ReadSettings()
         //else if(tmplist.at(i).split(":").at(0) == "save")
         // etc...
     }
-}
-
-void WombatForensics::HideTextViewer(bool checkstate)
-{
-    //ui->actionTextViewer->setChecked(checkstate);
 }
 
 void WombatForensics::HideMessageViewer(bool checkstate)
@@ -534,20 +484,16 @@ void WombatForensics::InitializeAppStructure()
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
     ui->actionView_Progress->setEnabled(false);
-    //ui->actionView_Properties->setEnabled(false);
-    //ui->actionView_File->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     ui->actionDigDeeper->setEnabled(false);
-    //ui->menuBookmark_Manager->setEnabled(false);
     ui->actionBookmark_Manager->setEnabled(false);
     ui->actionView_Image_Gallery->setEnabled(false);
     ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
     ui->actionByteConverter->setEnabled(false);
-    ui->actionTextViewer->setVisible(false);
-    ui->actionHtmlViewer->setVisible(false);
-    ui->actionMediaViewer->setVisible(false);
-    //ui->actionView_File->setVisible(false);
+    //ui->actionTextViewer->setVisible(false);
+    //ui->actionHtmlViewer->setVisible(false);
+    //ui->actionMediaViewer->setVisible(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);

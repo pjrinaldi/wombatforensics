@@ -637,12 +637,9 @@ private slots:
     void UpdateDig(void);
     void UpdateCheckCount(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
-    void HidePropertyWindow(bool checkstate);
-    void HideFileViewer(bool checkstate);
     void HideImageWindow(bool checkstate);
     void HideViewerManager(void);
     void HideSettingsWindow(void);
-    void HideTextViewer(bool checkstate);
     void HideMessageViewer(bool checkstate);
     void HideByteViewer(bool checkstate);
     void ShowExternalViewer();
