@@ -140,6 +140,7 @@ ImageViewer::~ImageViewer()
 
 void ImageViewer::GetPixmaps()
 {
+    /*
     pixmaps.clear();
     qDebug() << "GetPixmaps thumbsize:" << thumbsize;
     QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
@@ -152,10 +153,12 @@ void ImageViewer::GetPixmaps()
         pixmaps.append(tmppixmap);
         idlist.append(jpgfiles.at(i).split(".").at(0));
     }
+    */
 }
 
 void ImageViewer::UpdateGeometries()
 {
+    /*
     pixmaps.clear();
     thumbpathlist.clear();
     QString tmpstr = "";
@@ -176,8 +179,9 @@ void ImageViewer::UpdateGeometries()
     imagemodel = new ImageModel(pixmaps, idlist, thumbpathlist);
     connect(ui->listView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OpenImageWindow(const QModelIndex &)));
     connect(ui->listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(HighlightTreeViewItem(const QModelIndex &)));
-    ui->label_2->setText(QString::number(pixmaps.count()) + " Image(s)");
+    ui->label->setText(QString::number(pixmaps.count()) + " Image(s)");
     ui->listView->setModel(imagemodel);
+    */
 }
 
 /*

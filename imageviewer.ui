@@ -60,7 +60,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="label">
        <property name="text">
         <string>Loading...</string>
        </property>

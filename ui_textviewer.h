@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'textviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -78,8 +78,8 @@ public:
 
     void retranslateUi(QDialog *TextViewer)
     {
-        TextViewer->setWindowTitle(QApplication::translate("TextViewer", "Dialog", 0));
-        label->setText(QApplication::translate("TextViewer", "Encoding", 0));
+        TextViewer->setWindowTitle(QApplication::translate("TextViewer", "Dialog", Q_NULLPTR));
+        label->setText(QApplication::translate("TextViewer", "Encoding", Q_NULLPTR));
         comboBox->setCurrentText(QString());
     } // retranslateUi
 

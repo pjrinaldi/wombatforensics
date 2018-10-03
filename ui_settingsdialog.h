@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'settingsdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,12 @@
 #define UI_SETTINGSDIALOG_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
@@ -86,11 +89,11 @@ public:
 
     void retranslateUi(QDialog *SettingsDialog)
     {
-        SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", nullptr));
-        thumbnailspinbox->setSuffix(QApplication::translate("SettingsDialog", " pixels", nullptr));
-        thumbnaillabel->setText(QApplication::translate("SettingsDialog", "Thumbnail Size:", nullptr));
-        cancelbutton->setText(QApplication::translate("SettingsDialog", "Cancel", nullptr));
-        savebutton->setText(QApplication::translate("SettingsDialog", "Save", nullptr));
+        SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", Q_NULLPTR));
+        thumbnailspinbox->setSuffix(QApplication::translate("SettingsDialog", " pixels", Q_NULLPTR));
+        thumbnaillabel->setText(QApplication::translate("SettingsDialog", "Thumbnail Size:", Q_NULLPTR));
+        cancelbutton->setText(QApplication::translate("SettingsDialog", "Cancel", Q_NULLPTR));
+        savebutton->setText(QApplication::translate("SettingsDialog", "Save", Q_NULLPTR));
     } // retranslateUi
 
 };

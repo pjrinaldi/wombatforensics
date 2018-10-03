@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'aboutbox.ui'
 **
-** Created by: Qt User Interface Compiler version 5.5.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -79,8 +79,8 @@ public:
 
     void retranslateUi(QDialog *AboutBox)
     {
-        AboutBox->setWindowTitle(QApplication::translate("AboutBox", "About WombatForensics", 0));
-        label->setText(QApplication::translate("AboutBox", "Loading...", 0));
+        AboutBox->setWindowTitle(QApplication::translate("AboutBox", "About WombatForensics", Q_NULLPTR));
+        label->setText(QApplication::translate("AboutBox", "Loading...", Q_NULLPTR));
     } // retranslateUi
 
 };

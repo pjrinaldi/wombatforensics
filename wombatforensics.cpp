@@ -65,7 +65,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filetypefilterview = new FileTypeFilter(this);
     filecategoryfilterview = new FileCategoryFilter(this);
     hashfilterview = new HashFilter(this);
-    //imagewindow = new ImageViewer();
+    imagewindow = new ImageViewer();
     //videowindow = new VideoViewer();
     //textviewer = new TextViewer();
     //htmlviewer = new HtmlViewer();
@@ -75,12 +75,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     cancelthread = new CancelThread(this);
     //propertywindow->setWindowIcon(QIcon(":/bar/propview"));
     //fileviewer->setWindowIcon(QIcon(":/bar/fileview"));
-    //imagewindow->setWindowIcon(QIcon(":/bar/bwimageview"));
+    imagewindow->setWindowIcon(QIcon(":/thumb"));
     //textviewer->setWindowIcon(QIcon(":/bar/textencode"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
     //cancelthread->setWindowIcon(QIcon(""));
+    imagewindow->hide();
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.maxaccess = QDateTime::currentDateTimeUtc().toTime_t();
@@ -98,7 +99,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     // THIS ONE IS NOT NEEDED AS THE OUTPUT FILES DEFAULT TO THE MAIN HTML OUTPUT PATH.
     //SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_OUTPUT, QString("/home/pasquale/.wombatforensics/oiwv/").toStdString().c_str());
     SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_RESOURCES, QString("/home/pasquale/.wombatforensics/oiwv/assets/").toStdString().c_str());
-    //connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
+    connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     //connect(textviewer, SIGNAL(HideTextViewerWindow(bool)), this, SLOT(HideTextViewer(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
@@ -161,7 +162,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
     connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
-    //connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
+    connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(namefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(pathfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -1701,7 +1702,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     
     //propertywindow->close();
     //fileviewer->close();
-    //imagewindow->close();
+    imagewindow->close();
     /*
     if(videowindow->isVisible())
         videowindow->close();

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'fileviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.2
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -12,7 +12,9 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QWidget>
@@ -75,15 +77,15 @@ public:
 
     void retranslateUi(QMainWindow *FileViewer)
     {
-        FileViewer->setWindowTitle(QApplication::translate("FileViewer", "File Viewer", nullptr));
-        actionHex->setText(QApplication::translate("FileViewer", "Hex", nullptr));
-        actionText->setText(QApplication::translate("FileViewer", "Text", nullptr));
-        actionOmni->setText(QApplication::translate("FileViewer", "Omni", nullptr));
+        FileViewer->setWindowTitle(QApplication::translate("FileViewer", "File Viewer", Q_NULLPTR));
+        actionHex->setText(QApplication::translate("FileViewer", "Hex", Q_NULLPTR));
+        actionText->setText(QApplication::translate("FileViewer", "Text", Q_NULLPTR));
+        actionOmni->setText(QApplication::translate("FileViewer", "Omni", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
-        filehexview->setToolTip(QApplication::translate("FileViewer", "QHexEditWidget", nullptr));
+        filehexview->setToolTip(QApplication::translate("FileViewer", "QHexEditWidget", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_WHATSTHIS
-        filehexview->setWhatsThis(QApplication::translate("FileViewer", "QHexEdit widget allow to edit the data in hex view.", nullptr));
+        filehexview->setWhatsThis(QApplication::translate("FileViewer", "QHexEdit widget allow to edit the data in hex view.", Q_NULLPTR));
 #endif // QT_NO_WHATSTHIS
     } // retranslateUi
 

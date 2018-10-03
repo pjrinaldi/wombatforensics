@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'imageviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -19,7 +19,6 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -29,10 +28,8 @@ class Ui_ImageViewer
 public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
-    QLabel *label;
-    QSpinBox *spinBox;
     QSpacerItem *horizontalSpacer;
-    QLabel *label_2;
+    QLabel *label;
     QSpacerItem *horizontalSpacer_2;
     QListView *listView;
 
@@ -51,28 +48,14 @@ public:
         horizontalLayout->setSpacing(3);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(5, -1, -1, -1);
-        label = new QLabel(ImageViewer);
-        label->setObjectName(QStringLiteral("label"));
-
-        horizontalLayout->addWidget(label);
-
-        spinBox = new QSpinBox(ImageViewer);
-        spinBox->setObjectName(QStringLiteral("spinBox"));
-        spinBox->setMinimum(16);
-        spinBox->setMaximum(320);
-        spinBox->setSingleStep(16);
-        spinBox->setValue(320);
-
-        horizontalLayout->addWidget(spinBox);
-
         horizontalSpacer = new QSpacerItem(5, 20, QSizePolicy::Preferred, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
 
-        label_2 = new QLabel(ImageViewer);
-        label_2->setObjectName(QStringLiteral("label_2"));
+        label = new QLabel(ImageViewer);
+        label->setObjectName(QStringLiteral("label"));
 
-        horizontalLayout->addWidget(label_2);
+        horizontalLayout->addWidget(label);
 
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -103,11 +86,8 @@ public:
 
     void retranslateUi(QDialog *ImageViewer)
     {
-        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Image Viewer", 0));
-        label->setText(QApplication::translate("ImageViewer", "Thumbnail Size:", 0));
-        spinBox->setSuffix(QApplication::translate("ImageViewer", "px", 0));
-        spinBox->setPrefix(QString());
-        label_2->setText(QApplication::translate("ImageViewer", "Loading...", 0));
+        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Image Viewer", Q_NULLPTR));
+        label->setText(QApplication::translate("ImageViewer", "Loading...", Q_NULLPTR));
     } // retranslateUi
 
 };
