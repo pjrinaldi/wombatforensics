@@ -93,9 +93,11 @@ public:
     void GetPixmaps(void);
     void ShowImage(const QModelIndex &index);
 public slots:
-    void OpenImageWindow(const QModelIndex &index);
+    //void OpenImageWindow(const QModelIndex &index);
+    void OpenImageWindow(QListWidgetItem* item);
 private slots:
-    void HighlightTreeViewItem(const QModelIndex &index);
+    //void HighlightTreeViewItem(const QModelIndex &index);
+    void HighlightTreeViewItem(QListWidgetItem* item);
     void HideClicked();
     //void SetModel();
 

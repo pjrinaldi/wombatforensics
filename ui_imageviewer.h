@@ -17,9 +17,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QListView>
 #include <QtWidgets/QListWidget>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -29,17 +27,14 @@ class Ui_ImageViewer
 public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
-    QSpacerItem *horizontalSpacer;
     QLabel *label;
-    QSpacerItem *horizontalSpacer_2;
     QListWidget *listWidget;
-    QListView *listView;
 
     void setupUi(QDialog *ImageViewer)
     {
         if (ImageViewer->objectName().isEmpty())
             ImageViewer->setObjectName(QStringLiteral("ImageViewer"));
-        ImageViewer->resize(320, 240);
+        ImageViewer->resize(611, 552);
         ImageViewer->setSizeGripEnabled(false);
         ImageViewer->setModal(false);
         verticalLayout = new QVBoxLayout(ImageViewer);
@@ -50,53 +45,40 @@ public:
         horizontalLayout->setSpacing(3);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(5, -1, -1, -1);
-        horizontalSpacer = new QSpacerItem(5, 20, QSizePolicy::Preferred, QSizePolicy::Minimum);
-
-        horizontalLayout->addItem(horizontalSpacer);
-
         label = new QLabel(ImageViewer);
         label->setObjectName(QStringLiteral("label"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy);
         label->setTextFormat(Qt::PlainText);
         label->setScaledContents(true);
+        label->setMargin(5);
 
         horizontalLayout->addWidget(label);
-
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout->addItem(horizontalSpacer_2);
 
 
         verticalLayout->addLayout(horizontalLayout);
 
         listWidget = new QListWidget(ImageViewer);
         listWidget->setObjectName(QStringLiteral("listWidget"));
-        listWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        listWidget->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked);
         listWidget->setProperty("showDropIndicator", QVariant(false));
         listWidget->setDragDropMode(QAbstractItemView::NoDragDrop);
+        listWidget->setDefaultDropAction(Qt::IgnoreAction);
+        listWidget->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
         listWidget->setMovement(QListView::Static);
         listWidget->setFlow(QListView::LeftToRight);
         listWidget->setProperty("isWrapping", QVariant(true));
         listWidget->setResizeMode(QListView::Adjust);
         listWidget->setLayoutMode(QListView::Batched);
-        listWidget->setSpacing(0);
+        listWidget->setSpacing(10);
         listWidget->setViewMode(QListView::IconMode);
-        listWidget->setUniformItemSizes(true);
+        listWidget->setUniformItemSizes(false);
+        listWidget->setSelectionRectVisible(false);
 
         verticalLayout->addWidget(listWidget);
-
-        listView = new QListView(ImageViewer);
-        listView->setObjectName(QStringLiteral("listView"));
-        listView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
-        listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        listView->setProperty("showDropIndicator", QVariant(false));
-        listView->setMovement(QListView::Static);
-        listView->setResizeMode(QListView::Adjust);
-        listView->setLayoutMode(QListView::Batched);
-        listView->setViewMode(QListView::IconMode);
-        listView->setUniformItemSizes(true);
-        listView->setBatchSize(1);
-
-        verticalLayout->addWidget(listView);
 
 
         retranslateUi(ImageViewer);

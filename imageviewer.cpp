@@ -110,7 +110,6 @@ void ImageWindow::GetImage(QString objectid)
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
     ui->setupUi(this);
-    ui->listView->setVisible(false);
     //lw = ui->listView;
     //ui->listView->setViewMode(QListView::IconMode);
     //ui->listView->setUniformItemSizes(false);
@@ -120,6 +119,8 @@ ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageVie
     //imagedialog = new ImageWindow();
     //imagedialog->setModal(false);
     //imagedialog->hide();
+    connect(ui->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(OpenImageWindow(QListWidgetItem*)));
+    connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(HighlightTreeViewItem(QListWidgetItem*)));
     this->hide();
 }
 
@@ -142,7 +143,7 @@ ImageViewer::~ImageViewer()
 void ImageViewer::LoadThumbnails()
 {
     ui->listWidget->clear();
-    ui->listWidget->setIconSize(QSize(thumbsize, thumbsize));
+    ui->listWidget->setIconSize(QSize(thumbsize, thumbsize+20));
     QFile thumbfile;
     QString tmpstr = "";
     QByteArray ba;
@@ -228,27 +229,34 @@ void ImageViewer::SetModel()
 }
 */
 
-void ImageViewer::OpenImageWindow(const QModelIndex &index)
+//void ImageViewer::OpenImageWindow(const QModelIndex &index)
+void ImageViewer::OpenImageWindow(QListWidgetItem* item)
 {
+    qDebug() << "item double clicked";
     ui->label->setText("Loading...");
-    qDebug() << index.data(Qt::UserRole).toString();
+    //qDebug() << index.data(Qt::UserRole).toString();
     imagedialog = new ImageWindow();
     imagedialog->setModal(false);
     imagedialog->setAttribute(Qt::WA_DeleteOnClose);
-    imagedialog->GetImage(index.data(Qt::UserRole).toString());
+    imagedialog->GetImage(item->text());
+    //imagedialog->GetImage(index.data(Qt::UserRole).toString());
     imagedialog->show();
     ui->label->setText("");
 }
 
 void ImageViewer::ShowImage(const QModelIndex &index)
-{
+{/*
     ui->label->setText("Loading...");
     QtConcurrent::run(imagedialog, &ImageWindow::GetImage, index.sibling(index.row(), 0).data().toString());
     imagedialog->show();
     ui->label->setText("");
+    */
 }
 
-void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
+//void ImageViewer::HighlightTreeViewItem(const QModelIndex &index)
+void ImageViewer::HighlightTreeViewItem(QListWidgetItem* item)
 {
-    emit SendObjectToTreeView(index.data(Qt::UserRole).toString().split("-a").at(0)); 
+    qDebug() << "item clicked";
+    emit SendObjectToTreeView(item->text());
+    //emit SendObjectToTreeView(index.data(Qt::UserRole).toString().split("-a").at(0)); 
 }
