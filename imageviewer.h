@@ -10,6 +10,7 @@
 #include "ui_imageviewer.h"
 #include "ui_imagewindow.h"
 
+/*
 class ImageModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -50,6 +51,7 @@ private:
     QStringList idlist;
     QStringList pathlist;
 };
+*/
 
 namespace Ui
 {
@@ -87,6 +89,7 @@ public:
     QSpinBox* sb;
     void UpdateGeometries(void);
     //void UpdateThumbSize(void);
+    void LoadThumbnails(void);
     void GetPixmaps(void);
     void ShowImage(const QModelIndex &index);
 public slots:
@@ -101,7 +104,7 @@ signals:
     void SendObjectToTreeView(QString selectedid);
 private:
     Ui::ImageViewer* ui;
-    ImageModel* imagemodel;
+    //ImageModel* imagemodel;
     ImageWindow* imagedialog;
     QList<QPixmap> pixmaps;
     QStringList idlist;

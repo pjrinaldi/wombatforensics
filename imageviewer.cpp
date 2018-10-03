@@ -110,10 +110,11 @@ void ImageWindow::GetImage(QString objectid)
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
     ui->setupUi(this);
-    lw = ui->listView;
-    ui->listView->setViewMode(QListView::IconMode);
-    ui->listView->setUniformItemSizes(false);
-    ui->listView->setResizeMode(QListView::Adjust);
+    ui->listView->setVisible(false);
+    //lw = ui->listView;
+    //ui->listView->setViewMode(QListView::IconMode);
+    //ui->listView->setUniformItemSizes(false);
+    //ui->listView->setResizeMode(QListView::Adjust);
     //sb = ui->spinBox;
     //ui->spinBox->setValue(thumbsize);
     //imagedialog = new ImageWindow();
@@ -136,6 +137,38 @@ void ImageViewer::closeEvent(QCloseEvent* e)
 
 ImageViewer::~ImageViewer()
 {
+}
+
+void ImageViewer::LoadThumbnails()
+{
+    ui->listWidget->clear();
+    ui->listWidget->setIconSize(QSize(thumbsize, thumbsize));
+    QFile thumbfile;
+    QString tmpstr = "";
+    QByteArray ba;
+    ba.clear();
+    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
+    thumbfile.open(QIODevice::ReadOnly);
+    tmpstr = thumbfile.readLine();
+    thumbfile.close();
+    QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
+    QStringList jpgfiles = tdir.entryList(QStringList("*.jpg"), QDir::NoSymLinks | QDir::Files);
+    for(int j = 0; j < jpgfiles.count(); j++)
+    {
+        for(int i = 0; i < tmpstr.split(",", QString::SkipEmptyParts).count(); i++)
+        {
+            if(QString::compare(jpgfiles.at(j).split(".").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), Qt::CaseInsensitive) == 0)
+            {
+                QListWidgetItem* tmpitem = new QListWidgetItem(QIcon(wombatvariable.tmpmntpath + "thumbs/" + jpgfiles.at(j)), "", ui->listWidget);
+                ba.clear();
+                ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
+                tmpitem->setToolTip(QString(QByteArray::fromBase64(ba)));
+                qDebug() << i << ":" << tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0) << QString(QByteArray::fromBase64(ba));
+                break;
+            }
+        }
+    }
+    ui->label->setText("Thumbnail Count: " + jpgfiles.count());
 }
 
 void ImageViewer::GetPixmaps()

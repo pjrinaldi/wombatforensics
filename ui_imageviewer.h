@@ -18,6 +18,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListView>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 
@@ -31,6 +32,7 @@ public:
     QSpacerItem *horizontalSpacer;
     QLabel *label;
     QSpacerItem *horizontalSpacer_2;
+    QListWidget *listWidget;
     QListView *listView;
 
     void setupUi(QDialog *ImageViewer)
@@ -63,6 +65,19 @@ public:
 
 
         verticalLayout->addLayout(horizontalLayout);
+
+        listWidget = new QListWidget(ImageViewer);
+        listWidget->setObjectName(QStringLiteral("listWidget"));
+        listWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        listWidget->setFlow(QListView::LeftToRight);
+        listWidget->setProperty("isWrapping", QVariant(true));
+        listWidget->setResizeMode(QListView::Adjust);
+        listWidget->setLayoutMode(QListView::Batched);
+        listWidget->setSpacing(0);
+        listWidget->setViewMode(QListView::IconMode);
+        listWidget->setUniformItemSizes(true);
+
+        verticalLayout->addWidget(listWidget);
 
         listView = new QListView(ImageViewer);
         listView->setObjectName(QStringLiteral("listView"));

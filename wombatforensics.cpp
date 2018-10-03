@@ -1861,7 +1861,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
         }
         else
         {
-            //imagewindow->LoadImages(); // need to implement this function
+            imagewindow->LoadThumbnails(); // need to implement this function
             //imagewindow->UpdateGeometries();
             imagewindow->show();
         }
@@ -1889,7 +1889,7 @@ void WombatForensics::StartThumbnails()
         tmpfile.close();
         if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
         {
-            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12));
+            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
             QByteArray ba;
             QByteArray ba2;
             ba.append(tmpstr.split(",").at(0));
@@ -1898,6 +1898,8 @@ void WombatForensics::StartThumbnails()
             ba.clear();
             ba.append(fullpath);
             thumbfile.open(QIODevice::Append);
+            thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
+            thumbfile.write("|");
             thumbfile.write(ba.toBase64());
             thumbfile.write(",");
             thumbfile.close();
@@ -1913,6 +1915,7 @@ void WombatForensics::StartThumbnails()
 
 void WombatForensics::FinishThumbs()
 {
+    imagewindow->LoadThumbnails();
     //imagewindow->UpdateGeometries();
     cancelthread->close();
     if(digoptions.isEmpty() || digoptions.contains(0))
