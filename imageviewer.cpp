@@ -159,7 +159,7 @@ void ImageViewer::LoadThumbnails()
         {
             if(QString::compare(jpgfiles.at(j).split(".").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), Qt::CaseInsensitive) == 0)
             {
-                QListWidgetItem* tmpitem = new QListWidgetItem(QIcon(wombatvariable.tmpmntpath + "thumbs/" + jpgfiles.at(j)), "", ui->listWidget);
+                QListWidgetItem* tmpitem = new QListWidgetItem(QIcon(wombatvariable.tmpmntpath + "thumbs/" + jpgfiles.at(j)), jpgfiles.at(j).split(".").at(0), ui->listWidget);
                 ba.clear();
                 ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
                 tmpitem->setToolTip(QString(QByteArray::fromBase64(ba)));

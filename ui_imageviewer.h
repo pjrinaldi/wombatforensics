@@ -56,6 +56,8 @@ public:
 
         label = new QLabel(ImageViewer);
         label->setObjectName(QStringLiteral("label"));
+        label->setTextFormat(Qt::PlainText);
+        label->setScaledContents(true);
 
         horizontalLayout->addWidget(label);
 
@@ -69,6 +71,9 @@ public:
         listWidget = new QListWidget(ImageViewer);
         listWidget->setObjectName(QStringLiteral("listWidget"));
         listWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        listWidget->setProperty("showDropIndicator", QVariant(false));
+        listWidget->setDragDropMode(QAbstractItemView::NoDragDrop);
+        listWidget->setMovement(QListView::Static);
         listWidget->setFlow(QListView::LeftToRight);
         listWidget->setProperty("isWrapping", QVariant(true));
         listWidget->setResizeMode(QListView::Adjust);
