@@ -1858,8 +1858,6 @@ void WombatForensics::StartThumbnails()
         }
     }
     QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
-    //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
-    //sqlwatcher.setFuture(tmpfuture);
     thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
     thumbwatcher.setFuture(thumbfuture);
     cancelthread->show();
