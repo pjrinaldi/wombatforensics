@@ -775,7 +775,9 @@ void WombatForensics::PrepareEvidenceImage()
 
     }
     qDebug() << "xmntstr:" << xmntstr;
-    QProcess::execute(xmntstr);
+    QProcess* xmntprocess = new QProcess();
+    xmntprocess->start(xmntstr); // removes WARNING Messages but does not capture them..
+    //QProcess::execute(xmntstr);
 }
 
 void WombatForensics::UpdateStatus()
