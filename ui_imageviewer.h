@@ -34,7 +34,7 @@ public:
     {
         if (ImageViewer->objectName().isEmpty())
             ImageViewer->setObjectName(QStringLiteral("ImageViewer"));
-        ImageViewer->resize(611, 552);
+        ImageViewer->resize(820, 525);
         ImageViewer->setSizeGripEnabled(false);
         ImageViewer->setModal(false);
         verticalLayout = new QVBoxLayout(ImageViewer);
