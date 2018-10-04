@@ -658,9 +658,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
     QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
     if(!tdir.isEmpty())
-    {
-        QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
-    }
+        QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash); // load images hash after case open to speed up thumbnail viewing
     StatusUpdate("Ready");
 }
 
