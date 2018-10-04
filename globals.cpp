@@ -45,6 +45,7 @@ QString thumbpath = "";
 QString hexselection = "";
 QString hexstring = "";
 QHash<QString, bool> checkhash;
+QHash<QString, QString> imageshash;
 FilterValues filtervalues;
 TSK_IMG_INFO* readimginfo = NULL;
 TSK_VS_INFO* readvsinfo = NULL;

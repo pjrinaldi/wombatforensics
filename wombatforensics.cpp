@@ -655,6 +655,12 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     QApplication::restoreOverrideCursor();
     LogMessage("Case was Opened Successfully");
+    thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
+    QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
+    if(!tdir.isEmpty())
+    {
+        QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
+    }
     StatusUpdate("Ready");
 }
 
@@ -1807,7 +1813,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
         }
         else
         {
-            imagewindow->LoadThumbnails(); // need to implement this function
+            imagewindow->LoadThumbnails();
             //imagewindow->UpdateGeometries();
             imagewindow->show();
         }
@@ -1851,19 +1857,22 @@ void WombatForensics::StartThumbnails()
             thumbfile.close();
         }
     }
-
+    QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
+    //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
+    //sqlwatcher.setFuture(tmpfuture);
     thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
     thumbwatcher.setFuture(thumbfuture);
     cancelthread->show();
-    StatusUpdate("Thumbnail generation finished.");
-    LogMessage("Thumbnail generation finished.");
 }
 
 void WombatForensics::FinishThumbs()
 {
-    imagewindow->LoadThumbnails();
-    //imagewindow->UpdateGeometries();
     cancelthread->close();
+    StatusUpdate("Thumbnail generation finished.");
+    LogMessage("Thumbnail generation finished.");
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    imagewindow->LoadThumbnails(); // GUI Intensive
+    QApplication::restoreOverrideCursor();
     if(digoptions.isEmpty() || digoptions.contains(0))
         imagewindow->show();
     LogMessage("Digging Complete");

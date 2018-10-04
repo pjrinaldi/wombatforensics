@@ -48,6 +48,7 @@ extern QString thumbpath;
 extern QString hexselection;
 extern QString hexstring;
 extern QHash<QString, bool> checkhash;
+extern QHash<QString, QString> imageshash;
 
 struct dosdate
 {

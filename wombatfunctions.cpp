@@ -497,6 +497,18 @@ void ProcessExport(QString objectid)
     isignals->ExportUpd();
 }
 
+void LoadImagesHash()
+{
+    QFile thumbfile;
+    QString tmpstr = "";
+    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
+    thumbfile.open(QIODevice::ReadOnly);
+    tmpstr = thumbfile.readLine();
+    thumbfile.close();
+    for(int i = 0; i < tmpstr.split(",", QString::SkipEmptyParts).count(); i++)
+        imageshash.insert(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
+}
+
 void GenerateThumbnails(QString thumbid)
 {
     TSK_IMG_INFO* readimginfo;

@@ -117,22 +117,22 @@ ImageViewer::~ImageViewer()
 
 void ImageViewer::LoadThumbnails()
 {
-    QHash<QString, QString> imageshash;
+    //QHash<QString, QString> imageshash;
     ui->listWidget->clear();
     ui->listWidget->setIconSize(QSize(thumbsize, thumbsize+20));
-    QFile thumbfile;
-    QString tmpstr = "";
+    //QFile thumbfile;
+    //QString tmpstr = "";
     QByteArray ba;
     ba.clear();
-    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
-    thumbfile.open(QIODevice::ReadOnly);
-    tmpstr = thumbfile.readLine();
-    thumbfile.close();
+    //thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
+    //thumbfile.open(QIODevice::ReadOnly);
+    //tmpstr = thumbfile.readLine();
+    //thumbfile.close();
     // MOVE THIS CODE SOMEWHERE ELSE (PROBABLY CASE LOAD OR A DIFFERENT THREAD....
-    qDebug() << "load images hash started";
-    for(int i = 0; i < tmpstr.split(",", QString::SkipEmptyParts).count(); i++)
-        imageshash.insert(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
-    qDebug() << "load images hash finished";
+    //qDebug() << "load images hash started";
+    //for(int i = 0; i < tmpstr.split(",", QString::SkipEmptyParts).count(); i++)
+    //    imageshash.insert(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
+    //qDebug() << "load images hash finished";
     QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
     QStringList jpgfiles = tdir.entryList(QStringList("*.jpg"), QDir::NoSymLinks | QDir::Files);
     for(int i = 0; i < jpgfiles.count(); i++)
