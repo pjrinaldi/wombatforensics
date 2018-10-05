@@ -34,10 +34,9 @@ void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
             break;
     }
     msglog->append(QString(tmpstring + ": " + localmsg.constData()));
-    logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     logfile.write(ba);
     //logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
-    logfile.close();
+    //logfile.close();
 }
 
 int main(int argc, char *argv[])

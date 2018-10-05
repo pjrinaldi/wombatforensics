@@ -660,6 +660,7 @@ private slots:
     void UpdateDigging(void);
     void FinishExport(void);
     void FinishThumbs(void);
+    void ThreadCancelled(void);
     void ReadXMountOut(void);
     void ReadXMountErr(void);
     void StatusUpdate(QString tmptext)

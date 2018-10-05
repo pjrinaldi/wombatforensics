@@ -101,9 +101,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
-    connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
+    connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
-    connect(cancelthread, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()), Qt::QueuedConnection);
+    connect(cancelthread, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()));
+    //connect(cancelthread, SIGNAL(ThreadCancelled()), this, SLOT(ThreadCancelled()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
@@ -529,7 +530,7 @@ void WombatForensics::InitializeCaseStructure()
         // make ext4 partition
         QString mkfsstr = "mkfs.ext4 -q -E root_owner=" + QString::number(getuid()) + ":" + QString::number(getgid()) + " ";
         mkfsstr += wombatvariable.casename;
-        qDebug() << mkfsstr;
+        //qDebug() << mkfsstr;
         QProcess::execute(mkfsstr);
         QString lnkstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
         QProcess::execute(lnkstr);
@@ -539,6 +540,7 @@ void WombatForensics::InitializeCaseStructure()
 
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
+        logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         msglog->clear();
         qInfo() << "Log File Created";
         //LogMessage("Log File Created");
@@ -594,6 +596,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     wombatvariable.iscaseopen = true;
     logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
+    logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     msglog->clear();
     InitializeCheckState();
     ui->actionAdd_Evidence->setEnabled(true);
@@ -1699,6 +1702,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     event->accept();
     msglog->clear();
     msgviewer->close();
+    logfile.close();
 }
 
 void WombatForensics::RemoveTmpFiles()
@@ -2257,6 +2261,11 @@ void WombatForensics::AutoSaveState()
     SaveState();
     StatusUpdate("Evidence ready");
     // change display text
+}
+
+void WombatForensics::ThreadCancelled()
+{
+    qInfo() << "Current Operation Cancelled";
 }
 
 SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCommandID, VTLPVOID pCommandData)

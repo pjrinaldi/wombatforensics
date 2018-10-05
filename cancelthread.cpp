@@ -25,10 +25,13 @@ void CancelThread::ShowCancelThread()
 }
 void CancelThread::StopThread()
 {
-    int ret = QMessageBox::question(this, tr("Cancel Current Processing"), tr("You currently processing evidence. Are you sure you want to cancel it?"), QMessageBox::Yes | QMessageBox::No);
+    /*
+    int ret = QMessageBox::question(this, tr("Cancel Current Processing"), tr("You are currently processing evidence. Are you sure you want to cancel it? There is no recovery method or restart method built!"), QMessageBox::Yes | QMessageBox::No);
     if(ret == QMessageBox::Yes)
-    {
-        emit CancelCurrentThread();
-        this->hide();
-    }
+    {*/
+    emit CancelCurrentThread();
+    //emit ThreadCancelled();
+    qInfo() << "Current Operation Cancelled.";
+    this->hide();
+    //}
 }

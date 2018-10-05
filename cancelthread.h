@@ -28,6 +28,7 @@ private slots:
 
 signals:
     void CancelCurrentThread();
+    void ThreadCancelled();
 private:
     Ui::CancelThread* ui;
 protected:
