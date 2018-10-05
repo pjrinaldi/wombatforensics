@@ -845,7 +845,6 @@ void WombatForensics::UpdateStatus()
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
     //ui->actionBookmark_Manager->setEnabled(true);
-    //cancelthread->close();
     qInfo() << "Processing Complete";
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
