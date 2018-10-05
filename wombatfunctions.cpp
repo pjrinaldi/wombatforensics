@@ -538,7 +538,7 @@ void GenerateThumbnails(QString thumbid)
     readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
     if(readimginfo == NULL)
     {
-        //qDebug() << tsk_error_get_errstr();
+        qDebug() << tsk_error_get_errstr();
         //LogMessage("Image opening error");
     }
     free(imagepartspath);

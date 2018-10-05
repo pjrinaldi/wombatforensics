@@ -33,7 +33,7 @@ void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
             //fprintf(stderr, "My Fatal: %s\n", localmsg.constData());
             break;
     }
-    msglog->append(QString(tmpstring + ": " + localmsg.constData()));
+    //msglog->append(QString(tmpstring + ": " + localmsg.constData()));
     logfile.write(ba);
     //logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
     //logfile.close();
