@@ -804,12 +804,13 @@ void WombatForensics::UpdateStatus()
     StatusUpdate("Preparing Evidence Image...");
     qInfo() << "Preparing Evidence Image...";
     //LogMessage("Preparing Evidence Image...");
-    PrepareEvidenceImage();
     StatusUpdate("Evidence Image Ready...");
     qInfo() << "Evidence Image Ready...";
     //LogMessage("Evidence Image Ready...");
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     StatusUpdate("Building Initial Evidence Tree...");
     qInfo() << "Building Initial Evidence Tree...";
+    PrepareEvidenceImage();
     //LogMessage("Building Initial Evidence Tree...");
     treefile.close();
     listeditems.clear();
@@ -851,6 +852,7 @@ void WombatForensics::UpdateStatus()
     qInfo() << "Processing Complete";
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
+    QApplication::restoreOverrideCursor();
 }
 
 void WombatForensics::UpdateDigging()
