@@ -10,17 +10,6 @@ void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     QByteArray ba;
     ba.clear();
     QString tmpstring = QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t"));
-    /* // IMPORTED LogMessage CODE
-    QByteArray ba;
-    ba.clear();
-    QString tmpstring = QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t"));
-    ba.append(tmpstring + "\t" + logmsg  +"\n");
-    msglog->append(QString(tmpstring + ": " + logmsg));
-    logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
-    logfile.write(ba);
-    logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
-    logfile.close();
-    */
     switch(type)
     {
         case QtDebugMsg:
@@ -44,7 +33,7 @@ void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
             //fprintf(stderr, "My Fatal: %s\n", localmsg.constData());
             break;
     }
-    //msglog->append(QString(tmpstring + ": " + localmsg.constData()));
+    msglog->append(QString(tmpstring + ": " + localmsg.constData()));
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     logfile.write(ba);
     //logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
