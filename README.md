@@ -8,7 +8,7 @@ If you've ever used AD Lab, you have experienced GUI freezes all over the place 
 
 Wombat Forensics is user oriented in its design. You can select an item or check multiple items. The program is multithreaded. The GUI is always responsive because resource intensive tasks are done on different threads. Large files will not slow down the application. The hex viewer was designed to load portions of a file at a time, therefore it is always fast to view and does not eat up RAM.
 
-I find it a waste of real estate to have a treeview in one frame and a table listing in another frame. Therefore I have combined the file structure treeview and the file information table into one view. To ensure the list never loads slow, I have implemented lazy loading which will only fetch children when the parent is expanded. The columns autoresize when data is loaded or when parents are expanded, ensuring the data can be read in the column without having to resize the columns manually.
+I find it a waste of real estate to have a treeview in one frame and a table listing in another frame. Therefore I have combined the file structure treeview and the file information table into one view. The columns autoresize when data is loaded or when parents are expanded, ensuring the data can be read in the column without having to resize the columns manually.
 
 I run timezone data in UTC for all features. I always prefer to work in UTC and then would like to have an option to automatically convert to a preferred timezone when generating the report.
 
