@@ -241,12 +241,14 @@ public:
         QIcon icon22;
         icon22.addFile(QStringLiteral(":/web"), QSize(), QIcon::Normal, QIcon::Off);
         actionHtmlViewer->setIcon(icon22);
+        actionHtmlViewer->setVisible(false);
         actionMediaViewer = new QAction(WombatForensics);
         actionMediaViewer->setObjectName(QStringLiteral("actionMediaViewer"));
         actionMediaViewer->setCheckable(true);
         QIcon icon23;
         icon23.addFile(QStringLiteral(":/vid"), QSize(), QIcon::Normal, QIcon::Off);
         actionMediaViewer->setIcon(icon23);
+        actionMediaViewer->setVisible(false);
         actionSettings = new QAction(WombatForensics);
         actionSettings->setObjectName(QStringLiteral("actionSettings"));
         QIcon icon24;

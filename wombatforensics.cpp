@@ -1621,10 +1621,12 @@ void WombatForensics::ProcessDig(QString objectid)
 
 void WombatForensics::UpdateDig()
 {
+    /*
     int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
     qInfo() << "Dug:" << QString::number(digcount) << "of" << QString::number(digfilelist.count()) << QString::number(curprogress) << "%";
     //LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
     StatusUpdate("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
+    */
 }
 void WombatForensics::UpdateExport()
 {

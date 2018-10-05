@@ -630,6 +630,9 @@
    <property name="toolTip">
     <string>HTML Viewer</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionMediaViewer">
    <property name="checkable">
@@ -644,6 +647,9 @@
    </property>
    <property name="toolTip">
     <string>Audio and Video Media Viewer</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionSettings">
