@@ -1500,7 +1500,7 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     QFuture<void> tmpfuture = QtConcurrent::map(exportlist, ProcessExport);
     exportwatcher.setFuture(tmpfuture);
     ui->actionCancel_Operation->setEnabled(true);
-    QToolTip::showText(cancelwidget->mapToGlobal(QPoint(0, 0)), "Cancel Currently Running Opreation");
+    //QToolTip::showText(cancelwidget->mapToGlobal(QPoint(0, 0)), "Cancel Currently Running Opreation");
     //cancelthread->show();
 }
 
@@ -1689,6 +1689,7 @@ void WombatForensics::mouseDoubleClickEvent(QMouseEvent* event)
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
+    logfile.close();
     if(wombatvariable.iscaseopen)
         CloseCurrentCase();
     
@@ -1712,7 +1713,6 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     event->accept();
     msglog->clear();
     msgviewer->close();
-    logfile.close();
 }
 
 void WombatForensics::RemoveTmpFiles()
@@ -1909,7 +1909,7 @@ void WombatForensics::StartThumbnails()
     thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
     thumbwatcher.setFuture(thumbfuture);
     ui->actionCancel_Operation->setEnabled(true);
-    QToolTip::showText(cancelwidget->mapToGlobal(QPoint(0, 0)), tr("Cancel Currently Running Opreation"), cancelwidget, QRect(0,0,1000,10), 5000);
+    //QToolTip::showText(cancelwidget->mapToGlobal(QPoint()), tr("Cancel Currently Running Opreation"));
     //cancelthread->show();
 }
 
