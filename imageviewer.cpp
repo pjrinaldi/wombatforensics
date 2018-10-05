@@ -60,7 +60,7 @@ void ImageWindow::GetImage(QString objectid)
     if(readimginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
-        LogMessage("Image opening error");
+        //LogMessage("Image opening error");
     }
     free(imagepartspath);
     tmpstr = "";

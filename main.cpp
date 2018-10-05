@@ -7,36 +7,58 @@
 void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QByteArray localmsg = msg.toLocal8Bit();
+    QByteArray ba;
+    ba.clear();
+    QString tmpstring = QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t"));
+    /* // IMPORTED LogMessage CODE
+    QByteArray ba;
+    ba.clear();
+    QString tmpstring = QDateTime::currentDateTime().toString(QString("MM/dd/yyyy hh:mm:ss t"));
+    ba.append(tmpstring + "\t" + logmsg  +"\n");
+    msglog->append(QString(tmpstring + ": " + logmsg));
+    logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
+    logfile.write(ba);
+    logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
+    logfile.close();
+    */
     switch(type)
     {
         case QtDebugMsg:
-            fprintf(stderr, "My Debug: %s\n", localmsg.constData());
+            ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
+            //fprintf(stderr, "My Debug: %s\n", localmsg.constData());
             break;
         case QtInfoMsg:
-            fprintf(stderr, "My Info: %s\n", localmsg.constData());
+            ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
+            //fprintf(stderr, "My Info: %s\n", localmsg.constData());
             break;
         case QtWarningMsg:
-            fprintf(stderr, "My Warning: %s\n", localmsg.constData());
+            ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
+            //fprintf(stderr, "My Warning: %s\n", localmsg.constData());
             break;
         case QtCriticalMsg:
-            fprintf(stderr, "My Critical: %s\n", localmsg.constData());
+            ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
+            //fprintf(stderr, "My Critical: %s\n", localmsg.constData());
             break;
         case QtFatalMsg:
-            fprintf(stderr, "My Fatal: %s\n", localmsg.constData());
+            ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
+            //fprintf(stderr, "My Fatal: %s\n", localmsg.constData());
             break;
     }
+    //msglog->append(QString(tmpstring + ": " + localmsg.constData()));
+    logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
+    logfile.write(ba);
+    //logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
+    logfile.close();
 }
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(MyMessageOutput);
     QApplication a(argc, argv);
     
-    //new Q_DebugStream(std::cout, ui->TXT_Console); // redirect console output to QTextEdit
-    //Q_DebugStream::registerQDebugMessageHandler(); // redirect qDebug() output to QTextEdit
     a.setWindowIcon(QIcon(":/appicon"));
-    a.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
+    //a.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
     WombatForensics w;
+    qInstallMessageHandler(MyMessageOutput);
     w.show();
     
     return a.exec();

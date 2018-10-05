@@ -17,7 +17,7 @@ std::string GetTime()
 
     return timeStr;
 }
-
+/*
 void LogMessage(QString logmsg)
 {
     QByteArray ba;
@@ -30,7 +30,7 @@ void LogMessage(QString logmsg)
     logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
     logfile.close();
 }
-
+*/
 char* TskTimeToStringUTC(time_t time, char buf[128])
 {
     buf[0] = '\0';
@@ -435,7 +435,7 @@ void ProcessExport(QString objectid)
     if(readimginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
-        LogMessage("Image opening error");
+        //LogMessage("Image opening error");
     }
     free(imagepartspath);
     tmpstr = "";
@@ -470,7 +470,8 @@ void ProcessExport(QString objectid)
             bool tmpdir = (new QDir())->mkpath(QString(tmppath + tmpname));
             if(!tmpdir)
             {
-                LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
+                qWarning() << "Creation of export directory tree for file:" << tmppath << "failed";
+                //LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
                 errorcount++;
             }
         }
@@ -538,7 +539,7 @@ void GenerateThumbnails(QString thumbid)
     if(readimginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
-        LogMessage("Image opening error");
+        //LogMessage("Image opening error");
     }
     free(imagepartspath);
     tmpstr = "";
@@ -606,7 +607,8 @@ void InitializeEvidenceStructure()
     readimginfo = tsk_img_open(wombatvariable.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
     if(readimginfo == NULL)
     {
-        LogMessage("Evidence Image acess failed");
+        qWarning() << "Evidence Image access failed";
+        //LogMessage("Evidence Image acess failed");
         errorcount++;
     }
     free(images);
@@ -667,7 +669,8 @@ void InitializeEvidenceStructure()
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
         if(walkreturn == 1)
         {
-            LogMessage("Issues with traversing the file structure were encountered");
+            qWarning() << "Issues with traversing the file structure were encountered";
+            //LogMessage("Issues with traversing the file structure were encountered");
             errorcount++;
         }
         WriteFileSystemProperties(readfsinfo);
@@ -704,7 +707,8 @@ void InitializeEvidenceStructure()
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
                         if(walkreturn == 1)
                         {
-                            LogMessage("Issues with traversing the file structure were encountered");
+                            qWarning() << "Issues with traversing the file structure were encountered";
+                            //LogMessage("Issues with traversing the file structure were encountered");
                             errorcount++;
                         }
                         WriteFileSystemProperties(readfsinfo);

@@ -102,7 +102,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
     if(tskptr->readimginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
-        LogMessage("Image opening error");
+        //LogMessage("Image opening error");
     }
     free(tskptr->imagepartspath);
     tmpstr = "";
