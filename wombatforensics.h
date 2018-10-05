@@ -660,6 +660,8 @@ private slots:
     void UpdateDigging(void);
     void FinishExport(void);
     void FinishThumbs(void);
+    void ReadXMountOut(void);
+    void ReadXMountErr(void);
     void StatusUpdate(QString tmptext)
     {
         statuslabel->setText(tmptext);
@@ -721,6 +723,8 @@ private:
     QFutureWatcher<void> thumbwatcher;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;
+
+    QProcess* xmntprocess;
 
     QFile casesfile;
     QFile casedatafile;
