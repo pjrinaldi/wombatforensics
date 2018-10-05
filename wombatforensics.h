@@ -609,6 +609,7 @@ public:
     SettingsDialog* settingsdialog;
 
 signals:
+    void CancelCurrentThread();
 
 private slots:
     void AddEvidence();
@@ -632,6 +633,7 @@ private slots:
     void on_actionCollapseAll_triggered();
     void on_actionAbout_triggered();
     void on_actionSettings_triggered();
+    void on_actionCancel_Operation_triggered();
     void UpdateProgress(unsigned long long count);
     void UpdateExport(void);
     void UpdateDig(void);
@@ -756,6 +758,7 @@ private:
     QTimer* autosavetimer;
     TreeNode* actionitem;
     QStringList listeditems;
+    QWidget* cancelwidget;
 
     // outside in variables
     SCCERR oiiniterr;

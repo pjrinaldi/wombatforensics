@@ -254,6 +254,8 @@
    <addaction name="actionExport_Evidence"/>
    <addaction name="separator"/>
    <addaction name="actionBookmark_Manager"/>
+   <addaction name="separator"/>
+   <addaction name="actionCancel_Operation"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
    <property name="styleSheet">
@@ -607,7 +609,7 @@
      <normaloff>:/bar/docsave</normaloff>:/bar/docsave</iconset>
    </property>
    <property name="text">
-    <string>SaveState</string>
+    <string>Save State</string>
    </property>
    <property name="toolTip">
     <string>Save State</string>
@@ -674,6 +676,21 @@
    </property>
    <property name="toolTip">
     <string>Bookmark Manager</string>
+   </property>
+  </action>
+  <action name="actionCancel_Operation">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/cancelthread</normaloff>:/cancelthread</iconset>
+   </property>
+   <property name="text">
+    <string>Cancel Operation</string>
+   </property>
+   <property name="toolTip">
+    <string>Cancel Currently Running Operation</string>
    </property>
   </action>
  </widget>

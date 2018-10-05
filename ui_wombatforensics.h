@@ -65,6 +65,7 @@ public:
     QAction *actionMediaViewer;
     QAction *actionSettings;
     QAction *actionBookmark_Manager;
+    QAction *actionCancel_Operation;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -259,6 +260,12 @@ public:
         QIcon icon25;
         icon25.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
         actionBookmark_Manager->setIcon(icon25);
+        actionCancel_Operation = new QAction(WombatForensics);
+        actionCancel_Operation->setObjectName(QStringLiteral("actionCancel_Operation"));
+        actionCancel_Operation->setEnabled(false);
+        QIcon icon26;
+        icon26.addFile(QStringLiteral(":/cancelthread"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCancel_Operation->setIcon(icon26);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -310,17 +317,17 @@ public:
         menuSettings->setObjectName(QStringLiteral("menuSettings"));
         menuAbout = new QMenu(mainMenubar);
         menuAbout->setObjectName(QStringLiteral("menuAbout"));
-        QIcon icon26;
-        icon26.addFile(QStringLiteral(":/bar/about"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAbout->setIcon(icon26);
+        QIcon icon27;
+        icon27.addFile(QStringLiteral(":/bar/about"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAbout->setIcon(icon27);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
         menuBookmark_Manager->setIcon(icon25);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon27;
-        icon27.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon27);
+        QIcon icon28;
+        icon28.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon28);
         menuView = new QMenu(mainMenubar);
         menuView->setObjectName(QStringLiteral("menuView"));
         menuView_With = new QMenu(menuView);
@@ -397,6 +404,8 @@ public:
         analysisToolBar->addAction(actionExport_Evidence);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionBookmark_Manager);
+        analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionCancel_Operation);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
@@ -488,7 +497,7 @@ public:
 #endif // QT_NO_TOOLTIP
         actionCheck->setText(QApplication::translate("WombatForensics", "(Un)Check", Q_NULLPTR));
         actionExport->setText(QApplication::translate("WombatForensics", "Export...", Q_NULLPTR));
-        actionSaveState->setText(QApplication::translate("WombatForensics", "SaveState", Q_NULLPTR));
+        actionSaveState->setText(QApplication::translate("WombatForensics", "Save State", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
         actionSaveState->setToolTip(QApplication::translate("WombatForensics", "Save State", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
@@ -510,6 +519,10 @@ public:
         actionBookmark_Manager->setText(QApplication::translate("WombatForensics", "Bookmark Manager", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
         actionBookmark_Manager->setToolTip(QApplication::translate("WombatForensics", "Bookmark Manager", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        actionCancel_Operation->setText(QApplication::translate("WombatForensics", "Cancel Operation", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionCancel_Operation->setToolTip(QApplication::translate("WombatForensics", "Cancel Currently Running Operation", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_TOOLTIP
         hexview->setToolTip(QString());

@@ -45,6 +45,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     if(bookbutton)
         connect(ui->actionBookmark_Manager, SIGNAL(triggered(bool)), bookbutton, SLOT(showMenu()));
     ui->actionBookmark_Manager->setMenu(bookmarkmenu);
+    cancelwidget = ui->analysisToolBar->widgetForAction(ui->actionCancel_Operation);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
@@ -66,7 +67,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
-    cancelthread = new CancelThread(this);
+    //cancelthread = new CancelThread(this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
@@ -101,9 +102,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
-    connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
+    connect(this, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
+    //connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
-    connect(cancelthread, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()));
+    connect(this, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()));
+    //connect(cancelthread, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()));
     //connect(cancelthread, SIGNAL(ThreadCancelled()), this, SLOT(ThreadCancelled()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
@@ -1466,7 +1469,8 @@ void WombatForensics::ExportEvidence()
 
 void WombatForensics::FinishExport()
 {
-    cancelthread->close();
+    ui->actionCancel_Operation->setEnabled(false);
+    //cancelthread->close();
     qInfo() << "Export Completed with" << QString::number(errorcount) << "error(s)";
     //LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
     StatusUpdate("Exporting completed with " + QString::number(errorcount) + "error(s)");
@@ -1495,7 +1499,9 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     // cancellable map
     QFuture<void> tmpfuture = QtConcurrent::map(exportlist, ProcessExport);
     exportwatcher.setFuture(tmpfuture);
-    cancelthread->show();
+    ui->actionCancel_Operation->setEnabled(true);
+    QToolTip::showText(cancelwidget->mapToGlobal(QPoint(0, 0)), "Cancel Currently Running Opreation");
+    //cancelthread->show();
 }
 
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
@@ -1698,7 +1704,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     //htmlviewer->close();
     byteviewer->close();
     aboutbox->close();
-    cancelthread->close();
+    //cancelthread->close();
     settingsdialog->close();
     if(oiiniterr == DAERR_OK)
         DADeInit();
@@ -1756,6 +1762,12 @@ void WombatForensics::on_actionSaveState_triggered()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     SaveState();
     QApplication::restoreOverrideCursor();
+}
+
+void WombatForensics::on_actionCancel_Operation_triggered()
+{
+    emit CancelCurrentThread();
+    ui->actionCancel_Operation->setEnabled(false);
 }
 
 void WombatForensics::on_actionCheck_triggered()
@@ -1896,12 +1908,15 @@ void WombatForensics::StartThumbnails()
     QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
     thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
     thumbwatcher.setFuture(thumbfuture);
-    cancelthread->show();
+    ui->actionCancel_Operation->setEnabled(true);
+    QToolTip::showText(cancelwidget->mapToGlobal(QPoint(0, 0)), tr("Cancel Currently Running Opreation"), cancelwidget, QRect(0,0,1000,10), 5000);
+    //cancelthread->show();
 }
 
 void WombatForensics::FinishThumbs()
 {
-    cancelthread->close();
+    ui->actionCancel_Operation->setEnabled(false);
+    //cancelthread->close();
     StatusUpdate("Thumbnail generation finished.");
     qInfo() << "Thumbnail generation finished";
     //LogMessage("Thumbnail generation finished.");

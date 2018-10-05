@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file alias="cancelthread">Resources/process-stop.svg</file>
     <file alias="outsidein">Resources/object-inverse.svg</file>
     <file alias="textencode">Resources/text-x-gettext-translation.svg</file>
     <file alias="ehex">Resources/text-x-makefile.svg</file>
