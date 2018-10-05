@@ -779,17 +779,16 @@ void WombatForensics::PrepareEvidenceImage()
     connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()));
     connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()));
     xmntprocess->start(xmntstr); // removes WARNING Messages but does not capture them..
-    //QProcess::execute(xmntstr);
 }
 
 void WombatForensics::ReadXMountOut()
 {
-    qWarning() << QString(xmntprocess->readAllStandardOutput());
+    qWarning() << xmntprocess->readAllStandardOutput();
 }
 
 void WombatForensics::ReadXMountErr()
 {
-    qWarning() << QString(xmntprocess->readAllStandardError());
+    qWarning() << xmntprocess->readAllStandardError();
 }
 
 void WombatForensics::UpdateStatus()
