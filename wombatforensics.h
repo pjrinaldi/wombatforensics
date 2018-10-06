@@ -22,7 +22,6 @@
 #include "byteconverter.h"
 #include "digdeeperdialog.h"
 #include "aboutbox.h"
-#include "cancelthread.h"
 #include "settingsdialog.h"
 #define UNIX
 #define UNIX_64
@@ -605,7 +604,6 @@ public:
     MessageViewer* msgviewer;
     ByteConverter* byteviewer;
     AboutBox* aboutbox;
-    CancelThread* cancelthread;
     SettingsDialog* settingsdialog;
 
 signals:
