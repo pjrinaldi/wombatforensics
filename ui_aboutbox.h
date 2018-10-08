@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'aboutbox.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.11.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,9 @@
 #define UI_ABOUTBOX_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QWidget>
@@ -79,8 +76,8 @@ public:
 
     void retranslateUi(QDialog *AboutBox)
     {
-        AboutBox->setWindowTitle(QApplication::translate("AboutBox", "About WombatForensics", Q_NULLPTR));
-        label->setText(QApplication::translate("AboutBox", "Loading...", Q_NULLPTR));
+        AboutBox->setWindowTitle(QApplication::translate("AboutBox", "About WombatForensics", nullptr));
+        label->setText(QApplication::translate("AboutBox", "Loading...", nullptr));
     } // retranslateUi
 
 };

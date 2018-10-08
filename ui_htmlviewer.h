@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'htmlviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.11.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,12 +11,9 @@
 
 #include <QtCore/QVariant>
 #include <QtWebEngineWidgets/QWebEngineView>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 
 QT_BEGIN_NAMESPACE
 
@@ -50,7 +47,7 @@ public:
 
     void retranslateUi(QDialog *HtmlViewer)
     {
-        HtmlViewer->setWindowTitle(QApplication::translate("HtmlViewer", "Html Viewer", Q_NULLPTR));
+        HtmlViewer->setWindowTitle(QApplication::translate("HtmlViewer", "Html Viewer", nullptr));
     } // retranslateUi
 
 };

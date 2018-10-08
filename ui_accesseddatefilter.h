@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'accesseddatefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.11.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_ACCESSEDDATEFILTER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
 
@@ -91,12 +88,12 @@ public:
 
     void retranslateUi(QWidget *AccessedDateFilter)
     {
-        AccessedDateFilter->setWindowTitle(QApplication::translate("AccessedDateFilter", "Filter", Q_NULLPTR));
-        lesscheckBox->setText(QApplication::translate("AccessedDateFilter", "Show Items with date <", Q_NULLPTR));
-        lessdateTimeEdit->setDisplayFormat(QApplication::translate("AccessedDateFilter", "MM/dd/yyyy HH:mm:ss", Q_NULLPTR));
-        moredateTimeEdit->setDisplayFormat(QApplication::translate("AccessedDateFilter", "MM/dd/yyyy HH:mm:ss", Q_NULLPTR));
-        morecheckBox->setText(QApplication::translate("AccessedDateFilter", "Show Items with date >", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("AccessedDateFilter", "Apply", Q_NULLPTR));
+        AccessedDateFilter->setWindowTitle(QApplication::translate("AccessedDateFilter", "Filter", nullptr));
+        lesscheckBox->setText(QApplication::translate("AccessedDateFilter", "Show Items with date <", nullptr));
+        lessdateTimeEdit->setDisplayFormat(QApplication::translate("AccessedDateFilter", "MM/dd/yyyy HH:mm:ss", nullptr));
+        moredateTimeEdit->setDisplayFormat(QApplication::translate("AccessedDateFilter", "MM/dd/yyyy HH:mm:ss", nullptr));
+        morecheckBox->setText(QApplication::translate("AccessedDateFilter", "Show Items with date >", nullptr));
+        pushButton->setText(QApplication::translate("AccessedDateFilter", "Apply", nullptr));
     } // retranslateUi
 
 };

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'analysistypefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.11.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_ANALYSISTYPEFILTER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -60,8 +57,8 @@ public:
 
     void retranslateUi(QWidget *analysistypefilter)
     {
-        analysistypefilter->setWindowTitle(QApplication::translate("analysistypefilter", "Filter", Q_NULLPTR));
-        checkBox->setText(QApplication::translate("analysistypefilter", "Show Items where analysis type matches", Q_NULLPTR));
+        analysistypefilter->setWindowTitle(QApplication::translate("analysistypefilter", "Filter", nullptr));
+        checkBox->setText(QApplication::translate("analysistypefilter", "Show Items where analysis type matches", nullptr));
         comboBox->setCurrentText(QString());
     } // retranslateUi
 

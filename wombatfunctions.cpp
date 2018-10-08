@@ -280,6 +280,11 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     filebuf.open(QIODevice::ReadOnly);
     QCryptographicHash hash(QCryptographicHash::Md5);
     if(hash.addData(&filebuf))
+        qDebug() << "qthash:" << QString(hash.result().toHex()).toUpper();
+    filebuf.close();
+    */
+    /*
+    if(hash.addData(&filebuf))
         outstring += "," + QString(hash.result().toHex()).toUpper();
     else
         outstring += ",0";

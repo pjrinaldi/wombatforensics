@@ -35,6 +35,7 @@ void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     }
     //msglog->append(QString(tmpstring + ": " + localmsg.constData()));
     logfile.write(ba);
+    logfile.flush();
     //logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
     //logfile.close();
 }

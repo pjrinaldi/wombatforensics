@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'imagewindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.11.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,9 @@
 #define UI_IMAGEWINDOW_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QWidget>
@@ -75,8 +72,8 @@ public:
 
     void retranslateUi(QDialog *ImageWindow)
     {
-        ImageWindow->setWindowTitle(QApplication::translate("ImageWindow", "View Image", Q_NULLPTR));
-        label->setText(QApplication::translate("ImageWindow", "Loading...", Q_NULLPTR));
+        ImageWindow->setWindowTitle(QApplication::translate("ImageWindow", "View Image", nullptr));
+        label->setText(QApplication::translate("ImageWindow", "Loading...", nullptr));
     } // retranslateUi
 
 };

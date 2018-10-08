@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'sizefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.11.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,9 @@
 #define UI_SIZEFILTER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QWidget>
@@ -89,10 +86,10 @@ public:
 
     void retranslateUi(QWidget *SizeFilter)
     {
-        SizeFilter->setWindowTitle(QApplication::translate("SizeFilter", "Filter", Q_NULLPTR));
-        morecheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size >", Q_NULLPTR));
-        lesscheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size < ", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("SizeFilter", "Apply", Q_NULLPTR));
+        SizeFilter->setWindowTitle(QApplication::translate("SizeFilter", "Filter", nullptr));
+        morecheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size >", nullptr));
+        lesscheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size < ", nullptr));
+        pushButton->setText(QApplication::translate("SizeFilter", "Apply", nullptr));
     } // retranslateUi
 
 };

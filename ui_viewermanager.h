@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'viewermanager.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.11.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_VIEWERMANAGER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
@@ -127,12 +124,12 @@ public:
 
     void retranslateUi(QDialog *ViewerManager)
     {
-        ViewerManager->setWindowTitle(QApplication::translate("ViewerManager", "Viewer Manager", Q_NULLPTR));
-        label->setText(QApplication::translate("ViewerManager", "Path To Viewer:", Q_NULLPTR));
-        browsebutton->setText(QApplication::translate("ViewerManager", "Browse", Q_NULLPTR));
-        addbutton->setText(QApplication::translate("ViewerManager", "Add", Q_NULLPTR));
-        label_2->setText(QApplication::translate("ViewerManager", "Existing Viewers", Q_NULLPTR));
-        removebutton->setText(QApplication::translate("ViewerManager", "Remove Selected", Q_NULLPTR));
+        ViewerManager->setWindowTitle(QApplication::translate("ViewerManager", "Viewer Manager", nullptr));
+        label->setText(QApplication::translate("ViewerManager", "Path To Viewer:", nullptr));
+        browsebutton->setText(QApplication::translate("ViewerManager", "Browse", nullptr));
+        addbutton->setText(QApplication::translate("ViewerManager", "Add", nullptr));
+        label_2->setText(QApplication::translate("ViewerManager", "Existing Viewers", nullptr));
+        removebutton->setText(QApplication::translate("ViewerManager", "Remove Selected", nullptr));
     } // retranslateUi
 
 };

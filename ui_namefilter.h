@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'namefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.11.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,9 @@
 #define UI_NAMEFILTER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
@@ -73,10 +70,10 @@ public:
 
     void retranslateUi(QWidget *NameFilter)
     {
-        NameFilter->setWindowTitle(QApplication::translate("NameFilter", "Filter", Q_NULLPTR));
-        checkBox->setText(QApplication::translate("NameFilter", "Show Items where name contains", Q_NULLPTR));
+        NameFilter->setWindowTitle(QApplication::translate("NameFilter", "Filter", nullptr));
+        checkBox->setText(QApplication::translate("NameFilter", "Show Items where name contains", nullptr));
         lineEdit->setPlaceholderText(QString());
-        pushButton->setText(QApplication::translate("NameFilter", "Apply", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("NameFilter", "Apply", nullptr));
     } // retranslateUi
 
 };
