@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     a.setWindowIcon(QIcon(":/appicon"));
     //a.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
     WombatForensics w;
-    qInstallMessageHandler(MyMessageOutput);
+    //qInstallMessageHandler(MyMessageOutput); // comment out to view debug statements in terminal
     w.show();
     
     return a.exec();

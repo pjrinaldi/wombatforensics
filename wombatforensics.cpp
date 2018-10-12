@@ -548,6 +548,7 @@ void WombatForensics::InitializeCaseStructure()
         qInfo() << "Log File Created";
         //LogMessage("Log File Created");
         treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
+        //treefile.open(QIODevice::Append | QIODevice::Text);
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
@@ -817,6 +818,7 @@ void WombatForensics::UpdateStatus()
     //LogMessage("Building Initial Evidence Tree...");
     treefile.close();
     listeditems.clear();
+    treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     QStringList tmplist = QString(treefile.readAll()).split("\n");
     treefile.reset();
@@ -1393,8 +1395,9 @@ void WombatForensics::RemEvidence()
     /*
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
+    */
     treefile.close();
-    treefile.open(QIODevice::WriteOnly | QIODevice::Text);
+    /*treefile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream treeout(&treefile);
     for(int i=0; i < tmplist.count(); i++)
     {

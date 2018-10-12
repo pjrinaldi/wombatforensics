@@ -300,6 +300,8 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     QFile filefile;
     QTextStream out(&filefile);
     QTextStream treeout(&treefile);
+    //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
+    //treefile.open(QIODevice::Append | QIODevice::Text);
     if(tmpfile->name != NULL)
     {
         if(strcmp(tmpfile->name->name, ".") != 0)
@@ -310,6 +312,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     filefile.open(QIODevice::Append | QIODevice::Text);
                     out << outstring;
                     treeout << treestring << endl;
+                    treeout.flush();
             }
         }
     }
@@ -320,8 +323,10 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         out << outstring;
         out.flush();
         treeout << treestring << endl;
+        treeout.flush();
     }
     filefile.close();
+    //treefile.close();
     if(tmpfile->name != NULL)
     {
         if(!TSK_FS_ISDOT(tmpfile->name->name))
@@ -396,6 +401,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                 adsout.flush();
                                 adsfile.close();
                                 treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << adsba.toBase64() << "," << ba2.toBase64() <<  "," << fsattr->size << ",0,0,0,0,0,0,0,10,0" << endl; 
+                                treeout.flush();
                                 //treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << adsba.toBase64() << "," << ba2.toBase64() <<  "," << fsattr->size << ",0,0,0,0,0,0,0,10,0" << endl; 
                                 filesfound++;
                                 isignals->ProgUpd();
@@ -657,6 +663,8 @@ void InitializeEvidenceStructure()
     out.flush();
     volfile.close();
     treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) << "," << volname << "," << "0," << QString::number(readimginfo->size) << ",0,0,0,0,0,0,0" << endl;
+    treeout.flush();
+    treefile.close();
     if(readvsinfo != NULL)
         WriteVolumeProperties(readvsinfo);
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
@@ -668,7 +676,12 @@ void InitializeEvidenceStructure()
         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
         out.flush();
         pfile.close();
+        treefile.open(QIODevice::Append | QIODevice::Text);
         treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
+        treeout.flush();
+        treefile.close();
+        treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
+        treefile.open(QIODevice::Append | QIODevice::Text);
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
@@ -685,11 +698,14 @@ void InitializeEvidenceStructure()
         QFile pfile;
         if(readvsinfo->part_count > 0)
         {
+            qDebug() << "readvsinfo->part_count:" << readvsinfo->part_count;
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
+                //partint = i;
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
                 pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + QString::number(partint));
                 pfile.open(QIODevice::Append | QIODevice::Text);
+                treefile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
                 {
@@ -697,6 +713,8 @@ void InitializeEvidenceStructure()
                     out.flush();
                     pfile.close();
                     treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << QString(readpartinfo->desc) << ",0," << QString::number(readpartinfo->len * readvsinfo->block_size) << ",0,0,0,0,0,0,0" << endl;
+                    treeout.flush();
+                    treefile.close();
                 }
                 else if(readpartinfo->flags == 0x01) // allocated partition
                 {
@@ -707,6 +725,10 @@ void InitializeEvidenceStructure()
                         out.flush();
                         pfile.close();
                         treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
+                        treeout.flush();
+                        treefile.close();
+                        treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
+                        treefile.open(QIODevice::Append | QIODevice::Text);
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
