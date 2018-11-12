@@ -425,7 +425,10 @@ void BuildTreeFile(TSK_FS_FILE* tmpfile)
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     if(tmpptr){}
-    wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
+    if(tmpfile->meta != NULL)
+        wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
+    else if(tmpfile->name != NULL)
+        wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
     BuildStatFile(tmpfile, tmppath);
     //BuildTreeFile(tmpfile);
@@ -433,20 +436,26 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     //BuildPropFile(tmpfile);
     //if(tmpfile->meta->type == TSK_FS_META_TYPE_DIR || tmpfile->meta->type == TSK_FS_META_TYPE_VIRT_DIR) // (4.3)
         //if(!TSK_FS_ISDOT(tmpfile->name->name))
-    if(tmpfile->meta->type == TSK_FS_META_TYPE_DIR && !TSK_FS_ISDOT(tmpfile->name->name)) // (4.2)
+    if(tmpfile->name != NULL)
     {
-        qDebug() << tmpfile->name->name << "it's a dir, kick off it's dirwalk...";
-        uint8_t walkreturn;
-        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
-        walkreturn = tsk_fs_dir_walk(readfsinfo, tmpfile->meta->addr, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+        if(tmpfile->name->type == TSK_FS_NAME_TYPE_DIR && !TSK_FS_ISDOT(tmpfile->name->name)) // (4.2)
+        {
+            //qDebug() << tmpfile->name->name << "it's a dir, kick off it's dirwalk...";
+            uint8_t walkreturn;
+            int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
+            walkreturn = tsk_fs_dir_walk(readfsinfo, tmpfile->name->meta_addr, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+        }
+        return TSK_WALK_CONT;
     }
-    return TSK_WALK_CONT;
 }
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     if(tmpptr){}
-    wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
+    if(tmpfile->meta != NULL)
+        wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
+    else if(tmpfile->name != NULL)
+        wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
     /*
     QString outstring = "";
@@ -671,14 +680,17 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             }
         }
     }*/
-    if(tmpfile->meta->type == TSK_FS_META_TYPE_DIR && !TSK_FS_ISDOT(tmpfile->name->name)) // (4.2)
+    if(tmpfile->name != NULL)
     {
-        qDebug() << tmpfile->name->name << "it's a dir, kick off it's dirwalk...";
-        uint8_t walkreturn;
-        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
-        walkreturn = tsk_fs_dir_walk(readfsinfo, tmpfile->meta->addr, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+        if(tmpfile->name->type == TSK_FS_NAME_TYPE_DIR && !TSK_FS_ISDOT(tmpfile->name->name)) // (4.2)
+        {
+            //qDebug() << tmpfile->name->name << "it's a dir, kick off it's dirwalk...";
+            uint8_t walkreturn;
+            int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
+            walkreturn = tsk_fs_dir_walk(readfsinfo, tmpfile->name->meta_addr, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+        }
+        return TSK_WALK_CONT;
     }
-    return TSK_WALK_CONT;
 }
 
 void ProcessExport(QString objectid)
@@ -1136,7 +1148,7 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
     QFile adspropfile;
     if(curfileinfo->name != NULL)
     {
-        adspropfile.setFileName(wombatvariable.curfilepath + fvalue + "-prop");
+        adspropfile.setFileName(wombatvariable.curfilepath + attrid + "-prop");
         //adspropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + fvalue + ".prop");
         adspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream proplist(&adspropfile);
