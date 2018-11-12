@@ -1012,7 +1012,8 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
     char asc[512];
     char asc128[129];
     char timebuf[128];
-    QFile fspropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".partprop.p" + QString::number(partint));
+    QFile fspropfile(wombatvariable.partitionpath + "prop");
+    //QFile fspropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".partprop.p" + QString::number(partint));
     fspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream proplist(&fspropfile);
     if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || curfsinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
@@ -1663,7 +1664,8 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
 
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo)
 {
-    QFile vpropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".volprop");
+    QFile vpropfile(wombatvariable.volumepath + "prop");
+    //QFile vpropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".volprop");
     vpropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream proplist(&vpropfile);
     mac_part* macpart = NULL;
@@ -1827,7 +1829,8 @@ void WriteVolumeProperties(TSK_VS_INFO* curvolinfo)
 
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
 {
-    QFile epropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".eprop." + QString::number(evidcnt));
+    QFile epropfile(wombatvariable.evidencepath + "prop");
+    //QFile epropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".eprop." + QString::number(evidcnt));
     epropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream proplist(&epropfile);
     IMG_EWF_INFO* ewfinfo = NULL;
