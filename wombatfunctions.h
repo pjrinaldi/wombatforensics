@@ -14,6 +14,7 @@ unsigned long long GetChildCount(QString filefilter);
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
+TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 void GenerateThumbnails(QString thumbid);
 void LoadImagesHash(void);
 QString GetBlockList(TSK_FS_FILE* tmpfile);

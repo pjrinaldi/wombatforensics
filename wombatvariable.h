@@ -14,6 +14,10 @@ struct WombatVariable
     QString imgdatapath;
     QString curerrmsg;
     QString evidencename;
+    QString evidencepath;
+    QString volumepath;
+    QString partitionpath;
+    QString curfilepath;
     std::vector<std::string> fullpathvector;
     unsigned long long itemcount;
     QString casename;

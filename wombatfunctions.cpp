@@ -626,6 +626,9 @@ void InitializeEvidenceStructure()
     wombatvariable.imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
     //wombatvariable.segmentcount = readimginfo->num_img; // number of segments for xmount call (TSK 4.3)
     wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
+    QDir eviddir(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + QString::number(evidcnt));
+    if(!eviddir.exists())
+        eviddir.mkpath(".");
     QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + QString::number(evidcnt));
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);
