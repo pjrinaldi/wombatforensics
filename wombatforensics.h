@@ -503,7 +503,8 @@ private:
                 fpar = columnstrings.at(0).split("-").at(4).mid(1).toULongLong();
                 curid = columnstrings.at(0);
                 parid = columnstrings.at(0).split("-f").at(0);
-                QFile rootinumfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + columnstrings.at(0).split("-").at(2).mid(1));
+                QFile rootinumfile(wombatvariable.volumepath + wombatvariable.evidencename + ".part." + columnstrings.at(0).split("-").at(2).mid(1) + "/stat");
+                //QFile rootinumfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + columnstrings.at(0).split("-").at(2).mid(1));
                 rootinumfile.open(QIODevice::ReadOnly);
                 unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
                 rootinumfile.close();
