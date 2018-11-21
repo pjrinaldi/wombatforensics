@@ -883,6 +883,8 @@ void WombatForensics::AddEvidence()
             wombatvariable.itemcount = tmplist.count();
             qInfo() << "Start Adding Evidence";
             //LogMessage("Start Adding Evidence");
+            //InitializeEvidenceStructure();
+            //UpdateStatus();
             QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
             sqlwatcher.setFuture(tmpfuture);
         }
