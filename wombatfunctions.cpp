@@ -403,7 +403,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
                                 //adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 adsout.flush();
                                 adsfile.close();
-                                qDebug() << "BuildStatFile: adsfile: close";
+                                qDebug() << QString::number(tmpfile->meta->addr) << "BuildStatFile: adsfile: close";
                                 treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << adsba.toBase64() << "," << ba2.toBase64() <<  "," << fsattr->size << ",0,0,0,0,0,0,0,10,0" << endl; 
                                 treeout.flush();
                                 //treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << adsba.toBase64() << "," << ba2.toBase64() <<  "," << fsattr->size << ",0,0,0,0,0,0,0,10,0" << endl; 
@@ -449,10 +449,18 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             uint8_t walkreturn;
             int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
             walkreturn = tsk_fs_dir_walk(readfsinfo, tmpfile->name->meta_addr, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+            if(walkreturn == 1)
+            {
+                qWarning() << "Issues with traversing the file structure were encountered";
+                //LogMessage("Issues with traversing the file structure were encountered");
+                errorcount++;
+            }
         }
         return TSK_WALK_CONT;
     }
-    return TSK_WALK_CONT;
+    else
+        return TSK_WALK_CONT;
+    //return TSK_WALK_CONT;
 }
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
@@ -694,10 +702,18 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             uint8_t walkreturn;
             int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
             walkreturn = tsk_fs_dir_walk(readfsinfo, tmpfile->name->meta_addr, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
+            if(walkreturn == 1)
+            {
+                qWarning() << "Issues with traversing the file structure were encountered";
+                //LogMessage("Issues with traversing the file structure were encountered");
+                errorcount++;
+            }
         }
         return TSK_WALK_CONT;
     }
-    return TSK_WALK_CONT;
+    else
+        return TSK_WALK_CONT;
+    //return TSK_WALK_CONT;
 }
 
 void ProcessExport(QString objectid)
@@ -1263,7 +1279,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
         proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
     proplist.flush();
     filepropfile.close();
-    qDebug() << "filepropfile: close";
+    qDebug() << wombatvariable.curfilepath << "filepropfile: close";
 }
 
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
