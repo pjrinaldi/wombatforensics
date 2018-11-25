@@ -308,7 +308,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
                     filefile.setFileName(wombatvariable.curfilepath + "stat");
                     //filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->name->meta_addr) + ".a" + QString::number(tmpfile->name->par_addr));
                     filefile.open(QIODevice::Append | QIODevice::Text);
-                    qDebug() << QString::number(tmpfile->name->meta_addr) << "Build Stat File: file file: open: name";
+                    //qDebug() << QString::number(tmpfile->name->meta_addr) << "Build Stat File: file file: open: name";
                     out << outstring;
                     treeout << treestring << endl;
                     treeout.flush();
@@ -320,14 +320,17 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         filefile.setFileName(wombatvariable.curfilepath + "stat");
         //filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".a" + QString::number(tmpfile->name->par_addr));
         filefile.open(QIODevice::Append | QIODevice::Text);
-        qDebug() << QString::number(tmpfile->meta->addr) << "Build Stat File: file file open: meta";
+        //qDebug() << QString::number(tmpfile->meta->addr) << "Build Stat File: file file open: meta";
         out << outstring;
         out.flush();
         treeout << treestring << endl;
         treeout.flush();
     }
-    filefile.close();
-    qDebug() << wombatvariable.curfilepath << "Build Stat File: file file close";
+    if(filefile.isOpen())
+    {
+        filefile.close();
+        //qDebug() << wombatvariable.curfilepath << "Build Stat File: file file close";
+    }
     //treefile.close();
     if(tmpfile->name != NULL)
     {
@@ -396,14 +399,17 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
                                 QFile adsfile(wombatvariable.curfilepath + QString::number(fsattr->id) + "-stat");
                                 //QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->name->meta_addr) + "-" + QString::number(fsattr->id) + ".a" + QString::number(tmpfile->name->meta_addr));
                                 adsfile.open(QIODevice::Append | QIODevice::Text);
-                                qDebug() << QString::number(tmpfile->meta->addr) << "BuildStatFile: adsfile: open";
+                                //qDebug() << QString::number(tmpfile->meta->addr) << "BuildStatFile: adsfile: open";
                                 QTextStream adsout(&adsfile);
                                 adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
                                 adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 //adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 adsout.flush();
-                                adsfile.close();
-                                qDebug() << QString::number(tmpfile->meta->addr) << "BuildStatFile: adsfile: close";
+                                if(adsfile.isOpen())
+                                {
+                                    adsfile.close();
+                                    //qDebug() << QString::number(tmpfile->meta->addr) << "BuildStatFile: adsfile: close";
+                                }
                                 treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << adsba.toBase64() << "," << ba2.toBase64() <<  "," << fsattr->size << ",0,0,0,0,0,0,0,10,0" << endl; 
                                 treeout.flush();
                                 //treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << "," << adsba.toBase64() << "," << ba2.toBase64() <<  "," << fsattr->size << ",0,0,0,0,0,0,0,10,0" << endl; 
@@ -429,11 +435,22 @@ void BuildTreeFile(TSK_FS_FILE* tmpfile)
 
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    unsigned long long tmpaddress = 0;
+    int numdigits = 0;
     if(tmpptr){}
     if(tmpfile->meta != NULL)
-        wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
-    else if(tmpfile->name != NULL)
-        wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
+        tmpaddress = tmpfile->meta->addr;
+        //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
+    if(tmpfile->name != NULL)
+        tmpaddress = tmpfile->name->meta_addr;
+        //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
+        //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + ".null" + "/";
+    while(tmpaddress > 0)
+    {
+        tmpaddress = tmpaddress/10;
+        numdigits++;
+    }
+    wombatvariable.curfilepath = wombatvariable.partitionpath + QString::number(numdigits) + "/.f" + QString::number(tmpaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
     BuildStatFile(tmpfile, tmppath);
     //BuildTreeFile(tmpfile);
@@ -465,11 +482,21 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    unsigned long long tmpaddress = 0;
+    int numdigits = 0;
     if(tmpptr){}
     if(tmpfile->meta != NULL)
-        wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
-    else if(tmpfile->name != NULL)
-        wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
+        tmpaddress = tmpfile->meta->addr;
+        //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
+    if(tmpfile->name != NULL)
+        tmpaddress = tmpfile->name->meta_addr;
+        //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
+    while(tmpaddress > 0)
+    {
+        tmpaddress = tmpaddress/10;
+        numdigits++;
+    }
+    wombatvariable.curfilepath = wombatvariable.partitionpath + QString::number(numdigits) + "/.f" + QString::number(tmpaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
     /*
     QString outstring = "";
@@ -736,7 +763,8 @@ void ProcessExport(QString objectid)
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
     int partcount = tmpstr.split(",").at(3).split("|").size();
-    evidfile.close();
+    if(evidfile.isOpen())
+        evidfile.close();
     for(int i=0; i < partcount; i++)
         pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
     imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
@@ -754,7 +782,8 @@ void ProcessExport(QString objectid)
     QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();
-    partfile.close();
+    if(partfile.isOpen())
+        partfile.close();
     readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
     if(readfileinfo->meta != NULL)
@@ -765,7 +794,10 @@ void ProcessExport(QString objectid)
         QFile filefile(wombatvariable.tmpmntpath + filefiles.at(0));
         filefile.open(QIODevice::ReadOnly);
         tmpstr = filefile.readLine();
-        filefile.close();
+        if(filefile.isOpen())
+        {
+            filefile.close();
+        }
         QString tmppath = "";
         QByteArray ba;
         QByteArray ba2;
@@ -796,7 +828,8 @@ void ProcessExport(QString objectid)
                 {
                     QDataStream outbuffer(&tmpfile);
                     outbuffer.writeRawData(imgbuf, imglen);
-                    tmpfile.close();
+                    if(tmpfile.isOpen())
+                        tmpfile.close();
                 }
             }
         }
@@ -1213,8 +1246,11 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
             }
         }
         proplist.flush();
-        adspropfile.close();
-        qDebug() << "adspropfile: close";
+        if(adspropfile.isOpen())
+        {
+            adspropfile.close();
+            qDebug() << "adspropfile: close";
+        }
     }
 }
 
@@ -1229,7 +1265,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
         filepropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(curfileinfo->name->meta_addr) + ".prop");
     */
     filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
-    qDebug() << wombatvariable.curfilepath << "filepropfile: open";
+    //qDebug() << wombatvariable.curfilepath << "filepropfile: open";
     QTextStream proplist(&filepropfile);
     if(curfileinfo->name != NULL) proplist << "Short Name||" << curfileinfo->name->shrt_name << "||Short Name for a file" << endl;
     if(curfileinfo->meta != NULL)
@@ -1278,8 +1314,11 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
     else
         proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
     proplist.flush();
-    filepropfile.close();
-    qDebug() << wombatvariable.curfilepath << "filepropfile: close";
+    if(filepropfile.isOpen())
+    {
+        filepropfile.close();
+        //qDebug() << wombatvariable.curfilepath << "filepropfile: close";
+    }
 }
 
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
