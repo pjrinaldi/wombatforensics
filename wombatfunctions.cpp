@@ -436,21 +436,28 @@ void BuildTreeFile(TSK_FS_FILE* tmpfile)
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     unsigned long long tmpaddress = 0;
+    unsigned long long calcaddress = 0;
     int numdigits = 0;
     if(tmpptr){}
     if(tmpfile->meta != NULL)
+    {
+        calcaddress = tmpfile->meta->addr;
         tmpaddress = tmpfile->meta->addr;
         //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
-    if(tmpfile->name != NULL)
+    }
+    else if(tmpfile->name != NULL)
+    {
         tmpaddress = tmpfile->name->meta_addr;
+        calcaddress = tmpfile->name->meta_addr;
         //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
         //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + ".null" + "/";
+    }
     while(tmpaddress > 0)
     {
         tmpaddress = tmpaddress/10;
         numdigits++;
     }
-    wombatvariable.curfilepath = wombatvariable.partitionpath + QString::number(numdigits) + "/.f" + QString::number(tmpaddress) + "/";
+    wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
     BuildStatFile(tmpfile, tmppath);
     //BuildTreeFile(tmpfile);
@@ -483,20 +490,27 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     unsigned long long tmpaddress = 0;
+    unsigned long long calcaddress = 0;
     int numdigits = 0;
     if(tmpptr){}
     if(tmpfile->meta != NULL)
+    {
         tmpaddress = tmpfile->meta->addr;
+        calcaddress = tmpfile->meta->addr;
         //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
-    if(tmpfile->name != NULL)
+    }
+    else if(tmpfile->name != NULL)
+    {
         tmpaddress = tmpfile->name->meta_addr;
+        calcaddress = tmpfile->name->meta_addr;
         //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
+    }
     while(tmpaddress > 0)
     {
         tmpaddress = tmpaddress/10;
         numdigits++;
     }
-    wombatvariable.curfilepath = wombatvariable.partitionpath + QString::number(numdigits) + "/.f" + QString::number(tmpaddress) + "/";
+    wombatvariable.curfilepath = wombatvariable.partitionpath + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
     /*
     QString outstring = "";
@@ -1216,7 +1230,7 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
         adspropfile.setFileName(wombatvariable.curfilepath + attrid + "-prop");
         //adspropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + fvalue + ".prop");
         adspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
-        qDebug() << "adspropfile: open";
+        //qDebug() << "adspropfile: open";
         QTextStream proplist(&adspropfile);
         proplist << "Alternate Data Stream (ADS)||" << QString::fromStdString(std::string(curfileinfo->name->name)) << "||Alternate data stream which contains different content from what the file's standard content is." << endl;
         proplist << "Name||" << adsname << "||Name for the NTFS parent file additional $Data attribute" << endl;
@@ -1249,7 +1263,7 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
         if(adspropfile.isOpen())
         {
             adspropfile.close();
-            qDebug() << "adspropfile: close";
+            //qDebug() << "adspropfile: close";
         }
     }
 }
