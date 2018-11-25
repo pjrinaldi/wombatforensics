@@ -476,6 +476,7 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             if(walkreturn == 1)
             {
                 qWarning() << "Issues with traversing the file structure were encountered";
+		qWarning() << QString(tsk_error_get());
                 //LogMessage("Issues with traversing the file structure were encountered");
                 errorcount++;
             }
@@ -746,6 +747,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             if(walkreturn == 1)
             {
                 qWarning() << "Issues with traversing the file structure were encountered";
+		qWarning() << QString(tsk_error_get());
                 //LogMessage("Issues with traversing the file structure were encountered");
                 errorcount++;
             }
