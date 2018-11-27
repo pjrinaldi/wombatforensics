@@ -467,6 +467,7 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         numdigits++;
     }
     */
+    // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
     wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(tmpaddress).right(2) + "/.f" + QString::number(tmpaddress) + "/";
     //wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
@@ -524,6 +525,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         numdigits++;
     }
     */
+    // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
     wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(tmpaddress).right(2) + "/.f" + QString::number(tmpaddress) + "/";
     //wombatvariable.curfilepath = wombatvariable.partitionpath + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
@@ -1064,6 +1066,7 @@ void InitializeEvidenceStructure()
         treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
         treefile.open(QIODevice::Append | QIODevice::Text);
         uint8_t walkreturn;
+        // SINCE IT ISN'T CONCURRENT WHETHER I BREAK IT OUT OR NOT, I WILL PROBABLY GO BACK TO RECURSIVE SINGLE WALK...
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
         //int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
@@ -1286,6 +1289,7 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
 
 void WriteFileProperties(TSK_FS_FILE* curfileinfo)
 {
+    // NEED TO IMPLEMENT OFSTREAM FOR FILE PROPERTIES   
     //ofstream filepropfile;
     //ofstream.open(QString(wombatvariable.curfilepath + "prop").toStdString());
     QFile filepropfile;
