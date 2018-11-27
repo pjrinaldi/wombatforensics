@@ -423,6 +423,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
             }
         }
     }
+    //filefile.~QFile();
 }
 
 void BuildPropFile(TSK_FS_FILE* tmpfile)
