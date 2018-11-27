@@ -468,7 +468,7 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     */
     // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
-    wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(tmpaddress).right(2) + "/.f" + QString::number(tmpaddress) + "/";
+    wombatvariable.curfilepath = wombatvariable.partitionpath + "/.f" + QString::number(tmpaddress) + "/";
     //wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
     BuildStatFile(tmpfile, tmppath);
@@ -477,6 +477,11 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     //BuildPropFile(tmpfile);
     //if(tmpfile->meta->type == TSK_FS_META_TYPE_DIR || tmpfile->meta->type == TSK_FS_META_TYPE_VIRT_DIR) // (4.3)
         //if(!TSK_FS_ISDOT(tmpfile->name->name))
+    /*
+     *
+     *
+     *
+     *
     if(tmpfile->name != NULL)
     {
         if(tmpfile->name->type == TSK_FS_NAME_TYPE_DIR && !TSK_FS_ISDOT(tmpfile->name->name)) // (4.2)
@@ -498,6 +503,8 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     else
         return TSK_WALK_CONT;
     //return TSK_WALK_CONT;
+    */
+    return TSK_WALK_CONT;
 }
 
 TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
@@ -1067,8 +1074,8 @@ void InitializeEvidenceStructure()
         treefile.open(QIODevice::Append | QIODevice::Text);
         uint8_t walkreturn;
         // SINCE IT ISN'T CONCURRENT WHETHER I BREAK IT OUT OR NOT, I WILL PROBABLY GO BACK TO RECURSIVE SINGLE WALK...
-        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
-        //int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+        //int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
+        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
         //walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
         if(walkreturn == 1)
@@ -1122,8 +1129,8 @@ void InitializeEvidenceStructure()
                         treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
                         treefile.open(QIODevice::Append | QIODevice::Text);
                         uint8_t walkreturn;
-                        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
-                        //int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+                        //int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
+                        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
                         //walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
                         if(walkreturn == 1)
