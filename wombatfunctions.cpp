@@ -533,7 +533,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     */
     // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
-    wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(tmpaddress).right(2) + "/.f" + QString::number(tmpaddress) + "/";
+    wombatvariable.curfilepath = wombatvariable.partitionpath + "/.f" + QString::number(tmpaddress) + "/";
     //wombatvariable.curfilepath = wombatvariable.partitionpath + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
     /*
