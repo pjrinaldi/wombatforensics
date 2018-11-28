@@ -312,6 +312,20 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
                 //filefile.open(QIODevice::Append | QIODevice::Text);
                 //qDebug() << QString::number(tmpfile->name->meta_addr) << "Build Stat File: file file: open: name";
                 filefile << outstring.toStdString();
+                if(filefile.bad())
+                {
+                    qDebug() << "Writing to file failed";
+                }
+                else if(filefile.fail())
+                {
+                    const char* errstring = strerror(errno);
+                    std::cout << errstring << std::endl;
+                    qDebug() << "Writing failed";
+                    std::cout << tmppath << std::endl;
+                    std::cout << QString(wombatvariable.curfilepath + "stat").toStdString() << std::endl;
+                }
+                else
+                    qDebug() << "yes";
                 //out << outstring;
                 treeout << treestring << endl;
                 treeout.flush();
@@ -326,6 +340,12 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         //filefile.open(QIODevice::Append | QIODevice::Text);
         //qDebug() << QString::number(tmpfile->meta->addr) << "Build Stat File: file file open: meta";
         filefile << outstring.toStdString();
+        if(filefile.bad())
+            qDebug() << "Writing to file failed";
+        else if(filefile.fail())
+            qDebug() << "Writing failed";
+        else
+            qDebug() << "yes";
         //out << outstring;
         //out.flush();
         treeout << treestring << endl;
@@ -468,9 +488,9 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     */
     // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
-    wombatvariable.curfilepath = wombatvariable.partitionpath + "/.f" + QString::number(tmpaddress) + "/";
+    wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpaddress) + "/";
     //wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
-    (new QDir())->mkpath(wombatvariable.curfilepath);
+    (new QDir())->mkpath(wombatvariable.curfilepath); // DOESN'T ALWAYS MAKE THE DIRECTORY LIKE IT SHOULD... FIGURE IT OUT
     BuildStatFile(tmpfile, tmppath);
     //BuildTreeFile(tmpfile);
     //WriteFileProperties(tmpfile);
@@ -533,7 +553,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     */
     // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
-    wombatvariable.curfilepath = wombatvariable.partitionpath + "/.f" + QString::number(tmpaddress) + "/";
+    wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpaddress) + "/";
     //wombatvariable.curfilepath = wombatvariable.partitionpath + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath);
     /*

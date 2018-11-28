@@ -528,7 +528,7 @@ void WombatForensics::InitializeCaseStructure()
         }
         QFile casefile(wombatvariable.casename);
         casefile.open(QIODevice::ReadWrite);
-        casefile.resize(1000000000);
+        casefile.resize(1000000000000);
         casefile.close();
         // make ext4 partition
         QString mkfsstr = "mkfs.ext4 -q -E root_owner=" + QString::number(getuid()) + ":" + QString::number(getgid()) + " ";
