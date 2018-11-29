@@ -786,7 +786,7 @@ void WombatForensics::PrepareEvidenceImage()
         xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " --out raw " + wombatvariable.imgdatapath;
 
     }
-    qDebug() << "xmntstr:" << xmntstr;
+    //qDebug() << "xmntstr:" << xmntstr;
     xmntprocess = new QProcess();
     connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()));
     connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()));

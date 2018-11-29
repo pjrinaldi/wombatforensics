@@ -294,9 +294,9 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         outstring += "," + QString::number(tmpfile->meta->flags);
     */
 
-    //QFile filefile;
-    //QTextStream out(&filefile);
-    std::ofstream filefile;
+    QFile filefile;
+    QTextStream out(&filefile);
+    //std::ofstream filefile;
     QTextStream treeout(&treefile);
     //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
     //treefile.open(QIODevice::Append | QIODevice::Text);
@@ -306,12 +306,13 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
             {
-                filefile.open(QString(wombatvariable.curfilepath + "stat").toStdString());
-                //filefile.setFileName(wombatvariable.curfilepath + "stat");
+                //filefile.open(QString(wombatvariable.curfilepath + "stat").toStdString());
+                filefile.setFileName(wombatvariable.curfilepath + "stat");
                 //filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->name->meta_addr) + ".a" + QString::number(tmpfile->name->par_addr));
-                //filefile.open(QIODevice::Append | QIODevice::Text);
+                filefile.open(QIODevice::Append | QIODevice::Text);
                 //qDebug() << QString::number(tmpfile->name->meta_addr) << "Build Stat File: file file: open: name";
-                filefile << outstring.toStdString();
+                //filefile << outstring.toStdString();
+                /*
                 if(filefile.bad())
                 {
                     qDebug() << "Writing to file failed";
@@ -326,7 +327,9 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
                 }
                 else
                     qDebug() << "yes";
-                //out << outstring;
+                */
+                out << outstring;
+                out.flush();
                 treeout << treestring << endl;
                 treeout.flush();
             }
@@ -334,31 +337,31 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
     }
     else
     {
-        filefile.open(QString(wombatvariable.curfilepath + "stat").toStdString());
-        //filefile.setFileName(wombatvariable.curfilepath + "stat");
+        //filefile.open(QString(wombatvariable.curfilepath + "stat").toStdString());
+        filefile.setFileName(wombatvariable.curfilepath + "stat");
         //filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->meta->addr) + ".a" + QString::number(tmpfile->name->par_addr));
-        //filefile.open(QIODevice::Append | QIODevice::Text);
+        filefile.open(QIODevice::Append | QIODevice::Text);
         //qDebug() << QString::number(tmpfile->meta->addr) << "Build Stat File: file file open: meta";
-        filefile << outstring.toStdString();
+        //filefile << outstring.toStdString();
+        /*
         if(filefile.bad())
             qDebug() << "Writing to file failed";
         else if(filefile.fail())
             qDebug() << "Writing failed";
         else
             qDebug() << "yes";
-        //out << outstring;
-        //out.flush();
+        */
+        out << outstring;
+        out.flush();
         treeout << treestring << endl;
         treeout.flush();
     }
-    filefile.close();
-    /*
+    //filefile.close();
     if(filefile.isOpen())
     {
         filefile.close();
         //qDebug() << wombatvariable.curfilepath << "Build Stat File: file file close";
     }
-    */
     //treefile.close();
     if(tmpfile->name != NULL)
     {
@@ -464,6 +467,7 @@ void BuildTreeFile(TSK_FS_FILE* tmpfile)
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     unsigned long long tmpaddress = 0;
+    unsigned long long paraddress = readfsinfo->root_inum;
     //unsigned long long calcaddress = 0;
     //int numdigits = 0;
     if(tmpptr){}
@@ -476,6 +480,7 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     else if(tmpfile->name != NULL)
     {
         tmpaddress = tmpfile->name->meta_addr;
+        paraddress = tmpfile->name->par_addr;
         //calcaddress = tmpfile->name->meta_addr;
         //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
         //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + ".null" + "/";
@@ -488,12 +493,15 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     */
     // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
-    wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpaddress) + "/";
+    wombatvariable.curfilepath = wombatvariable.partitionpath;
+    if(paraddress != readfsinfo->root_inum)
+        wombatvariable.curfilepath += ".f" + QString::number(paraddress) + "/";
+    wombatvariable.curfilepath += ".f" + QString::number(tmpaddress) + "/";
     //wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath); // DOESN'T ALWAYS MAKE THE DIRECTORY LIKE IT SHOULD... FIGURE IT OUT
     BuildStatFile(tmpfile, tmppath);
     //BuildTreeFile(tmpfile);
-    //WriteFileProperties(tmpfile);
+    WriteFileProperties(tmpfile);
     //BuildPropFile(tmpfile);
     //if(tmpfile->meta->type == TSK_FS_META_TYPE_DIR || tmpfile->meta->type == TSK_FS_META_TYPE_VIRT_DIR) // (4.3)
         //if(!TSK_FS_ISDOT(tmpfile->name->name))
@@ -696,7 +704,7 @@ TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     */
     BuildStatFile(tmpfile, tmppath);
-    //WriteFileProperties(tmpfile);
+    WriteFileProperties(tmpfile);
     /*
     isignals->ProgUpd();
 
@@ -1316,9 +1324,6 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
 
 void WriteFileProperties(TSK_FS_FILE* curfileinfo)
 {
-    // NEED TO IMPLEMENT OFSTREAM FOR FILE PROPERTIES   
-    //ofstream filepropfile;
-    //ofstream.open(QString(wombatvariable.curfilepath + "prop").toStdString());
     QFile filepropfile;
     filepropfile.setFileName(wombatvariable.curfilepath + "prop");
     /*
