@@ -477,7 +477,7 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         tmpaddress = tmpfile->meta->addr;
         //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
     }
-    else if(tmpfile->name != NULL)
+    if(tmpfile->name != NULL)
     {
         tmpaddress = tmpfile->name->meta_addr;
         paraddress = tmpfile->name->par_addr;
@@ -493,15 +493,25 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     */
     // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
+    if(tmpfile->name != NULL)
+    {
+        if(strcmp(tmpfile->name->name, ".") != 0)
+        {
+            if(strcmp(tmpfile->name->name, "..") != 0)
+            {
     wombatvariable.curfilepath = wombatvariable.partitionpath;
     if(paraddress != readfsinfo->root_inum)
         wombatvariable.curfilepath += ".f" + QString::number(paraddress) + "/";
     wombatvariable.curfilepath += ".f" + QString::number(tmpaddress) + "/";
+    qDebug() << wombatvariable.curfilepath;
     //wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
     (new QDir())->mkpath(wombatvariable.curfilepath); // DOESN'T ALWAYS MAKE THE DIRECTORY LIKE IT SHOULD... FIGURE IT OUT
     BuildStatFile(tmpfile, tmppath);
     //BuildTreeFile(tmpfile);
     WriteFileProperties(tmpfile);
+    }
+        }
+    }
     //BuildPropFile(tmpfile);
     //if(tmpfile->meta->type == TSK_FS_META_TYPE_DIR || tmpfile->meta->type == TSK_FS_META_TYPE_VIRT_DIR) // (4.3)
         //if(!TSK_FS_ISDOT(tmpfile->name->name))
