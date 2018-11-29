@@ -1130,6 +1130,15 @@ void WombatForensics::LoadHexContents()
         unsigned long long fileoffset = 0;
         unsigned long long filesize = 0;
 
+        //if(!ui->hexview->isEnabled())
+            ui->hexview->setEnabled(true);
+
+        if(selectedindex.sibling(selectedindex.row(), 3).data().toULongLong() == 0)
+        {
+            ui->hexview->setEnabled(false);
+        }
+        else
+        {
         //qDebug() << "partfile fstype:" << partlist.at(0);
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
         {
@@ -1332,6 +1341,7 @@ void WombatForensics::LoadHexContents()
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
             fileoffset = bytestring.toULongLong();
             filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
+        }
         }
         (new QDir())->mkpath(wombatvariable.tmpfilepath);
         hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
