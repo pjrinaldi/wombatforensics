@@ -1036,7 +1036,7 @@ void InitializeEvidenceStructure()
     wombatvariable.imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
     //wombatvariable.segmentcount = readimginfo->num_img; // number of segments for xmount call (TSK 4.3)
     wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
-    wombatvariable.evidencepath = wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + QString::number(evidcnt) + "/";
+    wombatvariable.evidencepath = wombatvariable.tmpmntpath + wombatvariable.evidencename + ".e" + QString::number(evidcnt) + "/";
     (new QDir())->mkpath(wombatvariable.evidencepath);
     QFile evidfile(wombatvariable.evidencepath + "stat");
     //QFile evidfile(wombatvariable.evidencepath + wombatvariable.evidencename + ".evid." + QString::number(evidcnt));
@@ -1072,7 +1072,7 @@ void InitializeEvidenceStructure()
         volsectorsize = (int)readvsinfo->block_size;
         voloffset = (unsigned long long)readvsinfo->offset;
     }
-    wombatvariable.volumepath = wombatvariable.evidencepath + ".vol/";
+    wombatvariable.volumepath = wombatvariable.evidencepath + ".v" + QString::number(volcnt) + "/";
     (new QDir())->mkpath(wombatvariable.volumepath);
     QFile volfile(wombatvariable.volumepath + "stat");
     //QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".vol");
@@ -1091,7 +1091,7 @@ void InitializeEvidenceStructure()
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-        wombatvariable.partitionpath = wombatvariable.volumepath + ".part.0/";
+        wombatvariable.partitionpath = wombatvariable.volumepath + ".p0/";
         (new QDir())->mkpath(wombatvariable.partitionpath);
         QFile pfile(wombatvariable.partitionpath + "stat");
         //QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part.0");
@@ -1133,7 +1133,7 @@ void InitializeEvidenceStructure()
             {
                 //partint = i;
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                wombatvariable.partitionpath = wombatvariable.volumepath + ".part." + QString::number(partint) + "/";
+                wombatvariable.partitionpath = wombatvariable.volumepath + ".p" + QString::number(partint) + "/";
                 (new QDir())->mkpath(wombatvariable.partitionpath);
                 pfile.setFileName(wombatvariable.partitionpath + "stat");
                 //pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + QString::number(partint));
