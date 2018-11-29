@@ -964,7 +964,7 @@ void WombatForensics::LoadHexContents()
         //QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename
         QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".vol");
         */
-        QString volfilestring = wombatvariable.tmpmntpath + wombatvariable.evidencename + ".e" + wombatvariable.selectedid.split("-").at(0).mid(1) + "/.v" + wombatvariable.selectedid.split("-").at(1).mid(1) + "/stat";
+        QString volfilestring = wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + wombatvariable.selectedid.split("-").at(0) + "/." + wombatvariable.selectedid.split("-").at(1) + "/stat";
         //qDebug() << "volfilestring:" << volfilestring;
         QFile volfile(volfilestring);
         volfile.open(QIODevice::ReadOnly);
@@ -1001,14 +1001,17 @@ void WombatForensics::LoadHexContents()
         const TSK_TCHAR** imagepartspath;
         pathvector.clear();
         QString estring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(0);
+        QString vstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(1);
         QString pstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(2);
         QString fstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(3);
-        //
+        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
          // EVIDENCE IMAGE PIECE OF FILE HEX CONTENT CODE
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + estring.mid(1));
+        */
+        QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
         int partcount = tmpstr.split(",").at(3).split("|").size();
@@ -1026,14 +1029,15 @@ void WombatForensics::LoadHexContents()
         }
         free(imagepartspath);
 
-
-
         tmpstr = "";
         QStringList partlist;
         partlist.clear();
+        /*
         QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + wombatvariable.selectedid.split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
         QStringList partpropfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".partprop.p" + wombatvariable.selectedid.split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
         QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
+        */
+        QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/stat");
         partfile.open(QIODevice::ReadOnly);
         tmpstr = partfile.readLine();
         partfile.close();
@@ -1041,7 +1045,8 @@ void WombatForensics::LoadHexContents()
         // FILE SYSTEM PIECE OF FILE HEX CONTENT CODE
         filehexfsinfo = tsk_fs_open_img(fileheximginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
 
-        QFile partpropfile(wombatvariable.tmpmntpath + partpropfiles.at(0));
+        //QFile partpropfile(wombatvariable.tmpmntpath + partpropfiles.at(0));
+        QFile partpropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/prop");
         partpropfile.open(QIODevice::ReadOnly);
         QString mftentryoffset = "";
         while(!partpropfile.atEnd())
@@ -1067,6 +1072,7 @@ void WombatForensics::LoadHexContents()
         char* fhexbuf;
         ssize_t fhexlen = 0;
 
+        /*
         QStringList filefiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".p" + wombatvariable.selectedid.split("-").at(2).mid(1) + ".f" + tmpfilename + ".a*"), QDir::NoSymLinks | QDir::Files);
         QFile filefile;
         if(filefiles.count() == 1)
@@ -1081,9 +1087,20 @@ void WombatForensics::LoadHexContents()
                 }
             }
         }
+        */
+        QFile filefile;
+        QFile filefileprop;
+        if(fstring.split(":").count() > 1)
+            filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/." + fstring.split(":").first() + "/" + fstring.split(":").last() + "-stat");
+        else
+            filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/." + fstring.split(":").first() + "/stat");
         filefile.open(QIODevice::ReadOnly);
         tmpstr = filefile.readLine();
-        QFile filefileprop(filefile.fileName().split(".a").at(0) + ".prop");
+        //QFile filefileprop(filefile.fileName().split(".a").at(0) + ".prop");
+        if(fstring.split(":").count() > 1)
+            filefileprop.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/." + fstring.split(":").first() + "/" + fstring.split(":").last() + "-prop");
+        else
+            filefileprop.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/." + fstring.split(":").first() + "/prop");
         QString blockstring;
         QString residentstring;
         QString bytestring;
