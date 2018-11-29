@@ -24,6 +24,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo);
 void WriteFileProperties(TSK_FS_FILE* curfileinfo);
 void BuildPropFile(TSK_FS_FILE* curfileinfo);
 void BuildStatFile(TSK_FS_FILE* curfileinfo, const char* tmppath);
+void BuildStatFileThread(TSK_FS_FILE curfileinfo, std::string curpath);
 void BuildTreeFile(TSK_FS_FILE* curfileinfo);
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString fvalue, unsigned long long adssize, QString attrid);
 //void LogMessage(QString message);
