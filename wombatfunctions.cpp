@@ -493,23 +493,27 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
     }
     */
     // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
+    TSK_FS_FILE curfile = *tmpfile;
+    std::string curpath = std::string(tmppath);
     if(tmpfile->name != NULL)
     {
         if(strcmp(tmpfile->name->name, ".") != 0)
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
             {
-    wombatvariable.curfilepath = wombatvariable.partitionpath;
-    if(paraddress != readfsinfo->root_inum)
-        wombatvariable.curfilepath += ".f" + QString::number(paraddress) + "/";
-    wombatvariable.curfilepath += ".f" + QString::number(tmpaddress) + "/";
-    qDebug() << wombatvariable.curfilepath;
-    //wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
-    (new QDir())->mkpath(wombatvariable.curfilepath); // DOESN'T ALWAYS MAKE THE DIRECTORY LIKE IT SHOULD... FIGURE IT OUT
-    BuildStatFile(tmpfile, tmppath);
-    //BuildTreeFile(tmpfile);
-    WriteFileProperties(tmpfile);
-    }
+                wombatvariable.curfilepath = wombatvariable.partitionpath;
+                if(paraddress != readfsinfo->root_inum)
+                    wombatvariable.curfilepath += ".f" + QString::number(paraddress) + "/";
+                wombatvariable.curfilepath += ".f" + QString::number(tmpaddress) + "/";
+                //qDebug() << wombatvariable.curfilepath;
+                //wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
+                (new QDir())->mkpath(wombatvariable.curfilepath); // DOESN'T ALWAYS MAKE THE DIRECTORY LIKE IT SHOULD... FIGURE IT OUT
+                BuildStatFile(tmpfile, tmppath);
+                //QtConcurrent::run(BuildStatFile, curfile, curpath);
+                //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
+                //BuildTreeFile(tmpfile);
+                WriteFileProperties(tmpfile);
+            }
         }
     }
     //BuildPropFile(tmpfile);

@@ -814,6 +814,7 @@ void WombatForensics::UpdateStatus()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     StatusUpdate("Building Initial Evidence Tree...");
     qInfo() << "Building Initial Evidence Tree...";
+    //qInfo() << QTime::currentTime().toString(
     PrepareEvidenceImage();
     //LogMessage("Building Initial Evidence Tree...");
     treefile.close();
