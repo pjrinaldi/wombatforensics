@@ -965,7 +965,7 @@ void WombatForensics::LoadHexContents()
         QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".vol");
         */
         QString volfilestring = wombatvariable.tmpmntpath + wombatvariable.evidencename + ".e" + wombatvariable.selectedid.split("-").at(0).mid(1) + "/.v" + wombatvariable.selectedid.split("-").at(1).mid(1) + "/stat";
-        qDebug() << "volfilestring:" << volfilestring;
+        //qDebug() << "volfilestring:" << volfilestring;
         QFile volfile(volfilestring);
         volfile.open(QIODevice::ReadOnly);
         tmpstr = volfile.readLine();
@@ -975,11 +975,16 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedid.split("-").count() == 3) // partition file
     {
+        QStringList partlist;
+        partlist.clear();
+        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
         QStringList partlist = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + wombatvariable.selectedid.split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
         QFile partfile(wombatvariable.tmpmntpath + partlist.at(0));
+        */
+        QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + wombatvariable.selectedid.split("-").at(0) + "/." + wombatvariable.selectedid.split("-").at(1) + "/." + wombatvariable.selectedid.split("-").at(2) + "/stat");
         partfile.open(QIODevice::ReadOnly);
         tmpstr = partfile.readLine();
         partfile.close();
@@ -998,7 +1003,7 @@ void WombatForensics::LoadHexContents()
         QString estring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(0);
         QString pstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(2);
         QString fstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(3);
-
+        //
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
