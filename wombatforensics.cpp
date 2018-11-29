@@ -952,6 +952,10 @@ void WombatForensics::LoadHexContents()
         ui->hexview->setCursorPosition(0);
     else if(wombatvariable.selectedid.split("-").count() == 2) // volume file
     {
+        QStringList vollist;
+        vollist.clear();
+        // IF VOLFILE, JUST NEED TO LOAD THE PATH TO GET THE STAT FILE.
+        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + wombatvariable.selectedid.split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
         wombatvariable.evidencename = evidfiles.at(0);
@@ -959,6 +963,10 @@ void WombatForensics::LoadHexContents()
         vollist.clear();
         //QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename
         QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".vol");
+        */
+        QString volfilestring = wombatvariable.tmpmntpath + wombatvariable.evidencename + ".e" + wombatvariable.selectedid.split("-").at(0).mid(1) + "/.v" + wombatvariable.selectedid.split("-").at(1).mid(1) + "/stat";
+        qDebug() << "volfilestring:" << volfilestring;
+        QFile volfile(volfilestring);
         volfile.open(QIODevice::ReadOnly);
         tmpstr = volfile.readLine();
         volfile.close();
