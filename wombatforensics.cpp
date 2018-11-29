@@ -1135,6 +1135,7 @@ void WombatForensics::LoadHexContents()
 
         if(selectedindex.sibling(selectedindex.row(), 3).data().toULongLong() == 0)
         {
+            qDebug() << "zero file";
             ui->hexview->setEnabled(false);
         }
         else
@@ -1343,6 +1344,8 @@ void WombatForensics::LoadHexContents()
             filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         }
         }
+        if(selectedindex.sibling(selectedindex.row(), 3).data().toULongLong() > 0)
+        {
         (new QDir())->mkpath(wombatvariable.tmpfilepath);
         hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
         QFile tmpfile(hexstring);
@@ -1355,7 +1358,13 @@ void WombatForensics::LoadHexContents()
         tsk_fs_close(filehexfsinfo);
         tsk_img_close(fileheximginfo);
         //fileviewer->UpdateHexView();
-
+        }
+        else
+        {
+            tsk_fs_file_close(filehexfileinfo);
+            tsk_fs_close(filehexfsinfo);
+            tsk_img_close(fileheximginfo);
+        }
     }
     ui->hexview->ensureVisible();
 }
