@@ -957,6 +957,7 @@ void WombatForensics::LoadHexContents()
         wombatvariable.evidencename = evidfiles.at(0);
         QStringList vollist;
         vollist.clear();
+        //QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename
         QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".vol");
         volfile.open(QIODevice::ReadOnly);
         tmpstr = volfile.readLine();

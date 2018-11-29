@@ -1042,7 +1042,7 @@ void InitializeEvidenceStructure()
     //QFile evidfile(wombatvariable.evidencepath + wombatvariable.evidencename + ".evid." + QString::number(evidcnt));
     //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".evid." + QString::number(evidcnt));
     evidfile.open(QIODevice::Append | QIODevice::Text);
-    qDebug() << "evidfile: open";
+    //qDebug() << "evidfile: open";
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
     for(unsigned int i=0; i < wombatvariable.itemcount; i++)
@@ -1054,7 +1054,7 @@ void InitializeEvidenceStructure()
     out << "," << wombatvariable.itemcount << ",e" + QString::number(evidcnt);
     out.flush();
     evidfile.close();
-    qDebug() << "evidfile: close";
+    //qDebug() << "evidfile: close";
     treefile.open(QIODevice::Append | QIODevice::Text);
     QTextStream treeout(&treefile);
     treeout << "e" + QString::number(evidcnt) << "," << wombatvariable.evidencename << ",0," + QString::number(readimginfo->size) << ",0,0,0,0,0,0,0" << endl;
@@ -1077,12 +1077,12 @@ void InitializeEvidenceStructure()
     QFile volfile(wombatvariable.volumepath + "stat");
     //QFile volfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".vol");
     volfile.open(QIODevice::Append | QIODevice::Text);
-    qDebug() << "volfile: open";
+    //qDebug() << "volfile: open";
     out.setDevice(&volfile);
     out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt);
     out.flush();
     volfile.close();
-    qDebug() << "volfile: close";
+    //qDebug() << "volfile: close";
     treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) << "," << volname << "," << "0," << QString::number(readimginfo->size) << ",0,0,0,0,0,0,0" << endl;
     treeout.flush();
     treefile.close();
@@ -1096,12 +1096,12 @@ void InitializeEvidenceStructure()
         QFile pfile(wombatvariable.partitionpath + "stat");
         //QFile pfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part.0");
         pfile.open(QIODevice::Append | QIODevice::Text);
-        qDebug() << "no volume, single fs: pfile: open";
+        //qDebug() << "no volume, single fs: pfile: open";
         out.setDevice(&pfile);
         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
         out.flush();
         pfile.close();
-        qDebug() << "no volume, single fs: pfile: close";
+        //qDebug() << "no volume, single fs: pfile: close";
         treefile.open(QIODevice::Append | QIODevice::Text);
         treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
         treeout.flush();
@@ -1138,7 +1138,7 @@ void InitializeEvidenceStructure()
                 pfile.setFileName(wombatvariable.partitionpath + "stat");
                 //pfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + QString::number(partint));
                 pfile.open(QIODevice::Append | QIODevice::Text);
-                qDebug() << "pfile: open";
+                //qDebug() << "pfile: open";
                 treefile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
@@ -1146,7 +1146,7 @@ void InitializeEvidenceStructure()
                     out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                     out.flush();
                     pfile.close();
-                    qDebug() << "unallocated pfile: close";
+                    //qDebug() << "unallocated pfile: close";
                     treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << QString(readpartinfo->desc) << ",0," << QString::number(readpartinfo->len * readvsinfo->block_size) << ",0,0,0,0,0,0,0" << endl;
                     treeout.flush();
                     treefile.close();
@@ -1159,7 +1159,7 @@ void InitializeEvidenceStructure()
                         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                         out.flush();
                         pfile.close();
-                        qDebug() << "allocated pfile: close";
+                        //qDebug() << "allocated pfile: close";
                         treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << "," << GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + "),0," << QString::number(readfsinfo->block_size * readfsinfo->block_count) << ",0,0,0,0,0,0,0" << endl;
                         treeout.flush();
                         treefile.close();
