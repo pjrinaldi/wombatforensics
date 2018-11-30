@@ -446,6 +446,26 @@ private:
         unsigned long long fpar;
         int nodecount = 0;
 
+        for(int i=0; i < nodes.count(); i++)
+        {
+            if(nodes.at(i).length() > 0)
+            {
+                /*
+                QDirIterator it(wombatvariable.tmpmntpath + nodes.at(i), QDirIterator::Subdirectories);
+                while (it.hasNext())
+                {
+                    qDebug() << it.next();
+                }
+                */
+    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    //QStringList files = eviddir.entryList(QStringList(filefilter), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+                QDir eviddir = QDir(wombatvariable.tmpmntpath + nodes.at(i));
+                QStringList statlist = eviddir.entryList(QStringList("stat"), QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDir::DirsLast);
+                for(int i=0; i < statlist.count(); i++)
+                    qDebug() << eviddir.absolutePath() << "/" << statlist.at(i);
+            }
+        }
+        /*
         while(nodecount < nodes.count() - 1)
         {
             QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
@@ -528,7 +548,7 @@ private:
                     parents.value(curid)->SetDeleted(true);
             }
             nodecount++;
-        }
+        }*/
     };
 public:
     //void RemEvidence(QString evidid)
