@@ -273,7 +273,7 @@ public:
                                 return QIcon(QPixmap(QString(":/basic/treefile")));
                         }
                     }
-                    else if(itemtype == 2)
+                    else if(itemtype == 2 || itemtype == 3)
                     {
                         if(nodename.compare("$OrphanFiles") == 0 || nodename.compare("$Extend") == 0)
                             return QIcon(QPixmap(QString(":/basic/virtualfolder")));
@@ -445,7 +445,7 @@ private:
         QString curid;
         unsigned long long fpar;
         int nodecount = 0;
-
+        QString tmpstr = "";
         for(int i=0; i < nodes.count(); i++)
         {
             if(nodes.at(i).length() > 0)
@@ -460,10 +460,99 @@ private:
     //QDir eviddir = QDir(wombatvariable.tmpmntpath);
     //QStringList files = eviddir.entryList(QStringList(filefilter), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
                 QDir eviddir = QDir(wombatvariable.tmpmntpath + nodes.at(i));
+                QFile evidfile(wombatvariable.tmpmntpath + nodes.at(i) + "/stat");
+                evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                tmpstr = evidfile.readLine();
+                evidfile.close();
+                QList<QVariant> columndata;
+                columndata.clear();
+                columndata << tmpstr.split(",").at(5) << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                parent->AppendChild(new TreeNode(columndata, parent));
+                curid = tmpstr.split(",").at(5);
+                parents[curid] = parent->child(parent->ChildCount() - 1);
                 //QStringList statlist = eviddir.entryList(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Hidden, QDir::DirsLast);
-                QStringList statlist = eviddir.entryList(QStringList("stat"), QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden, QDir::DirsLast);
-                for(int i=0; i < statlist.count(); i++)
-                    qDebug() << statlist.at(i);
+                QStringList vollist = eviddir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
+                for(int j=0; j < vollist.count(); j++)
+                {
+                    columndata.clear();
+                    QFile volfile(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/stat");
+                    volfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                    tmpstr = volfile.readLine();
+                    volfile.close();
+                    columndata << tmpstr.split(",").at(5) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                    parid = tmpstr.split(",").at(5).split("-").at(0);
+                    curid = tmpstr.split(",").at(5);
+                    parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
+                    parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+                    QDir voldir = QDir(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j));
+                    QStringList partlist = voldir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
+                    for(int k = 0; k < partlist.count(); k++)
+                    {
+                        columndata.clear();
+                        QFile partfile(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/stat");
+                        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                        tmpstr = partfile.readLine();
+                        partfile.close();
+                        columndata << tmpstr.split(",").at(10) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                        parid = tmpstr.split(",").at(10).split("-p").at(0);
+                        curid = tmpstr.split(",").at(10);
+                        parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
+                        parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+                        QDir partdir = QDir(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k));
+                        QStringList rootlist = partdir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
+                        for(int l = 0; l < rootlist.count(); l++)
+                        {
+                            columndata.clear();
+                            QFile filefile(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + rootlist.at(l) + "/stat");
+                            filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+                            tmpstr = filefile.readLine();
+                            filefile.close();
+                            columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
+                            parid = tmpstr.split(",").at(12).split("-f").at(0);
+                            curid = tmpstr.split(",").at(12);
+                            parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
+                            parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+                            if(checkhash.contains(tmpstr.split(",").at(12).split("-a").first()))
+                                parents.value(curid)->SetChecked(true);
+                            if(tmpstr.split(",").at(14).toInt() == true)
+                                parents.value(curid)->SetDeleted(true);
+                            // NEED TO RECURSE HERE FOR EACH FILE FOLDER TO CHECK IF IT HAS CHILDREN...
+                            // CALL SOMETHING LIKE FileRecurse(path) WHICH WOULD GET CHILDREN, CALL THE DATA, ETC AND THEN CALL RECURSE
+                            /*
+                             *
+            if(columnstrings.at(0).split("-").count() == 5) // files
+            {
+                fpar = columnstrings.at(0).split("-").at(4).mid(1).toULongLong();
+                curid = columnstrings.at(0);
+                parid = columnstrings.at(0).split("-f").at(0);
+                QFile rootinumfile(wombatvariable.volumepath + ".p" + columnstrings.at(0).split("-").at(2).mid(1) + "/stat");
+                //QFile rootinumfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + columnstrings.at(0).split("-").at(2).mid(1));
+                rootinumfile.open(QIODevice::ReadOnly);
+                unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
+                rootinumfile.close();
+                if(fpar != rootinum)
+                {
+                    QString parkey = parid + "-f" + QString::number(fpar) + "-a";
+                    QHashIterator<QString, TreeNode*> i(parents);
+                    while(i.hasNext())
+                    {
+                        i.next();
+                        if(i.key().contains(parkey))
+                            parid = i.key();
+                    }
+                }
+                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), columnstrings.at(11).toInt()));
+                parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+                if(checkhash.contains(columnstrings.at(0).split("-a").first()))
+                    parents.value(curid)->SetChecked(true);
+                if(columnstrings.at(12).toInt() == true)
+                    parents.value(curid)->SetDeleted(true);
+
+                             *
+                             */ 
+                        }
+                    }
+                }
             }
         }
         /*

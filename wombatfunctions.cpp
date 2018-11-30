@@ -441,12 +441,21 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
     {
         treestring += QString::number(tmpfile->meta->type);
         if(((tmpfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((tmpfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
+        {
+            outstring += ",1";
             treestring += ",1";
+        }
         else
+        {
+            outstring += ",0";
             treestring += ",0";
+        }
     }
     else
+    {
+        outstring += ",0";
         treestring += "0,0";
+    }
     free(magicbuffer);
 
     /* alternative method using qt5 */
