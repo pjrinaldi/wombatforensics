@@ -460,9 +460,10 @@ private:
     //QDir eviddir = QDir(wombatvariable.tmpmntpath);
     //QStringList files = eviddir.entryList(QStringList(filefilter), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
                 QDir eviddir = QDir(wombatvariable.tmpmntpath + nodes.at(i));
-                QStringList statlist = eviddir.entryList(QStringList("stat"), QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDir::DirsLast);
+                //QStringList statlist = eviddir.entryList(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Hidden, QDir::DirsLast);
+                QStringList statlist = eviddir.entryList(QStringList("stat"), QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden, QDir::DirsLast);
                 for(int i=0; i < statlist.count(); i++)
-                    qDebug() << eviddir.absolutePath() << "/" << statlist.at(i);
+                    qDebug() << statlist.at(i);
             }
         }
         /*
