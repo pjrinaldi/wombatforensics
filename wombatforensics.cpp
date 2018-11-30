@@ -608,10 +608,13 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QString tmpstr = "";
+    /*
     QStringList foundlist = eviddir.entryList(QStringList(QString("*.p*.f*.a*")), QDir::Files | QDir::NoSymLinks);
     filesfound = foundlist.count();
     filecountlabel->setText("Found: " + QString::number(filesfound));
-    QStringList files = eviddir.entryList(QStringList(QString("*.evid.*")), QDir::Files | QDir::NoSymLinks);
+    */
+
+    QStringList files = eviddir.entryList(QStringList(QString("*.e*")), QDir::Files | QDir::NoSymLinks);
     for(int i=0; i < files.count(); i++)
     {
         tmpstr = "";
@@ -630,9 +633,20 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         evidcnt++;
     }
     listeditems.clear();
-    treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
-    treefile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
+    QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
+    evidlistfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidlistfile.size() > 0)
+    {
+        treefile.reset();
+        treenodemodel = new TreeNodeModel(evidlistfile.readAll());
+        evidlistfile.close();
+    }
+    else
+        evidlistfile.close();
+    //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
+    //treefile.open(QIODevice::ReadOnly | QIODevice::Text);
+    //QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
+    QStringList tmplist;
     if(tmplist.count() > 0)
     {
         treefile.reset();
@@ -822,7 +836,14 @@ void WombatForensics::UpdateStatus()
     PrepareEvidenceImage();
     //LogMessage("Building Initial Evidence Tree...");
     treefile.close();
-    listeditems.clear();
+    QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
+    evidlistfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(ui->dirTreeView->model() != NULL)
+        delete treenodemodel;
+    treenodemodel = new TreeNodeModel(evidlistfile.readAll());
+    evidlistfile.close();
+    //listeditems.clear();
+    /*
     treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     QStringList tmplist = QString(treefile.readAll()).split("\n");
@@ -836,6 +857,7 @@ void WombatForensics::UpdateStatus()
         if(tmplist.at(i).split(",").first().split("-").count() == 5)
             listeditems.append(tmplist.at(i).split(",").first());
     }
+    */
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));

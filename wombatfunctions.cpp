@@ -1172,6 +1172,12 @@ void InitializeEvidenceStructure()
         errorcount++;
     }
     free(images);
+    QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
+    evidlistfile.open(QIODevice::Append | QIODevice::Text);
+    QTextStream eout(&evidlistfile);
+    eout << wombatvariable.evidencename << ".e" << QString::number(evidcnt) << endl;
+    eout.flush();
+    evidlistfile.close();
     wombatvariable.imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
     //wombatvariable.segmentcount = readimginfo->num_img; // number of segments for xmount call (TSK 4.3)
     wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)

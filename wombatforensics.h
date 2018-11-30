@@ -445,6 +445,7 @@ private:
         QString curid;
         unsigned long long fpar;
         int nodecount = 0;
+
         while(nodecount < nodes.count() - 1)
         {
             QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
