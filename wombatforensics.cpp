@@ -680,6 +680,10 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     if(curitem.indexes().count() > 0)
     {
         selectedindex = curitem.indexes().at(0);
+        if(selectedindex.sibling(selectedindex.row(), 3).data().toULongLong() > 0)
+            ui->actionView_File->setEnabled(true);
+        else
+            ui->actionView_File->setEnabled(false);
         //ui->actionView_Properties->setEnabled(true);
         //ui->actionView_File->setEnabled(true);
         ui->actionView_Image_Gallery->setEnabled(true);

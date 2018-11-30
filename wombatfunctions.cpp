@@ -192,6 +192,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 void BuildStatFileThread(TSK_FS_FILE tmpfile, std::string tmppath)
 {
+    /*
     QString outstring = "";
     QString treestring = "";
     treestring += "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
@@ -231,8 +232,9 @@ void BuildStatFileThread(TSK_FS_FILE tmpfile, std::string tmppath)
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
     outstring += mimetype.name() + ",0,e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
-
+*/
     /* hash method using TSK */
+    /*
     TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     if(retval == 0)
@@ -366,7 +368,7 @@ void BuildStatFileThread(TSK_FS_FILE tmpfile, std::string tmppath)
                 }
             }
         }
-    }
+    }*/
 }
 
 void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
@@ -647,33 +649,18 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 {
     unsigned long long tmpaddress = 0;
     unsigned long long paraddress = readfsinfo->root_inum;
-    //unsigned long long calcaddress = 0;
-    //int numdigits = 0;
     if(tmpptr){}
     if(tmpfile->meta != NULL)
     {
-        //calcaddress = tmpfile->meta->addr;
         tmpaddress = tmpfile->meta->addr;
-        //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->meta->addr) + "/";
     }
     if(tmpfile->name != NULL)
     {
         tmpaddress = tmpfile->name->meta_addr;
         paraddress = tmpfile->name->par_addr;
-        //calcaddress = tmpfile->name->meta_addr;
-        //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + QString::number(tmpfile->name->meta_addr) + "/";
-        //wombatvariable.curfilepath = wombatvariable.partitionpath + ".f" + ".null" + "/";
     }
-    /*
-    while(tmpaddress > 0)
-    {
-        tmpaddress = tmpaddress/10;
-        numdigits++;
-    }
-    */
-    // NEED TO IMPLEMENT W/O LAST 2 NUMBERS DIRECTORY
-    TSK_FS_FILE curfile = *tmpfile;
-    std::string curpath = std::string(tmppath);
+    //TSK_FS_FILE curfile = *tmpfile;
+    //std::string curpath = std::string(tmppath);
     if(tmpfile->name != NULL)
     {
         if(strcmp(tmpfile->name->name, ".") != 0)
@@ -684,9 +671,7 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 if(paraddress != readfsinfo->root_inum)
                     wombatvariable.curfilepath += ".f" + QString::number(paraddress) + "/";
                 wombatvariable.curfilepath += ".f" + QString::number(tmpaddress) + "/";
-                //qDebug() << wombatvariable.curfilepath;
-                //wombatvariable.curfilepath = wombatvariable.partitionpath + "." + QString::number(numdigits) + "/.f" + QString::number(calcaddress) + "/";
-                (new QDir())->mkpath(wombatvariable.curfilepath); // DOESN'T ALWAYS MAKE THE DIRECTORY LIKE IT SHOULD... FIGURE IT OUT
+                (new QDir())->mkpath(wombatvariable.curfilepath);
                 BuildStatFile(tmpfile, tmppath);
                 //QtConcurrent::run(BuildStatFileThread, curfile, curpath);
                 //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
@@ -696,35 +681,6 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         }
     }
     //BuildPropFile(tmpfile);
-    //if(tmpfile->meta->type == TSK_FS_META_TYPE_DIR || tmpfile->meta->type == TSK_FS_META_TYPE_VIRT_DIR) // (4.3)
-        //if(!TSK_FS_ISDOT(tmpfile->name->name))
-    /*
-     *
-     *
-     *
-     *
-    if(tmpfile->name != NULL)
-    {
-        if(tmpfile->name->type == TSK_FS_NAME_TYPE_DIR && !TSK_FS_ISDOT(tmpfile->name->name)) // (4.2)
-        {
-            //qDebug() << tmpfile->name->name << "it's a dir, kick off it's dirwalk...";
-            uint8_t walkreturn;
-            int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC;
-            walkreturn = tsk_fs_dir_walk(readfsinfo, tmpfile->name->meta_addr, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, FileEntries, NULL);
-            if(walkreturn == 1)
-            {
-                qWarning() << "Issues with traversing the file structure were encountered";
-		qWarning() << QString(tsk_error_get());
-                //LogMessage("Issues with traversing the file structure were encountered");
-                errorcount++;
-            }
-        }
-        return TSK_WALK_CONT;
-    }
-    else
-        return TSK_WALK_CONT;
-    //return TSK_WALK_CONT;
-    */
     return TSK_WALK_CONT;
 }
 
