@@ -516,6 +516,8 @@ private:
                                 parents.value(curid)->SetChecked(true);
                             if(tmpstr.split(",").at(14).toInt() == true)
                                 parents.value(curid)->SetDeleted(true);
+                            FileRecurse(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + rootlist.at(l));
+                            //FileRecurse(newpath);
                             // NEED TO RECURSE HERE FOR EACH FILE FOLDER TO CHECK IF IT HAS CHILDREN...
                             // CALL SOMETHING LIKE FileRecurse(path) WHICH WOULD GET CHILDREN, CALL THE DATA, ETC AND THEN CALL RECURSE
                             /*
@@ -639,6 +641,54 @@ private:
             }
             nodecount++;
         }*/
+    };
+    void FileRecurse(QString path)
+    {
+        QString parid;
+        QString curid;
+        QString tmpstr = "";
+        QList<QVariant> columndata;
+        QDir filedir = QDir(path);
+        QStringList subfiles = filedir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
+        for(int i=0; i < subfiles.count(); i++)
+        {
+            //qDebug() << subfiles.at(i);
+            columndata.clear();
+            QFile subfile(path + "/" + subfiles.at(i) + "/stat");
+            subfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            tmpstr = subfile.readLine();
+            subfile.close();
+            columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
+            parid = tmpstr.split(",").at(12).split("-f").at(0);
+            curid = tmpstr.split(",").at(12);
+            parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
+            parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+            if(checkhash.contains(tmpstr.split(",").at(12).split("-a").first()))
+                parents.value(curid)->SetChecked(true);
+            if(tmpstr.split(",").at(14).toInt() == true)
+                parents.value(curid)->SetDeleted(true);
+            FileRecurse(path + subfiles.at(i));
+        }
+        /*
+         *  columndata.clear();
+            QFile filefile(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + rootlist.at(l) + "/stat");
+            filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+            tmpstr = filefile.readLine();
+            filefile.close();
+            columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
+            parid = tmpstr.split(",").at(12).split("-f").at(0);
+            curid = tmpstr.split(",").at(12);
+            parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
+            parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+            if(checkhash.contains(tmpstr.split(",").at(12).split("-a").first()))
+                parents.value(curid)->SetChecked(true);
+            if(tmpstr.split(",").at(14).toInt() == true)
+                parents.value(curid)->SetDeleted(true);
+            QDir partdir = QDir(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k));
+            QStringList rootlist = partdir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
+         *
+         */ 
+
     };
 public:
     //void RemEvidence(QString evidid)
