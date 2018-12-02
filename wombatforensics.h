@@ -670,10 +670,11 @@ private:
             if(tmpstr.split(",").count() > 12)
             {
                 columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
-                fpar = path.split("/").last().split("f").last().toULongLong();
-                qDebug() << "item path:" << path;
-                qDebug() << "parentid:" << path.split("/").at(path.split("/").count() - 2);
-                parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a";
+                //fpar = path.split("/").last().split("f").last().toULongLong();
+                //qDebug() << "item path:" << path;
+                //qDebug() << "parentid:" << path.split("/").at(path.split("/").count() - 1);
+                //parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a";
+                /*
                 QHashIterator<QString, TreeNode*> j(parents);
                 while(j.hasNext())
                 {
@@ -684,9 +685,11 @@ private:
                         break;
                     }
                 }
+                */
                 //parid = tmpstr.split(",").at(12).split("-f").at(0);
+                parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + path.split("/").last().split("f").last() + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
                 curid = tmpstr.split(",").at(12);
-                qDebug() << "current file:" << subfiles.at(i);
+                //qDebug() << "current file:" << subfiles.at(i);
                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
                 if(checkhash.contains(tmpstr.split(",").at(12).split("-a").first()))
