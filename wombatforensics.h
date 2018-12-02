@@ -450,15 +450,6 @@ private:
         {
             if(nodes.at(i).length() > 0)
             {
-                /*
-                QDirIterator it(wombatvariable.tmpmntpath + nodes.at(i), QDirIterator::Subdirectories);
-                while (it.hasNext())
-                {
-                    qDebug() << it.next();
-                }
-                */
-    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    //QStringList files = eviddir.entryList(QStringList(filefilter), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
                 QDir eviddir = QDir(wombatvariable.tmpmntpath + nodes.at(i));
                 QFile evidfile(wombatvariable.tmpmntpath + nodes.at(i) + "/stat");
                 evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -473,7 +464,6 @@ private:
                     parent->AppendChild(new TreeNode(columndata, parent));
                     curid = tmpstr.split(",").at(5);
                     parents[curid] = parent->child(parent->ChildCount() - 1);
-                //QStringList statlist = eviddir.entryList(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Hidden, QDir::DirsLast);
                 }
                 QStringList vollist = eviddir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
                 for(int j=0; j < vollist.count(); j++)
@@ -660,6 +650,7 @@ private:
     };
     void FileRecurse(QString path)
     {
+        qDebug() << "path:" << path;
         QString parid;
         QString curid;
         QString tmpstr = "";
@@ -680,6 +671,8 @@ private:
             {
                 columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
                 fpar = path.split("/").last().split("f").last().toULongLong();
+                qDebug() << "item path:" << path;
+                qDebug() << "parentid:" << path.split("/").at(path.split("/").count() - 2);
                 parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a";
                 QHashIterator<QString, TreeNode*> j(parents);
                 while(j.hasNext())
@@ -701,7 +694,7 @@ private:
                 if(tmpstr.split(",").at(14).toInt() == true)
                     parents.value(curid)->SetDeleted(true);
             }
-            FileRecurse(path + subfiles.at(i));
+            FileRecurse(path + "/" + subfiles.at(i));
         }
         /*
          *  columndata.clear();
