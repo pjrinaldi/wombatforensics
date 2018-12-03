@@ -653,14 +653,6 @@ void BuildPropFile(TSK_FS_FILE* tmpfile)
 void BuildTreeFile(TSK_FS_FILE* tmpfile)
 {
 }
-/*
-void BuildFilePath(TSK_FS_FILE* tmpfile)
-{
-    unsigned long tmpaddress = 0;
-    unsigned long long paraddress = readfsinfo->root_inum;
-    if(tmpfile->meta
-}
-*/
 
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
@@ -684,18 +676,8 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
             {
-                if(paraddress == readfsinfo->root_inum)
-                    wombatvariable.curfilepath = wombatvariable.partitionpath;
-                else
-                    wombatvariable.curfilepath = wombatvariable.curfilepath.left(wombatvariable.curfilepath.lastIndexOf("/", -1));
-                if(paraddress != readfsinfo->root_inum)
-                {
-                    wombatvariable.curfilepath += "/.f" + QString::number(paraddress);
-                }
-                if(paraddress == readfsinfo->root_inum)
-                    wombatvariable.curfilepath += ".f" + QString::number(tmpaddress);
-                else
-                    wombatvariable.curfilepath += "/.f" + QString::number(tmpaddress);
+                wombatvariable.curfilepath = wombatvariable.partitionpath;
+                wombatvariable.curfilepath += ".f" + QString::number(tmpaddress) + "/";
                 (new QDir())->mkpath(wombatvariable.curfilepath);
                 qDebug() << "curfilepath:" << wombatvariable.curfilepath;
                 BuildStatFile(tmpfile, tmppath);

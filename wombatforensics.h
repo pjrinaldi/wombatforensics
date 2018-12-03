@@ -444,6 +444,7 @@ private:
         QString parid;
         QString curid;
         unsigned long long fpar;
+        QString rootinum = "";
         int nodecount = 0;
         QString tmpstr = "";
         for(int i=0; i < nodes.count(); i++)
@@ -492,6 +493,7 @@ private:
                         if(partfile.isOpen())
                             tmpstr = partfile.readLine();
                         partfile.close();
+                        rootinum = tmpstr.split(",").at(3);
                         if(tmpstr.split(",").count() > 10)
                         {
                             columndata << tmpstr.split(",").at(10) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
@@ -513,8 +515,12 @@ private:
                             if(tmpstr.split(",").count() > 12)
                             {
                                 columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
-                                parid = tmpstr.split(",").at(12).split("-f").at(0);
-                                curid = tmpstr.split(",").at(12);
+                                if(tmpstr.split(",").at(2).toInt() == rootinum.toInt())
+                                    parid = tmpstr.split(",").at(12).split("-f").at(0);
+                                else
+                                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + tmpstr.split(",").at(2);
+                                curid = tmpstr.split(",").at(12).split("-a").at(0);
+                                qDebug() << "par-cur:" << parid << curid;
                                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
                                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
                                 if(checkhash.contains(tmpstr.split(",").at(12).split("-a").first()))
@@ -522,7 +528,7 @@ private:
                                 if(tmpstr.split(",").at(14).toInt() == true)
                                     parents.value(curid)->SetDeleted(true);
                             }
-                            FileRecurse(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + rootlist.at(l));
+                            //FileRecurse(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + rootlist.at(l));
                             //FileRecurse(newpath);
                             // NEED TO RECURSE HERE FOR EACH FILE FOLDER TO CHECK IF IT HAS CHILDREN...
                             // CALL SOMETHING LIKE FileRecurse(path) WHICH WOULD GET CHILDREN, CALL THE DATA, ETC AND THEN CALL RECURSE
