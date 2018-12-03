@@ -638,7 +638,9 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     if(evidlistfile.size() > 0)
     {
         treefile.reset();
-        treenodemodel = new TreeNodeModel(evidlistfile.readAll());
+        treenodemodel = new TreeNodeModel("");
+        //OpenEvidence();
+        //treenodemodel = new TreeNodeModel(evidlistfile.readAll());
         evidlistfile.close();
     }
     else
