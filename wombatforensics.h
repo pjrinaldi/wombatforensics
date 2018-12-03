@@ -650,7 +650,6 @@ private:
     };
     void FileRecurse(QString path)
     {
-        //qDebug() << "path:" << path;
         QString parid;
         QString curid;
         QString tmpstr = "";
@@ -660,7 +659,6 @@ private:
         QStringList subfiles = filedir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
         for(int i=0; i < subfiles.count(); i++)
         {
-            //qDebug() << subfiles.at(i);
             columndata.clear();
             QFile subfile(path + "/" + subfiles.at(i) + "/stat");
             subfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -693,11 +691,13 @@ private:
                 //unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
                 //rootinumfile.close();
                 //if(fpar != rootinum)
+                /*
                 QString pathstring = "";
                 for(int j = 0; j < path.split("/").count() - 1; j++)
                 {
                     pathstring += path.split("/").at(j) + "/";
                 }
+                */
                 //qDebug() << "path string:" << pathstring;
                 QFile rootinumfile(wombatvariable.tmpmntpath + path.split("/").at(5) + "/" + path.split("/").at(6) + "/" + path.split("/").at(7) + "/stat");
                 //qDebug() << "rootinumfile:" << rootinumfile.fileName();
@@ -707,17 +707,24 @@ private:
                 qDebug() << "rootinum:" << rootinum;
                 rootinumfile.close();
                 //QString filestring = 
+                /*
                 if(path.split("/").at(path.split("/").count() - 2).contains("p"))
                     parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + QString::number(rootinum);
                 else
                     parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
+                */
                 /*
                 if(fpar != rootinum)
                     parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
                 else
                     parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(rootinum) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
                 */
+                if(path.split("/").at(path.split("/").count() - 2).contains("p"))
+                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + QString::number(rootinum);
+                else
+                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
                 qDebug() << "path:" << path;
+                qDebug() << "subfile path:" << QString(path + "/" + subfiles.at(i));
                 qDebug() << "par id:" << parid;
                     //parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + path.split("/").last().split("f").last() + "-a"
                 //parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + path.split("/").last().split("f").last() + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
@@ -732,7 +739,7 @@ private:
                 if(tmpstr.split(",").at(14).toInt() == true)
                     parents.value(curid)->SetDeleted(true);
             }
-            FileRecurse(path + "/" + subfiles.at(i));
+            FileRecurse(QString(path + "/" + subfiles.at(i)));
         }
         /*
          *  columndata.clear();
