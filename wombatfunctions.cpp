@@ -653,7 +653,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
                         {
                             if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                             {
-                                QFile adsfile(wombatvariable.curfilepath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + "-a" + QString::number(paraddress) + ".stat");
+                                QFile adsfile(wombatvariable.curfilepath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(paraddress) + ".stat");
                                 //QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->name->meta_addr) + "-" + QString::number(fsattr->id) + ".a" + QString::number(tmpfile->name->meta_addr));
                                 adsfile.open(QIODevice::Append | QIODevice::Text);
                                 //qDebug() << QString::number(tmpfile->meta->addr) << "BuildStatFile: adsfile: open";
