@@ -650,7 +650,7 @@ private:
     };
     void FileRecurse(QString path)
     {
-        qDebug() << "path:" << path;
+        //qDebug() << "path:" << path;
         QString parid;
         QString curid;
         QString tmpstr = "";
@@ -670,8 +670,8 @@ private:
             if(tmpstr.split(",").count() > 12)
             {
                 columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
-                //fpar = path.split("/").last().split("f").last().toULongLong();
-                //qDebug() << "item path:" << path;
+                fpar = path.split("/").at(path.split("/").count() - 1).mid(2).toULongLong();
+                //qDebug() << "fpar:" << fpar;
                 //qDebug() << "parentid:" << path.split("/").at(path.split("/").count() - 1);
                 //parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a";
                 /*
@@ -687,8 +687,43 @@ private:
                 }
                 */
                 //parid = tmpstr.split(",").at(12).split("-f").at(0);
-                parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + path.split("/").last().split("f").last() + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
+                //QFile rootinumfile(wombatvariable.volumepath + ".p" + columnstrings.at(0).split("-").at(2).mid(1) + "/stat");
+                //QFile rootinumfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + columnstrings.at(0).split("-").at(2).mid(1));
+                //rootinumfile.open(QIODevice::ReadOnly);
+                //unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
+                //rootinumfile.close();
+                //if(fpar != rootinum)
+                QString pathstring = "";
+                for(int j = 0; j < path.split("/").count() - 1; j++)
+                {
+                    pathstring += path.split("/").at(j) + "/";
+                }
+                //qDebug() << "path string:" << pathstring;
+                QFile rootinumfile(wombatvariable.tmpmntpath + path.split("/").at(5) + "/" + path.split("/").at(6) + "/" + path.split("/").at(7) + "/stat");
+                //qDebug() << "rootinumfile:" << rootinumfile.fileName();
+                //QFile rootinumfile(path.split("/").last() + "/stat");
+                rootinumfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
+                qDebug() << "rootinum:" << rootinum;
+                rootinumfile.close();
+                //QString filestring = 
+                if(path.split("/").at(path.split("/").count() - 2).contains("p"))
+                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + QString::number(rootinum);
+                else
+                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
+                /*
+                if(fpar != rootinum)
+                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
+                else
+                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(rootinum) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
+                */
+                qDebug() << "path:" << path;
+                qDebug() << "par id:" << parid;
+                    //parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + path.split("/").last().split("f").last() + "-a"
+                //parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + path.split("/").last().split("f").last() + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
+                //qDebug() << "par id:" << parid;
                 curid = tmpstr.split(",").at(12);
+                qDebug() << "cur id:" << curid;
                 //qDebug() << "current file:" << subfiles.at(i);
                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
