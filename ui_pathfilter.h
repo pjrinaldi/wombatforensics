@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'pathfilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,12 @@
 #define UI_PATHFILTER_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
@@ -71,9 +74,9 @@ public:
 
     void retranslateUi(QWidget *PathFilter)
     {
-        PathFilter->setWindowTitle(QApplication::translate("PathFilter", "Filter", nullptr));
-        checkBox->setText(QApplication::translate("PathFilter", "Show Items where path contains", nullptr));
-        pushButton->setText(QApplication::translate("PathFilter", "Apply", nullptr));
+        PathFilter->setWindowTitle(QApplication::translate("PathFilter", "Filter", Q_NULLPTR));
+        checkBox->setText(QApplication::translate("PathFilter", "Show Items where path contains", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("PathFilter", "Apply", Q_NULLPTR));
     } // retranslateUi
 
 };

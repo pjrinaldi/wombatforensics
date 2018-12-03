@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'changeddatefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,10 +10,13 @@
 #define UI_CHANGEDDATEFILTER_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
 
@@ -88,12 +91,12 @@ public:
 
     void retranslateUi(QWidget *ChangedDateFilter)
     {
-        ChangedDateFilter->setWindowTitle(QApplication::translate("ChangedDateFilter", "Filter", nullptr));
-        morecheckBox->setText(QApplication::translate("ChangedDateFilter", "Show Items with date >", nullptr));
-        lessdateTimeEdit->setDisplayFormat(QApplication::translate("ChangedDateFilter", "MM/dd/yyyy HH:mm:ss", nullptr));
-        moredateTimeEdit->setDisplayFormat(QApplication::translate("ChangedDateFilter", "MM/dd/yyyy HH:mm:ss", nullptr));
-        lesscheckBox->setText(QApplication::translate("ChangedDateFilter", "Show Items with date <", nullptr));
-        pushButton->setText(QApplication::translate("ChangedDateFilter", "Apply", nullptr));
+        ChangedDateFilter->setWindowTitle(QApplication::translate("ChangedDateFilter", "Filter", Q_NULLPTR));
+        morecheckBox->setText(QApplication::translate("ChangedDateFilter", "Show Items with date >", Q_NULLPTR));
+        lessdateTimeEdit->setDisplayFormat(QApplication::translate("ChangedDateFilter", "MM/dd/yyyy HH:mm:ss", Q_NULLPTR));
+        moredateTimeEdit->setDisplayFormat(QApplication::translate("ChangedDateFilter", "MM/dd/yyyy HH:mm:ss", Q_NULLPTR));
+        lesscheckBox->setText(QApplication::translate("ChangedDateFilter", "Show Items with date <", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("ChangedDateFilter", "Apply", Q_NULLPTR));
     } // retranslateUi
 
 };

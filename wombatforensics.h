@@ -42,6 +42,7 @@
 #define FALSE 0
 #endif
 
+/*
 class TreeNodeModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -52,7 +53,7 @@ public:
         QList<QVariant> zerodata;
         zerodata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature";
         zeronode = new TreeNode(zerodata);
-        AddEvidence(data.split((QString("\n"))), zeronode);
+        //AddEvidence(data.split((QString("\n"))), zeronode);
     };
 
     ~TreeNodeModel()
@@ -68,7 +69,7 @@ public:
         if(role != Qt::DisplayRole)
             return QVariant();
         */
-        
+/*        
         TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
         int nodetype = 0;
         int itemtype = 0;
@@ -564,7 +565,7 @@ private:
 
                              *
                              */ 
-                        }
+/*                        }
                     }
                 }
             }
@@ -653,7 +654,7 @@ private:
             }
             nodecount++;
         }*/
-    };
+/*    };
     void FileRecurse(QString path)
     {
         QString parid;
@@ -705,7 +706,7 @@ private:
                 }
                 */
                 //qDebug() << "path string:" << pathstring;
-                QFile rootinumfile(wombatvariable.tmpmntpath + path.split("/").at(5) + "/" + path.split("/").at(6) + "/" + path.split("/").at(7) + "/stat");
+/*                QFile rootinumfile(wombatvariable.tmpmntpath + path.split("/").at(5) + "/" + path.split("/").at(6) + "/" + path.split("/").at(7) + "/stat");
                 //qDebug() << "rootinumfile:" << rootinumfile.fileName();
                 //QFile rootinumfile(path.split("/").last() + "/stat");
                 rootinumfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -725,7 +726,7 @@ private:
                 else
                     parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(rootinum) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
                 */
-                if(path.split("/").at(path.split("/").count() - 2).contains("p"))
+/*                if(path.split("/").at(path.split("/").count() - 2).contains("p"))
                     parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + QString::number(rootinum);
                 else
                     parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
@@ -766,8 +767,25 @@ private:
             QStringList rootlist = partdir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
          *
          */ 
-    };
+/*    };
 public:
+    void AddNode(QList<QVariant> data, QString parid, int type, int deleted)
+    {
+        if(parid.toInt() == -1)
+        {
+            zeronode->AppendChild(new TreeNode(data, zeronode));
+            parents[data.at(0).toString()] = zeronode->child(zeronode->ChildCount() - 1);
+        }
+        else
+        {
+            parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
+            parents[data.at(0).toString()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+            if(checkhash.contains(data.at(0).toString().split("-a").first()))
+                parents.value(data.at(0).toString())->SetChecked(true);
+            if(deleted == true)
+                parents.value(data.at(0).toString())->SetDeleted(true);
+        }
+    };
     //void RemEvidence(QString evidid)
     void RemEvidence()
     {
@@ -786,7 +804,7 @@ public:
         parents.remove(evidid);
         endRemoveRows();
         */
-        beginResetModel();
+/*        beginResetModel();
         endResetModel();
     };
 
@@ -800,6 +818,7 @@ private:
     TreeNode* zeronode; //rootitem
     QHash<QString, TreeNode*> parents;
 };
+*/
 
 namespace Ui {
 class WombatForensics;
@@ -818,7 +837,7 @@ public:
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;
     FileViewer* fileviewer;
-    TreeNodeModel* treenodemodel;
+    //TreeNodeModel* treenodemodel;
     QMenu* treemenu;
     QMenu* selectionmenu;
     QMenu* bookmarkmenu;

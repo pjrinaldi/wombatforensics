@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'idfilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,10 +10,13 @@
 #define UI_IDFILTER_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
@@ -155,19 +158,19 @@ public:
 
     void retranslateUi(QFrame *IdFilter)
     {
-        IdFilter->setWindowTitle(QApplication::translate("IdFilter", "Frame", nullptr));
+        IdFilter->setWindowTitle(QApplication::translate("IdFilter", "Frame", Q_NULLPTR));
         echeckBox->setText(QString());
         espinBox->setSuffix(QString());
-        espinBox->setPrefix(QApplication::translate("IdFilter", "e", nullptr));
+        espinBox->setPrefix(QApplication::translate("IdFilter", "e", Q_NULLPTR));
         vcheckBox->setText(QString());
-        vspinBox->setPrefix(QApplication::translate("IdFilter", "v", nullptr));
+        vspinBox->setPrefix(QApplication::translate("IdFilter", "v", Q_NULLPTR));
         pcheckBox->setText(QString());
-        pspinBox->setPrefix(QApplication::translate("IdFilter", "p", nullptr));
+        pspinBox->setPrefix(QApplication::translate("IdFilter", "p", Q_NULLPTR));
         fcheckBox->setText(QString());
-        fspinBox->setPrefix(QApplication::translate("IdFilter", "f", nullptr));
-        label->setText(QApplication::translate("IdFilter", "Show ID's that contain:", nullptr));
-        pushButton->setText(QApplication::translate("IdFilter", "Apply", nullptr));
-        idlabel->setText(QApplication::translate("IdFilter", "TextLabel", nullptr));
+        fspinBox->setPrefix(QApplication::translate("IdFilter", "f", Q_NULLPTR));
+        label->setText(QApplication::translate("IdFilter", "Show ID's that contain:", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("IdFilter", "Apply", Q_NULLPTR));
+        idlabel->setText(QApplication::translate("IdFilter", "TextLabel", Q_NULLPTR));
     } // retranslateUi
 
 };

@@ -9,7 +9,7 @@
 #include "globals.h"
 
 std::string GetTime(void);
-char* TskTimeToStringUTC(time_t time, char buf[128]);
+//char* TskTimeToStringUTC(time_t time, char buf[128]);
 unsigned long long GetChildCount(QString filefilter);
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);

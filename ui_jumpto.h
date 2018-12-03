@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'jumpto.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,12 @@
 #define UI_JUMPTO_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -83,12 +86,12 @@ public:
 
     void retranslateUi(QFrame *JumpFilter)
     {
-        JumpFilter->setWindowTitle(QApplication::translate("JumpFilter", "Frame", nullptr));
-        lineEdit->setPlaceholderText(QApplication::translate("JumpFilter", "Enter Hex Offset", nullptr));
-        label->setText(QApplication::translate("JumpFilter", "Jump to:", nullptr));
-        pushButton->setText(QApplication::translate("JumpFilter", "Go", nullptr));
+        JumpFilter->setWindowTitle(QApplication::translate("JumpFilter", "Frame", Q_NULLPTR));
+        lineEdit->setPlaceholderText(QApplication::translate("JumpFilter", "Enter Hex Offset", Q_NULLPTR));
+        label->setText(QApplication::translate("JumpFilter", "Jump to:", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("JumpFilter", "Go", Q_NULLPTR));
 #ifndef QT_NO_SHORTCUT
-        pushButton->setShortcut(QApplication::translate("JumpFilter", "Return", nullptr));
+        pushButton->setShortcut(QApplication::translate("JumpFilter", "Return", Q_NULLPTR));
 #endif // QT_NO_SHORTCUT
     } // retranslateUi
 

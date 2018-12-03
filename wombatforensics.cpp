@@ -836,12 +836,14 @@ void WombatForensics::UpdateStatus()
     PrepareEvidenceImage();
     //LogMessage("Building Initial Evidence Tree...");
     treefile.close();
+    /*
     QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
     evidlistfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(ui->dirTreeView->model() != NULL)
         delete treenodemodel;
     treenodemodel = new TreeNodeModel(evidlistfile.readAll());
     evidlistfile.close();
+    */
     //listeditems.clear();
     /*
     treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
@@ -912,6 +914,9 @@ void WombatForensics::AddEvidence()
             //LogMessage("Start Adding Evidence");
             //InitializeEvidenceStructure();
             //UpdateStatus();
+            if(ui->dirTreeView->model() != NULL)
+                delete treenodemodel;
+                treenodemodel = new TreeNodeModel("");
             QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
             sqlwatcher.setFuture(tmpfuture);
         }

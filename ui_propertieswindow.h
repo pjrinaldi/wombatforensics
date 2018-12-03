@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'propertieswindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,7 +10,9 @@
 #define UI_PROPERTIESWINDOW_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
@@ -135,9 +137,9 @@ public:
 
     void retranslateUi(QDialog *PropertiesWindow)
     {
-        PropertiesWindow->setWindowTitle(QApplication::translate("PropertiesWindow", "Properties", nullptr));
-        groupBox->setTitle(QApplication::translate("PropertiesWindow", "Description", nullptr));
-        label->setText(QApplication::translate("PropertiesWindow", "Information on the selected object and its value.", nullptr));
+        PropertiesWindow->setWindowTitle(QApplication::translate("PropertiesWindow", "Properties", Q_NULLPTR));
+        groupBox->setTitle(QApplication::translate("PropertiesWindow", "Description", Q_NULLPTR));
+        label->setText(QApplication::translate("PropertiesWindow", "Information on the selected object and its value.", Q_NULLPTR));
     } // retranslateUi
 
 };

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'imageviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,12 @@
 #define UI_IMAGEVIEWER_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QVBoxLayout>
@@ -85,8 +88,8 @@ public:
 
     void retranslateUi(QDialog *ImageViewer)
     {
-        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Image Viewer", nullptr));
-        label->setText(QApplication::translate("ImageViewer", "Loading...", nullptr));
+        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Image Viewer", Q_NULLPTR));
+        label->setText(QApplication::translate("ImageViewer", "Loading...", Q_NULLPTR));
     } // retranslateUi
 
 };

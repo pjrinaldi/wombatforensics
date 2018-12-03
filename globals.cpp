@@ -31,6 +31,7 @@ int linefactor = 0;
 int filelinefactor = 0;
 int thumbsize = 320;
 int mftrecordsize = 1024;
+TreeNodeModel* treenodemodel = NULL;
 InterfaceSignals* isignals = new InterfaceSignals();
 QList<QVariant> colvalues;
 QStringList propertylist;

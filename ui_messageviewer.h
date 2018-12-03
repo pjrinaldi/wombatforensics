@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'messageviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.11.1
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,12 @@
 #define UI_MESSAGEVIEWER_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 
@@ -63,14 +66,14 @@ public:
 
     void retranslateUi(QDialog *MessageViewer)
     {
-        MessageViewer->setWindowTitle(QApplication::translate("MessageViewer", "Message Viewer", nullptr));
-        checkBox->setText(QApplication::translate("MessageViewer", "View Logged Messages", nullptr));
+        MessageViewer->setWindowTitle(QApplication::translate("MessageViewer", "Message Viewer", Q_NULLPTR));
+        checkBox->setText(QApplication::translate("MessageViewer", "View Logged Messages", Q_NULLPTR));
         textEdit->setHtml(QApplication::translate("MessageViewer", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Bitstream Vera Sans'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", nullptr));
-        textEdit->setPlaceholderText(QApplication::translate("MessageViewer", "Messages and Errors go here...", nullptr));
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", Q_NULLPTR));
+        textEdit->setPlaceholderText(QApplication::translate("MessageViewer", "Messages and Errors go here...", Q_NULLPTR));
     } // retranslateUi
 
 };
