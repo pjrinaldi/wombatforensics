@@ -444,7 +444,6 @@ public:
                 {
                     char* ibuffer = new char[128];
                     time_t tmptime = itemnode->Data(index.column()).toInt();
-                    //ibuffer[0] = "\0";
                     if(tmptime <= 0)
                         strncpy(ibuffer, "", 128);
                     else
@@ -455,25 +454,6 @@ public:
                     QString tmpstr = QString(ibuffer);
                     delete[] ibuffer;
                     return tmpstr;
-                    //char* ibuffer = new char        //char buf[128];
-                    /*
-        char* buf = new char[128];
-        buf[0] = '\0';
-        if (time <= 0) {
-            strncpy(buf, "", 128);
-        }
-        else {
-            //struct tm *tmTime = localtime(&time);
-            struct tm *tmTime = gmtime(&time);
-    
-            snprintf(buf, 128, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d", (int) tmTime->tm_year + 1900, (int) tmTime->tm_mon + 1, (int) tmTime->tm_mday, tmTime->tm_hour, (int) tmTime->tm_min, (int) tmTime->tm_sec);//, tzname[(tmTime->tm_isdst == 0) ? 0 : 1]);
-        }
-        return buf;
-        */
-//[128];
-                    //QString tmpstr = QString(TskTimeToStringUTC(itemnode->Data(index.column()).toInt()));
-                    //delete[] ibuffer;
-                    //return tmpstr;
                 }
             }
             else if(index.column() >= 8 && index.column() <= 10)
@@ -1010,19 +990,26 @@ private:
 public:
     void AddNode(QList<QVariant> data, QString parid, int type, int deleted)
     {
-        if(parid.toInt() == -1)
+        if(parid.toInt() == -1) // evid
         {
             zeronode->AppendChild(new TreeNode(data, zeronode));
             parents[data.at(0).toString()] = zeronode->child(zeronode->ChildCount() - 1);
         }
-        else
+        else // everything else 
         {
-            parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
-            parents[data.at(0).toString()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+            //qDebug() << "parid:" << parid;
+            //qDebug() << parents;
+            if(type == -1)
+                parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid)));
+            else
+                parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
+            //qDebug() << "curid:" << data.at(0).toString();
+            //qDebug() << "no -a curid:" << data.at(0).toString().split("-a").first();
+            parents[data.at(0).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
             if(checkhash.contains(data.at(0).toString().split("-a").first()))
-                parents.value(data.at(0).toString())->SetChecked(true);
-            if(deleted == true)
-                parents.value(data.at(0).toString())->SetDeleted(true);
+                parents.value(data.at(0).toString().split("-a").first())->SetChecked(true);
+            if(deleted == 1)
+                parents.value(data.at(0).toString().split("-a").first())->SetDeleted(true);
         }
     };
     //void RemEvidence(QString evidid)
