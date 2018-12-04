@@ -1236,6 +1236,47 @@ void PopulateTreeModel()
                 nodedata << tmpstr.split(",").at(5) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                 treenodemodel->AddNode(nodedata, tmpstr.split(",").at(5).split("-").first(), -1, 0);
             }
+            QDir partdir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j));
+            QStringList partlist = partdir.entryList(QStringList(".p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+            for(int k = 0; k < partlist.count(); k++)
+            {
+                int rootinum = 0;
+                nodedata.clear();
+                QFile partfile(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/stat");
+                partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(partfile.isOpen())
+                    tmpstr = partfile.readLine();
+                partfile.close();
+                if(tmpstr.split(",").count() > 0)
+                {
+                    nodedata << tmpstr.split(",").at(10) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                    rootinum = tmpstr.split(",").at(3).toInt();
+                    treenodemodel->AddNode(nodedata, tmpstr.split(",").at(10).split("-p").first(), -1, 0);
+                }
+                QDir rootdir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k));
+                QStringList rootlist = rootdir.entryList(QStringList(QString("*.a" + QString::number(rootinum) + ".stat")), QDir::NoSymLinks | QDir::Files);
+                for(int l=0; l < rootlist.count(); l++)
+                {
+                    nodedata.clear();
+                    QFile rootfile(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + rootlist.at(l));
+                    rootfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                    if(rootfile.isOpen())
+                        tmpstr = rootfile.readLine();
+                    rootfile.close();
+                    if(tmpstr.split(",").count() > 0)
+                    {
+                        nodedata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").first() << tmpstr.split(",").at(10).split("/").last();
+                        treenodemodel->AddNode(nodedata, tmpstr.split(",").at(12).split("-f").first(), tmpstr.split(",").at(1).toInt(), tmpstr.split(",").at(14).toInt());
+                        /*
+                         *
+                        if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
+                            parentstr = "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                        else
+                            parentstr = "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->par_addr);
+                         */ 
+                    }
+                }
+            }
         }
     }
     //zerodata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature";
