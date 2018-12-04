@@ -653,13 +653,13 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
                         {
                             if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                             {
-                                QFile adsfile(wombatvariable.curfilepath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(paraddress) + ".stat");
+                                QFile adsfile(wombatvariable.curfilepath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
                                 //QFile adsfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + QString::number(tmpfile->name->meta_addr) + "-" + QString::number(fsattr->id) + ".a" + QString::number(tmpfile->name->meta_addr));
                                 adsfile.open(QIODevice::Append | QIODevice::Text);
                                 //qDebug() << QString::number(tmpfile->meta->addr) << "BuildStatFile: adsfile: open";
                                 QTextStream adsout(&adsfile);
                                 adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
-                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
+                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0,0";
                                 //adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(adssize - (unsigned long long)fsattr->size + 16) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0";
                                 adsout.flush();
                                 if(adsfile.isOpen())
@@ -1267,6 +1267,7 @@ void PopulateTreeModel()
                     {
                         nodedata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").first() << tmpstr.split(",").at(10).split("/").last();
                         treenodemodel->AddNode(nodedata, tmpstr.split(",").at(12).split("-f").first(), tmpstr.split(",").at(1).toInt(), tmpstr.split(",").at(14).toInt());
+                        FileRecurse(evidlist.at(i), vollist.at(j), partlist.at(k), rootlist.at(l).split(".a").first().mid(1));
                         /*
                          *
                         if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
@@ -1281,6 +1282,32 @@ void PopulateTreeModel()
     }
     //zerodata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature";
 
+}
+
+void FileRecurse(QString eid, QString vid, QString pid, QString parid)
+{
+    QString tmpstr = "";
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    QDir filedir = QDir(wombatvariable.tmpmntpath + eid + "/" + vid + "/" + pid);
+    QStringList filelist = filedir.entryList(QStringList(QString("*.a" + parid + ".stat")), QDir::NoSymLinks | QDir::Files);
+    for(int i=0; i < filelist.count(); i++)
+    {
+        //qDebug() << eid.split(".").last() + "-" + vid.mid(1) + "-" + pid.mid(1) + "-f" + parid;
+        //qDebug() << filelist.at(i).split(".a").first().mid(1);
+        QFile filefile(wombatvariable.tmpmntpath + eid + "/" + vid + "/" + pid + "/" + filelist.at(i));
+        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
+        filefile.close();
+        if(tmpstr.split(",").count() > 0)
+        {
+            //qDebug() << tmpstr;
+            nodedata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").first() << tmpstr.split(",").at(10).split("/").last();
+            treenodemodel->AddNode(nodedata, QString(eid.split(".").last() + "-" + vid.mid(1) + "-" + pid.mid(1) + "-f" + parid), tmpstr.split(",").at(1).toInt(), tmpstr.split(",").at(14).toInt());
+            FileRecurse(eid, vid, pid, filelist.at(i).split(".a").first().mid(1));
+        }
+    }
 }
 
 void InitializeEvidenceStructure()
