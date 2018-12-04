@@ -1305,8 +1305,9 @@ void FileRecurse(QString eid, QString vid, QString pid, QString parid)
             nodedata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").first() << tmpstr.split(",").at(10).split("/").last();
             //qDebug() << parid << filelist.at(i) << filelist.at(i).split(".a").first().mid(1).split("-").first() << QString(eid.split(".").last() + "-" + vid.mid(1) + "-" + pid.mid(1) + "-f" + parid);
             treenodemodel->AddNode(nodedata, QString(eid.split(".").last() + "-" + vid.mid(1) + "-" + pid.mid(1) + "-f" + parid), tmpstr.split(",").at(1).toInt(), tmpstr.split(",").at(14).toInt());
-            if(parid != filelist.at(i).split(".a").first().mid(1).split("-").first())
+            if(parid != filelist.at(i).split(".a").first().mid(1).split("-").first()) // for ads files to skip
                 FileRecurse(eid, vid, pid, filelist.at(i).split(".a").first().mid(1).split("-").first());
+            // i think the above recurses' on files forever need to step and see with qdebug statements.
         }
     }
 }
