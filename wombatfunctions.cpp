@@ -1267,6 +1267,7 @@ void PopulateTreeModel()
                     {
                         nodedata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").first() << tmpstr.split(",").at(10).split("/").last();
                         treenodemodel->AddNode(nodedata, tmpstr.split(",").at(12).split("-f").first(), tmpstr.split(",").at(1).toInt(), tmpstr.split(",").at(14).toInt());
+                        //qDebug() << rootlist.at(l).split(".a").first().mid(1);
                         FileRecurse(evidlist.at(i), vollist.at(j), partlist.at(k), rootlist.at(l).split(".a").first().mid(1));
                         /*
                          *
@@ -1293,19 +1294,19 @@ void FileRecurse(QString eid, QString vid, QString pid, QString parid)
     QStringList filelist = filedir.entryList(QStringList(QString("*.a" + parid + ".stat")), QDir::NoSymLinks | QDir::Files);
     for(int i=0; i < filelist.count(); i++)
     {
-        //qDebug() << eid.split(".").last() + "-" + vid.mid(1) + "-" + pid.mid(1) + "-f" + parid;
-        //qDebug() << filelist.at(i).split(".a").first().mid(1);
         QFile filefile(wombatvariable.tmpmntpath + eid + "/" + vid + "/" + pid + "/" + filelist.at(i));
         filefile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(filefile.isOpen())
             tmpstr = filefile.readLine();
         filefile.close();
+        nodedata.clear();
         if(tmpstr.split(",").count() > 0)
         {
-            //qDebug() << tmpstr;
             nodedata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").first() << tmpstr.split(",").at(10).split("/").last();
+            //qDebug() << parid << filelist.at(i) << filelist.at(i).split(".a").first().mid(1).split("-").first() << QString(eid.split(".").last() + "-" + vid.mid(1) + "-" + pid.mid(1) + "-f" + parid);
             treenodemodel->AddNode(nodedata, QString(eid.split(".").last() + "-" + vid.mid(1) + "-" + pid.mid(1) + "-f" + parid), tmpstr.split(",").at(1).toInt(), tmpstr.split(",").at(14).toInt());
-            FileRecurse(eid, vid, pid, filelist.at(i).split(".a").first().mid(1));
+            if(parid != filelist.at(i).split(".a").first().mid(1).split("-").first())
+                FileRecurse(eid, vid, pid, filelist.at(i).split(".a").first().mid(1).split("-").first());
         }
     }
 }
