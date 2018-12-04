@@ -1202,6 +1202,46 @@ int SegmentDigits(int number)
     return count;
 }
 
+void PopulateTreeModel()
+{
+    QList<QVariant> nodedata;
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidlist = eviddir.entryList(QStringList("*.e*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+    for(int i=0; i < evidlist.count(); i++)
+    {
+        nodedata.clear();
+        QFile evidfile(wombatvariable.tmpmntpath + evidlist.at(i) + "/stat");
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        QString tmpstr = "";
+        if(evidfile.isOpen())
+            tmpstr = evidfile.readLine();
+        evidfile.close();
+        if(tmpstr.split(",").count() > 0)
+        {
+            nodedata << tmpstr.split(",").at(5) << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+            treenodemodel->AddNode(nodedata,  "-1", -1, -1);
+        }
+        QDir voldir = QDir(wombatvariable.tmpmntpath + evidlist.at(i));
+        QStringList vollist = voldir.entryList(QStringList(".v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+        for(int j=0; j < vollist.count(); j++)
+        {
+            nodedata.clear();
+            QFile volfile(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/stat");
+            volfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(volfile.isOpen())
+                tmpstr = volfile.readLine();
+            volfile.close();
+            if(tmpstr.split(",").count() > 0)
+            {
+                nodedata << tmpstr.split(",").at(5) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                treenodemodel->AddNode(nodedata, tmpstr.split(",").at(5).split("-").first(), -1, 0);
+            }
+        }
+    }
+    //zerodata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature";
+
+}
+
 void InitializeEvidenceStructure()
 {
     readimginfo = NULL;
@@ -1222,12 +1262,12 @@ void InitializeEvidenceStructure()
         errorcount++;
     }
     free(images);
-    QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
-    evidlistfile.open(QIODevice::Append | QIODevice::Text);
-    QTextStream eout(&evidlistfile);
-    eout << wombatvariable.evidencename << ".e" << QString::number(evidcnt) << endl;
-    eout.flush();
-    evidlistfile.close();
+    //QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
+    //evidlistfile.open(QIODevice::Append | QIODevice::Text);
+    //QTextStream eout(&evidlistfile);
+    //eout << wombatvariable.evidencename << ".e" << QString::number(evidcnt) << endl;
+    //eout.flush();
+    //evidlistfile.close();
     wombatvariable.imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
     //wombatvariable.segmentcount = readimginfo->num_img; // number of segments for xmount call (TSK 4.3)
     wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)

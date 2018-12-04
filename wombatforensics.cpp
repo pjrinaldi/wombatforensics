@@ -633,8 +633,22 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         evidcnt++;
     }
     listeditems.clear();
-    QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
-    evidlistfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    treenodemodel = new TreeNodeModel("");
+    PopulateTreeModel();
+    ui->dirTreeView->setModel(treenodemodel);
+    connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    //connect(treenodemodel, SIGNAL(layoutChanged()), this, SLOT(ResizeColumns()));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    UpdateCheckCount();
+    if(indexlist.count() > 0)
+        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    else
+        ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+    //QtConcurrent::run(PopulateTreeModel);
+    //QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
+    //evidlistfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    /*
     if(evidlistfile.size() > 0)
     {
         treefile.reset();
@@ -645,9 +659,11 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     else
         evidlistfile.close();
+        */
     //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
     //treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     //QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
+    /*
     QStringList tmplist;
     if(tmplist.count() > 0)
     {
@@ -672,6 +688,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     else
         treefile.close();
+    */
     if(ui->dirTreeView->model() != NULL)
     {
         ui->actionRemove_Evidence->setEnabled(true);
@@ -745,7 +762,7 @@ void WombatForensics::UpdateDataTable()
 
 void WombatForensics::PrepareEvidenceImage()
 {
-    qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
+    //qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
     QString xmntstr = "";
     if(wombatvariable.segmentcount > 1)
     {
