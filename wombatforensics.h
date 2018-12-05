@@ -893,6 +893,7 @@ private slots:
     void UpdateProgress(unsigned long long count);
     void UpdateExport(void);
     void UpdateDig(void);
+    void OpenUpdate(void);
     void UpdateCheckCount(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideImageWindow(bool checkstate);
@@ -982,6 +983,8 @@ private:
     QFutureWatcher<void> thumbwatcher;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;
+    QFuture<void> openfuture;
+    QFutureWatcher<void> openwatcher;
 
     QProcess* xmntprocess;
 

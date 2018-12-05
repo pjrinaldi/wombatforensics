@@ -101,6 +101,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     InitializeAppStructure();
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+    connect(&openwatcher, SIGNAL(finished()), this, SLOT(OpenUpdate()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(this, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
@@ -634,7 +635,14 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     listeditems.clear();
     treenodemodel = new TreeNodeModel("");
-    PopulateTreeModel();
+    //PopulateTreeModel();
+    openfuture = QtConcurrent::run(PopulateTreeModel);
+    openwatcher.setFuture(openfuture);
+    openwatcher.waitForFinished();
+    //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
+    //sqlwatcher.setFuture(tmpfuture);
+    // MOVE TO WATCHER FINISH
+    /*
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     //connect(treenodemodel, SIGNAL(layoutChanged()), this, SLOT(ResizeColumns()));
@@ -645,6 +653,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+    */
     //QtConcurrent::run(PopulateTreeModel);
     //QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
     //evidlistfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -689,6 +698,40 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     else
         treefile.close();
     */
+    // MOVE TO OPEN WATCHER
+    /*
+    if(ui->dirTreeView->model() != NULL)
+    {
+        ui->actionRemove_Evidence->setEnabled(true);
+        ui->actionSaveState->setEnabled(true);
+        ui->actionDigDeeper->setEnabled(true);
+        //ui->actionBookmark_Manager->setEnabled(true);
+    }
+    */
+    // MOVE TO OPEN WATCHER
+    /*
+    QApplication::restoreOverrideCursor();
+    //LogMessage("Case was Opened Successfully");
+    qInfo() << "Case was Opened Successfully";
+    thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
+    QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
+    if(!tdir.isEmpty())
+        QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash); // load images hash after case open to speed up thumbnail viewing
+    StatusUpdate("Ready");
+    */
+}
+
+void WombatForensics::OpenUpdate()
+{
+    ui->dirTreeView->setModel(treenodemodel);
+    connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    UpdateCheckCount();
+    if(indexlist.count() > 0)
+        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    else
+        ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
     if(ui->dirTreeView->model() != NULL)
     {
         ui->actionRemove_Evidence->setEnabled(true);
@@ -697,7 +740,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         //ui->actionBookmark_Manager->setEnabled(true);
     }
     QApplication::restoreOverrideCursor();
-    //LogMessage("Case was Opened Successfully");
     qInfo() << "Case was Opened Successfully";
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
     QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
