@@ -739,6 +739,13 @@ void WombatForensics::OpenUpdate()
         ui->actionDigDeeper->setEnabled(true);
         //ui->actionBookmark_Manager->setEnabled(true);
     }
+    readfileinfo = NULL;
+    tsk_fs_close(readfsinfo);
+    readfsinfo = NULL;
+    tsk_vs_close(readvsinfo);
+    readvsinfo = NULL;
+    tsk_img_close(readimginfo);
+    readimginfo = NULL;
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
