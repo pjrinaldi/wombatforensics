@@ -638,7 +638,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //PopulateTreeModel();
     openfuture = QtConcurrent::run(PopulateTreeModel);
     openwatcher.setFuture(openfuture);
-    openwatcher.waitForFinished();
+    //openwatcher.waitForFinished();
     //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
     //sqlwatcher.setFuture(tmpfuture);
     // MOVE TO WATCHER FINISH
