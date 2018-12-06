@@ -926,9 +926,98 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 else
                     parentstr = tmplist.at(12).split("-f").first() + "-f" + tmplist.at(2);
                 //qDebug() << "parstr:" << parentstr;
-                nodedata << tmplist.at(12) << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
+                nodedata << tmplist.at(12).split("-a").first() << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
                 treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
                 filesfound++;
+                isignals->ProgUpd();
+                // NEED TO CHECK FOR ADS HERE...
+                if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+                {
+                    int cnt, i;
+                    cnt = tsk_fs_file_attr_getsize(tmpfile);
+                    for(i=0; i < cnt; i++)
+                    {
+                        char type[512];
+                        const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                        if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
+                        {
+                            if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                            {
+                                if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
+                                {
+                                    QFile adsfile(wombatvariable.curfilepath + "f" + QString::number(tmpaddress) + "-" + QString::number(fsattr->id) + ".a" + QString::number(tmpaddress) + ".stat");
+                                    adsfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                                    if(adsfile.isOpen())
+                                        tmpstr = adsfile.readLine();
+                                    tmplist.clear();
+                                    tmplist = tmpstr.split(",");
+                                    parentstr = tmplist.at(12).split("-f").first() + "-f" + tmplist.at(2);
+                                    nodedata.clear();
+                                    nodedata << tmplist.at(12).split("-a").first() << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
+                                    treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
+                                    filesfound++;
+                                    isignals->ProgUpd();
+                                }
+                            }
+                        }
+                    }
+                }
+                /*
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
+    {
+        QByteArray adsba;
+        unsigned long long adssize = 0;
+        TSK_OFF_T curmftentrystart = 0;
+        NTFS_INFO* ntfsinfo = (NTFS_INFO*)tmpfile->fs_info;
+        int recordsize = 0;
+        if(ntfsinfo->fs->mft_rsize_c > 0)
+        {
+            recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize);
+        }
+        else
+            recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
+        if(tmpfile->meta != NULL)
+            curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * tmpfile->meta->addr + 20;
+        else
+            curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
+        char startoffset[2];
+        tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
+        uint16_t teststart = startoffset[1] * 256 + startoffset[0];
+        adssize = (unsigned long long)teststart;
+        if(strcmp(tmpfile->name->name, ".") != 0)
+        {
+            if(strcmp(tmpfile->name->name, "..") != 0)
+            {
+                int cnt, i;
+                cnt = tsk_fs_file_attr_getsize(tmpfile);
+                for(i = 0; i < cnt; i++)
+                {
+                    char type[512];
+                    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+                    adssize += 24;
+                    adssize += (unsigned long long)fsattr->size;
+                    if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
+                    {
+                        if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                        {
+                            if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
+                            {
+                                adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
+                                treeout.clear();
+                                treeout << QString(evidid + "-" + volid.mid(1) + "-" + partid.mid(1) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "10" << "0";
+                                nodedata.clear();
+                                for(int i=0;  i < 11; i++)
+                                    nodedata << treeout.at(i);
+                                treenodemodel->AddNode(nodedata, QString(evidid + "-" + volid.mid(1) + "-" + partid.mid(1) + "-f" + QString::number(tmpfile->name->meta_addr)), treeout.at(11).toInt(), treeout.at(12).toInt());
+                                filesfound++;
+                                isignals->ProgUpd();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+*/
                 //BuildTreeFile(tmpfile, tmppath);
                 //QtConcurrent::run(BuildStatFileThread, curfile, curpath);
                 //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
