@@ -903,11 +903,33 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
             {
+                QString tmpstr = "";
+                QStringList tmplist;
+                tmplist.clear();
+                QList<QVariant> nodedata;
+                nodedata.clear();
                 wombatvariable.curfilepath = wombatvariable.partitionpath;
                 //wombatvariable.curfilepath += ".f" + QString::number(tmpaddress) + "/";
                 //(new QDir())->mkpath(wombatvariable.curfilepath);
                 //qDebug() << "curfilepath:" << wombatvariable.curfilepath;
-                BuildTreeFile(tmpfile, tmppath);
+                QFile filefile(wombatvariable.curfilepath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat");
+                filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(filefile.isOpen())
+                    tmpstr = filefile.readLine();
+                //qDebug() << filefile.fileName();
+                filefile.close();
+                tmplist = tmpstr.split(",");
+                QString parentstr = "";
+                int rootinum = tmpfile->fs_info->root_inum;
+                if(tmplist.at(2).toInt() == rootinum)
+                    parentstr = tmplist.at(12).split("-f").first();
+                else
+                    parentstr = tmplist.at(12).split("-f").first() + "-f" + tmplist.at(2);
+                //qDebug() << "parstr:" << parentstr;
+                nodedata << tmplist.at(12) << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
+                treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
+                filesfound++;
+                //BuildTreeFile(tmpfile, tmppath);
                 //QtConcurrent::run(BuildStatFileThread, curfile, curpath);
                 //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
             }
