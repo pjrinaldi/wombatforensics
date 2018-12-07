@@ -1093,6 +1093,8 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedid.split("-").count() == 4) // file file
     {
+        QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-f").last();
+        qDebug() << "paridstr:" << paridstr;
         // INITIAL PIECE OF FILE HEX CONTENT CODE
         TSK_IMG_INFO* fileheximginfo;
         TSK_FS_INFO* filehexfsinfo;
@@ -1145,6 +1147,10 @@ void WombatForensics::LoadHexContents()
         // FILE SYSTEM PIECE OF FILE HEX CONTENT CODE
         filehexfsinfo = tsk_fs_open_img(fileheximginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
 
+        unsigned long long rootinum = filehexfsinfo->root_inum;
+        if(paridstr.contains("-"))
+            paridstr = QString::number(rootinum);
+        qDebug() << "new parstrid:" << paridstr;
         //QFile partpropfile(wombatvariable.tmpmntpath + partpropfiles.at(0));
         QFile partpropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/prop");
         partpropfile.open(QIODevice::ReadOnly);
@@ -1191,16 +1197,18 @@ void WombatForensics::LoadHexContents()
         QFile filefile;
         QFile filefileprop;
         if(fstring.split(":").count() > 1)
-            filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/." + fstring.split(":").first() + "/" + fstring.split(":").last() + "-stat");
+            filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + fstring.split(":").first() + "-" + fstring.split(":").last() + ".a" + paridstr + ".stat");
         else
-            filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/." + fstring.split(":").first() + "/stat");
+            filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + fstring.split(":").first() + ".a" + paridstr + ".stat");
+        qDebug() << filefile.fileName();
         filefile.open(QIODevice::ReadOnly);
-        tmpstr = filefile.readLine();
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
         //QFile filefileprop(filefile.fileName().split(".a").at(0) + ".prop");
         if(fstring.split(":").count() > 1)
-            filefileprop.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/." + fstring.split(":").first() + "/" + fstring.split(":").last() + "-prop");
+            filefileprop.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + fstring.split(":").first() + "-" + fstring.split(":").last() + ".a" + paridstr + ".prop");
         else
-            filefileprop.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/." + fstring.split(":").first() + "/prop");
+            filefileprop.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + fstring.split(":").first() + ".a" + paridstr + ".prop");
         QString blockstring;
         QString residentstring;
         QString bytestring;

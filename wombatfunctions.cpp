@@ -2089,7 +2089,7 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
     QFile adspropfile;
     if(curfileinfo->name != NULL)
     {
-        adspropfile.setFileName(wombatvariable.curfilepath + "f" + QString::number(curfileinfo->name->meta_addr) + "-" + attrid + ".a" + QString::number(curfileinfo->name->par_addr) + ".prop");
+        adspropfile.setFileName(wombatvariable.curfilepath + "f" + QString::number(curfileinfo->name->meta_addr) + "-" + attrid + ".a" + QString::number(curfileinfo->name->meta_addr) + ".prop");
         //adspropfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".p" + QString::number(partint) + ".f" + fvalue + ".prop");
         adspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
         //qDebug() << "adspropfile: open";
