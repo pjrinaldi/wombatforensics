@@ -630,7 +630,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         wombatvariable.imgtype = (TSK_IMG_TYPE_ENUM)(tmpstr.split(",").first().toInt());
         for(int j=0; j < partcount; j++)
             wombatvariable.fullpathvector.push_back(tmpstr.split(",").at(3).split("|").at(j).toStdString());
-        PrepareEvidenceImage();
+        //PrepareEvidenceImage();
         evidcnt++;
     }
     listeditems.clear();
@@ -723,7 +723,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
 
 void WombatForensics::OpenUpdate()
 {
-    //PrepareEvidenceImage();
+    PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
