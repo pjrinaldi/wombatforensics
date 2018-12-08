@@ -1006,7 +1006,6 @@ void WombatForensics::UpdateProperties()
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 1) // evidence image
     {
         propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").first() + "/prop");
-        qDebug() << propfile.fileName();
         //propfile.setFileName(wombatvariable.tmpmntpath + selectedindex.sibling(selectedindex.row(), 1).data().toString().split("evid").at(0) + ".eprop." + selectedindex.sibling(selectedindex.row(), 0).data().toString().mid(1));
     }
     //QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -1016,13 +1015,11 @@ void WombatForensics::UpdateProperties()
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 2) // volume
     {
         propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(1) + "/prop");
-        qDebug() << propfile.fileName();
         //propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + ".volprop");
     }
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 3) // file system
     {
         propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(1) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "/prop");
-        qDebug() << propfile.fileName();
         //propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + ".partprop." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last());
     }
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 4) // file
@@ -1038,7 +1035,6 @@ void WombatForensics::UpdateProperties()
         else
             tmpfvalue = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last();
         propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(1) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "/" + tmpfvalue + ".a" + parentstr + ".prop");
-        qDebug() << propfile.fileName();
         //propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "." + tmpfvalue + ".prop");
     }
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
