@@ -727,12 +727,17 @@ void WombatForensics::OpenUpdate()
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+    // this currently fails to load content data in the hexviewer. until it does, the char bytes are zero...
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
     if(indexlist.count() > 0)
+    {
+        ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    }
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+    //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
     if(ui->dirTreeView->model() != NULL)
     {
         ui->actionRemove_Evidence->setEnabled(true);
@@ -904,7 +909,7 @@ void WombatForensics::UpdateStatus()
     //qInfo() << QTime::currentTime().toString(
     PrepareEvidenceImage();
     //LogMessage("Building Initial Evidence Tree...");
-    treefile.close();
+    //treefile.close();
     /*
     QFile evidlistfile(wombatvariable.tmpmntpath + "evidlist");
     evidlistfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -1044,7 +1049,6 @@ void WombatForensics::LoadHexContents()
     evidlist.clear();
 
     QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
-    //qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
     ui->hexview->setData(casedatafile);
 
@@ -1095,7 +1099,7 @@ void WombatForensics::LoadHexContents()
     else if(wombatvariable.selectedid.split("-").count() == 4) // file file
     {
         QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-f").last();
-        qDebug() << "paridstr:" << paridstr;
+        //qDebug() << "paridstr:" << paridstr;
         // INITIAL PIECE OF FILE HEX CONTENT CODE
         TSK_IMG_INFO* fileheximginfo;
         TSK_FS_INFO* filehexfsinfo;
@@ -1151,7 +1155,7 @@ void WombatForensics::LoadHexContents()
         unsigned long long rootinum = filehexfsinfo->root_inum;
         if(paridstr.contains("-"))
             paridstr = QString::number(rootinum);
-        qDebug() << "new parstrid:" << paridstr;
+        //qDebug() << "new parstrid:" << paridstr;
         //QFile partpropfile(wombatvariable.tmpmntpath + partpropfiles.at(0));
         QFile partpropfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/prop");
         partpropfile.open(QIODevice::ReadOnly);
@@ -1201,7 +1205,7 @@ void WombatForensics::LoadHexContents()
             filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + fstring.split(":").first() + "-" + fstring.split(":").last() + ".a" + paridstr + ".stat");
         else
             filefile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + fstring.split(":").first() + ".a" + paridstr + ".stat");
-        qDebug() << filefile.fileName();
+        //qDebug() << filefile.fileName();
         filefile.open(QIODevice::ReadOnly);
         if(filefile.isOpen())
             tmpstr = filefile.readLine();
@@ -1210,6 +1214,7 @@ void WombatForensics::LoadHexContents()
             filefileprop.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + fstring.split(":").first() + "-" + fstring.split(":").last() + ".a" + paridstr + ".prop");
         else
             filefileprop.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + fstring.split(":").first() + ".a" + paridstr + ".prop");
+        //qDebug() << filefileprop.fileName();
         QString blockstring;
         QString residentstring;
         QString bytestring;
@@ -1289,47 +1294,50 @@ void WombatForensics::LoadHexContents()
                     unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt());
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                     curoffset = 0;
-                    //qDebug() << "residentstring:" << residentstring.toULongLong();
-                    //qDebug() << resbuffer.at(0) << resbuffer.mid(0, 4) << curoffset;
-                    mftoffset[0] = (uint8_t)resbuffer.at(20);
-                    mftoffset[1] = (uint8_t)resbuffer.at(21);
-                    nextattrid[0] = (uint8_t)resbuffer.at(40);
-                    nextattrid[1] = (uint8_t)resbuffer.at(41);
-                    curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                    //qDebug() << "initial curoffset:" << curoffset;
-                    int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                    //qDebug() << "next attribute id:" << attrcnt;
-                    for(int i = 0; i < attrcnt; i++)
+                    if(resbuffer.length() == 1024)
                     {
-                        attrtype[0] = (uint8_t)resbuffer.at(curoffset);
-                        attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                        attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                        attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                        atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                        namelength = (uint8_t)resbuffer.at(curoffset + 9);
-                        //qDebug() << "namelength:" << namelength << "nameoffset:" << nameoffset;
-                        mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                        mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                        mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                        mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                        contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                        if(namelength > 0 && atrtype == 128)
-                            break;
-                        curoffset += contentlength;
-                        //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
+                        //qDebug() << "residentstring:" << residentstring.toULongLong();
+                        //qDebug() << resbuffer.at(0) << resbuffer.mid(0, 4) << curoffset;
+                        mftoffset[0] = (uint8_t)resbuffer.at(20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(21);
+                        nextattrid[0] = (uint8_t)resbuffer.at(40);
+                        nextattrid[1] = (uint8_t)resbuffer.at(41);
+                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        //qDebug() << "initial curoffset:" << curoffset;
+                        int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                        //qDebug() << "next attribute id:" << attrcnt;
+                        for(int i = 0; i < attrcnt; i++)
+                        {
+                            attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                            attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                            attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                            attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                            atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                            namelength = (uint8_t)resbuffer.at(curoffset + 9);
+                            //qDebug() << "namelength:" << namelength << "nameoffset:" << nameoffset;
+                            mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                            mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                            mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                            mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                            contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                            if(namelength > 0 && atrtype == 128)
+                                break;
+                            curoffset += contentlength;
+                            //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
+                        }
+                        mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
+                        resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        //qDebug() << "final curoffset:" << curoffset + nameoffset + namelength << "final attrtype:" << atrtype;
+                        //qDebug() << "actual ads offset:" << curoffset + nameoffset + namelength + residentoffset;
+                        //qDebug() << "test final offset:" << curoffset + resoffset + residentoffset;
+    
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
+                        ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
+                        fileoffset = (residentoffset + curoffset + resoffset);
+                        filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                     }
-                    mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
-                    mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-                    resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                    //qDebug() << "final curoffset:" << curoffset + nameoffset + namelength << "final attrtype:" << atrtype;
-                    //qDebug() << "actual ads offset:" << curoffset + nameoffset + namelength + residentoffset;
-                    //qDebug() << "test final offset:" << curoffset + resoffset + residentoffset;
-
-                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
-                    ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                    fileoffset = (residentoffset + curoffset + resoffset);
-                    filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
-                }
+                }   
             }
             else // IF NOT ADS
             {
@@ -1338,52 +1346,63 @@ void WombatForensics::LoadHexContents()
                     fhexbuf = new char[filehexfileinfo->meta->size];
                     fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
                 }
+                /*
+                if(filehexfileinfo->name != NULL && filehexfileinfo->meta == NULL)
+                {
+                    fhexbuf = new char[filehexfileinfo->name->size];
+                    fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->name->size, TSK_FS_FILE_READ_FLAG_NONE);
+                }
+                */
                 if(filelist.at(1).toInt() == 3) // IF DIR
                 {
                     //qDebug() << "it's a dir - get 144 attribute offset";
                     unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt());
                     //qDebug() << "residentoffset;" << residentoffset;
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
-                    curoffset = 0;
-                    resoffset = 0;
-                    mftoffset[0] = (uint8_t)resbuffer.at(20);
-                    mftoffset[1] = (uint8_t)resbuffer.at(21);
-                    nextattrid[0] = (uint8_t)resbuffer.at(40);
-                    nextattrid[1] = (uint8_t)resbuffer.at(41);
-                    curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                    //qDebug() << "initial curoffset:" << curoffset;
-                    int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                    //qDebug() << "next attribute id:" << attrcnt;
-                    for(int i = 0; i < attrcnt; i++)
+                    qDebug() << resbuffer.length();
+                    if(resbuffer.length() == 1024)
                     {
-                        attrtype[0] = (uint8_t)resbuffer.at(curoffset);
-                        attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                        attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                        attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                        atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                        //qDebug() << "curoffset:" << curoffset;
-                        //qDebug() << "atrtype:" << atrtype;
-                        mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                        mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                        mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                        mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                        contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                        //qDebug() << "content length:" << contentlength;
-                        //qDebug() << "resoffset:" << resoffset << "contentsize:" << contentsize;
-                        if(atrtype == 144)
-                            break;
-                        curoffset += contentlength;
+                        curoffset = 0;
+                        resoffset = 0;
+                        mftoffset[0] = (uint8_t)resbuffer.at(20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(21);
+                        nextattrid[0] = (uint8_t)resbuffer.at(40);
+                        nextattrid[1] = (uint8_t)resbuffer.at(41);
+                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        //qDebug() << "initial curoffset:" << curoffset;
+                        int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                        //qDebug() << "next attribute id:" << attrcnt;
+                        for(int i = 0; i < attrcnt; i++)
+                        {
+                            attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                            attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                            attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                            attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                            atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                            //qDebug() << "curoffset:" << curoffset;
+                            //qDebug() << "atrtype:" << atrtype;
+                            mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                            mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                            mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                            mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                            contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                            //qDebug() << "content length:" << contentlength;
+                            //qDebug() << "resoffset:" << resoffset << "contentsize:" << contentsize;
+                            if(atrtype == 144)
+                                break;
+                            curoffset += contentlength;
+                        }
+                        // offset to type 144 resident attribute content
+                        mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
+                        //qDebug() << "offset to attr content:" << tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype;
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
+                        ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
+                        fileoffset = (residentoffset + curoffset);
+                        filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                     }
-                    // offset to type 144 resident attribute content
-                    mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
-                    mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-                    //qDebug() << "offset to attr content:" << tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                    curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                    //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype;
-                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
-                    ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
-                    fileoffset = (residentoffset + curoffset);
-                    filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                 }
                 else // IF FILE AND OTHER STUFF
                 {
@@ -1401,40 +1420,43 @@ void WombatForensics::LoadHexContents()
                         unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt());
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                         curoffset = 0;
-                        mftoffset[0] = (uint8_t)resbuffer.at(20);
-                        mftoffset[1] = (uint8_t)resbuffer.at(21);
-                        nextattrid[0] = (uint8_t)resbuffer.at(40);
-                        nextattrid[1] = (uint8_t)resbuffer.at(41);
-                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                        //qDebug() << "initial curoffset:" << curoffset;
-                        int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                        //qDebug() << "next attribute id:" << attrcnt;
-                        for(int i = 0; i < attrcnt; i++)
+                        if(resbuffer.length() == 1024)
                         {
-                            attrtype[0] = (uint8_t)resbuffer.at(curoffset);
-                            attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                            attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                            attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                            atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                            namelength = (uint8_t)resbuffer.at(curoffset + 9);
-                            mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                            mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                            mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                            mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                            contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                            if(namelength == 0 && atrtype == 128)
-                                break;
-                            curoffset += contentlength;
-                            //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
+                            mftoffset[0] = (uint8_t)resbuffer.at(20);
+                            mftoffset[1] = (uint8_t)resbuffer.at(21);
+                            nextattrid[0] = (uint8_t)resbuffer.at(40);
+                            nextattrid[1] = (uint8_t)resbuffer.at(41);
+                            curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                            //qDebug() << "initial curoffset:" << curoffset;
+                            int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                            //qDebug() << "next attribute id:" << attrcnt;
+                            for(int i = 0; i < attrcnt; i++)
+                            {
+                                attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                                attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                                attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                                attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                                atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                                namelength = (uint8_t)resbuffer.at(curoffset + 9);
+                                mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                                mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                                mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                                mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                                contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                                if(namelength == 0 && atrtype == 128)
+                                    break;
+                                curoffset += contentlength;
+                                //qDebug() << "content length:" << contentlength << "curoffset:" << curoffset << "attrtype:" << atrtype << "namelength:" << namelength;
+                            }
+                            mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
+                            mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
+                            resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                            //qDebug() << "test final offset:" << curoffset + resoffset + residentoffset;
+                            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
+                            ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
+                            fileoffset = (residentoffset + curoffset + resoffset);
+                            filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                         }
-                        mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
-                        mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-                        resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                        //qDebug() << "test final offset:" << curoffset + resoffset + residentoffset;
-                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
-                        ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                        fileoffset = (residentoffset + curoffset + resoffset);
-                        filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                     }
                 }
             }
