@@ -962,7 +962,7 @@ private:
     void CloseCurrentCase(void);
     void UpdateProperties(void);
     void LoadHexContents(void);
-    void StartThumbnails(void);
+    void StartThumbnails(QStringList diglist);
     QStringList GetFileLists(int filelisttype);
     void ProcessDig(QString curid);
     void UpdateFilterCount(void);

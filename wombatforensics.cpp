@@ -1716,7 +1716,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     {
         if(digoptions.at(0) == 0) // Generate Thumbnails
         {
-            StartThumbnails();
+            StartThumbnails(digfilelist);
             //GenerateThumbnails();
         }
     }
@@ -1794,7 +1794,7 @@ void WombatForensics::ProcessDig(QString objectid)
     {
         if(digoptions.at(0) == 0) // Generate Thumbnails
         {
-            StartThumbnails();
+            //StartThumbnails();
             //GenerateThumbnails();
         }
     }
@@ -2048,7 +2048,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
-                StartThumbnails();
+                StartThumbnails(QStringList(""));
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
@@ -2062,8 +2062,12 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     }
 }
 
-void WombatForensics::StartThumbnails()
+void WombatForensics::StartThumbnails(QStringList diglist)
 {
+    if(diglist.at(0).length() == 0)
+        qDebug() << "process all";
+    else
+        qDebug() << "process the list";
     qInfo() << "Generating Thumbnails...";
     //LogMessage("Generating Thumbnails...");
     StatusUpdate("Generating Thumbnails...");
