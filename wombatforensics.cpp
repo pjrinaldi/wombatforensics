@@ -1029,7 +1029,6 @@ void WombatForensics::UpdateProperties()
     {
         QString tmpfvalue = "";
         QString parentstr = "5";
-        //QString parentstr = selectedindex.parent().sibling(selectedindex.row(), 0).data().toString().split("-").at(3).mid(1);
         if(selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-").count() == 3) // root inum
             parentstr = "5";
         else
