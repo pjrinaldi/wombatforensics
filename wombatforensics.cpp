@@ -1005,28 +1005,42 @@ void WombatForensics::UpdateProperties()
     propertylist.clear();
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 1) // evidence image
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + selectedindex.sibling(selectedindex.row(), 1).data().toString().split("evid").at(0) + ".eprop." + selectedindex.sibling(selectedindex.row(), 0).data().toString().mid(1));
+        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").first() + "/prop");
+        qDebug() << propfile.fileName();
+        //propfile.setFileName(wombatvariable.tmpmntpath + selectedindex.sibling(selectedindex.row(), 1).data().toString().split("evid").at(0) + ".eprop." + selectedindex.sibling(selectedindex.row(), 0).data().toString().mid(1));
     }
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
-    QString evidfilename = evidfiles.at(0).split(".evid").at(0);
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + wombatvariable.selectedid.split("-").at(0).mid(1));
+    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
+    //QString evidfilename = evidfiles.at(0).split(".evid").at(0);
+    //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + wombatvariable.selectedid.split("-").at(0).mid(1));
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 2) // volume
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + ".volprop");
+        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(1) + "/prop");
+        qDebug() << propfile.fileName();
+        //propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + ".volprop");
     }
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 3) // file system
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + ".partprop." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last());
+        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(1) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "/prop");
+        qDebug() << propfile.fileName();
+        //propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + ".partprop." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last());
     }
     if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 4) // file
     {
         QString tmpfvalue = "";
+        QString parentstr = "5";
+        //QString parentstr = selectedindex.parent().sibling(selectedindex.row(), 0).data().toString().split("-").at(3).mid(1);
+        if(selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-").count() == 3) // root inum
+            parentstr = "5";
+        else
+            parentstr = selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-").at(3).mid(1);
         if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last().contains(":"))
             tmpfvalue = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last().split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last().split(":").at(1);
         else
             tmpfvalue = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last();
-        propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "." + tmpfvalue + ".prop");
+        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(1) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "/" + tmpfvalue + ".a" + parentstr + ".prop");
+        qDebug() << propfile.fileName();
+        //propfile.setFileName(wombatvariable.tmpmntpath + evidfilename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "." + tmpfvalue + ".prop");
     }
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream in(&propfile);
