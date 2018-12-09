@@ -7,8 +7,6 @@ FileViewer::FileViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::FileVi
 {
     ui->setupUi(this);
     connect(ui->filehexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetOffsetLabel(qint64)));
-    //connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
-    //connect(ui->hexview, SIGNAL(selectionChanged()), this, SLOT(HexSelectionChanged()));
     connect(ui->filehexview, SIGNAL(selectionChanged()), this, SLOT(UpdateSelectValue()));
     this->statusBar()->setSizeGripEnabled(true);
     selectedoffset = new QLabel(this);
@@ -54,8 +52,6 @@ void FileViewer::UpdateSelectValue()
 {
     QByteArray selectionbytes = ui->filehexview->selectionToByteArray();
     QString tmptext = "Length: " + QString::number(selectionbytes.size());
-    //int sellength = txt.size()/2;
-    //QString tmptext = "Length: " + QString::number(sellength);
     selectedhex->setText(tmptext);
 }
 
