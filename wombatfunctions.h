@@ -9,27 +9,22 @@
 #include "globals.h"
 
 std::string GetTime(void);
-//char* TskTimeToStringUTC(time_t time, char buf[128]);
 unsigned long long GetChildCount(QString filefilter);
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
-TSK_WALK_RET_ENUM FileEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 void GenerateThumbnails(QString thumbid);
 void LoadImagesHash(void);
 void PopulateTreeModel(void);
-void FileRecurse(QString eid, QString vid, QString pid, QString parid);
 QString GetBlockList(TSK_FS_FILE* tmpfile);
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo);
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo);
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo);
 void WriteFileProperties(TSK_FS_FILE* curfileinfo);
-void BuildPropFile(TSK_FS_FILE* curfileinfo);
 void BuildStatFile(TSK_FS_FILE* curfileinfo, const char* tmppath);
-void BuildStatFileThread(TSK_FS_FILE curfileinfo, std::string curpath);
 void BuildTreeFile(TSK_FS_FILE* curfileinfo);
-void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString fvalue, unsigned long long adssize, QString attrid);
+void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, unsigned long long adssize, QString attrid);
 //void LogMessage(QString message);
 void cnid_to_array(uint32_t cnid, uint8_t array[4]);
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr);

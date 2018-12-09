@@ -243,35 +243,17 @@ class TreeNodeModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    explicit TreeNodeModel(const QString &data, QObject* parent = 0) : QAbstractItemModel(parent)
+    explicit TreeNodeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         QList<QVariant> zerodata;
         zerodata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature";
         zeronode = new TreeNode(zerodata);
-        //AddEvidence(data.split((QString("\n"))), zeronode);
     };
 
     ~TreeNodeModel()
     {
         delete zeronode;
     };
-/*
-    char* TskTimeToStringUTC(time_t time)
-    {
-        //char buf[128];
-        char* buf = new char[128];
-        buf[0] = '\0';
-        if (time <= 0) {
-            strncpy(buf, "", 128);
-        }
-        else {
-            //struct tm *tmTime = localtime(&time);
-            struct tm *tmTime = gmtime(&time);
-    
-            snprintf(buf, 128, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d", (int) tmTime->tm_year + 1900, (int) tmTime->tm_mon + 1, (int) tmTime->tm_mday, tmTime->tm_hour, (int) tmTime->tm_min, (int) tmTime->tm_sec);//, tzname[(tmTime->tm_isdst == 0) ? 0 : 1]);
-        }
-        return buf;
-    };*/
 
     QVariant data(const QModelIndex &index, int role) const override
     {
@@ -664,9 +646,7 @@ private:
         // parent is the zero item...
         QString parid;
         QString curid;
-        unsigned long long fpar;
         QString rootinum = "";
-        int nodecount = 0;
         QString tmpstr = "";
         for(int i=0; i < nodes.count(); i++)
         {
@@ -749,245 +729,13 @@ private:
                                 if(tmpstr.split(",").at(14).toInt() == true)
                                     parents.value(curid)->SetDeleted(true);
                             }
-                            //FileRecurse(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + rootlist.at(l));
-                            //FileRecurse(newpath);
-                            // NEED TO RECURSE HERE FOR EACH FILE FOLDER TO CHECK IF IT HAS CHILDREN...
-                            // CALL SOMETHING LIKE FileRecurse(path) WHICH WOULD GET CHILDREN, CALL THE DATA, ETC AND THEN CALL RECURSE
-                            /*
-                             *
-            if(columnstrings.at(0).split("-").count() == 5) // files
-            {
-                fpar = columnstrings.at(0).split("-").at(4).mid(1).toULongLong();
-                curid = columnstrings.at(0);
-                parid = columnstrings.at(0).split("-f").at(0);
-                QFile rootinumfile(wombatvariable.volumepath + ".p" + columnstrings.at(0).split("-").at(2).mid(1) + "/stat");
-                //QFile rootinumfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + columnstrings.at(0).split("-").at(2).mid(1));
-                rootinumfile.open(QIODevice::ReadOnly);
-                unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
-                rootinumfile.close();
-                if(fpar != rootinum)
-                {
-                    QString parkey = parid + "-f" + QString::number(fpar) + "-a";
-                    QHashIterator<QString, TreeNode*> i(parents);
-                    while(i.hasNext())
-                    {
-                        i.next();
-                        if(i.key().contains(parkey))
-                            parid = i.key();
-                    }
-                }
-                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), columnstrings.at(11).toInt()));
-                parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-                if(checkhash.contains(columnstrings.at(0).split("-a").first()))
-                    parents.value(curid)->SetChecked(true);
-                if(columnstrings.at(12).toInt() == true)
-                    parents.value(curid)->SetDeleted(true);
-
-                             *
-                             */ 
                         }
                     }
                 }
             }
         }
-        /*
-        while(nodecount < nodes.count() - 1)
-        {
-            QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
-            QList<QVariant> columndata;
-            for(int i = 0; i < 11; i++)
-                columndata << columnstrings.at(i);
-            if(columnstrings.at(0).split("-").count() == 1) // evidence image
-            {
-                curid = columnstrings.at(0).split("-").at(0);
-                parent->AppendChild(new TreeNode(columndata, parent));
-                parents[curid] = parent->child(parent->ChildCount() - 1);
-            }
-            nodecount++;
-        }
-        nodecount = 0;
-        while(nodecount < nodes.count() - 1)
-        {
-            QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
-            QList<QVariant> columndata;
-            for(int i = 0; i < 11; i++)
-                columndata << columnstrings.at(i);
-            if(columnstrings.at(0).split("-").count() == 2) // volume
-            {
-                parid = columnstrings.at(0).split("-").at(0);
-                curid = columnstrings.at(0);
-                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
-                parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-            }
-            nodecount++;
-        }
-        nodecount = 0;
-        while(nodecount < nodes.count() - 1)
-        {
-            QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
-            QList<QVariant> columndata;
-            for(int i = 0; i < 11; i++)
-                columndata << columnstrings.at(i);
-            if(columnstrings.at(0).split("-").count() == 3) // partition
-            {
-                parid = columnstrings.at(0).split("-p").at(0);
-                curid = columnstrings.at(0);
-                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
-                parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-            }
-            nodecount++;
-        }
-        nodecount = 0;
-        while(nodecount < nodes.count() - 1)
-        {
-            QStringList columnstrings = nodes.at(nodecount).split(",", QString::SkipEmptyParts);
-            QList<QVariant> columndata;
-            for(int i = 0; i < 11; i++)
-                columndata << columnstrings.at(i);
-            if(columnstrings.at(0).split("-").count() == 5) // files
-            {
-                fpar = columnstrings.at(0).split("-").at(4).mid(1).toULongLong();
-                curid = columnstrings.at(0);
-                parid = columnstrings.at(0).split("-f").at(0);
-                QFile rootinumfile(wombatvariable.volumepath + ".p" + columnstrings.at(0).split("-").at(2).mid(1) + "/stat");
-                //QFile rootinumfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + columnstrings.at(0).split("-").at(2).mid(1));
-                rootinumfile.open(QIODevice::ReadOnly);
-                unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
-                rootinumfile.close();
-                if(fpar != rootinum)
-                {
-                    QString parkey = parid + "-f" + QString::number(fpar) + "-a";
-                    QHashIterator<QString, TreeNode*> i(parents);
-                    while(i.hasNext())
-                    {
-                        i.next();
-                        if(i.key().contains(parkey))
-                            parid = i.key();
-                    }
-                }
-                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), columnstrings.at(11).toInt()));
-                parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-                if(checkhash.contains(columnstrings.at(0).split("-a").first()))
-                    parents.value(curid)->SetChecked(true);
-                if(columnstrings.at(12).toInt() == true)
-                    parents.value(curid)->SetDeleted(true);
-            }
-            nodecount++;
-        }*/
     };
-    void FileRecurse(QString path)
-    {
-        QString parid;
-        QString curid;
-        QString tmpstr = "";
-        unsigned long long fpar;
-        QList<QVariant> columndata;
-        QDir filedir = QDir(path);
-        QStringList subfiles = filedir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
-        for(int i=0; i < subfiles.count(); i++)
-        {
-            columndata.clear();
-            QFile subfile(path + "/" + subfiles.at(i) + "/stat");
-            subfile.open(QIODevice::ReadOnly | QIODevice::Text);
-            if(subfile.isOpen())
-                tmpstr = subfile.readLine();
-            subfile.close();
-            if(tmpstr.split(",").count() > 12)
-            {
-                columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
-                fpar = path.split("/").at(path.split("/").count() - 1).mid(2).toULongLong();
-                //qDebug() << "fpar:" << fpar;
-                //qDebug() << "parentid:" << path.split("/").at(path.split("/").count() - 1);
-                //parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a";
-                /*
-                QHashIterator<QString, TreeNode*> j(parents);
-                while(j.hasNext())
-                {
-                    j.next();
-                    if(j.key().contains(parid))
-                    {
-                        parid = j.key();
-                        break;
-                    }
-                }
-                */
-                //parid = tmpstr.split(",").at(12).split("-f").at(0);
-                //QFile rootinumfile(wombatvariable.volumepath + ".p" + columnstrings.at(0).split("-").at(2).mid(1) + "/stat");
-                //QFile rootinumfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + ".part." + columnstrings.at(0).split("-").at(2).mid(1));
-                //rootinumfile.open(QIODevice::ReadOnly);
-                //unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
-                //rootinumfile.close();
-                //if(fpar != rootinum)
-                /*
-                QString pathstring = "";
-                for(int j = 0; j < path.split("/").count() - 1; j++)
-                {
-                    pathstring += path.split("/").at(j) + "/";
-                }
-                */
-                //qDebug() << "path string:" << pathstring;
-                QFile rootinumfile(wombatvariable.tmpmntpath + path.split("/").at(5) + "/" + path.split("/").at(6) + "/" + path.split("/").at(7) + "/stat");
-                //qDebug() << "rootinumfile:" << rootinumfile.fileName();
-                //QFile rootinumfile(path.split("/").last() + "/stat");
-                rootinumfile.open(QIODevice::ReadOnly | QIODevice::Text);
-                unsigned long long rootinum = QString(rootinumfile.readLine()).split(",").at(3).toULongLong();
-                qDebug() << "rootinum:" << rootinum;
-                rootinumfile.close();
-                //QString filestring = 
-                /*
-                if(path.split("/").at(path.split("/").count() - 2).contains("p"))
-                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + QString::number(rootinum);
-                else
-                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
-                */
-                /*
-                if(fpar != rootinum)
-                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
-                else
-                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(rootinum) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
-                */
-                if(path.split("/").at(path.split("/").count() - 2).contains("p"))
-                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + QString::number(rootinum);
-                else
-                    parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
-                qDebug() << "path:" << path;
-                qDebug() << "subfile path:" << QString(path + "/" + subfiles.at(i));
-                qDebug() << "par id:" << parid;
-                    //parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + path.split("/").last().split("f").last() + "-a"
-                //parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + path.split("/").last().split("f").last() + "-a" + path.split("/").at(path.split("/").count() - 2).mid(2);
-                //qDebug() << "par id:" << parid;
-                curid = tmpstr.split(",").at(12);
-                qDebug() << "cur id:" << curid;
-                //qDebug() << "current file:" << subfiles.at(i);
-                parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
-                parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-                if(checkhash.contains(tmpstr.split(",").at(12).split("-a").first()))
-                    parents.value(curid)->SetChecked(true);
-                if(tmpstr.split(",").at(14).toInt() == true)
-                    parents.value(curid)->SetDeleted(true);
-            }
-            FileRecurse(QString(path + "/" + subfiles.at(i)));
-        }
-        /*
-         *  columndata.clear();
-            QFile filefile(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + rootlist.at(l) + "/stat");
-            filefile.open(QIODevice::ReadOnly | QIODevice::Text);
-            tmpstr = filefile.readLine();
-            filefile.close();
-            columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
-            parid = tmpstr.split(",").at(12).split("-f").at(0);
-            curid = tmpstr.split(",").at(12);
-            parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
-            parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-            if(checkhash.contains(tmpstr.split(",").at(12).split("-a").first()))
-                parents.value(curid)->SetChecked(true);
-            if(tmpstr.split(",").at(14).toInt() == true)
-                parents.value(curid)->SetDeleted(true);
-            QDir partdir = QDir(wombatvariable.tmpmntpath + nodes.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k));
-            QStringList rootlist = partdir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
-         *
-         */ 
-    };
+
 public:
     void AddNode(QList<QVariant> data, QString parid, int type, int deleted)
     {
@@ -998,14 +746,10 @@ public:
         }
         else // everything else 
         {
-            //qDebug() << "parid:" << parid;
-            //qDebug() << parents;
             if(type == -1)
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid)));
             else
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
-            //qDebug() << "curid:" << data.at(0).toString();
-            //qDebug() << "no -a curid:" << data.at(0).toString().split("-a").first();
             parents[data.at(0).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
             if(checkhash.contains(data.at(0).toString().split("-a").first()))
                 parents.value(data.at(0).toString().split("-a").first())->SetChecked(true);
