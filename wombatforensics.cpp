@@ -2048,7 +2048,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
-                StartThumbnails(QStringList(""));
+                StartThumbnails(QStringList("")); // Process All Thumbnails
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
@@ -2064,20 +2064,72 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 
 void WombatForensics::StartThumbnails(QStringList diglist)
 {
-    if(diglist.at(0).length() == 0)
-        qDebug() << "process all";
-    else
-        qDebug() << "process the list";
     qInfo() << "Generating Thumbnails...";
     //LogMessage("Generating Thumbnails...");
     StatusUpdate("Generating Thumbnails...");
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QFile tmpfile;
     QFile thumbfile;
     thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/" + "thumbpathlist");
     QString tmpstr = "";
     thumblist.clear();
     thumbpathlist.clear();
+    if(diglist.at(0).length() == 0)
+    {
+        //qDebug() << "process all";
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*.e*"), QDir::NoSymLinks | QDir::Dirs);
+        for(int i=0; i < evidfiles.count(); i++)
+        {
+            QDir voldir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i));
+            QStringList volfiles = voldir.entryList(QStringList(".v*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
+            for(int j=0; j < volfiles.count(); j++)
+            {
+                QDir partdir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j));
+                QStringList partfiles = partdir.entryList(QStringList(".p*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
+                for(int k=0; k < partfiles.count(); k++)
+                {
+                    QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k));
+                    //if(diglist.at(0).length() == 0)
+                    //{
+                    QStringList filefiles = filedir.entryList(QStringList("f*.a*.stat"), QDir::NoSymLinks | QDir::Files);
+                    //}
+                    //else
+                    //{
+                    // NEED TO FIGURE OUT HOW TO COMPARE AND REDUCE THE FILES WE PROCESS GIVEN THE ID: "E#-V#-P#-F#"
+                    //}
+                    for(int l=0; l < filefiles.count(); l++)
+                    {
+                        tmpstr = "";
+                        tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k) + "/" + filefiles.at(l));
+                        tmpfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                        if(tmpfile.isOpen())
+                            tmpstr = tmpfile.readLine();
+                        tmpfile.close();
+                        if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
+                        {
+                            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
+                            QByteArray ba;
+                            QByteArray ba2;
+                            ba.append(tmpstr.split(",").at(0));
+                            ba2.append(tmpstr.split(",").at(3));
+                            QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
+                            ba.clear();
+                            ba.append(fullpath);
+                            thumbfile.open(QIODevice::Append);
+                            thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
+                            thumbfile.write("|");
+                            thumbfile.write(ba.toBase64());
+                            thumbfile.write(",");
+                            thumbfile.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+        qDebug() << "process the list";
+    /*
     QStringList filefiles = eviddir.entryList(QStringList("*.p*.f*.a*"), QDir::NoSymLinks | QDir::Files);
     for(int i = 0; i < filefiles.count(); i++)
     {
@@ -2104,6 +2156,7 @@ void WombatForensics::StartThumbnails(QStringList diglist)
             thumbfile.close();
         }
     }
+    */
     QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
     thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
     thumbwatcher.setFuture(thumbfuture);

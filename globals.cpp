@@ -39,6 +39,7 @@ QStringList thumblist;
 QStringList thumbpathlist;
 QStringList exportlist;
 QStringList digfilelist;
+QStringList listeditems;
 QString exportpath = "";
 bool originalpath = true;
 QString blockstring = "";

@@ -928,6 +928,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 //qDebug() << "parstr:" << parentstr;
                 nodedata << tmplist.at(12).split("-a").first() << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
                 treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
+                listeditems.append(tmplist.at(12));
                 filesfound++;
                 isignals->ProgUpd();
                 // NEED TO CHECK FOR ADS HERE...
@@ -1468,13 +1469,19 @@ void GenerateThumbnails(QString thumbid)
     const TSK_TCHAR** imagepartspath;
     pathvector.clear();
     QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
-    unsigned long long curaddress = thumbid.split("-f").at(1).split("-a").at(0).toULongLong(); 
-    QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
+    QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
+    QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
+    unsigned long long curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong(); 
+    qDebug() << curaddress;
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
     wombatvariable.evidencename = evidfiles.at(0);
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + estring.mid(1));
-    evidfile.open(QIODevice::ReadOnly);
-    tmpstr = evidfile.readLine();
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "/stat");
+    qDebug() << evidfile;
+    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+        tmpstr = evidfile.readLine();
     int partcount = tmpstr.split(",").at(3).split("|").size();
     evidfile.close();
     for(int i=0; i < partcount; i++)
@@ -1490,10 +1497,12 @@ void GenerateThumbnails(QString thumbid)
     }
     free(imagepartspath);
     tmpstr = "";
-    QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + pstring.mid(1)), QDir::NoSymLinks | QDir::Files);
-    QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
-    partfile.open(QIODevice::ReadOnly);
-    tmpstr = partfile.readLine();
+    //QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + pstring.mid(1)), QDir::NoSymLinks | QDir::Files);
+    QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "/." + vstring + "/." + pstring + "/stat");
+    qDebug() << partfile.fileName();
+    partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(partfile.isOpen())
+        tmpstr = partfile.readLine();
     partfile.close();
     readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);

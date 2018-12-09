@@ -1016,7 +1016,7 @@ private:
     QShortcut* showitem;
     QTimer* autosavetimer;
     TreeNode* actionitem;
-    QStringList listeditems;
+    //QStringList listeditems;
     QWidget* cancelwidget;
 
     // outside in variables
