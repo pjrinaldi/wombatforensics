@@ -2089,14 +2089,7 @@ void WombatForensics::StartThumbnails(QStringList diglist)
                 for(int k=0; k < partfiles.count(); k++)
                 {
                     QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k));
-                    //if(diglist.at(0).length() == 0)
-                    //{
                     QStringList filefiles = filedir.entryList(QStringList("f*.a*.stat"), QDir::NoSymLinks | QDir::Files);
-                    //}
-                    //else
-                    //{
-                    // NEED TO FIGURE OUT HOW TO COMPARE AND REDUCE THE FILES WE PROCESS GIVEN THE ID: "E#-V#-P#-F#"
-                    //}
                     for(int l=0; l < filefiles.count(); l++)
                     {
                         tmpstr = "";
@@ -2128,15 +2121,38 @@ void WombatForensics::StartThumbnails(QStringList diglist)
         }
     }
     else
-    {// duplicate above cause i need the evidence filename...
-        qDebug() << "process the list";
+    {
         for(int i=0; i < diglist.count(); i++)
         {
-            qDebug() << diglist.at(i);
-            QStringList filefiles;
-            filefiles.clear();
-            tmpfile.setFileName(wombatvariable.tmpmntpath + diglist.at(i).split("-")
-
+            QDir eviddir = QDir(wombatvariable.tmpmntpath);
+            QStringList evidfiles = eviddir.entryList(QStringList("*." + diglist.at(i).split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+            QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(0) + "/." + diglist.at(i).split("-").at(1) + "/." + diglist.at(i).split("-").at(2));
+            QStringList filefiles = filedir.entryList(QStringList(diglist.at(i).split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
+            for(int j=0; j < filefiles.count(); j++)
+            {
+                tmpstr = "";
+                tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/." + diglist.at(i).split("-").at(1) + "/." + diglist.at(i).split("-").at(2) + "/" + filefiles.at(j));
+                tmpfile.open(QIODevice::ReadOnly);
+                tmpstr = tmpfile.readLine();
+                tmpfile.close();
+                if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
+                {
+                    thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
+                    QByteArray ba;
+                    QByteArray ba2;
+                    ba.append(tmpstr.split(",").at(0));
+                    ba2.append(tmpstr.split(",").at(3));
+                    QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
+                    ba.clear();
+                    ba.append(fullpath);
+                    thumbfile.open(QIODevice::Append);
+                    thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
+                    thumbfile.write("|");
+                    thumbfile.write(ba.toBase64());
+                    thumbfile.write(",");
+                    thumbfile.close();
+                }
+            }
         }
     }
     /*
