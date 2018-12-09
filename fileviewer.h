@@ -24,8 +24,8 @@ public slots:
 
 private slots:
 
-    void SetOffsetLabel(off_t pos);
-    void UpdateSelectValue(const QString &txt);
+    void SetOffsetLabel(qint64 pos);
+    void UpdateSelectValue(void);
     void HideClicked();
 
 signals:

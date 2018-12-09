@@ -6,6 +6,10 @@
 FileViewer::FileViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::FileViewer)
 {
     ui->setupUi(this);
+    connect(ui->filehexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetOffsetLabel(qint64)));
+    //connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
+    //connect(ui->hexview, SIGNAL(selectionChanged()), this, SLOT(HexSelectionChanged()));
+    connect(ui->filehexview, SIGNAL(selectionChanged()), this, SLOT(UpdateSelectValue()));
     this->statusBar()->setSizeGripEnabled(true);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
@@ -32,24 +36,26 @@ void FileViewer::closeEvent(QCloseEvent* event)
     event->accept();
 }
 
-void FileViewer::SetOffsetLabel(off_t pos)
+void FileViewer::SetOffsetLabel(qint64 pos)
 {
     QString label;
     label = "Offset: ";
     char buffer[64];
     #if _LARGEFILE_SOURCE
-    sprintf(buffer,"0x%llx",(qint64)pos);
+    sprintf(buffer,"0x%llx",pos);
     #else
-    sprintf(buffer,"0x%x",(qint64)pos);
+    sprintf(buffer,"0x%x",pos);
     #endif
     label += buffer;
     selectedoffset->setText(label);
 }
 
-void FileViewer::UpdateSelectValue(const QString &txt)
+void FileViewer::UpdateSelectValue()
 {
-    int sellength = txt.size()/2;
-    QString tmptext = "Length: " + QString::number(sellength);
+    QByteArray selectionbytes = ui->filehexview->selectionToByteArray();
+    QString tmptext = "Length: " + QString::number(selectionbytes.size());
+    //int sellength = txt.size()/2;
+    //QString tmptext = "Length: " + QString::number(sellength);
     selectedhex->setText(tmptext);
 }
 
