@@ -430,8 +430,6 @@ void BuildTreeFile(TSK_FS_FILE* tmpfile, const char* tmppath)
             parentstr = evidid + "-" + volid.mid(1) + "-" + partid.mid(1);
         else
             parentstr = evidid + "-" + volid.mid(1) + "-" + partid.mid(1) + "-f" + QString::number(tmpfile->name->par_addr);
-        curaddress = tmpfile->name->meta_addr;
-        paraddress = tmpfile->name->par_addr;
     }
     else
     {

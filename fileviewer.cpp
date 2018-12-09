@@ -36,6 +36,13 @@ void FileViewer::SetOffsetLabel(off_t pos)
 {
     QString label;
     label = "Offset: ";
+    char buffer[64];
+    #if _LARGEFILE_SOURCE
+    sprintf(buffer,"0x%llx",(qint64)pos);
+    #else
+    sprintf(buffer,"0x%x",(qint64)pos);
+    #endif
+    label += buffer;
     selectedoffset->setText(label);
 }
 

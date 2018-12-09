@@ -1059,10 +1059,6 @@ void WombatForensics::LoadHexContents()
         }
         filefileprop.close();
 
-        //old file hex code
-        unsigned long long fileoffset = 0;
-        unsigned long long filesize = 0;
-
         //if(!ui->hexview->isEnabled())
             ui->hexview->setEnabled(true);
 
@@ -1098,8 +1094,6 @@ void WombatForensics::LoadHexContents()
                 {
                     ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
                     ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
-                    fileoffset = bytestring.toULongLong(); // file offset
-                    filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(); // file size
                 }
                 else // IF RESIDENT
                 {
@@ -1137,8 +1131,6 @@ void WombatForensics::LoadHexContents()
     
                         ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                         ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                        fileoffset = (residentoffset + curoffset + resoffset);
-                        filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                     }
                 }   
             }
@@ -1186,8 +1178,6 @@ void WombatForensics::LoadHexContents()
                         curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                         ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
                         ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
-                        fileoffset = (residentoffset + curoffset);
-                        filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                     }
                 }
                 else // IF FILE AND OTHER STUFF
@@ -1196,8 +1186,6 @@ void WombatForensics::LoadHexContents()
                     {
                         ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
                         ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
-                        fileoffset = bytestring.toULongLong();
-                        filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                     }
                     else // IF RESIDENT
                     {
@@ -1234,8 +1222,6 @@ void WombatForensics::LoadHexContents()
                             resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                             ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                            fileoffset = (residentoffset + curoffset + resoffset);
-                            filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
                         }
                     }
                 }
@@ -1250,8 +1236,6 @@ void WombatForensics::LoadHexContents()
             }
             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
-            fileoffset = bytestring.toULongLong();
-            filesize = selectedindex.sibling(selectedindex.row(), 3).data().toULongLong();
         }
         }
         if(selectedindex.sibling(selectedindex.row(), 3).data().toULongLong() > 0)
@@ -1662,6 +1646,7 @@ void WombatForensics::on_actionDigDeeper_triggered()
 
 void WombatForensics::on_actionView_Properties_triggered(bool checked)
 {
+    if(checked){}
     propertywindow = new PropertiesWindow(this);
     propertywindow->setWindowIcon(QIcon(":/info"));
     propertywindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Properties");
@@ -1672,6 +1657,7 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
 
 void WombatForensics::on_actionView_File_triggered(bool checked)
 {
+    if(checked){}
     fileviewer = new FileViewer();
     fileviewer->setWindowIcon(QIcon(":/ehex"));
     fileviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Hex");
@@ -1834,11 +1820,12 @@ void WombatForensics::on_actionViewerManager_triggered()
 
 void WombatForensics::on_actionTextViewer_triggered(bool checked)
 {
-        if(selectedindex.sibling(selectedindex.row(), 9).data().toString().contains("text/"))
-        {
-            textviewer->ShowText(selectedindex);
-            textviewer->show();
-        }
+    if(checked){}
+    if(selectedindex.sibling(selectedindex.row(), 9).data().toString().contains("text/"))
+    {
+        textviewer->ShowText(selectedindex);
+        textviewer->show();
+    }
 }
 
 void WombatForensics::on_actionViewMessageLog_triggered(bool checked)
@@ -1963,7 +1950,7 @@ void WombatForensics::SetOffsetLabel(qint64 pos)
 {
     QString label;
     label = "Offset: ";
-    char    buffer[64];
+    char buffer[64];
     #if _LARGEFILE_SOURCE
     sprintf(buffer,"0x%llx",pos);
     #else
