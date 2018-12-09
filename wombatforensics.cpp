@@ -2128,7 +2128,17 @@ void WombatForensics::StartThumbnails(QStringList diglist)
         }
     }
     else
+    {// duplicate above cause i need the evidence filename...
         qDebug() << "process the list";
+        for(int i=0; i < diglist.count(); i++)
+        {
+            qDebug() << diglist.at(i);
+            QStringList filefiles;
+            filefiles.clear();
+            tmpfile.setFileName(wombatvariable.tmpmntpath + diglist.at(i).split("-")
+
+        }
+    }
     /*
     QStringList filefiles = eviddir.entryList(QStringList("*.p*.f*.a*"), QDir::NoSymLinks | QDir::Files);
     for(int i = 0; i < filefiles.count(); i++)
