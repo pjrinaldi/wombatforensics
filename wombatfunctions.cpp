@@ -170,10 +170,10 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
     QList<QVariant> nodedata;
     nodedata.clear();
     QString outstring = "";
-    QString treestring = "";
+    //QString treestring = "";
     QStringList treeout;
     treeout.clear();
-    treestring += "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+    //treestring += "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
     QByteArray ba2;
     ba2.append(QString("/" + QString(tmppath)));
     if(tmpfile->name != NULL)
@@ -181,7 +181,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         QByteArray ba;
         ba.append(QString(tmpfile->name->name));
         outstring += ba.toBase64() + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
-        treestring += "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr) + "," + ba.toBase64() + ",";
+        //treestring += "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr) + "," + ba.toBase64() + ",";
         treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr) << ba.toBase64();
         if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
             parentstr = "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
@@ -195,23 +195,23 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         QByteArray ba;
         ba.append("unknown");
         outstring += ba.toBase64() + "," + QString::number(tmpfile->meta->type) + ",0,";
-        treestring += "-f" + QString::number(tmpfile->meta->addr) + "-a0," + ba.toBase64() + ",0,";
+        //treestring += "-f" + QString::number(tmpfile->meta->addr) + "-a0," + ba.toBase64() + ",0,";
         treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a0" + QString::number(tmpfile->name->par_addr) << ba.toBase64();
         parentstr = "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f0";
     }
     outstring += ba2.toBase64() + ",";
-    treestring += ba2.toBase64() + ",";
+    //treestring += ba2.toBase64() + ",";
     treeout << ba2.toBase64();
     if(tmpfile->meta != NULL)
     {
         outstring += QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->addr) + ",";
-        treestring += QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime) + ",";
+        //treestring += QString::number(tmpfile->meta->size) + "," + QString::number(tmpfile->meta->crtime) + "," + QString::number(tmpfile->meta->mtime) + "," + QString::number(tmpfile->meta->atime) + "," + QString::number(tmpfile->meta->ctime) + ",";
         treeout << QString::number(tmpfile->meta->size) << QString::number(tmpfile->meta->crtime) << QString::number(tmpfile->meta->mtime) << QString::number(tmpfile->meta->atime) << QString::number(tmpfile->meta->ctime);
     }
     else
     {
         outstring += "0,0,0,0,0," + QString::number(tmpfile->name->meta_addr) + ",";
-        treestring += "0,0,0,0,0,";
+        //treestring += "0,0,0,0,0,";
         treeout << "0" << "0" << "0" << "0" << "0";
     }
     char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
@@ -239,38 +239,38 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
             hashint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
         }
         outstring +=  "," + QString(sbuf);
-        treestring += QString(sbuf) + ",";
+        //treestring += QString(sbuf) + ",";
         treeout << QString(sbuf);
     }
     else
     {
         outstring += ",0";
-        treestring += "0,";
+        //treestring += "0,";
         treeout << "0";
     }
-    treestring += mimetype.name().split("/").at(0) + "," + mimetype.name().split("/").at(1) + ",";
+    //treestring += mimetype.name().split("/").at(0) + "," + mimetype.name().split("/").at(1) + ",";
     treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1);
     if(tmpfile->meta != NULL)
     {
-        treestring += QString::number(tmpfile->meta->type);
+        //treestring += QString::number(tmpfile->meta->type);
         treeout << QString::number(tmpfile->meta->type);
         if(((tmpfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((tmpfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
         {
             outstring += ",1";
-            treestring += ",1";
+            //treestring += ",1";
             treeout << "1";
         }
         else
         {
             outstring += ",0";
-            treestring += ",0";
+            //treestring += ",0";
             treeout << "0";
         }
     }
     else
     {
         outstring += ",0";
-        treestring += "0,0";
+        //treestring += "0,0";
         treeout << "0" << "0";
     }
     free(magicbuffer);
@@ -379,18 +379,38 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
                         {
                             if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                             {
+                                /* Get MD5 HASH of Content using Qt Method */
+                                char* fbuf = new char[fsattr->size];
+                                ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
+                                QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
+                                QBuffer fbuffer(&fdata);
+                                fbuffer.open(QIODevice::ReadOnly);
+                                QCryptographicHash attrhash(QCryptographicHash::Md5);
+                                attrhash.addData(&fbuffer);
+                                fbuffer.close();
+                                QMimeDatabase adsmimedb;
+                                QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
+                                /*
+                                 *  QByteArray tmparray;
+                                    tmparray.clear();
+                                    tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+                                    tmparray = QByteArray::fromRawData(magicbuffer, 1024);
+                                    QMimeDatabase mimedb;
+                                    QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+                                 */ 
+                                delete[] fbuf;
                                 QFile adsfile(wombatvariable.curfilepath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
                                 adsfile.open(QIODevice::Append | QIODevice::Text);
                                 QTextStream adsout(&adsfile);
                                 adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
-                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << mimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0,0";
+                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << "," + QString(attrhash.result().toHex()).toUpper() + ",0";
                                 adsout.flush();
                                 if(adsfile.isOpen())
                                 {
                                     adsfile.close();
                                 }
                                 treeout.clear();
-                                treeout << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "10" << "0";
+                                treeout << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << "10" << "0";
                                 nodedata.clear();
                                 for(int i=0;  i < 11; i++)
                                     nodedata << treeout.at(i);
@@ -413,7 +433,7 @@ void BuildTreeFile(TSK_FS_FILE* tmpfile, const char* tmppath)
     QList<QVariant> nodedata;
     nodedata.clear();
     QString outstring = "";
-    QString treestring = "";
+    //QString treestring = "";
     QStringList treeout;
     treeout.clear();
     QString evidid = "e" + wombatvariable.evidencepath.split(".e").last().split("/").first();
