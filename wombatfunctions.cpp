@@ -686,20 +686,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-    //unsigned long long tmpaddress = 0;
-    //unsigned long long paraddress = readfsinfo->root_inum;
     if(tmpptr){}
-    /*
-    if(tmpfile->meta != NULL)
-    {
-        tmpaddress = tmpfile->meta->addr;
-    }
-    if(tmpfile->name != NULL)
-    {
-        tmpaddress = tmpfile->name->meta_addr;
-        paraddress = tmpfile->name->par_addr;
-    }
-    */
     if(tmpfile->name != NULL)
     {
         if(strcmp(tmpfile->name->name, ".") != 0)
