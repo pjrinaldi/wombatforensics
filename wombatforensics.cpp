@@ -714,7 +714,7 @@ void WombatForensics::UpdateDataTable()
 
 void WombatForensics::PrepareEvidenceImage()
 {
-    //qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
+    qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
     QString xmntstr = "";
     if(wombatvariable.segmentcount > 1)
     {
