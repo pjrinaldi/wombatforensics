@@ -390,14 +390,6 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
                                 fbuffer.close();
                                 QMimeDatabase adsmimedb;
                                 QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
-                                /*
-                                 *  QByteArray tmparray;
-                                    tmparray.clear();
-                                    tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
-                                    tmparray = QByteArray::fromRawData(magicbuffer, 1024);
-                                    QMimeDatabase mimedb;
-                                    QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-                                 */ 
                                 delete[] fbuf;
                                 QFile adsfile(wombatvariable.curfilepath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
                                 adsfile.open(QIODevice::Append | QIODevice::Text);
