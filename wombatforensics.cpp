@@ -1157,6 +1157,7 @@ void WombatForensics::LoadHexContents()
                         nextattrid[1] = (uint8_t)resbuffer.at(41);
                         curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                         int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                        qDebug() << "attrcnt:" << attrcnt;
                         for(int i = 0; i < attrcnt; i++)
                         {
                             if(curoffset < resbuffer.size())
@@ -1207,8 +1208,11 @@ void WombatForensics::LoadHexContents()
                             nextattrid[1] = (uint8_t)resbuffer.at(41);
                             curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                             int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                            qDebug() << "attrcnt:" << attrcnt;
                             for(int i = 0; i < attrcnt; i++)
                             {
+                                if(curoffset < resbuffer.size())
+                                {
                                 attrtype[0] = (uint8_t)resbuffer.at(curoffset);
                                 attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
                                 attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
@@ -1223,10 +1227,14 @@ void WombatForensics::LoadHexContents()
                                 if(namelength == 0 && atrtype == 128)
                                     break;
                                 curoffset += contentlength;
+                                }
                             }
+                            if(curoffset < resbuffer.size())
+                            {
                             mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
                             mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                             resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                            }
                             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                             ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                         }
