@@ -1159,6 +1159,8 @@ void WombatForensics::LoadHexContents()
                         int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
                         for(int i = 0; i < attrcnt; i++)
                         {
+                            if(curoffset < resbuffer.size())
+                            {
                             attrtype[0] = (uint8_t)resbuffer.at(curoffset);
                             attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
                             attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
@@ -1172,11 +1174,15 @@ void WombatForensics::LoadHexContents()
                             if(atrtype == 144)
                                 break;
                             curoffset += contentlength;
+                            }
                         }
                         // offset to type 144 resident attribute content
+                        if(curoffset < resbuffer.size())
+                        {
                         mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
                         mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                         curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        }
                         ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
                         ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
                     }
