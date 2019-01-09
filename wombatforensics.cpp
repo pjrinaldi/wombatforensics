@@ -919,6 +919,7 @@ void WombatForensics::LoadHexContents()
     QStringList evidlist;
     evidlist.clear();
 
+    // WOMBATVARIABLE.EVIDENCENAME IS NOT KNOWN IF THERE ARE MORE THAN 1 EVIDENCE FILES. NEED TO SET THIS FIRST BEFORE I USE IT.
     QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
     casedatafile.setFileName(datastring);
     ui->hexview->setData(casedatafile);
