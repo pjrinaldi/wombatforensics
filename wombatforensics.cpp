@@ -993,6 +993,7 @@ void WombatForensics::LoadHexContents()
         partfile.close();
         partlist = tmpstr.split(",");
         // FILE SYSTEM PIECE OF FILE HEX CONTENT CODE
+        qDebug() << "partfile fsoffset:" << partlist.at(4).toULongLong();
         filehexfsinfo = tsk_fs_open_img(fileheximginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
 
         unsigned long long rootinum = filehexfsinfo->root_inum;
@@ -1008,7 +1009,9 @@ void WombatForensics::LoadHexContents()
                 mftentryoffset = tmpstring.split("||").at(1);
         }
         partpropfile.close();
+        unsigned long long fsoffset = partlist.at(4).toULongLong();
         qDebug() << "mftentryoffset:" << mftentryoffset;
+        
         QStringList filelist;
         filelist.clear();
         QString tmpfilename = "";
@@ -1100,7 +1103,7 @@ void WombatForensics::LoadHexContents()
                 }
                 else // IF RESIDENT
                 {
-                    unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt());
+                    unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt()) + fsoffset;
                     qDebug() << "(resident ads) residentoffset:" << residentoffset;
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                     curoffset = 0;
@@ -1147,7 +1150,7 @@ void WombatForensics::LoadHexContents()
                 }
                 if(filelist.at(1).toInt() == 3) // IF DIR
                 {
-                    unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt());
+                    unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt()) + fsoffset;
                     qDebug() << "(resident dir) residentoffset:" << residentoffset;
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                     qDebug() << "resbuffer length:" << resbuffer.length();
@@ -1202,7 +1205,7 @@ void WombatForensics::LoadHexContents()
                     }
                     else // IF RESIDENT
                     {
-                        unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt());
+                        unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt()) + fsoffset;
                         qDebug() << "(resident file) residentoffset:" << residentoffset;
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                         curoffset = 0;
