@@ -993,9 +993,8 @@ void WombatForensics::LoadHexContents()
         partfile.close();
         partlist = tmpstr.split(",");
         // FILE SYSTEM PIECE OF FILE HEX CONTENT CODE
-        qDebug() << "partfile fsoffset:" << partlist.at(4).toULongLong();
         filehexfsinfo = tsk_fs_open_img(fileheximginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
-
+        unsigned long long fsoffset = partlist.at(4).toULongLong();
         unsigned long long rootinum = filehexfsinfo->root_inum;
         if(paridstr.contains("-"))
             paridstr = QString::number(rootinum);
@@ -1009,7 +1008,6 @@ void WombatForensics::LoadHexContents()
                 mftentryoffset = tmpstring.split("||").at(1);
         }
         partpropfile.close();
-        unsigned long long fsoffset = partlist.at(4).toULongLong();
         qDebug() << "mftentryoffset:" << mftentryoffset;
         
         QStringList filelist;
@@ -1136,7 +1134,7 @@ void WombatForensics::LoadHexContents()
                         mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                         resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
     
-                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                         ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                     }
                 }   
@@ -1192,7 +1190,7 @@ void WombatForensics::LoadHexContents()
                         mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                         curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                         }
-                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
                         ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
                     }
                 }
@@ -1245,7 +1243,7 @@ void WombatForensics::LoadHexContents()
                             mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                             resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                             }
-                            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
+                            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                             ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                         }
                     }
