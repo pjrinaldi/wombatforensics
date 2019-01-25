@@ -131,6 +131,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
             // should show an alert, then display 1st 2gb of text and display right click menu???
         }
         char tbuffer[tskptr->readfileinfo->meta->size];
+        // TEXTVIEWER FAILS FOR AN ADS WITH THE BELOW COMMAND
         ssize_t textlen = tsk_fs_file_read(tskptr->readfileinfo, 0, tbuffer, tskptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         txtdata = QByteArray::fromRawData(tbuffer, textlen);
         //UpdateEncoding(0);

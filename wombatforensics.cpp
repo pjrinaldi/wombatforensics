@@ -282,6 +282,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         textviewer->setWindowIcon(QIcon(":/textencode"));
         textviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Text Viewer");
         textviewer->setAttribute(Qt::WA_DeleteOnClose);
+        // THIS FAILS ON ADS
         textviewer->ShowText(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("text/html"))
@@ -927,6 +928,7 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
+    // HEXVIEWER SEEMS TO FAIL TO DISPLAY HEX CONTENT FOR A FILE THAT HAS 9 HEX PLACES.
     wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
     blockstring = "";
     QString tmpstr = "";
