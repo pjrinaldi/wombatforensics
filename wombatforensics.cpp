@@ -731,34 +731,41 @@ void WombatForensics::PrepareEvidenceImage()
 {
     qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
     QString xmntstr = "";
-    if(wombatvariable.segmentcount > 1)
-    {
-        int digitcount = SegmentDigits(wombatvariable.segmentcount);
+    //if(wombatvariable.segmentcount > 1)
+    //{
+        //int digitcount = SegmentDigits(wombatvariable.segmentcount);
 
-        xmntstr = "xmount --in ";
+        //xmntstr = "xmount --in ";
 
         if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
         {
-            xmntstr += "aff ";
-            xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".A";
-            qDebug() << "launch xmount with imgname.A and" << digitcount << "?'s.";
+            xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
+            // WILL HAVE TO USE AFFUSE...
+            //xmntstr += "aff ";
+            //xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".A";
+            //qDebug() << "launch xmount with imgname.A and" << digitcount << "?'s.";
         }
         else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
         {
-            xmntstr += "ewf ";
-            xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".E";
-            qDebug() << "launch xmount with imgname.E and" << digitcount << "?'s.";
+            xmntstr += "ewfmount " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath; 
+            // WILL HAVE TO EWFMOUNT
+            //xmntstr += "ewf ";
+            //xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".E";
+            //qDebug() << "launch xmount with imgname.E and" << digitcount << "?'s.";
         }
         else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
         {
-            xmntstr += "raw ";
-            xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".";
-            qDebug() << "open with xmount with imgname. and" << digitcount << "?'s.";
+            xmntstr += "ewfmount " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
+            // WILL HAVE TO USE AFFUSE (MAYBE) ...
+            //xmntstr += "raw ";
+            //xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".";
+            //qDebug() << "open with xmount with imgname. and" << digitcount << "?'s.";
         }
         else
         {
             qDebug() << "image format:" << tsk_img_type_toname(wombatvariable.imgtype) << "not supported";
         }
+        /*
         if(wombatvariable.segmentcount > 1)
         {
             for(int i=0; i < digitcount; i++)
@@ -766,10 +773,12 @@ void WombatForensics::PrepareEvidenceImage()
         }
         else
             xmntstr += "??";
-        xmntstr += " --out raw " + wombatvariable.imgdatapath;
-    }
-    else
-    {
+        */
+        //xmntstr += " --out raw " + wombatvariable.imgdatapath;
+    //}
+    //else
+    //{
+        /*
         xmntstr = "xmount --in ";
         if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
         {
@@ -789,7 +798,7 @@ void WombatForensics::PrepareEvidenceImage()
         }
         xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " --out raw " + wombatvariable.imgdatapath;
 
-    }
+    }*/
     //qDebug() << "xmntstr:" << xmntstr;
     xmntprocess = new QProcess();
     connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()));
@@ -938,7 +947,9 @@ void WombatForensics::LoadHexContents()
     evidlist.clear();
 
     // WOMBATVARIABLE.EVIDENCENAME IS NOT KNOWN IF THERE ARE MORE THAN 1 EVIDENCE FILES. NEED TO SET THIS FIRST BEFORE I USE IT.
-    QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
+    //QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
+    // if ewf else aff for raw...
+    QString datastring = wombatvariable.imgdatapath + "ewf1";
     casedatafile.setFileName(datastring);
     ui->hexview->setData(casedatafile);
 
