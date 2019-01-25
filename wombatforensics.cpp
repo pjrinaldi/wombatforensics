@@ -755,7 +755,8 @@ void WombatForensics::PrepareEvidenceImage()
         }
         else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
         {
-            xmntstr += "ewfmount " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
+            // affuse only works for raw with .000 extension.
+            xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
             // WILL HAVE TO USE AFFUSE (MAYBE) ...
             //xmntstr += "raw ";
             //xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".";
@@ -949,7 +950,15 @@ void WombatForensics::LoadHexContents()
     // WOMBATVARIABLE.EVIDENCENAME IS NOT KNOWN IF THERE ARE MORE THAN 1 EVIDENCE FILES. NEED TO SET THIS FIRST BEFORE I USE IT.
     //QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
     // if ewf else aff for raw...
-    QString datastring = wombatvariable.imgdatapath + "ewf1";
+    QString datastring = wombatvariable.imgdatapath;
+    if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
+        datastring += wombatvariable.evidencename + ".raw";
+    else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
+        datastring += "ewf1";
+    else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
+        datastring += wombatvariable.evidencename + ".raw";
+    else
+        qDebug() << "not supported...";
     casedatafile.setFileName(datastring);
     ui->hexview->setData(casedatafile);
 
