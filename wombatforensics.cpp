@@ -731,76 +731,19 @@ void WombatForensics::PrepareEvidenceImage()
 {
     qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
     QString xmntstr = "";
-    //if(wombatvariable.segmentcount > 1)
-    //{
-        //int digitcount = SegmentDigits(wombatvariable.segmentcount);
-
-        //xmntstr = "xmount --in ";
-
-        if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
-        {
-            xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
-            // WILL HAVE TO USE AFFUSE...
-            //xmntstr += "aff ";
-            //xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".A";
-            //qDebug() << "launch xmount with imgname.A and" << digitcount << "?'s.";
-        }
-        else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
-        {
-            xmntstr += "ewfmount " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath; 
-            // WILL HAVE TO EWFMOUNT
-            //xmntstr += "ewf ";
-            //xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".E";
-            //qDebug() << "launch xmount with imgname.E and" << digitcount << "?'s.";
-        }
-        else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
-        {
-            // affuse only works for raw with .000 extension.
-            xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
-            // WILL HAVE TO USE AFFUSE (MAYBE) ...
-            //xmntstr += "raw ";
-            //xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)).split(".").first() + ".";
-            //qDebug() << "open with xmount with imgname. and" << digitcount << "?'s.";
-        }
-        else
-        {
-            qDebug() << "image format:" << tsk_img_type_toname(wombatvariable.imgtype) << "not supported";
-        }
-        /*
+    if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
+        xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
+    else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
+        xmntstr += "ewfmount " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath; 
+    else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
+    {
         if(wombatvariable.segmentcount > 1)
-        {
-            for(int i=0; i < digitcount; i++)
-                xmntstr += "?";
-        }
-        else
-            xmntstr += "??";
-        */
-        //xmntstr += " --out raw " + wombatvariable.imgdatapath;
-    //}
-    //else
-    //{
-        /*
-        xmntstr = "xmount --in ";
-        if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
-        {
-            xmntstr += "aff ";
-        }
-        else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
-        {
-            xmntstr += "ewf ";
-        }
-        else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
-        {
-            xmntstr += "raw ";
-        }
-        else
-        {
-            qDebug() << "unsupported format:" << tsk_img_type_toname(wombatvariable.imgtype);
-        }
-        xmntstr += QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " --out raw " + wombatvariable.imgdatapath;
-
-    }*/
-    //qDebug() << "xmntstr:" << xmntstr;
+            xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
+    }
+    else
+    {
+        qDebug() << "image format:" << tsk_img_type_toname(wombatvariable.imgtype) << "not supported";
+    }
     xmntprocess = new QProcess();
     connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()));
     connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()));
@@ -938,25 +881,23 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
-    // HEXVIEWER SEEMS TO FAIL TO DISPLAY HEX CONTENT FOR A FILE THAT HAS 9 HEX PLACES.
-    // THIS SEEMS TO BE AN ISSUE WITH WHATEVER XMOUNT DOES. THE HEXEDITOR ITSELF WILL LOAD AND SCROLL A LARGE FILE BUT
-    // WILL FAIL WITH AN XMOUNT DD FILE. WILL HAVE TO TRY EWFMOUNT AND SEE THE RESULTS...
     wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
     blockstring = "";
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
-
-    // WOMBATVARIABLE.EVIDENCENAME IS NOT KNOWN IF THERE ARE MORE THAN 1 EVIDENCE FILES. NEED TO SET THIS FIRST BEFORE I USE IT.
-    //QString datastring = wombatvariable.imgdatapath + wombatvariable.evidencename.split(".").first() + ".dd";
-    // if ewf else aff for raw...
     QString datastring = wombatvariable.imgdatapath;
     if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
         datastring += wombatvariable.evidencename + ".raw";
     else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
         datastring += "ewf1";
     else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
-        datastring += wombatvariable.evidencename + ".raw";
+    {
+        if(wombatvariable.segmentcount > 1)
+            datastring += wombatvariable.evidencename + ".raw";
+        else
+            datastring = QString::fromStdString(wombatvariable.fullpathvector.at(0));
+    }
     else
         qDebug() << "not supported...";
     casedatafile.setFileName(datastring);
