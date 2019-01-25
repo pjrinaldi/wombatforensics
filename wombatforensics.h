@@ -238,7 +238,11 @@ private:
 
     // outside in variables
     SCCERR oiiniterr;
-    SCCERR oierr;
+    SCCERR oiopndocerr;
+    SCCERR oiopnexperr;
+    SCCERR oirunexperr;
+    SCCERR oiclsexperr;
+    SCCERR oiclsdocerr;
     VTHDOC oidoc;
     VTHEXPORT oiexport;
 };

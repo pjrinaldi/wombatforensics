@@ -299,35 +299,35 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         // STARTING ON STEP 2
         qDebug() << "Starting Document Export Conversion.";
         qDebug() << "hexstring:" << hexstring;
-        oierr = DAOpenDocument(&oidoc, PATH_TYPE, (VTLPVOID)(hexstring.toStdString().c_str()), 0);
-        qDebug() << "open document error:" << oierr;
+        oiopndocerr = DAOpenDocument(&oidoc, PATH_TYPE, (VTLPVOID)(hexstring.toStdString().c_str()), 0);
+        qDebug() << "open document error:" << oiopndocerr;
         // IT WORKS IF I DON'T SET THE FULL PATH, JUST HTE FILE NAME AND THEN IT PLACES ITSELF IN THE EXE WORKING DIR.
         // THIS IS A PROBLEM. I CAN SET THE ASSET DIRECTORY CORRECTLY, AS WELL AS THE SCRIPT LOCATIONS PROPERLY, JUST NEED TO BE
         // ABLE TO FIGURE OUT HOW TO SET THE FILE NAME WITH PATH CORRECTLY
         //std::string oiout = "/home/pasquale/.wombatforensics/oiwv/oiex.html";
         std::string oiout = hexstring.toStdString() + ".html";
         fprintf(stdout, "std::string export file path: %s\n", oiout.c_str());
-        oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, ((VTLPVOID)(oiout.c_str())), 0, 0, NULL, 0, &oiexport);
+        oiopnexperr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, ((VTLPVOID)(oiout.c_str())), 0, 0, NULL, 0, &oiexport);
         //oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, ((VTLPVOID)(oiout.c_str())), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport); // THIS ONE WORKS
         VTCHAR szError[256];
         //qDebug() << "export path:" << QDir::homePath() + "/oiex.html";
-        DAGetErrorString(oierr, szError, sizeof(szError));
+        DAGetErrorString(oiopnexperr, szError, sizeof(szError));
         fprintf(stderr, "open export error: %s\n", szError);
         //qDebug() << "open export error:" << DAGetErrorString(oierr, szError, sizeof(szError));
-        oierr = EXRunExport(oiexport);
-        DAGetErrorString(oierr, szError, sizeof(szError));
+        oirunexperr = EXRunExport(oiexport);
+        DAGetErrorString(oirunexperr, szError, sizeof(szError));
         fprintf(stderr, "run export error: %s\n", szError);
         //qDebug() << "run export error:" << oierr;
-        oierr = EXCloseExport(oiexport);
-        DAGetErrorString(oierr, szError, sizeof(szError));
+        oiclsexperr = EXCloseExport(oiexport);
+        DAGetErrorString(oiclsexperr, szError, sizeof(szError));
         fprintf(stderr, "close export error: %s\n", szError);
         //qDebug() << "close export error;" << oierr;
-        oierr = DACloseDocument(oidoc);
-        DAGetErrorString(oierr, szError, sizeof(szError));
+        oiclsdocerr = DACloseDocument(oidoc);
+        DAGetErrorString(oiclsdocerr, szError, sizeof(szError));
         fprintf(stderr, "close document error: %s\n", szError);
-        qDebug() << "close document error:" << oierr;
+        qDebug() << "close document error:" << oiclsdocerr;
         qDebug() << "Finished Document Export Conversion.";
-        if(oierr == 0)
+        if(oiopnexperr == 0 && oiopndocerr == 0 && oirunexperr == 0 && oiclsexperr == 0 && oiclsdocerr == 0)
         {
             htmlviewer = new HtmlViewer();
             htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
