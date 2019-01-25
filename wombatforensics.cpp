@@ -929,6 +929,8 @@ void WombatForensics::UpdateProperties()
 void WombatForensics::LoadHexContents()
 {
     // HEXVIEWER SEEMS TO FAIL TO DISPLAY HEX CONTENT FOR A FILE THAT HAS 9 HEX PLACES.
+    // THIS SEEMS TO BE AN ISSUE WITH WHATEVER XMOUNT DOES. THE HEXEDITOR ITSELF WILL LOAD AND SCROLL A LARGE FILE BUT
+    // WILL FAIL WITH AN XMOUNT DD FILE. WILL HAVE TO TRY EWFMOUNT AND SEE THE RESULTS...
     wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
     blockstring = "";
     QString tmpstr = "";
