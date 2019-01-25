@@ -45,7 +45,6 @@ void ImageWindow::GetImage(QString objectid)
     QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
     unsigned long long curaddress = objectid.split("-f").at(1).split("-a").at(0).toULongLong(); 
-    // NEED TO UPDATE THIS FOR THE NEW EVIDENCE FINDING LOCATION...
     //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
     //wombatvariable.evidencename = evidfiles.at(0);
     QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");

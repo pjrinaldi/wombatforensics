@@ -84,10 +84,16 @@ void TextViewer::GetTextContent(const QModelIndex &index)
     evidlist.clear();
     std::vector<std::string> pathvector;
     pathvector.clear();
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
-    wombatvariable.evidencename = evidfiles.at(0);
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1));
+    QString estring = index.sibling(index.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = index.sibling(index.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = index.sibling(index.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = index.sibling(index.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(3);
+    //wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
+    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
+    //wombatvariable.evidencename = evidfiles.at(0);
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
+    //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1));
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
     evidlist = tmpstr.split(",");
@@ -108,8 +114,9 @@ void TextViewer::GetTextContent(const QModelIndex &index)
     tmpstr = "";
     QStringList partlist;
     partlist.clear();
-    QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + index.sibling(index.row(), 0).data().toString().split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
-    QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
+    //QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + index.sibling(index.row(), 0).data().toString().split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
+    QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/stat");
+    //QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();
     partfile.close();
