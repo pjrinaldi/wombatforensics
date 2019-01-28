@@ -1237,6 +1237,7 @@ void QHexEdit::updateCursor()
     viewport()->update(_cursorRect);
 }
 
+// HEXVIEWER WON'T COLOR HIGHLIGHT OR SELECT HEX CONTENT AFTER 2GB OF DATA EVEN THOUGH IT LOADS THE WHOLE 20GB OF THE IMAGE
 // Added by Pasquale J. Rinaldi, Jr. May 2018
 // Passing required information for syntax highlighting
 // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
