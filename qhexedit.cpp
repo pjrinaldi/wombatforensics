@@ -877,6 +877,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 	unsigned long long curblkstart = 0;
 	unsigned long long curblkend = 0;
 
+        qDebug() << "blocklistcount:" << blocklist.count();
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
         {
             QByteArray hex;
@@ -920,7 +921,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                             curblkstart = fsoffset + blocklist.at(i).toULongLong() * blocksize;
                             curblkend = curblkstart + blocksize - 1;
                             //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
-			    //qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
+			    //qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
                             if((unsigned)posBa >= curblkstart && (unsigned)posBa <= qMin((curblkstart + filelength - blocksize*i - 1), (curblkstart + blocksize)))
                             {
 				c = contentbrush.color(); // BLUE
@@ -1250,6 +1251,7 @@ void QHexEdit::SetColorInformation(unsigned long long fsoff, unsigned long long 
     filelength = flength;
     dataoffset = dataoff;
     //qDebug() << "initial variables";
-    qDebug() << "blockstring:" << blockstring;
+    if(blockstring.split("^^", QString::SkipEmptyParts).count() > 1)
+        qDebug() << "blockstring F/L:" << blockstring.split("^^", QString::SkipEmptyParts).first() << blockstring.split("^^", QString::SkipEmptyParts).last();
     //qDebug() << "blockstring:" << blocklist << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength << "dataoffset:" << dataoffset;
 }
