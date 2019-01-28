@@ -1249,6 +1249,7 @@ void QHexEdit::SetColorInformation(unsigned long long fsoff, unsigned long long 
     byteoffset = bytestring.toULongLong();
     filelength = flength;
     dataoffset = dataoff;
-    qDebug() << "initial variables";
-    qDebug() << "blockstring:" << blocklist << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength << "dataoffset:" << dataoffset;
+    //qDebug() << "initial variables";
+    qDebug() << "blockstring:" << blockstring;
+    //qDebug() << "blockstring:" << blocklist << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength << "dataoffset:" << dataoffset;
 }
