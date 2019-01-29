@@ -27,6 +27,7 @@ extern unsigned long long digcount;
 extern unsigned long long errorcount;
 extern unsigned long long jumpoffset;
 extern unsigned long long filejumpoffset;
+extern unsigned long long orphancount;
 extern int partint;
 extern int evidcnt;
 extern int volcnt;

@@ -23,6 +23,7 @@ unsigned long long digcount = 0;
 unsigned long long errorcount = 0;
 unsigned long long jumpoffset = 0;
 unsigned long long filejumpoffset = 0;
+unsigned long long orphancount = 0;
 int partint = 0;
 int volcnt = 0;
 int evidcnt = 0;
