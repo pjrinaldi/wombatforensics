@@ -439,6 +439,7 @@ public:
             ba.clear();
             ba.append(itemnode->Data(1).toString());
             QString nodename = QByteArray::fromBase64(ba);
+            qDebug() << nodename << "nodetype:" << nodetype;
             if(index.column() == 0)
             {
                 if(nodetype == 1)
@@ -724,6 +725,7 @@ private:
 public:
     void AddNode(QList<QVariant> data, QString parid, int type, int deleted)
     {
+        qDebug() << "id" << data.at(0).toString().split("-a").first();
         if(parid.toInt() == -1) // evid
         {
             zeronode->AppendChild(new TreeNode(data, zeronode));

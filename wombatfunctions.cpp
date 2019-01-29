@@ -256,41 +256,35 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
     }
     treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1);
     if(tmpfile->meta != NULL)
-    {
         treeout << QString::number(tmpfile->meta->type);
-        if(((tmpfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((tmpfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
+    else
+        treeout << QString::number(tmpfile->name->type);
+
+    if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+    {
+        qDebug() << "f*# deleted" << QString(tmpfile->name->name);
+        outstring += ",1";
+        treeout << "1";
+    }
+    else
+    {
+        if(tmpfile->meta != NULL)
         {
-            outstring += ",1";
-            treeout << "1";
-        }
-        else
-        {
-            if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+            if(((tmpfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((tmpfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
             {
-                qDebug() << "should be a f*";
                 outstring += ",1";
                 treeout << "1";
             }
             else
             {
-                outstring += ",0";
-                treeout << "0";
+                    outstring += ",0";
+                    treeout << "0";
             }
-        }
-    }
-    else
-    {
-        treeout << QString::number(tmpfile->name->type);
-        if((tmpfile->name->flags & TSK_FS_NAME_FLAG_UNALLOC) == 0x02)
-        {
-            outstring += ",1";
-            treeout << "1";
         }
         else
         {
-            if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+            if((tmpfile->name->flags & TSK_FS_NAME_FLAG_UNALLOC) == 0x02)
             {
-                qDebug() << "should be an f*";
                 outstring += ",1";
                 treeout << "1";
             }
