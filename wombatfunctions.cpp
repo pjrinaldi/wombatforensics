@@ -262,7 +262,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
 
     if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
     {
-        qDebug() << "f*# deleted" << QString(tmpfile->name->name);
+        //qDebug() << "f*# deleted" << QString(tmpfile->name->name);
         outstring += ",1";
         treeout << "1";
     }

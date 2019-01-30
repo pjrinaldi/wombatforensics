@@ -439,7 +439,7 @@ public:
             ba.clear();
             ba.append(itemnode->Data(1).toString());
             QString nodename = QByteArray::fromBase64(ba);
-            qDebug() << nodename << "nodetype:" << nodetype;
+            //qDebug() << itemnode->Data(0).toString() << nodename << "nodetype:" << nodetype << "itemtype:" << itemtype;
             if(index.column() == 0)
             {
                 if(nodetype == 1)
@@ -474,7 +474,12 @@ public:
                     else if(itemtype == 11)
                         return QIcon(QPixmap(QString(":/basic/virtualdir")));
                     else
-                        return QIcon(QPixmap(QString(":/basic/treefile")));
+                    {
+                        if(itemnode->Data(0).toString().contains("f*"))
+                            return QIcon(QPixmap(QString(":/basic/deletedfile")));
+                        else
+                            return QIcon(QPixmap(QString(":/basic/treefile")));
+                    }
                 }
                 else
                     return QIcon(QPixmap(QString(":/basic/treefile")));
