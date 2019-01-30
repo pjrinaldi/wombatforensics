@@ -730,7 +730,7 @@ private:
 public:
     void AddNode(QList<QVariant> data, QString parid, int type, int deleted)
     {
-        qDebug() << "id" << data.at(0).toString().split("-a").first();
+        //qDebug() << "id" << data.at(0).toString().split("-a").first();
         if(parid.toInt() == -1) // evid
         {
             zeronode->AppendChild(new TreeNode(data, zeronode));

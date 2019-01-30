@@ -877,7 +877,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 	unsigned long long curblkstart = 0;
 	unsigned long long curblkend = 0;
 
-        qDebug() << "blocklistcount:" << blocklist.count();
+        //qDebug() << "blocklistcount:" << blocklist.count();
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
         {
             QByteArray hex;

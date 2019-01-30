@@ -944,7 +944,7 @@ void WombatForensics::LoadHexContents()
         QString vstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(1);
         QString pstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(2);
         QString fstring = wombatvariable.selectedid.split("-", QString::SkipEmptyParts).at(3);
-        qDebug() << "Initial string info (e-v-p-f):" << estring + vstring + pstring + fstring;
+        //qDebug() << "Initial string info (e-v-p-f):" << estring + vstring + pstring + fstring;
         QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
         evidfile.open(QIODevice::ReadOnly);
         tmpstr = evidfile.readLine();
@@ -987,7 +987,7 @@ void WombatForensics::LoadHexContents()
                 mftentryoffset = tmpstring.split("||").at(1);
         }
         partpropfile.close();
-        qDebug() << "mftentryoffset:" << mftentryoffset;
+        //qDebug() << "mftentryoffset:" << mftentryoffset;
         
         QStringList filelist;
         filelist.clear();
@@ -996,7 +996,7 @@ void WombatForensics::LoadHexContents()
             tmpfilename = wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0) + QString("-") + wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(1);
         else
             tmpfilename = wombatvariable.selectedid.split("-").at(3).mid(1);
-        qDebug() << "f value:" << tmpfilename;
+        //qDebug() << "f value:" << tmpfilename;
         // INITIAL FILE SYSTEM FILE PIECE OF FILE HEX CONTENT CODE
         if(tmpfilename.contains("-"))
             filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.split("-").at(0).toInt());
@@ -1047,7 +1047,7 @@ void WombatForensics::LoadHexContents()
 
         if(selectedindex.sibling(selectedindex.row(), 3).data().toULongLong() == 0)
         {
-            qDebug() << "zero file";
+            //qDebug() << "zero file";
             ui->hexview->setEnabled(false);
         }
         else
@@ -1081,11 +1081,11 @@ void WombatForensics::LoadHexContents()
                 else // IF RESIDENT
                 {
                     unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt()) + fsoffset;
-                    qDebug() << "(resident ads) residentoffset:" << residentoffset;
+                    //qDebug() << "(resident ads) residentoffset:" << residentoffset;
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                     curoffset = 0;
-                    if(resbuffer.length() == 1024)
-                    {
+                    //if(resbuffer.length() == 1024)
+                    //{
                         mftoffset[0] = (uint8_t)resbuffer.at(20);
                         mftoffset[1] = (uint8_t)resbuffer.at(21);
                         nextattrid[0] = (uint8_t)resbuffer.at(40);
@@ -1115,7 +1115,7 @@ void WombatForensics::LoadHexContents()
     
                         ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                         ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                    }
+                    //}
                 }   
             }
             else // IF NOT ADS
@@ -1128,11 +1128,11 @@ void WombatForensics::LoadHexContents()
                 if(filelist.at(1).toInt() == 3) // IF DIR
                 {
                     unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt()) + fsoffset;
-                    qDebug() << "(resident dir) residentoffset:" << residentoffset;
+                    //qDebug() << "(resident dir) residentoffset:" << residentoffset;
                     QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
-                    qDebug() << "resbuffer length:" << resbuffer.length();
-                    if(resbuffer.length() == 1024)
-                    {
+                    //qDebug() << "resbuffer length:" << resbuffer.length();
+                    //if(resbuffer.length() == 1024)
+                    //{
                         curoffset = 0;
                         resoffset = 0;
                         mftoffset[0] = (uint8_t)resbuffer.at(20);
@@ -1141,7 +1141,7 @@ void WombatForensics::LoadHexContents()
                         nextattrid[1] = (uint8_t)resbuffer.at(41);
                         curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                         int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                        qDebug() << "attrcnt:" << attrcnt;
+                        //qDebug() << "attrcnt:" << attrcnt;
                         for(int i = 0; i < attrcnt; i++)
                         {
                             if(curoffset < resbuffer.size())
@@ -1161,7 +1161,7 @@ void WombatForensics::LoadHexContents()
                             curoffset += contentlength;
                             }
                         }
-                        qDebug() << "curoffset:" << curoffset;
+                        //qDebug() << "curoffset:" << curoffset;
                         // offset to type 144 resident attribute content
                         if(curoffset < resbuffer.size())
                         {
@@ -1171,7 +1171,7 @@ void WombatForensics::LoadHexContents()
                         }
                         ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
                         ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
-                    }
+                    //}
                 }
                 else // IF FILE AND OTHER STUFF
                 {
@@ -1183,18 +1183,18 @@ void WombatForensics::LoadHexContents()
                     else // IF RESIDENT
                     {
                         unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt()) + fsoffset;
-                        qDebug() << "(resident file) residentoffset:" << residentoffset;
+                        //qDebug() << "(resident file) residentoffset:" << residentoffset;
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                         curoffset = 0;
-                        if(resbuffer.length() == 1024)
-                        {
+                        //if(resbuffer.length() == 1024)
+                        //{
                             mftoffset[0] = (uint8_t)resbuffer.at(20);
                             mftoffset[1] = (uint8_t)resbuffer.at(21);
                             nextattrid[0] = (uint8_t)resbuffer.at(40);
                             nextattrid[1] = (uint8_t)resbuffer.at(41);
                             curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                             int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                            qDebug() << "attrcnt:" << attrcnt;
+                            //qDebug() << "attrcnt:" << attrcnt;
                             for(int i = 0; i < attrcnt; i++)
                             {
                                 if(curoffset < resbuffer.size())
@@ -1215,7 +1215,7 @@ void WombatForensics::LoadHexContents()
                                 curoffset += contentlength;
                                 }
                             }
-                            qDebug() << "curoffset:" << curoffset;
+                            //qDebug() << "curoffset:" << curoffset;
                             if(curoffset < resbuffer.size())
                             {
                             mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
@@ -1224,7 +1224,7 @@ void WombatForensics::LoadHexContents()
                             }
                             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
                             ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                        }
+                        //}
                     }
                 }
             }
@@ -1286,7 +1286,7 @@ void WombatForensics::CloseCurrentCase()
     QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
     QProcess::execute(xunmntstr);
 
-    QString unmntstr = "umount " + wombatvariable.tmpmntpath;
+    QString unmntstr = "fusermount -u " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);
 
     // delete two link files
