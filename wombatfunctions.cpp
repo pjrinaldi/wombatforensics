@@ -1369,6 +1369,8 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
     if(curfileinfo->name != NULL) proplist << "Short Name||" << curfileinfo->name->shrt_name << "||Short Name for a file" << endl;
     if(curfileinfo->meta != NULL)
     {
+        proplist << "Target File Name||" << QString(curfileinfo->meta->link) << "||Name of target file if this is a symbolic link" << endl;
+        proplist << "Link Count||" << QString::number(curfileinfo->meta->nlink) << "||Number of files pointing to this file" << endl;
         proplist << "File Permissions||" << GetFilePermissions(curfileinfo->meta) << "||Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type|user|group|other - [rdlcbpv]|rw[sSx]|rw[sSx]|rw[tTx]" << endl;
         proplist << "User ID||" << QString::number(curfileinfo->meta->uid) << "||User ID" << endl;
         proplist << "Group ID||" << QString::number(curfileinfo->meta->gid) << "||Group ID" << endl;
@@ -1386,6 +1388,32 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
         if((curfileinfo->meta->flags & TSK_FS_META_FLAG_ORPHAN) == 32)
             proplist << "Orphan,";
         proplist << "||allocation status for the file." << endl;
+        proplist << "Attributes||";
+        QString attrstr = "";
+        int attrcnt = tsk_fs_file_attr_getsize(curfileinfo);
+        for(int i=0; i < attrcnt; i++)
+        {
+            const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(curfileinfo, i);
+            //qDebug() << QString(curfileinfo->name->name) << fsattr->type;
+            if(fsattr->type == 0) attrstr += "Not Found,";
+            else if(fsattr->type == 1) attrstr += "Default,";
+            else if(fsattr->type == 16) attrstr += "$STANDARD_INFOMRATION,";
+            else if(fsattr->type == 32) attrstr += "$ATTRIBUTE_LIST,";
+            else if(fsattr->type == 48) attrstr += "$FILE_NAME,";
+            else if(fsattr->type == 64) attrstr += "$OBJECT_ID,";
+            else if(fsattr->type == 80) attrstr += "SECURITY_DESCRIPTOR,";
+            else if(fsattr->type == 96) attrstr += "$VOLUME_NAME,";
+            else if(fsattr->type == 112) attrstr += "$VOLUME_INFORMATION,";
+            else if(fsattr->type == 128) attrstr += "$DATA,";
+            else if(fsattr->type == 144) attrstr += "$INDEX_ROOT,";
+            else if(fsattr->type == 160) attrstr += "$INDEX_ALLOCATION,";
+            else if(fsattr->type == 176) attrstr += "$BITMAP,";
+            else if(fsattr->type == 192) attrstr += "$REPARSE_POINT,";
+            else if(fsattr->type == 208) attrstr += "$EA_INFORMATION,";
+            else if(fsattr->type == 224) attrstr += "$EA,";
+            else if(fsattr->type == 256) attrstr += "$LOGGED_UTILITY_STREAM,";
+        }
+        proplist << attrstr << "||Attributes Types" << endl;
     }
     proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;
     if(GetBlockList(curfileinfo).compare("") == 0 || GetBlockList(curfileinfo).compare("0^^") == 0)
