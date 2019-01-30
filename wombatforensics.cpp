@@ -519,7 +519,7 @@ void WombatForensics::InitializeCaseStructure()
         casefile.resize(1000000000000);
         casefile.close();
         // make ext4 partition
-        QString mkfsstr = "mkfs.ext4 -q -E root_owner=" + QString::number(getuid()) + ":" + QString::number(getgid()) + " ";
+        QString mkfsstr = "mkfs.ext4 -F -q -E root_owner=" + QString::number(getuid()) + ":" + QString::number(getgid()) + " ";
         mkfsstr += wombatvariable.casename;
         //qDebug() << mkfsstr;
         QProcess::execute(mkfsstr);
