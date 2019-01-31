@@ -491,6 +491,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
     ui->actionByteConverter->setEnabled(false);
+    ui->actionJumpToHex->setEnabled(false);
     //ui->actionTextViewer->setVisible(false);
     //ui->actionHtmlViewer->setVisible(false);
     //ui->actionMediaViewer->setVisible(false);
@@ -656,6 +657,7 @@ void WombatForensics::OpenUpdate()
         ui->actionRemove_Evidence->setEnabled(true);
         ui->actionSaveState->setEnabled(true);
         ui->actionDigDeeper->setEnabled(true);
+        ui->actionJumpToHex->setEnabled(true);
         //ui->actionBookmark_Manager->setEnabled(true);
     }
     readfileinfo = NULL;
@@ -697,6 +699,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
         ui->actionByteConverter->setEnabled(true);
+        ui->actionJumpToHex->setEnabled(true);
         StatusUpdate("Loading Hex Contents...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         LoadHexContents();
@@ -2169,7 +2172,9 @@ void WombatForensics::AutoSaveState()
 
 void WombatForensics::SetHexOffset()
 {
-    qDebug() << "set offset jump here...";
+    ui->hexview->setCursorPosition(jumpoffset*2);
+    ui->hexview->ensureVisible();
+    qDebug() << "set offset jump here..." << jumpoffset;
 }
 
 void WombatForensics::ThreadCancelled()
