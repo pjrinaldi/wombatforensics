@@ -917,6 +917,10 @@ void GenerateThumbnails(QString thumbid)
             thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
             writer.write(thumbimage);
         }
+        else
+        {
+
+        }
     }
     free(imgbuf);
     tsk_fs_file_close(readfileinfo);
