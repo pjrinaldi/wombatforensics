@@ -1239,7 +1239,10 @@ void InitializeEvidenceStructure()
                         }
                     }
                     else
+                    {
+                        // NEED TO DO SOMETHING HERE TO DISPLAY THE ALLOCATED PARTITION THAT I CANNOT READ THE FILE SYSTEM FOR...
                         pfile.close();
+                    }
                 }
                 else
                     pfile.close();
