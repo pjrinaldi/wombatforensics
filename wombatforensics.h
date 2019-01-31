@@ -111,6 +111,7 @@ private slots:
     void on_actionAbout_triggered();
     void on_actionSettings_triggered();
     void on_actionCancel_Operation_triggered();
+    void on_actionJumpToHex_triggered();
     void UpdateProgress(unsigned long long count);
     void UpdateExport(void);
     void UpdateDig(void);
