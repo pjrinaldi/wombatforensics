@@ -1238,7 +1238,11 @@ void InitializeEvidenceStructure()
                             errorcount++;
                         }
                     }
+                    else
+                        pfile.close();
                 }
+                else
+                    pfile.close();
                 partint++;
                 //else if(readpartinfo->flags == 0x04) // meta partition
             }

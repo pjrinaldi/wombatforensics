@@ -735,7 +735,7 @@ void WombatForensics::UpdateDataTable()
 
 void WombatForensics::PrepareEvidenceImage()
 {
-    qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
+    //qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
     QString xmntstr = "";
     if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
         xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
@@ -1292,7 +1292,9 @@ void WombatForensics::CloseCurrentCase()
     QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
     QProcess::execute(xunmntstr);
 
-    QString unmntstr = "fusermount -u " + wombatvariable.tmpmntpath;
+    //QString unmntstr = "umount /tmp/wombatforensics/mntpt";
+    QString unmntstr = "umount " + wombatvariable.tmpmntpath;
+    //QString unmntstr = "fusermount -u " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);
 
     // delete two link files
