@@ -1123,7 +1123,7 @@ void InitializeEvidenceStructure()
     evidfile.close();
     treefile.open(QIODevice::Append | QIODevice::Text);
     QStringList treeout;
-    treeout << QString("e" + QString::number(evidcnt)) << wombatvariable.evidencename << "0" + QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+    treeout << QString("e" + QString::number(evidcnt)) << wombatvariable.evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
     QList<QVariant> nodedata;
     nodedata.clear();
     for(int i=0; i < treeout.count(); i++)
