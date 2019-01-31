@@ -667,13 +667,17 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
             {
+                QFile filefile;
                 QString tmpstr = "";
                 QStringList tmplist;
                 tmplist.clear();
                 QList<QVariant> nodedata;
                 nodedata.clear();
                 wombatvariable.curfilepath = wombatvariable.partitionpath;
-                QFile filefile(wombatvariable.curfilepath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat");
+                if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+                    filefile.setFileName(wombatvariable.curfilepath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
+                else
+                    filefile.setFileName(wombatvariable.curfilepath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat");
                 filefile.open(QIODevice::ReadOnly | QIODevice::Text);
                 if(filefile.isOpen())
                     tmpstr = filefile.readLine();
@@ -689,6 +693,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
                 listeditems.append(tmplist.at(12));
                 filesfound++;
+                if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+                    orphancount++;
                 isignals->ProgUpd();
                 // NEED TO CHECK FOR ADS HERE...
                 if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
