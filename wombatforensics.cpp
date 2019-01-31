@@ -167,6 +167,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(filetypefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(filecategoryfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(hashfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(jumpfilterview, SIGNAL(SetOffset()), this, SLOT(SetHexOffset()));
     jumpforward = new QShortcut(ui->dirTreeView);
     jumpbackward = new QShortcut(ui->dirTreeView);
     showitem = new QShortcut(ui->dirTreeView);
@@ -1654,6 +1655,11 @@ void WombatForensics::on_actionDigDeeper_triggered()
     digdeeperdialog->show();
 }
 
+void WombatForensics::on_actionJumpToHex_triggered()
+{
+    jumpfilterview->show();
+}
+
 void WombatForensics::on_actionView_Properties_triggered(bool checked)
 {
     if(checked){}
@@ -2159,6 +2165,11 @@ void WombatForensics::AutoSaveState()
     SaveState();
     StatusUpdate("Evidence ready");
     // change display text
+}
+
+void WombatForensics::SetHexOffset()
+{
+    qDebug() << "set offset jump here...";
 }
 
 void WombatForensics::ThreadCancelled()

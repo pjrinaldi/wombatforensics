@@ -752,22 +752,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionRemove_Evidence</sender>
-   <signal>triggered()</signal>
-   <receiver>WombatForensics</receiver>
-   <slot>RemEvidence()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionExport_Evidence</sender>
    <signal>triggered()</signal>
    <receiver>WombatForensics</receiver>

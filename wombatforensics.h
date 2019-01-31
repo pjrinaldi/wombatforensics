@@ -168,6 +168,7 @@ private slots:
     void AutoSaveState(void);
     void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
     void PrepareEvidenceImage(void);
+    void SetHexOffset(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
