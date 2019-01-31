@@ -919,7 +919,9 @@ void GenerateThumbnails(QString thumbid)
         }
         else
         {
-
+            fileimage.load(":/missingimage");
+            thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+            writer.write(thumbimage);
         }
     }
     free(imgbuf);
