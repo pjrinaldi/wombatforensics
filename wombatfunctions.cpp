@@ -1203,7 +1203,7 @@ void InitializeEvidenceStructure()
                 out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
                 {
-                    out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << readpartinfo->start << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                    out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << (unsigned long long)readpartinfo->start * (int)readvsinfo->block_size << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                     out.flush();
                     pfile.close();
                     treeout.clear();
@@ -1240,8 +1240,17 @@ void InitializeEvidenceStructure()
                     }
                     else
                     {
-                        // NEED TO DO SOMETHING HERE TO DISPLAY THE ALLOCATED PARTITION THAT I CANNOT READ THE FILE SYSTEM FOR...
+                        //qDebug() << "part->len * vs->blocksize" << readpartinfo->len << "*" << readvsinfo->block_size << "=" << (unsigned long long)readpartinfo->len * (int)readvsinfo->block_size;
+                        //qDebug() << "part->start * vs->blocksize" << readpartinfo->start << "*" << readvsinfo->block_size << "=" << readpartinfo->start * readvsinfo->block_size;
+                        out << "0," << (unsigned long long)readpartinfo->len * (int)readvsinfo->block_size << "," << QString(readpartinfo->desc) << " (Non-Recognized FS),0," << (unsigned long long)readpartinfo->start * (int)readvsinfo->block_size << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                        out.flush();
                         pfile.close();
+                        treeout.clear();
+                        treeout << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)) << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                        nodedata.clear();
+                        for(int j=0; j < treeout.count(); j++)
+                            nodedata << treeout.at(j);
+                        treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                     }
                 }
                 else
