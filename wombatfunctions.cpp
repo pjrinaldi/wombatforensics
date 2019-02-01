@@ -615,7 +615,8 @@ void LoadImagesHash()
     QString tmpstr = "";
     thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
     thumbfile.open(QIODevice::ReadOnly);
-    tmpstr = thumbfile.readLine();
+    if(thumbfile.isOpen())
+        tmpstr = thumbfile.readLine();
     thumbfile.close();
     for(int i = 0; i < tmpstr.split(",", QString::SkipEmptyParts).count(); i++)
         imageshash.insert(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
