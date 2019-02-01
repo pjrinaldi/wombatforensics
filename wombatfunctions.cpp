@@ -520,7 +520,10 @@ void ProcessExport(QString objectid)
     QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
     QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
-    unsigned long long curaddress = objectid.split("-f").at(1).toULongLong();
+    if(fstring.contains(":") == true)
+        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+    //unsigned long long curaddress = objectid.split("-f").at(1).toULongLong();
+    unsigned long long curaddress = objectid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong(); 
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
     wombatvariable.evidencename = evidfiles.at(0).split(".e").first();
     QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
@@ -655,7 +658,7 @@ void GenerateThumbnails(QString thumbid)
     }
     free(imagepartspath);
     tmpstr = "";
-    QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "/." + vstring + "/." + pstring + "/stat");
+    QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/stat");
     partfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(partfile.isOpen())
         tmpstr = partfile.readLine();
