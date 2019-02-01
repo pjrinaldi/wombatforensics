@@ -174,34 +174,20 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
     treeout.clear();
     QByteArray ba2;
     ba2.append(QString("/" + QString(tmppath)));
-    //if(tmpfile->name != NULL)
-    //{
-        QByteArray ba;
-        ba.append(QString(tmpfile->name->name));
-        outstring += ba.toBase64() + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
-        if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-            treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(tmpfile->name->par_addr);
-        else
-            treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
-        treeout << ba.toBase64();
-        if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
-            parentstr = "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
-        else
-            parentstr = "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->par_addr);
-        curaddress = tmpfile->name->meta_addr;
-        paraddress = tmpfile->name->par_addr;
-    //}
-    //else
-    //{
-    //    qDebug() << "Need to care for this better";
-        /*
-        QByteArray ba;
-        ba.append("unknown");
-        outstring += ba.toBase64() + "," + QString::number(tmpfile->meta->type) + ",0,";
-        treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a0" + QString::number(tmpfile->name->par_addr) << ba.toBase64();
-        parentstr = "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f00";
-        */
-    //}
+    QByteArray ba;
+    ba.append(QString(tmpfile->name->name));
+    outstring += ba.toBase64() + "," + QString::number(tmpfile->name->type) + "," + QString::number(tmpfile->name->par_addr) + ",";
+    if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+        treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(tmpfile->name->par_addr);
+    else
+        treeout << "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
+    treeout << ba.toBase64();
+    if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
+        parentstr = "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+    else
+        parentstr = "e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->par_addr);
+    curaddress = tmpfile->name->meta_addr;
+    paraddress = tmpfile->name->par_addr;
     outstring += ba2.toBase64() + ",";
     treeout << ba2.toBase64();
     if(tmpfile->meta != NULL)
@@ -222,14 +208,11 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
     outstring += mimetype.name() + ",0,e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f";
-    //if(tmpfile->name != NULL)
-    //{
-        if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-            outstring += "*" + QString::number(orphancount);
-        else
-            outstring += QString::number(tmpfile->name->meta_addr);
-        outstring += "-a" + QString::number(tmpfile->name->par_addr);
-    //}
+    if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+        outstring += "*" + QString::number(orphancount);
+    else
+        outstring += QString::number(tmpfile->name->meta_addr);
+    outstring += "-a" + QString::number(tmpfile->name->par_addr);
 
     /* hash method using TSK */
     TSK_FS_HASH_RESULTS hashresults;
@@ -262,7 +245,6 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
 
     if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
     {
-        //qDebug() << "f*# deleted" << QString(tmpfile->name->name);
         outstring += ",1";
         treeout << "1";
     }
@@ -325,45 +307,17 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
 
     QFile filefile;
     QTextStream out(&filefile);
-    //if(tmpfile->name != NULL)
-    //{
-    //    if(strcmp(tmpfile->name->name, ".") != 0)
-    //    {
-    //        if(strcmp(tmpfile->name->name, "..") != 0)
-    //        {
-                if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-                    filefile.setFileName(wombatvariable.curfilepath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
-                else
-                    filefile.setFileName(wombatvariable.curfilepath + "f" + QString::number(tmpfile->name->meta_addr) + ".a" + QString::number(paraddress) + ".stat");
-                //filefile.open(QIODevice::Append | QIODevice::Text);
-                //out << outstring;
-                //out.flush();
-                //nodedata.clear();
-                //for(int i=0; i < 11; i++)
-                //    nodedata << treeout.at(i);
-                //treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
-    //        }
-    //    }
-   //}
-   // else
-    //{
-    /*
-        if(tmpfile->meta->addr == 0)
-            filefile.setFileName(wombatvariable.curfilepath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
-        else
-        {
-            qDebug() << "curaddress: " << curaddress << "need to fix this somehow...";
-            filefile.setFileName(wombatvariable.curfilepath + "f" + QString::number(curaddress) + ".a" + QString::number(paraddress) + ".stat");
-        }
-        */
-        filefile.open(QIODevice::Append | QIODevice::Text);
-        out << outstring;
-        out.flush();
-        nodedata.clear();
-        for(int i=0; i < 11; i++)
-            nodedata << treeout.at(i);
-        treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
-    //}
+    if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+        filefile.setFileName(wombatvariable.curfilepath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
+    else
+        filefile.setFileName(wombatvariable.curfilepath + "f" + QString::number(tmpfile->name->meta_addr) + ".a" + QString::number(paraddress) + ".stat");
+    filefile.open(QIODevice::Append | QIODevice::Text);
+    out << outstring;
+    out.flush();
+    nodedata.clear();
+    for(int i=0; i < 11; i++)
+        nodedata << treeout.at(i);
+    treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
     if(filefile.isOpen())
         filefile.close();
     if(tmpfile->name != NULL)
@@ -371,13 +325,6 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         if(!TSK_FS_ISDOT(tmpfile->name->name))
             filesfound++;
     }
-    /*
-    if(tmpfile->name != NULL)
-    {
-        if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-            orphancount++;
-    }
-    */
     isignals->ProgUpd();
 
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -401,251 +348,56 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
         uint16_t teststart = startoffset[1] * 256 + startoffset[0];
         adssize = (unsigned long long)teststart;
-        //if(strcmp(tmpfile->name->name, ".") != 0)
-        //{
-        //    if(strcmp(tmpfile->name->name, "..") != 0)
-        //    {
-                int cnt, i;
-                cnt = tsk_fs_file_attr_getsize(tmpfile);
-                for(i = 0; i < cnt; i++)
-                {
-                    char type[512];
-                    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                    adssize += 24;
-                    adssize += (unsigned long long)fsattr->size;
-                    if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
-                    {
-                        if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
-                        {
-                            if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
-                            {
-                                /* Get MD5 HASH of Content using Qt Method */
-                                char* fbuf = new char[fsattr->size];
-                                ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
-                                QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
-                                QBuffer fbuffer(&fdata);
-                                fbuffer.open(QIODevice::ReadOnly);
-                                QCryptographicHash attrhash(QCryptographicHash::Md5);
-                                attrhash.addData(&fbuffer);
-                                fbuffer.close();
-                                QMimeDatabase adsmimedb;
-                                QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
-                                delete[] fbuf;
-                                QFile adsfile(wombatvariable.curfilepath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
-                                adsfile.open(QIODevice::Append | QIODevice::Text);
-                                QTextStream adsout(&adsfile);
-                                adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
-                                adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << "," + QString(attrhash.result().toHex()).toUpper() + ",0";
-                                adsout.flush();
-                                if(adsfile.isOpen())
-                                {
-                                    adsfile.close();
-                                }
-                                treeout.clear();
-                                treeout << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << "10" << "0";
-                                nodedata.clear();
-                                for(int i=0;  i < 11; i++)
-                                    nodedata << treeout.at(i);
-                                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr)), treeout.at(11).toInt(), treeout.at(12).toInt());
-                                filesfound++;
-                                isignals->ProgUpd();
-                                WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), (unsigned long long)(adssize - fsattr->size + 16), QString::number(fsattr->id));
-                            }
-                        }
-                    }
-                }
-            //}
-        //}
-    }
-}
-
-void BuildTreeFile(TSK_FS_FILE* tmpfile, const char* tmppath)
-{
-    /*
-    QString parentstr = "";
-    QList<QVariant> nodedata;
-    nodedata.clear();
-    QString outstring = "";
-    //QString treestring = "";
-    QStringList treeout;
-    treeout.clear();
-    QString evidid = "e" + wombatvariable.evidencepath.split(".e").last().split("/").first();
-    QString volid = wombatvariable.volumepath.split("/").at(wombatvariable.volumepath.split("/").count() - 2);
-    QString partid = wombatvariable.partitionpath.split("/").at(wombatvariable.partitionpath.split("/").count() - 2);
-    QByteArray ba2;
-    ba2.append(QString("/" + QString(tmppath)));
-    if(tmpfile->name != NULL)
-    {
-        QByteArray ba;
-        ba.append(QString(tmpfile->name->name));
-        treeout << QString(evidid + "-" + volid.mid(1) + "-" + partid.mid(1) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr)) << ba.toBase64();
-        if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
-            parentstr = evidid + "-" + volid.mid(1) + "-" + partid.mid(1);
-        else
-            parentstr = evidid + "-" + volid.mid(1) + "-" + partid.mid(1) + "-f" + QString::number(tmpfile->name->par_addr);
-    }
-    else
-    {
-        QByteArray ba;
-        ba.append("unknown");
-        treeout << QString(evidid + "-" + volid.mid(1) + "-" + partid.mid(1) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a0" + QString::number(tmpfile->name->par_addr)) << ba.toBase64();
-        parentstr = evidid + "-" + volid.mid(1) + "-" + partid.mid(1) + "-f00";
-    }
-    treeout << ba2.toBase64();
-    if(tmpfile->meta != NULL)
-        treeout << QString::number(tmpfile->meta->size) << QString::number(tmpfile->meta->crtime) << QString::number(tmpfile->meta->mtime) << QString::number(tmpfile->meta->atime) << QString::number(tmpfile->meta->ctime);
-    else
-        treeout << "0" << "0" << "0" << "0" << "0";
-    char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
-    QByteArray tmparray;
-    tmparray.clear();
-    tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
-    tmparray = QByteArray::fromRawData(magicbuffer, 1024);
-    QMimeDatabase mimedb;
-    QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-
-    /* hash method using TSK */
-/*
-    TSK_FS_HASH_RESULTS hashresults;
-    uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
-    if(retval == 0)
-    {
-        char sbuf[17];
-        int hashint;
-        hashint = 0;
-        if(hashint < 0)
+        int cnt, i;
+        cnt = tsk_fs_file_attr_getsize(tmpfile);
+        for(i = 0; i < cnt; i++)
         {
-        }
-        for(int i=0; i < 16; i++)
-        {
-            hashint = sprintf(sbuf+(2*i), "%02X", hashresults.md5_digest[i]);
-        }
-        treeout << QString(sbuf);
-    }
-    else
-        treeout << "0";
-    treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1);
-    if(tmpfile->meta != NULL)
-    {
-        treeout << QString::number(tmpfile->meta->type);
-        if(((tmpfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((tmpfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
-            treeout << "1";
-        else
-            treeout << "0";
-    }
-    else
-        treeout << "0" << "0";
-    free(magicbuffer);
-
-    /* alternative method using qt5 */
-    /*
-    char fbuf[tmpfile->meta->size];
-    ssize_t flen = tsk_fs_file_read(tmpfile, 0, fbuf, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-    QByteArray filedata = QByteArray::fromRawData(fbuf, flen);
-    QBuffer filebuf(&filedata);
-    filebuf.open(QIODevice::ReadOnly);
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    if(hash.addData(&filebuf))
-        qDebug() << "qthash:" << QString(hash.result().toHex()).toUpper();
-    filebuf.close();
-    */
-    /*
-    if(hash.addData(&filebuf))
-        outstring += "," + QString(hash.result().toHex()).toUpper();
-    else
-        outstring += ",0";
-    */
-    /* end alternative method */
-
-    /*
-    // maybe store info for an orphan
-    if(tmpfile->meta != NULL)
-        outstring += "," + QString::number(tmpfile->meta->flags);
-    */
-/*
-    if(tmpfile->name != NULL)
-    {
-        if(strcmp(tmpfile->name->name, ".") != 0)
-        {
-            if(strcmp(tmpfile->name->name, "..") != 0)
+            char type[512];
+            const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+            adssize += 24;
+            adssize += (unsigned long long)fsattr->size;
+            if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
             {
-                nodedata.clear();
-                for(int i=0; i < 11; i++)
-                    nodedata << treeout.at(i);
-                treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
-            }
-        }
-    }
-    else
-    {
-        nodedata.clear();
-        for(int i=0; i < 11; i++)
-            nodedata << treeout.at(i);
-        treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
-    }
-    if(tmpfile->name != NULL)
-    {
-        if(!TSK_FS_ISDOT(tmpfile->name->name))
-            filesfound++;
-    }
-    isignals->ProgUpd();
-
-    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
-    {
-        QByteArray adsba;
-        unsigned long long adssize = 0;
-        TSK_OFF_T curmftentrystart = 0;
-        NTFS_INFO* ntfsinfo = (NTFS_INFO*)tmpfile->fs_info;
-        int recordsize = 0;
-        if(ntfsinfo->fs->mft_rsize_c > 0)
-        {
-            recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize);
-        }
-        else
-            recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
-        if(tmpfile->meta != NULL)
-            curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * tmpfile->meta->addr + 20;
-        else
-            curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
-        char startoffset[2];
-        tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
-        uint16_t teststart = startoffset[1] * 256 + startoffset[0];
-        adssize = (unsigned long long)teststart;
-        if(strcmp(tmpfile->name->name, ".") != 0)
-        {
-            if(strcmp(tmpfile->name->name, "..") != 0)
-            {
-                int cnt, i;
-                cnt = tsk_fs_file_attr_getsize(tmpfile);
-                for(i = 0; i < cnt; i++)
+                if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
                 {
-                    char type[512];
-                    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
-                    adssize += 24;
-                    adssize += (unsigned long long)fsattr->size;
-                    if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
+                    if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                     {
-                        if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                        /* Get MD5 HASH of Content using Qt Method */
+                        char* fbuf = new char[fsattr->size];
+                        ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
+                        QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
+                        QBuffer fbuffer(&fdata);
+                        fbuffer.open(QIODevice::ReadOnly);
+                        QCryptographicHash attrhash(QCryptographicHash::Md5);
+                        attrhash.addData(&fbuffer);
+                        fbuffer.close();
+                        QMimeDatabase adsmimedb;
+                        QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
+                        delete[] fbuf;
+                        QFile adsfile(wombatvariable.curfilepath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
+                        adsfile.open(QIODevice::Append | QIODevice::Text);
+                        QTextStream adsout(&adsfile);
+                        adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
+                        adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << "," + QString(attrhash.result().toHex()).toUpper() + ",0";
+                        adsout.flush();
+                        if(adsfile.isOpen())
                         {
-                            if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
-                            {
-                                adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
-                                treeout.clear();
-                                treeout << QString(evidid + "-" + volid.mid(1) + "-" + partid.mid(1) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "10" << "0";
-                                nodedata.clear();
-                                for(int i=0;  i < 11; i++)
-                                    nodedata << treeout.at(i);
-                                treenodemodel->AddNode(nodedata, QString(evidid + "-" + volid.mid(1) + "-" + partid.mid(1) + "-f" + QString::number(tmpfile->name->meta_addr)), treeout.at(11).toInt(), treeout.at(12).toInt());
-                                filesfound++;
-                                isignals->ProgUpd();
-                            }
+                            adsfile.close();
                         }
+                        treeout.clear();
+                        treeout << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << "10" << "0";
+                        nodedata.clear();
+                        for(int i=0;  i < 11; i++)
+                            nodedata << treeout.at(i);
+                        treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr)), treeout.at(11).toInt(), treeout.at(12).toInt());
+                        filesfound++;
+                        isignals->ProgUpd();
+                        WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), (unsigned long long)(adssize - fsattr->size + 16), QString::number(fsattr->id));
                     }
                 }
             }
         }
     }
-*/
 }
 
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
@@ -1240,8 +992,6 @@ void InitializeEvidenceStructure()
                     }
                     else
                     {
-                        //qDebug() << "part->len * vs->blocksize" << readpartinfo->len << "*" << readvsinfo->block_size << "=" << (unsigned long long)readpartinfo->len * (int)readvsinfo->block_size;
-                        //qDebug() << "part->start * vs->blocksize" << readpartinfo->start << "*" << readvsinfo->block_size << "=" << readpartinfo->start * readvsinfo->block_size;
                         out << "0," << (unsigned long long)readpartinfo->len * (int)readvsinfo->block_size << "," << QString(readpartinfo->desc) << " (Non-Recognized FS),0," << (unsigned long long)readpartinfo->start * (int)readvsinfo->block_size << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                         out.flush();
                         pfile.close();
@@ -1256,7 +1006,6 @@ void InitializeEvidenceStructure()
                 else
                     pfile.close();
                 partint++;
-                //else if(readpartinfo->flags == 0x04) // meta partition
             }
         }
     }
@@ -1422,7 +1171,6 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
         for(int i=0; i < attrcnt; i++)
         {
             const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(curfileinfo, i);
-            //qDebug() << QString(curfileinfo->name->name) << fsattr->type;
             if(fsattr->type == 0) attrstr += "Not Found,";
             else if(fsattr->type == 1) attrstr += "Default,";
             else if(fsattr->type == 16) attrstr += "$STANDARD_INFOMRATION,";

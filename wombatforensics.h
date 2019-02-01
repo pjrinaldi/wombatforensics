@@ -63,7 +63,6 @@ public:
     QMenu* selectionmenu;
     QMenu* bookmarkmenu;
     IdFilter* idfilterview;
-    //JumpFilter* jumpfilterview;
     JumpHex* jumpfilterview;
     NameFilter* namefilterview;
     PathFilter* pathfilterview;

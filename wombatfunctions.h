@@ -23,7 +23,6 @@ void WriteVolumeProperties(TSK_VS_INFO* curvolinfo);
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo);
 void WriteFileProperties(TSK_FS_FILE* curfileinfo);
 void BuildStatFile(TSK_FS_FILE* curfileinfo, const char* tmppath);
-void BuildTreeFile(TSK_FS_FILE* curfileinfo);
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, unsigned long long adssize, QString attrid);
 //void LogMessage(QString message);
 void cnid_to_array(uint32_t cnid, uint8_t array[4]);

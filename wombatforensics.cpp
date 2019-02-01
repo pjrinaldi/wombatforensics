@@ -52,7 +52,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tskexternalptr = &tskexternalobject;
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
-    //jumpfilterview = new JumpFilter(this);
     jumpfilterview = new JumpHex(this);
     namefilterview = new NameFilter(this);
     pathfilterview = new PathFilter(this);
@@ -386,9 +385,9 @@ void WombatForensics::HideSettingsWindow()
 
 void WombatForensics::ReadSettings()
 {
-    qDebug() << "readsettings settingsfile:" << settingsfile.fileName();
+    //qDebug() << "readsettings settingsfile:" << settingsfile.fileName();
     settingsfile.open(QIODevice::ReadOnly);
-    qDebug() << "is file at end:" << settingsfile.atEnd();
+    //qDebug() << "is file at end:" << settingsfile.atEnd();
     QStringList tmplist = QString(settingsfile.readLine()).split(",", QString::SkipEmptyParts);
     settingsfile.close();
     // split settings and implement them...
@@ -422,7 +421,7 @@ void WombatForensics::CheckWombatConfiguration()
         while(!fstabin.atEnd())
         {
             QString line = fstabin.readLine();
-            if(line.compare("/tmp/wombatforensics/currentwfc /tmp/wombatforensics/mntpt auto defaults,rw,user,noauto 0 0", Qt::CaseSensitive) == 0)
+            if(line.compare("/tmp/wombatforensics/currentwfc /tmp/wombatforensics/mntpt auto defaults,rw,users,noauto 0 0", Qt::CaseSensitive) == 0)
                 fstabbool = 1;
         }
         fstabfile.close();
@@ -467,7 +466,7 @@ void WombatForensics::InitializeAppStructure()
         viewerfile.close();
     }
     settingsfile.setFileName(homepath + "settings");
-    qDebug() << "settingsfile:" << settingsfile.fileName();
+    //qDebug() << "settingsfile:" << settingsfile.fileName();
     if(!FileExists(QString(homepath + "settings").toStdString()))
     {
         settingsfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -1297,9 +1296,7 @@ void WombatForensics::CloseCurrentCase()
     QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
     QProcess::execute(xunmntstr);
 
-    //QString unmntstr = "umount /tmp/wombatforensics/mntpt";
     QString unmntstr = "umount " + wombatvariable.tmpmntpath;
-    //QString unmntstr = "fusermount -u " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);
 
     // delete two link files
@@ -1707,7 +1704,6 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
         }
         else
         {
-            // NEED TO TIE IN THE LOADING HASH THUMBNAILS FINISHING BEFORE I LAUNCH THIS...
             imagewindow->LoadThumbnails();
             imagewindow->show();
         }
@@ -2175,7 +2171,6 @@ void WombatForensics::SetHexOffset()
 {
     ui->hexview->setCursorPosition(jumpoffset*2);
     ui->hexview->ensureVisible();
-    //qDebug() << "set offset jump here..." << jumpoffset;
 }
 
 void WombatForensics::ThreadCancelled()

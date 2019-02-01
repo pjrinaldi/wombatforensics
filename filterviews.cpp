@@ -122,7 +122,6 @@ void IdFilter::Rebuild()
         emit ui->fspinBox->valueChanged(ui->fspinBox->text());
 }
 
-//JumpFilter::JumpFilter(QWidget* parent) : QFrame(parent), ui(new Ui::JumpFilter)
 JumpHex::JumpHex(QWidget* parent) : QDialog(parent), ui(new Ui::JumpHex)
 {
     ui->setupUi(this);
@@ -149,37 +148,8 @@ void JumpHex::HideClicked()
 {
     jumpoffset = ui->lineEdit->text().toULongLong(0, 16);
     emit SetOffset(); 
-    //this->hide();
 }
 
-/*
-FileJumpFilter::FileJumpFilter(QWidget* parent) : QFrame(parent), ui(new Ui::JumpFilter)
-{
-    ui->setupUi(this);
-    this->hide();
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
-}
-
-FileJumpFilter::~FileJumpFilter()
-{
-}
-
-void FileJumpFilter::DisplayFilter()
-{
-    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
-    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
-    if(this->pos().x() == 0)
-        this->move(newpos);
-    this->show();
-}
-
-void FileJumpFilter::HideClicked()
-{
-    filejumpoffset = ui->lineEdit->text().toULongLong(0, 16);
-    emit SetOffset(); 
-    this->hide();
-}
-*/
 NameFilter::NameFilter(QWidget* parent) : QWidget(parent), ui(new Ui::NameFilter)
 {
     ui->setupUi(this);

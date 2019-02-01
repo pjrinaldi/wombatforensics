@@ -18,7 +18,6 @@
 #include "ui_namefilter.h"
 #include "ui_pathfilter.h"
 #include "ui_sizefilter.h"
-#include "ui_jumpto.h"
 #include "ui_jumphex.h"
 #include "ui_filecategoryfilter.h"
 
@@ -34,9 +33,7 @@ namespace Ui {
     class FileTypeFilter;
     class FileCategoryFilter;
     class HashFilter;
-    //class JumpFilter;
     class JumpHex;
-    //class FileJumpFilter;
 }
 
 class IdFilter : public QFrame
@@ -63,25 +60,6 @@ private:
     QString pstring;
     QString fstring;
 };
-/*
-class JumpFilter : public QFrame
-{
-    Q_OBJECT
-public:
-    JumpFilter(QWidget* parent = 0);
-    ~JumpFilter();
-
-signals:
-    void SetOffset();
-
-private slots:
-    void HideClicked();
-    void DisplayFilter(void);
-
-private:
-    Ui::JumpFilter* ui;
-};
-*/
 
 class JumpHex : public QDialog
 {
@@ -99,26 +77,6 @@ private slots:
 private:
     Ui::JumpHex* ui;
 };
-
-/*
-class FileJumpFilter : public QFrame
-{
-    Q_OBJECT
-public:
-    FileJumpFilter(QWidget* parent = 0);
-    ~FileJumpFilter();
-
-signals:
-    void SetOffset();
-
-private slots:
-    void HideClicked();
-    void DisplayFilter(void);
-
-private:
-    Ui::JumpHex* ui;
-    //Ui::JumpFilter* ui;
-};*/
 
 class NameFilter : public QWidget
 {
@@ -307,6 +265,5 @@ Q_DECLARE_METATYPE(ChangedDateFilter*);
 Q_DECLARE_METATYPE(FileTypeFilter*);
 Q_DECLARE_METATYPE(FileCategoryFilter*);
 Q_DECLARE_METATYPE(HashFilter*);
-//Q_DECLARE_METATYPE(JumpFilter*);
 Q_DECLARE_METATYPE(JumpHex*);
 #endif
