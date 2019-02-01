@@ -752,8 +752,8 @@ void PopulateTreeModel()
         treeout << evidid.mid(1) << wombatvariable.evidencename << "0" + QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
         QList<QVariant> nodedata;
         nodedata.clear();
-        for(int j=0; j < treeout.count(); j++)
-            nodedata << treeout.at(j);
+        for(int m=0; m < treeout.count(); m++)
+            nodedata << treeout.at(m);
         treenodemodel->AddNode(nodedata, "-1", -1, -1);
         readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
         QString volname = "Dummy Volume (No PART)";
@@ -767,8 +767,8 @@ void PopulateTreeModel()
             treeout.clear();
             treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)) << volname << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
             nodedata.clear();
-            for(int k=0; k < treeout.count(); k++)
-                nodedata << treeout.at(k);
+            for(int m=0; m < treeout.count(); m++)
+                nodedata << treeout.at(m);
             treenodemodel->AddNode(nodedata, evidid.mid(1), -1, 0);
             if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image
             {
@@ -777,8 +777,8 @@ void PopulateTreeModel()
                 treeout.clear();
                 treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p0") << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                 nodedata.clear();
-                for(int i=0; i < treeout.count(); i++)
-                    nodedata << treeout.at(i);
+                for(int m=0; m < treeout.count(); m++)
+                    nodedata << treeout.at(m);
                 treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
                 uint8_t walkreturn;
                 int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
@@ -796,15 +796,15 @@ void PopulateTreeModel()
                 QStringList partlist = partdir.entryList(QStringList(".p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
                 for(int k=0; k < partlist.count(); k++)
                 {
-                    wombatvariable.partitionpath = wombatvariable.volumepath + partlist.at(k) + "/";
+                    wombatvariable.partitionpath = wombatvariable.volumepath + ".p" + QString::number(k) + "/";
                     readpartinfo = tsk_vs_part_get(readvsinfo, k);
                     if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
                     {
                         treeout.clear();
-                        treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-" + partlist.at(k).mid(1)) << QString(readpartinfo->desc) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                        treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k)) << QString(readpartinfo->desc) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                         nodedata.clear();
-                        for(int j=0; j < treeout.count(); j++)
-                            nodedata << treeout.at(j);
+                        for(int m=0; m < treeout.count(); m++)
+                            nodedata << treeout.at(m);
                         treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
                     }
                     else if(readpartinfo->flags == 0x01) // allocated partition
@@ -813,10 +813,10 @@ void PopulateTreeModel()
                         if(readfsinfo != NULL)
                         {
                             treeout.clear();
-                            treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-" + partlist.at(k).mid(1)) << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                            treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k)) << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                             nodedata.clear();
-                            for(int j=0; j < treeout.count(); j++)
-                                nodedata << treeout.at(j);
+                            for(int m=0; m < treeout.count(); m++)
+                                nodedata << treeout.at(m);
                             treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
                             uint8_t walkreturn;
                             int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
@@ -828,8 +828,16 @@ void PopulateTreeModel()
                                 errorcount++;
                             }
                         }
+                        else
+                        {
+                            treeout.clear();
+                            treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k)) << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                            nodedata.clear();
+                            for(int m=0; m < treeout.count(); m++)
+                                nodedata << treeout.at(m);
+                            treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-"), -1, 0);
+                        }
                     }
-                    //else if(readpartinfo->flags == 0x04) // meta partition
                 }
             }
         }
@@ -1003,8 +1011,10 @@ void InitializeEvidenceStructure()
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                     }
                 }
+                /*
                 else
                     pfile.close();
+                */
                 partint++;
             }
         }
