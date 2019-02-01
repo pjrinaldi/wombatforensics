@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'imageviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,9 @@
 #define UI_IMAGEVIEWER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QVBoxLayout>
@@ -33,20 +30,20 @@ public:
     void setupUi(QDialog *ImageViewer)
     {
         if (ImageViewer->objectName().isEmpty())
-            ImageViewer->setObjectName(QStringLiteral("ImageViewer"));
+            ImageViewer->setObjectName(QString::fromUtf8("ImageViewer"));
         ImageViewer->resize(820, 525);
         ImageViewer->setSizeGripEnabled(false);
         ImageViewer->setModal(false);
         verticalLayout = new QVBoxLayout(ImageViewer);
         verticalLayout->setSpacing(0);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(3);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(5, -1, -1, -1);
         label = new QLabel(ImageViewer);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -62,7 +59,7 @@ public:
         verticalLayout->addLayout(horizontalLayout);
 
         listWidget = new QListWidget(ImageViewer);
-        listWidget->setObjectName(QStringLiteral("listWidget"));
+        listWidget->setObjectName(QString::fromUtf8("listWidget"));
         listWidget->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked);
         listWidget->setProperty("showDropIndicator", QVariant(false));
         listWidget->setDragDropMode(QAbstractItemView::NoDragDrop);
@@ -88,8 +85,8 @@ public:
 
     void retranslateUi(QDialog *ImageViewer)
     {
-        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Image Viewer", Q_NULLPTR));
-        label->setText(QApplication::translate("ImageViewer", "Loading...", Q_NULLPTR));
+        ImageViewer->setWindowTitle(QApplication::translate("ImageViewer", "Image Viewer", nullptr));
+        label->setText(QApplication::translate("ImageViewer", "Loading...", nullptr));
     } // retranslateUi
 
 };

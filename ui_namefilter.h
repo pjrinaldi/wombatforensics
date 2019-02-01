@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'namefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,9 @@
 #define UI_NAMEFILTER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
@@ -33,7 +30,7 @@ public:
     void setupUi(QWidget *NameFilter)
     {
         if (NameFilter->objectName().isEmpty())
-            NameFilter->setObjectName(QStringLiteral("NameFilter"));
+            NameFilter->setObjectName(QString::fromUtf8("NameFilter"));
         NameFilter->setWindowModality(Qt::ApplicationModal);
         NameFilter->resize(346, 75);
         QFont font;
@@ -41,22 +38,22 @@ public:
         NameFilter->setFont(font);
         NameFilter->setAutoFillBackground(true);
         gridLayout = new QGridLayout(NameFilter);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
         checkBox = new QCheckBox(NameFilter);
-        checkBox->setObjectName(QStringLiteral("checkBox"));
+        checkBox->setObjectName(QString::fromUtf8("checkBox"));
 
         gridLayout->addWidget(checkBox, 0, 0, 1, 1);
 
         lineEdit = new QLineEdit(NameFilter);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
         lineEdit->setEnabled(false);
 
         gridLayout->addWidget(lineEdit, 0, 1, 1, 1);
 
         pushButton = new QPushButton(NameFilter);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setStyleSheet(QStringLiteral("border: 1px solid black; padding: 5px 10px 5px 10px;"));
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding: 5px 10px 5px 10px;"));
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 1, 1, 1, 1);
@@ -73,10 +70,10 @@ public:
 
     void retranslateUi(QWidget *NameFilter)
     {
-        NameFilter->setWindowTitle(QApplication::translate("NameFilter", "Filter", Q_NULLPTR));
-        checkBox->setText(QApplication::translate("NameFilter", "Show Items where name contains", Q_NULLPTR));
+        NameFilter->setWindowTitle(QApplication::translate("NameFilter", "Filter", nullptr));
+        checkBox->setText(QApplication::translate("NameFilter", "Show Items where name contains", nullptr));
         lineEdit->setPlaceholderText(QString());
-        pushButton->setText(QApplication::translate("NameFilter", "Apply", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("NameFilter", "Apply", nullptr));
     } // retranslateUi
 
 };

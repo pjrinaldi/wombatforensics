@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'sizefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,9 @@
 #define UI_SIZEFILTER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QWidget>
@@ -35,7 +32,7 @@ public:
     void setupUi(QWidget *SizeFilter)
     {
         if (SizeFilter->objectName().isEmpty())
-            SizeFilter->setObjectName(QStringLiteral("SizeFilter"));
+            SizeFilter->setObjectName(QString::fromUtf8("SizeFilter"));
         SizeFilter->setWindowModality(Qt::ApplicationModal);
         SizeFilter->resize(276, 105);
         QFont font;
@@ -43,35 +40,35 @@ public:
         SizeFilter->setFont(font);
         SizeFilter->setAutoFillBackground(true);
         gridLayout = new QGridLayout(SizeFilter);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
         lessspinBox = new QSpinBox(SizeFilter);
-        lessspinBox->setObjectName(QStringLiteral("lessspinBox"));
+        lessspinBox->setObjectName(QString::fromUtf8("lessspinBox"));
         lessspinBox->setEnabled(false);
         lessspinBox->setMaximum(1000000000);
 
         gridLayout->addWidget(lessspinBox, 2, 1, 1, 1);
 
         morecheckBox = new QCheckBox(SizeFilter);
-        morecheckBox->setObjectName(QStringLiteral("morecheckBox"));
+        morecheckBox->setObjectName(QString::fromUtf8("morecheckBox"));
 
         gridLayout->addWidget(morecheckBox, 0, 0, 1, 1);
 
         morespinBox = new QSpinBox(SizeFilter);
-        morespinBox->setObjectName(QStringLiteral("morespinBox"));
+        morespinBox->setObjectName(QString::fromUtf8("morespinBox"));
         morespinBox->setEnabled(false);
         morespinBox->setMaximum(1000000000);
 
         gridLayout->addWidget(morespinBox, 0, 1, 1, 1);
 
         lesscheckBox = new QCheckBox(SizeFilter);
-        lesscheckBox->setObjectName(QStringLiteral("lesscheckBox"));
+        lesscheckBox->setObjectName(QString::fromUtf8("lesscheckBox"));
 
         gridLayout->addWidget(lesscheckBox, 2, 0, 1, 1);
 
         pushButton = new QPushButton(SizeFilter);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setStyleSheet(QStringLiteral("border: 1px solid black; padding: 5px 10px 5px 10px;"));
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding: 5px 10px 5px 10px;"));
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 3, 1, 1, 1);
@@ -89,10 +86,10 @@ public:
 
     void retranslateUi(QWidget *SizeFilter)
     {
-        SizeFilter->setWindowTitle(QApplication::translate("SizeFilter", "Filter", Q_NULLPTR));
-        morecheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size >", Q_NULLPTR));
-        lesscheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size < ", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("SizeFilter", "Apply", Q_NULLPTR));
+        SizeFilter->setWindowTitle(QApplication::translate("SizeFilter", "Filter", nullptr));
+        morecheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size >", nullptr));
+        lesscheckBox->setText(QApplication::translate("SizeFilter", "Show Items with size < ", nullptr));
+        pushButton->setText(QApplication::translate("SizeFilter", "Apply", nullptr));
     } // retranslateUi
 
 };

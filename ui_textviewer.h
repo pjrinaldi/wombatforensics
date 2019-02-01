@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'textviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_TEXTVIEWER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTextEdit>
@@ -37,22 +34,22 @@ public:
     void setupUi(QDialog *TextViewer)
     {
         if (TextViewer->objectName().isEmpty())
-            TextViewer->setObjectName(QStringLiteral("TextViewer"));
+            TextViewer->setObjectName(QString::fromUtf8("TextViewer"));
         TextViewer->setWindowModality(Qt::NonModal);
         TextViewer->resize(640, 480);
         verticalLayout = new QVBoxLayout(TextViewer);
         verticalLayout->setSpacing(3);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         label = new QLabel(TextViewer);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
 
         horizontalLayout->addWidget(label);
 
         comboBox = new QComboBox(TextViewer);
-        comboBox->setObjectName(QStringLiteral("comboBox"));
+        comboBox->setObjectName(QString::fromUtf8("comboBox"));
 
         horizontalLayout->addWidget(comboBox);
 
@@ -64,7 +61,7 @@ public:
         verticalLayout->addLayout(horizontalLayout);
 
         textEdit = new QTextEdit(TextViewer);
-        textEdit->setObjectName(QStringLiteral("textEdit"));
+        textEdit->setObjectName(QString::fromUtf8("textEdit"));
         textEdit->setUndoRedoEnabled(false);
         textEdit->setReadOnly(true);
 
@@ -78,8 +75,8 @@ public:
 
     void retranslateUi(QDialog *TextViewer)
     {
-        TextViewer->setWindowTitle(QApplication::translate("TextViewer", "Dialog", Q_NULLPTR));
-        label->setText(QApplication::translate("TextViewer", "Encoding", Q_NULLPTR));
+        TextViewer->setWindowTitle(QApplication::translate("TextViewer", "Dialog", nullptr));
+        label->setText(QApplication::translate("TextViewer", "Encoding", nullptr));
         comboBox->setCurrentText(QString());
     } // retranslateUi
 

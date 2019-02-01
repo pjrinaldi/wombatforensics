@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'digdeeperdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,14 +10,12 @@
 #define UI_DIGDEEPERDIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSpacerItem>
@@ -49,40 +47,40 @@ public:
     void setupUi(QDialog *DigDeeperDialog)
     {
         if (DigDeeperDialog->objectName().isEmpty())
-            DigDeeperDialog->setObjectName(QStringLiteral("DigDeeperDialog"));
+            DigDeeperDialog->setObjectName(QString::fromUtf8("DigDeeperDialog"));
         DigDeeperDialog->setWindowModality(Qt::ApplicationModal);
         DigDeeperDialog->resize(308, 300);
         DigDeeperDialog->setModal(true);
         verticalLayout_2 = new QVBoxLayout(DigDeeperDialog);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(6);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(9, 9, 9, 9);
         groupBox_2 = new QGroupBox(DigDeeperDialog);
-        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
         verticalLayout_3 = new QVBoxLayout(groupBox_2);
-        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         selectedFileRadioButton = new QRadioButton(groupBox_2);
         exportButtonGroup = new QButtonGroup(DigDeeperDialog);
-        exportButtonGroup->setObjectName(QStringLiteral("exportButtonGroup"));
+        exportButtonGroup->setObjectName(QString::fromUtf8("exportButtonGroup"));
         exportButtonGroup->addButton(selectedFileRadioButton);
-        selectedFileRadioButton->setObjectName(QStringLiteral("selectedFileRadioButton"));
+        selectedFileRadioButton->setObjectName(QString::fromUtf8("selectedFileRadioButton"));
 
         horizontalLayout_2->addWidget(selectedFileRadioButton);
 
         checkedFileRadioButton = new QRadioButton(groupBox_2);
         exportButtonGroup->addButton(checkedFileRadioButton);
-        checkedFileRadioButton->setObjectName(QStringLiteral("checkedFileRadioButton"));
+        checkedFileRadioButton->setObjectName(QString::fromUtf8("checkedFileRadioButton"));
 
         horizontalLayout_2->addWidget(checkedFileRadioButton);
 
         listedFileRadioButton = new QRadioButton(groupBox_2);
         exportButtonGroup->addButton(listedFileRadioButton);
-        listedFileRadioButton->setObjectName(QStringLiteral("listedFileRadioButton"));
+        listedFileRadioButton->setObjectName(QString::fromUtf8("listedFileRadioButton"));
 
         horizontalLayout_2->addWidget(listedFileRadioButton);
 
@@ -93,11 +91,11 @@ public:
         verticalLayout->addWidget(groupBox_2);
 
         groupBox = new QGroupBox(DigDeeperDialog);
-        groupBox->setObjectName(QStringLiteral("groupBox"));
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
         verticalLayout_4 = new QVBoxLayout(groupBox);
-        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         thumbnailcheckBox = new QCheckBox(groupBox);
-        thumbnailcheckBox->setObjectName(QStringLiteral("thumbnailcheckBox"));
+        thumbnailcheckBox->setObjectName(QString::fromUtf8("thumbnailcheckBox"));
 
         verticalLayout_4->addWidget(thumbnailcheckBox);
 
@@ -109,19 +107,19 @@ public:
         verticalLayout->addItem(verticalSpacer);
 
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(-1, -1, 9, -1);
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
 
         cancelButton = new QPushButton(DigDeeperDialog);
-        cancelButton->setObjectName(QStringLiteral("cancelButton"));
+        cancelButton->setObjectName(QString::fromUtf8("cancelButton"));
 
         horizontalLayout->addWidget(cancelButton);
 
         processButton = new QPushButton(DigDeeperDialog);
-        processButton->setObjectName(QStringLiteral("processButton"));
+        processButton->setObjectName(QString::fromUtf8("processButton"));
 
         horizontalLayout->addWidget(processButton);
 
@@ -140,15 +138,15 @@ public:
 
     void retranslateUi(QDialog *DigDeeperDialog)
     {
-        DigDeeperDialog->setWindowTitle(QApplication::translate("DigDeeperDialog", "Dig Deeper", Q_NULLPTR));
-        groupBox_2->setTitle(QApplication::translate("DigDeeperDialog", "Process the Following File(s)", Q_NULLPTR));
-        selectedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Selected", Q_NULLPTR));
-        checkedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Checked (#)", Q_NULLPTR));
-        listedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "All (#)", Q_NULLPTR));
-        groupBox->setTitle(QApplication::translate("DigDeeperDialog", "For the Following Options", Q_NULLPTR));
-        thumbnailcheckBox->setText(QApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Image Files", Q_NULLPTR));
-        cancelButton->setText(QApplication::translate("DigDeeperDialog", "Cancel", Q_NULLPTR));
-        processButton->setText(QApplication::translate("DigDeeperDialog", "Process", Q_NULLPTR));
+        DigDeeperDialog->setWindowTitle(QApplication::translate("DigDeeperDialog", "Dig Deeper", nullptr));
+        groupBox_2->setTitle(QApplication::translate("DigDeeperDialog", "Process the Following File(s)", nullptr));
+        selectedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Selected", nullptr));
+        checkedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Checked (#)", nullptr));
+        listedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "All (#)", nullptr));
+        groupBox->setTitle(QApplication::translate("DigDeeperDialog", "For the Following Options", nullptr));
+        thumbnailcheckBox->setText(QApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Image Files", nullptr));
+        cancelButton->setText(QApplication::translate("DigDeeperDialog", "Cancel", nullptr));
+        processButton->setText(QApplication::translate("DigDeeperDialog", "Process", nullptr));
     } // retranslateUi
 
 };

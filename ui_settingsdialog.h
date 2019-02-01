@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'settingsdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,9 @@
 #define UI_SETTINGSDIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
@@ -36,14 +33,14 @@ public:
     void setupUi(QDialog *SettingsDialog)
     {
         if (SettingsDialog->objectName().isEmpty())
-            SettingsDialog->setObjectName(QStringLiteral("SettingsDialog"));
+            SettingsDialog->setObjectName(QString::fromUtf8("SettingsDialog"));
         SettingsDialog->setWindowModality(Qt::ApplicationModal);
         SettingsDialog->resize(367, 113);
         SettingsDialog->setModal(true);
         gridLayout = new QGridLayout(SettingsDialog);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         thumbnailspinbox = new QSpinBox(SettingsDialog);
-        thumbnailspinbox->setObjectName(QStringLiteral("thumbnailspinbox"));
+        thumbnailspinbox->setObjectName(QString::fromUtf8("thumbnailspinbox"));
         thumbnailspinbox->setReadOnly(false);
         thumbnailspinbox->setProperty("showGroupSeparator", QVariant(false));
         thumbnailspinbox->setMinimum(64);
@@ -54,7 +51,7 @@ public:
         gridLayout->addWidget(thumbnailspinbox, 0, 1, 1, 1);
 
         thumbnaillabel = new QLabel(SettingsDialog);
-        thumbnaillabel->setObjectName(QStringLiteral("thumbnaillabel"));
+        thumbnaillabel->setObjectName(QString::fromUtf8("thumbnaillabel"));
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -69,12 +66,12 @@ public:
         gridLayout->addItem(verticalSpacer, 1, 1, 1, 1);
 
         cancelbutton = new QPushButton(SettingsDialog);
-        cancelbutton->setObjectName(QStringLiteral("cancelbutton"));
+        cancelbutton->setObjectName(QString::fromUtf8("cancelbutton"));
 
         gridLayout->addWidget(cancelbutton, 2, 3, 1, 1);
 
         savebutton = new QPushButton(SettingsDialog);
-        savebutton->setObjectName(QStringLiteral("savebutton"));
+        savebutton->setObjectName(QString::fromUtf8("savebutton"));
 
         gridLayout->addWidget(savebutton, 2, 4, 1, 1);
 
@@ -89,11 +86,11 @@ public:
 
     void retranslateUi(QDialog *SettingsDialog)
     {
-        SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", Q_NULLPTR));
-        thumbnailspinbox->setSuffix(QApplication::translate("SettingsDialog", " pixels", Q_NULLPTR));
-        thumbnaillabel->setText(QApplication::translate("SettingsDialog", "Thumbnail Size:", Q_NULLPTR));
-        cancelbutton->setText(QApplication::translate("SettingsDialog", "Cancel", Q_NULLPTR));
-        savebutton->setText(QApplication::translate("SettingsDialog", "Save", Q_NULLPTR));
+        SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", nullptr));
+        thumbnailspinbox->setSuffix(QApplication::translate("SettingsDialog", " pixels", nullptr));
+        thumbnaillabel->setText(QApplication::translate("SettingsDialog", "Thumbnail Size:", nullptr));
+        cancelbutton->setText(QApplication::translate("SettingsDialog", "Cancel", nullptr));
+        savebutton->setText(QApplication::translate("SettingsDialog", "Save", nullptr));
     } // retranslateUi
 
 };

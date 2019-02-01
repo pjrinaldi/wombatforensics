@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'hashcategoryfilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_HASHCATEGORYFILTER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -31,22 +28,22 @@ public:
     void setupUi(QWidget *hashcategoryfilter)
     {
         if (hashcategoryfilter->objectName().isEmpty())
-            hashcategoryfilter->setObjectName(QStringLiteral("hashcategoryfilter"));
+            hashcategoryfilter->setObjectName(QString::fromUtf8("hashcategoryfilter"));
         hashcategoryfilter->setWindowModality(Qt::ApplicationModal);
         hashcategoryfilter->resize(383, 42);
         QFont font;
         font.setPointSize(8);
         hashcategoryfilter->setFont(font);
         gridLayout = new QGridLayout(hashcategoryfilter);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
         checkBox = new QCheckBox(hashcategoryfilter);
-        checkBox->setObjectName(QStringLiteral("checkBox"));
+        checkBox->setObjectName(QString::fromUtf8("checkBox"));
 
         gridLayout->addWidget(checkBox, 0, 0, 1, 1);
 
         comboBox = new QComboBox(hashcategoryfilter);
-        comboBox->setObjectName(QStringLiteral("comboBox"));
+        comboBox->setObjectName(QString::fromUtf8("comboBox"));
         comboBox->setEditable(false);
 
         gridLayout->addWidget(comboBox, 0, 1, 1, 1);
@@ -60,8 +57,8 @@ public:
 
     void retranslateUi(QWidget *hashcategoryfilter)
     {
-        hashcategoryfilter->setWindowTitle(QApplication::translate("hashcategoryfilter", "Filter", Q_NULLPTR));
-        checkBox->setText(QApplication::translate("hashcategoryfilter", "Show Items where hash matches", Q_NULLPTR));
+        hashcategoryfilter->setWindowTitle(QApplication::translate("hashcategoryfilter", "Filter", nullptr));
+        checkBox->setText(QApplication::translate("hashcategoryfilter", "Show Items where hash matches", nullptr));
         comboBox->setCurrentText(QString());
     } // retranslateUi
 

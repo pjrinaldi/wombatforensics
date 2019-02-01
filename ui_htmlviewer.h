@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'htmlviewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,12 +11,9 @@
 
 #include <QtCore/QVariant>
 #include <QtWebEngineWidgets/QWebEngineView>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 
 QT_BEGIN_NAMESPACE
 
@@ -29,16 +26,16 @@ public:
     void setupUi(QDialog *HtmlViewer)
     {
         if (HtmlViewer->objectName().isEmpty())
-            HtmlViewer->setObjectName(QStringLiteral("HtmlViewer"));
+            HtmlViewer->setObjectName(QString::fromUtf8("HtmlViewer"));
         HtmlViewer->resize(640, 480);
         HtmlViewer->setSizeGripEnabled(true);
         horizontalLayout = new QHBoxLayout(HtmlViewer);
         horizontalLayout->setSpacing(0);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         webView = new QWebEngineView(HtmlViewer);
-        webView->setObjectName(QStringLiteral("webView"));
-        webView->setUrl(QUrl(QStringLiteral("about:blank")));
+        webView->setObjectName(QString::fromUtf8("webView"));
+        webView->setUrl(QUrl(QString::fromUtf8("about:blank")));
 
         horizontalLayout->addWidget(webView);
 
@@ -50,7 +47,7 @@ public:
 
     void retranslateUi(QDialog *HtmlViewer)
     {
-        HtmlViewer->setWindowTitle(QApplication::translate("HtmlViewer", "Html Viewer", Q_NULLPTR));
+        HtmlViewer->setWindowTitle(QApplication::translate("HtmlViewer", "Html Viewer", nullptr));
     } // retranslateUi
 
 };

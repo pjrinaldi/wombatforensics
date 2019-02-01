@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'accesseddatefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_ACCESSEDDATEFILTER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDateTimeEdit>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
 
@@ -35,7 +32,7 @@ public:
     void setupUi(QWidget *AccessedDateFilter)
     {
         if (AccessedDateFilter->objectName().isEmpty())
-            AccessedDateFilter->setObjectName(QStringLiteral("AccessedDateFilter"));
+            AccessedDateFilter->setObjectName(QString::fromUtf8("AccessedDateFilter"));
         AccessedDateFilter->setWindowModality(Qt::ApplicationModal);
         AccessedDateFilter->resize(333, 105);
         QFont font;
@@ -43,15 +40,15 @@ public:
         AccessedDateFilter->setFont(font);
         AccessedDateFilter->setAutoFillBackground(true);
         gridLayout = new QGridLayout(AccessedDateFilter);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
         lesscheckBox = new QCheckBox(AccessedDateFilter);
-        lesscheckBox->setObjectName(QStringLiteral("lesscheckBox"));
+        lesscheckBox->setObjectName(QString::fromUtf8("lesscheckBox"));
 
         gridLayout->addWidget(lesscheckBox, 2, 0, 1, 1);
 
         lessdateTimeEdit = new QDateTimeEdit(AccessedDateFilter);
-        lessdateTimeEdit->setObjectName(QStringLiteral("lessdateTimeEdit"));
+        lessdateTimeEdit->setObjectName(QString::fromUtf8("lessdateTimeEdit"));
         lessdateTimeEdit->setEnabled(false);
         lessdateTimeEdit->setCalendarPopup(true);
         lessdateTimeEdit->setTimeSpec(Qt::UTC);
@@ -59,7 +56,7 @@ public:
         gridLayout->addWidget(lessdateTimeEdit, 2, 1, 1, 1);
 
         moredateTimeEdit = new QDateTimeEdit(AccessedDateFilter);
-        moredateTimeEdit->setObjectName(QStringLiteral("moredateTimeEdit"));
+        moredateTimeEdit->setObjectName(QString::fromUtf8("moredateTimeEdit"));
         moredateTimeEdit->setEnabled(false);
         moredateTimeEdit->setCalendarPopup(true);
         moredateTimeEdit->setTimeSpec(Qt::UTC);
@@ -67,13 +64,13 @@ public:
         gridLayout->addWidget(moredateTimeEdit, 0, 1, 1, 1);
 
         morecheckBox = new QCheckBox(AccessedDateFilter);
-        morecheckBox->setObjectName(QStringLiteral("morecheckBox"));
+        morecheckBox->setObjectName(QString::fromUtf8("morecheckBox"));
 
         gridLayout->addWidget(morecheckBox, 0, 0, 1, 1);
 
         pushButton = new QPushButton(AccessedDateFilter);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setStyleSheet(QStringLiteral("border: 1px solid black; padding: 5px 10px 5px 10px;"));
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding: 5px 10px 5px 10px;"));
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 3, 1, 1, 1);
@@ -91,12 +88,12 @@ public:
 
     void retranslateUi(QWidget *AccessedDateFilter)
     {
-        AccessedDateFilter->setWindowTitle(QApplication::translate("AccessedDateFilter", "Filter", Q_NULLPTR));
-        lesscheckBox->setText(QApplication::translate("AccessedDateFilter", "Show Items with date <", Q_NULLPTR));
-        lessdateTimeEdit->setDisplayFormat(QApplication::translate("AccessedDateFilter", "MM/dd/yyyy HH:mm:ss", Q_NULLPTR));
-        moredateTimeEdit->setDisplayFormat(QApplication::translate("AccessedDateFilter", "MM/dd/yyyy HH:mm:ss", Q_NULLPTR));
-        morecheckBox->setText(QApplication::translate("AccessedDateFilter", "Show Items with date >", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("AccessedDateFilter", "Apply", Q_NULLPTR));
+        AccessedDateFilter->setWindowTitle(QApplication::translate("AccessedDateFilter", "Filter", nullptr));
+        lesscheckBox->setText(QApplication::translate("AccessedDateFilter", "Show Items with date <", nullptr));
+        lessdateTimeEdit->setDisplayFormat(QApplication::translate("AccessedDateFilter", "MM/dd/yyyy HH:mm:ss", nullptr));
+        moredateTimeEdit->setDisplayFormat(QApplication::translate("AccessedDateFilter", "MM/dd/yyyy HH:mm:ss", nullptr));
+        morecheckBox->setText(QApplication::translate("AccessedDateFilter", "Show Items with date >", nullptr));
+        pushButton->setText(QApplication::translate("AccessedDateFilter", "Apply", nullptr));
     } // retranslateUi
 
 };

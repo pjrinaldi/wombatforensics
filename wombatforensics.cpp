@@ -52,7 +52,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tskexternalptr = &tskexternalobject;
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
-    jumpfilterview = new JumpFilter(this);
+    //jumpfilterview = new JumpFilter(this);
+    jumpfilterview = new JumpHex(this);
     namefilterview = new NameFilter(this);
     pathfilterview = new PathFilter(this);
     sizefilterview = new SizeFilter(this);
