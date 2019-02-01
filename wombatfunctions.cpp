@@ -542,7 +542,7 @@ void ProcessExport(QString objectid)
     }
     free(imagepartspath);
     tmpstr = "";
-    QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "/." + vstring + "/." + pstring + "/stat");
+    QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/stat");
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();
     if(partfile.isOpen())
@@ -553,9 +553,9 @@ void ProcessExport(QString objectid)
     {
         char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
         ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-        QDir filedir = QDir(wombatvariable.tmpmntpath + wombatvariable.evidencename + "/." + vstring + "/." + pstring);
+        QDir filedir = QDir(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring);
         QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
-        QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "/." + vstring + "/." + pstring + "/" + filefiles.at(0));
+        QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + filefiles.at(0));
         filefile.open(QIODevice::ReadOnly);
         tmpstr = filefile.readLine();
         if(filefile.isOpen())
