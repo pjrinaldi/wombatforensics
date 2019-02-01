@@ -16,6 +16,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -28,13 +29,14 @@ public:
     QLabel *label;
     QLineEdit *lineEdit;
     QPushButton *pushButton;
+    QSpacerItem *horizontalSpacer;
 
     void setupUi(QDialog *JumpHex)
     {
         if (JumpHex->objectName().isEmpty())
             JumpHex->setObjectName(QString::fromUtf8("JumpHex"));
         JumpHex->setWindowModality(Qt::NonModal);
-        JumpHex->resize(314, 195);
+        JumpHex->resize(258, 72);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -43,7 +45,7 @@ public:
         JumpHex->setModal(false);
         horizontalLayoutWidget = new QWidget(JumpHex);
         horizontalLayoutWidget->setObjectName(QString::fromUtf8("horizontalLayoutWidget"));
-        horizontalLayoutWidget->setGeometry(QRect(32, 70, 241, 81));
+        horizontalLayoutWidget->setGeometry(QRect(10, 10, 241, 51));
         horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
@@ -62,6 +64,10 @@ public:
         pushButton->setFlat(true);
 
         horizontalLayout->addWidget(pushButton);
+
+        horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer);
 
 
         retranslateUi(JumpHex);
