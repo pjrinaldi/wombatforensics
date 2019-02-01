@@ -1919,9 +1919,9 @@ void WombatForensics::UpdateSelectValue()
     int32_t asint32;
     ds32 >> asint32;
     if(selectionbytes.isEmpty())
-        ui->actionCopy_Selection_To->setEnabled(true);
-    else
         ui->actionCopy_Selection_To->setEnabled(false);
+    else
+        ui->actionCopy_Selection_To->setEnabled(true);
     QString tmptext = "Length: " + QString::number(selectionbytes.size());
     QString bytetext = "";
     selectedhex->setText(tmptext);
