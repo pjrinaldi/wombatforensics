@@ -607,6 +607,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     QStringList files = eviddir.entryList(QStringList(QString("*.e*")), QDir::Files | QDir::NoSymLinks);
     for(int i=0; i < files.count(); i++)
     {
+        qDebug() << "eviddir's:" << files.at(i);
         tmpstr = "";
         wombatvariable.fullpathvector.clear();
         wombatvariable.evidencename = files.at(i).split(".").at(0) + QString(".") + files.at(i).split(".").at(1);
@@ -1433,7 +1434,7 @@ void WombatForensics::FinishExport()
     //cancelthread->close();
     qInfo() << "Export Completed with" << QString::number(errorcount) << "error(s)";
     //LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
-    StatusUpdate("Exporting completed with " + QString::number(errorcount) + "error(s)");
+    StatusUpdate("Exporting completed with " + QString::number(errorcount) + " error(s)");
 }
 
 void WombatForensics::ExportFiles(int etype, bool opath, QString epath)

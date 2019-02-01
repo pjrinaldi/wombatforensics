@@ -522,8 +522,8 @@ void ProcessExport(QString objectid)
     QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
     unsigned long long curaddress = objectid.split("-f").at(1).toULongLong();
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
-    wombatvariable.evidencename = evidfiles.at(0);
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "/stat");
+    wombatvariable.evidencename = evidfiles.at(0).split(".e").first();
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
     int partcount = tmpstr.split(",").at(3).split("|").size();
@@ -635,8 +635,8 @@ void GenerateThumbnails(QString thumbid)
     QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
     unsigned long long curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong(); 
     QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
-    wombatvariable.evidencename = evidfiles.at(0);
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "/stat");
+    wombatvariable.evidencename = evidfiles.at(0).split(".e").first();
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
@@ -944,7 +944,7 @@ void InitializeEvidenceStructure()
         QFile pfile;
         if(readvsinfo->part_count > 0)
         {
-            qDebug() << "readvsinfo->part_count:" << readvsinfo->part_count;
+            //qDebug() << "readvsinfo->part_count:" << readvsinfo->part_count;
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
@@ -1241,7 +1241,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
     char timebuf[128];
     QFile fspropfile(wombatvariable.partitionpath + "prop");
     fspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
-    qDebug() << "fspropfile: open";
+    //qDebug() << "fspropfile: open";
     QTextStream proplist(&fspropfile);
     if(curfsinfo->ftype == TSK_FS_TYPE_EXT2 || curfsinfo->ftype == TSK_FS_TYPE_EXT3 || curfsinfo->ftype == TSK_FS_TYPE_EXT4 || curfsinfo->ftype == TSK_FS_TYPE_EXT_DETECT)
     {
@@ -1887,14 +1887,14 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
     proplist << "||Identifies the endian ordering of the data being read." << endl;
     proplist.flush();
     fspropfile.close();
-    qDebug() << "fspropfile: close";
+    //qDebug() << "fspropfile: close";
 }
 
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo)
 {
     QFile vpropfile(wombatvariable.volumepath + "prop");
     vpropfile.open(QIODevice::WriteOnly | QIODevice::Text);
-    qDebug() << "vpropfile: open";
+    //qDebug() << "vpropfile: open";
     QTextStream proplist(&vpropfile);
     mac_part* macpart = NULL;
     bsd_disklabel* bsdpart = NULL;
@@ -2053,14 +2053,14 @@ void WriteVolumeProperties(TSK_VS_INFO* curvolinfo)
     }
     proplist.flush();
     vpropfile.close();
-    qDebug() << "vpropfile: close";
+    //qDebug() << "vpropfile: close";
 }
 
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
 {
     QFile epropfile(wombatvariable.evidencepath + "prop");
     epropfile.open(QIODevice::WriteOnly | QIODevice::Text);
-    qDebug() << "epropfile: open";
+    //qDebug() << "epropfile: open";
     QTextStream proplist(&epropfile);
     IMG_EWF_INFO* ewfinfo = NULL;
     uint8_t* ewfvalue = (uint8_t*)malloc(sizeof(uint8_t)*64);
@@ -2272,7 +2272,7 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
     } 
     proplist.flush();
     epropfile.close();
-    qDebug() << "epropfile: close";
+    //qDebug() << "epropfile: close";
 }
 
 QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
