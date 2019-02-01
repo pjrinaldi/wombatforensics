@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>258</width>
-    <height>72</height>
+    <width>265</width>
+    <height>71</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -30,11 +30,14 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>241</width>
+     <width>247</width>
      <height>51</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>5</number>
+    </property>
     <item>
      <widget class="QLabel" name="label">
       <property name="text">
@@ -44,6 +47,18 @@
     </item>
     <item>
      <widget class="QLineEdit" name="lineEdit">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>110</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="placeholderText">
        <string>Enter Hex Offset</string>
       </property>
@@ -51,6 +66,18 @@
     </item>
     <item>
      <widget class="QPushButton" name="pushButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>40</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="text">
        <string>Go</string>
       </property>
@@ -66,7 +93,7 @@
       </property>
       <property name="sizeHint" stdset="0">
        <size>
-        <width>20</width>
+        <width>50</width>
         <height>20</height>
        </size>
       </property>

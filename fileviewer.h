@@ -27,6 +27,7 @@ private slots:
     void SetOffsetLabel(qint64 pos);
     void UpdateSelectValue(void);
     void HideClicked();
+    void JumpHex();
 
 signals:
     void HideFileViewer(bool checkstate);
@@ -39,6 +40,9 @@ private:
     QLabel* selectedoffset;
     QLabel* selectedhex;
     QFile hexfile;
+    QLineEdit* jumpto;
+    QLabel* jumplabel;
+    QPushButton* jumpbutton;
 };
 
 Q_DECLARE_METATYPE(FileViewer*);

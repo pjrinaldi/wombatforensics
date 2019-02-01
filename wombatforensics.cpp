@@ -2175,7 +2175,7 @@ void WombatForensics::SetHexOffset()
 {
     ui->hexview->setCursorPosition(jumpoffset*2);
     ui->hexview->ensureVisible();
-    qDebug() << "set offset jump here..." << jumpoffset;
+    //qDebug() << "set offset jump here..." << jumpoffset;
 }
 
 void WombatForensics::ThreadCancelled()

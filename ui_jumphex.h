@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'jumphex.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,12 @@
 #define UI_JUMPHEX_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -34,9 +37,9 @@ public:
     void setupUi(QDialog *JumpHex)
     {
         if (JumpHex->objectName().isEmpty())
-            JumpHex->setObjectName(QString::fromUtf8("JumpHex"));
+            JumpHex->setObjectName(QStringLiteral("JumpHex"));
         JumpHex->setWindowModality(Qt::NonModal);
-        JumpHex->resize(258, 72);
+        JumpHex->resize(265, 71);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -44,28 +47,41 @@ public:
         JumpHex->setSizePolicy(sizePolicy);
         JumpHex->setModal(false);
         horizontalLayoutWidget = new QWidget(JumpHex);
-        horizontalLayoutWidget->setObjectName(QString::fromUtf8("horizontalLayoutWidget"));
-        horizontalLayoutWidget->setGeometry(QRect(10, 10, 241, 51));
+        horizontalLayoutWidget->setObjectName(QStringLiteral("horizontalLayoutWidget"));
+        horizontalLayoutWidget->setGeometry(QRect(10, 10, 247, 51));
         horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setSpacing(5);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         label = new QLabel(horizontalLayoutWidget);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName(QStringLiteral("label"));
 
         horizontalLayout->addWidget(label);
 
         lineEdit = new QLineEdit(horizontalLayoutWidget);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
+        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(1);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(lineEdit->sizePolicy().hasHeightForWidth());
+        lineEdit->setSizePolicy(sizePolicy1);
+        lineEdit->setMinimumSize(QSize(110, 0));
 
         horizontalLayout->addWidget(lineEdit);
 
         pushButton = new QPushButton(horizontalLayoutWidget);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
+        pushButton->setSizePolicy(sizePolicy2);
+        pushButton->setMinimumSize(QSize(40, 0));
         pushButton->setFlat(true);
 
         horizontalLayout->addWidget(pushButton);
 
-        horizontalSpacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(50, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
 
@@ -77,10 +93,10 @@ public:
 
     void retranslateUi(QDialog *JumpHex)
     {
-        JumpHex->setWindowTitle(QApplication::translate("JumpHex", "Dialog", nullptr));
-        label->setText(QApplication::translate("JumpHex", "Jump To:", nullptr));
-        lineEdit->setPlaceholderText(QApplication::translate("JumpHex", "Enter Hex Offset", nullptr));
-        pushButton->setText(QApplication::translate("JumpHex", "Go", nullptr));
+        JumpHex->setWindowTitle(QApplication::translate("JumpHex", "Dialog", Q_NULLPTR));
+        label->setText(QApplication::translate("JumpHex", "Jump To:", Q_NULLPTR));
+        lineEdit->setPlaceholderText(QApplication::translate("JumpHex", "Enter Hex Offset", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("JumpHex", "Go", Q_NULLPTR));
     } // retranslateUi
 
 };

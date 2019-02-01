@@ -9,12 +9,20 @@ FileViewer::FileViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::FileVi
     connect(ui->filehexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetOffsetLabel(qint64)));
     connect(ui->filehexview, SIGNAL(selectionChanged()), this, SLOT(UpdateSelectValue()));
     this->statusBar()->setSizeGripEnabled(true);
+    jumpto = new QLineEdit();
+    jumplabel = new QLabel("Jump To:");
+    jumpbutton = new QPushButton("Go");
+    jumpto->setPlaceholderText("Enter Hex Offset");
+    ui->toolBar->addWidget(jumplabel);
+    ui->toolBar->addWidget(jumpto);
+    ui->toolBar->addWidget(jumpbutton);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
     selectedhex = new QLabel(this);
     selectedhex->setText("Length: 0");
     this->statusBar()->addWidget(selectedoffset, 0);
     this->statusBar()->addWidget(selectedhex, 0);
+    connect(jumpbutton, SIGNAL(clicked()), this, SLOT(JumpHex()));
 }
 
 FileViewer::~FileViewer()
@@ -60,4 +68,12 @@ void FileViewer::UpdateHexView()
     hexfile.setFileName(hexstring);
     ui->filehexview->setData(hexfile);
     this->show();
+}
+
+void FileViewer::JumpHex()
+{
+    //unsigned long long jumpoffset = ui->lineEdit->text().toULongLong(0, 16);
+    ui->filehexview->setCursorPosition(jumpto->text().toULongLong(0, 16)*2);
+    ui->filehexview->ensureVisible();
+    //ui->filehexview->
 }
