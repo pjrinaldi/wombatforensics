@@ -836,10 +836,12 @@ void PopulateTreeModel()
                         {
                             treeout.clear();
                             treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k)) << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+							//qDebug() << treeout;
+							//qDebug() << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1));
                             nodedata.clear();
                             for(int m=0; m < treeout.count(); m++)
                                 nodedata << treeout.at(m);
-                            treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-"), -1, 0);
+                            treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
                         }
                     }
                 }
