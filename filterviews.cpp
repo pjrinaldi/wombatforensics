@@ -403,7 +403,7 @@ void FileTypeFilter::DisplayFilter()
             for(int k=0; k < partlist.count(); k++)
             {
                 QDir filedir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k));
-                QStringList filefiles = filedir.entryList(QStringList(".a*.stat"), QDir::NoSymLinks | QDir::Files);
+                QStringList filefiles = filedir.entryList(QStringList("f*.a*.stat"), QDir::NoSymLinks | QDir::Files);
                 for(int l=0; l < filefiles.count(); l++)
                 {
                     QFile filefile(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + filefiles.at(l));
@@ -412,7 +412,6 @@ void FileTypeFilter::DisplayFilter()
                     if(filefile.isOpen())
                         tmpstr = filefile.readLine();
                     filefile.close();
-                    qDebug() << tmpstr;
                     if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).count() >= 2)
                         tmptype.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).last());
                 }
@@ -469,6 +468,39 @@ FileCategoryFilter::~FileCategoryFilter()
 void FileCategoryFilter::DisplayFilter()
 {
     QStringList tmpcategory;
+    tmpcategory.clear();
+    ui->categorycomboBox->clear();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QFile tmpfile;
+    QString tmpstr = "";
+    QStringList evidlist = eviddir.entryList(QStringList("*.e*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+    for(int i=0; i < evidlist.count(); i++)
+    {
+        QDir voldir = QDir(wombatvariable.tmpmntpath + evidlist.at(i));
+        QStringList vollist = voldir.entryList(QStringList(".v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+        for(int j=0; j < vollist.count(); j++)
+        {
+            QDir partdir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j));
+            QStringList partlist = partdir.entryList(QStringList(".p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+            for(int k=0; k < partlist.count(); k++)
+            {
+                QDir filedir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k));
+                QStringList filefiles = filedir.entryList(QStringList("f*.a*.stat"), QDir::NoSymLinks | QDir::Files);
+                for(int l=0; l < filefiles.count(); l++)
+                {
+                    QFile filefile(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + filefiles.at(l));
+                    filefile.open(QIODevice::ReadOnly);
+                    if(filefile.isOpen())
+                        tmpstr = filefile.readLine();
+                    filefile.close();
+                    if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).count() >= 2)
+                        tmpcategory.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).first());
+                }
+            }
+        }
+    }
+	/*
+    QStringList tmpcategory;
     QString tmpstr = "";
     tmpcategory.clear();
     ui->categorycomboBox->clear();
@@ -484,6 +516,7 @@ void FileCategoryFilter::DisplayFilter()
         tmpfile.close();
         tmpcategory.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).first());
     }
+	*/
     tmpcategory.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)
         ui->categorycomboBox->addItem(tmpcategory.at(i));
