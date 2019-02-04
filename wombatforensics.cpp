@@ -1306,6 +1306,7 @@ void WombatForensics::CloseCurrentCase()
     // WRITE MSGLOG TO FILE HERE...
 
     // UNMOUNT XMOUNT EVIDENCEIMAGEDATAFILE
+    // NEED TO LOOP THIS FOR EACH EVIDENCE ITEM.. USE DIR FIND TO GET NAME
     QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
     QProcess::execute(xunmntstr);
 
