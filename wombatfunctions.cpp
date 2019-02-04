@@ -137,7 +137,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
         tmpstring.replace(4, 1, "r");
     if(tmpmeta->mode & TSK_FS_META_MODE_IWGRP)
         tmpstring.replace(5, 1, "w");
-    if(tmpmeta->mode && TSK_FS_META_MODE_ISGID)
+    if(tmpmeta->mode & TSK_FS_META_MODE_ISGID)
     {
         if(tmpmeta->mode & TSK_FS_META_MODE_IXGRP)
             tmpstring.replace(6, 1, "s");
@@ -672,15 +672,15 @@ void GenerateThumbnails(QString thumbid)
 	if(tmpstr.count() > 0)
 	{
     	readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
-    	readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
+		if(readfsinfo != NULL)
+    		readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
 	}
     QImage fileimage;
     QImage thumbimage;
     QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
-	char* imgbuf;
 	if(readfileinfo != NULL)
 	{
-    	imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+    	char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
     	ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
     	if(readfileinfo->meta != NULL)
     	{
@@ -697,16 +697,19 @@ void GenerateThumbnails(QString thumbid)
             	writer.write(thumbimage);
         	}
     	}
+		free(imgbuf);
 	}
 	else
 	{
 		fileimage.load(":/missingimage");
 		thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
 	}
-    free(imgbuf);
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);
+	readfileinfo = NULL;
+	readfsinfo = NULL;
+	readimginfo = NULL;
     digcount++;
     isignals->DigUpd();
 }
