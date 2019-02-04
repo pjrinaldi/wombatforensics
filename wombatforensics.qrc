@@ -33,6 +33,8 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="newtag">Resources/tag-new.svg</file>
+    <file alias="managetags">Resources/folder-tag.svg</file>
     <file alias="jumptohex">Resources/jumptohex.png</file>
     <file alias="xhex">Resources/text-x-hex.png</file>
     <file alias="ispade">Resources/icons8-spade-40.png</file>

@@ -669,14 +669,15 @@
   </action>
   <action name="actionBookmark_Manager">
    <property name="icon">
-    <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/bookmarkmgr</normaloff>:/bar/bookmarkmgr</iconset>
+    <iconset>
+     <normalon>:/bar/managetags</normalon>
+    </iconset>
    </property>
    <property name="text">
-    <string>Bookmark Manager</string>
+    <string>Manage Tags</string>
    </property>
    <property name="toolTip">
-    <string>Bookmark Manager</string>
+    <string>Manage Tags</string>
    </property>
   </action>
   <action name="actionCancel_Operation">

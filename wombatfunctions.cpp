@@ -632,14 +632,14 @@ void GenerateThumbnails(QString thumbid)
     std::vector<std::string> pathvector;
     const TSK_TCHAR** imagepartspath;
     pathvector.clear();
-	qDebug() << "thumbid:" << thumbid;
+    qDebug() << "thumbid:" << thumbid;
     QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
     QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
     QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
     QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
     unsigned long long curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
-	qDebug() << "curaddress:" << curaddress;
+    qDebug() << "curaddress:" << curaddress;
     QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
     wombatvariable.evidencename = evidfiles.at(0).split(".e").first();
     QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
