@@ -1722,6 +1722,7 @@ void WombatForensics::StartThumbnails(QStringList diglist)
     QString tmpstr = "";
     thumblist.clear();
     thumbpathlist.clear();
+	qDebug() << "last diglist/count:" << diglist.last() << diglist.count();
     if(diglist.at(0).length() == 0)
     {
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
