@@ -404,19 +404,22 @@
   <action name="actionNew_Bookmark">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/addtonewbkmrk</normaloff>:/bar/addtonewbkmrk</iconset>
+     <normaloff>:/bar/newtag</normaloff>:/bar/newtag</iconset>
    </property>
    <property name="text">
-    <string>New Bookmark</string>
+    <string>New Tag</string>
    </property>
   </action>
   <action name="actionExisting_Bookmarks">
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
-     <normaloff>:/bar/addtobkmrk</normaloff>:/bar/addtobkmrk</iconset>
+     <normaloff>:/bar/managetags</normaloff>:/bar/managetags</iconset>
    </property>
    <property name="text">
-    <string>Existing Bookmarks</string>
+    <string>Add to Existing Tag</string>
+   </property>
+   <property name="toolTip">
+    <string>Add to Existing Tag</string>
    </property>
   </action>
   <action name="actionView_File">
@@ -669,9 +672,8 @@
   </action>
   <action name="actionBookmark_Manager">
    <property name="icon">
-    <iconset>
-     <normalon>:/bar/managetags</normalon>
-    </iconset>
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/managetags</normaloff>:/bar/managetags</iconset>
    </property>
    <property name="text">
     <string>Manage Tags</string>

@@ -146,12 +146,12 @@ public:
         actionNew_Bookmark = new QAction(WombatForensics);
         actionNew_Bookmark->setObjectName(QStringLiteral("actionNew_Bookmark"));
         QIcon icon8;
-        icon8.addFile(QStringLiteral(":/bar/addtonewbkmrk"), QSize(), QIcon::Normal, QIcon::Off);
+        icon8.addFile(QStringLiteral(":/bar/newtag"), QSize(), QIcon::Normal, QIcon::Off);
         actionNew_Bookmark->setIcon(icon8);
         actionExisting_Bookmarks = new QAction(WombatForensics);
         actionExisting_Bookmarks->setObjectName(QStringLiteral("actionExisting_Bookmarks"));
         QIcon icon9;
-        icon9.addFile(QStringLiteral(":/bar/addtobkmrk"), QSize(), QIcon::Normal, QIcon::Off);
+        icon9.addFile(QStringLiteral(":/bar/managetags"), QSize(), QIcon::Normal, QIcon::Off);
         actionExisting_Bookmarks->setIcon(icon9);
         actionView_File = new QAction(WombatForensics);
         actionView_File->setObjectName(QStringLiteral("actionView_File"));
@@ -258,20 +258,18 @@ public:
         actionSettings->setIcon(icon24);
         actionBookmark_Manager = new QAction(WombatForensics);
         actionBookmark_Manager->setObjectName(QStringLiteral("actionBookmark_Manager"));
-        QIcon icon25;
-        icon25.addFile(QStringLiteral(":/bar/managetags"), QSize(), QIcon::Normal, QIcon::On);
-        actionBookmark_Manager->setIcon(icon25);
+        actionBookmark_Manager->setIcon(icon9);
         actionCancel_Operation = new QAction(WombatForensics);
         actionCancel_Operation->setObjectName(QStringLiteral("actionCancel_Operation"));
         actionCancel_Operation->setEnabled(false);
-        QIcon icon26;
-        icon26.addFile(QStringLiteral(":/cancelthread"), QSize(), QIcon::Normal, QIcon::Off);
-        actionCancel_Operation->setIcon(icon26);
+        QIcon icon25;
+        icon25.addFile(QStringLiteral(":/cancelthread"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCancel_Operation->setIcon(icon25);
         actionJumpToHex = new QAction(WombatForensics);
         actionJumpToHex->setObjectName(QStringLiteral("actionJumpToHex"));
-        QIcon icon27;
-        icon27.addFile(QStringLiteral(":/bar/jumptohex"), QSize(), QIcon::Normal, QIcon::Off);
-        actionJumpToHex->setIcon(icon27);
+        QIcon icon26;
+        icon26.addFile(QStringLiteral(":/bar/jumptohex"), QSize(), QIcon::Normal, QIcon::Off);
+        actionJumpToHex->setIcon(icon26);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -323,19 +321,19 @@ public:
         menuSettings->setObjectName(QStringLiteral("menuSettings"));
         menuAbout = new QMenu(mainMenubar);
         menuAbout->setObjectName(QStringLiteral("menuAbout"));
-        QIcon icon28;
-        icon28.addFile(QStringLiteral(":/bar/about"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAbout->setIcon(icon28);
+        QIcon icon27;
+        icon27.addFile(QStringLiteral(":/bar/about"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAbout->setIcon(icon27);
         menuBookmark_Manager = new QMenu(mainMenubar);
         menuBookmark_Manager->setObjectName(QStringLiteral("menuBookmark_Manager"));
-        QIcon icon29;
-        icon29.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon29);
+        QIcon icon28;
+        icon28.addFile(QStringLiteral(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
+        menuBookmark_Manager->setIcon(icon28);
         menuAdd_File_to = new QMenu(menuBookmark_Manager);
         menuAdd_File_to->setObjectName(QStringLiteral("menuAdd_File_to"));
-        QIcon icon30;
-        icon30.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon30);
+        QIcon icon29;
+        icon29.addFile(QStringLiteral(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
+        menuAdd_File_to->setIcon(icon29);
         menuView = new QMenu(mainMenubar);
         menuView->setObjectName(QStringLiteral("menuView"));
         menuView_With = new QMenu(menuView);
@@ -469,8 +467,11 @@ public:
 #endif // QT_NO_SHORTCUT
         actionAbout->setText(QApplication::translate("WombatForensics", "About", Q_NULLPTR));
         actionHelp->setText(QApplication::translate("WombatForensics", "Help", Q_NULLPTR));
-        actionNew_Bookmark->setText(QApplication::translate("WombatForensics", "New Bookmark", Q_NULLPTR));
-        actionExisting_Bookmarks->setText(QApplication::translate("WombatForensics", "Existing Bookmarks", Q_NULLPTR));
+        actionNew_Bookmark->setText(QApplication::translate("WombatForensics", "New Tag", Q_NULLPTR));
+        actionExisting_Bookmarks->setText(QApplication::translate("WombatForensics", "Add to Existing Tag", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        actionExisting_Bookmarks->setToolTip(QApplication::translate("WombatForensics", "Add to Existing Tag", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         actionView_File->setText(QApplication::translate("WombatForensics", "View File Hex", Q_NULLPTR));
         actionView_Image_Gallery->setText(QApplication::translate("WombatForensics", "View Image Gallery", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
