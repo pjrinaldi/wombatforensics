@@ -913,7 +913,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                     else // non-resident attribute
                     {
                         //qDebug() << "non-resident attribute";
-                        for(int i=0; i < blocklist.count(); i++)
+                        for(int i=0; i < blocklist.count()-1; i++)
                         {
                             //qDebug() << "blocklist.at(i):" << blocklist.at(i) << "blocksize:" << blocksize;
 			    curblkstart = 0;
@@ -922,10 +922,12 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                             curblkend = curblkstart + blocksize - 1;
                             //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
 			    //qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
-                            if((unsigned)posBa >= curblkstart && (unsigned)posBa <= qMin((curblkstart + filelength - blocksize*i - 1), (curblkstart + blocksize)))
+                            //if((unsigned)posBa >= curblkstart && (unsigned)posBa <= qMin((curblkstart + filelength - blocksize*i - 1), (curblkstart + blocksize)))
+                            if((unsigned)posBa >= curblkstart && (unsigned)posBa <= (curblkstart + blocksize))
                             {
 				c = contentbrush.color(); // BLUE
                             }
+                            /*
                             if(i == (blocklist.count() - 1))
                             {
                                 if(((unsigned)posBa > (curblkstart + filelength - blocksize*i - 1)) && (unsigned)posBa <= curblkend)
@@ -935,7 +937,14 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 				    c = slackbrush.color(); // RED
 				}
                             }
+                            */
                         }
+                        curblkstart = fsoffset + blocklist.last().toULongLong() * blocksize;
+                        curblkend = curblkstart + blocksize - 1;
+                        if((unsigned)posBa >= curblkstart && (unsigned)posBa <= curblkstart + filelength - (blocksize * (blocklist.count() - 1)) - 1)
+                            c = contentbrush.color(); // BLUE
+                        else if(((unsigned)posBa > (curblkstart + filelength - ((blocklist.count() -1) * blocksize) - 1)) && (unsigned)posBa <= curblkend)
+                            c = slackbrush.color(); // RED
                     }
                 }
                 else // resident attribute
