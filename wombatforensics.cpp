@@ -925,6 +925,8 @@ void WombatForensics::LoadHexContents()
         qDebug() << "not supported...";
     casedatafile.setFileName(datastring);
     ui->hexview->setData(casedatafile);
+    //curhexdoc = QHexDocument::fromDevice<QMemoryBuffer>(casedatafile);
+    //curhexdoc = QHexDocument::fromFile<QMemoryBuffer>(datastring);
 
     // determine offset location in the editor
     if(wombatvariable.selectedid.split("-").count() == 1) // image file
@@ -1306,7 +1308,7 @@ void WombatForensics::CloseCurrentCase()
     // WRITE MSGLOG TO FILE HERE...
 
     // UNMOUNT XMOUNT EVIDENCEIMAGEDATAFILE
-    // NEED TO LOOP THIS FOR EACH EVIDENCE ITEM.. USE DIR FIND TO GET NAME
+    // NEED TO LOOP THIS FOR EACH EVIDENCE ITEM.. USE DIR FIND TO GET EVIDENCE NAMES
     QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
     QProcess::execute(xunmntstr);
 

@@ -85,6 +85,7 @@ public:
     ByteConverter* byteviewer;
     AboutBox* aboutbox;
     SettingsDialog* settingsdialog;
+    QHexDocument* curhexdoc;
     QHexView* hexviewer;
 
 signals:
