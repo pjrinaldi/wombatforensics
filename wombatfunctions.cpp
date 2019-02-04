@@ -661,55 +661,55 @@ void GenerateThumbnails(QString thumbid)
     }
     free(imagepartspath);
     tmpstr = "";
-	qDebug() << "wombatvariable.evidencename:" << wombatvariable.evidencename;
+    //qDebug() << "wombatvariable.evidencename:" << wombatvariable.evidencename;
     QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/stat");
-	qDebug() << "partfile:" << partfile.fileName();
+    //qDebug() << "partfile:" << partfile.fileName();
     partfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(partfile.isOpen())
         tmpstr = partfile.readLine();
     partfile.close();
-	qDebug() << "tmpstr:" << tmpstr;
-	if(tmpstr.count() > 0)
-	{
-    	readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
-		if(readfsinfo != NULL)
-    		readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
-	}
+    //qDebug() << "tmpstr:" << tmpstr;
+    if(tmpstr.count() > 0)
+    {
+        readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+        if(readfsinfo != NULL)
+            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
+    }
     QImage fileimage;
     QImage thumbimage;
     QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
-	if(readfileinfo != NULL)
-	{
-    	char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+    if(readfileinfo != NULL)
+    {
+        char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
     	ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
     	if(readfileinfo->meta != NULL)
     	{
-        	bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
-        	if(imageloaded)
-        	{
-            	thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+            bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
+    	    if(imageloaded)
+            {
+                thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
             	writer.write(thumbimage);
-        	}
-        	else
-        	{
+            }
+            else
+            {
             	fileimage.load(":/missingimage");
             	thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
             	writer.write(thumbimage);
-        	}
+            }
     	}
-		free(imgbuf);
-	}
-	else
-	{
-		fileimage.load(":/missingimage");
-		thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-	}
+	free(imgbuf);
+    }
+    else
+    {
+	fileimage.load(":/missingimage");
+	thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+    }
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);
-	readfileinfo = NULL;
-	readfsinfo = NULL;
-	readimginfo = NULL;
+    readfileinfo = NULL;
+    readfsinfo = NULL;
+    readimginfo = NULL;
     digcount++;
     isignals->DigUpd();
 }

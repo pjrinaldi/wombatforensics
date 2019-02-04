@@ -265,6 +265,7 @@ void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 
 void WombatForensics::ShowFile(const QModelIndex &index)
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     if(index.sibling(index.row(), 9).data().toString().contains("image"))
     {
         imageviewer = new ImageWindow();
@@ -348,6 +349,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
                 treemenu->exec(QCursor::pos());
         }
     }
+    QApplication::restoreOverrideCursor();
 }
 
 void WombatForensics::HideImageWindow(bool checkstate)
@@ -1722,7 +1724,7 @@ void WombatForensics::StartThumbnails(QStringList diglist)
     QString tmpstr = "";
     thumblist.clear();
     thumbpathlist.clear();
-	qDebug() << "last diglist/count:" << diglist.last() << diglist.count();
+    //qDebug() << "last diglist/count:" << diglist.last() << diglist.count();
     if(diglist.at(0).length() == 0)
     {
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
