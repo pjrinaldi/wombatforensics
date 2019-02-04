@@ -876,6 +876,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         painter.setBackgroundMode(Qt::TransparentMode);
 	unsigned long long curblkstart = 0;
 	unsigned long long curblkend = 0;
+        qDebug() << "F/L Pos:" << _bPosFirst << _bPosLast;
 
         //qDebug() << "blocklistcount:" << blocklist.count();
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
@@ -889,6 +890,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 QColor c = viewport()->palette().color(QPalette::Base);
                 painter.setPen(colStandard);
                 qint64 posBa = _bPosFirst + bPosLine + colIdx; // curoffset
+                /*
                 if(blocklist.count() > 0)
                 {
                     if(blocklist.at(0).toInt() == 0) // resident attribute
@@ -938,7 +940,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 				}
                             }
                             */
-                        }
+                        /*}
                         curblkstart = fsoffset + blocklist.last().toULongLong() * blocksize;
                         curblkend = curblkstart + blocksize - 1;
                         if((unsigned)posBa >= curblkstart && (unsigned)posBa <= curblkstart + filelength - (blocksize * (blocklist.count() - 1)) - 1)
@@ -967,7 +969,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 			//qDebug() << "should be red.";
 			c = slackbrush.color(); // RED
 		    }
-                }
+                }*/
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
                 {
                     c = _brushSelection.color();
