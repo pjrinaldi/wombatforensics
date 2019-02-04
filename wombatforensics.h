@@ -23,6 +23,7 @@
 #include "digdeeperdialog.h"
 #include "aboutbox.h"
 #include "settingsdialog.h"
+#include "qhexview.h"
 #define UNIX
 #define UNIX_64
 #include "sccex.h"
@@ -84,6 +85,7 @@ public:
     ByteConverter* byteviewer;
     AboutBox* aboutbox;
     SettingsDialog* settingsdialog;
+    QHexView* hexviewer;
 
 signals:
     void CancelCurrentThread();

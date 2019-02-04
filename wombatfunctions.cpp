@@ -905,7 +905,7 @@ void InitializeEvidenceStructure()
     out << "," << wombatvariable.itemcount << ",e" + QString::number(evidcnt);
     out.flush();
     evidfile.close();
-    treefile.open(QIODevice::Append | QIODevice::Text);
+    //treefile.open(QIODevice::Append | QIODevice::Text);
     QStringList treeout;
     treeout << QString("e" + QString::number(evidcnt)) << wombatvariable.evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
     QList<QVariant> nodedata;

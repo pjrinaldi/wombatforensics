@@ -27,3 +27,5 @@ win32:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)d
 #install
 target.path = ./
 INSTALLS += target
+
+include(QHexView.pri)

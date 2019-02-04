@@ -67,6 +67,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
+    hexviewer = new QHexView();
+    ui->splitter->addWidget(hexviewer);
     //cancelthread = new CancelThread(this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
@@ -545,7 +547,7 @@ void WombatForensics::InitializeCaseStructure()
         msglog->clear();
         qInfo() << "Log File Created";
         //LogMessage("Log File Created");
-        treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
+        //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
@@ -747,7 +749,11 @@ void WombatForensics::PrepareEvidenceImage()
     if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
         xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
     else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
-        xmntstr += "ewfmount " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath; 
+    {
+        QString tmpstr = wombatvariable.imgdatapath + wombatvariable.evidencename + "/";
+        (new QDir())->mkpath(tmpstr);
+        xmntstr += "ewfmount " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + tmpstr; 
+    }
     else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
     {
         if(wombatvariable.segmentcount > 1)
@@ -903,7 +909,11 @@ void WombatForensics::LoadHexContents()
     if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
         datastring += wombatvariable.evidencename + ".raw";
     else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
+    {
+        datastring += wombatvariable.evidencename + "/";
+        //(new QDir())->mkpath(datastring);
         datastring += "ewf1";
+    }
     else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
     {
         if(wombatvariable.segmentcount > 1)
@@ -1334,16 +1344,16 @@ void WombatForensics::RemEvidence()
         eviddir.remove(evidfiles.at(i));
     }
     listeditems.clear();
-    treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
-    treefile.remove(); // delete treefile.
+    //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
+    //treefile.remove(); // delete treefile.
     // find evidence files
     // find volume files
     // find partition files
     // find files files
     evidfiles.clear();
     evidfiles = eviddir.entryList(QStringList(QString("*.p*.f*.a*")), QDir::Files | QDir::NoSymLinks);
-    treefile.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream treeout(&treefile);
+    //treefile.open(QIODevice::WriteOnly | QIODevice::Text);
+    //QTextStream treeout(&treefile);
     for(int i=0; i < evidfiles.count(); i++)
     {
         QFile tmpfile(evidfiles.at(i));
@@ -1356,7 +1366,7 @@ void WombatForensics::RemEvidence()
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
     */
-    treefile.close();
+    //treefile.close();
     /*treefile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream treeout(&treefile);
     for(int i=0; i < tmplist.count(); i++)
