@@ -67,8 +67,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
-    hexviewer = new QHexView();
-    ui->splitter->addWidget(hexviewer);
+    //hexviewer = new QHexView();
+    //ui->splitter->addWidget(hexviewer);
     //cancelthread = new CancelThread(this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
