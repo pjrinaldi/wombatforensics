@@ -884,10 +884,12 @@ void QHexEdit::paintEvent(QPaintEvent *event)
             if(blocklist.at(0).toInt() != 0) // non-resident attribute
             {
                 unsigned long long blkoffset = 0;
-                for(int i=0; i < blocklist.count(); i++)
+                unsigned long long blkoffset2 = 0;
+                for(int i=1; i < blocklist.count(); i++)
                 {
-                    blkoffset = fsoffset + blocklist.at(i).toULongLong() * blocksize;
-                    if(blkoffset >= _bPosFirst && blkoffset <= _bPosLast)
+                    blkoffset2 = fsoffset + blocklist.at(i).toULongLong() * blocksize;
+                    blkoffset = fsoffset + blocklist.at(i-1).toULongLong() * blocksize;
+                    if(blkoffset >= (unsigned)_bPosFirst && blkoffset2 <= (unsigned)_bPosLast)
                         curblocklist.append(QString::number(blkoffset));
                 }
             }
@@ -941,7 +943,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                             //qDebug() << "blocklist.at(i):" << blocklist.at(i) << "blocksize:" << blocksize;
 	    	        	curblkstart = 0;
 	        		curblkend = 0;
-                                curblkstart = fsoffset + curblocklist.at(i).toULongLong() * blocksize;
+                                curblkstart = fsoffset + curblocklist.at(i).toULongLong();
                                 curblkend = curblkstart + blocksize - 1;
                                 //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
 			        //qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
@@ -966,11 +968,11 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                         else if(curblocklist.count() == 1)
                         {
                             //qDebug() << "not in for loop, a single block in curblocklist";
-                            curblkstart = fsoffset + curblocklist.last().toULongLong() * blocksize;
+                            curblkstart = fsoffset + curblocklist.last().toULongLong();
                             curblkend = curblkstart + blocksize - 1;
-                            if((unsigned)posBa >= curblkstart && (unsigned)posBa <= curblkstart + filelength - (blocksize * (blocklist.count() - 1)) - 1)
+                            if((unsigned)posBa >= curblkstart && (unsigned)posBa <= curblkstart + filelength - ((curblocklist.count() - 1)) - 1)
                                 c = contentbrush.color(); // BLUE
-                            else if(((unsigned)posBa > (curblkstart + filelength - ((blocklist.count() -1) * blocksize) - 1)) && (unsigned)posBa <= curblkend)
+                            else if(((unsigned)posBa > (curblkstart + filelength - ((curblocklist.count() -1)) - 1)) && (unsigned)posBa <= curblkend)
                                 c = slackbrush.color(); // RED
                         }
                     }
