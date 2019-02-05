@@ -895,10 +895,10 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 }
             }
         }
-        qDebug() << "blocklist:" << blocklist;
+        //qDebug() << "blocklist:" << blocklist;
         //qDebug() << "blocklist:" << blocklist.count() << "curblocklist:" << curblocklist.count() << "blocksize:" << blocksize;
-        if(curblocklist.count() > 0 && !curblocklist.isEmpty())
-            qDebug() << "curblklist:" << curblocklist;
+        //if(curblocklist.count() > 0 && !curblocklist.isEmpty())
+        //    qDebug() << "curblklist:" << curblocklist;
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
         {
             QByteArray hex;
