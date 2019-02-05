@@ -878,23 +878,25 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 	unsigned long long curblkend = 0;
         QStringList curblocklist;
         curblocklist.clear();
-        qDebug() << "F/L Pos:" << _bPosFirst << _bPosLast;
+        //qDebug() << "F/L Pos:" << _bPosFirst << _bPosLast;
+        qDebug() << "byte offset:" << byteoffset;
         if(blocklist.count() > 0)
         {
             if(blocklist.at(0).toInt() != 0) // non-resident attribute
             {
                 unsigned long long blkoffset = 0;
-                unsigned long long blkoffset2 = 0;
-                for(int i=1; i < blocklist.count(); i++)
+                //unsigned long long blkoffset2 = 0;
+                for(int i=0; i < blocklist.count(); i++)
                 {
-                    blkoffset2 = fsoffset + blocklist.at(i).toULongLong() * blocksize;
-                    blkoffset = fsoffset + blocklist.at(i-1).toULongLong() * blocksize;
-                    if(blkoffset >= (unsigned)_bPosFirst && blkoffset2 <= (unsigned)_bPosLast)
-                        curblocklist.append(QString::number(blkoffset));
+                    //blkoffset2 = fsoffset + blocklist.at(i).toULongLong() * blocksize;
+                    blkoffset = fsoffset + blocklist.at(i).toULongLong() * blocksize;
+                    if(blkoffset >= ((unsigned)_bPosFirst - blocksize) && blkoffset <= ((unsigned)_bPosLast + blocksize))
+                        curblocklist.append(blocklist.at(i));
                 }
             }
         }
-        qDebug() << "blocklist:" << blocklist.count() << "curblocklist:" << curblocklist.count();
+        qDebug() << "blocklist:" << blocklist;
+        qDebug() << "blocklist:" << blocklist.count() << "curblocklist:" << curblocklist.count() << "blocksize:" << blocksize;
         if(curblocklist.count() > 0 && !curblocklist.isEmpty())
             qDebug() << "curblklist:" << curblocklist;
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
@@ -934,23 +936,22 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                         //qDebug() << "non-resident attribute";
                         if(curblocklist.count() > 1)
                         {
-                            for(int i=0; i < curblocklist.count() - 1; i++)
+                            for(int i=0; i < curblocklist.count(); i++)
                             {
-                                //qDebug() << "w/in curblock for loop!";
-                        ///*
-                        //for(int i=0; i < blocklist.count()-1; i++)
-                        //{
-                            //qDebug() << "blocklist.at(i):" << blocklist.at(i) << "blocksize:" << blocksize;
 	    	        	curblkstart = 0;
 	        		curblkend = 0;
-                                curblkstart = fsoffset + curblocklist.at(i).toULongLong();
+                                curblkstart = fsoffset + curblocklist.at(i).toULongLong() * blocksize;
                                 curblkend = curblkstart + blocksize - 1;
-                                //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
-			        //qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
                                 //if((unsigned)posBa >= curblkstart && (unsigned)posBa <= qMin((curblkstart + filelength - blocksize*i - 1), (curblkstart + blocksize)))
-                                if((unsigned)posBa >= curblkstart && (unsigned)posBa <= (curblkstart + blocksize))
+                                if((unsigned)posBa >= curblkstart && (unsigned)posBa <= (curblkend))
                                 {
 				    c = contentbrush.color(); // BLUE
+                                }
+                                //if(i == (blocklist.count() - 1)) // invalid method...
+                                if(curblocklist.at(i).toULongLong() == (blocklist.last().toULongLong()))
+                                {
+                                    if(((unsigned)posBa > (curblkstart + filelength - blocksize *i  - 1)) && (unsigned)posBa <= curblkend)
+                                        c = slackbrush.color(); // RED
                                 }
                                 /*
                                 if(i == (blocklist.count() - 1))
@@ -968,12 +969,22 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                         else if(curblocklist.count() == 1)
                         {
                             //qDebug() << "not in for loop, a single block in curblocklist";
-                            curblkstart = fsoffset + curblocklist.last().toULongLong();
+                            curblkstart = fsoffset + curblocklist.last().toULongLong() * blocksize;
                             curblkend = curblkstart + blocksize - 1;
-                            if((unsigned)posBa >= curblkstart && (unsigned)posBa <= curblkstart + filelength - ((curblocklist.count() - 1)) - 1)
+                            if(curblocklist.last().toULongLong() == (blocklist.last().toULongLong()))
+                            {
+                            if((unsigned)posBa >= curblkstart && (unsigned)posBa <= curblkstart + filelength - 1)
                                 c = contentbrush.color(); // BLUE
-                            else if(((unsigned)posBa > (curblkstart + filelength - ((curblocklist.count() -1)) - 1)) && (unsigned)posBa <= curblkend)
+                            else if(((unsigned)posBa > (curblkstart + filelength - 1)) && (unsigned)posBa <= curblkend)
                                 c = slackbrush.color(); // RED
+                            }
+                            else
+                            {
+                                if((unsigned)posBa >= curblkstart && (unsigned)posBa <= (curblkstart + blocksize))
+                                {
+				    c = contentbrush.color(); // BLUE
+                                }
+                            }
                         }
                     }
                 }
