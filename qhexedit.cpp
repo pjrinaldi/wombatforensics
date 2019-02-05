@@ -879,7 +879,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         QStringList curblocklist;
         curblocklist.clear();
         //qDebug() << "F/L Pos:" << _bPosFirst << _bPosLast;
-        qDebug() << "byte offset:" << byteoffset;
+        //qDebug() << "byte offset:" << byteoffset;
         if(blocklist.count() > 0)
         {
             if(blocklist.at(0).toInt() != 0) // non-resident attribute
@@ -896,7 +896,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
             }
         }
         qDebug() << "blocklist:" << blocklist;
-        qDebug() << "blocklist:" << blocklist.count() << "curblocklist:" << curblocklist.count() << "blocksize:" << blocksize;
+        //qDebug() << "blocklist:" << blocklist.count() << "curblocklist:" << curblocklist.count() << "blocksize:" << blocksize;
         if(curblocklist.count() > 0 && !curblocklist.isEmpty())
             qDebug() << "curblklist:" << curblocklist;
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
@@ -934,7 +934,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                     else // non-resident attribute
                     {
                         //qDebug() << "non-resident attribute";
-                        if(curblocklist.count() > 1)
+                        if(curblocklist.count() > 0)
                         {
                             for(int i=0; i < curblocklist.count(); i++)
                             {
@@ -943,16 +943,24 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                                 curblkstart = fsoffset + curblocklist.at(i).toULongLong() * blocksize;
                                 curblkend = curblkstart + blocksize - 1;
                                 //if((unsigned)posBa >= curblkstart && (unsigned)posBa <= qMin((curblkstart + filelength - blocksize*i - 1), (curblkstart + blocksize)))
-                                if((unsigned)posBa >= curblkstart && (unsigned)posBa <= (curblkend))
+                                //if((unsigned)posBa >= curblkstart && (unsigned)posBa <= (curblkend))
+                                if((unsigned)posBa >= byteoffset && (unsigned)posBa <= byteoffset + filelength)
                                 {
 				    c = contentbrush.color(); // BLUE
                                 }
+                                if(curblocklist.at(i).toULongLong() == blocklist.last().toULongLong())
+                                {
+                                    if((unsigned)posBa > byteoffset + filelength && (unsigned)posBa <= curblkend)
+                                        c = slackbrush.color(); // RED
+                                }
                                 //if(i == (blocklist.count() - 1)) // invalid method...
+                                /*
                                 if(curblocklist.at(i).toULongLong() == (blocklist.last().toULongLong()))
                                 {
                                     if(((unsigned)posBa > (curblkstart + filelength - blocksize *i  - 1)) && (unsigned)posBa <= curblkend)
                                         c = slackbrush.color(); // RED
                                 }
+                                */
                                 /*
                                 if(i == (blocklist.count() - 1))
                                 {
@@ -966,6 +974,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                             */
                             }
                         }
+                        /*
                         else if(curblocklist.count() == 1)
                         {
                             //qDebug() << "not in for loop, a single block in curblocklist";
@@ -985,7 +994,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 				    c = contentbrush.color(); // BLUE
                                 }
                             }
-                        }
+                        }*/
                     }
                 }
                 else // resident attribute
