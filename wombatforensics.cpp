@@ -1495,10 +1495,12 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         digfilelist = GetFileLists(dtype);
     for(int i = 0; i < digoptions.count(); i++)
     {
-        if(digoptions.at(0) == 0) // Generate Thumbnails
-        {
+        if(digoptions.at(i) == 0) // Generate Thumbnails
             StartThumbnails(digfilelist);
-        }
+        else if(digoptions.at(i) == 1) // Generate MD5
+            StartHash(digfilelist, 0);
+        else if(digoptions.at(i) == 2) // Generate SHA1
+            StartHash(digfilelist, 1);
     }
 }
 
@@ -1724,6 +1726,16 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             imagewindow->show();
         }
     }
+}
+
+void WombatForensics::StartHash(QStringList diglist, int hashtype)
+{
+    qInfo() << "Generating Hash...";
+    StatusUpdate("Generating Hash...");
+    // NEED TO LOOP OVER THE FILES FROM DIGLIST
+    // FOR EACH FILE, I NEED TO GET THE TSK_FS_FILE AND THEN CALCULATE THE HASH FOR IT
+    // THEN READ THE FILE CONTENT AS A STRING LIST, UPDATE THE HASH, THEN WRITE IT BACK TO THE SAME FILE
+    // THEN I NEED TO FIGURE OUT HOW TO UPDATE THE TREEVIEW COLUMNS
 }
 
 void WombatForensics::StartThumbnails(QStringList diglist)

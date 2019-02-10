@@ -189,6 +189,7 @@ private:
     void UpdateProperties(void);
     void LoadHexContents(void);
     void StartThumbnails(QStringList diglist);
+    void StartHash(QStringList diglist, int hashtype);
     QStringList GetFileLists(int filelisttype);
     void ProcessDig(QString curid);
     void UpdateFilterCount(void);

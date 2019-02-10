@@ -27,6 +27,7 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, unsigned long long curcheckcou
     else
         ui->listedFileRadioButton->setEnabled(true);
     connect(ui->thumbnailcheckBox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
+    connect(ui->hashcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->processButton, SIGNAL(clicked()), this, SLOT(DigDeeperFiles()));
 }
 
@@ -50,6 +51,13 @@ void DigDeeperDialog::DigDeeperFiles()
         digtype = 2;
     if(ui->thumbnailcheckBox->isChecked())
         digoptions.append(0);
+    if(ui->hashcheckbox->isChecked())
+    {
+        if(ui->md5radiobutton->isChecked())
+            digoptions.append(1);
+        else if(ui->sha1radiobutton->isChecked())
+            digoptions.append(2);
+    }
     emit StartDig(digtype, digoptions);
     this->close();
 }
