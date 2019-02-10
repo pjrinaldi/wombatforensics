@@ -105,6 +105,31 @@
           </property>
          </widget>
         </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QCheckBox" name="hashcheckbox">
+            <property name="text">
+             <string>Calcuate the following hash:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="md5radiobutton">
+            <property name="text">
+             <string>MD5</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="sha1radiobutton">
+            <property name="text">
+             <string>SHA1</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
        </layout>
       </widget>
      </item>

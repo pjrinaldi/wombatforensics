@@ -37,6 +37,10 @@ public:
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_4;
     QCheckBox *thumbnailcheckBox;
+    QHBoxLayout *horizontalLayout_3;
+    QCheckBox *hashcheckbox;
+    QRadioButton *md5radiobutton;
+    QRadioButton *sha1radiobutton;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer;
@@ -99,6 +103,26 @@ public:
 
         verticalLayout_4->addWidget(thumbnailcheckBox);
 
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        hashcheckbox = new QCheckBox(groupBox);
+        hashcheckbox->setObjectName(QString::fromUtf8("hashcheckbox"));
+
+        horizontalLayout_3->addWidget(hashcheckbox);
+
+        md5radiobutton = new QRadioButton(groupBox);
+        md5radiobutton->setObjectName(QString::fromUtf8("md5radiobutton"));
+
+        horizontalLayout_3->addWidget(md5radiobutton);
+
+        sha1radiobutton = new QRadioButton(groupBox);
+        sha1radiobutton->setObjectName(QString::fromUtf8("sha1radiobutton"));
+
+        horizontalLayout_3->addWidget(sha1radiobutton);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_3);
+
 
         verticalLayout->addWidget(groupBox);
 
@@ -145,6 +169,9 @@ public:
         listedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "All (#)", nullptr));
         groupBox->setTitle(QApplication::translate("DigDeeperDialog", "For the Following Options", nullptr));
         thumbnailcheckBox->setText(QApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Image Files", nullptr));
+        hashcheckbox->setText(QApplication::translate("DigDeeperDialog", "Calcuate the following hash:", nullptr));
+        md5radiobutton->setText(QApplication::translate("DigDeeperDialog", "MD5", nullptr));
+        sha1radiobutton->setText(QApplication::translate("DigDeeperDialog", "SHA1", nullptr));
         cancelButton->setText(QApplication::translate("DigDeeperDialog", "Cancel", nullptr));
         processButton->setText(QApplication::translate("DigDeeperDialog", "Process", nullptr));
     } // retranslateUi

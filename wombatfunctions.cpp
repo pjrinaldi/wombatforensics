@@ -200,6 +200,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         outstring += "0,0,0,0,0," + QString::number(tmpfile->name->meta_addr) + ",";
         treeout << "0" << "0" << "0" << "0" << "0";
     }
+
     char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
     QByteArray tmparray;
     tmparray.clear();
@@ -213,9 +214,8 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
     else
         outstring += QString::number(tmpfile->name->meta_addr);
     outstring += "-a" + QString::number(tmpfile->name->par_addr);
-
     /* hash method using TSK */
-    TSK_FS_HASH_RESULTS hashresults;
+/*    TSK_FS_HASH_RESULTS hashresults;
     uint8_t retval = tsk_fs_file_hash_calc(tmpfile, &hashresults, TSK_BASE_HASH_MD5);
     if(retval == 0)
     {
@@ -237,6 +237,9 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
         outstring += ",0";
         treeout << "0";
     }
+    */
+    outstring += ",0";
+    treeout << "0";
     treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1);
     if(tmpfile->meta != NULL)
         treeout << QString::number(tmpfile->meta->type);
