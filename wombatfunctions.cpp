@@ -625,6 +625,80 @@ void LoadImagesHash()
         imageshash.insert(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
 }
 
+void GenerateHash(QString itemid)
+{
+    // given itemid, open file stat, file prop
+    TSK_IMG_INFO* readimginfo = NULL;
+    TSK_FS_INFO* readfsinfo = NULL;
+    TSK_FS_FILE* readfileinfo = NULL;
+    QString tmpstr = "";
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    std::vector<std::string> pathvector;
+    const TSK_TCHAR** imagepartspath;
+    pathvector.clear();
+    qDebug() << "itemid:" << itemid;
+    unsigned long long curaddress = itemid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
+    qDebug() << "curaddress:" << curaddress;
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + itemid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    wombatvariable.evidencename = evidfiles.at(0).split(".e").first();
+    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/stat");
+    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+        tmpstr = evidfile.readLine();
+    evidfile.close();
+    int partcount = tmpstr.split(",").at(3).split("|").size();
+    for(int i=0; i < partcount; i++)
+        pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
+    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+    for(uint i=0; i < pathvector.size(); i++)
+        imagepartspath[i] = pathvector[i].c_str();
+    readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    if(readimginfo == NULL)
+    {
+        qDebug() << tsk_error_get_errstr();
+        //LogMessage("Image opening error");
+    }
+    free(imagepartspath);
+    tmpstr = "";
+    QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/." + itemid.split("-").at(1) + "/." + itemid.split("-").at(2) + "/stat");
+    partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(partfile.isOpen())
+        tmpstr = partfile.readLine();
+    partfile.close();
+    if(tmpstr.count() > 0)
+    {
+        readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+        if(readfsinfo != NULL)
+            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
+    }
+    if(readfileinfo != NULL)
+    {
+        char* hashdata = new char[readfileinfo->meta->size];
+        ssize_t hashdatalen = tsk_fs_file_read(readfileinfo, 0, hashdata, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+        QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
+        // HERE IS WHERE I WOULD WRITE THIS TO THE FILE... THEN WHEN I RETURN, I NEED TO REDRAW TREEVIEW???
+        // OR I CAN WRITE TO THE FILE AND THEN CALL AN UPDATE NODE FUNCTION MAYBE...
+        // treenodemodel->UpdateNode(?, ?, ?);
+        if(hashdatalen > 0)
+            qDebug() << "item:" << itemid << "Test Hash:" << QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+        else
+            qDebug() << "hashdatalen is 0 for item:" << itemid;
+        // md5sum for zero file is: d41d8cd98f00b204e9800998ecf8427e
+        // sha1sum for zero file is: da39a3ee5e6b4b0d3255bfef95601890afd80709
+        // sha256sum for zero file is: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        delete[] hashdata;
+    }
+    tsk_fs_file_close(readfileinfo);
+    tsk_fs_close(readfsinfo);
+    tsk_img_close(readimginfo);
+    readfileinfo = NULL;
+    readfsinfo = NULL;
+    readimginfo = NULL;
+    digcount++;
+    isignals->DigUpd();
+}
+
 void GenerateThumbnails(QString thumbid)
 {
     TSK_IMG_INFO* readimginfo = NULL;

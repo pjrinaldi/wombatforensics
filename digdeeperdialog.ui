@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>308</width>
+    <width>363</width>
     <height>300</height>
    </rect>
   </property>
@@ -110,7 +110,7 @@
           <item>
            <widget class="QCheckBox" name="hashcheckbox">
             <property name="text">
-             <string>Calcuate the following hash:</string>
+             <string>Calcuate Hash:</string>
             </property>
            </widget>
           </item>
@@ -125,6 +125,13 @@
            <widget class="QRadioButton" name="sha1radiobutton">
             <property name="text">
              <string>SHA1</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="sha256radiobutton">
+            <property name="text">
+             <string>SHA256</string>
             </property>
            </widget>
           </item>

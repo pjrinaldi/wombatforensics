@@ -106,6 +106,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&openwatcher, SIGNAL(finished()), this, SLOT(OpenUpdate()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(&thashwatcher, SIGNAL(finished()), this, SLOT(ThashFinish()), Qt::QueuedConnection);
+    connect(&hashingwatcher, SIGNAL(finished()), this, SLOT(HashingFinish()), Qt::QueuedConnection);
     connect(this, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
@@ -1493,14 +1494,33 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     }
     else
         digfilelist = GetFileLists(dtype);
+    qDebug() << digfilelist;
     for(int i = 0; i < digoptions.count(); i++)
     {
         if(digoptions.at(i) == 0) // Generate Thumbnails
             StartThumbnails(digfilelist);
-        else if(digoptions.at(i) == 1) // Generate MD5
-            StartHash(digfilelist, 0);
+        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2) // Generate MD5 || Generate SHA1
+        {
+            if(digoptions.at(i) == 2)
+                hashsum = 2;
+            else if(digoptions.at(i) == 3)
+                hashsum = 4;
+            qInfo() << "Generating MD5 Hash...";
+            StatusUpdate("Generating MD5 Hash...");
+            hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
+            hashingwatcher.setFuture(hashingfuture);
+            //StartHash(digfilelist, 0);
+        }
+        /*
         else if(digoptions.at(i) == 2) // Generate SHA1
-            StartHash(digfilelist, 1);
+        {
+            qInfo() << "Generating SHA1 Hash...";
+            StatusUpdate("Generating SHA1 Hash...");
+            hashingfuture = QtConcurrent::map(digfilelist, GenerateSHA1);
+            hashingwatcher.setFuture(hashingfuture);
+            //StartHash(digfilelist, 1);
+        }
+        */
     }
 }
 
@@ -1728,10 +1748,17 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
     }
 }
 
+// SHOULDN'T NEED THIS SINCE I CAN LAUNCH THIS IN THE PARENT FUNCTION
 void WombatForensics::StartHash(QStringList diglist, int hashtype)
 {
+    /*
     qInfo() << "Generating Hash...";
     StatusUpdate("Generating Hash...");
+    // LAUNCH HASHFILES HERE...
+    QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
+    thashwatcher.setFuture(tmpfuture);
+    thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
+    thumbwatcher.setFuture(thumbfuture);
     // NEED TO LOOP OVER THE FILES FROM DIGLIST
     // FOR EACH FILE, I NEED TO GET THE TSK_FS_FILE AND THEN CALCULATE THE HASH FOR IT
     // THEN READ THE FILE CONTENT AS A STRING LIST, UPDATE THE HASH, THEN WRITE IT BACK TO THE SAME FILE
@@ -1740,6 +1767,7 @@ void WombatForensics::StartHash(QStringList diglist, int hashtype)
     // THEN I CAN CAT THE BLOCKS TO A TMPFILE AND HASH IT
     // THEN FOR RESIDENT ATTR I CAN USE "RESIDENT STRING" PROPERTY TO USE TSK_IMG_INFO[OPEN/READ/CLOSE]
     // THEN LOOP OVER THE ATTRIBUTE AND PULL OUT THE CONTENT TO HASH.
+    */
 }
 
 void WombatForensics::StartThumbnails(QStringList diglist)

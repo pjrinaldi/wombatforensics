@@ -208,6 +208,8 @@ private:
     QFutureWatcher<void> sqlwatcher;
     QFuture<void> thumbfuture;
     QFutureWatcher<void> thumbwatcher;
+    QFuture<void> hashingfuture;
+    QFutureWatcher<void> hashingwatcher;
     QFutureWatcher<void> thashwatcher;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;

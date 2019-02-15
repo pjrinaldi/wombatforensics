@@ -15,6 +15,7 @@ bool FileExists(const std::string& filename);
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 void GenerateThumbnails(QString thumbid);
+void GenerateHash(QString itemid);
 void LoadImagesHash(void);
 void PopulateTreeModel(void);
 QString GetBlockList(TSK_FS_FILE* tmpfile);

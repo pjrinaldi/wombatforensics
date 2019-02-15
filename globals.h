@@ -36,6 +36,7 @@ extern int linefactor;
 extern int filelinefactor;
 extern int thumbsize;
 extern int mftrecordsize;
+extern int hashsum;
 extern QList<QVariant> colvalues;
 extern QStringList propertylist;
 extern QStringList thumblist;
@@ -203,6 +204,14 @@ public:
     {
         deleted = set;
     };
+
+    bool SetData(int column, const QVariant &value)
+    {
+        if(column < 0 || column >= itemdata.size())
+            return false;
+        itemdata[column] = value;
+        return true;
+    }
 
     int itemtype;
     bool deleted = false;
@@ -515,12 +524,24 @@ public:
 
         if(role != Qt::EditRole)
             return false;
-        // if i have other SetData() items for the treenode's, use code similar to below.
-        //bool result = item->SetData(index, value);
-        //if(result)
-        //    emit dataChanged(index, index);
-        //return result;
+        if(role == Qt::EditRole)
+        {
+            bool result = itemnode->SetData(index.column(), value);
+            if(result)
+                emit dataChanged(index, index, {role});
+            return result;
+        }
         return false;
+    };
+
+    bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
+    {
+        if(role != Qt::EditRole || orientation != Qt::Horizontal)
+            return false;
+        bool result = zeronode->SetData(section, value);
+        if(result)
+            emit headerDataChanged(orientation, section, section);
+        return result;
     };
 
     Qt::ItemFlags flags(const QModelIndex &index) const override
@@ -749,6 +770,17 @@ public:
                 parents.value(data.at(0).toString().split("-a").first())->SetDeleted(true);
         }
     };
+    void UpdateNode(QString itemid, int column, QString hash)
+    {
+        //parents.value(data.at(0).toString().split("-a").first())->SetData(column, hash);
+    };
+    
+    void UpdateHeaderNode(int column, QString hash)
+    {
+        // SHOULD BE EITHER MD5 HASH, SHA1 HASH, SHA256 HASH
+        //zeronode->SetData(column, hash);
+    };
+
     //void RemEvidence(QString evidid)
     void RemEvidence()
     {
