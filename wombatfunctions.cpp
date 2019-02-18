@@ -673,17 +673,18 @@ void GenerateHash(QString itemid)
     }
     if(readfileinfo != NULL)
     {
+        QString hashstr = "";
         char* hashdata = new char[readfileinfo->meta->size];
         ssize_t hashdatalen = tsk_fs_file_read(readfileinfo, 0, hashdata, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
         QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
-        // NO "-a" in the itemid..
         QDir filedir = QDir(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/." + itemid.split("-").at(1) + "/." + itemid.split("-").at(2));
         QStringList filefiles = filedir.entryList(QStringList(itemid.split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
         QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/." + itemid.split("-").at(1) + "/." + itemid.split("-").at(2) + "/" + filefiles.at(0));
-        filefile.open(QIODevice::ReadWrite | QIODevice::Text);
+        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(filefile.isOpen())
             tmpstr = filefile.readLine();
+        filefile.close();
         if(tmpstr.split(",").count() > 0)
         {
             qDebug() << "tmpstr:" << tmpstr;
@@ -693,29 +694,30 @@ void GenerateHash(QString itemid)
             else
             {
                 if(hashsum == 1)
-                    tmplist[13] = "d41d8cd98f00b204e9800998ecf8427e";
+                    tmplist[13] = "d41d8cd98f00b204e9800998ecf8427e"; // MD5 zero file
                 else if(hashsum == 2)
-                    tmplist[13] = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+                    tmplist[13] = "da39a3ee5e6b4b0d3255bfef95601890afd80709"; // SHA1 zero file
                 else if(hashsum == 4)
-                    tmplist[13] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+                    tmplist[13] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"; // SHA256 zero file
             }
+            hashstr = tmplist.at(13);
             tmpstr = "";
             for(int i=0; i < tmplist.count() - 1; i++)
                 tmpstr += tmplist.at(i) + ",";
             tmpstr += tmplist.last();
-            filefile.write(tmpstr.toStdString().c_str());
+            filefile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+            if(filefile.isOpen())
+                filefile.write(tmpstr.toStdString().c_str());
+            filefile.close();
         }
-        filefile.close();
-        // HERE IS WHERE I WOULD WRITE THIS TO THE FILE... THEN WHEN I RETURN, I NEED TO REDRAW TREEVIEW???
-        // OR I CAN WRITE TO THE FILE AND THEN CALL AN UPDATE NODE FUNCTION MAYBE...
+        treenodemodel->UpdateNode(itemid,8 , hashstr);
         // treenodemodel->UpdateNode(?, ?, ?);
+        /*
         if(hashdatalen > 0)
             qDebug() << "item:" << itemid << "Test Hash:" << QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
         else
             qDebug() << "hashdatalen is 0 for item:" << itemid;
-        // md5sum for zero file is: d41d8cd98f00b204e9800998ecf8427e
-        // sha1sum for zero file is: da39a3ee5e6b4b0d3255bfef95601890afd80709
-        // sha256sum for zero file is: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        */
         delete[] hashdata;
     }
     tsk_fs_file_close(readfileinfo);

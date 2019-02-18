@@ -207,7 +207,8 @@ public:
 
     bool SetData(int column, const QVariant &value)
     {
-        if(column < 0 || column >= itemdata.size())
+        qDebug() << value;
+        if(column < 0 || column >= 10)
             return false;
         itemdata[column] = value;
         return true;
@@ -772,6 +773,8 @@ public:
     };
     void UpdateNode(QString itemid, int column, QString hash)
     {
+        const QVariant tmpvar(hash);
+        parents.value(itemid)->SetData(column, tmpvar);
         //parents.value(data.at(0).toString().split("-a").first())->SetData(column, hash);
     };
     

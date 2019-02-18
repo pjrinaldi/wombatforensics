@@ -118,6 +118,7 @@ private slots:
     void UpdateProgress(unsigned long long count);
     void UpdateExport(void);
     void UpdateDig(void);
+    void HashingFinish(void);
     void OpenUpdate(void);
     void UpdateCheckCount(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);

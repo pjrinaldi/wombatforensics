@@ -1526,6 +1526,11 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     }
 }
 
+void WombatForensics::HashingFinish()
+{
+    // here is where i should update the column header...., which is possibly display and then update hash type...
+}
+
 void WombatForensics::UpdateDig()
 {
     int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
