@@ -1499,14 +1499,16 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     {
         if(digoptions.at(i) == 0) // Generate Thumbnails
             StartThumbnails(digfilelist);
-        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2) // Generate MD5 || Generate SHA1
+        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 | digoptions.at(i) == 3) // Generate MD5 || Generate SHA1
         {
             if(digoptions.at(i) == 2)
                 hashsum = 2;
             else if(digoptions.at(i) == 3)
                 hashsum = 4;
-            qInfo() << "Generating MD5 Hash...";
-            StatusUpdate("Generating MD5 Hash...");
+            else if(digoptions.at(i) == 1)
+                hashsum = 1;
+            qInfo() << "Generating Hash...";
+            StatusUpdate("Generating Hash...");
             hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
             hashingwatcher.setFuture(hashingfuture);
             //StartHash(digfilelist, 0);

@@ -665,7 +665,7 @@ void GenerateHash(QString itemid)
     if(partfile.isOpen())
         tmpstr = partfile.readLine();
     partfile.close();
-    if(tmpstr.count() > 0)
+    if(tmpstr.split(",").count() > 0)
     {
         readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
         if(readfsinfo != NULL)
@@ -677,6 +677,35 @@ void GenerateHash(QString itemid)
         ssize_t hashdatalen = tsk_fs_file_read(readfileinfo, 0, hashdata, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
         QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
+        // NO "-a" in the itemid..
+        QDir filedir = QDir(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/." + itemid.split("-").at(1) + "/." + itemid.split("-").at(2));
+        QStringList filefiles = filedir.entryList(QStringList(itemid.split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
+        QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/." + itemid.split("-").at(1) + "/." + itemid.split("-").at(2) + "/" + filefiles.at(0));
+        filefile.open(QIODevice::ReadWrite | QIODevice::Text);
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
+        if(tmpstr.split(",").count() > 0)
+        {
+            qDebug() << "tmpstr:" << tmpstr;
+            QStringList tmplist = tmpstr.split(",");
+            if(hashdatalen > 0)
+                tmplist[13] = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+            else
+            {
+                if(hashsum == 1)
+                    tmplist[13] = "d41d8cd98f00b204e9800998ecf8427e";
+                else if(hashsum == 2)
+                    tmplist[13] = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+                else if(hashsum == 4)
+                    tmplist[13] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+            }
+            tmpstr = "";
+            for(int i=0; i < tmplist.count() - 1; i++)
+                tmpstr += tmplist.at(i) + ",";
+            tmpstr += tmplist.last();
+            filefile.write(tmpstr.toStdString().c_str());
+        }
+        filefile.close();
         // HERE IS WHERE I WOULD WRITE THIS TO THE FILE... THEN WHEN I RETURN, I NEED TO REDRAW TREEVIEW???
         // OR I CAN WRITE TO THE FILE AND THEN CALL AN UPDATE NODE FUNCTION MAYBE...
         // treenodemodel->UpdateNode(?, ?, ?);
