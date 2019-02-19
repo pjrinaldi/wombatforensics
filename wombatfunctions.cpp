@@ -637,9 +637,9 @@ void GenerateHash(QString itemid)
     std::vector<std::string> pathvector;
     const TSK_TCHAR** imagepartspath;
     pathvector.clear();
-    qDebug() << "itemid:" << itemid;
+    //qDebug() << "itemid:" << itemid;
     unsigned long long curaddress = itemid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
-    qDebug() << "curaddress:" << curaddress;
+    //qDebug() << "curaddress:" << curaddress;
     QStringList evidfiles = eviddir.entryList(QStringList("*." + itemid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     wombatvariable.evidencename = evidfiles.at(0).split(".e").first();
     QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/stat");
@@ -679,16 +679,16 @@ void GenerateHash(QString itemid)
         ssize_t hashdatalen = tsk_fs_file_read(readfileinfo, 0, hashdata, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
         QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
-        QDir filedir = QDir(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/." + itemid.split("-").at(1) + "/." + itemid.split("-").at(2));
-        QStringList filefiles = filedir.entryList(QStringList(itemid.split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
-        QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/." + itemid.split("-").at(1) + "/." + itemid.split("-").at(2) + "/" + filefiles.at(0));
+        //QDir filedir = QDir(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/." + itemid.split("-").at(1) + "/." + itemid.split("-").at(2));
+        //QStringList filefiles = filedir.entryList(QStringList(itemid.split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
+        QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + itemid.split("-").at(0) + "/." + itemid.split("-").at(1) + "/." + itemid.split("-").at(2) + "/" + itemid.split("-").at(3) + "." + itemid.split("-").at(4) + ".stat");
         filefile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(filefile.isOpen())
             tmpstr = filefile.readLine();
         filefile.close();
         if(tmpstr.split(",").count() > 0)
         {
-            qDebug() << "tmpstr:" << tmpstr;
+            //qDebug() << "tmpstr:" << tmpstr;
             QStringList tmplist = tmpstr.split(",");
             if(hashdatalen > 0)
                 tmplist[13] = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
