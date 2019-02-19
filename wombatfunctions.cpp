@@ -321,6 +321,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath)
     for(int i=0; i < 11; i++)
         nodedata << treeout.at(i);
     treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
+    listeditems.append(treeout.first());
     if(filefile.isOpen())
         filefile.close();
     if(tmpfile->name != NULL)
@@ -710,7 +711,7 @@ void GenerateHash(QString itemid)
                 filefile.write(tmpstr.toStdString().c_str());
             filefile.close();
         }
-        treenodemodel->UpdateNode(itemid,8 , hashstr);
+        treenodemodel->UpdateNode(itemid, 8, hashstr);
         // treenodemodel->UpdateNode(?, ?, ?);
         /*
         if(hashdatalen > 0)

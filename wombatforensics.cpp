@@ -1499,7 +1499,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     {
         if(digoptions.at(i) == 0) // Generate Thumbnails
             StartThumbnails(digfilelist);
-        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 | digoptions.at(i) == 3) // Generate MD5 || Generate SHA1
+        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 | digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256
         {
             if(digoptions.at(i) == 2)
                 hashsum = 2;
@@ -1528,6 +1528,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 
 void WombatForensics::HashingFinish()
 {
+    qDebug() << "Hashing should be Finished";
     // here is where i should update the column header...., which is possibly display and then update hash type...
 }
 
