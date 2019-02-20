@@ -240,7 +240,8 @@ public:
     explicit TreeNodeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         QList<QVariant> zerodata;
-        zerodata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature";
+        //zerodata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature";
+        zerodata << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature" << "ID"; // NAME IN FIRST COLUMN
         zeronode = new TreeNode(zerodata);
     };
 
@@ -262,7 +263,8 @@ public:
         int nodetype = 0;
         int itemtype = 0;
         QByteArray ba;
-        nodetype = itemnode->Data(0).toString().split("-a").first().split("-").count();
+        //nodetype = itemnode->Data(0).toString().split("-a").first().split("-").count();
+        nodetype = itemnode->Data(10).toString().split("-a").first().split("-").count();
         itemtype = itemnode->itemtype; // node type 1=file, 2=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs)
 
         if(role == Qt::CheckStateRole && index.column() == 0)
@@ -273,6 +275,9 @@ public:
                 return QColor(Qt::darkBlue);
             else if(nodetype == 4)
             {
+                /*
+                 * NEED TO UPDATE FOR THE NEW NAME FIRST PARADIGM AND ID LAST
+                 *
                 if(itemnode->Data(0).toString().contains(filtervalues.idfilter) == false)
                     return QColor(Qt::lightGray);
                 if(filtervalues.namebool)
@@ -387,15 +392,16 @@ public:
                     if(itemnode->Data(10).toString().contains(filtervalues.filetype) == false)
                             return QColor(Qt::lightGray);
                 }
+                */
             }
         }
         else if(role == Qt::DisplayRole)
         {
-            if(index.column() == 0)
+            if(index.column() == 10) // used to be 0
             {
                 return itemnode->Data(index.column()).toString().split("-a").at(0);
             }
-            else if(index.column() == 1 || index.column() == 2)
+            else if(index.column() == 0 || index.column() == 1) // used to be 1 || 2
             {
                 if(nodetype == 4)
                 {
@@ -411,9 +417,9 @@ public:
                         return itemnode->Data(index.column());
                 }
             }
-            else if(index.column() == 3)
+            else if(index.column() == 2) // used to be 3
                 return itemnode->Data(index.column());
-            else if(index.column() >= 4 && index.column() <= 7)
+            else if(index.column() >= 3 && index.column() <= 6) // used to be >= 4 <= 7
             {
                 if(itemnode->Data(index.column()).toString().compare("0") == 0)
                     return "";
@@ -433,7 +439,7 @@ public:
                     return tmpstr;
                 }
             }
-            else if(index.column() >= 8 && index.column() <= 10)
+            else if(index.column() >= 7 && index.column() <= 9) // used to be >= 8 <= 10
             {
                 if(itemnode->Data(index.column()).toString().compare("0") != 0)
                     return itemnode->Data(index.column());
@@ -446,7 +452,7 @@ public:
         else if(role == Qt::DecorationRole)
         {
             ba.clear();
-            ba.append(itemnode->Data(1).toString());
+            ba.append(itemnode->Data(0).toString()); // used to be 1
             QString nodename = QByteArray::fromBase64(ba);
             //qDebug() << itemnode->Data(0).toString() << nodename << "nodetype:" << nodetype << "itemtype:" << itemtype;
             if(index.column() == 0)
@@ -459,7 +465,7 @@ public:
                     return QIcon(QPixmap(QString(":/basic/treefs")));
                 else if(nodetype == 4)
                 {
-                    if((itemtype == 0 && itemnode->Data(2).toString().contains("/$OrphanFiles/")) || itemtype == 1)
+                    if((itemtype == 0 && itemnode->Data(1).toString().contains("/$OrphanFiles/")) || itemtype == 1) // used to be (2)
                     {
                         if(nodename.compare("AttrDef") == 0 || nodename.compare("$BadClus") == 0 || nodename.compare("$Bitmap") == 0 || nodename.compare("$Boot") == 0 || nodename.compare("$ObjId") == 0 || nodename.compare("$Quota") == 0 || nodename.compare("$Reparse") == 0 || nodename.compare("$LogFile") == 0 || nodename.compare("$MFT") == 0 || nodename.compare("$MFTMirr") == 0 || nodename.compare("$Secure") == 0 || nodename.compare("$UpCase") == 0 || nodename.compare("$Volume") == 0)
                             return QIcon(QPixmap(QString(":/basic/virtualfile")));
@@ -484,7 +490,7 @@ public:
                         return QIcon(QPixmap(QString(":/basic/virtualdir")));
                     else
                     {
-                        if(itemnode->Data(0).toString().contains("f*"))
+                        if(itemnode->Data(10).toString().contains("f*")) // used to be 0
                             return QIcon(QPixmap(QString(":/basic/deletedfile")));
                         else
                             return QIcon(QPixmap(QString(":/basic/treefile")));
@@ -510,12 +516,12 @@ public:
             if(itemnode->IsChecked())
             {
                 itemnode->SetChecked(false);
-                checkhash.insert(itemnode->Data(0).toString().split("-a").first(), false);
+                checkhash.insert(itemnode->Data(10).toString().split("-a").first(), false); // used to be 0
             }
             else
             {
                 itemnode->SetChecked(true);
-                checkhash.insert(itemnode->Data(0).toString().split("-a").first(), true);
+                checkhash.insert(itemnode->Data(10).toString().split("-a").first(), true); // used to be 0
             }
             emit dataChanged(index, index);
             emit CheckedNodesChanged();
@@ -553,7 +559,7 @@ public:
             return Qt::NoItemFlags;
         if(index == QModelIndex())
             return Qt::NoItemFlags;
-        if(index.column() == 0 && itemnode->Data(index.column()).toString().split("-a").first().split("-").count() == 4)
+        if(index.column() == 10 && itemnode->Data(index.column()).toString().split("-a").first().split("-").count() == 4) // used to be 0
             flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
         
         return flags;
@@ -568,6 +574,7 @@ public:
         }
         if(role == Qt::DecorationRole)
         {
+            /*
             if(section == 0 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 1 && filtervalues.namebool)
@@ -592,6 +599,7 @@ public:
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 10 && filtervalues.filetypebool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
+            */
         }
         return QVariant();
     };
@@ -674,7 +682,8 @@ private:
                 columndata.clear();
                 if(tmpstr.split(",").count() > 5)
                 {
-                    columndata << tmpstr.split(",").at(5) << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                    columndata << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
+                    //columndata << tmpstr.split(",").at(5) << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                     parent->AppendChild(new TreeNode(columndata, parent));
                     curid = tmpstr.split(",").at(5);
                     parents[curid] = parent->child(parent->ChildCount() - 1);
@@ -690,7 +699,8 @@ private:
                     volfile.close();
                     if(tmpstr.split(",").count() > 5)
                     {
-                        columndata << tmpstr.split(",").at(5) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                        columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
+                        //columndata << tmpstr.split(",").at(5) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                         parid = tmpstr.split(",").at(5).split("-").at(0);
                         curid = tmpstr.split(",").at(5);
                         parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
@@ -709,7 +719,8 @@ private:
                         rootinum = tmpstr.split(",").at(3);
                         if(tmpstr.split(",").count() > 10)
                         {
-                            columndata << tmpstr.split(",").at(10) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                            columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
+                            //columndata << tmpstr.split(",").at(10) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                             parid = tmpstr.split(",").at(10).split("-p").at(0);
                             curid = tmpstr.split(",").at(10);
                             parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
@@ -727,7 +738,8 @@ private:
                             filefile.close();
                             if(tmpstr.split(",").count() > 12)
                             {
-                                columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
+                                columndata << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1) << tmpstr.split(",").at(12);
+                                //columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
                                 if(tmpstr.split(",").at(2).toInt() == rootinum.toInt())
                                     parid = tmpstr.split(",").at(12).split("-f").at(0);
                                 else
