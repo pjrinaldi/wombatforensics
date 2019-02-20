@@ -767,7 +767,7 @@ public:
         if(parid.toInt() == -1) // evid
         {
             zeronode->AppendChild(new TreeNode(data, zeronode));
-            parents[data.at(0).toString()] = zeronode->child(zeronode->ChildCount() - 1);
+            parents[data.at(10).toString()] = zeronode->child(zeronode->ChildCount() - 1); // USED TO BE 0
         }
         else // everything else 
         {
@@ -775,11 +775,11 @@ public:
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid)));
             else
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
-            parents[data.at(0).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-            if(checkhash.contains(data.at(0).toString().split("-a").first()))
-                parents.value(data.at(0).toString().split("-a").first())->SetChecked(true);
+            parents[data.at(10).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
+            if(checkhash.contains(data.at(10).toString().split("-a").first())) // USED TO BE 0
+                parents.value(data.at(10).toString().split("-a").first())->SetChecked(true); // USED TO BE 0
             if(deleted == 1)
-                parents.value(data.at(0).toString().split("-a").first())->SetDeleted(true);
+                parents.value(data.at(10).toString().split("-a").first())->SetDeleted(true); // USED TO BE 0
         }
     };
     void UpdateNode(QString itemid, int column, QString hash)

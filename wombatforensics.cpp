@@ -808,11 +808,13 @@ void WombatForensics::UpdateStatus()
     evidcnt++;
     volcnt = 0;
     partint = 0;
+    /* // COMMENTED OUT UNTIL IMPLEMENT FULL NAME IN FIRST COLUMN (0), ID IN LAST COLUMN (10)
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+    */
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
