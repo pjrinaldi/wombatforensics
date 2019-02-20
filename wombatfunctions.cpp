@@ -633,6 +633,8 @@ void GenerateHash(QString itemid)
     TSK_FS_INFO* readfsinfo = NULL;
     TSK_FS_FILE* readfileinfo = NULL;
     QString tmpstr = "";
+    QStringList tmplist;
+    tmplist.clear();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     std::vector<std::string> pathvector;
     const TSK_TCHAR** imagepartspath;
@@ -666,7 +668,9 @@ void GenerateHash(QString itemid)
     if(partfile.isOpen())
         tmpstr = partfile.readLine();
     partfile.close();
-    if(tmpstr.split(",").count() > 0)
+    //qDebug() << "part tmpstr:" << tmpstr;
+    tmplist = tmpstr.split(",");
+    if(tmplist.count() > 0)
     {
         readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
         if(readfsinfo != NULL)
@@ -690,7 +694,8 @@ void GenerateHash(QString itemid)
         if(tmpstr.split(",").count() > 0)
         {
             //qDebug() << "tmpstr:" << tmpstr;
-            QStringList tmplist = tmpstr.split(",");
+            tmplist.clear();
+            tmplist = tmpstr.split(",");
             if(hashdatalen > 0)
                 tmplist[13] = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
             else
