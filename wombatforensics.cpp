@@ -1494,7 +1494,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     }
     else
         digfilelist = GetFileLists(dtype);
-    qDebug() << digfilelist;
+    //qDebug() << digfilelist;
     for(int i = 0; i < digoptions.count(); i++)
     {
         if(digoptions.at(i) == 0) // Generate Thumbnails
@@ -1535,7 +1535,7 @@ void WombatForensics::HashingFinish()
 void WombatForensics::UpdateDig()
 {
     int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
-    qInfo() << "Dug:" << QString::number(digcount) << "of" << QString::number(digfilelist.count()) << QString::number(curprogress) << "%";
+    //qInfo() << "Dug:" << QString::number(digcount) << "of" << QString::number(digfilelist.count()) << QString::number(curprogress) << "%";
     //LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
     StatusUpdate("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
 }
