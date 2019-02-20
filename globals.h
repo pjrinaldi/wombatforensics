@@ -207,9 +207,6 @@ public:
 
     bool SetData(int column, const QVariant &value)
     {
-        qDebug() << "itemdata:" << itemdata;
-        qDebug() << "itemdata count:" << itemdata.count();
-        qDebug() << "col/val:" << column << "/" << value;
         if(column < 0 || column >= 10)
             return false;
         itemdata[column] = value;
