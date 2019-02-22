@@ -826,6 +826,7 @@ void WombatForensics::UpdateDigging()
 
 void WombatForensics::AddEvidence()
 {
+    // HERE IS WHERE I WOULD OPEN THE NEW DIALOG
     wombatvariable.fullpathvector.clear();
     wombatvariable.itemcount = 0;
     int isnew = 1;
