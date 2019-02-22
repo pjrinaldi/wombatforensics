@@ -188,21 +188,17 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 //////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
 {
-    unsigned long long curobjaddr = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-f").at(1).toULongLong();
+    unsigned long long curobjaddr = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-f").at(1).toULongLong();
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
     std::vector<std::string> pathvector;
     pathvector.clear();
-    QString estring = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(0);
-    QString vstring = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(1);
-    QString pstring = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(3);
+    QString estring = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(3);
     QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
-    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
-    //wombatvariable.evidencename = evidfiles.at(0);
-    //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0).mid(1));
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
     evidlist = tmpstr.split(",");
@@ -223,8 +219,6 @@ void WombatForensics::ShowExternalViewer()
     tmpstr = "";
     QStringList partlist;
     partlist.clear();
-    //QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
-    //QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
     QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/stat");
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();
@@ -241,7 +235,7 @@ void WombatForensics::ShowExternalViewer()
         filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         //else
         (new QDir())->mkpath(wombatvariable.tmpfilepath);
-        QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-tmp";
+        QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 10).data().toString() + "-tmp";
         QFile tmpfile(tmpstring);
         if(tmpfile.open(QIODevice::WriteOnly))
         {
@@ -269,39 +263,39 @@ void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 void WombatForensics::ShowFile(const QModelIndex &index)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    if(index.sibling(index.row(), 9).data().toString().contains("image"))
+    if(index.sibling(index.row(), 8).data().toString().contains("image"))
     {
         imageviewer = new ImageWindow();
         imageviewer->setWindowIcon(QIcon(":/img"));
-        imageviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Image Viewer");
+        imageviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Image Viewer");
         imageviewer->setAttribute(Qt::WA_DeleteOnClose);
-        imageviewer->GetImage(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+        imageviewer->GetImage(selectedindex.sibling(selectedindex.row(), 10).data().toString());
         imageviewer->show();
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("video"))
+    else if(index.sibling(index.row(), 8).data().toString().contains("video"))
     {
         videowindow = new VideoViewer();
         videowindow->setAttribute(Qt::WA_DeleteOnClose);
         videowindow->setWindowIcon(QIcon(":/vid"));
-        videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Video Viewer");
+        videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Video Viewer");
         videowindow->ShowVideo(index);
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("text"))
+    else if(index.sibling(index.row(), 8).data().toString().contains("text"))
     {
         // toggle the button...
         textviewer = new TextViewer();
         textviewer->setWindowIcon(QIcon(":/textencode"));
-        textviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Text Viewer");
+        textviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Text Viewer");
         textviewer->setAttribute(Qt::WA_DeleteOnClose);
         // THIS FAILS ON ADS
         textviewer->ShowText(index);
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("text/html"))
+    else if(index.sibling(index.row(), 8).data().toString().contains("text/html"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowIcon(QIcon(":/web"));
-        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " HTML Viewer");
+        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " HTML Viewer");
         htmlviewer->ShowHtml(index);
     }
     else
@@ -343,12 +337,12 @@ void WombatForensics::ShowFile(const QModelIndex &index)
             htmlviewer = new HtmlViewer();
             htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
             htmlviewer->setWindowIcon(QIcon(":/outsidein"));
-            htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " OutsideIn Viewer");
+            htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " OutsideIn Viewer");
             htmlviewer->LoadHtml(QString::fromStdString(oiout));
         }
         else
         {
-            if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
+            if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
                 treemenu->exec(QCursor::pos());
         }
     }
@@ -695,7 +689,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     if(curitem.indexes().count() > 0)
     {
         selectedindex = curitem.indexes().at(0);
-        if(selectedindex.sibling(selectedindex.row(), 3).data().toULongLong() > 0)
+        if(selectedindex.sibling(selectedindex.row(), 2).data().toULongLong() > 0)
             ui->actionView_File->setEnabled(true);
         else
             ui->actionView_File->setEnabled(false);
@@ -724,7 +718,7 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     if(index.isValid())
     {
         actionitem = static_cast<TreeNode*>(index.internalPointer());
-        if(index.sibling(index.row(), 0).data().toString().split("-").count() == 4) // file
+        if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
             treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
 }
@@ -808,13 +802,11 @@ void WombatForensics::UpdateStatus()
     evidcnt++;
     volcnt = 0;
     partint = 0;
-    /* // COMMENTED OUT UNTIL IMPLEMENT FULL NAME IN FIRST COLUMN (0), ID IN LAST COLUMN (10)
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
-    */
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
@@ -863,31 +855,31 @@ void WombatForensics::UpdateProperties()
 {
     QFile propfile;
     propertylist.clear();
-    if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 1) // evidence image
+    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 1) // evidence image
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").first() + "/prop");
+        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").first() + "/prop");
     }
-    if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 2) // volume
+    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 2) // volume
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(1) + "/prop");
+        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(1) + "/prop");
     }
-    if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 3) // file system
+    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 3) // file system
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(1) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "/prop");
+        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(1) + "/." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(2) + "/prop");
     }
-    if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() == 4) // file
+    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 4) // file
     {
         QString tmpfvalue = "";
         QString parentstr = "5";
-        if(selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-").count() == 3) // root inum
+        if(selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-").count() == 3) // root inum
             parentstr = "5";
         else
-            parentstr = selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-").at(3).mid(1);
-        if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last().contains(":"))
-            tmpfvalue = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last().split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last().split(":").at(1);
+            parentstr = selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-").at(3).mid(1);
+        if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last().contains(":"))
+            tmpfvalue = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last().split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last().split(":").at(1);
         else
-            tmpfvalue = selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").last();
-        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(1) + "/." + selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").at(2) + "/" + tmpfvalue + ".a" + parentstr + ".prop");
+            tmpfvalue = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last();
+        propfile.setFileName(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0) + "/." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(1) + "/." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(2) + "/" + tmpfvalue + ".a" + parentstr + ".prop");
     }
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream in(&propfile);
@@ -903,7 +895,7 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
-    wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
+    wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 10).data().toString(); // mod object id
     blockstring = "";
     QString tmpstr = "";
     QStringList evidlist;
@@ -960,7 +952,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(wombatvariable.selectedid.split("-").count() == 4) // file file
     {
-        QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 0).data().toString().split("-f").last();
+        QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-f").last();
         // INITIAL PIECE OF FILE HEX CONTENT CODE
         TSK_IMG_INFO* fileheximginfo;
         TSK_FS_INFO* filehexfsinfo;
@@ -1073,7 +1065,7 @@ void WombatForensics::LoadHexContents()
         //if(!ui->hexview->isEnabled())
             ui->hexview->setEnabled(true);
 
-        if(selectedindex.sibling(selectedindex.row(), 3).data().toULongLong() == 0)
+        if(selectedindex.sibling(selectedindex.row(), 2).data().toULongLong() == 0)
         {
             //qDebug() << "zero file";
             ui->hexview->setEnabled(false);
@@ -1103,7 +1095,7 @@ void WombatForensics::LoadHexContents()
                 }
                 if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                 {
-                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), 0);
                     ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
                 }
                 else // IF RESIDENT
@@ -1141,7 +1133,7 @@ void WombatForensics::LoadHexContents()
                         mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                         resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
     
-                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), (curoffset + resoffset));
                         ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                     //}
                 }   
@@ -1197,7 +1189,7 @@ void WombatForensics::LoadHexContents()
                         mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                         curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                         }
-                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), curoffset);
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), curoffset);
                         ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
                     //}
                 }
@@ -1205,7 +1197,7 @@ void WombatForensics::LoadHexContents()
                 {
                     if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                     {
-                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), 0);
                         ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
                     }
                     else // IF RESIDENT
@@ -1250,7 +1242,7 @@ void WombatForensics::LoadHexContents()
                             mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                             resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                             }
-                            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), (curoffset + resoffset));
+                            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), (curoffset + resoffset));
                             ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                         //}
                     }
@@ -1264,14 +1256,14 @@ void WombatForensics::LoadHexContents()
                 fhexbuf = new char[filehexfileinfo->meta->size];
                 fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
             }
-            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 3).data().toULongLong(), 0);
+            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), 0);
             ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
         }
         }
-        if(selectedindex.sibling(selectedindex.row(), 3).data().toULongLong() > 0)
+        if(selectedindex.sibling(selectedindex.row(), 2).data().toULongLong() > 0)
         {
         (new QDir())->mkpath(wombatvariable.tmpfilepath);
-        hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 0).data().toString() + "-fhex";
+        hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 10).data().toString() + "-fhex";
         QFile tmpfile(hexstring);
         tmpfile.open(QIODevice::WriteOnly);
         QDataStream outbuffer(&tmpfile);
@@ -1296,7 +1288,7 @@ void WombatForensics::CloseCurrentCase()
 {
     if(ui->dirTreeView->model() != NULL)
     {
-        UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+        UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 10).data().toString());
         delete treenodemodel;
         evidcnt = 0;
         //autosavetimer->stop();
@@ -1338,13 +1330,13 @@ void WombatForensics::RemEvidence()
     // THEN I BUILD A NEW TREEFILE BASED OFF OF THE SINGLE FILES.
     QModelIndexList indexlist;
     QModelIndex curindex = selectedindex;
-    if(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").count() > 1)
+    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() > 1)
     {
-        indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(selectedindex.sibling(selectedindex.row(), 0).data().toString().split("-").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         curindex = indexlist.at(0);
     }
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString(curindex.sibling(curindex.row(), 1).data().toString() + ".*")), QDir::NoSymLinks | QDir::Files);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString(curindex.sibling(curindex.row(), 0).data().toString() + ".*")), QDir::NoSymLinks | QDir::Files);
     for(int i = 0; i < evidfiles.count(); i++)
     {
         eviddir.remove(evidfiles.at(i));
@@ -1467,7 +1459,7 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     //LogMessage("Started Exporting Evidence");
     if(etype == 0) // selected
     {
-        exportlist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+        exportlist.append(selectedindex.sibling(selectedindex.row(), 10).data().toString());
     }
     else
         exportlist = GetFileLists(etype);
@@ -1492,7 +1484,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     //LogMessage("Digging Deeper into Evidence");
     if(dtype == 0) // selected
     {
-        digfilelist.append(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+        digfilelist.append(selectedindex.sibling(selectedindex.row(), 10).data().toString());
     }
     else
         digfilelist = GetFileLists(dtype);
@@ -1714,7 +1706,7 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
     if(checked){}
     propertywindow = new PropertiesWindow(this);
     propertywindow->setWindowIcon(QIcon(":/info"));
-    propertywindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Properties");
+    propertywindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Properties");
     propertywindow->setAttribute(Qt::WA_DeleteOnClose);
     propertywindow->setModal(false);
     UpdateProperties();
@@ -1725,7 +1717,7 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
     if(checked){}
     fileviewer = new FileViewer();
     fileviewer->setWindowIcon(QIcon(":/ehex"));
-    fileviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 0).data().toString() + " Hex");
+    fileviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Hex");
     fileviewer->setAttribute(Qt::WA_DeleteOnClose);
     fileviewer->UpdateHexView();
 }
@@ -1910,7 +1902,7 @@ void WombatForensics::on_actionViewerManager_triggered()
 void WombatForensics::on_actionTextViewer_triggered(bool checked)
 {
     if(checked){}
-    if(selectedindex.sibling(selectedindex.row(), 9).data().toString().contains("text/"))
+    if(selectedindex.sibling(selectedindex.row(), 8).data().toString().contains("text/"))
     {
         textviewer->ShowText(selectedindex);
         textviewer->show();
@@ -2051,27 +2043,27 @@ void WombatForensics::SetOffsetLabel(qint64 pos)
 
 void WombatForensics::SetFilter(int headercolumn)
 {
-    if(headercolumn == 0)
-        idfilterview->DisplayFilter();
-    if(headercolumn == 1)
-        namefilterview->DisplayFilter();
-    if(headercolumn == 2)
-        pathfilterview->DisplayFilter();
-    if(headercolumn == 3)
-        sizefilterview->DisplayFilter();
-    if(headercolumn == 4)
-        createfilterview->DisplayFilter();
-    if(headercolumn == 5)
-        accessfilterview->DisplayFilter();
-    if(headercolumn == 6)
-        modifyfilterview->DisplayFilter();
-    if(headercolumn == 7)
-        changefilterview->DisplayFilter();
-    if(headercolumn == 8)
-        hashfilterview->DisplayFilter();
-    if(headercolumn == 9)
-        filecategoryfilterview->DisplayFilter();
     if(headercolumn == 10)
+        idfilterview->DisplayFilter();
+    if(headercolumn == 0)
+        namefilterview->DisplayFilter();
+    if(headercolumn == 1)
+        pathfilterview->DisplayFilter();
+    if(headercolumn == 2)
+        sizefilterview->DisplayFilter();
+    if(headercolumn == 3)
+        createfilterview->DisplayFilter();
+    if(headercolumn == 4)
+        accessfilterview->DisplayFilter();
+    if(headercolumn == 5)
+        modifyfilterview->DisplayFilter();
+    if(headercolumn == 6)
+        changefilterview->DisplayFilter();
+    if(headercolumn == 7)
+        hashfilterview->DisplayFilter();
+    if(headercolumn == 8)
+        filecategoryfilterview->DisplayFilter();
+    if(headercolumn == 9)
         filetypefilterview->DisplayFilter();
     ResizeColumns();
 }
@@ -2157,7 +2149,7 @@ void WombatForensics::SaveState()
 {
     RemoveTmpFiles();
     UpdateCheckState();
-    UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 0).data().toString());
+    UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 10).data().toString());
 }
 
 void WombatForensics::UpdateCheckCount()

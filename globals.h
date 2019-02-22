@@ -275,124 +275,120 @@ public:
                 return QColor(Qt::darkBlue);
             else if(nodetype == 4)
             {
-                /*
-                 * NEED TO UPDATE FOR THE NEW NAME FIRST PARADIGM AND ID LAST
-                 *
-                if(itemnode->Data(0).toString().contains(filtervalues.idfilter) == false)
+                if(itemnode->Data(10).toString().contains(filtervalues.idfilter) == false)
                     return QColor(Qt::lightGray);
                 if(filtervalues.namebool)
                 {
                     ba.clear();
-                    ba.append(itemnode->Data(1).toString());
+                    ba.append(itemnode->Data(0).toString());
                     if(QString(QByteArray::fromBase64(ba)).contains(filtervalues.namefilter) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.pathbool)
                 {
                     ba.clear();
-                    ba.append(itemnode->Data(2).toString());
+                    ba.append(itemnode->Data(1).toString());
                     if(QString(QByteArray::fromBase64(ba)).contains(filtervalues.pathfilter) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxsizebool && filtervalues.minsizebool == false)
                 {
-                    if(itemnode->Data(3).toULongLong() <= filtervalues.maxsize)
+                    if(itemnode->Data(2).toULongLong() <= filtervalues.maxsize)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.minsizebool && filtervalues.maxsizebool == false)
                 {
-                    if(itemnode->Data(3).toULongLong() >= filtervalues.minsize)
+                    if(itemnode->Data(2).toULongLong() >= filtervalues.minsize)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxsizebool && filtervalues.minsizebool)
                 {
-                    if(itemnode->Data(3).toULongLong() >= filtervalues.minsize || itemnode->Data(3).toULongLong() <= filtervalues.maxsize)
+                    if(itemnode->Data(2).toULongLong() >= filtervalues.minsize || itemnode->Data(2).toULongLong() <= filtervalues.maxsize)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
                 {
-                    if(itemnode->Data(4).toInt() <= filtervalues.maxcreate)
+                    if(itemnode->Data(3).toInt() <= filtervalues.maxcreate)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxcreatebool == false && filtervalues.mincreatebool)
                 {
-                    if(itemnode->Data(4).toInt() >= filtervalues.mincreate)
+                    if(itemnode->Data(3).toInt() >= filtervalues.mincreate)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool)
                 {
-                    if(itemnode->Data(4).toInt() >= filtervalues.mincreate || itemnode->Data(4).toInt() <= filtervalues.maxcreate)
+                    if(itemnode->Data(3).toInt() >= filtervalues.mincreate || itemnode->Data(3).toInt() <= filtervalues.maxcreate)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxaccessbool && filtervalues.minaccessbool == false)
                 {
-                    if(itemnode->Data(5).toInt() <= filtervalues.maxaccess)
+                    if(itemnode->Data(4).toInt() <= filtervalues.maxaccess)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxaccessbool == false && filtervalues.minaccessbool)
                 {
-                    if(itemnode->Data(5).toInt() >= filtervalues.minaccess)
+                    if(itemnode->Data(4).toInt() >= filtervalues.minaccess)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxaccessbool && filtervalues.minaccessbool)
                 {
-                    if(itemnode->Data(5).toInt() >= filtervalues.minaccess || itemnode->Data(5).toInt() <= filtervalues.maxaccess)
+                    if(itemnode->Data(4).toInt() >= filtervalues.minaccess || itemnode->Data(4).toInt() <= filtervalues.maxaccess)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxmodifybool && filtervalues.minmodifybool == false)
                 {
-                    if(itemnode->Data(6).toInt() <= filtervalues.maxmodify)
+                    if(itemnode->Data(5).toInt() <= filtervalues.maxmodify)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxmodifybool == false && filtervalues.minmodifybool)
                 {
-                    if(itemnode->Data(6).toInt() >= filtervalues.minmodify)
+                    if(itemnode->Data(5).toInt() >= filtervalues.minmodify)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxmodifybool && filtervalues.minmodifybool)
                 {
-                    if(itemnode->Data(6).toInt() >= filtervalues.minmodify || itemnode->Data(6).toInt() <= filtervalues.maxmodify)
+                    if(itemnode->Data(5).toInt() >= filtervalues.minmodify || itemnode->Data(5).toInt() <= filtervalues.maxmodify)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxchangebool && filtervalues.minchangebool == false)
                 {
-                    if(itemnode->Data(7).toInt() <= filtervalues.maxchange)
+                    if(itemnode->Data(6).toInt() <= filtervalues.maxchange)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxchangebool == false && filtervalues.minchangebool)
                 {
-                    if(itemnode->Data(7).toInt() >= filtervalues.minchange)
+                    if(itemnode->Data(6).toInt() >= filtervalues.minchange)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxchangebool && filtervalues.minchangebool)
                 {
-                    if(itemnode->Data(7).toInt() >= filtervalues.minchange || itemnode->Data(7).toInt() <= filtervalues.maxchange)
+                    if(itemnode->Data(6).toInt() >= filtervalues.minchange || itemnode->Data(6).toInt() <= filtervalues.maxchange)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.hashbool)
                 {
                     for(int i = 0; i < filtervalues.hashlist.count(); i++)
                     {
-                        if(itemnode->Data(8).toString().compare(filtervalues.hashlist.at(i)) == 0)
+                        if(itemnode->Data(7).toString().compare(filtervalues.hashlist.at(i)) == 0)
                             return QColor(Qt::lightGray);
                     }
                 }
                 if(filtervalues.hashbool2)
                 {
-                    if(itemnode->Data(8).toString().contains(filtervalues.hashfilter, Qt::CaseInsensitive) == false)
+                    if(itemnode->Data(7).toString().contains(filtervalues.hashfilter, Qt::CaseInsensitive) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.filegroupbool)
                 {
-                    if(itemnode->Data(9).toString().contains(filtervalues.filegroup) == false)
+                    if(itemnode->Data(8).toString().contains(filtervalues.filegroup) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.filetypebool)
                 {
-                    if(itemnode->Data(10).toString().contains(filtervalues.filetype) == false)
+                    if(itemnode->Data(9).toString().contains(filtervalues.filetype) == false)
                             return QColor(Qt::lightGray);
                 }
-                */
             }
         }
         else if(role == Qt::DisplayRole)
@@ -574,32 +570,30 @@ public:
         }
         if(role == Qt::DecorationRole)
         {
-            /*
-            if(section == 0 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
+            if(section == 10 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 1 && filtervalues.namebool)
+            if(section == 0 && filtervalues.namebool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 2 && filtervalues.pathbool)
+            if(section == 1 && filtervalues.pathbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 3 && filtervalues.maxsizebool)
+            if(section == 2 && filtervalues.maxsizebool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 3 && filtervalues.minsizebool)
+            if(section == 2 && filtervalues.minsizebool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 4 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
+            if(section == 3 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 5 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
+            if(section == 4 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 6 && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
+            if(section == 5 && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 7 && (filtervalues.maxchangebool || filtervalues.minchangebool))
+            if(section == 6 && (filtervalues.maxchangebool || filtervalues.minchangebool))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 8 && (filtervalues.hashbool || filtervalues.hashbool2))
+            if(section == 7 && (filtervalues.hashbool || filtervalues.hashbool2))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 9 && filtervalues.filegroupbool)
+            if(section == 8 && filtervalues.filegroupbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            if(section == 10 && filtervalues.filetypebool)
+            if(section == 9 && filtervalues.filetypebool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
-            */
         }
         return QVariant();
     };

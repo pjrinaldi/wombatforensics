@@ -454,7 +454,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     parentstr = tmplist.at(12).split("-f").first();
                 else
                     parentstr = tmplist.at(12).split("-f").first() + "-f" + tmplist.at(2);
-                nodedata << tmplist.at(12).split("-a").first() << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
+                nodedata << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last() << tmplist.at(12).split("-a").first();
+                //nodedata << tmplist.at(12).split("-a").first() << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
                 treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
                 listeditems.append(tmplist.at(12));
                 filesfound++;
@@ -484,7 +485,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                     tmplist = tmpstr.split(",");
                                     parentstr = tmplist.at(12).split("-f").first() + "-f" + tmplist.at(2);
                                     nodedata.clear();
-                                    nodedata << tmplist.at(12).split("-a").first() << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
+                                    nodedata << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last() << tmplist.at(12).split("-a").first();
+                                    //nodedata << tmplist.at(12).split("-a").first() << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
                                     treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
                                     filesfound++;
                                     isignals->ProgUpd();
@@ -726,7 +728,7 @@ void GenerateHash(QString itemid)
                 filefile.write(tmpstr.toStdString().c_str());
             filefile.close();
         }
-        treenodemodel->UpdateNode(itemid, 8, hashstr);
+        treenodemodel->UpdateNode(itemid, 7, hashstr);
         // treenodemodel->UpdateNode(?, ?, ?);
         /*
         if(hashdatalen > 0)
@@ -897,7 +899,7 @@ void PopulateTreeModel()
         wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
         wombatvariable.evidencepath = wombatvariable.tmpmntpath + wombatvariable.evidencename + evidid + "/";
         QStringList treeout;
-        treeout << evidid.mid(1) << wombatvariable.evidencename << "0" + QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+        treeout << wombatvariable.evidencename << "0" + QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
         QList<QVariant> nodedata;
         nodedata.clear();
         for(int m=0; m < treeout.count(); m++)
@@ -913,7 +915,7 @@ void PopulateTreeModel()
         {
             wombatvariable.volumepath = wombatvariable.evidencepath + vollist.at(j) + "/";
             treeout.clear();
-            treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)) << volname << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+            treeout << volname << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1));
             nodedata.clear();
             for(int m=0; m < treeout.count(); m++)
                 nodedata << treeout.at(m);
@@ -923,7 +925,7 @@ void PopulateTreeModel()
                 readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
                 wombatvariable.partitionpath = wombatvariable.volumepath + ".p0/";
                 treeout.clear();
-                treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p0") << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p0");
                 nodedata.clear();
                 for(int m=0; m < treeout.count(); m++)
                     nodedata << treeout.at(m);
@@ -949,7 +951,7 @@ void PopulateTreeModel()
                     if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
                     {
                         treeout.clear();
-                        treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k)) << QString(readpartinfo->desc) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                        treeout << QString(readpartinfo->desc) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k));
                         nodedata.clear();
                         for(int m=0; m < treeout.count(); m++)
                             nodedata << treeout.at(m);
@@ -961,7 +963,7 @@ void PopulateTreeModel()
                         if(readfsinfo != NULL)
                         {
                             treeout.clear();
-                            treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k)) << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                            treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k));
                             nodedata.clear();
                             for(int m=0; m < treeout.count(); m++)
                                 nodedata << treeout.at(m);
@@ -979,7 +981,7 @@ void PopulateTreeModel()
                         else
                         {
                             treeout.clear();
-                            treeout << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k)) << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                            treeout << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k));
                             nodedata.clear();
                             for(int m=0; m < treeout.count(); m++)
                                 nodedata << treeout.at(m);

@@ -43,5 +43,5 @@ void PropertiesWindow::SelectionChanged(const QItemSelection &selitem, const QIt
     if(deselitem.indexes().count() > 0)
         oldselectedindex = deselitem.indexes().at(0);
     selectedindex = selitem.indexes().at(0);
-    ui->label->setText(selectedindex.sibling(selectedindex.row(), 2).data().toString());
+    ui->label->setText(selectedindex.sibling(selectedindex.row(), 1).data().toString());
 }

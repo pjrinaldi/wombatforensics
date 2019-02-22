@@ -33,10 +33,10 @@ void TextViewer::HideClicked()
 void TextViewer::ShowText(const QModelIndex &index)
 {
     curindex = index;
-    curobjaddr = index.sibling(index.row(), 0).data().toString().split("-f").at(1).toULongLong();
+    curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toULongLong();
     //GetTextContent(index);
     UpdateEncoding(0);
-    this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 1).data().toString()));
+    this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 0).data().toString()));
     this->show();
 }
 
@@ -84,10 +84,10 @@ void TextViewer::GetTextContent(const QModelIndex &index)
     evidlist.clear();
     std::vector<std::string> pathvector;
     pathvector.clear();
-    QString estring = index.sibling(index.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(0);
-    QString vstring = index.sibling(index.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(1);
-    QString pstring = index.sibling(index.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = index.sibling(index.row(), 0).data().toString().split("-", QString::SkipEmptyParts).at(3);
+    QString estring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(3);
     //wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
     //QDir eviddir = QDir(wombatvariable.tmpmntpath);
     //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
