@@ -899,7 +899,7 @@ void PopulateTreeModel()
         wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
         wombatvariable.evidencepath = wombatvariable.tmpmntpath + wombatvariable.evidencename + evidid + "/";
         QStringList treeout;
-        treeout << wombatvariable.evidencename << "0" + QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
+        treeout << wombatvariable.evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
         QList<QVariant> nodedata;
         nodedata.clear();
         for(int m=0; m < treeout.count(); m++)
