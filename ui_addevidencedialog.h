@@ -30,7 +30,7 @@ public:
     QPushButton *addbutton;
     QGroupBox *groupbox;
     QVBoxLayout *verticalLayout_2;
-    QListWidget *listWidget;
+    QListWidget *evidencelist;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_2;
     QPushButton *removebutton;
@@ -68,16 +68,16 @@ public:
         verticalLayout_2 = new QVBoxLayout(groupbox);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-        listWidget = new QListWidget(groupbox);
-        listWidget->setObjectName(QString::fromUtf8("listWidget"));
-        listWidget->setFrameShape(QFrame::NoFrame);
-        listWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        listWidget->setProperty("showDropIndicator", QVariant(false));
-        listWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
-        listWidget->setUniformItemSizes(true);
-        listWidget->setWordWrap(true);
+        evidencelist = new QListWidget(groupbox);
+        evidencelist->setObjectName(QString::fromUtf8("evidencelist"));
+        evidencelist->setFrameShape(QFrame::NoFrame);
+        evidencelist->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        evidencelist->setProperty("showDropIndicator", QVariant(false));
+        evidencelist->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        evidencelist->setUniformItemSizes(true);
+        evidencelist->setWordWrap(true);
 
-        verticalLayout_2->addWidget(listWidget);
+        verticalLayout_2->addWidget(evidencelist);
 
 
         verticalLayout->addWidget(groupbox);
