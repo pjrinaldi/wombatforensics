@@ -26,6 +26,7 @@ private slots:
     void RemoveEvidence();
     void Cancel();
     void StartProcess();
+    void UpdateButtons();
     //void HideClicked();
     //void ShowAbout();
 private:

@@ -18,6 +18,7 @@ AddEvidenceDialog::AddEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new 
     connect(ui->removebutton, SIGNAL(clicked()), this, SLOT(RemoveEvidence()));
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(Cancel()));
     connect(ui->startbutton, SIGNAL(clicked()), this, SLOT(StartProcess()));
+    connect(ui->evidencelist, SIGNAL(itemSelectionChanged()), this, SLOT(UpdateButtons()));
 
     /*
     parentwidget = parent;
@@ -66,6 +67,7 @@ void AddEvidenceDialog::SelectEvidence()
     {
         // it's an evidence image so process...
         ui->evidencelist->addItem(evidfilename);
+        ui->startbutton->setEnabled(true);
     }
     else
     {
@@ -73,12 +75,20 @@ void AddEvidenceDialog::SelectEvidence()
     }
 }
 
+void AddEvidenceDialog::UpdateButtons()
+{
+    if(ui->evidencelist->selectedItems().count() > 0)
+        ui->removebutton->setEnabled(true);
+}
+
 void AddEvidenceDialog::RemoveEvidence()
 {
+    qDeleteAll(ui->evidencelist->selectedItems());
 }
 
 void AddEvidenceDialog::Cancel()
 {
+    this->close();
 }
 
 void AddEvidenceDialog::StartProcess()
