@@ -832,8 +832,8 @@ void WombatForensics::AddEvidence()
     wombatvariable.itemcount = 0;
     int isnew = 1;
     addevidencedialog = new AddEvidenceDialog(this);
-    int isok = addevidencedialog->exec();
-    if(isok)
+    addevidencedialog->exec();
+    if(evidencelist.count() > 0)
     {
         for(int i=0; i < evidencelist.count(); i++)
         {
