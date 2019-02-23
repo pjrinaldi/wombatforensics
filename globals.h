@@ -44,7 +44,7 @@ extern QStringList thumbpathlist;
 extern QStringList exportlist;
 extern QStringList digfilelist;
 extern QStringList listeditems;
-extern QStringList evidlist;
+extern QStringList evidencelist;
 extern QString exportpath;
 extern bool originalpath;
 extern QString blockstring;

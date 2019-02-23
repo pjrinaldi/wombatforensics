@@ -89,10 +89,10 @@ void AddEvidenceDialog::Cancel()
 
 void AddEvidenceDialog::StartProcess()
 {
-    evidlist.clear();
+    evidencelist.clear();
     for(int i=0; i < ui->evidencelist->count(); i++)
     {
-        evidlist.append(ui->evidencelist->item(i)->text());
+        evidencelist.append(ui->evidencelist->item(i)->text());
         this->close();
     }
 }

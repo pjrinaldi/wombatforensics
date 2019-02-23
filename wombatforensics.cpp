@@ -182,6 +182,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(showitem, SIGNAL(activated()), this, SLOT(ShowItem()));
     checkhash.clear();
     listeditems.clear();
+    treenodemodel = new TreeNodeModel();
     //autosavetimer = new QTimer(this);
     //connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
 }
@@ -831,12 +832,20 @@ void WombatForensics::AddEvidence()
     wombatvariable.itemcount = 0;
     int isnew = 1;
     addevidencedialog = new AddEvidenceDialog(this);
-    addevidencedialog->exec();
-    if(evidlist.count() > 0)
+    int isok = addevidencedialog->exec();
+    if(isok)
     {
-        qDebug() << evidlist;
-        QFuture<void> tmpfuture = QtConcurrent::map(evidlist, InitializeEvidenceStructure);
-        sqlwatcher.setFuture(tmpfuture);
+        for(int i=0; i < evidencelist.count(); i++)
+        {
+            wombatvariable.fullpathvector.clear();
+            wombatvariable.fullpathvector.push_back(evidencelist.at(i).toStdString());
+            wombatvariable.itemcount = 1;
+            qDebug() << evidencelist;
+            QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
+            //QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
+            if(i == evidencelist.count() - 1)
+                sqlwatcher.setFuture(tmpfuture);
+        }
     }
     /*
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
