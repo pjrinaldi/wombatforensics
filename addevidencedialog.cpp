@@ -78,6 +78,8 @@ void AddEvidenceDialog::UpdateButtons()
 void AddEvidenceDialog::RemoveEvidence()
 {
     qDeleteAll(ui->evidencelist->selectedItems());
+    if(ui->evidencelist->count() == 0)
+        ui->startbutton->setEnabled(false);
 }
 
 void AddEvidenceDialog::Cancel()
@@ -91,27 +93,6 @@ void AddEvidenceDialog::StartProcess()
     for(int i=0; i < ui->evidencelist->count(); i++)
     {
         evidlist.append(ui->evidencelist->item(i)->text());
-        //qDebug() << ui->evidencelist->item(i)->text();
         this->close();
     }
 }
-/*
-void AboutBox::HideClicked()
-{
-    this->hide();
-}
-
-void AboutBox::ShowAbout()
-{
-    this->show();
-}
-
-void AboutBox::mousePressEvent(QMouseEvent* e)
-{
-    if(e->type() == QEvent::MouseButtonPress)
-    {
-        this->hide();
-    }
-}
-*/
-

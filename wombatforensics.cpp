@@ -835,9 +835,9 @@ void WombatForensics::AddEvidence()
     if(evidlist.count() > 0)
     {
         qDebug() << evidlist;
+        QFuture<void> tmpfuture = QtConcurrent::map(evidlist, InitializeEvidenceStructure);
+        sqlwatcher.setFuture(tmpfuture);
     }
-    else
-        qDebug() << "evidlist:" << evidlist;
     /*
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
     if(tmplist.count())
