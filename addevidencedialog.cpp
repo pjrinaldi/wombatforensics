@@ -60,6 +60,17 @@ AddEvidenceDialog::~AddEvidenceDialog()
 
 void AddEvidenceDialog::SelectEvidence()
 {
+    QString evidfilename = QFileDialog::getOpenFileName(this, tr("Add Evidence Item"), QDir::homePath());
+    // check for evidence image
+    if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff"))
+    {
+        // it's an evidence image so process...
+        ui->evidencelist->addItem(evidfilename);
+    }
+    else
+    {
+        qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.2.";
+    }
 }
 
 void AddEvidenceDialog::RemoveEvidence()
