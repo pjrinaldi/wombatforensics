@@ -6,12 +6,6 @@
 AddEvidenceDialog::AddEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new Ui::AddEvidenceDialog)
 {
     ui->setupUi(this);
-    // ui->addbutton;
-    // ui->cancelbutton;
-    // ui->removebutton;
-    // ui->startbutton;
-    // ui->evidencelist;
-
     ui->removebutton->setEnabled(false);
     ui->startbutton->setEnabled(false);
     connect(ui->addbutton, SIGNAL(clicked()), this, SLOT(SelectEvidence()));
@@ -93,6 +87,13 @@ void AddEvidenceDialog::Cancel()
 
 void AddEvidenceDialog::StartProcess()
 {
+    evidlist.clear();
+    for(int i=0; i < ui->evidencelist->count(); i++)
+    {
+        evidlist.append(ui->evidencelist->item(i)->text());
+        //qDebug() << ui->evidencelist->item(i)->text();
+        this->close();
+    }
 }
 /*
 void AboutBox::HideClicked()

@@ -831,7 +831,13 @@ void WombatForensics::AddEvidence()
     wombatvariable.itemcount = 0;
     int isnew = 1;
     addevidencedialog = new AddEvidenceDialog(this);
-    addevidencedialog->show();
+    addevidencedialog->exec();
+    if(evidlist.count() > 0)
+    {
+        qDebug() << evidlist;
+    }
+    else
+        qDebug() << "evidlist:" << evidlist;
     /*
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
     if(tmplist.count())
