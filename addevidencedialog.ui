@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>addevidencedialog</class>
- <widget class="QDialog" name="addevidencedialog">
+ <class>AddEvidenceDialog</class>
+ <widget class="QDialog" name="AddEvidenceDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>

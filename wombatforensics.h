@@ -24,6 +24,8 @@
 #include "aboutbox.h"
 #include "settingsdialog.h"
 #include "qhexview.h"
+#include "addevidencedialog.h"
+
 #define UNIX
 #define UNIX_64
 #include "sccex.h"
