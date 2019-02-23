@@ -87,6 +87,7 @@ public:
     ByteConverter* byteviewer;
     AboutBox* aboutbox;
     SettingsDialog* settingsdialog;
+    AddEvidenceDialog* addevidencedialog;
     //QHexDocument* curhexdoc;
     //QHexView* hexviewer;
 

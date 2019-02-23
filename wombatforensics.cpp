@@ -830,6 +830,9 @@ void WombatForensics::AddEvidence()
     wombatvariable.fullpathvector.clear();
     wombatvariable.itemcount = 0;
     int isnew = 1;
+    addevidencedialog = new AddEvidenceDialog(this);
+    addevidencedialog->show();
+    /*
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
     if(tmplist.count())
     {
@@ -850,6 +853,7 @@ void WombatForensics::AddEvidence()
         else
             DisplayError("3.0", "Evidence already exists in the case", "Add Evidence Cancelled");
     }
+    */
 }
 
 void WombatForensics::UpdateProperties()

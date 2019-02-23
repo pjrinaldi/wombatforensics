@@ -22,6 +22,10 @@ public:
     AddEvidenceDialog(QWidget* parent = 0);
     ~AddEvidenceDialog();
 private slots:
+    void SelectEvidence();
+    void RemoveEvidence();
+    void Cancel();
+    void StartProcess();
     //void HideClicked();
     //void ShowAbout();
 private:

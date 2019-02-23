@@ -17,7 +17,7 @@ AddEvidenceDialog::AddEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new 
     connect(ui->addbutton, SIGNAL(clicked()), this, SLOT(SelectEvidence()));
     connect(ui->removebutton, SIGNAL(clicked()), this, SLOT(RemoveEvidence()));
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(Cancel()));
-    connect(ui->startbutton, SIGNAL(clicked()), this, SLOT(StartProcess()))
+    connect(ui->startbutton, SIGNAL(clicked()), this, SLOT(StartProcess()));
 
     /*
     parentwidget = parent;
@@ -55,6 +55,22 @@ AddEvidenceDialog::AddEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new 
 }
 
 AddEvidenceDialog::~AddEvidenceDialog()
+{
+}
+
+void AddEvidenceDialog::SelectEvidence()
+{
+}
+
+void AddEvidenceDialog::RemoveEvidence()
+{
+}
+
+void AddEvidenceDialog::Cancel()
+{
+}
+
+void AddEvidenceDialog::StartProcess()
 {
 }
 /*
