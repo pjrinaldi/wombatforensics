@@ -994,19 +994,33 @@ void PopulateTreeModel()
     }
 }
 
-void InitializeEvidenceStructure()
+//void InitializeEvidenceStructure()
+void InitializeEvidenceStructure(QString evidname)
 {
+    // REPLACE ALL THE GLOBAL VARIABLES WITH LOCAL ONES...
+    int evidcnt = 0;
+    int volcnt = 0;
+    int partint = 0;
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
+    evidcnt = evidfiles.count();
+    //qDebug() << evidfiles.count() << evidfiles;
+    std::vector<std::string> fullpathvector;
+    QString evidencename = evidname.split("/").last();
+    TSK_IMG_TYPE_ENUM imgtype;
+    fullpathvector.clear();
+    fullpathvector.push_back(evidname.toStdString());
     readimginfo = NULL;
     readvsinfo = NULL;
     readfsinfo = NULL;
     readfileinfo = NULL;
     const TSK_TCHAR** images;
-    images = (const char**)malloc(wombatvariable.fullpathvector.size()*sizeof(char*));
-    for(uint i=0; i < wombatvariable.fullpathvector.size(); i++)
+    images = (const char**)malloc(fullpathvector.size()*sizeof(char*));
+    for(uint i=0; i < fullpathvector.size(); i++)
     {
-        images[i] = wombatvariable.fullpathvector[i].c_str();
+        images[i] = fullpathvector[i].c_str();
     }
-    readimginfo = tsk_img_open(wombatvariable.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
+    readimginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
     if(readimginfo == NULL)
     {
         qWarning() << "Evidence Image access failed";
@@ -1014,34 +1028,34 @@ void InitializeEvidenceStructure()
         errorcount++;
     }
     free(images);
-    wombatvariable.imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
-    wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
-    wombatvariable.evidencepath = wombatvariable.tmpmntpath + wombatvariable.evidencename + ".e" + QString::number(evidcnt) + "/";
-    (new QDir())->mkpath(wombatvariable.evidencepath);
-    QFile evidfile(wombatvariable.evidencepath + "stat");
+    imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
+    //wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
+    QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
+    (new QDir())->mkpath(evidencepath);
+    QFile evidfile(evidencepath + "stat");
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
-    for(unsigned int i=0; i < wombatvariable.itemcount; i++)
-    {
-        if(i > 0 && i < wombatvariable.itemcount - 2)
-            out << "|";
-        out << QString::fromStdString(wombatvariable.fullpathvector[i]);
-    }
+    //for(unsigned int i=0; i < wombatvariable.itemcount; i++)
+    //{
+    //    if(i > 0 && i < wombatvariable.itemcount - 2)
+    //        out << "|";
+        out << QString::fromStdString(wombatvariable.fullpathvector[0]);
+    //}
     out << "," << wombatvariable.itemcount << ",e" + QString::number(evidcnt);
     out.flush();
     evidfile.close();
     //treefile.open(QIODevice::Append | QIODevice::Text);
     QStringList treeout;
     //treeout << QString("e" + QString::number(evidcnt)) << wombatvariable.evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
-    treeout << wombatvariable.evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt)); // NAME IN FIRST COLUMN
+    treeout << evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt)); // NAME IN FIRST COLUMN
     QList<QVariant> nodedata;
     nodedata.clear();
     for(int i=0; i < treeout.count(); i++)
         nodedata << treeout.at(i);
     treenodemodel->AddNode(nodedata,  "-1", -1, -1);
     // Write Evidence Properties Here...
-    WriteEvidenceProperties(readimginfo);
+    WriteEvidenceProperties(readimginfo, evidencepath, QString::fromStdString(fullpathvector[0]));
     readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
     QString volname = "Dummy Volume (NO PART)";
     int voltype = 240;
@@ -1054,9 +1068,12 @@ void InitializeEvidenceStructure()
         volsectorsize = (int)readvsinfo->block_size;
         voloffset = (unsigned long long)readvsinfo->offset;
     }
-    wombatvariable.volumepath = wombatvariable.evidencepath + ".v" + QString::number(volcnt) + "/";
-    (new QDir())->mkpath(wombatvariable.volumepath);
-    QFile volfile(wombatvariable.volumepath + "stat");
+    QDir voldir = QDir(evidencepath);
+    QStringList volfiles = voldir.entryList(QStringList(QString("*.v*")), QDir::NoSymLinks | QDir::Dirs);
+    volcnt = volfiles.count();
+    QString volumepath = evidencepath + "v" + QString::number(volcnt) + "/";
+    (new QDir())->mkpath(volumepath);
+    QFile volfile(volumepath + "stat");
     volfile.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&volfile);
     out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt);
@@ -1070,13 +1087,13 @@ void InitializeEvidenceStructure()
         nodedata << treeout.at(i);
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
     if(readvsinfo != NULL)
-        WriteVolumeProperties(readvsinfo);
+        WriteVolumeProperties(readvsinfo, volumepath);
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-        wombatvariable.partitionpath = wombatvariable.volumepath + ".p0/";
-        (new QDir())->mkpath(wombatvariable.partitionpath);
-        QFile pfile(wombatvariable.partitionpath + "stat");
+        QString partitionpath = volumepath + "p0/";
+        (new QDir())->mkpath(partitionpath);
+        QFile pfile(partitionpath + "stat");
         pfile.open(QIODevice::Append | QIODevice::Text);
         out.setDevice(&pfile);
         out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
@@ -1089,7 +1106,7 @@ void InitializeEvidenceStructure()
         for(int i=0; i < treeout.count(); i++)
             nodedata << treeout.at(i);
         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
-        WriteFileSystemProperties(readfsinfo);
+        WriteFileSystemProperties(readfsinfo, partitionpath);
         uint8_t walkreturn;
         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
@@ -1109,9 +1126,9 @@ void InitializeEvidenceStructure()
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                wombatvariable.partitionpath = wombatvariable.volumepath + ".p" + QString::number(partint) + "/";
-                (new QDir())->mkpath(wombatvariable.partitionpath);
-                pfile.setFileName(wombatvariable.partitionpath + "stat");
+                QString partitionpath = volumepath + ".p" + QString::number(partint) + "/";
+                (new QDir())->mkpath(partitionpath);
+                pfile.setFileName(partitionpath + "stat");
                 pfile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
@@ -1142,7 +1159,7 @@ void InitializeEvidenceStructure()
                         for(int j=0; j < treeout.count(); j++)
                             nodedata << treeout.at(j);
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
-                        WriteFileSystemProperties(readfsinfo);
+                        WriteFileSystemProperties(readfsinfo, partitionpath);
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
@@ -1386,7 +1403,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo)
     }
 }
 
-void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
+void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
 {
     FFS_INFO* ffs = NULL;
     ffs_sb1* sb1 = NULL;
@@ -1405,7 +1422,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
     char asc[512];
     char asc128[129];
     char timebuf[128];
-    QFile fspropfile(wombatvariable.partitionpath + "prop");
+    QFile fspropfile(partitionpath + "prop");
     fspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     //qDebug() << "fspropfile: open";
     QTextStream proplist(&fspropfile);
@@ -2056,9 +2073,10 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo)
     //qDebug() << "fspropfile: close";
 }
 
-void WriteVolumeProperties(TSK_VS_INFO* curvolinfo)
+//void WriteVolumeProperties(TSK_VS_INFO* curvolinfo)
+void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath)
 {
-    QFile vpropfile(wombatvariable.volumepath + "prop");
+    QFile vpropfile(volumepath + "prop");
     vpropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     //qDebug() << "vpropfile: open";
     QTextStream proplist(&vpropfile);
@@ -2222,9 +2240,10 @@ void WriteVolumeProperties(TSK_VS_INFO* curvolinfo)
     //qDebug() << "vpropfile: close";
 }
 
-void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
+//void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
+void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QString imgfullpath)
 {
-    QFile epropfile(wombatvariable.evidencepath + "prop");
+    QFile epropfile(evidencepath + "prop");
     epropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     //qDebug() << "epropfile: open";
     QTextStream proplist(&epropfile);
@@ -2239,7 +2258,7 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo)
     proplist << QString("File Format||") << QString(tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)curimginfo->itype)) << QString("||File Format the evidence data is stored in. Usually it is either a raw image (.dd/.001) or an embedded image (.E01/.AFF). A raw image contains only the data from the evidence. The embedded image contains other descriptive information from the acquisition.") << endl;
     proplist << QString("Sector Size||") << QString(QString::number(curimginfo->sector_size) + " bytes||") << QString("Sector size of the device. A Sector is a subdivision of a disk where data is stored. It is the smallest value used to divide the disk.") << endl;
     proplist << QString("Sector Count||") << QString(QString::number((int)((float)curimginfo->size/(float)curimginfo->sector_size)) + " sectors||") << QString("The number of sectors in the disk.") << endl;
-    proplist << QString("Image Path||") << QString::fromStdString(std::string(wombatvariable.fullpathvector[0])) << QString("||Location where the evidence image is stored and read from.") << endl;
+    proplist << QString("Image Path||") << imgfullpath << QString("||Location where the evidence image is stored and read from.") << endl;
     if(TSK_IMG_TYPE_ISAFF(curimginfo->itype)) // its AFF
     {
     }

@@ -621,7 +621,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         for(int j=0; j < partcount; j++)
             wombatvariable.fullpathvector.push_back(tmpstr.split(",").at(3).split("|").at(j).toStdString());
         //PrepareEvidenceImage();
-        evidcnt++;
+        //evidcnt++;
     }
     listeditems.clear();
     treenodemodel = new TreeNodeModel();
@@ -800,9 +800,9 @@ void WombatForensics::UpdateStatus()
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
-    evidcnt++;
-    volcnt = 0;
-    partint = 0;
+    //evidcnt++;
+    //volcnt = 0;
+    //partint = 0;
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
@@ -835,17 +835,19 @@ void WombatForensics::AddEvidence()
     addevidencedialog->exec();
     if(evidencelist.count() > 0)
     {
-        for(int i=0; i < evidencelist.count(); i++)
-        {
-            wombatvariable.fullpathvector.clear();
-            wombatvariable.fullpathvector.push_back(evidencelist.at(i).toStdString());
-            wombatvariable.itemcount = 1;
-            qDebug() << evidencelist;
-            QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
-            //QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
-            if(i == evidencelist.count() - 1)
-                sqlwatcher.setFuture(tmpfuture);
-        }
+        // TO MAKE THIS WORK, I NEED TO REPLACE ALL THE GLOBAL VARIABLES WITH LOCAL ONES OTHERWISE
+        // THE CONCURRENCY WILL COLLIDE AND CAUSE ISSUES
+        //for(int i=0; i < evidencelist.count(); i++)
+        //{
+           // wombatvariable.fullpathvector.clear();
+            //wombatvariable.fullpathvector.push_back(evidencelist.at(i).toStdString());
+            //wombatvariable.itemcount = 1;
+            //qDebug() << evidencelist;
+            //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
+        QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
+            //if(i == evidencelist.count() - 1)
+        sqlwatcher.setFuture(tmpfuture);
+        //}
     }
     /*
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
@@ -1310,7 +1312,7 @@ void WombatForensics::CloseCurrentCase()
     {
         UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 10).data().toString());
         delete treenodemodel;
-        evidcnt = 0;
+        //evidcnt = 0;
         //autosavetimer->stop();
         UpdateCheckState();
     }
