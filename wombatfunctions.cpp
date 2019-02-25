@@ -868,8 +868,11 @@ int SegmentDigits(int number)
     return count;
 }
 
-void PopulateTreeModel()
+//void PopulateTreeModel()
+void PopulateTreeModel(QString evidstring)
 {
+    qDebug() << "evidname:" << evidstring;
+}
 /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidlist = eviddir.entryList(QStringList("*.e*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
@@ -1001,7 +1004,7 @@ void PopulateTreeModel()
         }
     }
 */
-}
+//}
 
 //void InitializeEvidenceStructure()
 void InitializeEvidenceStructure(QString evidname)

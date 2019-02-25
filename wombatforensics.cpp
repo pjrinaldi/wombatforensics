@@ -602,13 +602,16 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QString tmpstr = "";
+    //QString tmpstr = "";
 
-    QStringList files = eviddir.entryList(QStringList(QString("*.e*")), QDir::Files | QDir::NoSymLinks);
-    qDebug() << files;
-    for(int i=0; i < files.count(); i++)
-    {
-        qDebug() << "eviddir's:" << files.at(i);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks);
+    qDebug() << evidfiles;
+    evidencelist.clear();
+    for(int i=0; i < evidfiles.count(); i++)
+        evidencelist.append(evidfiles.at(i));
+    //for(int i=0; i < files.count(); i++)
+    //{
+    //    qDebug() << "eviddir's:" << files.at(i);
         /*
         tmpstr = "";
         wombatvariable.fullpathvector.clear();
@@ -624,16 +627,21 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             wombatvariable.fullpathvector.push_back(tmpstr.split(",").at(3).split("|").at(j).toStdString());
         //PrepareEvidenceImage();
         //evidcnt++;
-        //*/
-    }
+        */
+    //}
     //listeditems.clear();
     //treenodemodel = new TreeNodeModel();
+    if(evidencelist.count() > 0)
+    {
+        QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
     //openfuture = QtConcurrent::run(PopulateTreeModel);
-    //openwatcher.setFuture(openfuture);
+        openwatcher.setFuture(tmpfuture);
+    }
 }
 
 void WombatForensics::OpenUpdate()
 {
+    /*
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
     QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
     if(!tdir.isEmpty())
@@ -641,6 +649,7 @@ void WombatForensics::OpenUpdate()
         QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash); // load images hash after case open to speed up thumbnail viewing
         thashwatcher.setFuture(tmpfuture);
     }
+    */
     PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));

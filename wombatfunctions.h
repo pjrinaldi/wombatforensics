@@ -17,7 +17,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
 void LoadImagesHash(void);
-void PopulateTreeModel(void);
+void PopulateTreeModel(QString evidstring);
 QString GetBlockList(TSK_FS_FILE* tmpfile);
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QString imgfullpath);
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath);
