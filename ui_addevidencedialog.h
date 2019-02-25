@@ -73,9 +73,13 @@ public:
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         evidencelist = new QListWidget(groupbox);
         evidencelist->setObjectName(QStringLiteral("evidencelist"));
+        evidencelist->setAcceptDrops(true);
         evidencelist->setFrameShape(QFrame::NoFrame);
         evidencelist->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        evidencelist->setProperty("showDropIndicator", QVariant(false));
+        evidencelist->setProperty("showDropIndicator", QVariant(true));
+        evidencelist->setDragDropMode(QAbstractItemView::DropOnly);
+        evidencelist->setDefaultDropAction(Qt::LinkAction);
+        evidencelist->setAlternatingRowColors(true);
         evidencelist->setSelectionMode(QAbstractItemView::ExtendedSelection);
         evidencelist->setUniformItemSizes(true);
         evidencelist->setWordWrap(true);

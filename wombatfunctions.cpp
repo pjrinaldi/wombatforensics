@@ -1187,7 +1187,7 @@ void InitializeEvidenceStructure(QString evidname)
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                QString partitionpath = volumepath + ".p" + QString::number(partint) + "/";
+                QString partitionpath = volumepath + "p" + QString::number(partint) + "/";
                 addevidvar.partitionpath = partitionpath;
                 addevidvar.partint = partint;
                 (new QDir())->mkpath(partitionpath);
