@@ -853,14 +853,14 @@ void WombatForensics::AddEvidence()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
-    qDebug() << "ecount before:" << ecount;
+    //qDebug() << "ecount before:" << ecount;
     for(int i=0; i < evidencelist.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + evidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
         (new QDir())->mkpath(evidencepath);
         ecount++;
     }
-    qDebug() << "ecount after:" << ecount;
+    //qDebug() << "ecount after:" << ecount;
     if(evidencelist.count() > 0)
     {
         // TO MAKE THIS WORK, I NEED TO REPLACE ALL THE GLOBAL VARIABLES WITH LOCAL ONES OTHERWISE

@@ -420,12 +420,12 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
 
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-    QMutex tmutex;
+    AddEvidenceVariable* aevar = (AddEvidenceVariable*)tmpptr;
     QStringList treeout;
     if(tmppath) {}
     unsigned long long tmpaddress = 0;
     unsigned long long paraddress = tmpfile->fs_info->root_inum;
-    //if(tmpptr){}
+    if(tmpptr){}
     if(tmpfile->meta != NULL)
         tmpaddress = tmpfile->meta->addr;
     if(tmpfile->name != NULL)
@@ -447,9 +447,9 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 nodedata.clear();
                 //wombatvariable.curfilepath = wombatvariable.partitionpath;
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-                    filefile.setFileName(((AddEvidenceVariable*)tmpptr)->partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
+                    filefile.setFileName(aevar->partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
                 else
-                    filefile.setFileName(((AddEvidenceVariable*)tmpptr)->partitionpath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat");
+                    filefile.setFileName(aevar->partitionpath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat");
                 filefile.open(QIODevice::ReadOnly | QIODevice::Text);
                 if(filefile.isOpen())
                     tmpstr = filefile.readLine();
@@ -468,10 +468,10 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 //nodedata << tmplist.at(12).split("-a").first() << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
                 int type = tmplist.at(1).toInt();
                 int deleted = tmplist.at(14).toInt();
-                tmutex.lock();
+                mutex.lock();
                 treenodemodel->AddNode(nodedata, parentstr, type, deleted);
                 //treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
-                tmutex.unlock();
+                mutex.unlock();
                 listeditems.append(tmplist.at(12));
                 filesfound++;
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
@@ -492,7 +492,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                             {
                                 if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                                 {
-                                    QFile adsfile(((AddEvidenceVariable*)tmpptr)->partitionpath + "f" + QString::number(tmpaddress) + "-" + QString::number(fsattr->id) + ".a" + QString::number(tmpaddress) + ".stat");
+                                    QFile adsfile(aevar->partitionpath + "f" + QString::number(tmpaddress) + "-" + QString::number(fsattr->id) + ".a" + QString::number(tmpaddress) + ".stat");
                                     adsfile.open(QIODevice::ReadOnly | QIODevice::Text);
                                     if(adsfile.isOpen())
                                         tmpstr = adsfile.readLine();
@@ -955,6 +955,7 @@ void PopulateTreeModel(QString evidstring)
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
             mutex.unlock();
+            /*
             uint8_t walkreturn;
             int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
             walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aevar);
@@ -964,6 +965,7 @@ void PopulateTreeModel(QString evidstring)
                 //LogMessage("Issues with traversing the file structure were encountered");
                 errorcount++;
             }
+            */
         }
         else
         {
@@ -998,6 +1000,7 @@ void PopulateTreeModel(QString evidstring)
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
                         mutex.unlock();
+                        /*
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aevar);
@@ -1007,6 +1010,7 @@ void PopulateTreeModel(QString evidstring)
                             //LogMessage("Issues with traversing the file structure were encountered");
                             errorcount++;
                         }
+                        */
                     }
                     else
                     {
