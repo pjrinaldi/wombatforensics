@@ -22,7 +22,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile);
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QString imgfullpath);
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath);
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath);
-void WriteFileProperties(TSK_FS_FILE* curfileinfo);
+void WriteFileProperties(TSK_FS_FILE* curfileinfo, AddEvidenceVariable* aevar);
 void BuildStatFile(TSK_FS_FILE* curfileinfo, const char* tmppath, AddEvidenceVariable* aevar);
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, unsigned long long adssize, QString attrid);
 //void LogMessage(QString message);

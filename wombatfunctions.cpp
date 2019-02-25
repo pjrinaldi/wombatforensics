@@ -512,7 +512,7 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             {
                 //wombatvariable.curfilepath = wombatvariable.partitionpath;
                 BuildStatFile(tmpfile, tmppath, (AddEvidenceVariable*)tmpptr);
-                WriteFileProperties(tmpfile);
+                WriteFileProperties(tmpfile, (AddEvidenceVariable*)tmpptr);
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
                     orphancount++;
             }
@@ -1043,7 +1043,7 @@ void InitializeEvidenceStructure(QString evidname)
     //{
     //    if(i > 0 && i < wombatvariable.itemcount - 2)
     //        out << "|";
-        out << QString::fromStdString(wombatvariable.fullpathvector[0]);
+        out << QString::fromStdString(fullpathvector[0]);
     //}
     out << "," << wombatvariable.itemcount << ",e" + QString::number(evidcnt);
     out.flush();
@@ -1327,13 +1327,13 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
     }
 }
 
-void WriteFileProperties(TSK_FS_FILE* curfileinfo)
+void WriteFileProperties(TSK_FS_FILE* curfileinfo, AddEvidenceVariable* aevar)
 {
     QFile filepropfile;
     if(curfileinfo->name->meta_addr == 0 && strcmp(curfileinfo->name->name, "$MFT") != 0)
-        filepropfile.setFileName(wombatvariable.curfilepath + "f*" + QString::number(orphancount) + ".a" + QString::number(curfileinfo->name->par_addr) + ".prop");
+        filepropfile.setFileName(aevar->partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(curfileinfo->name->par_addr) + ".prop");
     else
-        filepropfile.setFileName(wombatvariable.curfilepath + "f" + QString::number(curfileinfo->name->meta_addr) + ".a" + QString::number(curfileinfo->name->par_addr) + ".prop");
+        filepropfile.setFileName(aevar->partitionpath + "f" + QString::number(curfileinfo->name->meta_addr) + ".a" + QString::number(curfileinfo->name->par_addr) + ".prop");
     filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream proplist(&filepropfile);
     if(curfileinfo->name != NULL) proplist << "Short Name||" << curfileinfo->name->shrt_name << "||Short Name for a file" << endl;
