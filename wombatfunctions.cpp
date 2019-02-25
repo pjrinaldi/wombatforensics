@@ -1038,6 +1038,78 @@ void PopulateTreeModel(QString evidstring)
     readimginfo = NULL;
 }
 
+/*
+void FileRecurse(QString path)
+{
+    QString parid;
+    QString curid;
+    QString tmpstr = "";
+    unsigned long long fpar;
+    QList<QVariant> columndata;
+    QDir filedir = QDir(path);
+    QStringList subfiles = filedir.entryList(QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden);
+    for(int i=0; i < subfiles.count(); i++)
+    {
+        //qDebug() << subfiles.at(i);
+        columndata.clear();
+        QFile subfile(path + "/" + subfiles.at(i) + "/stat");
+        subfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        tmpstr = subfile.readLine();
+        subfile.close();
+        columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
+        fpar = path.split("/").last().split("f").last().toULongLong();
+        parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + QString::number(fpar) + "-a";
+        QHashIterator<QString, TreeNode*> j(parents);
+        while(j.hasNext())
+        {
+            j.next();
+            if(j.key().contains(parid))
+            {
+                parid = j.key();
+                break;
+            }
+        }
+        //parid = tmpstr.split(",").at(12).split("-f").at(0);
+        curid = tmpstr.split(",").at(12);
+        parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
+        parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
+        if(checkhash.contains(tmpstr.split(",").at(12).split("-a").first()))
+            parents.value(curid)->SetChecked(true);
+        if(tmpstr.split(",").at(14).toInt() == true)
+            parents.value(curid)->SetDeleted(true);
+        FileRecurse(path + subfiles.at(i));
+    }
+}
+
+void FileRecurse(QString eid, QString vid, QString pid, QString parid)
+{
+    QString tmpstr = "";
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    QDir filedir = QDir(wombatvariable.tmpmntpath + eid + "/" + vid + "/" + pid);
+    QStringList filelist = filedir.entryList(QStringList(QString("*.a" + parid + ".stat")), QDir::NoSymLinks | QDir::Files);
+    for(int i=0; i < filelist.count(); i++)
+    {
+        QFile filefile(wombatvariable.tmpmntpath + eid + "/" + vid + "/" + pid + "/" + filelist.at(i));
+        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
+        filefile.close();
+        nodedata.clear();
+        if(tmpstr.split(",").count() > 0)
+        {
+            nodedata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").first() << tmpstr.split(",").at(10).split("/").last();
+            qDebug() << parid << filelist.at(i) << filelist.at(i).split(".a").first().mid(1).split("-").first() << QString(eid.split(".").last() + "-" + vid.mid(1) + "-" + pid.mid(1) + "-f" + parid);
+            treenodemodel->AddNode(nodedata, QString(eid.split(".").last() + "-" + vid.mid(1) + "-" + pid.mid(1) + "-f" + parid), tmpstr.split(",").at(1).toInt(), tmpstr.split(",").at(14).toInt());
+            if(parid != filelist.at(i).split(".a").first().mid(1).split("-").first()) // for ads files to skip
+                QtConcurrent::run(FileRecurse, eid, vid, pid, filelist.at(i).split(".a").first().mid(1).split("-").first());
+                //FileRecurse(eid, vid, pid, filelist.at(i).split(".a").first().mid(1).split("-").first());
+            // i think the above recurses' on files forever need to step and see with qdebug statements.
+        }
+    }
+}
+*/
+
 //void InitializeEvidenceStructure()
 void InitializeEvidenceStructure(QString evidname)
 {
