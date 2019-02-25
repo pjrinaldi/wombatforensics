@@ -420,6 +420,8 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
 
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
+    QMutex tmutex;
+    QStringList treeout;
     if(tmppath) {}
     unsigned long long tmpaddress = 0;
     unsigned long long paraddress = tmpfile->fs_info->root_inum;
@@ -459,12 +461,18 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     parentstr = tmplist.at(12).split("-f").first();
                 else
                     parentstr = tmplist.at(12).split("-f").first() + "-f" + tmplist.at(2);
-                nodedata << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last() << tmplist.at(12).split("-a").first();
+                treeout.clear();
+                treeout << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last() << tmplist.at(12).split("-a").first();
+                for(int i=0; i < treeout.count(); i++)
+                    nodedata << treeout.at(i);
                 //nodedata << tmplist.at(12).split("-a").first() << tmplist.at(0) << tmplist.at(3) << tmplist.at(8) << tmplist.at(6) << tmplist.at(7) << tmplist.at(4) << tmplist.at(5) << tmplist.at(13) << tmplist.at(10).split("/").first() << tmplist.at(10).split("/").last();
-                mutex.lock();
-                treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
+                int type = tmplist.at(1).toInt();
+                int deleted = tmplist.at(14).toInt();
+                tmutex.lock();
+                treenodemodel->AddNode(nodedata, parentstr, type, deleted);
+                //treenodemodel->AddNode(nodedata, parentstr, tmplist.at(1).toInt(), tmplist.at(14).toInt());
+                tmutex.unlock();
                 listeditems.append(tmplist.at(12));
-                mutex.unlock();
                 filesfound++;
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
                     orphancount++;
@@ -1015,7 +1023,7 @@ void PopulateTreeModel(QString evidstring)
             }
         }
     }
-    tsk_fs_file_close(readfileinfo);
+    //tsk_fs_file_close(readfileinfo);
     readfileinfo = NULL;
     tsk_fs_close(readfsinfo);
     readfsinfo = NULL;

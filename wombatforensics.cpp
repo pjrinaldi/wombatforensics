@@ -631,10 +631,10 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //}
     //listeditems.clear();
     //treenodemodel = new TreeNodeModel();
+    //openfuture = QtConcurrent::run(PopulateTreeModel);
     if(evidencelist.count() > 0)
     {
         QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
-    //openfuture = QtConcurrent::run(PopulateTreeModel);
         openwatcher.setFuture(tmpfuture);
     }
 }
@@ -754,6 +754,7 @@ void WombatForensics::UpdateDataTable()
 
 void WombatForensics::PrepareEvidenceImage()
 {
+    // NEED TO RUN THIS FOR EACH IMAGE...
     //qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
     QString xmntstr = "";
     if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
