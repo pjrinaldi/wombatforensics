@@ -96,3 +96,17 @@ void AddEvidenceDialog::StartProcess()
         this->close();
     }
 }
+
+void AddEvidenceDialog::dragEnterEvent(QDragEnterEvent* e)
+{
+    if(e->mimeData()->hasUrls())
+        e->acceptProposedAction();
+}
+
+void AddEvidenceDialog::dropEvent(QDropEvent* e)
+{
+    foreach (const QUrl &url, e->mimeData()->urls())
+    {
+        qDebug() << "dropped filepath:" << url.toLocalFile();
+    }
+}

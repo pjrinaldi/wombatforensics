@@ -32,6 +32,8 @@ private slots:
 private:
     Ui::AddEvidenceDialog* ui;
 protected:
+    void dragEnterEvent(QDragEnterEvent* e);
+    void dropEvent(QDropEvent* e);
     //void mousePressEvent(QMouseEvent* event);
 };
 
