@@ -661,6 +661,7 @@ void WombatForensics::OpenUpdate()
         ui->actionJumpToHex->setEnabled(true);
         //ui->actionBookmark_Manager->setEnabled(true);
     }
+    /*
     readfileinfo = NULL;
     tsk_fs_close(readfsinfo);
     readfsinfo = NULL;
@@ -668,6 +669,7 @@ void WombatForensics::OpenUpdate()
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
+    */
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
     StatusUpdate("Ready");
@@ -793,6 +795,7 @@ void WombatForensics::UpdateStatus()
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     UpdateCheckCount();
+    /*
     readfileinfo = NULL;
     tsk_fs_close(readfsinfo);
     readfsinfo = NULL;
@@ -800,6 +803,7 @@ void WombatForensics::UpdateStatus()
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
+    */
     //evidcnt++;
     //volcnt = 0;
     //partint = 0;

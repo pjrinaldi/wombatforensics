@@ -34,6 +34,7 @@
 #include <QMainWindow>
 #include <QMediaPlayer>
 #include <QMessageBox>
+#include <QMutex>
 #include <QObject>
 #include <QSizePolicy>
 #include <QSlider>

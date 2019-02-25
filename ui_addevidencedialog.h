@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'addevidencedialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,10 +10,13 @@
 #define UI_ADDEVIDENCEDIALOG_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
@@ -40,21 +43,21 @@ public:
     void setupUi(QDialog *AddEvidenceDialog)
     {
         if (AddEvidenceDialog->objectName().isEmpty())
-            AddEvidenceDialog->setObjectName(QString::fromUtf8("AddEvidenceDialog"));
+            AddEvidenceDialog->setObjectName(QStringLiteral("AddEvidenceDialog"));
         AddEvidenceDialog->setWindowModality(Qt::ApplicationModal);
-        AddEvidenceDialog->resize(336, 286);
+        AddEvidenceDialog->resize(750, 400);
         AddEvidenceDialog->setSizeGripEnabled(true);
         AddEvidenceDialog->setModal(true);
         verticalLayout = new QVBoxLayout(AddEvidenceDialog);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
 
         addbutton = new QPushButton(AddEvidenceDialog);
-        addbutton->setObjectName(QString::fromUtf8("addbutton"));
+        addbutton->setObjectName(QStringLiteral("addbutton"));
 
         horizontalLayout->addWidget(addbutton);
 
@@ -62,14 +65,14 @@ public:
         verticalLayout->addLayout(horizontalLayout);
 
         groupbox = new QGroupBox(AddEvidenceDialog);
-        groupbox->setObjectName(QString::fromUtf8("groupbox"));
+        groupbox->setObjectName(QStringLiteral("groupbox"));
         groupbox->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
         groupbox->setFlat(false);
         verticalLayout_2 = new QVBoxLayout(groupbox);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         evidencelist = new QListWidget(groupbox);
-        evidencelist->setObjectName(QString::fromUtf8("evidencelist"));
+        evidencelist->setObjectName(QStringLiteral("evidencelist"));
         evidencelist->setFrameShape(QFrame::NoFrame);
         evidencelist->setEditTriggers(QAbstractItemView::NoEditTriggers);
         evidencelist->setProperty("showDropIndicator", QVariant(false));
@@ -83,23 +86,23 @@ public:
         verticalLayout->addWidget(groupbox);
 
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
         removebutton = new QPushButton(AddEvidenceDialog);
-        removebutton->setObjectName(QString::fromUtf8("removebutton"));
+        removebutton->setObjectName(QStringLiteral("removebutton"));
 
         horizontalLayout_2->addWidget(removebutton);
 
         cancelbutton = new QPushButton(AddEvidenceDialog);
-        cancelbutton->setObjectName(QString::fromUtf8("cancelbutton"));
+        cancelbutton->setObjectName(QStringLiteral("cancelbutton"));
 
         horizontalLayout_2->addWidget(cancelbutton);
 
         startbutton = new QPushButton(AddEvidenceDialog);
-        startbutton->setObjectName(QString::fromUtf8("startbutton"));
+        startbutton->setObjectName(QStringLiteral("startbutton"));
 
         horizontalLayout_2->addWidget(startbutton);
 
@@ -114,12 +117,12 @@ public:
 
     void retranslateUi(QDialog *AddEvidenceDialog)
     {
-        AddEvidenceDialog->setWindowTitle(QApplication::translate("AddEvidenceDialog", "Add Evidence", nullptr));
-        addbutton->setText(QApplication::translate("AddEvidenceDialog", "Add", nullptr));
-        groupbox->setTitle(QApplication::translate("AddEvidenceDialog", "Evidence", nullptr));
-        removebutton->setText(QApplication::translate("AddEvidenceDialog", "Remove", nullptr));
-        cancelbutton->setText(QApplication::translate("AddEvidenceDialog", "Cancel", nullptr));
-        startbutton->setText(QApplication::translate("AddEvidenceDialog", "Start", nullptr));
+        AddEvidenceDialog->setWindowTitle(QApplication::translate("AddEvidenceDialog", "Add Evidence", Q_NULLPTR));
+        addbutton->setText(QApplication::translate("AddEvidenceDialog", "Add", Q_NULLPTR));
+        groupbox->setTitle(QApplication::translate("AddEvidenceDialog", "Evidence", Q_NULLPTR));
+        removebutton->setText(QApplication::translate("AddEvidenceDialog", "Remove", Q_NULLPTR));
+        cancelbutton->setText(QApplication::translate("AddEvidenceDialog", "Cancel", Q_NULLPTR));
+        startbutton->setText(QApplication::translate("AddEvidenceDialog", "Start", Q_NULLPTR));
     } // retranslateUi
 
 };

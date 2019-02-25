@@ -53,6 +53,7 @@ extern QString hexselection;
 extern QString hexstring;
 extern QHash<QString, bool> checkhash;
 extern QHash<QString, QString> imageshash;
+extern QMutex mutex;
 
 struct dosdate
 {
@@ -224,6 +225,7 @@ private:
     TreeNode* parentitem;
 };
 
+/*
 extern TSK_IMG_INFO* readimginfo;
 extern TSK_VS_INFO* readvsinfo;
 extern const TSK_VS_PART_INFO* readpartinfo;
@@ -232,6 +234,7 @@ extern TSK_FS_FILE* readfileinfo;
 extern char asc[512];
 extern iso9660_pvd_node* p;
 extern HFS_INFO* hfs;
+*/
 
 class TreeNodeModel : public QAbstractItemModel
 {
