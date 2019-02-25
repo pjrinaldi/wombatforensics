@@ -18,6 +18,7 @@ void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
 void LoadImagesHash(void);
 void PopulateTreeModel(QString evidstring);
+void FileRecurse(QString partitionpath, QString paraddr);
 QString GetBlockList(TSK_FS_FILE* tmpfile);
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QString imgfullpath);
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath);

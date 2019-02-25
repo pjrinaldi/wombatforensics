@@ -892,6 +892,8 @@ void PopulateTreeModel(QString evidstring)
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
+    int imgtype = tmpstr.split(",").at(0).toInt();
+    /*
     std::vector<std::string> fullpathvector;
     fullpathvector.clear();
     fullpathvector.push_back(tmpstr.split(",").at(3).toStdString());
@@ -916,32 +918,64 @@ void PopulateTreeModel(QString evidstring)
     free(images);
     TSK_IMG_TYPE_ENUM imgtype;
     imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
+    */
     QString evidencepath = wombatvariable.tmpmntpath + evidstring + "/";    
     QStringList treeout;
-    treeout << evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
+    treeout << evidencename << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
+    //treeout << evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
     QList<QVariant> nodedata;
     for(int m=0; m < treeout.count(); m++)
         nodedata << treeout.at(m);
     mutex.lock();
     treenodemodel->AddNode(nodedata, "-1", -1, -1);
     mutex.unlock();
-    readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
-    QString volname = "Dummy Volume (No PART)";
+    //readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
+    //QString volname = "Dummy Volume (No PART)";
+    /*
     if(readvsinfo != NULL)
         volname = QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype));
+    */
     QDir voldir = QDir(wombatvariable.tmpmntpath + evidstring);
     QStringList vollist = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
     for(int j=0; j < vollist.count(); j++)
     {
+        QFile volfile(evidencepath + vollist.at(j) + "/stat");
+        volfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(volfile.isOpen())
+            tmpstr = volfile.readLine();
+        volfile.close();
         QString volumepath = evidencepath + vollist.at(j) + "/";
         treeout.clear();
-        treeout << volname << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1));
+        treeout << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
         nodedata.clear();
         for(int m=0; m < treeout.count(); m++)
             nodedata << treeout.at(m);
         mutex.lock();
         treenodemodel->AddNode(nodedata, evidid.mid(1), -1, 0);
         mutex.unlock();
+        QDir partdir = QDir(volumepath);
+        QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs);
+        for(int k = 0; k < partlist.count(); k++)
+        {
+            treeout.clear();
+            nodedata.clear();
+            QString partitionpath = volumepath + partlist.at(k) + "/";
+            QFile partfile(volumepath + partlist.at(k) + "/stat");
+            partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(partfile.isOpen())
+                tmpstr = partfile.readLine();
+            partfile.close();
+            treeout << tmpstr.split(",").at(2) + " (" + tmpstr.split(",").at(0).toUpper() + ")" << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
+            QString rootinum = tmpstr.split(",").at(3);
+            for(int m=0; m < treeout.count(); m++)
+                nodedata << treeout.at(m);
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j)), -1, 0);
+            mutex.unlock();
+            //Root inum Recurse Start
+            FileRecurse(partitionpath, rootinum);
+        }
+        /*
         if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image
         {
             readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
@@ -966,7 +1000,7 @@ void PopulateTreeModel(QString evidstring)
                 errorcount++;
             }
             */
-        }
+        /*}
         else
         {
             QDir partdir = QDir(wombatvariable.tmpmntpath + evidstring + "/" + vollist.at(j));
@@ -1011,7 +1045,7 @@ void PopulateTreeModel(QString evidstring)
                             errorcount++;
                         }
                         */
-                    }
+                    /*}
                     else
                     {
                         treeout.clear();
@@ -1025,9 +1059,10 @@ void PopulateTreeModel(QString evidstring)
                     }
                 }
             }
-        }
+        }*/
     }
     //tsk_fs_file_close(readfileinfo);
+    /*
     readfileinfo = NULL;
     tsk_fs_close(readfsinfo);
     readfsinfo = NULL;
@@ -1036,6 +1071,15 @@ void PopulateTreeModel(QString evidstring)
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
+    */
+}
+
+void FileRecurse(QString partitionpath, QString paraddr)
+{
+    QDir filedir = QDir(partitionpath);
+    //QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+    QStringList filefiles = filedir.entryList(QStringList("*.a" + paraddr + ".stat"), QDir::NoSymLinks | QDir::Files);
+    qDebug() << "file listing:" << filefiles;
 }
 
 /*
