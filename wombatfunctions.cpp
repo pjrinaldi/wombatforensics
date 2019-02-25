@@ -420,7 +420,6 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
 
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-/*
     if(tmppath) {}
     unsigned long long tmpaddress = 0;
     unsigned long long paraddress = readfsinfo->root_inum;
@@ -504,7 +503,6 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             }
         }
     }
-*/
     return TSK_WALK_CONT;
 }
 
@@ -871,140 +869,158 @@ int SegmentDigits(int number)
 //void PopulateTreeModel()
 void PopulateTreeModel(QString evidstring)
 {
-    qDebug() << "evidname:" << evidstring;
-}
-/*
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidlist = eviddir.entryList(QStringList("*.e*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
-    for(int i=0; i < evidlist.count(); i++)
+    AddEvidenceVariable addevidvar;
+    AddEvidenceVariable* aevar = &addevidvar;
+    //qDebug() << "evidname:" << evidstring;
+    QString tmpstr = "";
+    QString evidid = "." + evidstring.split(".").last();
+    QString evidencename = evidstring.split(evidid).first();
+    QFile evidfile(wombatvariable.tmpmntpath + evidstring + "/stat");
+    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+        tmpstr = evidfile.readLine();
+    evidfile.close();
+    std::vector<std::string> fullpathvector;
+    fullpathvector.clear();
+    fullpathvector.push_back(tmpstr.split(",").at(3).toStdString());
+    TSK_IMG_INFO* readimginfo = NULL;
+    TSK_VS_INFO* readvsinfo = NULL;
+    const TSK_VS_PART_INFO* readpartinfo = NULL;
+    TSK_FS_INFO* readfsinfo = NULL;
+    TSK_FS_FILE* readfileinfo = NULL;
+    //char asc[512];
+    //iso9660_pvd_node* p;
+    //HFS_INFO* hfs = NULL;
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(fullpathvector.size()*sizeof(char*));
+    images[0] = fullpathvector[0].c_str();
+    readimginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
+    if(readimginfo == NULL)
     {
-        QString evidid = "." + evidlist.at(i).split(".").last();
-        QString tmpstr = "";
-        wombatvariable.evidencename = evidlist.at(i).split(evidid).first();
-        QFile evidfile(wombatvariable.tmpmntpath + evidlist.at(i) + "/stat");
-        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(evidfile.isOpen())
-            tmpstr = evidfile.readLine();
-        evidfile.close();
-        wombatvariable.fullpathvector.clear();
-        wombatvariable.itemcount = 0;
-        for(int j=0; j < tmpstr.split(",").at(3).split("|").count(); j++)
-            wombatvariable.fullpathvector.push_back(tmpstr.split(",").at(3).split("|").at(j).toStdString());
-        wombatvariable.itemcount = tmpstr.split(",").at(3).split("|").count();
-        readimginfo = NULL;
-        readvsinfo = NULL;
-        readfileinfo = NULL;
-        const TSK_TCHAR** images;
-        images = (const char**)malloc(wombatvariable.fullpathvector.size()*sizeof(char*));
-        for(uint j=0; j < wombatvariable.fullpathvector.size(); j++)
-            images[j] = wombatvariable.fullpathvector[j].c_str();
-        readimginfo = tsk_img_open(wombatvariable.itemcount, images, TSK_IMG_TYPE_DETECT, 0);
-        if(readimginfo == NULL)
-        {
-            qWarning() << "Evidence image access failed";
-            //LogMessage("Evidence image access failed");
-            errorcount++;
-        }
-        free(images);
-        wombatvariable.imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
-        wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
-        wombatvariable.evidencepath = wombatvariable.tmpmntpath + wombatvariable.evidencename + evidid + "/";
-        QStringList treeout;
-        treeout << wombatvariable.evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
-        QList<QVariant> nodedata;
+        qWarning() << "Evidence image access failed";
+        //LogMessage("Evidence image access failed");
+        errorcount++;
+    }
+    free(images);
+    TSK_IMG_TYPE_ENUM imgtype;
+    imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
+    QString evidencepath = wombatvariable.tmpmntpath + evidstring + "/";    
+    QStringList treeout;
+    treeout << evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
+    QList<QVariant> nodedata;
+    for(int m=0; m < treeout.count(); m++)
+        nodedata << treeout.at(m);
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, "-1", -1, -1);
+    mutex.unlock();
+    readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
+    QString volname = "Dummy Volume (No PART)";
+    if(readvsinfo != NULL)
+        volname = QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype));
+    QDir voldir = QDir(wombatvariable.tmpmntpath + evidstring);
+    QStringList vollist = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+    for(int j=0; j < vollist.count(); j++)
+    {
+        QString volumepath = evidencepath + vollist.at(j) + "/";
+        treeout.clear();
+        treeout << volname << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1));
         nodedata.clear();
         for(int m=0; m < treeout.count(); m++)
             nodedata << treeout.at(m);
-        treenodemodel->AddNode(nodedata, "-1", -1, -1);
-        readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
-        QString volname = "Dummy Volume (No PART)";
-        if(readvsinfo != NULL)
-            volname = QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype));
-        QDir voldir = QDir(wombatvariable.tmpmntpath + evidlist.at(i));
-        QStringList vollist = voldir.entryList(QStringList(".v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
-        for(int j=0; j < vollist.count(); j++)
+        mutex.lock();
+        treenodemodel->AddNode(nodedata, evidid.mid(1), -1, 0);
+        mutex.unlock();
+        if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image
         {
-            wombatvariable.volumepath = wombatvariable.evidencepath + vollist.at(j) + "/";
+            readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
+            QString partitionpath = volumepath + "p0/";
+            addevidvar.partitionpath = partitionpath;
             treeout.clear();
-            treeout << volname << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1));
+            treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p0");
             nodedata.clear();
             for(int m=0; m < treeout.count(); m++)
                 nodedata << treeout.at(m);
-            treenodemodel->AddNode(nodedata, evidid.mid(1), -1, 0);
-            if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
+            mutex.unlock();
+            uint8_t walkreturn;
+            int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+            walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aaevar);
+            if(walkreturn == 1)
             {
-                readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-                wombatvariable.partitionpath = wombatvariable.volumepath + ".p0/";
-                treeout.clear();
-                treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p0");
-                nodedata.clear();
-                for(int m=0; m < treeout.count(); m++)
-                    nodedata << treeout.at(m);
-                treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
-                uint8_t walkreturn;
-                int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
-                walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, NULL);
-                if(walkreturn == 1)
-                {
-                    qWarning() << "Issues with traversing the file structure were encountered";
-                    //LogMessage("Issues with traversing the file structure were encountered");
-                    errorcount++;
-                }
+                qWarning() << "Issues with traversing the file structure were encountered";
+                //LogMessage("Issues with traversing the file structure were encountered");
+                errorcount++;
             }
-            else
+        }
+        else
+        {
+            QDir partdir = QDir(wombatvariable.tmpmntpath + evidstring + "/" + vollist.at(j));
+            QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+            for(int k=0; k < partlist.count(); k++)
             {
-                QDir partdir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j));
-                QStringList partlist = partdir.entryList(QStringList(".p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
-                for(int k=0; k < partlist.count(); k++)
+                QString partitionpath = volumepath + "p" + QString::number(k) + "/";
+                addevidvar.partitionpath = partitionpath;
+                readpartinfo = tsk_vs_part_get(readvsinfo, k);
+                if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
                 {
-                    wombatvariable.partitionpath = wombatvariable.volumepath + ".p" + QString::number(k) + "/";
-                    readpartinfo = tsk_vs_part_get(readvsinfo, k);
-                    if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
+                    treeout.clear();
+                    treeout << QString(readpartinfo->desc) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k));
+                    nodedata.clear();
+                    for(int m=0; m < treeout.count(); m++)
+                        nodedata << treeout.at(m);
+                    mutex.lock();
+                    treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
+                    mutex.unlock();
+                }
+                else if(readpartinfo->flags == 0x01) // allocated partition
+                {
+                    readfsinfo = tsk_fs_open_vol(readpartinfo, TSK_FS_TYPE_DETECT);
+                    if(readfsinfo != NULL)
                     {
                         treeout.clear();
-                        treeout << QString(readpartinfo->desc) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k));
+                        treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k));
                         nodedata.clear();
                         for(int m=0; m < treeout.count(); m++)
                             nodedata << treeout.at(m);
+                        mutex.lock();
                         treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
+                        mutex.unlock();
+                        uint8_t walkreturn;
+                        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+                        walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aevar);
+                        if(walkreturn == 1)
+                        {
+                            qWarning() << "Issues with traversing the file structure were encountered";
+                            //LogMessage("Issues with traversing the file structure were encountered");
+                            errorcount++;
+                        }
                     }
-                    else if(readpartinfo->flags == 0x01) // allocated partition
+                    else
                     {
-                        readfsinfo = tsk_fs_open_vol(readpartinfo, TSK_FS_TYPE_DETECT);
-                        if(readfsinfo != NULL)
-                        {
-                            treeout.clear();
-                            treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k));
-                            nodedata.clear();
-                            for(int m=0; m < treeout.count(); m++)
-                                nodedata << treeout.at(m);
-                            treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
-                            uint8_t walkreturn;
-                            int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
-                            walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, NULL);
-                            if(walkreturn == 1)
-                            {
-                                qWarning() << "Issues with traversing the file structure were encountered";
-                                //LogMessage("Issues with traversing the file structure were encountered");
-                                errorcount++;
-                            }
-                        }
-                        else
-                        {
-                            treeout.clear();
-                            treeout << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k));
-                            nodedata.clear();
-                            for(int m=0; m < treeout.count(); m++)
-                                nodedata << treeout.at(m);
-                            treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
-                        }
+                        treeout.clear();
+                        treeout << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(j).mid(1) + "-p" + QString::number(k));
+                        nodedata.clear();
+                        for(int m=0; m < treeout.count(); m++)
+                            nodedata << treeout.at(m);
+                        mutex.lock();
+                        treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j).mid(1)), -1, 0);
+                        mutex.unlock();
                     }
                 }
             }
         }
     }
-*/
-//}
+    tsk_fs_file_close(readfileinfo);
+    readfileinfo = NULL;
+    tsk_fs_close(readfsinfo);
+    readfsinfo = NULL;
+    readpartinfo = NULL;
+    tsk_vs_close(readvsinfo);
+    readvsinfo = NULL;
+    tsk_img_close(readimginfo);
+    readimginfo = NULL;
+}
 
 //void InitializeEvidenceStructure()
 void InitializeEvidenceStructure(QString evidname)
@@ -1017,10 +1033,10 @@ void InitializeEvidenceStructure(QString evidname)
     int partint = 0;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString(evidname.split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
-    qDebug() << evidfiles.count() << evidfiles;
+    //qDebug() << evidfiles.count() << evidfiles;
     //evidcnt = evidfiles.count();
     evidcnt = evidfiles.at(0).split(".e").last().toInt();
-    qDebug() << "evidcnt:" << evidcnt;
+    //qDebug() << "evidcnt:" << evidcnt;
     addevidvar.evidcnt = evidcnt;
     //qDebug() << evidfiles.count() << evidfiles;
     std::vector<std::string> fullpathvector;
@@ -1028,15 +1044,7 @@ void InitializeEvidenceStructure(QString evidname)
     TSK_IMG_TYPE_ENUM imgtype;
     fullpathvector.clear();
     fullpathvector.push_back(evidname.toStdString());
-    qDebug() << "fullpathvector:" << QString::fromStdString(fullpathvector[0]) << "evidencename:" << evidencename;
-//TSK_IMG_INFO* readimginfo = NULL;
-//TSK_VS_INFO* readvsinfo = NULL;
-//const TSK_VS_PART_INFO* readpartinfo = NULL;
-//TSK_FS_INFO* readfsinfo = NULL;
-//TSK_FS_FILE* readfileinfo = NULL;
-//char asc[512];
-//iso9660_pvd_node* p;
-//HFS_INFO* hfs = NULL;
+    //qDebug() << "fullpathvector:" << QString::fromStdString(fullpathvector[0]) << "evidencename:" << evidencename;
     TSK_IMG_INFO* readimginfo = NULL;
     TSK_VS_INFO* readvsinfo = NULL;
     const TSK_VS_PART_INFO* readpartinfo = NULL;
@@ -1059,7 +1067,7 @@ void InitializeEvidenceStructure(QString evidname)
     imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
     //wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
-    qDebug() << "evidencepath:" << evidencepath;
+    //qDebug() << "evidencepath:" << evidencepath;
     //QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
     //(new QDir())->mkpath(evidencepath);
     QFile evidfile(evidencepath + "stat");
