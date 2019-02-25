@@ -1005,9 +1005,11 @@ void InitializeEvidenceStructure(QString evidname)
     int volcnt = 0;
     int partint = 0;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
-    qDebug() << evidfiles.count() << evidfiles.count();
-    evidcnt = evidfiles.count();
+    QStringList evidfiles = eviddir.entryList(QStringList(QString(evidname.split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
+    qDebug() << evidfiles.count() << evidfiles;
+    //evidcnt = evidfiles.count();
+    evidcnt = evidfiles.at(0).split(".e").last().toInt();
+    qDebug() << "evidcnt:" << evidcnt;
     addevidvar.evidcnt = evidcnt;
     //qDebug() << evidfiles.count() << evidfiles;
     std::vector<std::string> fullpathvector;
@@ -1036,7 +1038,8 @@ void InitializeEvidenceStructure(QString evidname)
     imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
     //wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
-    (new QDir())->mkpath(evidencepath);
+    //QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
+    //(new QDir())->mkpath(evidencepath);
     QFile evidfile(evidencepath + "stat");
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);

@@ -29,7 +29,7 @@ extern unsigned long long jumpoffset;
 extern unsigned long long filejumpoffset;
 extern unsigned long long orphancount;
 //extern int partint;
-//extern int evidcnt;
+extern int ecount;
 //extern int volcnt;
 extern int childcount;
 extern int linefactor;

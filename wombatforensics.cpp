@@ -828,11 +828,21 @@ void WombatForensics::UpdateDigging()
 void WombatForensics::AddEvidence()
 {
     // HERE IS WHERE I WOULD OPEN THE NEW DIALOG
-    wombatvariable.fullpathvector.clear();
-    wombatvariable.itemcount = 0;
+    //wombatvariable.fullpathvector.clear();
+    //wombatvariable.itemcount = 0;
     int isnew = 1;
     addevidencedialog = new AddEvidenceDialog(this);
     addevidencedialog->exec();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
+    ecount = evidfiles.count();
+    qDebug() << "ecount:" << ecount;
+    for(int i=0; i < evidencelist.count(); i++)
+    {
+        QString evidencepath = wombatvariable.tmpmntpath + evidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
+        (new QDir())->mkpath(evidencepath);
+        ecount++;
+    }
     if(evidencelist.count() > 0)
     {
         // TO MAKE THIS WORK, I NEED TO REPLACE ALL THE GLOBAL VARIABLES WITH LOCAL ONES OTHERWISE
