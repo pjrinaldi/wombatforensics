@@ -27,6 +27,14 @@ struct WombatVariable
     TSK_IMG_TYPE_ENUM imgtype;
 };
 
+struct AddEvidenceVariable
+{
+    QString partitionpath;
+    int evidcnt;
+    int volcnt;
+    int partint;
+};
+
 typedef struct
 {
     TSK_IMG_INFO imginfo;
@@ -40,6 +48,7 @@ typedef struct
 } IMG_EWF_INFO;
 
 Q_DECLARE_METATYPE(WombatVariable);
+Q_DECLARE_METATYPE(AddEvidenceVariable);
 Q_DECLARE_METATYPE(IMG_EWF_INFO);
 
 #endif // WOMBATVARIABLE_H
