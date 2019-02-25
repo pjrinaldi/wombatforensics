@@ -107,6 +107,8 @@ void AddEvidenceDialog::dropEvent(QDropEvent* e)
 {
     foreach (const QUrl &url, e->mimeData()->urls())
     {
-        qDebug() << "dropped filepath:" << url.toLocalFile();
+        ui->evidencelist->addItem(url.toLocalFile());
+        ui->startbutton->setEnabled(true);
+        //qDebug() << "dropped filepath:" << url.toLocalFile();
     }
 }

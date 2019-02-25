@@ -46,6 +46,7 @@ public:
             AddEvidenceDialog->setObjectName(QStringLiteral("AddEvidenceDialog"));
         AddEvidenceDialog->setWindowModality(Qt::ApplicationModal);
         AddEvidenceDialog->resize(750, 400);
+        AddEvidenceDialog->setAcceptDrops(true);
         AddEvidenceDialog->setSizeGripEnabled(true);
         AddEvidenceDialog->setModal(true);
         verticalLayout = new QVBoxLayout(AddEvidenceDialog);
@@ -66,6 +67,7 @@ public:
 
         groupbox = new QGroupBox(AddEvidenceDialog);
         groupbox->setObjectName(QStringLiteral("groupbox"));
+        groupbox->setAcceptDrops(true);
         groupbox->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
         groupbox->setFlat(false);
         verticalLayout_2 = new QVBoxLayout(groupbox);
