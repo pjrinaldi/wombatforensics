@@ -1005,6 +1005,7 @@ void InitializeEvidenceStructure(QString evidname)
     int partint = 0;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
+    qDebug() << evidfiles.count() << evidfiles.count();
     evidcnt = evidfiles.count();
     addevidvar.evidcnt = evidcnt;
     //qDebug() << evidfiles.count() << evidfiles;
