@@ -74,7 +74,8 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
 
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
     {
-        blockstring += QString::number(addr) + "^^";
+        *(QString*)ptr += QString::number(addr) + "^^";
+        //blockstring += QString::number(addr) + "^^";
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
     {
@@ -85,18 +86,18 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
         if(tmpfile->name != NULL)
         {
             if((strcmp(tmpfile->name->name, "$FAT1") == 0) || (strcmp(tmpfile->name->name, "$FAT2") == 0) || (strcmp(tmpfile->name->name, "$MBR") == 0) || (strcmp(tmpfile->name->name, "$OrphanFiles") == 0))
-                blockstring += QString::number(addr) + "^^";
+               *(QString*)ptr += QString::number(addr) + "^^";
             else
-                blockstring += QString::number(addr) + "^^";
+                *(QString*)ptr += QString::number(addr) + "^^";
         }
         else
-            blockstring += QString::number(addr) + "^^";
+            *(QString*)ptr += QString::number(addr) + "^^";
     }
     else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_YAFFS2_DETECT)
     {
         if(flags & TSK_FS_BLOCK_FLAG_CONT)
         {
-            blockstring += QString::number(addr) + "^^";
+            *(QString*)ptr += QString::number(addr) + "^^";
         }
     }
     else
@@ -108,7 +109,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
             {
                 if(addr)
                 {
-                    blockstring += QString::number(addr + i) + "^^";
+                    *(QString*)ptr += QString::number(addr + i) + "^^";
                 }
             }
         }
@@ -405,7 +406,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr)), treeout.at(11).toInt(), treeout.at(12).toInt());
                         filesfound++;
                         isignals->ProgUpd();
-                        WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), (unsigned long long)(adssize - fsattr->size + 16), QString::number(fsattr->id));
+                        WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), (unsigned long long)(adssize - fsattr->size + 16), QString::number(fsattr->id), aevar);
                     }
                 }
             }
@@ -1207,22 +1208,28 @@ void InitializeEvidenceStructure(QString evidname)
 
 QString GetAdsBlockList(TSK_FS_FILE* tmpfile, unsigned long long attrid)
 {
-    blockstring = "";
+    QString blkstring = "";
+    QString* blkstr = &blkstring;
+    //blockstring = "";
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
-        tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+        tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, (void*)blkstr);
     }
-    return blockstring;
+    return blkstring;
+    //return blockstring;
 }
 
 QString GetBlockList(TSK_FS_FILE* tmpfile)
 {
-    blockstring = "";
+    QString blkstring = "";
+    QString* blkstr = &blkstring;
+    //blockstring = "";
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
     {
         if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
         {
-            tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+            tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, (void*)blkstr);
+            //tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
         {
@@ -1238,7 +1245,8 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
             TSK_OFF_T size = tmpfile->meta->size;
             while((int64_t)size > 0)
             {
-                blockstring += QString::number(block++) + "^^";
+                blkstring += QString::number(block++) + "^^";
+                //blockstring += QString::number(block++) + "^^";
                 size -= tmpfile->fs_info->block_size;
             }
         }
@@ -1270,7 +1278,8 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
                         {
                             if(tmpattr->type == TSK_FS_ATTR_TYPE_NTFS_DATA && tmpattr->id == minads)
                             {
-                                tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+                                tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, (void*)blkstr);
+                                //tsk_fs_file_walk_type(tmpfile, tmpattr->type, tmpattr->id, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
                             }
                         }
                     }
@@ -1279,16 +1288,21 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
         {
-            tsk_fs_file_walk(tmpfile, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
+            tsk_fs_file_walk(tmpfile, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, (void*)blkstr);
+            //tsk_fs_file_walk(tmpfile, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, NULL);
         }
     }
     else
-        tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
+    {
+        tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, (void*)blkstr);
+        //tsk_fs_file_walk(tmpfile, TSK_FS_FILE_WALK_FLAG_AONLY, GetBlockAddress, NULL);
+    }
     
-    return blockstring;
+    return blkstring;
+    //return blockstring;
 }
 
-void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, unsigned long long adssize, QString attrid)
+void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, unsigned long long adssize, QString attrid, AddEvidenceVariable* aevar)
 {
     QString curblockstring = GetAdsBlockList(curfileinfo, attrid.toULongLong());
     if(curblockstring.compare("0^^") == 0)
@@ -1296,7 +1310,7 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
     QFile adspropfile;
     if(curfileinfo->name != NULL)
     {
-        adspropfile.setFileName(wombatvariable.curfilepath + "f" + QString::number(curfileinfo->name->meta_addr) + "-" + attrid + ".a" + QString::number(curfileinfo->name->meta_addr) + ".prop");
+        adspropfile.setFileName(aevar->partitionpath + "f" + QString::number(curfileinfo->name->meta_addr) + "-" + attrid + ".a" + QString::number(curfileinfo->name->meta_addr) + ".prop");
         adspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream proplist(&adspropfile);
         proplist << "Alternate Data Stream (ADS)||" << QString::fromStdString(std::string(curfileinfo->name->name)) << "||Alternate data stream which contains different content from what the file's standard content is." << endl;

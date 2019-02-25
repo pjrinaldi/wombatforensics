@@ -24,7 +24,7 @@ void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath);
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath);
 void WriteFileProperties(TSK_FS_FILE* curfileinfo, AddEvidenceVariable* aevar);
 void BuildStatFile(TSK_FS_FILE* curfileinfo, const char* tmppath, AddEvidenceVariable* aevar);
-void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, unsigned long long adssize, QString attrid);
+void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, unsigned long long adssize, QString attrid, AddEvidenceVariable* aevar);
 //void LogMessage(QString message);
 void cnid_to_array(uint32_t cnid, uint8_t array[4]);
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr);
