@@ -605,9 +605,11 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     QString tmpstr = "";
 
     QStringList files = eviddir.entryList(QStringList(QString("*.e*")), QDir::Files | QDir::NoSymLinks);
+    qDebug() << files;
     for(int i=0; i < files.count(); i++)
     {
         qDebug() << "eviddir's:" << files.at(i);
+        /*
         tmpstr = "";
         wombatvariable.fullpathvector.clear();
         wombatvariable.evidencename = files.at(i).split(".").at(0) + QString(".") + files.at(i).split(".").at(1);
@@ -622,11 +624,12 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             wombatvariable.fullpathvector.push_back(tmpstr.split(",").at(3).split("|").at(j).toStdString());
         //PrepareEvidenceImage();
         //evidcnt++;
+        //*/
     }
-    listeditems.clear();
-    treenodemodel = new TreeNodeModel();
-    openfuture = QtConcurrent::run(PopulateTreeModel);
-    openwatcher.setFuture(openfuture);
+    //listeditems.clear();
+    //treenodemodel = new TreeNodeModel();
+    //openfuture = QtConcurrent::run(PopulateTreeModel);
+    //openwatcher.setFuture(openfuture);
 }
 
 void WombatForensics::OpenUpdate()
