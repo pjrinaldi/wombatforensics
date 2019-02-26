@@ -973,7 +973,7 @@ void PopulateTreeModel(QString evidstring)
             treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j)), -1, 0);
             mutex.unlock();
             //Root inum Recurse Start
-            FileRecurse(partitionpath, rootinum);
+            FileRecurse(partitionpath, rootinum, rootinum);
         }
         /*
         if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image
@@ -1074,12 +1074,44 @@ void PopulateTreeModel(QString evidstring)
     */
 }
 
-void FileRecurse(QString partitionpath, QString paraddr)
+void FileRecurse(QString partitionpath, QString paraddr, QString rootinum)
 {
     QDir filedir = QDir(partitionpath);
+    //QStringList filelist;
+    //filelist.clear();
     //QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
     QStringList filefiles = filedir.entryList(QStringList("*.a" + paraddr + ".stat"), QDir::NoSymLinks | QDir::Files);
-    qDebug() << "file listing:" << filefiles;
+    for(int i=0; i < filefiles.count(); i++)
+    {
+        QtConcurrent::run(AddFileData, filefiles.at(i), partitionpath, rootinum);
+        //filelist.append(filefiles.at(i));
+    }
+    //qDebug() << "filelist listing:" << filelist;
+    //qDebug() << "file listing:" << filefiles;
+    //QFuture<void> tmpfuture = QtConcurrent::map(filelist, AddFileData);
+}
+
+void AddFileData(QString tmpfile, QString partpath, QString rootinum)
+{
+    QString tmpstr = "";
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    //qDebug() << partpath << tmpfile;
+    QFile filefile(partpath + tmpfile);
+    filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(filefile.isOpen())
+        tmpstr = filefile.readLine();
+    filefile.close();
+    nodedata << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1) << tmpstr.split(",").at(12).split("-a").first();
+    int type = tmpstr.split(",").at(1).toInt();
+    int deleted = tmpstr.split(",").at(14).toInt();
+    mutex.lock();
+    if(rootinum.toInt() == tmpstr.split(",").at(2).toInt())
+        treenodemodel->AddNode(nodedata, QString(tmpstr.split(",").at(12).split("-f").first()), type, deleted);
+    else
+        treenodemodel->AddNode(nodedata, QString(tmpstr.split(",").at(12).split("-f").first() + "-a" + tmpstr.split(",").at(12).split("-a").last()), type, deleted);
+    mutex.unlock();
+    FileRecurse(partpath, tmpstr.split(",").at(9), rootinum);
 }
 
 /*
