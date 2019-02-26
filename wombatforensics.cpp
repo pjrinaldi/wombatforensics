@@ -683,7 +683,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     if(curitem.indexes().count() > 0)
     {
         selectedindex = curitem.indexes().at(0);
-        if(selectedindex.sibling(selectedindex.row(), 2).data().toULongLong() > 0)
+        if(selectedindex.sibling(selectedindex.row(), 2).data().toULongLong() > 0) // file size
             ui->actionView_File->setEnabled(true);
         else
             ui->actionView_File->setEnabled(false);
@@ -981,6 +981,7 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::LoadHexContents()
 {
+    // NEED TO GET EVIDENCE NAME FROM STAT FILE
     wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 10).data().toString(); // mod object id
     blockstring = "";
     QString tmpstr = "";
