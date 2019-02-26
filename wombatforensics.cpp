@@ -602,49 +602,20 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    //QString tmpstr = "";
-
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
-    qDebug() << evidfiles;
+    //qDebug() << evidfiles;
     evidencelist.clear();
     for(int i=0; i < evidfiles.count(); i++)
         evidencelist.append(evidfiles.at(i));
-    //for(int i=0; i < files.count(); i++)
-    //{
-    //    qDebug() << "eviddir's:" << files.at(i);
-        /*
-        tmpstr = "";
-        wombatvariable.fullpathvector.clear();
-        wombatvariable.evidencename = files.at(i).split(".").at(0) + QString(".") + files.at(i).split(".").at(1);
-        QFile evidfile(QString(wombatvariable.tmpmntpath + files.at(i)));
-        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        tmpstr = evidfile.readLine();
-        evidfile.close();
-        int partcount = tmpstr.split(",").at(3).split("|").size();
-        wombatvariable.segmentcount = partcount;
-        wombatvariable.imgtype = (TSK_IMG_TYPE_ENUM)(tmpstr.split(",").first().toInt());
-        for(int j=0; j < partcount; j++)
-            wombatvariable.fullpathvector.push_back(tmpstr.split(",").at(3).split("|").at(j).toStdString());
-        //PrepareEvidenceImage();
-        //evidcnt++;
-        */
-    //}
-    //listeditems.clear();
-    //treenodemodel = new TreeNodeModel();
-    //openfuture = QtConcurrent::run(PopulateTreeModel);
     if(evidencelist.count() > 0)
     {
         for(int i=0; i < evidencelist.count(); i++)
         {
-            //PopulateTreeModel(evidencelist.at(i));
             QFuture<void> tmpfuture = QtConcurrent::run(PopulateTreeModel, evidencelist.at(i));
             if(i == evidencelist.count() - 1)
                 openwatcher.setFuture(tmpfuture);
         }
-        //QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
-        //openwatcher.setFuture(tmpfuture);
     }
-    //OpenUpdate();
 }
 
 void WombatForensics::OpenUpdate()
