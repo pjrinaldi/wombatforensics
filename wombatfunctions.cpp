@@ -975,6 +975,8 @@ void PopulateTreeModel(QString evidstring)
             //Root inum Recurse Start
             FileRecurse(partitionpath, rootinum, rootinum);
         }
+    }
+}
         /*
         if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image
         {
@@ -1060,7 +1062,7 @@ void PopulateTreeModel(QString evidstring)
                 }
             }
         }*/
-    }
+    //}
     //tsk_fs_file_close(readfileinfo);
     /*
     readfileinfo = NULL;
@@ -1072,7 +1074,7 @@ void PopulateTreeModel(QString evidstring)
     tsk_img_close(readimginfo);
     readimginfo = NULL;
     */
-}
+//}
 
 void FileRecurse(QString partitionpath, QString paraddr, QString rootinum)
 {
