@@ -1082,12 +1082,11 @@ void FileRecurse(QString partitionpath, QString paraddr, QString rootinum)
     QDir filedir = QDir(partitionpath);
     //QStringList filelist;
     //filelist.clear();
-    //QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
     QStringList filefiles = filedir.entryList(QStringList("*.a" + paraddr + ".stat"), QDir::NoSymLinks | QDir::Files);
     for(int i=0; i < filefiles.count(); i++)
     {
         AddFileData(filefiles.at(i), partitionpath, rootinum);
-        //QtConcurrent::run(AddFileData, filefiles.at(i), partitionpath, rootinum);
+        QtConcurrent::run(AddFileData, filefiles.at(i), partitionpath, rootinum);
         //filelist.append(filefiles.at(i));
     }
     //qDebug() << "filelist listing:" << filelist;
@@ -1109,15 +1108,25 @@ void AddFileData(QString tmpfile, QString partpath, QString rootinum)
     nodedata << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1) << tmpstr.split(",").at(12).split("-a").first();
     int type = tmpstr.split(",").at(1).toInt();
     int deleted = tmpstr.split(",").at(14).toInt();
-    if(rootinum.toInt() == tmpstr.split(",").at(2).toInt())
-        qDebug() << QString(tmpstr.split(",").at(12).split("-f").first());
-    else
-        qDebug() << QString(tmpstr.split(",").at(12).split("-f").first() + "-f" + tmpstr.split(",").at(12).split("-a").last());
+
+    //if(fstring.contains(":") == true)
+    //    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+
+
+    //if(rootinum.toInt() == tmpstr.split(",").at(2).toInt())
+    //    qDebug() << QString(tmpstr.split(",").at(12).split("-f").first());
+    /*
+    if(rootinum.toInt() != tmpstr.split(",").at(2).toInt())
+    {
+        qDebug() << "current file:" << tmpstr.split(",").at(12);
+        qDebug() << "parent:" << QString(tmpstr.split(",").at(12).split("-f").first() + "-f" + tmpstr.split(",").at(12).split("-a").last());
+    }
+    */
     mutex.lock();
     if(rootinum.toInt() == tmpstr.split(",").at(2).toInt())
         treenodemodel->AddNode(nodedata, QString(tmpstr.split(",").at(12).split("-f").first()), type, deleted);
     else
-        treenodemodel->AddNode(nodedata, QString(tmpstr.split(",").at(12).split("-f").first() + "-a" + tmpstr.split(",").at(12).split("-a").last()), type, deleted);
+        treenodemodel->AddNode(nodedata, QString(tmpstr.split(",").at(12).split("-f").first() + "-f" + tmpstr.split(",").at(12).split("-a").last()), type, deleted);
     mutex.unlock();
     FileRecurse(partpath, tmpstr.split(",").at(9), rootinum);
 }

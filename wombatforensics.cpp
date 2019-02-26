@@ -636,15 +636,15 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     {
         for(int i=0; i < evidencelist.count(); i++)
         {
-            PopulateTreeModel(evidencelist.at(i));
-            //QFuture<void> tmpfuture = QtConcurrent::run(PopulateTreeModel, evidencelist.at(i));
-            //if(i == evidencelist.count() - 1)
-            //    openwatcher.setFuture(tmpfuture);
+            //PopulateTreeModel(evidencelist.at(i));
+            QFuture<void> tmpfuture = QtConcurrent::run(PopulateTreeModel, evidencelist.at(i));
+            if(i == evidencelist.count() - 1)
+                openwatcher.setFuture(tmpfuture);
         }
         //QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
         //openwatcher.setFuture(tmpfuture);
     }
-    OpenUpdate();
+    //OpenUpdate();
 }
 
 void WombatForensics::OpenUpdate()
