@@ -604,7 +604,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     //QString tmpstr = "";
 
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
     qDebug() << evidfiles;
     evidencelist.clear();
     for(int i=0; i < evidfiles.count(); i++)
