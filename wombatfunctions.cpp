@@ -965,7 +965,8 @@ void PopulateTreeModel(QString evidstring)
             if(partfile.isOpen())
                 tmpstr = partfile.readLine();
             partfile.close();
-            treeout << tmpstr.split(",").at(2) + " (" + tmpstr.split(",").at(0).toUpper() + ")" << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
+            //QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper()
+            treeout << tmpstr.split(",").at(2) + " (" + QString(tsk_fs_type_toname(((TSK_FS_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))).toUpper() + ")" << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
             QString rootinum = tmpstr.split(",").at(3);
             for(int m=0; m < treeout.count(); m++)
                 nodedata << treeout.at(m);
@@ -1085,7 +1086,8 @@ void FileRecurse(QString partitionpath, QString paraddr, QString rootinum)
     QStringList filefiles = filedir.entryList(QStringList("*.a" + paraddr + ".stat"), QDir::NoSymLinks | QDir::Files);
     for(int i=0; i < filefiles.count(); i++)
     {
-        QtConcurrent::run(AddFileData, filefiles.at(i), partitionpath, rootinum);
+        AddFileData(filefiles.at(i), partitionpath, rootinum);
+        //QtConcurrent::run(AddFileData, filefiles.at(i), partitionpath, rootinum);
         //filelist.append(filefiles.at(i));
     }
     //qDebug() << "filelist listing:" << filelist;
@@ -1113,7 +1115,7 @@ void AddFileData(QString tmpfile, QString partpath, QString rootinum)
     else
         treenodemodel->AddNode(nodedata, QString(tmpstr.split(",").at(12).split("-f").first() + "-a" + tmpstr.split(",").at(12).split("-a").last()), type, deleted);
     mutex.unlock();
-    FileRecurse(partpath, tmpstr.split(",").at(9), rootinum);
+    //FileRecurse(partpath, tmpstr.split(",").at(9), rootinum);
 }
 
 /*
