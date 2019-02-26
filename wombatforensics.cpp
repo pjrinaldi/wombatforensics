@@ -733,13 +733,64 @@ void WombatForensics::UpdateDataTable()
 
 void WombatForensics::PrepareEvidenceImage()
 {
-    qDebug() << evidencelist;
+    QString tmpstr = "";
+    QString mntstr = "";
+    for(int i=0; i < evidencelist.count(); i++)
+    {
+        QFile evidfile(wombatvariable.tmpmntpath + evidencelist.at(i) + "/stat");
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(evidfile.isOpen())
+           tmpstr = evidfile.readLine();
+        evidfile.close();
+        int imgtype = tmpstr.split(",").at(0).toInt();
+        QString imagefile = tmpstr.split(",").at(3);
+        if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
+        {
+            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
+                mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+        }
+        else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
+        {
+            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
+            {
+                QString tmpstr = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
+                (new QDir())->mkpath(tmpstr);
+                mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstr;
+            }
+        }
+        else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
+        {
+            QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
+            if(imgext.contains(".000"))
+            {
+                if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
+                    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+            }
+            else
+                mntstr = "";
+        }
+        else
+        {
+            qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
+            // this error should go in add evidence dialog bit...
+            //DisplayError("0.5", QString("Image type: " + QString(tsk_img_type_toname(imgtype)) + " is not supported."), "Unsupported Image");
+        }
+        if(!mntstr.isEmpty())
+        {
+            xmntprocess = new QProcess();
+            connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()));
+            connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()));
+            xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them..
+        }
+    }
+    //qDebug() << evidencelist;
     // 1. LOAD EVIDENCE STAT FILE TO GET IMGTYPE VARIABLE.
     // 2. CHECK IF SEE IF IT IS ALREADY OPEN
     // 3. DETERMINE IF IT MIGHT HAVE SEGMENTS FOR RAW BASED ON EXTENSION.
     // 4. HANDLE RAW ACCORDINGLY
     // NEED TO RUN THIS FOR EACH IMAGE...
     //qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
+    /*
     QString xmntstr = "";
     if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
         xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
@@ -762,6 +813,7 @@ void WombatForensics::PrepareEvidenceImage()
     connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()));
     connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()));
     xmntprocess->start(xmntstr); // removes WARNING Messages but does not capture them..
+    */
 }
 
 void WombatForensics::ReadXMountOut()
