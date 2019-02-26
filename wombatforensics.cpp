@@ -733,6 +733,11 @@ void WombatForensics::UpdateDataTable()
 
 void WombatForensics::PrepareEvidenceImage()
 {
+    qDebug() << evidencelist;
+    // 1. LOAD EVIDENCE STAT FILE TO GET IMGTYPE VARIABLE.
+    // 2. CHECK IF SEE IF IT IS ALREADY OPEN
+    // 3. DETERMINE IF IT MIGHT HAVE SEGMENTS FOR RAW BASED ON EXTENSION.
+    // 4. HANDLE RAW ACCORDINGLY
     // NEED TO RUN THIS FOR EACH IMAGE...
     //qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
     QString xmntstr = "";
