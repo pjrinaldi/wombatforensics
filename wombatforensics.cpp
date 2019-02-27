@@ -621,14 +621,19 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     if(evidencelist.count() > 0)
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        /*
         for(int i=0; i < evidencelist.count(); i++)
         {
-            PopulateTreeModel(evidencelist.at(i).split("/").last());
+            //PopulateTreeModel(evidencelist.at(i).split("/").last());
             //QFuture<void> tmpfuture = QtConcurrent::run(PopulateTreeModel, evidencelist.at(i).split("/").last());
             //if(i == evidencelist.count() - 1)
             //    openwatcher.setFuture(tmpfuture);
         }
-        OpenUpdate();
+        //OpenUpdate();
+        //
+        */
+        QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
+        openwatcher.setFuture(tmpfuture);
     }
 }
 
@@ -652,7 +657,7 @@ void WombatForensics::OpenUpdate()
     UpdateCheckCount();
     if(indexlist.count() > 0)
     {
-        ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+        //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     }
     else
@@ -678,7 +683,7 @@ void WombatForensics::OpenUpdate()
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
     StatusUpdate("Ready");
-    StatusUpdate("Loading Thumbnail Library...");
+    //StatusUpdate("Loading Thumbnail Library...");
     ui->actionView_Image_Gallery->setEnabled(false);
 }
 
@@ -880,7 +885,10 @@ void WombatForensics::UpdateStatus()
     //partint = 0;
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
+    {
+        ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    }
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
     ui->actionRemove_Evidence->setEnabled(true);

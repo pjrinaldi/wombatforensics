@@ -982,6 +982,43 @@ int SegmentDigits(int number)
 
 void PopulateTreeModel(QString evidstring)
 {
+    AddEvidenceVariable addevidvar;
+    AddEvidenceVariable* aevar;
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidlist = eviddir.entryList(QStringList(evidstring.split("/").last() + ".e*"), QDir::NoSymLinks | QDir::Dirs);
+    QString evidid = "." + evidlist.first().split(".").last();
+    QString tmpstr = "";
+    QString evidencename = evidlist.first().split(evidid).first();
+    QFile evidfile(wombatvariable.tmpmntpath + evidlist.first() + "/stat");
+    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+        tmpstr = evidfile.readLine();
+    evidfile.close();
+    std::vector<std::string> pathvector;
+    pathvector.clear();
+    pathvector.push_back(tmpstr.split(",").at(3).toStdString());
+    TSK_IMG_INFO* imginfo = NULL;
+    TSK_VS_INFO* vsinfo = NULL;
+    const TSK_VS_PART_INFO* partinfo = NULL;
+    TSK_FS_INFO* fsinfo = NULL;
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(pathvector.size()*sizeof(char*));
+    images[0] = pathvector[0].c_str();
+    imginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
+    if(imginfo == NULL)
+    {
+        qWarning() << "Evidence image access failed";
+        //LogMessage("Evidence image access failed");
+        errorcount++;
+    }
+    free(images);
+    int imgtype = imginfo->itype;
+    QString evidencepath = wombatvariable.tmpmntpath + evidencename + evidid + "/";
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << evidencename << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
+    treenodemodel->AddNode(nodedata, "-1", -1, -1);
+    //QString evidid = evidlist
 /*
  *
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -1116,6 +1153,7 @@ void PopulateTreeModel(QString evidstring)
  *
  *
  */ 
+ /*
     TSK_IMG_INFO* readimginfo = NULL;
     TSK_VS_INFO* readvsinfo = NULL;
     const TSK_VS_PART_INFO* readpartinfo = NULL;
@@ -1247,6 +1285,7 @@ void PopulateTreeModel(QString evidstring)
         }
         }
     }
+*/
 }
 
 void FileRecurse(QString partitionpath, QString paraddr, QString rootinum)
