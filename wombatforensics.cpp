@@ -982,6 +982,7 @@ void WombatForensics::UpdateProperties()
 void WombatForensics::LoadHexContents()
 {
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
+    // TRY TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
     wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 10).data().toString(); // mod object id
     blockstring = "";
     QString tmpstr = "";
