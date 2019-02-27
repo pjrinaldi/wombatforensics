@@ -620,7 +620,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     if(evidencelist.count() > 0)
     {
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        //QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         /*
         for(int i=0; i < evidencelist.count(); i++)
         {
