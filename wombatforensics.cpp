@@ -737,11 +737,14 @@ void WombatForensics::PrepareEvidenceImage()
     QString mntstr = "";
     for(int i=0; i < evidencelist.count(); i++)
     {
+        qDebug() << wombatvariable.tmpmntpath + evidencelist.at(i) + "/stat";
         QFile evidfile(wombatvariable.tmpmntpath + evidencelist.at(i) + "/stat");
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(evidfile.isOpen())
            tmpstr = evidfile.readLine();
         evidfile.close();
+        if(!tmpstr.isEmpty())
+        {
         int imgtype = tmpstr.split(",").at(0).toInt();
         QString imagefile = tmpstr.split(",").at(3);
         if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
@@ -781,6 +784,7 @@ void WombatForensics::PrepareEvidenceImage()
             connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()));
             connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()));
             xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them..
+        }
         }
     }
     //qDebug() << evidencelist;
@@ -983,35 +987,46 @@ void WombatForensics::LoadHexContents()
 {
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
     // TRY TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
-    wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 10).data().toString(); // mod object id
+    //wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 10).data().toString(); // mod object id
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
-    qDebug() << "evidencelist:" << evidencelist;
-    qDebug() << "selectednode id:" << selectednode->Data(10).toString();
-    /*
+    //qDebug() << "evidencelist:" << evidencelist; // original evidence path
+    //qDebug() << "selectednode id:" << selectednode->Data(10).toString();
+    //qDebug() << "selectednode evid id:" << selectednode->Data(10).toString().split("-").first();
+    QString evidid = selectednode->Data(10).toString().split("-").first();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + evidid)), QDir::NoSymLinks | QDir::Dirs);
+    //qDebug() << "evidfile name:" << evidfiles.first();
     blockstring = "";
     QString tmpstr = "";
-    QStringList evidlist;
-    evidlist.clear();
-    QString datastring = wombatvariable.imgdatapath;
-    if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
-        datastring += wombatvariable.evidencename + ".raw";
-    else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
+    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first());
+    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+        tmpstr = evidfile.readLine();
+    evidfile.close();
+    int imgtype = tmpstr.split(",").at(0).toInt();
+    qDebug() << imgtype;
+    qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
+    QString datastring = wombatvariable.tmpmntpath;
+    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+        datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
+    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+        datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
+    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
     {
-        datastring += wombatvariable.evidencename + "/";
-        //(new QDir())->mkpath(datastring);
-        datastring += "ewf1";
-    }
-    else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
-    {
-        if(wombatvariable.segmentcount > 1)
-            datastring += wombatvariable.evidencename + ".raw";
+        QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
+        if(imgext.contains(".000"))
+            datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
         else
-            datastring = QString::fromStdString(wombatvariable.fullpathvector.at(0));
+            datastring = tmpstr.split(",").at(3);
     }
     else
-        qDebug() << "not supported...";
+        qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
     casedatafile.setFileName(datastring);
     ui->hexview->setData(casedatafile);
+
+    /*
+    QStringList evidlist;
+    evidlist.clear();
     //curhexdoc = QHexDocument::fromDevice<QMemoryBuffer>(casedatafile);
     //curhexdoc = QHexDocument::fromFile<QMemoryBuffer>(datastring);
 

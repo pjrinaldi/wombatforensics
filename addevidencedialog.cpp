@@ -63,6 +63,10 @@ void AddEvidenceDialog::SelectEvidence()
         ui->evidencelist->addItem(evidfilename);
         ui->startbutton->setEnabled(true);
     }
+    else if(evidfilename.isNull())
+    {
+        qDebug() << "cancelled by the user.";
+    }
     else
     {
         qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.2.";
