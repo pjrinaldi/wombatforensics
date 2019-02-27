@@ -891,7 +891,7 @@ void PopulateTreeModel(QString evidstring)
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
-    int imgtype = tmpstr.split(",").at(0).toInt();
+    //int imgtype = tmpstr.split(",").at(0).toInt();
     QString evidencepath = wombatvariable.tmpmntpath + evidstring + "/";    
     QStringList treeout;
     treeout << evidencename << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
@@ -1086,7 +1086,7 @@ void InitializeEvidenceStructure(QString evidname)
     //qDebug() << evidfiles.count() << evidfiles;
     std::vector<std::string> fullpathvector;
     QString evidencename = evidname.split("/").last();
-    TSK_IMG_TYPE_ENUM imgtype;
+    //TSK_IMG_TYPE_ENUM imgtype;
     fullpathvector.clear();
     fullpathvector.push_back(evidname.toStdString());
     //qDebug() << "fullpathvector:" << QString::fromStdString(fullpathvector[0]) << "evidencename:" << evidencename;
@@ -1096,21 +1096,6 @@ void InitializeEvidenceStructure(QString evidname)
     TSK_FS_INFO* readfsinfo = NULL;
     TSK_FS_FILE* readfileinfo = NULL;
     const TSK_TCHAR** images;
-    /*
-    QString imgext = evidencename.split(".").last().toLower();
-    if(imgext == "dd" || imgext == "raw" || imgext == "000") // raw
-        imgtype = TSK_IMG_TYPE_RAW;
-    else if(imgext == "e01") // ewf
-        imgtype = TSK_IMG_TYPE_EWF_EWF;
-    else if(imgext == "aff" || imgext == "afd" || imgext == "afm")
-        imgtype = TSK_IMG_TYPE_AFF_ANY;
-    else if(imgext == "vmdk")
-        imgtype = TSK_IMG_TYPE_VMDK_VMDK;
-    else if(imgext == "vhd")
-        imgtype = TSK_IMG_TYPE_VHD_VHD;
-    else
-        imgtype = TSK_IMG_TYPE_UNSUPP;
-    */
     images = (const char**)malloc(fullpathvector.size()*sizeof(char*));
     for(uint i=0; i < fullpathvector.size(); i++)
     {
@@ -1124,9 +1109,6 @@ void InitializeEvidenceStructure(QString evidname)
         errorcount++;
     }
     free(images);
-    //qDebug() << "imgtype:" << imgtype;
-    //imgtype = readimginfo->itype; // type of image file: ewf, aff, raw
-    //qDebug() << "imgtype:" << (int)tsk_img_type_toid_utf8(evidencename.split(".").last().toStdString().c_str());
     //wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
     //qDebug() << "evidencepath:" << evidencepath;
@@ -1136,7 +1118,6 @@ void InitializeEvidenceStructure(QString evidname)
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
-    //out << (int)imgtype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
     //for(unsigned int i=0; i < wombatvariable.itemcount; i++)
     //{
     //    if(i > 0 && i < wombatvariable.itemcount - 2)
