@@ -55,7 +55,13 @@ AddEvidenceDialog::~AddEvidenceDialog()
 
 void AddEvidenceDialog::SelectEvidence()
 {
-    QString evidfilename = QFileDialog::getOpenFileName(this, tr("Add Evidence Item"), QDir::homePath());
+    QFileDialog addeviddialog(this, tr("Add Evidence Item"), QDir::homePath());
+    addeviddialog.setFileMode(QFileDialog::ExistingFile);
+    addeviddialog.setLabelText(QFileDialog::Accept, "Add");
+    QString evidfilename = "";
+    if(addeviddialog.exec())
+        evidfilename = addeviddialog.selectedFiles().first();
+    //QString evidfilename = QFileDialog::getOpenFileName(this, tr("Add Evidence Item"), QDir::homePath());
     // check for evidence image
     if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff"))
     {

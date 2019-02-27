@@ -506,7 +506,12 @@ void WombatForensics::InitializeCaseStructure()
 {
     StatusUpdate("Generating Case Structure...");
     // create new case here
-    wombatvariable.casename = QFileDialog::getSaveFileName(this, tr("Create New Case File"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
+    QFileDialog newcasedialog(this, tr("Create New Case"), QDir::homePath(), tr("Wombat Forensics Case (*.wfc)"));
+    newcasedialog.setLabelText(QFileDialog::Accept, "Create");
+    QString evidfilename = "";
+    if(newcasedialog.exec())
+        wombatvariable.casename = newcasedialog.selectedFiles().first();
+    //wombatvariable.casename = QFileDialog::getSaveFileName(this, tr("Create New Case File"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
     if(!wombatvariable.casename.isEmpty())
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -606,12 +611,18 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //qDebug() << evidfiles;
     evidencelist.clear();
     for(int i=0; i < evidfiles.count(); i++)
-        evidencelist.append(evidfiles.at(i));
+    {
+        QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(i) + "/stat");
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(evidfile.isOpen())
+            evidencelist.append(QString(evidfile.readLine()).split(",").at(3));
+        evidfile.close();
+    }
     if(evidencelist.count() > 0)
     {
         for(int i=0; i < evidencelist.count(); i++)
         {
-            QFuture<void> tmpfuture = QtConcurrent::run(PopulateTreeModel, evidencelist.at(i));
+            QFuture<void> tmpfuture = QtConcurrent::run(PopulateTreeModel, evidencelist.at(i).split("/").last());
             if(i == evidencelist.count() - 1)
                 openwatcher.setFuture(tmpfuture);
         }
@@ -737,6 +748,7 @@ void WombatForensics::PrepareEvidenceImage()
     QString mntstr = "";
     for(int i=0; i < evidencelist.count(); i++)
     {
+        qDebug() << "evidence list:" << evidencelist;
         QDir eviddir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList(QString(evidencelist.at(i).split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
         qDebug() << wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat";

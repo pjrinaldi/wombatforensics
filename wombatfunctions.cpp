@@ -880,19 +880,25 @@ int SegmentDigits(int number)
 
 void PopulateTreeModel(QString evidstring)
 {
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString(evidstring + ".e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
     AddEvidenceVariable addevidvar;
     AddEvidenceVariable* aevar = &addevidvar;
     //qDebug() << "evidname:" << evidstring;
     QString tmpstr = "";
-    QString evidid = "." + evidstring.split(".").last();
-    QString evidencename = evidstring.split(evidid).first();
-    QFile evidfile(wombatvariable.tmpmntpath + evidstring + "/stat");
+    QString evidid = "." + evidfiles.first().split(".").last();
+    //QString evidid = "." + evidstring.split(".").last();
+    QString evidencename = evidfiles.first().split(evidid).first();
+    //QString evidencename = evidstring.split(evidid).first();
+    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
+    //QFile evidfile(wombatvariable.tmpmntpath + evidstring + "/stat");
     evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
     //int imgtype = tmpstr.split(",").at(0).toInt();
-    QString evidencepath = wombatvariable.tmpmntpath + evidstring + "/";    
+    QString evidencepath = wombatvariable.tmpmntpath + evidfiles.first() + "/";    
+    //QString evidencepath = wombatvariable.tmpmntpath + evidstring + "/";    
     QStringList treeout;
     treeout << evidencename << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << evidid.mid(1);
     QList<QVariant> nodedata;
@@ -901,7 +907,8 @@ void PopulateTreeModel(QString evidstring)
     mutex.lock();
     treenodemodel->AddNode(nodedata, "-1", -1, -1);
     mutex.unlock();
-    QDir voldir = QDir(wombatvariable.tmpmntpath + evidstring);
+    QDir voldir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
+    //QDir voldir = QDir(wombatvariable.tmpmntpath + evidstring);
     QStringList vollist = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
     for(int j=0; j < vollist.count(); j++)
     {
