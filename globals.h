@@ -236,6 +236,8 @@ extern iso9660_pvd_node* p;
 extern HFS_INFO* hfs;
 */
 
+extern TreeNode* selectednode;
+
 class TreeNodeModel : public QAbstractItemModel
 {
     Q_OBJECT

@@ -984,6 +984,10 @@ void WombatForensics::LoadHexContents()
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
     // TRY TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
     wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 10).data().toString(); // mod object id
+    selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
+    qDebug() << "evidencelist:" << evidencelist;
+    qDebug() << "selectednode id:" << selectednode->Data(10).toString();
+    /*
     blockstring = "";
     QString tmpstr = "";
     QStringList evidlist;
@@ -1370,6 +1374,7 @@ void WombatForensics::LoadHexContents()
         }
     }
     ui->hexview->ensureVisible();
+    */
 }
 
 void WombatForensics::CloseCurrentCase()

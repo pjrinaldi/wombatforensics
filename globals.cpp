@@ -34,6 +34,7 @@ int thumbsize = 320;
 int mftrecordsize = 1024;
 int hashsum = 1;
 TreeNodeModel* treenodemodel = NULL;
+TreeNode* selectednode = NULL;
 InterfaceSignals* isignals = new InterfaceSignals();
 QList<QVariant> colvalues;
 QStringList propertylist;
