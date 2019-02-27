@@ -751,10 +751,10 @@ void WombatForensics::PrepareEvidenceImage()
     QString mntstr = "";
     for(int i=0; i < evidencelist.count(); i++)
     {
-        //qDebug() << "evidence list:" << evidencelist;
+        //qDebug() << "evidence list:" << evidencelist.at(i);
         QDir eviddir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList(QString(evidencelist.at(i).split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
-        qDebug() << wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat";
+        //qDebug() << wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat";
         QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(evidfile.isOpen())
@@ -781,6 +781,7 @@ void WombatForensics::PrepareEvidenceImage()
         else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
         {
             QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
+            //qDebug() << "imgext:" << imgext;
             if(imgext.contains(".000"))
             {
                 if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))

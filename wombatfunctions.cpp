@@ -446,15 +446,15 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 QList<QVariant> nodedata;
                 nodedata.clear();
                 //wombatvariable.curfilepath = wombatvariable.partitionpath;
-                qDebug() << tmpfile->name->name;
+                //qDebug() << tmpfile->name->name;
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
                 {
-                    qDebug() << aevar->partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat";
+                    //qDebug() << aevar->partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat";
                     filefile.setFileName(aevar->partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
                 }
                 else
                 {
-                qDebug() << aevar->partitionpath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat";
+                //qDebug() << aevar->partitionpath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat";
                     filefile.setFileName(aevar->partitionpath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat");
                 }
                 filefile.open(QIODevice::ReadOnly | QIODevice::Text);
