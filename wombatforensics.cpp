@@ -1091,11 +1091,6 @@ void WombatForensics::LoadHexContents()
             else
                 filefileprop.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/" + nodeid.split("-").at(3) + "." + nodeid.split("-").at(4) + ".prop");
             filefileprop.open(QIODevice::ReadOnly | QIODevice::Text);
-            /*
-             *
-             *
-             *
-             */ 
             while(!filefileprop.atEnd())
             {
                 QString tmpstring = filefileprop.readLine();
