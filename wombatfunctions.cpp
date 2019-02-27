@@ -446,18 +446,30 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 QList<QVariant> nodedata;
                 nodedata.clear();
                 //wombatvariable.curfilepath = wombatvariable.partitionpath;
+                qDebug() << tmpfile->name->name;
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+                {
+                    qDebug() << aevar->partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat";
                     filefile.setFileName(aevar->partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
+                }
                 else
+                {
+                qDebug() << aevar->partitionpath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat";
                     filefile.setFileName(aevar->partitionpath + "f" + QString::number(tmpaddress) + ".a" + QString::number(paraddress) + ".stat");
+                }
                 filefile.open(QIODevice::ReadOnly | QIODevice::Text);
                 if(filefile.isOpen())
                     tmpstr = filefile.readLine();
                 filefile.close();
+                //qDebug() << "tmpstr:" << tmpstr << "at 2:" << tmpstr.split(",").at(2);
                 tmplist = tmpstr.split(",");
+                if(tmplist.count() > 1)
+                {
+                //qDebug() << "tmplist:" << tmplist.at(2);
                 QString parentstr = "";
-                int rootinum = tmpfile->fs_info->root_inum;
-                if(tmplist.at(2).toInt() == rootinum)
+                unsigned int rootinum = tmpfile->fs_info->root_inum;
+                //if(tmplist.at(2).toInt() == rootinum)
+                if(tmpfile->name->par_addr == rootinum)
                     parentstr = tmplist.at(12).split("-f").first();
                 else
                     parentstr = tmplist.at(12).split("-f").first() + "-f" + tmplist.at(2);
@@ -511,6 +523,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                             }
                         }
                     }
+                }
                 }
             }
         }
@@ -880,6 +893,13 @@ int SegmentDigits(int number)
 
 void PopulateTreeModel(QString evidstring)
 {
+    TSK_IMG_INFO* readimginfo = NULL;
+    TSK_VS_INFO* readvsinfo = NULL;
+    const TSK_VS_PART_INFO* readpartinfo = NULL;
+    TSK_FS_INFO* readfsinfo = NULL;
+    std::vector<std::string> fullpathvector;
+    fullpathvector.clear();
+    const TSK_TCHAR** images;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString(evidstring + ".e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
     AddEvidenceVariable addevidvar;
@@ -894,6 +914,18 @@ void PopulateTreeModel(QString evidstring)
         tmpstr = evidfile.readLine();
     evidfile.close();
     //int imgtype = tmpstr.split(",").at(0).toInt();
+    fullpathvector.push_back(tmpstr.split(",").at(3).toStdString());
+    images = (const char**)malloc(fullpathvector.size()*sizeof(char*));
+    images[0] = fullpathvector[0].c_str();
+    readimginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
+    if(readimginfo == NULL)
+    {
+        qWarning() << "Evidence image access failed.";
+        //LogMessage("Evidence image access failed");
+        errorcount++;
+    }
+    free(images);
+    readvsinfo = tsk_vs_open(readimginfo, 0, TSK_VS_TYPE_DETECT);
     QString evidencepath = wombatvariable.tmpmntpath + evidfiles.first() + "/";    
     //QString evidencepath = wombatvariable.tmpmntpath + evidstring + "/";    
     QStringList treeout;
@@ -925,25 +957,71 @@ void PopulateTreeModel(QString evidstring)
         mutex.unlock();
         QDir partdir = QDir(volumepath);
         QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs);
+        if(readvsinfo == NULL)
+        {
+            readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
+            uint8_t walkreturn;
+            int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+            walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aevar);
+            if(walkreturn == 1)
+            {
+                qWarning() << "Issues with traversing the file structure were encountered";
+                //LogMessage("Issues with traversing the file structure were encountered");
+                errorcount++;
+            }
+        }
+        else
+        {
         for(int k = 0; k < partlist.count(); k++)
         {
+            readpartinfo = tsk_vs_part_get(readvsinfo, k);
             treeout.clear();
             nodedata.clear();
             QString partitionpath = volumepath + partlist.at(k) + "/";
+            addevidvar.partitionpath = partitionpath;
             QFile partfile(volumepath + partlist.at(k) + "/stat");
             partfile.open(QIODevice::ReadOnly | QIODevice::Text);
             if(partfile.isOpen())
                 tmpstr = partfile.readLine();
             partfile.close();
-            treeout << tmpstr.split(",").at(2) + " (" + QString(tsk_fs_type_toname(((TSK_FS_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))).toUpper() + ")" << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
+            if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated or meta entry
+            {
+                treeout << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
+            }
+            else if(readpartinfo->flags == 0x01) // allocated partition
+            {
+                treeout << tmpstr.split(",").at(2) + " (" + QString(tsk_fs_type_toname(((TSK_FS_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))).toUpper() + ")" << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
+            }
+            else
+            {
+                treeout << tmpstr.split(",").at(2) + " (NON-RECOGNIZED FS)" << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
+            }
             QString rootinum = tmpstr.split(",").at(3);
             for(int m=0; m < treeout.count(); m++)
                 nodedata << treeout.at(m);
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j)), -1, 0);
             mutex.unlock();
+            // NEED TO CALL TREEENTRIES HERE...
+            if(readpartinfo->flags == 0x01) // allocated partition
+            {
+                readfsinfo = tsk_fs_open_vol(readpartinfo, TSK_FS_TYPE_DETECT);
+                if(readfsinfo != NULL)
+                {
+                    uint8_t walkreturn;
+                    int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+                    walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aevar);
+                    if(walkreturn == 1)
+                    {
+                        qWarning() << "Issues with traversing the file structure were encountered";
+                        //LogMessage("Issues with traversing the file structure were encountered");
+                        errorcount++;
+                    }
+                }
+            }
             //Root inum Recurse Start
-            FileRecurse(partitionpath, rootinum, rootinum);
+            //FileRecurse(partitionpath, rootinum, rootinum);
+        }
         }
     }
 }
