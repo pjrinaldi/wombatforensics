@@ -421,6 +421,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
     //AddEvidenceVariable* aevar = (AddEvidenceVariable*)tmpptr;
+    unsigned long long curaddress = 0;
     unsigned long long tmpaddress = 0;
     unsigned long long paraddress = tmpfile->fs_info->root_inum;
     if(tmpfile->meta != NULL)
@@ -436,6 +437,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         {
             if(strcmp(tmpfile->name->name, "..") != 0)
             {
+                QStringList treeout;
+                treeout.clear();
                 QFile filefile;
                 QString tmpstr = "";
                 QStringList tmplist;
@@ -474,13 +477,13 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 ba2.append(QString("/" + QString(tmppath)));
                 QByteArray ba;
                 ba.append(QString(tmpfile->name->name));
-                //treeout << ba.toBase64();
+                treeout << ba.toBase64();
                 QString parentstr = "";
                 unsigned int rootinum = tmpfile->fs_info->root_inum;
                 if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
-                    parentstr = "e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint);
+                    parentstr = "e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint);
                 else
-                    parentstr = "e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->par_addr);
+                    parentstr = "e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->par_addr);
                 curaddress = tmpfile->name->meta_addr;
                 paraddress = tmpfile->name->par_addr;
                 treeout << ba2.toBase64();
@@ -504,9 +507,9 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1);
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-                    treeout << "e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(tmpfile->name->par_addr);
+                    treeout << "e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(tmpfile->name->par_addr);
                 else
-                    treeout << "e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
+                    treeout << "e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
                 if(tmpfile->meta != NULL)
                     treeout << QString::number(tmpfile->meta->type);
                 else
@@ -617,12 +620,12 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                     //}
                                     treeout.clear();
                                     //treeout << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << "10" << "0";
-                                    treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                                    treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                                     nodedata.clear();
                                     for(int i=0;  i < 11; i++)
                                         nodedata << treeout.at(i);
                                     mutex.lock();
-                                    treenodemodel->AddNode(nodedata, QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr)), treeout.at(11).toInt(), treeout.at(12).toInt());
+                                    treenodemodel->AddNode(nodedata, QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr)), treeout.at(11).toInt(), treeout.at(12).toInt());
                                     mutex.unlock();
                                     filesfound++;
                                     isignals->ProgUpd();
@@ -1211,6 +1214,7 @@ void PopulateTreeModel(QString evidstring)
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidlist = eviddir.entryList(QStringList(evidstring.split("/").last() + ".e*"), QDir::NoSymLinks | QDir::Dirs);
     QString evidid = "." + evidlist.first().split(".").last();
+    addevidvar.evidcnt = evidlist.first().split(".").last().mid(1).toInt();
     QString tmpstr = "";
     QString evidencename = evidlist.first().split(evidid).first();
     //qDebug() << "evidencename:" << evidencename;
@@ -1254,6 +1258,7 @@ void PopulateTreeModel(QString evidstring)
     QString partitionpath = "";
     for(int i=0; i < vollist.count(); i++)
     {
+        addevidvar.volcnt = vollist.at(i).mid(1).toInt();
         QString volumepath = evidencepath + vollist.at(i) + "/";
         nodedata.clear();
         nodedata << volname << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i));
@@ -1262,6 +1267,7 @@ void PopulateTreeModel(QString evidstring)
         mutex.unlock();
         if(vsinfo == NULL) // No volume so a single file system is all there is in the image
         {
+            addevidvar.partint = 0;
             fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
             partitionpath = volumepath + "p0/";
             addevidvar.partitionpath = partitionpath;
@@ -1286,6 +1292,7 @@ void PopulateTreeModel(QString evidstring)
             QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::Dirs);
             for(int j=0; j < partlist.count(); j++)
             {
+                addevidvar.partint = j;
                 partitionpath = volumepath + "p" + QString::number(j) + "/";
                 addevidvar.partitionpath = partitionpath;
                 partinfo = tsk_vs_part_get(vsinfo, j);
