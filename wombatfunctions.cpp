@@ -887,11 +887,8 @@ void PopulateTreeModel(QString evidstring)
     //qDebug() << "evidname:" << evidstring;
     QString tmpstr = "";
     QString evidid = "." + evidfiles.first().split(".").last();
-    //QString evidid = "." + evidstring.split(".").last();
     QString evidencename = evidfiles.first().split(evidid).first();
-    //QString evidencename = evidstring.split(evidid).first();
     QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
-    //QFile evidfile(wombatvariable.tmpmntpath + evidstring + "/stat");
     evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
@@ -1411,6 +1408,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, unsigned long long adssize, QString attrid, AddEvidenceVariable* aevar)
 {
     QString curblockstring = GetAdsBlockList(curfileinfo, attrid.toULongLong());
+    //qDebug() << "ads block string:" << curblockstring;
     if(curblockstring.compare("0^^") == 0)
         curblockstring = "";
     QFile adspropfile;
