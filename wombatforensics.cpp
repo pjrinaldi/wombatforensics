@@ -737,8 +737,10 @@ void WombatForensics::PrepareEvidenceImage()
     QString mntstr = "";
     for(int i=0; i < evidencelist.count(); i++)
     {
-        qDebug() << wombatvariable.tmpmntpath + evidencelist.at(i) + "/stat";
-        QFile evidfile(wombatvariable.tmpmntpath + evidencelist.at(i) + "/stat");
+        QDir eviddir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList(QString(evidencelist.at(i).split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
+        qDebug() << wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat";
+        QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(evidfile.isOpen())
            tmpstr = evidfile.readLine();
@@ -998,7 +1000,7 @@ void WombatForensics::LoadHexContents()
     //qDebug() << "evidfile name:" << evidfiles.first();
     blockstring = "";
     QString tmpstr = "";
-    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first());
+    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
     evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
