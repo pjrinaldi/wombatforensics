@@ -994,11 +994,12 @@ void WombatForensics::LoadHexContents()
     //qDebug() << "evidencelist:" << evidencelist; // original evidence path
     //qDebug() << "selectednode id:" << selectednode->Data(10).toString();
     //qDebug() << "selectednode evid id:" << selectednode->Data(10).toString().split("-").first();
-    QString evidid = selectednode->Data(10).toString().split("-").first();
+    QString nodeid = selectednode->Data(10).toString();
+    QString evidid = nodeid.split("-").first();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + evidid)), QDir::NoSymLinks | QDir::Dirs);
     //qDebug() << "evidfile name:" << evidfiles.first();
-    blockstring = "";
+    //blockstring = "";
     QString tmpstr = "";
     QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
     evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -1006,8 +1007,8 @@ void WombatForensics::LoadHexContents()
         tmpstr = evidfile.readLine();
     evidfile.close();
     int imgtype = tmpstr.split(",").at(0).toInt();
-    qDebug() << imgtype;
-    qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
+    //qDebug() << imgtype;
+    //qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
     QString datastring = wombatvariable.tmpmntpath;
     if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
         datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
@@ -1025,42 +1026,300 @@ void WombatForensics::LoadHexContents()
         qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
     casedatafile.setFileName(datastring);
     ui->hexview->setData(casedatafile);
+    // determine offset location in the editor
+    if(nodeid.split("-").count() == 1) // image file
+        ui->hexview->setCursorPosition(0);
+    else if(nodeid.split("-").count() == 2) // volume file
+    {
+        QFile volfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
+        volfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(volfile.isOpen())
+            tmpstr = volfile.readLine();
+        volfile.close();
+        ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toInt()*2);
+    }
+    else if(nodeid.split("-").count() == 3) // partition/file system
+    {
+        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            tmpstr = partfile.readLine();
+        partfile.close();
+        ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toULongLong()*2);
+    }
+    else if(nodeid.split("-").count() == 5) // dir/file
+    {
+        int fstype = 0;
+        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            fstype = QString(partfile.readLine()).split(",").at(0).toInt();
+        partfile.close();
+        QFile filefile;
+        if(nodeid.split("-").at(3).split(":").count() > 1)
+            filefile.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/" + nodeid.split("-").at(3).split(":").first() + "-" + nodeid.split("-").at(3).split(":").last() + "." + nodeid.split("-").at(4) + ".stat");
+        else
+            filefile.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/" + nodeid.split("-").at(3) + "." + nodeid.split("-").at(4) + ".stat");
+        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
+        filefile.close();
+        ui->hexview->setEnabled(true);
+        if(tmpstr.split(",").at(8).toInt() == 0) // zero file
+            ui->hexview->setEnabled(false);
+        else
+        {
+            QString blockstring = "";
+            QString residentstring = "";
+            QString bytestring = "";
+            QFile filefileprop;
+            if(nodeid.split("-").at(3).split(":").count() > 1)
+                filefileprop.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/" + nodeid.split("-").at(3).split(":").first() + "-" + nodeid.split("-").at(3).split(":").last() + "." + nodeid.split("-").at(4) + ".prop");
+            else
+                filefileprop.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/" + nodeid.split("-").at(3) + "." + nodeid.split("-").at(4) + ".prop");
+            filefileprop.open(QIODevice::ReadOnly | QIODevice::Text);
+            while(!filefileprop.atEnd())
+            {
+                QString tmpstring = filefileprop.readLine();
+                if(tmpstring.contains("Block Address"))
+                    blockstring = tmpstring.split("||").at(1);
+                else if(tmpstring.contains("Resident Offset"))
+                    residentstring = tmpstring.split("||").at(1);
+                else if(tmpstring.contains("Byte Offset"))
+                    bytestring = tmpstring.split("||").at(1);
+            }
+            filefileprop.close();
+            if(fstype == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
+            {
+            }
+        }
+    }
+    ui->hexview->ensureVisible();
+}
+        /*
+         *
+        if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
+        {
+            unsigned int curoffset = 0;
+            uint8_t mftoffset[2];
+            uint8_t nextattrid[2];
+            uint8_t mftlen[4];
+            uint8_t attrtype[4];
+            uint32_t atrtype = 0;
+            uint8_t namelength = 0;
+            uint32_t contentlength = 0;
+            uint16_t resoffset = 0;
 
+            if(wombatvariable.selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
+            {
+                if(filehexfileinfo->meta != NULL)
+                {
+                    fhexbuf = new char[filelist.at(8).toULongLong()];
+                    fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, wombatvariable.selectedid.split("-").at(3).split(":").at(1).toUInt(), 0, fhexbuf, filelist.at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_NONE);
+                    if(fhexlen == -1)
+                        qDebug() << tsk_error_get_errstr();
+                }
+                if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
+                {
+                    ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), 0);
+                    ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+                }
+                else // IF RESIDENT
+                {
+                    unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).split(":").at(0).toInt()) + fsoffset;
+                    //qDebug() << "(resident ads) residentoffset:" << residentoffset;
+                    QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
+                    curoffset = 0;
+                    //if(resbuffer.length() == 1024)
+                    //{
+                        mftoffset[0] = (uint8_t)resbuffer.at(20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(21);
+                        nextattrid[0] = (uint8_t)resbuffer.at(40);
+                        nextattrid[1] = (uint8_t)resbuffer.at(41);
+                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                        for(int i = 0; i < attrcnt; i++)
+                        {
+                            attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                            attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                            attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                            attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                            atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                            namelength = (uint8_t)resbuffer.at(curoffset + 9);
+                            mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                            mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                            mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                            mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                            contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                            if(namelength > 0 && atrtype == 128)
+                                break;
+                            curoffset += contentlength;
+                        }
+                        mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
+                        resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+    
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), (curoffset + resoffset));
+                        ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
+                    //}
+                }   
+            }
+            else // IF NOT ADS
+            {
+                if(filehexfileinfo->meta != NULL)
+                {
+                    fhexbuf = new char[filehexfileinfo->meta->size];
+                    fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                }
+                if(filelist.at(1).toInt() == 3) // IF DIR
+                {
+                    unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt()) + fsoffset;
+                    //qDebug() << "(resident dir) residentoffset:" << residentoffset;
+                    QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
+                    //qDebug() << "resbuffer length:" << resbuffer.length();
+                    //if(resbuffer.length() == 1024)
+                    //{
+                        curoffset = 0;
+                        resoffset = 0;
+                        mftoffset[0] = (uint8_t)resbuffer.at(20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(21);
+                        nextattrid[0] = (uint8_t)resbuffer.at(40);
+                        nextattrid[1] = (uint8_t)resbuffer.at(41);
+                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                        //qDebug() << "attrcnt:" << attrcnt;
+                        for(int i = 0; i < attrcnt; i++)
+                        {
+                            if(curoffset < resbuffer.size())
+                            {
+                            attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                            attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                            attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                            attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                            atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                            mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                            mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                            mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                            mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                            contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                            if(atrtype == 144)
+                                break;
+                            curoffset += contentlength;
+                            }
+                        }
+                        //qDebug() << "curoffset:" << curoffset;
+                        // offset to type 144 resident attribute content
+                        if(curoffset < resbuffer.size())
+                        {
+                        mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
+                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        }
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), "", QString::number(residentoffset + curoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), curoffset);
+                        ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
+                    //}
+                }
+                else // IF FILE AND OTHER STUFF
+                {
+                    if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
+                    {
+                        ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), 0);
+                        ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+                    }
+                    else // IF RESIDENT
+                    {
+                        unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * wombatvariable.selectedid.split("-").at(3).mid(1).toInt()) + fsoffset;
+                        //qDebug() << "(resident file) residentoffset:" << residentoffset;
+                        QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
+                        curoffset = 0;
+                        //if(resbuffer.length() == 1024)
+                        //{
+                            mftoffset[0] = (uint8_t)resbuffer.at(20);
+                            mftoffset[1] = (uint8_t)resbuffer.at(21);
+                            nextattrid[0] = (uint8_t)resbuffer.at(40);
+                            nextattrid[1] = (uint8_t)resbuffer.at(41);
+                            curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                            int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                            //qDebug() << "attrcnt:" << attrcnt;
+                            for(int i = 0; i < attrcnt; i++)
+                            {
+                                if(curoffset < resbuffer.size())
+                                {
+                                attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                                attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                                attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                                attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                                atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                                namelength = (uint8_t)resbuffer.at(curoffset + 9);
+                                mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                                mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                                mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                                mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                                contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                                if(namelength == 0 && atrtype == 128)
+                                    break;
+                                curoffset += contentlength;
+                                }
+                            }
+                            //qDebug() << "curoffset:" << curoffset;
+                            if(curoffset < resbuffer.size())
+                            {
+                            mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
+                            mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
+                            resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                            }
+                            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), (curoffset + resoffset));
+                            ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
+                        //}
+                    }
+                }
+            }
+        }
+        else // OTHER FILE SYSTEM
+        {
+            if(filehexfileinfo->meta != NULL)
+            {
+                fhexbuf = new char[filehexfileinfo->meta->size];
+                fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+            }
+            ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, residentstring, bytestring, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), 0);
+            ui->hexview->setCursorPosition(bytestring.toULongLong()*2);
+        }
+        }
+        if(selectedindex.sibling(selectedindex.row(), 2).data().toULongLong() > 0)
+        {
+        (new QDir())->mkpath(wombatvariable.tmpfilepath);
+        hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 10).data().toString() + "-fhex";
+        QFile tmpfile(hexstring);
+        tmpfile.open(QIODevice::WriteOnly);
+        QDataStream outbuffer(&tmpfile);
+        outbuffer.writeRawData(fhexbuf, fhexlen);
+        tmpfile.close();
+        delete[] fhexbuf;
+        tsk_fs_file_close(filehexfileinfo);
+        tsk_fs_close(filehexfsinfo);
+        tsk_img_close(fileheximginfo);
+        }
+        else
+        {
+            tsk_fs_file_close(filehexfileinfo);
+            tsk_fs_close(filehexfsinfo);
+            tsk_img_close(fileheximginfo);
+        }
+    }
+    ui->hexview->ensureVisible();
+
+         *
+         */ 
+    //}
     /*
     QStringList evidlist;
     evidlist.clear();
     //curhexdoc = QHexDocument::fromDevice<QMemoryBuffer>(casedatafile);
     //curhexdoc = QHexDocument::fromFile<QMemoryBuffer>(datastring);
-
-    // determine offset location in the editor
-    if(wombatvariable.selectedid.split("-").count() == 1) // image file
-        ui->hexview->setCursorPosition(0);
-    else if(wombatvariable.selectedid.split("-").count() == 2) // volume file
-    {
-        QStringList vollist;
-        vollist.clear();
-        // IF VOLFILE, JUST NEED TO LOAD THE PATH TO GET THE STAT FILE.
-        QString volfilestring = wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + wombatvariable.selectedid.split("-").at(0) + "/." + wombatvariable.selectedid.split("-").at(1) + "/stat";
-        QFile volfile(volfilestring);
-        volfile.open(QIODevice::ReadOnly);
-        tmpstr = volfile.readLine();
-        volfile.close();
-        vollist = tmpstr.split(",");
-        ui->hexview->setCursorPosition(vollist.at(4).toInt()*2);
-    }
-    else if(wombatvariable.selectedid.split("-").count() == 3) // partition file
-    {
-        QStringList partlist;
-        partlist.clear();
-        QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + wombatvariable.selectedid.split("-").at(0) + "/." + wombatvariable.selectedid.split("-").at(1) + "/." + wombatvariable.selectedid.split("-").at(2) + "/stat");
-        partfile.open(QIODevice::ReadOnly);
-        tmpstr = partfile.readLine();
-        partfile.close();
-        partlist = tmpstr.split(",");
-        ui->hexview->setCursorPosition(partlist.at(4).toULongLong()*2);
-    }
     else if(wombatvariable.selectedid.split("-").count() == 4) // file file
     {
+    // MOVE FILEHEX CODE TO THE FILEHEXVIEWER SOMEWHERE...
         QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-f").last();
         // INITIAL PIECE OF FILE HEX CONTENT CODE
         TSK_IMG_INFO* fileheximginfo;
@@ -1392,7 +1651,7 @@ void WombatForensics::LoadHexContents()
     }
     ui->hexview->ensureVisible();
     */
-}
+//}
 
 void WombatForensics::CloseCurrentCase()
 {
