@@ -377,6 +377,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                 {
                     if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                     {
+                        qDebug() << "curaddress:" << curaddress;
                         /* Get MD5 HASH of Content using Qt Method */
                         char* fbuf = new char[fsattr->size];
                         ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
