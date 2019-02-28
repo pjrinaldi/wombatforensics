@@ -931,20 +931,22 @@ void WombatForensics::AddEvidence()
     {
         // TO MAKE THIS WORK, I NEED TO REPLACE ALL THE GLOBAL VARIABLES WITH LOCAL ONES OTHERWISE
         // THE CONCURRENCY WILL COLLIDE AND CAUSE ISSUES
+        /*
         for(int i=0; i < evidencelist.count(); i++)
         {
-            InitializeEvidenceStructure(evidencelist.at(i));
+            //InitializeEvidenceStructure(evidencelist.at(i));
            // wombatvariable.fullpathvector.clear();
             //wombatvariable.fullpathvector.push_back(evidencelist.at(i).toStdString());
             //wombatvariable.itemcount = 1;
             //qDebug() << evidencelist;
-            //QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure, evidencelist.at(i));
-            //if(i == evidencelist.count() - 1)
-            //    sqlwatcher.setFuture(tmpfuture);
+            QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure, evidencelist.at(i));
+            if(i == evidencelist.count() - 1)
+                sqlwatcher.setFuture(tmpfuture);
         }
-        UpdateStatus();
-        //QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
-        //sqlwatcher.setFuture(tmpfuture);
+        */
+        //UpdateStatus();
+        QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
+        sqlwatcher.setFuture(tmpfuture);
     }
     /*
     QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
