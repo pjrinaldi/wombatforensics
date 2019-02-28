@@ -1128,7 +1128,7 @@ void WombatForensics::LoadHexContents()
                     }
                     else // IF RESIDENT
                     {
-                        if(tmpstr.split(",").at(8).toULongLong() < 700)
+                        if(tmpstr.split(",").at(8).toULongLong() < 700) // takes care of $BadClus which is non-resident but doesn't have blocks
                         {
                         unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * mftaddress) + fsoffset;
                         //qDebug() << "(resident ads) residentoffset:" << residentoffset;
