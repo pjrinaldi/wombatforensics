@@ -18,7 +18,7 @@ class FileViewer : public QMainWindow
 public:
     FileViewer(QWidget* parent = 0);
     ~FileViewer();
-    void UpdateHexView(const QModelIndex curindex);
+    void UpdateHexView();
 
 public slots:
 

@@ -41,13 +41,15 @@ void ImageWindow::GetImage(QString objectid)
     std::vector<std::string> pathvector;
     const TSK_TCHAR** imagepartspath;
     pathvector.clear();
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split(".e").first();
     QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
     QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
     unsigned long long curaddress = objectid.split("-f").at(1).split("-a").at(0).toULongLong(); 
     //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
     //wombatvariable.evidencename = evidfiles.at(0);
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
+    QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + estring.mid(1));
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
@@ -67,7 +69,7 @@ void ImageWindow::GetImage(QString objectid)
     free(imagepartspath);
     tmpstr = "";
     //QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + pstring.mid(1)), QDir::NoSymLinks | QDir::Files);
-    QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/stat");
+    QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
     //QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();

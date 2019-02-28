@@ -62,6 +62,9 @@ void VideoViewer::SetDuration(qint64 pos)
 
 void VideoViewer::GetVideo(const QModelIndex &index)
 {
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split(".e").first();
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
@@ -75,7 +78,7 @@ void VideoViewer::GetVideo(const QModelIndex &index)
     //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
     //wombatvariable.evidencename = evidfiles.at(0);
     //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1));
-    QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/stat");
+    QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
     evidlist = tmpstr.split(",");
@@ -98,7 +101,7 @@ void VideoViewer::GetVideo(const QModelIndex &index)
     partlist.clear();
     //QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + index.sibling(index.row(), 0).data().toString().split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
     //QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
-    QFile partfile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/stat");
+    QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();
     partfile.close();

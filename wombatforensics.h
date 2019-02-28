@@ -192,6 +192,7 @@ private:
     void CloseCurrentCase(void);
     void UpdateProperties(void);
     void LoadHexContents(void);
+    void GenerateHexFile(const QModelIndex index);
     void StartThumbnails(QStringList diglist);
     void StartHash(QStringList diglist, int hashtype);
     QStringList GetFileLists(int filelisttype);
