@@ -1124,7 +1124,7 @@ void WombatForensics::LoadHexContents()
                     }
                     else // IF RESIDENT
                     {
-                        if(tmpstr.split(",").at(8).toULongLong() < 2000)
+                        if(tmpstr.split(",").at(8).toULongLong() < 700)
                         {
                         unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * tmpstr.split(",").at(9).toInt()) + fsoffset;
                         qDebug() << "(resident ads) residentoffset:" << residentoffset;
