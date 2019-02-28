@@ -1299,8 +1299,26 @@ void WombatForensics::CloseCurrentCase()
 
     // UNMOUNT XMOUNT EVIDENCEIMAGEDATAFILE
     // NEED TO LOOP THIS FOR EACH EVIDENCE ITEM.. USE DIR FIND TO GET EVIDENCE NAMES
-    QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
-    QProcess::execute(xunmntstr);
+    for(int i=0; i < evidencelist.count(); i++)
+    {
+        //qDebug() << "evidencelist:" << evidencelist.at(i);
+        QString imgext = evidencelist.at(i).split("/").last().split(".").last().toLower();
+        if(imgext.contains("e01")) // ewfmount
+        {
+            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + evidencelist.at(i).split("/").last() + "/";
+            QProcess::execute(xunmntstr);
+        }
+        else if(imgext.contains("aff") || imgext.contains("000")) // affuse
+        {
+            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
+            QProcess::execute(xunmntstr);
+        }
+        /*
+        else // raw, so nothing to unmount
+        {
+        }
+        */
+    }
 
     QString unmntstr = "umount " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);
