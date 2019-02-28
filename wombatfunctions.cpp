@@ -638,6 +638,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             }
         }
     }
+    return TSK_WALK_CONT;
+}
             
                 /*
                 if(tmpfile->name->par_addr == rootinum)
@@ -844,8 +846,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             }
         }
     }*/
-    return TSK_WALK_CONT;
-}
+//    return TSK_WALK_CONT;
+//}
 
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
@@ -864,6 +866,8 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
             }
         }
     }
+    else
+        qDebug() << "what is going on...";
     return TSK_WALK_CONT;
 }
 
@@ -1794,7 +1798,9 @@ void InitializeEvidenceStructure(QString evidname)
             //qDebug() << "readvsinfo->part_count:" << readvsinfo->part_count;
             for(uint32_t i=0; i < readvsinfo->part_count; i++)
             {
+                //qDebug() << "partint:" << partint << "partcount:" << readvsinfo->part_count;
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
+                qDebug() << "slot num:" << readpartinfo->slot_num;
                 QString partitionpath = volumepath + "p" + QString::number(partint) + "/";
                 addevidvar.partitionpath = partitionpath;
                 addevidvar.partint = partint;
@@ -1861,6 +1867,21 @@ void InitializeEvidenceStructure(QString evidname)
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                         mutex.unlock();
                     }
+                }
+                else
+                {
+                    out << "0," << (unsigned long long)readpartinfo->len * (int)readvsinfo->block_size << "," << QString(readpartinfo->desc) << " (Non-Recognized FS),0," << (unsigned long long)readpartinfo->start * (int)readvsinfo->block_size << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                    out.flush();
+                    pfile.close();
+                    treeout.clear();
+                    //treeout << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)) << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
+                    treeout << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
+                    nodedata.clear();
+                    for(int j=0; j < treeout.count(); j++)
+                        nodedata << treeout.at(j);
+                    mutex.lock();
+                    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
+                    mutex.unlock();
                 }
                 /*
                 else
