@@ -620,18 +620,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     if(evidencelist.count() > 0)
     {
-        //QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        /*
-        for(int i=0; i < evidencelist.count(); i++)
-        {
-            //PopulateTreeModel(evidencelist.at(i).split("/").last());
-            //QFuture<void> tmpfuture = QtConcurrent::run(PopulateTreeModel, evidencelist.at(i).split("/").last());
-            //if(i == evidencelist.count() - 1)
-            //    openwatcher.setFuture(tmpfuture);
-        }
-        //OpenUpdate();
-        //
-        */
         QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
         openwatcher.setFuture(tmpfuture);
     }
@@ -929,22 +917,6 @@ void WombatForensics::AddEvidence()
     //qDebug() << "ecount after:" << ecount;
     if(evidencelist.count() > 0)
     {
-        // TO MAKE THIS WORK, I NEED TO REPLACE ALL THE GLOBAL VARIABLES WITH LOCAL ONES OTHERWISE
-        // THE CONCURRENCY WILL COLLIDE AND CAUSE ISSUES
-        /*
-        for(int i=0; i < evidencelist.count(); i++)
-        {
-            //InitializeEvidenceStructure(evidencelist.at(i));
-           // wombatvariable.fullpathvector.clear();
-            //wombatvariable.fullpathvector.push_back(evidencelist.at(i).toStdString());
-            //wombatvariable.itemcount = 1;
-            //qDebug() << evidencelist;
-            QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure, evidencelist.at(i));
-            if(i == evidencelist.count() - 1)
-                sqlwatcher.setFuture(tmpfuture);
-        }
-        */
-        //UpdateStatus();
         QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
         sqlwatcher.setFuture(tmpfuture);
     }
@@ -1034,7 +1006,7 @@ void WombatForensics::LoadHexContents()
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
-    QString datastring = wombatvariable.tmpmntpath;
+    QString datastring = wombatvariable.imgdatapath;
     if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
         datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
     else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
