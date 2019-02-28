@@ -1073,7 +1073,7 @@ void WombatForensics::LoadHexContents()
         partfile.close();
         ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toULongLong()*2);
     }
-    else if(nodeid.split("-").count() == 4) // dir/file
+    else if(nodeid.split("-").count() == 5) // dir/file
     {
         QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-f").last();
         QStringList partlist;
