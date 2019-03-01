@@ -18,6 +18,7 @@ void StartThumbnails(QStringList thumblist);
 void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
 void LoadImagesHash(void);
+void SaveImagesHash(void);
 void PopulateTreeModel(QString evidstring);
 void FileRecurse(QString partitionpath, QString paraddr, QString rootinum);
 void AddFileData(QString file, QString partpath, QString rootinum);

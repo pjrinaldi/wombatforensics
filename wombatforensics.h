@@ -168,6 +168,7 @@ private slots:
     void FinishExport(void);
     void FinishThumbs(void);
     void ThashFinish(void);
+    void ThashSaveFinish(void);
     void ThreadCancelled(void);
     void ReadXMountOut(void);
     void ReadXMountErr(void);
@@ -235,7 +236,8 @@ private:
     QFutureWatcher<void> thumbwatcher;
     QFuture<void> hashingfuture;
     QFutureWatcher<void> hashingwatcher;
-    //QFutureWatcher<void> thashwatcher;
+    QFutureWatcher<void> thashwatcher;
+    QFutureWatcher<void> thashsavewatcher;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;
     QFuture<void> openfuture;

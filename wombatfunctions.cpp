@@ -727,11 +727,14 @@ void SaveImagesHash()
     thumbfile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(thumbfile.isOpen())
     {
-        QHash<QString, QString> i(imageshash);
+        QHashIterator<QString, QString> i(imageshash);
         while(i.hasNext())
         {
             i.next();
-            thumbfile.write(
+            thumbfile.write(i.key().toStdString().c_str());
+            thumbfile.write("|");
+            thumbfile.write(i.value().toStdString().c_str());
+            thumbfile.write(",");
         }
     }
     thumbfile.close();
@@ -870,11 +873,14 @@ void GenerateHash(QString itemid)
     isignals->DigUpd(hashtype, digcount);
     }
 }
+
+// SHOULD NOT BE NEEDED
 void StartThumbnails(QStringList diglist)
 {
     //qInfo() << "Generating Thumbnails...";
     //LogMessage("Generating Thumbnails...");
     //StatusUpdate("Generating Thumbnails...");
+    /*
     QFile tmpfile;
     QFile thumbfile;
     thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/" + "thumbpathlist");
@@ -882,6 +888,7 @@ void StartThumbnails(QStringList diglist)
     thumblist.clear();
     thumbpathlist.clear();
     //qDebug() << "last diglist/count:" << diglist.last() << diglist.count();
+    */
     /*
     if(diglist.at(0).length() == 0)
     {
@@ -932,7 +939,7 @@ void StartThumbnails(QStringList diglist)
     else
     {
     */
-        for(int i=0; i < diglist.count(); i++)
+     /*   for(int i=0; i < diglist.count(); i++)
         {
             QDir eviddir = QDir(wombatvariable.tmpmntpath);
             QStringList evidfiles = eviddir.entryList(QStringList("*." + diglist.at(i).split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
@@ -947,7 +954,7 @@ void StartThumbnails(QStringList diglist)
                 tmpfile.close();
                 if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
                 {
-                    thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
+                    //thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
                     QByteArray ba;
                     QByteArray ba2;
                     ba.append(tmpstr.split(",").at(0));
@@ -965,108 +972,134 @@ void StartThumbnails(QStringList diglist)
             }
         }
     //}
-    digfilelist = thumblist;
-    QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
-    thashwatcher.setFuture(tmpfuture);
-    QFuture<void> tmpfuture2 = QtConcurrent::map(thumblist, GenerateThumbnails);
-    thumbwatcher.setFuture(tmpfuture2);
+    //digfilelist = thumblist;
+    //QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
+    //thashwatcher.setFuture(tmpfuture);
+    //QFuture<void> tmpfuture2 = QtConcurrent::map(thumblist, GenerateThumbnails);
+    //thumbwatcher.setFuture(tmpfuture2);
     //ui->actionCancel_Operation->setEnabled(true);
     //QToolTip::showText(cancelwidget->mapToGlobal(QPoint()), tr("Cancel Currently Running Opreation"));
     //cancelthread->show();
+    */
 }
 
 void GenerateThumbnails(QString thumbid)
 {
     if(thumbid.split("-").count() == 5)
     {
-    TSK_IMG_INFO* readimginfo = NULL;
-    TSK_FS_INFO* readfsinfo = NULL;
-    TSK_FS_FILE* readfileinfo = NULL;
-    QString tmpstr = "";
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    std::vector<std::string> pathvector;
-    const TSK_TCHAR** imagepartspath;
-    pathvector.clear();
-    //qDebug() << "thumbid:" << thumbid;
-    QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
-    QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
-    QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
-    QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
-    unsigned long long curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
-    //qDebug() << "curaddress:" << curaddress;
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
-    QString evidencename = evidfiles.at(0).split(".e").first();
-    QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
-    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(evidfile.isOpen())
-        tmpstr = evidfile.readLine();
-    int partcount = tmpstr.split(",").at(3).split("|").size();
-    evidfile.close();
-    for(int i=0; i < partcount; i++)
-        pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
-    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(uint i=0; i < pathvector.size(); i++)
-        imagepartspath[i] = pathvector[i].c_str();
-    readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    if(readimginfo == NULL)
-    {
-        qDebug() << tsk_error_get_errstr();
-        //LogMessage("Image opening error");
-    }
-    free(imagepartspath);
-    tmpstr = "";
-    //qDebug() << "wombatvariable.evidencename:" << wombatvariable.evidencename;
-    QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
-    //qDebug() << "partfile:" << partfile.fileName();
-    partfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(partfile.isOpen())
-        tmpstr = partfile.readLine();
-    partfile.close();
-    //qDebug() << "tmpstr:" << tmpstr;
-    if(tmpstr.count() > 0)
-    {
-        readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
-        if(readfsinfo != NULL)
-            readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
-    }
-    QImage fileimage;
-    QImage thumbimage;
-    QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
-    if(readfileinfo != NULL)
-    {
-        char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
-    	ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-    	if(readfileinfo->meta != NULL)
-    	{
-            bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
-    	    if(imageloaded)
+        TSK_IMG_INFO* readimginfo = NULL;
+        TSK_FS_INFO* readfsinfo = NULL;
+        TSK_FS_FILE* readfileinfo = NULL;
+        QString tmpstr = "";
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        std::vector<std::string> pathvector;
+        const TSK_TCHAR** imagepartspath;
+        pathvector.clear();
+        //qDebug() << "thumbid:" << thumbid;
+        QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
+        QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
+        QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
+        QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
+        QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
+        unsigned long long curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
+        //qDebug() << "curaddress:" << curaddress;
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
+        QString evidencename = evidfiles.at(0).split(".e").first();
+        QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(evidfile.isOpen())
+            tmpstr = evidfile.readLine();
+        int partcount = tmpstr.split(",").at(3).split("|").size();
+        evidfile.close();
+        for(int i=0; i < partcount; i++)
+            pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
+        imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+        for(uint i=0; i < pathvector.size(); i++)
+            imagepartspath[i] = pathvector[i].c_str();
+        readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+        if(readimginfo == NULL)
+        {
+            qDebug() << tsk_error_get_errstr();
+            //LogMessage("Image opening error");
+        }
+        free(imagepartspath);
+        tmpstr = "";
+        //qDebug() << "wombatvariable.evidencename:" << wombatvariable.evidencename;
+        QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
+        //qDebug() << "partfile:" << partfile.fileName();
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            tmpstr = partfile.readLine();
+        partfile.close();
+        //qDebug() << "tmpstr:" << tmpstr;
+        if(tmpstr.count() > 0)
+        {
+            readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+            if(readfsinfo != NULL)
+                readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
+        }
+        QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".stat");
+        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
+        filefile.close();
+        if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
+        {
+            //thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
+            QByteArray ba;
+            QByteArray ba2;
+            ba.append(tmpstr.split(",").at(0));
+            ba2.append(tmpstr.split(",").at(3));
+            QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
+            ba.clear();
+            ba.append(fullpath);
+            imageshash.insert(tmpstr.split(",", QString::SkipEmptyParts).at(12), QString(ba.toBase64()));
+            /*
+            thumbfile.open(QIODevice::Append);
+            thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
+            thumbfile.write("|");
+            thumbfile.write(ba.toBase64());
+            thumbfile.write(",");
+            thumbfile.close();
+            */
+            QImage fileimage;
+            QImage thumbimage;
+            QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
+            if(readfileinfo != NULL)
             {
-                thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-            	writer.write(thumbimage);
+                char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+                ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                if(readfileinfo->meta != NULL)
+                {
+                    bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
+                    if(imageloaded)
+                    {
+                        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                        writer.write(thumbimage);
+                    }
+                    else
+                    {
+                        fileimage.load(":/missingimage");
+            	        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                        writer.write(thumbimage);
+                    }
+                }   
+    	        free(imgbuf);
             }
             else
             {
-            	fileimage.load(":/missingimage");
-            	thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-            	writer.write(thumbimage);
+    	        fileimage.load(":/missingimage");
+                thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
             }
-    	}
-	free(imgbuf);
-    }
-    else
-    {
-	fileimage.load(":/missingimage");
-	thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-    }
-    tsk_fs_file_close(readfileinfo);
-    tsk_fs_close(readfsinfo);
-    tsk_img_close(readimginfo);
-    readfileinfo = NULL;
-    readfsinfo = NULL;
-    readimginfo = NULL;
-    digcount++;
-    isignals->DigUpd(0, digcount);
+            tsk_fs_file_close(readfileinfo);
+            tsk_fs_close(readfsinfo);
+            tsk_img_close(readimginfo);
+            readfileinfo = NULL;
+            readfsinfo = NULL;
+            readimginfo = NULL;
+            digcount++;
+            isignals->DigUpd(0, digcount);
+        }
     }
 }
 

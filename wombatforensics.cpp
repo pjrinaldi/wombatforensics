@@ -111,11 +111,12 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&openwatcher, SIGNAL(finished()), this, SLOT(OpenUpdate()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(&thashwatcher, SIGNAL(finished()), this, SLOT(ThashFinish()), Qt::QueuedConnection);
+    connect(&thashsavewatcher, SIGNAL(finished()), this, SLOT(ThashSaveFinish()), Qt::QueuedConnection);
     connect(&hashingwatcher, SIGNAL(finished()), this, SLOT(HashingFinish()), Qt::QueuedConnection);
-    connect(this, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
+    //connect(this, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
-    connect(this, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()));
+    //connect(this, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()));
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()));
     //connect(cancelthread, SIGNAL(ThreadCancelled()), this, SLOT(ThreadCancelled()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
@@ -643,15 +644,13 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
 
 void WombatForensics::OpenUpdate()
 {
-    /*
-    thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
+    thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/"); // won't do anything if it already exists
     QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
     if(!tdir.isEmpty())
     {
         QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash); // load images hash after case open to speed up thumbnail viewing
         thashwatcher.setFuture(tmpfuture);
     }
-    */
     PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
@@ -691,6 +690,13 @@ void WombatForensics::OpenUpdate()
     StatusUpdate("Ready");
     //StatusUpdate("Loading Thumbnail Library...");
     ui->actionView_Image_Gallery->setEnabled(false);
+}
+
+void WombatForensics::ThashSaveFinish(void)
+{
+    qDebug() << "SaveImageHashes Finished";
+    StatusUpdate("Thumbnail Library Saved");
+    StatusUpdate("Ready");
 }
 
 void WombatForensics::ThashFinish(void)
@@ -1677,7 +1683,9 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0) // Generate Thumbnails
         {
-            QFuture<void> tmpfuture = QtConcurrent::run(StartThumbnails, digfilelist);
+            thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
+            thumbwatcher.setFuture(thumbfuture);
+            //QFuture<void> tmpfuture = QtConcurrent::run(StartThumbnails, digfilelist);
             //thumbfuture = QtConcurrent::map(digfilelist, StartThumbnails); // Process Thumbnails
             //thumbwatcher.setFuture(thumbfuture);
             //QFuture<void> tmpfuture = QtConcurrent::run(&WombatForensics::StartThumbnails, digfilelist); // Process All Thumbnails
@@ -1932,7 +1940,8 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
-                QFuture<void> tmpfuture = QtConcurrent::run(StartThumbnails, listeditems); // Process all thumbnails
+                thumbfuture = QtConcurrent::map(listeditems, GenerateThumbnails); // Process All thumbnails
+                //QFuture<void> tmpfuture = QtConcurrent::run(StartThumbnails, listeditems); // Process all thumbnails
                 //QFuture<void> tmpfuture = QtConcurrent::run(&WombatForensics::StartThumbnails, listeditems); // Process All Thumbnails
             }
             else
@@ -2081,6 +2090,8 @@ void WombatForensics::FinishThumbs()
     //cancelthread->close();
     StatusUpdate("Thumbnail generation finished.");
     qInfo() << "Thumbnail generation finished";
+    QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
+    thashsavewatcher.setFuture(tmpfuture);
     //LogMessage("Thumbnail generation finished.");
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     imagewindow->LoadThumbnails(); // GUI Intensive
