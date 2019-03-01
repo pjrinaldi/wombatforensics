@@ -88,8 +88,10 @@
 #include <unistd.h>
 #include <string.h>
 
+//#include <tsk/libtsk.h>
+#include <libewf.h>
+//#include <tsk/fs/tsk_yaffs.h>
 #include "tskvariable.h"
-
 #include "libtsk.h"
 #include "ewf.h"
 #include "libewf.h"

@@ -25,6 +25,7 @@
 #include "settingsdialog.h"
 #include "qhexview.h"
 #include "addevidencedialog.h"
+#include "digstatus.h"
 
 #define UNIX
 #define UNIX_64
@@ -88,6 +89,7 @@ public:
     AboutBox* aboutbox;
     SettingsDialog* settingsdialog;
     AddEvidenceDialog* addevidencedialog;
+    DigStatus* digstatusdialog;
     //QHexDocument* curhexdoc;
     //QHexView* hexviewer;
 
@@ -152,6 +154,7 @@ private slots:
     void ThreadCancelled(void);
     void ReadXMountOut(void);
     void ReadXMountErr(void);
+    void ShowDigStatus(void);
     void StatusUpdate(QString tmptext)
     {
         statuslabel->setText(tmptext);

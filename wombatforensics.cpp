@@ -67,6 +67,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
+    digstatusdialog = new DigStatus(this);
     //hexviewer = new QHexView();
     //ui->splitter->addWidget(hexviewer);
     //cancelthread = new CancelThread(this);
@@ -97,6 +98,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long)), this, SLOT(UpdateProgress(unsigned long long)), Qt::QueuedConnection);
+    connect(statuslabel, SIGNAL(clicked()), this, SLOT(ShowDigStatus()), Qt::DirectConnection);
     connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     CheckWombatConfiguration();
@@ -186,6 +188,12 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //autosavetimer = new QTimer(this);
     //connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
 }
+
+void WombatForensics::ShowDigStatus()
+{
+    digstatusdialog->show();
+}
+
 //////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
 {

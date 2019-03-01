@@ -21,13 +21,13 @@ public:
     DigStatus(QWidget* parent = 0);
     ~DigStatus();
     //void SetText(QString txt);
-    void UpdateDigState(int digstateid, digstatecount);
-    void SetIntitialDigState(int digstateid, digtotal);
+    void UpdateDigState(int digstateid, int digstatecount);
+    void SetIntitialDigState(int digstateid, int digtotal);
 public slots:
    //void HideClicked();
 signals:
     //void HideDigStatusWindow(bool checkstate);
-    void CancelDigStatus(int digstateid)
+    void CancelDigStatus(int digstateid);
 protected:
     void closeEvent(QCloseEvent* event);
 
