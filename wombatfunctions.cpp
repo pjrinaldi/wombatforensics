@@ -325,7 +325,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
     mutex.lock();
     treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
     mutex.unlock();
-    listeditems.append(treeout.first());
+    listeditems.append(treeout.at(10));
     if(filefile.isOpen())
         filefile.close();
     if(tmpfile->name != NULL)
@@ -519,7 +519,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
                 mutex.unlock();
-                listeditems.append(treeout.first());
+                listeditems.append(treeout.at(10));
                 if(tmpfile->name != NULL)
                 {
                     if(!TSK_FS_ISDOT(tmpfile->name->name))
