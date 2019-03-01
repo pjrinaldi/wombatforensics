@@ -18,7 +18,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filecountlabel->setText("Found: 0");
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
-    statuslabel = new QLabel(this);
+    statuslabel = new QToolButton(this);
     StatusUpdate("");
     vline1 = new QFrame(this);
     vline1->setFrameStyle(QFrame::VLine | QFrame::Raised);

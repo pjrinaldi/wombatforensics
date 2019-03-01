@@ -239,7 +239,7 @@ private:
     QLabel* filecountlabel;
     QLabel* filtercountlabel;
     QLabel* checkedcountlabel;
-    QLabel* statuslabel;
+    QToolButton* statuslabel;
     QFrame* vline1;
     QFrame* vline2;
     int exporttype;
