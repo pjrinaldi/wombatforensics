@@ -46,6 +46,23 @@
 #define FALSE 0
 #endif
 
+class StatusLabel : public QLabel
+{
+    Q_OBJECT
+
+    public:
+        void ShowDigStatus(void);
+
+    protected:
+        void mouseReleaseEvent(QMouseEvent* e)
+        {
+            emit clicked();
+        }
+
+    signals:
+        void clicked();
+};
+
 namespace Ui {
 class WombatForensics;
 }
@@ -239,7 +256,8 @@ private:
     QLabel* filecountlabel;
     QLabel* filtercountlabel;
     QLabel* checkedcountlabel;
-    QToolButton* statuslabel;
+    //QToolButton* statuslabel;
+    StatusLabel* statuslabel;
     QFrame* vline1;
     QFrame* vline2;
     int exporttype;

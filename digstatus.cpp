@@ -8,6 +8,7 @@ DigStatus::DigStatus(QWidget* parent) : QDialog(parent), ui(new Ui::DigStatus)
     ui->setupUi(this);
     //ui->checkBox->setVisible(false);
     this->hide();
+    // need to hide ui elements until i use them. also need to build in the cancel buttons with signals...
 }
 
 DigStatus::~DigStatus()
