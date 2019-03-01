@@ -16,6 +16,7 @@ extern QDir thumbdir;
 extern QDir currentrawimagedir;
 extern QTextEdit* msglog;
 extern QFutureWatcher<void> thumbwatcher;
+extern QFutureWatcher<void> thashwatcher;
 extern QFutureWatcher<void> secondwatcher;
 extern unsigned long long filesfound;
 extern unsigned long long fileschecked;

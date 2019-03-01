@@ -749,9 +749,9 @@ void GenerateHash(QString itemid)
     std::vector<std::string> pathvector;
     const TSK_TCHAR** imagepartspath;
     pathvector.clear();
-    qDebug() << "itemid:" << itemid;
+    //qDebug() << "itemid:" << itemid;
     unsigned long long curaddress = itemid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
-    qDebug() << "curaddress:" << curaddress;
+    //qDebug() << "curaddress:" << curaddress;
     QStringList evidfiles = eviddir.entryList(QStringList("*." + itemid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + itemid.split("-").at(0) + "/stat");
@@ -853,6 +853,110 @@ void GenerateHash(QString itemid)
     isignals->DigUpd(hashtype, digcount);
     }
 }
+void StartThumbnails(QStringList diglist)
+{
+    //qInfo() << "Generating Thumbnails...";
+    //LogMessage("Generating Thumbnails...");
+    //StatusUpdate("Generating Thumbnails...");
+    QFile tmpfile;
+    QFile thumbfile;
+    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/" + "thumbpathlist");
+    QString tmpstr = "";
+    thumblist.clear();
+    thumbpathlist.clear();
+    //qDebug() << "last diglist/count:" << diglist.last() << diglist.count();
+    /*
+    if(diglist.at(0).length() == 0)
+    {
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*.e*"), QDir::NoSymLinks | QDir::Dirs);
+        for(int i=0; i < evidfiles.count(); i++)
+        {
+            QDir voldir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i));
+            QStringList volfiles = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
+            for(int j=0; j < volfiles.count(); j++)
+            {
+                QDir partdir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j));
+                QStringList partfiles = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
+                for(int k=0; k < partfiles.count(); k++)
+                {
+                    QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k));
+                    QStringList filefiles = filedir.entryList(QStringList("f*.a*.stat"), QDir::NoSymLinks | QDir::Files);
+                    for(int l=0; l < filefiles.count(); l++)
+                    {
+                        tmpstr = "";
+                        tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k) + "/" + filefiles.at(l));
+                        tmpfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                        if(tmpfile.isOpen())
+                            tmpstr = tmpfile.readLine();
+                        tmpfile.close();
+                        if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
+                        {
+                            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
+                            QByteArray ba;
+                            QByteArray ba2;
+                            ba.append(tmpstr.split(",").at(0));
+                            ba2.append(tmpstr.split(",").at(3));
+                            QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
+                            ba.clear();
+                            ba.append(fullpath);
+                            thumbfile.open(QIODevice::Append);
+                            thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
+                            thumbfile.write("|");
+                            thumbfile.write(ba.toBase64());
+                            thumbfile.write(",");
+                            thumbfile.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+    */
+        for(int i=0; i < diglist.count(); i++)
+        {
+            QDir eviddir = QDir(wombatvariable.tmpmntpath);
+            QStringList evidfiles = eviddir.entryList(QStringList("*." + diglist.at(i).split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+            QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + diglist.at(i).split("-").at(1) + "/" + diglist.at(i).split("-").at(2));
+            QStringList filefiles = filedir.entryList(QStringList(diglist.at(i).split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
+            for(int j=0; j < filefiles.count(); j++)
+            {
+                tmpstr = "";
+                tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + diglist.at(i).split("-").at(1) + "/" + diglist.at(i).split("-").at(2) + "/" + filefiles.at(j));
+                tmpfile.open(QIODevice::ReadOnly);
+                tmpstr = tmpfile.readLine();
+                tmpfile.close();
+                if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
+                {
+                    thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
+                    QByteArray ba;
+                    QByteArray ba2;
+                    ba.append(tmpstr.split(",").at(0));
+                    ba2.append(tmpstr.split(",").at(3));
+                    QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
+                    ba.clear();
+                    ba.append(fullpath);
+                    thumbfile.open(QIODevice::Append);
+                    thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
+                    thumbfile.write("|");
+                    thumbfile.write(ba.toBase64());
+                    thumbfile.write(",");
+                    thumbfile.close();
+                }
+            }
+        }
+    //}
+    digfilelist = thumblist;
+    QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
+    thashwatcher.setFuture(tmpfuture);
+    QFuture<void> tmpfuture2 = QtConcurrent::map(thumblist, GenerateThumbnails);
+    thumbwatcher.setFuture(tmpfuture2);
+    //ui->actionCancel_Operation->setEnabled(true);
+    //QToolTip::showText(cancelwidget->mapToGlobal(QPoint()), tr("Cancel Currently Running Opreation"));
+    //cancelthread->show();
+}
 
 void GenerateThumbnails(QString thumbid)
 {
@@ -866,14 +970,14 @@ void GenerateThumbnails(QString thumbid)
     std::vector<std::string> pathvector;
     const TSK_TCHAR** imagepartspath;
     pathvector.clear();
-    qDebug() << "thumbid:" << thumbid;
+    //qDebug() << "thumbid:" << thumbid;
     QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
     QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
     QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
     QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
     unsigned long long curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
-    qDebug() << "curaddress:" << curaddress;
+    //qDebug() << "curaddress:" << curaddress;
     QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");

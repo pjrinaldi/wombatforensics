@@ -213,7 +213,7 @@ private:
     void UpdateProperties(void);
     void LoadHexContents(void);
     void GenerateHexFile(const QModelIndex index);
-    void StartThumbnails(QStringList diglist);
+    //void StartThumbnails(QStringList diglist);
     void StartHash(QStringList diglist, int hashtype);
     QStringList GetFileLists(int filelisttype);
     void ProcessDig(QString curid);
@@ -235,7 +235,7 @@ private:
     QFutureWatcher<void> thumbwatcher;
     QFuture<void> hashingfuture;
     QFutureWatcher<void> hashingwatcher;
-    QFutureWatcher<void> thashwatcher;
+    //QFutureWatcher<void> thashwatcher;
     QFutureWatcher<void> exportwatcher;
     QFutureWatcher<void> digwatcher;
     QFuture<void> openfuture;

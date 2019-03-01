@@ -12,6 +12,7 @@ QDir thumbdir;
 QDir currentrawimagedir;
 QTextEdit* msglog = NULL;
 QFutureWatcher<void> thumbwatcher;
+QFutureWatcher<void> thashwatcher;
 QFutureWatcher<void> secondwatcher;
 unsigned long long filesfound = 0;
 unsigned long long fileschecked = 0;

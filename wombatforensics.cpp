@@ -46,7 +46,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     if(bookbutton)
         connect(ui->actionBookmark_Manager, SIGNAL(triggered(bool)), bookbutton, SLOT(showMenu()));
     ui->actionBookmark_Manager->setMenu(bookmarkmenu);
-    cancelwidget = ui->analysisToolBar->widgetForAction(ui->actionCancel_Operation);
+    //cancelwidget = ui->analysisToolBar->widgetForAction(ui->actionCancel_Operation);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
@@ -1617,7 +1617,7 @@ void WombatForensics::ExportEvidence()
 
 void WombatForensics::FinishExport()
 {
-    ui->actionCancel_Operation->setEnabled(false);
+    //ui->actionCancel_Operation->setEnabled(false);
     //cancelthread->close();
     qInfo() << "Export Completed with" << QString::number(errorcount) << "error(s)";
     //LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
@@ -1649,7 +1649,7 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     // cancellable map
     QFuture<void> tmpfuture = QtConcurrent::map(exportlist, ProcessExport);
     exportwatcher.setFuture(tmpfuture);
-    ui->actionCancel_Operation->setEnabled(true);
+    //ui->actionCancel_Operation->setEnabled(true);
     //QToolTip::showText(cancelwidget->mapToGlobal(QPoint(0, 0)), "Cancel Currently Running Opreation");
     //cancelthread->show();
 }
@@ -1676,7 +1676,12 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         //qDebug() << digfilelist;
         digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0) // Generate Thumbnails
-            StartThumbnails(digfilelist);
+        {
+            QFuture<void> tmpfuture = QtConcurrent::run(StartThumbnails, digfilelist);
+            //thumbfuture = QtConcurrent::map(digfilelist, StartThumbnails); // Process Thumbnails
+            //thumbwatcher.setFuture(thumbfuture);
+            //QFuture<void> tmpfuture = QtConcurrent::run(&WombatForensics::StartThumbnails, digfilelist); // Process All Thumbnails
+        }
         else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 | digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256
         {
             if(digoptions.at(i) == 2)
@@ -1851,8 +1856,10 @@ void WombatForensics::on_actionSaveState_triggered()
 
 void WombatForensics::on_actionCancel_Operation_triggered()
 {
+    /*
     emit CancelCurrentThread();
     ui->actionCancel_Operation->setEnabled(false);
+    */
 }
 
 void WombatForensics::on_actionCheck_triggered()
@@ -1925,7 +1932,8 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
-                StartThumbnails(QStringList("")); // Process All Thumbnails
+                QFuture<void> tmpfuture = QtConcurrent::run(StartThumbnails, listeditems); // Process all thumbnails
+                //QFuture<void> tmpfuture = QtConcurrent::run(&WombatForensics::StartThumbnails, listeditems); // Process All Thumbnails
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
@@ -1960,6 +1968,8 @@ void WombatForensics::StartHash(QStringList diglist, int hashtype)
     */
 }
 
+// shouldn't need this since i MOVED THIS TO WOMBATFUNCTIONS
+/*
 void WombatForensics::StartThumbnails(QStringList diglist)
 {
     qInfo() << "Generating Thumbnails...";
@@ -1972,6 +1982,7 @@ void WombatForensics::StartThumbnails(QStringList diglist)
     thumblist.clear();
     thumbpathlist.clear();
     //qDebug() << "last diglist/count:" << diglist.last() << diglist.count();
+    /*
     if(diglist.at(0).length() == 0)
     {
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -2020,7 +2031,8 @@ void WombatForensics::StartThumbnails(QStringList diglist)
     }
     else
     {
-        for(int i=0; i < diglist.count(); i++)
+    */
+/*        for(int i=0; i < diglist.count(); i++)
         {
             QDir eviddir = QDir(wombatvariable.tmpmntpath);
             QStringList evidfiles = eviddir.entryList(QStringList("*." + diglist.at(i).split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
@@ -2052,20 +2064,20 @@ void WombatForensics::StartThumbnails(QStringList diglist)
                 }
             }
         }
-    }
+    //}
     digfilelist = thumblist;
     QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
     thashwatcher.setFuture(tmpfuture);
     thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
     thumbwatcher.setFuture(thumbfuture);
-    ui->actionCancel_Operation->setEnabled(true);
+    //ui->actionCancel_Operation->setEnabled(true);
     //QToolTip::showText(cancelwidget->mapToGlobal(QPoint()), tr("Cancel Currently Running Opreation"));
     //cancelthread->show();
-}
+}*/
 
 void WombatForensics::FinishThumbs()
 {
-    ui->actionCancel_Operation->setEnabled(false);
+    //ui->actionCancel_Operation->setEnabled(false);
     //cancelthread->close();
     StatusUpdate("Thumbnail generation finished.");
     qInfo() << "Thumbnail generation finished";
