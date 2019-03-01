@@ -33,6 +33,12 @@ protected:
 
 private:
     Ui::DigStatus* ui;
+    int hashcount = 0;
+    int hashtotal = 0;
+    int imgthumbcount = 0;
+    int imgthumbtotal = 0;
+    float hashpercent = 0.0;
+    float imgthumbpercent = 0.0;
 };
 
 Q_DECLARE_METATYPE(DigStatus*);
