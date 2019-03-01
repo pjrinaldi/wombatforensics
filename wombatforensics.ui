@@ -255,8 +255,6 @@
    <addaction name="actionExport_Evidence"/>
    <addaction name="separator"/>
    <addaction name="actionBookmark_Manager"/>
-   <addaction name="separator"/>
-   <addaction name="actionCancel_Operation"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
    <property name="styleSheet">
@@ -534,7 +532,7 @@
   </action>
   <action name="actionExpandAll">
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/bar/expandall</normaloff>:/bar/expandall</iconset>
    </property>
    <property name="text">
@@ -549,7 +547,7 @@
   </action>
   <action name="actionCollapseAll">
    <property name="icon">
-    <iconset>
+    <iconset resource="wombatforensics.qrc">
      <normaloff>:/bar/collapseall</normaloff>:/bar/collapseall</iconset>
    </property>
    <property name="text">
@@ -695,6 +693,9 @@
    </property>
    <property name="toolTip">
     <string>Cancel Currently Running Operation</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionJumpToHex">

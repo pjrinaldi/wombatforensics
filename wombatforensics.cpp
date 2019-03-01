@@ -506,6 +506,8 @@ void WombatForensics::InitializeAppStructure()
     ui->actionTextViewer->setEnabled(false);
     ui->actionByteConverter->setEnabled(false);
     ui->actionJumpToHex->setEnabled(false);
+    //ui->actionCollapseAll->setEnabled(false);
+    //ui->actionExpandAll->setEnabled(false);
     //ui->actionTextViewer->setVisible(false);
     //ui->actionHtmlViewer->setVisible(false);
     //ui->actionMediaViewer->setVisible(false);
@@ -671,6 +673,8 @@ void WombatForensics::OpenUpdate()
         ui->actionSaveState->setEnabled(true);
         ui->actionDigDeeper->setEnabled(true);
         ui->actionJumpToHex->setEnabled(true);
+        //ui->actionExpandAll->setEnabled(true);
+        //ui->actionCollapseAll->setEnabled(true);
         //ui->actionBookmark_Manager->setEnabled(true);
     }
     /*

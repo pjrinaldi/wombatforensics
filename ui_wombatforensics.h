@@ -265,6 +265,7 @@ public:
         QIcon icon25;
         icon25.addFile(QStringLiteral(":/cancelthread"), QSize(), QIcon::Normal, QIcon::Off);
         actionCancel_Operation->setIcon(icon25);
+        actionCancel_Operation->setVisible(true);
         actionJumpToHex = new QAction(WombatForensics);
         actionJumpToHex->setObjectName(QStringLiteral("actionJumpToHex"));
         QIcon icon26;
@@ -411,8 +412,6 @@ public:
         analysisToolBar->addAction(actionExport_Evidence);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionBookmark_Manager);
-        analysisToolBar->addSeparator();
-        analysisToolBar->addAction(actionCancel_Operation);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
