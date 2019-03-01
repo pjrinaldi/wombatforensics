@@ -139,7 +139,7 @@ private slots:
     void on_actionJumpToHex_triggered();
     void UpdateProgress(unsigned long long count);
     void UpdateExport(void);
-    void UpdateDig(void);
+    void UpdateDig(int digstateid, int digcount);
     void HashingFinish(void);
     void OpenUpdate(void);
     void UpdateCheckCount(void);

@@ -13,6 +13,8 @@ DigStatus::DigStatus(QWidget* parent) : QDialog(parent), ui(new Ui::DigStatus)
     ui->imgthumbbutton->setVisible(false);
     ui->hashlabel->setVisible(false);
     ui->hashbutton->setVisible(false);
+    connect(ui->imgthumbbutton, SIGNAL(clicked()), this, SLOT(CancelImgThumb()));
+    connect(ui->hashbutton, SIGNAL(clicked()), this, SLOT(CancelHash()));
 }
 
 DigStatus::~DigStatus()
@@ -23,34 +25,64 @@ DigStatus::~DigStatus()
 
 void DigStatus::UpdateDigState(int digstateid, int digstatecount)
 {
+    if(digstateid == 0) // img thumbnail
+    {
+        imgthumbcount = digstatecount;
+        imgthumbpercent = (imgthumbcount/imgthumbtotal) * 100;
+        ui->imgthumblabel->setText("Generating Image Thumbnail: " + QString::number(imgthumbcount) + " of " + QString::number(imgthumbtotal) + " " + QString::number((int)imgthumbpercent) + "%");
+    }
+    else if(digstateid == 1 || digstateid == 2 || digstateid == 3) // md5 || sha1 || sha256
+    {
+        hashcount = digstatecount;
+        hashpercent = (hashcount/hashtotal) * 100;
+        if(digstateid == 1)
+            hashstring = "MD5";
+        else if(digstateid == 2)
+            hashstring = "SHA1";
+        else if(digstateid == 3)
+            hashstring = "SHA256";
+        hashstring += " Hashing: " + QString::number(hashcount) + " of " + QString::number(hashtotal) + " " + QString::number((int)hashpercent) + "%";
+        ui->hashlabel->setText(hashstring);
+    }
 }
 
-void DigStatus::SetIntitialDigState(int digstateid, int digtotal)
+void DigStatus::SetInitialDigState(int digstateid, int digtotal)
 {
     if(digstateid == 0) // img thumbnail
+    {
+        imgthumbcount = 0;
+        imgthumbtotal = digtotal;
+        imgthumbpercent = (imgthumbcount/imgthumbtotal) * 100;
+        ui->imgthumblabel->setVisible(true);
+        ui->imgthumbbutton->setVisible(true);
+        ui->imgthumblabel->setText("Generating Image Thumbnail: " + QString::number(imgthumbcount) + " of " + QString::number(imgthumbtotal) + " " + QString::number((int)imgthumbpercent) + "%");
+    }
+    else if(digstateid == 1 || digstateid == 2 || digstateid == 3) // md5 || sha1 || sha256
     {
         hashcount = 0;
         hashtotal = digtotal;
         hashpercent = (hashcount/hashtotal) * 100;
-        ui->imgthumblabel->setVisible(true);
-        ui->imgthumbbutton->setVisible(true);
-        ui->imgthumblabel->setText("Generating Image Thumbnail: " + QString::number(hashcount) + " of " + QString::number(hashtotal) + " " + QString::number((int)hashpercent) + "%");
-    }
-    else if(digstateid == 1) // md5
-    {
+        if(digstateid == 1)
+            hashstring = "MD5";
+        else if(digstateid == 2)
+            hashstring = "SHA1";
+        else if(digstateid == 3)
+            hashstring = "SHA256";
+        hashstring += " Hashing: " + QString::number(hashcount) + " of " + QString::number(hashtotal) + " " + QString::number((int)hashpercent) + "%";
         ui->hashlabel->setVisible(true);
         ui->hashbutton->setVisible(true);
+        ui->hashlabel->setText(hashstring);
     }
-    else if(digstateid == 2) // sha1
-    {
-        ui->hashlabel->setVisible(true);
-        ui->hashbutton->setVisible(true);
-    }
-    else if(digstateid == 3) // sha256
-    {
-        ui->hashlabel->setVisible(true);
-        ui->hashbutton->setVisible(true);
-    }
+}
+
+void DigStatus::CancelImgThumb()
+{
+    emit CancelImgThumbThread();
+}
+
+void DigStatus::CancelHash()
+{
+    emit CancelHashThread();
 }
 
 /*

@@ -100,8 +100,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(unsigned long long)), this, SLOT(UpdateProgress(unsigned long long)), Qt::QueuedConnection);
     connect(statuslabel, SIGNAL(clicked()), this, SLOT(ShowDigStatus()), Qt::DirectConnection);
-    connect(isignals, SIGNAL(DigUpdate(void)), this, SLOT(UpdateDig()), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
+    connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
+    connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
     CheckWombatConfiguration();
     InitializeAppStructure();
     //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
@@ -907,6 +909,7 @@ void WombatForensics::UpdateDigging()
     qInfo() << "Digging Complete";
     //LogMessage("Digging Complete");
     StatusUpdate("Evidence ready");
+    statuslabel->setToolTip("");
 }
 
 void WombatForensics::AddEvidence()
@@ -1651,6 +1654,8 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digoptions = doptions;
     digfilelist.clear();
     qInfo() << "Digging Deeper into Evidence";
+    StatusUpdate("Digging Deeper...");
+    statuslabel->setToolTip("Click for Details");
     //LogMessage("Digging Deeper into Evidence");
     if(dtype == 0) // selected
     {
@@ -1661,6 +1666,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     //qDebug() << digfilelist;
     for(int i = 0; i < digoptions.count(); i++)
     {
+        digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0) // Generate Thumbnails
             StartThumbnails(digfilelist);
         else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 | digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256
@@ -1671,8 +1677,8 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 hashsum = 4;
             else if(digoptions.at(i) == 1)
                 hashsum = 1;
-            qInfo() << "Generating Hash...";
-            StatusUpdate("Generating Hash...");
+            //qInfo() << "Generating Hash...";
+            //StatusUpdate("Generating Hash...");
             hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
             hashingwatcher.setFuture(hashingfuture);
             //StartHash(digfilelist, 0);
@@ -1696,12 +1702,15 @@ void WombatForensics::HashingFinish()
     // here is where i should update the column header...., which is possibly display and then update hash type...
 }
 
-void WombatForensics::UpdateDig()
+void WombatForensics::UpdateDig(int digid, int digcnt)
 {
+    digstatusdialog->UpdateDigState(digid, digcnt);
+    /*
     int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
     //qInfo() << "Dug:" << QString::number(digcount) << "of" << QString::number(digfilelist.count()) << QString::number(curprogress) << "%";
     //LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
     StatusUpdate("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
+    */
 }
 void WombatForensics::UpdateExport()
 {
@@ -1946,7 +1955,7 @@ void WombatForensics::StartThumbnails(QStringList diglist)
 {
     qInfo() << "Generating Thumbnails...";
     //LogMessage("Generating Thumbnails...");
-    StatusUpdate("Generating Thumbnails...");
+    //StatusUpdate("Generating Thumbnails...");
     QFile tmpfile;
     QFile thumbfile;
     thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/" + "thumbpathlist");

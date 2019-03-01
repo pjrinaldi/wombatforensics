@@ -735,6 +735,7 @@ void LoadImagesHash()
 
 void GenerateHash(QString itemid)
 {
+    int hashtype = 1;
     // given itemid, open file stat, file prop
     TSK_IMG_INFO* readimginfo = NULL;
     TSK_FS_INFO* readfsinfo = NULL;
@@ -746,9 +747,9 @@ void GenerateHash(QString itemid)
     std::vector<std::string> pathvector;
     const TSK_TCHAR** imagepartspath;
     pathvector.clear();
-    //qDebug() << "itemid:" << itemid;
+    qDebug() << "itemid:" << itemid;
     unsigned long long curaddress = itemid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
-    //qDebug() << "curaddress:" << curaddress;
+    qDebug() << "curaddress:" << curaddress;
     QStringList evidfiles = eviddir.entryList(QStringList("*." + itemid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + itemid.split("-").at(0) + "/stat");
@@ -840,8 +841,14 @@ void GenerateHash(QString itemid)
     readfileinfo = NULL;
     readfsinfo = NULL;
     readimginfo = NULL;
+    if(hashsum == 1)
+        hashtype = 1;
+    else if(hashsum == 2)
+        hashtype = 2;
+    else if(hashsum == 4)
+        hashtype = 3;
     digcount++;
-    isignals->DigUpd();
+    isignals->DigUpd(hashtype, digcount);
 }
 
 void GenerateThumbnails(QString thumbid)
@@ -933,7 +940,7 @@ void GenerateThumbnails(QString thumbid)
     readfsinfo = NULL;
     readimginfo = NULL;
     digcount++;
-    isignals->DigUpd();
+    isignals->DigUpd(0, digcount);
 }
 
 void cnid_to_array(uint32_t cnid, uint8_t array[4])

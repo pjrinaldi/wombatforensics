@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'digstatus.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.0
+** Created by: Qt User Interface Compiler version 5.9.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,10 +10,12 @@
 #define UI_DIGSTATUS_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QIcon>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QToolButton>
@@ -42,16 +44,17 @@ public:
     void setupUi(QDialog *DigStatus)
     {
         if (DigStatus->objectName().isEmpty())
-            DigStatus->setObjectName(QString::fromUtf8("DigStatus"));
-        DigStatus->setWindowModality(Qt::ApplicationModal);
+            DigStatus->setObjectName(QStringLiteral("DigStatus"));
+        DigStatus->setWindowModality(Qt::NonModal);
         DigStatus->resize(320, 294);
-        DigStatus->setModal(true);
+        DigStatus->setSizeGripEnabled(true);
+        DigStatus->setModal(false);
         verticalLayout_2 = new QVBoxLayout(DigStatus);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         imgthumblabel = new QLabel(DigStatus);
-        imgthumblabel->setObjectName(QString::fromUtf8("imgthumblabel"));
+        imgthumblabel->setObjectName(QStringLiteral("imgthumblabel"));
 
         horizontalLayout->addWidget(imgthumblabel);
 
@@ -60,9 +63,9 @@ public:
         horizontalLayout->addItem(horizontalSpacer);
 
         imgthumbbutton = new QToolButton(DigStatus);
-        imgthumbbutton->setObjectName(QString::fromUtf8("imgthumbbutton"));
+        imgthumbbutton->setObjectName(QStringLiteral("imgthumbbutton"));
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/cancelthread"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QStringLiteral(":/cancelthread"), QSize(), QIcon::Normal, QIcon::Off);
         imgthumbbutton->setIcon(icon);
 
         horizontalLayout->addWidget(imgthumbbutton);
@@ -71,9 +74,9 @@ public:
         verticalLayout_2->addLayout(horizontalLayout);
 
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         hashlabel = new QLabel(DigStatus);
-        hashlabel->setObjectName(QString::fromUtf8("hashlabel"));
+        hashlabel->setObjectName(QStringLiteral("hashlabel"));
 
         horizontalLayout_2->addWidget(hashlabel);
 
@@ -82,7 +85,7 @@ public:
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
         hashbutton = new QToolButton(DigStatus);
-        hashbutton->setObjectName(QString::fromUtf8("hashbutton"));
+        hashbutton->setObjectName(QStringLiteral("hashbutton"));
         hashbutton->setIcon(icon);
 
         horizontalLayout_2->addWidget(hashbutton);
@@ -91,9 +94,9 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_2);
 
         horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
         label_3 = new QLabel(DigStatus);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setObjectName(QStringLiteral("label_3"));
 
         horizontalLayout_3->addWidget(label_3);
 
@@ -102,7 +105,7 @@ public:
         horizontalLayout_3->addItem(horizontalSpacer_3);
 
         toolButton_3 = new QToolButton(DigStatus);
-        toolButton_3->setObjectName(QString::fromUtf8("toolButton_3"));
+        toolButton_3->setObjectName(QStringLiteral("toolButton_3"));
         toolButton_3->setIcon(icon);
 
         horizontalLayout_3->addWidget(toolButton_3);
@@ -122,13 +125,13 @@ public:
 
     void retranslateUi(QDialog *DigStatus)
     {
-        DigStatus->setWindowTitle(QApplication::translate("DigStatus", "Dig Status", nullptr));
-        imgthumblabel->setText(QApplication::translate("DigStatus", "Generating Image Thumbnail: x of y z%", nullptr));
-        imgthumbbutton->setText(QApplication::translate("DigStatus", "...", nullptr));
-        hashlabel->setText(QApplication::translate("DigStatus", "XXX Hashing: a of b c%", nullptr));
-        hashbutton->setText(QApplication::translate("DigStatus", "...", nullptr));
-        label_3->setText(QApplication::translate("DigStatus", "TextLabel", nullptr));
-        toolButton_3->setText(QApplication::translate("DigStatus", "...", nullptr));
+        DigStatus->setWindowTitle(QApplication::translate("DigStatus", "Dig Status", Q_NULLPTR));
+        imgthumblabel->setText(QApplication::translate("DigStatus", "Generating Image Thumbnail: x of y z%", Q_NULLPTR));
+        imgthumbbutton->setText(QApplication::translate("DigStatus", "...", Q_NULLPTR));
+        hashlabel->setText(QApplication::translate("DigStatus", "XXX Hashing: a of b c%", Q_NULLPTR));
+        hashbutton->setText(QApplication::translate("DigStatus", "...", Q_NULLPTR));
+        label_3->setText(QApplication::translate("DigStatus", "TextLabel", Q_NULLPTR));
+        toolButton_3->setText(QApplication::translate("DigStatus", "...", Q_NULLPTR));
     } // retranslateUi
 
 };

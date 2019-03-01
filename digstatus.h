@@ -22,23 +22,26 @@ public:
     ~DigStatus();
     //void SetText(QString txt);
     void UpdateDigState(int digstateid, int digstatecount);
-    void SetIntitialDigState(int digstateid, int digtotal);
+    void SetInitialDigState(int digstateid, int digtotal);
 public slots:
    //void HideClicked();
+    void CancelHash(void);
+    void CancelImgThumb(void);
 signals:
+    void CancelImgThumbThread(void);
+    void CancelHashThread(void);
     //void HideDigStatusWindow(bool checkstate);
-    void CancelDigStatus(int digstateid);
+    //void CancelDigStatus(int digstateid);
 protected:
     void closeEvent(QCloseEvent* event);
 
 private:
     Ui::DigStatus* ui;
-    int hashcount = 0;
-    int hashtotal = 0;
-    int imgthumbcount = 0;
-    int imgthumbtotal = 0;
-    float hashpercent = 0.0;
-    float imgthumbpercent = 0.0;
+    int hashcount, hashtotal;
+    int imgthumbcount, imgthumbtotal;
+    float hashpercent, imgthumbpercent;
+    int digstate;
+    QString hashstring;
 };
 
 Q_DECLARE_METATYPE(DigStatus*);

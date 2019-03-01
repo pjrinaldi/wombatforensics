@@ -122,12 +122,12 @@ public:
 
     void ProgUpd(void) { emit(ProgressUpdate(filesfound)); }
     void ExportUpd(void) { emit(ExportUpdate()); }
-    void DigUpd(void) { emit(DigUpdate()); }
+    void DigUpd(int digid, int digcnt) { emit(DigUpdate(digid, digcnt)); }
 
 signals:
     void ProgressUpdate(unsigned long long filecount);
     void ExportUpdate(void);
-    void DigUpdate(void);
+    void DigUpdate(int digid, int digcnt);
 
 };
 
