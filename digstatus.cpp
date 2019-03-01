@@ -13,6 +13,8 @@ DigStatus::DigStatus(QWidget* parent) : QDialog(parent), ui(new Ui::DigStatus)
     ui->imgthumbbutton->setVisible(false);
     ui->hashlabel->setVisible(false);
     ui->hashbutton->setVisible(false);
+    ui->label_3->setVisible(false);
+    ui->toolButton_3->setVisible(false);
     connect(ui->imgthumbbutton, SIGNAL(clicked()), this, SLOT(CancelImgThumb()));
     connect(ui->hashbutton, SIGNAL(clicked()), this, SLOT(CancelHash()));
 }
