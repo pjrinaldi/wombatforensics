@@ -54,7 +54,7 @@ class StatusLabel : public QLabel
         void ShowDigStatus(void);
 
     protected:
-        void mouseReleaseEvent(QMouseEvent* e)
+        void mousePressEvent(QMouseEvent* e)
         {
             emit clicked();
         }
