@@ -735,6 +735,8 @@ void LoadImagesHash()
 
 void GenerateHash(QString itemid)
 {
+    if(itemid.split("-").count() == 5)
+    {
     int hashtype = 1;
     // given itemid, open file stat, file prop
     TSK_IMG_INFO* readimginfo = NULL;
@@ -809,11 +811,11 @@ void GenerateHash(QString itemid)
             else
             {
                 if(hashsum == 1)
-                    tmplist[13] = "d41d8cd98f00b204e9800998ecf8427e"; // MD5 zero file
+                    tmplist[13] = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
                 else if(hashsum == 2)
-                    tmplist[13] = "da39a3ee5e6b4b0d3255bfef95601890afd80709"; // SHA1 zero file
+                    tmplist[13] = QString("da39a3ee5e6b4b0d3255bfef95601890afd80709").toUpper(); // SHA1 zero file
                 else if(hashsum == 4)
-                    tmplist[13] = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"; // SHA256 zero file
+                    tmplist[13] = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
             }
             hashstr = tmplist.at(13);
             tmpstr = "";
@@ -849,10 +851,13 @@ void GenerateHash(QString itemid)
         hashtype = 3;
     digcount++;
     isignals->DigUpd(hashtype, digcount);
+    }
 }
 
 void GenerateThumbnails(QString thumbid)
 {
+    if(thumbid.split("-").count() == 5)
+    {
     TSK_IMG_INFO* readimginfo = NULL;
     TSK_FS_INFO* readfsinfo = NULL;
     TSK_FS_FILE* readfileinfo = NULL;
@@ -941,6 +946,7 @@ void GenerateThumbnails(QString thumbid)
     readimginfo = NULL;
     digcount++;
     isignals->DigUpd(0, digcount);
+    }
 }
 
 void cnid_to_array(uint32_t cnid, uint8_t array[4])

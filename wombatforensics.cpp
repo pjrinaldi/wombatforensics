@@ -1632,7 +1632,9 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     //LogMessage("Started Exporting Evidence");
     if(etype == 0) // selected
     {
-        exportlist.append(selectedindex.sibling(selectedindex.row(), 10).data().toString());
+        TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
+        exportlist.append(itemnode->Data(10).toString());
+        //exportlist.append(selectedindex.sibling(selectedindex.row(), 10).data().toString());
     }
     else
         exportlist = GetFileLists(etype);
@@ -1657,15 +1659,17 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     StatusUpdate("Digging Deeper...");
     statuslabel->setToolTip("Click for Details");
     //LogMessage("Digging Deeper into Evidence");
-    if(dtype == 0) // selected
-    {
-        digfilelist.append(selectedindex.sibling(selectedindex.row(), 10).data().toString());
-    }
-    else
-        digfilelist = GetFileLists(dtype);
-    //qDebug() << digfilelist;
     for(int i = 0; i < digoptions.count(); i++)
     {
+        if(dtype == 0) // selected
+        {
+            TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
+            digfilelist.append(itemnode->Data(10).toString());
+            //digfilelist.append(selectedindex.sibling(selectedindex.row(), 10).data().toString());
+        }
+        else
+            digfilelist = GetFileLists(dtype);
+        //qDebug() << digfilelist;
         digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0) // Generate Thumbnails
             StartThumbnails(digfilelist);
@@ -1698,6 +1702,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 
 void WombatForensics::HashingFinish()
 {
+    StatusUpdate("Ready");
     qDebug() << "Hashing should be Finished";
     // here is where i should update the column header...., which is possibly display and then update hash type...
 }
@@ -1970,11 +1975,11 @@ void WombatForensics::StartThumbnails(QStringList diglist)
         for(int i=0; i < evidfiles.count(); i++)
         {
             QDir voldir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i));
-            QStringList volfiles = voldir.entryList(QStringList(".v*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
+            QStringList volfiles = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
             for(int j=0; j < volfiles.count(); j++)
             {
                 QDir partdir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j));
-                QStringList partfiles = partdir.entryList(QStringList(".p*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
+                QStringList partfiles = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
                 for(int k=0; k < partfiles.count(); k++)
                 {
                     QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k));
@@ -2015,12 +2020,12 @@ void WombatForensics::StartThumbnails(QStringList diglist)
         {
             QDir eviddir = QDir(wombatvariable.tmpmntpath);
             QStringList evidfiles = eviddir.entryList(QStringList("*." + diglist.at(i).split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-            QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(0) + "/." + diglist.at(i).split("-").at(1) + "/." + diglist.at(i).split("-").at(2));
+            QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + diglist.at(i).split("-").at(1) + "/" + diglist.at(i).split("-").at(2));
             QStringList filefiles = filedir.entryList(QStringList(diglist.at(i).split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
             for(int j=0; j < filefiles.count(); j++)
             {
                 tmpstr = "";
-                tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/." + diglist.at(i).split("-").at(1) + "/." + diglist.at(i).split("-").at(2) + "/" + filefiles.at(j));
+                tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + diglist.at(i).split("-").at(1) + "/" + diglist.at(i).split("-").at(2) + "/" + filefiles.at(j));
                 tmpfile.open(QIODevice::ReadOnly);
                 tmpstr = tmpfile.readLine();
                 tmpfile.close();

@@ -518,12 +518,12 @@ public:
             if(itemnode->IsChecked())
             {
                 itemnode->SetChecked(false);
-                checkhash.insert(itemnode->Data(10).toString().split("-a").first(), false); // used to be 0
+                checkhash.insert(itemnode->Data(10).toString(), false); // used to be 0
             }
             else
             {
                 itemnode->SetChecked(true);
-                checkhash.insert(itemnode->Data(10).toString().split("-a").first(), true); // used to be 0
+                checkhash.insert(itemnode->Data(10).toString(), true); // used to be 0
             }
             emit dataChanged(index, index);
             emit CheckedNodesChanged();
@@ -748,7 +748,7 @@ private:
                                 qDebug() << "par-cur:" << parid << curid;
                                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
                                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
-                                if(checkhash.contains(tmpstr.split(",").at(12).split("-a").first()))
+                                if(checkhash.contains(tmpstr.split(",").at(12)))
                                     parents.value(curid)->SetChecked(true);
                                 if(tmpstr.split(",").at(14).toInt() == true)
                                     parents.value(curid)->SetDeleted(true);
@@ -776,7 +776,7 @@ public:
             else
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
             parents[data.at(10).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
-            if(checkhash.contains(data.at(10).toString().split("-a").first())) // USED TO BE 0
+            if(checkhash.contains(data.at(10).toString())) // USED TO BE 0
                 parents.value(data.at(10).toString().split("-a").first())->SetChecked(true); // USED TO BE 0
             if(deleted == 1)
                 parents.value(data.at(10).toString().split("-a").first())->SetDeleted(true); // USED TO BE 0

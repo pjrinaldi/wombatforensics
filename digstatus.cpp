@@ -54,7 +54,10 @@ void DigStatus::SetInitialDigState(int digstateid, int digtotal)
     {
         imgthumbcount = 0;
         imgthumbtotal = digtotal;
-        imgthumbpercent = (imgthumbcount/imgthumbtotal) * 100;
+        if(imgthumbtotal != 0)
+            imgthumbpercent = (imgthumbcount/imgthumbtotal) * 100;
+        else
+            imgthumbtotal = 0;
         ui->imgthumblabel->setVisible(true);
         ui->imgthumbbutton->setVisible(true);
         ui->imgthumblabel->setText("Generating Image Thumbnail: " + QString::number(imgthumbcount) + " of " + QString::number(imgthumbtotal) + " " + QString::number((int)imgthumbpercent) + "%");
@@ -63,7 +66,10 @@ void DigStatus::SetInitialDigState(int digstateid, int digtotal)
     {
         hashcount = 0;
         hashtotal = digtotal;
-        hashpercent = (hashcount/hashtotal) * 100;
+        if(hashtotal != 0)
+            hashpercent = (hashcount/hashtotal) * 100;
+        else
+            hashpercent = 0;
         if(digstateid == 1)
             hashstring = "MD5";
         else if(digstateid == 2)
