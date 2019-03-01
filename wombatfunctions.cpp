@@ -720,6 +720,23 @@ void ProcessExport(QString objectid)
     isignals->ExportUpd();
 }
 
+void SaveImagesHash()
+{
+    QFile thumbfile;
+    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
+    thumbfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(thumbfile.isOpen())
+    {
+        QHash<QString, QString> i(imageshash);
+        while(i.hasNext())
+        {
+            i.next();
+            thumbfile.write(
+        }
+    }
+    thumbfile.close();
+}
+
 void LoadImagesHash()
 {
     QFile thumbfile;
