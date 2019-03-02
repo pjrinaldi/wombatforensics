@@ -1893,7 +1893,9 @@ void WombatForensics::on_actionDigDeeper_triggered()
 {
     totalcount = filesfound;
     totalchecked = fileschecked;
-    digcount = 0;
+    //digcount = 0;
+    dighashcount = 0;
+    digimgthumbcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
     connect(digdeeperdialog, SIGNAL(StartDig(int, QVector<int>)), this, SLOT(DigFiles(int, QVector<int>)), Qt::DirectConnection);
     digdeeperdialog->show();

@@ -370,7 +370,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                 {
                     if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                     {
-                        qDebug() << "curaddress:" << curaddress;
+                        //qDebug() << "curaddress:" << curaddress;
                         /* Get MD5 HASH of Content using Qt Method */
                         char* fbuf = new char[fsattr->size];
                         ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
@@ -475,7 +475,14 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1);
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+                {
+                    //QDir partdir = QDir(((AddEvidenceVariable*)tmpptr)->partitionpath);
+                    //QStringList fileslist = partdir.entryList(QStringList("*." + astring), QDir::NoSymLinks | QDir::Files);
+                    //QFile filefile(((AddEvidenceVariable*)tmpptr)->partitionpath + "
+                    // REPLACE THE BELOW WITH OPENING THE FILE AND GETTING THE ORPHAN COUNT #...
                     treeout << "e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(tmpfile->name->par_addr);
+                    orphancount++;
+                }
                 else
                     treeout << "e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
                 if(tmpfile->meta != NULL)
@@ -579,7 +586,6 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                     adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
                                     treeout.clear();
                                     treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
-                                    //treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                                     nodedata.clear();
                                     for(int i=0;  i < 11; i++)
                                         nodedata << treeout.at(i);
@@ -595,8 +601,6 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 }
             }
         }
-        if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-            orphancount++;
     }
     return TSK_WALK_CONT;
 }
@@ -874,8 +878,9 @@ void GenerateHash(QString itemid)
         hashtype = 2;
     else if(hashsum == 4)
         hashtype = 3;
-    digcount++;
-    isignals->DigUpd(hashtype, digcount);
+    //digcount++;
+    dighashcount++;
+    isignals->DigUpd(hashtype, dighashcount);
     }
 }
 
@@ -992,11 +997,11 @@ void GenerateThumbnails(QString thumbid)
 {
     if(thumbid.split("-").count() == 5)
     {
-        qDebug() << "thumbid:" << thumbid;
         TSK_IMG_INFO* readimginfo = NULL;
         TSK_FS_INFO* readfsinfo = NULL;
         TSK_FS_FILE* readfileinfo = NULL;
         QString tmpstr = "";
+        QString filestr = "";
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         std::vector<std::string> pathvector;
         const TSK_TCHAR** imagepartspath;
@@ -1045,22 +1050,24 @@ void GenerateThumbnails(QString thumbid)
                 readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         }
         QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".stat");
-        qDebug() << "fstring:" << fstring << "astring:" << astring << "file name:" << filefile.fileName();
+        qDebug() << "id:filename" << thumbid << filefile.fileName().split("mntpt/").at(1);
         filefile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(filefile.isOpen())
-            tmpstr = filefile.readLine();
+            filestr = filefile.readLine();
         filefile.close();
-        if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
+        QString filemime = filestr.split(",").at(10);
+        QString filecat = filemime.split("/").first();
+        if(filecat.contains("image"))
         {
             //thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
             QByteArray ba;
             QByteArray ba2;
-            ba.append(tmpstr.split(",").at(0));
-            ba2.append(tmpstr.split(",").at(3));
+            ba.append(filestr.split(",").at(0));
+            ba2.append(filestr.split(",").at(3));
             QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
             ba.clear();
             ba.append(fullpath);
-            imageshash.insert(tmpstr.split(",", QString::SkipEmptyParts).at(12), QString(ba.toBase64()));
+            imageshash.insert(filestr.split(",", QString::SkipEmptyParts).at(12), QString(ba.toBase64()));
             /*
             thumbfile.open(QIODevice::Append);
             thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
@@ -1097,6 +1104,7 @@ void GenerateThumbnails(QString thumbid)
             {
     	        fileimage.load(":/missingimage");
                 thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                writer.write(thumbimage);
             }
             tsk_fs_file_close(readfileinfo);
             tsk_fs_close(readfsinfo);
@@ -1104,8 +1112,9 @@ void GenerateThumbnails(QString thumbid)
             readfileinfo = NULL;
             readfsinfo = NULL;
             readimginfo = NULL;
-            digcount++;
-            isignals->DigUpd(0, digcount);
+            //digcount++;
+            digimgthumbcount++;
+            isignals->DigUpd(0, digimgthumbcount);
         }
     }
 }
@@ -1411,7 +1420,7 @@ void InitializeEvidenceStructure(QString evidname)
             {
                 //qDebug() << "partint:" << partint << "partcount:" << readvsinfo->part_count;
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                qDebug() << "slot num:" << readpartinfo->slot_num;
+                //qDebug() << "slot num:" << readpartinfo->slot_num;
                 QString partitionpath = volumepath + "p" + QString::number(partint) + "/";
                 addevidvar.partitionpath = partitionpath;
                 addevidvar.partint = partint;
