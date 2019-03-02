@@ -1020,8 +1020,8 @@ void GenerateThumbnails(QString thumbid)
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(evidfile.isOpen())
             tmpstr = evidfile.readLine();
-        int partcount = tmpstr.split(",").at(3).split("|").size();
         evidfile.close();
+        int partcount = tmpstr.split(",").at(3).split("|").size();
         for(int i=0; i < partcount; i++)
             pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
         imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
