@@ -377,8 +377,8 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                         QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                         QBuffer fbuffer(&fdata);
                         fbuffer.open(QIODevice::ReadOnly);
-                        QCryptographicHash attrhash(QCryptographicHash::Md5);
-                        attrhash.addData(&fbuffer);
+                        //QCryptographicHash attrhash(QCryptographicHash::Md5);
+                        //attrhash.addData(&fbuffer);
                         fbuffer.close();
                         QMimeDatabase adsmimedb;
                         QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
@@ -387,14 +387,16 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                         adsfile.open(QIODevice::Append | QIODevice::Text);
                         QTextStream adsout(&adsfile);
                         adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
-                        adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << "," + QString(attrhash.result().toHex()).toUpper() + ",0";
+                        adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0,0";
+                        //adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << "," + QString(attrhash.result().toHex()).toUpper() + ",0";
                         adsout.flush();
                         if(adsfile.isOpen())
                         {
                             adsfile.close();
                         }
                         treeout.clear();
-                        treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                        treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                        //treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                         nodedata.clear();
                         for(int i=0;  i < 11; i++)
                             nodedata << treeout.at(i);
@@ -568,15 +570,16 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                     QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                                     QBuffer fbuffer(&fdata);
                                     fbuffer.open(QIODevice::ReadOnly);
-                                    QCryptographicHash attrhash(QCryptographicHash::Md5);
-                                    attrhash.addData(&fbuffer);
+                                    //QCryptographicHash attrhash(QCryptographicHash::Md5);
+                                    //attrhash.addData(&fbuffer);
                                     fbuffer.close();
                                     QMimeDatabase adsmimedb;
                                     QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
                                     delete[] fbuf;
                                     adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
                                     treeout.clear();
-                                    treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                                    treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                                    //treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                                     nodedata.clear();
                                     for(int i=0;  i < 11; i++)
                                         nodedata << treeout.at(i);
@@ -592,6 +595,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 }
             }
         }
+        if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+            orphancount++;
     }
     return TSK_WALK_CONT;
 }
@@ -987,6 +992,7 @@ void GenerateThumbnails(QString thumbid)
 {
     if(thumbid.split("-").count() == 5)
     {
+        qDebug() << "thumbid:" << thumbid;
         TSK_IMG_INFO* readimginfo = NULL;
         TSK_FS_INFO* readfsinfo = NULL;
         TSK_FS_FILE* readfileinfo = NULL;
@@ -1039,6 +1045,7 @@ void GenerateThumbnails(QString thumbid)
                 readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         }
         QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".stat");
+        qDebug() << "fstring:" << fstring << "astring:" << astring << "file name:" << filefile.fileName();
         filefile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(filefile.isOpen())
             tmpstr = filefile.readLine();
