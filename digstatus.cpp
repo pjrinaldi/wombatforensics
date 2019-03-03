@@ -30,13 +30,13 @@ void DigStatus::UpdateDigState(int digstateid, int digstatecount)
     if(digstateid == 0) // img thumbnail
     {
         imgthumbcount = digstatecount;
-        imgthumbpercent = (imgthumbcount/imgthumbtotal) * 100;
+        imgthumbpercent = ((float)imgthumbcount/(float)imgthumbtotal) * 100.0;
         ui->imgthumblabel->setText("Generating Image Thumbnail: " + QString::number(imgthumbcount) + " of " + QString::number(imgthumbtotal) + " " + QString::number((int)imgthumbpercent) + "%");
     }
     else if(digstateid == 1 || digstateid == 2 || digstateid == 3) // md5 || sha1 || sha256
     {
         hashcount = digstatecount;
-        hashpercent = (hashcount/hashtotal) * 100;
+        hashpercent = ((float)hashcount/(float)hashtotal) * 100.0;
         if(digstateid == 1)
             hashstring = "MD5";
         else if(digstateid == 2)
@@ -55,7 +55,7 @@ void DigStatus::SetInitialDigState(int digstateid, int digtotal)
         imgthumbcount = 0;
         imgthumbtotal = digtotal;
         if(imgthumbtotal != 0)
-            imgthumbpercent = (imgthumbcount/imgthumbtotal) * 100;
+            imgthumbpercent = ((float)imgthumbcount/(float)imgthumbtotal) * 100.0;
         else
             imgthumbtotal = 0;
         ui->imgthumblabel->setVisible(true);
@@ -67,7 +67,7 @@ void DigStatus::SetInitialDigState(int digstateid, int digtotal)
         hashcount = 0;
         hashtotal = digtotal;
         if(hashtotal != 0)
-            hashpercent = (hashcount/hashtotal) * 100;
+            hashpercent = ((float)hashcount/(float)hashtotal) * 100.0;
         else
             hashpercent = 0;
         if(digstateid == 1)

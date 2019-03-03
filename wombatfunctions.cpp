@@ -1064,11 +1064,13 @@ void GenerateThumbnails(QString thumbid)
         readimginfo = NULL;
 
         QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".stat");
-        qDebug() << "id:filename" << thumbid << filefile.fileName().split("mntpt/").at(1);
+        //qDebug() << "id:filename" << thumbid << filefile.fileName().split("mntpt/").at(1);
         filefile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(filefile.isOpen())
             filestr = filefile.readLine();
         filefile.close();
+        if(filestr.count() > 1)
+        {
         QString filemime = filestr.split(",").at(10);
         QString filecat = filemime.split("/").first();
         if(filecat.contains("image"))
@@ -1099,6 +1101,7 @@ void GenerateThumbnails(QString thumbid)
                     writer.write(thumbimage);
                 }
             }
+        }
         }
         free(imgbuf);
         digimgthumbcount++;

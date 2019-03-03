@@ -195,6 +195,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 
 void WombatForensics::ShowDigStatus()
 {
+    QPoint p = QCursor::pos();
+    p += QPoint(20, 0);
+    digstatusdialog->move(p);
     digstatusdialog->show();
 }
 
