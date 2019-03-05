@@ -612,12 +612,8 @@ void WombatForensics::InitializeOpenCase()
 
 void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus)
 {
-    if(exitcode)
-    {
-    }
-    if(exitstatus)
-    {
-    }
+    if(exitcode) {}
+    if(exitstatus) {}
     wombatvariable.iscaseopen = true;
     logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);

@@ -205,6 +205,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
     tmparray = QByteArray::fromRawData(magicbuffer, 1024);
     QMimeDatabase mimedb;
     QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+    free(magicbuffer);
     outstring += mimetype.name() + ",0,e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f";
     if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
         outstring += "*" + QString::number(orphancount);
@@ -282,34 +283,6 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
             }
         }
     }
-    free(magicbuffer);
-
-    /* alternative method using qt5 */
-    /*
-    char fbuf[tmpfile->meta->size];
-    ssize_t flen = tsk_fs_file_read(tmpfile, 0, fbuf, tmpfile->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-    QByteArray filedata = QByteArray::fromRawData(fbuf, flen);
-    QBuffer filebuf(&filedata);
-    filebuf.open(QIODevice::ReadOnly);
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    if(hash.addData(&filebuf))
-        qDebug() << "qthash:" << QString(hash.result().toHex()).toUpper();
-    filebuf.close();
-    */
-    /*
-    if(hash.addData(&filebuf))
-        outstring += "," + QString(hash.result().toHex()).toUpper();
-    else
-        outstring += ",0";
-    */
-    /* end alternative method */
-
-    /*
-    // maybe store info for an orphan
-    if(tmpfile->meta != NULL)
-        outstring += "," + QString::number(tmpfile->meta->flags);
-    */
-
     QFile filefile;
     QTextStream out(&filefile);
     if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
@@ -319,6 +292,10 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
     filefile.open(QIODevice::Append | QIODevice::Text);
     out << outstring;
     out.flush();
+    if(filefile.isOpen())
+        filefile.close();
+    else
+        qDebug() << "file file failed to open.";
     nodedata.clear();
     for(int i=0; i < 11; i++)
         nodedata << treeout.at(i);
@@ -326,13 +303,13 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
     treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
     mutex.unlock();
     listeditems.append(treeout.at(10));
-    if(filefile.isOpen())
-        filefile.close();
     if(tmpfile->name != NULL)
     {
         if(!TSK_FS_ISDOT(tmpfile->name->name))
             filesfound++;
     }
+    else
+        qDebug() << "tmpfile->name is suddenly null";
     isignals->ProgUpd();
 
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -375,11 +352,11 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                         char* fbuf = new char[fsattr->size];
                         ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                         QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
-                        QBuffer fbuffer(&fdata);
-                        fbuffer.open(QIODevice::ReadOnly);
+                        //QBuffer fbuffer(&fdata);
+                        //fbuffer.open(QIODevice::ReadOnly);
                         //QCryptographicHash attrhash(QCryptographicHash::Md5);
                         //attrhash.addData(&fbuffer);
-                        fbuffer.close();
+                        //fbuffer.close();
                         QMimeDatabase adsmimedb;
                         QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
                         delete[] fbuf;
@@ -391,9 +368,9 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                         //adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << "," + QString(attrhash.result().toHex()).toUpper() + ",0";
                         adsout.flush();
                         if(adsfile.isOpen())
-                        {
                             adsfile.close();
-                        }
+                        else
+                            qDebug() << "ads file failed to open.";
                         treeout.clear();
                         treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                         //treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << QString(attrhash.result().toHex()).toUpper() << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
@@ -471,6 +448,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 tmparray = QByteArray::fromRawData(magicbuffer, 1024);
                 QMimeDatabase mimedb;
                 QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+                free(magicbuffer);
                 treeout << "0";
                 treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1);
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
@@ -519,9 +497,6 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                         }
                     }
                 }
-                free(magicbuffer);
-
-
                 nodedata.clear();
                 for(int i=0; i < 11; i++)
                     nodedata << treeout.at(i);
@@ -575,11 +550,11 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                     char* fbuf = new char[fsattr->size];
                                     ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                                     QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
-                                    QBuffer fbuffer(&fdata);
-                                    fbuffer.open(QIODevice::ReadOnly);
+                                    //QBuffer fbuffer(&fdata);
+                                    //fbuffer.open(QIODevice::ReadOnly);
                                     //QCryptographicHash attrhash(QCryptographicHash::Md5);
                                     //attrhash.addData(&fbuffer);
-                                    fbuffer.close();
+                                    //fbuffer.close();
                                     QMimeDatabase adsmimedb;
                                     QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
                                     delete[] fbuf;
@@ -600,7 +575,9 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     }
                 }
             }
+            return TSK_WALK_CONT;
         }
+        return TSK_WALK_CONT;
     }
     return TSK_WALK_CONT;
 }
@@ -619,7 +596,9 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
                     orphancount++;
             }
+            return TSK_WALK_CONT;
         }
+        return TSK_WALK_CONT;
     }
     else
         qDebug() << "what is going on...";
@@ -1145,6 +1124,8 @@ void PopulateTreeModel(QString evidstring)
     evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
+    else
+        qDebug() << "evidence file:" << evidfile.fileName() << "failed to open.";
     evidfile.close();
     std::vector<std::string> pathvector;
     pathvector.clear();
@@ -1174,7 +1155,7 @@ void PopulateTreeModel(QString evidstring)
     mutex.unlock();
     vsinfo = tsk_vs_open(imginfo, 0, TSK_VS_TYPE_DETECT);
     QString volname = "Dummy Volume (NO PART)";
-    if(fsinfo != NULL)
+    if(vsinfo != NULL)
         volname = QString::fromUtf8(tsk_vs_type_todesc(vsinfo->vstype));
     QDir voldir = QDir(evidencepath);
     QStringList vollist = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::Dirs);
@@ -1192,21 +1173,32 @@ void PopulateTreeModel(QString evidstring)
         {
             addevidvar.partint = 0;
             fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
-            partitionpath = volumepath + "p0/";
-            addevidvar.partitionpath = partitionpath;
-            nodedata.clear();
-            nodedata << QString(GetFileSystemLabel(fsinfo) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
-            mutex.lock();
-            treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
-            mutex.unlock();
-            uint8_t walkreturn;
-            int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
-            walkreturn = tsk_fs_dir_walk(fsinfo, fsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aevar);
-            if(walkreturn == 1)
+            if(fsinfo != NULL)
             {
-                qWarning() << "Issues with traversing the file structure were encountered";
-                //LogMessage("Issues with traversing the file structure were encountered");
-                errorcount++;
+                partitionpath = volumepath + "p0/";
+                addevidvar.partitionpath = partitionpath;
+                nodedata.clear();
+                nodedata << QString(GetFileSystemLabel(fsinfo) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
+                mutex.unlock();
+                uint8_t walkreturn;
+                int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+                walkreturn = tsk_fs_dir_walk(fsinfo, fsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aevar);
+                if(walkreturn == 1)
+                {
+                    qWarning() << "Issues with traversing the file structure were encountered";
+                    //LogMessage("Issues with traversing the file structure were encountered");
+                    errorcount++;
+                }
+            }
+            else
+            {
+                nodedata.clear();
+                nodedata << QString("NON-RECOGNIZED FS") << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
+                mutex.unlock();
             }
         }
         else
@@ -1298,6 +1290,7 @@ void InitializeEvidenceStructure(QString evidname)
     if(readimginfo == NULL)
     {
         qWarning() << "Evidence Image access failed";
+        tsk_error_print(stderr);
         //LogMessage("Evidence Image acess failed");
         errorcount++;
     }
@@ -1346,7 +1339,7 @@ void InitializeEvidenceStructure(QString evidname)
         voloffset = (unsigned long long)readvsinfo->offset;
     }
     QDir voldir = QDir(evidencepath);
-    QStringList volfiles = voldir.entryList(QStringList(QString("*.v*")), QDir::NoSymLinks | QDir::Dirs);
+    QStringList volfiles = voldir.entryList(QStringList(QString("v*")), QDir::NoSymLinks | QDir::Dirs);
     volcnt = volfiles.count();
     addevidvar.volcnt = volcnt;
     QString volumepath = evidencepath + "v" + QString::number(volcnt) + "/";
@@ -1370,34 +1363,60 @@ void InitializeEvidenceStructure(QString evidname)
     if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
     {
         readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-        QString partitionpath = volumepath + "p0/";
-        addevidvar.partitionpath = partitionpath;
-        addevidvar.partint = partint;
-        (new QDir())->mkpath(partitionpath);
-        QFile pfile(partitionpath + "stat");
-        pfile.open(QIODevice::Append | QIODevice::Text);
-        out.setDevice(&pfile);
-        out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
-        out.flush();
-        pfile.close();
-        treeout.clear();
-        treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
-        nodedata.clear();
-        for(int i=0; i < treeout.count(); i++)
-            nodedata << treeout.at(i);
-        mutex.lock();
-        treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
-        mutex.unlock();
-        WriteFileSystemProperties(readfsinfo, partitionpath);
-        uint8_t walkreturn;
-        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
-        walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, (void*)aevar);
-        //walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
-        if(walkreturn == 1)
+        if(readfsinfo == NULL) // unrecognized fs
         {
-            qWarning() << "Issues with traversing the file structure were encountered";
-            //LogMessage("Issues with traversing the file structure were encountered");
-            errorcount++;
+            qDebug() << "unrecognized single file system, need to catch and describe.";
+            QString partitionpath = volumepath + "p0/";
+            addevidvar.partitionpath = partitionpath;
+            addevidvar.partint = partint;
+            (new QDir())->mkpath(partitionpath);
+            QFile pfile(partitionpath + "stat");
+            pfile.open(QIODevice::Append | QIODevice::Text);
+            out.setDevice(&pfile);
+            out << "240," << QString::number(readimginfo->size) << ",NON-RECOGNIZED FS,0,0," << (unsigned long long)readimginfo->size/volsectorsize << "," << volsectorsize << ",0,0,0,e" << QString::number(evidcnt) + "-v0-p0";
+            out.flush();
+            pfile.close();
+            treeout.clear();
+            treeout << "NON-RECOGNIZED FS" << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0");
+            nodedata.clear();
+            for(int i=0; i < treeout.count(); i++)
+                nodedata << treeout.at(i);
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), -1, 0);
+            mutex.unlock();
+        }
+        else
+        {
+            QString partitionpath = volumepath + "p0/";
+            addevidvar.partitionpath = partitionpath;
+            addevidvar.partint = partint;
+            (new QDir())->mkpath(partitionpath);
+            QFile pfile(partitionpath + "stat");
+            pfile.open(QIODevice::Append | QIODevice::Text);
+            out.setDevice(&pfile);
+            out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+            out.flush();
+            pfile.close();
+            treeout.clear();
+            treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
+            nodedata.clear();
+            for(int i=0; i < treeout.count(); i++)
+                nodedata << treeout.at(i);
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
+            mutex.unlock();
+            WriteFileSystemProperties(readfsinfo, partitionpath);
+            uint8_t walkreturn;
+            int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
+            walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, (void*)aevar);
+            //walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
+            if(walkreturn == 1)
+            {
+                qWarning() << "Issues with traversing the file structure were encountered";
+                tsk_error_print(stderr);
+                //LogMessage("Issues with traversing the file structure were encountered");
+                errorcount++;
+            }
         }
     }
     else
@@ -1410,6 +1429,11 @@ void InitializeEvidenceStructure(QString evidname)
             {
                 //qDebug() << "partint:" << partint << "partcount:" << readvsinfo->part_count;
                 readpartinfo = tsk_vs_part_get(readvsinfo, i);
+                if(readpartinfo == NULL)
+                {
+                    qDebug() << "tsk_vs_part_get error:";
+                    tsk_error_print(stderr);
+                }
                 //qDebug() << "slot num:" << readpartinfo->slot_num;
                 QString partitionpath = volumepath + "p" + QString::number(partint) + "/";
                 addevidvar.partitionpath = partitionpath;
