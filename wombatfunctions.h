@@ -14,7 +14,6 @@ QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
-void StartThumbnails(QStringList thumblist); // should be able to delete
 void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
 void LoadImagesHash(void);

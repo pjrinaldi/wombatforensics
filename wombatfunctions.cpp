@@ -392,9 +392,10 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
 
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr)
 {
-    unsigned long long curaddress = 0;
-    unsigned long long tmpaddress = 0;
-    unsigned long long paraddress = tmpfile->fs_info->root_inum;
+    //unsigned long long curaddress = 0;
+    //unsigned long long tmpaddress = 0;
+    //unsigned long long paraddress = tmpfile->fs_info->root_inum;
+    /*
     if(tmpfile->meta != NULL)
         tmpaddress = tmpfile->meta->addr;
     if(tmpfile->name != NULL)
@@ -402,6 +403,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
         tmpaddress = tmpfile->name->meta_addr;
         paraddress = tmpfile->name->par_addr;
     }
+    */
     if(tmpfile->name != NULL)
     {
         if(strcmp(tmpfile->name->name, ".") != 0)
@@ -424,13 +426,13 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 ba.append(QString(tmpfile->name->name));
                 treeout << ba.toBase64();
                 QString parentstr = "";
-                unsigned int rootinum = tmpfile->fs_info->root_inum;
+                //unsigned int rootinum = tmpfile->fs_info->root_inum;
                 if(tmpfile->name->par_addr == tmpfile->fs_info->root_inum)
                     parentstr = "e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint);
                 else
                     parentstr = "e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->par_addr);
-                curaddress = tmpfile->name->meta_addr;
-                paraddress = tmpfile->name->par_addr;
+                //curaddress = tmpfile->name->meta_addr;
+                //paraddress = tmpfile->name->par_addr;
                 treeout << ba2.toBase64();
                 if(tmpfile->meta != NULL)
                 {
@@ -863,115 +865,6 @@ void GenerateHash(QString itemid)
     }
 }
 
-// SHOULD NOT BE NEEDED
-void StartThumbnails(QStringList diglist)
-{
-    //qInfo() << "Generating Thumbnails...";
-    //LogMessage("Generating Thumbnails...");
-    //StatusUpdate("Generating Thumbnails...");
-    /*
-    QFile tmpfile;
-    QFile thumbfile;
-    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/" + "thumbpathlist");
-    QString tmpstr = "";
-    thumblist.clear();
-    thumbpathlist.clear();
-    //qDebug() << "last diglist/count:" << diglist.last() << diglist.count();
-    */
-    /*
-    if(diglist.at(0).length() == 0)
-    {
-        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList("*.e*"), QDir::NoSymLinks | QDir::Dirs);
-        for(int i=0; i < evidfiles.count(); i++)
-        {
-            QDir voldir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i));
-            QStringList volfiles = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
-            for(int j=0; j < volfiles.count(); j++)
-            {
-                QDir partdir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j));
-                QStringList partfiles = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
-                for(int k=0; k < partfiles.count(); k++)
-                {
-                    QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k));
-                    QStringList filefiles = filedir.entryList(QStringList("f*.a*.stat"), QDir::NoSymLinks | QDir::Files);
-                    for(int l=0; l < filefiles.count(); l++)
-                    {
-                        tmpstr = "";
-                        tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k) + "/" + filefiles.at(l));
-                        tmpfile.open(QIODevice::ReadOnly | QIODevice::Text);
-                        if(tmpfile.isOpen())
-                            tmpstr = tmpfile.readLine();
-                        tmpfile.close();
-                        if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
-                        {
-                            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
-                            QByteArray ba;
-                            QByteArray ba2;
-                            ba.append(tmpstr.split(",").at(0));
-                            ba2.append(tmpstr.split(",").at(3));
-                            QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
-                            ba.clear();
-                            ba.append(fullpath);
-                            thumbfile.open(QIODevice::Append);
-                            thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
-                            thumbfile.write("|");
-                            thumbfile.write(ba.toBase64());
-                            thumbfile.write(",");
-                            thumbfile.close();
-                        }
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-    */
-     /*   for(int i=0; i < diglist.count(); i++)
-        {
-            QDir eviddir = QDir(wombatvariable.tmpmntpath);
-            QStringList evidfiles = eviddir.entryList(QStringList("*." + diglist.at(i).split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-            QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + diglist.at(i).split("-").at(1) + "/" + diglist.at(i).split("-").at(2));
-            QStringList filefiles = filedir.entryList(QStringList(diglist.at(i).split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
-            for(int j=0; j < filefiles.count(); j++)
-            {
-                tmpstr = "";
-                tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + diglist.at(i).split("-").at(1) + "/" + diglist.at(i).split("-").at(2) + "/" + filefiles.at(j));
-                tmpfile.open(QIODevice::ReadOnly);
-                tmpstr = tmpfile.readLine();
-                tmpfile.close();
-                if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
-                {
-                    //thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
-                    QByteArray ba;
-                    QByteArray ba2;
-                    ba.append(tmpstr.split(",").at(0));
-                    ba2.append(tmpstr.split(",").at(3));
-                    QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
-                    ba.clear();
-                    ba.append(fullpath);
-                    thumbfile.open(QIODevice::Append);
-                    thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
-                    thumbfile.write("|");
-                    thumbfile.write(ba.toBase64());
-                    thumbfile.write(",");
-                    thumbfile.close();
-                }
-            }
-        }
-    //}
-    //digfilelist = thumblist;
-    //QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
-    //thashwatcher.setFuture(tmpfuture);
-    //QFuture<void> tmpfuture2 = QtConcurrent::map(thumblist, GenerateThumbnails);
-    //thumbwatcher.setFuture(tmpfuture2);
-    //ui->actionCancel_Operation->setEnabled(true);
-    //QToolTip::showText(cancelwidget->mapToGlobal(QPoint()), tr("Cancel Currently Running Opreation"));
-    //cancelthread->show();
-    */
-}
-
 void GenerateThumbnails(QString thumbid)
 {
     if(thumbid.split("-").count() == 5)
@@ -1145,7 +1038,7 @@ void PopulateTreeModel(QString evidstring)
         errorcount++;
     }
     free(images);
-    int imgtype = imginfo->itype;
+    //int imgtype = imginfo->itype;
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + evidid + "/";
     QList<QVariant> nodedata;
     nodedata.clear();
@@ -2233,7 +2126,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
             proplist << "Application Identifier||" << QString::fromStdString(std::string(asc128)) << "||Identifies how the data are recorded on this volume (0x023E-0x02BD)" << endl;
             snprintf(asc128, 38, "%s", p->pvd.copy_id);
             proplist << "Copyright File Identifier||" << QString::fromStdString(std::string(asc128)) << "||Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)" << endl;
-            snprintf(asc128, 36, "%s", p->pvd.abs_id);
+            snprintf(asc128, 37, "%s", p->pvd.abs_id);
             proplist << "Abstract File Identifier||" << QString::fromStdString(std::string(asc128)) << "||Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)" << endl;
             snprintf(asc128, 37, "%s", p->pvd.bib_id);
             proplist << "Bibliographic File Identifier||" << QString::fromStdString(std::string(asc128)) << "||Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)" << endl;
@@ -2283,7 +2176,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
             proplist << "Application Identifier||" << QString::fromStdString(std::string(asc128)) << "||Identifies how the data are recorded on this volume (0x023E-0x02BD)" << endl;
             snprintf(asc128, 38, "%s", s->svd.copy_id);
             proplist << "Copyright File Identifier||" << QString::fromStdString(std::string(asc128)) << "||Fielname of a file in the root directory that contains copyright information for the volume set (0x02BE-0x02E3)" << endl;
-            snprintf(asc128, 36, "%s", s->svd.abs_id);
+            snprintf(asc128, 37, "%s", s->svd.abs_id);
             proplist << "Abstract File Identifier||" << QString::fromStdString(std::string(asc128)) << "||Filename of a file in the root directory that contains abstract information for the volume set (0x02E4-0x0307)" << endl;
             snprintf(asc128, 37, "%s", s->svd.bib_id);
             proplist << "Bibliographic File Identifier||" << QString::fromStdString(std::string(asc128)) << "||Filename of a file in the root directory that contains bibliographic information for this volume set (0x0308-0x032C)" << endl;

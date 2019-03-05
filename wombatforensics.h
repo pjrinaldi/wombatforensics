@@ -57,6 +57,7 @@ class StatusLabel : public QLabel
         void mousePressEvent(QMouseEvent* e)
         {
             emit clicked();
+            e->accept();
         }
 
     signals:
@@ -214,8 +215,6 @@ private:
     void UpdateProperties(void);
     void LoadHexContents(void);
     void GenerateHexFile(const QModelIndex index);
-    //void StartThumbnails(QStringList diglist);
-    void StartHash(QStringList diglist, int hashtype);
     QStringList GetFileLists(int filelisttype);
     void ProcessDig(QString curid);
     void UpdateFilterCount(void);

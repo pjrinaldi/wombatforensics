@@ -85,11 +85,13 @@ void DigStatus::SetInitialDigState(int digstateid, int digtotal)
 
 void DigStatus::CancelImgThumb()
 {
+    ui->imgthumblabel->setText("<s>" + ui->imgthumblabel->text() + "</s>");
     emit CancelImgThumbThread();
 }
 
 void DigStatus::CancelHash()
 {
+    ui->hashlabel->setText("<s>" + ui->hashlabel->text() + "</s>");
     emit CancelHashThread();
 }
 

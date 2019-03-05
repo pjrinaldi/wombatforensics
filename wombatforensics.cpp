@@ -196,7 +196,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 void WombatForensics::ShowDigStatus()
 {
     QPoint p = QCursor::pos();
-    p += QPoint(20, 0);
+    p += QPoint(40, -300);
     digstatusdialog->move(p);
     digstatusdialog->show();
 }
@@ -1357,21 +1357,21 @@ void WombatForensics::LoadHexContents()
                         //qDebug() << "attrcnt:" << attrcnt;
                         for(int i = 0; i < attrcnt; i++)
                         {
-                            if(curoffset < resbuffer.size())
+                            if(curoffset < (unsigned)resbuffer.size())
                             {
-                            attrtype[0] = (uint8_t)resbuffer.at(curoffset);
-                            attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                            attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                            attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                            atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                            mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                            mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                            mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                            mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                            contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                            if(atrtype == 144)
-                                break;
-                            curoffset += contentlength;
+                                attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                                attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                                attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                                attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                                atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                                mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                                mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                                mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                                mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                                contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                                if(atrtype == 144)
+                                    break;
+                                curoffset += contentlength;
                             }
                         }
                         //qDebug() << "curoffset:" << curoffset;
@@ -1404,30 +1404,30 @@ void WombatForensics::LoadHexContents()
                             //qDebug() << "attrcnt:" << attrcnt;
                             for(int i = 0; i < attrcnt; i++)
                             {
-                                if(curoffset < resbuffer.size())
+                                if(curoffset < (unsigned)resbuffer.size())
                                 {
-                                attrtype[0] = (uint8_t)resbuffer.at(curoffset);
-                                attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                                attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                                attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                                atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                                namelength = (uint8_t)resbuffer.at(curoffset + 9);
-                                mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                                mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                                mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                                mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                                contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                                if(namelength == 0 && atrtype == 128)
-                                    break;
-                                curoffset += contentlength;
+                                    attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                                    attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                                    attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                                    attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                                    atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                                    namelength = (uint8_t)resbuffer.at(curoffset + 9);
+                                    mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                                    mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                                    mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                                    mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                                    contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                                    if(namelength == 0 && atrtype == 128)
+                                        break;
+                                    curoffset += contentlength;
                                 }
                             }
                             //qDebug() << "curoffset:" << curoffset;
-                            if(curoffset < resbuffer.size())
+                            if(curoffset < (unsigned)resbuffer.size())
                             {
-                            mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
-                            mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-                            resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                                mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
+                                mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
+                                resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                             }
                             ui->hexview->SetColorInformation(partlist.at(4).toULongLong(), partlist.at(6).toULongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, tmpstr.split(",").at(8).toULongLong(), (curoffset + resoffset));
                             ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
@@ -1689,7 +1689,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             //thumbwatcher.setFuture(thumbfuture);
             //QFuture<void> tmpfuture = QtConcurrent::run(&WombatForensics::StartThumbnails, digfilelist); // Process All Thumbnails
         }
-        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 | digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256
+        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 || digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256
         {
             if(digoptions.at(i) == 2)
                 hashsum = 2;
@@ -1955,135 +1955,6 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
         }
     }
 }
-
-// SHOULDN'T NEED THIS SINCE I CAN LAUNCH THIS IN THE PARENT FUNCTION
-void WombatForensics::StartHash(QStringList diglist, int hashtype)
-{
-    /*
-    qInfo() << "Generating Hash...";
-    StatusUpdate("Generating Hash...");
-    // LAUNCH HASHFILES HERE...
-    QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
-    thashwatcher.setFuture(tmpfuture);
-    thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
-    thumbwatcher.setFuture(thumbfuture);
-    // NEED TO LOOP OVER THE FILES FROM DIGLIST
-    // FOR EACH FILE, I NEED TO GET THE TSK_FS_FILE AND THEN CALCULATE THE HASH FOR IT
-    // THEN READ THE FILE CONTENT AS A STRING LIST, UPDATE THE HASH, THEN WRITE IT BACK TO THE SAME FILE
-    // THEN I NEED TO FIGURE OUT HOW TO UPDATE THE TREEVIEW COLUMNS
-    // OR I CAN USE THE QT HASHING METHOD AND USE PROPERTIES, TO GET BLOCK(S) FROM TSK_IMG_INFO[OPEN/READ/CLOSE]
-    // THEN I CAN CAT THE BLOCKS TO A TMPFILE AND HASH IT
-    // THEN FOR RESIDENT ATTR I CAN USE "RESIDENT STRING" PROPERTY TO USE TSK_IMG_INFO[OPEN/READ/CLOSE]
-    // THEN LOOP OVER THE ATTRIBUTE AND PULL OUT THE CONTENT TO HASH.
-    */
-}
-
-// shouldn't need this since i MOVED THIS TO WOMBATFUNCTIONS
-/*
-void WombatForensics::StartThumbnails(QStringList diglist)
-{
-    qInfo() << "Generating Thumbnails...";
-    //LogMessage("Generating Thumbnails...");
-    //StatusUpdate("Generating Thumbnails...");
-    QFile tmpfile;
-    QFile thumbfile;
-    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/" + "thumbpathlist");
-    QString tmpstr = "";
-    thumblist.clear();
-    thumbpathlist.clear();
-    //qDebug() << "last diglist/count:" << diglist.last() << diglist.count();
-    /*
-    if(diglist.at(0).length() == 0)
-    {
-        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList("*.e*"), QDir::NoSymLinks | QDir::Dirs);
-        for(int i=0; i < evidfiles.count(); i++)
-        {
-            QDir voldir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i));
-            QStringList volfiles = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
-            for(int j=0; j < volfiles.count(); j++)
-            {
-                QDir partdir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j));
-                QStringList partfiles = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::Hidden | QDir::Dirs);
-                for(int k=0; k < partfiles.count(); k++)
-                {
-                    QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k));
-                    QStringList filefiles = filedir.entryList(QStringList("f*.a*.stat"), QDir::NoSymLinks | QDir::Files);
-                    for(int l=0; l < filefiles.count(); l++)
-                    {
-                        tmpstr = "";
-                        tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(i) + "/" + volfiles.at(j) + "/" + partfiles.at(k) + "/" + filefiles.at(l));
-                        tmpfile.open(QIODevice::ReadOnly | QIODevice::Text);
-                        if(tmpfile.isOpen())
-                            tmpstr = tmpfile.readLine();
-                        tmpfile.close();
-                        if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
-                        {
-                            thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
-                            QByteArray ba;
-                            QByteArray ba2;
-                            ba.append(tmpstr.split(",").at(0));
-                            ba2.append(tmpstr.split(",").at(3));
-                            QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
-                            ba.clear();
-                            ba.append(fullpath);
-                            thumbfile.open(QIODevice::Append);
-                            thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
-                            thumbfile.write("|");
-                            thumbfile.write(ba.toBase64());
-                            thumbfile.write(",");
-                            thumbfile.close();
-                        }
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-    */
-/*        for(int i=0; i < diglist.count(); i++)
-        {
-            QDir eviddir = QDir(wombatvariable.tmpmntpath);
-            QStringList evidfiles = eviddir.entryList(QStringList("*." + diglist.at(i).split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-            QDir filedir = QDir(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + diglist.at(i).split("-").at(1) + "/" + diglist.at(i).split("-").at(2));
-            QStringList filefiles = filedir.entryList(QStringList(diglist.at(i).split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
-            for(int j=0; j < filefiles.count(); j++)
-            {
-                tmpstr = "";
-                tmpfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + diglist.at(i).split("-").at(1) + "/" + diglist.at(i).split("-").at(2) + "/" + filefiles.at(j));
-                tmpfile.open(QIODevice::ReadOnly);
-                tmpstr = tmpfile.readLine();
-                tmpfile.close();
-                if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).at(0).contains("image"))
-                {
-                    thumblist.append(tmpstr.split(",", QString::SkipEmptyParts).at(12)); // object id
-                    QByteArray ba;
-                    QByteArray ba2;
-                    ba.append(tmpstr.split(",").at(0));
-                    ba2.append(tmpstr.split(",").at(3));
-                    QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
-                    ba.clear();
-                    ba.append(fullpath);
-                    thumbfile.open(QIODevice::Append);
-                    thumbfile.write(tmpstr.split(",", QString::SkipEmptyParts).at(12).toStdString().c_str());
-                    thumbfile.write("|");
-                    thumbfile.write(ba.toBase64());
-                    thumbfile.write(",");
-                    thumbfile.close();
-                }
-            }
-        }
-    //}
-    digfilelist = thumblist;
-    QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash);
-    thashwatcher.setFuture(tmpfuture);
-    thumbfuture = QtConcurrent::map(thumblist, GenerateThumbnails);
-    thumbwatcher.setFuture(thumbfuture);
-    //ui->actionCancel_Operation->setEnabled(true);
-    //QToolTip::showText(cancelwidget->mapToGlobal(QPoint()), tr("Cancel Currently Running Opreation"));
-    //cancelthread->show();
-}*/
 
 void WombatForensics::FinishThumbs()
 {
@@ -2457,7 +2328,7 @@ SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCo
 {
     SCCERR seResult = SCCERR_NOTHANDLED;
     EXFILEIOCALLBACKDATA *pNewFileInfo;
-    EXURLFILEIOCALLBACKDATA *pExportData;
+    //EXURLFILEIOCALLBACKDATA *pExportData;
     UNUSED(hExport);
     UNUSED(dwCallbackData);
 
@@ -2476,12 +2347,12 @@ SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCo
 
         /* Print the name of each output file generated. */
         pNewFileInfo = (EXFILEIOCALLBACKDATA *)pCommandData;
-        pExportData  = (EXURLFILEIOCALLBACKDATA *)pNewFileInfo->pExportData;
+        //pExportData  = (EXURLFILEIOCALLBACKDATA *)pNewFileInfo->pExportData;
 
         if( pNewFileInfo->dwSpecType == PATH_TYPE )
-          printf("Creating file: %ls\n", pNewFileInfo->pSpec );
+          printf("Creating file: %s\n", (char*)pNewFileInfo->pSpec );
         else
-          printf("Creating not file: %s\n", pNewFileInfo->pSpec );
+          printf("Creating not file: %s\n", (char*)pNewFileInfo->pSpec );
 
 				//if (pNewFileInfo->dwAssociation == CU_ROOT && g_monitorPort)
 					//SendReadyMessage();
