@@ -395,11 +395,11 @@ void FileTypeFilter::DisplayFilter()
     for(int i=0; i < evidlist.count(); i++)
     {
         QDir voldir = QDir(wombatvariable.tmpmntpath + evidlist.at(i));
-        QStringList vollist = voldir.entryList(QStringList(".v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+        QStringList vollist = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
         for(int j=0; j < vollist.count(); j++)
         {
             QDir partdir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j));
-            QStringList partlist = partdir.entryList(QStringList(".p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+            QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
             for(int k=0; k < partlist.count(); k++)
             {
                 QDir filedir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k));
@@ -407,7 +407,6 @@ void FileTypeFilter::DisplayFilter()
                 for(int l=0; l < filefiles.count(); l++)
                 {
                     QFile filefile(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k) + "/" + filefiles.at(l));
-                    //QFile filefile(wombatvariable.tmpmntpath + wombatvariable.evidencename + "." + estring + "/." + vstring + "/." + pstring + "/" + filefiles.at(0));
                     filefile.open(QIODevice::ReadOnly);
                     if(filefile.isOpen())
                         tmpstr = filefile.readLine();
@@ -418,21 +417,6 @@ void FileTypeFilter::DisplayFilter()
             }
         }
     }
-    // TWO OPTIONS TO FIX THE FILTER CONTENT IS TO EITHER LOOP OVER ALL THE EVIDENCE FOLDER STRUCUTRES
-    // OR I CAN TRY TO MATCH WITH THE MODEL... (GOING TO TRY LOOP OVER FOLDER'S FIRST AND READ THE DATA...)
-    /*
-    QStringList filefiles = eviddir.entryList(QStringList("*.p*.f*.a*"), QDir::NoSymLinks | QDir::Files);
-    for(int i = 0; i < filefiles.count(); i++)
-    {
-        tmpstr = "";
-        tmpfile.setFileName(wombatvariable.tmpmntpath + filefiles.at(i));
-        tmpfile.open(QIODevice::ReadOnly);
-        tmpstr = tmpfile.readLine();
-        tmpfile.close();
-        if(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/", QString::SkipEmptyParts).count() >= 2)
-            tmptype.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).last());
-    }
-    */
     tmptype.removeDuplicates();
     for(int i=0; i < tmptype.count(); i++)
         ui->typecomboBox->addItem(tmptype.at(i));
@@ -477,11 +461,11 @@ void FileCategoryFilter::DisplayFilter()
     for(int i=0; i < evidlist.count(); i++)
     {
         QDir voldir = QDir(wombatvariable.tmpmntpath + evidlist.at(i));
-        QStringList vollist = voldir.entryList(QStringList(".v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+        QStringList vollist = voldir.entryList(QStringList("v*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
         for(int j=0; j < vollist.count(); j++)
         {
             QDir partdir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j));
-            QStringList partlist = partdir.entryList(QStringList(".p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
+            QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
             for(int k=0; k < partlist.count(); k++)
             {
                 QDir filedir = QDir(wombatvariable.tmpmntpath + evidlist.at(i) + "/" + vollist.at(j) + "/" + partlist.at(k));
@@ -499,24 +483,6 @@ void FileCategoryFilter::DisplayFilter()
             }
         }
     }
-	/*
-    QStringList tmpcategory;
-    QString tmpstr = "";
-    tmpcategory.clear();
-    ui->categorycomboBox->clear();
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QFile tmpfile;
-    QStringList filefiles = eviddir.entryList(QStringList("*.p*.f*.a*"), QDir::NoSymLinks | QDir::Files);
-    for(int i = 0; i < filefiles.count(); i++)
-    {
-        tmpstr = "";
-        tmpfile.setFileName(wombatvariable.tmpmntpath + filefiles.at(i));
-        tmpfile.open(QIODevice::ReadOnly);
-        tmpstr = tmpfile.readLine();
-        tmpfile.close();
-        tmpcategory.append(tmpstr.split(",", QString::SkipEmptyParts).at(10).split("/",QString::SkipEmptyParts).first());
-    }
-	*/
     tmpcategory.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)
         ui->categorycomboBox->addItem(tmpcategory.at(i));

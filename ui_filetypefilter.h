@@ -57,6 +57,7 @@ public:
 
         typecomboBox = new QComboBox(FileTypeFilter);
         typecomboBox->setObjectName(QStringLiteral("typecomboBox"));
+        typecomboBox->setEnabled(false);
         typecomboBox->setInsertPolicy(QComboBox::NoInsert);
 
         gridLayout->addWidget(typecomboBox, 0, 1, 1, 1);
