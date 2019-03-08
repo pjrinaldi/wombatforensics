@@ -75,6 +75,7 @@ void AddEvidenceDialog::SelectEvidence()
     }
     else
     {
+        QMessageBox::warning(this, tr("Unsupported Format"), tr("Unfortunately, this format is not supported YET, it should be supported by v0.2"), QMessageBox::Ok);
         qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.2.";
     }
 }
