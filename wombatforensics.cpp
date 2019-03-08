@@ -655,23 +655,30 @@ void WombatForensics::OpenUpdate()
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     // this currently fails to load content data in the hexviewer. until it does, the char bytes are zero...
+    /*
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
     if(indexlist.count() > 0)
     {
         qDebug() << indexlist.at(0).sibling(indexlist.at(0).row(), 0).data().toString();
-        //if(selectedindex.sibling(selectedindex.row(), 2).data().toULongLong() > 0) // file size
-        //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+        ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+        selectedindex = treenodemodel->index(0, 0, QModelIndex());
+        LoadHexContents();
         //ui->hexview->ensureVisible();
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
         selectedindex = indexlist.first();
         LoadHexContents();
+        bool test = false;
+        qDebug() << ui->hexview->addressOffset() << selectedoffset->text().split("0x").last().toULongLong(&test, 16);
+        test = false;
+        ui->hexview->setCursorPosition(selectedoffset->text().split("0x").last().toULongLong(&test, 16)*2 + 56600*2);
         //ui->hexview->setCursorPosition(ui->hexview->addressOffset()*2);
-        //ui->hexview->ensureVisible();
+        ui->hexview->ensureVisible();
     }
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
-    //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+    */
+    ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
     if(ui->dirTreeView->model() != NULL)
     {
         ui->actionRemove_Evidence->setEnabled(true);
@@ -697,7 +704,6 @@ void WombatForensics::OpenUpdate()
     if(!tdir.isEmpty())
         StatusUpdate("Loading Thumbnail Library...");
     ui->actionView_Image_Gallery->setEnabled(false);
-    qDebug() << ui->hexview->addressOffset();
 }
 
 void WombatForensics::ThashSaveFinish(void)
