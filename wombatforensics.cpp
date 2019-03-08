@@ -655,12 +655,19 @@ void WombatForensics::OpenUpdate()
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     // this currently fails to load content data in the hexviewer. until it does, the char bytes are zero...
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
     if(indexlist.count() > 0)
     {
+        qDebug() << indexlist.at(0).sibling(indexlist.at(0).row(), 0).data().toString();
+        //if(selectedindex.sibling(selectedindex.row(), 2).data().toULongLong() > 0) // file size
         //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+        //ui->hexview->ensureVisible();
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+        selectedindex = indexlist.first();
+        LoadHexContents();
+        //ui->hexview->setCursorPosition(ui->hexview->addressOffset()*2);
+        //ui->hexview->ensureVisible();
     }
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
@@ -687,8 +694,10 @@ void WombatForensics::OpenUpdate()
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
     StatusUpdate("Ready");
-    //StatusUpdate("Loading Thumbnail Library...");
+    if(!tdir.isEmpty())
+        StatusUpdate("Loading Thumbnail Library...");
     ui->actionView_Image_Gallery->setEnabled(false);
+    qDebug() << ui->hexview->addressOffset();
 }
 
 void WombatForensics::ThashSaveFinish(void)
@@ -895,11 +904,12 @@ void WombatForensics::UpdateStatus()
     //evidcnt++;
     //volcnt = 0;
     //partint = 0;
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
     {
-        ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+        //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+        selectedindex = indexlist.at(0);
     }
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
@@ -2289,7 +2299,9 @@ QString WombatForensics::InitializeSelectedState()
         selectfile.open(QIODevice::ReadOnly);
         QString tmpstr = selectfile.readLine();
         selectfile.close();
-        return tmpstr;
+        qDebug() << tmpstr;
+        return "file-r-3.dat:here";
+        //return tmpstr;
     }
     else return "";
 }
