@@ -659,13 +659,14 @@ void WombatForensics::OpenUpdate()
     UpdateCheckCount();
     if(indexlist.count() > 0)
     {
-        qDebug() << indexlist.at(0).sibling(indexlist.at(0).row(), 0).data().toString();
+        qDebug() << indexlist.at(0).sibling(indexlist.at(0).row(), 0).data().toString() << indexlist.count();
         //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
         //selectedindex = treenodemodel->index(0, 0, QModelIndex());
         //LoadHexContents();
         //ui->hexview->ensureVisible();
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
-        ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::SelectCurrent);
+        QThread::sleep(60);
+        ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
         //selectedindex = indexlist.first();
         //LoadHexContents();
         //bool test = false;
@@ -897,24 +898,12 @@ void WombatForensics::UpdateStatus()
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     UpdateCheckCount();
-    /*
-    readfileinfo = NULL;
-    tsk_fs_close(readfsinfo);
-    readfsinfo = NULL;
-    tsk_vs_close(readvsinfo);
-    readvsinfo = NULL;
-    tsk_img_close(readimginfo);
-    readimginfo = NULL;
-    */
-    //evidcnt++;
-    //volcnt = 0;
-    //partint = 0;
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
     {
         //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
-        selectedindex = indexlist.at(0);
+        //selectedindex = indexlist.at(0);
     }
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
@@ -2305,7 +2294,7 @@ QString WombatForensics::InitializeSelectedState()
         QString tmpstr = selectfile.readLine();
         selectfile.close();
         qDebug() << tmpstr;
-        return "file-r-3.dat:here";
+        return "file-r-3.dat";
         //return tmpstr;
     }
     else return "";
