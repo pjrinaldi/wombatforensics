@@ -26,6 +26,7 @@
 #include "qhexview.h"
 #include "addevidencedialog.h"
 #include "digstatus.h"
+#include "remevidencedialog.h"
 
 #define UNIX
 #define UNIX_64
@@ -108,6 +109,7 @@ public:
     SettingsDialog* settingsdialog;
     AddEvidenceDialog* addevidencedialog;
     DigStatus* digstatusdialog;
+    RemEvidenceDialog* remevidencedialog;
     //QHexDocument* curhexdoc;
     //QHexView* hexviewer;
 

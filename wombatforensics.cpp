@@ -1509,6 +1509,11 @@ void WombatForensics::CloseCurrentCase()
 
 void WombatForensics::RemEvidence()
 {
+    // WHOLE NEW TAKE ON REMOVE EVIDENCE IS STARTING
+    remevidencedialog = new RemEvidenceDialog(this);
+    remevidencedialog->exec();
+
+    /*
     // if an evidence item is not selected, then move selection to it and remove then it...
     // also need to remove any thumbnails in the thumbs.db associated with it...
     // DELETE TREEFILE AS WELL AS THE SINGLE FILeS *.p0.f*.a*
@@ -1546,6 +1551,7 @@ void WombatForensics::RemEvidence()
         QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
         tmpfile.close();
     }
+    */
     /*
     treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
@@ -2294,8 +2300,8 @@ QString WombatForensics::InitializeSelectedState()
         QString tmpstr = selectfile.readLine();
         selectfile.close();
         qDebug() << tmpstr;
-        return "file-r-3.dat";
-        //return tmpstr;
+        //return "file-r-3.dat";
+        return tmpstr;
     }
     else return "";
 }
