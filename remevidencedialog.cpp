@@ -93,7 +93,11 @@ void AddEvidenceDialog::UpdateButtons()
 
 void RemEvidenceDialog::RemoveEvidence()
 {
-    qDebug() << ui->evidencelist->selectedItems();
+    for(int i=0; i < ui->evidencelist->selectedItems().count(); i++)
+    {
+        qDebug() << ui->evidencelist->selectedItems().at(i)->text();
+    }
+    //qDebug() << ui->evidencelist->selectedItems();
     //qDeleteAll(ui->evidencelist->selectedItems());
     /*
     if(ui->evidencelist->count() == 0)

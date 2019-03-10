@@ -1509,6 +1509,7 @@ void WombatForensics::CloseCurrentCase()
 
 void WombatForensics::RemEvidence()
 {
+    qDebug() << "remove evidence clicked";
     // WHOLE NEW TAKE ON REMOVE EVIDENCE IS STARTING
     remevidencedialog = new RemEvidenceDialog(this);
     remevidencedialog->exec();

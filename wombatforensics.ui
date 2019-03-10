@@ -740,6 +740,12 @@
    </hints>
   </connection>
   <connection>
+      <sender>actionRemove_Evidence</sender>
+      <signal>triggered()</signal>
+      <receiver>WombatForensics</receiver>
+      <slot>RemEvidence()</slot>
+  </connection>
+  <connection>
    <sender>actionAdd_Evidence</sender>
    <signal>triggered()</signal>
    <receiver>WombatForensics</receiver>
