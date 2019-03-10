@@ -97,6 +97,9 @@ void RemEvidenceDialog::RemoveEvidence()
     {
         qDebug() << ui->evidencelist->selectedItems().at(i)->text();
     }
+    //So I need to return a list of the selected items
+    //then i need to loop over these in the main thread and remove the items from the tree... or i can do it here...
+    //
     //qDebug() << ui->evidencelist->selectedItems();
     //qDeleteAll(ui->evidencelist->selectedItems());
     /*
