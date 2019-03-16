@@ -1187,12 +1187,12 @@ void QHexEdit::setSelection(qint64 pos)
     emit selectionChanged();
 }
 
-int QHexEdit::getSelectionBegin()
+qint64 QHexEdit::getSelectionBegin()
 {
     return _bSelectionBegin;
 }
 
-int QHexEdit::getSelectionEnd()
+qint64 QHexEdit::getSelectionEnd()
 {
     return _bSelectionEnd;
 }
