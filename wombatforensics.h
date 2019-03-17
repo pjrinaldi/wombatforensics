@@ -23,7 +23,6 @@
 #include "digdeeperdialog.h"
 #include "aboutbox.h"
 #include "settingsdialog.h"
-#include "qhexview.h"
 #include "addevidencedialog.h"
 #include "digstatus.h"
 #include "remevidencedialog.h"
@@ -110,8 +109,6 @@ public:
     AddEvidenceDialog* addevidencedialog;
     DigStatus* digstatusdialog;
     RemEvidenceDialog* remevidencedialog;
-    //QHexDocument* curhexdoc;
-    //QHexView* hexviewer;
 
 signals:
     void CancelCurrentThread();
