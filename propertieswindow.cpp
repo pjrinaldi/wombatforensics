@@ -30,11 +30,8 @@ void PropertiesWindow::UpdateTableView()
     pmodel = new PropertyModel(propertylist);
     ui->tableView->setModel(pmodel);
     ui->tableView->hideColumn(2);
-    for(int i=0; i < pmodel->rowCount(); i++)
-    {
-        if(pmodel->index(i, 1).data().toString().size() > 30)
-            ui->tableView->resizeRowToContents(i);
-    }
+    ui->tableView->resizeRowsToContents();
+    ui->tableView->resizeColumnsToContents();
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
 }
 

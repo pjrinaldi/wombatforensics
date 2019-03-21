@@ -1008,8 +1008,13 @@ void WombatForensics::UpdateProperties()
     QTextStream in(&propfile);
     while(!in.atEnd())
     {
+        QString tmpstr = "";
         QString line = in.readLine();
-        propertylist << line.split("||").at(0) << line.split("||").at(1) << line.split("||").at(2);
+        if(line.split("||").at(1).contains("^^"))
+            tmpstr = QString(line.split("||").at(1)).replace(QString("^^"), QString(", "));
+        else
+            tmpstr = line.split("||").at(1);
+        propertylist << line.split("||").at(0) << tmpstr << line.split("||").at(2);
     }
     propfile.close();
     propertywindow->UpdateTableView();
