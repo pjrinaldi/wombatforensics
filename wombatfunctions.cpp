@@ -484,8 +484,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     nodedata << treeout.at(i);
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, parentstr, treeout.at(11).toInt(), treeout.at(12).toInt());
-                mutex.unlock();
                 listeditems.append(treeout.at(10));
+                mutex.unlock();
                 if(tmpfile->name != NULL)
                 {
                     if(!TSK_FS_ISDOT(tmpfile->name->name))

@@ -882,7 +882,9 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         //qDebug() << "byte offset:" << byteoffset;
         if(blocklist.count() > 0)
         {
-            if(blocklist.at(0).toInt() != 0) // non-resident attribute
+            qDebug() << "blocklist.at(0):" << blocklist.at(0);
+            qDebug() << "blkoffset:" << blocklist.at(0).toULongLong()*blocksize + fsoffset;
+            if(blocklist.at(0).toULongLong() != 0) // non-resident attribute
             {
                 unsigned long long blkoffset = 0;
                 //unsigned long long blkoffset2 = 0;
@@ -895,10 +897,14 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 }
             }
         }
+        else
+            qDebug() << "blocklist is zero, but shouldn't be";
         //qDebug() << "blocklist:" << blocklist;
         //qDebug() << "blocklist:" << blocklist.count() << "curblocklist:" << curblocklist.count() << "blocksize:" << blocksize;
-        //if(curblocklist.count() > 0 && !curblocklist.isEmpty())
-        //    qDebug() << "curblklist:" << curblocklist;
+        if(curblocklist.count() > 0 && !curblocklist.isEmpty())
+            qDebug() << "curblklist:" << curblocklist;
+        else
+            qDebug() << "curblklist is empty";
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
         {
             QByteArray hex;
@@ -912,7 +918,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 qint64 posBa = _bPosFirst + bPosLine + colIdx; // curoffset
                 if(blocklist.count() > 0)
                 {
-                    if(blocklist.at(0).toInt() == 0) // resident attribute
+                    if(blocklist.at(0).toULongLong() == 0) // resident attribute
                     {
                         //qDebug() << "resident attribute";
                         curblkstart = 0;
