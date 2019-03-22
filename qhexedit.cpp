@@ -894,8 +894,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                     //blkoffset2 = fsoffset + blocklist.at(i).toULongLong() * blocksize;
                     blkoffset = fsoffset + blocklist.at(i).toULongLong() * blocksize;
                     if(i == 0)
-                        qDebug() << "inside loop blkoffset:" << blkoffset << "_bPosFirst" << (unsigned)_bPosFirst << "_bPosLast" << (unsigned)_bPosLast;
-                    if(blkoffset >= ((unsigned)_bPosFirst - blocksize) && blkoffset <= ((unsigned)_bPosLast + blocksize))
+                        qDebug() << "inside loop blkoffset:" << blkoffset << "_bPosFirst" << _bPosFirst << "_bPosLast" << _bPosLast;
+                    if(blkoffset >= (_bPosFirst - blocksize) && blkoffset <= (_bPosLast + blocksize))
                         curblocklist.append(blocklist.at(i));
                 }
             }
