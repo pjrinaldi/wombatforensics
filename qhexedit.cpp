@@ -878,10 +878,11 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 	unsigned long long curblkend = 0;
         QStringList curblocklist;
         curblocklist.clear();
-        //qDebug() << "F/L Pos:" << _bPosFirst << _bPosLast;
+        qDebug() << "F/L Pos:" << _bPosFirst << _bPosLast;
         //qDebug() << "byte offset:" << byteoffset;
         if(blocklist.count() > 0)
         {
+            qDebug() << "fsoffset:" << fsoffset;
             qDebug() << "blocklist.at(0):" << blocklist.at(0);
             qDebug() << "blkoffset:" << blocklist.at(0).toULongLong()*blocksize + fsoffset;
             if(blocklist.at(0).toULongLong() != 0) // non-resident attribute
@@ -892,6 +893,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 {
                     //blkoffset2 = fsoffset + blocklist.at(i).toULongLong() * blocksize;
                     blkoffset = fsoffset + blocklist.at(i).toULongLong() * blocksize;
+                    if(i == 0)
+                        qDebug() << "inside loop blkoffset:" << blkoffset << "_bPosFirst" << (unsigned)_bPosFirst << "_bPosLast" << (unsigned)_bPosLast;
                     if(blkoffset >= ((unsigned)_bPosFirst - blocksize) && blkoffset <= ((unsigned)_bPosLast + blocksize))
                         curblocklist.append(blocklist.at(i));
                 }
@@ -1319,5 +1322,5 @@ void QHexEdit::SetColorInformation(unsigned long long fsoff, unsigned long long 
     //qDebug() << "initial variables";
     //if(blockstring.split("^^", QString::SkipEmptyParts).count() > 1)
         //qDebug() << "blockstring F/L:" << blockstring.split("^^", QString::SkipEmptyParts).first() << blockstring.split("^^", QString::SkipEmptyParts).last();
-    //qDebug() << "blockstring:" << blocklist << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength << "dataoffset:" << dataoffset;
+    qDebug() << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength << "dataoffset:" << dataoffset;
 }
