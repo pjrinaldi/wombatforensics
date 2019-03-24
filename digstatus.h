@@ -20,18 +20,14 @@ class DigStatus : public QDialog
 public:
     DigStatus(QWidget* parent = 0);
     ~DigStatus();
-    //void SetText(QString txt);
     void UpdateDigState(int digstateid, int digstatecount);
     void SetInitialDigState(int digstateid, int digtotal);
 public slots:
-   //void HideClicked();
     void CancelHash(void);
     void CancelImgThumb(void);
 signals:
     void CancelImgThumbThread(void);
     void CancelHashThread(void);
-    //void HideDigStatusWindow(bool checkstate);
-    //void CancelDigStatus(int digstateid);
 protected:
     void closeEvent(QCloseEvent* event);
 

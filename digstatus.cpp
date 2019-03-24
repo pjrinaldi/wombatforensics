@@ -6,7 +6,6 @@
 DigStatus::DigStatus(QWidget* parent) : QDialog(parent), ui(new Ui::DigStatus)
 {
     ui->setupUi(this);
-    //ui->checkBox->setVisible(false);
     this->hide();
     // need to hide ui elements until i use them. also need to build in the cancel buttons with signals...
     ui->imgthumblabel->setVisible(false);
@@ -95,22 +94,7 @@ void DigStatus::CancelHash()
     emit CancelHashThread();
 }
 
-/*
-void ByteConverter::HideClicked()
-{
-    this->hide();
-    emit HideByteConverterWindow(false);
-}
-*/
 void DigStatus::closeEvent(QCloseEvent* e)
 {
-    //emit HideByteConverterWindow(false);
     e->accept();
 }
-
-/*
-void ByteConverter::SetText(QString txt)
-{
-    ui->label->setText(txt);
-}
-*/

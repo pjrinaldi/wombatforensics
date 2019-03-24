@@ -16,7 +16,7 @@ class DigDeeperDialog : public QDialog
     Q_OBJECT
     
 public:
-    explicit DigDeeperDialog(QWidget *parent = 0, unsigned long long curcheckcount = 0, unsigned long long curlistcount = 0);
+    explicit DigDeeperDialog(QWidget *parent = 0, qint64 curcheckcount = 0, qint64 curlistcount = 0);
     ~DigDeeperDialog();
 
 signals:
@@ -28,8 +28,8 @@ private slots:
 
 private:
     Ui::DigDeeperDialog *ui;
-    unsigned long long checkcount;
-    unsigned long long listcount;
+    qint64 checkcount;
+    qint64 listcount;
     int digtype = 0;
     QVector<int> digoptions;
     QWidget* parentwidget;
