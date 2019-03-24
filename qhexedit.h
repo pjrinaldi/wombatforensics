@@ -339,7 +339,7 @@ public:
     QColor selectionColor();
     void setSelectionColor(const QColor &color);
 
-    unsigned long long GetSelectionLength()
+    qint64 GetSelectionLength()
     {
         return (getSelectionEnd() - getSelectionBegin());
     };
@@ -348,7 +348,7 @@ public:
     // May 5, 2018
     // Enables information to be passed which is required for coloring hex/ascii
     // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
-    void SetColorInformation(unsigned long long fsoffset, unsigned long long blocksize, QString blockstring, QString residentstring, QString bytestring, unsigned long long flength, unsigned int dataoff);
+    void SetColorInformation(qint64 fsoffset, qint64 blocksize, QString blockstring, QString residentstring, QString bytestring, qint64 flength, int dataoff);
 
 protected:
     // Handle events
@@ -423,12 +423,12 @@ private:
     QBrush slackbrush;
     QPen slackpen;
     QStringList blocklist;
-    unsigned long long residentoffset;
-    unsigned long long fsoffset;
-    unsigned long long byteoffset;
-    unsigned long long blocksize;
-    unsigned long long filelength;
-    unsigned int dataoffset;
+    qint64 residentoffset;
+    qint64 fsoffset;
+    qint64 byteoffset;
+    qint64 blocksize;
+    qint64 filelength;
+    int dataoffset;
 
     // other variables
     bool _editAreaIsAscii;                      // flag about the ascii mode edited

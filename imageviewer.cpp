@@ -46,11 +46,8 @@ void ImageWindow::GetImage(QString objectid)
     QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
     QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
-    unsigned long long curaddress = objectid.split("-f").at(1).split("-a").at(0).toULongLong(); 
-    //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + estring.mid(1)), QDir::NoSymLinks | QDir::Files);
-    //wombatvariable.evidencename = evidfiles.at(0);
+    qint64 curaddress = objectid.split("-f").at(1).split("-a").at(0).toULongLong(); 
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
-    //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + estring.mid(1));
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
     int partcount = tmpstr.split(",").at(3).split("|").size();
@@ -68,9 +65,7 @@ void ImageWindow::GetImage(QString objectid)
     }
     free(imagepartspath);
     tmpstr = "";
-    //QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + pstring.mid(1)), QDir::NoSymLinks | QDir::Files);
     QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
-    //QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();
     readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);

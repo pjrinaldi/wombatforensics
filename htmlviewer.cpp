@@ -10,7 +10,6 @@ HtmlViewer::HtmlViewer(QWidget* parent) : QDialog(parent), ui(new Ui::HtmlViewer
     tskptr->readimginfo = NULL;
     tskptr->readfsinfo = NULL;
     tskptr->readfileinfo = NULL;
-    //this->hide();
 }
 
 HtmlViewer::~HtmlViewer()
@@ -22,8 +21,6 @@ HtmlViewer::~HtmlViewer()
 void HtmlViewer::HideClicked()
 {
     this->close();
-    //this->hide();
-    //emit HideHtmlViewerWindow(false);
 }
 
 void HtmlViewer::ShowHtml(const QModelIndex &index)
@@ -42,13 +39,11 @@ void HtmlViewer::LoadHtml(QString filepath)
 
 void HtmlViewer::closeEvent(QCloseEvent* e)
 {
-    //emit HideHtmlViewerWindow(false);
     e->accept();
 }
 
 void HtmlViewer::GetHtmlContent(const QModelIndex &index)
 {
-    //this->setWindowTitle("View Html - "); // populate filename here.
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
@@ -57,15 +52,10 @@ void HtmlViewer::GetHtmlContent(const QModelIndex &index)
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
-    //QString evidencename = index.sibling(index.row(), 0).data().toString().split(
     QString estring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(0);
     QString vstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(1);
     QString pstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(2);
     QString fstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(3);
-    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
-    //wombatvariable.evidencename = evidfiles.at(0);
-    //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1));
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
@@ -87,8 +77,6 @@ void HtmlViewer::GetHtmlContent(const QModelIndex &index)
     tmpstr = "";
     QStringList partlist;
     partlist.clear();
-    //QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + index.sibling(index.row(), 0).data().toString().split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
-    //QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
     QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();

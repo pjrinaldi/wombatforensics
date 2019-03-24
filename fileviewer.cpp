@@ -72,8 +72,6 @@ void FileViewer::UpdateHexView()
 
 void FileViewer::JumpHex()
 {
-    //unsigned long long jumpoffset = ui->lineEdit->text().toULongLong(0, 16);
     ui->filehexview->setCursorPosition(jumpto->text().toULongLong(0, 16)*2);
     ui->filehexview->ensureVisible();
-    //ui->filehexview->
 }

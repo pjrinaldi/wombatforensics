@@ -15,25 +15,20 @@ extern QFile treefile;
 extern QDir thumbdir;
 extern QDir currentrawimagedir;
 extern QTextEdit* msglog;
-//extern QFutureWatcher<void> thumbwatcher;
-//extern QFutureWatcher<void> thashwatcher;
 extern QFutureWatcher<void> secondwatcher;
-extern unsigned long long filesfound;
-extern unsigned long long fileschecked;
-extern unsigned long long processphase;
-extern unsigned long long totalcount;
-extern unsigned long long totalchecked;
-extern unsigned long long exportcount;
-//extern unsigned long long digcount;
-extern unsigned long long dighashcount;
-extern unsigned long long digimgthumbcount;
-extern unsigned long long errorcount;
-extern unsigned long long jumpoffset;
-extern unsigned long long filejumpoffset;
-extern unsigned long long orphancount;
-//extern int partint;
+extern qint64 filesfound;
+extern qint64 fileschecked;
+extern qint64 processphase;
+extern qint64 totalcount;
+extern qint64 totalchecked;
+extern qint64 exportcount;
+extern qint64 dighashcount;
+extern qint64 digimgthumbcount;
+extern qint64 errorcount;
+extern qint64 jumpoffset;
+extern qint64 filejumpoffset;
+extern qint64 orphancount;
 extern int ecount;
-//extern int volcnt;
 extern int childcount;
 extern int linefactor;
 extern int filelinefactor;
@@ -76,16 +71,16 @@ struct dostime
 struct FilterValues
 {
     QString idfilter;
-    unsigned long long maxid;
-    unsigned long long minid;
+    qint64 maxid;
+    qint64 minid;
     bool namebool;
     QString namefilter;
     bool pathbool;
     QString pathfilter;
     bool maxsizebool;
     bool minsizebool;
-    unsigned long long maxsize;
-    unsigned long long minsize;
+    qint64 maxsize;
+    qint64 minsize;
     bool maxcreatebool;
     bool mincreatebool;
     int maxcreate;
@@ -128,7 +123,7 @@ public:
     void DigUpd(int digid, int digcnt) { emit(DigUpdate(digid, digcnt)); }
 
 signals:
-    void ProgressUpdate(unsigned long long filecount);
+    void ProgressUpdate(qint64 filecount);
     void ExportUpdate(void);
     void DigUpdate(int digid, int digcnt);
 
@@ -228,17 +223,6 @@ private:
     TreeNode* parentitem;
 };
 
-/*
-extern TSK_IMG_INFO* readimginfo;
-extern TSK_VS_INFO* readvsinfo;
-extern const TSK_VS_PART_INFO* readpartinfo;
-extern TSK_FS_INFO* readfsinfo;
-extern TSK_FS_FILE* readfileinfo;
-extern char asc[512];
-extern iso9660_pvd_node* p;
-extern HFS_INFO* hfs;
-*/
-
 extern TreeNode* selectednode;
 
 class TreeNodeModel : public QAbstractItemModel
@@ -249,7 +233,6 @@ public:
     explicit TreeNodeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         QList<QVariant> zerodata;
-        //zerodata << "ID" << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature";
         zerodata << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature" << "ID"; // NAME IN FIRST COLUMN
         zeronode = new TreeNode(zerodata);
     };
@@ -272,7 +255,6 @@ public:
         int nodetype = 0;
         int itemtype = 0;
         QByteArray ba;
-        //nodetype = itemnode->Data(0).toString().split("-a").first().split("-").count();
         nodetype = itemnode->Data(10).toString().split("-a").first().split("-").count();
         itemtype = itemnode->itemtype; // node type 1=file, 2=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs)
 
@@ -686,7 +668,6 @@ private:
                 if(tmpstr.split(",").count() > 5)
                 {
                     columndata << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
-                    //columndata << tmpstr.split(",").at(5) << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                     parent->AppendChild(new TreeNode(columndata, parent));
                     curid = tmpstr.split(",").at(5);
                     parents[curid] = parent->child(parent->ChildCount() - 1);
@@ -703,7 +684,6 @@ private:
                     if(tmpstr.split(",").count() > 5)
                     {
                         columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
-                        //columndata << tmpstr.split(",").at(5) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                         parid = tmpstr.split(",").at(5).split("-").at(0);
                         curid = tmpstr.split(",").at(5);
                         parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
@@ -723,7 +703,6 @@ private:
                         if(tmpstr.split(",").count() > 10)
                         {
                             columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
-                            //columndata << tmpstr.split(",").at(10) << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0";
                             parid = tmpstr.split(",").at(10).split("-p").at(0);
                             curid = tmpstr.split(",").at(10);
                             parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
@@ -742,7 +721,6 @@ private:
                             if(tmpstr.split(",").count() > 12)
                             {
                                 columndata << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1) << tmpstr.split(",").at(12);
-                                //columndata << tmpstr.split(",").at(12) << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1);
                                 if(tmpstr.split(",").at(2).toInt() == rootinum.toInt())
                                     parid = tmpstr.split(",").at(12).split("-f").at(0);
                                 else
@@ -789,7 +767,6 @@ public:
     {
         const QVariant tmpvar(hash);
         parents.value(itemid.split("-a").first())->SetData(column, tmpvar);
-        //parents.value(data.at(0).toString().split("-a").first())->SetData(column, hash);
     };
     
     void UpdateHeaderNode(int column, QString hash)

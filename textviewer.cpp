@@ -14,7 +14,6 @@ TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer
     ui->comboBox->clear();
     foreach(QTextCodec* codec, codecs)
         ui->comboBox->addItem(codec->name(), codec->mibEnum());
-    //this->hide();
     connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(UpdateEncoding(int)));
 }
 
@@ -26,8 +25,6 @@ TextViewer::~TextViewer()
 
 void TextViewer::HideClicked()
 {
-    //this->hide();
-    //emit HideTextViewerWindow(false);
 }
 
 void TextViewer::ShowText(const QModelIndex &index)
@@ -91,12 +88,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
     QString vstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(1);
     QString pstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(2);
     QString fstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(3);
-    //wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 0).data().toString(); // mod object id
-    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    //QStringList evidfiles = eviddir.entryList(QStringList("*.evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1)), QDir::NoSymLinks | QDir::Files);
-    //wombatvariable.evidencename = evidfiles.at(0);
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
-    //QFile evidfile(wombatvariable.tmpmntpath + wombatvariable.evidencename.split(".evid").at(0) + ".evid." + index.sibling(index.row(), 0).data().toString().split("-").at(0).mid(1));
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
     evidlist = tmpstr.split(",");
@@ -117,9 +109,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
     tmpstr = "";
     QStringList partlist;
     partlist.clear();
-    //QStringList partfiles = eviddir.entryList(QStringList(wombatvariable.evidencename.split(".evid").at(0) + ".part." + index.sibling(index.row(), 0).data().toString().split("-").at(2).mid(1)), QDir::NoSymLinks | QDir::Files);
     QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
-    //QFile partfile(wombatvariable.tmpmntpath + partfiles.at(0));
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();
     partfile.close();
@@ -151,12 +141,6 @@ void TextViewer::UpdateEncoding(int unused)
     int mib = ui->comboBox->itemData(ui->comboBox->currentIndex()).toInt();
     qDebug() << "combobox number:" << ui->comboBox->currentIndex();
     QTextCodec* codec = QTextCodec::codecForMib(mib);
-    /*
-    QTextStream in(&txtdata);
-    in.setAutoDetectUnicode(false);
-    in.setCodec(codec);
-    decodedstring = in.readAll();
-    */
     QTextCodec::ConverterState state;
     decodedstring = codec->toUnicode(txtdata.constData(), txtdata.size(), &state);
     ui->textEdit->setPlainText(decodedstring);

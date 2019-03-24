@@ -16,17 +16,11 @@ namespace Ui
 class Thread : public QThread
 {
 public:
-    /*
-    Thread(QtAV::AVPlayer* player) : QThread(0), mplayer(player)
-    {
-    };
-    */
 protected:
     virtual void run()
     {
         exec();
     }
-    //QtAV::AVPlayer* mplayer;
 };
 
 class VideoViewer : public QDialog
@@ -38,22 +32,18 @@ public:
     ~VideoViewer();
 
 public slots:
-    //void ShowVideo(QString tmpfilepath, const QModelIndex &index);
     void ShowVideo(const QModelIndex &index);
     void Seek(int);
     void PlayPause();
     void UpdateSlider(qint64);
     void SetDuration(qint64);
-    //void GetVideo(QString tmpfilepath, unsigned long long objid);
     void GetVideo(const QModelIndex &index);
     
 private:
     Ui::VideoViewer* ui;
     QMediaPlayer* vplayer;
     QVideoWidget* videowidget;
-    //QtAV::VideoOutput* vout;
-    //QtAV::AVPlayer* vplayer;
-    unsigned long long curobjaddr;
+    qint64 curobjaddr;
     TskObject tskobj;
     TskObject* tskptr;
 protected:

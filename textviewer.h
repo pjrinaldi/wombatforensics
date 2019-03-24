@@ -40,7 +40,7 @@ private:
     QByteArray txtdata;
     QByteArray tmpdata;
     QString decodedstring;
-    unsigned long long curobjaddr;
+    qin64 curobjaddr;
     QList<QTextCodec*> codecs;
     void FindCodecs();
     QModelIndex curindex;

@@ -32,9 +32,9 @@ void LogMessage(QString logmsg)
 }
 */
 
-unsigned long long GetChildCount(QString filefilter)
+qint64 GetChildCount(QString filefilter)
 {
-    unsigned long long tmpcount = 0;
+    qint64 tmpcount = 0;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList files = eviddir.entryList(QStringList(filefilter), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
     tmpcount = files.count();
@@ -165,8 +165,8 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariable* aevar)
 {
-    unsigned long long curaddress = 0;
-    unsigned long long paraddress = 0;
+    qint64 curaddress = 0;
+    qint64 paraddress = 0;
     QString parentstr = "";
     QList<QVariant> nodedata;
     nodedata.clear();
@@ -315,7 +315,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
         QByteArray adsba;
-        unsigned long long adssize = 0;
+        qint64 adssize = 0;
         TSK_OFF_T curmftentrystart = 0;
         NTFS_INFO* ntfsinfo = (NTFS_INFO*)tmpfile->fs_info;
         int recordsize = 0;
@@ -332,7 +332,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
         char startoffset[2];
         tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
         uint16_t teststart = startoffset[1] * 256 + startoffset[0];
-        adssize = (unsigned long long)teststart;
+        adssize = (qint64)teststart;
         int cnt, i;
         cnt = tsk_fs_file_attr_getsize(tmpfile);
         for(i = 0; i < cnt; i++)
@@ -340,7 +340,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
             char type[512];
             const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
             adssize += 24;
-            adssize += (unsigned long long)fsattr->size;
+            adssize += (qint64)fsattr->size;
             if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
             {
                 if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
@@ -357,7 +357,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                         adsfile.open(QIODevice::Append | QIODevice::Text);
                         QTextStream adsout(&adsfile);
                         adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
-                        adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (unsigned long long)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0,0";
+                        adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (qint64)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0,0";
                         adsout.flush();
                         if(adsfile.isOpen())
                             adsfile.close();
@@ -374,7 +374,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                         listeditems.append(treeout.at(10)); // UNCOMMENT ONCE I CAN CAPTURE ADS IN GEN HASH AND IMG THUMB
                         filesfound++;
                         isignals->ProgUpd();
-                        WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), (unsigned long long)(adssize - fsattr->size + 16), QString::number(fsattr->id), aevar);
+                        WriteAlternateDataStreamProperties(tmpfile, QString(tmpfile->name->name) + QString(":") + QString(fsattr->name), (qint64)(adssize - fsattr->size + 16), QString::number(fsattr->id), aevar);
                     }
                 }
             }
@@ -496,7 +496,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
                 {
                     QByteArray adsba;
-                    unsigned long long adssize = 0;
+                    qint64 adssize = 0;
                     TSK_OFF_T curmftentrystart = 0;
                     NTFS_INFO* ntfsinfo = (NTFS_INFO*)tmpfile->fs_info;
                     int recordsize = 0;
@@ -513,7 +513,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     char startoffset[2];
                     tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
                     uint16_t teststart = startoffset[1] * 256 + startoffset[0];
-                    adssize = (unsigned long long)teststart;
+                    adssize = (qint64)teststart;
                     int cnt, i;
                     cnt = tsk_fs_file_attr_getsize(tmpfile);
                     for(i = 0; i < cnt; i++)
@@ -521,7 +521,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                         char type[512];
                         const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
                         adssize += 24;
-                        adssize += (unsigned long long)fsattr->size;
+                        adssize += (qint64)fsattr->size;
                         if(ntfs_attrname_lookup(tmpfile->fs_info, fsattr->type, type, 512) == 0)
                         {
                             if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
@@ -598,8 +598,8 @@ void ProcessExport(QString objectid)
     QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
     if(fstring.contains(":") == true)
         fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
-    //unsigned long long curaddress = objectid.split("-f").at(1).toULongLong();
-    unsigned long long curaddress = objectid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong(); 
+    //qint64 curaddress = objectid.split("-f").at(1).toULongLong();
+    qint64 curaddress = objectid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong(); 
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
@@ -736,7 +736,7 @@ void GenerateHash(QString itemid)
         const TSK_TCHAR** imagepartspath;
         pathvector.clear();
         //qDebug() << "itemid:" << itemid;
-        unsigned long long curaddress = itemid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
+        qint64 curaddress = itemid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
         //qDebug() << "curaddress:" << curaddress;
         QStringList evidfiles = eviddir.entryList(QStringList("*." + itemid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
         QString evidencename = evidfiles.at(0).split(".e").first();
@@ -779,7 +779,7 @@ void GenerateHash(QString itemid)
         {
             if(itemid.contains(":")) // ADS file
             {
-                unsigned long long adssize = 0;
+                qint64 adssize = 0;
                 TSK_OFF_T curmftentrystart = 0;
                 NTFS_INFO* ntfsinfo = (NTFS_INFO*)readfileinfo->fs_info;
                 int recordsize = 0;
@@ -794,7 +794,7 @@ void GenerateHash(QString itemid)
                 char startoffset[2];
                 tsk_fs_read(readfileinfo->fs_info, curmftentrystart, startoffset, 2);
                 uint16_t teststart = startoffset[1] * 256 + startoffset[0];
-                adssize = (unsigned long long)teststart;
+                adssize = (qint64)teststart;
                 int cnt, i;
                 cnt = tsk_fs_file_attr_getsize(readfileinfo);
                 for(i = 0; i < cnt; i++)
@@ -802,7 +802,7 @@ void GenerateHash(QString itemid)
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(readfileinfo, i);
                     adssize += 24;
-                    adssize += (unsigned long long)fsattr->size;
+                    adssize += (qint64)fsattr->size;
                     if(ntfs_attrname_lookup(readfileinfo->fs_info, fsattr->type, type, 512) == 0)
                     {
                         if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
@@ -907,7 +907,7 @@ void GenerateThumbnails(QString thumbid)
         if(fstring.contains(":"))
             fstring = thumbid.split("-").at(3).split(":").first() + "-" + thumbid.split("-").at(3).split(":").last();
         QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
-        unsigned long long curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
+        qint64 curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
         //qDebug() << "curaddress:" << curaddress;
         QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
         QString evidencename = evidfiles.at(0).split(".e").first();
@@ -950,7 +950,7 @@ void GenerateThumbnails(QString thumbid)
         {
             if(thumbid.contains(":")) // ADS
             {
-                unsigned long long adssize = 0;
+                qint64 adssize = 0;
                 TSK_OFF_T curmftentrystart = 0;
                 NTFS_INFO* ntfsinfo = (NTFS_INFO*)readfileinfo->fs_info;
                 int recordsize = 0;
@@ -965,7 +965,7 @@ void GenerateThumbnails(QString thumbid)
                 char startoffset[2];
                 tsk_fs_read(readfileinfo->fs_info, curmftentrystart, startoffset, 2);
                 uint16_t teststart = startoffset[1] * 256 + startoffset[0];
-                adssize = (unsigned long long)teststart;
+                adssize = (qint64)teststart;
                 int cnt, i;
                 cnt = tsk_fs_file_attr_getsize(readfileinfo);
                 for(i = 0; i < cnt; i++)
@@ -973,7 +973,7 @@ void GenerateThumbnails(QString thumbid)
                     char type[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(readfileinfo, i);
                     adssize += 24;
-                    adssize += (unsigned long long)fsattr->size;
+                    adssize += (qint64)fsattr->size;
                     if(ntfs_attrname_lookup(readfileinfo->fs_info, fsattr->type, type, 512) == 0)
                     {
                         if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
@@ -1261,7 +1261,7 @@ void InitializeEvidenceStructure(QString evidname)
     QFile evidfile(evidencepath + "stat");
     evidfile.open(QIODevice::Append | QIODevice::Text);
     QTextStream out(&evidfile);
-    out << (int)readimginfo->itype << "," << (unsigned long long)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
+    out << (int)readimginfo->itype << "," << (qint64)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
     //for(unsigned int i=0; i < wombatvariable.itemcount; i++)
     //{
     //    if(i > 0 && i < wombatvariable.itemcount - 2)
@@ -1288,13 +1288,13 @@ void InitializeEvidenceStructure(QString evidname)
     QString volname = "Dummy Volume (NO PART)";
     int voltype = 240;
     int volsectorsize = (int)readimginfo->sector_size;
-    unsigned long long voloffset = 0;
+    qint64 voloffset = 0;
     if(readvsinfo != NULL)
     {
         voltype = (int)readvsinfo->vstype;
         volname = QString::fromUtf8(tsk_vs_type_todesc(readvsinfo->vstype));
         volsectorsize = (int)readvsinfo->block_size;
-        voloffset = (unsigned long long)readvsinfo->offset;
+        voloffset = (qint64)readvsinfo->offset;
     }
     QDir voldir = QDir(evidencepath);
     QStringList volfiles = voldir.entryList(QStringList(QString("v*")), QDir::NoSymLinks | QDir::Dirs);
@@ -1305,7 +1305,7 @@ void InitializeEvidenceStructure(QString evidname)
     QFile volfile(volumepath + "stat");
     volfile.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&volfile);
-    out << voltype << "," << (unsigned long long)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt);
+    out << voltype << "," << (qint64)readimginfo->size << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt);
     out.flush();
     volfile.close();
     treeout.clear();
@@ -1331,7 +1331,7 @@ void InitializeEvidenceStructure(QString evidname)
             QFile pfile(partitionpath + "stat");
             pfile.open(QIODevice::Append | QIODevice::Text);
             out.setDevice(&pfile);
-            out << "240," << QString::number(readimginfo->size) << ",NON-RECOGNIZED FS,0,0," << (unsigned long long)readimginfo->size/volsectorsize << "," << volsectorsize << ",0,0,0,e" << QString::number(evidcnt) + "-v0-p0";
+            out << "240," << QString::number(readimginfo->size) << ",NON-RECOGNIZED FS,0,0," << (qint64)readimginfo->size/volsectorsize << "," << volsectorsize << ",0,0,0,e" << QString::number(evidcnt) + "-v0-p0";
             out.flush();
             pfile.close();
             treeout.clear();
@@ -1352,7 +1352,7 @@ void InitializeEvidenceStructure(QString evidname)
             QFile pfile(partitionpath + "stat");
             pfile.open(QIODevice::Append | QIODevice::Text);
             out.setDevice(&pfile);
-            out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+            out << readfsinfo->ftype << "," << (qint64)readfsinfo->block_size * (qint64)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (qint64)readfsinfo->root_inum << "," << (qint64)readfsinfo->offset << "," << (qint64)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
             out.flush();
             pfile.close();
             treeout.clear();
@@ -1402,7 +1402,7 @@ void InitializeEvidenceStructure(QString evidname)
                 out.setDevice(&pfile);
                 if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
                 {
-                    out << "0," << (unsigned long long)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << (unsigned long long)readpartinfo->start * (int)readvsinfo->block_size << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                    out << "0," << (qint64)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << (qint64)readpartinfo->start * (int)readvsinfo->block_size << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                     out.flush();
                     pfile.close();
                     treeout.clear();
@@ -1419,7 +1419,7 @@ void InitializeEvidenceStructure(QString evidname)
                     readfsinfo = tsk_fs_open_vol(readpartinfo, TSK_FS_TYPE_DETECT);
                     if(readfsinfo != NULL)
                     {
-                        out << readfsinfo->ftype << "," << (unsigned long long)readfsinfo->block_size * (unsigned long long)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (unsigned long long)readfsinfo->root_inum << "," << (unsigned long long)readfsinfo->offset << "," << (unsigned long long)readfsinfo->block_count << "," << (int)readfsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                        out << readfsinfo->ftype << "," << (qint64)readfsinfo->block_size * (qint64)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (qint64)readfsinfo->root_inum << "," << (qint64)readfsinfo->offset << "," << (qint64)readfsinfo->block_count << "," << (int)readfsinfo->block_size << "," << readpartinfo->flags << "," << (qint64)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                         out.flush();
                         pfile.close();
                         treeout.clear();
@@ -1444,7 +1444,7 @@ void InitializeEvidenceStructure(QString evidname)
                     }
                     else
                     {
-                        out << "0," << (unsigned long long)readpartinfo->len * (int)readvsinfo->block_size << "," << QString(readpartinfo->desc) << " (Non-Recognized FS),0," << (unsigned long long)readpartinfo->start * (int)readvsinfo->block_size << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                        out << "0," << (qint64)readpartinfo->len * (int)readvsinfo->block_size << "," << QString(readpartinfo->desc) << " (Non-Recognized FS),0," << (qint64)readpartinfo->start * (int)readvsinfo->block_size << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                         out.flush();
                         pfile.close();
                         treeout.clear();
@@ -1459,7 +1459,7 @@ void InitializeEvidenceStructure(QString evidname)
                 }
                 else
                 {
-                    out << "0," << (unsigned long long)readpartinfo->len * (int)readvsinfo->block_size << "," << QString(readpartinfo->desc) << " (Non-Recognized FS),0," << (unsigned long long)readpartinfo->start * (int)readvsinfo->block_size << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (unsigned long long)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
+                    out << "0," << (qint64)readpartinfo->len * (int)readvsinfo->block_size << "," << QString(readpartinfo->desc) << " (Non-Recognized FS),0," << (qint64)readpartinfo->start * (int)readvsinfo->block_size << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint);
                     out.flush();
                     pfile.close();
                     treeout.clear();
@@ -1486,7 +1486,7 @@ void InitializeEvidenceStructure(QString evidname)
     readimginfo = NULL;
 }
 
-QString GetAdsBlockList(TSK_FS_FILE* tmpfile, unsigned long long attrid)
+QString GetAdsBlockList(TSK_FS_FILE* tmpfile, qint64 attrid)
 {
     QString blkstring = "";
     QString* blkstr = &blkstring;
@@ -1582,7 +1582,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
     //return blockstring;
 }
 
-void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, unsigned long long adssize, QString attrid, AddEvidenceVariable* aevar)
+void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, qint64 adssize, QString attrid, AddEvidenceVariable* aevar)
 {
     QString curblockstring = GetAdsBlockList(curfileinfo, attrid.toULongLong());
     //qDebug() << "ads block string:" << curblockstring;

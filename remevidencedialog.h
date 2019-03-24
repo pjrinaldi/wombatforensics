@@ -22,19 +22,11 @@ public:
     RemEvidenceDialog(QWidget* parent = 0);
     ~RemEvidenceDialog();
 private slots:
-    //void SelectEvidence();
     void RemoveEvidence();
     void Cancel();
-    //void StartProcess();
-    //void UpdateButtons();
-    //void HideClicked();
-    //void ShowAbout();
 private:
     Ui::RemEvidenceDialog* ui;
 protected:
-    //void dragEnterEvent(QDragEnterEvent* e);
-    //void dropEvent(QDropEvent* e);
-    //void mousePressEvent(QMouseEvent* event);
 };
 
 Q_DECLARE_METATYPE(RemEvidenceDialog*)

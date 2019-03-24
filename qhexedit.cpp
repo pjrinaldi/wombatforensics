@@ -874,8 +874,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         QPen colStandard = QPen(viewport()->palette().color(QPalette::WindowText));
 
         painter.setBackgroundMode(Qt::TransparentMode);
-	unsigned long long curblkstart = 0;
-	unsigned long long curblkend = 0;
+	qint64 curblkstart = 0;
+	qint64 curblkend = 0;
         QStringList curblocklist;
         curblocklist.clear();
         //qDebug() << "F/L Pos:" << _bPosFirst << _bPosLast;
@@ -887,11 +887,9 @@ void QHexEdit::paintEvent(QPaintEvent *event)
             //qDebug() << "blkoffset:" << blocklist.at(0).toULongLong()*blocksize + fsoffset;
             if(blocklist.at(0).toULongLong() != 0) // non-resident attribute
             {
-                unsigned long long blkoffset = 0;
-                //unsigned long long blkoffset2 = 0;
+                qint64 blkoffset = 0;
                 for(int i=0; i < blocklist.count(); i++)
                 {
-                    //blkoffset2 = fsoffset + blocklist.at(i).toULongLong() * blocksize;
                     blkoffset = fsoffset + blocklist.at(i).toULongLong() * blocksize;
                     //if(i == 0)
                     //    qDebug() << "inside loop blkoffset:" << blkoffset << "_bPosFirst" << _bPosFirst << "_bPosLast" << _bPosLast;
@@ -900,8 +898,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 }
             }
         }
-        else
-            qDebug() << "blocklist is zero, but shouldn't be";
+        //else
+        //    qDebug() << "blocklist is zero, but shouldn't be";
         //qDebug() << "blocklist:" << blocklist;
         //qDebug() << "blocklist:" << blocklist.count() << "curblocklist:" << curblocklist.count() << "blocksize:" << blocksize;
         /*
@@ -953,8 +951,6 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 	        		curblkend = 0;
                                 curblkstart = fsoffset + curblocklist.at(i).toULongLong() * blocksize;
                                 curblkend = curblkstart + blocksize - 1;
-                                //if((unsigned)posBa >= curblkstart && (unsigned)posBa <= qMin((curblkstart + filelength - blocksize*i - 1), (curblkstart + blocksize)))
-                                //if((unsigned)posBa >= curblkstart && (unsigned)posBa <= (curblkend))
                                 if(posBa >= byteoffset && posBa <= byteoffset + filelength)
                                 {
 				    c = contentbrush.color(); // BLUE
@@ -964,48 +960,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                                     if(posBa > byteoffset + filelength && posBa <= curblkend)
                                         c = slackbrush.color(); // RED
                                 }
-                                //if(i == (blocklist.count() - 1)) // invalid method...
-                                /*
-                                if(curblocklist.at(i).toULongLong() == (blocklist.last().toULongLong()))
-                                {
-                                    if(((unsigned)posBa > (curblkstart + filelength - blocksize *i  - 1)) && (unsigned)posBa <= curblkend)
-                                        c = slackbrush.color(); // RED
-                                }
-                                */
-                                /*
-                                if(i == (blocklist.count() - 1))
-                                {
-                                if(((unsigned)posBa > (curblkstart + filelength - blocksize*i - 1)) && (unsigned)posBa <= curblkend)
-				{
-				    //qDebug() << "red";
-				    //qDebug() << "curblkstart:" << curblkstart << "filelength:" << filelength << "curfilelength:" << curfilelength << "curblkend:" << curblkend << "posBa:" << posBa << "fsoffset:" << fsoffset;
-				    c = slackbrush.color(); // RED
-				}
-                            }
-                            */
                             }
                         }
-                        /*
-                        else if(curblocklist.count() == 1)
-                        {
-                            //qDebug() << "not in for loop, a single block in curblocklist";
-                            curblkstart = fsoffset + curblocklist.last().toULongLong() * blocksize;
-                            curblkend = curblkstart + blocksize - 1;
-                            if(curblocklist.last().toULongLong() == (blocklist.last().toULongLong()))
-                            {
-                            if((unsigned)posBa >= curblkstart && (unsigned)posBa <= curblkstart + filelength - 1)
-                                c = contentbrush.color(); // BLUE
-                            else if(((unsigned)posBa > (curblkstart + filelength - 1)) && (unsigned)posBa <= curblkend)
-                                c = slackbrush.color(); // RED
-                            }
-                            else
-                            {
-                                if((unsigned)posBa >= curblkstart && (unsigned)posBa <= (curblkstart + blocksize))
-                                {
-				    c = contentbrush.color(); // BLUE
-                                }
-                            }
-                        }*/
                     }
                 }
                 else // resident attribute
@@ -1015,7 +971,6 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 		    curblkend = 0;
                     curblkstart = residentoffset + fsoffset;
                     curblkend = curblkstart + mftrecordsize - dataoffset - 1;
-                    //curblkend = curblkstart + mftrecordsize - dataoffset - 1;
                     //qDebug() << "curblkend:" << curblkend;
 		    //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
                     if(posBa >= curblkstart && posBa <= qMin((curblkstart + filelength - 1), curblkend))
@@ -1307,11 +1262,10 @@ void QHexEdit::updateCursor()
     viewport()->update(_cursorRect);
 }
 
-// HEXVIEWER WON'T COLOR HIGHLIGHT OR SELECT HEX CONTENT AFTER 2GB OF DATA EVEN THOUGH IT LOADS THE WHOLE 20GB OF THE IMAGE
 // Added by Pasquale J. Rinaldi, Jr. May 2018
 // Passing required information for syntax highlighting
 // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
-void QHexEdit::SetColorInformation(unsigned long long fsoff, unsigned long long blksize, QString blockstring, QString residentstring, QString bytestring, unsigned long long flength, unsigned int dataoff)
+void QHexEdit::SetColorInformation(qint64 fsoff, qint64 blksize, QString blockstring, QString residentstring, QString bytestring, qint64 flength, int dataoff)
 {
     blocklist.clear();
     blocklist = blockstring.split("^^", QString::SkipEmptyParts);
@@ -1324,5 +1278,5 @@ void QHexEdit::SetColorInformation(unsigned long long fsoff, unsigned long long 
     //qDebug() << "initial variables";
     //if(blockstring.split("^^", QString::SkipEmptyParts).count() > 1)
         //qDebug() << "blockstring F/L:" << blockstring.split("^^", QString::SkipEmptyParts).first() << blockstring.split("^^", QString::SkipEmptyParts).last();
-    qDebug() << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength << "dataoffset:" << dataoffset;
+    //qDebug() << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength << "dataoffset:" << dataoffset;
 }

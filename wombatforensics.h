@@ -137,7 +137,7 @@ private slots:
     void on_actionSettings_triggered();
     void on_actionCancel_Operation_triggered();
     void on_actionJumpToHex_triggered();
-    void UpdateProgress(unsigned long long count);
+    void UpdateProgress(qint64 count);
     void UpdateExport(void);
     void UpdateDig(int digstateid, int digcount);
     void HashingFinish(void);
@@ -256,7 +256,6 @@ private:
     QLabel* filecountlabel;
     QLabel* filtercountlabel;
     QLabel* checkedcountlabel;
-    //QToolButton* statuslabel;
     StatusLabel* statuslabel;
     QFrame* vline1;
     QFrame* vline2;

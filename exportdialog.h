@@ -16,7 +16,7 @@ class ExportDialog : public QDialog
     Q_OBJECT
     
 public:
-    explicit ExportDialog(QWidget *parent = 0, unsigned long long curcheckcount = 0, unsigned long long curlistcount = 0);
+    explicit ExportDialog(QWidget *parent = 0, qint64 curcheckcount = 0, qint64 curlistcount = 0);
     ~ExportDialog();
 
 signals:
@@ -28,8 +28,8 @@ private slots:
 
 private:
     Ui::ExportDialog *ui;
-    unsigned long long checkcount;
-    unsigned long long listcount;
+    qint64 checkcount;
+    qint64 listcount;
     int exporttype = 0;
     bool originalpath = true;
     QString exportpath = "";

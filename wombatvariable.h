@@ -19,7 +19,7 @@ struct WombatVariable
     QString partitionpath;
     QString curfilepath;
     std::vector<std::string> fullpathvector;
-    unsigned long long itemcount;
+    qint64 itemcount;
     QString casename;
     QString casepath;
     QString selectedid;

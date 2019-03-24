@@ -96,7 +96,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
-    connect(isignals, SIGNAL(ProgressUpdate(unsigned long long)), this, SLOT(UpdateProgress(unsigned long long)), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
     connect(statuslabel, SIGNAL(clicked()), this, SLOT(ShowDigStatus()), Qt::DirectConnection);
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
@@ -202,7 +202,7 @@ void WombatForensics::ShowDigStatus()
 //////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
 {
-    unsigned long long curobjaddr = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-f").at(1).toULongLong();
+    qint64 curobjaddr = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-f").at(1).toULongLong();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
@@ -1231,8 +1231,8 @@ void WombatForensics::LoadHexContents()
         if(partfile.isOpen())
             partlist = QString(partfile.readLine()).split(",");
         partfile.close();
-        unsigned long long fsoffset = partlist.at(4).toULongLong();
-        unsigned long long rootinum = partlist.at(3).toULongLong();
+        qint64 fsoffset = partlist.at(4).toULongLong();
+        qint64 rootinum = partlist.at(3).toULongLong();
         if(paridstr.contains("-"))
             paridstr = QString::number(rootinum);
         QString mftentryoffset = "";
@@ -1306,7 +1306,7 @@ void WombatForensics::LoadHexContents()
                     {
                         if(tmpstr.split(",").at(8).toULongLong() < 700) // takes care of $BadClus which is non-resident but doesn't have blocks
                         {
-                        unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * mftaddress) + fsoffset;
+                        qint64 residentoffset = mftentryoffset.toULongLong() + (1024 * mftaddress) + fsoffset;
                         //qDebug() << "(resident ads) residentoffset:" << residentoffset;
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                         curoffset = 0;
@@ -1349,7 +1349,7 @@ void WombatForensics::LoadHexContents()
                 {
                     if(tmpstr.split(",").at(1).toInt() == 3) // IF DIR
                     {
-                        unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * mftaddress) + fsoffset;
+                        qint64 residentoffset = mftentryoffset.toULongLong() + (1024 * mftaddress) + fsoffset;
                         //qDebug() << "(resident dir) residentoffset:" << residentoffset;
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                         //qDebug() << "resbuffer length:" << resbuffer.length();
@@ -1398,7 +1398,7 @@ void WombatForensics::LoadHexContents()
                         }
                         else // IF RESIDENT
                         {
-                            unsigned long long residentoffset = mftentryoffset.toULongLong() + (1024 * mftaddress) + fsoffset;
+                            qint64 residentoffset = mftentryoffset.toULongLong() + (1024 * mftaddress) + fsoffset;
                             //qDebug() << "(resident file) residentoffset:" << residentoffset;
                             QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                             curoffset = 0;
@@ -1754,7 +1754,7 @@ void WombatForensics::UpdateExport()
     //LogMessage(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
 }
-void WombatForensics::UpdateProgress(unsigned long long filecount)
+void WombatForensics::UpdateProgress(qint64 filecount)
 {
     filecountlabel->setText("Found: " + QString::number(filecount));
 }
@@ -2207,7 +2207,7 @@ void WombatForensics::ShowItem()
 
 void WombatForensics::UpdateFilterCount()
 {
-    unsigned long long filtercount = 0;
+    qint64 filtercount = 0;
     QModelIndexList tmplist = treenodemodel->match(treenodemodel->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     for(int i=0; i < tmplist.count(); i++)
     {
