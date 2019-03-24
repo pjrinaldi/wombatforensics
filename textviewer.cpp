@@ -30,7 +30,7 @@ void TextViewer::HideClicked()
 void TextViewer::ShowText(const QModelIndex &index)
 {
     curindex = index;
-    curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toULongLong();
+    curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toLongLong();
     //GetTextContent(index);
     UpdateEncoding(0);
     this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 0).data().toString()));
@@ -114,7 +114,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
     tmpstr = partfile.readLine();
     partfile.close();
     partlist = tmpstr.split(",");
-    tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+    tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
     tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, curobjaddr);
     if(tskptr->readfileinfo->meta != NULL)
     {

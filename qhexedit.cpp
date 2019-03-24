@@ -884,13 +884,13 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         {
             //qDebug() << "fsoffset:" << fsoffset;
             //qDebug() << "blocklist.at(0):" << blocklist.at(0);
-            //qDebug() << "blkoffset:" << blocklist.at(0).toULongLong()*blocksize + fsoffset;
-            if(blocklist.at(0).toULongLong() != 0) // non-resident attribute
+            //qDebug() << "blkoffset:" << blocklist.at(0).toLongLong()*blocksize + fsoffset;
+            if(blocklist.at(0).toLongLong() != 0) // non-resident attribute
             {
                 qint64 blkoffset = 0;
                 for(int i=0; i < blocklist.count(); i++)
                 {
-                    blkoffset = fsoffset + blocklist.at(i).toULongLong() * blocksize;
+                    blkoffset = fsoffset + blocklist.at(i).toLongLong() * blocksize;
                     //if(i == 0)
                     //    qDebug() << "inside loop blkoffset:" << blkoffset << "_bPosFirst" << _bPosFirst << "_bPosLast" << _bPosLast;
                     if(blkoffset >= (_bPosFirst - blocksize) && blkoffset <= (_bPosLast + blocksize))
@@ -921,7 +921,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 qint64 posBa = _bPosFirst + bPosLine + colIdx; // curoffset
                 if(blocklist.count() > 0)
                 {
-                    if(blocklist.at(0).toULongLong() == 0) // resident attribute
+                    if(blocklist.at(0).toLongLong() == 0) // resident attribute
                     {
                         //qDebug() << "resident attribute";
                         curblkstart = 0;
@@ -949,13 +949,13 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                             {
 	    	        	curblkstart = 0;
 	        		curblkend = 0;
-                                curblkstart = fsoffset + curblocklist.at(i).toULongLong() * blocksize;
+                                curblkstart = fsoffset + curblocklist.at(i).toLongLong() * blocksize;
                                 curblkend = curblkstart + blocksize - 1;
                                 if(posBa >= byteoffset && posBa <= byteoffset + filelength)
                                 {
 				    c = contentbrush.color(); // BLUE
                                 }
-                                if(curblocklist.at(i).toULongLong() == blocklist.last().toULongLong())
+                                if(curblocklist.at(i).toLongLong() == blocklist.last().toLongLong())
                                 {
                                     if(posBa > byteoffset + filelength && posBa <= curblkend)
                                         c = slackbrush.color(); // RED
@@ -1271,8 +1271,8 @@ void QHexEdit::SetColorInformation(qint64 fsoff, qint64 blksize, QString blockst
     blocklist = blockstring.split("^^", QString::SkipEmptyParts);
     fsoffset = fsoff;
     blocksize = blksize;
-    residentoffset = residentstring.toULongLong();
-    byteoffset = bytestring.toULongLong();
+    residentoffset = residentstring.toLongLong();
+    byteoffset = bytestring.toLongLong();
     filelength = flength;
     dataoffset = dataoff;
     //qDebug() << "initial variables";

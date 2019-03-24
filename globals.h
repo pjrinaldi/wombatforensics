@@ -284,17 +284,17 @@ public:
                 }
                 if(filtervalues.maxsizebool && filtervalues.minsizebool == false)
                 {
-                    if(itemnode->Data(2).toULongLong() <= filtervalues.maxsize)
+                    if(itemnode->Data(2).toLongLong() <= filtervalues.maxsize)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.minsizebool && filtervalues.maxsizebool == false)
                 {
-                    if(itemnode->Data(2).toULongLong() >= filtervalues.minsize)
+                    if(itemnode->Data(2).toLongLong() >= filtervalues.minsize)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxsizebool && filtervalues.minsizebool)
                 {
-                    if(itemnode->Data(2).toULongLong() >= filtervalues.minsize || itemnode->Data(2).toULongLong() <= filtervalues.maxsize)
+                    if(itemnode->Data(2).toLongLong() >= filtervalues.minsize || itemnode->Data(2).toLongLong() <= filtervalues.maxsize)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)

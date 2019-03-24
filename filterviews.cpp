@@ -146,7 +146,7 @@ void JumpHex::DisplayFilter()
 
 void JumpHex::HideClicked()
 {
-    jumpoffset = ui->lineEdit->text().toULongLong(0, 16);
+    jumpoffset = ui->lineEdit->text().toLongLong(0, 16);
     emit SetOffset(); 
 }
 

@@ -598,8 +598,8 @@ void ProcessExport(QString objectid)
     QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
     if(fstring.contains(":") == true)
         fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
-    //qint64 curaddress = objectid.split("-f").at(1).toULongLong();
-    qint64 curaddress = objectid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong(); 
+    //qint64 curaddress = objectid.split("-f").at(1).toLongLong();
+    qint64 curaddress = objectid.split("-f").at(1).split("-a").at(0).split(":").at(0).toLongLong(); 
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
@@ -626,7 +626,7 @@ void ProcessExport(QString objectid)
     tmpstr = partfile.readLine();
     if(partfile.isOpen())
         partfile.close();
-    readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+    readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toLongLong(), TSK_FS_TYPE_DETECT);
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
     if(readfileinfo->meta != NULL)
     {
@@ -736,7 +736,7 @@ void GenerateHash(QString itemid)
         const TSK_TCHAR** imagepartspath;
         pathvector.clear();
         //qDebug() << "itemid:" << itemid;
-        qint64 curaddress = itemid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
+        qint64 curaddress = itemid.split("-f").at(1).split("-a").at(0).split(":").at(0).toLongLong();
         //qDebug() << "curaddress:" << curaddress;
         QStringList evidfiles = eviddir.entryList(QStringList("*." + itemid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
         QString evidencename = evidfiles.at(0).split(".e").first();
@@ -768,7 +768,7 @@ void GenerateHash(QString itemid)
         tmplist = tmpstr.split(",");
         if(tmplist.count() > 0)
         {
-            readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+            readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toLongLong(), TSK_FS_TYPE_DETECT);
             if(readfsinfo != NULL)
                 readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         }
@@ -907,7 +907,7 @@ void GenerateThumbnails(QString thumbid)
         if(fstring.contains(":"))
             fstring = thumbid.split("-").at(3).split(":").first() + "-" + thumbid.split("-").at(3).split(":").last();
         QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
-        qint64 curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toULongLong();
+        qint64 curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toLongLong();
         //qDebug() << "curaddress:" << curaddress;
         QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
         QString evidencename = evidfiles.at(0).split(".e").first();
@@ -940,7 +940,7 @@ void GenerateThumbnails(QString thumbid)
         //qDebug() << "tmpstr:" << tmpstr;
         if(tmpstr.count() > 0)
         {
-            readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+            readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toLongLong(), TSK_FS_TYPE_DETECT);
             if(readfsinfo != NULL)
                 readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         }
@@ -1584,7 +1584,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
 
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, qint64 adssize, QString attrid, AddEvidenceVariable* aevar)
 {
-    QString curblockstring = GetAdsBlockList(curfileinfo, attrid.toULongLong());
+    QString curblockstring = GetAdsBlockList(curfileinfo, attrid.toLongLong());
     //qDebug() << "ads block string:" << curblockstring;
     if(curblockstring.compare("0^^") == 0)
         curblockstring = "";
@@ -1601,7 +1601,7 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
         proplist << "Block Address||" << curblockstring << "||List of block addresses which contain the contents of the alternate data stream" << endl;
         proplist << "Attribute ID||" << attrid << "||ID for the file's ADS attribute" << endl;
         if(curblockstring.compare("") != 0)
-            proplist << "Byte Offset||" << QString::number(curblockstring.split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+            proplist << "Byte Offset||" << QString::number(curblockstring.split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
         else
         {
             if(curfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -1701,7 +1701,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, AddEvidenceVariable* aevar)
             proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file" << endl;
     }
     else
-        proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toULongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+        proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
     proplist.flush();
     if(filepropfile.isOpen())
     {

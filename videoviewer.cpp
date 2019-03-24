@@ -99,7 +99,7 @@ void VideoViewer::GetVideo(const QModelIndex &index)
     tmpstr = partfile.readLine();
     partfile.close();
     partlist = tmpstr.split(",");
-    tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+    tskptr->readfsinfo = tsk_fs_open_img(tskptr->readimginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
     tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, curobjaddr);
     if(tskptr->readfileinfo->meta != NULL)
     {
@@ -118,7 +118,7 @@ void VideoViewer::ShowVideo(const QModelIndex &index)
     this->show();
     ui->label_2->setVisible(true);
     this->setWindowTitle(QString("Video Viewer - ") + QString(index.sibling(index.row(), 1).data().toString()));
-    curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toULongLong();
+    curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toLongLong();
     GetVideo(index);
     vplayer->play();
     ui->label_2->setVisible(false);
