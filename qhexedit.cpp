@@ -878,13 +878,13 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 	unsigned long long curblkend = 0;
         QStringList curblocklist;
         curblocklist.clear();
-        qDebug() << "F/L Pos:" << _bPosFirst << _bPosLast;
+        //qDebug() << "F/L Pos:" << _bPosFirst << _bPosLast;
         //qDebug() << "byte offset:" << byteoffset;
         if(blocklist.count() > 0)
         {
-            qDebug() << "fsoffset:" << fsoffset;
-            qDebug() << "blocklist.at(0):" << blocklist.at(0);
-            qDebug() << "blkoffset:" << blocklist.at(0).toULongLong()*blocksize + fsoffset;
+            //qDebug() << "fsoffset:" << fsoffset;
+            //qDebug() << "blocklist.at(0):" << blocklist.at(0);
+            //qDebug() << "blkoffset:" << blocklist.at(0).toULongLong()*blocksize + fsoffset;
             if(blocklist.at(0).toULongLong() != 0) // non-resident attribute
             {
                 unsigned long long blkoffset = 0;
@@ -893,8 +893,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 {
                     //blkoffset2 = fsoffset + blocklist.at(i).toULongLong() * blocksize;
                     blkoffset = fsoffset + blocklist.at(i).toULongLong() * blocksize;
-                    if(i == 0)
-                        qDebug() << "inside loop blkoffset:" << blkoffset << "_bPosFirst" << _bPosFirst << "_bPosLast" << _bPosLast;
+                    //if(i == 0)
+                    //    qDebug() << "inside loop blkoffset:" << blkoffset << "_bPosFirst" << _bPosFirst << "_bPosLast" << _bPosLast;
                     if(blkoffset >= (_bPosFirst - blocksize) && blkoffset <= (_bPosLast + blocksize))
                         curblocklist.append(blocklist.at(i));
                 }
@@ -904,10 +904,12 @@ void QHexEdit::paintEvent(QPaintEvent *event)
             qDebug() << "blocklist is zero, but shouldn't be";
         //qDebug() << "blocklist:" << blocklist;
         //qDebug() << "blocklist:" << blocklist.count() << "curblocklist:" << curblocklist.count() << "blocksize:" << blocksize;
+        /*
         if(curblocklist.count() > 0 && !curblocklist.isEmpty())
             qDebug() << "curblklist:" << curblocklist;
         else
             qDebug() << "curblklist is empty";
+        */
         for (int row = 0, pxPosY = pxPosStartY; row <= _rowsShown; row++, pxPosY +=_pxCharHeight)
         {
             QByteArray hex;
@@ -930,10 +932,10 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                         curblkend = curblkstart + mftrecordsize - dataoffset - 1;
                         //qDebug() << "curblkend:" << curblkend;
                         //qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
-                        if((unsigned)posBa >= curblkstart && (unsigned)posBa < qMin((curblkstart + filelength - 1), curblkend))
+                        if(posBa >= curblkstart && posBa < qMin((curblkstart + filelength - 1), curblkend))
                         {
 			    c = contentbrush.color(); // BLUE
-                            if(((unsigned)posBa > (curblkstart + filelength - 1)) && (unsigned)posBa <= curblkend)
+                            if((posBa > (curblkstart + filelength - 1)) && posBa <= curblkend)
                             {
 				c = slackbrush.color(); // RED
                             }
@@ -953,13 +955,13 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                                 curblkend = curblkstart + blocksize - 1;
                                 //if((unsigned)posBa >= curblkstart && (unsigned)posBa <= qMin((curblkstart + filelength - blocksize*i - 1), (curblkstart + blocksize)))
                                 //if((unsigned)posBa >= curblkstart && (unsigned)posBa <= (curblkend))
-                                if((unsigned)posBa >= byteoffset && (unsigned)posBa <= byteoffset + filelength)
+                                if(posBa >= byteoffset && posBa <= byteoffset + filelength)
                                 {
 				    c = contentbrush.color(); // BLUE
                                 }
                                 if(curblocklist.at(i).toULongLong() == blocklist.last().toULongLong())
                                 {
-                                    if((unsigned)posBa > byteoffset + filelength && (unsigned)posBa <= curblkend)
+                                    if(posBa > byteoffset + filelength && posBa <= curblkend)
                                         c = slackbrush.color(); // RED
                                 }
                                 //if(i == (blocklist.count() - 1)) // invalid method...
@@ -1016,12 +1018,12 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                     //curblkend = curblkstart + mftrecordsize - dataoffset - 1;
                     //qDebug() << "curblkend:" << curblkend;
 		    //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
-                    if((unsigned)posBa >= curblkstart && (unsigned)posBa <= qMin((curblkstart + filelength - 1), curblkend))
+                    if(posBa >= curblkstart && posBa <= qMin((curblkstart + filelength - 1), curblkend))
                     {
 			//qDebug() << "should be blue.";
 			c = contentbrush.color(); // BLUE
 		    }
-                    if(((unsigned)posBa > (curblkstart + filelength - 1)) && (unsigned)posBa <= curblkend)
+                    if((posBa > (curblkstart + filelength - 1)) && posBa <= curblkend)
 		    {
 			//qDebug() << "should be red.";
 			c = slackbrush.color(); // RED
