@@ -116,6 +116,7 @@ signals:
 private slots:
     void AddEvidence();
     void RemEvidence();
+    void RemoveEvidence(QStringList remlist);
     void ExportEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();

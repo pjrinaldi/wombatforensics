@@ -24,6 +24,8 @@ public:
 private slots:
     void RemoveEvidence();
     void Cancel();
+signals:
+    void RemEvid(QStringList remevidlist);
 private:
     Ui::RemEvidenceDialog* ui;
 protected:
