@@ -1548,10 +1548,16 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             edir.removeRecursively();
             */
             // 3. Delete from evidencelist.
+            /*
+            evidencelist.removeOne(remevidlist.at(i));
+            */
             // 4. Remove TreeNode.
             QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(!indexlist.isEmpty())
+            {
                 qDebug() << "index found:" << indexlist.first().sibling(indexlist.first().row(), 10).data().toString();
+                // CHECK OUT THE EDITABLE TREE MODEL EXAMPLE AND LOOK AT REMOVEROWS...
+            }
         }
     }
     StatusUpdate("Evidence Item Successfully Removed");
