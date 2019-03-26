@@ -444,7 +444,18 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 if(tmpfilestr.split(",").count() > 12)
                 {
                     if(tmpfilestr.split(",").at(13).compare("0") != 0)
+                    {
                         treeout << tmpfilestr.split(",").at(13);
+                        if(hashsum == 0)
+                        {
+                            if(tmpfilestr.split(",").at(13).size() == 32) // md5
+                                hashsum = 1;
+                            else if(tmpfilestr.split(",").at(13).size() == 40) // sha1
+                                hashsum = 2;
+                            else if(tmpfilestr.split(",").at(13).size() == 64) // sha256
+                                hashsum = 4;
+                        }
+                    }
                     else
                         treeout << "0";
                 }

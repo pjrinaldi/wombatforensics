@@ -581,6 +581,7 @@ void WombatForensics::InitializeCaseStructure()
 
 void WombatForensics::InitializeOpenCase()
 {
+    hashsum = 0;
     wombatvariable.casename = QFileDialog::getOpenFileName(this, tr("Open Existing Case"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
     if(!wombatvariable.casename.isEmpty())
     {
@@ -641,6 +642,13 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
 
 void WombatForensics::OpenUpdate()
 {
+    QString hashstr = "MD5 Hash";
+    // update Hash header: 32 = md5, 40 = sha1, 64 = sha256
+    if(hashsum == 2)
+        hashstr = "SHA1 Hash";
+    else if(hashsum == 4)
+        hashstr = "SHA256 Hash";
+    treenodemodel->UpdateHeaderNode(7, hashstr);
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/"); // won't do anything if it already exists
     QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
     if(!tdir.isEmpty())
@@ -1787,11 +1795,11 @@ void WombatForensics::HashingFinish()
 {
     StatusUpdate("Ready");
     if(hashsum == 1)
-        treenodemodel->UpdateHeaderNode(7, "MD5 HASH");
+        treenodemodel->UpdateHeaderNode(7, "MD5 Hash");
     else if(hashsum == 2)
-        treenodemodel->UpdateHeaderNode(7, "SHA1 HASH");
+        treenodemodel->UpdateHeaderNode(7, "SHA1 Hash");
     else if(hashsum == 4)
-        treenodemodel->UpdateHeaderNode(7, "SHA256 HASH");
+        treenodemodel->UpdateHeaderNode(7, "SHA256 Hash");
     //qDebug() << hashsum;
     qDebug() << "Hashing should be Finished";
     // here is where i should update the column header...., which is possibly display and then update hash type...
