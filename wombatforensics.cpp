@@ -1529,8 +1529,10 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
         QStringList evidfiles = eviddir.entryList(QStringList(remevidlist.at(i).split("/").last() + "*"), QDir::NoSymLinks | QDir::Dirs);
         if(!evidfiles.isEmpty())
         {
+            //qDebug() << "evidfiles id:" << evidfiles.first().split(".e").last();
+            //qDebug() << "evidfiles name:" << evidfiles.first().split(".e").first();
+
             // 1. Delete all thumbnails.
-            /*
             QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
             QStringList tfiles = tdir.entryList(QStringList("e" + evidfiles.first().split(".e").last() + "-*"), QDir::NoSymLinks | QDir::Files);
             if(!tfiles.isEmpty())
@@ -1539,18 +1541,11 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                 for(int j = 0; j < tfiles.count(); j++)
                     tdir.remove(tfiles.at(j));
             }
-            */
-            //qDebug() << "evidfiles id:" << evidfiles.first().split(".e").last();
-            //qDebug() << "evidfiles name:" << evidfiles.first().split(".e").first();
             // 2. Delete evid directory.
-            /*
             QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
             edir.removeRecursively();
-            */
             // 3. Delete from evidencelist.
-            /*
             evidencelist.removeOne(remevidlist.at(i));
-            */
             // 4. Remove TreeNode.
             QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(!indexlist.isEmpty())
