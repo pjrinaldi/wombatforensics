@@ -213,6 +213,21 @@ public:
         return true;
     }
 
+    bool RemoveChildren(int position, int count)
+    {
+        qDebug() << "pos:" << position << "count:" << count;
+        qDebug() << "parentitem:" << parentitem->Data(10).toString();
+        qDebug() << "childitems:" << parentitem->childitems.count();
+        qDebug() << "childitem to remove:" << parentitem->childitems.at(position)->Data(10).toString();
+        //qDebug() << parentitem;
+        if(position < 0 || position + count > parentitem->childitems.count())
+            return false;
+        for(int i=0; i < count; ++i)
+            delete parentitem->childitems.takeAt(position);
+
+        return true;
+    }
+
     int itemtype;
     bool deleted = false;
     bool checked = false;
@@ -535,6 +550,18 @@ public:
         if(result)
             emit headerDataChanged(orientation, section, section);
         return result;
+    };
+
+    bool removeRows(int position, int rows, const QModelIndex &parent = QModelIndex()) override
+    {
+        qDebug() << "pos:" << position << "rows:" << rows;
+        TreeNode* parentnode = static_cast<TreeNode*>(parent.internalPointer());
+        bool success = true;
+        beginRemoveRows(parent, position, position + rows - 1);
+        success = parentnode->RemoveChildren(position, rows);
+        endRemoveRows();
+
+        return success;
     };
 
     Qt::ItemFlags flags(const QModelIndex &index) const override

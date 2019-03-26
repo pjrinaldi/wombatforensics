@@ -1556,7 +1556,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             if(!indexlist.isEmpty())
             {
                 qDebug() << "index found:" << indexlist.first().sibling(indexlist.first().row(), 10).data().toString();
-                // CHECK OUT THE EDITABLE TREE MODEL EXAMPLE AND LOOK AT REMOVEROWS...
+                treenodemodel->removeRow(indexlist.first().row(), indexlist.first());
             }
         }
     }
