@@ -663,7 +663,7 @@ void WombatForensics::OpenUpdate()
         //LoadHexContents();
         //ui->hexview->ensureVisible();
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
-        QThread::sleep(60);
+        //QThread::sleep(60);
         ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
         //selectedindex = indexlist.first();
         //LoadHexContents();
@@ -1786,6 +1786,13 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 void WombatForensics::HashingFinish()
 {
     StatusUpdate("Ready");
+    if(hashsum == 1)
+        treenodemodel->UpdateHeaderNode(7, "MD5 HASH");
+    else if(hashsum == 2)
+        treenodemodel->UpdateHeaderNode(7, "SHA1 HASH");
+    else if(hashsum == 4)
+        treenodemodel->UpdateHeaderNode(7, "SHA256 HASH");
+    //qDebug() << hashsum;
     qDebug() << "Hashing should be Finished";
     // here is where i should update the column header...., which is possibly display and then update hash type...
 }

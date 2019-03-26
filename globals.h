@@ -546,10 +546,15 @@ public:
     {
         if(role != Qt::EditRole || orientation != Qt::Horizontal)
             return false;
-        bool result = zeronode->SetData(section, value);
-        if(result)
-            emit headerDataChanged(orientation, section, section);
-        return result;
+        if(role == Qt::EditRole)
+        {
+            qDebug() << "edit role for header...";
+            bool result = zeronode->SetData(section, value);
+            if(result)
+                emit headerDataChanged(orientation, section, section);
+            return result;
+        }
+        return false;
     };
 
     bool removeRows(int position, int rows, const QModelIndex &parent = QModelIndex()) override
@@ -798,6 +803,9 @@ public:
     
     void UpdateHeaderNode(int column, QString hash)
     {
+        //qDebug() << "updatehadernode value:" << zeronode->Data(9).toString();
+        //qDebug() << "
+        zeronode->SetData(column, hash);
         // SHOULD BE EITHER MD5 HASH, SHA1 HASH, SHA256 HASH
         //zeronode->SetData(column, hash);
     };

@@ -431,7 +431,27 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 QMimeDatabase mimedb;
                 QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
                 free(magicbuffer);
-                treeout << "0";
+                QFile hshfile;
+                if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
+                    hshfile.setFileName(partitionpath + "f" + QString::number(orphancount) + ".a" + QString::number(tmpfile->name->par_addr) + ".stat");
+                else
+                    hshfile.setFileName(partitionpath + "f" + QString::number(tmpfile->name->meta_addr) + ".a" + QString::number(tmpfile->name->par_addr) + ".stat");
+                hshfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                QString tmpfilestr = "";
+                if(hshfile.isOpen())
+                    tmpfilestr = hshfile.readLine();
+                hshfile.close();
+                if(tmpfilestr.split(",").count() > 12)
+                {
+                    if(tmpfilestr.split(",").at(13).compare("0") != 0)
+                        treeout << tmpfilestr.split(",").at(13);
+                    else
+                        treeout << "0";
+                }
+                else
+                    treeout << "0";
+                // ADD THE HASH VALUE FROM THE FILE TO TREEOUT
+                //treeout << "0";
                 treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1);
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
@@ -536,7 +556,26 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                     delete[] fbuf;
                                     adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
                                     treeout.clear();
-                                    treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                                    // ADD THE HASH VALUE TO FROM THE FILE
+                                    QFile hshfile;
+                                    hshfile.setFileName(partitionpath + "f" + QString::number(tmpfile->name->meta_addr) + "-" + QString::number(fsattr->id) + ".a" + QString::number(tmpfile->name->meta_addr) + ".stat");
+                                    hshfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                                    QString tmpfilestr = "";
+                                    if(hshfile.isOpen())
+                                        tmpfilestr = hshfile.readLine();
+                                    hshfile.close();
+                                    QString hshstr = "";
+                                    if(tmpfilestr.split(",").count() > 12)
+                                    {
+                                        if(tmpfilestr.split(",").at(13).compare("0") != 0)
+                                            hshstr = tmpfilestr.split(",").at(13);
+                                        else
+                                            hshstr = "0";
+                                    }
+                                    else
+                                        hshstr = "0";
+
+                                    treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << hshstr << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                                     nodedata.clear();
                                     for(int i=0;  i < 11; i++)
                                         nodedata << treeout.at(i);
@@ -874,12 +913,13 @@ void GenerateHash(QString itemid)
             filefile.close();
         }
         treenodemodel->UpdateNode(itemid, 7, hashstr);
+        QString hashheader = "";
         delete[] hashdata;
-        if(hashsum == 1)
+        if(hashsum == 1) // MD5
             hashtype = 1;
-        else if(hashsum == 2)
+        else if(hashsum == 2) // SHA1
             hashtype = 2;
-        else if(hashsum == 4)
+        else if(hashsum == 4) // SHA256
             hashtype = 3;
         dighashcount++;
         isignals->DigUpd(hashtype, dighashcount);
