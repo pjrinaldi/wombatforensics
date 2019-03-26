@@ -215,11 +215,11 @@ public:
 
     bool RemoveChildren(int position, int count)
     {
-        qDebug() << "pos:" << position << "count:" << count;
-        qDebug() << "parentitem:" << parentitem->Data(10).toString();
-        qDebug() << "childitems:" << parentitem->childitems.count();
-        qDebug() << "childitem to remove:" << parentitem->childitems.at(position)->Data(10).toString();
-        //qDebug() << parentitem;
+        //qDebug() << "pos:" << position << "count:" << count;
+        //qDebug() << "parentitem:" << parentitem->Data(10).toString();
+        //qDebug() << "childitems:" << parentitem->childitems.count();
+        //qDebug() << "childitem to remove:" << parentitem->childitems.at(position)->Data(10).toString();
+
         if(position < 0 || position + count > parentitem->childitems.count())
             return false;
         for(int i=0; i < count; ++i)
@@ -554,7 +554,7 @@ public:
 
     bool removeRows(int position, int rows, const QModelIndex &parent = QModelIndex()) override
     {
-        qDebug() << "pos:" << position << "rows:" << rows;
+        //qDebug() << "pos:" << position << "rows:" << rows;
         TreeNode* parentnode = static_cast<TreeNode*>(parent.internalPointer());
         bool success = true;
         beginRemoveRows(parent, position, position + rows - 1);

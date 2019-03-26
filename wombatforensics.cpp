@@ -1541,12 +1541,15 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                 for(int j = 0; j < tfiles.count(); j++)
                     tdir.remove(tfiles.at(j));
             }
-            // 2. Delete evid directory.
+            // 2. Remove e# entries from checkstate and selectedstate
+            // if selectedstate variable, change it to nothing, so nothing gets written on close???
+            // loop over checkhash and remove any with key contains[e#*]
+            // 3. Delete evid directory.
             QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
             edir.removeRecursively();
-            // 3. Delete from evidencelist.
+            // 4. Delete from evidencelist.
             evidencelist.removeOne(remevidlist.at(i));
-            // 4. Remove TreeNode.
+            // 5. Remove TreeNode.
             QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(!indexlist.isEmpty())
             {
