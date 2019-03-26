@@ -1542,8 +1542,20 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                     tdir.remove(tfiles.at(j));
             }
             // 2. Remove e# entries from checkstate and selectedstate
-            // if selectedstate variable, change it to nothing, so nothing gets written on close???
-            // loop over checkhash and remove any with key contains[e#*]
+            QHashIterator<QString, bool> m(checkhash);
+            while(m.hasNext())
+            {
+                m.next();
+                if(m.key().contains(QString("e" + evidfiles.first().split(".e").last())))
+                    checkhash.remove(m.key());
+            }
+            UpdateCheckState();
+            QFile selectfile(wombatvariable.tmpmntpath + "selectedstate");
+            selectfile.open(QIODevice::WriteOnly | QIODevice::ReadOnly | QIODevice::Text);
+            QString tmpstr = selectfile.readLine();
+            if(tmpstr.contains("e" + evidfiles.first().split(".e").last()))
+                selectfile.write("");
+            selectfile.close();
             // 3. Delete evid directory.
             QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
             edir.removeRecursively();
