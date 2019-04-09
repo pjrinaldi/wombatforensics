@@ -19,7 +19,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
     statuslabel = new StatusLabel();
-    //statuslabel = new QToolButton(this);
     StatusUpdate("");
     vline1 = new QFrame(this);
     vline1->setFrameStyle(QFrame::VLine | QFrame::Raised);
@@ -46,7 +45,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     if(bookbutton)
         connect(ui->actionBookmark_Manager, SIGNAL(triggered(bool)), bookbutton, SLOT(showMenu()));
     ui->actionBookmark_Manager->setMenu(bookmarkmenu);
-    //cancelwidget = ui->analysisToolBar->widgetForAction(ui->actionCancel_Operation);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
@@ -69,12 +67,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     byteviewer = new ByteConverter();
     aboutbox = new AboutBox(this);
     digstatusdialog = new DigStatus(this);
-    //cancelthread = new CancelThread(this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
-    //cancelthread->setWindowIcon(QIcon(""));
     imagewindow->hide();
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.mincreate = QDateTime::currentDateTimeUtc().toTime_t();
@@ -104,19 +100,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
     CheckWombatConfiguration();
     InitializeAppStructure();
-    //connect(cancelthread, SIGNAL(CancelCurrentThread()), &secondwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&openwatcher, SIGNAL(finished()), this, SLOT(OpenUpdate()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
     connect(&thashwatcher, SIGNAL(finished()), this, SLOT(ThashFinish()), Qt::QueuedConnection);
     connect(&thashsavewatcher, SIGNAL(finished()), this, SLOT(ThashSaveFinish()), Qt::QueuedConnection);
     connect(&hashingwatcher, SIGNAL(finished()), this, SLOT(HashingFinish()), Qt::QueuedConnection);
-    //connect(this, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
-    //connect(cancelthread, SIGNAL(CancelCurrentThread()), &thumbwatcher, SLOT(cancel()));
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
-    //connect(this, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()));
-    //connect(cancelthread, SIGNAL(CancelCurrentThread()), &exportwatcher, SLOT(cancel()));
-    //connect(cancelthread, SIGNAL(ThreadCancelled()), this, SLOT(ThreadCancelled()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
@@ -448,9 +438,9 @@ void WombatForensics::CheckWombatConfiguration()
             qDebug() << "fstab is wrong";
     }
     // check if mntpt link exists, if it does, remove it
-    // check if case link exists, if it does, remove it
     if(QFileInfo::exists("/tmp/wombatforensics/mntpt"))
         QFile::remove("/tmp/wombatforensics/mntpt");
+    // check if case link exists, if it does, remove it
     if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
         QFile::remove("/tmp/wombatforensics/currentwfc");
 }
@@ -508,11 +498,6 @@ void WombatForensics::InitializeAppStructure()
     ui->actionTextViewer->setEnabled(false);
     ui->actionByteConverter->setEnabled(false);
     ui->actionJumpToHex->setEnabled(false);
-    //ui->actionCollapseAll->setEnabled(false);
-    //ui->actionExpandAll->setEnabled(false);
-    //ui->actionTextViewer->setVisible(false);
-    //ui->actionHtmlViewer->setVisible(false);
-    //ui->actionMediaViewer->setVisible(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -695,15 +680,6 @@ void WombatForensics::OpenUpdate()
         //ui->actionCollapseAll->setEnabled(true);
         //ui->actionBookmark_Manager->setEnabled(true);
     }
-    /*
-    readfileinfo = NULL;
-    tsk_fs_close(readfsinfo);
-    readfsinfo = NULL;
-    tsk_vs_close(readvsinfo);
-    readvsinfo = NULL;
-    tsk_img_close(readimginfo);
-    readimginfo = NULL;
-    */
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
     StatusUpdate("Ready");
@@ -1033,103 +1009,112 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
     if(curindex.sibling(curindex.row(), 10).data().toString().split("-").count() == 4)
     {
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-    QString evidencename = evidfiles.at(0).split(".e").first();
-    QString tmpstr = "";
-    //qDebug() << "fileviewer:" << curindex.sibling(curindex.row(), 10).data().toString();
-    QString paridstr = curindex.parent().sibling(curindex.parent().row(), 10).data().toString().split("-f").last();
-    TSK_IMG_INFO* fileheximginfo;
-    TSK_FS_INFO* filehexfsinfo;
-    TSK_FS_FILE* filehexfileinfo;
-    std::vector<std::string> pathvector;
-    const TSK_TCHAR** imagepartspath;
-    pathvector.clear();
-    QString estring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(0);
-    QString vstring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(1);
-    QString pstring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(2);
-    QString fstring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(3);
-    QString curid = curindex.sibling(curindex.row(), 10).data().toString();
-    QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
-    //qDebug() << "Initial string info (e-v-p-f):" << estring + vstring + pstring + fstring;
-    evidfile.open(QIODevice::ReadOnly);
-    if(evidfile.isOpen())
-        tmpstr = evidfile.readLine();
-    evidfile.close();
-    int partcount = tmpstr.split(",").at(3).split("|").size();
-    for(int i=0; i < partcount; i++)
-        pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
-    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(uint i=0; i < pathvector.size(); i++)
-        imagepartspath[i] = pathvector[i].c_str();
-    fileheximginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    if(fileheximginfo == NULL)
-    {
-        qDebug() << tsk_error_get_errstr();
-        //LogMessage("Image opening error");
-    }
-    free(imagepartspath);
-
-    tmpstr = "";
-    QStringList partlist;
-    partlist.clear();
-    QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
-    partfile.open(QIODevice::ReadOnly);
-    tmpstr = partfile.readLine();
-    partfile.close();
-    partlist = tmpstr.split(",");
-    // FILE SYSTEM PIECE OF FILE HEX CONTENT CODE
-    filehexfsinfo = tsk_fs_open_img(fileheximginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
-    QStringList filelist;
-    filelist.clear();
-    QString tmpfilename = "";
-    if(curid.split("-").at(3).mid(1).contains(":"))
-        tmpfilename = curid.split("-").at(3).mid(1).split(":").at(0) + QString("-") + curid.split("-").at(3).mid(1).split(":").at(1);
-    else
-        tmpfilename = curid.split("-").at(3).mid(1);
-    //qDebug() << "f value:" << tmpfilename;
-    // INITIAL FILE SYSTEM FILE PIECE OF FILE HEX CONTENT CODE
-    if(tmpfilename.contains("-"))
-        filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.split("-").at(0).toInt());
-    else
-        filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.toInt());
-    char* fhexbuf;
-    ssize_t fhexlen = 0;
-
-    QFile filefile;
-    if(fstring.split(":").count() > 1)
-        filefile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring.split(":").first() + "-" + fstring.split(":").last() + ".a" + paridstr + ".stat");
-    else
-        filefile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring.split(":").first() + ".a" + paridstr + ".stat");
-    filefile.open(QIODevice::ReadOnly);
-    if(filefile.isOpen())
-        tmpstr = filefile.readLine();
-    filefile.close();
-    filelist = tmpstr.split(",");
-
-    //if(!ui->hexview->isEnabled())
-        ui->hexview->setEnabled(true);
-
-    if(curindex.sibling(curindex.row(), 2).data().toLongLong() == 0)
-    {
-        //qDebug() << "zero file";
-        ui->hexview->setEnabled(false);
-    }
-    else
-    {
-        if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+        QString evidencename = evidfiles.at(0).split(".e").first();
+        QString tmpstr = "";
+        //qDebug() << "fileviewer:" << curindex.sibling(curindex.row(), 10).data().toString();
+        QString paridstr = curindex.parent().sibling(curindex.parent().row(), 10).data().toString().split("-f").last();
+        TSK_IMG_INFO* fileheximginfo;
+        TSK_FS_INFO* filehexfsinfo;
+        TSK_FS_FILE* filehexfileinfo;
+        std::vector<std::string> pathvector;
+        const TSK_TCHAR** imagepartspath;
+        pathvector.clear();
+        QString estring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(0);
+        QString vstring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(1);
+        QString pstring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(2);
+        QString fstring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(3);
+        QString curid = curindex.sibling(curindex.row(), 10).data().toString();
+        QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
+        //qDebug() << "Initial string info (e-v-p-f):" << estring + vstring + pstring + fstring;
+        evidfile.open(QIODevice::ReadOnly);
+        if(evidfile.isOpen())
+            tmpstr = evidfile.readLine();
+        evidfile.close();
+        int partcount = tmpstr.split(",").at(3).split("|").size();
+        for(int i=0; i < partcount; i++)
+            pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
+        imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+        for(uint i=0; i < pathvector.size(); i++)
+            imagepartspath[i] = pathvector[i].c_str();
+        fileheximginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+        if(fileheximginfo == NULL)
         {
-            if(curid.split("-").at(3).split(":").count() > 1) // IF ADS
+            qDebug() << tsk_error_get_errstr();
+            //LogMessage("Image opening error");
+        }
+        free(imagepartspath);
+
+        tmpstr = "";
+        QStringList partlist;
+        partlist.clear();
+        QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
+        partfile.open(QIODevice::ReadOnly);
+        tmpstr = partfile.readLine();
+        partfile.close();
+        partlist = tmpstr.split(",");
+        // FILE SYSTEM PIECE OF FILE HEX CONTENT CODE
+        filehexfsinfo = tsk_fs_open_img(fileheximginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
+        QStringList filelist;
+        filelist.clear();
+        QString tmpfilename = "";
+        if(curid.split("-").at(3).mid(1).contains(":"))
+            tmpfilename = curid.split("-").at(3).mid(1).split(":").at(0) + QString("-") + curid.split("-").at(3).mid(1).split(":").at(1);
+        else
+            tmpfilename = curid.split("-").at(3).mid(1);
+        //qDebug() << "f value:" << tmpfilename;
+        // INITIAL FILE SYSTEM FILE PIECE OF FILE HEX CONTENT CODE
+        if(tmpfilename.contains("-"))
+            filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.split("-").at(0).toInt());
+        else
+            filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.toInt());
+        char* fhexbuf;
+        ssize_t fhexlen = 0;
+    
+        QFile filefile;
+        if(fstring.split(":").count() > 1)
+            filefile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring.split(":").first() + "-" + fstring.split(":").last() + ".a" + paridstr + ".stat");
+        else
+            filefile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring.split(":").first() + ".a" + paridstr + ".stat");
+        filefile.open(QIODevice::ReadOnly);
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
+        filefile.close();
+        filelist = tmpstr.split(",");
+    
+        //if(!ui->hexview->isEnabled())
+            ui->hexview->setEnabled(true);
+
+        if(curindex.sibling(curindex.row(), 2).data().toLongLong() == 0)
+        {
+            //qDebug() << "zero file";
+            ui->hexview->setEnabled(false);
+        }
+        else
+        {
+            if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
             {
-                if(filehexfileinfo->meta != NULL)
+                if(curid.split("-").at(3).split(":").count() > 1) // IF ADS
                 {
-                    fhexbuf = new char[filelist.at(8).toLongLong()];
-                    fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, curid.split("-").at(3).split(":").at(1).toInt(), 0, fhexbuf, filelist.at(8).toLongLong(), TSK_FS_FILE_READ_FLAG_NONE);
-                    if(fhexlen == -1)
-                        qDebug() << tsk_error_get_errstr();
+                    if(filehexfileinfo->meta != NULL)
+                    {
+                        fhexbuf = new char[filelist.at(8).toLongLong()];
+                        fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, curid.split("-").at(3).split(":").at(1).toInt(), 0, fhexbuf, filelist.at(8).toLongLong(), TSK_FS_FILE_READ_FLAG_NONE);
+                        if(fhexlen == -1)
+                            qDebug() << tsk_error_get_errstr();
+                    }
+                }
+                else // IF NOT ADS
+                {
+                    if(filehexfileinfo->meta != NULL)
+                    {
+                        fhexbuf = new char[filehexfileinfo->meta->size];
+                        fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                    }
                 }
             }
-            else // IF NOT ADS
+            else // OTHER FILE SYSTEM
             {
                 if(filehexfileinfo->meta != NULL)
                 {
@@ -1138,35 +1123,20 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
                 }
             }
         }
-        else // OTHER FILE SYSTEM
+        if(curindex.sibling(curindex.row(), 2).data().toLongLong() > 0)
         {
-            if(filehexfileinfo->meta != NULL)
-            {
-                fhexbuf = new char[filehexfileinfo->meta->size];
-                fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-            }
+            (new QDir())->mkpath(wombatvariable.tmpfilepath);
+            hexstring = wombatvariable.tmpfilepath + curindex.sibling(curindex.row(), 10).data().toString() + "-fhex";
+            QFile tmpfile(hexstring);
+            tmpfile.open(QIODevice::WriteOnly);
+            QDataStream outbuffer(&tmpfile);
+            outbuffer.writeRawData(fhexbuf, fhexlen);
+            tmpfile.close();
+            delete[] fhexbuf;
         }
-    }
-    if(curindex.sibling(curindex.row(), 2).data().toLongLong() > 0)
-    {
-        (new QDir())->mkpath(wombatvariable.tmpfilepath);
-        hexstring = wombatvariable.tmpfilepath + curindex.sibling(curindex.row(), 10).data().toString() + "-fhex";
-        QFile tmpfile(hexstring);
-        tmpfile.open(QIODevice::WriteOnly);
-        QDataStream outbuffer(&tmpfile);
-        outbuffer.writeRawData(fhexbuf, fhexlen);
-        tmpfile.close();
-        delete[] fhexbuf;
         tsk_fs_file_close(filehexfileinfo);
         tsk_fs_close(filehexfsinfo);
         tsk_img_close(fileheximginfo);
-    }
-    else
-    {
-        tsk_fs_file_close(filehexfileinfo);
-        tsk_fs_close(filehexfsinfo);
-        tsk_img_close(fileheximginfo);
-    }
     }
 }
 
@@ -1473,6 +1443,11 @@ void WombatForensics::CloseCurrentCase()
         //autosavetimer->stop();
         UpdateCheckState();
     }
+    if(ui->hexview->data().size() > 0)
+    {
+        casedatafile.resize(0);
+        ui->hexview->setData(casedatafile);
+    }
     setWindowTitle("WombatForensics");
     filesfound = 0;
     fileschecked = 0;
@@ -1521,7 +1496,6 @@ void WombatForensics::CloseCurrentCase()
 void WombatForensics::RemEvidence()
 {
     qDebug() << "remove evidence clicked";
-    // WHOLE NEW TAKE ON REMOVE EVIDENCE IS STARTING
     remevidencedialog = new RemEvidenceDialog(this);
     connect(remevidencedialog, SIGNAL(RemEvid(QStringList)), this, SLOT(RemoveEvidence(QStringList)));
     remevidencedialog->exec();
@@ -1530,7 +1504,6 @@ void WombatForensics::RemEvidence()
 void WombatForensics::RemoveEvidence(QStringList remevidlist)
 {
     qDebug() << "remevidlist:" << remevidlist;
-    //qDeleteAll(ui->evidencelist->selectedItems());
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     for(int i=0; i < remevidlist.count(); i++)
     {
@@ -1580,89 +1553,6 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
     }
     StatusUpdate("Evidence Item Successfully Removed");
 }
-    /*
-    // if an evidence item is not selected, then move selection to it and remove then it...
-    // also need to remove any thumbnails in the thumbs.db associated with it...
-    // DELETE TREEFILE AS WELL AS THE SINGLE FILeS *.p0.f*.a*
-    // treefile.remove()
-    // THEN I BUILD A NEW TREEFILE BASED OFF OF THE SINGLE FILES.
-    QModelIndexList indexlist;
-    QModelIndex curindex = selectedindex;
-    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() > 1)
-    {
-        indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        curindex = indexlist.at(0);
-    }
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString(curindex.sibling(curindex.row(), 0).data().toString() + ".*")), QDir::NoSymLinks | QDir::Files);
-    for(int i = 0; i < evidfiles.count(); i++)
-    {
-        eviddir.remove(evidfiles.at(i));
-    }
-    listeditems.clear();
-    //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
-    //treefile.remove(); // delete treefile.
-    // find evidence files
-    // find volume files
-    // find partition files
-    // find files files
-    evidfiles.clear();
-    evidfiles = eviddir.entryList(QStringList(QString("*.p*.f*.a*")), QDir::Files | QDir::NoSymLinks);
-    //treefile.open(QIODevice::WriteOnly | QIODevice::Text);
-    //QTextStream treeout(&treefile);
-    for(int i=0; i < evidfiles.count(); i++)
-    {
-        QFile tmpfile(evidfiles.at(i));
-        tmpfile.open(QIODevice::ReadOnly);
-        QString tmpstr = tmpfile.readLine();
-        QStringList tmplist = tmpstr.split(",", QString::SkipEmptyParts);
-        tmpfile.close();
-    }
-    */
-    /*
-    treefile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QStringList tmplist = QString(treefile.readAll()).split("\n", QString::SkipEmptyParts);
-    */
-    //treefile.close();
-    /*treefile.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream treeout(&treefile);
-    for(int i=0; i < tmplist.count(); i++)
-    {
-        if(!tmplist.at(i).split(",").first().contains(curindex.sibling(curindex.row(), 0).data().toString().split("-").first()))
-        {
-            listeditems.append(tmplist.at(i).split(",").first());
-            treeout << tmplist.at(i) << endl;
-        }
-    }
-    treefile.flush();
-    treefile.close();
-    qDebug() << "listeditems count:" << listeditems.count();
-    QStringList foundlist = eviddir.entryList(QStringList(QString("*.p*.f*.a*")), QDir::Files | QDir::NoSymLinks);
-    filesfound = foundlist.count();
-    filecountlabel->setText("Found: " + QString::number(filesfound));
-    qDebug() << "filesfound count:" << filesfound;
-    QHashIterator<QString, bool> i(checkhash);
-    while(i.hasNext())
-    {
-        i.next();
-        if(i.key().contains(curindex.sibling(curindex.row(), 0).data().toString().split("-").first()))
-            checkhash.remove(i.key());
-    }
-    UpdateCheckState();
-    QFile selectfile(wombatvariable.tmpmntpath + "selectedstate");
-    selectfile.open(QIODevice::WriteOnly);
-    selectfile.write("");
-    selectfile.close();
-    delete treenodemodel;
-    treefile.open(QIODevice::ReadOnly | QIODevice::Text);
-    treenodemodel = new TreeNodeModel();
-    treefile.close();
-    ui->dirTreeView->setModel(treenodemodel);
-    connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
-    //connect(treenodemodel, SIGNAL(layoutChanged()), this, SLOT(ResizeColumns()));
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
-    evidcnt--;
-    */
 
 QStringList WombatForensics::GetFileLists(int filelisttype)
 {
