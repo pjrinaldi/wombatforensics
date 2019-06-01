@@ -511,9 +511,11 @@ void WombatForensics::InitializeCaseStructure()
     // create new case here
     QFileDialog newcasedialog(this, tr("Create New Case"), QDir::homePath(), tr("Wombat Forensics Case (*.wfc)"));
     newcasedialog.setLabelText(QFileDialog::Accept, "Create");
+    //newcasedialog.setOptions(QFileDialog::DontUseNativeDialog|QFileDialog::DontUseSheet|QFileDialog::DontUseCustomDirectoryIcons);
     QString evidfilename = "";
     if(newcasedialog.exec())
         wombatvariable.casename = newcasedialog.selectedFiles().first();
+    // WORKING ON THE ICON CRASHING FILE DIALOG ISSUE????? ITS EITHER A QT OR GTK ISSUE, I'M GUESSING GTK SINCE LXQT WORKS FINE...
     //wombatvariable.casename = QFileDialog::getSaveFileName(this, tr("Create New Case File"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
     if(!wombatvariable.casename.isEmpty())
     {
