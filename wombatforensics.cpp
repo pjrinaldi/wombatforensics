@@ -511,8 +511,7 @@ void WombatForensics::InitializeCaseStructure()
     // create new case here
     QFileDialog newcasedialog(this, tr("Create New Case"), QDir::homePath(), tr("Wombat Forensics Case (*.wfc)"));
     newcasedialog.setLabelText(QFileDialog::Accept, "Create");
-    //newcasedialog.setOptions(QFileDialog::DontUseNativeDialog|QFileDialog::DontUseSheet|QFileDialog::DontUseCustomDirectoryIcons);
-    QString evidfilename = "";
+    newcasedialog.setOption(QFileDialog::DontUseNativeDialog, true);
     if(newcasedialog.exec())
         wombatvariable.casename = newcasedialog.selectedFiles().first();
     // WORKING ON THE ICON CRASHING FILE DIALOG ISSUE????? ITS EITHER A QT OR GTK ISSUE, I'M GUESSING GTK SINCE LXQT WORKS FINE...
@@ -569,7 +568,12 @@ void WombatForensics::InitializeCaseStructure()
 void WombatForensics::InitializeOpenCase()
 {
     hashsum = 0;
-    wombatvariable.casename = QFileDialog::getOpenFileName(this, tr("Open Existing Case"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
+    QFileDialog opencasedialog(this, tr("Open Existing Case"), QDir::homePath(), tr("Wombat Forensics Case (*.wfc)"));
+    opencasedialog.setLabelText(QFileDialog::Accept, "Open");
+    opencasedialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    if(opencasedialog.exec())
+        wombatvariable.casename = opencasedialog.selectedFiles().first();
+    //wombatvariable.casename = QFileDialog::getOpenFileName(this, tr("Open Existing Case"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
     if(!wombatvariable.casename.isEmpty())
     {
         StatusUpdate("Case Opening...");
