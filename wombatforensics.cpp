@@ -2195,7 +2195,7 @@ void WombatForensics::AddTextSection()
 
 void WombatForensics::CarveFile()
 {
-    QString carvefilename = QFileDialog::getSaveFileName(this, tr("Carve to a File"), QDir::homePath()); 
+    QString carvefilename = QFileDialog::getSaveFileName(this, tr("Carve to a File"), QDir::homePath(), "", NULL, QFileDialog::DontUseNativeDialog); 
     if(carvefilename.compare("") != 0)
     {
         QByteArray tmparray = ui->hexview->selectionToByteArray();

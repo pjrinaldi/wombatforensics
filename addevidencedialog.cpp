@@ -24,6 +24,7 @@ void AddEvidenceDialog::SelectEvidence()
     QFileDialog addeviddialog(this, tr("Add Evidence Item"), QDir::homePath());
     addeviddialog.setFileMode(QFileDialog::ExistingFile);
     addeviddialog.setLabelText(QFileDialog::Accept, "Add");
+    addeviddialog.setOption(QFileDialog::DontUseNativeDialog, true);
     QString evidfilename = "";
     if(addeviddialog.exec())
         evidfilename = addeviddialog.selectedFiles().first();

@@ -38,7 +38,7 @@ ExportDialog::~ExportDialog()
 
 void ExportDialog::SelectDirectory()
 {
-    QString dirname = QFileDialog::getExistingDirectory(this, tr("Select Directory"), QDir::homePath(), QFileDialog::ShowDirsOnly);
+    QString dirname = QFileDialog::getExistingDirectory(this, tr("Select Directory"), QDir::homePath(), QFileDialog::ShowDirsOnly | QFileDialog::DontUseNativeDialog);
     if(!dirname.isEmpty())
     {
         ui->exportDirectoryLineEdit->setText(dirname);

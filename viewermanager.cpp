@@ -34,7 +34,7 @@ void ViewerManager::closeEvent(QCloseEvent* e)
 
 void ViewerManager::ShowBrowser()
 {
-    fileviewerpath = QFileDialog::getOpenFileName(this, tr("Select Viewer Executable"), QDir::homePath());
+    fileviewerpath = QFileDialog::getOpenFileName(this, tr("Select Viewer Executable"), QDir::homePath(), "", NULL, QFileDialog::DontUseNativeDialog);
     if(!fileviewerpath.isNull())
     {
         ui->lineEdit->setText(fileviewerpath);
