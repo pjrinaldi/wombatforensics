@@ -111,23 +111,4 @@
 #include <tsk_img_i.h>
 #include <tsk_vs_i.h>
 
-/*
-#include "libtsk.h"
-#include "ewf.h"
-#include "libewf.h"
-#include "tsk_bsd.h"
-#include "tsk_mac.h"
-#include "tsk_sun.h"
-#include "tsk_gpt.h"
-#include "tsk_ntfs.h"
-#include "tsk_exfatfs.h"
-#include "tsk_fatfs.h"
-#include "tsk_fatxxfs.h"
-#include "tsk_ffs.h"
-#include "tsk_ext2fs.h"
-#include "tsk_iso9660.h"
-#include "tsk_hfs.h"
-#include "tsk_yaffs.h"
-*/
-
 #endif // WOMBATINCLUDE_H
