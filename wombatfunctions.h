@@ -5,7 +5,6 @@
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include "wombatinclude.h"
-#include "tsk_hfs.h"
 #include "globals.h"
 
 std::string GetTime(void);

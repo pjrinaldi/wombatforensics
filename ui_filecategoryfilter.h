@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'filecategoryfilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_FILECATEGORYFILTER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
 
@@ -33,7 +30,7 @@ public:
     void setupUi(QWidget *FileCategoryFilter)
     {
         if (FileCategoryFilter->objectName().isEmpty())
-            FileCategoryFilter->setObjectName(QStringLiteral("FileCategoryFilter"));
+            FileCategoryFilter->setObjectName(QString::fromUtf8("FileCategoryFilter"));
         FileCategoryFilter->setWindowModality(Qt::ApplicationModal);
         FileCategoryFilter->resize(429, 79);
         QFont font;
@@ -41,22 +38,22 @@ public:
         FileCategoryFilter->setFont(font);
         FileCategoryFilter->setAutoFillBackground(true);
         gridLayout = new QGridLayout(FileCategoryFilter);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setHorizontalSpacing(0);
         categorycheckBox = new QCheckBox(FileCategoryFilter);
-        categorycheckBox->setObjectName(QStringLiteral("categorycheckBox"));
+        categorycheckBox->setObjectName(QString::fromUtf8("categorycheckBox"));
 
         gridLayout->addWidget(categorycheckBox, 0, 0, 1, 1);
 
         pushButton = new QPushButton(FileCategoryFilter);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setStyleSheet(QStringLiteral("border: 1px solid black; padding: 5px 10px 5px 10px;"));
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding: 5px 10px 5px 10px;"));
         pushButton->setFlat(true);
 
         gridLayout->addWidget(pushButton, 1, 1, 1, 1);
 
         categorycomboBox = new QComboBox(FileCategoryFilter);
-        categorycomboBox->setObjectName(QStringLiteral("categorycomboBox"));
+        categorycomboBox->setObjectName(QString::fromUtf8("categorycomboBox"));
         categorycomboBox->setEnabled(false);
         categorycomboBox->setEditable(false);
         categorycomboBox->setInsertPolicy(QComboBox::NoInsert);
@@ -75,9 +72,9 @@ public:
 
     void retranslateUi(QWidget *FileCategoryFilter)
     {
-        FileCategoryFilter->setWindowTitle(QApplication::translate("FileCategoryFilter", "Filter", Q_NULLPTR));
-        categorycheckBox->setText(QApplication::translate("FileCategoryFilter", "Show Items where category matches", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("FileCategoryFilter", "Apply", Q_NULLPTR));
+        FileCategoryFilter->setWindowTitle(QApplication::translate("FileCategoryFilter", "Filter", nullptr));
+        categorycheckBox->setText(QApplication::translate("FileCategoryFilter", "Show Items where category matches", nullptr));
+        pushButton->setText(QApplication::translate("FileCategoryFilter", "Apply", nullptr));
         categorycomboBox->setCurrentText(QString());
     } // retranslateUi
 

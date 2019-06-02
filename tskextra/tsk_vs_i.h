@@ -16,8 +16,8 @@
 #define _TSK_VS_I_H
 
 // Include the other internal TSK header files
-#include "tsk_base_i.h"
-#include "tsk_img_i.h"
+#include "tsk/base/tsk_base_i.h"
+#include "tsk/img/tsk_img_i.h"
 
 // include the external vs header file
 #include "tsk_vs.h"
@@ -41,4 +41,8 @@ extern void tsk_vs_part_free(TSK_VS_INFO *);
 
 #define tsk_vs_guessu32(vs, x, mag)   \
     tsk_guess_end_u32(&(vs->endian), (x), (mag))
+
+#define tsk_vs_guessu64(vs, x, mag)   \
+    tsk_guess_end_u64(&(vs->endian), (x), (mag))
+
 #endif

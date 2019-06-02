@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'jumpto.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,9 @@
 #define UI_JUMPTO_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -33,30 +30,30 @@ public:
     void setupUi(QFrame *JumpFilter)
     {
         if (JumpFilter->objectName().isEmpty())
-            JumpFilter->setObjectName(QStringLiteral("JumpFilter"));
+            JumpFilter->setObjectName(QString::fromUtf8("JumpFilter"));
         JumpFilter->setWindowModality(Qt::WindowModal);
         JumpFilter->resize(266, 47);
         JumpFilter->setAutoFillBackground(true);
         JumpFilter->setFrameShape(QFrame::StyledPanel);
         JumpFilter->setFrameShadow(QFrame::Raised);
         gridLayout = new QGridLayout(JumpFilter);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setSizeConstraint(QLayout::SetFixedSize);
         lineEdit = new QLineEdit(JumpFilter);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
         lineEdit->setMinimumSize(QSize(100, 0));
         lineEdit->setClearButtonEnabled(false);
 
         gridLayout->addWidget(lineEdit, 0, 1, 1, 1);
 
         label = new QLabel(JumpFilter);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
         label->setScaledContents(false);
 
         gridLayout->addWidget(label, 0, 0, 1, 1);
 
         pushButton = new QPushButton(JumpFilter);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -86,12 +83,12 @@ public:
 
     void retranslateUi(QFrame *JumpFilter)
     {
-        JumpFilter->setWindowTitle(QApplication::translate("JumpFilter", "Frame", Q_NULLPTR));
-        lineEdit->setPlaceholderText(QApplication::translate("JumpFilter", "Enter Hex Offset", Q_NULLPTR));
-        label->setText(QApplication::translate("JumpFilter", "Jump to:", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("JumpFilter", "Go", Q_NULLPTR));
+        JumpFilter->setWindowTitle(QApplication::translate("JumpFilter", "Frame", nullptr));
+        lineEdit->setPlaceholderText(QApplication::translate("JumpFilter", "Enter Hex Offset", nullptr));
+        label->setText(QApplication::translate("JumpFilter", "Jump to:", nullptr));
+        pushButton->setText(QApplication::translate("JumpFilter", "Go", nullptr));
 #ifndef QT_NO_SHORTCUT
-        pushButton->setShortcut(QApplication::translate("JumpFilter", "Return", Q_NULLPTR));
+        pushButton->setShortcut(QApplication::translate("JumpFilter", "Return", nullptr));
 #endif // QT_NO_SHORTCUT
     } // retranslateUi
 

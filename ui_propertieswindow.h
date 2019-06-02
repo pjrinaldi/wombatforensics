@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'propertieswindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,7 @@
 #define UI_PROPERTIESWINDOW_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
@@ -36,7 +34,7 @@ public:
     void setupUi(QDialog *PropertiesWindow)
     {
         if (PropertiesWindow->objectName().isEmpty())
-            PropertiesWindow->setObjectName(QStringLiteral("PropertiesWindow"));
+            PropertiesWindow->setObjectName(QString::fromUtf8("PropertiesWindow"));
         PropertiesWindow->setWindowModality(Qt::ApplicationModal);
         PropertiesWindow->resize(240, 310);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -49,10 +47,10 @@ public:
         PropertiesWindow->setModal(true);
         horizontalLayout = new QHBoxLayout(PropertiesWindow);
         horizontalLayout->setSpacing(0);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         splitter = new QSplitter(PropertiesWindow);
-        splitter->setObjectName(QStringLiteral("splitter"));
+        splitter->setObjectName(QString::fromUtf8("splitter"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(1);
         sizePolicy1.setVerticalStretch(1);
@@ -62,7 +60,7 @@ public:
         splitter->setOpaqueResize(false);
         splitter->setChildrenCollapsible(false);
         tableView = new QTableView(splitter);
-        tableView->setObjectName(QStringLiteral("tableView"));
+        tableView->setObjectName(QString::fromUtf8("tableView"));
         QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(2);
@@ -95,7 +93,7 @@ public:
         tableView->verticalHeader()->setDefaultSectionSize(14);
         tableView->verticalHeader()->setHighlightSections(false);
         groupBox = new QGroupBox(splitter);
-        groupBox->setObjectName(QStringLiteral("groupBox"));
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
         QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy3.setHorizontalStretch(1);
         sizePolicy3.setVerticalStretch(0);
@@ -110,10 +108,10 @@ public:
         groupBox->setCheckable(false);
         horizontalLayout_2 = new QHBoxLayout(groupBox);
         horizontalLayout_2->setSpacing(0);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         label = new QLabel(groupBox);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
         QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -143,9 +141,9 @@ public:
 
     void retranslateUi(QDialog *PropertiesWindow)
     {
-        PropertiesWindow->setWindowTitle(QApplication::translate("PropertiesWindow", "Properties", Q_NULLPTR));
-        groupBox->setTitle(QApplication::translate("PropertiesWindow", "Description", Q_NULLPTR));
-        label->setText(QApplication::translate("PropertiesWindow", "Information on the selected object and its value.", Q_NULLPTR));
+        PropertiesWindow->setWindowTitle(QApplication::translate("PropertiesWindow", "Properties", nullptr));
+        groupBox->setTitle(QApplication::translate("PropertiesWindow", "Description", nullptr));
+        label->setText(QApplication::translate("PropertiesWindow", "Information on the selected object and its value.", nullptr));
     } // retranslateUi
 
 };

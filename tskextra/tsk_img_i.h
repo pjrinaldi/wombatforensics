@@ -15,7 +15,7 @@
  */
 
 // include the base internal header file
-#include "tsk_base_i.h"
+#include "tsk/base/tsk_base_i.h"
 
 // include the external disk image header file
 #include "tsk_img.h"
@@ -39,9 +39,6 @@ extern void *tsk_img_malloc(size_t);
 extern void tsk_img_free(void *);
 extern TSK_TCHAR **tsk_img_findFiles(const TSK_TCHAR * a_startingName,
     int *a_numFound);
-
-extern const TSK_TCHAR **
-    tsk_img_get_names(TSK_IMG_INFO *a_img_info, int *a_num_imgs); 
 
 #ifdef __cplusplus
 }
