@@ -2996,6 +2996,7 @@ void yaffscache_objects_stats(YAFFSFS_INFO* yfs, unsigned int* objcnt, uint32_t*
         }
     }
 }
+
 uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, unsigned char follow_hard_link)
 {
     TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
@@ -3036,7 +3037,6 @@ uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, un
     }
 
     /* now look up the actual file/folder record */
-
     memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     memcpy((char *) key.parent_cnid, (char *) thread.parent_cnid,
@@ -3066,7 +3066,6 @@ uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, un
         memcpy((char *) &entry->cat, (char *) &record, sizeof(hfs_file));
     }
     /* other cases already caught by hfs_cat_read_file_folder_record */
-
     memcpy((char *) &entry->thread, (char *) &thread, sizeof(hfs_thread));
 
     entry->flags = TSK_FS_META_FLAG_ALLOC | TSK_FS_META_FLAG_USED;
@@ -3167,49 +3166,111 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
 
     return 0;
 }
-    static uint8_t hfs_cat_get_record_offset_cb(HFS_INFO* hfs, int8_t level_type, const void* targ_data, const hfs_btree_key_cat* cur_key, TSK_OFF_T key_off, void* ptr)
-    {
-        const hfs_btree_key_cat *targ_key = (hfs_btree_key_cat *) targ_data;
-        //if (tsk_verbose)
-        //    tsk_fprintf(stderr,
-        //        "hfs_cat_get_record_offset_cb: %s node want: %" PRIu32
-        //        " vs have: %" PRIu32 "\n",
-        //        (level_type == HFS_BT_NODE_TYPE_IDX) ? "Index" : "Leaf",
-        //        tsk_getu32(hfs->fs_info.endian, targ_key->parent_cnid),
-        //        tsk_getu32(hfs->fs_info.endian, cur_key->parent_cnid));
 
-        if (level_type == HFS_BT_NODE_TYPE_IDX) {
-            int diff = hfs_cat_compare_keys(hfs, cur_key, targ_key);
-            if (diff < 0)
-                return HFS_BTREE_CB_IDX_LT;
-            else
-                return HFS_BTREE_CB_IDX_EQGT;
-        }
-        else {
-            int diff = hfs_cat_compare_keys(hfs, cur_key, targ_key);
 
-            // see if this record is for our file or if we passed the interesting entries
-            if (diff < 0) {
-                return HFS_BTREE_CB_LEAF_GO;
-            }
-            else if (diff == 0) {
-                TSK_OFF_T *off = (TSK_OFF_T *) ptr;
-                *off =
-                    key_off + 2 + tsk_getu16(hfs->fs_info.endian,
-                    cur_key->key_len);
-            }
-            return HFS_BTREE_CB_LEAF_STOP;
-        }   
+// FUNCTION NEEDS TO BE CHECKED AND UPDATED WITH EACH NEW TSK RELEASE
+typedef struct {
+    const hfs_btree_key_cat *targ_key;
+    TSK_OFF_T off;
+} HFS_CAT_GET_RECORD_OFFSET_DATA;
+
+// FUNCTION NEEDS TO BE CHECKED AND UPDATED WITH EACH NEW TSK RELEASE
+static uint8_t hfs_cat_get_record_offset_cb(HFS_INFO* hfs, int8_t level_type, const hfs_btree_key_cat* cur_key, TSK_OFF_T key_off, void* ptr)
+{
+    HFS_CAT_GET_RECORD_OFFSET_DATA* offset_data = (HFS_CAT_GET_RECORD_OFFSET_DATA*)ptr;
+
+    const hfs_btree_key_cat *targ_key = offset_data->targ_key;
+    //if (tsk_verbose)
+    //    tsk_fprintf(stderr,
+    //        "hfs_cat_get_record_offset_cb: %s node want: %" PRIu32
+    //        " vs have: %" PRIu32 "\n",
+    //        (level_type == HFS_BT_NODE_TYPE_IDX) ? "Index" : "Leaf",
+    //        tsk_getu32(hfs->fs_info.endian, targ_key->parent_cnid),
+    //        tsk_getu32(hfs->fs_info.endian, cur_key->parent_cnid));
+
+    if (level_type == HFS_BT_NODE_TYPE_IDX) {
+        int diff = hfs_cat_compare_keys(hfs, cur_key, targ_key);
+        if (diff < 0)
+            return HFS_BTREE_CB_IDX_LT;
+        else
+            return HFS_BTREE_CB_IDX_EQGT;
     }
+    else {
+        int diff = hfs_cat_compare_keys(hfs, cur_key, targ_key);
+
+        // see if this record is for our file or if we passed the interesting entries
+        if (diff < 0) {
+            return HFS_BTREE_CB_LEAF_GO;
+        }
+        else if (diff == 0) {
+            //TSK_OFF_T *off = (TSK_OFF_T *) ptr;
+            //*off =
+            offset_data->off = key_off + 2 + tsk_getu16(hfs->fs_info.endian, cur_key->key_len);
+        }
+        return HFS_BTREE_CB_LEAF_STOP;
+    }   
+}
+
+/*
+ *tatic uint8_t
+hfs_cat_get_record_offset_cb(HFS_INFO * hfs, int8_t level_type,
+    const hfs_btree_key_cat * cur_key,
+    TSK_OFF_T key_off, void *ptr)
+{
+    HFS_CAT_GET_RECORD_OFFSET_DATA *offset_data = (HFS_CAT_GET_RECORD_OFFSET_DATA *)ptr;
+    const hfs_btree_key_cat *targ_key = offset_data->targ_key;
+
+    if (tsk_verbose)
+        tsk_fprintf(stderr,
+            "hfs_cat_get_record_offset_cb: %s node want: %" PRIu32
+            " vs have: %" PRIu32 "\n",
+            (level_type == HFS_BT_NODE_TYPE_IDX) ? "Index" : "Leaf",
+            tsk_getu32(hfs->fs_info.endian, targ_key->parent_cnid),
+            tsk_getu32(hfs->fs_info.endian, cur_key->parent_cnid));
+
+    if (level_type == HFS_BT_NODE_TYPE_IDX) {
+        int diff = hfs_cat_compare_keys(hfs, cur_key, targ_key);
+        if (diff < 0)
+            return HFS_BTREE_CB_IDX_LT;
+        else
+            return HFS_BTREE_CB_IDX_EQGT;
+    }
+    else {
+        int diff = hfs_cat_compare_keys(hfs, cur_key, targ_key);
+
+        // see if this record is for our file or if we passed the interesting entries
+        if (diff < 0) {
+            return HFS_BTREE_CB_LEAF_GO;
+        }
+        else if (diff == 0) {
+            offset_data->off =
+                key_off + 2 + tsk_getu16(hfs->fs_info.endian,
+                cur_key->key_len);
+        }
+        return HFS_BTREE_CB_LEAF_STOP;
+    }
+}
+ *
+ */ 
+
+
+
+
+    // FUNCTION NEEDS TO BE CHECKED AND UPDATED WITH EACH NEW TSK RELEASE
     TSK_OFF_T hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle)
     {
-        TSK_OFF_T off = 0;
-        if(hfs_cat_traverse(hfs, needle, hfs_cat_get_record_offset_cb, &off))
+        HFS_CAT_GET_RECORD_OFFSET_DATA off;
+        off.off = 0;
+        off.targ_key = needle;
+        //TSK_OFF_T off = 0;
+        if(hfs_cat_traverse(hfs, hfs_cat_get_record_offset_cb, &off))
         {
             return 0;
         }
-        return off;
+        return off.off;
     }
+
+
     uint8_t hfs_cat_read_thread_record(HFS_INFO* hfs, TSK_OFF_T off, hfs_thread* thread)
     {
         TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
@@ -3323,7 +3384,8 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
         return hfs_unicode_compare(hfs, &key1->name, &key2->name);
 
     }
-    uint8_t hfs_cat_traverse(HFS_INFO* hfs, const void* targ_data, TSK_HFS_BTREE_CB a_cb, void* ptr)
+// FUNCTION NEEDS TO BE CHECKED WITH EACH NEW TSK RELEASE
+    uint8_t hfs_cat_traverse(HFS_INFO* hfs, TSK_HFS_BTREE_CB a_cb, void* ptr)
     {
         TSK_FS_INFO *fs = &(hfs->fs_info);
         uint32_t cur_node;          /* node id of the current node */
@@ -3377,7 +3439,7 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
             }
 
             // read the current node
-            cur_off = cur_node * nodesize;
+            cur_off = (TSK_OFF_T)cur_node * nodesize;
             cnt = tsk_fs_attr_read(hfs->catalog_attr, cur_off, node, nodesize, (TSK_FS_FILE_READ_FLAG_ENUM)0);
             if (cnt != nodesize) {
                 if (cnt >= 0) {
@@ -3392,6 +3454,13 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
             }
 
             // process the header / descriptor
+            if (nodesize < sizeof(hfs_btree_node)) {
+                //tsk_error_set_errno(TSK_ERR_FS_GENFS);
+                //tsk_error_set_errstr
+                //("hfs_cat_traverse: Node size %d is too small to be valid", nodesize);
+                free(node);
+                return 1;
+            }
             node_desc = (hfs_btree_node *) node;
             num_rec = tsk_getu16(fs->endian, node_desc->num_rec);
 
@@ -3414,10 +3483,11 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
                 uint32_t next_node = 0;
                 int rec;
 
-                for (rec = 0; rec < num_rec; rec++) {
+                for (rec = 0; rec < num_rec; ++rec) {
                     size_t rec_off;
                     hfs_btree_key_cat *key;
                     uint8_t retval;
+                    int keylen;
     
                     // get the record offset in the node
                     rec_off =
@@ -3434,6 +3504,12 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
                     }
                     key = (hfs_btree_key_cat *) & node[rec_off];
 
+                    keylen = 2 + tsk_getu16(hfs->fs_info.endian, key->key_len);
+                    if((keylen) >= nodesize - rec_off)
+                    {
+                        free(node);
+                        return 1;
+                    }
                     /*
                        if (tsk_verbose)
                        tsk_fprintf(stderr,
@@ -3444,8 +3520,21 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
                      */
 
                     /* save the info from this record unless it is too big */
+                    /*
+                    retval = a_cb(hfs, HFS_BT_NODE_TYPE_LEAF, key, cur_off + rec_off, ptr);
+                    if(retval == HFS_BTREE_CB_LEAF_STOP)
+                    {
+                        is_done = 1;
+                        break;
+                    }
+                    else if(retval == HFS_BTREE_CB_ERR)
+                    {
+                        free(node);
+                        return 1;
+                    }
+                    */
                     retval =
-                        a_cb(hfs, HFS_BT_NODE_TYPE_IDX, targ_data, key,
+                        a_cb(hfs, HFS_BT_NODE_TYPE_IDX, key,
                         cur_off + rec_off, ptr);
                     if (retval == HFS_BTREE_CB_ERR) {
          //               tsk_error_set_errno(TSK_ERR_FS_GENFS);
@@ -3496,10 +3585,11 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
             else if (node_desc->type == HFS_BT_NODE_TYPE_LEAF) {
                 int rec;
 
-            for (rec = 0; rec < num_rec; rec++) {
+            for (rec = 0; rec < num_rec; ++rec) {
                 size_t rec_off;
                 hfs_btree_key_cat *key;
                 uint8_t retval;
+                int keylen;
 
                 // get the record offset in the node
                 rec_off =
@@ -3515,7 +3605,12 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
                     return 1;
                 }
                 key = (hfs_btree_key_cat *) & node[rec_off];
-
+                keylen = 2 + tsk_getu16(hfs->fs_info.endian, key->key_len);
+                if((keylen) > nodesize)
+                {
+                    free(node);
+                    return 1;
+                }
                 /*
                    if (tsk_verbose)
                    tsk_fprintf(stderr,
@@ -3525,9 +3620,8 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
                    tsk_getu32(fs->endian, key->parent_cnid));
                  */
                 //                rec_cnid = tsk_getu32(fs->endian, key->file_id);
-
                 retval =
-                    a_cb(hfs, HFS_BT_NODE_TYPE_LEAF, targ_data, key,
+                    a_cb(hfs, HFS_BT_NODE_TYPE_LEAF, key,
                     cur_off + rec_off, ptr);
                 if (retval == HFS_BTREE_CB_LEAF_STOP) {
                     is_done = 1;
@@ -3966,6 +4060,7 @@ uint16_t gLowerCaseTable[] = {
     0xFFF8, 0xFFF9, 0xFFFA, 0xFFFB, 0xFFFC, 0xFFFD, 0xFFFE, 0xFFFF,
 };
 
+// FUNCTION NEEDS TO BE CHECKED WITH EACH NEW TSK RELEASE
 static int hfs_unicode_compare_int(uint16_t endian, const hfs_uni_str * uni1, const hfs_uni_str * uni2)
 {
     uint16_t c1, c2;
@@ -4012,6 +4107,7 @@ static int hfs_unicode_compare_int(uint16_t endian, const hfs_uni_str * uni1, co
         return 1;
 }
 
+// FUNCTION NEEDS TO BE CHECKED WITH EACH NEW TSK RELEASE
 int hfs_unicode_compare(HFS_INFO * hfs, const hfs_uni_str * uni1, const hfs_uni_str * uni2)
 {
     if (hfs->is_case_sensitive) {
@@ -4048,6 +4144,7 @@ int hfs_unicode_compare(HFS_INFO * hfs, const hfs_uni_str * uni1, const hfs_uni_
         return hfs_unicode_compare_int(hfs->fs_info.endian, uni1, uni2);
 }
 
+// FUNCTION NEEDS TO BE CHECKED WITH EACH NEW TSK RELEASE
 static TSK_INUM_T
 hfs_lookup_hard_link(HFS_INFO * hfs, TSK_INUM_T linknum,
     unsigned char is_directory)
@@ -4111,6 +4208,7 @@ hfs_lookup_hard_link(HFS_INFO * hfs, TSK_INUM_T linknum,
     return 0;
 }
 
+// FUNCTION NEEDS TO BE CHECKED WITH EACH NEW TSK RELEASE
 TSK_INUM_T hfs_follow_hard_link(HFS_INFO * hfs, hfs_file * cat, unsigned char *is_error)
 {
 
@@ -4279,6 +4377,7 @@ TSK_INUM_T hfs_follow_hard_link(HFS_INFO * hfs, hfs_file * cat, unsigned char *i
     return cnid;
 }
 
+// FUNCTION NEEDS TO BE CHECKED WITH EACH NEW TSK RELEASE
 uint32_t hfs_convert_2_unix_time(uint32_t hfsdate)
 {
     if(hfsdate < NSEC_BTWN_1904_1970)
