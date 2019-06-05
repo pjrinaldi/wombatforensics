@@ -106,10 +106,10 @@
 #include <tsk_yaffs.h>
 
 // THESE NEED TO BE MANUALLY UPDATED AND COPIED TO /USR/INCLUDE/TSK/../ PERIODICALLY AS NEW TSK RELEASES ARE MADE. CURRENTLY AT 4.6.6
-#include <tskvariable.h>
 #include <tsk_base_i.h>
 #include <tsk_fs_i.h>
 #include <tsk_img_i.h>
 #include <tsk_vs_i.h>
+#include <tskvariable.h>
 
 #endif // WOMBATINCLUDE_H
