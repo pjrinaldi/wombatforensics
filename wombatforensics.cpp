@@ -521,6 +521,7 @@ void WombatForensics::InitializeCaseStructure()
         QStringList tmplist = wombatvariable.casename.split("/");
         tmplist.removeLast();
         wombatvariable.casepath = tmplist.join("/");
+        /*
         // SPARSE FILE METHOD
         if(!wombatvariable.casename.contains(".wfc"))
         {
@@ -546,12 +547,16 @@ void WombatForensics::InitializeCaseStructure()
         QProcess::execute(lnkmnt);
         QProcess::execute("mount /tmp/wombatforensics/mntpt");
         // END SPARSE FILE METHOD
-        
+        */
         // BEGIN TAR METHOD
         // make case directory..
-        casedir.mkpath(QDir::homePath() + wombatvariable.casename.split("/").last());
-        qDebug() << "tar method:" << casedir.path();
+        // THIS ALMOST WORKS, BUT HAS ISSUES WITH WHERE IT DROPS IT...
+        QString casedirectory = QDir::homePath() + "/" + wombatvariable.casename.split("/").last().split(".").first();
+        casedir.mkpath(QDir::homePath() + casedirectory);
+        //casedir(QDir::homePath() + wombatvariable.casename.split("/").last());
+        qDebug() << "tar method:" << casedirectory;
         wombatvariable.iscaseopen = true;
+        /*
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         msglog->clear();
@@ -560,6 +565,7 @@ void WombatForensics::InitializeCaseStructure()
         //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
+        */
         ui->actionAdd_Evidence->setEnabled(true);
         qInfo() << "Case Was Created";
         //LogMessage("Case was Created");
@@ -1489,7 +1495,7 @@ void WombatForensics::CloseCurrentCase()
         }
         */
     }
-
+/*
     // BEGIN SPARSE FILE METHOD
     QString unmntstr = "umount " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);
@@ -1500,11 +1506,13 @@ void WombatForensics::CloseCurrentCase()
     if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
         QFile::remove("/tmp/wombatforensics/currentwfc");
     // END SPARSE FILE METHOD
+*/
     // BEGIN TAR METHOD
+    // THIS WORKS...
     TAR* casehandle;
-    const char* casename = QString(QDir::homePath() + wombatvariable.casename.split("/").last() + ".wfctar").toStdString().c_str();
-    tar_open(&casehandle, casename, NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
-    tar_append_file(casehandle, QString(QDir::homePath() + wombatvariable.casename.split("/").last() + "/").toStdString().c_str(), QString(QDir::homePath() + wombatvariable.casename.split("/").last() + "/").toStdString().c_str());
+    //char* casename = "tar.wfc";
+    tar_open(&casehandle, "tar.wfc", NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
+    tar_append_file(casehandle, "/home/pasquale/.local/share/recently-used.xbel", "/home/pasquale/.local/share/recently-used.xbel");
     tar_close(casehandle);
     // END TAR METHOD
     StatusUpdate("Current Case was closed successfully");
