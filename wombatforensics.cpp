@@ -578,7 +578,6 @@ void WombatForensics::InitializeCaseStructure()
         //casedir(QDir::homePath() + wombatvariable.casename.split("/").last());
         //qDebug() << "tar method:" << casedirectory;
         wombatvariable.iscaseopen = true;
-        /*
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         msglog->clear();
@@ -587,7 +586,6 @@ void WombatForensics::InitializeCaseStructure()
         //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
-        */
         ui->actionAdd_Evidence->setEnabled(true);
         qInfo() << "Case Was Created";
         //LogMessage("Case was Created");
@@ -1532,10 +1530,17 @@ void WombatForensics::CloseCurrentCase()
     // BEGIN TAR METHOD
     // THIS WORKS...
     TAR* casehandle;
+    QString tmptar = QDir::homePath() + "/" + wombatvariable.casename + ".wfc";
+    QByteArray tmparray = tmptar.toLocal8Bit();
+    QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
+    //QByteArray tmparray = wombatvariable.casename.toLocal8Bit();
     //char* casename = "tar.wfc";
-    tar_open(&casehandle, "tar.wfc", NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
-    tar_append_file(casehandle, "/home/pasquale/.local/share/recently-used.xbel", "/home/pasquale/.local/share/recently-used.xbel");
+    tar_open(&casehandle, tmparray.data(), NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
+    tar_append_tree(casehandle, tmparray2.data(), tmparray2.data());
     tar_close(casehandle);
+    // remove existing case directory
+    QDir cdir = QDir(wombatvariable.tmpmntpath);
+    cdir.removeRecursively();
     // END TAR METHOD
     StatusUpdate("Current Case was closed successfully");
     RemoveTmpFiles();
