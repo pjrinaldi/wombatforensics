@@ -609,6 +609,8 @@ void WombatForensics::InitializeOpenCase()
     {
         StatusUpdate("Case Opening...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last().split(".").first());
+        /*
         QStringList tmplist = wombatvariable.casename.split("/");
         tmplist.removeLast();
         wombatvariable.casepath = tmplist.join("/");
@@ -621,12 +623,25 @@ void WombatForensics::InitializeOpenCase()
         {
             this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last().split(".").first());
         }
+        */
+        /* SPARSE METHOD
         QFile casefile(wombatvariable.casename);
         QString lnkstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
         QProcess::execute(lnkstr);
         QString lnkmnt = "ln -s " + wombatvariable.tmpmntpath + " /tmp/wombatforensics/mntpt";
         QProcess::execute(lnkmnt);
         QProcess::execute("mount /tmp/wombatforensics/mntpt");
+        */
+        // TAR METHOD
+        QByteArray tmparray = wombatvariable.casename.toLocal8Bit();
+        qDebug() << "tmparray:" << tmparray.data();
+        QByteArray tmparray2 = QString("./" + wombatvariable.casename.split("/").last().split(".wfc").first()).toLocal8Bit();
+        qDebug() << "tmparray2:" << tmparray2.data();
+        TAR* tarhandle;
+        tar_open(&tarhandle, tmparray.data(), NULL, O_RDONLY, 0644, TAR_GNU);
+        tar_extract_all(tarhandle, tmparray2.data());
+        tar_close(tarhandle);
+        wombatvariable.tmpmntpath += wombatvariable.casename + "/";
         OpenCaseMountFinished(0, QProcess::NormalExit);
     }
 }
