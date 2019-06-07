@@ -525,15 +525,21 @@ void WombatForensics::InitializeCaseStructure()
     casedialog->setLabelText("Enter Case Name");
     casedialog->setOkButtonText("Create Case");
     casedialog->setTextEchoMode(QLineEdit::Normal);
+    casedialog->setWindowTitle("New Case");
     if(casedialog->exec())
         wombatvariable.casename = casedialog->textValue();
     qDebug() << "case name:" << wombatvariable.casename;
     if(!wombatvariable.casename.isEmpty())
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        QStringList tmplist = wombatvariable.casename.split("/");
-        tmplist.removeLast();
-        wombatvariable.casepath = tmplist.join("/");
+        this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
+        qDebug() << "tmpmntpath before:" << wombatvariable.tmpmntpath;
+        wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename + "/";
+        (new QDir())->mkpath(wombatvariable.tmpmntpath);
+        qDebug() << "tmpmntpath after:" << wombatvariable.tmpmntpath;
+        //QStringList tmplist = wombatvariable.casename.split("/");
+        //tmplist.removeLast();
+        //wombatvariable.casepath = tmplist.join("/");
         /*
         // SPARSE FILE METHOD
         if(!wombatvariable.casename.contains(".wfc"))
