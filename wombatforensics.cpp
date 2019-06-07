@@ -1533,10 +1533,9 @@ void WombatForensics::CloseCurrentCase()
     QString tmptar = QDir::homePath() + "/" + wombatvariable.casename + ".wfc";
     QByteArray tmparray = tmptar.toLocal8Bit();
     QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
-    //QByteArray tmparray = wombatvariable.casename.toLocal8Bit();
-    //char* casename = "tar.wfc";
+    QByteArray tmparray3 = QString("./" + wombatvariable.casename).toLocal8Bit();
     tar_open(&casehandle, tmparray.data(), NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
-    tar_append_tree(casehandle, tmparray2.data(), tmparray2.data());
+    tar_append_tree(casehandle, tmparray2.data(), tmparray3.data());
     tar_close(casehandle);
     // remove existing case directory
     QDir cdir = QDir(wombatvariable.tmpmntpath);
