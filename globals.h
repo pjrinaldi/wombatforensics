@@ -12,6 +12,7 @@ extern QFile logfile;
 extern QFile viewerfile;
 extern QFile settingsfile;
 extern QFile treefile;
+extern QDir casedir;
 extern QDir thumbdir;
 extern QDir currentrawimagedir;
 extern QTextEdit* msglog;

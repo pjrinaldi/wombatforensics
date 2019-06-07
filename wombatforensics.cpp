@@ -521,6 +521,7 @@ void WombatForensics::InitializeCaseStructure()
         QStringList tmplist = wombatvariable.casename.split("/");
         tmplist.removeLast();
         wombatvariable.casepath = tmplist.join("/");
+        // SPARSE FILE METHOD
         if(!wombatvariable.casename.contains(".wfc"))
         {
             this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last());
@@ -544,7 +545,12 @@ void WombatForensics::InitializeCaseStructure()
         QString lnkmnt = "ln -s " + wombatvariable.tmpmntpath + " /tmp/wombatforensics/mntpt";
         QProcess::execute(lnkmnt);
         QProcess::execute("mount /tmp/wombatforensics/mntpt");
-
+        // END SPARSE FILE METHOD
+        
+        // BEGIN TAR METHOD
+        // make case directory..
+        casedir.mkpath(QDir::homePath() + wombatvariable.casename.split("/").last());
+        qDebug() << "tar method:" << casedir.path();
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
@@ -1484,6 +1490,7 @@ void WombatForensics::CloseCurrentCase()
         */
     }
 
+    // BEGIN SPARSE FILE METHOD
     QString unmntstr = "umount " + wombatvariable.tmpmntpath;
     QProcess::execute(unmntstr);
 
@@ -1492,7 +1499,14 @@ void WombatForensics::CloseCurrentCase()
         QFile::remove("/tmp/wombatforensics/mntpt");
     if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
         QFile::remove("/tmp/wombatforensics/currentwfc");
-
+    // END SPARSE FILE METHOD
+    // BEGIN TAR METHOD
+    TAR* casehandle;
+    const char* casename = QString(QDir::homePath() + wombatvariable.casename.split("/").last() + ".wfctar").toStdString().c_str();
+    tar_open(&casehandle, casename, NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
+    tar_append_file(casehandle, QString(QDir::homePath() + wombatvariable.casename.split("/").last() + "/").toStdString().c_str(), QString(QDir::homePath() + wombatvariable.casename.split("/").last() + "/").toStdString().c_str());
+    tar_close(casehandle);
+    // END TAR METHOD
     StatusUpdate("Current Case was closed successfully");
     RemoveTmpFiles();
     wombatvariable.iscaseopen = false;

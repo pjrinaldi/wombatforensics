@@ -8,6 +8,7 @@ QFile logfile;
 QFile viewerfile;
 QFile settingsfile;
 QFile treefile;
+QDir casedir;
 QDir thumbdir;
 QDir currentrawimagedir;
 QTextEdit* msglog = NULL;

@@ -88,6 +88,9 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <tar.h>
+#include <libtar.h>
+
 //#include <tsk/libtsk.h>
 #include <libtsk.h>
 #include <libewf.h>
