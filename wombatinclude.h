@@ -27,6 +27,7 @@
 #include <QGridLayout>
 #include <QImage>
 #include <QInputDialog>
+#include <QLineEdit>
 #include <QIODevice>
 #include <QJsonDocument>
 #include <QJsonObject>

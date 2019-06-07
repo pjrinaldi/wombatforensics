@@ -509,12 +509,25 @@ void WombatForensics::InitializeCaseStructure()
 {
     StatusUpdate("Generating Case Structure...");
     // create new case here
+    /*
     QFileDialog newcasedialog(this, tr("Create New Case"), QDir::homePath(), tr("Wombat Forensics Case (*.wfc)"));
     newcasedialog.setLabelText(QFileDialog::Accept, "Create");
     newcasedialog.setOption(QFileDialog::DontUseNativeDialog, true);
     if(newcasedialog.exec())
         wombatvariable.casename = newcasedialog.selectedFiles().first();
     //wombatvariable.casename = QFileDialog::getSaveFileName(this, tr("Create New Case File"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
+    */
+    //bool ok;
+    //QString wombatvariable.casename = QInputDialog::getText(this, tr("Create New Case"), tr("Case Name"), QLineEdit::Normal, "My Case", &ok);
+    QInputDialog* casedialog = new QInputDialog(this);
+    casedialog->setCancelButtonText("Cancel");
+    casedialog->setInputMode(QInputDialog::TextInput);
+    casedialog->setLabelText("Enter Case Name");
+    casedialog->setOkButtonText("Create Case");
+    casedialog->setTextEchoMode(QLineEdit::Normal);
+    if(casedialog->exec())
+        wombatvariable.casename = casedialog->textValue();
+    qDebug() << "case name:" << wombatvariable.casename;
     if(!wombatvariable.casename.isEmpty())
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -551,10 +564,13 @@ void WombatForensics::InitializeCaseStructure()
         // BEGIN TAR METHOD
         // make case directory..
         // THIS ALMOST WORKS, BUT HAS ISSUES WITH WHERE IT DROPS IT...
-        QString casedirectory = QDir::homePath() + "/" + wombatvariable.casename.split("/").last().split(".").first();
-        casedir.mkpath(QDir::homePath() + casedirectory);
+
+        //(new QDir())->mkpath(tmppath);
+
+        //QString casedirectory = QDir::homePath() + "/" + wombatvariable.casename.split("/").last().split(".").first();
+        //casedir.mkpath(QDir::homePath() + casedirectory);
         //casedir(QDir::homePath() + wombatvariable.casename.split("/").last());
-        qDebug() << "tar method:" << casedirectory;
+        //qDebug() << "tar method:" << casedirectory;
         wombatvariable.iscaseopen = true;
         /*
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
