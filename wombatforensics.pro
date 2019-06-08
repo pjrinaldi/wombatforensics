@@ -1,12 +1,6 @@
 QT += widgets core concurrent sql multimedia multimediawidgets webenginewidgets gui
 QT -= opengl quick network qml
-mac:CONFIG += debug app_bundle
 linux:CONFIG += debug qt #c++11
-mac:TEMPLATE = app
-#INCLUDEPATH += ../sleuthkit/
-#INCLUDEPATH += ../sleuthkit/tsk/
-#INCLUDEPATH += ../libewf_64bit/include/
-#INCLUDEPATH += ./common/
 INCLUDEPATH += /usr/include/tsk/
 INCLUDEPATH += /usr/include/tsk/auto/
 INCLUDEPATH += /usr/include/tsk/base/
@@ -14,10 +8,6 @@ INCLUDEPATH += /usr/include/tsk/fs/
 INCLUDEPATH += /usr/include/tsk/hashdb/
 INCLUDEPATH += /usr/include/tsk/img/
 INCLUDEPATH += /usr/include/tsk/vs/
-INCLUDEPATH += ../outsideinwebview/common/
-#VPATH += ../sleuthkit/
-#VPATH += ../sleuthkit/tsk/
-#VPATH += ../libewf_64bit/include/
 VPATH += /usr/include/tsk/
 VPATH += /usr/include/tsk/auto/
 VPATH += /usr/include/tsk/base/
@@ -31,13 +21,9 @@ HEADERS = wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h ts
 SOURCES = main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp digstatus.cpp remevidencedialog.cpp tskcpp.cpp
 RESOURCES += wombatforensics.qrc
 DESTDIR = ./
-mac:LIBS = -lsqlite3 -L/opt/local/lib -lewf -L/opt/local/lib -ltsk 
-linux:LIBS = -lewf -ltsk -ltar -L/home/pasquale/Projects/outsideinwebview/lib -lsc_ex -lsc_da -lsc_ch -lsc_fa -lsc_fi -lsc_ut -lwv_core -lsc_fut -lsc_lo -lsc_fnt
+linux:LIBS = -lewf -ltsk -ltar
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
-win32:LIBS = $$member(LIBS, 0) $$member(LIBS, 1)d
 }
-#win32:RC_ICONS = wombat_32.ico
-#mac:ICON = myapp.ico
 #linux:
 
 #install
