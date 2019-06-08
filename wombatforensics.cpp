@@ -635,13 +635,14 @@ void WombatForensics::InitializeOpenCase()
         // TAR METHOD
         QByteArray tmparray = wombatvariable.casename.toLocal8Bit();
         qDebug() << "tmparray:" << tmparray.data();
-        QByteArray tmparray2 = QString("./" + wombatvariable.casename.split("/").last().split(".wfc").first()).toLocal8Bit();
+        QByteArray tmparray2 = QString(wombatvariable.tmpmntpath).toLocal8Bit();
         qDebug() << "tmparray2:" << tmparray2.data();
         TAR* tarhandle;
         tar_open(&tarhandle, tmparray.data(), NULL, O_RDONLY, 0644, TAR_GNU);
         tar_extract_all(tarhandle, tmparray2.data());
         tar_close(tarhandle);
         wombatvariable.tmpmntpath += wombatvariable.casename + "/";
+        QFile::remove(wombatvariable.casename);
         OpenCaseMountFinished(0, QProcess::NormalExit);
     }
 }
@@ -675,10 +676,18 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
         openwatcher.setFuture(tmpfuture);
     }
+    else
+    {
+        QApplication::restoreOverrideCursor();
+        qInfo() << "Case was Opened Successfully";
+        StatusUpdate("Ready");
+        ui->actionView_Image_Gallery->setEnabled(false);
+    }
 }
 
 void WombatForensics::OpenUpdate()
 {
+    // Need to account
     QString hashstr = "MD5 Hash";
     // update Hash header: 32 = md5, 40 = sha1, 64 = sha256
     if(hashsum == 2)
