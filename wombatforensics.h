@@ -27,25 +27,6 @@
 #include "digstatus.h"
 #include "remevidencedialog.h"
 
-#define UNIX
-#define UNIX_64
-#include "sccex.h"
-#ifdef UNIX
-#define PATH_TYPE   IOTYPE_UNIXPATH
-#define STRLEN      strlen
-#endif
-
-#ifndef UNUSED
-#define UNUSED(x) ((x) = (x))
-#endif
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-#ifndef FALSE
-#define FALSE 0
-#endif
-
 class StatusLabel : public QLabel
 {
     Q_OBJECT
@@ -207,7 +188,6 @@ private:
     Ui::WombatForensics *ui;
 
     void SetupHexPage(void);
-    void CheckWombatConfiguration(void);
     void InitializeAppStructure(void);
     void InitializeCaseStructure(void);
     void InitializeOpenCase(void);
@@ -269,21 +249,6 @@ private:
     QTimer* autosavetimer;
     TreeNode* actionitem;
     QWidget* cancelwidget;
-
-    // outside in variables
-    SCCERR oiiniterr;
-    SCCERR oiopndocerr;
-    SCCERR oiopnexperr;
-    SCCERR oirunexperr;
-    SCCERR oiclsexperr;
-    SCCERR oiclsdocerr;
-    VTHDOC oidoc;
-    VTHEXPORT oiexport;
 };
-
-SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCommandID, VTLPVOID pCommandData);
-void SetOptionDWORD(VTHDOC target, VTDWORD optionId, VTDWORD val);
-void SetOptionBOOL(VTHDOC target, VTDWORD optionId, VTBOOL val);
-void SetOptionString(VTHDOC target, VTDWORD optionId, const char* val);
 
 #endif // WOMBATFORENSICS_H

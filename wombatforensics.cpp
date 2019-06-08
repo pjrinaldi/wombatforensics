@@ -81,14 +81,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     qRegisterMetaType<QVector<int> >();
-    oiiniterr = DAInitEx(DATHREAD_INIT_PTHREADS, OI_INIT_NOLOADOPTIONS|OI_INIT_NOSAVEOPTIONS); // Initialize Data Access at Application Start
-    SetOptionDWORD((VTHDOC)NULL, SCCOPT_FIFLAGS, SCCUT_FI_NORMAL);
-    SetOptionBOOL((VTHDOC)NULL, SCCOPT_EX_UNICODECALLBACKSTR, FALSE);
-    SetOptionDWORD((VTHDOC)NULL, SCCOPT_FONT_REFERENCE_METHOD, SCCFONTS_REFERENCE_EXPORTED);
-
-    // THIS ONE IS NOT NEEDED AS THE OUTPUT FILES DEFAULT TO THE MAIN HTML OUTPUT PATH.
-    //SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_OUTPUT, QString("/home/pasquale/.wombatforensics/oiwv/").toStdString().c_str());
-    SetOptionString((VTHDOC)NULL, SCCOPT_URLPATH_RESOURCES, QString("/home/pasquale/.wombatforensics/oiwv/assets/").toStdString().c_str());
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
@@ -98,7 +90,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
-    CheckWombatConfiguration();
     InitializeAppStructure();
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&openwatcher, SIGNAL(finished()), this, SLOT(OpenUpdate()), Qt::QueuedConnection);
@@ -307,51 +298,8 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else
     {
-        // TRY OUTSIDE IN VIEWER EXPORT HERE.. if it fails, popup right menu...
-        // STARTING ON STEP 2
-        qDebug() << "Starting Document Export Conversion.";
-        qDebug() << "hexstring:" << hexstring;
-        oiopndocerr = DAOpenDocument(&oidoc, PATH_TYPE, (VTLPVOID)(hexstring.toStdString().c_str()), 0);
-        qDebug() << "open document error:" << oiopndocerr;
-        // IT WORKS IF I DON'T SET THE FULL PATH, JUST HTE FILE NAME AND THEN IT PLACES ITSELF IN THE EXE WORKING DIR.
-        // THIS IS A PROBLEM. I CAN SET THE ASSET DIRECTORY CORRECTLY, AS WELL AS THE SCRIPT LOCATIONS PROPERLY, JUST NEED TO BE
-        // ABLE TO FIGURE OUT HOW TO SET THE FILE NAME WITH PATH CORRECTLY
-        //std::string oiout = "/home/pasquale/.wombatforensics/oiwv/oiex.html";
-        std::string oiout = hexstring.toStdString() + ".html";
-        fprintf(stdout, "std::string export file path: %s\n", oiout.c_str());
-        oiopnexperr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, ((VTLPVOID)(oiout.c_str())), 0, 0, NULL, 0, &oiexport);
-        //oierr = EXOpenExport(oidoc, FI_HTML5, PATH_TYPE, ((VTLPVOID)(oiout.c_str())), 0, 0, (EXCALLBACKPROC)ExportCallback, 0, &oiexport); // THIS ONE WORKS
-        VTCHAR szError[256];
-        //qDebug() << "export path:" << QDir::homePath() + "/oiex.html";
-        DAGetErrorString(oiopnexperr, szError, sizeof(szError));
-        fprintf(stderr, "open export error: %s\n", szError);
-        //qDebug() << "open export error:" << DAGetErrorString(oierr, szError, sizeof(szError));
-        oirunexperr = EXRunExport(oiexport);
-        DAGetErrorString(oirunexperr, szError, sizeof(szError));
-        fprintf(stderr, "run export error: %s\n", szError);
-        //qDebug() << "run export error:" << oierr;
-        oiclsexperr = EXCloseExport(oiexport);
-        DAGetErrorString(oiclsexperr, szError, sizeof(szError));
-        fprintf(stderr, "close export error: %s\n", szError);
-        //qDebug() << "close export error;" << oierr;
-        oiclsdocerr = DACloseDocument(oidoc);
-        DAGetErrorString(oiclsdocerr, szError, sizeof(szError));
-        fprintf(stderr, "close document error: %s\n", szError);
-        qDebug() << "close document error:" << oiclsdocerr;
-        qDebug() << "Finished Document Export Conversion.";
-        if(oiopnexperr == 0 && oiopndocerr == 0 && oirunexperr == 0 && oiclsexperr == 0 && oiclsdocerr == 0)
-        {
-            htmlviewer = new HtmlViewer();
-            htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-            htmlviewer->setWindowIcon(QIcon(":/outsidein"));
-            htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " OutsideIn Viewer");
-            htmlviewer->LoadHtml(QString::fromStdString(oiout));
-        }
-        else
-        {
-            if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
-                treemenu->exec(QCursor::pos());
-        }
+        if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
+            treemenu->exec(QCursor::pos());
     }
     QApplication::restoreOverrideCursor();
 }
@@ -414,35 +362,6 @@ void WombatForensics::HideMessageViewer(bool checkstate)
 void WombatForensics::HideByteViewer(bool checkstate)
 {
     ui->actionByteConverter->setChecked(checkstate);
-}
-
-void WombatForensics::CheckWombatConfiguration()
-{
-    // check fstab entry
-    int fstabbool = 0;
-    QFile fstabfile("/etc/fstab");
-    if(fstabfile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream fstabin(&fstabfile);
-        while(!fstabin.atEnd())
-        {
-            QString line = fstabin.readLine();
-            if(line.compare("/tmp/wombatforensics/currentwfc /tmp/wombatforensics/mntpt auto defaults,rw,users,noauto 0 0", Qt::CaseSensitive) == 0)
-                fstabbool = 1;
-        }
-        fstabfile.close();
-        // SHOULD PROBABLY SWITCH THIS TO A DIALOG ALERT...
-        if(fstabbool == 1)
-            qDebug() << "fstab is correct";
-        else
-            qDebug() << "fstab is wrong";
-    }
-    // check if mntpt link exists, if it does, remove it
-    if(QFileInfo::exists("/tmp/wombatforensics/mntpt"))
-        QFile::remove("/tmp/wombatforensics/mntpt");
-    // check if case link exists, if it does, remove it
-    if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
-        QFile::remove("/tmp/wombatforensics/currentwfc");
 }
 
 void WombatForensics::InitializeAppStructure()
@@ -509,16 +428,6 @@ void WombatForensics::InitializeCaseStructure()
 {
     StatusUpdate("Generating Case Structure...");
     // create new case here
-    /*
-    QFileDialog newcasedialog(this, tr("Create New Case"), QDir::homePath(), tr("Wombat Forensics Case (*.wfc)"));
-    newcasedialog.setLabelText(QFileDialog::Accept, "Create");
-    newcasedialog.setOption(QFileDialog::DontUseNativeDialog, true);
-    if(newcasedialog.exec())
-        wombatvariable.casename = newcasedialog.selectedFiles().first();
-    //wombatvariable.casename = QFileDialog::getSaveFileName(this, tr("Create New Case File"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
-    */
-    //bool ok;
-    //QString wombatvariable.casename = QInputDialog::getText(this, tr("Create New Case"), tr("Case Name"), QLineEdit::Normal, "My Case", &ok);
     QInputDialog* casedialog = new QInputDialog(this);
     casedialog->setCancelButtonText("Cancel");
     casedialog->setInputMode(QInputDialog::TextInput);
@@ -528,55 +437,14 @@ void WombatForensics::InitializeCaseStructure()
     casedialog->setWindowTitle("New Case");
     if(casedialog->exec())
         wombatvariable.casename = casedialog->textValue();
-    qDebug() << "case name:" << wombatvariable.casename;
+    //qDebug() << "case name:" << wombatvariable.casename;
     if(!wombatvariable.casename.isEmpty())
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
-        qDebug() << "tmpmntpath before:" << wombatvariable.tmpmntpath;
+        //qDebug() << "tmpmntpath before:" << wombatvariable.tmpmntpath;
         wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename + "/";
         (new QDir())->mkpath(wombatvariable.tmpmntpath);
-        qDebug() << "tmpmntpath after:" << wombatvariable.tmpmntpath;
-        //QStringList tmplist = wombatvariable.casename.split("/");
-        //tmplist.removeLast();
-        //wombatvariable.casepath = tmplist.join("/");
-        /*
-        // SPARSE FILE METHOD
-        if(!wombatvariable.casename.contains(".wfc"))
-        {
-            this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last());
-            wombatvariable.casename += ".wfc";
-        }
-        else
-        {
-            this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last().split(".").first());
-        }
-        QFile casefile(wombatvariable.casename);
-        casefile.open(QIODevice::ReadWrite);
-        casefile.resize(1000000000000);
-        casefile.close();
-        // make ext4 partition
-        QString mkfsstr = "mkfs.ext4 -F -q -E root_owner=" + QString::number(getuid()) + ":" + QString::number(getgid()) + " ";
-        mkfsstr += wombatvariable.casename;
-        //qDebug() << mkfsstr;
-        QProcess::execute(mkfsstr);
-        QString lnkstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
-        QProcess::execute(lnkstr);
-        QString lnkmnt = "ln -s " + wombatvariable.tmpmntpath + " /tmp/wombatforensics/mntpt";
-        QProcess::execute(lnkmnt);
-        QProcess::execute("mount /tmp/wombatforensics/mntpt");
-        // END SPARSE FILE METHOD
-        */
-        // BEGIN TAR METHOD
-        // make case directory..
-        // THIS ALMOST WORKS, BUT HAS ISSUES WITH WHERE IT DROPS IT...
-
-        //(new QDir())->mkpath(tmppath);
-
-        //QString casedirectory = QDir::homePath() + "/" + wombatvariable.casename.split("/").last().split(".").first();
-        //casedir.mkpath(QDir::homePath() + casedirectory);
-        //casedir(QDir::homePath() + wombatvariable.casename.split("/").last());
-        //qDebug() << "tar method:" << casedirectory;
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
@@ -604,57 +472,23 @@ void WombatForensics::InitializeOpenCase()
     opencasedialog.setOption(QFileDialog::DontUseNativeDialog, true);
     if(opencasedialog.exec())
         wombatvariable.casename = opencasedialog.selectedFiles().first().split("/").last().split(".wfc").first();
-    //wombatvariable.casename = QFileDialog::getOpenFileName(this, tr("Open Existing Case"), QDir::homePath(), tr("WombatForensics Case (*.wfc)"));
     if(!wombatvariable.casename.isEmpty())
     {
         StatusUpdate("Case Opening...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
-        /*
-        QStringList tmplist = wombatvariable.casename.split("/");
-        tmplist.removeLast();
-        wombatvariable.casepath = tmplist.join("/");
-        if(!wombatvariable.casename.contains(".wfc"))
-        {
-            this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last());
-            wombatvariable.casename += ".wfc";
-        }
-        else
-        {
-            this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename.split("/").last().split(".").first());
-        }
-        */
-        /* SPARSE METHOD
-        QFile casefile(wombatvariable.casename);
-        QString lnkstr = "ln -s " + wombatvariable.casename + " /tmp/wombatforensics/currentwfc";
-        QProcess::execute(lnkstr);
-        QString lnkmnt = "ln -s " + wombatvariable.tmpmntpath + " /tmp/wombatforensics/mntpt";
-        QProcess::execute(lnkmnt);
-        QProcess::execute("mount /tmp/wombatforensics/mntpt");
-        */
-        // TAR METHOD
-        /*
-    qDebug() << "close tmpmntpath:" << wombatvariable.tmpmntpath;
-    QString tmptar = QDir::homePath() + "/" + wombatvariable.casename + ".wfc";
-    qDebug() << "tmptar:" << tmptar;
-    qDebug() << "casename:" << wombatvariable.casename;
-    QByteArray tmparray = tmptar.toLocal8Bit();
-    QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
-    QByteArray tmparray3 = QString("./" + wombatvariable.casename).toLocal8Bit();
-         *
-         */ 
         QByteArray tmparray = QString(QDir::homePath() + "/" + wombatvariable.casename + ".wfc").toLocal8Bit();
-        qDebug() << "tmparray:" << tmparray.data();
+        //qDebug() << "tmparray:" << tmparray.data();
         QByteArray tmparray2 = QString(wombatvariable.tmpmntpath).toLocal8Bit();
-        qDebug() << "tmparray2:" << tmparray2.data();
+        //qDebug() << "tmparray2:" << tmparray2.data();
         TAR* tarhand;
         tar_open(&tarhand, tmparray.data(), NULL, O_RDONLY, 0644, TAR_GNU);
         tar_extract_all(tarhand, tmparray2.data());
         tar_close(tarhand);
         wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename.split("/").last().split(".wfc").first() + "/";
-        qDebug() << "open tmpmntpath:" << wombatvariable.tmpmntpath;
+        //qDebug() << "open tmpmntpath:" << wombatvariable.tmpmntpath;
         QString rmstr = QDir::homePath() + "/" + wombatvariable.casename + ".wfc";
-        qDebug() << "rmstr:" << rmstr;
+        //qDebug() << "rmstr:" << rmstr;
         QFile::remove(rmstr);
         OpenCaseMountFinished(0, QProcess::NormalExit);
     }
@@ -1552,24 +1386,11 @@ void WombatForensics::CloseCurrentCase()
         }
         */
     }
-/*
-    // BEGIN SPARSE FILE METHOD
-    QString unmntstr = "umount " + wombatvariable.tmpmntpath;
-    QProcess::execute(unmntstr);
-
-    // delete two link files
-    if(QFileInfo::exists("/tmp/wombatforensics/mntpt"))
-        QFile::remove("/tmp/wombatforensics/mntpt");
-    if(QFileInfo::exists("/tmp/wombatforensics/currentwfc"))
-        QFile::remove("/tmp/wombatforensics/currentwfc");
-    // END SPARSE FILE METHOD
-*/
     // BEGIN TAR METHOD
-    // THIS WORKS...
-    qDebug() << "close tmpmntpath:" << wombatvariable.tmpmntpath;
+    //qDebug() << "close tmpmntpath:" << wombatvariable.tmpmntpath;
     QString tmptar = QDir::homePath() + "/" + wombatvariable.casename + ".wfc";
-    qDebug() << "tmptar:" << tmptar;
-    qDebug() << "casename:" << wombatvariable.casename;
+    //qDebug() << "tmptar:" << tmptar;
+    //qDebug() << "casename:" << wombatvariable.casename;
     QByteArray tmparray = tmptar.toLocal8Bit();
     QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
     QByteArray tmparray3 = QString("./" + wombatvariable.casename).toLocal8Bit();
@@ -1869,8 +1690,6 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     aboutbox->close();
     //cancelthread->close();
     settingsdialog->close();
-    if(oiiniterr == DAERR_OK)
-        DADeInit();
     RemoveTmpFiles();
     event->accept();
     msglog->clear();
@@ -2389,60 +2208,4 @@ void WombatForensics::SetHexOffset()
 void WombatForensics::ThreadCancelled()
 {
     qInfo() << "Current Operation Cancelled";
-}
-
-SCCERR ExportCallback(VTHEXPORT hExport, VTSYSPARAM dwCallbackData, VTDWORD dwCommandID, VTLPVOID pCommandData)
-{
-    SCCERR seResult = SCCERR_NOTHANDLED;
-    EXFILEIOCALLBACKDATA *pNewFileInfo;
-    //EXURLFILEIOCALLBACKDATA *pExportData;
-    UNUSED(hExport);
-    UNUSED(dwCallbackData);
-
-    /* This is a simple callback handler just to show how they are
-     * coded.  The callback routine should always return
-     * SCCERR_NOTHANDLED unless the user is returning data to the
-     * conversion.
-     */
-
-    switch (dwCommandID)
-    {
-      case EX_CALLBACK_ID_NEWFILEINFO:
-
-        /* Count files that are created by the conversion. */
-        //gdwFileCount++;
-
-        /* Print the name of each output file generated. */
-        pNewFileInfo = (EXFILEIOCALLBACKDATA *)pCommandData;
-        //pExportData  = (EXURLFILEIOCALLBACKDATA *)pNewFileInfo->pExportData;
-
-        if( pNewFileInfo->dwSpecType == PATH_TYPE )
-          printf("Creating file: %s\n", (char*)pNewFileInfo->pSpec );
-        else
-          printf("Creating not file: %s\n", (char*)pNewFileInfo->pSpec );
-
-				//if (pNewFileInfo->dwAssociation == CU_ROOT && g_monitorPort)
-					//SendReadyMessage();
-        break;
-
-      default:
-        break;
-    }
-    
-    return seResult;
-}
-
-void SetOptionDWORD(VTHDOC target, VTDWORD optionId, VTDWORD val)
-{
-    DASetOption(target, optionId, (VTLPVOID)&val, sizeof(VTDWORD));
-}
-
-void SetOptionBOOL(VTHDOC target, VTDWORD optionId, VTBOOL val)
-{
-    DASetOption(target, optionId, (VTLPVOID)&val, sizeof(VTBOOL));
-}
-
-void SetOptionString(VTHDOC target, VTDWORD optionId, const char* val)
-{
-    DASetOption(target, optionId, (VTLPVOID)val, STRLEN(val)+1);
 }
