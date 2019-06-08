@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>367</width>
+    <width>387</width>
     <height>113</height>
    </rect>
   </property>
@@ -20,6 +20,52 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="3">
+    <widget class="QPushButton" name="cancelbutton">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="4">
+    <widget class="QPushButton" name="savebutton">
+     <property name="text">
+      <string>Save</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="thumbnaillabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Thumbnail Size:</string>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="0" column="1">
     <widget class="QSpinBox" name="thumbnailspinbox">
      <property name="readOnly">
@@ -45,49 +91,17 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="thumbnaillabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+   <item row="1" column="0">
+    <widget class="QLabel" name="casepathlabel">
      <property name="text">
-      <string>Thumbnail Size:</string>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
+      <string>Set Case Path:</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="2" column="3">
-    <widget class="QPushButton" name="cancelbutton">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="4">
-    <widget class="QPushButton" name="savebutton">
-     <property name="text">
-      <string>Save</string>
-     </property>
-     <property name="default">
-      <bool>true</bool>
+   <item row="1" column="1" colspan="2">
+    <widget class="QLineEdit" name="casepathlineedit">
+     <property name="placeholderText">
+      <string>User's Home Directory</string>
      </property>
     </widget>
    </item>
