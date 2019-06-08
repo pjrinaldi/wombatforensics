@@ -8,7 +8,6 @@ QFile logfile;
 QFile viewerfile;
 QFile settingsfile;
 QFile treefile;
-QDir casedir;
 QDir thumbdir;
 QDir currentrawimagedir;
 QTextEdit* msglog = NULL;
@@ -29,7 +28,7 @@ int ecount = 0;
 int childcount = 0;
 int linefactor = 0;
 int filelinefactor = 0;
-int thumbsize = 320;
+int thumbsize = 320; // thumbnail size settings variable
 int mftrecordsize = 1024;
 int hashsum = 1;
 TreeNodeModel* treenodemodel = NULL;
@@ -43,6 +42,7 @@ QStringList exportlist;
 QStringList digfilelist;
 QStringList listeditems;
 QStringList evidencelist;
+QString casepath = QDir::homePath(); // case path settings variable
 QString exportpath = "";
 bool originalpath = true;
 QString blockstring = "";

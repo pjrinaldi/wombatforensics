@@ -19,10 +19,18 @@ SettingsDialog::~SettingsDialog()
 void SettingsDialog::SaveChanges()
 {
     thumbsize = ui->thumbnailspinbox->value();
+    if(!ui->casepathlineedit->text().isEmpty())
+        casepath = ui->casepathlineedit->text();
+    if(casepath.endsWith("/"))
+        casepath.chop(1);
+    //qDebug() << "casepath:" << casepath;
+    QByteArray ba;
+    ba.append(casepath);
     // repeat this process for other variables..
     settingsfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&settingsfile);
     out << "thumb:" << QString::number(ui->thumbnailspinbox->value()) << ",";
+    out << "casepath:" << ba.toBase64() << ",";
     settingsfile.close();
     this->hide();
 }
@@ -40,5 +48,11 @@ void SettingsDialog::LoadSettings()
     {
         if(tmplist.at(i).split(":").at(0) == "thumb")
             ui->thumbnailspinbox->setValue(tmplist.at(i).split(":").at(1).toInt());
+        else if(tmplist.at(i).split(":").at(0) == "casepath")
+        {
+            QByteArray ba;
+            ba.append(tmplist.at(i).split(":").at(1));
+            ui->casepathlineedit->setText(QByteArray::fromBase64(ba));
+        }
     }
 }

@@ -12,7 +12,6 @@ extern QFile logfile;
 extern QFile viewerfile;
 extern QFile settingsfile;
 extern QFile treefile;
-extern QDir casedir;
 extern QDir thumbdir;
 extern QDir currentrawimagedir;
 extern QTextEdit* msglog;
@@ -33,7 +32,7 @@ extern int ecount;
 extern int childcount;
 extern int linefactor;
 extern int filelinefactor;
-extern int thumbsize;
+extern int thumbsize; // thumbnail size settings variable
 extern int mftrecordsize;
 extern int hashsum;
 extern QList<QVariant> colvalues;
@@ -46,6 +45,7 @@ extern QStringList listeditems;
 extern QStringList evidencelist;
 extern QString exportpath;
 extern bool originalpath;
+extern QString casepath; // case path settings variable
 extern QString blockstring;
 extern QString thumbpath;
 extern QString hexselection;
