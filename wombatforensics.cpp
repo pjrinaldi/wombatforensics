@@ -641,7 +641,8 @@ void WombatForensics::InitializeOpenCase()
         tar_open(&tarhandle, tmparray.data(), NULL, O_RDONLY, 0644, TAR_GNU);
         tar_extract_all(tarhandle, tmparray2.data());
         tar_close(tarhandle);
-        wombatvariable.tmpmntpath += wombatvariable.casename + "/";
+        wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename.split("/").last().split(".wfc").first() + "/";
+        qDebug() << "open tmpmntpath:" << wombatvariable.tmpmntpath;
         QFile::remove(wombatvariable.casename);
         OpenCaseMountFinished(0, QProcess::NormalExit);
     }
@@ -1553,6 +1554,7 @@ void WombatForensics::CloseCurrentCase()
 */
     // BEGIN TAR METHOD
     // THIS WORKS...
+    qDebug() << "close tmpmntpath:" << wombatvariable.tmpmntpath;
     TAR* casehandle;
     QString tmptar = QDir::homePath() + "/" + wombatvariable.casename + ".wfc";
     QByteArray tmparray = tmptar.toLocal8Bit();
