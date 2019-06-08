@@ -487,7 +487,7 @@ void WombatForensics::InitializeOpenCase()
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
         QByteArray tmparray = QString(casepath + "/" + wombatvariable.casename + ".wfc").toLocal8Bit();
-        qDebug() << "tmparray:" << tmparray.data();
+        //qDebug() << "tmparray:" << tmparray.data();
         QByteArray tmparray2 = QString(wombatvariable.tmpmntpath).toLocal8Bit();
         //qDebug() << "tmparray2:" << tmparray2.data();
         TAR* tarhand;
@@ -1398,7 +1398,7 @@ void WombatForensics::CloseCurrentCase()
     // BEGIN TAR METHOD
     //qDebug() << "close tmpmntpath:" << wombatvariable.tmpmntpath;
     QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
-    qDebug() << "tmptar:" << tmptar;
+    //qDebug() << "tmptar:" << tmptar;
     //qDebug() << "casename:" << wombatvariable.casename;
     QByteArray tmparray = tmptar.toLocal8Bit();
     QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
