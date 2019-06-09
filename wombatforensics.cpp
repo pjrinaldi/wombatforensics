@@ -1408,6 +1408,7 @@ void WombatForensics::CloseCurrentCase()
         }
         */
     }
+    logfile.close();
     // BEGIN TAR METHOD
     //qDebug() << "close tmpmntpath:" << wombatvariable.tmpmntpath;
     QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
@@ -1428,7 +1429,6 @@ void WombatForensics::CloseCurrentCase()
     wombatvariable.tmpmntpath = homepath + "mntpt/";
     // END TAR METHOD
     StatusUpdate("Current Case was closed successfully");
-    logfile.close();
     RemoveTmpFiles();
     wombatvariable.iscaseopen = false;
 }
