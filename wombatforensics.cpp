@@ -878,7 +878,9 @@ void WombatForensics::UpdateProperties()
     QFile propfile;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    qDebug() << "evidfiles:" << evidfiles;
     QString evidencename = evidfiles.at(0).split(".e").first();
+    qDebug() << "evidencename:" << evidencename;
     propertylist.clear();
     if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 1) // evidence image
     {
@@ -895,9 +897,10 @@ void WombatForensics::UpdateProperties()
     if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 4) // file
     {
         QString tmpfvalue = "";
+        // NEED TO FIX THIS
         QString parentstr = "5";
         if(selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-").count() == 3) // root inum
-            parentstr = "5";
+            parentstr = "5"; // FOR NTFS | FOR EXT the parentstr = "2" // NEED TO SET PARENT STR TO THE CHILD # FROM ???
         else
             parentstr = selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-").at(3).mid(1);
         if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last().contains(":"))
@@ -1340,7 +1343,7 @@ void WombatForensics::LoadHexContents()
             }
             else // OTHER FILE SYSTEM
             {
-                qDebug() << "not ntfs";
+                //qDebug() << "not ntfs";
                 ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, tmpstr.split(",").at(8).toLongLong(), 0);
                 ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
             }
