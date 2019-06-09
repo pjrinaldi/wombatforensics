@@ -1423,8 +1423,12 @@ void WombatForensics::CloseCurrentCase()
     // remove existing case directory
     QDir cdir = QDir(wombatvariable.tmpmntpath);
     cdir.removeRecursively();
+    QString homepath = QDir::homePath();
+    homepath += "/.wombatforensics/";
+    wombatvariable.tmpmntpath = homepath + "mntpt/";
     // END TAR METHOD
     StatusUpdate("Current Case was closed successfully");
+    logfile.close();
     RemoveTmpFiles();
     wombatvariable.iscaseopen = false;
 }
@@ -1694,7 +1698,6 @@ void WombatForensics::mouseDoubleClickEvent(QMouseEvent* event)
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
-    logfile.close();
     if(wombatvariable.iscaseopen)
         CloseCurrentCase();
     
