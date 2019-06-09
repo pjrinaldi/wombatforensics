@@ -1367,7 +1367,9 @@ void WombatForensics::CloseCurrentCase()
     if(ui->dirTreeView->model() != NULL)
     {
         UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 10).data().toString());
-        delete treenodemodel;
+        treenodemodel->Clear();
+        //delete treenodemodel;
+        //qDebug() << "treenodemodel deleted";
         //evidcnt = 0;
         //autosavetimer->stop();
         UpdateCheckState();
