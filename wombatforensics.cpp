@@ -897,10 +897,18 @@ void WombatForensics::UpdateProperties()
     if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 4) // file
     {
         QString tmpfvalue = "";
-        // NEED TO FIX THIS
-        QString parentstr = "5";
+        QString parentstr = "5"; // NTFS ROOT INUM
         if(selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-").count() == 3) // root inum
-            parentstr = "5"; // FOR NTFS | FOR EXT the parentstr = "2" // NEED TO SET PARENT STR TO THE CHILD # FROM ???
+        {
+            QFile fsstatfile(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(2) + "/stat");
+            fsstatfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            QString tmpstr = "";
+            if(fsstatfile.isOpen())
+                tmpstr = fsstatfile.readLine();
+            fsstatfile.close();
+            if(tmpstr.split(",").count() > 0)
+                parentstr = tmpstr.split(",").at(3);
+        }
         else
             parentstr = selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-").at(3).mid(1);
         if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last().contains(":"))
