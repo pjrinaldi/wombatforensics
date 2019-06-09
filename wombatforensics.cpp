@@ -1367,8 +1367,7 @@ void WombatForensics::CloseCurrentCase()
     if(ui->dirTreeView->model() != NULL)
     {
         UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 10).data().toString());
-        treenodemodel->Clear();
-        //delete treenodemodel;
+        delete treenodemodel;
         //qDebug() << "treenodemodel deleted";
         //evidcnt = 0;
         //autosavetimer->stop();
@@ -1741,6 +1740,7 @@ void WombatForensics::on_actionNew_Case_triggered()
         if(ret == QMessageBox::Yes)
         {
             CloseCurrentCase();
+            treenodemodel = new TreeNodeModel();
             InitializeCaseStructure();
         }
     }
@@ -1758,6 +1758,7 @@ void WombatForensics::on_actionOpen_Case_triggered()
         {
             StatusUpdate("Closing Current Case...");
             CloseCurrentCase();
+            treenodemodel = new TreeNodeModel();
             InitializeOpenCase();
         }
     }
