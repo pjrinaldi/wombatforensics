@@ -298,7 +298,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else
     {
-        if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
+        //if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
             treemenu->exec(QCursor::pos());
     }
     QApplication::restoreOverrideCursor();
@@ -568,7 +568,7 @@ void WombatForensics::OpenUpdate()
     UpdateCheckCount();
     if(indexlist.count() > 0)
     {
-        qDebug() << indexlist.at(0).sibling(indexlist.at(0).row(), 0).data().toString() << indexlist.count();
+        //qDebug() << indexlist.at(0).sibling(indexlist.at(0).row(), 0).data().toString() << indexlist.count();
         //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
         //selectedindex = treenodemodel->index(0, 0, QModelIndex());
         //LoadHexContents();
@@ -658,7 +658,7 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     if(index.isValid())
     {
         actionitem = static_cast<TreeNode*>(index.internalPointer());
-        if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
+        //if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
             treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
 }
@@ -878,9 +878,9 @@ void WombatForensics::UpdateProperties()
     QFile propfile;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-    qDebug() << "evidfiles:" << evidfiles;
+    //qDebug() << "evidfiles:" << evidfiles;
     QString evidencename = evidfiles.at(0).split(".e").first();
-    qDebug() << "evidencename:" << evidencename;
+    //qDebug() << "evidencename:" << evidencename;
     propertylist.clear();
     if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 1) // evidence image
     {
@@ -1436,7 +1436,7 @@ void WombatForensics::CloseCurrentCase()
 
 void WombatForensics::RemEvidence()
 {
-    qDebug() << "remove evidence clicked";
+    //qDebug() << "remove evidence clicked";
     remevidencedialog = new RemEvidenceDialog(this);
     connect(remevidencedialog, SIGNAL(RemEvid(QStringList)), this, SLOT(RemoveEvidence(QStringList)));
     remevidencedialog->exec();
@@ -1444,7 +1444,7 @@ void WombatForensics::RemEvidence()
 
 void WombatForensics::RemoveEvidence(QStringList remevidlist)
 {
-    qDebug() << "remevidlist:" << remevidlist;
+    //qDebug() << "remevidlist:" << remevidlist;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     for(int i=0; i < remevidlist.count(); i++)
     {
@@ -1459,7 +1459,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             QStringList tfiles = tdir.entryList(QStringList("e" + evidfiles.first().split(".e").last() + "-*"), QDir::NoSymLinks | QDir::Files);
             if(!tfiles.isEmpty())
             {
-                qDebug() << "tfiles:" << tfiles;
+                //qDebug() << "tfiles:" << tfiles;
                 for(int j = 0; j < tfiles.count(); j++)
                     tdir.remove(tfiles.at(j));
             }
@@ -1487,7 +1487,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(!indexlist.isEmpty())
             {
-                qDebug() << "index found:" << indexlist.first().sibling(indexlist.first().row(), 10).data().toString();
+                //qDebug() << "index found:" << indexlist.first().sibling(indexlist.first().row(), 10).data().toString();
                 treenodemodel->removeRow(indexlist.first().row(), indexlist.first());
             }
         }
@@ -2201,7 +2201,7 @@ QString WombatForensics::InitializeSelectedState()
         selectfile.open(QIODevice::ReadOnly);
         QString tmpstr = selectfile.readLine();
         selectfile.close();
-        qDebug() << tmpstr;
+        //qDebug() << tmpstr;
         //return "file-r-3.dat";
         return tmpstr;
     }
