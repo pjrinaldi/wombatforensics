@@ -1145,6 +1145,8 @@ void PopulateTreeModel(QString evidstring)
         //LogMessage("Evidence image access failed");
         errorcount++;
     }
+    else
+        qInfo() << "Evidence Image successfully opened";
     free(images);
     //int imgtype = imginfo->itype;
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + evidid + "/";
@@ -1174,7 +1176,15 @@ void PopulateTreeModel(QString evidstring)
         {
             addevidvar.partint = 0;
             fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
-            if(fsinfo != NULL)
+            if(fsinfo == NULL)
+            {
+                nodedata.clear();
+                nodedata << QString("NON-RECOGNIZED FS") << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
+                mutex.unlock();
+            }
+            else
             {
                 partitionpath = volumepath + "p0/";
                 addevidvar.partitionpath = partitionpath;
@@ -1192,14 +1202,7 @@ void PopulateTreeModel(QString evidstring)
                     //LogMessage("Issues with traversing the file structure were encountered");
                     errorcount++;
                 }
-            }
-            else
-            {
-                nodedata.clear();
-                nodedata << QString("NON-RECOGNIZED FS") << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
-                mutex.lock();
-                treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
-                mutex.unlock();
+
             }
         }
         else

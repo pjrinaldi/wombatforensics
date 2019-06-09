@@ -517,7 +517,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
-    //qDebug() << evidfiles;
+    //qDebug() << "evidfiles:" << evidfiles;
     evidencelist.clear();
     for(int i=0; i < evidfiles.count(); i++)
     {
@@ -527,6 +527,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             evidencelist.append(QString(evidfile.readLine()).split(",").at(3));
         evidfile.close();
     }
+    //qDebug() << "evidlist:" << evidencelist;
     if(evidencelist.count() > 0)
     {
         QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
@@ -1362,7 +1363,8 @@ void WombatForensics::CloseCurrentCase()
     }
     if(ui->hexview->data().size() > 0)
     {
-        casedatafile.resize(0);
+        casedatafile.setFileName(QDir::tempPath() + "/zfile");
+        //casedatafile.resize(0);
         ui->hexview->setData(casedatafile);
     }
     setWindowTitle("WombatForensics");
