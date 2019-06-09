@@ -297,10 +297,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->ShowHtml(index);
     }
     else
-    {
-        //if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
-            treemenu->exec(QCursor::pos());
-    }
+        treemenu->exec(QCursor::pos());
     QApplication::restoreOverrideCursor();
 }
 
@@ -658,8 +655,7 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     if(index.isValid())
     {
         actionitem = static_cast<TreeNode*>(index.internalPointer());
-        //if(index.sibling(index.row(), 10).data().toString().split("-").count() == 4) // file
-            treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
+        treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
 }
 
