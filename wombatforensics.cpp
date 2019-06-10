@@ -461,7 +461,7 @@ void WombatForensics::InitializeCaseStructure()
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
-        qInfo() << "Case Was Created";
+        qInfo() << "Case was Created";
         //LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
