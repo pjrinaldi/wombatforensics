@@ -917,6 +917,7 @@ void WombatForensics::UpdateProperties()
     {
         QString tmpstr = "";
         QString line = in.readLine();
+        //qDebug() << "line:" << line;
         if(line.split("||").at(1).contains("^^"))
             tmpstr = QString(line.split("||").at(1)).replace(QString("^^"), QString(", "));
         else
