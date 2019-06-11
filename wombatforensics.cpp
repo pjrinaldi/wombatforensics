@@ -493,9 +493,6 @@ void WombatForensics::InitializeOpenCase()
         tar_close(tarhand);
         wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename.split("/").last().split(".wfc").first() + "/";
         //qDebug() << "open tmpmntpath:" << wombatvariable.tmpmntpath;
-        QString rmstr = casepath + "/" + wombatvariable.casename + ".wfc";
-        //qDebug() << "rmstr:" << rmstr;
-        QFile::remove(rmstr);
         OpenCaseMountFinished(0, QProcess::NormalExit);
     }
 }
@@ -791,6 +788,7 @@ void WombatForensics::UpdateStatus()
     PrepareEvidenceImage();
     //LogMessage("Building Initial Evidence Tree...");
     ui->dirTreeView->setModel(treenodemodel);
+    emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
     UpdateCheckCount();
@@ -1363,11 +1361,12 @@ void WombatForensics::CloseCurrentCase()
     if(ui->dirTreeView->model() != NULL)
     {
         UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 10).data().toString());
+        UpdateCheckState();
+        ui->dirTreeView->clearSelection();
         delete treenodemodel;
         //qDebug() << "treenodemodel deleted";
         //evidcnt = 0;
         //autosavetimer->stop();
-        UpdateCheckState();
     }
     if(ui->hexview->data().size() > 0)
     {
