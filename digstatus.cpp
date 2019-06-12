@@ -28,13 +28,19 @@ void DigStatus::UpdateDigState(int digstateid, int digstatecount)
 {
     if(digstateid == 0) // img thumbnail
     {
-        imgthumbcount = digstatecount;
+        if(digstatecount == -1)
+            imgthumbcount = imgthumbtotal;
+        else
+            imgthumbcount = digstatecount;
         imgthumbpercent = ((float)imgthumbcount/(float)imgthumbtotal) * 100.0;
         ui->imgthumblabel->setText("Generating Image Thumbnail: " + QString::number(imgthumbcount) + " of " + QString::number(imgthumbtotal) + " " + QString::number((int)imgthumbpercent) + "%");
     }
     else if(digstateid == 1 || digstateid == 2 || digstateid == 3) // md5 || sha1 || sha256
     {
-        hashcount = digstatecount;
+        if(digstatecount == -1)
+            hashcount = hashtotal;
+        else
+            hashcount = digstatecount;
         hashpercent = ((float)hashcount/(float)hashtotal) * 100.0;
         if(digstateid == 1)
             hashstring = "MD5";

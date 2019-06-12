@@ -98,7 +98,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&thashsavewatcher, SIGNAL(finished()), this, SLOT(ThashSaveFinish()), Qt::QueuedConnection);
     connect(&hashingwatcher, SIGNAL(finished()), this, SLOT(HashingFinish()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
-    connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
+    //connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
@@ -814,6 +814,7 @@ void WombatForensics::UpdateStatus()
     QApplication::restoreOverrideCursor();
 }
 
+/*
 void WombatForensics::UpdateDigging()
 {
     qInfo() << "Digging Complete";
@@ -821,6 +822,7 @@ void WombatForensics::UpdateDigging()
     StatusUpdate("Evidence ready");
     statuslabel->setToolTip("");
 }
+*/
 
 void WombatForensics::AddEvidence()
 {
@@ -1627,6 +1629,7 @@ void WombatForensics::HashingFinish()
         StatusUpdate("Ready");
     else
         StatusUpdate("Digging Deeper...");
+    digstatusdialog->UpdateDigState(1, -1);
     if(hashsum == 1)
         treenodemodel->UpdateHeaderNode(7, "MD5 Hash");
     else if(hashsum == 2)
@@ -1641,6 +1644,12 @@ void WombatForensics::HashingFinish()
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
     digstatusdialog->UpdateDigState(digid, digcnt);
+    /*
+    if(hashingwatcher.isFinished() && (digid = 1 || digid == 2 || digid == 3))
+        digstatusdialog->UpdateDigState(digid, -1);
+    if(thumbwatcher.isFinished() && digid == 0)
+        digstatusdialog->UpdateDigState(digid, -1);
+    */
     /*
     int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
     //qInfo() << "Dug:" << QString::number(digcount) << "of" << QString::number(digfilelist.count()) << QString::number(curprogress) << "%";
@@ -1889,6 +1898,7 @@ void WombatForensics::FinishThumbs()
 {
     //ui->actionCancel_Operation->setEnabled(false);
     //cancelthread->close();
+    digstatusdialog->UpdateDigState(0, -1);
     StatusUpdate("Thumbnail generation finished.");
     qInfo() << "Thumbnail generation finished";
     QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
