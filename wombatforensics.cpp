@@ -604,7 +604,10 @@ void WombatForensics::ThashSaveFinish(void)
 {
     qDebug() << "SaveImageHashes Finished";
     StatusUpdate("Thumbnail Library Saved");
-    StatusUpdate("Ready");
+    if(hashingwatcher.isFinished())
+        StatusUpdate("Ready");
+    else
+        StatusUpdate("Digging Deeper...");
 }
 
 void WombatForensics::ThashFinish(void)
@@ -1572,6 +1575,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     //LogMessage("Digging Deeper into Evidence");
     for(int i = 0; i < digoptions.count(); i++)
     {
+        qDebug() << "dig iteration:" << i;
         if(dtype == 0) // selected
         {
             TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
