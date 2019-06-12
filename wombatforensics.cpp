@@ -1575,7 +1575,6 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     //LogMessage("Digging Deeper into Evidence");
     for(int i = 0; i < digoptions.count(); i++)
     {
-        qDebug() << "dig iteration:" << i;
         if(dtype == 0) // selected
         {
             TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
@@ -1624,7 +1623,10 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 
 void WombatForensics::HashingFinish()
 {
-    StatusUpdate("Ready");
+    if(thumbwatcher.isFinished())
+        StatusUpdate("Ready");
+    else
+        StatusUpdate("Digging Deeper...");
     if(hashsum == 1)
         treenodemodel->UpdateHeaderNode(7, "MD5 Hash");
     else if(hashsum == 2)
