@@ -10,8 +10,13 @@ ImageWindow::ImageWindow(QWidget* parent) : QDialog(parent), ui(new Ui::ImageWin
     tskptr->readimginfo = NULL;
     tskptr->readfsinfo = NULL;
     tskptr->readfileinfo = NULL;
+    connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(SwitchScale(bool)));
 }
 
+void ImageWindow::SwitchScale(bool switchscale)
+{
+    ui->label->setScaledContents(switchscale);
+}
 ImageWindow::~ImageWindow()
 {
     this->close();

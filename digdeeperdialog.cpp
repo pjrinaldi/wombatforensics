@@ -48,6 +48,8 @@ void DigDeeperDialog::EnableProcess(bool checked)
         ui->sha1radiobutton->setEnabled(true);
         ui->sha256radiobutton->setEnabled(true);
     }
+    if(ui->hashcheckbox->isChecked() || ui->thumbnailcheckBox->isChecked())
+        ui->processButton->setEnabled(true);
 }
 
 void DigDeeperDialog::DigDeeperFiles()

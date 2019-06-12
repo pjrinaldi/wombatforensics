@@ -26,6 +26,8 @@ public:
     void GetImage(QString objid);
 private slots:
     void ShowImage();
+    void SwitchScale(bool swsc);
+
 private:
     Ui::ImageWindow* ui;
     TskObject tskobj;
