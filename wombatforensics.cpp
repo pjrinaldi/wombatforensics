@@ -1695,8 +1695,23 @@ void WombatForensics::mouseDoubleClickEvent(QMouseEvent* event)
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
+    StatusUpdate("Exiting...");
+    //QApplication::restoreOverrideCursor();
     if(wombatvariable.iscaseopen)
+    {
+        /*
+        QMessageBox exitbox;
+        exitbox.setText("Saving Current Case, Please Wait...");
+        exitbox.setIcon(QMessageBox::Information);
+        exitbox.setStandardButtons(QMessageBox::Ok);
+        exitbox.button(QMessageBox::Ok)->animateClick(3000);
+        exitbox.exec();
+        */
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        StatusUpdate("Saving Current Case...");
         CloseCurrentCase();
+        StatusUpdate("Exiting...");
+    }
     
     //propertywindow->close();
     //fileviewer->close();

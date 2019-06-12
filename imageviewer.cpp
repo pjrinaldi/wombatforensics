@@ -147,6 +147,6 @@ void ImageViewer::OpenImageWindow(QListWidgetItem* item)
 
 void ImageViewer::HighlightTreeViewItem(QListWidgetItem* item)
 {
-    qDebug() << "image item:" << item->text();
+    //qDebug() << "image item:" << item->text();
     emit SendObjectToTreeView(item->text().split("-a").at(0));
 }

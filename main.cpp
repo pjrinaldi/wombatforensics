@@ -43,7 +43,6 @@ void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    
     a.setWindowIcon(QIcon(":/appicon"));
     //a.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
     WombatForensics w;

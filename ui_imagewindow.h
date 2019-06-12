@@ -14,7 +14,10 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -22,7 +25,10 @@ QT_BEGIN_NAMESPACE
 class Ui_ImageWindow
 {
 public:
+    QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
+    QPushButton *pushButton;
+    QSpacerItem *horizontalSpacer;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
     QHBoxLayout *horizontalLayout_2;
@@ -33,16 +39,30 @@ public:
         if (ImageWindow->objectName().isEmpty())
             ImageWindow->setObjectName(QString::fromUtf8("ImageWindow"));
         ImageWindow->resize(800, 600);
-        horizontalLayout = new QHBoxLayout(ImageWindow);
-        horizontalLayout->setSpacing(0);
+        verticalLayout = new QVBoxLayout(ImageWindow);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        pushButton = new QPushButton(ImageWindow);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setCheckable(true);
+        pushButton->setChecked(false);
+
+        horizontalLayout->addWidget(pushButton);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer);
+
+
+        verticalLayout->addLayout(horizontalLayout);
+
         scrollArea = new QScrollArea(ImageWindow);
         scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 798, 598));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 780, 546));
         horizontalLayout_2 = new QHBoxLayout(scrollAreaWidgetContents);
         horizontalLayout_2->setSpacing(0);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
@@ -55,6 +75,7 @@ public:
         sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
         label->setSizePolicy(sizePolicy);
         label->setLineWidth(0);
+        label->setScaledContents(false);
         label->setAlignment(Qt::AlignCenter);
         label->setTextInteractionFlags(Qt::NoTextInteraction);
 
@@ -62,7 +83,7 @@ public:
 
         scrollArea->setWidget(scrollAreaWidgetContents);
 
-        horizontalLayout->addWidget(scrollArea);
+        verticalLayout->addWidget(scrollArea);
 
 
         retranslateUi(ImageWindow);
@@ -73,6 +94,7 @@ public:
     void retranslateUi(QDialog *ImageWindow)
     {
         ImageWindow->setWindowTitle(QApplication::translate("ImageWindow", "View Image", nullptr));
+        pushButton->setText(QApplication::translate("ImageWindow", "Stretch/Shrink Contents To Fit", nullptr));
         label->setText(QApplication::translate("ImageWindow", "Loading...", nullptr));
     } // retranslateUi
 
