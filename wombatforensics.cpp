@@ -1377,6 +1377,9 @@ void WombatForensics::CloseCurrentCase()
     if(ui->hexview->data().size() > 0)
     {
         casedatafile.setFileName(QDir::tempPath() + "/zfile");
+        casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
+        casedatafile.write("dummy zerofile");
+        casedatafile.close();
         //casedatafile.resize(0);
         ui->hexview->setData(casedatafile);
     }
@@ -1714,14 +1717,12 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     //QApplication::restoreOverrideCursor();
     if(wombatvariable.iscaseopen)
     {
-        /*
         QMessageBox exitbox;
         exitbox.setText("Saving Current Case, Please Wait...");
         exitbox.setIcon(QMessageBox::Information);
         exitbox.setStandardButtons(QMessageBox::Ok);
         exitbox.button(QMessageBox::Ok)->animateClick(3000);
         exitbox.exec();
-        */
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         StatusUpdate("Saving Current Case...");
         CloseCurrentCase();
@@ -1879,7 +1880,10 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
+                StatusUpdate("Generating Thumbnails...");
+                digstatusdialog->SetInitialDigState(0, filesfound);
                 thumbfuture = QtConcurrent::map(listeditems, GenerateThumbnails); // Process All thumbnails
+                thumbwatcher.setFuture(thumbfuture);
                 //QFuture<void> tmpfuture = QtConcurrent::run(StartThumbnails, listeditems); // Process all thumbnails
                 //QFuture<void> tmpfuture = QtConcurrent::run(&WombatForensics::StartThumbnails, listeditems); // Process All Thumbnails
             }
