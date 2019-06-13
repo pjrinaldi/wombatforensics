@@ -257,7 +257,7 @@ public:
         nodetype = itemnode->Data(10).toString().split("-a").first().split("-").count();
         itemtype = itemnode->itemtype; // node type 1=file, 2=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs)
 
-        if(role == Qt::CheckStateRole && index.column() == 0)
+        if(role == Qt::CheckStateRole && index.column() == 10)
             return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
         else if(role == Qt::ForegroundRole)
         {
@@ -509,6 +509,7 @@ public:
                 itemnode->SetChecked(true);
                 checkhash.insert(itemnode->Data(10).toString(), true); // used to be 0
             }
+            //qDebug() << "checkhash:" << checkhash;
             emit dataChanged(index, index);
             emit CheckedNodesChanged();
             return true;
@@ -742,7 +743,7 @@ private:
                                 else
                                     parid = tmpstr.split(",").at(12).split("-f").at(0) + "-f" + tmpstr.split(",").at(2);
                                 curid = tmpstr.split(",").at(12).split("-a").at(0);
-                                qDebug() << "par-cur:" << parid << curid;
+                                //qDebug() << "par-cur:" << parid << curid;
                                 parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid), tmpstr.split(",").at(1).toInt()));
                                 parents[curid] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1);
                                 if(checkhash.contains(tmpstr.split(",").at(12)))

@@ -14,30 +14,26 @@ void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     {
         case QtDebugMsg:
             ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
-            //fprintf(stderr, "My Debug: %s\n", localmsg.constData());
             break;
         case QtInfoMsg:
             ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
-            //fprintf(stderr, "My Info: %s\n", localmsg.constData());
             break;
         case QtWarningMsg:
             ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
-            //fprintf(stderr, "My Warning: %s\n", localmsg.constData());
             break;
         case QtCriticalMsg:
             ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
-            //fprintf(stderr, "My Critical: %s\n", localmsg.constData());
             break;
         case QtFatalMsg:
             ba.append(tmpstring + "\t" + localmsg.constData() + "\n");
-            //fprintf(stderr, "My Fatal: %s\n", localmsg.constData());
             break;
     }
     msglog->append(QString(tmpstring + ": " + localmsg.constData()));
-    logfile.write(ba);
-    logfile.flush();
-    //logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
-    //logfile.close();
+    if(logfile.isOpen())
+    {
+        logfile.write(ba);
+        logfile.flush();
+    }
 }
 
 int main(int argc, char *argv[])

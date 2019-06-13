@@ -81,6 +81,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtervalues.maxchange = QDateTime::currentDateTimeUtc().toTime_t();
     filtervalues.minchange = QDateTime::currentDateTimeUtc().toTime_t();
     qRegisterMetaType<QVector<int> >();
+    qRegisterMetaType<QTextCursor>("QTextCursor");
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
@@ -110,7 +111,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     QToolButton* testbutton = qobject_cast<QToolButton*>(testwidget);
     if(testbutton)
     {
-        connect(ui->actionCopy_Selection_To, SIGNAL(triggered(bool)), testbutton, SLOT(showMenu()));
+        connect(ui->actionCopy_Selection_To, SIGNAL(triggered(bool)), testbutton, SLOT(showMenu()), Qt::QueuedConnection);
     }
     ui->actionCopy_Selection_To->setMenu(selectionmenu);
 
@@ -552,7 +553,7 @@ void WombatForensics::OpenUpdate()
     PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     // this currently fails to load content data in the hexviewer. until it does, the char bytes are zero...
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
@@ -717,8 +718,8 @@ void WombatForensics::PrepareEvidenceImage()
         if(!mntstr.isEmpty())
         {
             xmntprocess = new QProcess();
-            connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()));
-            connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()));
+            connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
+            connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
             xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them..
         }
         }
@@ -754,7 +755,7 @@ void WombatForensics::UpdateStatus()
     ui->dirTreeView->setModel(treenodemodel);
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
-    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
+    connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     UpdateCheckCount();
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
@@ -1311,7 +1312,6 @@ void WombatForensics::CloseCurrentCase()
     filtercountlabel->setText("Filtered: 0");
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
-    // WRITE MSGLOG TO FILE HERE...
 
     // UNMOUNT EVIDENCEIMAGEDATAFILE
     for(int i=0; i < evidencelist.count(); i++)
@@ -1334,7 +1334,6 @@ void WombatForensics::CloseCurrentCase()
         }
         */
     }
-    logfile.close();
     // BEGIN TAR METHOD
     //qDebug() << "close tmpmntpath:" << wombatvariable.tmpmntpath;
     QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
@@ -1347,16 +1346,18 @@ void WombatForensics::CloseCurrentCase()
     tar_open(&casehandle, tmparray.data(), NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
     tar_append_tree(casehandle, tmparray2.data(), tmparray3.data());
     tar_close(casehandle);
+    // END TAR METHOD
+    StatusUpdate("Current Case was closed successfully");
+    RemoveTmpFiles();
+    wombatvariable.iscaseopen = false;
+    if(logfile.isOpen())
+        logfile.close();
     // remove existing case directory
     QDir cdir = QDir(wombatvariable.tmpmntpath);
     cdir.removeRecursively();
     QString homepath = QDir::homePath();
     homepath += "/.wombatforensics/";
     wombatvariable.tmpmntpath = homepath + "mntpt/";
-    // END TAR METHOD
-    StatusUpdate("Current Case was closed successfully");
-    RemoveTmpFiles();
-    wombatvariable.iscaseopen = false;
 }
 
 void WombatForensics::RemEvidence()
@@ -1673,6 +1674,7 @@ void WombatForensics::on_actionSaveState_triggered()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     SaveState();
+    qInfo() << "Current State Saved.";
     QApplication::restoreOverrideCursor();
 }
 
@@ -2120,6 +2122,7 @@ void WombatForensics::AutoSaveState()
     // change display text
     StatusUpdate("Saving State Started");
     SaveState();
+    qInfo() << "Current State Auto Saved.";
     StatusUpdate("Evidence ready");
 }
 
