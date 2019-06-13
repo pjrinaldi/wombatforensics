@@ -1,6 +1,6 @@
 QT += widgets core concurrent sql multimedia multimediawidgets webenginewidgets gui
 QT -= opengl quick network qml
-linux:CONFIG += debug qt #c++11
+linux:CONFIG += debug_and_release debug_and_release_target qt x11 build_all c++11
 INCLUDEPATH += /usr/include/tsk/
 INCLUDEPATH += /usr/include/tsk/auto/
 INCLUDEPATH += /usr/include/tsk/base/
@@ -20,7 +20,8 @@ HEADERS = wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h ts
 #HEADERS = wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h digstatus.h
 SOURCES = main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp digstatus.cpp remevidencedialog.cpp tskcpp.cpp
 RESOURCES += wombatforensics.qrc
-DESTDIR = ./
+release: DESTDIR = release
+debug:   DESTDIR = debug
 linux:LIBS = -lewf -ltsk -ltar
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 }
