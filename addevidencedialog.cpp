@@ -28,7 +28,7 @@ void AddEvidenceDialog::SelectEvidence()
     QString evidfilename = "";
     if(addeviddialog.exec())
         evidfilename = addeviddialog.selectedFiles().first();
-    if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff"))
+    if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff") || evidfilename.toLower().contains(".image"))
     {
         // it's an evidence image so process...
         ui->evidencelist->addItem(evidfilename);
