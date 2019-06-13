@@ -1,6 +1,6 @@
 #include "fileviewer.h"
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 FileViewer::FileViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::FileViewer)

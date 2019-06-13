@@ -1,6 +1,6 @@
 #include "wombatforensics.h"
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
@@ -98,12 +98,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&thashsavewatcher, SIGNAL(finished()), this, SLOT(ThashSaveFinish()), Qt::QueuedConnection);
     connect(&hashingwatcher, SIGNAL(finished()), this, SLOT(HashingFinish()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
-    //connect(&digwatcher, SIGNAL(finished()), this, SLOT(UpdateDigging()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
 
-    // NOT SURE IF THIS WILL WORK
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->actionSection);
     selectionmenu->addAction(ui->actionTextSection);
@@ -168,8 +166,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkhash.clear();
     listeditems.clear();
     treenodemodel = new TreeNodeModel();
-    //autosavetimer = new QTimer(this);
-    //connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
+    autosavetimer = new QTimer(this);
+    connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
 }
 
 void WombatForensics::ShowDigStatus()
@@ -180,7 +178,6 @@ void WombatForensics::ShowDigStatus()
     digstatusdialog->show();
 }
 
-//////////////////////////////////////////////////////////////
 void WombatForensics::ShowExternalViewer()
 {
     qint64 curobjaddr = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-f").at(1).toLongLong();
@@ -457,7 +454,6 @@ void WombatForensics::InitializeCaseStructure()
         msglog->clear();
         qInfo() << "Log File Created";
         //LogMessage("Log File Created");
-        //treefile.setFileName(wombatvariable.tmpmntpath + "treemodel");
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
@@ -465,8 +461,8 @@ void WombatForensics::InitializeCaseStructure()
         //LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
-        //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
-        //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
+        autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+        autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     }
 }
 
@@ -507,8 +503,8 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     msglog->clear();
     InitializeCheckState();
     ui->actionAdd_Evidence->setEnabled(true);
-    //autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
-    //autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
+    autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
+    autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
     //qDebug() << "evidfiles:" << evidfiles;
@@ -642,10 +638,6 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
-        /*
-        if(propertywindow->isVisible())
-            UpdateProperties();
-        */
     }
 }
 
@@ -721,8 +713,6 @@ void WombatForensics::PrepareEvidenceImage()
         else
         {
             qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
-            // this error should go in add evidence dialog bit...
-            //DisplayError("0.5", QString("Image type: " + QString(tsk_img_type_toname(imgtype)) + " is not supported."), "Unsupported Image");
         }
         if(!mntstr.isEmpty())
         {
@@ -734,36 +724,7 @@ void WombatForensics::PrepareEvidenceImage()
         }
     }
     //qDebug() << evidencelist;
-    // 1. LOAD EVIDENCE STAT FILE TO GET IMGTYPE VARIABLE.
-    // 2. CHECK IF SEE IF IT IS ALREADY OPEN
-    // 3. DETERMINE IF IT MIGHT HAVE SEGMENTS FOR RAW BASED ON EXTENSION.
-    // 4. HANDLE RAW ACCORDINGLY
-    // NEED TO RUN THIS FOR EACH IMAGE...
     //qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
-    /*
-    QString xmntstr = "";
-    if(TSK_IMG_TYPE_ISAFF(wombatvariable.imgtype))
-        xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
-    else if(TSK_IMG_TYPE_ISEWF(wombatvariable.imgtype))
-    {
-        QString tmpstr = wombatvariable.imgdatapath + wombatvariable.evidencename + "/";
-        (new QDir())->mkpath(tmpstr);
-        xmntstr += "ewfmount " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + tmpstr; 
-    }
-    else if(TSK_IMG_TYPE_ISRAW(wombatvariable.imgtype))
-    {
-        if(wombatvariable.segmentcount > 1)
-            xmntstr += "affuse " + QString::fromStdString(wombatvariable.fullpathvector.at(0)) + " " + wombatvariable.imgdatapath;
-    }
-    else
-    {
-        qDebug() << "image format:" << tsk_img_type_toname(wombatvariable.imgtype) << "not supported";
-    }
-    xmntprocess = new QProcess();
-    connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()));
-    connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()));
-    xmntprocess->start(xmntstr); // removes WARNING Messages but does not capture them..
-    */
 }
 
 void WombatForensics::ReadXMountOut()
@@ -814,22 +775,10 @@ void WombatForensics::UpdateStatus()
     QApplication::restoreOverrideCursor();
 }
 
-/*
-void WombatForensics::UpdateDigging()
-{
-    qInfo() << "Digging Complete";
-    //LogMessage("Digging Complete");
-    StatusUpdate("Evidence ready");
-    statuslabel->setToolTip("");
-}
-*/
-
 void WombatForensics::AddEvidence()
 {
     // HERE IS WHERE I WOULD OPEN THE NEW DIALOG
-    //wombatvariable.fullpathvector.clear();
-    //wombatvariable.itemcount = 0;
-    int isnew = 1;
+    // NEED TO CHECK AND SEE IF EVIDENCE IS ALREADY IN CASE THROUGH ADD EVIDENCE DIALOG
     addevidencedialog = new AddEvidenceDialog(this);
     addevidencedialog->exec();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -848,28 +797,6 @@ void WombatForensics::AddEvidence()
         QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
         sqlwatcher.setFuture(tmpfuture);
     }
-    /*
-    QStringList tmplist = QFileDialog::getOpenFileNames(this, tr("Select Evidence Image(s)"), QDir::homePath());
-    if(tmplist.count())
-    {
-        wombatvariable.evidencename = tmplist.at(0).split("/").last();
-        if(isnew == 1)
-        {
-            for(int i=0; i < tmplist.count(); i++)
-                wombatvariable.fullpathvector.push_back(tmplist.at(i).toStdString());
-            wombatvariable.itemcount = tmplist.count();
-            qInfo() << "Start Adding Evidence";
-            //LogMessage("Start Adding Evidence");
-            if(ui->dirTreeView->model() != NULL)
-                delete treenodemodel;
-                treenodemodel = new TreeNodeModel();
-            QFuture<void> tmpfuture = QtConcurrent::run(InitializeEvidenceStructure);
-            sqlwatcher.setFuture(tmpfuture);
-        }
-        else
-            DisplayError("3.0", "Evidence already exists in the case", "Add Evidence Cancelled");
-    }
-    */
 }
 
 void WombatForensics::UpdateProperties()
@@ -1012,8 +939,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         filefile.close();
         filelist = tmpstr.split(",");
     
-        //if(!ui->hexview->isEnabled())
-            ui->hexview->setEnabled(true);
+        ui->hexview->setEnabled(true);
 
         if(curindex.sibling(curindex.row(), 2).data().toLongLong() == 0)
         {
@@ -1072,8 +998,6 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 void WombatForensics::LoadHexContents()
 {
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
-    // TRY TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
-    //wombatvariable.selectedid = selectedindex.sibling(selectedindex.row(), 10).data().toString(); // mod object id
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     //qDebug() << "evidencelist:" << evidencelist; // original evidence path
     //qDebug() << "selectednode id:" << selectednode->Data(10).toString();
@@ -1371,8 +1295,7 @@ void WombatForensics::CloseCurrentCase()
         ui->dirTreeView->clearSelection();
         delete treenodemodel;
         //qDebug() << "treenodemodel deleted";
-        //evidcnt = 0;
-        //autosavetimer->stop();
+        autosavetimer->stop();
     }
     if(ui->hexview->data().size() > 0)
     {
@@ -1380,7 +1303,6 @@ void WombatForensics::CloseCurrentCase()
         casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
         casedatafile.write("dummy zerofile");
         casedatafile.close();
-        //casedatafile.resize(0);
         ui->hexview->setData(casedatafile);
     }
     setWindowTitle("WombatForensics");
@@ -1391,8 +1313,7 @@ void WombatForensics::CloseCurrentCase()
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
     // WRITE MSGLOG TO FILE HERE...
 
-    // UNMOUNT XMOUNT EVIDENCEIMAGEDATAFILE
-    // NEED TO LOOP THIS FOR EACH EVIDENCE ITEM.. USE DIR FIND TO GET EVIDENCE NAMES
+    // UNMOUNT EVIDENCEIMAGEDATAFILE
     for(int i=0; i < evidencelist.count(); i++)
     {
         //qDebug() << "evidencelist:" << evidencelist.at(i);
@@ -1532,8 +1453,6 @@ void WombatForensics::ExportEvidence()
 
 void WombatForensics::FinishExport()
 {
-    //ui->actionCancel_Operation->setEnabled(false);
-    //cancelthread->close();
     qInfo() << "Export Completed with" << QString::number(errorcount) << "error(s)";
     //LogMessage(QString("Export Completed with " + QString::number(errorcount) + " error(s)"));
     StatusUpdate("Exporting completed with " + QString::number(errorcount) + " error(s)");
@@ -1553,7 +1472,6 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     {
         TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
         exportlist.append(itemnode->Data(10).toString());
-        //exportlist.append(selectedindex.sibling(selectedindex.row(), 10).data().toString());
     }
     else
         exportlist = GetFileLists(etype);
@@ -1564,9 +1482,6 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     // cancellable map
     QFuture<void> tmpfuture = QtConcurrent::map(exportlist, ProcessExport);
     exportwatcher.setFuture(tmpfuture);
-    //ui->actionCancel_Operation->setEnabled(true);
-    //QToolTip::showText(cancelwidget->mapToGlobal(QPoint(0, 0)), "Cancel Currently Running Opreation");
-    //cancelthread->show();
 }
 
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
@@ -1584,7 +1499,6 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         {
             TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
             digfilelist.append(itemnode->Data(10).toString());
-            //digfilelist.append(selectedindex.sibling(selectedindex.row(), 10).data().toString());
         }
         else
             digfilelist = GetFileLists(dtype);
@@ -1594,10 +1508,6 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         {
             thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
             thumbwatcher.setFuture(thumbfuture);
-            //QFuture<void> tmpfuture = QtConcurrent::run(StartThumbnails, digfilelist);
-            //thumbfuture = QtConcurrent::map(digfilelist, StartThumbnails); // Process Thumbnails
-            //thumbwatcher.setFuture(thumbfuture);
-            //QFuture<void> tmpfuture = QtConcurrent::run(&WombatForensics::StartThumbnails, digfilelist); // Process All Thumbnails
         }
         else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 || digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256
         {
@@ -1611,18 +1521,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             //StatusUpdate("Generating Hash...");
             hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
             hashingwatcher.setFuture(hashingfuture);
-            //StartHash(digfilelist, 0);
         }
-        /*
-        else if(digoptions.at(i) == 2) // Generate SHA1
-        {
-            qInfo() << "Generating SHA1 Hash...";
-            StatusUpdate("Generating SHA1 Hash...");
-            hashingfuture = QtConcurrent::map(digfilelist, GenerateSHA1);
-            hashingwatcher.setFuture(hashingfuture);
-            //StartHash(digfilelist, 1);
-        }
-        */
     }
 }
 
@@ -1641,24 +1540,11 @@ void WombatForensics::HashingFinish()
         treenodemodel->UpdateHeaderNode(7, "SHA256 Hash");
     //qDebug() << hashsum;
     qDebug() << "Hashing should be Finished";
-    // here is where i should update the column header...., which is possibly display and then update hash type...
 }
 
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
     digstatusdialog->UpdateDigState(digid, digcnt);
-    /*
-    if(hashingwatcher.isFinished() && (digid = 1 || digid == 2 || digid == 3))
-        digstatusdialog->UpdateDigState(digid, -1);
-    if(thumbwatcher.isFinished() && digid == 0)
-        digstatusdialog->UpdateDigState(digid, -1);
-    */
-    /*
-    int curprogress = (int)((((float)digcount)/(float)digfilelist.count())*100);
-    //qInfo() << "Dug:" << QString::number(digcount) << "of" << QString::number(digfilelist.count()) << QString::number(curprogress) << "%";
-    //LogMessage("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
-    StatusUpdate("Dug: " + QString::number(digcount) + " of " + QString::number(digfilelist.count()) + " " + QString::number(curprogress) + "%");
-    */
 }
 void WombatForensics::UpdateExport()
 {
@@ -1714,7 +1600,6 @@ void WombatForensics::mouseDoubleClickEvent(QMouseEvent* event)
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
     StatusUpdate("Exiting...");
-    //QApplication::restoreOverrideCursor();
     if(wombatvariable.iscaseopen)
     {
         QMessageBox exitbox;
@@ -1729,19 +1614,10 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         StatusUpdate("Exiting...");
     }
     
-    //propertywindow->close();
-    //fileviewer->close();
     imagewindow->close();
-    /*
-    if(videowindow->isVisible())
-        videowindow->close();
-    */
     viewmanage->close();
-    //textviewer->close();
-    //htmlviewer->close();
     byteviewer->close();
     aboutbox->close();
-    //cancelthread->close();
     settingsdialog->close();
     RemoveTmpFiles();
     event->accept();
@@ -1802,10 +1678,6 @@ void WombatForensics::on_actionSaveState_triggered()
 
 void WombatForensics::on_actionCancel_Operation_triggered()
 {
-    /*
-    emit CancelCurrentThread();
-    ui->actionCancel_Operation->setEnabled(false);
-    */
 }
 
 void WombatForensics::on_actionCheck_triggered()
@@ -1831,7 +1703,6 @@ void WombatForensics::on_actionDigDeeper_triggered()
 {
     totalcount = filesfound;
     totalchecked = fileschecked;
-    //digcount = 0;
     dighashcount = 0;
     digimgthumbcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
@@ -1884,8 +1755,6 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
                 digstatusdialog->SetInitialDigState(0, filesfound);
                 thumbfuture = QtConcurrent::map(listeditems, GenerateThumbnails); // Process All thumbnails
                 thumbwatcher.setFuture(thumbfuture);
-                //QFuture<void> tmpfuture = QtConcurrent::run(StartThumbnails, listeditems); // Process all thumbnails
-                //QFuture<void> tmpfuture = QtConcurrent::run(&WombatForensics::StartThumbnails, listeditems); // Process All Thumbnails
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
@@ -1900,8 +1769,6 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 
 void WombatForensics::FinishThumbs()
 {
-    //ui->actionCancel_Operation->setEnabled(false);
-    //cancelthread->close();
     digstatusdialog->UpdateDigState(0, -1);
     StatusUpdate("Thumbnail generation finished.");
     qInfo() << "Thumbnail generation finished";
@@ -2233,7 +2100,6 @@ QString WombatForensics::InitializeSelectedState()
         QString tmpstr = selectfile.readLine();
         selectfile.close();
         //qDebug() << tmpstr;
-        //return "file-r-3.dat";
         return tmpstr;
     }
     else return "";
@@ -2255,7 +2121,6 @@ void WombatForensics::AutoSaveState()
     StatusUpdate("Saving State Started");
     SaveState();
     StatusUpdate("Evidence ready");
-    // change display text
 }
 
 void WombatForensics::SetHexOffset()

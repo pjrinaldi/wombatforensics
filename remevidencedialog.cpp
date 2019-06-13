@@ -1,6 +1,6 @@
 #include "remevidencedialog.h"
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 RemEvidenceDialog::RemEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RemEvidenceDialog)
@@ -17,41 +17,6 @@ RemEvidenceDialog::RemEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new 
 RemEvidenceDialog::~RemEvidenceDialog()
 {
 }
-
-/*
-void AddEvidenceDialog::SelectEvidence()
-{
-    QFileDialog addeviddialog(this, tr("Add Evidence Item"), QDir::homePath());
-    addeviddialog.setFileMode(QFileDialog::ExistingFile);
-    addeviddialog.setLabelText(QFileDialog::Accept, "Add");
-    QString evidfilename = "";
-    if(addeviddialog.exec())
-        evidfilename = addeviddialog.selectedFiles().first();
-    //QString evidfilename = QFileDialog::getOpenFileName(this, tr("Add Evidence Item"), QDir::homePath());
-    // check for evidence image
-    if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff"))
-    {
-        // it's an evidence image so process...
-        ui->evidencelist->addItem(evidfilename);
-        ui->startbutton->setEnabled(true);
-    }
-    else if(evidfilename.isNull())
-    {
-        qDebug() << "cancelled by the user.";
-    }
-    else
-    {
-        QMessageBox::warning(this, tr("Unsupported Format"), tr("Unfortunately, this format is not supported YET, it should be supported by v0.2"), QMessageBox::Ok);
-        qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.2.";
-    }
-}
-
-void AddEvidenceDialog::UpdateButtons()
-{
-    if(ui->evidencelist->selectedItems().count() > 0)
-        ui->removebutton->setEnabled(true);
-}
-*/
 
 void RemEvidenceDialog::RemoveEvidence()
 {

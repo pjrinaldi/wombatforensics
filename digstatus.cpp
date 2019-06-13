@@ -1,13 +1,12 @@
 #include "digstatus.h"
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 DigStatus::DigStatus(QWidget* parent) : QDialog(parent), ui(new Ui::DigStatus)
 {
     ui->setupUi(this);
     this->hide();
-    // need to hide ui elements until i use them. also need to build in the cancel buttons with signals...
     ui->imgthumblabel->setVisible(false);
     ui->imgthumbbutton->setVisible(false);
     ui->hashlabel->setVisible(false);

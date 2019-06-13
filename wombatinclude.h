@@ -1,7 +1,7 @@
 #ifndef WOMBATINCLUDE_H
 #define WOMBATINCLUDE_H
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include <bitset>
@@ -92,7 +92,6 @@
 #include <tar.h>
 #include <libtar.h>
 
-//#include <tsk/libtsk.h>
 #include <libtsk.h>
 #include <libewf.h>
 #include <tsk_bsd.h>

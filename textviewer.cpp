@@ -1,6 +1,6 @@
 #include "textviewer.h"
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 TextViewer::TextViewer(QWidget* parent) : QDialog(parent), ui(new Ui::TextViewer)
@@ -31,7 +31,6 @@ void TextViewer::ShowText(const QModelIndex &index)
 {
     curindex = index;
     curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toLongLong();
-    //GetTextContent(index);
     UpdateEncoding(0);
     this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 0).data().toString()));
     this->show();

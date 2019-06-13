@@ -1,7 +1,7 @@
 #ifndef WOMBATFUNCTIONS_H
 #define WOMBATFUNCTIONS_H
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include "wombatinclude.h"
@@ -34,7 +34,6 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta);
 QString ConvertGmtHours(int gmtvar);
 void ProcessExport(QString curid);
 void InitializeEvidenceStructure(QString evidstring);
-//void InitializeEvidenceStructure(void);
 int SegmentDigits(int);
 QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
 

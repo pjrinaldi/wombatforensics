@@ -1,7 +1,7 @@
 #include "wombatinclude.h"
 #include "wombatforensics.h"
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -33,7 +33,7 @@ void MyMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
             //fprintf(stderr, "My Fatal: %s\n", localmsg.constData());
             break;
     }
-    //msglog->append(QString(tmpstring + ": " + localmsg.constData()));
+    msglog->append(QString(tmpstring + ": " + localmsg.constData()));
     logfile.write(ba);
     logfile.flush();
     //logfile.write(QString(tmpstring + "\t" + logmsg + "\n").toStdString().c_str());
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     a.setWindowIcon(QIcon(":/appicon"));
     //a.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
     WombatForensics w;
-    //qInstallMessageHandler(MyMessageOutput); // comment out to view debug statements in terminal
+    qInstallMessageHandler(MyMessageOutput); // comment out to view debug statements in terminal
     w.show();
     
     return a.exec();

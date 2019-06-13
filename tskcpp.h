@@ -1,10 +1,9 @@
 #ifndef TSKCPP_H
 #define TSKCPP_H
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2
+// SLEUTHKIT FUNCTIONS NEEDED FROM HFS.C AND YAFFS.CPP WHICH ARE NOT IN ANY AVAIALBLE H FILE
 
-#include "wombatinclude.h"
+#include "wombatinclude.h" // my include file code
 
 void cnid_to_array(uint32_t cnid, uint8_t array[4]);
 int hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2);

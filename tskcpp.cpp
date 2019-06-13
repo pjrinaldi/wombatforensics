@@ -1,4 +1,5 @@
 #include "tskcpp.h"
+// SLEUTHKIT FUNCTIONS NEEDED FROM HFS.C AND YAFFS.CPP WHICH ARE NOT IN ANY AVAIALBLE H FILE
 
 void cnid_to_array(uint32_t cnid, uint8_t array[4])
 {

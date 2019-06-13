@@ -7,52 +7,39 @@
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-extern WombatVariable wombatvariable;
-extern QFile logfile;
-extern QFile viewerfile;
-extern QFile settingsfile;
-extern QFile treefile;
-extern QDir thumbdir;
-extern QDir currentrawimagedir;
+extern WombatVariable wombatvariable; // contains useful application variables
+extern QFile logfile; // controls the logfile
+extern QFile viewerfile; // controls the viewer file and its values for external viewers
+extern QFile settingsfile; // controls the settings
+extern QDir thumbdir; // controls the thumbs/ directory
 extern QTextEdit* msglog;
-extern QFutureWatcher<void> secondwatcher;
-extern qint64 filesfound;
-extern qint64 fileschecked;
-extern qint64 processphase;
-extern qint64 totalcount;
-extern qint64 totalchecked;
-extern qint64 exportcount;
-extern qint64 dighashcount;
-extern qint64 digimgthumbcount;
-extern qint64 errorcount;
-extern qint64 jumpoffset;
-extern qint64 filejumpoffset;
-extern qint64 orphancount;
-extern int ecount;
-extern int childcount;
-extern int linefactor;
-extern int filelinefactor;
+extern qint64 filesfound; // holds the number of files found for all the evidence.
+extern qint64 fileschecked; // holds humber of files checked for a case across all evidence
+extern qint64 totalcount; // used for dig deeper and export dialogs
+extern qint64 totalchecked; // used for dig deeper and export dialogs
+extern qint64 exportcount; // used for exporting files
+extern qint64 dighashcount; // used for hashing files with dig deeper
+extern qint64 digimgthumbcount; // used for generating thumbnails
+extern qint64 errorcount; // export error count variable
+extern qint64 jumpoffset; // stores offset hex value when the user wants to jump to that offset
+extern qint64 filejumpoffset; // stores offset hex value when the user wants to jump to that offset in the file hexviewer
+extern qint64 orphancount; // keeps track of unique id # for orphan files
+extern int ecount; // evidence count variable
 extern int thumbsize; // thumbnail size settings variable
 extern int mftrecordsize;
-extern int hashsum;
-extern QList<QVariant> colvalues;
-extern QStringList propertylist;
-extern QStringList thumblist;
-extern QStringList thumbpathlist;
-extern QStringList exportlist;
-extern QStringList digfilelist;
-extern QStringList listeditems;
-extern QStringList evidencelist;
-extern QString exportpath;
-extern bool originalpath;
+extern int hashsum; // type of hash used: either md5, sha1, sha256
+extern QStringList propertylist; // contains properties list values
+extern QStringList exportlist; // contains list of files to be exported
+extern QStringList digfilelist; // contains list of files to dig
+extern QStringList listeditems; // contains checked or all list of files for a case
+extern QStringList evidencelist; // contains the list of evidence
+extern QString exportpath; // path to export files to
+extern bool originalpath; // whether to include original file path or not
 extern QString casepath; // case path settings variable
-extern QString blockstring;
-extern QString thumbpath;
-extern QString hexselection;
-extern QString hexstring;
-extern QHash<QString, bool> checkhash;
-extern QHash<QString, QString> imageshash;
-extern QMutex mutex;
+extern QString hexstring; // tmp hex file filename with path
+extern QHash<QString, bool> checkhash; // hash value list for check boxes.
+extern QHash<QString, QString> imageshash; // list of thumbnail ids, paths
+extern QMutex mutex; // mutex so my code will work when multithreaded (mainly for adding treeview nodes)
 
 struct dosdate
 {
@@ -262,11 +249,7 @@ public:
     {
         if(!index.isValid())
             return QVariant();
-        /*
-        if(role != Qt::DisplayRole)
-            return QVariant();
-        */
-        
+
         TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
         int nodetype = 0;
         int itemtype = 0;
@@ -805,30 +788,12 @@ public:
     void UpdateHeaderNode(int column, QString hash)
     {
         //qDebug() << "updatehadernode value:" << zeronode->Data(9).toString();
-        //qDebug() << "
         zeronode->SetData(column, hash);
-        // SHOULD BE EITHER MD5 HASH, SHA1 HASH, SHA256 HASH
-        //zeronode->SetData(column, hash);
     };
 
     //void RemEvidence(QString evidid)
     void RemEvidence()
     {
-        /*
-        if(evidid.compare("") == 0)
-        {
-        }
-        */
-        // READALL THE MODEL DATA INTO A STRINGLIST...
-        // LOOP OVER STRING ITEMS AND IF MATCH EVIDID, REMOVE FROM LIST
-        // WRITE THE STRINGLIST TO THE TREEFILE.
-        // this would need to remove all instances of the e# from the file and then save the file and then reload the evidence...
-        // have to think on this and figure out a quick way to do this...
-        /*
-        beginRemoveRows(QModelIndex(), evidid, evidid);
-        parents.remove(evidid);
-        endRemoveRows();
-        */
         beginResetModel();
         endResetModel();
     };

@@ -1,7 +1,7 @@
 #include "exportdialog.h"
 #include "ui_exportdialog.h"
 
-// Copyright 2015 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 ExportDialog::ExportDialog(QWidget *parent, qint64 curcheckcount, qint64 curlistcount) :
