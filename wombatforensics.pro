@@ -1,6 +1,7 @@
 QT += widgets core concurrent sql multimedia multimediawidgets webenginewidgets gui
-QT -= opengl quick network qml
+#QT -= opengl quick network qml
 linux:CONFIG += debug_and_release debug_and_release_target qt x11 build_all c++11
+#linux:CONFIG += release qt x11 build_all c++11
 INCLUDEPATH += /usr/include/tsk/
 INCLUDEPATH += /usr/include/tsk/auto/
 INCLUDEPATH += /usr/include/tsk/base/
@@ -28,6 +29,7 @@ if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 #linux:
 
 #install
-target.path = ./
+target.path = /usr/local/bin
+#target.path = ./
 INSTALLS += target
 

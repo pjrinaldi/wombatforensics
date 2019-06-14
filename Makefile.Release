@@ -28823,13 +28823,13 @@ release/moc_remevidencedialog.o: release/moc_remevidencedialog.cpp
 ####### Install
 
 install_target: all FORCE
-	@test -d $(INSTALL_ROOT)/home/pasquale/Projects/wombatforensics/./ || mkdir -p $(INSTALL_ROOT)/home/pasquale/Projects/wombatforensics/./
-	-$(QINSTALL_PROGRAM) release/$(QMAKE_TARGET) $(INSTALL_ROOT)/home/pasquale/Projects/wombatforensics/$(QMAKE_TARGET)
-	-$(STRIP) $(INSTALL_ROOT)/home/pasquale/Projects/wombatforensics/$(QMAKE_TARGET)
+	@test -d $(INSTALL_ROOT)/usr/local/bin || mkdir -p $(INSTALL_ROOT)/usr/local/bin
+	-$(QINSTALL_PROGRAM) release/$(QMAKE_TARGET) $(INSTALL_ROOT)/usr/local/bin/$(QMAKE_TARGET)
+	-$(STRIP) $(INSTALL_ROOT)/usr/local/bin/$(QMAKE_TARGET)
 
 uninstall_target: FORCE
-	-$(DEL_FILE) $(INSTALL_ROOT)/home/pasquale/Projects/wombatforensics/$(QMAKE_TARGET)
-	-$(DEL_DIR) $(INSTALL_ROOT)/home/pasquale/Projects/wombatforensics/./ 
+	-$(DEL_FILE) $(INSTALL_ROOT)/usr/local/bin/$(QMAKE_TARGET)
+	-$(DEL_DIR) $(INSTALL_ROOT)/usr/local/bin/ 
 
 
 install: install_target  FORCE
