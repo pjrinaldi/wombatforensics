@@ -45,11 +45,13 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         label = new QLabel(TextViewer);
         label->setObjectName(QString::fromUtf8("label"));
+        label->setEnabled(false);
 
         horizontalLayout->addWidget(label);
 
         comboBox = new QComboBox(TextViewer);
         comboBox->setObjectName(QString::fromUtf8("comboBox"));
+        comboBox->setEnabled(false);
 
         horizontalLayout->addWidget(comboBox);
 

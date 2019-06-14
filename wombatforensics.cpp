@@ -956,7 +956,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
                     if(filehexfileinfo->meta != NULL)
                     {
                         fhexbuf = new char[filelist.at(8).toLongLong()];
-                        fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, curid.split("-").at(3).split(":").at(1).toInt(), 0, fhexbuf, filelist.at(8).toLongLong(), TSK_FS_FILE_READ_FLAG_NONE);
+                        fhexlen = tsk_fs_file_read_type(filehexfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, curid.split("-").at(3).split(":").at(1).toInt(), 0, fhexbuf, filelist.at(8).toLongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
                         if(fhexlen == -1)
                             qDebug() << tsk_error_get_errstr();
                     }
@@ -966,7 +966,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
                     if(filehexfileinfo->meta != NULL)
                     {
                         fhexbuf = new char[filehexfileinfo->meta->size];
-                        fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                        fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
                     }
                 }
             }
@@ -975,7 +975,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
                 if(filehexfileinfo->meta != NULL)
                 {
                     fhexbuf = new char[filehexfileinfo->meta->size];
-                    fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                    fhexlen = tsk_fs_file_read(filehexfileinfo, 0, fhexbuf, filehexfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
                 }
             }
         }

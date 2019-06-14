@@ -37,8 +37,8 @@ private:
     Ui::TextViewer* ui;
     TskObject tskobj;
     TskObject* tskptr;
-    QByteArray txtdata;
-    QByteArray tmpdata;
+    //QByteArray txtdata;
+    //QByteArray tmpdata;
     QString decodedstring;
     qint64 curobjaddr;
     QList<QTextCodec*> codecs;
