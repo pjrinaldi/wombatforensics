@@ -225,12 +225,15 @@ void WombatForensics::ShowExternalViewer()
     ssize_t filelen = 0;
     if(tskexternalptr->readfileinfo->meta != NULL)
     {
-        char* ibuffer = new char[tskexternalptr->readfileinfo->meta->size];
+        char ibuffer[tskexternalptr->readfileinfo->meta->size];
+        //char* ibuffer = new char[tskexternalptr->readfileinfo->meta->size];
         // WILL NEED TO FIGURE OUT IF ITS AN ATTRIBUTE OR NOT AND HANDLE THE IF BELOW...
         //if(objtype == 5)
         filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         //else
-        (new QDir())->mkpath(wombatvariable.tmpfilepath);
+        QDir dir;
+        dir.mkpath(wombatvariable.tmpfilepath);
+        //(new QDir())->mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 10).data().toString() + "-tmp";
         QFile tmpfile(tmpstring);
         if(tmpfile.open(QIODevice::WriteOnly))
@@ -239,7 +242,7 @@ void WombatForensics::ShowExternalViewer()
             outbuffer.writeRawData(ibuffer, filelen);
             tmpfile.close();
         }
-        delete[] ibuffer;
+        //delete[] ibuffer;
         QProcess* process = new QProcess(this);
         QStringList arguments;
         arguments << tmpstring;
@@ -353,9 +356,14 @@ void WombatForensics::ReadSettings()
         //else if(tmplist.at(i).split(":").at(0) == "save")
         // etc...
     }
-    // ensure casepath exists
-    if((new QDir())->mkpath(casepath) == false)
+    QDir dir;
+    if(dir.mkpath(casepath) == false)
         DisplayError("S.1", "App casepath folder failed", "App casepath folder was not created");
+
+    // ensure casepath exists
+    //QDir::mkpath(casepath);
+    //if((new QDir())->mkpath(casepath) == false)
+    //    DisplayError("S.1", "App casepath folder failed", "App casepath folder was not created");
 }
 
 void WombatForensics::HideMessageViewer(bool checkstate)
@@ -378,6 +386,19 @@ void WombatForensics::InitializeAppStructure()
     wombatvariable.tmpfilepath = tmppath + "tmpfiles/";
     wombatvariable.tmpmntpath = homepath + "mntpt/";
     wombatvariable.imgdatapath = tmppath + "datamnt/";
+    QDir dir;
+    if(dir.mkpath(tmppath) == false)
+        DisplayError("1.6", "App tmppath folder failed", "App tmppath folder was not created");
+    if(dir.mkpath(wombatvariable.tmpfilepath) == false)
+        DisplayError("1.3", "App tmpfile folder failed", "App Tmpfile folder was not created");
+    if(dir.mkpath(wombatvariable.tmpmntpath) == false)
+        DisplayError("1.2", "App tmpmnt folder failed", "App tmpmnt folder was not created");
+    if(dir.mkpath(homepath) == false)
+        DisplayError("1.4", "App homepath folder failed", "App homepath folder was not created");
+    if(dir.mkpath(wombatvariable.imgdatapath) == false)
+        DisplayError("1.5", "App imgdatapath folder failed", "App imgdatapath folder was not created");
+
+    /*
     if((new QDir())->mkpath(tmppath) == false)
         DisplayError("1.6", "App tmppath folder failed", "App tmppath folder was not created");
     if((new QDir())->mkpath(wombatvariable.tmpfilepath) == false)
@@ -388,6 +409,7 @@ void WombatForensics::InitializeAppStructure()
         DisplayError("1.4", "App homepath folder failed", "App homepath folder was not created");
     if((new QDir())->mkpath(wombatvariable.imgdatapath) == false)
         DisplayError("1.5", "App imgdatapath folder failed", "App imgdatapath folder was not created");
+    */
     viewerfile.setFileName(homepath + "viewers");
     if(!FileExists(QString(homepath + "viewers").toStdString()))
     {
@@ -448,7 +470,9 @@ void WombatForensics::InitializeCaseStructure()
         this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
         //qDebug() << "tmpmntpath before:" << wombatvariable.tmpmntpath;
         wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename + "/";
-        (new QDir())->mkpath(wombatvariable.tmpmntpath);
+        QDir dir;
+        dir.mkpath(wombatvariable.tmpmntpath);
+        //(new QDir())->mkpath(wombatvariable.tmpmntpath);
         wombatvariable.iscaseopen = true;
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
@@ -695,7 +719,9 @@ void WombatForensics::PrepareEvidenceImage()
             if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
             {
                 QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
-                (new QDir())->mkpath(tmpstring);
+                QDir dir;
+                dir.mkpath(tmpstring);
+                //(new QDir())->mkpath(tmpstring);
                 mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
             }
         }
@@ -789,7 +815,9 @@ void WombatForensics::AddEvidence()
     for(int i=0; i < evidencelist.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + evidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
-        (new QDir())->mkpath(evidencepath);
+        QDir dir;
+        dir.mkpath(evidencepath);
+        //(new QDir())->mkpath(evidencepath);
         ecount++;
     }
     //qDebug() << "ecount after:" << ecount;
@@ -926,7 +954,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
             filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.split("-").at(0).toInt());
         else
             filehexfileinfo = tsk_fs_file_open_meta(filehexfsinfo, NULL, tmpfilename.toInt());
-        char* fhexbuf;
+        char* fhexbuf = new char[0];
         ssize_t fhexlen = 0;
     
         QFile filefile;
@@ -981,7 +1009,9 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         }
         if(curindex.sibling(curindex.row(), 2).data().toLongLong() > 0)
         {
-            (new QDir())->mkpath(wombatvariable.tmpfilepath);
+            QDir dir;
+            dir.mkpath(wombatvariable.tmpfilepath);
+            //(new QDir())->mkpath(wombatvariable.tmpfilepath);
             hexstring = wombatvariable.tmpfilepath + curindex.sibling(curindex.row(), 10).data().toString() + "-fhex";
             QFile tmpfile(hexstring);
             tmpfile.open(QIODevice::WriteOnly);
@@ -1588,6 +1618,28 @@ void WombatForensics::SetupHexPage(void)
 
 WombatForensics::~WombatForensics()
 {
+    delete bookmarkmenu;
+    delete selectionmenu;
+    delete msgviewer;
+    delete idfilterview;
+    delete jumpfilterview;
+    delete namefilterview;
+    delete pathfilterview;
+    delete sizefilterview;
+    delete createfilterview;
+    delete accessfilterview;
+    delete modifyfilterview;
+    delete changefilterview;
+    delete filetypefilterview;
+    delete filecategoryfilterview;
+    delete hashfilterview;
+    delete byteviewer;
+    delete viewmanage;
+    delete imagewindow;
+    delete aboutbox;
+    delete settingsdialog;
+    delete isignals;
+    delete treemenu;
     delete ui;
 }
 
@@ -1614,6 +1666,10 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         CloseCurrentCase();
         StatusUpdate("Exiting...");
     }
+    else
+    {
+        delete treenodemodel;
+    }
     
     imagewindow->close();
     viewmanage->close();
@@ -1622,8 +1678,10 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     settingsdialog->close();
     RemoveTmpFiles();
     event->accept();
-    msglog->clear();
+    //msglog->clear();
     msgviewer->close();
+    //delete ui;
+    //delete ui->mainStatusBar;
 }
 
 void WombatForensics::RemoveTmpFiles()

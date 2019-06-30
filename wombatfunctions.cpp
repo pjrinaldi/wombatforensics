@@ -198,14 +198,17 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
         treeout << "0" << "0" << "0" << "0" << "0";
     }
 
-    char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
-    QByteArray tmparray;
+    //char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
+    char magicbuffer[1024];
+    //char* magicbuffer = new char[1024];
+    QByteArray tmparray("intro");
     tmparray.clear();
     tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
     tmparray = QByteArray::fromRawData(magicbuffer, 1024);
     QMimeDatabase mimedb;
-    QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-    free(magicbuffer);
+    const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+    //delete[] magicbuffer;
+    //free(magicbuffer);
     outstring += mimetype.name() + ",0,e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f";
     if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
         outstring += "*" + QString::number(orphancount);
@@ -422,15 +425,18 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 {
                     treeout << "0" << "0" << "0" << "0" << "0";
                 }
-            
-                char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
+                char magicbuffer[1024];
+                //char* magicbuffer = new char[1024];
+                //char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
+                //char* fbuf = new char[fsattr->size];
                 QByteArray tmparray;
                 tmparray.clear();
                 tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
                 tmparray = QByteArray::fromRawData(magicbuffer, 1024);
                 QMimeDatabase mimedb;
                 QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-                free(magicbuffer);
+                //free(magicbuffer);
+                //delete[] magicbuffer;
                 QFile hshfile;
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
                     hshfile.setFileName(partitionpath + "f" + QString::number(orphancount) + ".a" + QString::number(tmpfile->name->par_addr) + ".stat");
@@ -680,7 +686,8 @@ void ProcessExport(QString objectid)
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
     if(readfileinfo->meta != NULL)
     {
-        char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+        //char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+        char* imgbuf = new char[readfileinfo->meta->size];
         ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
         QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
@@ -726,7 +733,8 @@ void ProcessExport(QString objectid)
                 }
             }
         }
-        free(imgbuf);
+        delete[] imgbuf;
+        //free(imgbuf);
     }
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
@@ -823,7 +831,7 @@ void GenerateHash(QString itemid)
                 readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         }
         QString hashstr = "";
-        char* hashdata;
+        char* hashdata = new char[0];;
         ssize_t hashdatalen = 0;
         if(readfileinfo != NULL)
         {
@@ -925,7 +933,7 @@ void GenerateHash(QString itemid)
         }
         treenodemodel->UpdateNode(itemid, 7, hashstr);
         QString hashheader = "";
-        delete[] hashdata;
+        //delete[] hashdata;
         if(hashsum == 1) // MD5
             hashtype = 1;
         else if(hashsum == 2) // SHA1
@@ -1040,7 +1048,8 @@ void GenerateThumbnails(QString thumbid)
             }
             else // regular file
             {
-                imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+                imgbuf = new char[readfileinfo->meta->size];
+                //imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
                 imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
             }
         }
@@ -1091,7 +1100,8 @@ void GenerateThumbnails(QString thumbid)
                 }
             }
         }
-        free(imgbuf);
+        delete[] imgbuf;
+        //free(imgbuf);
         digimgthumbcount++;
         isignals->DigUpd(0, digimgthumbcount);
     }
