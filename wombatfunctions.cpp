@@ -350,12 +350,13 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                 {
                     if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                     {
-                        char* fbuf = new char[fsattr->size];
+                        //char* fbuf = new char[fsattr->size];
+                        char fbuf[fsattr->size];
                         ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                         QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                         QMimeDatabase adsmimedb;
                         QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
-                        delete[] fbuf;
+                        //delete[] fbuf;
                         QFile adsfile(aevar->partitionpath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
                         adsfile.open(QIODevice::Append | QIODevice::Text);
                         QTextStream adsout(&adsfile);
@@ -565,12 +566,13 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                             {
                                 if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                                 {
-                                    char* fbuf = new char[fsattr->size];
+                                    char fbuf[fsattr->size];
+                                    //char* fbuf = new char[fsattr->size];
                                     ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                                     QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                                     QMimeDatabase adsmimedb;
                                     QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
-                                    delete[] fbuf;
+                                    //delete[] fbuf;
                                     adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
                                     treeout.clear();
                                     // ADD THE HASH VALUE TO FROM THE FILE
@@ -686,8 +688,9 @@ void ProcessExport(QString objectid)
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
     if(readfileinfo->meta != NULL)
     {
+        char imgbuf[readfileinfo->meta->size];
         //char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
-        char* imgbuf = new char[readfileinfo->meta->size];
+        //char* imgbuf = new char[readfileinfo->meta->size];
         ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
         QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
@@ -710,7 +713,11 @@ void ProcessExport(QString objectid)
             tmppath = exportpath + "/";
         if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
         {
-            bool tmpdir = (new QDir())->mkpath(QString(tmppath + tmpname));
+            QDir dir;
+            bool tmpdir = dir.mkpath(QString(tmppath + tmpname));
+            //QDir dir;
+            //dir.mkpath(wombatvariable.tmpfilepath);
+            //bool tmpdir = (new QDir())->mkpath(QString(tmppath + tmpname));
             if(!tmpdir)
             {
                 qWarning() << "Creation of export directory tree for file:" << tmppath << "failed";
@@ -720,7 +727,9 @@ void ProcessExport(QString objectid)
         }
         else
         {
-            bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(tmppath));
+            QDir dir;
+            bool tmpdir = dir.mkpath(QDir::cleanPath(tmppath));
+            //bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(tmppath));
             if(tmpdir == true)
             {
                 QFile tmpfile(tmppath + tmpname);
@@ -733,7 +742,7 @@ void ProcessExport(QString objectid)
                 }
             }
         }
-        delete[] imgbuf;
+        //delete[] imgbuf;
         //free(imgbuf);
     }
     tsk_fs_file_close(readfileinfo);
@@ -831,7 +840,7 @@ void GenerateHash(QString itemid)
                 readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         }
         QString hashstr = "";
-        char* hashdata = new char[0];;
+        char* hashdata = new char[0];
         ssize_t hashdatalen = 0;
         if(readfileinfo != NULL)
         {
@@ -1357,7 +1366,9 @@ void InitializeEvidenceStructure(QString evidname)
     volcnt = volfiles.count();
     addevidvar.volcnt = volcnt;
     QString volumepath = evidencepath + "v" + QString::number(volcnt) + "/";
-    (new QDir())->mkpath(volumepath);
+    QDir dir;
+    dir.mkpath(volumepath);
+    //(new QDir())->mkpath(volumepath);
     QFile volfile(volumepath + "stat");
     volfile.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&volfile);
@@ -1383,7 +1394,8 @@ void InitializeEvidenceStructure(QString evidname)
             QString partitionpath = volumepath + "p0/";
             addevidvar.partitionpath = partitionpath;
             addevidvar.partint = partint;
-            (new QDir())->mkpath(partitionpath);
+            dir.mkpath(partitionpath);
+            //(new QDir())->mkpath(partitionpath);
             QFile pfile(partitionpath + "stat");
             pfile.open(QIODevice::Append | QIODevice::Text);
             out.setDevice(&pfile);
@@ -1404,7 +1416,8 @@ void InitializeEvidenceStructure(QString evidname)
             QString partitionpath = volumepath + "p0/";
             addevidvar.partitionpath = partitionpath;
             addevidvar.partint = partint;
-            (new QDir())->mkpath(partitionpath);
+            dir.mkpath(partitionpath);
+            //(new QDir())->mkpath(partitionpath);
             QFile pfile(partitionpath + "stat");
             pfile.open(QIODevice::Append | QIODevice::Text);
             out.setDevice(&pfile);
@@ -1452,7 +1465,8 @@ void InitializeEvidenceStructure(QString evidname)
                 QString partitionpath = volumepath + "p" + QString::number(partint) + "/";
                 addevidvar.partitionpath = partitionpath;
                 addevidvar.partint = partint;
-                (new QDir())->mkpath(partitionpath);
+                dir.mkpath(partitionpath);
+                //(new QDir())->mkpath(partitionpath);
                 pfile.setFileName(partitionpath + "stat");
                 pfile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
