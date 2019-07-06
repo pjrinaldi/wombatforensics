@@ -102,6 +102,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
+    //connect(ui->actionNew_Bookmark, SIGNAL(triggered()), this, SLOT(CreateNewTag()), Qt::DirectConnection);
 
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->actionSection);
@@ -181,16 +182,24 @@ void WombatForensics::ReadBookmarks()
     bookmarkfile.close();
     bookmarkmenu->clear();
     tagcheckedmenu->clear();
-    bookmarkmenu->addAction(ui->actionNew_Bookmark);
+    QAction* newtagaction = new QAction("New Tag", bookmarkmenu);
+    connect(newtagaction, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
+    bookmarkmenu->addAction(newtagaction);
+    QAction* newtagaction1 = new QAction("New Tag", tagcheckedmenu);
+    connect(newtagaction1, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
+    tagcheckedmenu->addAction(newtagaction1);
+    //bookmarkmenu->addAction(ui->actionNew_Bookmark);
     bookmarkmenu->addSeparator();
-    tagcheckedmenu->addAction(ui->actionNew_Bookmark);
+    //tagcheckedmenu->addAction(ui->actionNew_Bookmark);
     tagcheckedmenu->addSeparator();
     for(int i=0; i < bookitemlist.count(); i++)
     {
-        QAction* tmpaction = new QAction(bookitemlist.at(i), this);
+        QAction* tmpaction = new QAction(bookitemlist.at(i), bookmarkmenu);
+        QAction* tmpaction1 = new QAction(bookitemlist.at(i), tagcheckedmenu);
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
+        connect(tmpaction1, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         bookmarkmenu->addAction(tmpaction);
-        tagcheckedmenu->addAction(tmpaction);
+        tagcheckedmenu->addAction(tmpaction1);
     }
 }
 
@@ -211,6 +220,8 @@ void WombatForensics::UpdateBookmarkItems(QString tagname)
 
 void WombatForensics::CreateNewTag()
 {
+    QAction* tagaction = qobject_cast<QAction*>(sender());
+    QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString tagname = "";
     QInputDialog* newtagdialog = new QInputDialog(this);
     newtagdialog->setCancelButtonText("Cancel");
@@ -225,18 +236,74 @@ void WombatForensics::CreateNewTag()
     {
         UpdateBookmarkItems(tagname);
         ReadBookmarks();
-        TagFile(tagname);
+        TagFile(parentmenu, tagname);
     }
 }
 
-void WombatForensics::TagFile(QString tagname)
+void WombatForensics::TagFile(QString parentmenu, QString tagname)
 {
+    if(parentmenu.contains("Selected")) // single file
+    {
+        QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-f").last();
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
+        QString evidencename = evidfiles.first();
+        QString estring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
+        QString vstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
+        QString pstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
+        QString fstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
+        //qDebug() << "evidencename:" << evidencename;
+        QStringList partlist;
+        partlist.clear();
+        QFile partfile(wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/stat");
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            partlist = QString(partfile.readLine()).split(",");
+        partfile.close();
+        qint64 rootinum = partlist.at(3).toLongLong();
+        if(paridstr.contains("-"))
+            paridstr = QString::number(rootinum);
+        QFile filefile;
+        QString filefilepath = wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/";
+        if(fstring.split(":").count() > 1)
+            filefilepath += fstring.split(":").first() + "-" + fstring.split(":").last();
+        else
+            filefilepath += fstring.split(":").first();
+        filefilepath += ".a" + paridstr + ".stat";
+        //qDebug() << "filepath:" << filefilepath;
+        filefile.setFileName(filefilepath);
+        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        QString tmpstr = "";
+        QStringList tmplist;
+        tmplist.clear();
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
+        filefile.close();
+        //qDebug() << "tmpstr before:" << tmpstr;
+        if(tmpstr.split(",").count() > 15)
+            tmplist = tmpstr.split(",");
+        tmplist[15] = tagname;
+        tmpstr = "";
+        for(int i = 0; i < tmplist.count(); i++)
+            tmpstr += tmplist.at(i) + ",";
+        //qDebug() << "tmpstr after:" << tmpstr;
+        filefile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(filefile.isOpen())
+            filefile.write(tmpstr.toStdString().c_str());
+        filefile.close();
+        treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, tagname);
+    }
+    else if(parentmenu.contains("Checked")) // checked files
+    {
+    }
 }
 
 void WombatForensics::SetBookmark()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
+    QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString tag = tagaction->text();
+    TagFile(parentmenu, tag);
 }
 
 void WombatForensics::ShowDigStatus()

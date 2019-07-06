@@ -1174,6 +1174,7 @@ void PopulateTreeModel(QString evidstring)
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + evidid + "/";
     QList<QVariant> nodedata;
     nodedata.clear();
+    //qDebug() << "tmpstr:" << tmpstr;
     nodedata << evidencename << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(6) << evidid.mid(1);
     mutex.lock();
     treenodemodel->AddNode(nodedata, "-1", -1, -1);
