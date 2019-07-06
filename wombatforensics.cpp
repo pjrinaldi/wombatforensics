@@ -495,12 +495,7 @@ void WombatForensics::InitializeAppStructure()
     if((new QDir())->mkpath(wombatvariable.imgdatapath) == false)
         DisplayError("1.5", "App imgdatapath folder failed", "App imgdatapath folder was not created");
     */
-    bookmarkfile.setFileName(homepath + "bookmarks");
-    if(!FileExists(QString(homepath + "bookmarks").toStdString()))
-    {
-        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
-        bookmarkfile.close();
-    }
+
     viewerfile.setFileName(homepath + "viewers");
     if(!FileExists(QString(homepath + "viewers").toStdString()))
     {
@@ -565,6 +560,13 @@ void WombatForensics::InitializeCaseStructure()
         dir.mkpath(wombatvariable.tmpmntpath);
         //(new QDir())->mkpath(wombatvariable.tmpmntpath);
         wombatvariable.iscaseopen = true;
+        bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
+        if(!FileExists(QString(wombatvariable.tmpmntpath + "bookmarks").toStdString()))
+        {
+            bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+            bookmarkfile.close();
+        }
+        qInfo() << "Bookmarks File Created";
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         msglog->clear();
@@ -614,6 +616,13 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     if(exitcode) {}
     if(exitstatus) {}
     wombatvariable.iscaseopen = true;
+    bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
+    if(!FileExists(QString(wombatvariable.tmpmntpath + "bookmarks").toStdString()))
+    {
+        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        bookmarkfile.close();
+    }
+    qInfo() << "Bookmarks File Created";
     logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     msglog->clear();
