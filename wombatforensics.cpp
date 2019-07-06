@@ -225,12 +225,18 @@ void WombatForensics::CreateNewTag()
     {
         UpdateBookmarkItems(tagname);
         ReadBookmarks();
-        // TagFile(tagname);
+        TagFile(tagname);
     }
 }
 
 void WombatForensics::TagFile(QString tagname)
 {
+}
+
+void WombatForensics::SetBookmark()
+{
+    QAction* tagaction = qobject_cast<QAction*>(sender());
+    QString tag = tagaction->text();
 }
 
 void WombatForensics::ShowDigStatus()

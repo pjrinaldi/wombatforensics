@@ -182,6 +182,7 @@ private slots:
     void PrepareEvidenceImage(void);
     void SetHexOffset(void);
     void CreateNewTag(void);
+    void SetBookmark(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
