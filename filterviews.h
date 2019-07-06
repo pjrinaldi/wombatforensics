@@ -20,6 +20,7 @@
 #include "ui_sizefilter.h"
 #include "ui_jumphex.h"
 #include "ui_filecategoryfilter.h"
+#include "ui_tagfilter.h"
 
 namespace Ui {
     class IdFilter;
@@ -33,6 +34,7 @@ namespace Ui {
     class FileTypeFilter;
     class FileCategoryFilter;
     class HashFilter;
+    class TagFilter;
     class JumpHex;
 }
 
@@ -237,6 +239,23 @@ private:
     Ui::FileCategoryFilter* ui;
 };
 
+class TagFilter : public QWidget
+{
+    Q_OBJECT
+public:
+    TagFilter(QWidget* parent = 0);
+    ~TagFilter();
+    void DisplayFilter();
+
+signals:
+    void HeaderChanged();
+
+private slots:
+    void HideClicked();
+private:
+    Ui::TagFilter* ui;
+};
+
 class HashFilter : public QWidget
 {
     Q_OBJECT
@@ -265,5 +284,6 @@ Q_DECLARE_METATYPE(ChangedDateFilter*);
 Q_DECLARE_METATYPE(FileTypeFilter*);
 Q_DECLARE_METATYPE(FileCategoryFilter*);
 Q_DECLARE_METATYPE(HashFilter*);
+Q_DECLARE_METATYPE(TagFilter*);
 Q_DECLARE_METATYPE(JumpHex*);
 #endif

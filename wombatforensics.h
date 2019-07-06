@@ -78,6 +78,7 @@ public:
     FileTypeFilter* filetypefilterview;
     FileCategoryFilter* filecategoryfilterview;
     HashFilter* hashfilterview;
+    TagFilter* tagfilterview;
     ImageViewer* imagewindow;
     ImageWindow* imageviewer;
     VideoViewer* videowindow;

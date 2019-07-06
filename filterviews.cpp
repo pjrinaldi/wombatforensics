@@ -438,6 +438,50 @@ void FileTypeFilter::HideClicked()
     emit HeaderChanged();
 }
 
+TagFilter::TagFilter(QWidget* parent) : QWidget(parent), ui(new Ui::TagFilter)
+{
+    ui->setupUi(this);
+    this->hide();
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+}
+
+TagFilter::~TagFilter()
+{
+    delete ui;
+}
+
+void TagFilter::DisplayFilter()
+{
+    QStringList tags;
+    tags.clear();
+    ui->tagcomboBox->clear();
+    QFile tmpfile(wombatvariable.tmpmntpath + "bookmarks");
+    QString tmpstr = "";
+    tmpfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(tmpfile.isOpen())
+        tmpstr = tmpfile.readLine();
+    tmpfile.close();
+    tags = tmpstr.split(",", QString::SkipEmptyParts);
+    for(int i=0; i < tags.count(); i++)
+        ui->tagcomboBox->addItem(tags.at(i));
+    if(filtervalues.tag.compare("") != 0)
+        ui->tagcomboBox->setCurrentText(filtervalues.tag);
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
+    if(this->pos().x() == 0)
+        this->move(newpos);
+    this->show();
+}
+
+void TagFilter::HideClicked()
+{
+    filtervalues.tagbool = ui->tagcheckBox->isChecked();
+    if(filtervalues.tagbool)
+        filtervalues.tag = ui->tagcomboBox->currentText();
+    this->hide();
+    emit HeaderChanged();
+}
+
 FileCategoryFilter::FileCategoryFilter(QWidget* parent) : QWidget(parent), ui(new Ui::FileCategoryFilter)
 {
     ui->setupUi(this);

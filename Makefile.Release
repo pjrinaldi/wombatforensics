@@ -354,7 +354,7 @@ TARGET        = release/wombatforensics
 first: all
 ####### Build rules
 
-release/wombatforensics: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_digstatus.h ui_remevidencedialog.h $(OBJECTS)  
+release/wombatforensics: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_digstatus.h ui_remevidencedialog.h ui_tagfilter.h $(OBJECTS)  
 	@test -d release/ || mkdir -p release/
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
@@ -376,7 +376,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h digstatus.h remevidencedialog.h tskcpp.h $(DISTDIR)/
 	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp digstatus.cpp remevidencedialog.cpp tskcpp.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui digstatus.ui remevidencedialog.ui $(DISTDIR)/
+	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui digstatus.ui remevidencedialog.ui tagfilter.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -482,6 +482,9 @@ release/moc_wombatforensics.cpp: wombatforensics.h \
 		globals.h \
 		tskcpp.h \
 		ui_wombatforensics.h \
+		qhexedit.h \
+		chunks.h \
+		commands.h \
 		propertieswindow.h \
 		ui_propertieswindow.h \
 		exportdialog.h \
@@ -502,6 +505,7 @@ release/moc_wombatforensics.cpp: wombatforensics.h \
 		ui_sizefilter.h \
 		ui_jumphex.h \
 		ui_filecategoryfilter.h \
+		ui_tagfilter.h \
 		imageviewer.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
@@ -562,6 +566,11 @@ release/moc_fileviewer.cpp: fileviewer.h \
 		wombatinclude.h \
 		tskvariable.h \
 		ui_fileviewer.h \
+		qhexedit.h \
+		chunks.h \
+		commands.h \
+		globals.h \
+		wombatvariable.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/release/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include fileviewer.h -o release/moc_fileviewer.cpp
@@ -585,6 +594,7 @@ release/moc_filterviews.cpp: filterviews.h \
 		ui_sizefilter.h \
 		ui_jumphex.h \
 		ui_filecategoryfilter.h \
+		ui_tagfilter.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/release/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include filterviews.h -o release/moc_filterviews.cpp
@@ -760,9 +770,9 @@ compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_digstatus.h ui_remevidencedialog.h
+compiler_uic_make_all: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_digstatus.h ui_remevidencedialog.h ui_tagfilter.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_digstatus.h ui_remevidencedialog.h
+	-$(DEL_FILE) ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_digstatus.h ui_remevidencedialog.h ui_tagfilter.h
 ui_aboutbox.h: aboutbox.ui \
 		/usr/bin/uic
 	/usr/bin/uic aboutbox.ui -o ui_aboutbox.h
@@ -906,6 +916,10 @@ ui_remevidencedialog.h: remevidencedialog.ui \
 		/usr/bin/uic
 	/usr/bin/uic remevidencedialog.ui -o ui_remevidencedialog.h
 
+ui_tagfilter.h: tagfilter.ui \
+		/usr/bin/uic
+	/usr/bin/uic tagfilter.ui -o ui_tagfilter.h
+
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
 compiler_yacc_impl_make_all:
@@ -924,6 +938,9 @@ release/main.o: main.cpp wombatinclude.h \
 		globals.h \
 		tskcpp.h \
 		ui_wombatforensics.h \
+		qhexedit.h \
+		chunks.h \
+		commands.h \
 		propertieswindow.h \
 		ui_propertieswindow.h \
 		exportdialog.h \
@@ -944,6 +961,7 @@ release/main.o: main.cpp wombatinclude.h \
 		ui_sizefilter.h \
 		ui_jumphex.h \
 		ui_filecategoryfilter.h \
+		ui_tagfilter.h \
 		imageviewer.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
@@ -980,6 +998,9 @@ release/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		globals.h \
 		tskcpp.h \
 		ui_wombatforensics.h \
+		qhexedit.h \
+		chunks.h \
+		commands.h \
 		propertieswindow.h \
 		ui_propertieswindow.h \
 		exportdialog.h \
@@ -1000,6 +1021,7 @@ release/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		ui_sizefilter.h \
 		ui_jumphex.h \
 		ui_filecategoryfilter.h \
+		ui_tagfilter.h \
 		imageviewer.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
@@ -1060,7 +1082,12 @@ release/propertieswindow.o: propertieswindow.cpp propertieswindow.h \
 release/fileviewer.o: fileviewer.cpp fileviewer.h \
 		wombatinclude.h \
 		tskvariable.h \
-		ui_fileviewer.h
+		ui_fileviewer.h \
+		qhexedit.h \
+		chunks.h \
+		commands.h \
+		globals.h \
+		wombatvariable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/fileviewer.o fileviewer.cpp
 
 release/filterviews.o: filterviews.cpp filterviews.h \
@@ -1081,7 +1108,8 @@ release/filterviews.o: filterviews.cpp filterviews.h \
 		ui_pathfilter.h \
 		ui_sizefilter.h \
 		ui_jumphex.h \
-		ui_filecategoryfilter.h
+		ui_filecategoryfilter.h \
+		ui_tagfilter.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/filterviews.o filterviews.cpp
 
 release/imageviewer.o: imageviewer.cpp imageviewer.h \

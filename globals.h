@@ -97,6 +97,8 @@ struct FilterValues
     int hashdupcnt;
     QString hashfilter;
     QStringList hashlist;
+    bool tagbool;
+    QString tag;
 };
 
 extern FilterValues filtervalues;
@@ -381,6 +383,11 @@ public:
                     if(itemnode->Data(9).toString().contains(filtervalues.filetype) == false)
                             return QColor(Qt::lightGray);
                 }
+                if(filtervalues.tagbool)
+                {
+                    if(itemnode->Data(10).toString().compare(filtervalues.tag) == 0)
+                        return QColor(Qt::lightGray);
+                }
             }
         }
         else if(role == Qt::DisplayRole)
@@ -427,7 +434,7 @@ public:
                     return tmpstr;
                 }
             }
-            else if(index.column() >= 7 && index.column() <= 10) // used to be >= 8 <= 10
+            else if(index.column() >= 7 && index.column() <= 10) // used to be >= 8 <= 10 // now includes tagged column
             {
                 if(itemnode->Data(index.column()).toString().compare("0") != 0)
                     return itemnode->Data(index.column());
@@ -603,6 +610,8 @@ public:
             if(section == 8 && filtervalues.filegroupbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 9 && filtervalues.filetypebool)
+                return QIcon(QPixmap(QString(":/basic/filterimg")));
+            if(section == 10 && filtervalues.tagbool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
         }
         return QVariant();

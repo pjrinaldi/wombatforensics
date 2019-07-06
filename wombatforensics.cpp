@@ -51,6 +51,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filetypefilterview = new FileTypeFilter(this);
     filecategoryfilterview = new FileCategoryFilter(this);
     hashfilterview = new HashFilter(this);
+    tagfilterview = new TagFilter(this);
     imagewindow = new ImageViewer();
     msgviewer = new MessageViewer();
     byteviewer = new ByteConverter();
@@ -155,6 +156,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(filetypefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(filecategoryfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(hashfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(tagfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(jumpfilterview, SIGNAL(SetOffset()), this, SLOT(SetHexOffset()));
     jumpforward = new QShortcut(ui->dirTreeView);
     jumpbackward = new QShortcut(ui->dirTreeView);
@@ -1711,6 +1713,7 @@ WombatForensics::~WombatForensics()
     delete filetypefilterview;
     delete filecategoryfilterview;
     delete hashfilterview;
+    delete tagfilterview;
     delete byteviewer;
     delete viewmanage;
     delete imagewindow;
@@ -2096,6 +2099,8 @@ void WombatForensics::SetFilter(int headercolumn)
         filecategoryfilterview->DisplayFilter();
     if(headercolumn == 9)
         filetypefilterview->DisplayFilter();
+    if(headercolumn == 10)
+        tagfilterview->DisplayFilter();
     ResizeColumns();
 }
 
@@ -2145,7 +2150,7 @@ void WombatForensics::UpdateFilterCount()
     QModelIndexList tmplist = treenodemodel->match(treenodemodel->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     for(int i=0; i < tmplist.count(); i++)
     {
-        if(tmplist.at(i).sibling(tmplist.at(i).row(), 0).data().toString().split("-").count() == 4)
+        if(tmplist.at(i).sibling(tmplist.at(i).row(), 11).data().toString().split("-").count() == 4)
             filtercount++;
     }
     if(filtercount == filesfound)
