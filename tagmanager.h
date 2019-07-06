@@ -29,8 +29,8 @@ private slots:
     //void ShowBrowser();
     //void AddViewer();
     //void RemoveSelected();
-    //void UpdateList();
-    //void SelectionChanged();
+    void UpdateList();
+    void SelectionChanged();
 signals:
     void HideManagerWindow();
 
@@ -38,6 +38,7 @@ protected:
     //void closeEvent(QCloseEvent* event);
 private:
     Ui::TagManager* ui;
+    QFile bookmarkfile;
     //QString fileviewerpath;
     //QModelIndex selectedindex;
 };

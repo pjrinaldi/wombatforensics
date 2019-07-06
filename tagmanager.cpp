@@ -6,14 +6,12 @@
 TagManager::TagManager(QWidget* parent) : QDialog(parent), ui(new Ui::TagManager)
 {
     ui->setupUi(this);
-    //this->hide();
-    /*
-    connect(ui->browsebutton, SIGNAL(clicked()), this, SLOT(ShowBrowser()));
-    connect(ui->addbutton, SIGNAL(clicked()), this, SLOT(AddViewer()));
-    connect(ui->removebutton, SIGNAL(clicked()), this, SLOT(RemoveSelected()));
+    connect(ui->newbutton, SIGNAL(clicked()), this, SLOT(AddTag()));
+    connect(ui->modifybutton, SIGNAL(clicked()), this, SLOT(ModifyTag()));
+    connect(ui->removebutton, SIGNAL(clicked()), this, SLOT(RemoveTag()));
     connect(ui->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(SelectionChanged()));
+    ui->removebutton->setEnabled(false);
     UpdateList();
-    */
 }
 
 TagManager::~TagManager()
@@ -29,13 +27,17 @@ void TagManager::HideClicked()
     this->close();
 }
 
-/*
-void TagManager::closeEvent(QCloseEvent* e)
+void TagManager::AddTag()
 {
-    emit HideManagerWindow();
-    e->accept();
 }
-*/
+
+void TagManager::ModifyTag()
+{
+}
+
+void TagManager::RemoveTag()
+{
+}
 
 /*
 void TagManager::ShowBrowser()
@@ -82,6 +84,7 @@ void TagManager::RemoveSelected()
     ui->removebutton->setEnabled(false);
     UpdateList();
 }
+*/
 
 void TagManager::SelectionChanged()
 {
@@ -90,14 +93,17 @@ void TagManager::SelectionChanged()
 void TagManager::UpdateList()
 {
     QString debugstr;
+    QStringList itemlist;
+    itemlist.clear();
     ui->listWidget->clear();
-    viewerfile.open(QIODevice::ReadOnly);
-    QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
+    bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
+    bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(bookmarkfile.isOpen())
+        itemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+    bookmarkfile.close();
     itemlist.removeDuplicates();
-    viewerfile.close();
     for(int i=0; i < itemlist.count(); i++)
     {
         new QListWidgetItem(itemlist.at(i), ui->listWidget);
     }
 }
-*/
