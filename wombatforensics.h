@@ -62,6 +62,7 @@ public:
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;
     FileViewer* fileviewer;
+    QMenu* viewmenu;
     QMenu* treemenu;
     QMenu* selectionmenu;
     QMenu* bookmarkmenu;

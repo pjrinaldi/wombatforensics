@@ -106,101 +106,6 @@
    <property name="acceptDrops">
     <bool>true</bool>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionNew_Case"/>
-    <addaction name="actionOpen_Case"/>
-    <addaction name="separator"/>
-    <addaction name="actionView_Progress"/>
-    <addaction name="separator"/>
-    <addaction name="actionExit"/>
-   </widget>
-   <widget class="QMenu" name="menuEvidence">
-    <property name="title">
-     <string>Evidence</string>
-    </property>
-    <addaction name="actionAdd_Evidence"/>
-    <addaction name="actionRemove_Evidence"/>
-    <addaction name="separator"/>
-   </widget>
-   <widget class="QMenu" name="menuAction">
-    <property name="title">
-     <string>Action</string>
-    </property>
-    <addaction name="actionExport_Evidence"/>
-   </widget>
-   <widget class="QMenu" name="menuSettings">
-    <property name="title">
-     <string>Settings</string>
-    </property>
-    <addaction name="actionManage_OmniViewer"/>
-   </widget>
-   <widget class="QMenu" name="menuAbout">
-    <property name="title">
-     <string>About</string>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>:/bar/about</normaloff>:/bar/about</iconset>
-    </property>
-    <addaction name="actionAbout"/>
-    <addaction name="actionHelp"/>
-   </widget>
-   <widget class="QMenu" name="menuBookmark_Manager">
-    <property name="title">
-     <string>Bookmark Manager</string>
-    </property>
-    <property name="icon">
-     <iconset resource="wombatforensics.qrc">
-      <normaloff>:/bar/bookmarkmgr</normaloff>:/bar/bookmarkmgr</iconset>
-    </property>
-    <widget class="QMenu" name="menuAdd_File_to">
-     <property name="title">
-      <string>Add Selected File to...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="wombatforensics.qrc">
-       <normaloff>:/bar/addfileto</normaloff>:/bar/addfileto</iconset>
-     </property>
-     <addaction name="actionNew_Bookmark"/>
-     <addaction name="actionExisting_Bookmarks"/>
-     <addaction name="separator"/>
-    </widget>
-    <addaction name="menuAdd_File_to"/>
-    <addaction name="actionTagChecked"/>
-   </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-    <widget class="QMenu" name="menuView_With">
-     <property name="title">
-      <string>View With</string>
-     </property>
-     <addaction name="actionPlaceHolder"/>
-    </widget>
-    <widget class="QMenu" name="menuCopy_To">
-     <property name="title">
-      <string>Copy to</string>
-     </property>
-     <addaction name="actionSection"/>
-     <addaction name="actionTextSection"/>
-     <addaction name="actionFile"/>
-    </widget>
-    <addaction name="menuView_With"/>
-    <addaction name="menuCopy_To"/>
-    <addaction name="actionCheck"/>
-    <addaction name="actionExport"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuEvidence"/>
-   <addaction name="menuAction"/>
-   <addaction name="menuSettings"/>
-   <addaction name="menuAbout"/>
-   <addaction name="menuBookmark_Manager"/>
-   <addaction name="menuView"/>
   </widget>
   <widget class="QToolBar" name="analysisToolBar">
    <property name="windowTitle">
@@ -255,6 +160,7 @@
    <addaction name="actionCopy_Selection_To"/>
    <addaction name="actionExport_Evidence"/>
    <addaction name="separator"/>
+   <addaction name="actionBookmark_Manager"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
    <property name="styleSheet">
@@ -674,10 +580,10 @@
      <normaloff>:/bar/managetags</normaloff>:/bar/managetags</iconset>
    </property>
    <property name="text">
-    <string>Tag Selected As</string>
+    <string>Manage Tags</string>
    </property>
    <property name="toolTip">
-    <string>Apply Tag to Selected Item</string>
+    <string>Manage Tags</string>
    </property>
   </action>
   <action name="actionCancel_Operation">

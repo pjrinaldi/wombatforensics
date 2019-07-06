@@ -10,13 +10,11 @@
 #define UI_WOMBATFORENSICS_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStatusBar>
@@ -74,16 +72,6 @@ public:
     QTreeView *dirTreeView;
     QHexEdit *hexview;
     QMenuBar *mainMenubar;
-    QMenu *menuFile;
-    QMenu *menuEvidence;
-    QMenu *menuAction;
-    QMenu *menuSettings;
-    QMenu *menuAbout;
-    QMenu *menuBookmark_Manager;
-    QMenu *menuAdd_File_to;
-    QMenu *menuView;
-    QMenu *menuView_With;
-    QMenu *menuCopy_To;
     QToolBar *analysisToolBar;
     QStatusBar *mainStatusBar;
 
@@ -316,35 +304,6 @@ public:
         mainMenubar->setObjectName(QString::fromUtf8("mainMenubar"));
         mainMenubar->setGeometry(QRect(0, 0, 1641, 23));
         mainMenubar->setAcceptDrops(true);
-        menuFile = new QMenu(mainMenubar);
-        menuFile->setObjectName(QString::fromUtf8("menuFile"));
-        menuEvidence = new QMenu(mainMenubar);
-        menuEvidence->setObjectName(QString::fromUtf8("menuEvidence"));
-        menuAction = new QMenu(mainMenubar);
-        menuAction->setObjectName(QString::fromUtf8("menuAction"));
-        menuSettings = new QMenu(mainMenubar);
-        menuSettings->setObjectName(QString::fromUtf8("menuSettings"));
-        menuAbout = new QMenu(mainMenubar);
-        menuAbout->setObjectName(QString::fromUtf8("menuAbout"));
-        QIcon icon27;
-        icon27.addFile(QString::fromUtf8(":/bar/about"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAbout->setIcon(icon27);
-        menuBookmark_Manager = new QMenu(mainMenubar);
-        menuBookmark_Manager->setObjectName(QString::fromUtf8("menuBookmark_Manager"));
-        QIcon icon28;
-        icon28.addFile(QString::fromUtf8(":/bar/bookmarkmgr"), QSize(), QIcon::Normal, QIcon::Off);
-        menuBookmark_Manager->setIcon(icon28);
-        menuAdd_File_to = new QMenu(menuBookmark_Manager);
-        menuAdd_File_to->setObjectName(QString::fromUtf8("menuAdd_File_to"));
-        QIcon icon29;
-        icon29.addFile(QString::fromUtf8(":/bar/addfileto"), QSize(), QIcon::Normal, QIcon::Off);
-        menuAdd_File_to->setIcon(icon29);
-        menuView = new QMenu(mainMenubar);
-        menuView->setObjectName(QString::fromUtf8("menuView"));
-        menuView_With = new QMenu(menuView);
-        menuView_With->setObjectName(QString::fromUtf8("menuView_With"));
-        menuCopy_To = new QMenu(menuView);
-        menuCopy_To->setObjectName(QString::fromUtf8("menuCopy_To"));
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
         analysisToolBar->setObjectName(QString::fromUtf8("analysisToolBar"));
@@ -361,39 +320,6 @@ public:
         mainStatusBar->setSizeGripEnabled(true);
         WombatForensics->setStatusBar(mainStatusBar);
 
-        mainMenubar->addAction(menuFile->menuAction());
-        mainMenubar->addAction(menuEvidence->menuAction());
-        mainMenubar->addAction(menuAction->menuAction());
-        mainMenubar->addAction(menuSettings->menuAction());
-        mainMenubar->addAction(menuAbout->menuAction());
-        mainMenubar->addAction(menuBookmark_Manager->menuAction());
-        mainMenubar->addAction(menuView->menuAction());
-        menuFile->addAction(actionNew_Case);
-        menuFile->addAction(actionOpen_Case);
-        menuFile->addSeparator();
-        menuFile->addAction(actionView_Progress);
-        menuFile->addSeparator();
-        menuFile->addAction(actionExit);
-        menuEvidence->addAction(actionAdd_Evidence);
-        menuEvidence->addAction(actionRemove_Evidence);
-        menuEvidence->addSeparator();
-        menuAction->addAction(actionExport_Evidence);
-        menuSettings->addAction(actionManage_OmniViewer);
-        menuAbout->addAction(actionAbout);
-        menuAbout->addAction(actionHelp);
-        menuBookmark_Manager->addAction(menuAdd_File_to->menuAction());
-        menuBookmark_Manager->addAction(actionTagChecked);
-        menuAdd_File_to->addAction(actionNew_Bookmark);
-        menuAdd_File_to->addAction(actionExisting_Bookmarks);
-        menuAdd_File_to->addSeparator();
-        menuView->addAction(menuView_With->menuAction());
-        menuView->addAction(menuCopy_To->menuAction());
-        menuView->addAction(actionCheck);
-        menuView->addAction(actionExport);
-        menuView_With->addAction(actionPlaceHolder);
-        menuCopy_To->addAction(actionSection);
-        menuCopy_To->addAction(actionTextSection);
-        menuCopy_To->addAction(actionFile);
         analysisToolBar->addAction(actionNew_Case);
         analysisToolBar->addAction(actionOpen_Case);
         analysisToolBar->addAction(actionSaveState);
@@ -416,6 +342,7 @@ public:
         analysisToolBar->addAction(actionCopy_Selection_To);
         analysisToolBar->addAction(actionExport_Evidence);
         analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionBookmark_Manager);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
@@ -529,9 +456,9 @@ public:
 #if QT_CONFIG(tooltip)
         actionSettings->setToolTip(QCoreApplication::translate("WombatForensics", "Settings", nullptr));
 #endif // QT_CONFIG(tooltip)
-        actionBookmark_Manager->setText(QCoreApplication::translate("WombatForensics", "Tag Selected As", nullptr));
+        actionBookmark_Manager->setText(QCoreApplication::translate("WombatForensics", "Manage Tags", nullptr));
 #if QT_CONFIG(tooltip)
-        actionBookmark_Manager->setToolTip(QCoreApplication::translate("WombatForensics", "Apply Tag to Selected Item", nullptr));
+        actionBookmark_Manager->setToolTip(QCoreApplication::translate("WombatForensics", "Manage Tags", nullptr));
 #endif // QT_CONFIG(tooltip)
         actionCancel_Operation->setText(QCoreApplication::translate("WombatForensics", "Cancel Operation", nullptr));
 #if QT_CONFIG(tooltip)
@@ -551,16 +478,6 @@ public:
 #if QT_CONFIG(whatsthis)
         hexview->setWhatsThis(QCoreApplication::translate("WombatForensics", "QHexEdit widget allow to edit the data in hex view.", nullptr));
 #endif // QT_CONFIG(whatsthis)
-        menuFile->setTitle(QCoreApplication::translate("WombatForensics", "File", nullptr));
-        menuEvidence->setTitle(QCoreApplication::translate("WombatForensics", "Evidence", nullptr));
-        menuAction->setTitle(QCoreApplication::translate("WombatForensics", "Action", nullptr));
-        menuSettings->setTitle(QCoreApplication::translate("WombatForensics", "Settings", nullptr));
-        menuAbout->setTitle(QCoreApplication::translate("WombatForensics", "About", nullptr));
-        menuBookmark_Manager->setTitle(QCoreApplication::translate("WombatForensics", "Bookmark Manager", nullptr));
-        menuAdd_File_to->setTitle(QCoreApplication::translate("WombatForensics", "Add Selected File to...", nullptr));
-        menuView->setTitle(QCoreApplication::translate("WombatForensics", "View", nullptr));
-        menuView_With->setTitle(QCoreApplication::translate("WombatForensics", "View With", nullptr));
-        menuCopy_To->setTitle(QCoreApplication::translate("WombatForensics", "Copy to", nullptr));
         analysisToolBar->setWindowTitle(QCoreApplication::translate("WombatForensics", "toolBar", nullptr));
     } // retranslateUi
 

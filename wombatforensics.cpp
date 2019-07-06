@@ -102,7 +102,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
-    //connect(ui->actionNew_Bookmark, SIGNAL(triggered()), this, SLOT(CreateNewTag()), Qt::DirectConnection);
 
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->actionSection);
@@ -122,6 +121,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addMenu(bookmarkmenu);
     treemenu->addMenu(tagcheckedmenu);
     viewerfile.open(QIODevice::ReadOnly);
+    viewmenu = new QMenu();
+    viewmenu->setTitle("View With");
+    viewmenu->setIcon(QIcon(":/bar/setview"));
     QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
     itemlist.removeDuplicates();
     viewerfile.close();
@@ -129,9 +131,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     {
         QAction* tmpaction = new QAction(itemlist.at(i), this);
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
-        ui->menuView_With->addAction(tmpaction);
+        viewmenu->addAction(tmpaction);
     }
-    treemenu->addAction(ui->menuView_With->menuAction());
+    treemenu->addAction(viewmenu->menuAction());
     treemenu->addAction(ui->actionCheck);
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
@@ -188,9 +190,7 @@ void WombatForensics::ReadBookmarks()
     QAction* newtagaction1 = new QAction("New Tag", tagcheckedmenu);
     connect(newtagaction1, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
     tagcheckedmenu->addAction(newtagaction1);
-    //bookmarkmenu->addAction(ui->actionNew_Bookmark);
     bookmarkmenu->addSeparator();
-    //tagcheckedmenu->addAction(ui->actionNew_Bookmark);
     tagcheckedmenu->addSeparator();
     for(int i=0; i < bookitemlist.count(); i++)
     {
@@ -445,7 +445,8 @@ void WombatForensics::HideImageWindow(bool checkstate)
 void WombatForensics::HideViewerManager()
 {
     treemenu->clear();
-    ui->menuView_With->clear();
+    viewmenu->clear();
+    //ui->menuView_With->clear();
     treemenu->addAction(ui->actionView_File);
     treemenu->addAction(ui->actionView_Properties);
     viewerfile.open(QIODevice::ReadOnly);
@@ -456,9 +457,9 @@ void WombatForensics::HideViewerManager()
     {
         QAction* tmpaction = new QAction(itemlist.at(i), this);
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
-        ui->menuView_With->addAction(tmpaction);
+        viewmenu->addAction(tmpaction);
     }
-    treemenu->addAction(ui->menuView_With->menuAction());
+    treemenu->addAction(viewmenu->menuAction());
     treemenu->addAction(ui->actionCheck);
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
@@ -573,7 +574,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionView_Progress->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     ui->actionDigDeeper->setEnabled(false);
-    //ui->actionBookmark_Manager->setEnabled(false);
+    ui->actionBookmark_Manager->setEnabled(false);
     ui->actionView_Image_Gallery->setEnabled(false);
     ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
@@ -763,7 +764,7 @@ void WombatForensics::OpenUpdate()
         ui->actionJumpToHex->setEnabled(true);
         //ui->actionExpandAll->setEnabled(true);
         //ui->actionCollapseAll->setEnabled(true);
-        //ui->actionBookmark_Manager->setEnabled(true);
+        ui->actionBookmark_Manager->setEnabled(true);
     }
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
@@ -947,7 +948,7 @@ void WombatForensics::UpdateStatus()
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
-    //ui->actionBookmark_Manager->setEnabled(true);
+    ui->actionBookmark_Manager->setEnabled(true);
     qInfo() << "Processing Complete";
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
