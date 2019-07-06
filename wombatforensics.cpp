@@ -179,8 +179,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 
 void WombatForensics::ReadBookmarks()
 {
+    QStringList bookitemlist;
+    bookitemlist.clear();
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+    if(bookmarkfile.isOpen())
+        bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
     bookmarkfile.close();
     bookmarkmenu->clear();
     tagcheckedmenu->clear();
@@ -446,7 +449,6 @@ void WombatForensics::HideViewerManager()
 {
     treemenu->clear();
     viewmenu->clear();
-    //ui->menuView_With->clear();
     treemenu->addAction(ui->actionView_File);
     treemenu->addAction(ui->actionView_Properties);
     viewerfile.open(QIODevice::ReadOnly);
@@ -463,7 +465,11 @@ void WombatForensics::HideViewerManager()
     treemenu->addAction(ui->actionCheck);
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
+}
 
+void WombatForensics::HideTagManager()
+{
+    ReadBookmarks();
 }
 
 void WombatForensics::HideSettingsWindow()
@@ -568,6 +574,9 @@ void WombatForensics::InitializeAppStructure()
     settingsdialog->setWindowIcon(QIcon(":/bar/settings"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
     connect(settingsdialog, SIGNAL(HideSettingsWindow()), this, SLOT(HideSettingsWindow()), Qt::DirectConnection);
+    //tagmanage = new TagManager(this);
+    //tagmanage->setWindowIcon(QIcon(":/bar/managetags"));
+    //connect(tagmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideTagManager()), Qt::DirectConnection);
     ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
@@ -1495,7 +1504,7 @@ void WombatForensics::CloseCurrentCase()
     filtercountlabel->setText("Filtered: 0");
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
-
+    //tagmanage->close();
     // UNMOUNT EVIDENCEIMAGEDATAFILE
     for(int i=0; i < evidencelist.count(); i++)
     {
@@ -1790,6 +1799,7 @@ WombatForensics::~WombatForensics()
     delete tagfilterview;
     delete byteviewer;
     delete viewmanage;
+    //delete tagmanage;
     delete imagewindow;
     delete aboutbox;
     delete settingsdialog;
@@ -1828,6 +1838,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     
     imagewindow->close();
     viewmanage->close();
+    //tagmanage->close();
     byteviewer->close();
     aboutbox->close();
     settingsdialog->close();
@@ -2005,6 +2016,14 @@ void WombatForensics::FinishThumbs()
 void WombatForensics::on_actionViewerManager_triggered()
 {
     viewmanage->show();
+}
+
+void WombatForensics::on_actionBookmark_Manager_triggered()
+{
+    tagmanage = new TagManager(this);
+    tagmanage->setWindowIcon(QIcon(":/bar/managetags"));
+    connect(tagmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideTagManager()), Qt::DirectConnection);
+    tagmanage->show();
 }
 
 void WombatForensics::on_actionTextViewer_triggered(bool checked)

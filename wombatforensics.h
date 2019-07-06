@@ -26,6 +26,7 @@
 #include "addevidencedialog.h"
 #include "digstatus.h"
 #include "remevidencedialog.h"
+#include "tagmanager.h"
 
 class StatusLabel : public QLabel
 {
@@ -93,6 +94,7 @@ public:
     AddEvidenceDialog* addevidencedialog;
     DigStatus* digstatusdialog;
     RemEvidenceDialog* remevidencedialog;
+    TagManager* tagmanage;
 
 signals:
     void CancelCurrentThread();
@@ -112,6 +114,7 @@ private slots:
     void on_actionView_File_triggered(bool checked);
     void on_actionView_Image_Gallery_triggered(bool checked);
     void on_actionViewerManager_triggered();
+    void on_actionBookmark_Manager_triggered();
     void on_actionTextViewer_triggered(bool checked);
     void on_actionViewMessageLog_triggered(bool checked);
     void on_actionByteConverter_triggered(bool checked);
@@ -131,6 +134,7 @@ private slots:
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideImageWindow(bool checkstate);
     void HideViewerManager(void);
+    void HideTagManager(void);
     void HideSettingsWindow(void);
     void HideMessageViewer(bool checkstate);
     void HideByteViewer(bool checkstate);
