@@ -24,6 +24,7 @@ int ecount = 0;
 int thumbsize = 320; // thumbnail size settings variable
 int mftrecordsize = 1024;
 int hashsum = 1;
+int idcol = 0;
 TreeNodeModel* treenodemodel = NULL;
 TreeNode* selectednode = NULL;
 InterfaceSignals* isignals = new InterfaceSignals();

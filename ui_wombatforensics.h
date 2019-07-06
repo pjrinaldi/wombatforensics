@@ -67,6 +67,7 @@ public:
     QAction *actionBookmark_Manager;
     QAction *actionCancel_Operation;
     QAction *actionJumpToHex;
+    QAction *actionTagChecked;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -271,6 +272,9 @@ public:
         QIcon icon26;
         icon26.addFile(QString::fromUtf8(":/bar/jumptohex"), QSize(), QIcon::Normal, QIcon::Off);
         actionJumpToHex->setIcon(icon26);
+        actionTagChecked = new QAction(WombatForensics);
+        actionTagChecked->setObjectName(QString::fromUtf8("actionTagChecked"));
+        actionTagChecked->setIcon(icon8);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -378,6 +382,7 @@ public:
         menuAbout->addAction(actionAbout);
         menuAbout->addAction(actionHelp);
         menuBookmark_Manager->addAction(menuAdd_File_to->menuAction());
+        menuBookmark_Manager->addAction(actionTagChecked);
         menuAdd_File_to->addAction(actionNew_Bookmark);
         menuAdd_File_to->addAction(actionExisting_Bookmarks);
         menuAdd_File_to->addSeparator();
@@ -411,7 +416,6 @@ public:
         analysisToolBar->addAction(actionCopy_Selection_To);
         analysisToolBar->addAction(actionExport_Evidence);
         analysisToolBar->addSeparator();
-        analysisToolBar->addAction(actionBookmark_Manager);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
@@ -525,9 +529,9 @@ public:
 #if QT_CONFIG(tooltip)
         actionSettings->setToolTip(QCoreApplication::translate("WombatForensics", "Settings", nullptr));
 #endif // QT_CONFIG(tooltip)
-        actionBookmark_Manager->setText(QCoreApplication::translate("WombatForensics", "Tags - Add To", nullptr));
+        actionBookmark_Manager->setText(QCoreApplication::translate("WombatForensics", "Tag Selected As", nullptr));
 #if QT_CONFIG(tooltip)
-        actionBookmark_Manager->setToolTip(QCoreApplication::translate("WombatForensics", "Manage Tags", nullptr));
+        actionBookmark_Manager->setToolTip(QCoreApplication::translate("WombatForensics", "Apply Tag to Selected Item", nullptr));
 #endif // QT_CONFIG(tooltip)
         actionCancel_Operation->setText(QCoreApplication::translate("WombatForensics", "Cancel Operation", nullptr));
 #if QT_CONFIG(tooltip)
@@ -536,6 +540,10 @@ public:
         actionJumpToHex->setText(QCoreApplication::translate("WombatForensics", "JumpToHex", nullptr));
 #if QT_CONFIG(tooltip)
         actionJumpToHex->setToolTip(QCoreApplication::translate("WombatForensics", "Jump to Hex Offset", nullptr));
+#endif // QT_CONFIG(tooltip)
+        actionTagChecked->setText(QCoreApplication::translate("WombatForensics", "Tag Checked As", nullptr));
+#if QT_CONFIG(tooltip)
+        actionTagChecked->setToolTip(QCoreApplication::translate("WombatForensics", "Apply Tag to Checked Items", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());

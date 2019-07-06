@@ -82,17 +82,21 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
-    //bookmarkmenu->addAction(ui->actionNew_Bookmark);
-    //bookmarkmenu->addAction(ui->actionExisting_Bookmarks);
-    //bookmarkmenu->addSeparator();
-    //ReadBookmarks();
-    //UpdateBookmarkItems();
+    bookmarkmenu->setTitle("Tag Selected As");
+    bookmarkmenu->setIcon(QIcon(":/bar/newtag"));
+    /*
     connect(ui->actionNew_Bookmark, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
     QWidget* bookwidget = ui->analysisToolBar->widgetForAction(ui->actionBookmark_Manager);
     QToolButton* bookbutton = qobject_cast<QToolButton*>(bookwidget);
     if(bookbutton)
         connect(ui->actionBookmark_Manager, SIGNAL(triggered(bool)), bookbutton, SLOT(showMenu()));
     ui->actionBookmark_Manager->setMenu(bookmarkmenu);
+    */
+    tagcheckedmenu = new QMenu();
+    tagcheckedmenu->setTitle("Tag Checked As");
+    tagcheckedmenu->setIcon(QIcon(":/bar/newtag"));
+    //QWidget* checktagwidget = ui->analysisToolBar->widgetForAction(ui->actionTagChecked);
+    //QToolButton* checktagbutton = qobject_cast<QToolButton*>(
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
@@ -124,6 +128,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addAction(ui->actionView_File);
     treemenu->addAction(ui->actionView_Properties);
     treemenu->addMenu(bookmarkmenu);
+    treemenu->addMenu(tagcheckedmenu);
     viewerfile.open(QIODevice::ReadOnly);
     QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
     itemlist.removeDuplicates();
@@ -183,13 +188,17 @@ void WombatForensics::ReadBookmarks()
     QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
     bookmarkfile.close();
     bookmarkmenu->clear();
+    tagcheckedmenu->clear();
     bookmarkmenu->addAction(ui->actionNew_Bookmark);
     bookmarkmenu->addSeparator();
+    tagcheckedmenu->addAction(ui->actionNew_Bookmark);
+    tagcheckedmenu->addSeparator();
     for(int i=0; i < bookitemlist.count(); i++)
     {
         QAction* tmpaction = new QAction(bookitemlist.at(i), this);
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         bookmarkmenu->addAction(tmpaction);
+        tagcheckedmenu->addAction(tmpaction);
     }
 }
 
@@ -1697,6 +1706,7 @@ void WombatForensics::SetupHexPage(void)
 WombatForensics::~WombatForensics()
 {
     delete bookmarkmenu;
+    delete tagcheckedmenu;
     delete selectionmenu;
     delete msgviewer;
     delete idfilterview;

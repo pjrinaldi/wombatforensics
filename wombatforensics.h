@@ -65,6 +65,7 @@ public:
     QMenu* treemenu;
     QMenu* selectionmenu;
     QMenu* bookmarkmenu;
+    QMenu* tagcheckedmenu;
     IdFilter* idfilterview;
     JumpHex* jumpfilterview;
     NameFilter* namefilterview;

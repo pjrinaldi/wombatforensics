@@ -12,7 +12,7 @@ extern QFile logfile; // controls the logfile
 extern QFile viewerfile; // controls the viewer file and its values for external viewers
 extern QFile settingsfile; // controls the settings
 extern QDir thumbdir; // controls the thumbs/ directory
-extern QTextEdit* msglog;
+extern QTextEdit* msglog; // holds the msglog variable to write messages to the log
 extern qint64 filesfound; // holds the number of files found for all the evidence.
 extern qint64 fileschecked; // holds humber of files checked for a case across all evidence
 extern qint64 totalcount; // used for dig deeper and export dialogs
@@ -26,8 +26,9 @@ extern qint64 filejumpoffset; // stores offset hex value when the user wants to 
 extern qint64 orphancount; // keeps track of unique id # for orphan files
 extern int ecount; // evidence count variable
 extern int thumbsize; // thumbnail size settings variable
-extern int mftrecordsize;
+extern int mftrecordsize; // contains the size of an mft record, usually always 1024
 extern int hashsum; // type of hash used: either md5, sha1, sha256
+extern int idcol; // contains the position for the ID column
 extern QStringList propertylist; // contains properties list values
 extern QStringList exportlist; // contains list of files to be exported
 extern QStringList digfilelist; // contains list of files to dig
@@ -195,7 +196,7 @@ public:
 
     bool SetData(int column, const QVariant &value)
     {
-        if(column < 0 || column >= 10)
+        if(column < 0 || column >= 11)
             return false;
         itemdata[column] = value;
         return true;
@@ -219,6 +220,7 @@ public:
     int itemtype;
     bool deleted = false;
     bool checked = false;
+    //QString tagged = "";
 
 private:
     QList<TreeNode*> childitems;
@@ -236,7 +238,7 @@ public:
     explicit TreeNodeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         QList<QVariant> zerodata;
-        zerodata << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature" << "Tag" << "ID"; // NAME IN FIRST COLUMN
+        zerodata << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature" << "Tagged" << "ID"; // NAME IN FIRST COLUMN
         zeronode = new TreeNode(zerodata);
     };
 
@@ -254,10 +256,10 @@ public:
         int nodetype = 0;
         int itemtype = 0;
         QByteArray ba;
-        nodetype = itemnode->Data(10).toString().split("-a").first().split("-").count();
+        nodetype = itemnode->Data(11).toString().split("-a").first().split("-").count();
         itemtype = itemnode->itemtype; // node type 1=file, 2=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs)
 
-        if(role == Qt::CheckStateRole && index.column() == 10)
+        if(role == Qt::CheckStateRole && index.column() == 11)
             return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
         else if(role == Qt::ForegroundRole)
         {
@@ -265,7 +267,7 @@ public:
                 return QColor(Qt::darkBlue);
             else if(nodetype == 4)
             {
-                if(itemnode->Data(10).toString().contains(filtervalues.idfilter) == false)
+                if(itemnode->Data(11).toString().contains(filtervalues.idfilter) == false)
                     return QColor(Qt::lightGray);
                 if(filtervalues.namebool)
                 {
@@ -383,7 +385,7 @@ public:
         }
         else if(role == Qt::DisplayRole)
         {
-            if(index.column() == 10) // used to be 0
+            if(index.column() == 11) // used to be 0
             {
                 return itemnode->Data(index.column()).toString().split("-a").at(0);
             }
@@ -476,7 +478,7 @@ public:
                         return QIcon(QPixmap(QString(":/basic/virtualdir")));
                     else
                     {
-                        if(itemnode->Data(10).toString().contains("f*")) // used to be 0
+                        if(itemnode->Data(11).toString().contains("f*")) // used to be 0
                             return QIcon(QPixmap(QString(":/basic/deletedfile")));
                         else
                             return QIcon(QPixmap(QString(":/basic/treefile")));
@@ -502,12 +504,12 @@ public:
             if(itemnode->IsChecked())
             {
                 itemnode->SetChecked(false);
-                checkhash.insert(itemnode->Data(10).toString(), false); // used to be 0
+                checkhash.insert(itemnode->Data(11).toString(), false); // used to be 0
             }
             else
             {
                 itemnode->SetChecked(true);
-                checkhash.insert(itemnode->Data(10).toString(), true); // used to be 0
+                checkhash.insert(itemnode->Data(11).toString(), true); // used to be 0
             }
             //qDebug() << "checkhash:" << checkhash;
             emit dataChanged(index, index);
@@ -563,7 +565,7 @@ public:
             return Qt::NoItemFlags;
         if(index == QModelIndex())
             return Qt::NoItemFlags;
-        if(index.column() == 10 && itemnode->Data(index.column()).toString().split("-a").first().split("-").count() == 4) // used to be 0
+        if(index.column() == 11 && itemnode->Data(index.column()).toString().split("-a").first().split("-").count() == 4) // used to be 0
             flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
         
         return flags;
@@ -578,7 +580,7 @@ public:
         }
         if(role == Qt::DecorationRole)
         {
-            if(section == 10 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
+            if(section == 11 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
             if(section == 0 && filtervalues.namebool)
                 return QIcon(QPixmap(QString(":/basic/filterimg")));
@@ -684,7 +686,7 @@ private:
                 columndata.clear();
                 if(tmpstr.split(",").count() > 5)
                 {
-                    columndata << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
+                    columndata << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
                     parent->AppendChild(new TreeNode(columndata, parent));
                     curid = tmpstr.split(",").at(5);
                     parents[curid] = parent->child(parent->ChildCount() - 1);
@@ -700,7 +702,7 @@ private:
                     volfile.close();
                     if(tmpstr.split(",").count() > 5)
                     {
-                        columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
+                        columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
                         parid = tmpstr.split(",").at(5).split("-").at(0);
                         curid = tmpstr.split(",").at(5);
                         parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
@@ -717,9 +719,9 @@ private:
                             tmpstr = partfile.readLine();
                         partfile.close();
                         rootinum = tmpstr.split(",").at(3);
-                        if(tmpstr.split(",").count() > 10)
+                        if(tmpstr.split(",").count() > 11)
                         {
-                            columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
+                            columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
                             parid = tmpstr.split(",").at(10).split("-p").at(0);
                             curid = tmpstr.split(",").at(10);
                             parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
