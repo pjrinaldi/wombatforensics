@@ -23,6 +23,9 @@ public:
 
 private slots:
     void HideClicked();
+    void ModifyTag();
+    void RemoveTag();
+    void AddTag();
     //void ShowBrowser();
     //void AddViewer();
     //void RemoveSelected();
