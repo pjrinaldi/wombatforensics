@@ -211,7 +211,7 @@ void WombatForensics::ReadBookmarks()
     bookmarkmenu->addAction(remtagaction);
     QAction* remtagaction1 = new QAction("Remove Tag", tagcheckedmenu);
     connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
-    tagcheckedmenu->addAction(remtagaction);
+    tagcheckedmenu->addAction(remtagaction1);
 }
 
 void WombatForensics::RemoveTag()
@@ -271,6 +271,66 @@ void WombatForensics::RemoveTag()
     }
     else if(parentmenu.contains("Checked")) // checked files
     {
+        QStringList checkeditems = GetFileLists(1);
+        //qDebug() << "Remove Tag Checked Items:" << checkeditems;
+        for(int i=0; i < checkeditems.count(); i++)
+        {
+            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            //qDebug() << "indexlist:" << indexlist.count();
+            if(indexlist.count() > 0)
+            {
+                QModelIndex curindex = ((QModelIndex)indexlist.first());
+                QModelIndex parindex = ((QModelIndex)indexlist.first()).parent();
+                QString paridstr = parindex.sibling(parindex.row(), 11).data().toString().split("-f").last();
+                QDir eviddir = QDir(wombatvariable.tmpmntpath);
+                QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
+                QString evidencename = evidfiles.first();
+                QString estring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
+                QString vstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
+                QString pstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
+                QString fstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
+                //qDebug() << "evidencename:" << evidencename;
+                QStringList partlist;
+                partlist.clear();
+                QFile partfile(wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/stat");
+                partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(partfile.isOpen())
+                    partlist = QString(partfile.readLine()).split(",");
+                partfile.close();
+                qint64 rootinum = partlist.at(3).toLongLong();
+                if(paridstr.contains("-"))
+                    paridstr = QString::number(rootinum);
+                QFile filefile;
+                QString filefilepath = wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/";
+                if(fstring.split(":").count() > 1)
+                    filefilepath += fstring.split(":").first() + "-" + fstring.split(":").last();
+                else
+                    filefilepath += fstring.split(":").first();
+                filefilepath += ".a" + paridstr + ".stat";
+                //qDebug() << "filepath:" << filefilepath;
+                QString tmpstr = "";
+                QStringList tmplist;
+                tmplist.clear();
+                filefile.setFileName(filefilepath);
+                filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(filefile.isOpen())
+                    tmpstr = filefile.readLine();
+                filefile.close();
+                //qDebug() << "tmpstr before:" << tmpstr;
+                if(tmpstr.split(",").count() > 15)
+                    tmplist = tmpstr.split(",");
+                tmplist[15] = "";
+                tmpstr = "";
+                for(int i = 0; i < tmplist.count(); i++)
+                    tmpstr += tmplist.at(i) + ",";
+                //qDebug() << "tmpstr after:" << tmpstr;
+                filefile.open(QIODevice::WriteOnly | QIODevice::Text);
+                if(filefile.isOpen())
+                    filefile.write(tmpstr.toStdString().c_str());
+                filefile.close();
+                treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, "0");
+            }
+        }
     }
 }
 
@@ -366,6 +426,66 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
     }
     else if(parentmenu.contains("Checked")) // checked files
     {
+        QStringList checkeditems = GetFileLists(1);
+        //qDebug() << "Tag File Checked Items:" << checkeditems;
+        for(int i=0; i < checkeditems.count(); i++)
+        {
+            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            //qDebug() << "indexlist:" << indexlist.count();
+            if(indexlist.count() > 0)
+            {
+                QModelIndex curindex = ((QModelIndex)indexlist.first());
+                QModelIndex parindex = ((QModelIndex)indexlist.first()).parent();
+                QString paridstr = parindex.sibling(parindex.row(), 11).data().toString().split("-f").last();
+                QDir eviddir = QDir(wombatvariable.tmpmntpath);
+                QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
+                QString evidencename = evidfiles.first();
+                QString estring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
+                QString vstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
+                QString pstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
+                QString fstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
+                //qDebug() << "evidencename:" << evidencename;
+                QStringList partlist;
+                partlist.clear();
+                QFile partfile(wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/stat");
+                partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(partfile.isOpen())
+                    partlist = QString(partfile.readLine()).split(",");
+                partfile.close();
+                qint64 rootinum = partlist.at(3).toLongLong();
+                if(paridstr.contains("-"))
+                    paridstr = QString::number(rootinum);
+                QFile filefile;
+                QString filefilepath = wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/";
+                if(fstring.split(":").count() > 1)
+                    filefilepath += fstring.split(":").first() + "-" + fstring.split(":").last();
+                else
+                    filefilepath += fstring.split(":").first();
+                filefilepath += ".a" + paridstr + ".stat";
+                //qDebug() << "filepath:" << filefilepath;
+                QString tmpstr = "";
+                QStringList tmplist;
+                tmplist.clear();
+                filefile.setFileName(filefilepath);
+                filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(filefile.isOpen())
+                    tmpstr = filefile.readLine();
+                filefile.close();
+                //qDebug() << "tmpstr before:" << tmpstr;
+                if(tmpstr.split(",").count() > 15)
+                    tmplist = tmpstr.split(",");
+                tmplist[15] = tagname;
+                tmpstr = "";
+                for(int i = 0; i < tmplist.count(); i++)
+                    tmpstr += tmplist.at(i) + ",";
+                //qDebug() << "tmpstr after:" << tmpstr;
+                filefile.open(QIODevice::WriteOnly | QIODevice::Text);
+                if(filefile.isOpen())
+                    filefile.write(tmpstr.toStdString().c_str());
+                filefile.close();
+                treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
+            }
+        }
     }
 }
 
