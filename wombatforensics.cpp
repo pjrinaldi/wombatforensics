@@ -84,19 +84,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     bookmarkmenu = new QMenu();
     bookmarkmenu->setTitle("Tag Selected As");
     bookmarkmenu->setIcon(QIcon(":/bar/newtag"));
-    /*
-    connect(ui->actionNew_Bookmark, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
-    QWidget* bookwidget = ui->analysisToolBar->widgetForAction(ui->actionBookmark_Manager);
-    QToolButton* bookbutton = qobject_cast<QToolButton*>(bookwidget);
-    if(bookbutton)
-        connect(ui->actionBookmark_Manager, SIGNAL(triggered(bool)), bookbutton, SLOT(showMenu()));
-    ui->actionBookmark_Manager->setMenu(bookmarkmenu);
-    */
     tagcheckedmenu = new QMenu();
     tagcheckedmenu->setTitle("Tag Checked As");
     tagcheckedmenu->setIcon(QIcon(":/bar/newtag"));
-    //QWidget* checktagwidget = ui->analysisToolBar->widgetForAction(ui->actionTagChecked);
-    //QToolButton* checktagbutton = qobject_cast<QToolButton*>(
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
