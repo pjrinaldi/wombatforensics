@@ -188,6 +188,7 @@ private slots:
     void SetHexOffset(void);
     void CreateNewTag(void);
     void SetBookmark(void);
+    void RemoveTag(void);
 
 protected:
     void closeEvent(QCloseEvent* event);

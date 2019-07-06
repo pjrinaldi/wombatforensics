@@ -204,6 +204,74 @@ void WombatForensics::ReadBookmarks()
         bookmarkmenu->addAction(tmpaction);
         tagcheckedmenu->addAction(tmpaction1);
     }
+    bookmarkmenu->addSeparator();
+    tagcheckedmenu->addSeparator();
+    QAction* remtagaction = new QAction("Remove Tag", bookmarkmenu);
+    connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
+    bookmarkmenu->addAction(remtagaction);
+    QAction* remtagaction1 = new QAction("Remove Tag", tagcheckedmenu);
+    connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
+    tagcheckedmenu->addAction(remtagaction);
+}
+
+void WombatForensics::RemoveTag()
+{
+    QAction* tagaction = qobject_cast<QAction*>(sender());
+    QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
+    if(parentmenu.contains("Selected")) // single file
+    {
+        QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-f").last();
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
+        QString evidencename = evidfiles.first();
+        QString estring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
+        QString vstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
+        QString pstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
+        QString fstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
+        //qDebug() << "evidencename:" << evidencename;
+        QStringList partlist;
+        partlist.clear();
+        QFile partfile(wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/stat");
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            partlist = QString(partfile.readLine()).split(",");
+        partfile.close();
+        qint64 rootinum = partlist.at(3).toLongLong();
+        if(paridstr.contains("-"))
+            paridstr = QString::number(rootinum);
+        QFile filefile;
+        QString filefilepath = wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/";
+        if(fstring.split(":").count() > 1)
+            filefilepath += fstring.split(":").first() + "-" + fstring.split(":").last();
+        else
+            filefilepath += fstring.split(":").first();
+        filefilepath += ".a" + paridstr + ".stat";
+        //qDebug() << "filepath:" << filefilepath;
+        filefile.setFileName(filefilepath);
+        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        QString tmpstr = "";
+        QStringList tmplist;
+        tmplist.clear();
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
+        filefile.close();
+        //qDebug() << "tmpstr before:" << tmpstr;
+        if(tmpstr.split(",").count() > 15)
+            tmplist = tmpstr.split(",");
+        tmplist[15] = "";
+        tmpstr = "";
+        for(int i = 0; i < tmplist.count(); i++)
+            tmpstr += tmplist.at(i) + ",";
+        //qDebug() << "tmpstr after:" << tmpstr;
+        filefile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(filefile.isOpen())
+            filefile.write(tmpstr.toStdString().c_str());
+        filefile.close();
+        treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, "0");
+    }
+    else if(parentmenu.contains("Checked")) // checked files
+    {
+    }
 }
 
 void WombatForensics::UpdateBookmarkItems(QString tagname)
