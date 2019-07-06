@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'jumphex.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -90,10 +90,10 @@ public:
 
     void retranslateUi(QDialog *JumpHex)
     {
-        JumpHex->setWindowTitle(QApplication::translate("JumpHex", "Dialog", nullptr));
-        label->setText(QApplication::translate("JumpHex", "Jump To:", nullptr));
-        lineEdit->setPlaceholderText(QApplication::translate("JumpHex", "Enter Hex Offset", nullptr));
-        pushButton->setText(QApplication::translate("JumpHex", "Go", nullptr));
+        JumpHex->setWindowTitle(QCoreApplication::translate("JumpHex", "Dialog", nullptr));
+        label->setText(QCoreApplication::translate("JumpHex", "Jump To:", nullptr));
+        lineEdit->setPlaceholderText(QCoreApplication::translate("JumpHex", "Enter Hex Offset", nullptr));
+        pushButton->setText(QCoreApplication::translate("JumpHex", "Go", nullptr));
     } // retranslateUi
 
 };

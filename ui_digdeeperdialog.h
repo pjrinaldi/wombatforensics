@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'digdeeperdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -168,19 +168,19 @@ public:
 
     void retranslateUi(QDialog *DigDeeperDialog)
     {
-        DigDeeperDialog->setWindowTitle(QApplication::translate("DigDeeperDialog", "Dig Deeper", nullptr));
-        groupBox_2->setTitle(QApplication::translate("DigDeeperDialog", "Process the Following File(s)", nullptr));
-        selectedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Selected", nullptr));
-        checkedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "Checked (#)", nullptr));
-        listedFileRadioButton->setText(QApplication::translate("DigDeeperDialog", "All (#)", nullptr));
-        groupBox->setTitle(QApplication::translate("DigDeeperDialog", "For the Following Options", nullptr));
-        thumbnailcheckBox->setText(QApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Image Files", nullptr));
-        hashcheckbox->setText(QApplication::translate("DigDeeperDialog", "Calcuate Hash:", nullptr));
-        md5radiobutton->setText(QApplication::translate("DigDeeperDialog", "MD5", nullptr));
-        sha1radiobutton->setText(QApplication::translate("DigDeeperDialog", "SHA1", nullptr));
-        sha256radiobutton->setText(QApplication::translate("DigDeeperDialog", "SHA256", nullptr));
-        cancelButton->setText(QApplication::translate("DigDeeperDialog", "Cancel", nullptr));
-        processButton->setText(QApplication::translate("DigDeeperDialog", "Process", nullptr));
+        DigDeeperDialog->setWindowTitle(QCoreApplication::translate("DigDeeperDialog", "Dig Deeper", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate("DigDeeperDialog", "Process the Following File(s)", nullptr));
+        selectedFileRadioButton->setText(QCoreApplication::translate("DigDeeperDialog", "Selected", nullptr));
+        checkedFileRadioButton->setText(QCoreApplication::translate("DigDeeperDialog", "Checked (#)", nullptr));
+        listedFileRadioButton->setText(QCoreApplication::translate("DigDeeperDialog", "All (#)", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("DigDeeperDialog", "For the Following Options", nullptr));
+        thumbnailcheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Image Files", nullptr));
+        hashcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Calcuate Hash:", nullptr));
+        md5radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "MD5", nullptr));
+        sha1radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA1", nullptr));
+        sha256radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA256", nullptr));
+        cancelButton->setText(QCoreApplication::translate("DigDeeperDialog", "Cancel", nullptr));
+        processButton->setText(QCoreApplication::translate("DigDeeperDialog", "Process", nullptr));
     } // retranslateUi
 
 };

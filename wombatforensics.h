@@ -179,6 +179,7 @@ private slots:
     void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
     void PrepareEvidenceImage(void);
     void SetHexOffset(void);
+    void CreateNewTag(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -203,6 +204,8 @@ private:
     void InitializeCheckState(void);
     void UpdateSelectedState(QString id);
     void ReadSettings(void);
+    void UpdateBookmarkItems(QString tagname);
+    void ReadBookmarks(void);
     static void PopulateModel(const QModelIndex index);
     QString InitializeSelectedState(void);
     QModelIndex selectedindex;
@@ -222,10 +225,9 @@ private:
 
     QProcess* xmntprocess;
 
-    QFile casesfile;
     QFile casedatafile;
+    QFile bookmarkfile;
     off_t offset() const;
-    QFile testfile;
     QPushButton* lineup;
     QPushButton* linedown;
     QPushButton* pageup;

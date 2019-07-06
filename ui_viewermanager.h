@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'viewermanager.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -124,12 +124,12 @@ public:
 
     void retranslateUi(QDialog *ViewerManager)
     {
-        ViewerManager->setWindowTitle(QApplication::translate("ViewerManager", "Viewer Manager", nullptr));
-        label->setText(QApplication::translate("ViewerManager", "Path To Viewer:", nullptr));
-        browsebutton->setText(QApplication::translate("ViewerManager", "Browse", nullptr));
-        addbutton->setText(QApplication::translate("ViewerManager", "Add", nullptr));
-        label_2->setText(QApplication::translate("ViewerManager", "Existing Viewers", nullptr));
-        removebutton->setText(QApplication::translate("ViewerManager", "Remove Selected", nullptr));
+        ViewerManager->setWindowTitle(QCoreApplication::translate("ViewerManager", "Viewer Manager", nullptr));
+        label->setText(QCoreApplication::translate("ViewerManager", "Path To Viewer:", nullptr));
+        browsebutton->setText(QCoreApplication::translate("ViewerManager", "Browse", nullptr));
+        addbutton->setText(QCoreApplication::translate("ViewerManager", "Add", nullptr));
+        label_2->setText(QCoreApplication::translate("ViewerManager", "Existing Viewers", nullptr));
+        removebutton->setText(QCoreApplication::translate("ViewerManager", "Remove Selected", nullptr));
     } // retranslateUi
 
 };

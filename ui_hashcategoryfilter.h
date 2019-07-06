@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'hashcategoryfilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -57,8 +57,8 @@ public:
 
     void retranslateUi(QWidget *hashcategoryfilter)
     {
-        hashcategoryfilter->setWindowTitle(QApplication::translate("hashcategoryfilter", "Filter", nullptr));
-        checkBox->setText(QApplication::translate("hashcategoryfilter", "Show Items where hash matches", nullptr));
+        hashcategoryfilter->setWindowTitle(QCoreApplication::translate("hashcategoryfilter", "Filter", nullptr));
+        checkBox->setText(QCoreApplication::translate("hashcategoryfilter", "Show Items where hash matches", nullptr));
         comboBox->setCurrentText(QString());
     } // retranslateUi
 

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'propertieswindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -141,9 +141,9 @@ public:
 
     void retranslateUi(QDialog *PropertiesWindow)
     {
-        PropertiesWindow->setWindowTitle(QApplication::translate("PropertiesWindow", "Properties", nullptr));
-        groupBox->setTitle(QApplication::translate("PropertiesWindow", "Description", nullptr));
-        label->setText(QApplication::translate("PropertiesWindow", "Information on the selected object and its value.", nullptr));
+        PropertiesWindow->setWindowTitle(QCoreApplication::translate("PropertiesWindow", "Properties", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("PropertiesWindow", "Description", nullptr));
+        label->setText(QCoreApplication::translate("PropertiesWindow", "Information on the selected object and its value.", nullptr));
     } // retranslateUi
 
 };

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'digstatus.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -123,13 +123,13 @@ public:
 
     void retranslateUi(QDialog *DigStatus)
     {
-        DigStatus->setWindowTitle(QApplication::translate("DigStatus", "Dig Status", nullptr));
-        imgthumblabel->setText(QApplication::translate("DigStatus", "Generating Image Thumbnail: x of y z%", nullptr));
-        imgthumbbutton->setText(QApplication::translate("DigStatus", "...", nullptr));
-        hashlabel->setText(QApplication::translate("DigStatus", "XXX Hashing: a of b c%", nullptr));
-        hashbutton->setText(QApplication::translate("DigStatus", "...", nullptr));
-        label_3->setText(QApplication::translate("DigStatus", "TextLabel", nullptr));
-        toolButton_3->setText(QApplication::translate("DigStatus", "...", nullptr));
+        DigStatus->setWindowTitle(QCoreApplication::translate("DigStatus", "Dig Status", nullptr));
+        imgthumblabel->setText(QCoreApplication::translate("DigStatus", "Generating Image Thumbnail: x of y z%", nullptr));
+        imgthumbbutton->setText(QCoreApplication::translate("DigStatus", "...", nullptr));
+        hashlabel->setText(QCoreApplication::translate("DigStatus", "XXX Hashing: a of b c%", nullptr));
+        hashbutton->setText(QCoreApplication::translate("DigStatus", "...", nullptr));
+        label_3->setText(QCoreApplication::translate("DigStatus", "TextLabel", nullptr));
+        toolButton_3->setText(QCoreApplication::translate("DigStatus", "...", nullptr));
     } // retranslateUi
 
 };

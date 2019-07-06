@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'namefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -70,10 +70,10 @@ public:
 
     void retranslateUi(QWidget *NameFilter)
     {
-        NameFilter->setWindowTitle(QApplication::translate("NameFilter", "Filter", nullptr));
-        checkBox->setText(QApplication::translate("NameFilter", "Show Items where name contains", nullptr));
+        NameFilter->setWindowTitle(QCoreApplication::translate("NameFilter", "Filter", nullptr));
+        checkBox->setText(QCoreApplication::translate("NameFilter", "Show Items where name contains", nullptr));
         lineEdit->setPlaceholderText(QString());
-        pushButton->setText(QApplication::translate("NameFilter", "Apply", nullptr));
+        pushButton->setText(QCoreApplication::translate("NameFilter", "Apply", nullptr));
     } // retranslateUi
 
 };

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'imagewindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -93,9 +93,9 @@ public:
 
     void retranslateUi(QDialog *ImageWindow)
     {
-        ImageWindow->setWindowTitle(QApplication::translate("ImageWindow", "View Image", nullptr));
-        pushButton->setText(QApplication::translate("ImageWindow", "Stretch/Shrink Contents To Fit", nullptr));
-        label->setText(QApplication::translate("ImageWindow", "Loading...", nullptr));
+        ImageWindow->setWindowTitle(QCoreApplication::translate("ImageWindow", "View Image", nullptr));
+        pushButton->setText(QCoreApplication::translate("ImageWindow", "Stretch/Shrink Contents To Fit", nullptr));
+        label->setText(QCoreApplication::translate("ImageWindow", "Loading...", nullptr));
     } // retranslateUi
 
 };

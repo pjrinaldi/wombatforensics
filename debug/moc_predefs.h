@@ -40,6 +40,7 @@
 #define __GNUC_PATCHLEVEL__ 0
 #define __FLT32_HAS_DENORM__ 1
 #define __UINT_FAST8_MAX__ 0xff
+#define __cpp_rvalue_reference 200610
 #define __has_include(STR) __has_include__(STR)
 #define __DEC64_MAX_EXP__ 385
 #define __INT8_C(c) c
@@ -103,7 +104,7 @@
 #define __FLT64X_MIN_10_EXP__ (-4931)
 #define __LDBL_HAS_QUIET_NAN__ 1
 #define __FLT64_MANT_DIG__ 53
-#define __GNUC__ 8
+#define __GNUC__ 9
 #define __GXX_RTTI 1
 #define __pie__ 2
 #define __MMX__ 1
@@ -118,6 +119,7 @@
 #define __cpp_raw_strings 200710
 #define __INT_FAST32_MAX__ 0x7fffffffffffffffL
 #define __DBL_HAS_INFINITY__ 1
+#define __HAVE_SPECULATION_SAFE_VALUE 1
 #define __DEC32_MIN_EXP__ (-94)
 #define __INTPTR_WIDTH__ 64
 #define __FLT32X_HAS_DENORM__ 1
@@ -140,10 +142,9 @@
 #define __amd64 1
 #define __ATOMIC_HLE_ACQUIRE 65536
 #define __FLT32_HAS_QUIET_NAN__ 1
-#define __GNUG__ 8
+#define __GNUG__ 9
 #define __LONG_LONG_MAX__ 0x7fffffffffffffffLL
 #define __SIZEOF_SIZE_T__ 8
-#define __cpp_rvalue_reference 200610
 #define __cpp_nsdmi 200809
 #define __FLT64X_MIN_EXP__ (-16381)
 #define __SIZEOF_WINT_T__ 4
@@ -169,13 +170,12 @@
 #define __DEC128_MIN__ 1E-6143DL
 #define __REGISTER_PREFIX__ 
 #define __UINT16_MAX__ 0xffff
-#define __DBL_HAS_DENORM__ 1
 #define __FLT32_MIN__ 1.17549435082228750796873653722224568e-38F32
 #define __UINT8_TYPE__ unsigned char
 #define __NO_INLINE__ 1
 #define __FLT_MANT_DIG__ 24
 #define __LDBL_DECIMAL_DIG__ 21
-#define __VERSION__ "8.3.0"
+#define __VERSION__ "9.1.0"
 #define __UINT64_C(c) c ## UL
 #define __cpp_unicode_characters 200704
 #define _STDC_PREDEF_H 1
@@ -196,6 +196,7 @@
 #define __UINT_LEAST16_TYPE__ short unsigned int
 #define __FLT64X_HAS_INFINITY__ 1
 #define unix 1
+#define __DBL_HAS_DENORM__ 1
 #define __INT16_MAX__ 0x7fff
 #define __cpp_rtti 199711
 #define __SIZE_TYPE__ long unsigned int
@@ -343,7 +344,7 @@
 #define __DEC128_MAX_EXP__ 6145
 #define __FLT32X_HAS_QUIET_NAN__ 1
 #define __ATOMIC_CONSUME 1
-#define __GNUC_MINOR__ 3
+#define __GNUC_MINOR__ 1
 #define __GLIBCXX_TYPE_INT_N_0 __int128
 #define __INT_FAST16_WIDTH__ 64
 #define __UINTMAX_MAX__ 0xffffffffffffffffUL

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'idfilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -155,19 +155,19 @@ public:
 
     void retranslateUi(QFrame *IdFilter)
     {
-        IdFilter->setWindowTitle(QApplication::translate("IdFilter", "Frame", nullptr));
+        IdFilter->setWindowTitle(QCoreApplication::translate("IdFilter", "Frame", nullptr));
         echeckBox->setText(QString());
         espinBox->setSuffix(QString());
-        espinBox->setPrefix(QApplication::translate("IdFilter", "e", nullptr));
+        espinBox->setPrefix(QCoreApplication::translate("IdFilter", "e", nullptr));
         vcheckBox->setText(QString());
-        vspinBox->setPrefix(QApplication::translate("IdFilter", "v", nullptr));
+        vspinBox->setPrefix(QCoreApplication::translate("IdFilter", "v", nullptr));
         pcheckBox->setText(QString());
-        pspinBox->setPrefix(QApplication::translate("IdFilter", "p", nullptr));
+        pspinBox->setPrefix(QCoreApplication::translate("IdFilter", "p", nullptr));
         fcheckBox->setText(QString());
-        fspinBox->setPrefix(QApplication::translate("IdFilter", "f", nullptr));
-        label->setText(QApplication::translate("IdFilter", "Show ID's that contain:", nullptr));
-        pushButton->setText(QApplication::translate("IdFilter", "Apply", nullptr));
-        idlabel->setText(QApplication::translate("IdFilter", "TextLabel", nullptr));
+        fspinBox->setPrefix(QCoreApplication::translate("IdFilter", "f", nullptr));
+        label->setText(QCoreApplication::translate("IdFilter", "Show ID's that contain:", nullptr));
+        pushButton->setText(QCoreApplication::translate("IdFilter", "Apply", nullptr));
+        idlabel->setText(QCoreApplication::translate("IdFilter", "TextLabel", nullptr));
     } // retranslateUi
 
 };

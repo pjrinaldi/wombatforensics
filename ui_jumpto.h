@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'jumpto.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -83,13 +83,13 @@ public:
 
     void retranslateUi(QFrame *JumpFilter)
     {
-        JumpFilter->setWindowTitle(QApplication::translate("JumpFilter", "Frame", nullptr));
-        lineEdit->setPlaceholderText(QApplication::translate("JumpFilter", "Enter Hex Offset", nullptr));
-        label->setText(QApplication::translate("JumpFilter", "Jump to:", nullptr));
-        pushButton->setText(QApplication::translate("JumpFilter", "Go", nullptr));
-#ifndef QT_NO_SHORTCUT
-        pushButton->setShortcut(QApplication::translate("JumpFilter", "Return", nullptr));
-#endif // QT_NO_SHORTCUT
+        JumpFilter->setWindowTitle(QCoreApplication::translate("JumpFilter", "Frame", nullptr));
+        lineEdit->setPlaceholderText(QCoreApplication::translate("JumpFilter", "Enter Hex Offset", nullptr));
+        label->setText(QCoreApplication::translate("JumpFilter", "Jump to:", nullptr));
+        pushButton->setText(QCoreApplication::translate("JumpFilter", "Go", nullptr));
+#if QT_CONFIG(shortcut)
+        pushButton->setShortcut(QCoreApplication::translate("JumpFilter", "Return", nullptr));
+#endif // QT_CONFIG(shortcut)
     } // retranslateUi
 
 };

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'filetypefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -71,9 +71,9 @@ public:
 
     void retranslateUi(QWidget *FileTypeFilter)
     {
-        FileTypeFilter->setWindowTitle(QApplication::translate("FileTypeFilter", "Filter", nullptr));
-        pushButton->setText(QApplication::translate("FileTypeFilter", "Apply", nullptr));
-        typecheckBox->setText(QApplication::translate("FileTypeFilter", "Show Items where type matches", nullptr));
+        FileTypeFilter->setWindowTitle(QCoreApplication::translate("FileTypeFilter", "Filter", nullptr));
+        pushButton->setText(QCoreApplication::translate("FileTypeFilter", "Apply", nullptr));
+        typecheckBox->setText(QCoreApplication::translate("FileTypeFilter", "Show Items where type matches", nullptr));
     } // retranslateUi
 
 };

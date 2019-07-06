@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'analysistypefilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -57,8 +57,8 @@ public:
 
     void retranslateUi(QWidget *analysistypefilter)
     {
-        analysistypefilter->setWindowTitle(QApplication::translate("analysistypefilter", "Filter", nullptr));
-        checkBox->setText(QApplication::translate("analysistypefilter", "Show Items where analysis type matches", nullptr));
+        analysistypefilter->setWindowTitle(QCoreApplication::translate("analysistypefilter", "Filter", nullptr));
+        checkBox->setText(QCoreApplication::translate("analysistypefilter", "Show Items where analysis type matches", nullptr));
         comboBox->setCurrentText(QString());
     } // retranslateUi
 

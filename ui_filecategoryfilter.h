@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'filecategoryfilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -72,9 +72,9 @@ public:
 
     void retranslateUi(QWidget *FileCategoryFilter)
     {
-        FileCategoryFilter->setWindowTitle(QApplication::translate("FileCategoryFilter", "Filter", nullptr));
-        categorycheckBox->setText(QApplication::translate("FileCategoryFilter", "Show Items where category matches", nullptr));
-        pushButton->setText(QApplication::translate("FileCategoryFilter", "Apply", nullptr));
+        FileCategoryFilter->setWindowTitle(QCoreApplication::translate("FileCategoryFilter", "Filter", nullptr));
+        categorycheckBox->setText(QCoreApplication::translate("FileCategoryFilter", "Show Items where category matches", nullptr));
+        pushButton->setText(QCoreApplication::translate("FileCategoryFilter", "Apply", nullptr));
         categorycomboBox->setCurrentText(QString());
     } // retranslateUi
 

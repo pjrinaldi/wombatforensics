@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'addevidencedialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -120,12 +120,12 @@ public:
 
     void retranslateUi(QDialog *AddEvidenceDialog)
     {
-        AddEvidenceDialog->setWindowTitle(QApplication::translate("AddEvidenceDialog", "Add Evidence", nullptr));
-        addbutton->setText(QApplication::translate("AddEvidenceDialog", "Add", nullptr));
-        groupbox->setTitle(QApplication::translate("AddEvidenceDialog", "Evidence", nullptr));
-        removebutton->setText(QApplication::translate("AddEvidenceDialog", "Remove", nullptr));
-        cancelbutton->setText(QApplication::translate("AddEvidenceDialog", "Cancel", nullptr));
-        startbutton->setText(QApplication::translate("AddEvidenceDialog", "Start", nullptr));
+        AddEvidenceDialog->setWindowTitle(QCoreApplication::translate("AddEvidenceDialog", "Add Evidence", nullptr));
+        addbutton->setText(QCoreApplication::translate("AddEvidenceDialog", "Add", nullptr));
+        groupbox->setTitle(QCoreApplication::translate("AddEvidenceDialog", "Evidence", nullptr));
+        removebutton->setText(QCoreApplication::translate("AddEvidenceDialog", "Remove", nullptr));
+        cancelbutton->setText(QCoreApplication::translate("AddEvidenceDialog", "Cancel", nullptr));
+        startbutton->setText(QCoreApplication::translate("AddEvidenceDialog", "Start", nullptr));
     } // retranslateUi
 
 };

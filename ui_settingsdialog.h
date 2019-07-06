@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'settingsdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -104,13 +104,13 @@ public:
 
     void retranslateUi(QDialog *SettingsDialog)
     {
-        SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", nullptr));
-        cancelbutton->setText(QApplication::translate("SettingsDialog", "Cancel", nullptr));
-        savebutton->setText(QApplication::translate("SettingsDialog", "Save", nullptr));
-        thumbnaillabel->setText(QApplication::translate("SettingsDialog", "Thumbnail Size:", nullptr));
-        thumbnailspinbox->setSuffix(QApplication::translate("SettingsDialog", " pixels", nullptr));
-        casepathlabel->setText(QApplication::translate("SettingsDialog", "Set Case Path:", nullptr));
-        casepathlineedit->setPlaceholderText(QApplication::translate("SettingsDialog", "User's Home Directory", nullptr));
+        SettingsDialog->setWindowTitle(QCoreApplication::translate("SettingsDialog", "Settings", nullptr));
+        cancelbutton->setText(QCoreApplication::translate("SettingsDialog", "Cancel", nullptr));
+        savebutton->setText(QCoreApplication::translate("SettingsDialog", "Save", nullptr));
+        thumbnaillabel->setText(QCoreApplication::translate("SettingsDialog", "Thumbnail Size:", nullptr));
+        thumbnailspinbox->setSuffix(QCoreApplication::translate("SettingsDialog", " pixels", nullptr));
+        casepathlabel->setText(QCoreApplication::translate("SettingsDialog", "Set Case Path:", nullptr));
+        casepathlineedit->setPlaceholderText(QCoreApplication::translate("SettingsDialog", "User's Home Directory", nullptr));
     } // retranslateUi
 
 };

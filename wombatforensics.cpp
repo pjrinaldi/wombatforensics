@@ -37,17 +37,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addPermanentWidget(vline2, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
-    bookmarkmenu = new QMenu();
-    bookmarkmenu->addAction(ui->actionNew_Bookmark);
-    bookmarkmenu->addAction(ui->actionExisting_Bookmarks);
-    QWidget* bookwidget = ui->analysisToolBar->widgetForAction(ui->actionBookmark_Manager);
-    QToolButton* bookbutton = qobject_cast<QToolButton*>(bookwidget);
-    if(bookbutton)
-        connect(ui->actionBookmark_Manager, SIGNAL(triggered(bool)), bookbutton, SLOT(showMenu()));
-    ui->actionBookmark_Manager->setMenu(bookmarkmenu);
-    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    ui->analysisToolBar->addWidget(spacer);
-    ui->analysisToolBar->addAction(ui->actionAbout);
     tskexternalptr = &tskexternalobject;
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
@@ -92,6 +81,33 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
     InitializeAppStructure();
+    bookmarkmenu = new QMenu();
+    bookmarkmenu->addAction(ui->actionNew_Bookmark);
+    //bookmarkmenu->addAction(ui->actionExisting_Bookmarks);
+    bookmarkmenu->addSeparator();
+    ReadBookmarks();
+    //UpdateBookmarkItems();
+    /*
+    bookmarkfile.open(QIODevice::ReadOnly);
+    QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+    bookmarkfile.close();
+    for(int i=0; i < bookitemlist.count(); i++)
+    {
+        QAction* tmpaction = new QAction(bookitemlist.at(i), this);
+        connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
+        bookmarkmenu->addAction(tmpaction);
+    }
+    */
+    connect(ui->actionNew_Bookmark, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
+    QWidget* bookwidget = ui->analysisToolBar->widgetForAction(ui->actionBookmark_Manager);
+    QToolButton* bookbutton = qobject_cast<QToolButton*>(bookwidget);
+    if(bookbutton)
+        connect(ui->actionBookmark_Manager, SIGNAL(triggered(bool)), bookbutton, SLOT(showMenu()));
+    ui->actionBookmark_Manager->setMenu(bookmarkmenu);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    ui->analysisToolBar->addWidget(spacer);
+    ui->analysisToolBar->addAction(ui->actionAbout);
+
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&openwatcher, SIGNAL(finished()), this, SLOT(OpenUpdate()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
@@ -118,6 +134,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu = new QMenu(ui->dirTreeView);
     treemenu->addAction(ui->actionView_File);
     treemenu->addAction(ui->actionView_Properties);
+    treemenu->addMenu(bookmarkmenu);
     viewerfile.open(QIODevice::ReadOnly);
     QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
     itemlist.removeDuplicates();
@@ -169,6 +186,74 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treenodemodel = new TreeNodeModel();
     autosavetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
+}
+
+void WombatForensics::ReadBookmarks()
+{
+    bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+    bookmarkfile.close();
+    bookmarkmenu->clear();
+    bookmarkmenu->addAction(ui->actionNew_Bookmark);
+    bookmarkmenu->addSeparator();
+    for(int i=0; i < bookitemlist.count(); i++)
+    {
+        QAction* tmpaction = new QAction(bookitemlist.at(i), this);
+        connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
+        bookmarkmenu->addAction(tmpaction);
+    }
+}
+
+void WombatForensics::UpdateBookmarkItems(QString tagname)
+{
+    bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+    bookmarkfile.close();
+    bookitemlist.append(tagname);
+    bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&bookmarkfile);
+    for(int i=0; i < bookitemlist.count(); i++)
+    {
+        out << bookitemlist.at(i) << ",";
+    }
+    bookmarkfile.close();
+}
+
+void WombatForensics::CreateNewTag()
+{
+    QString tagname = "";
+    QInputDialog* newtagdialog = new QInputDialog(this);
+    newtagdialog->setCancelButtonText("Cancel");
+    newtagdialog->setInputMode(QInputDialog::TextInput);
+    newtagdialog->setLabelText("Enter Tag Name");
+    newtagdialog->setOkButtonText("Create Tag");
+    newtagdialog->setTextEchoMode(QLineEdit::Normal);
+    newtagdialog->setWindowTitle("New Tag");
+    if(newtagdialog->exec())
+        tagname = newtagdialog->textValue();
+    if(!tagname.isEmpty())
+    {
+        UpdateBookmarkItems(tagname);
+        ReadBookmarks();
+        // TagFile(tagname);
+        // do something here
+    }
+    /*
+     *    QInputDialog* casedialog = new QInputDialog(this);
+    casedialog->setCancelButtonText("Cancel");
+    casedialog->setInputMode(QInputDialog::TextInput);
+    casedialog->setLabelText("Enter Case Name");
+    casedialog->setOkButtonText("Create Case");
+    casedialog->setTextEchoMode(QLineEdit::Normal);
+    casedialog->setWindowTitle("New Case");
+    if(casedialog->exec())
+        wombatvariable.casename = casedialog->textValue();
+    //qDebug() << "case name:" << wombatvariable.casename;
+    if(!wombatvariable.casename.isEmpty())
+    {
+
+     */ 
+    
 }
 
 void WombatForensics::ShowDigStatus()
@@ -410,6 +495,12 @@ void WombatForensics::InitializeAppStructure()
     if((new QDir())->mkpath(wombatvariable.imgdatapath) == false)
         DisplayError("1.5", "App imgdatapath folder failed", "App imgdatapath folder was not created");
     */
+    bookmarkfile.setFileName(homepath + "bookmarks");
+    if(!FileExists(QString(homepath + "bookmarks").toStdString()))
+    {
+        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        bookmarkfile.close();
+    }
     viewerfile.setFileName(homepath + "viewers");
     if(!FileExists(QString(homepath + "viewers").toStdString()))
     {
@@ -611,7 +702,7 @@ void WombatForensics::OpenUpdate()
         ui->actionJumpToHex->setEnabled(true);
         //ui->actionExpandAll->setEnabled(true);
         //ui->actionCollapseAll->setEnabled(true);
-        //ui->actionBookmark_Manager->setEnabled(true);
+        ui->actionBookmark_Manager->setEnabled(true);
     }
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
@@ -795,7 +886,7 @@ void WombatForensics::UpdateStatus()
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
-    //ui->actionBookmark_Manager->setEnabled(true);
+    ui->actionBookmark_Manager->setEnabled(true);
     qInfo() << "Processing Complete";
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
