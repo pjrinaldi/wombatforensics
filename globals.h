@@ -236,7 +236,7 @@ public:
     explicit TreeNodeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
         QList<QVariant> zerodata;
-        zerodata << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature" << "ID"; // NAME IN FIRST COLUMN
+        zerodata << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature" << "Tag" << "ID"; // NAME IN FIRST COLUMN
         zeronode = new TreeNode(zerodata);
     };
 

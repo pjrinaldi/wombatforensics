@@ -82,22 +82,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
-    bookmarkmenu->addAction(ui->actionNew_Bookmark);
+    //bookmarkmenu->addAction(ui->actionNew_Bookmark);
     //bookmarkmenu->addAction(ui->actionExisting_Bookmarks);
-    bookmarkmenu->addSeparator();
-    ReadBookmarks();
+    //bookmarkmenu->addSeparator();
+    //ReadBookmarks();
     //UpdateBookmarkItems();
-    /*
-    bookmarkfile.open(QIODevice::ReadOnly);
-    QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
-    bookmarkfile.close();
-    for(int i=0; i < bookitemlist.count(); i++)
-    {
-        QAction* tmpaction = new QAction(bookitemlist.at(i), this);
-        connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
-        bookmarkmenu->addAction(tmpaction);
-    }
-    */
     connect(ui->actionNew_Bookmark, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
     QWidget* bookwidget = ui->analysisToolBar->widgetForAction(ui->actionBookmark_Manager);
     QToolButton* bookbutton = qobject_cast<QToolButton*>(bookwidget);
@@ -236,24 +225,11 @@ void WombatForensics::CreateNewTag()
         UpdateBookmarkItems(tagname);
         ReadBookmarks();
         // TagFile(tagname);
-        // do something here
     }
-    /*
-     *    QInputDialog* casedialog = new QInputDialog(this);
-    casedialog->setCancelButtonText("Cancel");
-    casedialog->setInputMode(QInputDialog::TextInput);
-    casedialog->setLabelText("Enter Case Name");
-    casedialog->setOkButtonText("Create Case");
-    casedialog->setTextEchoMode(QLineEdit::Normal);
-    casedialog->setWindowTitle("New Case");
-    if(casedialog->exec())
-        wombatvariable.casename = casedialog->textValue();
-    //qDebug() << "case name:" << wombatvariable.casename;
-    if(!wombatvariable.casename.isEmpty())
-    {
+}
 
-     */ 
-    
+void WombatForensics::TagFile(QString tagname)
+{
 }
 
 void WombatForensics::ShowDigStatus()
@@ -567,6 +543,7 @@ void WombatForensics::InitializeCaseStructure()
             bookmarkfile.close();
         }
         qInfo() << "Bookmarks File Created";
+        ReadBookmarks();
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         msglog->clear();
@@ -623,6 +600,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         bookmarkfile.close();
     }
     qInfo() << "Bookmarks File Created";
+    ReadBookmarks();
     logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     msglog->clear();
