@@ -241,19 +241,19 @@ void WombatForensics::ShowDigStatus()
 
 void WombatForensics::ShowExternalViewer()
 {
-    qint64 curobjaddr = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-f").at(1).toLongLong();
+    qint64 curobjaddr = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-f").at(1).toLongLong();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
     std::vector<std::string> pathvector;
     pathvector.clear();
-    QString estring = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(0);
-    QString vstring = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(1);
-    QString pstring = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(3);
+    QString estring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
@@ -294,7 +294,7 @@ void WombatForensics::ShowExternalViewer()
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
         //(new QDir())->mkpath(wombatvariable.tmpfilepath);
-        QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 10).data().toString() + "-tmp";
+        QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "-tmp";
         QFile tmpfile(tmpstring);
         if(tmpfile.open(QIODevice::WriteOnly))
         {
@@ -314,7 +314,7 @@ void WombatForensics::ShowExternalViewer()
 
 void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 {
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
 }
@@ -326,9 +326,9 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         imageviewer = new ImageWindow();
         imageviewer->setWindowIcon(QIcon(":/img"));
-        imageviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Image Viewer");
+        imageviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Image Viewer");
         imageviewer->setAttribute(Qt::WA_DeleteOnClose);
-        imageviewer->GetImage(selectedindex.sibling(selectedindex.row(), 10).data().toString());
+        imageviewer->GetImage(selectedindex.sibling(selectedindex.row(), 11).data().toString());
         imageviewer->show();
     }
     else if(index.sibling(index.row(), 8).data().toString().contains("video"))
@@ -336,7 +336,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         videowindow = new VideoViewer();
         videowindow->setAttribute(Qt::WA_DeleteOnClose);
         videowindow->setWindowIcon(QIcon(":/vid"));
-        videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Video Viewer");
+        videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Video Viewer");
         videowindow->ShowVideo(index);
     }
     else if(index.sibling(index.row(), 8).data().toString().contains("text"))
@@ -344,7 +344,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         // toggle the button...
         textviewer = new TextViewer();
         textviewer->setWindowIcon(QIcon(":/textencode"));
-        textviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Text Viewer");
+        textviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Text Viewer");
         textviewer->setAttribute(Qt::WA_DeleteOnClose);
         // THIS FAILS ON ADS
         textviewer->ShowText(index);
@@ -354,7 +354,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowIcon(QIcon(":/web"));
-        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " HTML Viewer");
+        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " HTML Viewer");
         htmlviewer->ShowHtml(index);
     }
     else
@@ -498,7 +498,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionView_Progress->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     ui->actionDigDeeper->setEnabled(false);
-    ui->actionBookmark_Manager->setEnabled(false);
+    //ui->actionBookmark_Manager->setEnabled(false);
     ui->actionView_Image_Gallery->setEnabled(false);
     ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
@@ -656,7 +656,7 @@ void WombatForensics::OpenUpdate()
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     // this currently fails to load content data in the hexviewer. until it does, the char bytes are zero...
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
     if(indexlist.count() > 0)
     {
@@ -688,7 +688,7 @@ void WombatForensics::OpenUpdate()
         ui->actionJumpToHex->setEnabled(true);
         //ui->actionExpandAll->setEnabled(true);
         //ui->actionCollapseAll->setEnabled(true);
-        ui->actionBookmark_Manager->setEnabled(true);
+        //ui->actionBookmark_Manager->setEnabled(true);
     }
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
@@ -860,7 +860,7 @@ void WombatForensics::UpdateStatus()
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     UpdateCheckCount();
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
     {
         //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
@@ -872,7 +872,7 @@ void WombatForensics::UpdateStatus()
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
-    ui->actionBookmark_Manager->setEnabled(true);
+    //ui->actionBookmark_Manager->setEnabled(true);
     qInfo() << "Processing Complete";
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
@@ -909,30 +909,30 @@ void WombatForensics::UpdateProperties()
 {
     QFile propfile;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     //qDebug() << "evidfiles:" << evidfiles;
     QString evidencename = evidfiles.at(0).split(".e").first();
     //qDebug() << "evidencename:" << evidencename;
     propertylist.clear();
-    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 1) // evidence image
+    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 1) // evidence image
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").first() + "/prop");
+        propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first() + "/prop");
     }
-    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 2) // volume
+    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 2) // volume
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(1) + "/prop");
+        propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(1) + "/prop");
     }
-    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 3) // file system
+    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 3) // file system
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(2) + "/prop");
+        propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(2) + "/prop");
     }
-    if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").count() == 4) // file
+    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 4) // file
     {
         QString tmpfvalue = "";
         QString parentstr = "5"; // NTFS ROOT INUM
-        if(selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-").count() == 3) // root inum
+        if(selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-").count() == 3) // root inum
         {
-            QFile fsstatfile(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(2) + "/stat");
+            QFile fsstatfile(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(2) + "/stat");
             fsstatfile.open(QIODevice::ReadOnly | QIODevice::Text);
             QString tmpstr = "";
             if(fsstatfile.isOpen())
@@ -942,12 +942,12 @@ void WombatForensics::UpdateProperties()
                 parentstr = tmpstr.split(",").at(3);
         }
         else
-            parentstr = selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-").at(3).mid(1);
-        if(selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last().contains(":"))
-            tmpfvalue = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last().split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last().split(":").at(1);
+            parentstr = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-").at(3).mid(1);
+        if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").last().contains(":"))
+            tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").last().split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").last().split(":").at(1);
         else
-            tmpfvalue = selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").last();
-        propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 10).data().toString().split("-").at(2) + "/" + tmpfvalue + ".a" + parentstr + ".prop");
+            tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").last();
+        propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(2) + "/" + tmpfvalue + ".a" + parentstr + ".prop");
     }
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream in(&propfile);
@@ -969,25 +969,25 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
-    if(curindex.sibling(curindex.row(), 10).data().toString().split("-").count() == 4)
+    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 4)
     {
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
         QString evidencename = evidfiles.at(0).split(".e").first();
         QString tmpstr = "";
-        //qDebug() << "fileviewer:" << curindex.sibling(curindex.row(), 10).data().toString();
-        QString paridstr = curindex.parent().sibling(curindex.parent().row(), 10).data().toString().split("-f").last();
+        //qDebug() << "fileviewer:" << curindex.sibling(curindex.row(), 11).data().toString();
+        QString paridstr = curindex.parent().sibling(curindex.parent().row(), 11).data().toString().split("-f").last();
         TSK_IMG_INFO* fileheximginfo;
         TSK_FS_INFO* filehexfsinfo;
         TSK_FS_FILE* filehexfileinfo;
         std::vector<std::string> pathvector;
         const TSK_TCHAR** imagepartspath;
         pathvector.clear();
-        QString estring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(0);
-        QString vstring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(1);
-        QString pstring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(2);
-        QString fstring = curindex.sibling(curindex.row(), 10).data().toString().split("-").at(3);
-        QString curid = curindex.sibling(curindex.row(), 10).data().toString();
+        QString estring = curindex.sibling(curindex.row(), 11).data().toString().split("-").at(0);
+        QString vstring = curindex.sibling(curindex.row(), 11).data().toString().split("-").at(1);
+        QString pstring = curindex.sibling(curindex.row(), 11).data().toString().split("-").at(2);
+        QString fstring = curindex.sibling(curindex.row(), 11).data().toString().split("-").at(3);
+        QString curid = curindex.sibling(curindex.row(), 11).data().toString();
         QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
         //qDebug() << "Initial string info (e-v-p-f):" << estring + vstring + pstring + fstring;
         evidfile.open(QIODevice::ReadOnly);
@@ -1089,7 +1089,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
             QDir dir;
             dir.mkpath(wombatvariable.tmpfilepath);
             //(new QDir())->mkpath(wombatvariable.tmpfilepath);
-            hexstring = wombatvariable.tmpfilepath + curindex.sibling(curindex.row(), 10).data().toString() + "-fhex";
+            hexstring = wombatvariable.tmpfilepath + curindex.sibling(curindex.row(), 11).data().toString() + "-fhex";
             QFile tmpfile(hexstring);
             tmpfile.open(QIODevice::WriteOnly);
             QDataStream outbuffer(&tmpfile);
@@ -1108,9 +1108,9 @@ void WombatForensics::LoadHexContents()
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     //qDebug() << "evidencelist:" << evidencelist; // original evidence path
-    //qDebug() << "selectednode id:" << selectednode->Data(10).toString();
-    //qDebug() << "selectednode evid id:" << selectednode->Data(10).toString().split("-").first();
-    QString nodeid = selectednode->Data(10).toString();
+    //qDebug() << "selectednode id:" << selectednode->Data(11).toString();
+    //qDebug() << "selectednode evid id:" << selectednode->Data(11).toString().split("-").first();
+    QString nodeid = selectednode->Data(11).toString();
     QString evidid = nodeid.split("-").first();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + evidid)), QDir::NoSymLinks | QDir::Dirs);
@@ -1162,7 +1162,7 @@ void WombatForensics::LoadHexContents()
     }
     else if(nodeid.split("-").count() == 5) // dir/file
     {
-        QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 10).data().toString().split("-f").last();
+        QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-f").last();
         QStringList partlist;
         partlist.clear();
         QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
@@ -1398,7 +1398,7 @@ void WombatForensics::CloseCurrentCase()
 {
     if(ui->dirTreeView->model() != NULL)
     {
-        UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 10).data().toString());
+        UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
         UpdateCheckState();
         ui->dirTreeView->clearSelection();
         delete treenodemodel;
@@ -1517,10 +1517,10 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             // 4. Delete from evidencelist.
             evidencelist.removeOne(remevidlist.at(i));
             // 5. Remove TreeNode.
-            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(!indexlist.isEmpty())
             {
-                //qDebug() << "index found:" << indexlist.first().sibling(indexlist.first().row(), 10).data().toString();
+                //qDebug() << "index found:" << indexlist.first().sibling(indexlist.first().row(), 11).data().toString();
                 treenodemodel->removeRow(indexlist.first().row(), indexlist.first());
             }
         }
@@ -1579,7 +1579,7 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     if(etype == 0) // selected
     {
         TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
-        exportlist.append(itemnode->Data(10).toString());
+        exportlist.append(itemnode->Data(11).toString());
     }
     else
         exportlist = GetFileLists(etype);
@@ -1606,7 +1606,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         if(dtype == 0) // selected
         {
             TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
-            digfilelist.append(itemnode->Data(10).toString());
+            digfilelist.append(itemnode->Data(11).toString());
         }
         else
             digfilelist = GetFileLists(dtype);
@@ -1858,7 +1858,7 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
     if(checked){}
     propertywindow = new PropertiesWindow(this);
     propertywindow->setWindowIcon(QIcon(":/info"));
-    propertywindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Properties");
+    propertywindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Properties");
     propertywindow->setAttribute(Qt::WA_DeleteOnClose);
     propertywindow->setModal(false);
     UpdateProperties();
@@ -1869,7 +1869,7 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
     if(checked){}
     fileviewer = new FileViewer();
     fileviewer->setWindowIcon(QIcon(":/ehex"));
-    fileviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 10).data().toString() + " Hex");
+    fileviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Hex");
     fileviewer->setAttribute(Qt::WA_DeleteOnClose);
     fileviewer->UpdateHexView();
 }
@@ -2031,7 +2031,7 @@ void WombatForensics::UpdateSelectValue()
     bytetext += "<tr><td>DOS Date:</td><td align=right>";
     if(bytes.size() == 2)
     {
-        bytetext += QString::fromStdString(std::string(tsk_fs_time_to_str(fatfs_dos_2_unix_time(intvalue, intvalue, bytes[0]), buf)).substr(0, 10));
+        bytetext += QString::fromStdString(std::string(tsk_fs_time_to_str(fatfs_dos_2_unix_time(intvalue, intvalue, bytes[0]), buf)).substr(0, 11));
     }
     bytetext += "</td></tr>";
     bytetext += "<tr><td>DOS Time:</td><td align=right>";
@@ -2074,7 +2074,7 @@ void WombatForensics::SetOffsetLabel(qint64 pos)
 
 void WombatForensics::SetFilter(int headercolumn)
 {
-    if(headercolumn == 10)
+    if(headercolumn == 11)
         idfilterview->DisplayFilter();
     if(headercolumn == 0)
         namefilterview->DisplayFilter();
@@ -2180,7 +2180,7 @@ void WombatForensics::SaveState()
 {
     RemoveTmpFiles();
     UpdateCheckState();
-    UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 10).data().toString());
+    UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
 }
 
 void WombatForensics::UpdateCheckCount()

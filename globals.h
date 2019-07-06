@@ -196,7 +196,7 @@ public:
 
     bool SetData(int column, const QVariant &value)
     {
-        if(column < 0 || column >= 11)
+        if(column < 0 || column >= 12)
             return false;
         itemdata[column] = value;
         return true;
@@ -205,9 +205,9 @@ public:
     bool RemoveChildren(int position, int count)
     {
         //qDebug() << "pos:" << position << "count:" << count;
-        //qDebug() << "parentitem:" << parentitem->Data(10).toString();
+        //qDebug() << "parentitem:" << parentitem->Data(11).toString();
         //qDebug() << "childitems:" << parentitem->childitems.count();
-        //qDebug() << "childitem to remove:" << parentitem->childitems.at(position)->Data(10).toString();
+        //qDebug() << "childitem to remove:" << parentitem->childitems.at(position)->Data(11).toString();
 
         if(position < 0 || position + count > parentitem->childitems.count())
             return false;
@@ -427,7 +427,7 @@ public:
                     return tmpstr;
                 }
             }
-            else if(index.column() >= 7 && index.column() <= 9) // used to be >= 8 <= 10
+            else if(index.column() >= 7 && index.column() <= 10) // used to be >= 8 <= 10
             {
                 if(itemnode->Data(index.column()).toString().compare("0") != 0)
                     return itemnode->Data(index.column());
@@ -686,7 +686,7 @@ private:
                 columndata.clear();
                 if(tmpstr.split(",").count() > 5)
                 {
-                    columndata << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
+                    columndata << tmpstr.split(",").at(3).split("/").last() << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
                     parent->AppendChild(new TreeNode(columndata, parent));
                     curid = tmpstr.split(",").at(5);
                     parents[curid] = parent->child(parent->ChildCount() - 1);
@@ -702,7 +702,7 @@ private:
                     volfile.close();
                     if(tmpstr.split(",").count() > 5)
                     {
-                        columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
+                        columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(5);
                         parid = tmpstr.split(",").at(5).split("-").at(0);
                         curid = tmpstr.split(",").at(5);
                         parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
@@ -721,7 +721,7 @@ private:
                         rootinum = tmpstr.split(",").at(3);
                         if(tmpstr.split(",").count() > 11)
                         {
-                            columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
+                            columndata << tmpstr.split(",").at(2) << "0" << tmpstr.split(",").at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(10);
                             parid = tmpstr.split(",").at(10).split("-p").at(0);
                             curid = tmpstr.split(",").at(10);
                             parents.value(parid)->AppendChild(new TreeNode(columndata, parents.value(parid)));
@@ -739,7 +739,7 @@ private:
                             filefile.close();
                             if(tmpstr.split(",").count() > 12)
                             {
-                                columndata << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1) << tmpstr.split(",").at(12);
+                                columndata << tmpstr.split(",").at(0) << tmpstr.split(",").at(3) << tmpstr.split(",").at(8) << tmpstr.split(",").at(6) << tmpstr.split(",").at(7) << tmpstr.split(",").at(4) << tmpstr.split(",").at(5) << tmpstr.split(",").at(13) << tmpstr.split(",").at(10).split("/").at(0) << tmpstr.split(",").at(10).split("/").at(1) << "0" << tmpstr.split(",").at(12);
                                 if(tmpstr.split(",").at(2).toInt() == rootinum.toInt())
                                     parid = tmpstr.split(",").at(12).split("-f").at(0);
                                 else
@@ -767,7 +767,7 @@ public:
         if(parid.toInt() == -1) // evid
         {
             zeronode->AppendChild(new TreeNode(data, zeronode));
-            parents[data.at(10).toString()] = zeronode->child(zeronode->ChildCount() - 1); // USED TO BE 0
+            parents[data.at(11).toString()] = zeronode->child(zeronode->ChildCount() - 1); // USED TO BE 0
         }
         else // everything else 
         {
@@ -775,13 +775,14 @@ public:
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid)));
             else
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
-            parents[data.at(10).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
-            if(checkhash.contains(data.at(10).toString())) // USED TO BE 0
-                parents.value(data.at(10).toString().split("-a").first())->SetChecked(true); // USED TO BE 0
+            parents[data.at(11).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
+            if(checkhash.contains(data.at(11).toString())) // USED TO BE 0
+                parents.value(data.at(11).toString().split("-a").first())->SetChecked(true); // USED TO BE 0
             if(deleted == 1)
-                parents.value(data.at(10).toString().split("-a").first())->SetDeleted(true); // USED TO BE 0
+                parents.value(data.at(11).toString().split("-a").first())->SetDeleted(true); // USED TO BE 0
         }
     };
+
     void UpdateNode(QString itemid, int column, QString hash)
     {
         const QVariant tmpvar(hash);
