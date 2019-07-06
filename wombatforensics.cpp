@@ -574,9 +574,6 @@ void WombatForensics::InitializeAppStructure()
     settingsdialog->setWindowIcon(QIcon(":/bar/settings"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
     connect(settingsdialog, SIGNAL(HideSettingsWindow()), this, SLOT(HideSettingsWindow()), Qt::DirectConnection);
-    //tagmanage = new TagManager(this);
-    //tagmanage->setWindowIcon(QIcon(":/bar/managetags"));
-    //connect(tagmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideTagManager()), Qt::DirectConnection);
     ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
@@ -1504,7 +1501,6 @@ void WombatForensics::CloseCurrentCase()
     filtercountlabel->setText("Filtered: 0");
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
-    //tagmanage->close();
     // UNMOUNT EVIDENCEIMAGEDATAFILE
     for(int i=0; i < evidencelist.count(); i++)
     {
@@ -1799,7 +1795,6 @@ WombatForensics::~WombatForensics()
     delete tagfilterview;
     delete byteviewer;
     delete viewmanage;
-    //delete tagmanage;
     delete imagewindow;
     delete aboutbox;
     delete settingsdialog;
@@ -1838,7 +1833,6 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     
     imagewindow->close();
     viewmanage->close();
-    //tagmanage->close();
     byteviewer->close();
     aboutbox->close();
     settingsdialog->close();

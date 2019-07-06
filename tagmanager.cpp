@@ -17,93 +17,105 @@ TagManager::TagManager(QWidget* parent) : QDialog(parent), ui(new Ui::TagManager
 TagManager::~TagManager()
 {
     delete ui;
-    //this->close();
 }
 
 void TagManager::HideClicked()
 {
-    //this->hide();
     emit HideManagerWindow();
     this->close();
 }
 
-void TagManager::AddTag()
-{
-}
-
 void TagManager::ModifyTag()
 {
+    QString selectedtag = ui->listWidget->currentItem()->text();
+    QString tmpstr = "";
+    QString modtagname = "";
+    QInputDialog* modtagdialog = new QInputDialog(this);
+    modtagdialog->setCancelButtonText("Cancel");
+    modtagdialog->setInputMode(QInputDialog::TextInput);
+    modtagdialog->setLabelText("Modify Tag Name");
+    modtagdialog->setOkButtonText("Modify");
+    modtagdialog->setTextEchoMode(QLineEdit::Normal);
+    modtagdialog->setWindowTitle("Modify Tag");
+    modtagdialog->setTextValue(selectedtag);
+    if(modtagdialog->exec())
+        modtagname = modtagdialog->textValue();
+    if(!modtagname.isEmpty())
+    {
+        ui->listWidget->currentItem()->setText(modtagname);
+        for(int i=0; i < ui->listWidget->count(); i++)
+            tmpstr += ((QListWidgetItem*)ui->listWidget->item(i))->text() + ",";
+        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(bookmarkfile.isOpen())
+            bookmarkfile.write(tmpstr.toStdString().c_str());
+        bookmarkfile.close();
+        UpdateList();
+    }
 }
 
 void TagManager::RemoveTag()
 {
-}
-
-/*
-void TagManager::ShowBrowser()
-{
-    fileviewerpath = QFileDialog::getOpenFileName(this, tr("Select Viewer Executable"), QDir::homePath(), "", NULL, QFileDialog::DontUseNativeDialog);
-    if(!fileviewerpath.isNull())
+    QString selectedtag = ui->listWidget->currentItem()->text();
+    QString tmpstr = "";
+    for(int i = 0; i < taglist.count(); i++)
     {
-        ui->lineEdit->setText(fileviewerpath);
-        ui->addbutton->setEnabled(true);
+        if(taglist.at(i).contains(selectedtag))
+            taglist.removeAt(i);
     }
-}
-
-void TagManager::AddViewer()
-{
-    viewerfile.open(QIODevice::Append);
-    viewerfile.write(QString(fileviewerpath + ",").toStdString().c_str());
-    viewerfile.close();
-    ui->lineEdit->setText("");
-    ui->addbutton->setEnabled(false);
-    UpdateList();
-}
-
-void TagManager::RemoveSelected()
-{
-    QString selectedviewer = ui->listWidget->currentItem()->text();
-    QString tmpstring;
-    viewerfile.open(QIODevice::ReadOnly);
-    QStringList tmplist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
-    viewerfile.close();
-    for(int i=0; i < tmplist.count(); i++)
-    {
-        if(tmplist.at(i).contains(selectedviewer))
-            tmplist.removeAt(i);
-    }
-    tmplist.removeDuplicates();
-    for(int i=0; i < tmplist.count(); i++)
-    {
-        tmpstring.append(tmplist.at(i));
-        tmpstring.append(",");
-    }
-    viewerfile.open(QIODevice::WriteOnly);
-    viewerfile.write(tmpstring.toStdString().c_str());
-    viewerfile.close();
+    for(int i=0; i < taglist.count(); i++)
+        tmpstr += taglist.at(i) + ",";
+    bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(bookmarkfile.isOpen())
+        bookmarkfile.write(tmpstr.toStdString().c_str());
+    bookmarkfile.close();
     ui->removebutton->setEnabled(false);
     UpdateList();
 }
-*/
+
+void TagManager::AddTag()
+{
+    QString tagname = "";
+    QInputDialog* newtagdialog = new QInputDialog(this);
+    newtagdialog->setCancelButtonText("Cancel");
+    newtagdialog->setInputMode(QInputDialog::TextInput);
+    newtagdialog->setLabelText("Enter Tag Name");
+    newtagdialog->setOkButtonText("Create Tag");
+    newtagdialog->setTextEchoMode(QLineEdit::Normal);
+    newtagdialog->setWindowTitle("New Tag");
+    if(newtagdialog->exec())
+        tagname = newtagdialog->textValue();
+    if(!tagname.isEmpty())
+    {
+        QString tmpstr = "";
+        taglist.append(tagname);
+        taglist.removeDuplicates();
+        for(int i = 0; i < taglist.count(); i++)
+            tmpstr += taglist.at(i) + ",";
+        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(bookmarkfile.isOpen())
+            bookmarkfile.write(tmpstr.toStdString().c_str());
+        bookmarkfile.close();
+        UpdateList();
+    }
+}
 
 void TagManager::SelectionChanged()
 {
     ui->removebutton->setEnabled(true);
 }
+
 void TagManager::UpdateList()
 {
-    QString debugstr;
-    QStringList itemlist;
-    itemlist.clear();
     ui->listWidget->clear();
+    taglist.clear();
     bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())
-        itemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+        taglist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
     bookmarkfile.close();
-    itemlist.removeDuplicates();
-    for(int i=0; i < itemlist.count(); i++)
+    taglist.removeDuplicates();
+    for(int i=0; i < taglist.count(); i++)
     {
-        new QListWidgetItem(itemlist.at(i), ui->listWidget);
+        new QListWidgetItem(taglist.at(i), ui->listWidget);
     }
 }

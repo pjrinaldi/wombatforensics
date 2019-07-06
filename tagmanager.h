@@ -26,23 +26,17 @@ private slots:
     void ModifyTag();
     void RemoveTag();
     void AddTag();
-    //void ShowBrowser();
-    //void AddViewer();
-    //void RemoveSelected();
     void UpdateList();
     void SelectionChanged();
 signals:
     void HideManagerWindow();
 
-protected:
-    //void closeEvent(QCloseEvent* event);
 private:
     Ui::TagManager* ui;
     QFile bookmarkfile;
-    //QString fileviewerpath;
-    //QModelIndex selectedindex;
+    QStringList taglist;
 };
 
 Q_DECLARE_METATYPE(TagManager*);
 
-#endif // VIDEOMANAGER_H
+#endif // TAGMANAGER_H
