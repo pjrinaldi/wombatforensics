@@ -62,7 +62,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
     previewreport->setWindowIcon(QIcon(":/bar/reportpreview"));
-    previewreport->setTitle("Report Preview");
+    previewreport->setWindowTitle("Report Preview");
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
     imagewindow->hide();
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
