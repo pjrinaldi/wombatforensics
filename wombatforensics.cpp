@@ -52,14 +52,16 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filecategoryfilterview = new FileCategoryFilter(this);
     hashfilterview = new HashFilter(this);
     tagfilterview = new TagFilter(this);
-    imagewindow = new ImageViewer();
-    msgviewer = new MessageViewer();
-    byteviewer = new ByteConverter();
+    imagewindow = new ImageViewer(this);
+    msgviewer = new MessageViewer(this);
+    byteviewer = new ByteConverter(this);
+    previewreport = new HtmlViewer(this);
     aboutbox = new AboutBox(this);
     digstatusdialog = new DigStatus(this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
+    previewreport->setWindowIcon(QIcon(":/bar/reportpreview"));
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
     imagewindow->hide();
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
@@ -75,6 +77,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
+    connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
     connect(statuslabel, SIGNAL(clicked()), this, SLOT(ShowDigStatus()), Qt::DirectConnection);
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
@@ -1982,6 +1985,7 @@ WombatForensics::~WombatForensics()
     delete hashfilterview;
     delete tagfilterview;
     delete byteviewer;
+    delete previewreport;
     delete viewmanage;
     delete imagewindow;
     delete aboutbox;
@@ -2022,6 +2026,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     imagewindow->close();
     viewmanage->close();
     byteviewer->close();
+    previewreport->close();
     aboutbox->close();
     settingsdialog->close();
     RemoveTmpFiles();
@@ -2232,6 +2237,14 @@ void WombatForensics::on_actionByteConverter_triggered(bool checked)
         byteviewer->hide();
     else
         byteviewer->show();
+}
+
+void WombatForensics::on_actionpreviewreport_triggered(bool checked)
+{
+    if(!checked) // hide viewer
+        previewreport->hide();
+    else
+        previewreport->show();
 }
 
 void WombatForensics::on_actionCopy_Selection_To_triggered()

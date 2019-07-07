@@ -66,6 +66,7 @@ public:
     QAction *actionCancel_Operation;
     QAction *actionJumpToHex;
     QAction *actionTagChecked;
+    QAction *actionpreviewreport;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -263,6 +264,12 @@ public:
         actionTagChecked = new QAction(WombatForensics);
         actionTagChecked->setObjectName(QString::fromUtf8("actionTagChecked"));
         actionTagChecked->setIcon(icon8);
+        actionpreviewreport = new QAction(WombatForensics);
+        actionpreviewreport->setObjectName(QString::fromUtf8("actionpreviewreport"));
+        actionpreviewreport->setCheckable(true);
+        QIcon icon27;
+        icon27.addFile(QString::fromUtf8(":/bar/reportpreview"), QSize(), QIcon::Normal, QIcon::Off);
+        actionpreviewreport->setIcon(icon27);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -343,6 +350,7 @@ public:
         analysisToolBar->addAction(actionExport_Evidence);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionBookmark_Manager);
+        analysisToolBar->addAction(actionpreviewreport);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionExit, SIGNAL(triggered()), WombatForensics, SLOT(close()));
@@ -471,6 +479,10 @@ public:
         actionTagChecked->setText(QCoreApplication::translate("WombatForensics", "Tag Checked As", nullptr));
 #if QT_CONFIG(tooltip)
         actionTagChecked->setToolTip(QCoreApplication::translate("WombatForensics", "Apply Tag to Checked Items", nullptr));
+#endif // QT_CONFIG(tooltip)
+        actionpreviewreport->setText(QCoreApplication::translate("WombatForensics", "Preview Report", nullptr));
+#if QT_CONFIG(tooltip)
+        actionpreviewreport->setToolTip(QCoreApplication::translate("WombatForensics", "Preview Report", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());

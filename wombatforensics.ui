@@ -161,6 +161,7 @@
    <addaction name="actionExport_Evidence"/>
    <addaction name="separator"/>
    <addaction name="actionBookmark_Manager"/>
+   <addaction name="actionpreviewreport"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
    <property name="styleSheet">
@@ -626,6 +627,21 @@
    </property>
    <property name="toolTip">
     <string>Apply Tag to Checked Items</string>
+   </property>
+  </action>
+  <action name="actionpreviewreport">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/reportpreview</normaloff>:/bar/reportpreview</iconset>
+   </property>
+   <property name="text">
+    <string>Preview Report</string>
+   </property>
+   <property name="toolTip">
+    <string>Preview Report</string>
    </property>
   </action>
  </widget>

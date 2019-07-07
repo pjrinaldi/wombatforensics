@@ -87,6 +87,7 @@ public:
     ViewerManager* viewmanage;
     TextViewer* textviewer;
     HtmlViewer* htmlviewer;
+    HtmlViewer* previewreport;
     MessageViewer* msgviewer;
     ByteConverter* byteviewer;
     AboutBox* aboutbox;
@@ -115,6 +116,7 @@ private slots:
     void on_actionView_Image_Gallery_triggered(bool checked);
     void on_actionViewerManager_triggered();
     void on_actionBookmark_Manager_triggered();
+    void on_actionpreviewreport_triggered(bool checked);
     void on_actionTextViewer_triggered(bool checked);
     void on_actionViewMessageLog_triggered(bool checked);
     void on_actionByteConverter_triggered(bool checked);

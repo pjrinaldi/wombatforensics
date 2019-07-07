@@ -33,6 +33,7 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="reportpreview">Resources/reportpreview1.png</file>
     <file alias="collapseall">Resources/go-first.svg</file>
     <file alias="expandall">Resources/go-last.svg</file>
     <file alias="newtag">Resources/tag-new.svg</file>
