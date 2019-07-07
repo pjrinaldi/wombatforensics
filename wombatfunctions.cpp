@@ -352,13 +352,13 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                 {
                     if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                     {
-                        //char* fbuf = new char[fsattr->size];
-                        char fbuf[fsattr->size];
+                        char* fbuf = new char[fsattr->size];
+                        //char fbuf[fsattr->size];
                         ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                         QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                         QMimeDatabase adsmimedb;
                         QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
-                        //delete[] fbuf;
+                        delete[] fbuf;
                         QFile adsfile(aevar->partitionpath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
                         adsfile.open(QIODevice::Append | QIODevice::Text);
                         QTextStream adsout(&adsfile);
@@ -473,7 +473,10 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 // ADD THE HASH VALUE FROM THE FILE TO TREEOUT
                 //treeout << "0";
                 treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1); // category << signature
-                treeout << tmpfilestr.split(",").at(15); // bookmark value
+                if(tmpfilestr.split(",").count() == 16)
+                    treeout << tmpfilestr.split(",").at(15); // bookmark value
+                else
+                    treeout << "0"; // default no bookmark value
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
                 {
@@ -569,13 +572,13 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                             {
                                 if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                                 {
-                                    char fbuf[fsattr->size];
-                                    //char* fbuf = new char[fsattr->size];
+                                    //char fbuf[fsattr->size];
+                                    char* fbuf = new char[fsattr->size];
                                     ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                                     QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                                     QMimeDatabase adsmimedb;
                                     QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
-                                    //delete[] fbuf;
+                                    delete[] fbuf;
                                     adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
                                     treeout.clear();
                                     // ADD THE HASH VALUE TO FROM THE FILE

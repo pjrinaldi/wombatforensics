@@ -25,7 +25,7 @@ void HtmlViewer::HideClicked()
 
 void HtmlViewer::ShowHtml(const QModelIndex &index)
 {
-    curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toLongLong();
+    curobjaddr = index.sibling(index.row(), 11).data().toString().split("-f").at(1).toLongLong();
     GetHtmlContent(index);
     this->show();
 }
@@ -51,12 +51,12 @@ void HtmlViewer::GetHtmlContent(const QModelIndex &index)
     std::vector<std::string> pathvector;
     pathvector.clear();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
-    QString estring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(0);
-    QString vstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(1);
-    QString pstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(3);
+    QString estring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();

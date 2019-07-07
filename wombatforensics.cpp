@@ -584,6 +584,8 @@ void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 void WombatForensics::ShowFile(const QModelIndex &index)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    qDebug() << "index8:" << index.sibling(index.row(), 8).data().toString();
+    qDebug() << "index9:" << index.sibling(index.row(), 9).data().toString();
     if(index.sibling(index.row(), 8).data().toString().contains("image"))
     {
         imageviewer = new ImageWindow();
@@ -601,6 +603,14 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Video Viewer");
         videowindow->ShowVideo(index);
     }
+    else if(index.sibling(index.row(), 9).data().toString().contains("html"))
+    {
+        htmlviewer = new HtmlViewer();
+        htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
+        htmlviewer->setWindowIcon(QIcon(":/web"));
+        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " HTML Viewer");
+        htmlviewer->ShowHtml(index);
+    }
     else if(index.sibling(index.row(), 8).data().toString().contains("text"))
     {
         // toggle the button...
@@ -610,14 +620,6 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         textviewer->setAttribute(Qt::WA_DeleteOnClose);
         // THIS FAILS ON ADS
         textviewer->ShowText(index);
-    }
-    else if(index.sibling(index.row(), 8).data().toString().contains("text/html"))
-    {
-        htmlviewer = new HtmlViewer();
-        htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-        htmlviewer->setWindowIcon(QIcon(":/web"));
-        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " HTML Viewer");
-        htmlviewer->ShowHtml(index);
     }
     else
         treemenu->exec(QCursor::pos());

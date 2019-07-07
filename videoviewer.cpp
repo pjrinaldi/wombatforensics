@@ -62,17 +62,17 @@ void VideoViewer::SetDuration(qint64 pos)
 void VideoViewer::GetVideo(const QModelIndex &index)
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
     std::vector<std::string> pathvector;
     pathvector.clear();
-    QString estring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(0);
-    QString vstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(1);
-    QString pstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(3);
+    QString estring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
@@ -118,7 +118,7 @@ void VideoViewer::ShowVideo(const QModelIndex &index)
     this->show();
     ui->label_2->setVisible(true);
     this->setWindowTitle(QString("Video Viewer - ") + QString(index.sibling(index.row(), 1).data().toString()));
-    curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toLongLong();
+    curobjaddr = index.sibling(index.row(), 11).data().toString().split("-f").at(1).toLongLong();
     GetVideo(index);
     vplayer->play();
     ui->label_2->setVisible(false);

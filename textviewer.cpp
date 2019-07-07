@@ -36,7 +36,7 @@ void TextViewer::ShowText(const QModelIndex &index)
     //UpdateEncoding(0);
     GetTextContent(index);
     ui->textEdit->setPlainText(decodedstring);
-    this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 10).data().toString()));
+    this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 11).data().toString()));
     this->show();
 }
 
@@ -80,18 +80,18 @@ void TextViewer::FindCodecs()
 void TextViewer::GetTextContent(const QModelIndex &index)
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 10).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     QString tmpstr = "";
     QStringList evidlist;
     evidlist.clear();
     std::vector<std::string> pathvector;
     pathvector.clear();
-    QString paridstr = index.parent().sibling(index.parent().row(), 10).data().toString().split("-f").last();
-    QString estring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(0);
-    QString vstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(1);
-    QString pstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = index.sibling(index.row(), 10).data().toString().split("-", QString::SkipEmptyParts).at(3);
+    QString paridstr = index.parent().sibling(index.parent().row(), 11).data().toString().split("-f").last();
+    QString estring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = index.sibling(index.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly);
     if(evidfile.isOpen())
