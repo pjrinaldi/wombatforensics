@@ -385,7 +385,7 @@ public:
                 }
                 if(filtervalues.tagbool)
                 {
-                    if(itemnode->Data(10).toString().compare(filtervalues.tag) == 0)
+                    if(itemnode->Data(10).toString().compare(filtervalues.tag) != 0)
                         return QColor(Qt::lightGray);
                 }
             }
