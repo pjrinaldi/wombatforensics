@@ -110,13 +110,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     selectionmenu->addAction(ui->actionSection);
     selectionmenu->addAction(ui->actionTextSection);
     selectionmenu->addAction(ui->actionFile);
-    QWidget* testwidget = ui->analysisToolBar->widgetForAction(ui->actionCopy_Selection_To);
-    QToolButton* testbutton = qobject_cast<QToolButton*>(testwidget);
-    if(testbutton)
-    {
-        connect(ui->actionCopy_Selection_To, SIGNAL(triggered(bool)), testbutton, SLOT(showMenu()), Qt::QueuedConnection);
-    }
-    ui->actionCopy_Selection_To->setMenu(selectionmenu);
 
     treemenu = new QMenu(ui->dirTreeView);
     treemenu->addAction(ui->actionView_File);
@@ -709,6 +702,11 @@ void WombatForensics::HideByteViewer(bool checkstate)
     ui->actionByteConverter->setChecked(checkstate);
 }
 
+void WombatForensics::HidePreviewReport(bool checkstate)
+{
+    ui->actionpreviewreport->setChecked(checkstate);
+}
+
 void WombatForensics::InitializeAppStructure()
 {
     wombatvariable.iscaseopen = false;
@@ -768,12 +766,10 @@ void WombatForensics::InitializeAppStructure()
     ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
-    ui->actionView_Progress->setEnabled(false);
     ui->actionExport_Evidence->setEnabled(false);
     ui->actionDigDeeper->setEnabled(false);
     ui->actionBookmark_Manager->setEnabled(false);
     ui->actionView_Image_Gallery->setEnabled(false);
-    ui->actionCopy_Selection_To->setEnabled(false);
     ui->actionTextViewer->setEnabled(false);
     ui->actionByteConverter->setEnabled(false);
     ui->actionJumpToHex->setEnabled(false);
@@ -2089,10 +2085,6 @@ void WombatForensics::on_actionSaveState_triggered()
     QApplication::restoreOverrideCursor();
 }
 
-void WombatForensics::on_actionCancel_Operation_triggered()
-{
-}
-
 void WombatForensics::on_actionCheck_triggered()
 {
     if(!actionitem->IsChecked())
@@ -2247,14 +2239,6 @@ void WombatForensics::on_actionpreviewreport_triggered(bool checked)
         previewreport->show();
 }
 
-void WombatForensics::on_actionCopy_Selection_To_triggered()
-{
-    //qDebug() << "no idea why it won't work how i want it.";
-    //selectionmenu->popup(QCursor::pos(), ui->actionCopy_Selection_To);
-    //selectionmenu->exec(QCursor::pos());
-    //treemenu->exec(QCursor::pos());
-}
-
 void WombatForensics::on_actionExpandAll_triggered()
 {
     // this can take some time, must alert the user.
@@ -2303,10 +2287,6 @@ void WombatForensics::UpdateSelectValue()
     ds32.setByteOrder(QDataStream::LittleEndian);
     int32_t asint32;
     ds32 >> asint32;
-    if(selectionbytes.isEmpty())
-        ui->actionCopy_Selection_To->setEnabled(false);
-    else
-        ui->actionCopy_Selection_To->setEnabled(true);
     QString tmptext = "Length: " + QString::number(selectionbytes.size());
     QString bytetext = "";
     selectedhex->setText(tmptext);

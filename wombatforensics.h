@@ -120,12 +120,10 @@ private slots:
     void on_actionTextViewer_triggered(bool checked);
     void on_actionViewMessageLog_triggered(bool checked);
     void on_actionByteConverter_triggered(bool checked);
-    void on_actionCopy_Selection_To_triggered();
     void on_actionExpandAll_triggered();
     void on_actionCollapseAll_triggered();
     void on_actionAbout_triggered();
     void on_actionSettings_triggered();
-    void on_actionCancel_Operation_triggered();
     void on_actionJumpToHex_triggered();
     void UpdateProgress(qint64 count);
     void UpdateExport(void);
@@ -140,6 +138,7 @@ private slots:
     void HideSettingsWindow(void);
     void HideMessageViewer(bool checkstate);
     void HideByteViewer(bool checkstate);
+    void HidePreviewReport(bool checkstate);
     void ShowExternalViewer();
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);

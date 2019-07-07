@@ -29,7 +29,8 @@ private slots:
     void GetHtmlContent(const QModelIndex &index);
     
 signals:
-    void HideHtmlViewerWindow(bool checkstate);
+    //void HideHtmlViewerWindow(bool checkstate);
+    void HideReportPreviewWindow(bool checkstate);
 
 protected:
     void closeEvent(QCloseEvent* event);

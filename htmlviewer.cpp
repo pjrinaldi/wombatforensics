@@ -39,6 +39,7 @@ void HtmlViewer::LoadHtml(QString filepath)
 
 void HtmlViewer::closeEvent(QCloseEvent* e)
 {
+    emit HideReportPreviewWindow(false);
     e->accept();
 }
 
