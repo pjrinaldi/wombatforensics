@@ -33,6 +33,7 @@ signals:
     void HideReportPreviewWindow(bool checkstate);
 
 protected:
+    void mousePressEvent(QMouseEvent* event);
     void closeEvent(QCloseEvent* event);
 
 private:

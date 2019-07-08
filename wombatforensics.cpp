@@ -85,6 +85,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(reload()), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
     bookmarkmenu->setTitle("Tag Selected As");
@@ -824,20 +825,20 @@ void WombatForensics::InitializeCaseStructure()
 
 void WombatForensics::InitializePreviewReport()
 {
-        QString initialhtml = "";
-        previewfile.setFileName(":/html/initialhtml");
-        previewfile.open(QIODevice::ReadOnly);
-        if(previewfile.isOpen())
-            initialhtml = previewfile.readAll();
-        previewfile.close();
-        previewfile.setFileName(wombatvariable.tmpmntpath + "previewreport.html");
-        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
-        if(previewfile.isOpen())
-        {
-            previewfile.write(initialhtml.toStdString().c_str());
-            previewfile.write(QString("<div id='infotitle'>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></div><br/>").toStdString().c_str());
-        }
-        previewfile.close();
+    QString initialhtml = "";
+    previewfile.setFileName(":/html/initialhtml");
+    previewfile.open(QIODevice::ReadOnly);
+    if(previewfile.isOpen())
+        initialhtml = previewfile.readAll();
+    previewfile.close();
+    previewfile.setFileName(wombatvariable.tmpmntpath + "previewreport.html");
+    previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+    {
+        previewfile.write(initialhtml.toStdString().c_str());
+        previewfile.write(QString("<div id='infotitle'>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></div><br/>").toStdString().c_str());
+    }
+    previewfile.close();
 }
 
 void WombatForensics::InitializeOpenCase()
@@ -863,7 +864,6 @@ void WombatForensics::InitializeOpenCase()
         tar_close(tarhand);
         wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename.split("/").last().split(".wfc").first() + "/";
         //qDebug() << "open tmpmntpath:" << wombatvariable.tmpmntpath;
-        InitializePreviewReport();
         OpenCaseMountFinished(0, QProcess::NormalExit);
     }
 }
@@ -903,7 +903,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             tmplist = QString(evidfile.readLine()).split(",");
         evidencelist.append(tmplist.at(3));
         evidfile.close();
-        //AppendPreviewReport(QString("<div class='tabletitle' id='" + tmplist.at(5) + "'>Evidence Item (" + tmplist.at(5) + "):&nbsp;" + tmplist.at(3) + "</div><br/>"));
     }
     //qDebug() << "evidlist:" << evidencelist;
     if(evidencelist.count() > 0)
@@ -1176,7 +1175,6 @@ void WombatForensics::AddEvidence()
     for(int i=0; i < evidencelist.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + evidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
-        //AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(ecount) + "'>Evidence Item (E" + QString::number(ecount) + "):&nbsp;" + evidencelist.at(i) + "</div><br/>"));
         QDir dir;
         dir.mkpath(evidencepath);
         ecount++;

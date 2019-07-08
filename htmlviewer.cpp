@@ -37,6 +37,12 @@ void HtmlViewer::LoadHtml(QString filepath)
     this->show();
 }
 
+void HtmlViewer::mousePressEvent(QMouseEvent* e)
+{
+    if(e->type() == QEvent::MouseButtonPress)
+        isignals->ActivateReload();
+}
+
 void HtmlViewer::closeEvent(QCloseEvent* e)
 {
     emit HideReportPreviewWindow(false);

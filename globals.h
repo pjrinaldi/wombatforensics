@@ -113,11 +113,13 @@ public:
     void ProgUpd(void) { emit(ProgressUpdate(filesfound)); }
     void ExportUpd(void) { emit(ExportUpdate()); }
     void DigUpd(int digid, int digcnt) { emit(DigUpdate(digid, digcnt)); }
+    void ActivateReload(void) { emit(ReloadPreview()); }
 
 signals:
     void ProgressUpdate(qint64 filecount);
     void ExportUpdate(void);
     void DigUpdate(int digid, int digcnt);
+    void ReloadPreview(void);
 
 };
 
