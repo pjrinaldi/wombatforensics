@@ -64,6 +64,6 @@
     <file alias="missingthumb">./Resources/thumbmissing.png</file>
   </qresource>
   <qresource prefix="/html">
-    <file alias="infohtml">./Resources/information.html</file>
+    <file alias="initialhtml">Resources/information.html</file>
   </qresource>
 </RCC>

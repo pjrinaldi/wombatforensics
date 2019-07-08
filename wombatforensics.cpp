@@ -732,19 +732,6 @@ void WombatForensics::InitializeAppStructure()
     if(dir.mkpath(wombatvariable.imgdatapath) == false)
         DisplayError("1.5", "App imgdatapath folder failed", "App imgdatapath folder was not created");
 
-    /*
-    if((new QDir())->mkpath(tmppath) == false)
-        DisplayError("1.6", "App tmppath folder failed", "App tmppath folder was not created");
-    if((new QDir())->mkpath(wombatvariable.tmpfilepath) == false)
-        DisplayError("1.3", "App tmpfile folder failed", "App Tmpfile folder was not created");
-    if((new QDir())->mkpath(wombatvariable.tmpmntpath) == false)
-        DisplayError("1.2", "App tmpmnt folder failed", "App tmpmnt folder was not created");
-    if((new QDir())->mkpath(homepath) == false)
-        DisplayError("1.4", "App homepath folder failed", "App homepath folder was not created");
-    if((new QDir())->mkpath(wombatvariable.imgdatapath) == false)
-        DisplayError("1.5", "App imgdatapath folder failed", "App imgdatapath folder was not created");
-    */
-
     viewerfile.setFileName(homepath + "viewers");
     if(!FileExists(QString(homepath + "viewers").toStdString()))
     {
@@ -820,6 +807,7 @@ void WombatForensics::InitializeCaseStructure()
         msglog->clear();
         qInfo() << "Log File Created";
         //LogMessage("Log File Created");
+        InitializePreviewReport();
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
@@ -830,6 +818,32 @@ void WombatForensics::InitializeCaseStructure()
         autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
         autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     }
+}
+
+void WombatForensics::InitializePreviewReport()
+{
+        QString initialhtml = "";
+        previewfile.setFileName(":/html/initialhtml");
+        previewfile.open(QIODevice::ReadOnly);
+        if(previewfile.isOpen())
+            initialhtml = previewfile.readAll();
+        previewfile.close();
+        previewfile.setFileName(wombatvariable.tmpmntpath + "previewreport.html");
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(previewfile.isOpen())
+        {
+            previewfile.write(initialhtml.toStdString().c_str());
+            previewfile.write(QString("<div id='infotitle'>Case Title:&nbsp;" + wombatvariable.casename + "</div><br/>").toStdString().c_str());
+        }
+        previewfile.close();
+}
+
+void WombatForensics::AppendPreviewReport(QString content)
+{
+    previewfile.open(QIODevice::Append | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(content.toStdString().c_str());
+    previewfile.close();
 }
 
 void WombatForensics::InitializeOpenCase()
@@ -855,6 +869,7 @@ void WombatForensics::InitializeOpenCase()
         tar_close(tarhand);
         wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename.split("/").last().split(".wfc").first() + "/";
         //qDebug() << "open tmpmntpath:" << wombatvariable.tmpmntpath;
+        InitializePreviewReport();
         OpenCaseMountFinished(0, QProcess::NormalExit);
     }
 }
