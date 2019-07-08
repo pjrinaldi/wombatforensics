@@ -11,6 +11,7 @@ extern WombatVariable wombatvariable; // contains useful application variables
 extern QFile logfile; // controls the logfile
 extern QFile viewerfile; // controls the viewer file and its values for external viewers
 extern QFile settingsfile; // controls the settings
+extern QFile previewfile; // controls the preview html file for the analysis results
 extern QDir thumbdir; // controls the thumbs/ directory
 extern QTextEdit* msglog; // holds the msglog variable to write messages to the log
 extern qint64 filesfound; // holds the number of files found for all the evidence.

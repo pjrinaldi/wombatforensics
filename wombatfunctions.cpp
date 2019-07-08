@@ -32,6 +32,24 @@ void LogMessage(QString logmsg)
 }
 */
 
+void AppendPreviewReport(QString content)
+{
+    previewfile.open(QIODevice::Append | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(content.toStdString().c_str());
+    previewfile.close();
+}
+
+void RemovePreviewItem(QString itemid)
+{
+    // open the report file.
+    // read it all into a string.
+    // search the string for the id.
+    // another option is to read it line by line, compare for the line which contains the id, and don't write it to the new string.
+    // then write the string to the new file.
+    // or split string by '\n', loop over it and not write the item which contains the id...
+}
+
 qint64 GetChildCount(QString filefilter)
 {
     qint64 tmpcount = 0;
@@ -1332,6 +1350,7 @@ void InitializeEvidenceStructure(QString evidname)
     //(new QDir())->mkpath(evidencepath);
     QFile evidfile(evidencepath + "stat");
     evidfile.open(QIODevice::Append | QIODevice::Text);
+    AppendPreviewReport(QString("<span class='property'>Image Size:&nbsp;</span><span class='pvalue'>" + QString::number(readimginfo->size) + "</span>"));
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (qint64)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
     //for(unsigned int i=0; i < wombatvariable.itemcount; i++)
@@ -2954,6 +2973,7 @@ QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
         }
         else if(curinfo->ftype == TSK_FS_TYPE_HFS)
         {
+            char asc[767];
             HFS_INFO* hfs = NULL;
             hfs = (HFS_INFO*)curinfo;
             char fn[HFS_MAXNAMLEN + 1];

@@ -7,6 +7,7 @@ WombatVariable wombatvariable;
 QFile logfile;
 QFile viewerfile;
 QFile settingsfile;
+QFile previewfile;
 QDir thumbdir;
 QTextEdit* msglog = NULL;
 qint64 filesfound = 0;

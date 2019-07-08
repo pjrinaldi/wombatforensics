@@ -202,7 +202,6 @@ private:
     void InitializeCaseStructure(void);
     void InitializeOpenCase(void);
     void InitializePreviewReport(void);
-    void AppendPreviewReport(QString string);
     void CloseCurrentCase(void);
     void UpdateProperties(void);
     void LoadHexContents(void);
@@ -240,7 +239,6 @@ private:
 
     QFile casedatafile;
     QFile bookmarkfile;
-    QFile previewfile;
     off_t offset() const;
     QPushButton* lineup;
     QPushButton* linedown;

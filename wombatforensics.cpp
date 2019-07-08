@@ -763,6 +763,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionTextViewer->setEnabled(false);
     ui->actionByteConverter->setEnabled(false);
     ui->actionJumpToHex->setEnabled(false);
+    ui->actionpreviewreport->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -811,6 +812,7 @@ void WombatForensics::InitializeCaseStructure()
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
+        ui->actionpreviewreport->setEnabled(true);
         qInfo() << "Case was Created";
         //LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
@@ -836,14 +838,6 @@ void WombatForensics::InitializePreviewReport()
             previewfile.write(QString("<div id='infotitle'>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></div><br/>").toStdString().c_str());
         }
         previewfile.close();
-}
-
-void WombatForensics::AppendPreviewReport(QString content)
-{
-    previewfile.open(QIODevice::Append | QIODevice::Text);
-    if(previewfile.isOpen())
-        previewfile.write(content.toStdString().c_str());
-    previewfile.close();
 }
 
 void WombatForensics::InitializeOpenCase()
@@ -892,6 +886,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     msglog->clear();
     InitializeCheckState();
     ui->actionAdd_Evidence->setEnabled(true);
+    ui->actionpreviewreport->setEnabled(true);
     autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -2256,7 +2251,10 @@ void WombatForensics::on_actionpreviewreport_triggered(bool checked)
     if(!checked) // hide viewer
         previewreport->hide();
     else
+    {
+        previewreport->LoadHtml(QString(wombatvariable.tmpmntpath + "previewreport.html"));
         previewreport->show();
+    }
 }
 
 void WombatForensics::on_actionExpandAll_triggered()

@@ -10,6 +10,8 @@
 
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
+void AppendPreviewReport(QString string);
+void RemovePreviewItem(QString itemid);
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
