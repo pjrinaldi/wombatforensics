@@ -1315,7 +1315,6 @@ void InitializeEvidenceStructure(QString evidname)
     //qDebug() << evidfiles.count() << evidfiles;
     //evidcnt = evidfiles.count();
     evidcnt = evidfiles.at(0).split(".e").last().toInt();
-    AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(evidcnt) + "'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/>"));
     //qDebug() << "evidcnt:" << evidcnt;
     addevidvar.evidcnt = evidcnt;
     //qDebug() << evidfiles.count() << evidfiles;
@@ -1362,7 +1361,6 @@ void InitializeEvidenceStructure(QString evidname)
     //out << "," << wombatvariable.itemcount << ",e" + QString::number(evidcnt);
     out.flush();
     evidfile.close();
-    AppendPreviewReport(QString("<span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span>"));
     //treefile.open(QIODevice::Append | QIODevice::Text);
     QStringList treeout;
     treeout << evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt)); // NAME IN FIRST COLUMN
@@ -1371,6 +1369,7 @@ void InitializeEvidenceStructure(QString evidname)
     for(int i=0; i < treeout.count(); i++)
         nodedata << treeout.at(i);
     mutex.lock();
+    AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(evidcnt) + "'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/><div><span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span></div>"));
     treenodemodel->AddNode(nodedata,  "-1", -1, -1);
     mutex.unlock();
     // Write Evidence Properties Here...
@@ -1406,6 +1405,7 @@ void InitializeEvidenceStructure(QString evidname)
     for(int i=0; i < treeout.count(); i++)
         nodedata << treeout.at(i);
     mutex.lock();
+    AppendPreviewReport(QString("<br/><div><span class='property' id=v'" + QString::number(volcnt) + ">Volume (v" + QString::number(volcnt) + ");</span><span class='pvalue'>" + volname + "</span></div><br/>"));
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
     mutex.unlock();
     if(readvsinfo != NULL)
