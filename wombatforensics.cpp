@@ -903,7 +903,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             tmplist = QString(evidfile.readLine()).split(",");
         evidencelist.append(tmplist.at(3));
         evidfile.close();
-        AppendPreviewReport(QString("<div class='tabletitle' id='" + tmplist.at(5) + "'>Evidence Item (" + tmplist.at(5) + "):&nbsp;" + tmplist.at(3) + "</div><br/>"));
+        //AppendPreviewReport(QString("<div class='tabletitle' id='" + tmplist.at(5) + "'>Evidence Item (" + tmplist.at(5) + "):&nbsp;" + tmplist.at(3) + "</div><br/>"));
     }
     //qDebug() << "evidlist:" << evidencelist;
     if(evidencelist.count() > 0)
@@ -1176,7 +1176,7 @@ void WombatForensics::AddEvidence()
     for(int i=0; i < evidencelist.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + evidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
-        AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(ecount) + "'>Evidence Item (E" + QString::number(ecount) + "):&nbsp;" + evidencelist.at(i) + "</div><br/>"));
+        //AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(ecount) + "'>Evidence Item (E" + QString::number(ecount) + "):&nbsp;" + evidencelist.at(i) + "</div><br/>"));
         QDir dir;
         dir.mkpath(evidencepath);
         ecount++;

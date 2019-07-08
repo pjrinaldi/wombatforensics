@@ -34,7 +34,8 @@ void LogMessage(QString logmsg)
 
 void AppendPreviewReport(QString content)
 {
-    previewfile.open(QIODevice::Append | QIODevice::Text);
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::Append | QIODevice::Text);
     if(previewfile.isOpen())
         previewfile.write(content.toStdString().c_str());
     previewfile.close();
@@ -1314,6 +1315,7 @@ void InitializeEvidenceStructure(QString evidname)
     //qDebug() << evidfiles.count() << evidfiles;
     //evidcnt = evidfiles.count();
     evidcnt = evidfiles.at(0).split(".e").last().toInt();
+    AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(evidcnt) + "'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/>"));
     //qDebug() << "evidcnt:" << evidcnt;
     addevidvar.evidcnt = evidcnt;
     //qDebug() << evidfiles.count() << evidfiles;
@@ -1343,14 +1345,11 @@ void InitializeEvidenceStructure(QString evidname)
         errorcount++;
     }
     free(images);
-    //wombatvariable.segmentcount = wombatvariable.fullpathvector.size(); // number of segments for xmount call (TSK 4.2)
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
     //qDebug() << "evidencepath:" << evidencepath;
     //QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
-    //(new QDir())->mkpath(evidencepath);
     QFile evidfile(evidencepath + "stat");
     evidfile.open(QIODevice::Append | QIODevice::Text);
-    AppendPreviewReport(QString("<span class='property'>Image Size:&nbsp;</span><span class='pvalue'>" + QString::number(readimginfo->size) + "</span>"));
     QTextStream out(&evidfile);
     out << (int)readimginfo->itype << "," << (qint64)readimginfo->size << "," << (int)readimginfo->sector_size << ",";
     //for(unsigned int i=0; i < wombatvariable.itemcount; i++)
@@ -1363,6 +1362,8 @@ void InitializeEvidenceStructure(QString evidname)
     //out << "," << wombatvariable.itemcount << ",e" + QString::number(evidcnt);
     out.flush();
     evidfile.close();
+    AppendPreviewReport(QString("<span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>"));
+    AppendPreviewReport(QString("&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span>"));
     //treefile.open(QIODevice::Append | QIODevice::Text);
     QStringList treeout;
     treeout << evidencename << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt)); // NAME IN FIRST COLUMN
