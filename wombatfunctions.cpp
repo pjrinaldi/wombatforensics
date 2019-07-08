@@ -1369,7 +1369,7 @@ void InitializeEvidenceStructure(QString evidname)
     for(int i=0; i < treeout.count(); i++)
         nodedata << treeout.at(i);
     mutex.lock();
-    AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(evidcnt) + "'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/><div><span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span></div>"));
+    //AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(evidcnt) + "'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/><div><span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span></div>"));
     treenodemodel->AddNode(nodedata,  "-1", -1, -1);
     mutex.unlock();
     // Write Evidence Properties Here...
@@ -1405,7 +1405,7 @@ void InitializeEvidenceStructure(QString evidname)
     for(int i=0; i < treeout.count(); i++)
         nodedata << treeout.at(i);
     mutex.lock();
-    AppendPreviewReport(QString("<br/><div><span class='property' id=v'" + QString::number(volcnt) + ">Volume (v" + QString::number(volcnt) + ");</span><span class='pvalue'>" + volname + "</span></div><br/>"));
+    AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(evidcnt) + "'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/><br/><br/><div><span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span></div><br/><br/><div><span class='property' id=v'" + QString::number(volcnt) + ">Volume (v" + QString::number(volcnt) + ");</span><span class='pvalue'>" + volname + "</span></div><br/>"));
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
     mutex.unlock();
     if(readvsinfo != NULL)
