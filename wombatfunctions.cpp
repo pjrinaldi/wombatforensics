@@ -1369,7 +1369,6 @@ void InitializeEvidenceStructure(QString evidname)
     for(int i=0; i < treeout.count(); i++)
         nodedata << treeout.at(i);
     mutex.lock();
-    //AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(evidcnt) + "'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/><div><span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span></div>"));
     treenodemodel->AddNode(nodedata,  "-1", -1, -1);
     mutex.unlock();
     // Write Evidence Properties Here...
@@ -1404,8 +1403,9 @@ void InitializeEvidenceStructure(QString evidname)
     nodedata.clear();
     for(int i=0; i < treeout.count(); i++)
         nodedata << treeout.at(i);
+    QString reportstring = "";
     mutex.lock();
-    AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(evidcnt) + "'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/><br/><br/><div><span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span></div><br/><br/><div><span class='property' id=v'" + QString::number(volcnt) + ">Volume (v" + QString::number(volcnt) + ");</span><span class='pvalue'>" + volname + "</span></div><br/>"));
+    reportstring += "<div id='e" + QString::number(evidcnt) + "'><div class='tabletitle'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/><br/><br/><div><span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span></div><br/><br/><div><span class='property' id=v'" + QString::number(volcnt) + ">Volume (v" + QString::number(volcnt) + ");</span><span class='pvalue'>" + volname + "</span></div><br/>";
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
     mutex.unlock();
     if(readvsinfo != NULL)
@@ -1434,6 +1434,7 @@ void InitializeEvidenceStructure(QString evidname)
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), -1, 0);
             mutex.unlock();
+            reportstring += "<div><span class='property'>Partition 0</span><span class='pvalue'>NON-RECOGNIZED FS</span></div><br/>" ;
         }
         else
         {
@@ -1455,6 +1456,7 @@ void InitializeEvidenceStructure(QString evidname)
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
             mutex.unlock();
+            reportstring += "<div><span class='property'>Partition 0:</span><span class'property'>" + QString(GetFileSystemLabel(readfsinfo)) + "</span></div><br/>";
             WriteFileSystemProperties(readfsinfo, partitionpath);
             uint8_t walkreturn;
             int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
@@ -1506,6 +1508,7 @@ void InitializeEvidenceStructure(QString evidname)
                     mutex.lock();
                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                     mutex.unlock();
+                    reportstring += "<div><span class='property'>Partition&nbsp;" + QString::number(partint) + "</span><span class='pvalue'>" + QString(readpartinfo->desc) + "</span></div><br/>";
                 }
                 else if(readpartinfo->flags == 0x01) // allocated partition
                 {
@@ -1523,6 +1526,7 @@ void InitializeEvidenceStructure(QString evidname)
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                         mutex.unlock();
+                        reportstring += "<div><span class='property'>Partition&nbsp;" + QString::number(partint) + "</span><span class='pvalue'>" + QString(GetFileSystemLabel(readfsinfo)) + "</span></div><br/>";
                         WriteFileSystemProperties(readfsinfo, partitionpath);
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
@@ -1548,6 +1552,7 @@ void InitializeEvidenceStructure(QString evidname)
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                         mutex.unlock();
+                        reportstring += "<div><span class='property'>Partition&nbsp;" + QString::number(partint) + "</span><span class='pvalue'>" + QString(readpartinfo->desc) + " (NON-RECOGNIZED FS)</span></div><br/>";
                     }
                 }
                 else
@@ -1563,11 +1568,14 @@ void InitializeEvidenceStructure(QString evidname)
                     mutex.lock();
                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                     mutex.unlock();
+                    reportstring += "<div><span class='property'>Partition&nbsp;" + QString::number(partint) + "</span><span class='pvalue'>" + QString(readpartinfo->desc) + " (NON-RECOGNIZED FS)</span></div><br/>";
                 }
                 partint++;
             }
         }
     }
+    reportstring += "</div><br/><br/><br/>";
+    AppendPreviewReport(reportstring);
     tsk_fs_file_close(readfileinfo);
     readfileinfo = NULL;
     tsk_fs_close(readfsinfo);
