@@ -833,7 +833,7 @@ void WombatForensics::InitializePreviewReport()
         if(previewfile.isOpen())
         {
             previewfile.write(initialhtml.toStdString().c_str());
-            previewfile.write(QString("<div id='infotitle'>Case Title:&nbsp;" + wombatvariable.casename + "</div><br/>").toStdString().c_str());
+            previewfile.write(QString("<div id='infotitle'>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></div><br/>").toStdString().c_str());
         }
         previewfile.close();
 }
@@ -898,13 +898,17 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
     //qDebug() << "evidfiles:" << evidfiles;
     evidencelist.clear();
+    QStringList tmplist;
     for(int i=0; i < evidfiles.count(); i++)
     {
+        tmplist.clear();
         QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(i) + "/stat");
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(evidfile.isOpen())
-            evidencelist.append(QString(evidfile.readLine()).split(",").at(3));
+            tmplist = QString(evidfile.readLine()).split(",");
+        evidencelist.append(tmplist.at(3));
         evidfile.close();
+        AppendPreviewReport(QString("<div class='tabletitle' id='" + tmplist.at(5) + "'>Evidence Item (" + tmplist.at(5) + "):&nbsp;" + tmplist.at(3) + "</div><br/>"));
     }
     //qDebug() << "evidlist:" << evidencelist;
     if(evidencelist.count() > 0)
@@ -1168,8 +1172,6 @@ void WombatForensics::UpdateStatus()
 
 void WombatForensics::AddEvidence()
 {
-    // HERE IS WHERE I WOULD OPEN THE NEW DIALOG
-    // NEED TO CHECK AND SEE IF EVIDENCE IS ALREADY IN CASE THROUGH ADD EVIDENCE DIALOG
     addevidencedialog = new AddEvidenceDialog(this);
     addevidencedialog->exec();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -1179,9 +1181,9 @@ void WombatForensics::AddEvidence()
     for(int i=0; i < evidencelist.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + evidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
+        AppendPreviewReport(QString("<div class='tabletitle' id='e" + QString::number(ecount) + "'>Evidence Item (E" + QString::number(ecount) + "):&nbsp;" + evidencelist.at(i) + "</div><br/>"));
         QDir dir;
         dir.mkpath(evidencepath);
-        //(new QDir())->mkpath(evidencepath);
         ecount++;
     }
     //qDebug() << "ecount after:" << ecount;
