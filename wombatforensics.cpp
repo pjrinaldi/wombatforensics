@@ -2076,11 +2076,13 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         exitbox.setText("Saving Current Case, Please Wait...");
         exitbox.setIcon(QMessageBox::Information);
         exitbox.setStandardButtons(QMessageBox::Ok);
-        exitbox.button(QMessageBox::Ok)->animateClick(2000);
-        exitbox.exec();
+        //exitbox.button(QMessageBox::Ok)->animateClick(2000);
+        exitbox.show();
+        //exitbox.exec();
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         StatusUpdate("Saving Current Case...");
         CloseCurrentCase();
+        exitbox.close();
         StatusUpdate("Exiting...");
     }
     else
