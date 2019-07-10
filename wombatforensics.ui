@@ -429,7 +429,7 @@
      <normaloff>:/echeck</normaloff>:/echeck</iconset>
    </property>
    <property name="text">
-    <string>(Un)Check</string>
+    <string>(Un)Check Selected</string>
    </property>
   </action>
   <action name="actionExport">

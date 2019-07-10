@@ -359,7 +359,7 @@ public:
 #if QT_CONFIG(tooltip)
         actionByteConverter->setToolTip(QCoreApplication::translate("WombatForensics", "Byte Converter", nullptr));
 #endif // QT_CONFIG(tooltip)
-        actionCheck->setText(QCoreApplication::translate("WombatForensics", "(Un)Check", nullptr));
+        actionCheck->setText(QCoreApplication::translate("WombatForensics", "(Un)Check Selected", nullptr));
         actionExport->setText(QCoreApplication::translate("WombatForensics", "Export...", nullptr));
         actionSaveState->setText(QCoreApplication::translate("WombatForensics", "Save State", nullptr));
 #if QT_CONFIG(tooltip)
