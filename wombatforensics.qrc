@@ -34,6 +34,8 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="newcase">Resources/newcase.svg</file>
+    <file alias="opencase">Resources/opencase.svg</file>
     <file alias="tag-rem">Resources/tag-rem.svg</file>
     <file alias="reportpreview">Resources/reportpreview1.png</file>
     <file alias="collapseall">Resources/go-first.svg</file>

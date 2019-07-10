@@ -114,8 +114,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     selectionmenu->addAction(ui->actionFile);
 
     remtagaction = new QAction("Remove Selected Tag", bookmarkmenu);
+    remtagaction->setIcon(QIcon(":/bar/tag-rem"));
     connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
     remtagaction1 = new QAction("Remove All Checked Tags", tagcheckedmenu);
+    remtagaction1->setIcon(QIcon(":/bar/tag-rem"));
     connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
 
     viewerfile.open(QIODevice::ReadOnly);
@@ -2030,6 +2032,7 @@ void WombatForensics::SetupHexPage(void)
 
 WombatForensics::~WombatForensics()
 {
+    delete viewmanage;
     delete bookmarkmenu;
     delete tagcheckedmenu;
     delete selectionmenu;
@@ -2049,7 +2052,6 @@ WombatForensics::~WombatForensics()
     delete tagfilterview;
     delete byteviewer;
     delete previewreport;
-    delete viewmanage;
     delete imagewindow;
     delete aboutbox;
     delete settingsdialog;
