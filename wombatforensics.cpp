@@ -118,6 +118,12 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addAction(ui->actionView_Properties);
     treemenu->addMenu(bookmarkmenu);
     treemenu->addMenu(tagcheckedmenu);
+    remtagaction = new QAction("Remove Selected Tag", bookmarkmenu);
+    connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
+    remtagaction1 = new QAction("Remove All Checked Tags", tagcheckedmenu);
+    connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
+    treemenu->addAction(remtagaction);
+    treemenu->addAction(remtagaction1);
     viewerfile.open(QIODevice::ReadOnly);
     viewmenu = new QMenu();
     viewmenu->setTitle("View With");
@@ -202,20 +208,21 @@ void WombatForensics::ReadBookmarks()
         bookmarkmenu->addAction(tmpaction);
         tagcheckedmenu->addAction(tmpaction1);
     }
-    bookmarkmenu->addSeparator();
-    tagcheckedmenu->addSeparator();
-    QAction* remtagaction = new QAction("Remove Tag", bookmarkmenu);
-    connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
-    bookmarkmenu->addAction(remtagaction);
-    QAction* remtagaction1 = new QAction("Remove Tag", tagcheckedmenu);
-    connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
-    tagcheckedmenu->addAction(remtagaction1);
+    //bookmarkmenu->addSeparator();
+    //tagcheckedmenu->addSeparator();
+    //QAction* remtagaction = new QAction("Remove Tag", bookmarkmenu);
+    //connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
+    //bookmarkmenu->addAction(remtagaction);
+    //QAction* remtagaction1 = new QAction("Remove Tag", tagcheckedmenu);
+    //connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
+    //tagcheckedmenu->addAction(remtagaction1);
 }
 
 void WombatForensics::RemoveTag()
 {
     // THIS ADDS MULTIPLE ",," AT THE END OF THE STAT FILE. FIND AND FIX.
     QAction* tagaction = qobject_cast<QAction*>(sender());
+    qDebug() << tagaction->iconText();
     QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     if(parentmenu.contains("Selected")) // single file
     {
@@ -256,11 +263,15 @@ void WombatForensics::RemoveTag()
         filefile.close();
         //qDebug() << "tmpstr before:" << tmpstr;
         if(tmpstr.split(",").count() > 15)
-            tmplist = tmpstr.split(",");
-        tmplist[15] = "";
+            tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+        tmplist[15] = "0";
         tmpstr = "";
         for(int i = 0; i < tmplist.count(); i++)
-            tmpstr += tmplist.at(i) + ",";
+        {
+            tmpstr += tmplist.at(i);
+            if(i < tmplist.count() - 1)
+                tmpstr += ",";
+        }
         //qDebug() << "tmpstr after:" << tmpstr;
         filefile.open(QIODevice::WriteOnly | QIODevice::Text);
         if(filefile.isOpen())
@@ -318,11 +329,15 @@ void WombatForensics::RemoveTag()
                 filefile.close();
                 //qDebug() << "tmpstr before:" << tmpstr;
                 if(tmpstr.split(",").count() > 15)
-                    tmplist = tmpstr.split(",");
-                tmplist[15] = "";
+                    tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+                tmplist[15] = "0";
                 tmpstr = "";
                 for(int i = 0; i < tmplist.count(); i++)
-                    tmpstr += tmplist.at(i) + ",";
+                {
+                    tmpstr += tmplist.at(i);
+                    if(i < tmplist.count() - 1)
+                        tmpstr += ",";
+                }
                 //qDebug() << "tmpstr after:" << tmpstr;
                 filefile.open(QIODevice::WriteOnly | QIODevice::Text);
                 if(filefile.isOpen())
@@ -415,17 +430,22 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
             filefile.close();
             //qDebug() << "tmpstr before:" << tmpstr;
             if(tmpstr.split(",").count() > 15)
-                tmplist = tmpstr.split(",");
+                tmplist = tmpstr.split(",", QString::SkipEmptyParts);
             tmplist[15] = tagname;
             tmpstr = "";
             for(int i = 0; i < tmplist.count(); i++)
-                tmpstr += tmplist.at(i) + ",";
+            {
+                tmpstr += tmplist.at(i);
+                if(i < tmplist.count() - 1)
+                    tmpstr += ",";
+            }
             //qDebug() << "tmpstr after:" << tmpstr;
             filefile.open(QIODevice::WriteOnly | QIODevice::Text);
             if(filefile.isOpen())
                 filefile.write(tmpstr.toStdString().c_str());
             filefile.close();
             treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, tagname);
+            AppendPreviewReport(QString("<div id='" + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + tmplist.at(0) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + tmplist.at(3) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div><br/><br/>"));
         }
         else
             qInfo() << "Can only tag files and directories, not evidence images, volumes, or partitions";
@@ -481,11 +501,15 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
                     filefile.close();
                     //qDebug() << "tmpstr before:" << tmpstr;
                     if(tmpstr.split(",").count() > 15)
-                        tmplist = tmpstr.split(",");
+                        tmplist = tmpstr.split(",", QString::SkipEmptyParts);
                     tmplist[15] = tagname;
                     tmpstr = "";
                     for(int i = 0; i < tmplist.count(); i++)
-                        tmpstr += tmplist.at(i) + ",";
+                    {
+                        tmpstr += tmplist.at(i);
+                        if(i < tmplist.count() - 1)
+                            tmpstr += ",";
+                    }
                     //qDebug() << "tmpstr after:" << tmpstr;
                     filefile.open(QIODevice::WriteOnly | QIODevice::Text);
                     if(filefile.isOpen())
@@ -637,7 +661,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         textviewer->ShowText(index);
     }
     else
-        treemenu->exec(QCursor::pos());
+        treemenu->exec(QCursor::pos()); // might want to add the enable/disable depending on whether its a file/dir or not. (4-)
     QApplication::restoreOverrideCursor();
 }
 
@@ -652,6 +676,8 @@ void WombatForensics::HideViewerManager()
     viewmenu->clear();
     treemenu->addAction(ui->actionView_File);
     treemenu->addAction(ui->actionView_Properties);
+    treemenu->addAction(remtagaction);
+    treemenu->addAction(remtagaction1);
     viewerfile.open(QIODevice::ReadOnly);
     QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
     itemlist.removeDuplicates();

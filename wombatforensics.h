@@ -68,6 +68,8 @@ public:
     QMenu* selectionmenu;
     QMenu* bookmarkmenu;
     QMenu* tagcheckedmenu;
+    QAction* remtagaction;
+    QAction* remtagaction1;
     IdFilter* idfilterview;
     JumpHex* jumpfilterview;
     NameFilter* namefilterview;

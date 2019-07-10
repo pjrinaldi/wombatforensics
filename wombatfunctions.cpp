@@ -67,6 +67,7 @@ void RemovePreviewItem(QString itemid)
     if(previewfile.isOpen())
         previewfile.write(readstr.toStdString().c_str());
     previewfile.close();
+    isignals->ActivateReload();
     //qDebug() << "readstr:" << readstr;
 }
 
