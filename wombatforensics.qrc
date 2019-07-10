@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file alias="remcheck">Resources/process-remove.svg</file>
     <file alias="missingimage">Resources/image-missing.png</file>
     <file alias="cancelthread">Resources/process-stop.svg</file>
     <file alias="outsidein">Resources/object-inverse.svg</file>
@@ -33,6 +34,7 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="tag-rem">Resources/tag-rem.svg</file>
     <file alias="reportpreview">Resources/reportpreview1.png</file>
     <file alias="collapseall">Resources/go-first.svg</file>
     <file alias="expandall">Resources/go-last.svg</file>
