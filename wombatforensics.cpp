@@ -85,7 +85,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
-    connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(reload()), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
     bookmarkmenu->setTitle("Tag Selected As");
@@ -266,6 +266,7 @@ void WombatForensics::RemoveTag()
             filefile.write(tmpstr.toStdString().c_str());
         filefile.close();
         treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, "0");
+        RemovePreviewItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
     }
     else if(parentmenu.contains("Checked")) // checked files
     {
@@ -327,6 +328,7 @@ void WombatForensics::RemoveTag()
                     filefile.write(tmpstr.toStdString().c_str());
                 filefile.close();
                 treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, "0");
+                RemovePreviewItem(curindex.sibling(curindex.row(), 11).data().toString());
             }
         }
     }
@@ -836,7 +838,7 @@ void WombatForensics::InitializePreviewReport()
     if(previewfile.isOpen())
     {
         previewfile.write(initialhtml.toStdString().c_str());
-        previewfile.write(QString("<div id='infotitle'>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></div><br/>").toStdString().c_str());
+        previewfile.write(QString("<div id='infotitle'>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></div><br/>\n").toStdString().c_str());
     }
     previewfile.close();
 }
@@ -879,6 +881,9 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
         bookmarkfile.close();
     }
+    previewfile.setFileName(wombatvariable.tmpmntpath + "previewreport.html");
+    if(!FileExists(QString(wombatvariable.tmpmntpath + "previewreport.html").toStdString()))
+        InitializePreviewReport();
     qInfo() << "Bookmarks File Created";
     ReadBookmarks();
     logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
@@ -1804,6 +1809,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                 //qDebug() << "index found:" << indexlist.first().sibling(indexlist.first().row(), 11).data().toString();
                 treenodemodel->removeRow(indexlist.first().row(), indexlist.first());
             }
+            RemovePreviewItem(QString("e" + evidfiles.first().split(".e").last()));
         }
     }
     StatusUpdate("Evidence Item Successfully Removed");

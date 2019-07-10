@@ -27,9 +27,9 @@ public:
 private slots:
     void HideClicked();
     void GetHtmlContent(const QModelIndex &index);
+    void Reload();
     
 signals:
-    //void HideHtmlViewerWindow(bool checkstate);
     void HideReportPreviewWindow(bool checkstate);
 
 protected:

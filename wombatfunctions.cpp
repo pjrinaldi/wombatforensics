@@ -34,15 +34,25 @@ void LogMessage(QString logmsg)
 
 void AppendPreviewReport(QString content)
 {
+    content += "\n";
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::Append | QIODevice::Text);
     if(previewfile.isOpen())
         previewfile.write(content.toStdString().c_str());
     previewfile.close();
+    isignals->ActivateReload();
 }
 
 void RemovePreviewItem(QString itemid)
 {
+    qDebug() << "itemid:" << itemid;
+    QString readstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly);
+    if(previewfile.isOpen())
+        readstr = previewfile.readAll();
+    previewfile.close();
+    qDebug() << readstr;
     // open the report file.
     // read it all into a string.
     // search the string for the id.
@@ -469,6 +479,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 if(hshfile.isOpen())
                     tmpfilestr = hshfile.readLine();
                 hshfile.close();
+                qDebug() << "file read line:" << tmpfilestr;
                 if(tmpfilestr.split(",").count() > 12)
                 {
                     if(tmpfilestr.split(",").at(13).compare("0") != 0)
@@ -492,7 +503,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 // ADD THE HASH VALUE FROM THE FILE TO TREEOUT
                 //treeout << "0";
                 treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1); // category << signature
-                if(tmpfilestr.split(",").count() == 16)
+                if(tmpfilestr.split(",").count() >= 16)
                     treeout << tmpfilestr.split(",").at(15); // bookmark value
                 else
                     treeout << "0"; // default no bookmark value
@@ -1405,7 +1416,7 @@ void InitializeEvidenceStructure(QString evidname)
         nodedata << treeout.at(i);
     QString reportstring = "";
     mutex.lock();
-    reportstring += "<div id='e" + QString::number(evidcnt) + "'><div class='tabletitle'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/><br/><br/><div><span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span></div><br/><br/><div><span class='property' id=v'" + QString::number(volcnt) + ">Volume (v" + QString::number(volcnt) + ");</span><span class='pvalue'>" + volname + "</span></div><br/>";
+    reportstring += "<div id='e" + QString::number(evidcnt) + "'><div class='tabletitle'>Evidence Item (E" + QString::number(evidcnt) + "):&nbsp;" + evidname + "</div><br/><br/><br/><div><span class='property'>Image Size:&nbsp;</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->size) + "</span>&nbsp;<span class='property'>Sector Size:</span>&nbsp;<span class='pvalue'>" + QString::number(readimginfo->sector_size) + "</span></div><br/><br/><div><span class='property'>Volume (v" + QString::number(volcnt) + ");</span><span class='pvalue'>" + volname + "</span></div><br/>";
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
     mutex.unlock();
     if(readvsinfo != NULL)
@@ -1456,7 +1467,7 @@ void InitializeEvidenceStructure(QString evidname)
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
             mutex.unlock();
-            reportstring += "<div><span class='property'>Partition 0:</span><span class'property'>" + QString(GetFileSystemLabel(readfsinfo)) + "</span></div><br/>";
+            reportstring += "<div><span class='property'>Partition 0:&nbsp;</span><span class'property'>" + QString(GetFileSystemLabel(readfsinfo)) + "&nbsp;(" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")</span></div><br/>";
             WriteFileSystemProperties(readfsinfo, partitionpath);
             uint8_t walkreturn;
             int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;

@@ -37,6 +37,11 @@ void HtmlViewer::LoadHtml(QString filepath)
     this->show();
 }
 
+void HtmlViewer::Reload()
+{
+    ui->webView->reload();
+}
+
 void HtmlViewer::mousePressEvent(QMouseEvent* e)
 {
     if(e->type() == QEvent::MouseButtonPress)
