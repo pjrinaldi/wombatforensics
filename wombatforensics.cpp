@@ -214,6 +214,7 @@ void WombatForensics::ReadBookmarks()
 
 void WombatForensics::RemoveTag()
 {
+    // THIS ADDS MULTIPLE ",," AT THE END OF THE STAT FILE. FIND AND FIX.
     QAction* tagaction = qobject_cast<QAction*>(sender());
     QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     if(parentmenu.contains("Selected")) // single file
