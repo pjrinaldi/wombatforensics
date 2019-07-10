@@ -113,17 +113,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     selectionmenu->addAction(ui->actionTextSection);
     selectionmenu->addAction(ui->actionFile);
 
-    treemenu = new QMenu(ui->dirTreeView);
-    treemenu->addAction(ui->actionView_File);
-    treemenu->addAction(ui->actionView_Properties);
-    treemenu->addMenu(bookmarkmenu);
-    treemenu->addMenu(tagcheckedmenu);
     remtagaction = new QAction("Remove Selected Tag", bookmarkmenu);
     connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
     remtagaction1 = new QAction("Remove All Checked Tags", tagcheckedmenu);
     connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
-    treemenu->addAction(remtagaction);
-    treemenu->addAction(remtagaction1);
+
     viewerfile.open(QIODevice::ReadOnly);
     viewmenu = new QMenu();
     viewmenu->setTitle("View With");
@@ -137,10 +131,22 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
         viewmenu->addAction(tmpaction);
     }
+
+    treemenu = new QMenu(ui->dirTreeView);
+    
+    treemenu->addAction(ui->actionView_File);
+    treemenu->addAction(ui->actionView_Properties);
     treemenu->addAction(viewmenu->menuAction());
+    treemenu->addSeparator();
     treemenu->addAction(ui->actionCheck);
+    treemenu->addMenu(bookmarkmenu);
+    treemenu->addMenu(tagcheckedmenu);
+    treemenu->addAction(remtagaction);
+    treemenu->addAction(remtagaction1);
+    treemenu->addSeparator();
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
+
     ui->dirTreeView->setSortingEnabled(true); // enables the sorting arrow, but doesn't sort anything.
     ui->dirTreeView->setUniformRowHeights(true);
     ui->dirTreeView->header()->setSortIndicatorShown(false);
@@ -222,9 +228,10 @@ void WombatForensics::RemoveTag()
 {
     // THIS ADDS MULTIPLE ",," AT THE END OF THE STAT FILE. FIND AND FIX.
     QAction* tagaction = qobject_cast<QAction*>(sender());
-    qDebug() << tagaction->iconText();
-    QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
-    if(parentmenu.contains("Selected")) // single file
+    //qDebug() << tagaction->iconText();
+    //QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
+    //if(parentmenu.contains("Selected")) // single file
+    if(QString(tagaction->iconText()).contains("Selected")) // single file
     {
         QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-f").last();
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -280,7 +287,7 @@ void WombatForensics::RemoveTag()
         treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, "0");
         RemovePreviewItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
     }
-    else if(parentmenu.contains("Checked")) // checked files
+    else if(QString(tagaction->iconText()).contains("Checked")) // single file
     {
         QStringList checkeditems = GetFileLists(1);
         //qDebug() << "Remove Tag Checked Items:" << checkeditems;
@@ -674,22 +681,26 @@ void WombatForensics::HideViewerManager()
 {
     treemenu->clear();
     viewmenu->clear();
-    treemenu->addAction(ui->actionView_File);
-    treemenu->addAction(ui->actionView_Properties);
-    treemenu->addAction(remtagaction);
-    treemenu->addAction(remtagaction1);
     viewerfile.open(QIODevice::ReadOnly);
     QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
-    itemlist.removeDuplicates();
     viewerfile.close();
+    itemlist.removeDuplicates();
     for(int i=0; i < itemlist.count(); i++)
     {
         QAction* tmpaction = new QAction(itemlist.at(i), this);
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
         viewmenu->addAction(tmpaction);
     }
+    treemenu->addAction(ui->actionView_File);
+    treemenu->addAction(ui->actionView_Properties);
     treemenu->addAction(viewmenu->menuAction());
+    treemenu->addSeparator();
     treemenu->addAction(ui->actionCheck);
+    treemenu->addMenu(bookmarkmenu);
+    treemenu->addMenu(tagcheckedmenu);
+    treemenu->addAction(remtagaction);
+    treemenu->addAction(remtagaction1);
+    treemenu->addSeparator();
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
 }
