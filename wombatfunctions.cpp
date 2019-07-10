@@ -45,9 +45,9 @@ void AppendPreviewReport(QString content)
 
 void RemovePreviewItem(QString itemid)
 {
-    qDebug() << "itemid:" << itemid;
+    //qDebug() << "itemid:" << itemid;
     QString itemstr = "<div id='" + itemid + "'>";
-    qDebug() << "itemstr:" << itemstr;
+    //qDebug() << "itemstr:" << itemstr;
     QString readstr = "";
     QStringList readstrlist;
     readstrlist.clear();
@@ -57,20 +57,17 @@ void RemovePreviewItem(QString itemid)
         readstrlist = QString(previewfile.readAll()).split("\n");
     previewfile.close();
     //qDebug() << "readstrlist:" << readstrlist;
-    // THIS CURRENTLY FAILS TO WORK
     for(int i=0; i < readstrlist.count(); i++)
     {
         if(readstrlist.at(i).contains(itemstr, Qt::CaseInsensitive) == false)
             readstr += readstrlist.at(i) + "\n";
     }
-    qDebug() << "readstr:" << readstr;
-
-    // open the report file.
-    // read it all into a string.
-    // search the string for the id.
-    // another option is to read it line by line, compare for the line which contains the id, and don't write it to the new string.
-    // then write the string to the new file.
-    // or split string by '\n', loop over it and not write the item which contains the id...
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(readstr.toStdString().c_str());
+    previewfile.close();
+    //qDebug() << "readstr:" << readstr;
 }
 
 qint64 GetChildCount(QString filefilter)
