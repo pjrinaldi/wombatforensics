@@ -670,7 +670,21 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         textviewer->ShowText(index);
     }
     else
+    {
+        QApplication::restoreOverrideCursor();
+        actionitem = static_cast<TreeNode*>(selectedindex.internalPointer());
+        if(!actionitem->IsChecked())
+        {
+            ui->actionCheck->setText("Check Selected");
+            ui->actionCheck->setIcon(QIcon(":/echeck"));
+        }
+        else
+        {
+            ui->actionCheck->setText("UnCheck Selected");
+            ui->actionCheck->setIcon(QIcon(":/remcheck"));
+        }
         treemenu->exec(QCursor::pos()); // might want to add the enable/disable depending on whether its a file/dir or not. (4-)
+    }
     QApplication::restoreOverrideCursor();
 }
 
@@ -1089,6 +1103,17 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     if(index.isValid())
     {
         actionitem = static_cast<TreeNode*>(index.internalPointer());
+        qDebug() << "action item checked?:" << actionitem->IsChecked();
+        if(!actionitem->IsChecked())
+        {
+            ui->actionCheck->setText("Check Selected");
+            ui->actionCheck->setIcon(QIcon(":/echeck"));
+        }
+        else
+        {
+            ui->actionCheck->setText("UnCheck Selected");
+            ui->actionCheck->setIcon(QIcon(":/remcheck"));
+        }
         treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
 }
