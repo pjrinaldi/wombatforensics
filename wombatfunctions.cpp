@@ -63,7 +63,7 @@ void RemovePreviewItem(QString itemid)
         if(readstrlist.at(i).contains(itemstr, Qt::CaseInsensitive) == false)
             readstr += readstrlist.at(i) + "\n";
     }
-    qDebug() << "readstr:";
+    qDebug() << "readstr:" << readstr;
 
     // open the report file.
     // read it all into a string.
@@ -1478,7 +1478,7 @@ void InitializeEvidenceStructure(QString evidname)
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
             mutex.unlock();
-            reportstring += "<div><span class='property'>Partition 0:&nbsp;</span><span class'property'>" + QString(GetFileSystemLabel(readfsinfo)) + "&nbsp;(" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")</span></div><br/>";
+            reportstring += "<div><span class='property'>Partition 0:&nbsp;</span><span class='property'>" + QString(GetFileSystemLabel(readfsinfo)) + "&nbsp;(" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")</span></div><br/>";
             WriteFileSystemProperties(readfsinfo, partitionpath);
             uint8_t walkreturn;
             int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
