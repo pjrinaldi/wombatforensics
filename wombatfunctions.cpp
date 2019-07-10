@@ -46,13 +46,25 @@ void AppendPreviewReport(QString content)
 void RemovePreviewItem(QString itemid)
 {
     qDebug() << "itemid:" << itemid;
+    QString itemstr = "<div id='" + itemid + "'>";
+    qDebug() << "itemstr:" << itemstr;
     QString readstr = "";
+    QStringList readstrlist;
+    readstrlist.clear();
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::ReadOnly);
     if(previewfile.isOpen())
-        readstr = previewfile.readAll();
+        readstrlist = QString(previewfile.readAll()).split("\n");
     previewfile.close();
-    qDebug() << readstr;
+    //qDebug() << "readstrlist:" << readstrlist;
+    // THIS CURRENTLY FAILS TO WORK
+    for(int i=0; i < readstrlist.count(); i++)
+    {
+        if(readstrlist.at(i).contains(itemstr, Qt::CaseInsensitive) == false)
+            readstr += readstrlist.at(i) + "\n";
+    }
+    qDebug() << "readstr:";
+
     // open the report file.
     // read it all into a string.
     // search the string for the id.
@@ -479,7 +491,6 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 if(hshfile.isOpen())
                     tmpfilestr = hshfile.readLine();
                 hshfile.close();
-                qDebug() << "file read line:" << tmpfilestr;
                 if(tmpfilestr.split(",").count() > 12)
                 {
                     if(tmpfilestr.split(",").at(13).compare("0") != 0)

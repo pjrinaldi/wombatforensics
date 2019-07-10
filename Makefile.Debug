@@ -464,6 +464,7 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/folder-tag.svg \
 		Resources/document-new.svg \
 		Resources/list-remove.png \
+		Resources/reportpreview1.png \
 		Resources/bookmark.png \
 		Resources/list-add.svg \
 		Resources/window-new.png \
