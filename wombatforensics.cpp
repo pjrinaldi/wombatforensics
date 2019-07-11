@@ -120,6 +120,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     remtagaction1->setIcon(QIcon(":/bar/tag-rem"));
     connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
 
+    remcheckedaction = new QAction("UnCheck all Checked", treemenu);
+    remcheckedaction->setIcon(QIcon(":/remcheck"));
+    connect(remcheckedaction, SIGNAL(triggered()), this, SLOT(UnCheckChecked()));
+
     viewerfile.open(QIODevice::ReadOnly);
     viewmenu = new QMenu();
     viewmenu->setTitle("View With");
@@ -141,6 +145,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addAction(viewmenu->menuAction());
     treemenu->addSeparator();
     treemenu->addAction(ui->actionCheck);
+    treemenu->addAction(remcheckedaction);
+    treemenu->addSeparator();
     treemenu->addMenu(bookmarkmenu);
     treemenu->addMenu(tagcheckedmenu);
     treemenu->addAction(remtagaction);
@@ -187,6 +193,25 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treenodemodel = new TreeNodeModel();
     autosavetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
+}
+
+void WombatForensics::UnCheckChecked()
+{
+    QStringList checkeditems;
+    checkeditems.clear();
+    checkeditems = GetFileLists(1);
+    qDebug() << "checekeditems:" << checkeditems;
+    for(int i=0; i < checkeditems.count(); i++)
+    {
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        if(indexlist.count() > 0)
+        {
+            actionitem = static_cast<TreeNode*>(indexlist.first().internalPointer());
+            if(!actionitem->IsChecked())
+                actionitem->SetChecked(true);
+        }
+    }
+    emit treenodemodel->CheckedNodesChanged();
 }
 
 void WombatForensics::ReadBookmarks()
@@ -712,6 +737,8 @@ void WombatForensics::HideViewerManager()
     treemenu->addAction(viewmenu->menuAction());
     treemenu->addSeparator();
     treemenu->addAction(ui->actionCheck);
+    treemenu->addAction(remcheckedaction);
+    treemenu->addSeparator();
     treemenu->addMenu(bookmarkmenu);
     treemenu->addMenu(tagcheckedmenu);
     treemenu->addAction(remtagaction);
@@ -1103,7 +1130,6 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     if(index.isValid())
     {
         actionitem = static_cast<TreeNode*>(index.internalPointer());
-        qDebug() << "action item checked?:" << actionitem->IsChecked();
         if(!actionitem->IsChecked())
         {
             ui->actionCheck->setText("Check Selected");

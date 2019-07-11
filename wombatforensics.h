@@ -68,8 +68,9 @@ public:
     QMenu* selectionmenu;
     QMenu* bookmarkmenu;
     QMenu* tagcheckedmenu;
-    QAction* remtagaction;
-    QAction* remtagaction1;
+    QAction* remtagaction; // remove selected tag
+    QAction* remtagaction1; // remove checked tag
+    QAction* remcheckedaction; // remove all checked tags
     IdFilter* idfilterview;
     JumpHex* jumpfilterview;
     NameFilter* namefilterview;
@@ -192,6 +193,7 @@ private slots:
     void CreateNewTag(void);
     void SetBookmark(void);
     void RemoveTag(void);
+    void UnCheckChecked(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
