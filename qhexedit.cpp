@@ -919,6 +919,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 QColor c = viewport()->palette().color(QPalette::Base);
                 painter.setPen(colStandard);
                 qint64 posBa = _bPosFirst + bPosLine + colIdx; // curoffset
+                if(!bypasscolor)
+                {
                 if(blocklist.count() > 0)
                 {
                     if(blocklist.at(0).toLongLong() == 0) // resident attribute
@@ -984,6 +986,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 			c = slackbrush.color(); // RED
 		    }
                 }
+
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
                 {
                     c = _brushSelection.color();
@@ -997,6 +1000,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                             c = _brushHighlighted.color();
                             painter.setPen(_penHighlighted);
                         }
+                }
                 }
 
                 // render hex value

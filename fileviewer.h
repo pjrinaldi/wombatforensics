@@ -19,6 +19,7 @@ public:
     FileViewer(QWidget* parent = 0);
     ~FileViewer();
     void UpdateHexView();
+    void BypassColor(bool bypass);
 
 public slots:
 

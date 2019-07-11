@@ -350,6 +350,11 @@ public:
     // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
     void SetColorInformation(qint64 fsoffset, qint64 blocksize, QString blockstring, QString residentstring, QString bytestring, qint64 flength, int dataoff);
 
+    void BypassColor(bool bypass)
+    {
+        bypasscolor = bypass;
+    };
+
 protected:
     // Handle events
     void keyPressEvent(QKeyEvent *event);
@@ -429,6 +434,7 @@ private:
     qint64 blocksize;
     qint64 filelength;
     int dataoffset;
+    bool bypasscolor = false;
 
     // other variables
     bool _editAreaIsAscii;                      // flag about the ascii mode edited

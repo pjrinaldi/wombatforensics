@@ -1487,6 +1487,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
             outbuffer.writeRawData(fhexbuf, fhexlen);
             tmpfile.close();
             delete[] fhexbuf;
+            //fileviewer->BypassColor(true);
         }
         tsk_fs_file_close(filehexfileinfo);
         tsk_fs_close(filehexfsinfo);
@@ -1528,6 +1529,7 @@ void WombatForensics::LoadHexContents()
     else
         qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");
     casedatafile.setFileName(datastring);
+    ui->hexview->BypassColor(false);
     ui->hexview->setData(casedatafile);
 
     // determine offset location in the editor
@@ -1802,6 +1804,7 @@ void WombatForensics::CloseCurrentCase()
         casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
         casedatafile.write("dummy zerofile");
         casedatafile.close();
+        ui->hexview->BypassColor(true);
         ui->hexview->setData(casedatafile);
     }
     setWindowTitle("WombatForensics");

@@ -56,6 +56,12 @@ void FileViewer::SetOffsetLabel(qint64 pos)
     selectedoffset->setText(label);
 }
 
+void FileViewer::BypassColor(bool bypass)
+{
+    ui->filehexview->BypassColor(bypass);
+}
+
+
 void FileViewer::UpdateSelectValue()
 {
     QByteArray selectionbytes = ui->filehexview->selectionToByteArray();
@@ -67,6 +73,7 @@ void FileViewer::UpdateHexView()
 {
     hexfile.setFileName(hexstring);
     ui->filehexview->setData(hexfile);
+    BypassColor(true);
     this->show();
 }
 
