@@ -478,7 +478,11 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
                 filefile.write(tmpstr.toStdString().c_str());
             filefile.close();
             treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, tagname);
-            AppendPreviewReport(QString("<div id='" + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + tmplist.at(0) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + tmplist.at(3) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div><br/><br/>"));
+            QByteArray baname, bapath;
+            baname.append(tmplist.at(0));
+            bapath.append(tmplist.at(3));
+            //QString tmpname = QByteArray::fromBase64(ba);
+            AppendPreviewReport(QString("<div id='" + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div><br/><br/>"));
         }
         else
             qInfo() << "Can only tag files and directories, not evidence images, volumes, or partitions";
