@@ -221,6 +221,7 @@ void WombatForensics::ReadBookmarks()
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())
         bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+    qDebug() << "bookitemlist count:" << bookitemlist.count();
     bookmarkfile.close();
     bookmarkmenu->clear();
     tagcheckedmenu->clear();
@@ -232,14 +233,43 @@ void WombatForensics::ReadBookmarks()
     tagcheckedmenu->addAction(newtagaction1);
     bookmarkmenu->addSeparator();
     tagcheckedmenu->addSeparator();
+    QString linkstr = "";
+    QString tagstr = "";
+    QString repstr = "";
+    QString newrep = "";
+    QString newrep2 = "";
     for(int i=0; i < bookitemlist.count(); i++)
     {
         QAction* tmpaction = new QAction(bookitemlist.at(i), bookmarkmenu);
+        tmpaction->setData(QVariant(QString("t" + QString::number(i))));
         QAction* tmpaction1 = new QAction(bookitemlist.at(i), tagcheckedmenu);
+        tmpaction1->setData(QVariant(QString("t" + QString::number(i))));
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         connect(tmpaction1, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         bookmarkmenu->addAction(tmpaction);
         tagcheckedmenu->addAction(tmpaction1);
+        linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) +  "</a></span><br/>";
+        tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>";
+    }
+    linkstr += "<!--lastlitem-->";
+    tagstr += "<!--lasttitem-->";
+    if(bookitemlist.count() > 0)
+    {
+        if(!previewfile.isOpen())
+            previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(previewfile.isOpen())
+           repstr = previewfile.readAll();
+        previewfile.close();
+        QStringList linklist = repstr.split("<!--lastlitem-->", QString::SkipEmptyParts);
+        newrep = linklist.at(0);
+        newrep += linkstr;
+        newrep += linklist.at(1);
+        QStringList taglist = newrep.split("<!--lasttitem-->", QString::SkipEmptyParts);
+        newrep2 = taglist.at(0);
+        newrep2 += tagstr;
+        newrep2 += taglist.at(1);
+        //AppendPreviewReport(newrep2);
+        ReplacePreviewReport(newrep2);
     }
     //bookmarkmenu->addSeparator();
     //tagcheckedmenu->addSeparator();
@@ -414,6 +444,7 @@ void WombatForensics::CreateNewTag()
         tagname = newtagdialog->textValue();
     if(!tagname.isEmpty())
     {
+        qDebug() << "tagaction data|name :" << tagaction->data() << tagname;
         UpdateBookmarkItems(tagname);
         ReadBookmarks();
         TagFile(parentmenu, tagname);
@@ -478,11 +509,20 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
                 filefile.write(tmpstr.toStdString().c_str());
             filefile.close();
             treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, tagname);
+            /*
             QByteArray baname, bapath;
             baname.append(tmplist.at(0));
             bapath.append(tmplist.at(3));
-            //QString tmpname = QByteArray::fromBase64(ba);
+            // READ PREVIEW FILE...
+            // SPLIT AT \n AND LOOP
+            // IF .AT(I).CONTAINS('tagid')
+            // GENERATE NEW TAG INFO BY SPLITTING ON <!--LASTFITEM-->
+            // QSTRING NEWSTR = SPLIT.AT(0) + new text + <!--LASTFITEM-->
+            // ADD NEWSTR TO CURSTR
+            // ELSE
+            // ADD .AT(I) TO CURSTR
             AppendPreviewReport(QString("<div id='" + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div><br/><br/>"));
+            */
         }
         else
             qInfo() << "Can only tag files and directories, not evidence images, volumes, or partitions";
@@ -553,6 +593,12 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
                         filefile.write(tmpstr.toStdString().c_str());
                     filefile.close();
                     treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
+                    /*
+                    QByteArray baname, bapath;
+                    baname.append(tmplist.at(0));
+                    bapath.append(tmplist.at(3));
+                    AppendPreviewReport(QString("<div id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div><br/><br/>"));
+                    */
                 }
                 else
                     qInfo() << "Can only tag files and directories, not evidence images, volumes or partitions.";
@@ -566,6 +612,7 @@ void WombatForensics::SetBookmark()
     QAction* tagaction = qobject_cast<QAction*>(sender());
     QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString tag = tagaction->text();
+    qDebug() << "tagaction data|name:" << tagaction->data() << tag;
     TagFile(parentmenu, tag);
 }
 
@@ -892,6 +939,7 @@ void WombatForensics::InitializeCaseStructure()
         dir.mkpath(wombatvariable.tmpmntpath);
         //(new QDir())->mkpath(wombatvariable.tmpmntpath);
         wombatvariable.iscaseopen = true;
+        InitializePreviewReport();
         bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
         if(!FileExists(QString(wombatvariable.tmpmntpath + "bookmarks").toStdString()))
         {
@@ -905,7 +953,6 @@ void WombatForensics::InitializeCaseStructure()
         msglog->clear();
         qInfo() << "Log File Created";
         //LogMessage("Log File Created");
-        InitializePreviewReport();
         thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
@@ -932,7 +979,10 @@ void WombatForensics::InitializePreviewReport()
     if(previewfile.isOpen())
     {
         previewfile.write(initialhtml.toStdString().c_str());
-        previewfile.write(QString("<div id='infotitle'>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></div><br/>\n").toStdString().c_str());
+        QString initialstr = "";
+        initialstr = "<div id='infotitle'><h1>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></h1></div><br/>\n";
+        initialstr += "<br/><div id='evidence'><!--lasteitem--></div><br/><br/><!--linkarea--><div id='tags'><!--lastlitem--></div><br/><br/><div id='tagarea'><!--lasttitem--></div>\n";
+        previewfile.write(initialstr.toStdString().c_str());
     }
     previewfile.close();
 }

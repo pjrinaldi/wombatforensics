@@ -11,6 +11,7 @@
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
 void AppendPreviewReport(QString string);
+void ReplacePreviewReport(QString string);
 void RemovePreviewItem(QString itemid);
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);

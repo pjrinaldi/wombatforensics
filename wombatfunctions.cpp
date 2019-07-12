@@ -43,6 +43,17 @@ void AppendPreviewReport(QString content)
     isignals->ActivateReload();
 }
 
+void ReplacePreviewReport(QString content)
+{
+    content += "\n";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(content.toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+}
+
 void RemovePreviewItem(QString itemid)
 {
     //qDebug() << "itemid:" << itemid;
