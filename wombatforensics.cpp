@@ -233,24 +233,29 @@ void WombatForensics::ReadBookmarks()
     tagcheckedmenu->addAction(newtagaction1);
     bookmarkmenu->addSeparator();
     tagcheckedmenu->addSeparator();
+    /*
     QString linkstr = "";
     QString tagstr = "";
     QString repstr = "";
     QString newrep = "";
     QString newrep2 = "";
+    */
     for(int i=0; i < bookitemlist.count(); i++)
     {
         QAction* tmpaction = new QAction(bookitemlist.at(i), bookmarkmenu);
-        tmpaction->setData(QVariant(QString("t" + QString::number(i))));
+        tmpaction->setData(QVariant("t" + QString::number(i)));
         QAction* tmpaction1 = new QAction(bookitemlist.at(i), tagcheckedmenu);
         tmpaction1->setData(QVariant(QString("t" + QString::number(i))));
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         connect(tmpaction1, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         bookmarkmenu->addAction(tmpaction);
         tagcheckedmenu->addAction(tmpaction1);
+        /*
         linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) +  "</a></span><br/>";
         tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>";
+        */
     }
+    /*
     linkstr += "<!--lastlitem-->";
     tagstr += "<!--lasttitem-->";
     if(bookitemlist.count() > 0)
@@ -269,8 +274,9 @@ void WombatForensics::ReadBookmarks()
         newrep2 += tagstr;
         newrep2 += taglist.at(1);
         //AppendPreviewReport(newrep2);
-        ReplacePreviewReport(newrep2);
+        ReplacePreviewReport(newrep2);  
     }
+    */
     //bookmarkmenu->addSeparator();
     //tagcheckedmenu->addSeparator();
     //QAction* remtagaction = new QAction("Remove Tag", bookmarkmenu);
@@ -444,7 +450,7 @@ void WombatForensics::CreateNewTag()
         tagname = newtagdialog->textValue();
     if(!tagname.isEmpty())
     {
-        qDebug() << "tagaction data|name :" << tagaction->data() << tagname;
+        qDebug() << "tagaction data|name :" << tagaction->data().toString() << tagname;
         UpdateBookmarkItems(tagname);
         ReadBookmarks();
         TagFile(parentmenu, tagname);
@@ -612,7 +618,7 @@ void WombatForensics::SetBookmark()
     QAction* tagaction = qobject_cast<QAction*>(sender());
     QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString tag = tagaction->text();
-    qDebug() << "tagaction data|name:" << tagaction->data() << tag;
+    qDebug() << "tagaction data|name:" << tagaction->data().toString() << tag;
     TagFile(parentmenu, tag);
 }
 
