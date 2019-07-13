@@ -986,8 +986,18 @@ void WombatForensics::InitializePreviewReport()
     {
         previewfile.write(initialhtml.toStdString().c_str());
         QString initialstr = "";
-        initialstr = "<div id='infotitle'><h1>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></h1></div><br/>\n";
-        initialstr += "<br/><div id='evidence'><!--lasteitem--></div><br/><br/><!--linkarea--><div id='tags'><!--lastlitem--></div><br/><br/><div id='tagarea'><!--lasttitem--></div>\n";
+        initialstr = "<div id='infotitle'><h1>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></h1></div><br/><br/>\n";
+        initialstr += "<div id='evidence'>";
+        initialstr += "<!--firstevid-->";
+        initialstr += "<!--lastevid-->";
+        initialstr += "\n</div><br/><br/>";
+        initialstr += "<div id='links'>";
+        initialstr += "<!--firstlink-->";
+        initialstr += "<!--lastlink-->";
+        initialstr += "</div><br/><br/>";
+        initialstr += "<div id='tags'>";
+        initialstr += "<!--firsttag-->";
+        initialstr += "<!--lasttag--></div>";
         previewfile.write(initialstr.toStdString().c_str());
     }
     previewfile.close();

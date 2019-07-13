@@ -13,6 +13,10 @@ qint64 GetChildCount(QString filefilter);
 void AppendPreviewReport(QString string);
 void ReplacePreviewReport(QString string);
 void RemovePreviewItem(QString itemid);
+
+void AddItem(QString content, QString section, QString itemid, QString subitemid = "");
+void RemItem(QString content, QString section, QString itemid, QString subitemid = "");
+
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
