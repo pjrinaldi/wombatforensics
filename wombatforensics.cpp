@@ -773,6 +773,9 @@ void WombatForensics::HideViewerManager()
 
 void WombatForensics::HideTagManager()
 {
+    // MAYBE PUT UPDATE TAGS HERE...
+    // WHEN RUNNING THROUGH IT, I WOULD NEED TO CHECK AND SEE WHAT I HAVE, THEN DETERMINE IF WHAT I AM ADDING IS NEW OR NOT...
+    // MAYBE READBOOKMARKS IS THE WRITE PLACE FOR IT...
     ReadBookmarks();
 }
 
