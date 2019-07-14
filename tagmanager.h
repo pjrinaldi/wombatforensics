@@ -6,6 +6,7 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
+#include "wombatfunctions.h"
 #include "ui_tagmanager.h"
 
 namespace Ui
@@ -35,6 +36,10 @@ private:
     Ui::TagManager* ui;
     QFile bookmarkfile;
     QStringList taglist;
+    QStringList llist;
+    QStringList tlist;
+    QString linkstr = "";
+    QString tagstr = "";
 };
 
 Q_DECLARE_METATYPE(TagManager*);

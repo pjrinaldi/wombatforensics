@@ -71,6 +71,15 @@ void TagManager::RemoveTag()
     ui->removebutton->setEnabled(false);
     UpdateList();
 }
+/*
+ *
+    //linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</a></span><br/>\n";
+    //tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>\n";
+    //qDebug() << "linkstr:" << linkstr;
+    //qDebug() << "tagstr:" << tagstr;
+    //AddItem(linkstr, "link");
+    //AddItem(tagstr, "tag");
+ */ 
 
 void TagManager::AddTag()
 {
@@ -96,6 +105,46 @@ void TagManager::AddTag()
             bookmarkfile.write(tmpstr.toStdString().c_str());
         bookmarkfile.close();
         UpdateList();
+        tmpstr = "";
+        if(!previewfile.isOpen())
+            previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(previewfile.isOpen())
+            tmpstr = previewfile.readAll();
+        previewfile.close();
+        // link content
+        QStringList beginsplit = tmpstr.split("<!--firstlink-->", QString::SkipEmptyParts);
+        QString precontent = beginsplit.first();
+        precontent += "<!--firstlink-->";
+        QString curcontent = beginsplit.last().split("<!--lastlink-->").first();
+        QString postcontent = beginsplit.last().split("<!--lastlink-->").last();
+        postcontent = "<!--lastlink-->" + postcontent;
+        QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
+        qDebug() << "linklist:" << linklist;
+        linkstr = "";
+        bool tagexists = false;
+        if(linklist.count() > 0)
+        {
+            for(int i = 0; i < linklist.count(); i++)
+            {
+                if(linklist.at(i).contains(tagname))
+                    tagexists = true;
+            }
+            if(!tagexists)
+                linkstr += "<span id='l" + QString::number(linklist.count()) + "'><a href='#t" + QString::number(linklist.count()) + "'>" + tagname + "</a></span><br/>\n";
+        }
+        else
+            linkstr = "<span id='l0'><a href='#t0'>" + tagname + "</a></span><br/>\n";
+        qDebug() << "linkstr:" << linkstr;
+        AddItem(linkstr, "link");
+//linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + taglist.at(i) + "</a></span><br/>\n";
+//tagstr += "<div id='t" + QString::number(i) + "'>" + taglist.at(i) + "</div><br/>\n";
+        // tag content
+        beginsplit = tmpstr.split("<!--firsttag-->", QString::SkipEmptyParts);
+        precontent = beginsplit.first();
+        precontent += "<!--firsttag-->";
+        curcontent = beginsplit.last().split("<!--lasttag-->").first();
+        postcontent = beginsplit.last().split("<!--lasttag-->").last();
+        postcontent = "<!--lasttag-->" + postcontent;
     }
 }
 
@@ -108,6 +157,8 @@ void TagManager::UpdateList()
 {
     ui->listWidget->clear();
     taglist.clear();
+    tlist.clear();
+    llist.clear();
     bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())

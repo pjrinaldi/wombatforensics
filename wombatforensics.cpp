@@ -221,7 +221,7 @@ void WombatForensics::ReadBookmarks()
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())
         bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
-    qDebug() << "bookitemlist count:" << bookitemlist.count();
+    //qDebug() << "bookitemlist count:" << bookitemlist.count();
     bookmarkfile.close();
     bookmarkmenu->clear();
     tagcheckedmenu->clear();
@@ -245,13 +245,13 @@ void WombatForensics::ReadBookmarks()
         connect(tmpaction1, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         bookmarkmenu->addAction(tmpaction);
         tagcheckedmenu->addAction(tmpaction1);
-        linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</a></span><br/>\n";
-        tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>\n";
+        //linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</a></span><br/>\n";
+        //tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>\n";
     }
-    qDebug() << "linkstr:" << linkstr;
-    qDebug() << "tagstr:" << tagstr;
-    AddItem(linkstr, "link");
-    AddItem(tagstr, "tag");
+    //qDebug() << "linkstr:" << linkstr;
+    //qDebug() << "tagstr:" << tagstr;
+    //AddItem(linkstr, "link");
+    //AddItem(tagstr, "tag");
 }
 
 void WombatForensics::RemoveTag()
