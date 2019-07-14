@@ -14,8 +14,10 @@ void AppendPreviewReport(QString string);
 void ReplacePreviewReport(QString string);
 void RemovePreviewItem(QString itemid);
 
-void AddItem(QString content, QString section, QString itemid, QString subitemid = "");
-void RemItem(QString content, QString section, QString itemid, QString subitemid = "");
+void AddItem(QString content, QString section);
+void AddSubItem(QString content, QString section, QString itemid);
+void RemItem(QString content, QString section, QString itemid);
+void RemSubItem(QString content, QString section, QString itemid, QString subitemid);
 
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);

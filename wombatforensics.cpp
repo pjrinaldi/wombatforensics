@@ -240,6 +240,8 @@ void WombatForensics::ReadBookmarks()
     QString newrep = "";
     QString newrep2 = "";
     */
+    QString linkstr = "";
+    QString tagstr = "";
     for(int i=0; i < bookitemlist.count(); i++)
     {
         QAction* tmpaction = new QAction(bookitemlist.at(i), bookmarkmenu);
@@ -250,11 +252,15 @@ void WombatForensics::ReadBookmarks()
         connect(tmpaction1, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         bookmarkmenu->addAction(tmpaction);
         tagcheckedmenu->addAction(tmpaction1);
+        linkstr += "<span id='l" + QString::number(i) + "'>a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</a></span><br/>\n";
+        tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>\n";
         /*
         linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) +  "</a></span><br/>\n";
         tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>\n";
         */
     }
+    AddItem(linkstr, "link");
+    AddItem(tagstr, "tag");
     /*
     linkstr += "<!--lastlitem-->";
     tagstr += "<!--lasttitem-->";
@@ -963,6 +969,7 @@ void WombatForensics::InitializeCaseStructure()
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
         ui->actionpreviewreport->setEnabled(true);
+        ui->actionBookmark_Manager->setEnabled(true);
         qInfo() << "Case was Created";
         //LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
@@ -1051,6 +1058,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     msglog->clear();
     InitializeCheckState();
     ui->actionAdd_Evidence->setEnabled(true);
+    ui->actionBookmark_Manager->setEnabled(true);
     ui->actionpreviewreport->setEnabled(true);
     autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
@@ -1138,7 +1146,6 @@ void WombatForensics::OpenUpdate()
         ui->actionJumpToHex->setEnabled(true);
         //ui->actionExpandAll->setEnabled(true);
         //ui->actionCollapseAll->setEnabled(true);
-        ui->actionBookmark_Manager->setEnabled(true);
     }
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
@@ -1332,7 +1339,6 @@ void WombatForensics::UpdateStatus()
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
-    ui->actionBookmark_Manager->setEnabled(true);
     qInfo() << "Processing Complete";
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
