@@ -233,13 +233,6 @@ void WombatForensics::ReadBookmarks()
     tagcheckedmenu->addAction(newtagaction1);
     bookmarkmenu->addSeparator();
     tagcheckedmenu->addSeparator();
-    /*
-    QString linkstr = "";
-    QString tagstr = "";
-    QString repstr = "";
-    QString newrep = "";
-    QString newrep2 = "";
-    */
     QString linkstr = "";
     QString tagstr = "";
     for(int i=0; i < bookitemlist.count(); i++)
@@ -252,45 +245,13 @@ void WombatForensics::ReadBookmarks()
         connect(tmpaction1, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         bookmarkmenu->addAction(tmpaction);
         tagcheckedmenu->addAction(tmpaction1);
-        linkstr += "<span id='l" + QString::number(i) + "'>a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</a></span><br/>\n";
+        linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</a></span><br/>\n";
         tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>\n";
-        /*
-        linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) +  "</a></span><br/>\n";
-        tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>\n";
-        */
     }
+    qDebug() << "linkstr:" << linkstr;
+    qDebug() << "tagstr:" << tagstr;
     AddItem(linkstr, "link");
     AddItem(tagstr, "tag");
-    /*
-    linkstr += "<!--lastlitem-->";
-    tagstr += "<!--lasttitem-->";
-    if(bookitemlist.count() > 0)
-    {
-        if(!previewfile.isOpen())
-            previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(previewfile.isOpen())
-           repstr = previewfile.readAll();
-        previewfile.close();
-        QStringList linklist = repstr.split("<!--lastlitem-->", QString::SkipEmptyParts);
-        newrep = linklist.at(0);
-        newrep += linkstr;
-        newrep += linklist.at(1);
-        QStringList taglist = newrep.split("<!--lasttitem-->", QString::SkipEmptyParts);
-        newrep2 = taglist.at(0);
-        newrep2 += tagstr;
-        newrep2 += taglist.at(1);
-        //AppendPreviewReport(newrep2);
-        ReplacePreviewReport(newrep2);  
-    }
-    */
-    //bookmarkmenu->addSeparator();
-    //tagcheckedmenu->addSeparator();
-    //QAction* remtagaction = new QAction("Remove Tag", bookmarkmenu);
-    //connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
-    //bookmarkmenu->addAction(remtagaction);
-    //QAction* remtagaction1 = new QAction("Remove Tag", tagcheckedmenu);
-    //connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
-    //tagcheckedmenu->addAction(remtagaction1);
 }
 
 void WombatForensics::RemoveTag()
