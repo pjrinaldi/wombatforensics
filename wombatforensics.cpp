@@ -245,13 +245,7 @@ void WombatForensics::ReadBookmarks()
         connect(tmpaction1, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         bookmarkmenu->addAction(tmpaction);
         tagcheckedmenu->addAction(tmpaction1);
-        //linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</a></span><br/>\n";
-        //tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>\n";
     }
-    //qDebug() << "linkstr:" << linkstr;
-    //qDebug() << "tagstr:" << tagstr;
-    //AddItem(linkstr, "link");
-    //AddItem(tagstr, "tag");
 }
 
 void WombatForensics::RemoveTag()
@@ -773,9 +767,6 @@ void WombatForensics::HideViewerManager()
 
 void WombatForensics::HideTagManager()
 {
-    // MAYBE PUT UPDATE TAGS HERE...
-    // WHEN RUNNING THROUGH IT, I WOULD NEED TO CHECK AND SEE WHAT I HAVE, THEN DETERMINE IF WHAT I AM ADDING IS NEW OR NOT...
-    // MAYBE READBOOKMARKS IS THE WRITE PLACE FOR IT...
     ReadBookmarks();
 }
 
