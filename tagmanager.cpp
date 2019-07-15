@@ -119,7 +119,7 @@ void TagManager::AddTag()
         QString postcontent = beginsplit.last().split("<!--lastlink-->").last();
         postcontent = "<!--lastlink-->" + postcontent;
         QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
-        qDebug() << "linklist:" << linklist;
+        //qDebug() << "linklist:" << linklist;
         linkstr = "";
         bool tagexists = false;
         if(linklist.count() > 0)
@@ -134,7 +134,7 @@ void TagManager::AddTag()
         }
         else
             linkstr = "<span id='l0'><a href='#t0'>" + tagname + "</a></span><br/>\n";
-        qDebug() << "linkstr:" << linkstr;
+        //qDebug() << "linkstr:" << linkstr;
         AddItem(linkstr, "link");
 //linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + taglist.at(i) + "</a></span><br/>\n";
 //tagstr += "<div id='t" + QString::number(i) + "'>" + taglist.at(i) + "</div><br/>\n";
@@ -145,6 +145,22 @@ void TagManager::AddTag()
         curcontent = beginsplit.last().split("<!--lasttag-->").first();
         postcontent = beginsplit.last().split("<!--lasttag-->").last();
         postcontent = "<!--lasttag-->" + postcontent;
+        tagstr = "";
+        tagexists = false;
+        QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
+        if(taglist.count() > 0)
+        {
+            for(int i = 0; i < taglist.count(); i++)
+            {
+                if(taglist.at(i).contains(tagname))
+                    tagexists = true;
+            }
+            if(!tagexists)
+                tagstr += "<div id='t" + QString::number(taglist.count()) + "'>" + tagname + "</div><br/>\n";
+        }
+        else
+            tagstr += "<div id='t0'>" + tagname + "</div><br/>\n";
+        AddItem(tagstr, "tag");
     }
 }
 
