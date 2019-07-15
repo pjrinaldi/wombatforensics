@@ -119,7 +119,6 @@ void TagManager::AddTag()
         QString postcontent = beginsplit.last().split("<!--lastlink-->").last();
         postcontent = "<!--lastlink-->" + postcontent;
         QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
-        //qDebug() << "linklist:" << linklist;
         linkstr = "";
         bool tagexists = false;
         if(linklist.count() > 0)
@@ -134,10 +133,7 @@ void TagManager::AddTag()
         }
         else
             linkstr = "<span id='l0'><a href='#t0'>" + tagname + "</a></span><br/>\n";
-        //qDebug() << "linkstr:" << linkstr;
         AddItem(linkstr, "link");
-//linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + taglist.at(i) + "</a></span><br/>\n";
-//tagstr += "<div id='t" + QString::number(i) + "'>" + taglist.at(i) + "</div><br/>\n";
         // tag content
         beginsplit = tmpstr.split("<!--firsttag-->", QString::SkipEmptyParts);
         precontent = beginsplit.first();
