@@ -70,16 +70,9 @@ void TagManager::RemoveTag()
     bookmarkfile.close();
     ui->removebutton->setEnabled(false);
     UpdateList();
+    RemItem(selectedtag, "link", "");
+    RemItem(selectedtag, "tag", "");
 }
-/*
- *
-    //linkstr += "<span id='l" + QString::number(i) + "'><a href='#t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</a></span><br/>\n";
-    //tagstr += "<div id='t" + QString::number(i) + "'>" + bookitemlist.at(i) + "</div><br/>\n";
-    //qDebug() << "linkstr:" << linkstr;
-    //qDebug() << "tagstr:" << tagstr;
-    //AddItem(linkstr, "link");
-    //AddItem(tagstr, "tag");
- */ 
 
 void TagManager::AddTag()
 {

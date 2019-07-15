@@ -111,6 +111,32 @@ void AddSubItem(QString content, QString section, QString itemid)
 
 void RemItem(QString content, QString section, QString itemid)
 {
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--first" + section + "-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--first" + section + "-->";
+    QString curcontent = beginsplit.last().split("<!--last" + section + "-->").first();
+    QString postcontent = beginsplit.last().split("<!--last" + section + "-->").last();
+    postcontent = "<!--last" + section + "-->" + postcontent;
+    QStringList curlist = curcontent.split("\n", QString::SkipEmptyParts);
+    QString updatedcontent = "";
+    for(int i=0; i < curlist.count(); i++)
+    {
+        if(!curlist.at(i).contains(content))
+            updatedcontent += curlist.at(i) + "\n";
+    }
+    //curcontent += content;
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + updatedcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
 }
 
 void RemSubItem(QString content, QString section, QString itemid, QString subitemid)
