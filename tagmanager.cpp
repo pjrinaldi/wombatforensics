@@ -174,10 +174,10 @@ void TagManager::AddTag()
                     tagexists = true;
             }
             if(!tagexists)
-                tagstr += "<div id='t" + QString::number(taglist.count()) + "'>" + tagname + "</div><br/>\n";
+                tagstr += "<div id='t" + QString::number(taglist.count()) + "'>" + tagname + "<!--firstfile--><!--lastfile--></div><br/>\n";
         }
         else
-            tagstr += "<div id='t0'>" + tagname + "</div><br/>\n";
+            tagstr += "<div id='t0'>" + tagname + "<!--firstfile--><!--lastfile--></div><br/>\n";
         AddItem(tagstr, "tag");
     }
 }

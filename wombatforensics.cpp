@@ -308,7 +308,7 @@ void WombatForensics::RemoveTag()
             filefile.write(tmpstr.toStdString().c_str());
         filefile.close();
         treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, "0");
-        RemovePreviewItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        //RemovePreviewItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
     }
     else if(QString(tagaction->iconText()).contains("Checked")) // single file
     {
@@ -374,7 +374,7 @@ void WombatForensics::RemoveTag()
                     filefile.write(tmpstr.toStdString().c_str());
                 filefile.close();
                 treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, "0");
-                RemovePreviewItem(curindex.sibling(curindex.row(), 11).data().toString());
+                //RemovePreviewItem(curindex.sibling(curindex.row(), 11).data().toString());
             }
         }
     }
@@ -1943,7 +1943,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                 //qDebug() << "index found:" << indexlist.first().sibling(indexlist.first().row(), 11).data().toString();
                 treenodemodel->removeRow(indexlist.first().row(), indexlist.first());
             }
-            RemovePreviewItem(QString("e" + evidfiles.first().split(".e").last()));
+            //RemovePreviewItem(QString("e" + evidfiles.first().split(".e").last()));
         }
     }
     StatusUpdate("Evidence Item Successfully Removed");
