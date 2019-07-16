@@ -105,8 +105,32 @@ void AddItem(QString content, QString section)
     isignals->ActivateReload();
 }
 
-void AddSubItem(QString content, QString section, QString itemid)
+void AddSubItem(QString content, QString section, QString tagid, QString itemid)
 {
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--first" + section + "-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--first" + section + "-->";
+    QString curcontent = beginsplit.last().split("<!--last" + section + "-->").first();
+    QString postcontent = beginsplit.last().split("<!--last" + section + "-->").last();
+    postcontent = "<!--last" + section + "-->" + postcontent;
+    QStringList curlist = curcontent.split("\n", QString::SkipEmptyParts);
+    if(curlist.count() > 0)
+    {
+        for(int i=0; i < curlist.count(); i++)
+        {
+            if(curlist.at(i).contains(tagname))
+            {
+                qDebug() << curlist.at(i);
+            }
+        }
+    }
+    //qDebug() << content << section << itemid;
 }
 
 void UpdateItem(QString oldcontent, QString newcontent, QString section, QString itemid) // LINKs/TAGs ONLY FOR NOW

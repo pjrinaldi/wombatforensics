@@ -476,6 +476,11 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
                 filefile.write(tmpstr.toStdString().c_str());
             filefile.close();
             treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, tagname);
+            QByteArray baname, bapath;
+            baname.append(tmplist.at(0));
+            bapath.append(tmplist.at(3));
+            QString filestr = "<div id='" + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div>";
+            AddSubItem(filestr, "tag", tagname, selectedindex.sibling(selectedindex.row(), 11).data().toString());
             /*
             QByteArray baname, bapath;
             baname.append(tmplist.at(0));
