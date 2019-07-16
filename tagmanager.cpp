@@ -28,6 +28,7 @@ void TagManager::HideClicked()
 void TagManager::ModifyTag()
 {
     QString selectedtag = ui->listWidget->currentItem()->text();
+    int selectedtagid = ui->listWidget->currentRow();
     QString tmpstr = "";
     QString modtagname = "";
     QInputDialog* modtagdialog = new QInputDialog(this);
@@ -50,6 +51,34 @@ void TagManager::ModifyTag()
             bookmarkfile.write(tmpstr.toStdString().c_str());
         bookmarkfile.close();
         UpdateList();
+        tmpstr = "";
+        if(!previewfile.isOpen())
+            previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(previewfile.isOpen())
+            tmpstr = previewfile.readAll();
+        previewfile.close();
+        // link content
+        QStringList beginsplit = tmpstr.split("<!--firstlink-->", QString::SkipEmptyParts);
+        QString precontent = beginsplit.first();
+        precontent += "<!--firstlink-->";
+        QString curcontent = beginsplit.last().split("<!--lastlink-->").first();
+        QString postcontent = beginsplit.last().split("<!--lastlink-->").last();
+        postcontent = "<!--lastlink-->" + postcontent;
+        QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
+        linkstr = "";
+        if(linklist.count() > 0)
+            UpdateItem(selectedtag, modtagname, "link", QString::number(selectedtagid));
+        // tag content
+        beginsplit = tmpstr.split("<!--firsttag-->", QString::SkipEmptyParts);
+        precontent = beginsplit.first();
+        precontent += "<!--firsttag-->";
+        curcontent = beginsplit.last().split("<!--lasttag-->").first();
+        postcontent = beginsplit.last().split("<!--lasttag-->").last();
+        postcontent = "<!--lasttag-->" + postcontent;
+        tagstr = "";
+        QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
+        if(taglist.count() > 0)
+            UpdateItem(selectedtag, modtagname, "tag", QString::number(selectedtagid));
     }
 }
 
@@ -155,6 +184,7 @@ void TagManager::AddTag()
 
 void TagManager::SelectionChanged()
 {
+    qDebug() << "selectionid:" << ui->listWidget->currentRow();
     ui->removebutton->setEnabled(true);
 }
 
