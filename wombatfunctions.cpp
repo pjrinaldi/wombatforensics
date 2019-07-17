@@ -142,7 +142,7 @@ void AddSubItem(QString content, QString section, QString tagid, QString itemid)
                 midstr += presub + precur + postsub;
             }
             else
-                midstr += curlist.at(i);
+                midstr += curlist.at(i) + "\n";
         }
     }
     midstr += postcontent;

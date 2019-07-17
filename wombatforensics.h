@@ -222,7 +222,6 @@ private:
     void UpdateBookmarkItems(QString tagname);
     void ReadBookmarks(void);
     void TagFile(QModelIndex curindex, QString tagname);
-    //void TagFile(QString parentmenu, QString tagname);
     static void PopulateModel(const QModelIndex index);
     QString InitializeSelectedState(void);
     QModelIndex selectedindex;
