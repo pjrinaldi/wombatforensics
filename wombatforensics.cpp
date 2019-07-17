@@ -148,8 +148,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addAction(remcheckedaction);
     treemenu->addSeparator();
     treemenu->addMenu(bookmarkmenu);
-    treemenu->addMenu(tagcheckedmenu);
     treemenu->addAction(remtagaction);
+    treemenu->addSeparator();
+    treemenu->addMenu(tagcheckedmenu);
     treemenu->addAction(remtagaction1);
     treemenu->addSeparator();
     treemenu->addAction(ui->actionDigDeeper);
@@ -221,7 +222,6 @@ void WombatForensics::ReadBookmarks()
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())
         bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
-    //qDebug() << "bookitemlist count:" << bookitemlist.count();
     bookmarkfile.close();
     bookmarkmenu->clear();
     tagcheckedmenu->clear();
@@ -249,6 +249,10 @@ void WombatForensics::ReadBookmarks()
 void WombatForensics::RemoveTag()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
+    // TO CLEAN UP CODE, I SHOULD DETERMINE IF IT's CHECKED OR SELECTED HERE...
+    // THEN I CAN CALL THE SINGLE TAGFILE CALL OR THE FOR LOOP FOR TAGFILE'S
+    // THIS SHOULD REDUCE THE DUPLICATION OF THE CODE FOR SELECTED OR CHECKED
+
     //qDebug() << tagaction->iconText();
     //QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     //if(parentmenu.contains("Selected")) // single file
@@ -409,13 +413,104 @@ void WombatForensics::CreateNewTag()
         tagname = newtagdialog->textValue();
     if(!tagname.isEmpty())
     {
-        qDebug() << "tagaction data|name :" << tagaction->data().toString() << tagname;
         UpdateBookmarkItems(tagname);
         ReadBookmarks();
-        TagFile(parentmenu, tagname);
+        if(parentmenu.contains("Selected")) // single file
+        {
+            TagFile(selectedindex, tagname);
+        }
+        else if(parentmenu.contains("Checked")) // checked files
+        {
+            QStringList checkeditems = GetFileLists(1);
+            qDebug() << "Tag File Checked Items:" << checkeditems;
+            for(int i=0; i < checkeditems.count(); i++)
+            {
+                QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+                qDebug() << "indexlist:" << indexlist.count();
+                if(indexlist.count() > 0)
+                {
+                    QModelIndex curindex = ((QModelIndex)indexlist.first());
+                    TagFile(curindex, tagname);
+                }
+            }
+        }
+        //qDebug() << "tagaction data|name :" << tagaction->data().toString() << tagname;
+        // TO CLEAN UP CODE, I SHOULD DETERMINE IF IT's CHECKED OR SELECTED HERE...
+        // THEN I CAN CALL THE SINGLE TAGFILE CALL OR THE FOR LOOP FOR TAGFILE'S
+        // THIS SHOULD REDUCE THE DUPLICATION OF THE CODE FOR SELECTED OR CHECKED
+        //TagFile(parentmenu, tagname);
     }
 }
 
+void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
+{
+    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 4)
+    {
+        QModelIndex parindex = curindex.parent();
+        QString paridstr = parindex.sibling(parindex.row(), 11).data().toString().split("-f").last();
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
+        QString evidencename = evidfiles.first();
+        QString estring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
+        QString vstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
+        QString pstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
+        QString fstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
+        //qDebug() << "evidencename:" << evidencename;
+        QStringList partlist;
+        partlist.clear();
+        QFile partfile(wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/stat");
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            partlist = QString(partfile.readLine()).split(",");
+        partfile.close();
+        qint64 rootinum = partlist.at(3).toLongLong();
+        if(paridstr.contains("-"))
+            paridstr = QString::number(rootinum);
+        QFile filefile;
+        QString filefilepath = wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/";
+        if(fstring.split(":").count() > 1)
+            filefilepath += fstring.split(":").first() + "-" + fstring.split(":").last();
+        else
+            filefilepath += fstring.split(":").first();
+        filefilepath += ".a" + paridstr + ".stat";
+        //qDebug() << "filepath:" << filefilepath;
+        QString tmpstr = "";
+        QStringList tmplist;
+        tmplist.clear();
+        filefile.setFileName(filefilepath);
+        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(filefile.isOpen())
+            tmpstr = filefile.readLine();
+        filefile.close();
+        //qDebug() << "tmpstr before:" << tmpstr;
+        if(tmpstr.split(",").count() > 15)
+            tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+        tmplist[15] = tagname;
+        tmpstr = "";
+        for(int i = 0; i < tmplist.count(); i++)
+        {
+            tmpstr += tmplist.at(i);
+            if(i < tmplist.count() - 1)
+                tmpstr += ",";
+        }
+        //qDebug() << "tmpstr after:" << tmpstr;
+        filefile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(filefile.isOpen())
+            filefile.write(tmpstr.toStdString().c_str());
+        filefile.close();
+        treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
+        QByteArray baname, bapath;
+        baname.append(tmplist.at(0));
+        bapath.append(tmplist.at(3));
+        QString filestr = "<div id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div>";
+        AddSubItem(filestr, "tag", tagname, curindex.sibling(curindex.row(), 11).data().toString());
+        emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
+    }
+    else
+        qInfo() << "Can only tag files and directories, not evidence images, volumes or partitions.";
+}
+
+/*
 void WombatForensics::TagFile(QString parentmenu, QString tagname)
 {
     if(parentmenu.contains("Selected")) // single file
@@ -485,7 +580,7 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
             bapath.append(tmplist.at(3));
             AppendPreviewReport(QString("<div id='" + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div><br/><br/>"));
             */
-            emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
+/*            emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
         }
         else
             qInfo() << "Can only tag files and directories, not evidence images, volumes, or partitions";
@@ -569,14 +664,38 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
         }
     }
 }
+*/
 
 void WombatForensics::SetBookmark()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
     QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString tag = tagaction->text();
-    qDebug() << "tagaction data|name:" << tagaction->data().toString() << tag;
-    TagFile(parentmenu, tag);
+
+    if(parentmenu.contains("Selected")) // single file
+    {
+        TagFile(selectedindex, tag);
+    }
+    else if(parentmenu.contains("Checked")) // checked files
+    {
+        QStringList checkeditems = GetFileLists(1);
+        qDebug() << "Tag File Checked Items:" << checkeditems;
+        for(int i=0; i < checkeditems.count(); i++)
+        {
+            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            qDebug() << "indexlist:" << indexlist.count();
+            if(indexlist.count() > 0)
+            {
+                QModelIndex curindex = ((QModelIndex)indexlist.first());
+                TagFile(curindex, tag);
+            }
+        }
+    }
+    //qDebug() << "tagaction data|name:" << tagaction->data().toString() << tag;
+    // TO CLEAN UP CODE, I SHOULD DETERMINE IF IT's CHECKED OR SELECTED HERE...
+    // THEN I CAN CALL THE SINGLE TAGFILE CALL OR THE FOR LOOP FOR TAGFILE'S
+    // THIS SHOULD REDUCE THE DUPLICATION OF THE CODE FOR SELECTED OR CHECKED
+    //TagFile(parentmenu, tag);
 }
 
 void WombatForensics::ShowDigStatus()
@@ -763,7 +882,23 @@ void WombatForensics::HideViewerManager()
 
 void WombatForensics::HideTagManager()
 {
+    treemenu->clear();
     ReadBookmarks();
+    treemenu->addAction(ui->actionView_File);
+    treemenu->addAction(ui->actionView_Properties);
+    treemenu->addAction(viewmenu->menuAction());
+    treemenu->addSeparator();
+    treemenu->addAction(ui->actionCheck);
+    treemenu->addAction(remcheckedaction);
+    treemenu->addSeparator();
+    treemenu->addMenu(bookmarkmenu);
+    treemenu->addAction(remtagaction);
+    treemenu->addSeparator();
+    treemenu->addMenu(tagcheckedmenu);
+    treemenu->addAction(remtagaction1);
+    treemenu->addSeparator();
+    treemenu->addAction(ui->actionDigDeeper);
+    treemenu->addAction(ui->actionExport);
 }
 
 void WombatForensics::HideSettingsWindow()
@@ -1274,6 +1409,7 @@ void WombatForensics::UpdateStatus()
     PrepareEvidenceImage();
     //LogMessage("Building Initial Evidence Tree...");
     ui->dirTreeView->setModel(treenodemodel);
+    ReadBookmarks();
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
