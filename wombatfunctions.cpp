@@ -84,7 +84,28 @@ void RemovePreviewItem(QString itemid)
 
 void AddItem(QString content, QString section)
 {
+    /*
+     *
+        // link content
+        QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
+        linkstr = "";
+        bool tagexists = false;
+        if(linklist.count() > 0)
+        {
+            for(int i = 0; i < linklist.count(); i++)
+            {
+                if(linklist.at(i).contains(tagname))
+                    tagexists = true;
+            }
+            if(!tagexists)
+                linkstr += "<span id='l" + QString::number(linklist.count()) + "'><a href='#t" + QString::number(linklist.count()) + "'>" + tagname + "</a></span><br/>\n";
+        }
+        else
+            linkstr = "<span id='l0'><a href='#t0'>" + tagname + "</a></span><br/>\n";
+        AddItem(linkstr, "link");
+     */ 
     QString origstr = "";
+    QString itemstr = "";
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(previewfile.isOpen())
@@ -96,7 +117,25 @@ void AddItem(QString content, QString section)
     QString curcontent = beginsplit.last().split("<!--last" + section + "-->").first();
     QString postcontent = beginsplit.last().split("<!--last" + section + "-->").last();
     postcontent = "<!--last" + section + "-->" + postcontent;
-    curcontent += content;
+    QStringList itemlist = curcontent.split("\n", QString::SkipEmptyParts);
+    bool itemexists = false;
+    /*
+     * HOW DO I GET THE ID='' VALUE TO BE L# OR T# E#...
+     *
+    if(itemlist.count() > 0)
+    {
+        for(int i=0; i < itemlist.count(); i++)
+        {
+            if(itemlist.at(i).contains(itemid))
+                itemexists = true;
+        }
+        if(!itemexists)
+            itemstr += "<span id='l" + QString::number(linklist.count()) + "'><a href='#t" + QString::number(linklist.count()) + "'>" + content + "</a></span><br/>\n";
+    }
+    else
+        itemstr = "<span id='l0'><a href='#t0'>" + content + "</a></span><br/>\n";
+    */
+    //curcontent += content;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(previewfile.isOpen())
@@ -105,7 +144,7 @@ void AddItem(QString content, QString section)
     isignals->ActivateReload();
 }
 
-void AddSubItem(QString content, QString section, QString tagid, QString itemid)
+void AddSubItem(QString content, QString section, QString tagid)
 {
     QString origstr = "";
     if(!previewfile.isOpen())
@@ -120,15 +159,16 @@ void AddSubItem(QString content, QString section, QString tagid, QString itemid)
     QString postcontent = beginsplit.last().split("<!--last" + section + "-->").last();
     postcontent = "<!--last" + section + "-->" + postcontent;
     QStringList curlist = curcontent.split("\n", QString::SkipEmptyParts);
-    QString midstr = precontent;
+    QString midstr = "";
+    midstr += precontent;
     if(curlist.count() > 0)
     {
         for(int i=0; i < curlist.count(); i++)
         {
+            qDebug() << curlist.at(i);
             if(curlist.at(i).contains(tagid))
             {
                 QString tmpstr;
-                //qDebug() << curlist.at(i);
                 QString origsub  = curlist.at(i);
                 QStringList presubsplit = origsub.split("<!--firstfile-->", QString::SkipEmptyParts);
                 QString presub = presubsplit.first();
@@ -145,6 +185,7 @@ void AddSubItem(QString content, QString section, QString tagid, QString itemid)
                 midstr += curlist.at(i) + "\n";
         }
     }
+    // don't think i need itemid...
     midstr += postcontent;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -223,7 +264,7 @@ void RemItem(QString content, QString section, QString itemid)
     isignals->ActivateReload();
 }
 
-void RemSubItem(QString content, QString section, QString itemid, QString subitemid)
+void RemSubItem(QString content, QString section, QString tagid, QString fileid)
 {
 }
 
@@ -1749,7 +1790,7 @@ void InitializeEvidenceStructure(QString evidname)
             }
         }
     }
-    reportstring += "</div><br/><br/><br/>\n";
+    reportstring += "</div><br/>\n";
     AddItem(reportstring, "evid");
     //AppendPreviewReport(reportstring);
     tsk_fs_file_close(readfileinfo);

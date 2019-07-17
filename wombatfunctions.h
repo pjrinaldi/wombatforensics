@@ -16,10 +16,11 @@ void ReplacePreviewReport(QString string);
 void RemovePreviewItem(QString itemid);
 
 void AddItem(QString content, QString section);
+// SHOULD CALL THE FUNCTIONS ADDEVIDITEM, ADDTAGITEM, ADDLINKITEM, ADDFILEITEM
 void RemItem(QString content, QString section, QString itemid);
 void UpdateItem(QString oldcontent, QString newcontent, QString section, QString itemid);
-void AddSubItem(QString content, QString section, QString tagid, QString itemid);
-void RemSubItem(QString content, QString section, QString itemid, QString subitemid);
+void AddSubItem(QString content, QString section, QString tagid);
+void RemSubItem(QString content, QString section, QString tagid, QString fileid);
 
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
