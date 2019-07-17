@@ -233,8 +233,6 @@ void WombatForensics::ReadBookmarks()
     tagcheckedmenu->addAction(newtagaction1);
     bookmarkmenu->addSeparator();
     tagcheckedmenu->addSeparator();
-    QString linkstr = "";
-    QString tagstr = "";
     for(int i=0; i < bookitemlist.count(); i++)
     {
         QAction* tmpaction = new QAction(bookitemlist.at(i), bookmarkmenu);
@@ -485,16 +483,9 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
             QByteArray baname, bapath;
             baname.append(tmplist.at(0));
             bapath.append(tmplist.at(3));
-            // READ PREVIEW FILE...
-            // SPLIT AT \n AND LOOP
-            // IF .AT(I).CONTAINS('tagid')
-            // GENERATE NEW TAG INFO BY SPLITTING ON <!--LASTFITEM-->
-            // QSTRING NEWSTR = SPLIT.AT(0) + new text + <!--LASTFITEM-->
-            // ADD NEWSTR TO CURSTR
-            // ELSE
-            // ADD .AT(I) TO CURSTR
             AppendPreviewReport(QString("<div id='" + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div><br/><br/>"));
             */
+            emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
         }
         else
             qInfo() << "Can only tag files and directories, not evidence images, volumes, or partitions";
@@ -565,12 +556,12 @@ void WombatForensics::TagFile(QString parentmenu, QString tagname)
                         filefile.write(tmpstr.toStdString().c_str());
                     filefile.close();
                     treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
-                    /*
                     QByteArray baname, bapath;
                     baname.append(tmplist.at(0));
                     bapath.append(tmplist.at(3));
-                    AppendPreviewReport(QString("<div id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div><br/><br/>"));
-                    */
+                    QString filestr = "<div id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div>";
+                    AddSubItem(filestr, "tag", tagname, curindex.sibling(curindex.row(), 11).data().toString());
+                    emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
                 }
                 else
                     qInfo() << "Can only tag files and directories, not evidence images, volumes or partitions.";
