@@ -384,7 +384,7 @@ void WombatForensics::RemoveTag()
     }
 }
 
-void WombatForensics::UpdateBookmarkItems(QString tagname)
+int WombatForensics::UpdateBookmarkItems(QString tagname)
 {
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
@@ -392,17 +392,20 @@ void WombatForensics::UpdateBookmarkItems(QString tagname)
     bookitemlist.append(tagname);
     bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&bookmarkfile);
+    qDebug() << "bookitemlist count:" << bookitemlist.count();
     for(int i=0; i < bookitemlist.count(); i++)
     {
         out << bookitemlist.at(i) << ",";
     }
     bookmarkfile.close();
+    return bookitemlist.count();
 }
 
 void WombatForensics::CreateNewTag()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
     QString tagid = tagaction->data().toString();
+    // NEED TO FIGURE OUT A WAY TO GET THE TAG ID ASSIGNED...
     //qDebug() << "tagaction id:" << tagaction->data().toInt();
     QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString tagname = "";
@@ -417,9 +420,9 @@ void WombatForensics::CreateNewTag()
         tagname = newtagdialog->textValue();
     if(!tagname.isEmpty())
     {
-        UpdateBookmarkItems(tagname);
+        int tagid = UpdateBookmarkItems(tagname);
         ReadBookmarks();
-        AddLinkItem(tagid, tagname);
+        AddLinkItem(QString::number(tagid), tagname);
     }
         //QString tmpstr = "";
         //QString linkstr = "";

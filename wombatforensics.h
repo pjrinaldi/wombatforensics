@@ -219,7 +219,8 @@ private:
     void InitializeCheckState(void);
     void UpdateSelectedState(QString id);
     void ReadSettings(void);
-    void UpdateBookmarkItems(QString tagname);
+    int UpdateBookmarkItems(QString tagname);
+    //void UpdateBookmarkItems(QString tagname);
     void ReadBookmarks(void);
     void TagFile(QModelIndex curindex, QString tagname);
     static void PopulateModel(const QModelIndex index);
