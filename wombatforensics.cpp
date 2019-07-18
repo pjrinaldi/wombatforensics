@@ -422,6 +422,7 @@ void WombatForensics::CreateNewTag()
     {
         int tagid = UpdateBookmarkItems(tagname);
         ReadBookmarks();
+        qDebug() << "tagid:" << tagid;
         AddLinkItem(QString::number(tagid), tagname);
     }
         //QString tmpstr = "";
