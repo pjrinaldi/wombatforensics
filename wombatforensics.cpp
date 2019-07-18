@@ -398,7 +398,7 @@ int WombatForensics::UpdateBookmarkItems(QString tagname)
         out << bookitemlist.at(i) << ",";
     }
     bookmarkfile.close();
-    return bookitemlist.count();
+    return bookitemlist.count() - 1;
 }
 
 void WombatForensics::CreateNewTag()
