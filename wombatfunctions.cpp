@@ -82,6 +82,11 @@ void RemovePreviewItem(QString itemid)
     //qDebug() << "readstr:" << readstr;
 }
 
+void AddLinkItem(QString tagid, QString tagname)
+{
+
+}
+
 void AddItem(QString content, QString section)
 {
     /*

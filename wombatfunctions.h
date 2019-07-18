@@ -16,6 +16,14 @@ void ReplacePreviewReport(QString string);
 void RemovePreviewItem(QString itemid);
 
 void AddItem(QString content, QString section);
+void AddLinkItem(QString tagid, QString tagname);
+//void AddEvidItem(QString content, QString section);
+//void AddTagItem(QString content, QString section);
+//void AddLinkItem(QString content, QString section);
+//void AddFileItem(QString content, QString section, QString itemid);
+//void RemEvidItem(QString content, QString section, QString itemid);
+//void RemTagItem(QString content, QString section, QString itemid);
+//void RemLinkItem(QString content, QString section, QString itemid);
 // SHOULD CALL THE FUNCTIONS ADDEVIDITEM, ADDTAGITEM, ADDLINKITEM, ADDFILEITEM
 void RemItem(QString content, QString section, QString itemid);
 void UpdateItem(QString oldcontent, QString newcontent, QString section, QString itemid);

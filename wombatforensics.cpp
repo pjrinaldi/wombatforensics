@@ -235,8 +235,10 @@ void WombatForensics::ReadBookmarks()
     tagcheckedmenu->addSeparator();
     for(int i=0; i < bookitemlist.count(); i++)
     {
+        qDebug() << "i:" << i;
         QAction* tmpaction = new QAction(bookitemlist.at(i), bookmarkmenu);
         tmpaction->setData(QVariant("t" + QString::number(i)));
+        qDebug() << "tmpaction data;" << tmpaction->data().toString();
         QAction* tmpaction1 = new QAction(bookitemlist.at(i), tagcheckedmenu);
         tmpaction1->setData(QVariant(QString("t" + QString::number(i))));
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
@@ -400,6 +402,8 @@ void WombatForensics::UpdateBookmarkItems(QString tagname)
 void WombatForensics::CreateNewTag()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
+    QString tagid = tagaction->data().toString();
+    //qDebug() << "tagaction id:" << tagaction->data().toInt();
     QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString tagname = "";
     QInputDialog* newtagdialog = new QInputDialog(this);
@@ -415,10 +419,13 @@ void WombatForensics::CreateNewTag()
     {
         UpdateBookmarkItems(tagname);
         ReadBookmarks();
-        QString tmpstr = "";
-        QString linkstr = "";
-        QString tagstr = "";
+        AddLinkItem(tagid, tagname);
+    }
+        //QString tmpstr = "";
+        //QString linkstr = "";
+        //QString tagstr = "";
         // I THINK I CAN MOVE THE IF COUNT CODE INTO THE ADDITEM FUNCTION AND REDUCE THE REPETITIVENESS OF THIS...
+        /*
         if(!previewfile.isOpen())
             previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(previewfile.isOpen())
@@ -489,8 +496,8 @@ void WombatForensics::CreateNewTag()
                     TagFile(curindex, tagname);
                 }
             }
-        }
-    }
+        }*/
+    //}
 }
 
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
