@@ -235,7 +235,7 @@ void WombatForensics::ReadBookmarks()
     tagcheckedmenu->addSeparator();
     for(int i=0; i < bookitemlist.count(); i++)
     {
-        qDebug() << "i:" << i;
+        //qDebug() << "i:" << i;
         QAction* tmpaction = new QAction(bookitemlist.at(i), bookmarkmenu);
         tmpaction->setData(QVariant("t" + QString::number(i)));
         qDebug() << "tmpaction data;" << tmpaction->data().toString();
@@ -392,7 +392,7 @@ int WombatForensics::UpdateBookmarkItems(QString tagname)
     bookitemlist.append(tagname);
     bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&bookmarkfile);
-    qDebug() << "bookitemlist count:" << bookitemlist.count();
+    //qDebug() << "bookitemlist count:" << bookitemlist.count();
     for(int i=0; i < bookitemlist.count(); i++)
     {
         out << bookitemlist.at(i) << ",";
@@ -404,9 +404,7 @@ int WombatForensics::UpdateBookmarkItems(QString tagname)
 void WombatForensics::CreateNewTag()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
-    QString tagid = tagaction->data().toString();
     // NEED TO FIGURE OUT A WAY TO GET THE TAG ID ASSIGNED...
-    //qDebug() << "tagaction id:" << tagaction->data().toInt();
     QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString tagname = "";
     QInputDialog* newtagdialog = new QInputDialog(this);
@@ -422,8 +420,7 @@ void WombatForensics::CreateNewTag()
     {
         int tagid = UpdateBookmarkItems(tagname);
         ReadBookmarks();
-        qDebug() << "tagid:" << tagid;
-        AddLinkItem(QString::number(tagid), tagname);
+        AddTLinkItem(tagid, tagname);
     }
         //QString tmpstr = "";
         //QString linkstr = "";
@@ -982,9 +979,13 @@ void WombatForensics::InitializePreviewReport()
         QString initialstr = "";
         initialstr = "<div id='infotitle'><h1>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></h1></div><br/><br/>\n";
         initialstr += "<div id='toc'><h2>Contents</h2>";
-        initialstr += "<div id='links'>";
-        initialstr += "<!--firstlink-->";
-        initialstr += "<!--lastlink-->";
+        initialstr += "<div id='elinks'>";
+        initialstr += "<!--firstelink-->";
+        initialstr += "<!--lastelink-->";
+        initialstr += "</div><br/><br/>";
+        initialstr += "<div id='tlinks'>";
+        initialstr += "<!--firsttlink-->";
+        initialstr += "<!--lasttlink-->";
         initialstr += "</div><br/><br/>";
         initialstr += "</div><br/>\n";
         initialstr += "<div id='evidence'>";

@@ -97,9 +97,10 @@ void TagManager::RemoveTag()
     if(bookmarkfile.isOpen())
         bookmarkfile.write(tmpstr.toStdString().c_str());
     bookmarkfile.close();
+    qDebug() << "tmpstr:" << tmpstr;
     ui->removebutton->setEnabled(false);
     UpdateList();
-    RemItem(selectedtag, "link", "");
+    RemItem(selectedtag, "tlink", "");
     RemItem(selectedtag, "tag", "");
 }
 
@@ -204,4 +205,10 @@ void TagManager::UpdateList()
     {
         new QListWidgetItem(taglist.at(i), ui->listWidget);
     }
+}
+
+void TagManager::closeEvent(QCloseEvent* e)
+{
+    emit HideManagerWindow();
+    e->accept();
 }

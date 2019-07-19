@@ -31,6 +31,8 @@ private slots:
     void SelectionChanged();
 signals:
     void HideManagerWindow();
+protected:
+    void closeEvent(QCloseEvent* event);
 
 private:
     Ui::TagManager* ui;

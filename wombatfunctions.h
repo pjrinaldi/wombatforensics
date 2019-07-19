@@ -16,7 +16,7 @@ void ReplacePreviewReport(QString string);
 void RemovePreviewItem(QString itemid);
 
 void AddItem(QString content, QString section);
-void AddLinkItem(QString tagid, QString tagname);
+void AddTLinkItem(int tagid, QString tagname);
 //void AddEvidItem(QString content, QString section);
 //void AddTagItem(QString content, QString section);
 //void AddLinkItem(QString content, QString section);

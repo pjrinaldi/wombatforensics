@@ -82,8 +82,45 @@ void RemovePreviewItem(QString itemid)
     //qDebug() << "readstr:" << readstr;
 }
 
-void AddLinkItem(QString tagid, QString tagname)
+void AddTLinkItem(int tagid, QString tagname)
 {
+    qDebug() << "tagid:" << tagid;
+    QString origstr = "";
+    QString linkstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firsttlink-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firsttlink-->";
+    QString curcontent = beginsplit.last().split("<!--lasttlink-->").first();
+    QString postcontent = beginsplit.last().split("<!--lasttlink-->").last();
+    postcontent = "<!--lasttlink-->" + postcontent;
+    QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
+    linkstr = "";
+    bool tagexists = false;
+    qDebug() << "linklist count:" << linklist.count();
+    if(linklist.count() > 0)
+    {
+        for(int i = 0; i < linklist.count(); i++)
+        {
+            if(linklist.at(i).contains(tagname))
+                tagexists = true;
+        }
+        if(!tagexists)
+            linkstr += "<span id='l" + QString::number(linklist.count()) + "'><a href='#t" + QString::number(linklist.count()) + "'>" + tagname + "</a></span><br/>\n";
+    }
+    else
+        linkstr = "<span id='l0'><a href='#t0'>" + tagname + "</a></span><br/>\n";
+    curcontent += linkstr;
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + curcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
 
 }
 

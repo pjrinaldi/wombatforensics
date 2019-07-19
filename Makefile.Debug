@@ -418,10 +418,11 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/process-stop.svg \
 		Resources/archive-manager.svg \
 		Resources/text-x-makefile.svg \
-		Resources/system-search.png \
 		Resources/multimedia-video-player.svg \
+		Resources/system-search.png \
 		Resources/dialog-information.svg \
 		Resources/help-contents.svg \
+		Resources/process-remove.svg \
 		Resources/text-x-gettext-translation.svg \
 		Resources/edit-find.svg \
 		Resources/wombat_32.ico \
@@ -443,13 +444,16 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/foldersexplorer.png \
 		Resources/go-last.svg \
 		Resources/bookmark-new-4.png \
+		Resources/newcase.svg \
 		Resources/dig.png \
 		Resources/list-add.png \
 		Resources/tag-new.svg \
-		Resources/accessories-calculator.svg \
 		Resources/icons8-spade-40.png \
+		Resources/accessories-calculator.svg \
 		Resources/thumbmissing.png \
+		Resources/tag-rem.svg \
 		Resources/document-open.png \
+		Resources/opencase.svg \
 		Resources/document-save.png \
 		Resources/extension.svg \
 		Resources/bookmark-new.png \
@@ -780,6 +784,8 @@ debug/moc_tagmanager.cpp: tagmanager.h \
 		tskvariable.h \
 		globals.h \
 		wombatvariable.h \
+		wombatfunctions.h \
+		tskcpp.h \
 		ui_tagmanager.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -1285,6 +1291,8 @@ debug/tagmanager.o: tagmanager.cpp tagmanager.h \
 		tskvariable.h \
 		globals.h \
 		wombatvariable.h \
+		wombatfunctions.h \
+		tskcpp.h \
 		ui_tagmanager.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/tagmanager.o tagmanager.cpp
 
