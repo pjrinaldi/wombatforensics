@@ -71,6 +71,25 @@ int UpdateBookmarkItems(QString tagname)
     return bookitemlist.count() - 1;
 }
 
+void UpdateEvidenceList()
+{
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
+    //qDebug() << "evidfiles:" << evidfiles;
+    evidencelist.clear();
+    QStringList tmplist;
+    for(int i=0; i < evidfiles.count(); i++)
+    {
+        tmplist.clear();
+        QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(i) + "/stat");
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(evidfile.isOpen())
+            tmplist = QString(evidfile.readLine()).split(",");
+        evidencelist.append(tmplist.at(3));
+        evidfile.close();
+    }
+}
+
 void RemovePreviewItem(QString itemid)
 {
     //qDebug() << "itemid:" << itemid;

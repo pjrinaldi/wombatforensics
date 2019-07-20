@@ -980,6 +980,8 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     ui->actionpreviewreport->setEnabled(true);
     autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
+    UpdateEvidenceList();
+    /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
     //qDebug() << "evidfiles:" << evidfiles;
@@ -995,6 +997,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         evidencelist.append(tmplist.at(3));
         evidfile.close();
     }
+    */
     //qDebug() << "evidlist:" << evidencelist;
     if(evidencelist.count() > 0)
     {
@@ -1259,6 +1262,7 @@ void WombatForensics::UpdateStatus()
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
     qInfo() << "Processing Complete";
+    UpdateEvidenceList();
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
     QApplication::restoreOverrideCursor();

@@ -10,6 +10,7 @@ RemEvidenceDialog::RemEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new 
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(Cancel()));
 
     // POPULATE EVIDENCE LIST
+    qDebug() << "evidencelist:" << evidencelist;
     for(int i=0; i < evidencelist.count(); i++)
         ui->evidencelist->addItem(evidencelist.at(i));
 }

@@ -16,6 +16,7 @@ void ReplacePreviewReport(QString string);
 void RemovePreviewItem(QString itemid);
 
 int UpdateBookmarkItems(QString tagname);
+void UpdateEvidenceList(void);
 
 void AddItem(QString content, QString section);
 void AddTLinkItem(int tagid, QString tagname);
