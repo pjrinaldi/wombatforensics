@@ -194,6 +194,7 @@ private slots:
     void SetBookmark(void);
     void RemoveTag(void);
     void UnCheckChecked(void);
+    void ReadSettings(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -218,9 +219,6 @@ private:
     void UpdateCheckState(void);
     void InitializeCheckState(void);
     void UpdateSelectedState(QString id);
-    void ReadSettings(void);
-    int UpdateBookmarkItems(QString tagname);
-    //void UpdateBookmarkItems(QString tagname);
     void ReadBookmarks(void);
     void TagFile(QModelIndex curindex, QString tagname);
     static void PopulateModel(const QModelIndex index);
@@ -243,7 +241,6 @@ private:
     QProcess* xmntprocess;
 
     QFile casedatafile;
-    QFile bookmarkfile;
     off_t offset() const;
     QPushButton* lineup;
     QPushButton* linedown;

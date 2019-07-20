@@ -31,6 +31,7 @@ private slots:
     void SelectionChanged();
 signals:
     void HideManagerWindow();
+    void ReadBookmarks();
 protected:
     void closeEvent(QCloseEvent* event);
 

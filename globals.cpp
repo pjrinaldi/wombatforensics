@@ -8,6 +8,7 @@ QFile logfile;
 QFile viewerfile;
 QFile settingsfile;
 QFile previewfile;
+QFile bookmarkfile;
 QDir thumbdir;
 QTextEdit* msglog = NULL;
 qint64 filesfound = 0;

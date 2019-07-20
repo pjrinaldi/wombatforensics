@@ -15,8 +15,15 @@ void AppendPreviewReport(QString string);
 void ReplacePreviewReport(QString string);
 void RemovePreviewItem(QString itemid);
 
+int UpdateBookmarkItems(QString tagname);
 void AddItem(QString content, QString section);
 void AddTLinkItem(int tagid, QString tagname);
+void RemoveTLinkItem(QString tagname);
+void AddTagItem(int tagid, QString tagname);
+void RemoveTagItem(QString tagname);
+void UpdateTLinkItem(int tagid, QString oldname, QString tagname);
+void UpdateTagItem(int tagid, QString oldname, QString tagname);
+//void AddFileItem();
 //void AddEvidItem(QString content, QString section);
 //void AddTagItem(QString content, QString section);
 //void AddLinkItem(QString content, QString section);

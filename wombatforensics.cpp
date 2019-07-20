@@ -384,23 +384,6 @@ void WombatForensics::RemoveTag()
     }
 }
 
-int WombatForensics::UpdateBookmarkItems(QString tagname)
-{
-    bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
-    bookmarkfile.close();
-    bookitemlist.append(tagname);
-    bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&bookmarkfile);
-    //qDebug() << "bookitemlist count:" << bookitemlist.count();
-    for(int i=0; i < bookitemlist.count(); i++)
-    {
-        out << bookitemlist.at(i) << ",";
-    }
-    bookmarkfile.close();
-    return bookitemlist.count() - 1;
-}
-
 void WombatForensics::CreateNewTag()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
@@ -421,6 +404,26 @@ void WombatForensics::CreateNewTag()
         int tagid = UpdateBookmarkItems(tagname);
         ReadBookmarks();
         AddTLinkItem(tagid, tagname);
+        AddTagItem(tagid, tagname);
+        if(parentmenu.contains("Selected")) // single file
+        {
+            TagFile(selectedindex, tagname);
+        }
+        else if(parentmenu.contains("Checked")) // checked files
+        {
+            QStringList checkeditems = GetFileLists(1);
+            //qDebug() << "Tag File Checked Items:" << checkeditems;
+            for(int i=0; i < checkeditems.count(); i++)
+            {
+                QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+                //qDebug() << "indexlist:" << indexlist.count();
+                if(indexlist.count() > 0)
+                {
+                    QModelIndex curindex = ((QModelIndex)indexlist.first());
+                    TagFile(curindex, tagname);
+                }
+            }
+        }
     }
         //QString tmpstr = "";
         //QString linkstr = "";
@@ -2393,6 +2396,7 @@ void WombatForensics::on_actionBookmark_Manager_triggered()
     tagmanage = new TagManager(this);
     tagmanage->setWindowIcon(QIcon(":/bar/managetags"));
     connect(tagmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideTagManager()), Qt::DirectConnection);
+    connect(tagmanage, SIGNAL(ReadBookmarks()), this, SLOT(ReadBookmarks()), Qt::DirectConnection);
     tagmanage->show();
 }
 

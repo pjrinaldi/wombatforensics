@@ -54,6 +54,23 @@ void ReplacePreviewReport(QString content)
     isignals->ActivateReload();
 }
 
+int UpdateBookmarkItems(QString tagname)
+{
+    bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+    bookmarkfile.close();
+    bookitemlist.append(tagname);
+    bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&bookmarkfile);
+    //qDebug() << "bookitemlist count:" << bookitemlist.count();
+    for(int i=0; i < bookitemlist.count(); i++)
+    {
+        out << bookitemlist.at(i) << ",";
+    }
+    bookmarkfile.close();
+    return bookitemlist.count() - 1;
+}
+
 void RemovePreviewItem(QString itemid)
 {
     //qDebug() << "itemid:" << itemid;
@@ -82,9 +99,55 @@ void RemovePreviewItem(QString itemid)
     //qDebug() << "readstr:" << readstr;
 }
 
+void AddTagItem(int tagid, QString tagname)
+{
+    //qDebug() << "tagid:" << tagid;
+    QString origstr = "";
+    QString tagstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firsttag-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firsttag-->";
+    QString curcontent = beginsplit.last().split("<!--lasttag-->").first();
+    QString postcontent = beginsplit.last().split("<!--lasttag-->").last();
+    postcontent = "<!--lasttag-->" + postcontent;
+    QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
+    tagstr = "";
+    bool tagexists = false;
+    //qDebug() << "taglist count:" << taglist.count();
+    if(tagid == taglist.count())
+        tagstr += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
+    /*
+    if(taglist.count() > 0)
+    {
+        for(int i = 0; i < taglist.count(); i++)
+        {
+            if(taglist.at(i).contains(tagname))
+                tagexists = true;
+        }
+        if(!tagexists)
+            tagstr += "<span id='l" + QString::number(taglist.count()) + "'><a href='#t" + QString::number(linklist.count()) + "'>" + tagname + "</a></span><br/>\n";
+    }
+    else
+        tagstr += "<div id='t0'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
+    curcontent += linkstr;
+    */
+    curcontent += tagstr;
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + curcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+}
+
 void AddTLinkItem(int tagid, QString tagname)
 {
-    qDebug() << "tagid:" << tagid;
+    //qDebug() << "tagid:" << tagid;
     QString origstr = "";
     QString linkstr = "";
     if(!previewfile.isOpen())
@@ -101,19 +164,9 @@ void AddTLinkItem(int tagid, QString tagname)
     QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
     linkstr = "";
     bool tagexists = false;
-    qDebug() << "linklist count:" << linklist.count();
-    if(linklist.count() > 0)
-    {
-        for(int i = 0; i < linklist.count(); i++)
-        {
-            if(linklist.at(i).contains(tagname))
-                tagexists = true;
-        }
-        if(!tagexists)
-            linkstr += "<span id='l" + QString::number(linklist.count()) + "'><a href='#t" + QString::number(linklist.count()) + "'>" + tagname + "</a></span><br/>\n";
-    }
-    else
-        linkstr = "<span id='l0'><a href='#t0'>" + tagname + "</a></span><br/>\n";
+    //qDebug() << "linklist count:" << linklist.count();
+    if(tagid == linklist.count())
+        linkstr += "<span id='l" + QString::number(tagid) + "'><a href='#t" + QString::number(tagid) + "'>" + tagname + "</a></span><br/>\n";
     curcontent += linkstr;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -121,7 +174,6 @@ void AddTLinkItem(int tagid, QString tagname)
         previewfile.write(QString(precontent + curcontent + postcontent).toStdString().c_str());
     previewfile.close();
     isignals->ActivateReload();
-
 }
 
 void AddItem(QString content, QString section)
@@ -146,6 +198,7 @@ void AddItem(QString content, QString section)
             linkstr = "<span id='l0'><a href='#t0'>" + tagname + "</a></span><br/>\n";
         AddItem(linkstr, "link");
      */ 
+    /*
     QString origstr = "";
     QString itemstr = "";
     if(!previewfile.isOpen())
@@ -161,9 +214,8 @@ void AddItem(QString content, QString section)
     postcontent = "<!--last" + section + "-->" + postcontent;
     QStringList itemlist = curcontent.split("\n", QString::SkipEmptyParts);
     bool itemexists = false;
+    */
     /*
-     * HOW DO I GET THE ID='' VALUE TO BE L# OR T# E#...
-     *
     if(itemlist.count() > 0)
     {
         for(int i=0; i < itemlist.count(); i++)
@@ -178,12 +230,14 @@ void AddItem(QString content, QString section)
         itemstr = "<span id='l0'><a href='#t0'>" + content + "</a></span><br/>\n";
     */
     //curcontent += content;
+    /*
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(previewfile.isOpen())
         previewfile.write(QString(precontent + curcontent + postcontent).toStdString().c_str());
     previewfile.close();
     isignals->ActivateReload();
+    */
 }
 
 void AddSubItem(QString content, QString section, QString tagid)
@@ -268,6 +322,142 @@ void UpdateItem(QString oldcontent, QString newcontent, QString section, QString
             else
                 updatedcontent += curlist.at(i) + "\n";
         }
+    }
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + updatedcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+}
+
+void UpdateTLinkItem(int tagid, QString oldname, QString newname)
+{
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firsttlink-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firsttlink-->";
+    QString curcontent = beginsplit.last().split("<!--lasttlink-->").first();
+    QString postcontent = beginsplit.last().split("<!--lasttlink-->").last();
+    postcontent = "<!--lasttlink-->" + postcontent;
+    QStringList curlist = curcontent.split("\n", QString::SkipEmptyParts);
+    QString updatedcontent = "";
+    if(curlist.count() > 0)
+    {
+        for(int i=0; i < curlist.count(); i++)
+        {
+            if(i == tagid)
+            {
+                int startindex = curlist.at(tagid).indexOf(oldname);
+                int oldlength = oldname.count();
+                QString tmpstr = curlist.at(tagid);
+                updatedcontent += tmpstr.replace(startindex, oldlength, newname) + "\n";
+            }
+            else
+                updatedcontent += curlist.at(i) + "\n";
+        }
+    }
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + updatedcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+}
+
+void UpdateTagItem(int tagid, QString oldname, QString newname)
+{
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firsttag-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firsttag-->";
+    QString curcontent = beginsplit.last().split("<!--lasttag-->").first();
+    QString postcontent = beginsplit.last().split("<!--lasttag-->").last();
+    postcontent = "<!--lasttag-->" + postcontent;
+    QStringList curlist = curcontent.split("\n", QString::SkipEmptyParts);
+    QString updatedcontent = "";
+    if(curlist.count() > 0)
+    {
+        for(int i=0; i < curlist.count(); i++)
+        {
+            if(i == tagid)
+            {
+                int startindex = curlist.at(tagid).indexOf(oldname);
+                int oldlength = oldname.count();
+                QString tmpstr = curlist.at(tagid);
+                updatedcontent += tmpstr.replace(startindex, oldlength, newname) + "\n";
+            }
+            else
+                updatedcontent += curlist.at(i) + "\n";
+        }
+    }
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + updatedcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+}
+
+void RemoveTLinkItem(QString tagname)
+{
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firsttlink-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firsttlink-->";
+    QString curcontent = beginsplit.last().split("<!--lasttlink-->").first();
+    QString postcontent = beginsplit.last().split("<!--lasttlink-->").last();
+    postcontent = "<!--lasttlink-->" + postcontent;
+    QStringList curlist = curcontent.split("\n", QString::SkipEmptyParts);
+    QString updatedcontent = "";
+    for(int i=0; i < curlist.count(); i++)
+    {
+        if(!curlist.at(i).contains(tagname))
+            updatedcontent += curlist.at(i) + "\n";
+    }
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + updatedcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+}
+
+void RemoveTagItem(QString tagname)
+{
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firsttag-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firsttag-->";
+    QString curcontent = beginsplit.last().split("<!--lasttag-->").first();
+    QString postcontent = beginsplit.last().split("<!--lasttag-->").last();
+    postcontent = "<!--lasttag-->" + postcontent;
+    QStringList curlist = curcontent.split("\n", QString::SkipEmptyParts);
+    QString updatedcontent = "";
+    for(int i=0; i < curlist.count(); i++)
+    {
+        if(!curlist.at(i).contains(tagname))
+            updatedcontent += curlist.at(i) + "\n";
     }
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);

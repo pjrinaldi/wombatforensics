@@ -51,6 +51,17 @@ void TagManager::ModifyTag()
             bookmarkfile.write(tmpstr.toStdString().c_str());
         bookmarkfile.close();
         UpdateList();
+        UpdateTLinkItem(selectedtagid, selectedtag, modtagname);
+        UpdateTagItem(selectedtagid, selectedtag, modtagname);
+        /*
+        ui->listWidget->currentItem()->setText(modtagname);
+        for(int i=0; i < ui->listWidget->count(); i++)
+            tmpstr += ((QListWidgetItem*)ui->listWidget->item(i))->text() + ",";
+        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(bookmarkfile.isOpen())
+            bookmarkfile.write(tmpstr.toStdString().c_str());
+        bookmarkfile.close();
+        UpdateList();
         tmpstr = "";
         if(!previewfile.isOpen())
             previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -58,12 +69,12 @@ void TagManager::ModifyTag()
             tmpstr = previewfile.readAll();
         previewfile.close();
         // link content
-        QStringList beginsplit = tmpstr.split("<!--firstlink-->", QString::SkipEmptyParts);
+        QStringList beginsplit = tmpstr.split("<!--firsttlink-->", QString::SkipEmptyParts);
         QString precontent = beginsplit.first();
-        precontent += "<!--firstlink-->";
-        QString curcontent = beginsplit.last().split("<!--lastlink-->").first();
-        QString postcontent = beginsplit.last().split("<!--lastlink-->").last();
-        postcontent = "<!--lastlink-->" + postcontent;
+        precontent += "<!--firsttlink-->";
+        QString curcontent = beginsplit.last().split("<!--lasttlink-->").first();
+        QString postcontent = beginsplit.last().split("<!--lasttlink-->").last();
+        postcontent = "<!--lasttlink-->" + postcontent;
         QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
         linkstr = "";
         if(linklist.count() > 0)
@@ -79,6 +90,7 @@ void TagManager::ModifyTag()
         QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
         if(taglist.count() > 0)
             UpdateItem(selectedtag, modtagname, "tag", QString::number(selectedtagid));
+        */
     }
 }
 
@@ -97,11 +109,13 @@ void TagManager::RemoveTag()
     if(bookmarkfile.isOpen())
         bookmarkfile.write(tmpstr.toStdString().c_str());
     bookmarkfile.close();
-    qDebug() << "tmpstr:" << tmpstr;
+    //qDebug() << "tmpstr:" << tmpstr;
     ui->removebutton->setEnabled(false);
     UpdateList();
-    RemItem(selectedtag, "tlink", "");
-    RemItem(selectedtag, "tag", "");
+    RemoveTLinkItem(selectedtag);
+    RemoveTagItem(selectedtag);
+    //RemItem(selectedtag, "tlink", "");
+    //RemItem(selectedtag, "tag", "");
 }
 
 void TagManager::AddTag()
@@ -118,74 +132,17 @@ void TagManager::AddTag()
         tagname = newtagdialog->textValue();
     if(!tagname.isEmpty())
     {
-        QString tmpstr = "";
-        taglist.append(tagname);
-        taglist.removeDuplicates();
-        for(int i = 0; i < taglist.count(); i++)
-            tmpstr += taglist.at(i) + ",";
-        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
-        if(bookmarkfile.isOpen())
-            bookmarkfile.write(tmpstr.toStdString().c_str());
-        bookmarkfile.close();
+        int tagid = UpdateBookmarkItems(tagname);
+        emit ReadBookmarks();
         UpdateList();
-        tmpstr = "";
-        if(!previewfile.isOpen())
-            previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(previewfile.isOpen())
-            tmpstr = previewfile.readAll();
-        previewfile.close();
-        // link content
-        QStringList beginsplit = tmpstr.split("<!--firstlink-->", QString::SkipEmptyParts);
-        QString precontent = beginsplit.first();
-        precontent += "<!--firstlink-->";
-        QString curcontent = beginsplit.last().split("<!--lastlink-->").first();
-        QString postcontent = beginsplit.last().split("<!--lastlink-->").last();
-        postcontent = "<!--lastlink-->" + postcontent;
-        QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
-        linkstr = "";
-        bool tagexists = false;
-        if(linklist.count() > 0)
-        {
-            for(int i = 0; i < linklist.count(); i++)
-            {
-                if(linklist.at(i).contains(tagname))
-                    tagexists = true;
-            }
-            if(!tagexists)
-                linkstr += "<span id='l" + QString::number(linklist.count()) + "'><a href='#t" + QString::number(linklist.count()) + "'>" + tagname + "</a></span><br/>\n";
-        }
-        else
-            linkstr = "<span id='l0'><a href='#t0'>" + tagname + "</a></span><br/>\n";
-        AddItem(linkstr, "link");
-        // tag content
-        beginsplit = tmpstr.split("<!--firsttag-->", QString::SkipEmptyParts);
-        precontent = beginsplit.first();
-        precontent += "<!--firsttag-->";
-        curcontent = beginsplit.last().split("<!--lasttag-->").first();
-        postcontent = beginsplit.last().split("<!--lasttag-->").last();
-        postcontent = "<!--lasttag-->" + postcontent;
-        tagstr = "";
-        tagexists = false;
-        QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
-        if(taglist.count() > 0)
-        {
-            for(int i = 0; i < taglist.count(); i++)
-            {
-                if(taglist.at(i).contains(tagname))
-                    tagexists = true;
-            }
-            if(!tagexists)
-                tagstr += "<div id='t" + QString::number(taglist.count()) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
-        }
-        else
-            tagstr += "<div id='t0'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
-        AddItem(tagstr, "tag");
+        AddTLinkItem(tagid, tagname);
+        AddTagItem(tagid, tagname);
     }
 }
 
 void TagManager::SelectionChanged()
 {
-    qDebug() << "selectionid:" << ui->listWidget->currentRow();
+    //qDebug() << "selectionid:" << ui->listWidget->currentRow();
     ui->removebutton->setEnabled(true);
 }
 
