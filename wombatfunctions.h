@@ -19,18 +19,16 @@ int UpdateBookmarkItems(QString tagname);
 
 void AddItem(QString content, QString section);
 void AddTLinkItem(int tagid, QString tagname);
+void AddELinkItem(int evidid, QString evidname);
+void AddEvidItem(int evidid, QString content);
 void RemoveTLinkItem(QString tagname);
 void AddTagItem(int tagid, QString tagname);
 void RemoveTagItem(QString tagname);
 void UpdateTLinkItem(int tagid, QString oldname, QString tagname);
 void UpdateTagItem(int tagid, QString oldname, QString tagname);
 //void AddFileItem();
-//void AddEvidItem(QString content, QString section);
-//void AddTagItem(QString content, QString section);
-//void AddLinkItem(QString content, QString section);
 //void AddFileItem(QString content, QString section, QString itemid);
 //void RemEvidItem(QString content, QString section, QString itemid);
-//void RemTagItem(QString content, QString section, QString itemid);
 //void RemLinkItem(QString content, QString section, QString itemid);
 // SHOULD CALL THE FUNCTIONS ADDEVIDITEM, ADDTAGITEM, ADDLINKITEM, ADDFILEITEM
 /*

@@ -117,26 +117,66 @@ void AddTagItem(int tagid, QString tagname)
     postcontent = "<!--lasttag-->" + postcontent;
     QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
     tagstr = "";
-    //bool tagexists = false;
     //qDebug() << "taglist count:" << taglist.count();
     if(tagid == taglist.count())
         tagstr += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
-    /*
-    if(taglist.count() > 0)
-    {
-        for(int i = 0; i < taglist.count(); i++)
-        {
-            if(taglist.at(i).contains(tagname))
-                tagexists = true;
-        }
-        if(!tagexists)
-            tagstr += "<span id='l" + QString::number(taglist.count()) + "'><a href='#t" + QString::number(linklist.count()) + "'>" + tagname + "</a></span><br/>\n";
-    }
-    else
-        tagstr += "<div id='t0'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
-    curcontent += linkstr;
-    */
     curcontent += tagstr;
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + curcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+}
+
+void AddEvidItem(int evidid, QString content)
+{
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firstevid-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firstevid-->";
+    QString curcontent = beginsplit.last().split("<!--lastevid-->").first();
+    QString postcontent = beginsplit.last().split("<!--lastevid-->").last();
+    postcontent = "<!--lastevid-->" + postcontent;
+    QStringList evidlist = curcontent.split("\n", QString::SkipEmptyParts);
+    //qDebug() << "evidlist count:" << evidlist.count();
+    if(evidid == evidlist.count())
+        curcontent += content;
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + curcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+}
+
+void AddELinkItem(int evidid, QString evidname)
+{
+    QString origstr = "";
+    QString linkstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firstelink-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firstelink-->";
+    QString curcontent = beginsplit.last().split("<!--lastelink-->").first();
+    QString postcontent = beginsplit.last().split("<!--lastelink-->").last();
+    postcontent = "<!--lastelink-->" + postcontent;
+    QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
+    linkstr = "";
+    //bool tagexists = false;
+    //qDebug() << "linklist count:" << linklist.count();
+    if(evidid == linklist.count())
+        linkstr += "<span id='l" + QString::number(evidid) + "'><a href='#e" + QString::number(evidid) + "'>" + evidname + "</a></span><br/>\n";
+    curcontent += linkstr;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(previewfile.isOpen())
@@ -2031,6 +2071,8 @@ void InitializeEvidenceStructure(QString evidname)
         }
     }
     reportstring += "</div><br/>\n";
+    AddELinkItem(evidcnt, evidencename);
+    AddEvidItem(evidcnt, reportstring);
     //AddItem(reportstring, "evid");
     //AppendPreviewReport(reportstring);
     tsk_fs_file_close(readfileinfo);
