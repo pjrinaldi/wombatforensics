@@ -117,7 +117,7 @@ void AddTagItem(int tagid, QString tagname)
     postcontent = "<!--lasttag-->" + postcontent;
     QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
     tagstr = "";
-    bool tagexists = false;
+    //bool tagexists = false;
     //qDebug() << "taglist count:" << taglist.count();
     if(tagid == taglist.count())
         tagstr += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
@@ -163,7 +163,7 @@ void AddTLinkItem(int tagid, QString tagname)
     postcontent = "<!--lasttlink-->" + postcontent;
     QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
     linkstr = "";
-    bool tagexists = false;
+    //bool tagexists = false;
     //qDebug() << "linklist count:" << linklist.count();
     if(tagid == linklist.count())
         linkstr += "<span id='l" + QString::number(tagid) + "'><a href='#t" + QString::number(tagid) + "'>" + tagname + "</a></span><br/>\n";
@@ -176,6 +176,7 @@ void AddTLinkItem(int tagid, QString tagname)
     isignals->ActivateReload();
 }
 
+/*
 void AddItem(QString content, QString section)
 {
     /*
@@ -238,8 +239,9 @@ void AddItem(QString content, QString section)
     previewfile.close();
     isignals->ActivateReload();
     */
-}
+//}
 
+/*
 void AddSubItem(QString content, QString section, QString tagid)
 {
     QString origstr = "";
@@ -291,7 +293,9 @@ void AddSubItem(QString content, QString section, QString tagid)
     isignals->ActivateReload();
     //qDebug() << midstr;
 }
+*/
 
+/*
 void UpdateItem(QString oldcontent, QString newcontent, QString section, QString itemid) // LINKs/TAGs ONLY FOR NOW
 {
     QString origstr = "";
@@ -330,6 +334,7 @@ void UpdateItem(QString oldcontent, QString newcontent, QString section, QString
     previewfile.close();
     isignals->ActivateReload();
 }
+*/
 
 void UpdateTLinkItem(int tagid, QString oldname, QString newname)
 {
@@ -467,6 +472,7 @@ void RemoveTagItem(QString tagname)
     isignals->ActivateReload();
 }
 
+/*
 void RemItem(QString content, QString section, QString itemid)
 {
     QString origstr = "";
@@ -495,10 +501,12 @@ void RemItem(QString content, QString section, QString itemid)
     previewfile.close();
     isignals->ActivateReload();
 }
-
+*/
+/*
 void RemSubItem(QString content, QString section, QString tagid, QString fileid)
 {
 }
+*/
 
 qint64 GetChildCount(QString filefilter)
 {
@@ -2023,7 +2031,7 @@ void InitializeEvidenceStructure(QString evidname)
         }
     }
     reportstring += "</div><br/>\n";
-    AddItem(reportstring, "evid");
+    //AddItem(reportstring, "evid");
     //AppendPreviewReport(reportstring);
     tsk_fs_file_close(readfileinfo);
     readfileinfo = NULL;

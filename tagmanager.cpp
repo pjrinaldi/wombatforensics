@@ -53,44 +53,6 @@ void TagManager::ModifyTag()
         UpdateList();
         UpdateTLinkItem(selectedtagid, selectedtag, modtagname);
         UpdateTagItem(selectedtagid, selectedtag, modtagname);
-        /*
-        ui->listWidget->currentItem()->setText(modtagname);
-        for(int i=0; i < ui->listWidget->count(); i++)
-            tmpstr += ((QListWidgetItem*)ui->listWidget->item(i))->text() + ",";
-        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
-        if(bookmarkfile.isOpen())
-            bookmarkfile.write(tmpstr.toStdString().c_str());
-        bookmarkfile.close();
-        UpdateList();
-        tmpstr = "";
-        if(!previewfile.isOpen())
-            previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(previewfile.isOpen())
-            tmpstr = previewfile.readAll();
-        previewfile.close();
-        // link content
-        QStringList beginsplit = tmpstr.split("<!--firsttlink-->", QString::SkipEmptyParts);
-        QString precontent = beginsplit.first();
-        precontent += "<!--firsttlink-->";
-        QString curcontent = beginsplit.last().split("<!--lasttlink-->").first();
-        QString postcontent = beginsplit.last().split("<!--lasttlink-->").last();
-        postcontent = "<!--lasttlink-->" + postcontent;
-        QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
-        linkstr = "";
-        if(linklist.count() > 0)
-            UpdateItem(selectedtag, modtagname, "link", QString::number(selectedtagid));
-        // tag content
-        beginsplit = tmpstr.split("<!--firsttag-->", QString::SkipEmptyParts);
-        precontent = beginsplit.first();
-        precontent += "<!--firsttag-->";
-        curcontent = beginsplit.last().split("<!--lasttag-->").first();
-        postcontent = beginsplit.last().split("<!--lasttag-->").last();
-        postcontent = "<!--lasttag-->" + postcontent;
-        tagstr = "";
-        QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
-        if(taglist.count() > 0)
-            UpdateItem(selectedtag, modtagname, "tag", QString::number(selectedtagid));
-        */
     }
 }
 
@@ -114,8 +76,6 @@ void TagManager::RemoveTag()
     UpdateList();
     RemoveTLinkItem(selectedtag);
     RemoveTagItem(selectedtag);
-    //RemItem(selectedtag, "tlink", "");
-    //RemItem(selectedtag, "tag", "");
 }
 
 void TagManager::AddTag()

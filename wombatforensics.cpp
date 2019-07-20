@@ -238,7 +238,7 @@ void WombatForensics::ReadBookmarks()
         //qDebug() << "i:" << i;
         QAction* tmpaction = new QAction(bookitemlist.at(i), bookmarkmenu);
         tmpaction->setData(QVariant("t" + QString::number(i)));
-        qDebug() << "tmpaction data;" << tmpaction->data().toString();
+        //qDebug() << "tmpaction data;" << tmpaction->data().toString();
         QAction* tmpaction1 = new QAction(bookitemlist.at(i), tagcheckedmenu);
         tmpaction1->setData(QVariant(QString("t" + QString::number(i))));
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
@@ -425,83 +425,6 @@ void WombatForensics::CreateNewTag()
             }
         }
     }
-        //QString tmpstr = "";
-        //QString linkstr = "";
-        //QString tagstr = "";
-        // I THINK I CAN MOVE THE IF COUNT CODE INTO THE ADDITEM FUNCTION AND REDUCE THE REPETITIVENESS OF THIS...
-        /*
-        if(!previewfile.isOpen())
-            previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(previewfile.isOpen())
-            tmpstr = previewfile.readAll();
-        previewfile.close();
-        // link content
-        QStringList beginsplit = tmpstr.split("<!--firstlink-->", QString::SkipEmptyParts);
-        QString precontent = beginsplit.first();
-        precontent += "<!--firstlink-->";
-        QString curcontent = beginsplit.last().split("<!--lastlink-->").first();
-        QString postcontent = beginsplit.last().split("<!--lastlink-->").last();
-        postcontent = "<!--lastlink-->" + postcontent;
-        QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
-        linkstr = "";
-        bool tagexists = false;
-        if(linklist.count() > 0)
-        {
-            for(int i = 0; i < linklist.count(); i++)
-            {
-                if(linklist.at(i).contains(tagname))
-                    tagexists = true;
-            }
-            if(!tagexists)
-                linkstr += "<span id='l" + QString::number(linklist.count()) + "'><a href='#t" + QString::number(linklist.count()) + "'>" + tagname + "</a></span><br/>\n";
-        }
-        else
-            linkstr = "<span id='l0'><a href='#t0'>" + tagname + "</a></span><br/>\n";
-        AddItem(linkstr, "link");
-        // tag content
-        beginsplit = tmpstr.split("<!--firsttag-->", QString::SkipEmptyParts);
-        precontent = beginsplit.first();
-        precontent += "<!--firsttag-->";
-        curcontent = beginsplit.last().split("<!--lasttag-->").first();
-        postcontent = beginsplit.last().split("<!--lasttag-->").last();
-        postcontent = "<!--lasttag-->" + postcontent;
-        tagstr = "";
-        tagexists = false;
-        QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
-        if(taglist.count() > 0)
-        {
-            for(int i = 0; i < taglist.count(); i++)
-            {
-                if(taglist.at(i).contains(tagname))
-                    tagexists = true;
-            }
-            if(!tagexists)
-                tagstr += "<div id='t" + QString::number(taglist.count()) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
-        }
-        else
-            tagstr += "<div id='t0'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
-        AddItem(tagstr, "tag");
-
-        if(parentmenu.contains("Selected")) // single file
-        {
-            TagFile(selectedindex, tagname);
-        }
-        else if(parentmenu.contains("Checked")) // checked files
-        {
-            QStringList checkeditems = GetFileLists(1);
-            //qDebug() << "Tag File Checked Items:" << checkeditems;
-            for(int i=0; i < checkeditems.count(); i++)
-            {
-                QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-                //qDebug() << "indexlist:" << indexlist.count();
-                if(indexlist.count() > 0)
-                {
-                    QModelIndex curindex = ((QModelIndex)indexlist.first());
-                    TagFile(curindex, tagname);
-                }
-            }
-        }*/
-    //}
 }
 
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
@@ -565,7 +488,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         baname.append(tmplist.at(0));
         bapath.append(tmplist.at(3));
         QString filestr = "<div id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div>";
-        AddSubItem(filestr, "tag", tagname);
+        //AddSubItem(filestr, "tag", tagname);
         emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     }
     else

@@ -16,6 +16,7 @@ void ReplacePreviewReport(QString string);
 void RemovePreviewItem(QString itemid);
 
 int UpdateBookmarkItems(QString tagname);
+
 void AddItem(QString content, QString section);
 void AddTLinkItem(int tagid, QString tagname);
 void RemoveTLinkItem(QString tagname);
@@ -32,11 +33,12 @@ void UpdateTagItem(int tagid, QString oldname, QString tagname);
 //void RemTagItem(QString content, QString section, QString itemid);
 //void RemLinkItem(QString content, QString section, QString itemid);
 // SHOULD CALL THE FUNCTIONS ADDEVIDITEM, ADDTAGITEM, ADDLINKITEM, ADDFILEITEM
+/*
 void RemItem(QString content, QString section, QString itemid);
 void UpdateItem(QString oldcontent, QString newcontent, QString section, QString itemid);
 void AddSubItem(QString content, QString section, QString tagid);
 void RemSubItem(QString content, QString section, QString tagid, QString fileid);
-
+*/
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
