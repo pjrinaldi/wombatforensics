@@ -117,7 +117,7 @@ void TagManager::UpdateList()
     if(bookmarkfile.isOpen())
         taglist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
     bookmarkfile.close();
-    taglist.removeDuplicates();
+    //taglist.removeDuplicates();
     for(int i=0; i < taglist.count(); i++)
     {
         new QListWidgetItem(taglist.at(i), ui->listWidget);

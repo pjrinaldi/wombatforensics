@@ -914,10 +914,12 @@ void WombatForensics::InitializePreviewReport()
         initialstr += "<!--lasttlink-->";
         initialstr += "</div><br/><br/>";
         initialstr += "</div><br/>\n";
+        initialstr += "<h2>Evidence Items</h2>";
         initialstr += "<div id='evidence'>";
         initialstr += "<!--firstevid-->";
         initialstr += "<!--lastevid-->";
         initialstr += "\n</div><br/><br/>";
+        initialstr += "<h2>Tagged Items</h2>";
         initialstr += "<div id='tags'>";
         initialstr += "<!--firsttag-->";
         initialstr += "<!--lasttag--></div>";
