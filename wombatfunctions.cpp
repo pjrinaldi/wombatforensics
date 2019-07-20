@@ -483,6 +483,16 @@ void RemoveTLinkItem(QString tagname)
     isignals->ActivateReload();
 }
 
+void RemoveELinkItem(QString evidname)
+{
+    qDebug() << "evidname:" << evidname;
+}
+
+void RemoveEvidItem(QString evidname)
+{
+    qDebug() << "evidname:" << evidname;
+}
+
 void RemoveTagItem(QString tagname)
 {
     QString origstr = "";

@@ -1861,7 +1861,7 @@ void WombatForensics::RemEvidence()
 
 void WombatForensics::RemoveEvidence(QStringList remevidlist)
 {
-    //qDebug() << "remevidlist:" << remevidlist;
+    qDebug() << "remevidlist:" << remevidlist;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     for(int i=0; i < remevidlist.count(); i++)
     {
@@ -1907,6 +1907,8 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                 //qDebug() << "index found:" << indexlist.first().sibling(indexlist.first().row(), 11).data().toString();
                 treenodemodel->removeRow(indexlist.first().row(), indexlist.first());
             }
+            //6. Remove ELink and EItem from Preview Report
+            //RemELinkItem(
             //RemovePreviewItem(QString("e" + evidfiles.first().split(".e").last()));
         }
     }
