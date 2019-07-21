@@ -489,10 +489,14 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         QByteArray baname, bapath;
         baname.append(tmplist.at(0));
         bapath.append(tmplist.at(3));
-        QString filestr = "<td id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='th1'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><span class='odd'>File Path: " + QString(QByteArray::fromBase64(bapath)) + "</span><br/><span class='even'>File Size: " + tmplist.at(8) + "</span></td>";
-        //QString filestr = "<div id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div>";
+        QString filestr = "<td id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
+        filestr += "<table><tr><th>" + QString(QByteArray::fromBase64(baname)) + "</th></tr>";
+        filestr += "<tr class='odd'><td>File Path: " + QString(QByteArray::fromBase64(bapath)) + "</td></tr>";
+        filestr += "<tr class='odd'><td>File Size: " + tmplist.at(8) + "</td></tr>";
+        filestr += "</table></td>";
+        //filestr += "<span class='th1'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><span class='odd'>File Path: " + QString(QByteArray::fromBase64(bapath)) + "</span><br/><span class='odd'>File Size: " + tmplist.at(8) + "</span></td>";
+        RemoveFileItem(tagname, curindex.sibling(curindex.row(), 11).data().toString());
         AddFileItem(tagname, filestr);
-        //AddSubItem(filestr, "tag", tagname);
         emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     }
     else
@@ -1928,7 +1932,6 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             //6. Remove ELink and EItem from Preview Report
             RemoveELinkItem(remevidlist.at(i).split("/").last());
             RemoveEvidItem(remevidlist.at(i).split("/").last());
-            //RemovePreviewItem(QString("e" + evidfiles.first().split(".e").last()));
         }
     }
     StatusUpdate("Evidence Item Successfully Removed");

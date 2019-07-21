@@ -11,9 +11,6 @@
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
 
-//void AppendPreviewReport(QString string);
-//void ReplacePreviewReport(QString string);
-//void RemovePreviewItem(QString itemid);
 
 int UpdateBookmarkItems(QString tagname);
 void UpdateEvidenceList(void);
@@ -31,12 +28,6 @@ void UpdateTLinkItem(int tagid, QString oldname, QString tagname);
 void UpdateTagItem(int tagid, QString oldname, QString tagname);
 void AddFileItem(QString tagname, QString content);
 void RemoveFileItem(QString tagname, QString fileid);
-/*
-void RemItem(QString content, QString section, QString itemid);
-void UpdateItem(QString oldcontent, QString newcontent, QString section, QString itemid);
-void AddSubItem(QString content, QString section, QString tagid);
-void RemSubItem(QString content, QString section, QString tagid, QString fileid);
-*/
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
 TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
