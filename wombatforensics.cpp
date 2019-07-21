@@ -487,20 +487,20 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         filefile.close();
         treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
         QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
-        filestr += "<table><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + "</td></tr>";
+        filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
+        filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
+        filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + " bytes</td></tr>";
         if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
-            filestr += "<tr class='even'><td class='pvalue'>Created:</td><td class='property'>" + curindex.sibling(curindex.row(), 3).data().toString() + "</td></tr>";
+            filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + curindex.sibling(curindex.row(), 3).data().toString() + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
             filestr += "<tr class='even'><td class='pvalue'>Accessed:</td><td class='property'>" + curindex.sibling(curindex.row(), 4).data().toString() + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 5).data().toString().isEmpty())
-            filestr += "<tr class='even'><td class='pvalue'>Modified:</td><td class='property'>" + curindex.sibling(curindex.row(), 5).data().toString() + "</td></tr>";
+            filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + curindex.sibling(curindex.row(), 5).data().toString() + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
-            filestr += "<tr class='even'><td class='pvalue'>Status Changed:</td><td class='property'>" + curindex.sibling(curindex.row(), 6).data().toString() + "</td></tr>";
+            filestr += "<tr class='even'><td class='pvalue'>Changed:</td><td class='property'>" + curindex.sibling(curindex.row(), 6).data().toString() + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 7).data().toString().isEmpty())
         {
-            filestr += "<tr class='even'><td class='pvalue'>";
+            filestr += "<tr class='odd'><td class='pvalue'>";
             if(hashsum == 1)
                 filestr += "MD5";
             else if(hashsum == 2)
@@ -510,9 +510,9 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
             filestr += " Hash:</td><td class='property'>" + curindex.sibling(curindex.row(), 7).data().toString() + "</td></tr>";
         }
         filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + curindex.sibling(curindex.row(), 8).data().toString() + "</td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), 9).data().toString() + "</td></tr>";
+        filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), 9).data().toString() + "</td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
+        filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
         filestr += "</table></td>";
         RemoveFileItem(tagname, curindex.sibling(curindex.row(), 11).data().toString());
         AddFileItem(tagname, filestr);
@@ -2161,8 +2161,11 @@ void WombatForensics::mouseDoubleClickEvent(QMouseEvent* event)
 void WombatForensics::closeEvent(QCloseEvent* event)
 {
     StatusUpdate("Exiting...");
+    statuslabel->repaint();
+    ui->mainStatusBar->repaint();
     if(wombatvariable.iscaseopen)
     {
+        /*
         QMessageBox exitbox;
         exitbox.setText("Saving Current Case, Please Wait...");
         exitbox.setIcon(QMessageBox::Information);
@@ -2170,11 +2173,14 @@ void WombatForensics::closeEvent(QCloseEvent* event)
         //exitbox.button(QMessageBox::Ok)->animateClick(2000);
         exitbox.show();
         //exitbox.exec();
+        */
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        StatusUpdate("Saving Current Case...");
+        //StatusUpdate("Saving Current Case...");
+        //statuslabel->repaint();
         CloseCurrentCase();
-        exitbox.close();
-        StatusUpdate("Exiting...");
+        //exitbox.close();
+        //StatusUpdate("Exiting...");
+        //statuslabel->repaint();
     }
     else
     {
