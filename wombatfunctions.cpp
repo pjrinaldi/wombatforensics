@@ -149,10 +149,10 @@ void AddTagItem(int tagid, QString tagname)
                 tagexists = true;
         }
         if(!tagexists)
-            curcontent += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
+            curcontent += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><table><tr><!--firstfile--><!--lastfile--></tr></table></div><br/>\n";
     }
     else
-        curcontent += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
+        curcontent += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><table><tr><!--firstfile--><!--lastfile--></tr></table></div><br/>\n";
     curcontent += tagstr;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -357,6 +357,13 @@ void AddFileItem(QString tagname, QString content)
             //qDebug() << curlist.at(i);
             if(curlist.at(i).contains(tagname))
             {
+                QString origsub = curlist.at(i);
+                QStringList subsplit = origsub.split("<!--lastfile-->", QString::SkipEmptyParts);
+                midstr += subsplit.first();
+                midstr += content;
+                midstr += "<!--lastfile-->";
+                midstr += subsplit.last() + "\n";
+                /*
                 QString tmpstr;
                 QString origsub  = curlist.at(i);
                 QStringList presubsplit = origsub.split("<!--firstfile-->", QString::SkipEmptyParts);
@@ -365,10 +372,11 @@ void AddFileItem(QString tagname, QString content)
                 QString precur = presubsplit.last().split("<!--lastfile-->").first();
                 QString postsub = presubsplit.last().split("<!--lastfile-->").last();
                 postsub = "<!--lastfile-->" + postsub;
-                precur += content + "\n";
+                precur += content;
                 //qDebug() << precur;
                 //qDebug() << presub + precur + postsub;
                 midstr += presub + precur + postsub;
+                */
             }
             else
                 midstr += curlist.at(i) + "\n";
@@ -387,15 +395,31 @@ void AddFileItem(QString tagname, QString content)
 
 void RemoveFileItem(QString tagname, QString fileid)
 {
-    QString itemstr = "<div id='" + fileid + "'>";
+    QString itemstr = "<td id='" + fileid + "'>";
     QString origstr = "";
-    //QString midstr = "";
+    QString postcontent = "";
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(previewfile.isOpen())
         origstr = previewfile.readAll();
     previewfile.close();
     QString finalstr = "";
+    QStringList filelist = origstr.split(itemstr, QString::SkipEmptyParts);
+    if(filelist.count() > 1)
+    {
+        finalstr += filelist.first();
+        QString laststr = filelist.last();
+        int tagend = laststr.indexOf("</td>");
+        tagend = tagend + 5;
+        finalstr += laststr.remove(0, tagend);
+        if(!previewfile.isOpen())
+            previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(previewfile.isOpen())
+            previewfile.write(finalstr.toStdString().c_str());
+        previewfile.close();
+        isignals->ActivateReload();
+    }
+    //postcontent = filelist.last().split("</td>").last();
     /*
     QStringList contentlist = origstr.split("\n");
     for(int i=0; i < contentlist.count(); i++)
@@ -477,12 +501,6 @@ void RemoveFileItem(QString tagname, QString fileid)
     //}
     //midstr += curcontent;
     //midstr += postcontent;
-    if(!previewfile.isOpen())
-        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if(previewfile.isOpen())
-        previewfile.write(finalstr.toStdString().c_str());
-    previewfile.close();
-    isignals->ActivateReload();
     /*
     //qDebug() << "itemid:" << itemid;
     QString itemstr = "<div id='" + fileid + "'>";

@@ -489,7 +489,8 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         QByteArray baname, bapath;
         baname.append(tmplist.at(0));
         bapath.append(tmplist.at(3));
-        QString filestr = "<div id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div>";
+        QString filestr = "<td id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='th1'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><span class='odd'>File Path: " + QString(QByteArray::fromBase64(bapath)) + "</span><br/><span class='even'>File Size: " + tmplist.at(8) + "</span></td>";
+        //QString filestr = "<div id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div>";
         AddFileItem(tagname, filestr);
         //AddSubItem(filestr, "tag", tagname);
         emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
