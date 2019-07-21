@@ -104,6 +104,16 @@ struct FilterValues
 };
 
 extern FilterValues filtervalues;
+
+struct EvidenceReportData
+{
+    int evidid;
+    QString evidname;
+    QString evidcontent;
+};
+
+extern QList<EvidenceReportData> evidrepdatalist;
+
 class InterfaceSignals : public QObject
 {
     Q_OBJECT

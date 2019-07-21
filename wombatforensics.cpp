@@ -1242,6 +1242,12 @@ void WombatForensics::UpdateStatus()
     qInfo() << "Building Initial Evidence Tree...";
     //qInfo() << QTime::currentTime().toString(
     PrepareEvidenceImage();
+    qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
+    for(int i=0; i < evidrepdatalist.count(); i++)
+    {
+        AddELinkItem(evidrepdatalist.at(i).evidid, evidrepdatalist.at(i).evidname);
+        AddEvidItem(evidrepdatalist.at(i).evidid, evidrepdatalist.at(i).evidcontent);
+    }
     //LogMessage("Building Initial Evidence Tree...");
     ui->dirTreeView->setModel(treenodemodel);
     ReadBookmarks();

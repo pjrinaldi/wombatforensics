@@ -164,7 +164,20 @@ void AddEvidItem(int evidid, QString content)
     postcontent = "<!--lastevid-->" + postcontent;
     QStringList evidlist = curcontent.split("\n", QString::SkipEmptyParts);
     //qDebug() << "evidlist count:" << evidlist.count();
-    if(evidid == evidlist.count())
+    //if(evidid == evidlist.count())
+    //    curcontent += content;
+    bool elinkexists = false;
+    if(evidlist.count() > 0)
+    {
+        for(int i=0; i < evidlist.count(); i++)
+        {
+            if(evidlist.at(i).contains(content))
+                elinkexists = true;
+        }
+        if(!elinkexists)
+            curcontent += content;
+    }
+    else
         curcontent += content;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -191,10 +204,21 @@ void AddELinkItem(int evidid, QString evidname)
     postcontent = "<!--lastelink-->" + postcontent;
     QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
     linkstr = "";
-    //bool tagexists = false;
-    //qDebug() << "linklist count:" << linklist.count();
-    if(evidid == linklist.count())
-        linkstr += "<span id='l" + QString::number(evidid) + "'><a href='#e" + QString::number(evidid) + "'>" + evidname + "</a></span><br/>\n";
+    bool elinkexists = false;
+    if(linklist.count() > 0)
+    {
+        for(int i=0; i < linklist.count(); i++)
+        {
+            if(linklist.at(i).contains(evidname))
+                elinkexists = true;
+        }
+        if(!elinkexists)
+            linkstr += "<span id='l" + QString::number(evidid) + "'><a href='#e" + QString::number(evidid) + "'>" + evidname + "</a></span><br/>\n";
+    }
+    else
+        linkstr = "<span id='l0'><a href='#e0'>" + evidname + "</a></span><br/>\n";
+    //if(evidid == linklist.count())
+    //    linkstr += "<span id='l" + QString::number(evidid) + "'><a href='#e" + QString::number(evidid) + "'>" + evidname + "</a></span><br/>\n";
     curcontent += linkstr;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -2140,16 +2164,23 @@ void InitializeEvidenceStructure(QString evidname)
                         nodedata << treeout.at(j);
                     mutex.lock();
                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
-                    mutex.unlock();
                     reportstring += "<div><span>Partition (P" + QString::number(partint) + "): </span><span>" + QString(readpartinfo->desc) + " (NON-RECOGNIZED FS)</span></div><br/>";
+                    mutex.unlock();
                 }
                 partint++;
             }
         }
     }
+    mutex.lock();
     reportstring += "</div><br/>\n";
-    AddELinkItem(evidcnt, evidencename);
-    AddEvidItem(evidcnt, reportstring);
+    EvidenceReportData tmpdata;
+    tmpdata.evidid = evidcnt;
+    tmpdata.evidname = evidencename;
+    tmpdata.evidcontent = reportstring;
+    evidrepdatalist.append(tmpdata);
+    //AddELinkItem(evidcnt, evidencename);
+    //AddEvidItem(evidcnt, reportstring);
+    mutex.unlock();
     //AddItem(reportstring, "evid");
     //AppendPreviewReport(reportstring);
     tsk_fs_file_close(readfileinfo);

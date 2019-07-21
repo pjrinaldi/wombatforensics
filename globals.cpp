@@ -43,3 +43,4 @@ QHash<QString, bool> checkhash;
 QHash<QString, QString> imageshash;
 QMutex mutex;
 FilterValues filtervalues;
+QList<EvidenceReportData> evidrepdatalist;
