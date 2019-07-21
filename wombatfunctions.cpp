@@ -504,12 +504,60 @@ void RemoveTLinkItem(QString tagname)
 
 void RemoveELinkItem(QString evidname)
 {
-    qDebug() << "evidname:" << evidname;
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firstelink-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firstelink-->";
+    QString curcontent = beginsplit.last().split("<!--lastelink-->").first();
+    QString postcontent = beginsplit.last().split("<!--lastelink-->").last();
+    postcontent = "<!--lastelink-->" + postcontent;
+    QStringList curlist = curcontent.split("\n", QString::SkipEmptyParts);
+    QString updatedcontent = "";
+    for(int i=0; i < curlist.count(); i++)
+    {
+        if(!curlist.at(i).contains(evidname))
+            updatedcontent += curlist.at(i) + "\n";
+    }
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + updatedcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
 }
 
 void RemoveEvidItem(QString evidname)
 {
-    qDebug() << "evidname:" << evidname;
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firstevid-->", QString::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firstevid-->";
+    QString curcontent = beginsplit.last().split("<!--lastevid-->").first();
+    QString postcontent = beginsplit.last().split("<!--lastevid-->").last();
+    postcontent = "<!--lastevid-->" + postcontent;
+    QStringList curlist = curcontent.split("\n", QString::SkipEmptyParts);
+    QString updatedcontent = "";
+    for(int i=0; i < curlist.count(); i++)
+    {
+        if(!curlist.at(i).contains(evidname))
+            updatedcontent += curlist.at(i) + "\n";
+    }
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + updatedcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
 }
 
 void RemoveTagItem(QString tagname)
