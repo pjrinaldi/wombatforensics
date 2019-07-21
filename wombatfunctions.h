@@ -31,8 +31,6 @@ void UpdateTLinkItem(int tagid, QString oldname, QString tagname);
 void UpdateTagItem(int tagid, QString oldname, QString tagname);
 //void AddFileItem();
 //void AddFileItem(QString content, QString section, QString itemid);
-//void RemEvidItem(QString content, QString section, QString itemid);
-//void RemLinkItem(QString content, QString section, QString itemid);
 // SHOULD CALL THE FUNCTIONS ADDEVIDITEM, ADDTAGITEM, ADDLINKITEM, ADDFILEITEM
 /*
 void RemItem(QString content, QString section, QString itemid);

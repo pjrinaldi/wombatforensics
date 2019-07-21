@@ -164,8 +164,6 @@ void AddEvidItem(int evidid, QString content)
     postcontent = "<!--lastevid-->" + postcontent;
     QStringList evidlist = curcontent.split("\n", QString::SkipEmptyParts);
     //qDebug() << "evidlist count:" << evidlist.count();
-    //if(evidid == evidlist.count())
-    //    curcontent += content;
     bool elinkexists = false;
     if(evidlist.count() > 0)
     {
@@ -217,8 +215,6 @@ void AddELinkItem(int evidid, QString evidname)
     }
     else
         linkstr = "<span id='l0'><a href='#e0'>" + evidname + "</a></span><br/>\n";
-    //if(evidid == linklist.count())
-    //    linkstr += "<span id='l" + QString::number(evidid) + "'><a href='#e" + QString::number(evidid) + "'>" + evidname + "</a></span><br/>\n";
     curcontent += linkstr;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -246,7 +242,6 @@ void AddTLinkItem(int tagid, QString tagname)
     postcontent = "<!--lasttlink-->" + postcontent;
     QStringList linklist = curcontent.split("\n", QString::SkipEmptyParts);
     linkstr = "";
-    //bool tagexists = false;
     //qDebug() << "linklist count:" << linklist.count();
     if(tagid == linklist.count())
         linkstr += "<span id='l" + QString::number(tagid) + "'><a href='#t" + QString::number(tagid) + "'>" + tagname + "</a></span><br/>\n";
