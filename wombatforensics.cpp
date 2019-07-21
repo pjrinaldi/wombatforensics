@@ -911,12 +911,12 @@ void WombatForensics::InitializePreviewReport()
         initialstr += "<div id='elinks'>";
         initialstr += "<!--firstelink-->";
         initialstr += "<!--lastelink-->";
-        initialstr += "</div><br/><br/>";
+        initialstr += "</div><br/>";
         initialstr += "<div id='tlinks'>";
         initialstr += "<!--firsttlink-->";
         initialstr += "<!--lasttlink-->";
         initialstr += "</div><br/><br/>";
-        initialstr += "</div><br/>\n";
+        initialstr += "</div><br/><br/>";
         initialstr += "<h2>Evidence Items</h2>";
         initialstr += "<div id='evidence'>";
         initialstr += "<!--firstevid-->";
@@ -1245,7 +1245,7 @@ void WombatForensics::UpdateStatus()
     qInfo() << "Building Initial Evidence Tree...";
     //qInfo() << QTime::currentTime().toString(
     PrepareEvidenceImage();
-    qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
+    //qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
     for(int i=0; i < evidrepdatalist.count(); i++)
     {
         AddELinkItem(evidrepdatalist.at(i).evidid, evidrepdatalist.at(i).evidname);

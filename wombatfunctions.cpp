@@ -140,8 +140,19 @@ void AddTagItem(int tagid, QString tagname)
     QStringList taglist = curcontent.split("\n", QString::SkipEmptyParts);
     tagstr = "";
     //qDebug() << "taglist count:" << taglist.count();
-    if(tagid == taglist.count())
-        tagstr += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
+    bool tagexists = false;
+    if(taglist.count() > 0)
+    {
+        for(int i=0; i < taglist.count(); i++)
+        {
+            if(taglist.at(i).contains(tagname))
+                tagexists = true;
+        }
+        if(!tagexists)
+            curcontent += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
+    }
+    else
+        curcontent += "<div id='t" + QString::number(tagid) + "'>" + tagname + "<br/><br/><!--firstfile--><!--lastfile--></div><br/>\n";
     curcontent += tagstr;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -376,6 +387,31 @@ void AddFileItem(QString tagname, QString content)
 
 void RemoveFileItem(QString tagname, QString fileid)
 {
+    QString itemstr = "<div id='" + fileid + "'>";
+    QString origstr = "";
+    //QString midstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QString finalstr = "";
+    /*
+    QStringList contentlist = origstr.split("\n");
+    for(int i=0; i < contentlist.count(); i++)
+    {
+        if(contentlist.at(i).contains(fileid))
+        {
+            QStringList precontent = 
+            if(!contentlist.at(i).contains(fileid))
+                finalstr += contentlist.at(i);
+            else
+                qDebug() << "content to remove:" << contentlist.at(i);
+        }
+    }
+    */
+    //qDebug() << finalstr;
+    /*
     qDebug() << "tagname:" << tagname;
     QString origstr = "";
     if(!previewfile.isOpen())
@@ -394,12 +430,13 @@ void RemoveFileItem(QString tagname, QString fileid)
     midstr += precontent;
     if(curlist.count() > 0)
     {
-        qDebug() << curlist;
+        qDebug() << "curlist:" << curlist;
         for(int i=0; i < curlist.count(); i++)
         {
-            if(curlist.at(i).contains(tagname))
-                qDebug() << curlist.at(i);
+            //if(curlist.at(i).contains(tagname))
+            //    qDebug() << "curlist contains tag:" << curlist.at(i);
         }
+        */
         /*
         for(int i=0; i < curlist.count(); i++)
         {
@@ -437,13 +474,13 @@ void RemoveFileItem(QString tagname, QString fileid)
                 midstr += curlist.at(i) + "\n";
             */
         //}
-    }
-    midstr += curcontent;
-    midstr += postcontent;
+    //}
+    //midstr += curcontent;
+    //midstr += postcontent;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(previewfile.isOpen())
-        previewfile.write(midstr.toStdString().c_str());
+        previewfile.write(finalstr.toStdString().c_str());
     previewfile.close();
     isignals->ActivateReload();
     /*
