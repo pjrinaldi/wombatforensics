@@ -19,6 +19,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
     statuslabel = new StatusLabel();
+    //statuslabel->setAlignment(Qt::AlignRight);
     StatusUpdate("");
     vline1 = new QFrame(this);
     vline1->setFrameStyle(QFrame::VLine | QFrame::Raised);
@@ -1879,7 +1880,9 @@ void WombatForensics::CloseCurrentCase()
     tar_append_tree(casehandle, tmparray2.data(), tmparray3.data());
     tar_close(casehandle);
     // END TAR METHOD
-    StatusUpdate("Current Case was closed successfully");
+    StatusUpdate("Saved...");
+    statuslabel->repaint();
+    statuslabel->adjustSize();
     RemoveTmpFiles();
     wombatvariable.iscaseopen = false;
     if(logfile.isOpen())
@@ -2162,25 +2165,17 @@ void WombatForensics::closeEvent(QCloseEvent* event)
 {
     StatusUpdate("Exiting...");
     statuslabel->repaint();
-    ui->mainStatusBar->repaint();
+    statuslabel->adjustSize();
     if(wombatvariable.iscaseopen)
     {
-        /*
-        QMessageBox exitbox;
-        exitbox.setText("Saving Current Case, Please Wait...");
-        exitbox.setIcon(QMessageBox::Information);
-        exitbox.setStandardButtons(QMessageBox::Ok);
-        //exitbox.button(QMessageBox::Ok)->animateClick(2000);
-        exitbox.show();
-        //exitbox.exec();
-        */
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        //StatusUpdate("Saving Current Case...");
-        //statuslabel->repaint();
+        StatusUpdate("Saving...");
+        statuslabel->adjustSize();
+        statuslabel->repaint();
         CloseCurrentCase();
-        //exitbox.close();
-        //StatusUpdate("Exiting...");
-        //statuslabel->repaint();
+        StatusUpdate("Exiting...");
+        statuslabel->repaint();
+        statuslabel->adjustSize();
     }
     else
     {
