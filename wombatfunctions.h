@@ -11,9 +11,9 @@
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
 
-void AppendPreviewReport(QString string);
-void ReplacePreviewReport(QString string);
-void RemovePreviewItem(QString itemid);
+//void AppendPreviewReport(QString string);
+//void ReplacePreviewReport(QString string);
+//void RemovePreviewItem(QString itemid);
 
 int UpdateBookmarkItems(QString tagname);
 void UpdateEvidenceList(void);
@@ -29,9 +29,8 @@ void RemoveTagItem(QString tagname);
 void RemoveEvidItem(QString evidname);
 void UpdateTLinkItem(int tagid, QString oldname, QString tagname);
 void UpdateTagItem(int tagid, QString oldname, QString tagname);
-//void AddFileItem();
-//void AddFileItem(QString content, QString section, QString itemid);
-// SHOULD CALL THE FUNCTIONS ADDEVIDITEM, ADDTAGITEM, ADDLINKITEM, ADDFILEITEM
+void AddFileItem(QString tagname, QString content);
+void RemoveFileItem(QString tagname, QString fileid);
 /*
 void RemItem(QString content, QString section, QString itemid);
 void UpdateItem(QString oldcontent, QString newcontent, QString section, QString itemid);

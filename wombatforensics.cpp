@@ -312,6 +312,7 @@ void WombatForensics::RemoveTag()
             filefile.write(tmpstr.toStdString().c_str());
         filefile.close();
         treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, "0");
+        RemoveFileItem(selectedindex.sibling(selectedindex.row(), 10).data().toString(), selectedindex.sibling(selectedindex.row(), 11).data().toString());
         //RemovePreviewItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
     }
     else if(QString(tagaction->iconText()).contains("Checked")) // single file
@@ -378,6 +379,7 @@ void WombatForensics::RemoveTag()
                     filefile.write(tmpstr.toStdString().c_str());
                 filefile.close();
                 treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, "0");
+                RemoveFileItem(curindex.sibling(curindex.row(), 10).data().toString(), curindex.sibling(curindex.row(), 11).data().toString());
                 //RemovePreviewItem(curindex.sibling(curindex.row(), 11).data().toString());
             }
         }
@@ -488,6 +490,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         baname.append(tmplist.at(0));
         bapath.append(tmplist.at(3));
         QString filestr = "<div id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'><span class='tabletitle'>" + QString(QByteArray::fromBase64(baname)) + "</span><br/><table><tr class='odd'><td>File Path:</td><td>" + QString(QByteArray::fromBase64(bapath)) + "</td></tr><tr class='even'><td>File Size:</td><td>" + tmplist.at(8) + "</td></tr></table></div>";
+        AddFileItem(tagname, filestr);
         //AddSubItem(filestr, "tag", tagname);
         emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     }
