@@ -296,6 +296,7 @@ void WombatForensics::RemoveTag()
             tmpstr = filefile.readLine();
         filefile.close();
         //qDebug() << "tmpstr before:" << tmpstr;
+        RemoveFileItem(selectedindex.sibling(selectedindex.row(), 10).data().toString(), selectedindex.sibling(selectedindex.row(), 11).data().toString());
         if(tmpstr.split(",").count() > 15)
             tmplist = tmpstr.split(",", QString::SkipEmptyParts);
         tmplist[15] = "0";
@@ -312,7 +313,6 @@ void WombatForensics::RemoveTag()
             filefile.write(tmpstr.toStdString().c_str());
         filefile.close();
         treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, "0");
-        RemoveFileItem(selectedindex.sibling(selectedindex.row(), 10).data().toString(), selectedindex.sibling(selectedindex.row(), 11).data().toString());
         //RemovePreviewItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
     }
     else if(QString(tagaction->iconText()).contains("Checked")) // single file
@@ -362,6 +362,7 @@ void WombatForensics::RemoveTag()
                 if(filefile.isOpen())
                     tmpstr = filefile.readLine();
                 filefile.close();
+                RemoveFileItem(curindex.sibling(curindex.row(), 10).data().toString(), curindex.sibling(curindex.row(), 11).data().toString());
                 //qDebug() << "tmpstr before:" << tmpstr;
                 if(tmpstr.split(",").count() > 15)
                     tmplist = tmpstr.split(",", QString::SkipEmptyParts);
@@ -379,7 +380,6 @@ void WombatForensics::RemoveTag()
                     filefile.write(tmpstr.toStdString().c_str());
                 filefile.close();
                 treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, "0");
-                RemoveFileItem(curindex.sibling(curindex.row(), 10).data().toString(), curindex.sibling(curindex.row(), 11).data().toString());
                 //RemovePreviewItem(curindex.sibling(curindex.row(), 11).data().toString());
             }
         }

@@ -195,6 +195,7 @@ private slots:
     void RemoveTag(void);
     void UnCheckChecked(void);
     void ReadSettings(void);
+    void ReadBookmarks(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -219,7 +220,6 @@ private:
     void UpdateCheckState(void);
     void InitializeCheckState(void);
     void UpdateSelectedState(QString id);
-    void ReadBookmarks(void);
     void TagFile(QModelIndex curindex, QString tagname);
     static void PopulateModel(const QModelIndex index);
     QString InitializeSelectedState(void);

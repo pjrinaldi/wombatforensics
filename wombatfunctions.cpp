@@ -376,6 +376,7 @@ void AddFileItem(QString tagname, QString content)
 
 void RemoveFileItem(QString tagname, QString fileid)
 {
+    qDebug() << "tagname:" << tagname;
     QString origstr = "";
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -393,6 +394,13 @@ void RemoveFileItem(QString tagname, QString fileid)
     midstr += precontent;
     if(curlist.count() > 0)
     {
+        qDebug() << curlist;
+        for(int i=0; i < curlist.count(); i++)
+        {
+            if(curlist.at(i).contains(tagname))
+                qDebug() << curlist.at(i);
+        }
+        /*
         for(int i=0; i < curlist.count(); i++)
         {
             //qDebug() << curlist.at(i);
@@ -408,10 +416,14 @@ void RemoveFileItem(QString tagname, QString fileid)
                 postsub = "<!--lastfile-->" + postsub;
                 QStringList filelist = precur.split("\n", QString::SkipEmptyParts);
                 midstr += presub;
+                qDebug() << "filelist:" << filelist;
                 for(int j=0; j < filelist.count(); j++)
                 {
                     if(!filelist.at(j).contains(fileid))
+                    {
+                        //qDebug() << filelist.at(j);
                         midstr += filelist.at(j) + "\n";
+                    }
                 }
                 midstr += postsub;
                 //precur += content + "\n";
@@ -419,11 +431,14 @@ void RemoveFileItem(QString tagname, QString fileid)
                 //qDebug() << presub + precur + postsub;
                 //midstr += presub + precur + postsub;
             }
+            */
+            /* this should duplicate the other tags, so i am removing it... maybe...
             else
                 midstr += curlist.at(i) + "\n";
-
-        }
+            */
+        //}
     }
+    midstr += curcontent;
     midstr += postcontent;
     if(!previewfile.isOpen())
         previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
