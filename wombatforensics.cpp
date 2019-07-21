@@ -486,21 +486,16 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
             filefile.write(tmpstr.toStdString().c_str());
         filefile.close();
         treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
-        /*
-        QByteArray baname, bapath;
-        baname.append(tmplist.at(0));
-        bapath.append(tmplist.at(3));
-        */
-        QString filestr = "<td id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
+        QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
         filestr += "<table><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
-        //filestr += "<table><tr><th colspan='2'>" + QString(QByteArray::fromBase64(baname)) + "</th></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>File Path:</td><td class='property'> " + curindex.sibling(curindex.row(), 1).data().toString() + "</td></tr>";
-        //filestr += "<tr class='even'><td class='pvalue'>File Path:</td><td class='property'> " + QString(QByteArray::fromBase64(bapath)) + "</td></tr>";
+        filestr += "<tr class='even'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + "</td></tr>";
-        //filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + tmplist.at(8) + "</td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>Created:</td><td class='property'>" + curindex.sibling(curindex.row(), 3).data().toString() + "</td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>Accessed:<td><td class='property'>" + curindex.sibling(curindex.row(), 4).data().toString() + "</td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>Modified:</td><td class='property'>" + curindex.sibling(curindex.row(), 5).data().toString() + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
+            filestr += "<tr class='even'><td class='pvalue'>Created:</td><td class='property'>" + curindex.sibling(curindex.row(), 3).data().toString() + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
+            filestr += "<tr class='even'><td class='pvalue'>Accessed:</td><td class='property'>" + curindex.sibling(curindex.row(), 4).data().toString() + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), 5).data().toString().isEmpty())
+            filestr += "<tr class='even'><td class='pvalue'>Modified:</td><td class='property'>" + curindex.sibling(curindex.row(), 5).data().toString() + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
             filestr += "<tr class='even'><td class='pvalue'>Status Changed:</td><td class='property'>" + curindex.sibling(curindex.row(), 6).data().toString() + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 7).data().toString().isEmpty())
@@ -517,6 +512,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + curindex.sibling(curindex.row(), 8).data().toString() + "</td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), 9).data().toString() + "</td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
+        filestr += "<tr class='even'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
         filestr += "</table></td>";
         RemoveFileItem(tagname, curindex.sibling(curindex.row(), 11).data().toString());
         AddFileItem(tagname, filestr);
