@@ -26,23 +26,34 @@ void AddEvidenceDialog::SelectEvidence()
     addeviddialog.setLabelText(QFileDialog::Accept, "Add");
     addeviddialog.setOption(QFileDialog::DontUseNativeDialog, true);
     QString evidfilename = "";
+    bool alreadyadded = false;
     if(addeviddialog.exec())
         evidfilename = addeviddialog.selectedFiles().first();
-    if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff") || evidfilename.toLower().contains(".image"))
+    for(int i=0; i < evidencelist.count();i++)
     {
-        // it's an evidence image so process...
-        ui->evidencelist->addItem(evidfilename);
-        ui->startbutton->setEnabled(true);
+        if(evidencelist.at(i).contains(evidfilename))
+            alreadyadded = true;
     }
-    else if(evidfilename.isNull())
+    if(alreadyadded == false)
     {
-        qDebug() << "cancelled by the user.";
+        if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff") || evidfilename.toLower().contains(".image"))
+        {
+            // it's an evidence image so process...
+            ui->evidencelist->addItem(evidfilename);
+            ui->startbutton->setEnabled(true);
+        }
+        else if(evidfilename.isNull())
+        {
+            qDebug() << "cancelled by the user.";
+        }
+        else
+        {
+            QMessageBox::warning(this, tr("Unsupported Format"), tr("Unfortunately, this format is not supported YET, it should be supported by v0.2"), QMessageBox::Ok);
+            qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.2.";
+        }
     }
     else
-    {
-        QMessageBox::warning(this, tr("Unsupported Format"), tr("Unfortunately, this format is not supported YET, it should be supported by v0.2"), QMessageBox::Ok);
-        qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.2.";
-    }
+        QMessageBox::warning(this, tr("Already Added"), tr("The evidence has already been added to the case, please select another item."), QMessageBox::Ok);
 }
 
 void AddEvidenceDialog::UpdateButtons()
@@ -81,10 +92,19 @@ void AddEvidenceDialog::dragEnterEvent(QDragEnterEvent* e)
 
 void AddEvidenceDialog::dropEvent(QDropEvent* e)
 {
+    bool alreadyadded = false;
     foreach (const QUrl &url, e->mimeData()->urls())
     {
-        ui->evidencelist->addItem(url.toLocalFile());
-        ui->startbutton->setEnabled(true);
-        //qDebug() << "dropped filepath:" << url.toLocalFile();
+        for(int i=0; i < evidencelist.count();i++)
+        {
+            if(evidencelist.at(i).contains(url.toLocalFile().split("/").last()))
+                alreadyadded = true;
+        }
+        if(alreadyadded == false)
+        {
+            ui->evidencelist->addItem(url.toLocalFile());
+            ui->startbutton->setEnabled(true);
+            //qDebug() << "dropped filepath:" << url.toLocalFile();
+        }
     }
 }

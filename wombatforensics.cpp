@@ -1275,19 +1275,23 @@ void WombatForensics::AddEvidence()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
+    //qDebug() << "ecount:" << ecount << "evidencelist count:" << evidencelist.count();
     //qDebug() << "ecount before:" << ecount;
-    for(int i=0; i < evidencelist.count(); i++)
+    if(ecount != evidencelist.count())
     {
-        QString evidencepath = wombatvariable.tmpmntpath + evidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
-        QDir dir;
-        dir.mkpath(evidencepath);
-        ecount++;
-    }
-    //qDebug() << "ecount after:" << ecount;
-    if(evidencelist.count() > 0)
-    {
-        QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
-        sqlwatcher.setFuture(tmpfuture);
+        for(int i=0; i < evidencelist.count(); i++)
+        {
+            QString evidencepath = wombatvariable.tmpmntpath + evidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
+            QDir dir;
+            dir.mkpath(evidencepath);
+            ecount++;
+        }
+        //qDebug() << "ecount after:" << ecount;
+        if(evidencelist.count() > 0)
+        {
+            QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
+            sqlwatcher.setFuture(tmpfuture);
+        }
     }
 }
 
