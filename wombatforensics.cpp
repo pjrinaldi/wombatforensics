@@ -192,6 +192,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(showitem, SIGNAL(activated()), this, SLOT(ShowItem()));
     checkhash.clear();
     listeditems.clear();
+    existingevidence.clear();
     treenodemodel = new TreeNodeModel();
     autosavetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
@@ -1027,9 +1028,16 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     }
     */
     //qDebug() << "evidlist:" << evidencelist;
+    /*
     if(evidencelist.count() > 0)
     {
         QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
+        openwatcher.setFuture(tmpfuture);
+    }
+    */
+    if(existingevidence.count() > 0)
+    {
+        QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
         openwatcher.setFuture(tmpfuture);
     }
     else
@@ -1187,11 +1195,13 @@ void WombatForensics::PrepareEvidenceImage()
 {
     QString tmpstr = "";
     QString mntstr = "";
-    for(int i=0; i < evidencelist.count(); i++)
+    //for(int i=0; i < evidencelist.count(); i++)
+    for(int i=0; i < existingevidence.count(); i++)
     {
         //qDebug() << "evidence list:" << evidencelist.at(i);
         QDir eviddir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList(QString(evidencelist.at(i).split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
+        QStringList evidfiles = eviddir.entryList(QStringList(QString(existingevidence.at(i).split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
+        //QStringList evidfiles = eviddir.entryList(QStringList(QString(evidencelist.at(i).split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
         //qDebug() << wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat";
         QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -1269,6 +1279,7 @@ void WombatForensics::UpdateStatus()
     StatusUpdate("Building Initial Evidence Tree...");
     qInfo() << "Building Initial Evidence Tree...";
     //qInfo() << QTime::currentTime().toString(
+    UpdateEvidenceList();
     PrepareEvidenceImage();
     //qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
     for(int i=0; i < evidrepdatalist.count(); i++)
@@ -1296,7 +1307,6 @@ void WombatForensics::UpdateStatus()
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
     qInfo() << "Processing Complete";
-    UpdateEvidenceList();
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
     QApplication::restoreOverrideCursor();
@@ -1305,12 +1315,30 @@ void WombatForensics::UpdateStatus()
 void WombatForensics::AddEvidence()
 {
     addevidencedialog = new AddEvidenceDialog(this);
+    connect(addevidencedialog, SIGNAL(SendNewEvidence(QStringList)), this, SLOT(GetNewEvidence(QStringList)));
     addevidencedialog->exec();
+    QStringList newevidencelist;
+    newevidencelist.clear();
+    newevidencelist = addevidencedialog->SendNewEvidence();
+    qDebug() << "newevidlist:" << newevidencelist;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
+    for(int i=0 ; i < newevidencelist.count(); i++)
+    {
+        QString evidencepath = wombatvariable.tmpmntpath + newevidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
+        QDir dir;
+        dir.mkpath(evidencepath);
+        ecount++;
+    }
+    if(newevidencelist.count() > 0)
+    {
+        QFuture<void> tmpfuture = QtConcurrent::map(newevidencelist, InitializeEvidenceStructure);
+        sqlwatcher.setFuture(tmpfuture);
+    }
     //qDebug() << "ecount:" << ecount << "evidencelist count:" << evidencelist.count();
     //qDebug() << "ecount before:" << ecount;
+    /*
     if(ecount != evidencelist.count())
     {
         for(int i=0; i < evidencelist.count(); i++)
@@ -1327,6 +1355,7 @@ void WombatForensics::AddEvidence()
             sqlwatcher.setFuture(tmpfuture);
         }
     }
+    */
 }
 
 void WombatForensics::UpdateProperties()

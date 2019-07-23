@@ -54,7 +54,8 @@ void UpdateEvidenceList()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
     //qDebug() << "evidfiles:" << evidfiles;
-    evidencelist.clear();
+    //evidencelist.clear();
+    existingevidence.clear();
     QStringList tmplist;
     for(int i=0; i < evidfiles.count(); i++)
     {
@@ -63,7 +64,8 @@ void UpdateEvidenceList()
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(evidfile.isOpen())
             tmplist = QString(evidfile.readLine()).split(",");
-        evidencelist.append(tmplist.at(3));
+        existingevidence.append(tmplist.at(3));
+        //evidencelist.append(tmplist.at(3));
         evidfile.close();
     }
 }
