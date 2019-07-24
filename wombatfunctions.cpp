@@ -2017,7 +2017,7 @@ void InitializeEvidenceStructure(QString evidname)
         }
     }
     mutex.lock();
-    reportstring += "</div><br/>\n";
+    reportstring += "</table></div><br/>\n";
     evidrepdatalist.clear();
     EvidenceReportData tmpdata;
     tmpdata.evidid = evidcnt;
