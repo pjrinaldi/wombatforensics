@@ -34,8 +34,8 @@ QStringList propertylist;
 QStringList exportlist;
 QStringList digfilelist;
 QStringList listeditems;
-//QStringList evidencelist;
 QStringList existingevidence;
+QStringList newevidence;
 QString casepath = QDir::homePath(); // case path settings variable
 QString exportpath = "";
 bool originalpath = true;

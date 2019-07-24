@@ -21,15 +21,12 @@ class AddEvidenceDialog : public QDialog
 public:
     AddEvidenceDialog(QWidget* parent = 0);
     ~AddEvidenceDialog();
-    QStringList SendNewEvidence(void);
 private slots:
     void SelectEvidence();
     void RemoveEvidence();
     void Cancel();
     void StartProcess();
     void UpdateButtons();
-//signals:
-//    SendNewEvidence(QStringList list);
 private:
     Ui::AddEvidenceDialog* ui;
 protected:

@@ -35,8 +35,8 @@ extern QStringList propertylist; // contains properties list values
 extern QStringList exportlist; // contains list of files to be exported
 extern QStringList digfilelist; // contains list of files to dig
 extern QStringList listeditems; // contains checked or all list of files for a case
-//extern QStringList evidencelist; // contains the list of evidence
 extern QStringList existingevidence; // contains the list of existing evidence
+extern QStringList newevidence; // contains the list of new evidence items
 extern QString exportpath; // path to export files to
 extern bool originalpath; // whether to include original file path or not
 extern QString casepath; // case path settings variable

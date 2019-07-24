@@ -29,7 +29,6 @@ void AddEvidenceDialog::SelectEvidence()
     bool alreadyadded = false;
     if(addeviddialog.exec())
         evidfilename = addeviddialog.selectedFiles().first();
-    //for(int i=0; i < evidencelist.count();i++)
     for(int i=0; i < existingevidence.count();i++)
     {
         if(existingevidence.at(i).contains(evidfilename))
@@ -77,32 +76,10 @@ void AddEvidenceDialog::Cancel()
 
 void AddEvidenceDialog::StartProcess()
 {
-    /*
-    QStringList newevidlist;
-    newevidlist.clear();
+    newevidence.clear();
     for(int i=0; i < ui->evidencelist->count(); i++)
-        newevidlist.append(ui->evidencelist->item(i)->text());
-    emit SendNewEvidence(newevidlist);
-    */
+        newevidence.append(ui->evidencelist->item(i)->text());
     this->close();
-    /*
-    evidencelist.clear();
-    for(int i=0; i < ui->evidencelist->count(); i++)
-    {
-        evidencelist.append(ui->evidencelist->item(i)->text());
-        this->close();
-    }
-    */
-}
-
-QStringList AddEvidenceDialog::SendNewEvidence()
-{
-    QStringList newevidlist;
-    newevidlist.clear();
-    for(int i=0; i < ui->evidencelist->count(); i++)
-        newevidlist.append(ui->evidencelist->item(i)->text());
-
-    return newevidlist;
 }
 
 void AddEvidenceDialog::dragEnterEvent(QDragEnterEvent* e)
@@ -113,13 +90,12 @@ void AddEvidenceDialog::dragEnterEvent(QDragEnterEvent* e)
 
 void AddEvidenceDialog::dropEvent(QDropEvent* e)
 {
-    /*
     bool alreadyadded = false;
-    foreach (const QUrl &url, e->mimeData()->urls())
+    foreach(const QUrl &url, e->mimeData()->urls())
     {
-        for(int i=0; i < evidencelist.count();i++)
+        for(int i=0; i < existingevidence.count(); i++)
         {
-            if(evidencelist.at(i).contains(url.toLocalFile().split("/").last()))
+            if(existingevidence.at(i).contains(url.toLocalFile().split("/").last()))
                 alreadyadded = true;
         }
         if(alreadyadded == false)
@@ -129,5 +105,4 @@ void AddEvidenceDialog::dropEvent(QDropEvent* e)
             //qDebug() << "dropped filepath:" << url.toLocalFile();
         }
     }
-    */
 }

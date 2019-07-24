@@ -298,7 +298,8 @@ void WombatForensics::RemoveTag()
             tmpstr = filefile.readLine();
         filefile.close();
         //qDebug() << "tmpstr before:" << tmpstr;
-        RemoveFileItem(selectedindex.sibling(selectedindex.row(), 10).data().toString(), selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        RemoveFileItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        //RemoveFileItem(selectedindex.sibling(selectedindex.row(), 10).data().toString(), selectedindex.sibling(selectedindex.row(), 11).data().toString());
         if(tmpstr.split(",").count() > 15)
             tmplist = tmpstr.split(",", QString::SkipEmptyParts);
         tmplist[15] = "0";
@@ -364,7 +365,8 @@ void WombatForensics::RemoveTag()
                 if(filefile.isOpen())
                     tmpstr = filefile.readLine();
                 filefile.close();
-                RemoveFileItem(curindex.sibling(curindex.row(), 10).data().toString(), curindex.sibling(curindex.row(), 11).data().toString());
+                RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
+                //RemoveFileItem(curindex.sibling(curindex.row(), 10).data().toString(), curindex.sibling(curindex.row(), 11).data().toString());
                 //qDebug() << "tmpstr before:" << tmpstr;
                 if(tmpstr.split(",").count() > 15)
                     tmplist = tmpstr.split(",", QString::SkipEmptyParts);
@@ -516,7 +518,8 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
         filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
         filestr += "</table></td>";
-        RemoveFileItem(tagname, curindex.sibling(curindex.row(), 11).data().toString());
+        RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
+        //RemoveFileItem(tagname, curindex.sibling(curindex.row(), 11).data().toString());
         AddFileItem(tagname, filestr);
         emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     }
@@ -1010,31 +1013,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     UpdateEvidenceList();
-    /*
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
-    //qDebug() << "evidfiles:" << evidfiles;
-    evidencelist.clear();
-    QStringList tmplist;
-    for(int i=0; i < evidfiles.count(); i++)
-    {
-        tmplist.clear();
-        QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(i) + "/stat");
-        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(evidfile.isOpen())
-            tmplist = QString(evidfile.readLine()).split(",");
-        evidencelist.append(tmplist.at(3));
-        evidfile.close();
-    }
-    */
-    //qDebug() << "evidlist:" << evidencelist;
-    /*
-    if(evidencelist.count() > 0)
-    {
-        QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, PopulateTreeModel);
-        openwatcher.setFuture(tmpfuture);
-    }
-    */
     if(existingevidence.count() > 0)
     {
         QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
@@ -1195,13 +1173,10 @@ void WombatForensics::PrepareEvidenceImage()
 {
     QString tmpstr = "";
     QString mntstr = "";
-    //for(int i=0; i < evidencelist.count(); i++)
     for(int i=0; i < existingevidence.count(); i++)
     {
-        //qDebug() << "evidence list:" << evidencelist.at(i);
         QDir eviddir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList(QString(existingevidence.at(i).split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
-        //QStringList evidfiles = eviddir.entryList(QStringList(QString(evidencelist.at(i).split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
         //qDebug() << wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat";
         QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -1253,7 +1228,6 @@ void WombatForensics::PrepareEvidenceImage()
         }
         }
     }
-    //qDebug() << evidencelist;
     //qDebug() << "evidnecename:" << QString::fromStdString(wombatvariable.fullpathvector.at(0));
 }
 
@@ -1285,7 +1259,8 @@ void WombatForensics::UpdateStatus()
     for(int i=0; i < evidrepdatalist.count(); i++)
     {
         AddELinkItem(evidrepdatalist.at(i).evidid, evidrepdatalist.at(i).evidname);
-        AddEvidItem(evidrepdatalist.at(i).evidid, evidrepdatalist.at(i).evidcontent);
+        //AddEvidItem(evidrepdatalist.at(i).evidid, evidrepdatalist.at(i).evidcontent);
+        AddEvidItem(evidrepdatalist.at(i).evidcontent);
     }
     //LogMessage("Building Initial Evidence Tree...");
     ui->dirTreeView->setModel(treenodemodel);
@@ -1315,47 +1290,22 @@ void WombatForensics::UpdateStatus()
 void WombatForensics::AddEvidence()
 {
     addevidencedialog = new AddEvidenceDialog(this);
-    connect(addevidencedialog, SIGNAL(SendNewEvidence(QStringList)), this, SLOT(GetNewEvidence(QStringList)));
     addevidencedialog->exec();
-    QStringList newevidencelist;
-    newevidencelist.clear();
-    newevidencelist = addevidencedialog->SendNewEvidence();
-    qDebug() << "newevidlist:" << newevidencelist;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
-    for(int i=0 ; i < newevidencelist.count(); i++)
+    for(int i=0; i < newevidence.count(); i++)
     {
-        QString evidencepath = wombatvariable.tmpmntpath + newevidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
+        QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
         QDir dir;
         dir.mkpath(evidencepath);
         ecount++;
     }
-    if(newevidencelist.count() > 0)
+    if(newevidence.count() > 0)
     {
-        QFuture<void> tmpfuture = QtConcurrent::map(newevidencelist, InitializeEvidenceStructure);
+        QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
         sqlwatcher.setFuture(tmpfuture);
     }
-    //qDebug() << "ecount:" << ecount << "evidencelist count:" << evidencelist.count();
-    //qDebug() << "ecount before:" << ecount;
-    /*
-    if(ecount != evidencelist.count())
-    {
-        for(int i=0; i < evidencelist.count(); i++)
-        {
-            QString evidencepath = wombatvariable.tmpmntpath + evidencelist.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
-            QDir dir;
-            dir.mkpath(evidencepath);
-            ecount++;
-        }
-        //qDebug() << "ecount after:" << ecount;
-        if(evidencelist.count() > 0)
-        {
-            QFuture<void> tmpfuture = QtConcurrent::map(evidencelist, InitializeEvidenceStructure);
-            sqlwatcher.setFuture(tmpfuture);
-        }
-    }
-    */
 }
 
 void WombatForensics::UpdateProperties()
@@ -1561,7 +1511,6 @@ void WombatForensics::LoadHexContents()
 {
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
-    //qDebug() << "evidencelist:" << evidencelist; // original evidence path
     //qDebug() << "selectednode id:" << selectednode->Data(11).toString();
     //qDebug() << "selectednode evid id:" << selectednode->Data(11).toString().split("-").first();
     QString nodeid = selectednode->Data(11).toString();
@@ -1876,13 +1825,12 @@ void WombatForensics::CloseCurrentCase()
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
     // UNMOUNT EVIDENCEIMAGEDATAFILE
-    for(int i=0; i < evidencelist.count(); i++)
+    for(int i=0; i < existingevidence.count(); i++)
     {
-        //qDebug() << "evidencelist:" << evidencelist.at(i);
-        QString imgext = evidencelist.at(i).split("/").last().split(".").last().toLower();
+        QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
         if(imgext.contains("e01")) // ewfmount
         {
-            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + evidencelist.at(i).split("/").last() + "/";
+            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
             QProcess::execute(xunmntstr);
         }
         else if(imgext.contains("aff") || imgext.contains("000")) // affuse
@@ -1971,8 +1919,8 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             // 3. Delete evid directory.
             QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
             edir.removeRecursively();
-            // 4. Delete from evidencelist.
-            evidencelist.removeOne(remevidlist.at(i));
+            // 4. Delete from existingevidence.
+            existingevidence.removeOne(remevidlist.at(i));
             // 5. Remove TreeNode.
             QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(!indexlist.isEmpty())

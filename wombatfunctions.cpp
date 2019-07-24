@@ -54,7 +54,6 @@ void UpdateEvidenceList()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
     //qDebug() << "evidfiles:" << evidfiles;
-    //evidencelist.clear();
     existingevidence.clear();
     QStringList tmplist;
     for(int i=0; i < evidfiles.count(); i++)
@@ -65,7 +64,6 @@ void UpdateEvidenceList()
         if(evidfile.isOpen())
             tmplist = QString(evidfile.readLine()).split(",");
         existingevidence.append(tmplist.at(3));
-        //evidencelist.append(tmplist.at(3));
         evidfile.close();
     }
 }
@@ -111,7 +109,8 @@ void AddTagItem(int tagid, QString tagname)
     isignals->ActivateReload();
 }
 
-void AddEvidItem(int evidid, QString content)
+//void AddEvidItem(int evidid, QString content)
+void AddEvidItem(QString content)
 {
     QString origstr = "";
     if(!previewfile.isOpen())
@@ -261,7 +260,8 @@ void AddFileItem(QString tagname, QString content)
     isignals->ActivateReload();
 }
 
-void RemoveFileItem(QString tagname, QString fileid)
+//void RemoveFileItem(QString tagname, QString fileid)
+void RemoveFileItem(QString fileid)
 {
     QString itemstr = "<td class='fitem' id='" + fileid + "'>";
     QString origstr = "";
@@ -2018,6 +2018,7 @@ void InitializeEvidenceStructure(QString evidname)
     }
     mutex.lock();
     reportstring += "</div><br/>\n";
+    evidrepdatalist.clear();
     EvidenceReportData tmpdata;
     tmpdata.evidid = evidcnt;
     tmpdata.evidname = evidencename;
