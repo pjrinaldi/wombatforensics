@@ -408,28 +408,33 @@ void WombatForensics::CreateNewTag()
     if(!tagname.isEmpty())
     {
         int tagid = UpdateBookmarkItems(tagname);
-        ReadBookmarks();
-        AddTLinkItem(tagid, tagname);
-        AddTagItem(tagid, tagname);
-        if(parentmenu.contains("Selected")) // single file
+        if(tagid != -15)
         {
-            TagFile(selectedindex, tagname);
-        }
-        else if(parentmenu.contains("Checked")) // checked files
-        {
-            QStringList checkeditems = GetFileLists(1);
-            //qDebug() << "Tag File Checked Items:" << checkeditems;
-            for(int i=0; i < checkeditems.count(); i++)
+            ReadBookmarks();
+            AddTLinkItem(tagid, tagname);
+            AddTagItem(tagid, tagname);
+            if(parentmenu.contains("Selected")) // single file
             {
-                QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-                //qDebug() << "indexlist:" << indexlist.count();
-                if(indexlist.count() > 0)
+                TagFile(selectedindex, tagname);
+            }
+            else if(parentmenu.contains("Checked")) // checked files
+            {
+                QStringList checkeditems = GetFileLists(1);
+                //qDebug() << "Tag File Checked Items:" << checkeditems;
+                for(int i=0; i < checkeditems.count(); i++)
                 {
-                    QModelIndex curindex = ((QModelIndex)indexlist.first());
-                    TagFile(curindex, tagname);
+                    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+                    //qDebug() << "indexlist:" << indexlist.count();
+                    if(indexlist.count() > 0)
+                    {
+                        QModelIndex curindex = ((QModelIndex)indexlist.first());
+                        TagFile(curindex, tagname);
+                    }
                 }
             }
         }
+        else
+            QMessageBox::information(this, "Tag Exists", "Tag Not Added. Tag Name Already Exists.", QMessageBox::Ok);
     }
 }
 

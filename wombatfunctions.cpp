@@ -37,16 +37,22 @@ int UpdateBookmarkItems(QString tagname)
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     QStringList bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
     bookmarkfile.close();
-    bookitemlist.append(tagname);
-    bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&bookmarkfile);
-    //qDebug() << "bookitemlist count:" << bookitemlist.count();
-    for(int i=0; i < bookitemlist.count(); i++)
+    if(bookitemlist.indexOf(tagname) == -1)
     {
-        out << bookitemlist.at(i) << ",";
+        bookitemlist.append(tagname);
+        bookitemlist.removeDuplicates();
+        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream out(&bookmarkfile);
+        //qDebug() << "bookitemlist count:" << bookitemlist.count();
+        for(int i=0; i < bookitemlist.count(); i++)
+        {
+            out << bookitemlist.at(i) << ",";
+        }
+        bookmarkfile.close();
+        return bookitemlist.count() - 1;
     }
-    bookmarkfile.close();
-    return bookitemlist.count() - 1;
+    else
+        return -15;
 }
 
 void UpdateEvidenceList()

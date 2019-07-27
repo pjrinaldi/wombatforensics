@@ -43,16 +43,21 @@ void TagManager::ModifyTag()
         modtagname = modtagdialog->textValue();
     if(!modtagname.isEmpty())
     {
-        ui->listWidget->currentItem()->setText(modtagname);
-        for(int i=0; i < ui->listWidget->count(); i++)
-            tmpstr += ((QListWidgetItem*)ui->listWidget->item(i))->text() + ",";
-        bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
-        if(bookmarkfile.isOpen())
-            bookmarkfile.write(tmpstr.toStdString().c_str());
-        bookmarkfile.close();
-        UpdateList();
-        UpdateTLinkItem(selectedtagid, selectedtag, modtagname);
-        UpdateTagItem(selectedtagid, selectedtag, modtagname);
+        if(UpdateBookmarkItems(modtagname) != -15)
+        {
+            ui->listWidget->currentItem()->setText(modtagname);
+            for(int i=0; i < ui->listWidget->count(); i++)
+                tmpstr += ((QListWidgetItem*)ui->listWidget->item(i))->text() + ",";
+            bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+            if(bookmarkfile.isOpen())
+                bookmarkfile.write(tmpstr.toStdString().c_str());
+            bookmarkfile.close();
+            UpdateList();
+            UpdateTLinkItem(selectedtagid, selectedtag, modtagname);
+            UpdateTagItem(selectedtagid, selectedtag, modtagname);
+        }
+        else
+            QMessageBox::information(this, "Tag Exists", "Tag Name Not Modified. New Tag Name already Exists.", QMessageBox::Ok);
     }
 }
 
@@ -93,10 +98,15 @@ void TagManager::AddTag()
     if(!tagname.isEmpty())
     {
         int tagid = UpdateBookmarkItems(tagname);
-        emit ReadBookmarks();
-        UpdateList();
-        AddTLinkItem(tagid, tagname);
-        AddTagItem(tagid, tagname);
+        if(tagid != -15)
+        {
+            emit ReadBookmarks();
+            UpdateList();
+            AddTLinkItem(tagid, tagname);
+            AddTagItem(tagid, tagname);
+        }
+        else
+            QMessageBox::information(this, "Tag Exists", "Tag Not Added. Tag Name Already Exists.", QMessageBox::Ok);
     }
 }
 
