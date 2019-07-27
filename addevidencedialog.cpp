@@ -71,6 +71,7 @@ void AddEvidenceDialog::RemoveEvidence()
 
 void AddEvidenceDialog::Cancel()
 {
+    newevidence.clear();
     this->close();
 }
 

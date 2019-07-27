@@ -1289,6 +1289,7 @@ void WombatForensics::UpdateStatus()
 
 void WombatForensics::AddEvidence()
 {
+    newevidence.clear();
     addevidencedialog = new AddEvidenceDialog(this);
     addevidencedialog->exec();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
