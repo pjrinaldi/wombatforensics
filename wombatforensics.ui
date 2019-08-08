@@ -145,14 +145,15 @@
    <addaction name="actionAdd_Evidence"/>
    <addaction name="actionRemove_Evidence"/>
    <addaction name="separator"/>
-   <addaction name="actionView_Image_Gallery"/>
    <addaction name="actionJumpToHex"/>
+   <addaction name="actionsearchhex"/>
    <addaction name="actionByteConverter"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="actionViewerManager"/>
    <addaction name="actionViewMessageLog"/>
    <addaction name="separator"/>
+   <addaction name="actionView_Image_Gallery"/>
    <addaction name="actionDigDeeper"/>
    <addaction name="actionCopy_Selection_To"/>
    <addaction name="actionExport_Evidence"/>
@@ -505,6 +506,18 @@
    </property>
    <property name="toolTip">
     <string>Preview Report</string>
+   </property>
+  </action>
+  <action name="actionsearchhex">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/hexsrch</normaloff>:/bar/hexsrch</iconset>
+   </property>
+   <property name="text">
+    <string>Find in Hex/Ascii</string>
+   </property>
+   <property name="toolTip">
+    <string>Find in Hex/Ascii</string>
    </property>
   </action>
  </widget>
