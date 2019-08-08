@@ -27,6 +27,7 @@
 #include "digstatus.h"
 #include "remevidencedialog.h"
 #include "tagmanager.h"
+#include "searchdialog.h"
 
 class StatusLabel : public QLabel
 {

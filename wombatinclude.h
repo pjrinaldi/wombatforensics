@@ -65,11 +65,11 @@
 #include <QResizeEvent>
 #include <QKeyEvent>
 #include <QPaintEvent>
-#include <QWidget>
 #include <QPainter>
 #include <QPixmap>
 #include <QVideoWidget>
 #include <QWebEngineView>
+#include <QWidget>
 
 #include <sstream>
 #include <stdio.h>
