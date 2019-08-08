@@ -55,6 +55,7 @@ public:
     QAction *actionBookmark_Manager;
     QAction *actionJumpToHex;
     QAction *actionpreviewreport;
+    QAction *actionsearchhex;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -210,6 +211,11 @@ public:
         QIcon icon22;
         icon22.addFile(QString::fromUtf8(":/bar/reportpreview"), QSize(), QIcon::Normal, QIcon::Off);
         actionpreviewreport->setIcon(icon22);
+        actionsearchhex = new QAction(WombatForensics);
+        actionsearchhex->setObjectName(QString::fromUtf8("actionsearchhex"));
+        QIcon icon23;
+        icon23.addFile(QString::fromUtf8(":/bar/hexsrch"), QSize(), QIcon::Normal, QIcon::Off);
+        actionsearchhex->setIcon(icon23);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -274,14 +280,15 @@ public:
         analysisToolBar->addAction(actionAdd_Evidence);
         analysisToolBar->addAction(actionRemove_Evidence);
         analysisToolBar->addSeparator();
-        analysisToolBar->addAction(actionView_Image_Gallery);
         analysisToolBar->addAction(actionJumpToHex);
+        analysisToolBar->addAction(actionsearchhex);
         analysisToolBar->addAction(actionByteConverter);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionSettings);
         analysisToolBar->addAction(actionViewerManager);
         analysisToolBar->addAction(actionViewMessageLog);
         analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionView_Image_Gallery);
         analysisToolBar->addAction(actionDigDeeper);
         analysisToolBar->addAction(actionCopy_Selection_To);
         analysisToolBar->addAction(actionExport_Evidence);
@@ -383,6 +390,10 @@ public:
         actionpreviewreport->setText(QCoreApplication::translate("WombatForensics", "Preview Report", nullptr));
 #if QT_CONFIG(tooltip)
         actionpreviewreport->setToolTip(QCoreApplication::translate("WombatForensics", "Preview Report", nullptr));
+#endif // QT_CONFIG(tooltip)
+        actionsearchhex->setText(QCoreApplication::translate("WombatForensics", "Find in Hex/Ascii", nullptr));
+#if QT_CONFIG(tooltip)
+        actionsearchhex->setToolTip(QCoreApplication::translate("WombatForensics", "Find in Hex/Ascii", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());
