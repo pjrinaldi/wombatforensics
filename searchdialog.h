@@ -20,8 +20,8 @@ public:
 
 private slots:
     void on_pbFind_clicked();
-    void on_pbReplace_clicked();
-    void on_pbReplaceAll_clicked();
+    //void on_pbReplace_clicked();
+    //void on_pbReplaceAll_clicked();
 
 private:
     QByteArray getContent(int comboIndex, const QString &input);

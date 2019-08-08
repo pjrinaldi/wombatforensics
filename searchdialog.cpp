@@ -37,21 +37,19 @@ void SearchDialog::on_pbFind_clicked()
     findNext();
 }
 
+/*
 void SearchDialog::on_pbReplace_clicked()
 {
-    /*
     int idx = findNext();
     if (idx >= 0)
     {
         QByteArray replaceBa = getContent(ui->cbReplaceFormat->currentIndex(), ui->cbReplace->currentText());
         replaceOccurrence(idx, replaceBa);
     }
-    */
 }
 
 void SearchDialog::on_pbReplaceAll_clicked()
 {
-    /*
     int replaceCounter = 0;
     int idx = 0;
     int goOn = QMessageBox::Yes;
@@ -74,8 +72,8 @@ void SearchDialog::on_pbReplaceAll_clicked()
 
     if (replaceCounter > 0)
         QMessageBox::information(this, tr("QHexEdit"), QString(tr("%1 occurrences replaced.")).arg(replaceCounter));
-    */
 }
+*/
 
 
 QByteArray SearchDialog::getContent(int comboIndex, const QString &input)

@@ -59,6 +59,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     previewreport = new HtmlViewer(this);
     aboutbox = new AboutBox(this);
     digstatusdialog = new DigStatus(this);
+    searchdialog = new SearchDialog(ui->hexview, this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
@@ -108,6 +109,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
+    connect(ui->actionsearchhex, SIGNAL(triggered()), this, SLOT(ShowSearchDialog()), Qt::DirectConnection);
 
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->actionSection);
@@ -557,6 +559,11 @@ void WombatForensics::SetBookmark()
             }
         }
     }
+}
+
+void WombatForensics::ShowSearchDialog()
+{
+    searchdialog->show();
 }
 
 void WombatForensics::ShowDigStatus()

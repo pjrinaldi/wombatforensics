@@ -64,6 +64,7 @@ public:
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;
     FileViewer* fileviewer;
+    SearchDialog* searchdialog;
     QMenu* viewmenu;
     QMenu* treemenu;
     QMenu* selectionmenu;
@@ -197,6 +198,7 @@ private slots:
     void UnCheckChecked(void);
     void ReadSettings(void);
     void ReadBookmarks(void);
+    void ShowSearchDialog(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
