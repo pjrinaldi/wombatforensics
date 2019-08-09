@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>436</width>
-    <height>196</height>
+    <height>166</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,13 +69,6 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QCheckBox" name="cbCase">
-          <property name="text">
-           <string>&amp;Case Sensitive</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
      </item>
@@ -124,7 +117,6 @@
   <tabstop>cbFind</tabstop>
   <tabstop>cbFindFormat</tabstop>
   <tabstop>cbBackwards</tabstop>
-  <tabstop>cbCase</tabstop>
   <tabstop>pbFind</tabstop>
   <tabstop>pbCancel</tabstop>
  </tabstops>

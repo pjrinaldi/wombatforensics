@@ -874,6 +874,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionByteConverter->setEnabled(false);
     ui->actionJumpToHex->setEnabled(false);
     ui->actionpreviewreport->setEnabled(false);
+    ui->actionsearchhex->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -1091,6 +1092,7 @@ void WombatForensics::OpenUpdate()
         ui->actionSaveState->setEnabled(true);
         ui->actionDigDeeper->setEnabled(true);
         ui->actionJumpToHex->setEnabled(true);
+        ui->actionsearchhex->setEnabled(true);
         //ui->actionExpandAll->setEnabled(true);
         //ui->actionCollapseAll->setEnabled(true);
     }
@@ -1138,6 +1140,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionExport_Evidence->setEnabled(true);
         ui->actionByteConverter->setEnabled(true);
         ui->actionJumpToHex->setEnabled(true);
+        ui->actionsearchhex->setEnabled(true);
         StatusUpdate("Loading Hex Contents...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         LoadHexContents();
@@ -1293,6 +1296,7 @@ void WombatForensics::UpdateStatus()
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
+    ui->actionsearchhex->setEnabled(true);
     qInfo() << "Processing Complete";
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
@@ -1462,11 +1466,13 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         filelist = tmpstr.split(",");
     
         ui->hexview->setEnabled(true);
+        ui->actionsearchhex->setEnabled(true);
 
         if(curindex.sibling(curindex.row(), 2).data().toLongLong() == 0)
         {
             //qDebug() << "zero file";
             ui->hexview->setEnabled(false);
+            ui->actionsearchhex->setEnabled(false);
         }
         else
         {
@@ -1616,8 +1622,12 @@ void WombatForensics::LoadHexContents()
         else
             mftaddress = tmpstr.split(",").at(9).toInt();
         ui->hexview->setEnabled(true);
+        ui->actionsearchhex->setEnabled(true);
         if(tmpstr.split(",").at(8).toInt() == 0) // zero file
+        {
             ui->hexview->setEnabled(false);
+            ui->actionsearchhex->setEnabled(false);
+        }
         else
         {
             QString blockstring = "";

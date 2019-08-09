@@ -20,12 +20,10 @@ public:
 
 private slots:
     void on_pbFind_clicked();
-    //void on_pbReplace_clicked();
-    //void on_pbReplaceAll_clicked();
 
 private:
     QByteArray getContent(int comboIndex, const QString &input);
-    qint64 replaceOccurrence(qint64 idx, const QByteArray &replaceBa);
+    //qint64 replaceOccurrence(qint64 idx, const QByteArray &replaceBa);
 
     QHexEdit *_hexEdit;
     QByteArray _findBa;

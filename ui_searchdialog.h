@@ -35,7 +35,6 @@ public:
     QGroupBox *gbOptions;
     QVBoxLayout *verticalLayout_3;
     QCheckBox *cbBackwards;
-    QCheckBox *cbCase;
     QVBoxLayout *verticalLayout;
     QPushButton *pbFind;
     QPushButton *pbCancel;
@@ -45,7 +44,7 @@ public:
     {
         if (SearchDialog->objectName().isEmpty())
             SearchDialog->setObjectName(QString::fromUtf8("SearchDialog"));
-        SearchDialog->resize(436, 196);
+        SearchDialog->resize(436, 166);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/bar/hexsrch"), QSize(), QIcon::Normal, QIcon::Off);
         SearchDialog->setWindowIcon(icon);
@@ -87,11 +86,6 @@ public:
 
         verticalLayout_3->addWidget(cbBackwards);
 
-        cbCase = new QCheckBox(gbOptions);
-        cbCase->setObjectName(QString::fromUtf8("cbCase"));
-
-        verticalLayout_3->addWidget(cbCase);
-
 
         verticalLayout_2->addWidget(gbOptions);
 
@@ -119,8 +113,7 @@ public:
 
         QWidget::setTabOrder(cbFind, cbFindFormat);
         QWidget::setTabOrder(cbFindFormat, cbBackwards);
-        QWidget::setTabOrder(cbBackwards, cbCase);
-        QWidget::setTabOrder(cbCase, pbFind);
+        QWidget::setTabOrder(cbBackwards, pbFind);
         QWidget::setTabOrder(pbFind, pbCancel);
 
         retranslateUi(SearchDialog);
@@ -141,7 +134,6 @@ public:
 
         gbOptions->setTitle(QCoreApplication::translate("SearchDialog", "Options", nullptr));
         cbBackwards->setText(QCoreApplication::translate("SearchDialog", "&Backwards", nullptr));
-        cbCase->setText(QCoreApplication::translate("SearchDialog", "&Case Sensitive", nullptr));
         pbFind->setText(QCoreApplication::translate("SearchDialog", "&Find", nullptr));
 #if QT_CONFIG(shortcut)
         pbFind->setShortcut(QCoreApplication::translate("SearchDialog", "F3", nullptr));

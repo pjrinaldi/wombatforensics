@@ -90,7 +90,7 @@ QByteArray SearchDialog::getContent(int comboIndex, const QString &input)
     }
     return findBa;
 }
-
+/*
 qint64 SearchDialog::replaceOccurrence(qint64 idx, const QByteArray &replaceBa)
 {
     int result = QMessageBox::Yes;
@@ -115,3 +115,4 @@ qint64 SearchDialog::replaceOccurrence(qint64 idx, const QByteArray &replaceBa)
     }
     return result;
 }
+*/
