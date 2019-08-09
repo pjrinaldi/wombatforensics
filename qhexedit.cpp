@@ -921,70 +921,70 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 qint64 posBa = _bPosFirst + bPosLine + colIdx; // curoffset
                 if(!bypasscolor)
                 {
-                if(blocklist.count() > 0)
-                {
-                    if(blocklist.at(0).toLongLong() == 0) // resident attribute
+                    if(blocklist.count() > 0)
                     {
-                        //qDebug() << "resident attribute";
+                        if(blocklist.at(0).toLongLong() == 0) // resident attribute
+                        {
+                            //qDebug() << "resident attribute";
+                            curblkstart = 0;
+			    curblkend = 0;
+                            curblkstart = residentoffset + fsoffset;
+                            curblkend = curblkstart + mftrecordsize - dataoffset - 1;
+                            //qDebug() << "curblkend:" << curblkend;
+                            //qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
+                            if(posBa >= curblkstart && posBa < qMin((curblkstart + filelength - 1), curblkend))
+                            {
+			        c = contentbrush.color(); // BLUE
+                                if((posBa > (curblkstart + filelength - 1)) && posBa <= curblkend)
+                                {
+    				    c = slackbrush.color(); // RED
+                                }
+                            }
+                        }
+                        else // non-resident attribute
+                        {
+                            //qDebug() << "non-resident attribute";
+                            if(curblocklist.count() > 0)
+                            {
+                                for(int i=0; i < curblocklist.count(); i++)
+                                {
+        	    	        	curblkstart = 0;
+    	                		curblkend = 0;
+                                    curblkstart = fsoffset + curblocklist.at(i).toLongLong() * blocksize;
+                                    curblkend = curblkstart + blocksize - 1;
+                                    if(posBa >= byteoffset && posBa <= byteoffset + filelength)
+                                    {
+				        c = contentbrush.color(); // BLUE
+                                    }
+                                    if(curblocklist.at(i).toLongLong() == blocklist.last().toLongLong())
+                                    {
+                                        if(posBa > byteoffset + filelength && posBa <= curblkend)
+                                            c = slackbrush.color(); // RED
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else // resident attribute
+                    {
+                        //qDebug() << "resident attribute 2";
                         curblkstart = 0;
-			curblkend = 0;
+        		    curblkend = 0;
                         curblkstart = residentoffset + fsoffset;
                         curblkend = curblkstart + mftrecordsize - dataoffset - 1;
                         //qDebug() << "curblkend:" << curblkend;
-                        //qDebug() << "blockstart:" << curblkstart << "blockend:" << curblkend;
-                        if(posBa >= curblkstart && posBa < qMin((curblkstart + filelength - 1), curblkend))
+		        //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
+                        if(posBa >= curblkstart && posBa <= qMin((curblkstart + filelength - 1), curblkend))
                         {
-			    c = contentbrush.color(); // BLUE
-                            if((posBa > (curblkstart + filelength - 1)) && posBa <= curblkend)
-                            {
-				c = slackbrush.color(); // RED
-                            }
-                        }
-
+	    	            //qDebug() << "should be blue.";
+	            	    c = contentbrush.color(); // BLUE
+        		}
+                        if((posBa > (curblkstart + filelength - 1)) && posBa <= curblkend)
+        		{
+			    //qDebug() << "should be red.";
+        		    c = slackbrush.color(); // RED
+		        }
                     }
-                    else // non-resident attribute
-                    {
-                        //qDebug() << "non-resident attribute";
-                        if(curblocklist.count() > 0)
-                        {
-                            for(int i=0; i < curblocklist.count(); i++)
-                            {
-	    	        	curblkstart = 0;
-	        		curblkend = 0;
-                                curblkstart = fsoffset + curblocklist.at(i).toLongLong() * blocksize;
-                                curblkend = curblkstart + blocksize - 1;
-                                if(posBa >= byteoffset && posBa <= byteoffset + filelength)
-                                {
-				    c = contentbrush.color(); // BLUE
-                                }
-                                if(curblocklist.at(i).toLongLong() == blocklist.last().toLongLong())
-                                {
-                                    if(posBa > byteoffset + filelength && posBa <= curblkend)
-                                        c = slackbrush.color(); // RED
-                                }
-                            }
-                        }
-                    }
-                }
-                else // resident attribute
-                {
-                    //qDebug() << "resident attribute 2";
-                    curblkstart = 0;
-		    curblkend = 0;
-                    curblkstart = residentoffset + fsoffset;
-                    curblkend = curblkstart + mftrecordsize - dataoffset - 1;
-                    //qDebug() << "curblkend:" << curblkend;
-		    //qDebug() << "curblkstart:" << curblkstart << "curblkend:" << curblkend;
-                    if(posBa >= curblkstart && posBa <= qMin((curblkstart + filelength - 1), curblkend))
-                    {
-			//qDebug() << "should be blue.";
-			c = contentbrush.color(); // BLUE
-		    }
-                    if((posBa > (curblkstart + filelength - 1)) && posBa <= curblkend)
-		    {
-			//qDebug() << "should be red.";
-			c = slackbrush.color(); // RED
-		    }
                 }
 
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
@@ -1000,7 +1000,6 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                             c = _brushHighlighted.color();
                             painter.setPen(_penHighlighted);
                         }
-                }
                 }
 
                 // render hex value
