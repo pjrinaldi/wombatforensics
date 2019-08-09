@@ -6,6 +6,7 @@
 
 #include "wombatinclude.h"
 #include "ui_fileviewer.h"
+#include "searchdialog.h"
 
 namespace Ui {
     class FileViewer;
@@ -29,6 +30,7 @@ private slots:
     void UpdateSelectValue(void);
     void HideClicked();
     void JumpHex();
+    void ShowSearch();
 
 signals:
     void HideFileViewer(bool checkstate);
@@ -44,6 +46,8 @@ private:
     QLineEdit* jumpto;
     QLabel* jumplabel;
     QPushButton* jumpbutton;
+    QAction* hexbutton;
+    SearchDialog* searchdialog;
 };
 
 Q_DECLARE_METATYPE(FileViewer*);

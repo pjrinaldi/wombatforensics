@@ -13,9 +13,13 @@ FileViewer::FileViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::FileVi
     jumplabel = new QLabel("Jump To:");
     jumpbutton = new QPushButton("Go");
     jumpto->setPlaceholderText("Enter Hex Offset");
+    hexbutton = new QAction("Find in Hex/Ascii", this);
+    hexbutton->setIcon(QIcon(":/bar/hexsrch"));
     ui->toolBar->addWidget(jumplabel);
     ui->toolBar->addWidget(jumpto);
     ui->toolBar->addWidget(jumpbutton);
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(hexbutton);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
     selectedhex = new QLabel(this);
@@ -23,6 +27,8 @@ FileViewer::FileViewer(QWidget* parent) : QMainWindow(parent), ui(new Ui::FileVi
     this->statusBar()->addWidget(selectedoffset, 0);
     this->statusBar()->addWidget(selectedhex, 0);
     connect(jumpbutton, SIGNAL(clicked()), this, SLOT(JumpHex()));
+    connect(hexbutton, SIGNAL(triggered()), this, SLOT(ShowSearch()));
+    searchdialog = new SearchDialog(ui->filehexview, this);
 }
 
 FileViewer::~FileViewer()
@@ -81,4 +87,9 @@ void FileViewer::JumpHex()
 {
     ui->filehexview->setCursorPosition(jumpto->text().toLongLong(0, 16)*2);
     ui->filehexview->ensureVisible();
+}
+
+void FileViewer::ShowSearch()
+{
+    searchdialog->show();
 }
