@@ -56,6 +56,7 @@ public:
     QAction *actionJumpToHex;
     QAction *actionpreviewreport;
     QAction *actionsearchhex;
+    QAction *actionpublishresults;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -216,6 +217,11 @@ public:
         QIcon icon23;
         icon23.addFile(QString::fromUtf8(":/bar/hexsrch"), QSize(), QIcon::Normal, QIcon::Off);
         actionsearchhex->setIcon(icon23);
+        actionpublishresults = new QAction(WombatForensics);
+        actionpublishresults->setObjectName(QString::fromUtf8("actionpublishresults"));
+        QIcon icon24;
+        icon24.addFile(QString::fromUtf8(":/bar/publish"), QSize(), QIcon::Normal, QIcon::Off);
+        actionpublishresults->setIcon(icon24);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -295,6 +301,7 @@ public:
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionBookmark_Manager);
         analysisToolBar->addAction(actionpreviewreport);
+        analysisToolBar->addAction(actionpublishresults);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionRemove_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(RemEvidence()));
@@ -395,6 +402,7 @@ public:
 #if QT_CONFIG(tooltip)
         actionsearchhex->setToolTip(QCoreApplication::translate("WombatForensics", "Find in Hex/Ascii", nullptr));
 #endif // QT_CONFIG(tooltip)
+        actionpublishresults->setText(QCoreApplication::translate("WombatForensics", "Publish Results", nullptr));
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());
 #endif // QT_CONFIG(tooltip)

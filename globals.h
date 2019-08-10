@@ -40,6 +40,7 @@ extern QStringList newevidence; // contains the list of new evidence items
 extern QString exportpath; // path to export files to
 extern bool originalpath; // whether to include original file path or not
 extern QString casepath; // case path settings variable
+extern QString reportpath; // report path settings variable
 extern QString hexstring; // tmp hex file filename with path
 extern QHash<QString, bool> checkhash; // hash value list for check boxes.
 extern QHash<QString, QString> imageshash; // list of thumbnail ids, paths

@@ -792,13 +792,20 @@ void WombatForensics::ReadSettings()
             ba.append(tmplist.at(i).split(":").at(1));
             casepath = QByteArray::fromBase64(ba);
         }
+        else if(tmplist.at(i).split(":").at(1) == "reportpath")
+        {
+            QByteArray ba;
+            ba.append(tmplist.at(i).split(":").at(1));
+            reportpath = QByteArray::fromBase64(ba);
+        }
         //else if(tmplist.at(i).split(":").at(0) == "save")
         // etc...
     }
     QDir dir;
     if(dir.mkpath(casepath) == false)
         DisplayError("S.1", "App casepath folder failed", "App casepath folder was not created");
-
+    if(dir.mkpath(reportpath) == false)
+        DisplayError("S.2", "App reportpath folder failed", "App reportpath folder was not created");
     // ensure casepath exists
     //QDir::mkpath(casepath);
     //if((new QDir())->mkpath(casepath) == false)

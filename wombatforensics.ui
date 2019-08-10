@@ -160,6 +160,7 @@
    <addaction name="separator"/>
    <addaction name="actionBookmark_Manager"/>
    <addaction name="actionpreviewreport"/>
+   <addaction name="actionpublishresults"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
    <property name="styleSheet">
@@ -518,6 +519,15 @@
    </property>
    <property name="toolTip">
     <string>Find in Hex/Ascii</string>
+   </property>
+  </action>
+  <action name="actionpublishresults">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/publish</normaloff>:/bar/publish</iconset>
+   </property>
+   <property name="text">
+    <string>Publish Results</string>
    </property>
   </action>
  </widget>

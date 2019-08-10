@@ -37,6 +37,7 @@ QStringList listeditems;
 QStringList existingevidence;
 QStringList newevidence;
 QString casepath = QDir::homePath(); // case path settings variable
+QString reportpath = QDir::homePath(); // report path settings variable
 QString exportpath = "";
 bool originalpath = true;
 QString hexstring = "";

@@ -24,13 +24,20 @@ void SettingsDialog::SaveChanges()
     if(casepath.endsWith("/"))
         casepath.chop(1);
     //qDebug() << "casepath:" << casepath;
+    if(!ui->reportpathlineedit->text().isEmpty())
+        reportpath = ui->reportpathlineedit->text();
+    if(reportpath.endsWith("/"))
+        reportpath.chop(1);
     QByteArray ba;
     ba.append(casepath);
+    QByteArray ba2;
+    ba2.append(reportpath);
     // repeat this process for other variables..
     settingsfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&settingsfile);
     out << "thumb:" << QString::number(ui->thumbnailspinbox->value()) << ",";
     out << "casepath:" << ba.toBase64() << ",";
+    out << "reportpath:" << ba2.toBase64() << ",";
     settingsfile.close();
     this->hide();
 }
@@ -53,6 +60,12 @@ void SettingsDialog::LoadSettings()
             QByteArray ba;
             ba.append(tmplist.at(i).split(":").at(1));
             ui->casepathlineedit->setText(QByteArray::fromBase64(ba));
+        }
+        else if(tmplist.at(i).split(":").at(0) == "reportpath")
+        {
+            QByteArray ba;
+            ba.append(tmplist.at(i).split(":").at(1));
+            ui->reportpathlineedit->setText(QByteArray::fromBase64(ba));
         }
     }
 }

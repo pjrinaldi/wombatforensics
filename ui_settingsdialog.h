@@ -25,47 +25,64 @@ class Ui_SettingsDialog
 {
 public:
     QGridLayout *gridLayout;
-    QPushButton *cancelbutton;
-    QPushButton *savebutton;
-    QLabel *thumbnaillabel;
-    QSpacerItem *verticalSpacer;
-    QSpinBox *thumbnailspinbox;
     QLabel *casepathlabel;
     QLineEdit *casepathlineedit;
+    QLabel *thumbnaillabel;
+    QPushButton *cancelbutton;
+    QSpacerItem *verticalSpacer;
+    QPushButton *savebutton;
+    QSpinBox *thumbnailspinbox;
+    QLabel *reportpathlabel;
+    QLineEdit *reportpathlineedit;
 
     void setupUi(QDialog *SettingsDialog)
     {
         if (SettingsDialog->objectName().isEmpty())
             SettingsDialog->setObjectName(QString::fromUtf8("SettingsDialog"));
         SettingsDialog->setWindowModality(Qt::ApplicationModal);
-        SettingsDialog->resize(393, 115);
+        SettingsDialog->resize(407, 166);
         SettingsDialog->setModal(true);
         gridLayout = new QGridLayout(SettingsDialog);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        cancelbutton = new QPushButton(SettingsDialog);
-        cancelbutton->setObjectName(QString::fromUtf8("cancelbutton"));
+        casepathlabel = new QLabel(SettingsDialog);
+        casepathlabel->setObjectName(QString::fromUtf8("casepathlabel"));
 
-        gridLayout->addWidget(cancelbutton, 3, 3, 1, 1);
+        gridLayout->addWidget(casepathlabel, 1, 0, 1, 1);
 
-        savebutton = new QPushButton(SettingsDialog);
-        savebutton->setObjectName(QString::fromUtf8("savebutton"));
+        casepathlineedit = new QLineEdit(SettingsDialog);
+        casepathlineedit->setObjectName(QString::fromUtf8("casepathlineedit"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(2);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(casepathlineedit->sizePolicy().hasHeightForWidth());
+        casepathlineedit->setSizePolicy(sizePolicy);
 
-        gridLayout->addWidget(savebutton, 3, 4, 1, 1);
+        gridLayout->addWidget(casepathlineedit, 1, 1, 1, 4);
 
         thumbnaillabel = new QLabel(SettingsDialog);
         thumbnaillabel->setObjectName(QString::fromUtf8("thumbnaillabel"));
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(thumbnaillabel->sizePolicy().hasHeightForWidth());
-        thumbnaillabel->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(thumbnaillabel->sizePolicy().hasHeightForWidth());
+        thumbnaillabel->setSizePolicy(sizePolicy1);
         thumbnaillabel->setScaledContents(false);
 
         gridLayout->addWidget(thumbnaillabel, 0, 0, 1, 1);
 
+        cancelbutton = new QPushButton(SettingsDialog);
+        cancelbutton->setObjectName(QString::fromUtf8("cancelbutton"));
+
+        gridLayout->addWidget(cancelbutton, 4, 3, 1, 1);
+
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        gridLayout->addItem(verticalSpacer, 2, 1, 1, 1);
+        gridLayout->addItem(verticalSpacer, 3, 1, 1, 1);
+
+        savebutton = new QPushButton(SettingsDialog);
+        savebutton->setObjectName(QString::fromUtf8("savebutton"));
+
+        gridLayout->addWidget(savebutton, 4, 4, 1, 1);
 
         thumbnailspinbox = new QSpinBox(SettingsDialog);
         thumbnailspinbox->setObjectName(QString::fromUtf8("thumbnailspinbox"));
@@ -78,20 +95,18 @@ public:
 
         gridLayout->addWidget(thumbnailspinbox, 0, 1, 1, 1);
 
-        casepathlabel = new QLabel(SettingsDialog);
-        casepathlabel->setObjectName(QString::fromUtf8("casepathlabel"));
+        reportpathlabel = new QLabel(SettingsDialog);
+        reportpathlabel->setObjectName(QString::fromUtf8("reportpathlabel"));
 
-        gridLayout->addWidget(casepathlabel, 1, 0, 1, 1);
+        gridLayout->addWidget(reportpathlabel, 2, 0, 1, 1);
 
-        casepathlineedit = new QLineEdit(SettingsDialog);
-        casepathlineedit->setObjectName(QString::fromUtf8("casepathlineedit"));
-        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(2);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(casepathlineedit->sizePolicy().hasHeightForWidth());
-        casepathlineedit->setSizePolicy(sizePolicy1);
+        reportpathlineedit = new QLineEdit(SettingsDialog);
+        reportpathlineedit->setObjectName(QString::fromUtf8("reportpathlineedit"));
+        sizePolicy.setHeightForWidth(reportpathlineedit->sizePolicy().hasHeightForWidth());
+        reportpathlineedit->setSizePolicy(sizePolicy);
+        reportpathlineedit->setClearButtonEnabled(false);
 
-        gridLayout->addWidget(casepathlineedit, 1, 1, 1, 4);
+        gridLayout->addWidget(reportpathlineedit, 2, 1, 1, 4);
 
 
         retranslateUi(SettingsDialog);
@@ -105,12 +120,14 @@ public:
     void retranslateUi(QDialog *SettingsDialog)
     {
         SettingsDialog->setWindowTitle(QCoreApplication::translate("SettingsDialog", "Settings", nullptr));
-        cancelbutton->setText(QCoreApplication::translate("SettingsDialog", "Cancel", nullptr));
-        savebutton->setText(QCoreApplication::translate("SettingsDialog", "Save", nullptr));
-        thumbnaillabel->setText(QCoreApplication::translate("SettingsDialog", "Thumbnail Size:", nullptr));
-        thumbnailspinbox->setSuffix(QCoreApplication::translate("SettingsDialog", " pixels", nullptr));
         casepathlabel->setText(QCoreApplication::translate("SettingsDialog", "Set Case Path:", nullptr));
         casepathlineedit->setPlaceholderText(QCoreApplication::translate("SettingsDialog", "User's Home Directory", nullptr));
+        thumbnaillabel->setText(QCoreApplication::translate("SettingsDialog", "Thumbnail Size:", nullptr));
+        cancelbutton->setText(QCoreApplication::translate("SettingsDialog", "Cancel", nullptr));
+        savebutton->setText(QCoreApplication::translate("SettingsDialog", "Save", nullptr));
+        thumbnailspinbox->setSuffix(QCoreApplication::translate("SettingsDialog", " pixels", nullptr));
+        reportpathlabel->setText(QCoreApplication::translate("SettingsDialog", "Set Report Folder:", nullptr));
+        reportpathlineedit->setPlaceholderText(QCoreApplication::translate("SettingsDialog", "User's Home Directory", nullptr));
     } // retranslateUi
 
 };
