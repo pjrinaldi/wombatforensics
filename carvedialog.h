@@ -24,11 +24,14 @@ public:
 
 private slots:
     void HideClicked();
+    void Assign();
 /*
     void ModifyTag();
     void RemoveTag();
     void AddTag();
+*/
     void UpdateList();
+/*
     void SelectionChanged();
 */
 signals:
@@ -39,8 +42,8 @@ protected:
 
 private:
     Ui::CarveDialog* ui;
-    //QFile bookmarkfile;
-    //QStringList taglist;
+    QFile bookmarkfile;
+    QStringList taglist;
     //QStringList llist;
     //QStringList tlist;
     //QString linkstr = "";

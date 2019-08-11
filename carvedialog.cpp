@@ -6,12 +6,15 @@
 CarveDialog::CarveDialog(QWidget* parent) : QDialog(parent), ui(new Ui::CarveDialog)
 {
     ui->setupUi(this);
+    connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->carvebutton, SIGNAL(clicked()), this, SLOT(Assign()));
     //connect(ui->newbutton, SIGNAL(clicked()), this, SLOT(AddTag()));
     //connect(ui->modifybutton, SIGNAL(clicked()), this, SLOT(ModifyTag()));
     //connect(ui->removebutton, SIGNAL(clicked()), this, SLOT(RemoveTag()));
     //connect(ui->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(SelectionChanged()));
     //ui->removebutton->setEnabled(false);
     //UpdateList();
+    UpdateList();
 }
 
 CarveDialog::~CarveDialog()
@@ -21,7 +24,14 @@ CarveDialog::~CarveDialog()
 
 void CarveDialog::HideClicked()
 {
-    emit HideManagerWindow();
+    //emit HideManagerWindow();
+    this->close();
+}
+
+void CarveDialog::Assign()
+{
+    qDebug() << ui->tagcombobox->currentText();
+    qDebug() << ui->titlelineedit->text();
     this->close();
 }
 /*
@@ -115,13 +125,16 @@ void CarveDialog::SelectionChanged()
     //qDebug() << "selectionid:" << ui->listWidget->currentRow();
     ui->removebutton->setEnabled(true);
 }
+*/
 
 void CarveDialog::UpdateList()
 {
-    ui->listWidget->clear();
     taglist.clear();
+    /*
+    ui->listWidget->clear();
     tlist.clear();
     llist.clear();
+    */
     bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())
@@ -130,13 +143,12 @@ void CarveDialog::UpdateList()
     //taglist.removeDuplicates();
     for(int i=0; i < taglist.count(); i++)
     {
-        new QListWidgetItem(taglist.at(i), ui->listWidget);
+        ui->tagcombobox->addItem(taglist.at(i));
     }
 }
-*/
 
 void CarveDialog::closeEvent(QCloseEvent* e)
 {
-    emit HideManagerWindow();
+    //emit HideManagerWindow();
     e->accept();
 }

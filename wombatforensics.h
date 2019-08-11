@@ -28,6 +28,7 @@
 #include "remevidencedialog.h"
 #include "tagmanager.h"
 #include "searchdialog.h"
+#include "carvedialog.h"
 
 class StatusLabel : public QLabel
 {
@@ -101,6 +102,7 @@ public:
     DigStatus* digstatusdialog;
     RemEvidenceDialog* remevidencedialog;
     TagManager* tagmanage;
+    CarveDialog* carvedialog;
 
 signals:
     void CancelCurrentThread();
