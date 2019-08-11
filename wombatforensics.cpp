@@ -2619,6 +2619,7 @@ void WombatForensics::AddSection()
 
 void WombatForensics::TagSection(QString ctitle, QString ctag)
 {
+    qDebug() << "ctitle:" << ctitle << "ctag:" << ctag;
 }
 
 /*

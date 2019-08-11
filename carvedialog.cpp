@@ -25,8 +25,8 @@ void CarveDialog::HideClicked()
 
 void CarveDialog::Assign()
 {
-    qDebug() << ui->tagcombobox->currentText();
-    qDebug() << ui->titlelineedit->text();
+    //qDebug() << ui->tagcombobox->currentText();
+    //qDebug() << ui->titlelineedit->text();
     emit TagCarved(ui->titlelineedit->text(), ui->tagcombobox->currentText());
     this->close();
 }
