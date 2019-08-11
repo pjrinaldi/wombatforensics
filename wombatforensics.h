@@ -188,7 +188,7 @@ private slots:
     void SetSelectedFromImageViewer(QString selectedid);
     void ShowFile(const QModelIndex &index);
     void AddSection(void);
-    void AddTextSection(void);
+    //void AddTextSection(void);
     void CarveFile(void);
     void AutoSaveState(void);
     void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);

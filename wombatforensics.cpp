@@ -107,13 +107,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&hashingwatcher, SIGNAL(finished()), this, SLOT(HashingFinish()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
-    connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
+    //connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
     connect(ui->actionsearchhex, SIGNAL(triggered()), this, SLOT(ShowSearchDialog()), Qt::DirectConnection);
 
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->actionSection);
-    selectionmenu->addAction(ui->actionTextSection);
+    //selectionmenu->addAction(ui->actionTextSection);
     selectionmenu->addAction(ui->actionFile);
 
     remtagaction = new QAction("Remove Selected Tag", bookmarkmenu);
@@ -2616,10 +2616,12 @@ void WombatForensics::AddSection()
     //qDebug() << "Add selected hex to a new section";
 }
 
+/*
 void WombatForensics::AddTextSection()
 {
     //qDebug() << "Add selected text to a new section";
 }
+*/
 
 void WombatForensics::CarveFile()
 {
