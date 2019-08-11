@@ -8,12 +8,8 @@ CarveDialog::CarveDialog(QWidget* parent) : QDialog(parent), ui(new Ui::CarveDia
     ui->setupUi(this);
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->carvebutton, SIGNAL(clicked()), this, SLOT(Assign()));
-    //connect(ui->newbutton, SIGNAL(clicked()), this, SLOT(AddTag()));
-    //connect(ui->modifybutton, SIGNAL(clicked()), this, SLOT(ModifyTag()));
-    //connect(ui->removebutton, SIGNAL(clicked()), this, SLOT(RemoveTag()));
-    //connect(ui->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(SelectionChanged()));
-    //ui->removebutton->setEnabled(false);
-    //UpdateList();
+    connect(ui->titlelineedit, SIGNAL(editingFinished()), this, SLOT(UpdateAssign()));
+    ui->carvebutton->setEnabled(false);
     UpdateList();
 }
 
@@ -24,7 +20,6 @@ CarveDialog::~CarveDialog()
 
 void CarveDialog::HideClicked()
 {
-    //emit HideManagerWindow();
     this->close();
 }
 
@@ -32,115 +27,26 @@ void CarveDialog::Assign()
 {
     qDebug() << ui->tagcombobox->currentText();
     qDebug() << ui->titlelineedit->text();
+    emit TagCarved(ui->titlelineedit->text(), ui->tagcombobox->currentText());
     this->close();
 }
-/*
-void CarveDialog::ModifyTag()
-{
-    QString selectedtag = ui->listWidget->currentItem()->text();
-    int selectedtagid = ui->listWidget->currentRow();
-    QString tmpstr = "";
-    QString modtagname = "";
-    QInputDialog* modtagdialog = new QInputDialog(this);
-    modtagdialog->setCancelButtonText("Cancel");
-    modtagdialog->setInputMode(QInputDialog::TextInput);
-    modtagdialog->setLabelText("Modify Tag Name");
-    modtagdialog->setOkButtonText("Modify");
-    modtagdialog->setTextEchoMode(QLineEdit::Normal);
-    modtagdialog->setWindowTitle("Modify Tag");
-    modtagdialog->setTextValue(selectedtag);
-    if(modtagdialog->exec())
-        modtagname = modtagdialog->textValue();
-    if(!modtagname.isEmpty())
-    {
-        if(UpdateBookmarkItems(modtagname) != -15)
-        {
-            ui->listWidget->currentItem()->setText(modtagname);
-            for(int i=0; i < ui->listWidget->count(); i++)
-                tmpstr += ((QListWidgetItem*)ui->listWidget->item(i))->text() + ",";
-            bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
-            if(bookmarkfile.isOpen())
-                bookmarkfile.write(tmpstr.toStdString().c_str());
-            bookmarkfile.close();
-            UpdateList();
-            UpdateTLinkItem(selectedtagid, selectedtag, modtagname);
-            UpdateTagItem(selectedtagid, selectedtag, modtagname);
-        }
-        else
-            QMessageBox::information(this, "Tag Exists", "Tag Name Not Modified. New Tag Name already Exists.", QMessageBox::Ok);
-    }
-}
 
-void CarveDialog::RemoveTag()
+void CarveDialog::UpdateAssign()
 {
-    QString selectedtag = ui->listWidget->currentItem()->text();
-    QString tmpstr = "";
-    for(int i = 0; i < taglist.count(); i++)
-    {
-        if(taglist.at(i).contains(selectedtag))
-            taglist.removeAt(i);
-    }
-    for(int i=0; i < taglist.count(); i++)
-        tmpstr += taglist.at(i) + ",";
-    bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if(bookmarkfile.isOpen())
-        bookmarkfile.write(tmpstr.toStdString().c_str());
-    bookmarkfile.close();
-    //qDebug() << "tmpstr:" << tmpstr;
-    ui->removebutton->setEnabled(false);
-    UpdateList();
-    RemoveTLinkItem(selectedtag);
-    RemoveTagItem(selectedtag);
+    if(ui->titlelineedit->text().isEmpty())
+        ui->carvebutton->setEnabled(false);
+    else
+        ui->carvebutton->setEnabled(true);
 }
-
-void CarveDialog::AddTag()
-{
-    QString tagname = "";
-    QInputDialog* newtagdialog = new QInputDialog(this);
-    newtagdialog->setCancelButtonText("Cancel");
-    newtagdialog->setInputMode(QInputDialog::TextInput);
-    newtagdialog->setLabelText("Enter Tag Name");
-    newtagdialog->setOkButtonText("Create Tag");
-    newtagdialog->setTextEchoMode(QLineEdit::Normal);
-    newtagdialog->setWindowTitle("New Tag");
-    if(newtagdialog->exec())
-        tagname = newtagdialog->textValue();
-    if(!tagname.isEmpty())
-    {
-        int tagid = UpdateBookmarkItems(tagname);
-        if(tagid != -15)
-        {
-            emit ReadBookmarks();
-            UpdateList();
-            AddTLinkItem(tagid, tagname);
-            AddTagItem(tagid, tagname);
-        }
-        else
-            QMessageBox::information(this, "Tag Exists", "Tag Not Added. Tag Name Already Exists.", QMessageBox::Ok);
-    }
-}
-
-void CarveDialog::SelectionChanged()
-{
-    //qDebug() << "selectionid:" << ui->listWidget->currentRow();
-    ui->removebutton->setEnabled(true);
-}
-*/
 
 void CarveDialog::UpdateList()
 {
     taglist.clear();
-    /*
-    ui->listWidget->clear();
-    tlist.clear();
-    llist.clear();
-    */
     bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())
         taglist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
     bookmarkfile.close();
-    //taglist.removeDuplicates();
     for(int i=0; i < taglist.count(); i++)
     {
         ui->tagcombobox->addItem(taglist.at(i));
@@ -149,6 +55,5 @@ void CarveDialog::UpdateList()
 
 void CarveDialog::closeEvent(QCloseEvent* e)
 {
-    //emit HideManagerWindow();
     e->accept();
 }

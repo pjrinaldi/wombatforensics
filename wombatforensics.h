@@ -201,6 +201,7 @@ private slots:
     void ReadSettings(void);
     void ReadBookmarks(void);
     void ShowSearchDialog(void);
+    void TagSection(QString ctitle, QString ctag);
 
 protected:
     void closeEvent(QCloseEvent* event);

@@ -25,18 +25,10 @@ public:
 private slots:
     void HideClicked();
     void Assign();
-/*
-    void ModifyTag();
-    void RemoveTag();
-    void AddTag();
-*/
     void UpdateList();
-/*
-    void SelectionChanged();
-*/
+    void UpdateAssign();
 signals:
-    void HideManagerWindow();
-    //void ReadBookmarks();
+    void TagCarved(QString ctitle, QString ctag);
 protected:
     void closeEvent(QCloseEvent* event);
 
@@ -44,10 +36,6 @@ private:
     Ui::CarveDialog* ui;
     QFile bookmarkfile;
     QStringList taglist;
-    //QStringList llist;
-    //QStringList tlist;
-    //QString linkstr = "";
-    //QString tagstr = "";
 };
 
 Q_DECLARE_METATYPE(CarveDialog*);
