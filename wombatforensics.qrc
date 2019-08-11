@@ -34,7 +34,7 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
-    <file alias="publish">Resources/PossibleGraphics/publish/publishreport.png</file>
+    <file alias="publish">Resources/PossibleGraphics/publish/paperairplane2.png</file>
     <file alias="hexsrch">Resources/searchhex.png</file>
     <file alias="newcase">Resources/newcase.svg</file>
     <file alias="opencase">Resources/opencase.svg</file>
