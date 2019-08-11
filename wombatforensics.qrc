@@ -3,7 +3,6 @@
     <file alias="remcheck">Resources/process-remove.svg</file>
     <file alias="missingimage">Resources/image-missing.png</file>
     <file alias="cancelthread">Resources/process-stop.svg</file>
-    <file alias="outsidein">Resources/object-inverse.svg</file>
     <file alias="textencode">Resources/text-x-gettext-translation.svg</file>
     <file alias="ehex">Resources/text-x-makefile.svg</file>
     <file alias="esearch">Resources/edit-find.svg</file>
@@ -36,14 +35,8 @@
   <qresource prefix="/bar">
     <file alias="publish">Resources/PossibleGraphics/publish/paperairplane2.png</file>
     <file alias="hexsrch">Resources/searchhex.png</file>
-    <file alias="newcase">Resources/newcase.svg</file>
-    <file alias="opencase">Resources/opencase.svg</file>
-    <file alias="tag-rem">Resources/tag-rem.svg</file>
     <file alias="reportpreview">Resources/reportpreview1.png</file>
-    <file alias="collapseall">Resources/go-first.svg</file>
-    <file alias="expandall">Resources/go-last.svg</file>
-    <file alias="newtag">Resources/tag-new.svg</file>
-    <file alias="managetags">Resources/folder-tag.svg</file>
+    <file alias="tag-rem">Resources/bookmark-rem.svg</file>
     <file alias="jumptohex">Resources/jumptohex.png</file>
     <file alias="xhex">Resources/text-x-hex.png</file>
     <file alias="ispade">Resources/icons8-spade-40.png</file>
@@ -55,18 +48,12 @@
     <file alias="docnew">Resources/document-new.svg</file>
     <file alias="byteview">Resources/accessories-calculator.svg</file>
     <file alias="settingsview">Resources/applications-system.png</file>
-    <file alias="casenew">Resources/document-new.png</file>
-    <file alias="caseopen">Resources/document-open.png</file>
-    <file alias="casesave">Resources/document-save.png</file>
-    <file alias="evidadd">Resources/list-add.png</file>
-    <file alias="evidrem">Resources/list-remove.png</file>
     <file alias="checkbox">Resources/checkbox.png</file>
     <file alias="dig">Resources/dig.png</file>
     <file alias="window">./Resources/window-new.png</file>
-    <file alias="bookmarkmgr">./Resources/bookmarks-organize.png</file>
-    <file alias="addfileto">./Resources/bookmark-new-4.png</file>
-    <file alias="addtobkmrk">./Resources/bookmark.png</file>
-    <file alias="addtonewbkmrk">./Resources/bookmark-new.png</file>
+    <file alias="managetags">./Resources/bookmarks-organize.png</file>
+    <file alias="addtotag">./Resources/bookmark.png</file>
+    <file alias="newtag">./Resources/bookmark-new.png</file>
     <file alias="missingthumb">./Resources/thumbmissing.png</file>
   </qresource>
   <qresource prefix="/html">

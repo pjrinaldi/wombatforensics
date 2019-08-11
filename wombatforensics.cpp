@@ -91,10 +91,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
     bookmarkmenu->setTitle("Tag Selected As");
-    bookmarkmenu->setIcon(QIcon(":/bar/newtag"));
+    bookmarkmenu->setIcon(QIcon(":/bar/addtotag"));
     tagcheckedmenu = new QMenu();
     tagcheckedmenu->setTitle("Tag Checked As");
-    tagcheckedmenu->setIcon(QIcon(":/bar/newtag"));
+    tagcheckedmenu->setIcon(QIcon(":/bar/addtotag"));
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionAbout);
@@ -230,9 +230,11 @@ void WombatForensics::ReadBookmarks()
     bookmarkmenu->clear();
     tagcheckedmenu->clear();
     QAction* newtagaction = new QAction("New Tag", bookmarkmenu);
+    newtagaction->setIcon(QIcon(":/bar/newtag"));
     connect(newtagaction, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
     bookmarkmenu->addAction(newtagaction);
     QAction* newtagaction1 = new QAction("New Tag", tagcheckedmenu);
+    newtagaction->setIcon(QIcon(":/bar/newtag"));
     connect(newtagaction1, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
     tagcheckedmenu->addAction(newtagaction1);
     bookmarkmenu->addSeparator();
@@ -241,9 +243,11 @@ void WombatForensics::ReadBookmarks()
     {
         //qDebug() << "i:" << i;
         QAction* tmpaction = new QAction(bookitemlist.at(i), bookmarkmenu);
+        tmpaction->setIcon(QIcon(":/bar/addtotag"));
         tmpaction->setData(QVariant("t" + QString::number(i)));
         //qDebug() << "tmpaction data;" << tmpaction->data().toString();
         QAction* tmpaction1 = new QAction(bookitemlist.at(i), tagcheckedmenu);
+        tmpaction1->setIcon(QIcon(":/bar/addtotag"));
         tmpaction1->setData(QVariant(QString("t" + QString::number(i))));
         connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetBookmark()));
         connect(tmpaction1, SIGNAL(triggered()), this, SLOT(SetBookmark()));
