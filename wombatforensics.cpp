@@ -886,6 +886,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionJumpToHex->setEnabled(false);
     ui->actionpreviewreport->setEnabled(false);
     ui->actionsearchhex->setEnabled(false);
+    ui->actionpublishresults->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -936,6 +937,7 @@ void WombatForensics::InitializeCaseStructure()
         ui->actionAdd_Evidence->setEnabled(true);
         ui->actionpreviewreport->setEnabled(true);
         ui->actionBookmark_Manager->setEnabled(true);
+        ui->actionpublishresults->setEnabled(true);
         qInfo() << "Case was Created";
         //LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
@@ -1034,6 +1036,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     ui->actionAdd_Evidence->setEnabled(true);
     ui->actionBookmark_Manager->setEnabled(true);
     ui->actionpreviewreport->setEnabled(true);
+    ui->actionpublishresults->setEnabled(true);
     autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
     autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
     UpdateEvidenceList();

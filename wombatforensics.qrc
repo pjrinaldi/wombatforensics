@@ -33,6 +33,7 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="carvetofile">Resources/PossibleGraphics/pie_chart_003.png</file>
     <file alias="publish">Resources/PossibleGraphics/publish/paperairplane2.png</file>
     <file alias="hexsrch">Resources/searchhex.png</file>
     <file alias="reportpreview">Resources/reportpreview1.png</file>
@@ -51,7 +52,7 @@
     <file alias="checkbox">Resources/checkbox.png</file>
     <file alias="dig">Resources/dig.png</file>
     <file alias="window">./Resources/window-new.png</file>
-    <file alias="managetags">./Resources/bookmarks-organize.png</file>
+    <file alias="managetags">Resources/managetags.png</file>
     <file alias="addtotag">./Resources/bookmark.png</file>
     <file alias="newtag">./Resources/bookmark-new.png</file>
     <file alias="missingthumb">./Resources/thumbmissing.png</file>

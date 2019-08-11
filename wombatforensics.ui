@@ -333,6 +333,10 @@
    </property>
   </action>
   <action name="actionFile">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/carvetofile</normaloff>:/bar/carvetofile</iconset>
+   </property>
    <property name="text">
     <string>Carve to a File</string>
    </property>
