@@ -2612,13 +2612,12 @@ void WombatForensics::AddSection()
     carvedialog = new CarveDialog(this);
     connect(carvedialog, SIGNAL(TagCarved(QString, QString)), this, SLOT(TagSection(QString, QString)));
     carvedialog->show();
-    // NEED TO GET THE CARVED OFFSET, EVIDITEM, LENGTH/SIZE, ASSIGNED TAG, TITLE/NAME
-    // THEN GENERATE WHAT NEEDS TO BE GENERATED... AND ADD IT TO TREEVIEW/ GENERATE .STAT FILE (E#-C#.STAT)/ ADD IT TO PREVIEW REPORT
-    //qDebug() << "Add selected hex to a new section";
 }
 
 void WombatForensics::TagSection(QString ctitle, QString ctag)
 {
+    // NEED TO GET THE CARVED OFFSET, EVIDITEM, LENGTH/SIZE, ASSIGNED TAG, TITLE/NAME
+    // THEN GENERATE WHAT NEEDS TO BE GENERATED... AND ADD IT TO TREEVIEW/ GENERATE .STAT FILE (E#-C#.STAT)/ ADD IT TO PREVIEW REPORT
     qDebug() << "ctitle:" << ctitle << "ctag:" << ctag;
 }
 
