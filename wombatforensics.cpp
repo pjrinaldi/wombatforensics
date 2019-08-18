@@ -106,6 +106,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&thashsavewatcher, SIGNAL(finished()), this, SLOT(ThashSaveFinish()), Qt::QueuedConnection);
     connect(&hashingwatcher, SIGNAL(finished()), this, SLOT(HashingFinish()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
+    connect(&carvewatcher, SIGNAL(finished()), this, SLOT(FinishCarve()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     //connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
@@ -1073,6 +1074,15 @@ void WombatForensics::OpenUpdate()
         QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash); // load images hash after case open to speed up thumbnail viewing
         thashwatcher.setFuture(tmpfuture);
     }
+    // add manual carved files
+    QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
+    QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
+    if(!cfiles.isEmpty())
+    {
+        QFuture<void> tfuture = QtConcurrent::map(cfiles, PopulateCarvedFiles);
+        carvewatcher.setFuture(tfuture);
+        carvedcount = cfiles.count() + 1;
+    }
     PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
@@ -1118,6 +1128,13 @@ void WombatForensics::OpenUpdate()
     if(!tdir.isEmpty())
         StatusUpdate("Loading Thumbnail Library...");
     ui->actionView_Image_Gallery->setEnabled(false);
+}
+
+void WombatForensics::FinishCarve(void)
+{
+    StatusUpdate("Carved Files Successfully Added");
+    qInfo() << "Carved Files Successfully Added";
+    StatusUpdate("Ready");
 }
 
 void WombatForensics::ThashSaveFinish(void)
@@ -2662,35 +2679,12 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimetype.name() + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," +  ctag;
     qDebug() << "carvedstring:" << carvedstring;
     // Add CARVED STAT FILE
-    /*
     QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".stat");
     if(!cfile.isOpen())
         cfile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(cfile.isOpen())
         cfile.write(carvedstring.toStdString().c_str());
     cfile.close();
-    */
-        /*
-         *
-        if(tmpfilestr.split(",").at(13).size() == 32) // md5
-            hashsum = 1;
-        else if(tmpfilestr.split(",").at(13).size() == 40) // sha1
-            hashsum = 2;
-        else if(tmpfilestr.split(",").at(13).size() == 64) // sha256
-            hashsum = 4;
-        QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
-        QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
-            if(hashdatalen > 0)
-                tmplist[13] = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
-            else
-            {
-                if(hashsum == 1)
-                    tmplist[13] = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
-                else if(hashsum == 2)
-                    tmplist[13] = QString("da39a3ee5e6b4b0d3255bfef95601890afd80709").toUpper(); // SHA1 zero file
-                else if(hashsum == 4)
-                    tmplist[13] = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
-         */ 
     // ADD CARVED STAT FILE TO THE TREE
     QList<QVariant> nodedata;
     nodedata.clear();
@@ -2707,7 +2701,38 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     nodedata << ctag;
     nodedata << QString(enumber + "-c" + QString::number(carvedcount));
     qDebug() << "nodedata:" << nodedata;
-    //treenodemodel->AddNode(nodedata, enumber, -1, 0);
+    treenodemodel->AddNode(nodedata, enumber, -1, 0);
+    // ADD TO PREVIEW REPORT
+    QString filestr = "<td class='fitem' id='" + QString(enumber + "-c" + QString::number(carvedcount)) + "'>";
+    filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
+    filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
+    filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + " bytes</td></tr>";
+    if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
+        filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + curindex.sibling(curindex.row(), 3).data().toString() + "</td></tr>";
+    if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
+        filestr += "<tr class='even'><td class='pvalue'>Accessed:</td><td class='property'>" + curindex.sibling(curindex.row(), 4).data().toString() + "</td></tr>";
+    if(!curindex.sibling(curindex.row(), 5).data().toString().isEmpty())
+        filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + curindex.sibling(curindex.row(), 5).data().toString() + "</td></tr>";
+    if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
+        filestr += "<tr class='even'><td class='pvalue'>Changed:</td><td class='property'>" + curindex.sibling(curindex.row(), 6).data().toString() + "</td></tr>";
+    if(!curindex.sibling(curindex.row(), 7).data().toString().isEmpty())
+    {
+        filestr += "<tr class='odd'><td class='pvalue'>";
+        if(hashsum == 1)
+            filestr += "MD5";
+        else if(hashsum == 2)
+            filestr += "SHA1";
+        else if(hashsum == 4)
+            filestr += "SHA256";
+        filestr += " Hash:</td><td class='property'>" + curindex.sibling(curindex.row(), 7).data().toString() + "</td></tr>";
+    }
+    filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + curindex.sibling(curindex.row(), 8).data().toString() + "</td></tr>";
+    filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), 9).data().toString() + "</td></tr>";
+    filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
+    filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
+    filestr += "</table></td>";
+    // AddFileItem(ctag, filestr);
+    carvedcount++;
 }
 
 /*

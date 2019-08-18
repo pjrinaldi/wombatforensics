@@ -56,5 +56,6 @@ void ProcessExport(QString curid);
 void InitializeEvidenceStructure(QString evidstring);
 int SegmentDigits(int);
 QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
+void PopulateCarvedFiles(QString cfile);
 
 #endif // wombatfunctions.h

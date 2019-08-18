@@ -1592,6 +1592,36 @@ int SegmentDigits(int number)
     return count;
 }
 
+void PopulateCarvedFiles(QString cfilestr)
+{
+    QString tmpstr = "";
+    QFile cfile(cfilestr);
+    if(!cfile.isOpen())
+        cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(cfile.isOpen())
+        tmpstr = cfile.readLine();
+    cfile.close();
+    QStringList slist = tmpstr.split(",");
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << tmpstr.at(0); // name
+    nodedata << tmpstr.at(3); // path
+    nodedata << tmpstr.at(8); // size
+    nodedata << tmpstr.at(6); // crtime
+    nodedata << tmpstr.at(4); // atime
+    nodedata << tmpstr.at(7); // mtime
+    nodedata << tmpstr.at(5); // ctime
+    nodedata << tmpstr.at(13); // hash
+    nodedata << QString(tmpstr.at(10)).split("/").first(); // category
+    nodedata << QString(tmpstr.at(10)).split("/").last(); // signature
+    nodedata << tmpstr.at(15); // tag
+    nodedata << tmpstr.at(12); // id
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, QString(tmpstr.at(12)).split("-").first(), -1, 0);
+    mutex.unlock();
+    // concurrent map() to read files, populate nodedata and addtreenode...
+}
+
 void PopulateTreeModel(QString evidstring)
 {
     AddEvidenceVariable addevidvar;

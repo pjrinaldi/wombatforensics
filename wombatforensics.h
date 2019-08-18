@@ -202,6 +202,7 @@ private slots:
     void ReadBookmarks(void);
     void ShowSearchDialog(void);
     void TagSection(QString ctitle, QString ctag);
+    void FinishCarve(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -243,6 +244,7 @@ private:
     QFutureWatcher<void> exportwatcher;
     QFuture<void> openfuture;
     QFutureWatcher<void> openwatcher;
+    QFutureWatcher<void> carvewatcher;
 
     QProcess* xmntprocess;
 
