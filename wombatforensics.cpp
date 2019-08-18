@@ -2640,8 +2640,8 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     #endif
     QString offstr = buffer;
     QByteArray tmparray = ui->hexview->selectionToByteArray();
-    if(clength > 512)
-        tmparray.truncate(512);
+    //if(clength > 512)
+    //    tmparray.truncate(512);
     QMimeDatabase mimedb;
     const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
     QByteArray ba;
@@ -2650,10 +2650,64 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     QByteArray ba2;
     ba2.clear();
     ba2.append(QString(enumber + "->" + offstr));
-    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimetype.name() + ",0," + enumber + "-c" + QString::number(carvedcount) + ",0,0," +  ctag;
-    qDebug() << "carved string:" << carvedstring;
-    //QFile cfile(wombatvariable.tmpmntpath + "carved/" + "e" + selectedobject.sibling(selectedobject.row(), 11).data().toString() + "-c" + carvedcount + ".stat");
-
+    // HASH INFO
+    QString curhash = "0";
+    QString hashval = selectedindex.sibling(selectedindex.row(), 7).data().toString();
+    if(!hashval.isEmpty()) // hash exists, determine what it is...
+    {
+        QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+        QByteArray hasharray = QByteArray::fromRawData(tmparray, clength);
+        curhash = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+    }
+    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimetype.name() + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," +  ctag;
+    qDebug() << "carvedstring:" << carvedstring;
+    // Add CARVED STAT FILE
+    /*
+    QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".stat");
+    if(!cfile.isOpen())
+        cfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(cfile.isOpen())
+        cfile.write(carvedstring.toStdString().c_str());
+    cfile.close();
+    */
+        /*
+         *
+        if(tmpfilestr.split(",").at(13).size() == 32) // md5
+            hashsum = 1;
+        else if(tmpfilestr.split(",").at(13).size() == 40) // sha1
+            hashsum = 2;
+        else if(tmpfilestr.split(",").at(13).size() == 64) // sha256
+            hashsum = 4;
+        QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+        QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
+            if(hashdatalen > 0)
+                tmplist[13] = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+            else
+            {
+                if(hashsum == 1)
+                    tmplist[13] = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
+                else if(hashsum == 2)
+                    tmplist[13] = QString("da39a3ee5e6b4b0d3255bfef95601890afd80709").toUpper(); // SHA1 zero file
+                else if(hashsum == 4)
+                    tmplist[13] = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
+         */ 
+    // ADD CARVED STAT FILE TO THE TREE
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << ba.toBase64();
+    nodedata << ba2.toBase64();
+    nodedata << QString::number(clength);
+    nodedata << "0";
+    nodedata << "0";
+    nodedata << "0";
+    nodedata << "0";
+    nodedata << curhash;
+    nodedata << mimetype.name().split("/").first();
+    nodedata << mimetype.name().split("/").last();
+    nodedata << ctag;
+    nodedata << QString(enumber + "-c" + QString::number(carvedcount));
+    qDebug() << "nodedata:" << nodedata;
+    //treenodemodel->AddNode(nodedata, enumber, -1, 0);
 }
 
 /*
