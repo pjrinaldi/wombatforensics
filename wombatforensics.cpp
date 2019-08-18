@@ -2628,10 +2628,30 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
 {
     // NEED TO GET THE CARVED OFFSET, EVIDITEM, LENGTH/SIZE, ASSIGNED TAG, TITLE/NAME
     // THEN GENERATE WHAT NEEDS TO BE GENERATED... AND ADD IT TO TREEVIEW/ GENERATE .STAT FILE (E#-C#.STAT)/ ADD IT TO PREVIEW REPORT
-    qDebug() << "ctitle:" << ctitle << "ctag:" << ctag;
-    qDebug() << "offset:" << ui->hexview->GetOffset() << "length:" << ui->hexview->GetSelectionLength();
-    qDebug() << "carvedcount:" << carvedcount << "e#" << selectedindex.sibling(selectedindex.row(), 11).data().toString();
-    //QString carvedstring = ctitle + ",5,0," + 
+    // DETERMINE HASH BASED OFF HASH QHASH...
+    qint64 coffset = ui->hexview->GetOffset();
+    qint64 clength = ui->hexview->GetSelectionLength();
+    QString enumber = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first();
+    char buffer[64];
+    #if _LARGEFILE_SOURCE
+    sprintf(buffer,"0x%llx",coffset);
+    #else
+    sprintf(buffer,"0x%x",coffset);
+    #endif
+    QString offstr = buffer;
+    QByteArray tmparray = ui->hexview->selectionToByteArray();
+    if(clength > 512)
+        tmparray.truncate(512);
+    QMimeDatabase mimedb;
+    const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+    QByteArray ba;
+    ba.clear();
+    ba.append(ctitle);
+    QByteArray ba2;
+    ba2.clear();
+    ba2.append(QString(enumber + "->" + offstr));
+    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimetype.name() + ",0," + enumber + "-c" + QString::number(carvedcount) + ",0,0," +  ctag;
+    qDebug() << "carved string:" << carvedstring;
     //QFile cfile(wombatvariable.tmpmntpath + "carved/" + "e" + selectedobject.sibling(selectedobject.row(), 11).data().toString() + "-c" + carvedcount + ".stat");
 
 }
