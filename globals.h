@@ -26,6 +26,7 @@ extern qint64 errorcount; // export error count variable
 extern qint64 jumpoffset; // stores offset hex value when the user wants to jump to that offset
 extern qint64 filejumpoffset; // stores offset hex value when the user wants to jump to that offset in the file hexviewer
 extern qint64 orphancount; // keeps track of unique id # for orphan files
+extern qint64 carvedcount; // keeps track of unique id # for carved files
 extern int ecount; // evidence count variable
 extern int thumbsize; // thumbnail size settings variable
 extern int mftrecordsize; // contains the size of an mft record, usually always 1024

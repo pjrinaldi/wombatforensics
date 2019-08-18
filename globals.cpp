@@ -22,6 +22,7 @@ qint64 errorcount = 0;
 qint64 jumpoffset = 0;
 qint64 filejumpoffset = 0;
 qint64 orphancount = 1;
+qint64 carvedcount = 1;
 int ecount = 0;
 int thumbsize = 320; // thumbnail size settings variable
 int mftrecordsize = 1024;
