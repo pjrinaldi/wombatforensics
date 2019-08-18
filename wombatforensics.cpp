@@ -2630,6 +2630,10 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     // THEN GENERATE WHAT NEEDS TO BE GENERATED... AND ADD IT TO TREEVIEW/ GENERATE .STAT FILE (E#-C#.STAT)/ ADD IT TO PREVIEW REPORT
     qDebug() << "ctitle:" << ctitle << "ctag:" << ctag;
     qDebug() << "offset:" << ui->hexview->GetOffset() << "length:" << ui->hexview->GetSelectionLength();
+    qDebug() << "carvedcount:" << carvedcount << "e#" << selectedindex.sibling(selectedindex.row(), 11).data().toString();
+    //QString carvedstring = ctitle + ",5,0," + 
+    //QFile cfile(wombatvariable.tmpmntpath + "carved/" + "e" + selectedobject.sibling(selectedobject.row(), 11).data().toString() + "-c" + carvedcount + ".stat");
+
 }
 
 /*
