@@ -916,6 +916,7 @@ void WombatForensics::InitializeCaseStructure()
         wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename + "/";
         QDir dir;
         dir.mkpath(wombatvariable.tmpmntpath);
+        dir.mkpath(wombatvariable.tmpmntpath + "carved/");
         //(new QDir())->mkpath(wombatvariable.tmpmntpath);
         wombatvariable.iscaseopen = true;
         InitializePreviewReport();
@@ -1064,6 +1065,7 @@ void WombatForensics::OpenUpdate()
     else if(hashsum == 4)
         hashstr = "SHA256 Hash";
     treenodemodel->UpdateHeaderNode(7, hashstr);
+    thumbdir.mkpath(wombatvariable.tmpmntpath + "carved/");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/"); // won't do anything if it already exists
     QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
     if(!tdir.isEmpty())
@@ -1937,6 +1939,14 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                 //qDebug() << "tfiles:" << tfiles;
                 for(int j = 0; j < tfiles.count(); j++)
                     tdir.remove(tfiles.at(j));
+            }
+            // 1.5 Delete all carved files
+            QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
+            QStringList cfiles = cdir.entryList(QStringList("e" + evidfiles.first().split(".e").last() + "-*"), QDir::NoSymLinks | QDir::Files);
+            if(!cfiles.isEmpty())
+            {
+                for(int j = 0; j < cfiles.count(); j++)
+                    cdir.remove(cfiles.at(j));
             }
             // 2. Remove e# entries from checkstate and selectedstate
             QHashIterator<QString, bool> m(checkhash);
