@@ -339,6 +339,9 @@ public:
     QColor selectionColor();
     void setSelectionColor(const QColor &color);
 
+    // Added by Pasquale J. Rinaldi, Jr.
+    // May 5, 2018
+    // Returns the selection length
     qint64 GetSelectionLength()
     {
         return (getSelectionEnd() - getSelectionBegin());
@@ -350,9 +353,19 @@ public:
     // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
     void SetColorInformation(qint64 fsoffset, qint64 blocksize, QString blockstring, QString residentstring, QString bytestring, qint64 flength, int dataoff);
 
+    // Added by Pasquale J. Rinaldi, Jr.
+    // May 5, 2018
+    // Enables file hex view to ignore color since it is designed for the image and not the file.
     void BypassColor(bool bypass)
     {
         bypasscolor = bypass;
+    };
+    // Added by Pasquale J. Rinaldi, Jr.
+    // August 18, 2019
+    // Returns the selection beginning offset to calculate the carved contents for the stat file
+    qint64 GetOffset()
+    {
+        return getSelectionBegin();
     };
 
 protected:
