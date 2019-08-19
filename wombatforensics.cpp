@@ -2704,18 +2704,14 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     treenodemodel->AddNode(nodedata, enumber, -1, 0);
     // ADD TO PREVIEW REPORT
     QString filestr = "<td class='fitem' id='" + QString(enumber + "-c" + QString::number(carvedcount)) + "'>";
-    filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
-    filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
-    filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + " bytes</td></tr>";
-    if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
-        filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + curindex.sibling(curindex.row(), 3).data().toString() + "</td></tr>";
-    if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
-        filestr += "<tr class='even'><td class='pvalue'>Accessed:</td><td class='property'>" + curindex.sibling(curindex.row(), 4).data().toString() + "</td></tr>";
-    if(!curindex.sibling(curindex.row(), 5).data().toString().isEmpty())
-        filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + curindex.sibling(curindex.row(), 5).data().toString() + "</td></tr>";
-    if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
-        filestr += "<tr class='even'><td class='pvalue'>Changed:</td><td class='property'>" + curindex.sibling(curindex.row(), 6).data().toString() + "</td></tr>";
-    if(!curindex.sibling(curindex.row(), 7).data().toString().isEmpty())
+    filestr += "<table width='300px'><tr><th colspan='2'>" + ctitle + "</th></tr>";
+    filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + enumber + "->" + offstr + "</span></td></tr>";
+    filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + QString::number(clength) + " bytes</td></tr>";
+    filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>-</td></tr>";
+    filestr += "<tr class='even'><td class='pvalue'>Accessed:</td><td class='property'>-</td></tr>";
+    filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>-</td></tr>";
+    filestr += "<tr class='even'><td class='pvalue'>Changed:</td><td class='property'>-</td></tr>";
+    if(!curhash.isEmpty())
     {
         filestr += "<tr class='odd'><td class='pvalue'>";
         if(hashsum == 1)
@@ -2724,11 +2720,11 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
             filestr += "SHA1";
         else if(hashsum == 4)
             filestr += "SHA256";
-        filestr += " Hash:</td><td class='property'>" + curindex.sibling(curindex.row(), 7).data().toString() + "</td></tr>";
+        filestr += " Hash:</td><td class='property'>" + curhash + "</td></tr>";
     }
-    filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + curindex.sibling(curindex.row(), 8).data().toString() + "</td></tr>";
-    filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), 9).data().toString() + "</td></tr>";
-    filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
+    filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + mimetype.name().split("/").first() + "</td></tr>";
+    filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + mimetype.name().split("/").last() + "</td></tr>";
+    filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + QString(enumber + "-c" + QString::number(carvedcount)) + "</td></tr>";
     filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
     filestr += "</table></td>";
     // AddFileItem(ctag, filestr);
