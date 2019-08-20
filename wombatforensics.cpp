@@ -124,7 +124,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     remtagaction1->setIcon(QIcon(":/bar/tag-rem"));
     connect(remtagaction1, SIGNAL(triggered()), this, SLOT(RemoveTag()));
 
-    remcheckedaction = new QAction("UnCheck all Checked", treemenu);
+    remcheckedaction = new QAction("UnCheck all Checked", this);
     remcheckedaction->setIcon(QIcon(":/remcheck"));
     connect(remcheckedaction, SIGNAL(triggered()), this, SLOT(UnCheckChecked()));
 
@@ -2701,7 +2701,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     nodedata << ctag;
     nodedata << QString(enumber + "-c" + QString::number(carvedcount));
     qDebug() << "nodedata:" << nodedata;
-    treenodemodel->AddNode(nodedata, enumber, -1, 0);
+    treenodemodel->AddNode(nodedata, enumber, 15, 0);
     // ADD TO PREVIEW REPORT
     QString filestr = "<td class='fitem' id='" + QString(enumber + "-c" + QString::number(carvedcount)) + "'>";
     filestr += "<table width='300px'><tr><th colspan='2'>" + ctitle + "</th></tr>";

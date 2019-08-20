@@ -276,15 +276,13 @@ public:
         int itemtype = 0;
         QByteArray ba;
         nodetype = itemnode->Data(11).toString().split("-a").first().split("-").count();
-        itemtype = itemnode->itemtype; // node type 1=file, 2=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs)
-
+        //if(nodetype == 2 && itemnode->Data(11).toString().contains("-c"))
+        itemtype = itemnode->itemtype; // node type 1=file, 2=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
         if(role == Qt::CheckStateRole && index.column() == 11)
             return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
         else if(role == Qt::ForegroundRole)
         {
-            if(nodetype < 4)
-                return QColor(Qt::darkBlue);
-            else if(nodetype == 4)
+            if(nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))
             {
                 if(itemnode->Data(11).toString().contains(filtervalues.idfilter) == false)
                     return QColor(Qt::lightGray);
@@ -406,6 +404,8 @@ public:
                         return QColor(Qt::lightGray);
                 }
             }
+            else if(nodetype < 4)
+                return QColor(Qt::darkBlue);
         }
         else if(role == Qt::DisplayRole)
         {
@@ -415,7 +415,8 @@ public:
             }
             else if(index.column() == 0 || index.column() == 1) // used to be 1 || 2
             {
-                if(nodetype == 4)
+                //if(nodetype == 4)
+                if(nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))
                 {
                     ba.clear();
                     ba.append(itemnode->Data(index.column()).toString());
@@ -475,7 +476,8 @@ public:
                     return QIcon(QPixmap(QString(":/basic/treevol")));
                 else if(nodetype == 3)
                     return QIcon(QPixmap(QString(":/basic/treefs")));
-                else if(nodetype == 4)
+                //else if(nodetype == 4)
+                else if(nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))
                 {
                     if((itemtype == 0 && itemnode->Data(1).toString().contains("$OrphanFiles")) || itemtype == 1) // used to be (2)
                     {
@@ -500,6 +502,8 @@ public:
                         return QIcon(QPixmap(QString(":/basic/virtualfile")));
                     else if(itemtype == 11)
                         return QIcon(QPixmap(QString(":/basic/virtualdir")));
+                    else if(itemtype == 15)
+                        return QIcon(":/basic/carvedfile");
                     else
                     {
                         if(itemnode->Data(11).toString().contains("f*")) // used to be 0
