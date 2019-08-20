@@ -472,7 +472,7 @@ public:
             {
                 if(nodetype == 1)
                     return QIcon(QPixmap(QString(":/basic/treeimg")));
-                else if(nodetype == 2)
+                else if(nodetype == 2 && !itemnode->Data(11).toString().contains("-c"))
                     return QIcon(QPixmap(QString(":/basic/treevol")));
                 else if(nodetype == 3)
                     return QIcon(QPixmap(QString(":/basic/treefs")));

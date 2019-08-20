@@ -1095,7 +1095,7 @@ void WombatForensics::OpenUpdate()
         //qDebug() << indexlist.at(0).sibling(indexlist.at(0).row(), 0).data().toString() << indexlist.count();
         //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
         //selectedindex = treenodemodel->index(0, 0, QModelIndex());
-        //LoadHexContents();
+        //oadHexContents();
         //ui->hexview->ensureVisible();
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
         //QThread::sleep(60);
@@ -1598,7 +1598,7 @@ void WombatForensics::LoadHexContents()
     // determine offset location in the editor
     if(nodeid.split("-").count() == 1) // image file
         ui->hexview->setCursorPosition(0);
-    else if(nodeid.split("-").count() == 2) // volume file
+    else if(nodeid.split("-").count() == 2 && !nodeid.contains("-c")) // volume file
     {
         QFile volfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
         volfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -1606,6 +1606,17 @@ void WombatForensics::LoadHexContents()
             tmpstr = volfile.readLine();
         volfile.close();
         ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toInt()*2);
+    }
+    else if(nodeid.split("-").count() == 2 && nodeid.contains("-c")) // carved file
+    {
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".stat");
+        qDebug() << "cfile:" << cfile.fileName();
+        // read stat file... get size, offset, evidence image from stat file.
+        // then send the correct variables to display properly
+        /*
+        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, tmpstr.split(",").at(8).toLongLong(), 0);
+        ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
+        */
     }
     else if(nodeid.split("-").count() == 3) // partition/file system
     {
@@ -2676,7 +2687,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
         QByteArray hasharray = QByteArray::fromRawData(tmparray, clength);
         curhash = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
     }
-    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimetype.name() + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," +  ctag;
+    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimetype.name() + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," +  ctag + "," + QString::number(coffset);
     qDebug() << "carvedstring:" << carvedstring;
     // Add CARVED STAT FILE
     QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".stat");
@@ -2700,7 +2711,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     nodedata << mimetype.name().split("/").last();
     nodedata << ctag;
     nodedata << QString(enumber + "-c" + QString::number(carvedcount));
-    qDebug() << "nodedata:" << nodedata;
+    //qDebug() << "nodedata:" << nodedata;
     treenodemodel->AddNode(nodedata, enumber, 15, 0);
     // ADD TO PREVIEW REPORT
     QString filestr = "<td class='fitem' id='" + QString(enumber + "-c" + QString::number(carvedcount)) + "'>";
@@ -2727,7 +2738,8 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + QString(enumber + "-c" + QString::number(carvedcount)) + "</td></tr>";
     filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
     filestr += "</table></td>";
-    // AddFileItem(ctag, filestr);
+    AddFileItem(ctag, filestr);
+    emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     carvedcount++;
 }
 

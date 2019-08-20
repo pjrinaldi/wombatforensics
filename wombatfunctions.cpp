@@ -1594,6 +1594,8 @@ int SegmentDigits(int number)
 
 void PopulateCarvedFiles(QString cfilestr)
 {
+    cfilestr = wombatvariable.tmpmntpath + "carved/" + cfilestr;
+    qDebug() << "Open Carve:" << cfilestr;
     QString tmpstr = "";
     QFile cfile(cfilestr);
     if(!cfile.isOpen())
@@ -1604,20 +1606,20 @@ void PopulateCarvedFiles(QString cfilestr)
     QStringList slist = tmpstr.split(",");
     QList<QVariant> nodedata;
     nodedata.clear();
-    nodedata << tmpstr.at(0); // name
-    nodedata << tmpstr.at(3); // path
-    nodedata << tmpstr.at(8); // size
-    nodedata << tmpstr.at(6); // crtime
-    nodedata << tmpstr.at(4); // atime
-    nodedata << tmpstr.at(7); // mtime
-    nodedata << tmpstr.at(5); // ctime
-    nodedata << tmpstr.at(13); // hash
-    nodedata << QString(tmpstr.at(10)).split("/").first(); // category
-    nodedata << QString(tmpstr.at(10)).split("/").last(); // signature
-    nodedata << tmpstr.at(15); // tag
-    nodedata << tmpstr.at(12); // id
+    nodedata << slist.at(0); // name
+    nodedata << slist.at(3); // path
+    nodedata << slist.at(8); // size
+    nodedata << slist.at(6); // crtime
+    nodedata << slist.at(4); // atime
+    nodedata << slist.at(7); // mtime
+    nodedata << slist.at(5); // ctime
+    nodedata << slist.at(13); // hash
+    nodedata << QString(slist.at(10)).split("/").first(); // category
+    nodedata << QString(slist.at(10)).split("/").last(); // signature
+    nodedata << slist.at(15); // tag
+    nodedata << slist.at(12); // id
     mutex.lock();
-    treenodemodel->AddNode(nodedata, QString(tmpstr.at(12)).split("-").first(), -1, 0);
+    treenodemodel->AddNode(nodedata, QString(slist.at(12)).split("-").first(), 15, 0);
     mutex.unlock();
     // concurrent map() to read files, populate nodedata and addtreenode...
 }
