@@ -437,9 +437,11 @@ private:
 
     // Added by Pasquale J. Rinaldi, Jr. Apr 2018 to enable content and slack highlighting
     QBrush contentbrush;
-    QPen contentpen;
+    //QPen contentpen;
     QBrush slackbrush;
-    QPen slackpen;
+    //QPen slackpen;
+    QBrush carvebrush;
+    //QPen carvepen;
     QStringList blocklist;
     qint64 residentoffset;
     qint64 fsoffset;

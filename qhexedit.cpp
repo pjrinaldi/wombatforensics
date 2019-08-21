@@ -30,6 +30,7 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
     // set brush colors for content/slack
     contentbrush = QBrush(QColor(194, 214, 228, 255));
     slackbrush = QBrush(QColor(214, 153, 153, 255));
+    carvebrush = QBrush(QColor(153, 214, 153, 255));
 
     _chunks = new Chunks(this);
     _undoStack = new UndoStack(_chunks, this);
@@ -986,6 +987,17 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 		        }
                     }
                 }
+
+//qDebug() << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength << "dataoffset:" << dataoffset;
+                // color highlight carved here...
+                if(fsoffset == 0 && blocksize == 0 && residentoffset == 0 && byteoffset == 0)
+                {
+                    qDebug() << "carved file";
+                }
+                //if(posBa >= byteoffset && posBa <= byteoffset + size)
+                //{
+                //c = carvebrush.color(); // GREEN
+                //}
 
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
                 {

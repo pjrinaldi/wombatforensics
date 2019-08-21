@@ -1617,7 +1617,7 @@ void WombatForensics::LoadHexContents()
             tmpstr = cfile.readLine();
         cfile.close();
         ui->hexview->BypassColor(true);
-        //ui->hexview->SetColorInformation(
+        //ui->hexview->SetColorInformation(0, 0, 0, 0, offset, size, 0);
         if(tmpstr.split(",").count() > 15)
             ui->hexview->setCursorPosition(tmpstr.split(",").at(16).toULongLong()*2);
         /*
