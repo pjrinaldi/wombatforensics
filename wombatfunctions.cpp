@@ -1595,7 +1595,7 @@ int SegmentDigits(int number)
 void PopulateCarvedFiles(QString cfilestr)
 {
     cfilestr = wombatvariable.tmpmntpath + "carved/" + cfilestr;
-    qDebug() << "Open Carve:" << cfilestr;
+    //qDebug() << "Open Carve:" << cfilestr;
     QString tmpstr = "";
     QFile cfile(cfilestr);
     if(!cfile.isOpen())

@@ -471,49 +471,49 @@ public:
             if(index.column() == 0)
             {
                 if(nodetype == 1)
-                    return QIcon(QPixmap(QString(":/basic/treeimg")));
+                    return QIcon(":/basic/treeimg");
                 else if(nodetype == 2 && !itemnode->Data(11).toString().contains("-c"))
-                    return QIcon(QPixmap(QString(":/basic/treevol")));
+                    return QIcon(":/basic/treevol");
                 else if(nodetype == 3)
-                    return QIcon(QPixmap(QString(":/basic/treefs")));
+                    return QIcon(":/basic/treefs");
                 //else if(nodetype == 4)
                 else if(nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))
                 {
                     if((itemtype == 0 && itemnode->Data(1).toString().contains("$OrphanFiles")) || itemtype == 1) // used to be (2)
                     {
                         if(nodename.compare("AttrDef") == 0 || nodename.compare("$BadClus") == 0 || nodename.compare("$Bitmap") == 0 || nodename.compare("$Boot") == 0 || nodename.compare("$ObjId") == 0 || nodename.compare("$Quota") == 0 || nodename.compare("$Reparse") == 0 || nodename.compare("$LogFile") == 0 || nodename.compare("$MFT") == 0 || nodename.compare("$MFTMirr") == 0 || nodename.compare("$Secure") == 0 || nodename.compare("$UpCase") == 0 || nodename.compare("$Volume") == 0)
-                            return QIcon(QPixmap(QString(":/basic/virtualfile")));
+                            return QIcon(":/basic/virtualfile");
                         else
                         {
                             if(itemnode->IsDeleted()) // Unallocated and Used
-                                return QIcon(QPixmap(QString(":/basic/deletedfile")));
+                                return QIcon(":/basic/deletedfile");
                             else
-                                return QIcon(QPixmap(QString(":/basic/treefile")));
+                                return QIcon(":/basic/treefile");
                         }
                     }
                     else if(itemtype == 2 || itemtype == 3)
                     {
                         if(nodename.compare("$OrphanFiles") == 0 || nodename.compare("$Extend") == 0)
-                            return QIcon(QPixmap(QString(":/basic/virtualfolder")));
+                            return QIcon(":/basic/virtualfolder");
                         else
-                            return QIcon(QPixmap(QString(":/basic/treefolder")));
+                            return QIcon(":/basic/treefolder");
                     }
                     else if(itemtype == 10)
-                        return QIcon(QPixmap(QString(":/basic/virtualfile")));
+                        return QIcon(":/basic/virtualfile");
                     else if(itemtype == 11)
-                        return QIcon(QPixmap(QString(":/basic/virtualdir")));
+                        return QIcon(":/basic/virtualdir");
                     else if(itemtype == 15)
-                        return QIcon(":/basic/carvedfile");
+                        return QIcon(":/bar/carvetofile");
                     else
                     {
                         if(itemnode->Data(11).toString().contains("f*")) // used to be 0
-                            return QIcon(QPixmap(QString(":/basic/deletedfile")));
+                            return QIcon(":/basic/deletedfile");
                         else
-                            return QIcon(QPixmap(QString(":/basic/treefile")));
+                            return QIcon(":/basic/treefile");
                     }
                 }
                 else
-                    return QIcon(QPixmap(QString(":/basic/treefile")));
+                    return QIcon(":/basic/treefile");
             }
         }
         else
@@ -609,31 +609,31 @@ public:
         if(role == Qt::DecorationRole)
         {
             if(section == 11 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 0 && filtervalues.namebool)
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 1 && filtervalues.pathbool)
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 2 && filtervalues.maxsizebool)
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 2 && filtervalues.minsizebool)
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 3 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 4 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 5 && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 6 && (filtervalues.maxchangebool || filtervalues.minchangebool))
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 7 && (filtervalues.hashbool || filtervalues.hashbool2))
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 8 && filtervalues.filegroupbool)
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 9 && filtervalues.filetypebool)
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
             if(section == 10 && filtervalues.tagbool)
-                return QIcon(QPixmap(QString(":/basic/filterimg")));
+                return QIcon(":/basic/filterimg");
         }
         return QVariant();
     };

@@ -1610,7 +1610,16 @@ void WombatForensics::LoadHexContents()
     else if(nodeid.split("-").count() == 2 && nodeid.contains("-c")) // carved file
     {
         QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".stat");
-        qDebug() << "cfile:" << cfile.fileName();
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+            tmpstr = cfile.readLine();
+        cfile.close();
+        ui->hexview->BypassColor(true);
+        //ui->hexview->SetColorInformation(
+        if(tmpstr.split(",").count() > 15)
+            ui->hexview->setCursorPosition(tmpstr.split(",").at(16).toULongLong()*2);
+        //qDebug() << "cfile:" << cfile.fileName();
         // read stat file... get size, offset, evidence image from stat file.
         // then send the correct variables to display properly
         /*
