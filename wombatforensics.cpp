@@ -2695,7 +2695,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
         curhash = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
     }
     QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimetype.name() + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," +  ctag + "," + QString::number(coffset);
-    qDebug() << "carvedstring:" << carvedstring;
+    //qDebug() << "carvedstring:" << carvedstring;
     // Add CARVED STAT FILE
     QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".stat");
     if(!cfile.isOpen())
