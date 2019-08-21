@@ -190,6 +190,7 @@ private slots:
     void AddSection(void);
     //void AddTextSection(void);
     void CarveFile(void);
+    void PublishResults(void);
     void AutoSaveState(void);
     void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
     void PrepareEvidenceImage(void);
