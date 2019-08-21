@@ -1080,8 +1080,9 @@ void WombatForensics::OpenUpdate()
     QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
     if(!cfiles.isEmpty())
     {
-        QFuture<void> tfuture = QtConcurrent::map(cfiles, PopulateCarvedFiles);
-        carvewatcher.setFuture(tfuture);
+        QtConcurrent::map(cfiles, PopulateCarvedFiles);
+        //QFuture<void> tfuture = QtConcurrent::map(cfiles, PopulateCarvedFiles);
+        //carvewatcher.setFuture(tfuture);
         carvedcount = cfiles.count() + 1;
     }
     PrepareEvidenceImage();

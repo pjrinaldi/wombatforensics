@@ -991,7 +991,6 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 // color highlight carved here...
                 if(fsoffset == 0 && blocksize == 0 && residentoffset == 0)
                 {
-                    qDebug() << "carved file";
                     if(posBa >= byteoffset && posBa <= byteoffset + filelength - 1)
                     {
                         c = carvebrush.color(); // GREEN
