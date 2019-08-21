@@ -1617,13 +1617,9 @@ void WombatForensics::LoadHexContents()
             tmpstr = cfile.readLine();
         cfile.close();
         ui->hexview->BypassColor(true);
-        //ui->hexview->SetColorInformation(0, 0, 0, 0, offset, size, 0);
+        ui->hexview->SetColorInformation(0, 0, 0, 0, tmpstr.split(",").at(16), tmpstr.split(",").at(8).toULongLong(), 0);
         if(tmpstr.split(",").count() > 15)
             ui->hexview->setCursorPosition(tmpstr.split(",").at(16).toULongLong()*2);
-        /*
-        void QHexEdit::SetColorInformation(qint64 fsoff, qint64 blksize, QString blockstring, QString residentstring, QString bytestring, qint64 flength, int dataoff)
-        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, tmpstr.split(",").at(8).toLongLong(), 0);
-        */
     }
     else if(nodeid.split("-").count() == 3) // partition/file system
     {
