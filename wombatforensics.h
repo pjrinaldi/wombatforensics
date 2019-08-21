@@ -245,7 +245,7 @@ private:
     QFutureWatcher<void> exportwatcher;
     QFuture<void> openfuture;
     QFutureWatcher<void> openwatcher;
-    QFutureWatcher<void> carvewatcher;
+    //QFutureWatcher<void> carvewatcher;
 
     QProcess* xmntprocess;
 
