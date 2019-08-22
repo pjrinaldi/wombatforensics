@@ -19,6 +19,7 @@ SettingsDialog::~SettingsDialog()
 void SettingsDialog::SaveChanges()
 {
     thumbsize = ui->thumbnailspinbox->value();
+    vidcount = ui->videospinbox->value();
     if(!ui->casepathlineedit->text().isEmpty())
         casepath = ui->casepathlineedit->text();
     if(casepath.endsWith("/"))
@@ -38,6 +39,7 @@ void SettingsDialog::SaveChanges()
     out << "thumb:" << QString::number(ui->thumbnailspinbox->value()) << ",";
     out << "casepath:" << ba.toBase64() << ",";
     out << "reportpath:" << ba2.toBase64() << ",";
+    out << "video:" << QString::number(ui->videospinbox->value()) << ",";
     settingsfile.close();
     this->hide();
 }
@@ -67,5 +69,7 @@ void SettingsDialog::LoadSettings()
             ba.append(tmplist.at(i).split(":").at(1));
             ui->reportpathlineedit->setText(QByteArray::fromBase64(ba));
         }
+        else if(tmplist.at(i).split(":").at(0) == "video")
+            ui->videospinbox->setValue(tmplist.at(i).split(":").at(1).toInt());
     }
 }
