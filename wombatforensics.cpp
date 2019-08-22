@@ -2103,10 +2103,18 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             digfilelist = GetFileLists(dtype);
         //qDebug() << digfilelist;
         digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
-        if(digoptions.at(i) == 0) // Generate Image Thumbnails
+        if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
         {
-            thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
-            thumbwatcher.setFuture(thumbfuture);
+            if(digoptions.at(i) == 0 || digoptions.at(i) == 5)
+            {
+                thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
+                thumbwatcher.setFuture(thumbfuture);
+            }
+            if(digoptions.at(i) == 4 || digoptions.at(i) == 5)
+            {
+                videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
+                videowatcher.setFuture(videofuture);
+            }
         }
         else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 || digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256
         {
@@ -2120,11 +2128,6 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                     //StatusUpdate("Generating Hash...");
             hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
             hashingwatcher.setFuture(hashingfuture);
-        }
-        else if(digoptions.at(i) == 4) // Generate Video Thumbnails
-        {
-            videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails); // Process Video Thumbnails
-            videowatcher.setFuture(videofuture);
         }
     }
 }
@@ -2887,5 +2890,8 @@ void WombatForensics::ThreadCancelled()
 
 void WombatForensics::LaunchChomp()
 {
+    // need to install xchomp when i install the app to /usr/local/bin...
+    // set the high score file where it needs to be.
+    // call process or whatever to launch it...
     qDebug() << "Launch Chomp here...";
 }

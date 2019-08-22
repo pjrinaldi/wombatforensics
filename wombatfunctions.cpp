@@ -1419,6 +1419,9 @@ void GenerateHash(QString itemid)
 
 void GenerateVidThumbnails(QString thumbid)
 {
+    if(thumbid.split("-").count() == 5)
+    {
+    }
 }
 
 void GenerateThumbnails(QString thumbid)

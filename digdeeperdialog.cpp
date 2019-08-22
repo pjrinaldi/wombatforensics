@@ -61,8 +61,12 @@ void DigDeeperDialog::DigDeeperFiles()
         digtype = 1;
     if(ui->listedFileRadioButton->isChecked())
         digtype = 2;
-    if(ui->thumbnailcheckBox->isChecked())
+    if(ui->thumbnailcheckBox->isChecked() && !ui->videocheckBox->isChecked())
         digoptions.append(0);
+    else if(!ui->thumbnailcheckBox->isChecked() && ui->videocheckBox->isChecked())
+        digoptions.append(4);
+    else if(ui->thumbnailcheckBox->isChecked() && ui->videocheckBox->isChecked())
+        digoptions.append(5);
     if(ui->hashcheckbox->isChecked())
     {
         if(ui->md5radiobutton->isChecked())
@@ -72,8 +76,6 @@ void DigDeeperDialog::DigDeeperFiles()
         else if(ui->sha256radiobutton->isChecked())
             digoptions.append(3);
     }
-    if(ui->videocheckBox->isChecked())
-        digoptions.append(4);
     emit StartDig(digtype, digoptions);
     this->close();
 }
