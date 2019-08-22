@@ -204,6 +204,7 @@ private slots:
     void ShowSearchDialog(void);
     void TagSection(QString ctitle, QString ctag);
     void FinishCarve(void);
+    void LaunchChomp(void);
 
 protected:
     void closeEvent(QCloseEvent* event);

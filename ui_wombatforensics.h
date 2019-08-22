@@ -57,6 +57,7 @@ public:
     QAction *actionpreviewreport;
     QAction *actionsearchhex;
     QAction *actionpublishresults;
+    QAction *actionchomp;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -228,6 +229,11 @@ public:
         QIcon icon26;
         icon26.addFile(QString::fromUtf8(":/bar/publish"), QSize(), QIcon::Normal, QIcon::Off);
         actionpublishresults->setIcon(icon26);
+        actionchomp = new QAction(WombatForensics);
+        actionchomp->setObjectName(QString::fromUtf8("actionchomp"));
+        QIcon icon27;
+        icon27.addFile(QString::fromUtf8(":/bar/xchomppng"), QSize(), QIcon::Normal, QIcon::Off);
+        actionchomp->setIcon(icon27);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -412,6 +418,10 @@ public:
         actionsearchhex->setToolTip(QCoreApplication::translate("WombatForensics", "Find in Hex/Ascii", nullptr));
 #endif // QT_CONFIG(tooltip)
         actionpublishresults->setText(QCoreApplication::translate("WombatForensics", "Publish Results", nullptr));
+        actionchomp->setText(QCoreApplication::translate("WombatForensics", "Play xchomp", nullptr));
+#if QT_CONFIG(tooltip)
+        actionchomp->setToolTip(QCoreApplication::translate("WombatForensics", "Play xchomp While  You Wait", nullptr));
+#endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());
 #endif // QT_CONFIG(tooltip)

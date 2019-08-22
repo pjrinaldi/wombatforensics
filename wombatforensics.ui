@@ -541,6 +541,18 @@
     <string>Publish Results</string>
    </property>
   </action>
+  <action name="actionchomp">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/xchomppng</normaloff>:/bar/xchomppng</iconset>
+   </property>
+   <property name="text">
+    <string>Play xchomp</string>
+   </property>
+   <property name="toolTip">
+    <string>Play xchomp While  You Wait</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

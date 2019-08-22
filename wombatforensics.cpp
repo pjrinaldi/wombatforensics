@@ -97,6 +97,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tagcheckedmenu->setIcon(QIcon(":/bar/addtotag"));
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
+    ui->analysisToolBar->addAction(ui->actionchomp);
     ui->analysisToolBar->addAction(ui->actionAbout);
 
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
@@ -112,6 +113,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
     connect(ui->actionsearchhex, SIGNAL(triggered()), this, SLOT(ShowSearchDialog()), Qt::DirectConnection);
     connect(ui->actionpublishresults, SIGNAL(triggered()), this, SLOT(PublishResults()), Qt::DirectConnection);
+    connect(ui->actionchomp, SIGNAL(triggered()), this, SLOT(LaunchChomp()), Qt::DirectConnection);
 
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->actionSection);
@@ -2867,4 +2869,9 @@ void WombatForensics::SetHexOffset()
 void WombatForensics::ThreadCancelled()
 {
     qInfo() << "Current Operation Cancelled";
+}
+
+void WombatForensics::LaunchChomp()
+{
+    qDebug() << "Launch Chomp here...";
 }
