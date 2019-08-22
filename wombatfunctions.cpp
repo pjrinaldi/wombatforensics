@@ -1421,6 +1421,163 @@ void GenerateVidThumbnails(QString thumbid)
 {
     if(thumbid.split("-").count() == 5)
     {
+        TSK_IMG_INFO* readimginfo = NULL;
+        TSK_FS_INFO* readfsinfo = NULL;
+        TSK_FS_FILE* readfileinfo = NULL;
+        QString tmpstr = "";
+        QString filestr = "";
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        std::vector<std::string> pathvector;
+        const TSK_TCHAR** imagepartspath;
+        pathvector.clear();
+        //qDebug() << "thumbid:" << thumbid;
+        QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
+        QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
+        QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
+        QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
+        if(fstring.contains(":"))
+            fstring = thumbid.split("-").at(3).split(":").first() + "-" + thumbid.split("-").at(3).split(":").last();
+        QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
+        qint64 curaddress = thumbid.split("-f").at(1).split("-a").at(0).split(":").at(0).toLongLong();
+        //qDebug() << "curaddress:" << curaddress;
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
+        QString evidencename = evidfiles.at(0).split(".e").first();
+        QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(evidfile.isOpen())
+            tmpstr = evidfile.readLine();
+        evidfile.close();
+        int partcount = tmpstr.split(",").at(3).split("|").size();
+        for(int i=0; i < partcount; i++)
+            pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
+        imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+        for(uint i=0; i < pathvector.size(); i++)
+            imagepartspath[i] = pathvector[i].c_str();
+        readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+        if(readimginfo == NULL)
+        {
+            qDebug() << tsk_error_get_errstr();
+            //LogMessage("Image opening error");
+        }
+        free(imagepartspath);
+        tmpstr = "";
+        //qDebug() << "wombatvariable.evidencename:" << wombatvariable.evidencename;
+        QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
+        //qDebug() << "partfile:" << partfile.fileName();
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            tmpstr = partfile.readLine();
+        partfile.close();
+        //qDebug() << "tmpstr:" << tmpstr;
+        if(tmpstr.count() > 0)
+        {
+            readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toLongLong(), TSK_FS_TYPE_DETECT);
+            if(readfsinfo != NULL)
+                readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
+        }
+        char* imgbuf = NULL;
+        ssize_t imglen = 0;
+        if(readfileinfo != NULL)
+        {
+            if(thumbid.contains(":")) // ADS
+            {
+                qint64 adssize = 0;
+                TSK_OFF_T curmftentrystart = 0;
+                NTFS_INFO* ntfsinfo = (NTFS_INFO*)readfileinfo->fs_info;
+                int recordsize = 0;
+                if(ntfsinfo->fs->mft_rsize_c > 0)
+                    recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(readfileinfo->fs_info->endian, ntfsinfo->fs->ssize);
+                else
+                    recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
+                if(readfileinfo->meta != NULL)
+                    curmftentrystart = tsk_getu16(readfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(readfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * readfileinfo->meta->addr + 20;
+                else
+                    curmftentrystart = tsk_getu16(readfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(readfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
+                char startoffset[2];
+                tsk_fs_read(readfileinfo->fs_info, curmftentrystart, startoffset, 2);
+                uint16_t teststart = startoffset[1] * 256 + startoffset[0];
+                adssize = (qint64)teststart;
+                int cnt, i;
+                cnt = tsk_fs_file_attr_getsize(readfileinfo);
+                for(i = 0; i < cnt; i++)
+                {
+                    char type[512];
+                    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(readfileinfo, i);
+                    adssize += 24;
+                    adssize += (qint64)fsattr->size;
+                    if(ntfs_attrname_lookup(readfileinfo->fs_info, fsattr->type, type, 512) == 0)
+                    {
+                        if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                        {
+                            if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
+                            {
+                                imgbuf = new char[fsattr->size];
+                                imglen = tsk_fs_attr_read(fsattr, 0, imgbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
+                            }
+                        }
+                    }
+                }
+            }
+            else // regular file
+            {
+                imgbuf = new char[readfileinfo->meta->size];
+                //imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+                imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+            }
+        }
+        tsk_fs_file_close(readfileinfo);
+        tsk_fs_close(readfsinfo);
+        tsk_img_close(readimginfo);
+        readfileinfo = NULL;
+        readfsinfo = NULL;
+        readimginfo = NULL;
+
+        QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".stat");
+        //qDebug() << "id:filename" << thumbid << filefile.fileName().split("mntpt/").at(1);
+        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(filefile.isOpen())
+            filestr = filefile.readLine();
+        filefile.close();
+        if(filestr.count() > 1)
+        {
+            QString filemime = filestr.split(",").at(10);
+            QString filecat = filemime.split("/").first();
+            if(filecat.contains("video"))
+            {
+                /*
+                QByteArray ba;
+                QByteArray ba2;
+                ba.append(filestr.split(",").at(0));
+                ba2.append(filestr.split(",").at(3));
+                QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
+                ba.clear();
+                ba.append(fullpath);
+                imageshash.insert(filestr.split(",", QString::SkipEmptyParts).at(12), QString(ba.toBase64()));
+                QImage fileimage;
+                QImage thumbimage;
+                QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
+                if(imglen > 0)
+                {
+                    bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
+                    if(imageloaded)
+                    {
+                        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                        writer.write(thumbimage);
+                    }
+                    else
+                    {
+                        fileimage.load(":/missingimage");
+                        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                        writer.write(thumbimage);
+                    }
+                }
+            */
+            }
+        }
+        delete[] imgbuf;
+        //free(imgbuf);
+        digimgthumbcount++;
+        isignals->DigUpd(0, digimgthumbcount);
     }
 }
 
