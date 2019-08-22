@@ -87,6 +87,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
+    connect(digstatusdialog, SIGNAL(CancelVidThumbThread()), &videowatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
@@ -103,6 +104,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&openwatcher, SIGNAL(finished()), this, SLOT(OpenUpdate()), Qt::QueuedConnection);
     connect(&thumbwatcher, SIGNAL(finished()), this, SLOT(FinishThumbs()), Qt::QueuedConnection);
+    connect(&videowatcher, SIGNAL(finished()), this, SLOT(FinishVideos()), Qt::QueuedConnection);
     connect(&thashwatcher, SIGNAL(finished()), this, SLOT(ThashFinish()), Qt::QueuedConnection);
     connect(&thashsavewatcher, SIGNAL(finished()), this, SLOT(ThashSaveFinish()), Qt::QueuedConnection);
     connect(&hashingwatcher, SIGNAL(finished()), this, SLOT(HashingFinish()), Qt::QueuedConnection);
@@ -2101,7 +2103,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             digfilelist = GetFileLists(dtype);
         //qDebug() << digfilelist;
         digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
-        if(digoptions.at(i) == 0) // Generate Thumbnails
+        if(digoptions.at(i) == 0) // Generate Image Thumbnails
         {
             thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
             thumbwatcher.setFuture(thumbfuture);
@@ -2115,9 +2117,14 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             else if(digoptions.at(i) == 1)
                 hashsum = 1;
             //qInfo() << "Generating Hash...";
-            //StatusUpdate("Generating Hash...");
+                    //StatusUpdate("Generating Hash...");
             hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
             hashingwatcher.setFuture(hashingfuture);
+        }
+        else if(digoptions.at(i) == 4) // Generate Video Thumbnails
+        {
+            videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails); // Process Video Thumbnails
+            videowatcher.setFuture(videofuture);
         }
     }
 }
@@ -2391,6 +2398,13 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             imagewindow->show();
         }
     }
+}
+
+void WombatForensics::FinishVideos()
+{
+    digstatusdialog->UpdateDigState(0, -1);
+    StatusUpdate("Thumbnail Generation Finished");
+    qInfo() << "Video Thumbnail Generation Finished";
 }
 
 void WombatForensics::FinishThumbs()

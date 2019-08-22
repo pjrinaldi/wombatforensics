@@ -11,10 +11,11 @@ DigStatus::DigStatus(QWidget* parent) : QDialog(parent), ui(new Ui::DigStatus)
     ui->imgthumbbutton->setVisible(false);
     ui->hashlabel->setVisible(false);
     ui->hashbutton->setVisible(false);
-    ui->label_3->setVisible(false);
-    ui->toolButton_3->setVisible(false);
+    ui->vidthumblabel->setVisible(false);
+    ui->vidthumbbutton->setVisible(false);
     connect(ui->imgthumbbutton, SIGNAL(clicked()), this, SLOT(CancelImgThumb()));
     connect(ui->hashbutton, SIGNAL(clicked()), this, SLOT(CancelHash()));
+    connect(ui->vidthumbbutton, SIGNAL(clicked()), this, SLOT(CancelVidThumb()));
 }
 
 DigStatus::~DigStatus()
@@ -49,6 +50,15 @@ void DigStatus::UpdateDigState(int digstateid, int digstatecount)
             hashstring = "SHA256";
         hashstring += " Hashing: " + QString::number(hashcount) + " of " + QString::number(hashtotal) + " " + QString::number((int)hashpercent) + "%";
         ui->hashlabel->setText(hashstring);
+    }
+    else if(digstateid == 4) // vid thumbnail
+    {
+        if(digstatecount == -1)
+            vidthumbcount = vidthumbtotal;
+        else
+            vidthumbcount = digstatecount;
+        vidthumbpercent = ((float)vidthumbcount/(float)vidthumbtotal) * 100.0;
+        ui->vidthumblabel->setText("Generating Video Thumbnail: " + QString::number(vidthumbcount) + " of " + QString::number(vidthumbtotal) + " " + QString::number((int)vidthumbpercent) + "%");
     }
 }
 
@@ -85,6 +95,18 @@ void DigStatus::SetInitialDigState(int digstateid, int digtotal)
         ui->hashbutton->setVisible(true);
         ui->hashlabel->setText(hashstring);
     }
+    else if(digstateid == 4) // vid thumbnail
+    {
+        vidthumbcount = 0;
+        vidthumbtotal = digtotal;
+        if(vidthumbtotal != 0)
+            vidthumbpercent = ((float)vidthumbcount/(float)vidthumbtotal) * 100.0;
+        else
+            vidthumbtotal = 0;
+        ui->vidthumblabel->setVisible(true);
+        ui->vidthumbbutton->setVisible(true);
+        ui->vidthumblabel->setText("Generating Video thumbnail: " + QString::number(vidthumbcount) + " of " + QString::number(vidthumbtotal) + " " + QString::number((int)vidthumbpercent) + "%");
+    }
 }
 
 void DigStatus::CancelImgThumb()
@@ -97,6 +119,12 @@ void DigStatus::CancelHash()
 {
     ui->hashlabel->setText("<s>" + ui->hashlabel->text() + "</s>");
     emit CancelHashThread();
+}
+
+void DigStatus::CancelVidThumb()
+{
+    ui->vidthumblabel->setText("<s>" + ui->vidthumblabel->text() + "</s>");
+    emit CancelVidThumbThread();
 }
 
 void DigStatus::closeEvent(QCloseEvent* e)

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>363</width>
-    <height>300</height>
+    <width>365</width>
+    <height>314</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -102,6 +102,13 @@
          <widget class="QCheckBox" name="thumbnailcheckBox">
           <property name="text">
            <string>Generate Thumbnails for All Image Files</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="videocheckBox">
+          <property name="text">
+           <string>Generate Thumbnails for All Video Files</string>
           </property>
          </widget>
         </item>

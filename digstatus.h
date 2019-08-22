@@ -25,9 +25,11 @@ public:
 public slots:
     void CancelHash(void);
     void CancelImgThumb(void);
+    void CancelVidThumb(void);
 signals:
     void CancelImgThumbThread(void);
     void CancelHashThread(void);
+    void CancelVidThumbThread(void);
 protected:
     void closeEvent(QCloseEvent* event);
 
@@ -35,7 +37,8 @@ private:
     Ui::DigStatus* ui;
     int hashcount, hashtotal;
     int imgthumbcount, imgthumbtotal;
-    float hashpercent, imgthumbpercent;
+    int vidthumbcount, vidthumbtotal;
+    float hashpercent, imgthumbpercent, vidthumbpercent;
     int digstate;
     QString hashstring;
 };

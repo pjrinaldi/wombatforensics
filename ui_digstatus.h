@@ -30,13 +30,13 @@ public:
     QSpacerItem *horizontalSpacer;
     QToolButton *imgthumbbutton;
     QHBoxLayout *horizontalLayout_2;
-    QLabel *hashlabel;
+    QLabel *vidthumblabel;
     QSpacerItem *horizontalSpacer_2;
-    QToolButton *hashbutton;
+    QToolButton *vidthumbbutton;
     QHBoxLayout *horizontalLayout_3;
-    QLabel *label_3;
+    QLabel *hashlabel;
     QSpacerItem *horizontalSpacer_3;
-    QToolButton *toolButton_3;
+    QToolButton *hashbutton;
     QSpacerItem *verticalSpacer;
 
     void setupUi(QDialog *DigStatus)
@@ -73,40 +73,40 @@ public:
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        hashlabel = new QLabel(DigStatus);
-        hashlabel->setObjectName(QString::fromUtf8("hashlabel"));
+        vidthumblabel = new QLabel(DigStatus);
+        vidthumblabel->setObjectName(QString::fromUtf8("vidthumblabel"));
 
-        horizontalLayout_2->addWidget(hashlabel);
+        horizontalLayout_2->addWidget(vidthumblabel);
 
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
-        hashbutton = new QToolButton(DigStatus);
-        hashbutton->setObjectName(QString::fromUtf8("hashbutton"));
-        hashbutton->setIcon(icon);
+        vidthumbbutton = new QToolButton(DigStatus);
+        vidthumbbutton->setObjectName(QString::fromUtf8("vidthumbbutton"));
+        vidthumbbutton->setIcon(icon);
 
-        horizontalLayout_2->addWidget(hashbutton);
+        horizontalLayout_2->addWidget(vidthumbbutton);
 
 
         verticalLayout_2->addLayout(horizontalLayout_2);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        label_3 = new QLabel(DigStatus);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
+        hashlabel = new QLabel(DigStatus);
+        hashlabel->setObjectName(QString::fromUtf8("hashlabel"));
 
-        horizontalLayout_3->addWidget(label_3);
+        horizontalLayout_3->addWidget(hashlabel);
 
         horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_3->addItem(horizontalSpacer_3);
 
-        toolButton_3 = new QToolButton(DigStatus);
-        toolButton_3->setObjectName(QString::fromUtf8("toolButton_3"));
-        toolButton_3->setIcon(icon);
+        hashbutton = new QToolButton(DigStatus);
+        hashbutton->setObjectName(QString::fromUtf8("hashbutton"));
+        hashbutton->setIcon(icon);
 
-        horizontalLayout_3->addWidget(toolButton_3);
+        horizontalLayout_3->addWidget(hashbutton);
 
 
         verticalLayout_2->addLayout(horizontalLayout_3);
@@ -126,10 +126,10 @@ public:
         DigStatus->setWindowTitle(QCoreApplication::translate("DigStatus", "Dig Status", nullptr));
         imgthumblabel->setText(QCoreApplication::translate("DigStatus", "Generating Image Thumbnail: x of y z%", nullptr));
         imgthumbbutton->setText(QCoreApplication::translate("DigStatus", "...", nullptr));
+        vidthumblabel->setText(QCoreApplication::translate("DigStatus", "Generating Video Thumbnail: x of y z%", nullptr));
+        vidthumbbutton->setText(QCoreApplication::translate("DigStatus", "...", nullptr));
         hashlabel->setText(QCoreApplication::translate("DigStatus", "XXX Hashing: a of b c%", nullptr));
         hashbutton->setText(QCoreApplication::translate("DigStatus", "...", nullptr));
-        label_3->setText(QCoreApplication::translate("DigStatus", "TextLabel", nullptr));
-        toolButton_3->setText(QCoreApplication::translate("DigStatus", "...", nullptr));
     } // retranslateUi
 
 };

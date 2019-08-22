@@ -163,6 +163,7 @@ private slots:
     void UpdateStatus(void);
     void FinishExport(void);
     void FinishThumbs(void);
+    void FinishVideos(void);
     void ThashFinish(void);
     void ThashSaveFinish(void);
     void ThreadCancelled(void);
@@ -246,6 +247,8 @@ private:
     QFutureWatcher<void> exportwatcher;
     QFuture<void> openfuture;
     QFutureWatcher<void> openwatcher;
+    QFuture<void> videofuture;
+    QFutureWatcher<void> videowatcher;
     //QFutureWatcher<void> carvewatcher;
 
     QProcess* xmntprocess;

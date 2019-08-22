@@ -37,6 +37,7 @@ public:
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_4;
     QCheckBox *thumbnailcheckBox;
+    QCheckBox *videocheckBox;
     QHBoxLayout *horizontalLayout_3;
     QCheckBox *hashcheckbox;
     QRadioButton *md5radiobutton;
@@ -54,7 +55,7 @@ public:
         if (DigDeeperDialog->objectName().isEmpty())
             DigDeeperDialog->setObjectName(QString::fromUtf8("DigDeeperDialog"));
         DigDeeperDialog->setWindowModality(Qt::ApplicationModal);
-        DigDeeperDialog->resize(363, 300);
+        DigDeeperDialog->resize(365, 314);
         DigDeeperDialog->setModal(true);
         verticalLayout_2 = new QVBoxLayout(DigDeeperDialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
@@ -103,6 +104,11 @@ public:
         thumbnailcheckBox->setObjectName(QString::fromUtf8("thumbnailcheckBox"));
 
         verticalLayout_4->addWidget(thumbnailcheckBox);
+
+        videocheckBox = new QCheckBox(groupBox);
+        videocheckBox->setObjectName(QString::fromUtf8("videocheckBox"));
+
+        verticalLayout_4->addWidget(videocheckBox);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
@@ -175,6 +181,7 @@ public:
         listedFileRadioButton->setText(QCoreApplication::translate("DigDeeperDialog", "All (#)", nullptr));
         groupBox->setTitle(QCoreApplication::translate("DigDeeperDialog", "For the Following Options", nullptr));
         thumbnailcheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Image Files", nullptr));
+        videocheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Video Files", nullptr));
         hashcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Calcuate Hash:", nullptr));
         md5radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "MD5", nullptr));
         sha1radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA1", nullptr));

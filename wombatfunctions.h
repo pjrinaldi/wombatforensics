@@ -36,6 +36,7 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
+void GenerateVidThumbnails(QString thumbid);
 void LoadImagesHash(void);
 void SaveImagesHash(void);
 void PopulateTreeModel(QString evidstring);
