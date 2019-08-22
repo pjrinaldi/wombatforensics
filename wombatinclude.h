@@ -92,6 +92,9 @@
 #include <tar.h>
 #include <libtar.h>
 
+#include <videothumbnailer.h>
+#include <Magick++.h>
+
 #include <libtsk.h>
 #include <libewf.h>
 #include <tsk_bsd.h>

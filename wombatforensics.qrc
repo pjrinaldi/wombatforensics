@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file alias="xchomp">Resources/xchomp</file>
     <file alias="remcheck">Resources/process-remove.svg</file>
     <file alias="missingimage">Resources/image-missing.png</file>
     <file alias="cancelthread">Resources/process-stop.svg</file>
@@ -34,6 +35,7 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="xchomppng">Resources/xchomp.png</file>
     <file alias="carvetofile">Resources/PossibleGraphics/pie_chart_003.png</file>
     <file alias="publish">Resources/PossibleGraphics/publish/paperairplane2.png</file>
     <file alias="hexsrch">Resources/searchhex.png</file>
