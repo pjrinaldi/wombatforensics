@@ -92,6 +92,7 @@
 #include <tar.h>
 #include <libtar.h>
 
+#include <filmstripfilter.h>
 #include <videothumbnailer.h>
 #include <Magick++.h>
 
