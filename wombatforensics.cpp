@@ -807,6 +807,8 @@ void WombatForensics::ReadSettings()
             ba.append(tmplist.at(i).split(":").at(1));
             reportpath = QByteArray::fromBase64(ba);
         }
+        if(tmplist.at(i).split(":").at(0) == "video")
+            vidcount = tmplist.at(i).split(":").at(1).toInt();
         //else if(tmplist.at(i).split(":").at(0) == "save")
         // etc...
     }
