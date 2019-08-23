@@ -2414,6 +2414,8 @@ void WombatForensics::FinishVideos()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     imagewindow->LoadThumbnails();
     QApplication::restoreOverrideCursor();
+    // NEED TO FIX THIS TO DISPLAY THE THUMBNAILS FOR VIDEO AS WELL AS IMAGES...
+    // ALSO CHECK IMAGEVIEWER CODE AND UPDATE HEADER TO BE THUMBNAILS VS. IMAGE VIEWER OR IMAGE/VIDEO VIEWER
     if(digoptions.isEmpty() || digoptions.contains(0))
         imagewindow->show();
 }
