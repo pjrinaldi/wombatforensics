@@ -1590,7 +1590,6 @@ void GenerateVidThumbnails(QString thumbid)
                 delete filmstripfilter;
                 //qDebug() << "tlist:" << tlist;
                 // implement imagemagick montage...
-                //Magick::InitializeMagick("");
                 std::list<Magick::Image> thmbimages;
                 std::list<Magick::Image> montage;
                 Magick::Image image;
@@ -1614,46 +1613,12 @@ void GenerateVidThumbnails(QString thumbid)
                     std::string mstring = thumbout.toStdString();
                     Magick::Image& montageimage = montage.front();
                     montageimage.magick("jpg");
-                    //montageimage.write("GEE.jpg");
-                    //montageimage.write("/home/pasquale/TEST.jpg");
                     montageimage.write(mstring);
-                    //Magick::writeImages(montage.begin(), montage.end(), mstring);
                 }
                 else
                     qDebug() << "something went wrong:" << montage.size();
-                //Magick::Image& montageimage = montage.front();
-                /*
-                QByteArray ba;
-                QByteArray ba2;
-                ba.append(filestr.split(",").at(0));
-                ba2.append(filestr.split(",").at(3));
-                QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
-                ba.clear();
-                ba.append(fullpath);
-                imageshash.insert(filestr.split(",", QString::SkipEmptyParts).at(12), QString(ba.toBase64()));
-                QImage fileimage;
-                QImage thumbimage;
-                QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
-                if(imglen > 0)
-                {
-                    bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
-                    if(imageloaded)
-                    {
-                        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-                        writer.write(thumbimage);
-                    }
-                    else
-                    {
-                        fileimage.load(":/missingimage");
-                        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-                        writer.write(thumbimage);
-                    }
-                }
-            */
             }
         }
-        //delete[] imgbuf;
-        //free(imgbuf);
         digimgthumbcount++;
         isignals->DigUpd(0, digimgthumbcount);
     }

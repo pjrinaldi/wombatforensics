@@ -2409,6 +2409,13 @@ void WombatForensics::FinishVideos()
     digstatusdialog->UpdateDigState(0, -1);
     StatusUpdate("Thumbnail Generation Finished");
     qInfo() << "Video Thumbnail Generation Finished";
+    QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
+    thashsavewatcher.setFuture(tmpfuture);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    imagewindow->LoadThumbnails();
+    QApplication::restoreOverrideCursor();
+    if(digoptions.isEmpty() || digoptions.contains(0))
+        imagewindow->show();
 }
 
 void WombatForensics::FinishThumbs()
