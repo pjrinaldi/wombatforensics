@@ -1525,6 +1525,17 @@ void GenerateVidThumbnails(QString thumbid)
                 imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
             }
         }
+        QDir dir;
+        dir.mkpath(wombatvariable.tmpfilepath);
+        QString tmpstring = wombatvariable.tmpfilepath + thumbid.split("-a").first() + "-tmp";
+        QFile tmpfile(tmpstring);
+        if(tmpfile.open(QIODevice::WriteOnly))
+        {
+            QDataStream outbuffer(&tmpfile);
+            outbuffer.writeRawData(imgbuf, imglen);
+            tmpfile.close();
+        }
+        delete[] imgbuf;
         tsk_fs_file_close(readfileinfo);
         tsk_fs_close(readfsinfo);
         tsk_img_close(readimginfo);
@@ -1544,6 +1555,31 @@ void GenerateVidThumbnails(QString thumbid)
             QString filecat = filemime.split("/").first();
             if(filecat.contains("video"))
             {
+                ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
+                videothumbnailer.setThumbnailSize(thumbsize);
+                ffmpegthumbnailer::FilmStripFilter* filmstripfilter = nullptr;
+                filmstripfilter = new ffmpegthumbnailer::FilmStripFilter();
+                videothumbnailer.addFilter(filmstripfilter);
+                videothumbnailer.setPreferEmbeddedMetadata(false);
+                int vtcnt = 100 / vidcount;
+                qDebug() << "vidcount:" << vidcount << "vtcnt:" << vtcnt;
+                QStringList tlist;
+                tlist.clear();
+                for(int i=0; i <= vtcnt; i++)
+                {
+                    int seekpercentage = i * vidcount;
+                    if(seekpercentage == 0)
+                        seekpercentage = 5;
+                    if(seekpercentage == 100)
+                        seekpercentage = 95;
+                    qDebug() << "seekpercentage:" << seekpercentage;
+                    QString tmpoutfile = wombatvariable.tmpfilepath + thumbid.split("-a").first() + ".t" + QString::number(seekpercentage) + ".jpg";
+                    tlist.append(tmpoutfile);
+                    videothumbnailer.setSeekPercentage(seekpercentage);
+                    videothumbnailer.generateThumbnail(tmpstring.toStdString(), Jpeg, tmpoutfile.toStdString());
+                }
+                delete filmstripfilter;
+                // implement imagemagick montage...
                 /*
                 QByteArray ba;
                 QByteArray ba2;
@@ -1574,7 +1610,7 @@ void GenerateVidThumbnails(QString thumbid)
             */
             }
         }
-        delete[] imgbuf;
+        //delete[] imgbuf;
         //free(imgbuf);
         digimgthumbcount++;
         isignals->DigUpd(0, digimgthumbcount);

@@ -638,7 +638,6 @@ void WombatForensics::ShowExternalViewer()
         //else
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
-        //(new QDir())->mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "-tmp";
         QFile tmpfile(tmpstring);
         if(tmpfile.open(QIODevice::WriteOnly))
