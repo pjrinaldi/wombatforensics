@@ -94,9 +94,7 @@
 
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
-#include <Magick++.h>
-//#include <MagickCore/MagickCore.h>
-//#include <MagickCore/montage.h>
+//#include <Magick++.h>
 
 #include <libtsk.h>
 #include <libewf.h>

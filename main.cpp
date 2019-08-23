@@ -1,5 +1,6 @@
 #include "wombatinclude.h"
 #include "wombatforensics.h"
+#include <Magick++.h>
 
 // Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
