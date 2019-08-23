@@ -1607,14 +1607,17 @@ void GenerateVidThumbnails(QString thumbid)
                 montageopts.tile(QString(QString::number(tlist.count()) + "x1").toStdString());
                 montageopts.backgroundColor(color);
                 montageopts.fileName(QString(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg").toStdString());
-                Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); // fails...
+                Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); 
                 if(montage.size() == 1)
                 {
                     qDebug() << "montage worked:" << thumbout;
+                    std::string mstring = thumbout.toStdString();
                     Magick::Image& montageimage = montage.front();
-                    montageimage.write("GEEE.jpg");
-                    montageimage.write(thumbout.toStdString());
-                    //Magick::writeImages(montage.begin(), montage.end(), thumbout.toStdString());
+                    montageimage.magick("jpg");
+                    //montageimage.write("GEE.jpg");
+                    //montageimage.write("/home/pasquale/TEST.jpg");
+                    montageimage.write(mstring);
+                    //Magick::writeImages(montage.begin(), montage.end(), mstring);
                 }
                 else
                     qDebug() << "something went wrong:" << montage.size();
