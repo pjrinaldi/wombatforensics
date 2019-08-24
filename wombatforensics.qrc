@@ -22,6 +22,7 @@
     <file alias="appicon">./Resources/wombat_32.ico</file>
   </qresource>
   <qresource prefix="/basic">
+    <file alias="missingvideo">Resources/filmstrip.png</file>
     <file alias="carvedfile">Resources/carvedfile.svg</file>
     <file alias="deletedfile">Resources/deletedfile.png</file>
     <file alias="treefolder">./Resources/folder.png</file>

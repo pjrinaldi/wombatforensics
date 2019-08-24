@@ -1529,7 +1529,6 @@ void GenerateVidThumbnails(QString thumbid)
                 if(readfileinfo->meta->size > 0)
                 {
                     imgbuf = new char[readfileinfo->meta->size];
-                    //imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
                     imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
                 }
                 else
@@ -1538,7 +1537,6 @@ void GenerateVidThumbnails(QString thumbid)
         }
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
-        // LEFT OFF HERE
         QString tmpstring = wombatvariable.tmpfilepath + thumbid.split("-a").first() + "-tmp";
         if(imglen > 0)
         {
@@ -1572,68 +1570,81 @@ void GenerateVidThumbnails(QString thumbid)
             QString filecat = filemime.split("/").first();
             if(filecat.contains("video"))
             {
-                QByteArray ba;
-                QByteArray ba2;
-                ba.append(filestr.split(",").at(0));
-                ba2.append(filestr.split(",").at(3));
-                QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
-                ba.clear();
-                ba.append(fullpath);
-                imageshash.insert(filestr.split(",", QString::SkipEmptyParts).at(12), QString(ba.toBase64()));
-                // implement libffmpegthumbnailer...
-                ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
-                videothumbnailer.setThumbnailSize(thumbsize);
-                ffmpegthumbnailer::FilmStripFilter* filmstripfilter = nullptr;
-                filmstripfilter = new ffmpegthumbnailer::FilmStripFilter();
-                videothumbnailer.addFilter(filmstripfilter);
-                videothumbnailer.setPreferEmbeddedMetadata(false);
-                int vtcnt = 100 / vidcount;
-                //qDebug() << "vidcount:" << vidcount << "vtcnt:" << vtcnt;
-                QStringList tlist;
-                tlist.clear();
-                for(int i=0; i <= vtcnt; i++)
+                if(imglen > 0)
                 {
-                    int seekpercentage = i * vidcount;
-                    if(seekpercentage == 0)
-                        seekpercentage = 5;
-                    if(seekpercentage == 100)
-                        seekpercentage = 95;
-                    //qDebug() << "seekpercentage:" << seekpercentage;
-                    QString tmpoutfile = wombatvariable.tmpfilepath + thumbid.split("-a").first() + ".t" + QString::number(seekpercentage) + ".jpg";
-                    tlist.append(tmpoutfile);
-                    videothumbnailer.setSeekPercentage(seekpercentage);
-                    videothumbnailer.generateThumbnail(tmpstring.toStdString(), Jpeg, tmpoutfile.toStdString());
+                    QByteArray ba;
+                    QByteArray ba2;
+                    ba.append(filestr.split(",").at(0));
+                    ba2.append(filestr.split(",").at(3));
+                    QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
+                    ba.clear();
+                    ba.append(fullpath);
+                    imageshash.insert(filestr.split(",", QString::SkipEmptyParts).at(12), QString(ba.toBase64()));
+                    // implement libffmpegthumbnailer...
+                    ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
+                    videothumbnailer.setThumbnailSize(thumbsize);
+                    ffmpegthumbnailer::FilmStripFilter* filmstripfilter = nullptr;
+                    filmstripfilter = new ffmpegthumbnailer::FilmStripFilter();
+                    videothumbnailer.addFilter(filmstripfilter);
+                    videothumbnailer.setPreferEmbeddedMetadata(false);
+                    int vtcnt = 100 / vidcount;
+                    //qDebug() << "vidcount:" << vidcount << "vtcnt:" << vtcnt;
+                    QStringList tlist;
+                    tlist.clear();
+                    for(int i=0; i <= vtcnt; i++)
+                    {
+                        int seekpercentage = i * vidcount;
+                        if(seekpercentage == 0)
+                            seekpercentage = 5;
+                        if(seekpercentage == 100)
+                            seekpercentage = 95;
+                        //qDebug() << "seekpercentage:" << seekpercentage;
+                        QString tmpoutfile = wombatvariable.tmpfilepath + thumbid.split("-a").first() + ".t" + QString::number(seekpercentage) + ".jpg";
+                        tlist.append(tmpoutfile);
+                        videothumbnailer.setSeekPercentage(seekpercentage);
+                        videothumbnailer.generateThumbnail(tmpstring.toStdString(), Jpeg, tmpoutfile.toStdString());
+                    }
+                    delete filmstripfilter;
+                    //qDebug() << "tlist:" << tlist;
+                    // implement imagemagick montage...
+                    std::list<Magick::Image> thmbimages;
+                    std::list<Magick::Image> montage;
+                    Magick::Image image;
+                    for(int i=0; i < tlist.count(); i++)
+                    {
+                        image.read(tlist.at(i).toStdString());
+                        thmbimages.push_back(image);
+                    }
+                    //qDebug() << "thmbimages:" << thmbimages.size();
+                    QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
+                    Magick::Montage montageopts;
+                    Magick::Color color("rgba(0,0,0,0)");
+                    montageopts.geometry(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize) + "+1+1").toStdString());
+                    montageopts.tile(QString(QString::number(tlist.count()) + "x1").toStdString());
+                    montageopts.backgroundColor(color);
+                    montageopts.fileName(QString(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg").toStdString());
+                    Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); 
+                    if(montage.size() == 1)
+                    {
+                        //qDebug() << "montage worked:" << thumbout;
+                        std::string mstring = thumbout.toStdString();
+                        Magick::Image& montageimage = montage.front();
+                        montageimage.magick("jpg");
+                        montageimage.write(mstring);
+                    }
+                    else
+                        qDebug() << "something went wrong:" << montage.size();
                 }
-                delete filmstripfilter;
-                //qDebug() << "tlist:" << tlist;
-                // implement imagemagick montage...
-                std::list<Magick::Image> thmbimages;
-                std::list<Magick::Image> montage;
-                Magick::Image image;
-                for(int i=0; i < tlist.count(); i++)
+                else // video was 0 length
                 {
-                    image.read(tlist.at(i).toStdString());
-                    thmbimages.push_back(image);
+                    QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
+                    QImage fileimage;
+                    QImage thumbimage;
+                    QImageWriter writer(thumbout);
+                    fileimage.load(":/basic/missingvideo");
+                    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                    writer.write(thumbimage);
                 }
-                qDebug() << "thmbimages:" << thmbimages.size();
-                QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
-                Magick::Montage montageopts;
-                Magick::Color color("rgba(0,0,0,0)");
-                montageopts.geometry(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize) + "+1+1").toStdString());
-                montageopts.tile(QString(QString::number(tlist.count()) + "x1").toStdString());
-                montageopts.backgroundColor(color);
-                montageopts.fileName(QString(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg").toStdString());
-                Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); 
-                if(montage.size() == 1)
-                {
-                    qDebug() << "montage worked:" << thumbout;
-                    std::string mstring = thumbout.toStdString();
-                    Magick::Image& montageimage = montage.front();
-                    montageimage.magick("jpg");
-                    montageimage.write(mstring);
-                }
-                else
-                    qDebug() << "something went wrong:" << montage.size();
             }
         }
         digimgthumbcount++;
