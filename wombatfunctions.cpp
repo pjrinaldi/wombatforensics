@@ -1512,8 +1512,13 @@ void GenerateVidThumbnails(QString thumbid)
                         {
                             if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                             {
-                                imgbuf = new char[fsattr->size];
-                                imglen = tsk_fs_attr_read(fsattr, 0, imgbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
+                                if(fsattr->size > 0)
+                                {
+                                    imgbuf = new char[fsattr->size];
+                                    imglen = tsk_fs_attr_read(fsattr, 0, imgbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
+                                }
+                                else
+                                    qDebug() << "empty attr, do nothing...";
                             }
                         }
                     }
@@ -1521,21 +1526,31 @@ void GenerateVidThumbnails(QString thumbid)
             }
             else // regular file
             {
-                imgbuf = new char[readfileinfo->meta->size];
-                //imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
-                imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                if(readfileinfo->meta->size > 0)
+                {
+                    imgbuf = new char[readfileinfo->meta->size];
+                    //imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+                    imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                }
+                else
+                    qDebug() << "empty file, do nothing...";
             }
         }
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + thumbid.split("-a").first() + "-tmp";
-        QFile tmpfile(tmpstring);
-        if(tmpfile.open(QIODevice::WriteOnly))
+        if(imglen > 0)
         {
-            QDataStream outbuffer(&tmpfile);
-            outbuffer.writeRawData(imgbuf, imglen);
-            tmpfile.close();
+            QFile tmpfile(tmpstring);
+            if(tmpfile.open(QIODevice::WriteOnly))
+            {
+                QDataStream outbuffer(&tmpfile);
+                outbuffer.writeRawData(imgbuf, imglen);
+                tmpfile.close();
+            }
         }
+        else
+            qDebug() << "video file is zero, don't write it out";
         delete[] imgbuf;
         tsk_fs_file_close(readfileinfo);
         tsk_fs_close(readfsinfo);
@@ -1719,8 +1734,13 @@ void GenerateThumbnails(QString thumbid)
                         {
                             if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                             {
-                                imgbuf = new char[fsattr->size];
-                                imglen = tsk_fs_attr_read(fsattr, 0, imgbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
+                                if(fsattr->size > 0)
+                                {
+                                    imgbuf = new char[fsattr->size];
+                                    imglen = tsk_fs_attr_read(fsattr, 0, imgbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
+                                }
+                                else
+                                    qDebug() << "empty attr, do nothing...";
                             }
                         }
                     }
@@ -1728,9 +1748,14 @@ void GenerateThumbnails(QString thumbid)
             }
             else // regular file
             {
-                imgbuf = new char[readfileinfo->meta->size];
-                //imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
-                imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                if(readfileinfo->meta->size > 0)
+                {
+                    imgbuf = new char[readfileinfo->meta->size];
+                    //imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+                    imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+                }
+                else
+                    qDebug() << "empty file, do nothing...";
             }
         }
         tsk_fs_file_close(readfileinfo);
@@ -1777,6 +1802,12 @@ void GenerateThumbnails(QString thumbid)
                         thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
                         writer.write(thumbimage);
                     }
+                }
+                else
+                {
+                    fileimage.load(":/missingimage");
+                    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                    writer.write(thumbimage);
                 }
             }
         }

@@ -666,8 +666,8 @@ void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 void WombatForensics::ShowFile(const QModelIndex &index)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    qDebug() << "index8:" << index.sibling(index.row(), 8).data().toString();
-    qDebug() << "index9:" << index.sibling(index.row(), 9).data().toString();
+    //qDebug() << "index8:" << index.sibling(index.row(), 8).data().toString();
+    //qDebug() << "index9:" << index.sibling(index.row(), 9).data().toString();
     if(index.sibling(index.row(), 8).data().toString().contains("image"))
     {
         imageviewer = new ImageWindow();
@@ -952,7 +952,7 @@ void WombatForensics::InitializeCaseStructure()
         //LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
-        autosavetimer->start(autosave); // 10 minutes in milliseconds for a general setting for real.
+        autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
     }
 }
 
@@ -1046,7 +1046,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     ui->actionBookmark_Manager->setEnabled(true);
     ui->actionpreviewreport->setEnabled(true);
     ui->actionpublishresults->setEnabled(true);
-    autosavetimer->start(autosave); // 10 minutes in milliseconds for a general setting for real.
+    autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
     UpdateEvidenceList();
     if(existingevidence.count() > 0)
     {
@@ -2315,7 +2315,7 @@ void WombatForensics::on_actionSaveState_triggered()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     SaveState();
-    qInfo() << "Current State Saved.";
+    //qInfo() << "Current State Saved.";
     QApplication::restoreOverrideCursor();
 }
 
