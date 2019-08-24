@@ -1538,6 +1538,7 @@ void GenerateVidThumbnails(QString thumbid)
         }
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
+        // LEFT OFF HERE
         QString tmpstring = wombatvariable.tmpfilepath + thumbid.split("-a").first() + "-tmp";
         if(imglen > 0)
         {
