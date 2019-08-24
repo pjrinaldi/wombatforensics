@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>407</width>
-    <height>194</height>
+    <height>220</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,14 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="1">
+   <item row="2" column="0">
+    <widget class="QLabel" name="casepathlabel">
+     <property name="text">
+      <string>Set Case Path:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -33,40 +40,7 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="casepathlabel">
-     <property name="text">
-      <string>Set Case Path:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="thumbnaillabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Thumbnail Size:</string>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="4">
-    <widget class="QPushButton" name="savebutton">
-     <property name="text">
-      <string>Save</string>
-     </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="3">
+   <item row="6" column="3">
     <widget class="QPushButton" name="cancelbutton">
      <property name="text">
       <string>Cancel</string>
@@ -86,34 +60,6 @@
      </property>
      <property name="clearButtonEnabled">
       <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QSpinBox" name="thumbnailspinbox">
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-     <property name="correctionMode">
-      <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-     </property>
-     <property name="showGroupSeparator" stdset="0">
-      <bool>false</bool>
-     </property>
-     <property name="suffix">
-      <string> pixels</string>
-     </property>
-     <property name="minimum">
-      <number>64</number>
-     </property>
-     <property name="maximum">
-      <number>320</number>
-     </property>
-     <property name="singleStep">
-      <number>64</number>
-     </property>
-     <property name="value">
-      <number>64</number>
      </property>
     </widget>
    </item>
@@ -137,14 +83,39 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QLabel" name="videolabel">
+   <item row="6" column="4">
+    <widget class="QPushButton" name="savebutton">
      <property name="text">
-      <string>Generate Video Thumbnail Every</string>
+      <string>Save</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
+   <item row="4" column="4">
+    <widget class="QSpinBox" name="autosavespinbox">
+     <property name="toolTip">
+      <string>Interval to Remove temp files and save checked and selected states</string>
+     </property>
+     <property name="suffix">
+      <string> minutes</string>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>120</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>20</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
     <widget class="QSpinBox" name="videospinbox">
      <property name="readOnly">
       <bool>false</bool>
@@ -165,7 +136,68 @@
       <number>100</number>
      </property>
      <property name="singleStep">
-      <number>10</number>
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <widget class="QSpinBox" name="thumbnailspinbox">
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+     <property name="correctionMode">
+      <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+     </property>
+     <property name="showGroupSeparator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="suffix">
+      <string> pixels</string>
+     </property>
+     <property name="minimum">
+      <number>64</number>
+     </property>
+     <property name="maximum">
+      <number>384</number>
+     </property>
+     <property name="singleStep">
+      <number>64</number>
+     </property>
+     <property name="value">
+      <number>128</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="4">
+    <widget class="QLabel" name="videolabel">
+     <property name="text">
+      <string>Generate Video Thumbnail Every:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="3">
+    <widget class="QLabel" name="autosavelabel">
+     <property name="toolTip">
+      <string>When Saving, removes tmpfiles, stores checked and selected states</string>
+     </property>
+     <property name="text">
+      <string>Set AutoSave Interval:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="thumbnaillabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>IMG/VID Thumbnail Size:</string>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
      </property>
     </widget>
    </item>

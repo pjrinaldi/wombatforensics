@@ -807,8 +807,10 @@ void WombatForensics::ReadSettings()
             ba.append(tmplist.at(i).split(":").at(1));
             reportpath = QByteArray::fromBase64(ba);
         }
-        if(tmplist.at(i).split(":").at(0) == "video")
+        else if(tmplist.at(i).split(":").at(0) == "video")
             vidcount = tmplist.at(i).split(":").at(1).toInt();
+        else if(tmplist.at(i).split(":").at(0) == "autosave")
+            autosave = tmplist.at(i).split(":").at(1).toInt();
         //else if(tmplist.at(i).split(":").at(0) == "save")
         // etc...
     }
@@ -950,8 +952,7 @@ void WombatForensics::InitializeCaseStructure()
         //LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
-        autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
-        autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
+        autosavetimer->start(autosave); // 10 minutes in milliseconds for a general setting for real.
     }
 }
 
@@ -1045,8 +1046,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     ui->actionBookmark_Manager->setEnabled(true);
     ui->actionpreviewreport->setEnabled(true);
     ui->actionpublishresults->setEnabled(true);
-    autosavetimer->start(10000); // 10 seconds in milliseconds for testing purposes
-    autosavetimer->start(600000); // 10 minutes in milliseconds for a general setting for real.
+    autosavetimer->start(autosave); // 10 minutes in milliseconds for a general setting for real.
     UpdateEvidenceList();
     if(existingevidence.count() > 0)
     {

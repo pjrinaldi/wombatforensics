@@ -26,6 +26,7 @@ qint64 carvedcount = 1;
 int ecount = 0;
 int thumbsize = 320; // thumbnail size settings variable
 int vidcount = 10;
+int autosave = 10;
 int mftrecordsize = 1024;
 int hashsum = 1;
 int idcol = 0;
