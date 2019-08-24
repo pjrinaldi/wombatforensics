@@ -1920,6 +1920,8 @@ void WombatForensics::CloseCurrentCase()
         }
         */
     }
+    existingevidence.clear();
+    newevidence.clear();
     // BEGIN TAR METHOD
     //qDebug() << "close tmpmntpath:" << wombatvariable.tmpmntpath;
     QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
