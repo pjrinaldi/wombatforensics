@@ -355,9 +355,9 @@ public:
 #endif // QT_CONFIG(shortcut)
         actionAbout->setText(QCoreApplication::translate("WombatForensics", "About", nullptr));
         actionView_File->setText(QCoreApplication::translate("WombatForensics", "View File Hex", nullptr));
-        actionView_Image_Gallery->setText(QCoreApplication::translate("WombatForensics", "View Image Gallery", nullptr));
+        actionView_Image_Gallery->setText(QCoreApplication::translate("WombatForensics", "View IMG/VID Thumbnails", nullptr));
 #if QT_CONFIG(tooltip)
-        actionView_Image_Gallery->setToolTip(QCoreApplication::translate("WombatForensics", "View Image Gallery", nullptr));
+        actionView_Image_Gallery->setToolTip(QCoreApplication::translate("WombatForensics", "View Image and Video Thumbnails", nullptr));
 #endif // QT_CONFIG(tooltip)
         actionViewerManager->setText(QCoreApplication::translate("WombatForensics", "Viewer Manager", nullptr));
         actionCopy_Selection_To->setText(QCoreApplication::translate("WombatForensics", "Copy Selection To", nullptr));
